@@ -38,12 +38,12 @@ i.e. each point $\hat{\mathbf x}\in\hat S$ induces a point ${\mathbf
 G_S\dealcoloneq (D \mathbf{x}_S)^T \ D \mathbf{x}_S
 @f]
 denotes the corresponding first fundamental form, where $D
-\mathbf{x}_S=\left(\frac{\partial x_{S,i}(\hat{\mathbf x})}{\partial \hat x_j}\right)_{ij}$ is the 
+\mathbf{x}_S=\left(\frac{\partial x_{S,i}(\hat{\mathbf x})}{\partial \hat x_j}\right)_{ij}$ is the
 derivative (Jacobian) of the mapping.
 In the following, $S$ will be either the entire surface $\Gamma$ or,
 more convenient for the finite element method, any face $S \in
 {\mathbb T}$, where ${\mathbb T}$ is a partition (triangulation) of $\Gamma$
-constituted of quadrilaterals. 
+constituted of quadrilaterals.
 We are now in position to define the tangential gradient of a function $v : S \rightarrow \mathbb
 R$ by
 @f[
@@ -56,7 +56,7 @@ Note that an alternate way to compute the surface gradient on smooth surfaces $\
 \nabla_S v = \nabla \tilde v - \mathbf n (\mathbf n \cdot \nabla \tilde v),
 @f]
 where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\Gamma$ and
-$\mathbf n$ is the normal of $\Gamma$. 
+$\mathbf n$ is the normal of $\Gamma$.
 Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
 @f[
 \Delta_S v = \Delta \tilde v - \mathbf n^T \ D^2 \tilde v \ \mathbf n - (\mathbf n \cdot \nabla \tilde v) (\nabla \cdot \mathbf n - \mathbf n^T \ D \mathbf n \ \mathbf n ).
@@ -79,13 +79,13 @@ Moreover, each integral in the above expression is computed in the reference
 element $\hat K \dealcoloneq [0,1]^2$
 so that
 @f{align*}
-\int_{K} \nabla_{K} u \cdot \nabla_{K} v 
-&= 
+\int_{K} \nabla_{K} u \cdot \nabla_{K} v
+&=
 \int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
   x_K)^T D \mathbf x_K G_K^{-1} \nabla (v \circ \mathbf x_K) \sqrt{\det
     (G_K)}
 \\
-&= 
+&=
 \int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} \nabla (v \circ \mathbf x_K) \sqrt{\det
     (G_K)}
 @f}
@@ -126,7 +126,7 @@ return
 This provides exactly the terms we need for our computations.
 
 On a more general note, details for the finite element approximation on
-surfaces can be found for instance in 
+surfaces can be found for instance in
 [Dziuk, in Partial differential equations and calculus of
 variations 1357, Lecture Notes in Math., 1988],
 [Demlow, SIAM J. Numer. Anal.  47(2), 2009]
@@ -155,12 +155,12 @@ We produce one test case for a 2d problem and another one for 3d:
   is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
     -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D^2 u \ \mathbf n - (\mathbf n \cdot \nabla u)\ \kappa,
-  @f]	
+  @f]
   where $\kappa$ is the total curvature of $\Gamma$.
   Since we are on the unit circle, $\mathbf n=\mathbf x$ and $\kappa = 1$ so that
   @f[
     -\Delta_\Gamma u = -8 x_1x_2.
-  @f]	
+  @f]
 
   A somewhat simpler way, at least for the current case of a curve in
   two-dimensional space, is to note that we can map the interval $t \in
@@ -172,7 +172,7 @@ We produce one test case for a 2d problem and another one for 3d:
   segment of length $dt$ is mapped onto a piece of curve of exactly the same
   length, the tangential Laplacian then satisfies
   @f{align*}
-    \Delta_\Gamma u 
+    \Delta_\Gamma u
     &= \frac{d^2}{dt^2}(-2\cos t \sin t)
     = -2 \frac{d}{dt}(-\sin^2 t + \cos^2 t)
     = -2 (-2 \sin t \cos t - 2 \cos t \sin t)
@@ -191,13 +191,13 @@ We produce one test case for a 2d problem and another one for 3d:
   awkward and lengthy expression. You can find the full expression in the
   source code.
 </li>
-</ul> 
+</ul>
 
 In the program, we will also compute the $H^1$ seminorm error of the
 solution. Since the solution function and its numerical approximation are only
 defined on the manifold, the obvious definition of this error functional is
-$| e |_{H^1(\Gamma)} 
-  = | \nabla_\Gamma e |_{L_2(\Gamma)} 
+$| e |_{H^1(\Gamma)}
+  = | \nabla_\Gamma e |_{L_2(\Gamma)}
   = \left( \int_\Gamma | \nabla_\Gamma (u-u_h) |^2 \right)^{1/2}$. This requires us to provide the
 <i>tangential</i> gradient $\nabla_\Gamma u$ to the function VectorTools::integrate_difference
 (first introduced in step-7), which we
