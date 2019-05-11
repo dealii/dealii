@@ -2157,6 +2157,8 @@ namespace Step44
         const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
         const double d2Psi_vol_dJ2        = lqph[q_point]->get_d2Psi_vol_dJ2();
         const double det_F                = lqph[q_point]->get_det_F();
+        const SymmetricTensor<2, dim> &I =
+          Physics::Elasticity::StandardTensors<dim>::I;
 
         // Next we define some aliases to make the assembly process easier to
         // follow
@@ -2185,11 +2187,12 @@ namespace Step44
                 // the local matrix diagonals:
                 if ((i_group == j_group) && (i_group == u_dof))
                   {
-                    data.cell_matrix(i, j) += symm_grad_Nx[i] *
-                                              Jc // The material contribution:
-                                              * symm_grad_Nx[j] * JxW;
-                    if (component_i ==
-                        component_j) // geometrical stress contribution
+                    // The material contribution:
+                    data.cell_matrix(i, j) += symm_grad_Nx[i] * Jc * //
+                                              symm_grad_Nx[j] * JxW; //
+
+                    // The geometrical stress contribution:
+                    if (component_i == component_j)
                       data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau *
                                                 grad_Nx[j][component_j] * JxW;
                   }
@@ -2197,11 +2200,8 @@ namespace Step44
                 // contribution
                 else if ((i_group == p_dof) && (j_group == u_dof))
                   {
-                    data.cell_matrix(i, j) +=
-                      N[i] * det_F *
-                      (symm_grad_Nx[j] *
-                       Physics::Elasticity::StandardTensors<dim>::I) *
-                      JxW;
+                    data.cell_matrix(i, j) += N[i] * det_F *               //
+                                              (symm_grad_Nx[j] * I) * JxW; //
                   }
                 // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J}
                 // \widetilde{p}}$ and $\mathsf{\mathbf{k}}_{ \widetilde{J}
