@@ -45,6 +45,19 @@ namespace Differentiation
       , registered_marked_independent_variables(n_independent_variables, false)
       , registered_marked_dependent_variables(n_dependent_variables, false)
     {
+      // We have enabled the compilation of this class for arithmetic
+      // types (i.e. ADNumberTypeCode == NumberTypes::none), but we
+      // can't actually do anything with them. Lets not advance any further
+      // and seemingly allow any operations that will not give any
+      // sensible results.
+      Assert(ADNumberTypeCode != NumberTypes::none,
+             ExcMessage(
+               "Floating point/arithmetic numbers have no derivatives."));
+      Assert(
+        AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 1,
+        ExcMessage(
+          "The AD number type does not support the calculation of any derivatives."));
+
       // Tapeless mode must be configured before any active live
       // variables are created.
       if (AD::is_tapeless_ad_number<ad_type>::value)
@@ -459,6 +472,7 @@ namespace Differentiation
             // duration of the simulation, we create a global live variable
             // that doesn't go out of scope.
             static ad_type num = 0.0;
+            (void)num;
           }
     }
 
@@ -1877,6 +1891,8 @@ namespace Differentiation
 
 
 /* --- Explicit instantiations --- */
+#  include "ad_helpers.inst"
+
 #  ifdef DEAL_II_WITH_ADOLC
 #    include "ad_helpers.inst1"
 #  endif

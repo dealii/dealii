@@ -1,0 +1,65 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+// TODO: Include complex types
+
+for (number : REAL_SCALARS)
+  {
+    namespace Differentiation
+    \{
+      namespace AD
+      \{
+
+        // -------------------------- TapedDrivers ----------------------
+
+        template struct TapedDrivers<typename Differentiation::AD::NumberTraits<
+                                       number,
+                                       NumberTypes::none>::ad_type,
+                                     number>;
+
+        // -------------------------- TapelessDrivers ----------------------
+
+        template struct TapelessDrivers<
+          typename Differentiation::AD::
+            NumberTraits<number, NumberTypes::none>::ad_type,
+          number>;
+
+      \}
+    \}
+  }
+
+// Instantiations for ADHelpers for which the underlying number type is fixed
+for ()
+  {
+    namespace Differentiation
+    \{
+      namespace AD
+      \{
+
+        // -------------------------- Types ----------------------
+
+        template struct Types<typename Differentiation::AD::NumberTraits<
+          double,
+          NumberTypes::none>::ad_type>;
+
+        // -------------------------- Numbers ----------------------
+
+        template struct Numbers<typename Differentiation::AD::NumberTraits<
+          double,
+          NumberTypes::none>::ad_type>;
+
+      \}
+    \}
+  }

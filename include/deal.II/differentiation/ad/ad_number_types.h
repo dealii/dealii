@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2017, 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,22 @@ namespace Differentiation
      * is to be used for computations. If a type that is selected for use
      * is not available in the library, a run-time error will be thrown.
      *
-     * @author Jean-Paul Pelteret, 2017
+     * @author Jean-Paul Pelteret, 2017, 2019
      */
     enum class NumberTypes
     {
+      /**
+       * A dummy type for floating point numbers (i.e., non-differentiable
+       * scalar types).
+       *
+       * This option exists to facilitate the use of template meta-programming
+       * techniques to select, based on this enumeration, which
+       * auto-differentiable number type will be used to perform calculations.
+       * It will not permit any computations because the underlying number types
+       * resulting from its selection are floating point types, rather than
+       * auto-differentiable numbers.
+       */
+      none,
       /**
        * Taped forward and reverse-mode ADOL-C number type (n-differentiable).
        *
