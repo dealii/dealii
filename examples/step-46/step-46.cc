@@ -280,20 +280,14 @@ namespace Step46
   {
     GridGenerator::subdivided_hyper_cube(triangulation, 8, -1, 1);
 
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary() &&
             (cell->face(f)->center()[dim - 1] == 1))
           cell->face(f)->set_all_boundary_ids(1);
 
 
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (((std::fabs(cell->center()[0]) < 0.25) &&
            (cell->center()[dim - 1] > 0.5)) ||
           ((std::fabs(cell->center()[0]) >= 0.25) &&
@@ -317,10 +311,7 @@ namespace Step46
   template <int dim>
   void FluidStructureProblem<dim>::set_active_fe_indices()
   {
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         if (cell_is_in_fluid_domain(cell))
           cell->set_active_fe_index(0);
@@ -375,10 +366,7 @@ namespace Step46
     {
       std::vector<types::global_dof_index> local_face_dof_indices(
         stokes_fe.dofs_per_face);
-      for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
-           cell != dof_handler.end();
-           ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell_is_in_fluid_domain(cell))
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             if (!cell->at_boundary(f))
@@ -544,10 +532,7 @@ namespace Step46
     // initialization of the hp::FEValues object for the current cell and the
     // extraction of a FEValues object that is appropriate for the current
     // cell:
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         hp_fe_values.reinit(cell);
 
@@ -963,10 +948,7 @@ namespace Step46
     // more. The structure of these nested conditions is much the same as we
     // encountered when assembling interface terms in
     // <code>assemble_system</code>.
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell_is_in_solid_domain(cell))
           {
