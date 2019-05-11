@@ -142,12 +142,25 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
     }
 }
 
+
+
+template <int spacedim, typename Number>
+std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+BoundingBox<spacedim, Number>::get_boundary_points()
+{
+  return this->boundary_points;
+}
+
+
+
 template <int spacedim, typename Number>
 const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
 BoundingBox<spacedim, Number>::get_boundary_points() const
 {
   return this->boundary_points;
 }
+
+
 
 template <int spacedim, typename Number>
 double

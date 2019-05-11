@@ -1430,6 +1430,11 @@ public:
 
   /**
    * Return the smallest bounding box that encloses the object.
+   *
+   * Notice that this method is not aware of any mapping you may be using to
+   * do your computations. If you are using a mapping object that modifies the
+   * position of the vertices, like MappingQEulerian, or MappingFEField, then
+   * you should call the function Mapping::get_bounding_box() instead.
    */
   BoundingBox<spacedim>
   bounding_box() const;

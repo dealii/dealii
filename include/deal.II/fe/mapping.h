@@ -366,6 +366,29 @@ public:
              const bool map_center_of_reference_cell = true) const;
 
   /**
+   * Return the bounding box of a mapped cell.
+   *
+   * If you are using a (bi-,tri-)linear mapping that preserves vertex
+   * locations, this function simply returns the value also produced by
+   * `cell->bounding_box()`. However, there are also mappings that add
+   * displacements or choose completely different locations, e.g.,
+   * MappingQEulerian, MappingQ1Eulerian, or MappingFEField.
+   *
+   * This function returns the bounding box containing all the vertices of the
+   * cell, as returned by the get_vertices() method. Beware of the fact that
+   * for higher order mappings this bounding box is only an approximation of the
+   * true bounding box, since it does not take into account curved faces, and it
+   * may be smaller than the true bounding box.
+   *
+   * @param[in] cell The cell for which you want to compute the bounding box
+   *
+   * @author Luca Heltai, 2019.
+   */
+  virtual BoundingBox<spacedim>
+  get_bounding_box(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
+
+  /**
    * Return whether the mapping preserves vertex locations. In other words,
    * this function returns whether the mapped location of the reference cell
    * vertices (given by GeometryInfo::unit_cell_vertex()) equals the result of

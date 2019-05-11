@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/boost_adaptors/bounding_box.h>
+
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria.h>
@@ -57,6 +59,19 @@ Mapping<dim, spacedim>::get_center(
         center += v;
       return center / GeometryInfo<dim>::vertices_per_cell;
     }
+}
+
+
+
+template <int dim, int spacedim>
+BoundingBox<spacedim>
+Mapping<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  if (preserves_vertex_locations())
+    return cell->bounding_box();
+  else
+    return BoundingBox<spacedim>(get_vertices(cell));
 }
 
 
