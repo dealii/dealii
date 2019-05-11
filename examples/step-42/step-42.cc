@@ -938,10 +938,7 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        Triangulation<3>::active_cell_iterator cell =
-                                                 triangulation.begin_active(),
-                                               endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (unsigned int face_no = 0;
                face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
@@ -1151,11 +1148,7 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
@@ -1246,11 +1239,7 @@ namespace Step42
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
@@ -1954,10 +1943,7 @@ namespace Step42
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           if (vertex_touched[cell->vertex_index(v)] == false)
@@ -2142,10 +2128,7 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
