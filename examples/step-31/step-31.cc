@@ -1294,9 +1294,9 @@ namespace Step31
     // the update flags, zeroing out the local arrays and getting the values
     // of the old solution at the quadrature points. Then we are ready to loop
     // over the quadrature points on the cell.
-    auto cell             = stokes_dof_handler.begin_active(),
-         endc             = stokes_dof_handler.end();
-    auto temperature_cell = temperature_dof_handler.begin_active();
+    auto       cell             = stokes_dof_handler.begin_active();
+    const auto endc             = stokes_dof_handler.end();
+    auto       temperature_cell = temperature_dof_handler.begin_active();
 
     for (; cell != endc; ++cell, ++temperature_cell)
       {
@@ -1573,9 +1573,9 @@ namespace Step31
     // Stokes part we restrict ourselves to extracting the velocity part (and
     // ignoring the pressure part) by using
     // <code>stokes_fe_values[velocities].get_function_values</code>.
-    auto cell        = temperature_dof_handler.begin_active(),
-         endc        = temperature_dof_handler.end();
-    auto stokes_cell = stokes_dof_handler.begin_active();
+    auto       cell        = temperature_dof_handler.begin_active();
+    const auto endc        = temperature_dof_handler.end();
+    auto       stokes_cell = stokes_dof_handler.begin_active();
 
     for (; cell != endc; ++cell, ++stokes_cell)
       {
