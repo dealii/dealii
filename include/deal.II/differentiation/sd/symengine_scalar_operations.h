@@ -120,7 +120,7 @@ namespace Differentiation
     /**
      * Return the symbolic result of computing the partial derivative of the
      * scalar @p f with respect to the scalar @p x.
-     * In most use cases the function or variable @f would be called the
+     * In most use cases the function or variable @p f would be called the
      * dependent variable, and @p x the independent variable.
      *
      * @param[in] f A scalar symbolic function or (dependent) expression.
@@ -977,7 +977,7 @@ namespace Differentiation
      * expression, and that the paired @p symbol_value elements are compatible
      * with the other add_to_substitution_map() functions.
      *
-     * The @p ExpressionType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @p ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *
@@ -1025,7 +1025,7 @@ namespace Differentiation
      * symbolic expressions, and that the paired @p symbol_value elements are
      * compatible with the other add_to_substitution_map() functions.
      *
-     * The @p ExpressionType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @p ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *

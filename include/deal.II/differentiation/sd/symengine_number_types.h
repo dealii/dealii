@@ -747,7 +747,7 @@ namespace Differentiation
        * type. This could be achieved with an overriding conversion function
        * in the base class, for example:
        *
-       * <code>
+       * @code
        *   class MyNumber : public Expression
        *   {
        *     ...
@@ -766,7 +766,7 @@ namespace Differentiation
        *         return Expression::operator ResultType();
        *     }
        *   }
-       * </code>
+       * @endcode
        */
       template <typename ResultType>
       explicit operator ResultType() const;

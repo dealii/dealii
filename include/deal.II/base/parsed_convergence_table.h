@@ -294,7 +294,7 @@ public:
     const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
-   * Add an additional column (with name @p name) to the table, by invoking
+   * Add an additional column (with name @p column_name) to the table, by invoking
    * the function @p custom_function, when calling error_from_exact() or
    * difference().
    *
@@ -349,7 +349,7 @@ public:
    * @endcode
    *
    *
-   * @param name Name of the column to add;
+   * @param column_name Name of the column to add;
    * @param custom_function Function that will be called to fill the given
    * entry. You need to make sure that the scope of this function is valid
    * up to the call to error_from_exact() or difference();

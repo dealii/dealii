@@ -715,7 +715,7 @@ namespace Step59
   // matrices from a product of 1D mass and Laplace matrices. Our first task
   // is to compute the 1D matrices, which we do by first creating a 1D finite
   // element. Instead of anticipating FE_DGQHermite<1> here, we get the finite
-  // element's name from DoFHandler, replace the <dim> argument (2 or 3) by 1
+  // element's name from DoFHandler, replace the @p dim argument (2 or 3) by 1
   // to create a 1D name, and construct the 1D element by using FETools.
 
   template <int dim, int fe_degree, typename number>

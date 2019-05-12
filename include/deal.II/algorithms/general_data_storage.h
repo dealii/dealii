@@ -87,7 +87,7 @@ public:
    * Print the contents of the internal cache to the @p stream.
    *
    * Each key and value pair in the @p any_data map are printed on an
-   * individual line, with the <tt>std::string<\tt> key listed first
+   * individual line, with the <tt>std::string</tt> key listed first
    * followed by the demangled <tt>type_id</tt> of the associated mapped
    * type.
    */

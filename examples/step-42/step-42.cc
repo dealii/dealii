@@ -401,8 +401,7 @@ namespace Step42
         values(c) = SphereObstacle<dim>::value(p, c);
     }
 
-    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code>
-    // classes}
+    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code> classes}
 
     // The following two classes describe the obstacle outlined in the
     // introduction, i.e., the Chinese character. The first of the two,
