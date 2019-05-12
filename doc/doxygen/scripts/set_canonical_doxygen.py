@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 ## ---------------------------------------------------------------------
 ##
 ## Copyright (C) 2019 by the deal.II authors
@@ -22,26 +22,37 @@
 # the deal.ii repository you can use the script
 # contrib/utilities/set_canonical_webpages.py
 
-import glob
+import os
 
-filenames = glob.iglob('**/*html', recursive=True)
+LINK_START = ('<link rel="canonical" href="https://www.dealii.org/current'
+              + '/doxygen/')
 
-for filename in filenames:
-    file = open(filename, 'r')
+def filename_generator():
+    for root, _, file_names in os.walk("./"):
+        for file_name in file_names:
+            if file_name.endswith(".html"):
+                if root == "./":
+                    yield root + file_name
+                else:
+                    yield root + "/" + file_name
+
+for filename in filename_generator():
+    # there is no relevant content in the header
+    if filename == "./header.html":
+        pass
     new_text_data = str()
-    if '<link rel="canonical"' not in file.read():
-        file.seek(0)
-        for line in file.readlines():
-            # Do not add the canonical link twice
-            canonical_link_added = False
-            new_text_data += line
-            if (not canonical_link_added) and ('<head>' in line):
-                new_text_data += ('<link rel="canonical" href="https://www.dealii.org/current/doxygen/deal.II/'
-                                  + filename + '" />' + '\n')
-                canonical_link_added = True
-        file.close()
-
+    with open(filename, 'r') as file_handle:
+        if '<link rel="canonical"' not in file_handle.read():
+            file_handle.seek(0)
+            for line in file_handle.readlines():
+                # Do not add the canonical link twice
+                canonical_link_added = False
+                new_text_data += line
+                if not canonical_link_added and '<head>' in line:
+                    assert filename[:2] == "./"
+                    new_text_data += LINK_START + filename[2:] + '" />\n'
+                    canonical_link_added = True
+    if new_text_data:
         # Truncate the file and write the new text
-        file = open(filename, 'w+')
-        file.write(new_text_data)
-        file.close()
+        with open(filename, 'w+') as file_handle:
+            file_handle.write(new_text_data)
