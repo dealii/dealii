@@ -271,7 +271,7 @@ Triangulation<3> triangulation;
 create_3d_grid(triangulation);
 triangulation.set_manifold(cylinder_id, cylinder);
 
-for (auto & cell : triangulation.active_cell_iterators())
+for (auto &cell : triangulation.active_cell_iterators())
   if (cell->center()[1] >= 3.0)
     cell->set_all_manifold_ids(cylinder_id);
 
@@ -300,11 +300,11 @@ Triangulation<3> triangulation;
 create_3d_grid(triangulation);
 triangulation.set_manifold(cylinder_id, cylinder);
 
-for (auto & cell : triangulation.active_cell_iterators())
+for (auto &cell : triangulation.active_cell_iterators())
   if (cell->center()[1] >= 3.0)
     cell->set_all_manifold_ids(cylinder_id);
 
-for (auto & cell : triangulation.active_cell_iterators())
+for (auto &cell : triangulation.active_cell_iterators())
   for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
        ++face_n)
     {
