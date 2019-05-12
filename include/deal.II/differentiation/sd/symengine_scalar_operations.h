@@ -1196,7 +1196,8 @@ namespace Differentiation
      * rendered by a single substitition of the returned dependency-resolved
      * map.
      *
-     * Example: If <tt>map["a"] -> 1</tt> and
+     * Example:
+     * If <tt>map["a"] -> 1</tt> and
      * <tt>map["b"] -> "a"+ 2</tt>, then then the function $f(a,b(a)) = a+b$
      * will be evaluated and the result $f\vert_{a=1,b=a+2} = 3+a$ is determined
      * upon the completion of the first sweep. A second sweep is therefore
@@ -1261,32 +1262,33 @@ namespace Differentiation
      *
      * @note This function call is typically expensive, as by default it performs a
      * dictionary substitution for the symbols in the symbolic expression.
-     * Should the numerical values of some symbolic expression be derired, then
+     * Should the numerical value of some symbolic expression be desired, then
      * this performance deficit may be mitigated through the use of the
      * BatchOptimizer class.
      * Situation dependent, the overhead of using a typical dictionary based
-     * substitution may be on par with that of the a substitution performed
+     * substitution may be on par with that of a substitution performed
      * using a BatchOptimizer. This is because there is an overhead to setting
      * up the optimizer, so this should be taken into consideration if
      * substitution is to occur for the given symbolic
      * expression only a few times.
      *
      * @note If the symbols stored in the map are explicitly dependent on one another,
-     * then the returned result depends on order in which the map is traversed.
-     * It is recommended to first resolve all inter-dependencies in the map
-     * using the resolve_explicit_dependencies() function.
+     * then the returned result depends on the order in which the map is
+     * traversed. It is recommended to first resolve all interdependencies in
+     * the map using the resolve_explicit_dependencies() function.
+     *
      * Examples:
-     *   1. If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a"+ 2</tt> then
-     *     then the function $f(a,b(a)) = a+b$ will be evaluated and the result
+     *   1. If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a" + 2</tt>,
+     *     then the function $f(a,b(a)) := a+b$ will be evaluated and the result
      *     $f\vert_{a=1,b=a+2} = 3+a$ is returned. This return is because the
      *     symbol "a" is substituted throughout the function first, and only
-     * then is the symbol "b(a)" substituted, by which time its explicit
-     * dependency on "a" cannot be resolved.
-     *  2. If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt> then
-     *     then the function $f(a(b),a) = a+b$ will be evaluated and the result
+     *     then is the symbol "b(a)" substituted, by which time its explicit
+     *     dependency on "a" cannot be resolved.
+     *  2. If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt>,
+     *     then the function $f(a(b),b): = a+b$ will be evaluated and the result
      *     $f\vert_{a=b+2, b} = [b+2+b]_{b=1} = 4$ is returned. This is because
-     * the explicitly dependent symbol "a(b)" is substituted first followed by
-     * the symbol "b".
+     *     the explicitly dependent symbol "a(b)" is substituted first followed
+     *     by the symbol "b".
      */
     Expression
     substitute(const Expression &             expression,
@@ -1294,7 +1296,7 @@ namespace Differentiation
 
     /**
      * Perform a substitution of the @p symbol into the given
-     * @p expression, with the result that all matches are assigned
+     * @p expression. All matches are assigned
      * the corresponding @p value.
      * This substitution function may be used to give a set of symbolic
      * variables either a numeric interpretation or some symbolic definition.
@@ -1385,7 +1387,7 @@ namespace Differentiation
      * of the @p substitution_map are substituted with the map entry's associated
      * value.
      * This substitution function is used to give a set of symbolic variables
-     * a numeric interpretation, with the returned result being of the type
+     * a numeric interpretation with the returned result being of the type
      * specified by the @p ValueType template argument.
      *
      * For more information regarding the performance of symbolic substitution,
