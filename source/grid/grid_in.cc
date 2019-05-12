@@ -1478,11 +1478,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              int physical_tag;
+              // if there is no physical tag, use 0 as default
+              int physical_tag = 0;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
-              // if there is no physical tag, use 0 as default
-              tag_maps[0][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              tag_maps[0][tag] = physical_tag;
             }
           for (unsigned int i = 0; i < n_curves; ++i)
             {
@@ -1498,11 +1498,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              int physical_tag;
+              // if there is no physical tag, use 0 as default
+              int physical_tag = 0;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
-              // if there is no physical tag, use 0 as default
-              tag_maps[1][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              tag_maps[1][tag] = physical_tag;
               // we don't care about the points associated to a curve, but have
               // to parse them anyway because their format is unstructured
               in >> n_points;
@@ -1524,11 +1524,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              int physical_tag;
+              // if there is no physical tag, use 0 as default
+              int physical_tag = 0;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
-              // if there is no physical tag, use 0 as default
-              tag_maps[2][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              tag_maps[2][tag] = physical_tag;
               // we don't care about the curves associated to a surface, but
               // have to parse them anyway because their format is unstructured
               in >> n_curves;
@@ -1549,11 +1549,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              int physical_tag;
+              // if there is no physical tag, use 0 as default
+              int physical_tag = 0;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
-              // if there is no physical tag, use 0 as default
-              tag_maps[3][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              tag_maps[3][tag] = physical_tag;
               // we don't care about the surfaces associated to a volume, but
               // have to parse them anyway because their format is unstructured
               in >> n_surfaces;
