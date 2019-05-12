@@ -316,9 +316,6 @@ namespace Step42
 
       virtual double value(const Point<dim> & p,
                            const unsigned int component = 0) const override;
-
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
     };
 
 
@@ -335,13 +332,6 @@ namespace Step42
       return 0.;
     }
 
-    template <int dim>
-    void BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                           Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = BoundaryValues<dim>::value(p, c);
-    }
 
 
     // @sect4{The <code>SphereObstacle</code> class}
@@ -471,7 +461,7 @@ namespace Step42
 
       AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
 
-      for (int k = 0; k < nx * ny; k++)
+      for (int k = 0; k < nx * ny; ++k)
         {
           double val;
           f >> val;
@@ -948,10 +938,7 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        Triangulation<3>::active_cell_iterator cell =
-                                                 triangulation.begin_active(),
-                                               endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (unsigned int face_no = 0;
                face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
@@ -1058,7 +1045,7 @@ namespace Step42
 
       const unsigned int start = (newton_rhs.local_range().first),
                          end   = (newton_rhs.local_range().second);
-      for (unsigned int j = start; j < end; j++)
+      for (unsigned int j = start; j < end; ++j)
         diag_mass_matrix_vector(j) = mass_matrix.diag_element(j);
       diag_mass_matrix_vector.compress(VectorOperation::insert);
 
@@ -1161,11 +1148,7 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
@@ -1185,7 +1168,7 @@ namespace Step42
 
               cell->get_dof_indices(local_dof_indices);
 
-              for (unsigned int i = 0; i < dofs_per_cell; i++)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 mass_matrix.add(local_dof_indices[i],
                                 local_dof_indices[i],
                                 cell_matrix(i, i));
@@ -1256,11 +1239,7 @@ namespace Step42
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
@@ -1824,7 +1803,7 @@ namespace Step42
           }
         else
           {
-            for (unsigned int i = 0; i < 5; i++)
+            for (unsigned int i = 0; i < 5; ++i)
               {
                 distributed_solution = solution;
 
@@ -1964,10 +1943,7 @@ namespace Step42
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           if (vertex_touched[cell->vertex_index(v)] == false)
@@ -2152,10 +2128,7 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
