@@ -400,7 +400,7 @@ Unfortunately, $\mathbf{K} \mathbf{v}_j$ may not be in the $RT$ space
 (unless, of course, if $\mathbf K$ is constant times the identity matrix). 
 So, in order to represent it in a finite element program, we need to
 project it back into a finite dimensional space we can work with. Here,
-we we will use the $L_2$-projection to project it back to the (broken) $RT$
+we will use the $L_2$-projection to project it back to the (broken) $RT$
 space. 
 
 We define the projection as 

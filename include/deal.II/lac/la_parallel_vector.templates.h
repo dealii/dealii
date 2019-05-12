@@ -921,7 +921,7 @@ namespace LinearAlgebra
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // Move the data to the host and then move it back to the
-      // the device. We use values to store the elements because the function
+      // device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
       Number *new_val;
@@ -1081,7 +1081,7 @@ namespace LinearAlgebra
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // Move the data to the host and then move it back to the
-      // the device. We use values to store the elements because the function
+      // device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
       Number *new_val;

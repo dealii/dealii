@@ -278,7 +278,8 @@ namespace Differentiation
      * tensor @p T with respect to the rank-0 tensor @p x.
      *
      * @param[in] T A tensor of symbolic functions or (dependent) expressions.
-     * @param[in] x A rank-0 tensor symbolic symbolic (independent) variable.
+     * @param[in] x A rank-0 tensor containing a symbolic (independent)
+     *            variable.
      * @return The tensor of symbolic functions or expressions representing
      *         the result $\frac{\partial \mathbf{T}}{\partial x}$.
      */
@@ -293,7 +294,8 @@ namespace Differentiation
      *
      * @param[in] S A symmetric tensor of symbolic functions or (dependent)
      *            expressions.
-     * @param[in] x A rank-0 tensor symbolic symbolic (independent) variable.
+     * @param[in] x A rank-0 tensor containing a symbolic (independent)
+     *            variable.
      * @return The symmetric tensor of symbolic functions or expressions representing
      *         the result $\frac{\partial \mathbf{S}}{\partial x}$.
      */
@@ -307,7 +309,7 @@ namespace Differentiation
      * tensor @p T1 with respect to the tensor @p T2.
      *
      * @param[in] T1 A tensor of symbolic functions or (dependent) expressions.
-     * @param[in] T2 A tensor symbolic symbolic (independent) variables.
+     * @param[in] T2 A tensor of symbolic (independent) variables.
      * @return The tensor of symbolic functions or variables representing
      *         the result $\frac{\partial \mathbf{T}_{1}}{\partial
      * \mathbf{T}_{2}}$.
@@ -323,7 +325,7 @@ namespace Differentiation
      *
      * @param[in] S1 A symmetric tensor of symbolic functions or (dependent)
      *            expressions.
-     * @param[in] S2 A symmetric tensor symbolic symbolic (independent)
+     * @param[in] S2 A symmetric tensor of symbolic (independent)
      *            variables.
      * @return The symmetric tensor of symbolic functions or variables representing
      *         the result $\frac{\partial \mathbf{S}_{1}}{\partial
@@ -339,7 +341,7 @@ namespace Differentiation
      * tensor @p T with respect to the symmetric tensor @p S.
      *
      * @param[in] T A tensor of symbolic functions or (dependent) expressions.
-     * @param[in] S A symmetric tensor symbolic symbolic (independent)
+     * @param[in] S A symmetric tensor of symbolic (independent)
      *            variables.
      * @return The tensor of symbolic functions or variables representing
      *         the result $\frac{\partial \mathbf{T}}{\partial \mathbf{S}}$.
@@ -355,7 +357,7 @@ namespace Differentiation
      *
      * @param[in] S A symmetric tensor of symbolic functions or (dependent)
      *            expressions.
-     * @param[in] T A tensor symbolic symbolic (independent) variables.
+     * @param[in] T A tensor of symbolic (independent) variables.
      * @return The tensor of symbolic functions or variables representing
      *         the result $\frac{\partial \mathbf{S}}{\partial \mathbf{T}}$.
      */

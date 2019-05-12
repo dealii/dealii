@@ -237,7 +237,7 @@ namespace Differentiation
      *
      * This function is guaranteed to create an ordering that is identical
      * to the typical add_to_substitution_map() call that is used when
-     * constructing a map to to perform symbol substitution.
+     * constructing a map to perform symbol substitution.
      * It exists primarily to create an initial map that can be used in the
      * optimize() call to a BatchOptimizer, specifically if the values that
      * are to be substituted into the map are not known at the time that the

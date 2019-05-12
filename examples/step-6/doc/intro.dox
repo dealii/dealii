@@ -261,7 +261,7 @@ The steps you need to make this work are essentially like this:
 - You then solve the linear system as usual, but at the end of this
   step, you need to make sure that the degrees of "freedom" located
   on hanging nodes get their correct (constrained) value so that the
-  solution you then visualize or evaluate in other ways in in
+  solution you then visualize or evaluate in other ways is in
   fact continuous. This is done by calling
   AffineConstraints::distribute() immediately after solving.
 

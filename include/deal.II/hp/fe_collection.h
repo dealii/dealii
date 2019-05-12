@@ -388,7 +388,7 @@ namespace hp
      * and therefore this function will return their indices in the
      * FECollection, namely `{2,3}`.
      *
-     * The @p codim parameter describes the codimension of of the investigated
+     * The @p codim parameter describes the codimension of the investigated
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
@@ -424,7 +424,7 @@ namespace hp
      * then one could return zero or one.  In that case, the function returns
      * either `0` or `1` since there is no tie-breaker between the two.
      *
-     * The @p codim parameter describes the codimension of of the investigated
+     * The @p codim parameter describes the codimension of the investigated
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
@@ -460,7 +460,7 @@ namespace hp
      * indices, then one could return two or three.  In that case, the function
      * returns either `2` or `3` since there is no tie-breaker between the two.
      *
-     * The @p codim parameter describes the codimension of of the investigated
+     * The @p codim parameter describes the codimension of the investigated
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
@@ -487,7 +487,7 @@ namespace hp
      * function is not able to find a finite element at all, it returns
      * numbers::invalid_unsigned_int.
      *
-     * The @p codim parameter describes the codimension of of the investigated
+     * The @p codim parameter describes the codimension of the investigated
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
@@ -513,7 +513,7 @@ namespace hp
      * function is not able to find a finite element at all, it returns
      * numbers::invalid_unsigned_int.
      *
-     * The @p codim parameter describes the codimension of of the investigated
+     * The @p codim parameter describes the codimension of the investigated
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */

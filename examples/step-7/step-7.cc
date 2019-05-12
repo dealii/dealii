@@ -884,7 +884,7 @@ namespace Step7
     // being used, and since we would like to avoid false results due to
     // super-convergence effects at some points, we use a special quadrature
     // rule that is obtained by iterating the trapezoidal rule by the degree of
-    // of the finite element times two plus one in each space direction.
+    // the finite element times two plus one in each space direction.
     // Note that the constructor of the QIterated class
     // takes a one-dimensional quadrature rule and a number that tells it how
     // often it shall use this rule in each space direction.

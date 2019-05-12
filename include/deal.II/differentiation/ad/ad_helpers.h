@@ -804,7 +804,7 @@ namespace Differentiation
      * @note When using the cell-level taped AD methods in 3d and/or with higher
      * order elements, it is incredibly easy to exceed the tape buffer size.
      * The reason for this is two-fold:
-     *   1. there are are many independent variables (the local
+     *   1. there are many independent variables (the local
      *      degrees-of-freedom) to take the derivatives with respect to, and
      *   2. the expressions for the dependent variables (each being a component
      *      of the residual vector) in terms of all of the independent variables

@@ -450,7 +450,7 @@ public:
 
     /**
      * In case the quadrature rule given represents a tensor product
-     * we need to store the evaluations of the 1d polynomials at the
+     * we need to store the evaluations of the 1d polynomials at
      * the 1d quadrature points. That is what this variable is for.
      */
     internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>>
