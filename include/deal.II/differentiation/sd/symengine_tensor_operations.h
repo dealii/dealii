@@ -508,11 +508,23 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
-    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
-                          const Tensor<rank, dim, ValueType> & value_tensor);
+    make_substitution_map(
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor);
 
     /**
      * Return a substitution map that has the entry keys given by the
@@ -523,12 +535,23 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor);
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor);
 
     //@}
 
@@ -551,15 +574,28 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
               int  rank,
               int  dim,
+              typename ExpressionType,
               typename ValueType>
     void
-    add_to_substitution_map(types::substitution_map &substitution_map,
-                            const Tensor<rank, dim, Expression> &symbol_tensor,
-                            const Tensor<rank, dim, ValueType> & value_tensor);
+    add_to_substitution_map(
+      types::substitution_map &                substitution_map,
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor);
 
     /**
      * A convenience function for adding an entry to the @p substitution_map.
@@ -574,16 +610,28 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
               int  rank,
               int  dim,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                     substitution_map,
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor);
+      types::substitution_map &                         substitution_map,
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor);
 
     //@}
 
@@ -1090,10 +1138,11 @@ namespace Differentiation
     /* ------------------ Symbol substitution map creation ----------------*/
 
 
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
-    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
-                          const Tensor<rank, dim, ValueType> & value_tensor)
+    make_substitution_map(
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
@@ -1101,11 +1150,11 @@ namespace Differentiation
     }
 
 
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor)
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
@@ -1120,14 +1169,15 @@ namespace Differentiation
     {
       template <int rank,
                 int dim,
+                typename ExpressionType,
                 typename ValueType,
                 template <int, int, typename> class TensorType>
-      std::vector<std::pair<Expression, ValueType>>
+      std::vector<std::pair<ExpressionType, ValueType>>
       tensor_substitution_map(
-        const TensorType<rank, dim, Expression> &symbol_tensor,
-        const TensorType<rank, dim, ValueType> & value_tensor)
+        const TensorType<rank, dim, ExpressionType> &symbol_tensor,
+        const TensorType<rank, dim, ValueType> &     value_tensor)
       {
-        std::vector<std::pair<Expression, ValueType>> symbol_values;
+        std::vector<std::pair<ExpressionType, ValueType>> symbol_values;
         for (unsigned int i = 0; i < symbol_tensor.n_independent_components;
              ++i)
           {
@@ -1140,13 +1190,13 @@ namespace Differentiation
       }
 
 
-      template <int dim, typename ValueType>
-      std::vector<std::pair<Expression, ValueType>>
+      template <int dim, typename ExpressionType, typename ValueType>
+      std::vector<std::pair<ExpressionType, ValueType>>
       tensor_substitution_map(
-        const SymmetricTensor<4, dim, Expression> &symbol_tensor,
-        const SymmetricTensor<4, dim, ValueType> & value_tensor)
+        const SymmetricTensor<4, dim, ExpressionType> &symbol_tensor,
+        const SymmetricTensor<4, dim, ValueType> &     value_tensor)
       {
-        std::vector<std::pair<Expression, ValueType>> symbol_values;
+        std::vector<std::pair<ExpressionType, ValueType>> symbol_values;
         for (unsigned int i = 0;
              i < SymmetricTensor<2, dim>::n_independent_components;
              ++i)
@@ -1167,11 +1217,13 @@ namespace Differentiation
     template <bool ignore_invalid_symbols,
               int  rank,
               int  dim,
+              typename ExpressionType,
               typename ValueType>
     void
-    add_to_substitution_map(types::substitution_map &substitution_map,
-                            const Tensor<rank, dim, Expression> &symbol_tensor,
-                            const Tensor<rank, dim, ValueType> & value_tensor)
+    add_to_substitution_map(
+      types::substitution_map &                substitution_map,
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor)
     {
       add_to_substitution_map<ignore_invalid_symbols>(
         substitution_map,
@@ -1182,12 +1234,13 @@ namespace Differentiation
     template <bool ignore_invalid_symbols,
               int  rank,
               int  dim,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                     substitution_map,
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor)
+      types::substitution_map &                         substitution_map,
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor)
     {
       add_to_substitution_map<ignore_invalid_symbols>(
         substitution_map,

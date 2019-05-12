@@ -178,6 +178,10 @@ namespace Differentiation
      *         add_to_symbol_map() functions. This includes individual
      *         Expression, std::vector<Expression>, as well as
      *         Tensors and SymmetricTensors of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. This @p ValueType is somewhat
+     *         arbitrary as it is only used to create default-constructed
+     *         values as entries in the map.
      */
     template <bool ignore_invalid_symbols = false,
               typename ValueType          = double,
@@ -211,6 +215,10 @@ namespace Differentiation
      *         add_to_symbol_map() functions. This includes individual
      *         Expression, std::vector<Expression>, as well as
      *         Tensors and SymmetricTensors of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. This @p ValueType is somewhat
+     *         arbitrary as it is only used to create default-constructed
+     *         values as entries in the map.
      * @tparam Args A type associated with the parameter pack that contains
      *         any number of other @p SymbolicTypes. All types held by the
      *         parameter pack share the same restriction as the @p SymbolicType
@@ -324,6 +332,10 @@ namespace Differentiation
      *         add_to_symbol_map() functions. This includes an individual
      *         Expression, as well as Tensors and SymmetricTensors of
      *         Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. This @p ValueType is somewhat
+     *         arbitrary as it is only used to create default-constructed
+     *         values as entries in the map.
      */
     template <bool ignore_invalid_symbols = false,
               typename ValueType          = double,
@@ -345,6 +357,11 @@ namespace Differentiation
      * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. This @p ValueType is somewhat
+     *         arbitrary as it is only used to create default-constructed
+     *         values as entries in the map.
      */
     template <bool ignore_invalid_symbols = false, typename ValueType = double>
     void
@@ -384,6 +401,10 @@ namespace Differentiation
      *         add_to_symbol_map() functions. This includes individual
      *         Expression, std::vector<Expression>, as well as
      *         Tensors and SymmetricTensors of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. This @p ValueType is somewhat
+     *         arbitrary as it is only used to create default-constructed
+     *         values as entries in the map.
      * @tparam Args A type associated with the parameter pack that contains
      *         any number of other @p SymbolicTypes. All types held by the
      *         parameter pack share the same restriction as the @p SymbolicType
@@ -553,7 +574,7 @@ namespace Differentiation
      *         expression type or be a special type that a user-defined
      *         @p SymbolicType can be constructed from.
      */
-    template <typename SymbolicType = SD::Expression, typename ValueType>
+    template <typename SymbolicType, typename ValueType>
     void
     set_value_in_symbol_map(
       types::substitution_map &                              substitution_map,
@@ -740,11 +761,25 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType Any symbolic expression type that is understood
+     *         by the make_substitution_map() functions. This includes
+     *         individual Expression, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
+     * @tparam Args A type associated with the parameter pack that contains
+     *         any number of other @p ExpressionTypes. All types held by the
+     *         parameter pack share the same restriction as the
+     *         @p ExpressionType documented above.
      */
-    template <typename SymbolicType, typename ValueType, typename... Args>
+    template <typename ExpressionType, typename ValueType, typename... Args>
     types::substitution_map
     make_substitution_map(
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values);
 
     //@}
@@ -942,7 +977,7 @@ namespace Differentiation
      * expression, and that the paired @p symbol_value elements are compatible
      * with the other add_to_substitution_map() functions.
      *
-     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *
@@ -963,14 +998,24 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType Any symbolic expression type that is understood
+     *         by the add_to_substitution_map() functions. This includes
+     *         individual Expression, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value);
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value);
 
     /**
      * A convenience function for adding multiple entries to the
@@ -980,7 +1025,7 @@ namespace Differentiation
      * symbolic expressions, and that the paired @p symbol_value elements are
      * compatible with the other add_to_substitution_map() functions.
      *
-     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *
@@ -1005,14 +1050,24 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType Any symbolic expression type that is understood
+     *         by the add_to_substitution_map() functions. This includes
+     *         individual Expression, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                              substitution_map,
-      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values);
+      types::substitution_map &                                substitution_map,
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values);
 
     /**
      * A convenience function for adding multiple entries to the
@@ -1043,15 +1098,29 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType Any symbolic expression type that is understood
+     *         by the add_to_substitution_map() functions. This includes
+     *         individual Expression, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
+     * @tparam Args A type associated with the parameter pack that contains
+     *         any number of other @p ExpressionTypes. All types held by the
+     *         parameter pack share the same restriction as the
+     *         @p ExpressionType documented above.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType,
               typename... Args>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values);
 
     /**
@@ -1303,10 +1372,10 @@ namespace Differentiation
     }
 
 
-    template <typename ExpressionType, typename ValueType, typename>
+    template <typename SymbolicType, typename ValueType, typename>
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
-                            const ExpressionType &   symbol,
+                            const SymbolicType &     symbol,
                             const ValueType &        value)
     {
       // Call the above function
@@ -1314,7 +1383,7 @@ namespace Differentiation
       internal::set_value_in_symbol_map(substitution_map,
                                         static_cast<SE_RCP_Basic>(symbol),
                                         static_cast<SE_RCP_Basic>(
-                                          ExpressionType(value)));
+                                          SymbolicType(value)));
     }
 
 
@@ -1420,10 +1489,10 @@ namespace Differentiation
     }
 
 
-    template <typename SymbolicType, typename ValueType, typename... Args>
+    template <typename ExpressionType, typename ValueType, typename... Args>
     types::substitution_map
     make_substitution_map(
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values)
     {
       types::substitution_map substitution_map;
@@ -1536,12 +1605,12 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value)
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value)
     {
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
                                                       symbol_value.first,
@@ -1550,12 +1619,12 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                              substitution_map,
-      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values)
+      types::substitution_map &                                substitution_map,
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values)
     {
       for (const auto &entry : symbol_values)
         {
@@ -1581,13 +1650,13 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType,
               typename... Args>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values)
     {
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
