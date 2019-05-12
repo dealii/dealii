@@ -72,7 +72,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // we then increment it):
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
-    for (auto cell : triangulation.active_cell_iterators())
+    for (auto &cell : triangulation.active_cell_iterators())
       {
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)

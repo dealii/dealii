@@ -774,7 +774,7 @@ namespace Step18
   {
     const double inner_radius = 0.8, outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation, 3, inner_radius, outer_radius);
-    for (auto cell : triangulation.active_cell_iterators())
+    for (auto &cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
@@ -1228,7 +1228,7 @@ namespace Step18
     Vector<double> norm_of_stress(triangulation.n_active_cells());
     {
       // Loop over all the cells...
-      for (auto cell : triangulation.active_cell_iterators())
+      for (auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           {
             // On these cells, add up the stresses over all quadrature
@@ -1573,7 +1573,7 @@ namespace Step18
     pcout << "    Moving mesh..." << std::endl;
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
-    for (auto cell : dof_handler.active_cell_iterators())
+    for (auto &cell : dof_handler.active_cell_iterators())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
@@ -1641,7 +1641,7 @@ namespace Step18
     // quadrature point objects corresponding to this cell in the vector of
     // such objects:
     unsigned int history_index = 0;
-    for (auto cell : triangulation.active_cell_iterators())
+    for (auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell->set_user_pointer(&quadrature_point_history[history_index]);
@@ -1724,7 +1724,7 @@ namespace Step18
 
     // Then loop over all cells and do the job in the cells that belong to our
     // subdomain:
-    for (auto cell : dof_handler.active_cell_iterators())
+    for (auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           // Next, get a pointer to the quadrature point history data local to
