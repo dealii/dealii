@@ -31,15 +31,15 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number = double>
 class SymmetricTensor;
 
-template <int dim, typename Number = double>
+template <int dim, typename Number>
 SymmetricTensor<2, dim, Number>
 unit_symmetric_tensor();
 
-template <int dim, typename Number = double>
+template <int dim, typename Number>
 SymmetricTensor<4, dim, Number>
 deviator_tensor();
 
-template <int dim, typename Number = double>
+template <int dim, typename Number>
 SymmetricTensor<4, dim, Number>
 identity_tensor();
 
@@ -3311,6 +3311,23 @@ unit_symmetric_tensor()
 
 
 /**
+ * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim identity
+ * matrix. This specialization of the function uses <code>double</code> as the
+ * data type for the elements.
+ *
+ * @relatesalso SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline SymmetricTensor<2, dim>
+unit_symmetric_tensor()
+{
+  return unit_symmetric_tensor<dim, double>();
+}
+
+
+
+/**
  * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
  * tensor <tt>t</tt> returns the deviator $\textrm{dev}\ t$. It is the
  * operator representation of the linear deviator operator.
@@ -3347,6 +3364,29 @@ deviator_tensor()
     tmp.data[i][i] = 0.5;
 
   return tmp;
+}
+
+
+
+/**
+ * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
+ * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
+ * representation of the linear deviator operator.
+ *
+ * For every tensor <tt>t</tt>, there holds the identity
+ * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
+ * round-off. The reason this operator representation is provided is that one
+ * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
+ * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
+ *
+ * @relatesalso SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline SymmetricTensor<4, dim>
+deviator_tensor()
+{
+  return deviator_tensor<dim, double>();
 }
 
 
@@ -3395,6 +3435,36 @@ identity_tensor()
     tmp.data[i][i] = 0.5;
 
   return tmp;
+}
+
+
+
+/**
+ * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
+ * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
+ * representation of the linear deviator operator.
+ *
+ * Note that this tensor, even though it is the identity, has a somewhat funny
+ * form, and in particular does not only consist of zeros and ones. For
+ * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
+ * except for <tt>id[0][0][0][0]=id[1][1][1][1]=1</tt> and
+ * <tt>id[0][1][0][1]=id[0][1][1][0]=id[1][0][0][1]=id[1][0][1][0]=1/2</tt>.
+ * To see why this factor of 1/2 is necessary, consider computing <tt>A=Id .
+ * B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
+ * id_0111 b_11 + id_0101 b_01 + id_0110 b_10</tt>. On the other hand, we need
+ * to have <tt>a_01=b_01</tt>, and symmetry implies <tt>b_01=b_10</tt>,
+ * leading to <tt>a_01=(id_0101+id_0110) b_01</tt>, or, again by symmetry,
+ * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the three-
+ * dimensional case.
+ *
+ * @relatesalso SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline SymmetricTensor<4, dim>
+identity_tensor()
+{
+  return identity_tensor<dim, double>();
 }
 
 
