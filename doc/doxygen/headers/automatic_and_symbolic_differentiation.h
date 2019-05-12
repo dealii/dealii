@@ -65,7 +65,7 @@
  * the Tensor and SymmetricTensor classes should support calculations performed with these specialized
  * numbers.
  * (In theory an entire program could be made differentiable. This could be useful in, for example,
- * the sentitivity analysis of solutions with respect to input parameters. However, to date this has
+ * the sensitivity analysis of solutions with respect to input parameters. However, to date this has
  * not been tested.)
  *
  * Implementations of specialized frameworks based on <em>operator overloading</em> typically fall into
@@ -120,7 +120,7 @@
  *    function.
  *
  * Each of these methods, of course, has its advantages and disadvantages, and one may be more appropriate
- * than another for a given problem that is to be solved. As the aforemetioned implementational details
+ * than another for a given problem that is to be solved. As the aforementioned implementational details
  * (and others not discussed) may be hidden from the user, it may still be important to understand the
  * implications, run-time cost,  and potential limitations, of using any one of these "black-box"
  * auto-differentiable numbers.
@@ -157,8 +157,8 @@
  * In the most practical sense, any of the above categories exploit the chain-rule to compute the total
  * derivative of a composite function. To perform this action, they typically use one of two mechanisms to
  * compute derivatives, specifically
- * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentation, or
- * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentation.
+ * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentiation, or
+ * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentiation.
  *
  * As a point of interest, the <em>optimal Jacobian accumulation</em>, which performs a minimal set of
  * computations, lies somewhere between these two limiting cases. Its computation for a general composite
@@ -479,9 +479,117 @@
  * - our <a href="https://github.com/dealii/dealii/tree/master/tests/sacado">test-suite</a>.
  *
  *
- * @section symb_diff_1 Symbolic differentiation
+ * @section symb_diff_1 Symbolic expressions and differentiation
  *
- * TODO. As a temporary placeholder, here is a link to the Wikipedia article on
- * <a href="https://en.wikipedia.org/wiki/Symbolic_differentiation">symbolic differentiation</a> and the
- * <a href="https://www.sympy.org/en/index.html">SymPy</a> library.
+ * <a href="https://en.wikipedia.org/wiki/Symbolic_differentiation">Symbolic differentiation</a> is,
+ * in terms of its design and usage, quite different to automatic differentiation.
+ * Underlying any symbolic library is a computer algebra system (CAS) that implements a
+ * language and collection of algorithms to manipulate symbolic (or "string-like") expressions.
+ * This is most similar, from a philosophical point of view, to how algebraic operations would be
+ * performed by hand.
+ *
+ * To help better distinguish between symbolic differentiation and numerical methods like automatic
+ * differentiation, let's consider a very simple example.
+ * Suppose that the function $f(x,y) = [2x+1]^{y}$, where $x$ and $y$ are variables that are independent
+ * of one another.
+ * By applying the chain-rule, the derivatives of this function are simply
+ * $\dfrac{d f(x,y)}{d x} = 2y[2x+1]^{y-1}$ and
+ * $\dfrac{d f(x,y)}{d y} = [2x+1]^{y} \ln(2x+1)$.
+ * These are exactly the results that you get from a CAS after defining the symbolic variables
+ * `x` and `y`, defining the symbolic expression `f = pow(2x+1, y)` and computing the
+ * derivatives `diff(f, x)` and `diff(f, y)`.
+ * At this point there is no assumption of what `x` and `y` represent; they may later be interpreted
+ * as plain (scalar) numbers, complex numbers, or something else for which the power and natural
+ * logarithm functions are well defined.
+ * Obviously this means that there is also no assumption about which point to evaluate either
+ * the expression or its derivatives.
+ * One could readily take the expression for $\dfrac{d f(x, y)}{d x}$ and evaluate it
+ * at $x=1, y=2.5$ and then later, with no recomputation of the derivative expression itself,
+ * evaluate it at $x=3.25, y=-6$.
+ * In fact, the interpretation of any symbolic variable or expression, and the inter-dependencies
+ * between variables, may be defined or redefined at any point during their manipulation;
+ * this leads to a degree of flexibility in computations that cannot be matched by
+ * auto-differentiation.
+ * For example, one could perform the permanent substitution
+ * $g(x) = \dfrac{d f(x, y)}{d x} \vert_{y=1}$ and then recompute
+ * $g(x)$ for several different values of $x$.
+ * One could also post-factum express an interdependency between `x` and `y`, such as
+ * $y \rightarrow y(x) := 2x$.
+ * For such a case, this means that the initially computed derivatives
+ * $\dfrac{d f(x, y)}{d x} \rightarrow \dfrac{\partial f(x, y(x))}{\partial x} = 2y(x) [2x+1]^{y(x)-1} = 4x[2x+1]^{2x-1}$ and
+ * $\dfrac{d f(x, y)}{d y} \rightarrow \dfrac{\partial f(x, y(x))}{\partial y} = [2x+1]^{y(x)} \ln(2x+1) = [2x+1]^{2x} \ln(2x+1)$
+ * truly represent partial derivatives rather than total derivatives.
+ * Of course, if such an inter-dependency was explicitly defined before the derivatives
+ * $\dfrac{d f(x, y(x))}{d x}$ and $\dfrac{d f(x, y(x))}{d y}$ are computed, then this
+ * could correspond to the total derivative (which is the only result that auto-differentiation
+ * is able to achieve for this example).
+ *
+ * Due to the sophisticated CAS that forms the foundation of symbolic operations, the types of
+ * manipulations are not necessarily restricted to differentiation alone, but rather may span an
+ * range spectra of manipulations relevant to discrete differential calculus, topics in pure
+ * mathematics, and more.
+ * The documentation for the <a href="https://www.sympy.org/en/index.html">SymPy</a> library gives
+ * plenty of examples that highlight what a fully-fledged CAS is capable of.
+ * Through the Differentiation::SD::Expression class, and the associated functions in the
+ * Differentiation::SD namespace, we provide a wrapper to the high-performance
+ * <a href="https://github.com/symengine/symengine">SymEngine</a> symbolic manipulation library
+ * that has enriched operator overloading and a consistent interface that makes it easy and
+ * "natural" to use.
+ * In fact, this class can be used as a "drop-in" replacement for arithmetic types in many
+ * situations, transforming the operations from being numeric to symbolic in nature; this is
+ * made especially easy when classes are templated on the underlying number type.
+ * Being focused on numerical simulation of PDE's, the functionality of the CAS that is exposed
+ * within deal.II focuses on symbolic expression creation, manipulation, and differentiation.
+ *
+ * As a final note, it is important to recognize a major deficiency in deal.II's current implementation
+ * of the interface to the supported symbolic library.
+ * To date, convenience wrappers to SymEngine functionality is focused on manipulations that solely
+ * involve dictionary-based (i.e., something reminiscent of "string-based") operations.
+ * Although SymEngine performs these operations in an efficient manner, they are still known to be
+ * computationally expensive, especially when the operations are performed on large expressions.
+ * It should therefore be expected that the performance of the parts of code that perform
+ * differentiation, symbolic substitution, etc., @b may be a limiting factor when using this in
+ * production code.
+ * In the future, deal.II will provide an interface to accelerate the evaluation of lengthy symbolic
+ * expression through the @p BatchOptimizer class (which is already referenced in several places in
+ * the documentation).
+ * In particular, the @p BatchOptimizer will simultaneously optimize a collection of symbolic
+ * expressions using methods such as common subexpression elimination (CSE), as well as by generating
+ * high performance code-paths to evaluate these expressions through the use of a custom-generated
+ * `std::function` or by compiling the expression using the LLVM JIT compiler.
+ * Additionally, the level of functionality currently implemented effectively limits the use of
+ * symbolic algebra to the traditional use case (i.e. scalar and tensor algebra, as might be useful to
+ * define constitutive relations or complex functions for application as boundary conditions or
+ * source terms).
+ * In the future we will also implement classes to assist in performing assembly operations in
+ * the same spirit as that which has been done in the Differentiation::AD namespace.
+ *
+ * A summary of the files that implement the interface to the supported symbolic differentiable
+ * numbers is as follows:
+ * - symengine_math.h: Implementation of math operations that allow the class that implements
+ *   symbolic expressions to be used consistently throughout the library and in user code.
+ *   It provides counterpart definitions for many of the math functions found in the standard
+ *   namespace.
+ * - symengine_number_traits.h: Provides some mechanisms to easily query select properties of
+ *   symbolic numbers, i.e. some type traits.
+ * - symengine_number_types.h: Implementation of the Differentiation::SD::Expression class that can
+ *   be used to represent scalar symbolic variables, scalar symbolic expressions, and more.
+ *   This Expression class has been given a full set of operators overloaded for all mathematical
+ *   and logical operations that are supported by the SymEngine library and are considered useful
+ *   within the context of numerical modeling.
+ * - symengine_product_types.h: Defines some product and scalar types that allow the use of symbolic
+ *   expressions in conjunction with the Tensor and SymmetricTensor classes.
+ * - symengine_scalar_operations.h: Defines numerous operations that can be performed either on or
+ *   with scalar symbolic expressions or variables.
+ *   This includes (but is not limited to) the creation of scalar symbols, performing differentiation
+ *   with respect to scalars, and symbolic substitution within scalar expressions.
+ * - symengine_tensor_operations.h: Defines numerous operations that can be performed either on or
+ *   with tensors of symbolic expressions or variables.
+ *   This includes (but is not limited to) the creation of tensors of symbols, performing
+ *   differentiation with respect to tensors of symbols, differentiation of tensors of symbols, and
+ *   symbolic substitution within tensor expressions.
+ * - symengine_types.h: Provides aliases for some types that are commonly used within the context of
+ *   symbolic computations.
+ * - symengine_utilities.h: Provides some utility functions that are useful within the context of
+ *   symbolic computations.
  */
