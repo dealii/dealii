@@ -39,7 +39,7 @@ check()
 
   triangulation.refine_global(2);
 
-  for (const auto cell : triangulation.active_cell_iterators())
+  for (const auto &cell : triangulation.active_cell_iterators())
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
          ++face_no)
       {

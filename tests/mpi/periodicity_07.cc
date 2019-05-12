@@ -53,7 +53,7 @@ test(const unsigned numRefinementLevels = 2)
   GridGenerator::hyper_cube(triangulation, -L, L, /*colorize*/ false);
 
   // mark faces
-  for (auto cell : triangulation.active_cell_iterators())
+  for (auto &cell : triangulation.active_cell_iterators())
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
         const Point<dim> &face_center = cell->face(f)->center();
@@ -95,7 +95,7 @@ test(const unsigned numRefinementLevels = 2)
   for (unsigned int ilevel = 0; ilevel < numRefinementLevels; ilevel++)
     {
       // pick an corner cell and refine
-      for (auto cell : triangulation.active_cell_iterators())
+      for (auto &cell : triangulation.active_cell_iterators())
         {
           try
             {

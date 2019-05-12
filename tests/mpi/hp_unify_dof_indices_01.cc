@@ -73,7 +73,7 @@ test()
 
   deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
           << std::endl;
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       deallog << "  Cell: " << cell << std::endl;
 

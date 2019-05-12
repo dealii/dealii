@@ -247,7 +247,7 @@ Test_Solver_Output::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())
         {

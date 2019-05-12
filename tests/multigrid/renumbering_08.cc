@@ -39,7 +39,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> dof_indices(dof.get_fe().dofs_per_cell);
   deallog << "DoF numbers on active cells" << std::endl;
-  for (auto cell : dof.active_cell_iterators())
+  for (auto &cell : dof.active_cell_iterators())
     if (!cell->is_artificial())
       {
         cell->get_dof_indices(dof_indices);
@@ -51,7 +51,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
   for (unsigned int l = 0; l < dof.get_triangulation().n_global_levels(); ++l)
     {
       deallog << "DoF numbers on level " << l << std::endl;
-      for (auto cell : dof.cell_iterators_on_level(l))
+      for (auto &cell : dof.cell_iterators_on_level(l))
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
             cell->get_mg_dof_indices(dof_indices);

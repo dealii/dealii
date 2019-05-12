@@ -39,11 +39,11 @@ check()
   {
     // set flags on active cells
     tr.clear_user_flags();
-    for (auto cell : tr.active_cell_iterators())
+    for (auto &cell : tr.active_cell_iterators())
       cell->set_user_flag();
 
     // now verify that it is really only the active cells
-    for (auto cell : tr.cell_iterators())
+    for (auto &cell : tr.cell_iterators())
       AssertThrow(cell->user_flag_set() == !cell->has_children(),
                   ExcInternalError());
   }
@@ -52,14 +52,14 @@ check()
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     {
       tr.clear_user_flags();
-      for (auto cell : tr.active_cell_iterators_on_level(l))
+      for (auto &cell : tr.active_cell_iterators_on_level(l))
         cell->set_user_flag();
 
-      for (auto cell : tr.cell_iterators_on_level(l))
+      for (auto &cell : tr.cell_iterators_on_level(l))
         AssertThrow(cell->user_flag_set() == !cell->has_children(),
                     ExcInternalError());
 
-      for (auto cell : tr.cell_iterators())
+      for (auto &cell : tr.cell_iterators())
         AssertThrow((cell->user_flag_set() == !cell->has_children()) ||
                       (l != (unsigned int)cell->level()),
                     ExcInternalError());

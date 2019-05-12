@@ -86,7 +86,7 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
   std::vector<std::vector<unsigned int>> computed_ranks;
 
   unsigned int computed_pts = 0;
-  for (auto cell : sphere.active_cell_iterators())
+  for (auto &cell : sphere.active_cell_iterators())
     {
       // The points we consider are the cell centers
       auto center_pt = cell->center();

@@ -62,7 +62,7 @@ test_distributed_cpt(unsigned int ref_cube)
   Triangulation<dim>      cube;
   GridGenerator::hyper_cube(cube);
   cube.refine_global(ref_cube);
-  for (auto cell : cube.active_cell_iterators())
+  for (auto &cell : cube.active_cell_iterators())
     test_points.emplace_back(cell->center());
 
   deallog << " Testing on " << test_points.size() << " points" << std::endl;

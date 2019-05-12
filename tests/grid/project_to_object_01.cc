@@ -225,7 +225,7 @@ main()
             << std::endl;
 
     MappingQGeneric<2, 3> mapping(6);
-    for (auto cell : triangulation.active_cell_iterators())
+    for (auto &cell : triangulation.active_cell_iterators())
       {
         const Point<3> projected_point =
           GridTools::project_to_object(cell, trial_point);
