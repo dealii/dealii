@@ -117,7 +117,7 @@ namespace Differentiation
 
     /**
      * Return a symbolic number that represents the Euler constant
-     * $e approx 2.71828$ raised to the given @p exponent.
+     * $e \approx 2.71828$ raised to the given @p exponent.
      *
      * Mimics the function <code> std::exp(exponent) </code> using the standard
      * math library.
