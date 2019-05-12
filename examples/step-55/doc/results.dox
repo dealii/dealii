@@ -234,4 +234,23 @@ You can prescribe the exact flow solution as $b$ in the convective term $b
 \cdot \nabla u$. This should give the same solution as the original problem,
 if you set the right hand side to zero.
 
+<h4>Adaptive refinement</h4>
 
+So far, this tutorial program refines the mesh globally in each step.
+Replacing the code in StokesProblem::refine_grid() by something like
+@code
+Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+
+FEValuesExtractors::Vector velocities(0);
+KellyErrorEstimator<dim>::estimate(
+  dof_handler,
+  QGauss<dim - 1>(fe.degree + 1),
+  std::map<types::boundary_id, const Function<dim> *>(),
+  locally_relevant_solution,
+  estimated_error_per_cell,
+  fe.component_mask(velocities));
+parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+  triangulation, estimated_error_per_cell, 0.3, 0.0);
+triangulation.execute_coarsening_and_refinement();
+@endcode
+makes it simple to explore adaptive mesh refinement.
