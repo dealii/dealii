@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Andrea Bonito, Sebastian Pauletti.
  */
@@ -25,11 +24,7 @@
 // will not explain their meaning here again.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/solver_control.h>
@@ -37,11 +32,18 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
@@ -64,7 +66,7 @@ namespace Step38
   // - The template parameter now denotes the dimensionality of the embedding
   //   space, which is no longer the same as the dimensionality of the domain
   //   and the triangulation on which we compute. We indicate this by calling
-  //   the parameter @p spacedim , and introducing a constant @p dim equal to
+  //   the parameter @p spacedim, and introducing a constant @p dim equal to
   //   the dimensionality of the domain -- here equal to
   //   <code>spacedim-1</code>.
   // - All member variables that have geometric aspects now need to know about
@@ -101,7 +103,7 @@ namespace Step38
     void run();
 
   private:
-    static const unsigned int dim = spacedim - 1;
+    static constexpr unsigned int dim = spacedim - 1;
 
     void make_grid_and_dofs();
     void assemble_system();
@@ -349,7 +351,7 @@ namespace Step38
   // matrix that corresponds to the surface Laplacian (Laplace-Beltrami
   // operator). Maybe surprisingly, it actually looks exactly the same as for
   // the regular Laplace operator discussed in, for example, step-4. The key
-  // is that the FEValues::shape_gradient function does the magic: It returns
+  // is that the FEValues::shape_grad() function does the magic: It returns
   // the surface gradient $\nabla_K \phi_i(x_q)$ of the $i$th shape function
   // at the $q$th quadrature point. The rest then does not need any changes
   // either:
@@ -378,11 +380,7 @@ namespace Step38
 
     const RightHandSide<spacedim> rhs;
 
-    for (typename DoFHandler<dim, spacedim>::active_cell_iterator
-           cell = dof_handler.begin_active(),
-           endc = dof_handler.end();
-         cell != endc;
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0;
         cell_rhs    = 0;
@@ -449,9 +447,9 @@ namespace Step38
   // solution. Most of it is boilerplate code, but there are two points worth
   // pointing out:
   //
-  // - The DataOut::add_data_vector function can take two kinds of vectors:
+  // - The DataOut::add_data_vector() function can take two kinds of vectors:
   //   Either vectors that have one value per degree of freedom defined by the
-  //   DoFHandler object previously attached via DataOut::attach_dof_handler;
+  //   DoFHandler object previously attached via DataOut::attach_dof_handler();
   //   and vectors that have one value for each cell of the triangulation, for
   //   example to output estimated errors for each cell. Typically, the
   //   DataOut class knows to tell these two kinds of vectors apart: there are
@@ -461,10 +459,10 @@ namespace Step38
   //   sphere. If we had used the whole sphere as domain and $Q_1$ elements,
   //   we would have the same number of cells as vertices and consequently the
   //   two kinds of vectors would have the same number of elements. To avoid
-  //   the resulting confusion, we have to tell the DataOut::add_data_vector
+  //   the resulting confusion, we have to tell the DataOut::add_data_vector()
   //   function which kind of vector we have: DoF data. This is what the third
   //   argument to the function does.
-  // - The DataOut::build_patches function can generate output that subdivides
+  // - The DataOut::build_patches() function can generate output that subdivides
   //   each cell so that visualization programs can resolve curved manifolds
   //   or higher polynomial degree shape functions better. We here subdivide
   //   each element in each coordinate direction as many times as the
@@ -480,9 +478,8 @@ namespace Step38
       DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
     data_out.build_patches(mapping, mapping.get_degree());
 
-    std::string filename("solution-");
-    filename += static_cast<char>('0' + spacedim);
-    filename += "d.vtk";
+    const std::string filename =
+      "solution-" + std::to_string(spacedim) + "d.vtk";
     std::ofstream output(filename);
     data_out.write_vtk(output);
   }

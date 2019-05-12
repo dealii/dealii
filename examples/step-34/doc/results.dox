@@ -14,7 +14,7 @@ set Run 3d simulation               = true
 
 subsection Exact solution 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants  =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -28,7 +28,7 @@ end
 
 subsection Exact solution 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants  =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -58,7 +58,7 @@ end
 
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants  =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -72,7 +72,7 @@ end
 
 subsection Wind function 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants  = 
+  set Function constants  =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -88,7 +88,7 @@ When we run the program, the following is printed on screen:
 @verbatim
 DEAL::
 DEAL::Parsing parameter file parameters.prm
-DEAL::for a 2 dimensional simulation. 
+DEAL::for a 2 dimensional simulation.
 DEAL:GMRES::Starting value 2.21576
 DEAL:GMRES::Convergence step 1 value 2.37635e-13
 DEAL::Cycle 0:
@@ -110,14 +110,14 @@ DEAL::Cycle 3:
 DEAL::   Number of active cells:       160
 DEAL::   Number of degrees of freedom: 160
 DEAL::
-cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    20   20 4.465e-02             - 5.000e-02    - 
-    1    40   40 1.081e-02          2.05 2.500e-02 1.00 
-    2    80   80 2.644e-03          2.03 1.250e-02 1.00 
-    3   160  160 6.529e-04          2.02 6.250e-03 1.00 
+cycle cells dofs    L2(phi)     Linfty(alpha)
+    0    20   20 4.465e-02    - 5.000e-02    -
+    1    40   40 1.081e-02 2.05 2.500e-02 1.00
+    2    80   80 2.644e-03 2.03 1.250e-02 1.00
+    3   160  160 6.529e-04 2.02 6.250e-03 1.00
 DEAL::
 DEAL::Parsing parameter file parameters.prm
-DEAL::for a 3 dimensional simulation. 
+DEAL::for a 3 dimensional simulation.
 DEAL:GMRES::Starting value 2.84666
 DEAL:GMRES::Convergence step 3 value 8.68638e-18
 DEAL::Cycle 0:
@@ -139,11 +139,11 @@ DEAL::Cycle 3:
 DEAL::   Number of active cells:       1536
 DEAL::   Number of degrees of freedom: 1538
 DEAL::
-cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    24   26 6.873e-01             - 2.327e-01    - 
-    1    96   98 1.960e-01          1.81 1.239e-01 0.91 
-    2   384  386 4.837e-02          2.02 6.319e-02 0.97 
-    3  1536 1538 1.176e-02          2.04 3.176e-02 0.99 
+cycle cells dofs    L2(phi)     Linfty(alpha)
+    0    24   26 3.437e-01    - 2.327e-01    -
+    1    96   98 9.794e-02 1.81 1.239e-01 0.91
+    2   384  386 2.417e-02 2.02 6.319e-02 0.97
+    3  1536 1538 5.876e-03 2.04 3.176e-02 0.99
 @endverbatim
 
 As we can see from the convergence table in 2d, if we choose
@@ -154,11 +154,11 @@ equal size generates a regular polygon with N faces, whose angles are
 exactly $\pi-\frac {2\pi}{N}$, therefore the error we commit should be
 exactly $\frac 12 - (\frac 12 -\frac 1N) = \frac 1N$. In fact this is
 a very good indicator that we are performing the singular integrals in
-an appropriate manner. 
+an appropriate manner.
 
 The error in the approximation of the potential $\phi$ is largely due
 to approximation of the domain. A much better approximation could be
-obtained by using higher order mappings. 
+obtained by using higher order mappings.
 
 If we modify the main() function, setting fe_degree and mapping_degree
 to two, and raise the order of the quadrature formulas  in
@@ -166,21 +166,21 @@ the parameter file, we obtain the following convergence table for the
 two dimensional simulation
 
 @verbatim
-cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    20   40 5.404e-05             - 2.306e-04    - 
-    1    40   80 3.578e-06          3.92 1.738e-05 3.73 
-    2    80  160 2.479e-07          3.85 1.253e-05 0.47 
-    3   160  320 1.856e-08          3.74 7.670e-06 0.71 
+cycle cells dofs    L2(phi)     Linfty(alpha)
+    0    20   40 5.414e-05    - 2.306e-04    -
+    1    40   80 3.623e-06 3.90 1.737e-05 3.73
+    2    80  160 2.690e-07 3.75 1.253e-05 0.47
+    3   160  320 2.916e-08 3.21 7.670e-06 0.71
 @endverbatim
 
 and
 
 @verbatim
-cycle cells dofs  L2(phi)  Linfty(alpha) 
-    0    24   98 9.187e-03             - 8.956e-03    - 
-    1    96  386 3.991e-04          4.52 1.182e-03 2.92 
-    2   384 1538 2.113e-05          4.24 1.499e-04 2.98 
-    3  1536 6146 1.247e-06          4.08 1.896e-05 2.98 
+cycle cells dofs    L2(phi)     Linfty(alpha)
+    0    24   98 3.770e-03    - 8.956e-03    -
+    1    96  386 1.804e-04 4.39 1.182e-03 2.92
+    2   384 1538 9.557e-06 4.24 1.499e-04 2.98
+    3  1536 6146 6.617e-07 3.85 1.892e-05 2.99
 @endverbatim
 
 for the three dimensional case. As we can see, convergence results are
@@ -191,7 +191,7 @@ of Q2 case in the three dimensional simulation, the error is roughly
 three orders of magnitude lower.
 
 The result of running these computations is a bunch of output files that we
-can pass to our visualization program of choice. 
+can pass to our visualization program of choice.
 The output files are of two kind: the potential on the boundary
 element surface, and the potential extended to the outer and inner
 domain. The combination of the two for the two dimensional case looks

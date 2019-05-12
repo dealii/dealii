@@ -55,7 +55,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <list>
 
 
 namespace Step41
@@ -126,19 +125,15 @@ namespace Step41
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      AssertIndexRange(component, 1);
+
+      return -10;
+    }
   };
-
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> &,
-                                   const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    return -10;
-  }
 
 
 
@@ -150,19 +145,15 @@ namespace Step41
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      AssertIndexRange(component, 1);
+
+      return 0;
+    }
   };
-
-  template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> &,
-                                    const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    return 0;
-  }
 
 
 
@@ -177,25 +168,21 @@ namespace Step41
     {}
 
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+
+      if (p(0) < -0.5)
+        return -0.2;
+      else if (p(0) >= -0.5 && p(0) < 0.0)
+        return -0.4;
+      else if (p(0) >= 0.0 && p(0) < 0.5)
+        return -0.6;
+      else
+        return -0.8;
+    }
   };
-
-  template <int dim>
-  double Obstacle<dim>::value(const Point<dim> & p,
-                              const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    if (p(0) < -0.5)
-      return -0.2;
-    else if (p(0) >= -0.5 && p(0) < 0.0)
-      return -0.4;
-    else if (p(0) >= 0.0 && p(0) < 0.5)
-      return -0.6;
-    else
-      return -0.8;
-  }
 
 
 
@@ -309,11 +296,7 @@ namespace Step41
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
@@ -385,11 +368,7 @@ namespace Step41
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
@@ -475,10 +454,7 @@ namespace Step41
     const Obstacle<dim> obstacle;
     std::vector<bool>   dof_touched(dof_handler.n_dofs(), false);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
           Assert(dof_handler.get_fe().dofs_per_cell ==
@@ -596,7 +572,7 @@ namespace Step41
 
     data_out.build_patches();
 
-    std::ofstream output_vtk(std::string("output_") +
+    std::ofstream output_vtk("output_" +
                              Utilities::int_to_string(iteration, 3) + ".vtk");
     data_out.write_vtk(output_vtk);
   }
