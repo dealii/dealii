@@ -393,6 +393,11 @@
  *   <tr valign="top">
  *       <td>step-44</td>
  *       <td> Finite strain hyperelasticity based on a three-field formulation.
+ *       <br/> Keywords: CellDataStorage, FEValuesExtractors, WorkStream::run,
+ *       BlockSparseMatrix, BlockVector, ComponentSelectFunction,
+ *       Physics::Elasticity, FullMatrix::extract_submatrix_from,
+ *       FullMatrix::scatter_matrix_to, LinearOperator, SolverSelector,
+ *       PreconditionSelector, ReductionControl, MappingQEulerian
  *       </td></tr>
  *
  *   <tr valign="top">
