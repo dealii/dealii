@@ -50,7 +50,7 @@ namespace Differentiation
     //@{
 
     /**
-     * Return a symbolic number that represents a @p base value to the power of
+     * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
      * Mimics the function <code> std::pow(base,exponent) </code> using the
@@ -60,7 +60,7 @@ namespace Differentiation
     pow(const Expression &base, const Expression &exponent);
 
     /**
-     * Return a symbolic number that represents a @p base value to the power of
+     * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
      * Mimics the function <code> std::pow(base,exponent) </code> using the
@@ -79,7 +79,7 @@ namespace Differentiation
     }
 
     /**
-     * Return a symbolic number that represents a @p base value to the power of
+     * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
      * Mimics the function <code> std::pow(base,exponent) </code> using the
@@ -117,7 +117,7 @@ namespace Differentiation
 
     /**
      * Return a symbolic number that represents the Euler constant
-     * $e approx 2.71828$ raised to the given @p exponent.
+     * $e \approx 2.71828$ raised to the given @p exponent.
      *
      * Mimics the function <code> std::exp(exponent) </code> using the standard
      * math library.
@@ -135,7 +135,7 @@ namespace Differentiation
     log(const Expression &x);
 
     /**
-     * Return a symbolic number that represents the logarithm of a value @p x with
+     * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
      * Mimics the function <code> std::log(x,base) </code> using the standard
@@ -145,7 +145,7 @@ namespace Differentiation
     log(const Expression &x, const Expression &base);
 
     /**
-     * Return a symbolic number that represents the logarithm of a value @p x with
+     * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
      * Mimics the function <code> std::log(x,base) </code> using the standard
@@ -164,7 +164,7 @@ namespace Differentiation
     }
 
     /**
-     * Return a symbolic number that represents the logarithm of a value @p x with
+     * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
      * Mimics the function <code> std::log(x,base) </code> using the standard
