@@ -50,7 +50,7 @@ namespace LocalIntegrators
      * integrals \f[ \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot
      * \mathbf v\,ds \f]
      *
-     * @param M The mass matrix matrix obtained as result.
+     * @param M The mass matrix obtained as result.
      * @param fe The FEValues object describing the local trial function
      * space. #update_values and #update_JxW_values must be set.
      * @param factor A constant that multiplies the mass matrix.
@@ -102,7 +102,7 @@ namespace LocalIntegrators
      * integrals \f[ \int_F \omega(x) uv\,ds \quad \text{or} \quad \int_F
      * \omega(x) \mathbf u\cdot \mathbf v\,ds \f]
      *
-     * @param M The weighted mass matrix matrix obtained as result.
+     * @param M The weighted mass matrix obtained as result.
      * @param fe The FEValues object describing the local trial function
      * space. #update_values and #update_JxW_values must be set.
      * @param weights The weights, $\omega(x)$, evaluated at the quadrature

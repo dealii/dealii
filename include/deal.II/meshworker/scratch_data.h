@@ -495,9 +495,9 @@ namespace MeshWorker
     /** @} */ // NeighborCellMethods
 
     /**
-     * Return a GeneralDataStorage object that can be used to store store any
-     * amount of data, of any type, which is then made accessible by an
-     * identifier string.
+     * Return a GeneralDataStorage object that can be used to store any amount
+     * of data, of any type, which is then made accessible by an identifier
+     * string.
      */
     GeneralDataStorage &
     get_general_data_storage();

@@ -1033,7 +1033,7 @@ namespace Functions
     const double unitary_integral_value;
 
     /**
-     * Current rescaling to apply the the cut-off function.
+     * Current rescaling to apply the cut-off function.
      */
     double rescaling;
   };

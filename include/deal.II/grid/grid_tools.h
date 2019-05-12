@@ -768,8 +768,8 @@ namespace GridTools
    * @return A tuple containing four elements; the first three
    * are documented in GridTools::compute_point_locations().
    * The last element of the @p return_type contains the
-   * indices of points which are not not found inside the mesh
-   * or lie on artificial cells. The @p return_type equals the
+   * indices of points which are neither found inside the mesh
+   * nor lie in artificial cells. The @p return_type equals the
    * following tuple type:
    * @code
    *   std::tuple<
@@ -2262,7 +2262,7 @@ namespace GridTools
    * build a Triangulation from those, and then adaptively refine it so that
    * the input cells all also exist in the output Triangulation.
    *
-   * A consequence of this procedure is that that output Triangulation may
+   * A consequence of this procedure is that the output Triangulation may
    * contain more active cells than the ones that exist in the input vector.
    * On the other hand, one typically wants to solve the local problem not on
    * the entire output Triangulation, but only on those cells of it that

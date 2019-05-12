@@ -999,7 +999,7 @@ namespace MeshWorker
             // degree of freedom on the refinement edge, k does
             // not, and both are not on the boundary. This is part
             // the difference between the complete matrix with no
-            // boundary condition at the refinement edge and and
+            // boundary condition at the refinement edge and
             // the matrix assembled above by assemble().
 
             // Thus the logic is: enter the row if it is

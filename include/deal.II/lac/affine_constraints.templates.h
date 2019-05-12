@@ -516,8 +516,8 @@ AffineConstraints<number>::close()
             new_entries = line.entries;
           else
             {
-              // otherwise, we need to go through the list by and and
-              // resolve the duplicates
+              // otherwise, we need to go through the list and resolve the
+              // duplicates
               new_entries.reserve(line.entries.size() - duplicates);
               new_entries.push_back(line.entries[0]);
               for (size_type j = 1; j < line.entries.size(); ++j)

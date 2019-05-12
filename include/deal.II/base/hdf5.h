@@ -841,7 +841,7 @@ namespace HDF5
      * The return type is `uint32_t` and corresponds to the value returned by
      * H5Pget_mpio_no_collective_cause.
      *
-     * The return value value can be
+     * The return value can be
      * Value                                      | Meaning
      * ------------------------------------------ | -------
      * H5D_MPIO_COLLECTIVE                        | Collective I/O was performed successfully.
@@ -955,7 +955,7 @@ namespace HDF5
     /**
      * This constructor creates or opens a group depending on the value of
      * @p mode. The group will be placed inside the group @p parent_group. The
-     * parameter @p mpi defines if the the I/O operations are serial or
+     * parameter @p mpi defines if the I/O operations are serial or
      * parallel. This is an internal constructor, the functions open_group() and
      * create_group() of the current class should be used to open or create a
      * group.

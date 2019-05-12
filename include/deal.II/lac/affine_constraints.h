@@ -705,7 +705,7 @@ public:
    * condensed and compressed.  This function is the appropriate choice for
    * applying inhomogeneous constraints.
    *
-   * The current object object must be closed to call this function.
+   * The current object must be closed to call this function.
    *
    * See the general documentation of this class for more detailed
    * information.
