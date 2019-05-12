@@ -287,12 +287,12 @@ namespace MeshWorker
      *
      * @param fe The finite element
      * @param quadrature The cell quadrature
-     * @param update_flags UpdateFlags for the current cell FEValues
+     * @param update_flags UpdateFlags for the current cell FEValues and
+     * neighbor cell FEValues
      * @param face_quadrature Face quadrature, used for FEFaceFvalues and
      * FESubfaceValues for both the current cell and the neighbor cell
      * @param face_update_flags UpdateFlags used for FEFaceFvalues and
-     * FESubfaceValues for the current cell
-     * FESubfaceValues for the neighbor cell
+     * FESubfaceValues for both the current cell and the neighbor cell
      */
     ScratchData(
       const FiniteElement<dim, spacedim> &fe,
