@@ -1081,7 +1081,7 @@ namespace Differentiation
      *   Vector<double> cell_rhs (...);
      *
      *   // Assembly loop:
-     *   for (auto cell & : ...)
+     *   for (auto & cell : ...)
      *   {
      *     cell->get_dof_indices(local_dof_indices);
      *     const unsigned int n_independent_variables =
@@ -1384,7 +1384,7 @@ namespace Differentiation
      *   Vector<double> cell_rhs (...);
      *
      *   // Assembly loop:
-     *   for (auto cell & : ...)
+     *   for (auto & cell : ...)
      *   {
      *     cell->get_dof_indices(local_dof_indices);
      *     const unsigned int n_independent_variables
