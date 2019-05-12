@@ -694,7 +694,7 @@ namespace Differentiation
      * of the @p substitution_map are substituted with the map entry's associated
      * value.
      * This substitution function is used to give a set of symbolic variables
-     * a numeric interpretation, with the returned result being of the type
+     * a numeric interpretation with the returned result being of the type
      * specified by the @p ValueType template argument.
      *
      * For more information regarding the performance of symbolic substitution,
