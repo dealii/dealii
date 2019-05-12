@@ -243,9 +243,9 @@ namespace MeshWorker
      * @param quadrature The cell quadrature
      * @param update_flags UpdateFlags for the current cell FEValues and
      * neighbor cell FEValues
-     * @param face_quadrature Face quadrature, used for FEFaceFvalues and
+     * @param face_quadrature Face quadrature, used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
-     * @param face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
      */
     ScratchData(
@@ -265,11 +265,11 @@ namespace MeshWorker
      * @param quadrature The cell quadrature
      * @param update_flags UpdateFlags for the current cell FEValues
      * @param neighbor_update_flags UpdateFlags for the neighbor cell FEValues
-     * @param face_quadrature Face quadrature, used for FEFaceFvalues and
+     * @param face_quadrature Face quadrature, used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
-     * @param face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for the current cell
-     * @param neighbor_face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param neighbor_face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for the neighbor cell
      */
     ScratchData(
@@ -289,9 +289,9 @@ namespace MeshWorker
      * @param quadrature The cell quadrature
      * @param update_flags UpdateFlags for the current cell FEValues and
      * neighbor cell FEValues
-     * @param face_quadrature Face quadrature, used for FEFaceFvalues and
+     * @param face_quadrature Face quadrature, used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
-     * @param face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
      */
     ScratchData(
@@ -308,11 +308,11 @@ namespace MeshWorker
      * @param quadrature The cell quadrature
      * @param update_flags UpdateFlags for the current cell FEValues
      * @param neighbor_update_flags UpdateFlags for the neighbor cell FEValues
-     * @param face_quadrature Face quadrature, used for FEFaceFvalues and
+     * @param face_quadrature Face quadrature, used for FEFaceValues and
      * FESubfaceValues for both the current cell and the neighbor cell
-     * @param face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for the current cell
-     * @param neighbor_face_update_flags UpdateFlags used for FEFaceFvalues and
+     * @param neighbor_face_update_flags UpdateFlags used for FEFaceValues and
      * FESubfaceValues for the neighbor cell
      */
     ScratchData(
