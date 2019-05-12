@@ -412,7 +412,7 @@ namespace python
         static_cast<Triangulation<dim,spacedim>*>(
           triangulation_wrapper.get_triangulation());
       boost::python::list cells;
-      for (auto cell : tria->active_cell_iterators())
+      for (auto & cell : tria->active_cell_iterators())
         cells.append(CellAccessorWrapper(triangulation_wrapper, cell->level(),
                                          cell->index()));
 

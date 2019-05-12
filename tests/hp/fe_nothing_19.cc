@@ -58,7 +58,7 @@ test()
   dof_handler.distribute_dofs(fe);
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       deallog << cell << ": ";
       std::vector<types::global_dof_index> dof_indices(

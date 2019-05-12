@@ -3833,7 +3833,7 @@ namespace GridTools
     tria.clear_user_data();
 
     unsigned next_index = 1;
-    for (auto cell : tria.active_cell_iterators())
+    for (auto &cell : tria.active_cell_iterators())
       {
         if (dim > 1)
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
@@ -3862,7 +3862,7 @@ namespace GridTools
                   cell->manifold_id());
             }
       }
-    for (auto cell : tria.active_cell_iterators())
+    for (auto &cell : tria.active_cell_iterators())
       {
         if (dim > 1)
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)

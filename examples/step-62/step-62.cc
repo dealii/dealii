@@ -1133,7 +1133,7 @@ namespace step62
           dim, Vector<double>(triangulation.n_active_cells()));
         Vector<double> rho(triangulation.n_active_cells());
 
-        for (auto cell : triangulation.active_cell_iterators())
+        for (auto &cell : triangulation.active_cell_iterators())
           {
             if (cell->is_locally_owned())
               {

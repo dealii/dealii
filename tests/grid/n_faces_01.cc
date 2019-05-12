@@ -42,7 +42,7 @@ test()
     mymap;
 
   unsigned int face_counter = 0;
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     {
       for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
         {

@@ -52,12 +52,12 @@ test(const bool adaptive_ref = true)
   tria.refine_global(1);
   if (adaptive_ref)
     {
-      for (auto cell : tria.active_cell_iterators())
+      for (auto &cell : tria.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 0.5)
             cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
-      for (auto cell : tria.active_cell_iterators())
+      for (auto &cell : tria.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center()[0] < 0.2)
             cell->set_refine_flag();

@@ -71,7 +71,7 @@ test()
                                               bottom_left,
                                               top_right);
 
-    for (auto cell : tria.active_cell_iterators())
+    for (auto &cell : tria.active_cell_iterators())
       {
         if (cell->center()[0] < 24.)
           cell->set_material_id(0);

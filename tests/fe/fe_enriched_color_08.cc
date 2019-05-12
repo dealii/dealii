@@ -64,7 +64,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 
   // find set of dofs which belong to enriched cells
   std::set<unsigned int> enriched_cell_dofs;
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     if (cell->active_fe_index() != 0)
       {
         unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -146,7 +146,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 
   // get material ids:
   Vector<float> fe_index(dof_handler.get_triangulation().n_active_cells());
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       fe_index[cell->active_cell_index()] = cell->active_fe_index();
     }

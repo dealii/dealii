@@ -68,7 +68,7 @@ test()
   fe.push_back(FE_Q<dim>(2));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())
         {
@@ -94,7 +94,7 @@ test()
 
   deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
           << std::endl;
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       deallog << "  Cell: " << cell << std::endl;
 

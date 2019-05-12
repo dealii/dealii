@@ -28,13 +28,13 @@ void setup_tria(Triangulation<1> &tria)
 {
   GridGenerator::subdivided_hyper_rectangle(
     tria, std::vector<unsigned int>(5u, 1), Point<1>(), Point<1>(1.5), true);
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     cell->set_material_id(
       static_cast<types::material_id>(10.0 * (3.0 + cell->center()[0])));
   for (auto face : tria.active_face_iterators())
     if (0.5 < face->center()[0])
       face->set_all_manifold_ids(42);
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     cell->set_manifold_id(
       static_cast<types::material_id>(10.0 * (2.0 + cell->center()[0])));
 }
@@ -51,7 +51,7 @@ setup_tria(Triangulation<dim> &tria)
   for (auto face : tria.active_face_iterators())
     if (face->at_boundary() && 0.0 < face->center()[0])
       face->set_boundary_id(42);
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     if (cell->center() != Point<dim>())
       {
         const double angle = std::atan2(cell->center()[0], cell->center()[1]);
@@ -63,7 +63,7 @@ setup_tria(Triangulation<dim> &tria)
   for (auto face : tria.active_face_iterators())
     if (-0.1 < face->center()[0])
       face->set_all_manifold_ids(42);
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     if (cell->center() != Point<dim>())
       {
         const double angle = std::atan2(cell->center()[0], cell->center()[1]);

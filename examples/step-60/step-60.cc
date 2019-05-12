@@ -769,7 +769,7 @@ namespace Step60
           GridTools::compute_point_locations(*space_grid_tools_cache,
                                              support_points);
         const auto &cells = std::get<0>(point_locations);
-        for (auto cell : cells)
+        for (auto &cell : cells)
           {
             cell->set_refine_flag();
             for (unsigned int face_no = 0;

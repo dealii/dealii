@@ -66,7 +66,7 @@ test()
   // set the active_fe_index on all locally active cells equal to the
   // subdomain_id. we can later verify this equality also on ghost
   // cells
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     if (cell->is_locally_owned())
       cell->set_active_fe_index(cell->subdomain_id());
 
@@ -77,7 +77,7 @@ test()
           << std::endl;
 
   // verify that the information has been communicated between processors
-  for (auto cell : dof_handler.active_cell_iterators())
+  for (auto &cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())
         Assert(cell->active_fe_index() == cell->subdomain_id(),

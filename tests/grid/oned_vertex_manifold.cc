@@ -38,7 +38,7 @@ main()
 
   triangulation.begin_active()->set_all_manifold_ids(spherical_manifold_id);
 
-  for (const auto cell : triangulation.active_cell_iterators())
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       deallog << "current cell manifold id: " << cell->manifold_id()
               << std::endl;

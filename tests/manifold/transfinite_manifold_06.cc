@@ -65,7 +65,7 @@ main()
 
   deallog.precision(10);
   deallog << "Cell centers" << std::endl;
-  for (auto cell : tria.cell_iterators())
+  for (auto &cell : tria.cell_iterators())
     deallog << cell->id() << " has center "
             << cell->center(/*respect_manifold*/ true) << std::endl;
 

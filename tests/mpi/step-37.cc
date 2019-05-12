@@ -542,7 +542,7 @@ namespace Step37
           }
         else
           {
-            for (auto cell : triangulation.active_cell_iterators())
+            for (auto &cell : triangulation.active_cell_iterators())
               if (cell->is_locally_owned())
                 {
                   if ((cell->center()[0] < -8. && cell->center()[1] < 0) ||

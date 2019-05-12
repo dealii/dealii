@@ -107,7 +107,7 @@ check()
 
   const Quadrature<dim> support_quadrature(fe.get_unit_support_points());
   FEValues<dim> fe_values(fe, support_quadrature, update_quadrature_points);
-  for (const auto cell : dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
       const auto &qp = fe_values.get_quadrature_points();

@@ -44,7 +44,7 @@ test()
   };
 
   GridTools::assign_co_dimensional_manifold_indicators(tria, validate);
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     {
       deallog << "Cell: " << (int)cell->manifold_id() << std::endl;
       if (dim > 1)

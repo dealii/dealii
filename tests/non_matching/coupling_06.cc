@@ -120,7 +120,7 @@ test()
     FullMatrix<double>        cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
     AffineConstraints<double> constraints;
 
-    for (auto cell : dh.active_cell_iterators())
+    for (auto &cell : dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;

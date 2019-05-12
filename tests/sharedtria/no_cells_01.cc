@@ -55,7 +55,7 @@ test()
     parallel::shared::Triangulation<dim>::partition_custom_signal);
   triangulation.signals.post_refinement.connect([&triangulation]() {
     // partition the triangulation by hand
-    for (auto cell : triangulation.active_cell_iterators())
+    for (auto &cell : triangulation.active_cell_iterators())
       cell->set_subdomain_id(cell->active_cell_index() %
                              Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD));
   });
