@@ -155,28 +155,32 @@ namespace Step63
   {
     ParameterHandler prm;
 
-    prm.declare_entry("Epsilon", "0.005", Patterns::Double(0), "Epsilon");
+    prm.declare_entry("Epsilon",
+                      "0.005",
+                      Patterns::Double(0),
+                      "Diffusion parameter");
 
     prm.declare_entry("Fe degree",
                       "1",
-                      Patterns::Integer(0),
+                      Patterns::Integer(1),
                       "Finite Element degree");
     prm.declare_entry("Smoother type",
                       "block SOR",
                       Patterns::Selection("SOR|Jacobi|block SOR|block Jacobi"),
-                      "Smoother Type: SOR|Jacobi|block SOR|block Jacobi");
+                      "Select smoother: SOR|Jacobi|block SOR|block Jacobi");
     prm.declare_entry("Smoothing steps",
                       "2",
                       Patterns::Integer(1),
                       "Number of smoothing steps");
-    prm.declare_entry("DoF renumbering",
-                      "downstream",
-                      Patterns::Selection("none|downstream|upstream|random"),
-                      "DoF renumbering: none|downstream|upstream|random");
+    prm.declare_entry(
+      "DoF renumbering",
+      "downstream",
+      Patterns::Selection("none|downstream|upstream|random"),
+      "Select DoF renumbering: none|downstream|upstream|random");
     prm.declare_entry("With streamline diffusion",
                       "true",
                       Patterns::Bool(),
-                      "With streamline diffusion: true|false");
+                      "Enable streamline diffusion stabilization: true|false");
     prm.declare_entry("Output",
                       "true",
                       Patterns::Bool(),
@@ -211,7 +215,7 @@ namespace Step63
   }
 
 
-  // @sect1{Cell permutations}
+  // @sect3{Cell permutations}
   //
   // The ordering in which cells and degrees of freedom are traversed
   // will play a roll in the speed of convergence for multiplicative
@@ -870,7 +874,7 @@ namespace Step63
   // The relaxation parameter for point smoothers is chosen based on trial and
   // error, and they reflect values necessary to keep the iteration counts in
   // the GMRES solve constant (or as close as possible) as we refine the mesh.
-  // The two values given for both ``Jacobi" and ``SOR" are for degree 1 and
+  // The two values given for both "Jacobi" and "SOR" are for degree 1 and
   // degree 3 finite elements. If the user wants to change to another degree,
   // they may need to adjust these numbers. For block smoothers, this parameter
   // has a more straightforward interpretation, namely that for additive methods
