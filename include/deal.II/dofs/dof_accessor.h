@@ -601,23 +601,6 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcRefinementNotSupported,
-                   "DoFHandler is not of type hp::DoFHandler and "
-                   "does not support p-refinement.");
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclExceptionMsg(ExcCoarseningNotSupported,
-                   "DoFHandler is not of type hp::DoFHandler and "
-                   "does not support p-coarsening.");
-
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
   DeclException0(ExcVectorNotEmpty);
   /**
    * Exception
@@ -1902,10 +1885,14 @@ public:
    * parallel::shared::Triangulation or parallel::distributed::Triangulation
    * classes, it is only allowed to call this function on locally
    * owned or ghost cells. No information is available on artificial cells.
-   * Furthermore, @p active_fe_index information is exchanged from locally
+   * Furthermore, @p active_fe_index information is only exchanged from locally
    * owned cells on one processor to other processors where they may be
-   * ghost cells, during the call to hp::DoFHandler::distribute_dofs().
-   * See the documentation of hp::DoFHandler for more information.
+   * ghost cells, during the call to hp::DoFHandler::set_fe() and
+   * hp::DoFHandler::distribute_dofs(). Be aware that if you call
+   * set_active_fe_index() on a cell after calling one of these functions, then
+   * this information will not be propagated to other processors who may have
+   * this cell as a ghost cell. See the documentation of hp::DoFHandler for more
+   * information.
    */
   unsigned int
   active_fe_index() const;
@@ -1928,8 +1915,7 @@ public:
    * classes, it is only allowed to call this function on locally
    * owned cells (see
    * @ref GlossLocallyOwnedCell "this glossary entry").
-   * This
-   * is because otherwise a common source of errors would be if one
+   * This is because otherwise a common source of errors would be if one
    * processor sets a different @p active_fe_index on a ghost cell than
    * the processor that actually owns the cell does. To avoid this mistake,
    * one can only set @p active_fe_index information on locally owned
@@ -1970,82 +1956,56 @@ public:
    */
 
   /**
-   * Return whether the p-refinement flag is set or not.
+   * Return the fe_index of the finite element that will be assigned to this
+   * cell next time the triangulation gets refined and coarsened. If no future
+   * finite element has been specified for this cell via the
+   * set_future_fe_index() function, the active one will remain unchanged, in
+   * which case the fe_index of the active finite element will be returned.
    *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  bool
-  p_refine_flag_set() const;
-
-  /**
-   * Flag the cell pointed to for p-refinement. This function is only allowed
-   * for active cells.
+   * @note Since degrees of freedom only exist on active cells for
+   * hp::DoFHandler (i.e., there is currently no implementation of multilevel
+   * hp::DoFHandler objects), it does not make sense to query future FE
+   * indices on non-active cells since they do not have finite element spaces
+   * associated with them without having any degrees of freedom. Consequently,
+   * this function will produce an exception when called on non-active cells.
    *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  void
-  set_p_refine_flag() const;
-
-  /**
-   * Clear the p-refinement flag.
-   *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  void
-  clear_p_refine_flag() const;
-
-  /**
-   * Return whether the p-coarsening flag is set or not.
-   *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  bool
-  p_coarsen_flag_set() const;
-
-  /**
-   * Flag the cell pointed to for p-coarsening. This function is only allowed
-   * for active cells.
-   *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  void
-  set_p_coarsen_flag() const;
-
-  /**
-   * Clear the p-coarsening flag.
-   *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
-   */
-  void
-  clear_p_coarsen_flag() const;
-
-  /**
-   * Returns the active_fe_index that this cell would have if refinement would
-   * happen.
-   *
-   * Prediction is based on the current p-refinement flags set on this cell,
-   * returning FECollection::next_in_hierarchy() for p-refinement,
-   * FECollection::previous_in_hierarchy() for p-coarsening,
-   * or the current active_fe_index otherwise.
-   *
-   * If this cell is additionally flagged for h-refinement or h-coarsening,
-   * these predicted active_fe_indices will be used to determine the finite
-   * elements on the refined and coarsened cells. For h-refinement, the
-   * predicted active_fe_index will be distributed on its children. For
-   * h-coarsening, the predicted active_fe_index of this cell and its siblings
-   * will be used to determine the active_fe_index on parent cell.
-   *
-   * @note The DoFHandler in use has to be of type hp::DoFHandler.
-   * An exception is thrown otherwise.
+   * @note When using parallel meshes, either through the
+   * parallel::shared::Triangulation or parallel::distributed::Triangulation
+   * classes, it is only allowed to call this function on locally owned cells.
    */
   unsigned int
-  active_fe_index_after_p_refinement_and_coarsening() const;
+  future_fe_index() const;
+
+  /**
+   * Set the fe_index of the finite element that will be assigned to this
+   * cell next time the triangulation gets refined and coarsened. A previously
+   * assigned future finite element will be overwritten.
+   *
+   * See notes of future_fe_index() for information about restrictions on this
+   * functionality.
+   */
+  void
+  set_future_fe_index(const unsigned int i) const;
+
+  /**
+   * Return whether a future finite element has been set.
+   *
+   * See notes of future_fe_index() for information about restrictions on this
+   * functionality.
+   */
+  bool
+  future_fe_index_set() const;
+
+  /**
+   * Revoke the future finite element assigned. Thus, the active finite element
+   * will remain unchanged next time the triangulation gets refined and
+   * coarsened.
+   *
+   * See notes on future_fe_index() for information about restrictions on this
+   * functionality.
+   */
+  void
+  clear_future_fe_index() const;
   /**
    * @}
    */

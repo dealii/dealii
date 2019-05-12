@@ -137,7 +137,7 @@ namespace parallel
         case Triangulation<dim, spacedim>::CELL_PERSIST:
         case Triangulation<dim, spacedim>::CELL_REFINE:
         case Triangulation<dim, spacedim>::CELL_INVALID:
-          fe_index = cell->active_fe_index();
+          fe_index = cell->future_fe_index();
           break;
 
         case Triangulation<dim, spacedim>::CELL_COARSEN:
@@ -147,7 +147,7 @@ namespace parallel
                  child_index < GeometryInfo<dim>::max_children_per_cell;
                  ++child_index)
               fe_indices_children.insert(
-                cell->child(child_index)->active_fe_index());
+                cell->child(child_index)->future_fe_index());
 
             Assert(dof_handler->get_fe_collection().find_dominating_fe_extended(
                      fe_indices_children, /*codim=*/0) !=

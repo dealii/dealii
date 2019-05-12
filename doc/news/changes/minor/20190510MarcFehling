@@ -1,0 +1,7 @@
+New: Introduced indices for future finite elements that cells will be assigned
+to after the triangulation changes. The future_fe_index of each cell can be
+accessed and changed via member functions of the DoFCellAccessor class,
+namely DoFCellAccessor::future_fe_index(), DoFCellAccessor::set_future_fe_index(),
+DoFCellAccessor::future_fe_index_set(), and DoFCellAccessor::clear_future_fe_index().
+<br>
+(Marc Fehling, 2019/05/10)

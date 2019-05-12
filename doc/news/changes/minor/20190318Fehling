@@ -1,5 +1,0 @@
-New: Function DoFCellAccessor::active_fe_index_after_p_refinement_and_coarsening()
-returns the active fe index that a cell (of a hp::DoFHandler) will have if
-p-refinement would be performed.
-<br>
-(Marc Fehling, 2019/03/18)
