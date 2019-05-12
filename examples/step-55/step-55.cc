@@ -515,10 +515,7 @@ namespace Step55
     const FEValuesExtractors::Vector     velocities(0);
     const FEValuesExtractors::Scalar     pressure(dim);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.begin_active())
       if (cell->is_locally_owned())
         {
           cell_matrix  = 0;
@@ -595,19 +592,6 @@ namespace Step55
 
 #ifdef USE_PETSC_LA
       data.symmetric_operator = true;
-#else
-//      data.n_cycles = 1;
-//      data.higher_order_elements = true;
-//      data.elliptic = true;
-//      data.smoother_sweeps = 5;
-//      data.smoother_overlap = 1;
-
-//      std::vector<std::vector<bool> > constant_modes;
-//      FEValuesExtractors::Vector velocity_components(0);
-//      DoFTools::extract_constant_modes (dof_handler,
-//                                        fe.component_mask(velocity_components),
-//                                        constant_modes);
-//      data.constant_modes = constant_modes;
 #endif
       prec_A.initialize(system_matrix.block(0, 0), data);
     }
@@ -618,7 +602,6 @@ namespace Step55
 
 #ifdef USE_PETSC_LA
       data.symmetric_operator = true;
-#else
 #endif
       prec_S.initialize(preconditioner_matrix.block(1, 1), data);
     }
@@ -679,26 +662,7 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer, "refine");
 
-    if (true)
-      {
-        triangulation.refine_global();
-      }
-    else
-      {
-        Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-
-        FEValuesExtractors::Vector velocities(0);
-        KellyErrorEstimator<dim>::estimate(
-          dof_handler,
-          QGauss<dim - 1>(fe.degree + 1),
-          std::map<types::boundary_id, const Function<dim> *>(),
-          locally_relevant_solution,
-          estimated_error_per_cell,
-          fe.component_mask(velocities));
-        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-          triangulation, estimated_error_per_cell, 0.3, 0.0);
-        triangulation.execute_coarsening_and_refinement();
-      }
+    triangulation.refine_global();
   }
 
 
