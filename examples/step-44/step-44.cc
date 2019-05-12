@@ -813,8 +813,6 @@ namespace Step44
   public:
     Solid(const std::string &input_file);
 
-    virtual ~Solid();
-
     void run();
 
   private:
@@ -1078,13 +1076,6 @@ namespace Step44
     Assert(dim == 2 || dim == 3,
            ExcMessage("This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
-  }
-
-  // The class destructor simply clears the data held by the DOFHandler
-  template <int dim>
-  Solid<dim>::~Solid()
-  {
-    dof_handler.clear();
   }
 
 
