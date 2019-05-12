@@ -355,9 +355,9 @@ namespace Step33
     // go with the pragmatic, even if not pretty, solution shown here:
     template <typename DataVector>
     static void
-    compute_Wminus(const BoundaryKind (&boundary_kind)[n_components],
-                   const Tensor<1, dim> &normal_vector,
-                   const DataVector &    Wplus,
+    compute_Wminus(const std::array<BoundaryKind, n_components> &boundary_kind,
+                   const Tensor<1, dim> &                        normal_vector,
+                   const DataVector &                            Wplus,
                    const Vector<double> &boundary_values,
                    const DataVector &    Wminus)
     {
@@ -460,11 +460,9 @@ namespace Step33
       std::vector<std::vector<Tensor<1, dim>>> dU(
         1, std::vector<Tensor<1, dim>>(n_components));
 
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
+          const unsigned int cell_no = cell->active_cell_index();
           fe_v.reinit(cell);
           fe_v.get_function_gradients(solution, dU);
 
@@ -1061,8 +1059,9 @@ namespace Step33
 
       struct BoundaryConditions
       {
-        typename EulerEquations<dim>::BoundaryKind
-          kind[EulerEquations<dim>::n_components];
+        std::array<typename EulerEquations<dim>::BoundaryKind,
+                   EulerEquations<dim>::n_components>
+          kind;
 
         FunctionParser<dim> values;
 
@@ -1093,8 +1092,9 @@ namespace Step33
     AllParameters<dim>::BoundaryConditions::BoundaryConditions()
       : values(EulerEquations<dim>::n_components)
     {
-      for (unsigned int c = 0; c < EulerEquations<dim>::n_components; ++c)
-        kind[c] = EulerEquations<dim>::no_penetration_boundary;
+      std::fill(kind.begin(),
+                kind.end(),
+                EulerEquations<dim>::no_penetration_boundary);
     }
 
 
@@ -1472,10 +1472,7 @@ namespace Step33
     // Then loop over all cells, initialize the FEValues object for the
     // current cell and call the function that assembles the problem on this
     // cell.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_v.reinit(cell);
         cell->get_dof_indices(dof_indices);
@@ -2250,12 +2247,9 @@ namespace Step33
   void
   ConservationLaw<dim>::refine_grid(const Vector<double> &refinement_indicators)
   {
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        const unsigned int cell_no = cell->active_cell_index();
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();
 
