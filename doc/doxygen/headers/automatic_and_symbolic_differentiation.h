@@ -65,7 +65,7 @@
  * the Tensor and SymmetricTensor classes should support calculations performed with these specialized
  * numbers.
  * (In theory an entire program could be made differentiable. This could be useful in, for example,
- * the sentitivity analysis of solutions with respect to input parameters. However, to date this has
+ * the sensitivity analysis of solutions with respect to input parameters. However, to date this has
  * not been tested.)
  *
  * Implementations of specialized frameworks based on <em>operator overloading</em> typically fall into
@@ -120,7 +120,7 @@
  *    function.
  *
  * Each of these methods, of course, has its advantages and disadvantages, and one may be more appropriate
- * than another for a given problem that is to be solved. As the aforemetioned implementational details
+ * than another for a given problem that is to be solved. As the aforementioned implementational details
  * (and others not discussed) may be hidden from the user, it may still be important to understand the
  * implications, run-time cost,  and potential limitations, of using any one of these "black-box"
  * auto-differentiable numbers.
@@ -157,8 +157,8 @@
  * In the most practical sense, any of the above categories exploit the chain-rule to compute the total
  * derivative of a composite function. To perform this action, they typically use one of two mechanisms to
  * compute derivatives, specifically
- * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentation, or
- * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentation.
+ * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentiation, or
+ * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentiation.
  *
  * As a point of interest, the <em>optimal Jacobian accumulation</em>, which performs a minimal set of
  * computations, lies somewhere between these two limiting cases. Its computation for a general composite
