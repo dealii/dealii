@@ -74,7 +74,6 @@ memory (VM) peak usage:
   <th colspan="6">ILU</th>
   <th colspan="3">UMFPACK</th>
 </tr>
-
 <tr>
   <th></th>
   <th></th>
@@ -88,7 +87,6 @@ memory (VM) peak usage:
   <th colspan="2">Timings</th>
   <th></th>
 </tr>
-
 <tr>
   <th>Cycle</th>
   <th>DoFs</th>
@@ -110,7 +108,6 @@ memory (VM) peak usage:
   <th>Solve</th>
   <th>VM Peak</th>
 </tr>
-
 <tr>
   <td>0</td>
   <td>15468</td>
@@ -132,7 +129,6 @@ memory (VM) peak usage:
   <td>2.8s</td>
   <td>5054</td>
 </tr>
-
 <tr>
   <td>1</td>
   <td>112724</td>
@@ -154,7 +150,6 @@ memory (VM) peak usage:
   <td>237s</td>
   <td>11288</td>
 </tr>
-
 <tr>
   <td>2</td>
   <td>859812</td>
@@ -176,7 +171,6 @@ memory (VM) peak usage:
   <td>-</td>
   <td>-</td>
 </tr>
-
 </table>
 
 As can be seen from the table,
