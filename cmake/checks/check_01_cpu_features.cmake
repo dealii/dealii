@@ -78,7 +78,7 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
   CHECK_CXX_SOURCE_RUNS(
     "
-    #include <emmintrin.h>
+    #include <x86intrin.h>
     int main()
     {
     __m128d a, b;
@@ -116,7 +116,7 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     #ifndef __AVX__
     #error \"__AVX__ flag not set, no support for AVX\"
     #endif
-    #include <immintrin.h>
+    #include <x86intrin.h>
     class VectorizedArray
     {
     public:
@@ -175,7 +175,7 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     #ifndef __AVX512F__
     #error \"__AVX512F__ flag not set, no support for AVX512\"
     #endif
-    #include <immintrin.h>
+    #include <x86intrin.h>
     int main()
     {
       __m512d a, b;
