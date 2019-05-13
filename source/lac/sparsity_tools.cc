@@ -388,6 +388,7 @@ namespace SparsityTools
       std::fill(partition_indices.begin(), partition_indices.end(), 0);
 
       // copy from export_to_part to partition_indices, whose part_ids != 0.
+      Assert(export_to_part != nullptr, ExcInternalError());
       for (int i = 0; i < num_export; i++)
         partition_indices[export_local_ids[i]] = export_to_part[i];
 #endif
