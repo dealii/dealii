@@ -26,7 +26,7 @@
 
 // Note:
 // The flag DEAL_II_COMPILER_VECTORIZATION_LEVEL is essentially constructed
-// according to the following scheme
+// according to the following scheme (on x86-based architectures)
 // #ifdef __AVX512F__
 // #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
 // #elif defined (__AVX__)
@@ -40,30 +40,35 @@
 // 'check_01_cpu_features.cmake', ensures that these feature are not only
 // present in the compilation unit but also working properly.
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
-  !defined(__AVX__)
-#  error \
-    "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
-#endif
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
-  !defined(__AVX512F__)
-#  error \
-    "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
-#endif
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
 
-#if defined(_MSC_VER)
-#  include <intrin.h>
-#elif defined(__ALTIVEC__)
-#  include <altivec.h>
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
+    !defined(__AVX__)
+#    error \
+      "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
+#  endif
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
+    !defined(__AVX512F__)
+#    error \
+      "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
+#  endif
+
+#  if defined(_MSC_VER)
+#    include <intrin.h>
+#  elif defined(__ALTIVEC__)
+#    include <altivec.h>
 
 // altivec.h defines vector, pixel, bool, but we do not use them, so undefine
 // them before they make trouble
-#  undef vector
-#  undef pixel
-#  undef bool
-#else
-#  include <x86intrin.h>
+#    undef vector
+#    undef pixel
+#    undef bool
+#  else
+#    include <x86intrin.h>
+#  endif
+
 #endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
