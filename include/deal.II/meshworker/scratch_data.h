@@ -86,7 +86,7 @@ namespace MeshWorker
    * discontinuous Galerkin methods).
    *
    * If you need to retrieve values or gradients of finite element solution
-   * vectors, on the cell, face, or subface that has just beeing initialized
+   * vectors, on the cell, face, or subface that has just been initialized
    * with one of the functions in
    * @ref CurrentCellMethods,
    * you can use the

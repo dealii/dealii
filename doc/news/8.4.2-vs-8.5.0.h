@@ -1656,7 +1656,7 @@ inconvenience this causes.
   New: Added TrilinosWrappers::SolveDirect::initialize and
   TrilinosWrappers::SolverDirect::solve to solve distributed linear systems
   with multiple right hand sides without needing to refactorize the matrix
-  everytime.
+  every time.
   <br>
   (Michael Harmon, 2016/06/30)
  </li>
