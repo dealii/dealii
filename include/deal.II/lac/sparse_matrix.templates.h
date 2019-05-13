@@ -897,7 +897,7 @@ namespace internal
       for (size_type i = begin_row; i < end_row; ++i)
         {
           typename InVector::value_type s = 0;
-          for (size_type j = rowstart[i]; j < rowstart[i + 1]; j++)
+          for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
             s += typename InVector::value_type(values[j]) * v(colnums[j]);
           norm_sqr +=
             v(i) *
@@ -963,7 +963,7 @@ namespace internal
       for (size_type i = begin_row; i < end_row; ++i)
         {
           typename InVector::value_type s = 0;
-          for (size_type j = rowstart[i]; j < rowstart[i + 1]; j++)
+          for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
             s += typename InVector::value_type(values[j]) * v(colnums[j]);
           norm_sqr +=
             u(i) *
@@ -1307,7 +1307,7 @@ namespace internal
       for (size_type i = begin_row; i < end_row; ++i)
         {
           typename OutVector::value_type s = b(i);
-          for (size_type j = rowstart[i]; j < rowstart[i + 1]; j++)
+          for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
             s -= typename OutVector::value_type(values[j]) * u(colnums[j]);
           dst(i) = s;
           norm_sqr +=

@@ -718,7 +718,7 @@ namespace TrilinosWrappers
         return false;
 
       size_type i;
-      for (i = 0; i < local_size(); i++)
+      for (i = 0; i < local_size(); ++i)
         if ((*(v.vector))[0][i] != (*vector)[0][i])
           return false;
 
