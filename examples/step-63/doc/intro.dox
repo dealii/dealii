@@ -18,12 +18,94 @@ smoothers in geometric multigrid.
 
 OUTLINE
 
+- based on step-16 (GMG), and step-9 (advection)
+
+differences to GMG in step-16:
+
+- non-symmetric problem (interface matrices)
+- renumbering of dofs on each level
+- different smoothers (include block)
+
+
+<h2>Equation</h2>
+
 * Statement of PDE and weak-form with physical description
 
-* SUPG (streamline diffusion): State modifications to weak-form. Show
+* SUPG (streamline diffusion): State modifications to weak-form.
+
+
+<h2>Smoothers</h2>
+
+One of the goals of this tutorial is to expand from using a simple
+(point-wise) Gauss-Seidel (SOR) smoother that is used in step-16 (class
+PreconditionSOR) on each level of the multigrid hierarchy.  Here, we consider
+point-wise smoothers (Jacobi and SOR) and cell-based smoothers (Block Jacobi
+and Block SOR). The cell-based smoothers can best be explained within the framework
+of additive and multiplicative Schwarz methods.
+
+In contrast to step-16, our test problem contains an advective
+term. Especially with small viscosity, information is transported along
+streamlines in the given advection direction. This means that smoothers are
+likely to be more effective, if they allow information to travel in downstream
+direction within a single smoother application. This requires reordering
+degrees of freedom or cells (for the cell-based smoothers) accordingly. The
+influence of the ordering will be visible in the results section.
+
+Let us now briefly define the smoothers used in this tutorial. A Schwarz
+preconditioner requires a decomposition
+@f{align*}{
+V = \sum_{j=1}^J V_j
+@f}
+of our finite element space $V$. Each subproblem $V_j$ also has a Ritz
+projection $P_j: V \rightarrow V_j$ based on the bilinear form
+$a(\cdot,\cdot)$. This projection induces a local operator $A_j$ for each
+subproblem $V_j$. If $\Pi_j:V\rightarrow V_j$ is the orthogonal projector onto
+$V_j$, one can show $A_jP_j=\Pi_j^TA$.
+
+With this we can define an <i>additive Schwarz preconditioner</i> for the
+operator $A$ as
+@f{align*}{
+ B^{-1} = \sum_{j=1}^J P_j A^{-1} = \sum_{j=1}^J A_j^{-1} \Pi_j^T.
+@f}
+In other words, we project our solution into each subproblem, apply the
+inverse of the subproblem $A_j$, and sum the contributions up over all $j$.
+
+Note that one can interpret the point-wise Jacobi method as an additive
+Schwarz method by defining a subproblem $V_j$ for each degree of
+freedom. Then, $A_j^{-1}$ becomes a multiplication with the inverse of the
+diagonal entry of $A$.
+
+For the "Block Jacobi" method used in this tutorial, we define a subproblem
+$V_j$ for each cell of the mesh on the current level. Note that we use a
+continuous finite element, so these blocks are overlapping, as degrees of
+freedom on an interface between two cells belong to both subproblems. The
+logic for the Schwarz operator operating on the subproblems (in deal.II they
+are called "blocks"), is done in the class RelaxationBlock. The "Block
+Jacobi" method is implemented in the class RelaxationBlockJacobi. Many
+aspects of the class (for example how the blocks are defined and how to invert
+the local subproblems $A_j$ can be configured in the smoother data (see
+RelaxationBlock::AdditionalData and DoFTools::make_cell_patches).
+
+So far, we discussed additive smoothers where the updates can be applied
+independently and there is no information flowing within a single smoother
+application. A <i>multiplicative Schwarz preconditioner</i> addresses this by
+@f{align*}{
+ B^{-1} = \left( I- \prod_{j=1}^J I-P_J \right) A^{-1}.
+@f}
+In contrast to above, the updates on the subproblems $V_j$ are applied
+sequentially. This means that the update obtained when inverting the
+subproblem $A_j$ is immediately used in $A_{j+1}$.
+
+This method is implemented in the class RelaxationBlockSOR and used when you
+select "Block SOR" in this tutorial. The class RelaxationBlockSOR is also
+derived from RelaxationBlock. As such, both additive and multiplicative
+Schwarz methods are implemented in a unified framework.
+
+Finally, let us note that the standard Gauss-Seidel (or SOR) method can be
+seen as a multiplicative Schwarz method with a subproblem for each DoF.
+
+<h2>Test problem</h2>
+
+ Show
   image of solution without and with SUPG.
-
-* Breifly talk about point- vs. block-smoothers, additive v.s
-  multiplicative (renumbering)
-
 

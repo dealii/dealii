@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h3> GMRES Iteration Counts </h3>
+<h3> GMRES Iteration Numbers </h3>
 
 The major advantage for GMG is that it is an $\mathcal{O}(n)$ method,
 that is, the complexity of the problem increases linearly with the
@@ -12,7 +12,7 @@ refine the mesh.
 Each of the following tables gives the GMRES iteration counts to
 reduce the initial residual by 1e8.
 
-<h5> DoF/Cell Renumbering: </h5>
+<h4> DoF/Cell Renumbering </h4>
 
 Starting with the additive smoothers, we see that renumbering the
 DoFs/cells has no effect on convergence speed. This is because these
@@ -30,7 +30,6 @@ different components will not affect the end result.
   <th colspan="1">$Q_1$</th>
   <th colspan="7">Smoother (smoothing steps)</th>
 </tr>
-
 <tr>
   <th></th>
   <th></th>
@@ -285,7 +284,7 @@ conditions in this case).
 </table>
 
 
-<h5> Point vs. Block Smoothers </h5>
+<h4> Point vs. Block Smoothers </h4>
 
 We will limit the results to runs using the downstream
 renumbering. Here is a cross comparison of all four smoothers for both
@@ -497,19 +496,24 @@ though currently for these examples it is quite slow.
 
 <h3> Possible Extensions </h3>
 
-<h5> Constant iterations for Q<sub>5</sub> </h5>
+<h4> Constant iterations for Q<sub>5</sub> </h4>
 
 Change the number of smoothing steps and the smoother relaxation
 parameter (set in <code>Smoother::AdditionalData()</code> inside
 <code>create_smoother()</code>, only necessary for point smoothers) so
 that we maintain a constant number of iterations for a $Q_5$ element.
 
-<h5> Effectiveness of renumbering for changing epsilon </h5>
+<h4> Effectiveness of renumbering for changing epsilon </h4>
 
 Increase/decrease the parameter "Epsilon" in the .prm files of the
 multiplicative methods and observe for which values renumbering no
 longer influences convergence speed.
 
+<h4> Mesh adaptivity </h4>
+
+The code is set up to work correctly with an adaptively refined mesh (the
+interface matrices are created and set). Devise a suitable refinement
+criterium or try KellyErrorEstimator).
 
 
 
