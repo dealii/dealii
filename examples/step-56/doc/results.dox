@@ -17,7 +17,7 @@ see for example Ern/Guermond "Theory and Practice of Finite Elements", Section
 element as an example (this is what is done in the code, but is easily
 changed in <code>main()</code>):
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
     <th>&nbsp;</th>
     <th>L2 Velocity</th>
@@ -66,7 +66,7 @@ CG. The preconditioner for CG is then either ILU or GMG.
 The following table summarizes solver iterations, timings, and virtual
 memory (VM) peak usage:
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
 <tr>
   <th></th>
   <th colspan="3">General</th>
@@ -173,7 +173,7 @@ memory (VM) peak usage:
 </tr>
 </table>
 
-As can be seen from the table,
+As can be seen from the table:
 
 1. UMFPACK uses large amounts of memory, especially in 3d. Also, UMFPACK
 timings do not scale favorably with problem size.
