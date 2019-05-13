@@ -40,6 +40,8 @@
 #  endif
 #endif
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
@@ -53,6 +55,8 @@
 #  include <boost/iostreams/filtering_stream.hpp>
 #  include <boost/iostreams/stream.hpp>
 #endif
+
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

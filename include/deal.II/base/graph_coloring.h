@@ -24,8 +24,10 @@
 
 #  include <deal.II/lac/sparsity_tools.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/unordered_map.hpp>
 #  include <boost/unordered_set.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <functional>
 #  include <set>

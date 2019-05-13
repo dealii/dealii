@@ -40,7 +40,9 @@
 #ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/parallel.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/concurrent_unordered_map.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #include <fstream>
