@@ -480,19 +480,18 @@ of an additive method. This is a major disadvantage to these methods.
 able to compute the inverse of the cell matrices much cheaper than
 what is currently being done inside deal.II. This research is based on
 the fast diagonalization method (dating back to the 1960s) and has
-been used in the spectral community for around 20 years (see, e.g.,
-https://doi.org/10.1007/s10915-004-4787-3). There are currently
-efforts to generalize these methods to DG and make them more
-robust. Also, it seems that one should be able to take advantage of
-matrix-free implementations and the fact that, in the interior of
-the domain, cell matrices tend to look very similar, allowing fewer
-matrix inverse computations.
+been used in the spectral community for around 20 years (see, e.g., <a
+href="https://doi.org/10.1007/s10915-004-4787-3"> Hybrid
+Multigrid/Schwarz Algorithms for the Spectral Element Method by Lottes
+and Fischer</a>). There are currently efforts to generalize these
+methods to DG and make them more robust. Also, it seems that one
+should be able to take advantage of matrix-free implementations and
+the fact that, in the interior of the domain, cell matrices tend to
+look very similar, allowing fewer matrix inverse computations.
 
 Combining 1. and 2. gives a good reason for expecting that a method
 like block Jacobi could become very powerful in the future, even
 though currently for these examples it is quite slow.
-
-
 
 <h3> Possible Extensions </h3>
 

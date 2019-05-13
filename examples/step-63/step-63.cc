@@ -340,10 +340,14 @@ namespace Step63
   // @sect3{Right-hand Side and Boundary Values}
 
   // The problem solved in this tutorial is an adaptation of Ex. 3.1.3
-  // found on pg. 118 of Finite Elements and Fast Iterative Solvers:
-  // with Applications in Incompressible Fluid Dynamics by Elman, Silvester,
-  // and Wathen. The main difference being that we add a hole in the center
-  // of our domain with zero Dirichlet boundary.
+  // found on pg. 118 of
+  // <a
+  // href="https://global.oup.com/academic/product/finite-elements-and-fast-iterative-solvers-9780199678808">
+  // Finite Elements and Fast Iterative Solvers: with Applications in
+  // Incompressible Fluid Dynamics by Elman, Silvester, and Wathen</a> with
+  // Applications in Incompressible Fluid Dynamics by Elman, Silvester, and
+  // Wathen. The main difference being that we add a hole in the center of our
+  // domain with zero Dirichlet boundary.
 
   // We have a zero right-hand side.
   template <int dim>
@@ -445,9 +449,9 @@ namespace Step63
   // @sect3{Streamline Diffusion}
 
   // Streamline diffusion stabilization term. Value is defined in
-  // "On Discontinuity—Capturing Methods for Convection—Diffusion
-  // Equations" by Volker and Petr
-  // (https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27).
+  // <a href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
+  // On Discontinuity—Capturing Methods for Convection—Diffusion Equations
+  // by Volker and Petr</a>
   template <int dim>
   double compute_stabilization_delta(const double         hk,
                                      const double         eps,
@@ -723,13 +727,13 @@ namespace Step63
               copy_data.cell_matrix(i, j) +=
                 // Galerkin contribution:
                 (settings.epsilon *
-                 scratch_data.fe_values.shape_grad(j, q_point) *
                  scratch_data.fe_values.shape_grad(i, q_point) *
+                 scratch_data.fe_values.shape_grad(j, q_point) *
                  scratch_data.fe_values.JxW(q_point)) +
-                ((advection_direction *
+                (scratch_data.fe_values.shape_value(i, q_point) *
+                 (advection_direction *
                   scratch_data.fe_values.shape_grad(j, q_point)) *
-                 scratch_data.fe_values.shape_value(i, q_point)) *
-                  scratch_data.fe_values.JxW(q_point) +
+                 scratch_data.fe_values.JxW(q_point)) +
                 // Streamline diffusion contribution:
                 delta *
                   (advection_direction *
