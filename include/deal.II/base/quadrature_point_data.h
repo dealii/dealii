@@ -310,9 +310,9 @@ namespace parallel
      * // CellDataStorage::initialize()
      * data_transfer.interpolate();
      * @endcode
-     * This approach can be extended to quadrature point data with Tensors of
-     * arbitrary order, although with a little bit more work in packing and
-     * unpacking of data inside MyQData class.
+     * This approach can be extended to quadrature point data with Tensor
+     * objects of arbitrary order, although with a little bit more work in
+     * packing and unpacking of data inside MyQData class.
      *
      * @note Currently coarsening is not supported.
      *
