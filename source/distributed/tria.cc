@@ -1351,7 +1351,7 @@ namespace parallel
       //
       // To deal with the case that at least one of the processors does not own
       // any cell at all, we will exchange the information about the data sizes
-      // among them later. The code inbetween is still well-defined, since the
+      // among them later. The code in between is still well-defined, since the
       // following loops will be skipped.
       std::vector<unsigned int> local_sizes_fixed(
         1 + n_callbacks_fixed + (variable_size_data_stored ? 1 : 0));

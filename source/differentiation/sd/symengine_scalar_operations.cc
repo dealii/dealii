@@ -229,7 +229,7 @@ namespace Differentiation
                   // Here we substitute in symbol_values_resolved instead of
                   // symbol_values, in order to break any cyclic dependencies.
                   // The earlier entries in the dictionary are in this way
-                  // guarenteed to be resolved before any subsequent entries,
+                  // guaranteed to be resolved before any subsequent entries,
                   // thereby breaking the dependency loop.
                   out = out.substitute(symbol_values_resolved);
                 }
