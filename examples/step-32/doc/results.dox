@@ -19,7 +19,7 @@ meshes had around 72,000 and 236,000 cells, for a total of 2,680,000
 and 8,250,000 degrees of freedom, respectively, more than an order of
 magnitude more than we had available in step-31:
 
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="doxtable">
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-32.3d.cube.0.png" alt="">

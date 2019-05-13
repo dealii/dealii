@@ -81,7 +81,7 @@ DEAL::Generating output... done (0.720528s)
 The graphical output of the program looks as follows:
 
 
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="doxtable">
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-29.v.png" alt="v = Re(u)">
@@ -109,7 +109,7 @@ Because colorful graphics are always fun, and to stress the focusing
 effects some more, here is another set of images highlighting how well
 the intensity is actually focused in $x$-direction:
 
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="doxtable">
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-29.surface.png" alt="|u|">

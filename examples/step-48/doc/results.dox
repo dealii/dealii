@@ -11,7 +11,7 @@ wave equation (the sine-term skipped from the sine-Gordon equation). We use
 both second and fourth order elements. The results are summarized in the
 following table.
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
     <th>&nbsp;</th>
     <th colspan="3">wave equation</th>

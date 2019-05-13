@@ -213,7 +213,7 @@ support, i.e., four operations on doubles can be done with one CPU
 instruction, which is heavily used in FEEvaluation), optimized mode, and two
 MPI ranks.
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
     <th>&nbsp;</th>
     <th colspan="2">Sparse matrix</th>

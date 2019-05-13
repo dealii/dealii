@@ -126,7 +126,7 @@ million degrees of freedom solved per second (MDoFs/s) to be able to compare
 the efficiency of the different degrees, which is computed by dividing the
 number of degrees of freedom by the solver time.
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
    <th>degree</th>
    <td>1</td>
@@ -237,7 +237,7 @@ basic FE_DGQ elements where both the MPI exchange are more expensive and the
 operations done by FEFaceEvaluation::gather_evaluate() and
 FEFaceEvaluation::integrate_scatter().
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
    <th>degree</th>
    <td>1</td>

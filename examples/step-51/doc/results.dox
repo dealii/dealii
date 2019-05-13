@@ -304,7 +304,7 @@ problems). Let us look at
 the computing time of the tutorial program and the share of the individual
 components:
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
   <tr>
     <th>&nbsp;</th>
     <th>&nbsp;</th>
