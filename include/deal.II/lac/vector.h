@@ -80,7 +80,8 @@ namespace parallel
 
 /**
  * A class that represents a vector of numerical elements. As for the
- * other classes, in the @ref Vectors group, this class has a substantial
+ * other classes, in the
+ * @ref Vectors group, this class has a substantial
  * number of member functions. These include:
  * - functions that initialize the vector or change its size;
  * - functions that compute properties of the vector, such as a variety of

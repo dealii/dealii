@@ -858,8 +858,8 @@ private:
  * }
  *
  * FunctionFromFunctionObjects<2, RangeNumberType>
- *	custom_function({&first_component, &second_component},
- *		        {&zero_gradient, &zero_gradient});
+ * custom_function({&first_component, &second_component}, {&zero_gradient,
+ * &zero_gradient});
  * @endcode
  *
  * @author Luca Heltai, 2019

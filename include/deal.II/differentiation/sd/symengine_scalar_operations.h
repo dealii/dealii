@@ -1227,8 +1227,9 @@ namespace Differentiation
      * the returned result may still be symbolic in nature.
      *
      * For an example of what this function does, see the documentation for the
-     * other @ref resolve_explicit_dependencies(const
-     * types::substitution_map &) function.
+     * other
+     * @ref resolve_explicit_dependencies(const types::substitution_map &)
+     * function.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
      *         The Differentiation::SD::Expression class is often suitable for
@@ -1302,8 +1303,9 @@ namespace Differentiation
      * variables either a numeric interpretation or some symbolic definition.
      *
      * For more information regarding the performance of symbolic substitution,
-     * see the other @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * see the other
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -1330,8 +1332,9 @@ namespace Differentiation
      * variables either a numeric interpretation or some symbolic definition.
      *
      * For more information regarding the performance of symbolic substitution,
-     * see the other @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * see the other
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -1363,8 +1366,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in the @p expression be
      * successfully resolved by the @p substitution_map.
@@ -1392,8 +1396,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in the @p expression be
      * successfully resolved by the substitution map that is generated with the

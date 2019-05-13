@@ -153,10 +153,11 @@ namespace GridGenerator
    * corresponds to the numbers of faces of the unit square of cube as laid
    * out in the documentation of the GeometryInfo class; see also
    * @ref GlossColorization "the glossary entry on colorization". Importantly,
-   * however, in 3d @ref GlossColorization "colorization" does not set @p
-   * boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
-   * boundary edge is shared between two faces and it is not clear how the
-   * boundary id of an edge should be set in that case.
+   * however, in 3d
+   * @ref GlossColorization "colorization" does not set @p boundary_ids of
+   * <i>edges</i>, but only of <i>faces</i>, because each boundary edge is
+   * shared between two faces and it is not clear how the boundary id of an
+   * edge should be set in that case.
    *
    * Additionally, if @p colorize is @p true, material ids are assigned to the
    * cells according to the octant their center is in: being in the right half
@@ -394,17 +395,17 @@ namespace GridGenerator
    * The resulting Triangulation uses three manifolds: a PolarManifold (in 2D)
    * or CylindricalManifold (in 3D) with manifold id $0$, a
    * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
-   * everywhere else. For more information on this topic see @ref
-   * GlossManifoldIndicator "the glossary entry on manifold indicators".  The
-   * cell faces on the cylinder and surrounding shells have manifold ids of
-   * $0$, while the cell volumes adjacent to the shells (or, if they do not
-   * exist, the cylinder) have a manifold id of $1$. Put another way: this
-   * grid uses TransfiniteInterpolationManifold to smoothly transition from
-   * the shells (generated with GridGenerator::concentric_hyper_shells) to the
-   * bulk region. All other cell volumes and faces have manifold id
-   * numbers::flat_manifold_id and use FlatManifold. All cells with id
-   * numbers::flat_manifold_id are rectangular prisms aligned with the
-   * coordinate axes.
+   * everywhere else. For more information on this topic see
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The cell faces on the cylinder and surrounding shells have manifold
+   * ids of $0$, while the cell volumes adjacent to the shells (or, if they
+   * do not exist, the cylinder) have a manifold id of $1$. Put another
+   * way: this grid uses TransfiniteInterpolationManifold to smoothly
+   * transition from the shells (generated with
+   * GridGenerator::concentric_hyper_shells) to the bulk region. All other
+   * cell volumes and faces have manifold id numbers::flat_manifold_id and
+   * use FlatManifold. All cells with id numbers::flat_manifold_id are
+   * rectangular prisms aligned with the coordinate axes.
    *
    * The picture below shows part of the 2D grid (using all default arguments
    * to this function) after two global refinements. The cells with manifold
@@ -597,8 +598,8 @@ namespace GridGenerator
    * If the flag @p colorize is set, the outer cells get material ids
    * according to the following scheme: extending over the inner cube in (+/-)
    * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
-   * corners and edges (3d) get these values bitwise or'd (see also @ref
-   * GlossColorization "the glossary entry on colorization").
+   * corners and edges (3d) get these values bitwise or'd (see also
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * Presently only available in 2d and 3d.
    *
@@ -1083,7 +1084,8 @@ namespace GridGenerator
    * @param repetitions Number of subdivisions along the @p z-direction.
    * @param colorize Whether to assign different boundary indicators to
    * different faces
-   * (see @ref GlossColorization "the glossary entry on colorization").
+   * (see
+   * @ref GlossColorization "the glossary entry on colorization").
    * The colors are given in lexicographic ordering for the
    * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the

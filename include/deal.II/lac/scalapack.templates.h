@@ -449,15 +449,15 @@ extern "C"
 
   /**
    * Perform one of the matrix-matrix operations:
-   * @f{align*}
+   * @f{align*}{
    * \mathrm{sub}(C) &\dealcoloneq \alpha op(\mathrm{sub}(A))op(\mathrm{sub}(B))
-   *                            + \beta \mathrm{sub}(C), \\
+   * + \beta \mathrm{sub}(C),
+   * \\
    * \mathrm{sub}(C) &\dealcoloneq \alpha op(\mathrm{sub}(A))op(\mathrm{sub}(B))
-   *                            + beta sub(C),
-   * @f
-   * where
-   * $\mathrm{sub}(C)$ denotes C(IC:IC+M-1,JC:JC+N-1),  and, $op(X)$ is one of
-   * $op(X) = X$ or $op(X) = X^T$.
+   * + beta sub(C),
+   * @f}
+   * where $\mathrm{sub}(C)$ denotes C(IC:IC+M-1,JC:JC+N-1),
+   * and $op(X)$ is one of $op(X) = X$ or $op(X) = X^T$.
    */
   void
   pdgemm_(const char *  transa,

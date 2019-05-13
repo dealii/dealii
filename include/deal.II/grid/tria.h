@@ -1378,7 +1378,8 @@ public:
      */
     patch_level_1 = 0x4,
     /**
-     * Each @ref GlossCoarseMesh "coarse grid" cell is refined at least once,
+     * Each
+     * @ref GlossCoarseMesh "coarse grid" cell is refined at least once,
      * i.e., the triangulation
      * might have active cells on level 1 but not on level 0. This flag
      * ensures that a mesh which has coarsest_level_1 has still
@@ -1954,7 +1955,8 @@ public:
    * of the latter being a list of <tt>1<<dim</tt> vertex indices. The
    * triangulation must be empty upon calling this function and the cell list
    * should be useful (connected domain, etc.). The result of calling this
-   * function is a @ref GlossCoarseMesh "coarse mesh".
+   * function is a
+   * @ref GlossCoarseMesh "coarse mesh".
    *
    * Material data for the cells is given within the @p cells array, while
    * boundary information is given in the @p subcelldata field.

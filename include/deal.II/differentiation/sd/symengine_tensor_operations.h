@@ -653,8 +653,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -676,8 +677,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -701,8 +703,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in @p expression_tensor be
      * successfully resolved by the @p substitution_map.
@@ -732,8 +735,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in @p expression_tensor be
      * successfully resolved by the @p substitution_map.

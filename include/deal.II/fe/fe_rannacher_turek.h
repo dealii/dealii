@@ -61,7 +61,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Node values</h4>
  *
- * The @ref GlossNodes "node values" are moments on faces.
+ * The
+ * @ref GlossNodes "node values" are moments on faces.
  *
  * <h4>Generalized support points</h4>
  *

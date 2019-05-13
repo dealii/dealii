@@ -2849,7 +2849,8 @@ namespace GridTools
    * individually, which could also be of use to other processes. An
    * example would be if the input vector of bounding boxes
    * corresponded to a covering of the locally owned partition of a
-   * mesh (see @ref GlossLocallyOwnedCell) of a
+   * mesh (see
+   * @ref GlossLocallyOwnedCell) of a
    * parallel::distributed::Triangulation object. While these may
    * overlap the bounding boxes of other processes, finding which
    * process owns the cell that encloses a given point is vastly
