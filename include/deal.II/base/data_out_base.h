@@ -1986,7 +1986,7 @@ namespace DataOutBase
    *
    * For more information consult the Tecplot Users and Reference manuals.
    *
-   *  @deprecated Use the version using DataComponentInterpretation instead.
+   * @deprecated Use the version using DataComponentInterpretation instead.
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED void

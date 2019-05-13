@@ -478,8 +478,9 @@ class FESystem;
  * The matrix <i>M</i> may be computed with FETools::compute_node_matrix().
  * This function relies on the existence of #generalized_support_points and
  * FiniteElement::convert_generalized_support_point_values_to_dof_values()
- * (see the @ref GlossGeneralizedSupport "glossary entry on generalized
- * support points" for more information). With this, one can then use the
+ * (see the
+ * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+ * for more information). With this, one can then use the
  * following piece of code in the constructor of a class derived from
  * FiniteElement to compute the $M$ matrix:
  * @code

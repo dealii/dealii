@@ -171,7 +171,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Apply the functor @tparam Binop to each element of @p v1 and @p v2.
+       * Apply the functor @p Binop to each element of @p v1 and @p v2.
        *
        * @ingroup CUDAWrappers
        */
@@ -182,7 +182,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Apply the functor @tparam Binop to the elements of @p v1 that have
+       * Apply the functor @p Binop to the elements of @p v1 that have
        * indices in @p mask and @p v2. The size of @p mask should be greater
        * than the size of @p v1. @p mask and @p v2 should have the same size @p
        * N.
@@ -271,7 +271,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Perform a reduction on @p v using @tparam Operation.
+       * Perform a reduction on @p v using @p Operation.
        *
        * @ingroup CUDAWrappers
        */
