@@ -827,8 +827,8 @@ public:
   norm() const;
 
   /**
-   * Tensors can be unrolled by simply pasting all elements into one long
-   * vector, but for this an order of elements has to be defined. For
+   * Tensor objects can be unrolled by simply pasting all elements into one
+   * long vector, but for this an order of elements has to be defined. For
    * symmetric tensors, this function returns which index within the range
    * <code>[0,n_independent_components)</code> the given entry in a symmetric
    * tensor has.
