@@ -63,7 +63,7 @@ such big problems can no longer be visualized, so we also ran the
 program on only 16 processors. Here are a mesh, along with its
 partitioning onto the 16 processors, and the corresponding solution:
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
   <img src="https://www.dealii.org/images/steps/developer/step-40.mesh.png" alt="">
@@ -86,7 +86,7 @@ graphs are taken from an earlier version of the
 data of runs on even larger numbers of processors, and a lot
 more interpretation can be found in the final version of the paper):
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
   <img src="https://www.dealii.org/images/steps/developer/step-40.strong2.png" alt="">
@@ -114,7 +114,7 @@ interesting question may be how big problems can become so that they can still
 be solved within a reasonable time on a machine of a particular size. We show
 this in the following two graphs for 256 and 4096 processors:
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
   <img src="https://www.dealii.org/images/steps/developer/step-40.256.png" alt="">

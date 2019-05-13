@@ -51,7 +51,7 @@ Refinement cycle 5
 
 The results are easily visualized:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr valign="top">
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.velocity-magnitude.png" alt="">
@@ -137,7 +137,7 @@ minutes). Clearly a better solver is needed here, a topic discussed below.
 
 The results can also be visualized and yield some good pictures:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr valign="top">
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">

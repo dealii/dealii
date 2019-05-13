@@ -68,13 +68,13 @@ constant values (as indicated by the legend at the top left). Isosurface
 pictures look best if one makes the individual surfaces slightly transparent
 so that it is possible to see through them and see what's behind.
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-4.solution-3d.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-4.contours-3d.png" alt="">
     </td>
   </tr>

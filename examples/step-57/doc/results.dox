@@ -124,23 +124,23 @@ $8 \times 8$ mesh, and the mesh is refined adaptively. Between meshes, the
 solution from the coarse mesh is interpolated to the fine mesh to be used as an
 initial guess.
 
-<TABLE ALIGN="center">
+<table align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh0.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh1.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh2.png" width="232px" alt="">
     </td>
   </tr>
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh3.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Mesh4.png" width="232px" alt="">
     </td>
   </tr>
@@ -299,23 +299,23 @@ mesh. The quadratic convergence is clearly visible in the table.
 
 
 The sequence of generated grids looks like this:
-<TABLE ALIGN="center">
+<table align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh0.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh1.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh2.png" width="232px" alt="">
     </td>
   </tr>
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh3.png" width="232px" alt="">
     </td>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Mesh4.png" width="232px" alt="">
     </td>
   </tr>

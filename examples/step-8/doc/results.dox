@@ -6,7 +6,7 @@ that they look nice. All images were made using Visit from the
 output files that the program wrote to disk. The first two pictures show
 the $x$- and $y$-displacements as scalar components:
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
 <img src="https://www.dealii.org/images/steps/developer/step-8.x.png" alt="">

@@ -2,13 +2,13 @@
 
 Running the program produces graphics of two grids (grid-1.eps and grid-2.eps). They look like this:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2r2.png" alt="">
     </td>
   </tr>

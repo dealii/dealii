@@ -148,46 +148,46 @@ results section of step-38 but let us show a simpler example here:
 In the function <code>grid_5()</code> of the current program, we perturb the y
 coordinate of a mesh with a sine curve:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
     </td>
   </tr>
-</TABLE>
+</table>
 
 Similarly, we can transform a regularly refined
 unit square to a wall-adapted mesh in y direction using the formula
 $(x,y) \mapsto (x,\tanh(2 y)/\tanh(2))$. This is done in <code>grid_6()</code>
 of this tutorial:
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
     </td>
   </tr>
-</TABLE>
+</table>
 
 Finally, the function GridTools::distort_random allows you to move vertices in the
 mesh (optionally ignoring boundary nodes) by a random amount. This is
 demonstrated in <code>grid_7()</code> and the result is as follows:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
     </td>
   </tr>
-</TABLE>
+</table>
 
 This function is primarily intended to negate some of the superconvergence
 effects one gets when studying convergence on regular meshes, as well as to
@@ -216,9 +216,9 @@ These are the input meshes and the output mesh:
 
 <table width="80%" align="center">
   <tr>
-    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
-    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
-    <td ALIGN="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
+    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">input mesh 1</td>
+    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px">input mesh 2</td>
+    <td align="center"><img src="https://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px">merged mesh</td>
   </tr>
 </table>
 
@@ -231,13 +231,13 @@ or inverted cells and you shouldn't expect anything useful to come of using
 such meshes. Here, we create a box with a cylindrical hole that is not exactly
 centered by moving the top vertices upwards:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
     </td>
   </tr>
@@ -257,13 +257,13 @@ GridGenerator::hyper_cube_with_cylindrical_hole(). The main usage is a 2d
 mesh, generated for example with Gmsh, that is read in from a
 <code>.msh</code> file as described above. This is the output from grid_4():
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
   </tr>

@@ -73,33 +73,33 @@ and 1 in the right one, so there is an abrupt change at $x=0$. Likewise,
 there are changes from Dirichlet to Neumann data in the two upper
 corners, so there is need for refinement there as well:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
     </td>
   </tr>
 
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
     </td>
   </tr>
 
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
     </td>
   </tr>
@@ -184,33 +184,33 @@ href="#improved-solver">below</a>.
 As for the graphical output, the grids generated during the solution
 look as follow:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
     </td>
   </tr>
 
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
     </td>
   </tr>
 
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
     </td>
   </tr>
@@ -791,13 +791,13 @@ $[-2,2]\times[-2,2]\times[-1,0]$
                                                top_right);
 @endcode
 then we get images where the fault line is curved:
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
     </td>
   </tr>
