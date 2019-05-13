@@ -187,7 +187,7 @@ public:
    * owned by this class, and is accessible via reference through the
    * get_object_with_name() method.
    *
-   * This function ensures that no @p entry with the given @name is
+   * This function ensures that no @p entry with the given @p name is
    * already stored by this class instance.
    */
   template <typename Type>
@@ -200,7 +200,7 @@ public:
    * get_object_with_name() method.
    *
    * This function does not perform any checks to ensure that the @p entry
-   * with the given @name is already stored by this class instance. If the
+   * with the given @p name is already stored by this class instance. If the
    * @p name does in fact point to existing data, then this is overwritten.
    */
   template <typename Type>
@@ -213,7 +213,7 @@ public:
    * referenced object lives longer than this class instance. The stored
    * reference is accessible through the get_object_with_name() method.
    *
-   * This function ensures that no @p entry with the given @name is
+   * This function ensures that no @p entry with the given @p name is
    * already stored by this class instance.
    */
   template <typename Type>
@@ -227,7 +227,7 @@ public:
    * reference is accessible through the get_object_with_name() method.
    *
    * This function does not perform any checks to ensure that the @p entry
-   * with the given @name is already stored by this class instance. If the
+   * with the given @p name is already stored by this class instance. If the
    * @p name does in fact point to existing data, then this is overwritten.
    */
   template <typename Type>

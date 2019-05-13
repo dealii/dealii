@@ -69,12 +69,16 @@ namespace MeshWorker
    *   construction of these temporaries *on demand*, and easy access to
    *   values, gradients, etc., of already computed solution vectors.
    *
-   * The methods in @ref CurrentCellMethods initialize on demand internal FEValues,
+   * The methods in
+   * @ref CurrentCellMethods
+   * initialize on demand internal FEValues,
    * FEFaceValues, and FESubfaceValues objects on the current cell, allowing the
    * use of this class as a single substitute for three different objects used
    * to integrate and query finite element values on cells, faces, and subfaces.
    *
-   * Similarly, the methods in @ref NeighborCellMethods initialize on demand
+   * Similarly, the methods in
+   * @ref NeighborCellMethods
+   * initialize on demand
    * (different) internal FEValues, FEFaceValues, and FESubfaceValues, on
    * neighbor cells, allowing the use of this class also as a single substitute
    * for the additional three objects you would typically need to integrate on
@@ -83,8 +87,11 @@ namespace MeshWorker
    *
    * If you need to retrieve values or gradients of finite element solution
    * vectors, on the cell, face, or subface that has just beeing initialized
-   * with one of the functions in @ref CurrentCellMethods, you can use the
-   * methods in @ref CurrentCellEvaluation.
+   * with one of the functions in
+   * @ref CurrentCellMethods,
+   * you can use the
+   * methods in
+   * @ref CurrentCellEvaluation.
    *
    * An example usage for this class is given by the following snippet of code:
    *

@@ -839,6 +839,7 @@ private:
  * vector components is deduced from the size of the vector in the constructor.
  *
  * To be more concrete, let us consider the following example:
+ *
  * @code
  * RangeNumberType
  * first_component(const Point<2> &p)
@@ -858,8 +859,8 @@ private:
  * }
  *
  * FunctionFromFunctionObjects<2, RangeNumberType>
- *	custom_function({&first_component, &second_component},
- *		        {&zero_gradient, &zero_gradient});
+ *     custom_function({&first_component, &second_component},
+ *                     {&zero_gradient, &zero_gradient});
  * @endcode
  *
  * @author Luca Heltai, 2019

@@ -170,8 +170,8 @@ namespace Differentiation
      * valid symbols or symbolic expressions.
      *
      * @tparam ignore_invalid_symbols See the
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam SymbolicType Any symbolic type that is understood by the
@@ -207,8 +207,8 @@ namespace Differentiation
      * @endcode
      *
      * @tparam ignore_invalid_symbols See the
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam SymbolicType Any symbolic type that is understood by the
@@ -277,12 +277,12 @@ namespace Differentiation
      * given by @p symbol, to the symbolic map @p symbol_map.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function.
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam SymbolicType A type that represents a symbolic variable.
@@ -320,12 +320,12 @@ namespace Differentiation
      * functions.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function.
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam SymbolicType Any symbolic type that is understood by the
@@ -350,12 +350,12 @@ namespace Differentiation
      * map @p symbol_map.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function.
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam ValueType A type that corresponds to the @p value that the
@@ -377,8 +377,8 @@ namespace Differentiation
      * functions.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function.
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function.
      *
      * With this function it is possible to add entries from different types
      * to a symbolic map. An example may be as follows:
@@ -393,8 +393,8 @@ namespace Differentiation
      * @endcode
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_symbol_map(types::substitution_map &,const
-     * Expression &) function for a detailed discussion on the role of this
+     * @ref add_to_symbol_map(types::substitution_map &, const Expression &)
+     * function for a detailed discussion on the role of this
      * template argument.
      *
      * @tparam SymbolicType Any symbolic type that is understood by the
@@ -664,7 +664,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * @ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &, const ValueType &)
      * function.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
@@ -690,7 +690,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * @ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &, const ValueType &)
      * function.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
@@ -717,7 +717,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * @ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &, const ValueType &)
      * function.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
@@ -759,7 +759,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * @ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &, const ValueType &)
      * function.
      *
      * @tparam ExpressionType Any symbolic expression type that is understood
@@ -870,12 +870,12 @@ namespace Differentiation
      * &`.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &, const Expression &) function.
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &,const Expression &) function for a detailed
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function for a detailed
      * discussion on the role of this template argument.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
@@ -916,12 +916,12 @@ namespace Differentiation
      * &`.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &, const Expression &) function.
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &,const Expression &) function for a detailed
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function for a detailed
      * discussion on the role of this template argument.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
@@ -956,12 +956,12 @@ namespace Differentiation
      * are no duplicate entries between the two maps.
      *
      * For more context which this function is used, see the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &, const Expression &) function.
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &,const Expression &) function for a detailed
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function for a detailed
      * discussion on the role of this template argument.
      */
     template <bool ignore_invalid_symbols = false>
@@ -991,12 +991,12 @@ namespace Differentiation
      * @endcode
      *
      * For more context which this function is used, see the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &, const Expression &) function.
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &,const Expression &) function for a detailed
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function for a detailed
      * discussion on the role of this template argument.
      *
      * @tparam ExpressionType Any symbolic expression type that is understood
@@ -1043,12 +1043,12 @@ namespace Differentiation
      * @endcode
      *
      * For more context which this function is used, see the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &, const Expression &) function.
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * @ref add_to_substitution_map(types::substitution_map &,const
-     * Expression &,const Expression &) function for a detailed
+     * @ref add_to_substitution_map(types::substitution_map &, const Expression &, const Expression &)
+     * function for a detailed
      * discussion on the role of this template argument.
      *
      * @tparam ExpressionType Any symbolic expression type that is understood
@@ -1096,7 +1096,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * @ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &, const ValueType &)
      * function.
      *
      * @tparam ExpressionType Any symbolic expression type that is understood
@@ -1227,8 +1227,9 @@ namespace Differentiation
      * the returned result may still be symbolic in nature.
      *
      * For an example of what this function does, see the documentation for the
-     * other @ref resolve_explicit_dependencies(const
-     * types::substitution_map &) function.
+     * other
+     * @ref resolve_explicit_dependencies(const types::substitution_map &)
+     * function.
      *
      * @tparam ExpressionType A type that represents a symbolic expression.
      *         The Differentiation::SD::Expression class is often suitable for
@@ -1302,8 +1303,9 @@ namespace Differentiation
      * variables either a numeric interpretation or some symbolic definition.
      *
      * For more information regarding the performance of symbolic substitution,
-     * see the other @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * see the other
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -1330,8 +1332,9 @@ namespace Differentiation
      * variables either a numeric interpretation or some symbolic definition.
      *
      * For more information regarding the performance of symbolic substitution,
-     * see the other @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * see the other
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
@@ -1363,8 +1366,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in the @p expression be
      * successfully resolved by the @p substitution_map.
@@ -1392,8 +1396,9 @@ namespace Differentiation
      *
      * For more information regarding the performance of symbolic substitution,
      * and the outcome of evaluation using a substitution map with cyclic
-     * dependencies, see the @ref substitute(const Expression &,
-     * const types::substitution_map &) function.
+     * dependencies, see the
+     * @ref substitute(const Expression &, const types::substitution_map &)
+     * function.
      *
      * @note It is required that all symbols in the @p expression be
      * successfully resolved by the substitution map that is generated with the

@@ -183,7 +183,8 @@ namespace LinearAlgebra
      * CPU. When the memory space is CUDA, all the data is allocated on the GPU.
      * The operations on the vector are performed on the chosen memory space. *
      * From the host, there are two methods to access the elements of the Vector
-     * when using the CUDA memory space: <ul>
+     * when using the CUDA memory space:
+     * <ul>
      * <li> use get_values()
      * <code>
      * Vector<double, MemorySpace::CUDA> vector(local_range, comm);

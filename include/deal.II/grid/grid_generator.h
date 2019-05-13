@@ -70,7 +70,8 @@ namespace GridGenerator
    * If the argument @p colorize is false, then all boundary indicators are
    * set to zero (the default boundary indicator) for 2d and 3d. If it is
    * true, the boundary is
-   * @ref GlossColorization "colorized" as in hyper_rectangle(). In 1d the
+   * @ref GlossColorization "colorized"
+   * as in hyper_rectangle(). In 1d the
    * indicators are always colorized, see hyper_rectangle().
    *
    * @image html hyper_cubes.png
@@ -152,8 +153,11 @@ namespace GridGenerator
    * @p y-direction are 2 and 3, the ones for @p z are 4 and 5. This
    * corresponds to the numbers of faces of the unit square of cube as laid
    * out in the documentation of the GeometryInfo class; see also
-   * @ref GlossColorization "the glossary entry on colorization". Importantly,
-   * however, in 3d @ref GlossColorization "colorization" does not set @p
+   * @ref GlossColorization "the glossary entry on colorization".
+   * Importantly,
+   * however, in 3d
+   * @ref GlossColorization "colorization"
+   * does not set @p
    * boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
    * boundary edge is shared between two faces and it is not clear how the
    * boundary id of an edge should be set in that case.
@@ -197,7 +201,8 @@ namespace GridGenerator
    * @p z are 4 and 5.  Additionally, material ids are assigned to the cells
    * according to the octant their center is in: being in the right half plane
    * for any coordinate direction <i>x<sub>i</sub></i> adds 2<sup>i</sup> (see
-   * @ref GlossColorization "the glossary entry on colorization"). For
+   * @ref GlossColorization "the glossary entry on colorization").
+   * For
    * instance, the center point (1,-1,1) yields a material id 5 (this means
    * that in 2d only material ids 0,1,2,3 are assigned independent from the
    * number of repetitions).
@@ -345,7 +350,8 @@ namespace GridGenerator
    * If the @p colorize flag is <code>true</code>, the boundary_ids of the
    * boundary faces are assigned such that the lower one in the x-direction is
    * 0, and the upper one is 1 (see
-   * @ref GlossColorization "the glossary entry on colorization"). The
+   * @ref GlossColorization "the glossary entry on colorization").
+   * The
    * indicators for the surfaces in the y-direction are 2 and 3, and the ones
    * for the z-direction are 5 and 6. The hole boundary has indicator 4.
    *
@@ -394,8 +400,9 @@ namespace GridGenerator
    * The resulting Triangulation uses three manifolds: a PolarManifold (in 2D)
    * or CylindricalManifold (in 3D) with manifold id $0$, a
    * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
-   * everywhere else. For more information on this topic see @ref
-   * GlossManifoldIndicator "the glossary entry on manifold indicators".  The
+   * everywhere else. For more information on this topic see
+   * @ref* GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The
    * cell faces on the cylinder and surrounding shells have manifold ids of
    * $0$, while the cell volumes adjacent to the shells (or, if they do not
    * exist, the cylinder) have a manifold id of $1$. Put another way: this
@@ -472,7 +479,8 @@ namespace GridGenerator
    * If the argument @p colorize is false, then all boundary indicators are
    * set to zero for 2d and 3d. If it is true, the boundary is colorized as in
    * hyper_rectangle() (see
-   * @ref GlossColorization "the glossary entry on colorization"). In 1d the
+   * @ref GlossColorization "the glossary entry on colorization").
+   * In 1d the
    * indicators are always colorized, see hyper_rectangle().
    *
    * @param tria The triangulation that will be created
@@ -597,8 +605,8 @@ namespace GridGenerator
    * If the flag @p colorize is set, the outer cells get material ids
    * according to the following scheme: extending over the inner cube in (+/-)
    * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
-   * corners and edges (3d) get these values bitwise or'd (see also @ref
-   * GlossColorization "the glossary entry on colorization").
+   * corners and edges (3d) get these values bitwise or'd (see also
+   * @ref GlossColorization "the glossary entry on colorization").
    *
    * Presently only available in 2d and 3d.
    *
@@ -1082,8 +1090,8 @@ namespace GridGenerator
    * @param L  Extension in @p z-direction (only used in 3d).
    * @param repetitions Number of subdivisions along the @p z-direction.
    * @param colorize Whether to assign different boundary indicators to
-   * different faces
-   * (see @ref GlossColorization "the glossary entry on colorization").
+   * different faces (see
+   * @ref GlossColorization "the glossary entry on colorization").
    * The colors are given in lexicographic ordering for the
    * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the
@@ -1318,7 +1326,8 @@ namespace GridGenerator
    * the two initial meshes. This function computes such a mesh.
    *
    * @note If you want to create a mesh that is the merger of two other
-   * @ref GlossCoarseMesh "coarse meshes", for example in order to compose
+   * @ref GlossCoarseMesh "coarse meshes",
+   * for example in order to compose
    * a mesh for a complicated geometry
    * from meshes for simpler geometries, then this is not the function for
    * you. Instead, consider GridGenerator::merge_triangulations().
@@ -1427,7 +1436,8 @@ namespace GridGenerator
    * input) will always be the last entry in the first category.
    *
    * @note The 2d input triangulation @p input must be a
-   * @ref GlossCoarseMesh "coarse mesh", i.e., it cannot have any
+   * @ref GlossCoarseMesh "coarse mesh",
+   * i.e., it cannot have any
    * refined cells.
    *
    * @note Since @p input and @p output have different spatial dimensions, no
@@ -1453,7 +1463,8 @@ namespace GridGenerator
    * indicators.
    *
    * @note The 2d input triangulation @p input must be a
-   * @ref GlossCoarseMesh "coarse mesh", i.e., it cannot have any
+   * @ref GlossCoarseMesh "coarse mesh",
+   * i.e., it cannot have any
    * refined cells.
    *
    * @note Since @p input and @p output have different spatial dimensions no
@@ -1542,7 +1553,8 @@ namespace GridGenerator
    * value of the function.
    *
    * @note The function builds the surface mesh by creating a
-   * @ref GlossCoarseMesh "coarse mesh" from
+   * @ref GlossCoarseMesh "coarse mesh"
+   * from
    * the selected faces of the coarse cells of the volume mesh. It copies the
    * boundary indicators of these faces to the cells of the coarse surface
    * mesh. The surface mesh is then refined in the same way as the faces of
