@@ -1196,7 +1196,8 @@ namespace Differentiation
      * rendered by a single substitition of the returned dependency-resolved
      * map.
      *
-     * Example: If <tt>map["a"] -> 1</tt> and
+     * Example:
+     * If <tt>map["a"] -> 1</tt> and
      * <tt>map["b"] -> "a"+ 2</tt>, then then the function $f(a,b(a)) = a+b$
      * will be evaluated and the result $f\vert_{a=1,b=a+2} = 3+a$ is determined
      * upon the completion of the first sweep. A second sweep is therefore
@@ -1245,6 +1246,174 @@ namespace Differentiation
     resolve_explicit_dependencies(
       const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values,
       const bool force_cyclic_dependency_resolution = false);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symbolic expression.
+     * The symbols in the @p expression that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function may be used to give a set of symbolic
+     * variables either a numeric interpretation or some symbolic definition.
+     *
+     * @note It is not required that all symbolic expressions be fully resolved
+     * when using this function. In other words, partial substitutions are
+     * valid.
+     *
+     * @note This function call is typically expensive, as by default it performs a
+     * dictionary substitution for the symbols in the symbolic expression.
+     * Should the numerical value of some symbolic expression be desired, then
+     * this performance deficit may be mitigated through the use of the
+     * BatchOptimizer class.
+     * Situation dependent, the overhead of using a typical dictionary based
+     * substitution may be on par with that of a substitution performed
+     * using a BatchOptimizer. This is because there is an overhead to setting
+     * up the optimizer, so this should be taken into consideration if
+     * substitution is to occur for the given symbolic
+     * expression only a few times.
+     *
+     * @note If the symbols stored in the map are explicitly dependent on one another,
+     * then the returned result depends on the order in which the map is
+     * traversed. It is recommended to first resolve all interdependencies in
+     * the map using the resolve_explicit_dependencies() function.
+     *
+     * Examples:
+     *   1. If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a" + 2</tt>,
+     *     then the function $f(a,b(a)) := a+b$ will be evaluated and the result
+     *     $f\vert_{a=1,b=a+2} = 3+a$ is returned. This return is because the
+     *     symbol "a" is substituted throughout the function first, and only
+     *     then is the symbol "b(a)" substituted, by which time its explicit
+     *     dependency on "a" cannot be resolved.
+     *  2. If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt>,
+     *     then the function $f(a(b),b): = a+b$ will be evaluated and the result
+     *     $f\vert_{a=b+2, b} = [b+2+b]_{b=1} = 4$ is returned. This is because
+     *     the explicitly dependent symbol "a(b)" is substituted first followed
+     *     by the symbol "b".
+     */
+    Expression
+    substitute(const Expression &             expression,
+               const types::substitution_map &substitution_map);
+
+    /**
+     * Perform a substitution of the @p symbol into the given
+     * @p expression. All matches are assigned
+     * the corresponding @p value.
+     * This substitution function may be used to give a set of symbolic
+     * variables either a numeric interpretation or some symbolic definition.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * see the other @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is not required that all symbolic expressions be fully resolved
+     * when using this function. In other words, partial substitutions are
+     * valid.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type.
+     */
+    template <typename ValueType>
+    Expression
+    substitute(const Expression &expression,
+               const Expression &symbol,
+               const ValueType & value);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symbolic expression.
+     * The symbols in the @p expression that correspond to a matching entry key
+     * of the @p symbol_values vector entry are substituted by the entry's associated
+     * value.
+     * This substitution function may be used to give a set of symbolic
+     * variables either a numeric interpretation or some symbolic definition.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * see the other @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is not required that all symbolic expressions be fully resolved
+     * when using this function. In other words, partial substitutions are
+     * valid.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, but this may also represent Tensors and
+     *         SymmetricTensors of Expressions.
+     * @tparam Args Any symbolic type and value combination that is understood
+     *         by the make_substitution_map() functions. This includes
+     *         arguments involving individual Expressions,
+     *         std::vector<Expression>, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     */
+    template <typename ExpressionType, typename... Args>
+    ExpressionType
+    substitute(const ExpressionType &expression, const Args &... symbol_values);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symbolic function, and immediately evaluate the result.
+     * The symbols in the @p expression that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function is used to give a set of symbolic variables
+     * a numeric interpretation, with the returned result being of the type
+     * specified by the @p ValueType template argument.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is required that all symbols in the @p expression be
+     * successfully resolved by the @p substitution_map.
+     * If only partial substitution is performed, then an error is thrown.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
+     */
+    template <typename ValueType>
+    ValueType
+    substitute_and_evaluate(const Expression &             expression,
+                            const types::substitution_map &substitution_map);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symbolic function, and immediately evaluate the result.
+     * The symbols in the @p expression that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function is used to give a set of symbolic variables
+     * a numeric interpretation with the returned result being of the type
+     * specified by the @p ValueType template argument.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is required that all symbols in the @p expression be
+     * successfully resolved by the substitution map that is generated with the
+     * input collection of @p symbol_values.
+     * If only partial substitution is performed, then an error is thrown.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
+     * @tparam Args Any symbolic type and value combination that is understood
+     *         by the make_substitution_map() functions. This includes
+     *         arguments involving individual Expressions,
+     *         std::vector<Expression>, as well as Tensors and SymmetricTensors
+     *         of Expressions.
+     */
+    template <typename ValueType, typename... Args>
+    ValueType
+    substitute_and_evaluate(const Expression &expression,
+                            const Args &... symbol_values);
 
     //@}
 
@@ -1703,6 +1872,45 @@ namespace Differentiation
     {
       return resolve_explicit_dependencies(make_substitution_map(symbol_values),
                                            force_cyclic_dependency_resolution);
+    }
+
+
+    template <typename ValueType>
+    Expression
+    substitute(const Expression &expression,
+               const Expression &symbol,
+               const ValueType & value)
+    {
+      return expression.substitute(symbol, value);
+    }
+
+
+    template <typename ExpressionType, typename... Args>
+    ExpressionType
+    substitute(const ExpressionType &expression, const Args &... symbol_values)
+    {
+      // Call other function
+      return substitute(expression, make_substitution_map(symbol_values...));
+    }
+
+
+    template <typename ValueType>
+    ValueType
+    substitute_and_evaluate(const Expression &             expression,
+                            const types::substitution_map &substitution_map)
+    {
+      return expression.substitute_and_evaluate<ValueType>(substitution_map);
+    }
+
+
+    template <typename ValueType, typename... Args>
+    ValueType
+    substitute_and_evaluate(const Expression &expression,
+                            const Args &... symbol_values)
+    {
+      // Call other function
+      return substitute_and_evaluate<ValueType>(
+        expression, make_substitution_map(symbol_values...));
     }
 
   } // namespace SD

@@ -1,0 +1,58 @@
+
+DEAL::Tensor: Rank 0, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a + b
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0
+DEAL::OK
+DEAL::
+DEAL::Tensor: Rank 1, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_0 + b_0 a_1 + b_1
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_0 1.0 + b_1
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::Tensor: Rank 2, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_00 + b_00 a_01 + b_01 a_10 + b_10 a_11 + b_11
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_00 1.0 + b_01 1.0 + b_10 1.0 + b_11
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::Tensor: Rank 3, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_000 + b_000 a_001 + b_001 a_010 + b_010 a_011 + b_011 a_100 + b_100 a_101 + b_101 a_110 + b_110 a_111 + b_111
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_000 1.0 + b_001 1.0 + b_010 1.0 + b_011 1.0 + b_100 1.0 + b_101 1.0 + b_110 1.0 + b_111
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::Tensor: Rank 4, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_0000 + b_0000 a_0001 + b_0001 a_0010 + b_0010 a_0011 + b_0011 a_0100 + b_0100 a_0101 + b_0101 a_0110 + b_0110 a_0111 + b_0111 a_1000 + b_1000 a_1001 + b_1001 a_1010 + b_1010 a_1011 + b_1011 a_1100 + b_1100 a_1101 + b_1101 a_1110 + b_1110 a_1111 + b_1111
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_0000 1.0 + b_0001 1.0 + b_0010 1.0 + b_0011 1.0 + b_0100 1.0 + b_0101 1.0 + b_0110 1.0 + b_0111 1.0 + b_1000 1.0 + b_1001 1.0 + b_1010 1.0 + b_1011 1.0 + b_1100 1.0 + b_1101 1.0 + b_1110 1.0 + b_1111
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::SymmetricTensor: Rank 2, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_00 + b_00 a_01 + b_01 a_01 + b_01 a_11 + b_11
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_00 1.0 + b_01 1.0 + b_01 1.0 + b_11
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::SymmetricTensor: Rank 4, dim 2
+DEAL:Substitution: Individual::Symbolic a+b: a_0000 + b_0000 a_0001 + b_0001 a_0001 + b_0001 a_0011 + b_0011 a_0100 + b_0100 a_0101 + b_0101 a_0101 + b_0101 a_0111 + b_0111 a_0100 + b_0100 a_0101 + b_0101 a_0101 + b_0101 a_0111 + b_0111 a_1100 + b_1100 a_1101 + b_1101 a_1101 + b_1101 a_1111 + b_1111
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_0000 1.0 + b_0001 1.0 + b_0001 1.0 + b_0011 1.0 + b_0100 1.0 + b_0101 1.0 + b_0101 1.0 + b_0111 1.0 + b_0100 1.0 + b_0101 1.0 + b_0101 1.0 + b_0111 1.0 + b_1100 1.0 + b_1101 1.0 + b_1101 1.0 + b_1111
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
+DEAL::OK
+DEAL::
+DEAL::OK

@@ -1,0 +1,5 @@
+New: Some utility functions that perform symbolic substitution on, and
+evaluation of, symbolic scalar and tensor expressions have been added to the 
+Differentiation::SD namespace.
+<br>
+(Jean-Paul Pelteret, 2019/05/07)
