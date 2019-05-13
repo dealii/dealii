@@ -525,8 +525,8 @@
  * is able to achieve for this example).
  *
  * Due to the sophisticated CAS that forms the foundation of symbolic operations, the types of
- * manipulations are not necessarily restricted to differentiation alone, but rather may span an
- * range spectra of manipulations relevant to discrete differential calculus, topics in pure
+ * manipulations are not necessarily restricted to differentiation alone, but rather may span a
+ * spectrum of manipulations relevant to discrete differential calculus, topics in pure
  * mathematics, and more.
  * The documentation for the <a href="https://www.sympy.org/en/index.html">SymPy</a> library gives
  * plenty of examples that highlight what a fully-fledged CAS is capable of.
@@ -538,7 +538,7 @@
  * In fact, this class can be used as a "drop-in" replacement for arithmetic types in many
  * situations, transforming the operations from being numeric to symbolic in nature; this is
  * made especially easy when classes are templated on the underlying number type.
- * Being focused on numerical simulation of PDE's, the functionality of the CAS that is exposed
+ * Being focused on numerical simulation of PDEs, the functionality of the CAS that is exposed
  * within deal.II focuses on symbolic expression creation, manipulation, and differentiation.
  *
  * As a final note, it is important to recognize a major deficiency in deal.II's current implementation
