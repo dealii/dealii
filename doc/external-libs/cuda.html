@@ -72,5 +72,22 @@
       will lead to segmentation faults in MPI calls.
     </p>
 
+    <p>
+      Using CUDA in combination with architecture-specific C++ compiler flags
+      like <code>-march=native</code> is known to be fragile and there might be
+      compatibility issues with other libraries, e.g. using CUDA 10.1 with
+      <code>-DDEAL_II_WITH_THREADS=ON</code> and
+      <code>-DDEAL_II_CXX_FLAGS=-march=native</code> results in compile time
+      errors like:
+      <pre>
+
+        /usr/lib/gcc/x86_64-linux-gnu/7/include/avx512fintrin.h(11265): error: identifier "__builtin_ia32_scalefsd_round" is undefined
+        /usr/lib/gcc/x86_64-linux-gnu/7/include/avx512fintrin.h(11274): error: identifier "__builtin_ia32_scalefss_round" is undefined
+      </pre>
+      Since vectorization in VectorizedArray is disabled when compiling with
+      CUDA support anyway, it is recommended to drop the compile flag in that
+      case.
+    </p>
+
   </body>
 </html>
