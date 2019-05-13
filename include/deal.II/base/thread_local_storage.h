@@ -19,9 +19,11 @@
 
 #  include <deal.II/base/config.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_THREADS
 #    include <tbb/enumerable_thread_specific.h>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

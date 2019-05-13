@@ -32,6 +32,7 @@
 #  include <tuple>
 #  include <utility>
 #  include <vector>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_THREADS
 #    include <thread>
 #    ifdef DEAL_II_USE_MT_POSIX
@@ -40,6 +41,7 @@
 #    include <tbb/task.h>
 #    include <tbb/tbb_stddef.h>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
