@@ -752,13 +752,15 @@ TableHandler::n_rows() const
     return 0;
 
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
-  unsigned int n          = col_iter->second.entries.size();
-  std::string  first_name = col_iter->first;
+  unsigned int n = col_iter->second.entries.size();
 
+#ifdef DEBUG
+  std::string first_name = col_iter->first;
   for (++col_iter; col_iter != columns.end(); ++col_iter)
     Assert(col_iter->second.entries.size() == n,
            ExcWrongNumberOfDataEntries(
              col_iter->first, col_iter->second.entries.size(), first_name, n));
+#endif
 
   return n;
 }
