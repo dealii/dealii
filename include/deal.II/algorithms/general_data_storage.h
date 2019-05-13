@@ -414,10 +414,10 @@ GeneralDataStorage::get_object_with_name(const std::string &name)
     }
   else
     {
-      Assert(false,
-             ExcTypeMismatch(name,
-                             any_data[name].type().name(),
-                             typeid(Type).name()));
+      AssertThrow(false,
+                  ExcTypeMismatch(name,
+                                  any_data[name].type().name(),
+                                  typeid(Type).name()));
     }
 
   return *p;
@@ -444,10 +444,10 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
     }
   else
     {
-      Assert(false,
-             ExcTypeMismatch(name,
-                             it->second.type().name(),
-                             typeid(Type).name()));
+      AssertThrow(false,
+                  ExcTypeMismatch(name,
+                                  it->second.type().name(),
+                                  typeid(Type).name()));
       const Type *p = nullptr;
       return *p;
     }
