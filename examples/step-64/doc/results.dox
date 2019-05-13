@@ -1,0 +1,38 @@
+<h1>Results</h1>
+
+Since the main purpose of this tutorial is to demonstrate how to use the
+CUDAWrappers::MatrixFree interface, we just show the expected output here:
+@code
+Cycle 0
+   Number of active cells:       8
+   Number of degrees of freedom: 343
+  Solved in 27 iterations.
+  solution norm: 0.0205439
+
+Cycle 1
+   Number of active cells:       64
+   Number of degrees of freedom: 2197
+  Solved in 60 iterations.
+  solution norm: 0.0205269
+
+Cycle 2
+   Number of active cells:       512
+   Number of degrees of freedom: 15625
+  Solved in 114 iterations.
+  solution norm: 0.0205261
+
+Cycle 3
+   Number of active cells:       4096
+   Number of degrees of freedom: 117649
+  Solved in 227 iterations.
+  solution norm: 0.0205261
+@endcode
+
+<a name="extensions"></a>
+<h3> Possible extensions </h3>
+
+Currently, there is no preconditioner used at all. This is mainly since 
+constructing an efficient matrix-free preconditioner is non-trivial.
+However, simple choices just requiring the diagonal of the corresponding matrix
+are good candidates. In particular, one could extend the tutorial to use multigrid 
+with Chebyshev smoothers similar to step-37.
