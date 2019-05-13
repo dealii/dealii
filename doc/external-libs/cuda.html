@@ -84,6 +84,9 @@
         /usr/lib/gcc/x86_64-linux-gnu/7/include/avx512fintrin.h(11265): error: identifier "__builtin_ia32_scalefsd_round" is undefined
         /usr/lib/gcc/x86_64-linux-gnu/7/include/avx512fintrin.h(11274): error: identifier "__builtin_ia32_scalefss_round" is undefined
       </pre>
+      Since vectorization in VectorizedArray is disabled when compiling with
+      CUDA support anyway, it is recommended to drop the compile flag in that
+      case.
     </p>
 
   </body>
