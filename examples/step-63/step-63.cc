@@ -80,11 +80,11 @@ namespace Step63
 
   // @sect3{MeshWorker Data}
 
-  // The following are structure needed by assemble_cell()
+  // The following are structures needed by the assemble_cell()
   // function used by Meshworker::mesh_loop(). ScratchData
-  // contains a FeValues object with is needed for assembling
-  // a cells local contribution, while CopyData contains the
-  // output from a cells local contribution and necessary information
+  // contains an FeValues object which is needed for assembling
+  // a cell's local contribution, while CopyData contains the
+  // output from a cell's local contribution and necessary information
   // to copy that to the global system.
 
   template <int dim>
@@ -218,7 +218,7 @@ namespace Step63
   // @sect3{Cell permutations}
   //
   // The ordering in which cells and degrees of freedom are traversed
-  // will play a roll in the speed of convergence for multiplicative
+  // will play a role in the speed of convergence for multiplicative
   // methods. Here we define functions which return a specific ordering
   // of cells to be used by the block smoothers.
 
@@ -320,15 +320,15 @@ namespace Step63
     for (const auto &cell : dof_handler.active_cell_iterators())
       ordered_cells.push_back(cell->index());
 
-    // shuffle the elements:
+    // Shuffle the elements:
     std::mt19937 random_number_generator;
     for (unsigned int i = 1; i < n_cells; ++i)
       {
-        // get a random number between 0 and i (inclusive):
+        // Get a random number between 0 and i (inclusive):
         const unsigned int j =
           std::uniform_int_distribution<>(0, i)(random_number_generator);
 
-        // if possible, swap the elements:
+        // If possible, swap the elements:
         if (i != j)
           std::swap(ordered_cells[i], ordered_cells[j]);
       }
@@ -339,9 +339,11 @@ namespace Step63
 
   // @sect3{Right-hand Side and Boundary Values}
 
-  // The problem solved in this tutorial is an adaptation of Ex. ___
-  // found in ______ (how to cite?), namely, we add a hole in the middle
-  // of our domain.
+  // The problem solved in this tutorial is an adaptation of Ex. 3.1.3
+  // found on pg. 118 of Finite Elements and Fast Iterative Solvers:
+  // with Applications in Incompressible Fluid Dynamics by Elman, Silvester,
+  // and Wathen. The main difference being that we add a hole in the center
+  // of our domain with zero Dirichlet boundary.
 
   // We have a zero right-hand side.
   template <int dim>
@@ -442,9 +444,10 @@ namespace Step63
 
   // @sect3{Streamline Diffusion}
 
-  // Streamline diffusion stabilization term. Value defined in
-  // 'On discontinuity–capturing methods for convection–diffusion
-  // equations' (cite?)
+  // Streamline diffusion stabilization term. Value is defined in
+  // "On Discontinuity—Capturing Methods for Convection—Diffusion
+  // Equations" by Volker and Petr
+  // (https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27).
   template <int dim>
   double compute_stabilization_delta(const double         hk,
                                      const double         eps,
@@ -461,14 +464,14 @@ namespace Step63
 
   // @sect3{<code>AdvectionProlem</code> class}
 
-  // This main class of the program, and should look very similar to step-16.
-  // The major difference is that, since we are defining our multigrid smoother
-  // at runtime, we choose to define a function create_smoother() and a class
-  // object mg_smoother which is a std::unique_ptr to a smoother that is derived
-  // from MGSmoother. Note that for smoother derived from RelaxationBlock, we
-  // must include a smoother_data object for each level. This will contain
-  // information about the cell ordering and the method of inverting cell
-  // matrices.
+  // This is the main class of the program, and should look very similar to
+  // step-16. The major difference is that, since we are defining our multigrid
+  // smoother at runtime, we choose to define a function create_smoother() and a
+  // class object mg_smoother which is a std::unique_ptr to a smoother that is
+  // derived from MGSmoother. Note that for smoothers derived from
+  // RelaxationBlock, we must include a smoother_data object for each level.
+  // This will contain information about the cell ordering and the method of
+  // inverting cell matrices.
 
   template <int dim>
   class AdvectionProblem
@@ -551,7 +554,7 @@ namespace Step63
 
   // @sect4{<code>AdvectionProblem::setup_system</code>}
 
-  // Here we setup the DoFHandler, ConstraintMatrix, and sparsity patterns for
+  // Here we set up the DoFHandler, ConstraintMatrix, and sparsity patterns for
   // both active and multigrid level meshes.
 
   template <int dim>
@@ -559,12 +562,11 @@ namespace Step63
   {
     const unsigned int n_levels = triangulation.n_levels();
 
-    // Setup active DoFs:
     dof_handler.distribute_dofs(fe);
 
     // We could renumber the active DoFs with the DoFRenumbering class
     // here, but the smoothers only act on multigrid levels and as such, this
-    // wouldn't matter for the computations. Instead, we will renumber the
+    // would not matter for the computations. Instead, we will renumber the
     // DoFs on each multigrid level below.
 
     solution.reinit(dof_handler.n_dofs());
@@ -586,11 +588,8 @@ namespace Step63
                                     /*keep_constrained_dofs = */ false);
 
     sparsity_pattern.copy_from(dsp);
-
     system_matrix.reinit(sparsity_pattern);
 
-
-    // Setup GMG DoFs:
     dof_handler.distribute_mg_dofs();
 
     // Renumber DoFs on each level in downstream or upstream direction if
@@ -705,7 +704,7 @@ namespace Step63
                                rhs_values);
 
     // If we are using streamline diffusion we must add its contribution
-    // to both the cell matrix and the cell right-handside. If we are not
+    // to both the cell matrix and the cell right-hand side. If we are not
     // using streamline diffusion, setting $\delta=0$ negates this contribution
     // below and we are left with the standard, Galerkin finite element
     // assembly.
@@ -794,8 +793,8 @@ namespace Step63
                           MeshWorker::assemble_own_cells);
 
     // Unlike the constraints for the active level, we choose to create
-    // local constraint matrices for each multigrid level since they are
-    // never needed elsewhere in the program.
+    // constraint objects for each multigrid level local to this function
+    // since they are never needed elsewhere in the program.
     std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
     for (unsigned int level = 0; level < triangulation.n_global_levels();
@@ -861,29 +860,29 @@ namespace Step63
 
   // @sect4{<code>AdvectionProblem::setup_smoother</code>}
 
-  // Here we setup the smoother based on the settings in the .prm. The two
+  // Here we set up the smoother based on the settings in the .prm. The two
   // options that are of significance is the number of pre- and post-smoothing
   // steps on each level of the multigrid v-cycle and the relaxation parameter.
 
   // Since multiplicative methods tend to be more powerful than additive method,
   // fewer smoothing steps are required to see convergence indepedent of mesh
-  // size. The same hold for block smoothers over point smoothers. This is
+  // size. The same holds for block smoothers over point smoothers. This is
   // reflected in the choice for the number of smoothing steps for each type of
   // smoother below.
 
   // The relaxation parameter for point smoothers is chosen based on trial and
   // error, and they reflect values necessary to keep the iteration counts in
   // the GMRES solve constant (or as close as possible) as we refine the mesh.
-  // The two values given for both "Jacobi" and "SOR" are for degree 1 and
-  // degree 3 finite elements. If the user wants to change to another degree,
-  // they may need to adjust these numbers. For block smoothers, this parameter
-  // has a more straightforward interpretation, namely that for additive methods
-  // in 2D, a DoF can have a repeated contribution from up to 4 cells,
-  // therefore we must relax these methods by 0.25 to compensate. This is not an
-  // issue for multiplicative methods as each cell inverse application carries
-  // new information to all its DoFs.
+  // The two values given for both "Jacobi" and "SOR" in the .prm files are for
+  // degree 1 and degree 3 finite elements. If the user wants to change to
+  // another degree, they may need to adjust these numbers. For block smoothers,
+  // this parameter has a more straightforward interpretation, namely that for
+  // additive methods in 2D, a DoF can have a repeated contribution from up to 4
+  // cells, therefore we must relax these methods by 0.25 to compensate. This is
+  // not an issue for multiplicative methods as each cell inverse application
+  // carries new information to all its DoFs.
 
-  // Finally, as mention above, the point smoothers only operate on DoFs, and
+  // Finally, as mentioned above, the point smoothers only operate on DoFs, and
   // the block smoothers on cells, so only the block smoothers need to be given
   // information regarding cell orderings. DoF ordering for point smoothers has
   // already been taken care of in setup_system().
@@ -1005,7 +1004,7 @@ namespace Step63
   // @sect4{<code>AdvectionProblem::solve</code>}
 
   // Before we can solve the system, we must first set up the multigrid
-  // preconditioner. This is requires the setup of the transfer between levels,
+  // preconditioner. This requires the setup of the transfer between levels,
   // the coarse matrix solver, and the smoother. This setup follows almost
   // identically to Step-16, the main difference being the various smoothers
   // defined above and the fact that we need different interface edge matrices
@@ -1017,13 +1016,19 @@ namespace Step63
 
   // The last thing to note is that since our problem is non-symetric, we must
   // use an appropriate Krylov subspace method. We choose here to
-  // use GMRES since it offers the guarentee of residual reduction in each
+  // use GMRES since it offers the guarantee of residual reduction in each
   // iteration. The major disatvantage to GMRES is that, for each iteration, we
   // must store an additional temporary vector as well as compute an additional
-  // scalar product. However, the goal of this tutorial is to have very low
-  // iteration counts by using a powerful GMG preconditioner, so this should not
-  // be a factor. If the user is interested, another sutaible method offered in
-  // deal.II would be BiCGStab.
+  // scalar product. This requirement is relaxed by using the restarted GMRES
+  // method which puts a cap on the number of vectors we are required to store
+  // at any one time (here we resart after 50 temporary vectors, or 48
+  // iterations). This then has the disatvantage that we lose information we
+  // have gathered throughout the iteration and therefore we could see slower
+  // convergence. However, the goal of this tutorial is to have very low
+  // iteration counts by using a powerful GMG preconditioner, so we have picked
+  // the restart length such that all of the results shown below converge prior
+  // and thus we have a standard GMRES method. If the user is interested,
+  // another sutaible method offered in deal.II would be BiCGStab.
 
   template <int dim>
   void AdvectionProblem<dim>::solve()
