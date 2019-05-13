@@ -31,6 +31,7 @@ DEAL_II_NAMESPACE_OPEN
  * for SparseMatrix the mapping from buffer location to matrix entry
  * $\mathbf{A}(i, j)$ is more complicated. In any case, however, the
  * contiguous arrangements of elements enables random access iteration.
+ *
  * LinearIndexIterator provides most of the functionality needed to write
  * iterators for these classes. LinearIndexIterator is essentially a
  * simplified version of <code>boost::iterator_facade</code> that assumes

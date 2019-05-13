@@ -102,7 +102,7 @@ namespace Rol
    * @endcode
    *
    * @note The current implementation in ROL doesn't support vector sizes above
-   * the largest value of int type. Some of the vectors in deal.II (
+   * the largest value of int type. Some of the vectors in deal.II (see
    * @ref Vector)
    * may not satisfy the above requirements.
    *
