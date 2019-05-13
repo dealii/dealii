@@ -114,6 +114,7 @@ public:
         : t_(t), which_(which) 
         { }
     void operator()() const { t_.close(which_); }
+    member_close_operation(const member_close_operation&) = default;
 private:
     member_close_operation& operator=(const member_close_operation&);
     T&                   t_;
@@ -132,6 +133,7 @@ class reset_operation {
 public:
     reset_operation(T& t) : t_(t) { }
     void operator()() const { t_.reset(); }
+    reset_operation(const reset_operation&) = default;
 private:
     reset_operation& operator=(const reset_operation&);
     T& t_;
@@ -148,6 +150,7 @@ public:
     typedef void result_type;
     clear_flags_operation(T& t) : t_(t) { }
     void operator()() const { t_ = 0; }
+    clear_flags_operation(const clear_flags_operation&) = default;
 private:
     clear_flags_operation& operator=(const clear_flags_operation&);
     T& t_;
@@ -172,6 +175,7 @@ public:
         if (flush_) 
             buf_.flush(dev_);
     }
+    flush_buffer_operation(const flush_buffer_operation&) = default;
 private:
     flush_buffer_operation& operator=(const flush_buffer_operation&);
     Buffer&  buf_;

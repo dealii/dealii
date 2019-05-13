@@ -313,6 +313,8 @@ struct cons {
   template <class HT2, class TT2>
   cons( const cons<HT2, TT2>& u ) : head(u.head), tail(u.tail) {}
 
+  cons( const cons &u ) : head(u.head), tail(u.tail) {}
+
   template <class HT2, class TT2>
   cons& operator=( const cons<HT2, TT2>& u ) {
     head=u.head; tail=u.tail; return *this;
@@ -371,6 +373,8 @@ struct cons<HT, null_type> {
 
   //  cons() : head(detail::default_arg<HT>::f()) {}
   cons() : head() {}
+
+  cons( const cons & u ) : head(u.head) {}
 
   cons(typename access_traits<stored_head_type>::parameter_type h,
        const null_type& = null_type())

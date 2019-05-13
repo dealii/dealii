@@ -152,6 +152,8 @@ struct ordered_index_node_compressed_base
   
   struct parent_ref
   {
+    parent_ref(const parent_ref& x) = default;
+
     parent_ref(uintptr_type* r_):r(r_){}
     
     operator pointer()const

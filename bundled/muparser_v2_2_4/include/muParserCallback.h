@@ -81,7 +81,8 @@ public:
     ParserCallback(strfun_type3 a_pFun, bool a_bAllowOpti);
     ParserCallback();
     ParserCallback(const ParserCallback &a_Fun);
-    
+    ParserCallback & operator=(const ParserCallback &a_Fun) = default;   
+ 
     ParserCallback* Clone() const;
 
     bool  IsOptimizable() const;

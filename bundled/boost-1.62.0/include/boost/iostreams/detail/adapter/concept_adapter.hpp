@@ -118,6 +118,7 @@ public:
     std::streamsize optimal_buffer_size() const
     { return iostreams::optimal_buffer_size(t_); }
 public:
+    concept_adapter(const concept_adapter&) = default;
     concept_adapter& operator=(const concept_adapter&);
     value_type t_;
 };

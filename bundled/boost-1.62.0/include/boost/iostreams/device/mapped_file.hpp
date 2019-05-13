@@ -142,6 +142,9 @@ struct basic_mapped_file_params
         : base_type(other), path(other.path)
         { }
 
+    basic_mapped_file_params &
+    operator= (const basic_mapped_file_params& other) { path = other.path; return *this; }
+
     typedef Path  path_type;
     Path          path;
 };
