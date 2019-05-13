@@ -101,7 +101,6 @@ the color scale used for the temperature is not always the same):
         <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.2d.solution.04.png" alt="">
@@ -152,7 +151,6 @@ adaptive mesh and the flow field at the same time steps:
         <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.2d.grid.04.png" alt="">
@@ -257,7 +255,6 @@ following plots:
         <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.04.png" alt="">
@@ -272,7 +269,6 @@ following plots:
         <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.07.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.3d.solution.08.png" alt="">
@@ -421,7 +417,6 @@ bilinear elements (<code>temperature_degree=1</code>) in 2d:
         <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q1.beta=0.1.png" alt="">
@@ -498,7 +493,6 @@ retain the $Q_2/Q_1$ stable Taylor-Hood element for the Stokes system:
         <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
         <img src="https://www.dealii.org/images/steps/developer/step-31.timestep.q2.beta=0.1.png" alt="">

@@ -45,7 +45,7 @@ experiments, and the right is the simulated data.
 In the experiment, a single small strong absorber was embedded in
 weaker absorbing tissue:
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
 <img src="https://www.dealii.org/images/steps/developer/step-24.one.png" alt="">
@@ -90,7 +90,7 @@ thermoacoustic waves in the medium by multiple absorbers:
 
 Experimental data and our simulated data are compared in the following two
 figures:
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
 <img src="https://www.dealii.org/images/steps/developer/step-24.multi.png" alt="">
@@ -113,7 +113,7 @@ As before, the numerical result better matches experimental ones by applying a
 bandwidth filter that matches the actual behavior of detectors (left) and by
 choosing a finer mesh (right):
 
-<TABLE WIDTH="100%">
+<table width="100%">
 <tr>
 <td>
 <img src="https://www.dealii.org/images/steps/developer/step-24.multi_sf.png" alt="">

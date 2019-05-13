@@ -105,22 +105,20 @@ Now we show the solutions on the mesh after one and after five adaptive
 refinement steps for both the isotropic (left) and anisotropic refinement
 algorithms (right).
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.iso.png" alt="">
     </td>
-
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.png" alt="">
     </td>
   </tr>
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.iso.png" alt="">
     </td>
-
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.aniso.png" alt="">
     </td>
   </tr>

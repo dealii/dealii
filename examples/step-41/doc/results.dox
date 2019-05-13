@@ -71,7 +71,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.00.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       3 &nbsp;
@@ -86,7 +85,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.03.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       6 &nbsp;
@@ -101,7 +99,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.06.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       9 &nbsp;
@@ -116,7 +113,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.09.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       12 &nbsp;
@@ -131,7 +127,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.12.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       15 &nbsp;
@@ -146,7 +141,6 @@ leftmost column):
       <img src="https://www.dealii.org/images/steps/developer/step-41.displacement.3d.15.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td valign="top">
       18 &nbsp;
@@ -192,7 +186,6 @@ blue for negative values.
       <img src="https://www.dealii.org/images/steps/developer/step-41.forces.18.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       Iteration 1

@@ -163,13 +163,12 @@ step-4) as well as CPU time needed (using the Timer class,
 discussed, for example, in step-12) and get the
 following results (left: iterations; right: CPU time):
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
     </td>
-
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
     </td>
   </tr>
@@ -187,13 +186,12 @@ The situation changes slightly when the finite element is not a
 bi-quadratic one as set in the constructor of this program, but a
 bi-linear one. If one makes this change, the results are as follows:
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
     </td>
-
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
     </td>
   </tr>

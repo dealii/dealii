@@ -278,19 +278,16 @@ as the function that generate such objects:
     <th>cell_iterator type</th>
     <th>function call</th>
   </tr>
-
   <tr>
     <th>Triangulation</th>
     <td>typename Triangulation::cell_iterator</td>
     <td>Triangulation::begin()</td>
   </tr>
-
   <tr>
     <th>DoFHandler</th>
     <td>typename DoFHandler::cell_iterator</td>
     <td>DoFHandler::begin()</td>
   </tr>
-
   <tr>
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::cell_iterator</td>
@@ -310,19 +307,16 @@ Active iterators have the following properties:
     <th>cell_iterator type</th>
     <th>function call</th>
   </tr>
-
   <tr>
     <th>Triangulation</th>
     <td>typename Triangulation::active_cell_iterator</td>
     <td>Triangulation::begin_active()</td>
   </tr>
-
   <tr>
     <th>DoFHandler</th>
     <td>typename DoFHandler::active_cell_iterator</td>
     <td>DoFHandler::begin_active()</td>
   </tr>
-
   <tr>
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::active_cell_iterator</td>
