@@ -75,7 +75,7 @@ the program run.
 
 If one does this, one finds the following pattern for the $L_2$ error
 in the pressure variable:
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="doxtable">
   <tr>
     <td></td>
     <td colspan="3" align="center">Finite element order</td>
@@ -119,7 +119,7 @@ experimentally observed ones indicated in the last row of the table.
 
 One can make the same experiment with the $L_2$ error
 in the velocity variables:
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="doxtable">
   <tr>
     <td></td>
     <td colspan="3" align="center">Finite element order</td>
