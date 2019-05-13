@@ -85,6 +85,14 @@ namespace PETScWrappers
 
 
 
+    Vector::Vector(const Vector &v)
+      : VectorBase()
+    {
+      this->operator=(v);
+    }
+
+
+
     Vector::Vector(const IndexSet &local, const MPI_Comm &communicator)
       : communicator(communicator)
     {
