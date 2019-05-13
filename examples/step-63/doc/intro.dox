@@ -13,35 +13,89 @@ N16A-T003.
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-Please note: This is work in progress and will be an example for block
-smoothers in geometric multigrid.
-
-OUTLINE
-
-- based on step-16 (GMG), and step-9 (advection)
-
-differences to GMG in step-16:
-
-- non-symmetric problem (interface matrices)
-- renumbering of dofs on each level
-- different smoothers (include block)
-
+This program solves an advection-diffusion problem using a geometric
+multigrid preconditioner. The basics of this preconditioner are
+discussed in step-16; here we discuss the necessary changes needed for
+a non-symmetric PDE, we introduce the idea of block smoothing (as
+compared to point smoothing), and examine the effects of DoF
+renumbering for additive and multiplicative methods.
 
 <h2>Equation</h2>
+The advection-diffusion equation is given by
 
-* Statement of PDE and weak-form with physical description
+@f{align*}{
+-\varepsilon \Delta u + \vec{\beta}\cdot \nabla u & =& f &
+\text{ on } \Omega\\
+u &=& g & \text{ on } \partial\Omega
+@f}
 
-* SUPG (streamline diffusion): State modifications to weak-form.
+where $\varepsilon>0$, $\vec{\beta}$ is the \textit{advection
+direction}, and $f$ is a source. A few notes:
+
+1. If $\vec{\beta}=\vec{0}$, this is the Laplace equation solved in
+step-16 (and many other places).
+
+2. If $\varepsilon=0$ then this is the advection equation solved in
+step-9.
+
+3. If $\varepsilon \ll \norm{\vec{\beta}},$ we say the problem is
+\textit{advection-dominated}, else we say the problem is
+\textit{diffusion-dominated}.
+
+For the discussion in this tutorial we will be concerned with
+advection-dominated flow. 
+
+Using the standard Galerkin finite element method, for suitable test
+function $v_h$, the discretized weak form of the PDE reads
+
+@f{align*}{
+a(u_h,\v_h) = F(v_h)
+@f}
+
+where
+
+@f{align*}{
+a(u_h,\v_h) &= (\nabla u_h,\, \nabla v_h) + (\vec{\beta}\cdot\nabla u_h,\,v_h)\\
+F(v_h) &= (f,\,v)
+@f}
+
+<h3>Streamline diffusion</h3>
+
+The following error estimate can be shown for this PDE:
+
+@f{align*}{
+\norm{\nabla (u-u_h)} \leq (1+\mathcal{P}) \inf_{v_h} \norm (\nabla (u-v_h)}
+@f}
+
+where $\mathcal{P} \sim \norm{\vec{\beta}}/\varepsilon$ (referred
+to as the \textit{Peclet} number). This implies that we may have poor
+numerical solutions when $\varepsilon \ll \norm{\vec{\beta}}$. To
+combat this, we will consider the new weak form
+
+@f{align*}{
+a(u_h,\,v_h) + (-\varepsilon \Delta u_h + \vec{\beta}\cdot
+\nabla u_h-f,\,\delta \vec{\beta}\cdot \nabla v_h) = F(v_h)
+@f}
+
+where $\delta$ is a stabilization parameter defined in <a
+href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
+On Discontinuity—Capturing Methods for Convection—Diffusion Equations
+by Volker and Petr</a>. Essentially, adding in the discrete strong
+form residual enhances the coercivity of the bilinear form
+$a(\cdot,\cdot)$ which increases the stability of the discrete
+solution. This method is commonly referred to as \textit{streamline
+diffusion} or \textit{SUPG} (streamline upwind/Petrov-Galerkin).
 
 
 <h2>Smoothers</h2>
 
 One of the goals of this tutorial is to expand from using a simple
-(point-wise) Gauss-Seidel (SOR) smoother that is used in step-16 (class
-PreconditionSOR) on each level of the multigrid hierarchy.  Here, we consider
-point-wise smoothers (Jacobi and SOR) and cell-based smoothers (Block Jacobi
-and Block SOR). The cell-based smoothers can best be explained within the framework
-of additive and multiplicative Schwarz methods.
+(point-wise) Gauss-Seidel (SOR) smoother that is used in step-16
+(class PreconditionSOR) on each level of the multigrid hierarchy.
+Here, we consider point-wise smoothers (Jacobi and SOR) and cell-based
+smoothers (Block Jacobi and Block SOR). The cell-based smoothers can
+best be explained within the framework of additive and multiplicative
+Schwarz methods.
 
 In contrast to step-16, our test problem contains an advective
 term. Especially with small viscosity, information is transported along
@@ -104,8 +158,33 @@ Schwarz methods are implemented in a unified framework.
 Finally, let us note that the standard Gauss-Seidel (or SOR) method can be
 seen as a multiplicative Schwarz method with a subproblem for each DoF.
 
+
 <h2>Test problem</h2>
 
- Show
-  image of solution without and with SUPG.
+We will be considering the following test problem: $\Omega =
+[-1,\,1]\times[-1,\,1]$ with circle of radius 0.3 centered at the
+origin removed, $\varepsilon=0.005$, $\vec{\beta} =
+[-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and the boundary function 
+
+@f{align*}{
+g = \left\{\begin{array}{ll} 1 & x=-1 \text{ OR } y=-1,\,x\geq 0.5 \\ 
+0 & \text{else} \end{array}\right.
+@f}
+
+The following figures depict the solutions with (left) and without
+(right) streamline diffusion. Without streamline diffusion we see high
+oscillations around the boundary layer, demonstrating the instability
+of the standard Galerkin finite elements for this problem.
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-63-solution.png" alt="">
+    </td>
+
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
+    </td>
+  </tr>
+</table>
 
