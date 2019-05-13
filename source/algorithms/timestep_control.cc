@@ -73,11 +73,11 @@ TimestepControl::parse_parameters(ParameterHandler &param)
   max_step(param.get_double("Max step"));
   final(param.get_double("Final"));
   tolerance(param.get_double("Tolerance"));
-  print_step              = param.get_double("Print step");
-  const std::string strat = param.get("Strategy");
-  if (strat == std::string("uniform"))
+  print_step                 = param.get_double("Print step");
+  const std::string strategy = param.get("Strategy");
+  if (strategy == std::string("uniform"))
     strategy_val = uniform;
-  else if (strat == std::string("doubling"))
+  else if (strategy == std::string("doubling"))
     strategy_val = doubling;
 }
 

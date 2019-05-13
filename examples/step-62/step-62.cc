@@ -1013,7 +1013,7 @@ namespace step62
          position_idx < parameters.nb_probe_points;
          ++position_idx)
       {
-        // Because of the way the operator + and - are overloaded. To substract
+        // Because of the way the operator + and - are overloaded to subtract
         // two points, the following has to be done:
         // `Point_b<dim> + (-Point_a<dim>)`
         const Point<dim> p =

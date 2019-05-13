@@ -361,7 +361,7 @@ namespace OpenCASCADE
     /**
      * The constructor takes an OpenCASCADE TopoDS_Face @p face and an optional
      * @p tolerance. This class uses the interval OpenCASCADE variables @var u,
-     * @var v to descrive the manifold.
+     * @var v to describe the manifold.
      */
     NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
 

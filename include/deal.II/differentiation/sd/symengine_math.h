@@ -194,7 +194,7 @@ namespace Differentiation
     //@}
 
     /**
-     * @name Trignometric functions
+     * @name Trigonometric functions
      */
     //@{
 
@@ -378,7 +378,7 @@ namespace Differentiation
     //@}
 
     /**
-     * @name Hyperbolic trignometric functions
+     * @name Hyperbolic trigonometric functions
      */
     //@{
 

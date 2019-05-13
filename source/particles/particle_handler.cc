@@ -69,12 +69,13 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::initialize(
-    const parallel::distributed::Triangulation<dim, spacedim> &tria,
-    const Mapping<dim, spacedim> &                             mapp,
-    const unsigned int                                         n_properties)
+    const parallel::distributed::Triangulation<dim, spacedim>
+      &                           new_triangulation,
+    const Mapping<dim, spacedim> &new_mapping,
+    const unsigned int            n_properties)
   {
-    triangulation = &tria;
-    mapping       = &mapp;
+    triangulation = &new_triangulation;
+    mapping       = &new_mapping;
 
     // Create the memory pool that will store all particle properties
     property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
