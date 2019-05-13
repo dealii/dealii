@@ -87,9 +87,10 @@ test()
   // The generated arrays of face and line centers contain duplicates: get rid
   // of them by sorting and then std::unique-ing
   auto point_comparator = [](const Point<3> &a, const Point<3> &b) {
-    // just use std::tuple's lexical ordering so that we don't have to think
-    // too hard
-    return std::tie(a[0], a[1], a[2]) < std::tie(b[0], b[1], b[2]);
+    // to minimize roundoff problems, align numbers in some lexicographic-like
+    // order
+    return 1e-10 * a[0] + 1e-5 * a[1] + a[2] <
+           1e-10 * b[0] + 1e-5 * b[1] + b[2];
   };
 
   deallog << "face centers:" << std::endl;
