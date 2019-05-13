@@ -55,15 +55,12 @@ The results are easily visualized:
   <tr valign="top">
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.velocity-magnitude.png" alt="">
-
       <p align="center">
         Magnitude of the fluid velocity.
       </p>
     </td>
-
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.pressure.png" alt="">
-
       <p align="center">
         Fluid pressure. The dynamic range has been truncated to cut off the
         pressure singularities at the top left and right corners of the domain
@@ -75,15 +72,12 @@ The results are easily visualized:
   <tr valign="top">
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.velocity.png" alt="">
-
       <p align="center">
         Fluid velocity.
       </p>
     </td>
-
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.displacement.png" alt="">
-
       <p align="center">
         Solid displacement.
       </p>
@@ -141,16 +135,13 @@ The results can also be visualized and yield some good pictures:
   <tr valign="top">
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">
-
       <p align="center">
         Vectors of the fluid velocity and magnitude of the
         displacement of the solid part.
       </p>
     </td>
-
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.3d.streamlines.png" alt="">
-
       <p align="center">
         Streamlines of the velocity, with the mesh superimposed.
       </p>
@@ -159,7 +150,6 @@ The results can also be visualized and yield some good pictures:
   <tr valign="top">
     <td valign="top" align="center" colspan="2">
       <img src="https://www.dealii.org/images/steps/developer/step-46.3d.displacement.png" alt="">
-
       <p align="center">
         Solid displacement.
       </p>

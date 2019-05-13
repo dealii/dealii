@@ -177,7 +177,6 @@ and could be smoothed on a continuous grid for the post-processing purposes.
 
 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
-
   <tr>
     <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-44.Q2-P1_gr_3_p_ratio_80-displacement.png" alt="">
@@ -241,7 +240,6 @@ displacement field, although qualitatively similar, is different to that of the 
 
 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
-
   <tr>
     <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-44.2d-gr_2.png" alt="">

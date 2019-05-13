@@ -78,27 +78,22 @@ corners, so there is need for refinement there as well:
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-0.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-1.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-2.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-3.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-4.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.2d.mesh-5.png" alt="">
     </td>
@@ -189,27 +184,22 @@ look as follow:
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-0.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-1.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-2.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-3.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-4.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d.mesh-5.png" alt="">
     </td>
@@ -796,7 +786,6 @@ then we get images where the fault line is curved:
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d-extension.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-22.3d-grid-extension.png" alt="">
     </td>

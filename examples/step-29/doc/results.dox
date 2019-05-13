@@ -90,7 +90,6 @@ The graphical output of the program looks as follows:
       <img src="https://www.dealii.org/images/steps/developer/step-29.w.png" alt="w = Im(u)">
     </td>
   </tr>
-
   <tr>
     <td colspan="2">
       <img src="https://www.dealii.org/images/steps/developer/step-29.intensity.png" alt="|u|">

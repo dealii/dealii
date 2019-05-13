@@ -54,7 +54,6 @@ grid, primal and dual numerical solutions look like this:
     <td width="50%">
       <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5.png" alt="">
     </td>
-
     <td width="50%">
       <img src="https://www.dealii.org/images/steps/developer/step-14.point-value.solution-5-dual.png" alt="">
     </td>

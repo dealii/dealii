@@ -176,67 +176,53 @@ To demonstrate the output we show the output from every 1250th time step here:
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-000.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-050.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-100.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-150.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-200.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-250.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-300.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-350.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-400.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-450.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-500.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-550.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-time-600.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-cells.png" alt="">
     </td>
-
     <td>
       <img src="https://www.dealii.org/images/steps/developer/step-32-2d-partition.png" alt="">
     </td>

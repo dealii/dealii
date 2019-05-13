@@ -168,7 +168,6 @@ following results (left: iterations; right: CPU time):
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
     </td>
@@ -192,7 +191,6 @@ bi-linear one. If one makes this change, the results are as follows:
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
     </td>

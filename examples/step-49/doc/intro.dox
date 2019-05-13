@@ -236,7 +236,6 @@ centered by moving the top vertices upwards:
     <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
     </td>
-
     <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
     </td>
@@ -262,7 +261,6 @@ mesh, generated for example with Gmsh, that is read in from a
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
-
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
