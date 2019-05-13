@@ -78,7 +78,7 @@ public:
   size() const;
 
   /**
-   *  Merge the contents of @p other_data with this object.
+   * Merge the contents of @p other_data with this object.
    */
   void
   merge(const GeneralDataStorage &other_data);
