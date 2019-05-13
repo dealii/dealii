@@ -362,13 +362,12 @@ namespace TrilinosWrappers
         const Epetra_LinearProblem &linear_problem)
         : initial_residual(std::numeric_limits<double>::max())
         , current_residual(std::numeric_limits<double>::max())
+        // Consider linear problem converged if any of the collection of
+        // criterion are met
+        , status_test_collection(
+            std_cxx14::make_unique<AztecOO_StatusTestCombo>(
+              AztecOO_StatusTestCombo::OR))
       {
-        // Consider linear problem converged if any of the collection
-        // of criterion are met
-        status_test_collection =
-          std_cxx14::make_unique<AztecOO_StatusTestCombo>(
-            AztecOO_StatusTestCombo::OR);
-
         // Maximum number of iterations
         Assert(max_steps >= 0, ExcInternalError());
         status_test_max_steps =
