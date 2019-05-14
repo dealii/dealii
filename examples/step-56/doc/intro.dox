@@ -189,7 +189,7 @@ solvers instead of the Schur Complement approach used in
 step-22. Details of this approach can be found under the "Block Schur
 complement preconditioner" subsection of the "Possible Extensions"
 section of step-22. For the preconditioner of the velocity block, we
-borrow a class from <a href="http://aspect.dealii.org">ASPECT</a>
+borrow a class from <a href="https://aspect.geodynamics.org">ASPECT</a>
 called @p BlockSchurPreconditioner that has the option to solve for
 the inverse of $A$ or just apply one preconditioner sweep for it
 instead, which provides us with an expensive and cheap approach,

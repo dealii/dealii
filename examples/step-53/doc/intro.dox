@@ -112,7 +112,7 @@ we will do in this program.
 
 To illustrate how one describes geometries using charts in deal.II, we will
 consider a case that originates in an application of the <a
-href="http://aspect.dealii.org">ASPECT mantle convection code</a>, using a
+href="https://aspect.geodynamics.org">ASPECT mantle convection code</a>, using a
 data set provided by D. Sarah Stamps. In the concrete application, we were
 interested in describing flow in the Earth mantle under the <a
 href="http://en.wikipedia.org/wiki/East_African_rift">East African Rift</a>, a

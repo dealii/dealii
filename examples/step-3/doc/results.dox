@@ -159,8 +159,8 @@ suggestions:
   @endcode
   For 1 through 9 global refinement steps, we then get the following sequence
   of point values:
-  <table align="center">
-    <tr> <td># of refinements</td> <td>$u_h(\frac 13,\frac13)$</td> </tr>
+  <table align="center" class="doxtable">
+    <tr> <th># of refinements</th> <th>$u_h(\frac 13,\frac13)$</th> </tr>
     <tr> <td>1</td> <td>0.166667</td> </tr>
     <tr> <td>2</td> <td>0.227381</td> </tr>
     <tr> <td>3</td> <td>0.237375</td> </tr>
@@ -200,8 +200,8 @@ suggestions:
   parameters mean, while the first and third should be obvious. Doing the same
   study again where we change the number of global refinement steps, we get
   the following result:
-  <table align="center">
-    <tr> <td># of refinements</td> <td>$\int_\Omega u_h(x)\; dx$</td> </tr>
+  <table align="center" class="doxtable">
+    <tr> <th># of refinements</th> <th>$\int_\Omega u_h(x)\; dx$</th> </tr>
     <tr> <td>0</td> <td>0.09375000</td> </tr>
     <tr> <td>1</td> <td>0.12790179</td> </tr>
     <tr> <td>2</td> <td>0.13733440</td> </tr>

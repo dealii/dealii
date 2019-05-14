@@ -269,7 +269,7 @@ seen above, interesting behavior only starts after quite a long time
 requiring more CPU hours than is available on a typical
 cluster. Consequently, rather than showing a complete simulation here,
 let us simply show a couple of pictures we have obtained using the
-successor to this program, called <i>Aspect</i> (short for <i>Advanced
+successor to this program, called <i>ASPECT</i> (short for <i>Advanced
 %Solver for Problems in Earth's ConvecTion</i>), that is being
 developed independently of deal.II and that already incorporates some
 of the extensions discussed below. The following two pictures show
@@ -288,7 +288,7 @@ with the mesh) onto 512 processors:
 
 There are many directions in which this program could be extended. As
 mentioned at the end of the introduction, most of these are under active
-development in the <i>Aspect</i> (short for <i>Advanced %Solver for Problems
+development in the <i>ASPECT</i> (short for <i>Advanced %Solver for Problems
 in Earth's ConvecTion</i>) code at the time this tutorial program is being
 finished. Specifically, the following are certainly topics that one should
 address to make the program more useful:
@@ -415,6 +415,6 @@ able to.
 
 There are many other ways to extend the current program. However, rather than
 discussing them here, let us point to the much larger open
-source code Aspect (see http://aspect.dealii.org/ ) that constitutes the
+source code ASPECT (see https://aspect.geodynamics.org/ ) that constitutes the
 further development of step-32 and that already includes many such possible
 extensions.
