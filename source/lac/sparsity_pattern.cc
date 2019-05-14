@@ -34,8 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_MSVC
 __declspec(selectany) // Weak extern binding due to multiple link error
 #endif
-  const SparsityPattern::size_type SparsityPattern::invalid_entry;
-const SparsityPatternBase::size_type SparsityPatternBase::invalid_entry;
+  const SparsityPatternBase::size_type SparsityPatternBase::invalid_entry;
 
 
 SparsityPatternBase::SparsityPatternBase()
@@ -324,7 +323,7 @@ SparsityPattern::reinit(const size_type                      m,
   // if diagonal elements are special: let the first entry in each row be the
   // diagonal value
   if (store_diagonal_first_in_row)
-    for (size_type i = 0; i < rows; i++)
+    for (size_type i = 0; i < rows; ++i)
       colnums[rowstart[i]] = i;
 
   compressed = false;
@@ -784,7 +783,7 @@ SparsityPatternBase::exists(const size_type i, const size_type j) const
   Assert(i < rows, ExcIndexRange(i, 0, rows));
   Assert(j < cols, ExcIndexRange(j, 0, cols));
 
-  for (size_type k = rowstart[i]; k < rowstart[i + 1]; k++)
+  for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
       // entry already exists
       if (colnums[k] == j)
@@ -802,7 +801,7 @@ SparsityPatternBase::row_position(const size_type i, const size_type j) const
   Assert(i < rows, ExcIndexRange(i, 0, rows));
   Assert(j < cols, ExcIndexRange(j, 0, cols));
 
-  for (size_type k = rowstart[i]; k < rowstart[i + 1]; k++)
+  for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
       // entry exists
       if (colnums[k] == j)
@@ -856,7 +855,7 @@ SparsityPatternBase::symmetrize()
   // 2. that the @p{add} function can be called on elements that already exist
   // without any harm
   for (size_type row = 0; row < rows; ++row)
-    for (size_type k = rowstart[row]; k < rowstart[row + 1]; k++)
+    for (size_type k = rowstart[row]; k < rowstart[row + 1]; ++k)
       {
         // check whether we are at the end of the entries of this row. if so,
         // go to next row

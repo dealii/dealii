@@ -1869,7 +1869,7 @@ namespace TrilinosWrappers
 
       // loop over all the elements because
       // Trilinos does not support lp norms
-      for (size_type i = 0; i < n_local; i++)
+      for (size_type i = 0; i < n_local; ++i)
         sum += std::pow(std::fabs((*vector)[0][i]), p);
 
       norm = std::pow(sum, static_cast<TrilinosScalar>(1. / p));
@@ -1981,7 +1981,7 @@ namespace TrilinosWrappers
       AssertIsFinite(s);
 
       size_type n_local = local_size();
-      for (size_type i = 0; i < n_local; i++)
+      for (size_type i = 0; i < n_local; ++i)
         (*vector)[0][i] += s;
     }
 

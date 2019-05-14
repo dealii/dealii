@@ -885,22 +885,6 @@ public:
   using SparsityPatternBase::reinit;
 
   /**
-   * Define a value which is used to indicate that a certain value in the
-   * #colnums array is unused, i.e. does not represent a certain column number
-   * index.
-   *
-   * Indices with this invalid value are used to insert new entries to the
-   * sparsity pattern using the add() member function, and are removed when
-   * calling compress().
-   *
-   * You should not assume that the variable declared here has a certain
-   * value. The initialization is given here only to enable the compiler to
-   * perform some optimizations, but the actual value of the variable may
-   * change over time.
-   */
-  static const size_type invalid_entry = SparsityPatternBase::invalid_entry;
-
-  /**
    * @name Construction and setup Constructors, destructor; functions
    * initializing, copying and filling an object.
    */

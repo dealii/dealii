@@ -398,7 +398,7 @@ namespace internal
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
-        apply_to_subrange(0, size);
+        AlignedVectorCopy::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }

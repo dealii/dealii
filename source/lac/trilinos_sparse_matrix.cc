@@ -3043,11 +3043,11 @@ namespace TrilinosWrappers
 
 
       int
-      TrilinosPayload::ApplyInverse(const VectorType &X, VectorType &Y) const
+      TrilinosPayload::ApplyInverse(const VectorType &Y, VectorType &X) const
       {
         // The transposedness of the operations is taken care of
         // when we hit the transpose flag.
-        inv_vmult(Y, X);
+        inv_vmult(X, Y);
         return 0;
       }
 

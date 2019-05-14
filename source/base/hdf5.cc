@@ -231,7 +231,7 @@ namespace HDF5
       std::is_same<Container,
                    FullMatrix<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(const std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> &dimensions)
     {
       // If the rank is higher than 2, then remove single-dimensional entries
       // from the shape defined by dimensions. This is equivalent to the squeeze
