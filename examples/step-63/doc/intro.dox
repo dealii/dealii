@@ -6,85 +6,76 @@ The creation of this tutorial was partially supported by NSF Award
 DMS-1522191, DMS-1901529, OAC-1835452, by the Computational
 Infrastructure in Geodynamics initiative (CIG), through the NSF under
 Award EAR-0949446 and EAR-1550901 and The University of California -
-Davis, and by Technical Data Analysis, Inc. through US Navy STTR
-N16A-T003.
+Davis.
 </i>
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This program solves an advection-diffusion problem using a geometric
-multigrid preconditioner. The basics of this preconditioner are
-discussed in step-16; here we discuss the necessary changes needed for
-a non-symmetric PDE, we introduce the idea of block smoothing (as
-compared to point smoothing), and examine the effects of DoF
-renumbering for additive and multiplicative methods.
+This program solves an advection-diffusion problem using a geometric multigrid
+preconditioner. The basics of this preconditioner are discussed in step-16;
+here we discuss the necessary changes needed for a non-symmetric
+PDE. Additionally, we introduce the idea of block smoothing (as compared to
+point smoothing in step-16), and examine the effects of DoF renumbering for
+additive and multiplicative smoothers.
 
 <h2>Equation</h2>
 The advection-diffusion equation is given by
-
 @f{align*}{
--\varepsilon \Delta u + \vec{\beta}\cdot \nabla u & =& f &
-\text{ on } \Omega\\
-u &=& g & \text{ on } \partial\Omega
+-\varepsilon \Delta u + \boldsymbol{\beta}\cdot \nabla u & = f &
+\text{ in } \Omega\\
+u &= g & \text{ on } \partial\Omega
 @f}
+where $\varepsilon>0$, $\boldsymbol{\beta}$ is the <i>advection
+direction</i>, and $f$ is a source. A few notes:
 
-where $\varepsilon>0$, $\vec{\beta}$ is the \textit{advection
-direction}, and $f$ is a source. A few notes:
+1. If $\boldsymbol{\beta}=\boldsymbol{0}$, this is the Laplace equation solved in step-16
+(and many other places).
 
-1. If $\vec{\beta}=\vec{0}$, this is the Laplace equation solved in
-step-16 (and many other places).
-
-2. If $\varepsilon=0$ then this is the advection equation solved in
+2. If $\varepsilon=0$ then this is the stationary advection equation solved in
 step-9.
 
-3. If $\varepsilon \ll \norm{\vec{\beta}},$ we say the problem is
-\textit{advection-dominated}, else we say the problem is
-\textit{diffusion-dominated}.
+3. If $\varepsilon \ll \|\boldsymbol{\beta}\|$, we say the problem is
+<i>advection-dominated</i>, else we say the problem is
+<i>diffusion-dominated</i>.
 
 For the discussion in this tutorial we will be concerned with
 advection-dominated flow. 
 
 Using the standard Galerkin finite element method, for suitable test
-function $v_h$, the discretized weak form of the PDE reads
-
+functions $v_h$, the discrete weak form of the PDE reads
 @f{align*}{
-a(u_h,\v_h) = F(v_h)
+a(u_h,v_h) = F(v_h)
 @f}
-
 where
-
 @f{align*}{
-a(u_h,\v_h) &= (\nabla u_h,\, \nabla v_h) + (\vec{\beta}\cdot\nabla u_h,\,v_h)\\
-F(v_h) &= (f,\,v)
+a(u_h,v_h) &= (\varepsilon \nabla u_h,\, \nabla v_h) + (\boldsymbol{\beta}\cdot\nabla u_h,\,v_h),\\
+F(v_h) &= (f,\,v_h).
 @f}
 
 <h3>Streamline diffusion</h3>
 
 The following error estimate can be shown for this PDE:
-
 @f{align*}{
-\norm{\nabla (u-u_h)} \leq (1+\mathcal{P}) \inf_{v_h} \norm (\nabla (u-v_h)}
+\|\nabla (u-u_h)\| \leq (1+\mathcal{P}) \inf_{v_h} \|\nabla (u-v_h)\|
 @f}
-
-where $\mathcal{P} \sim \norm{\vec{\beta}}/\varepsilon$ (referred
-to as the \textit{Peclet} number). This implies that we may have poor
-numerical solutions when $\varepsilon \ll \norm{\vec{\beta}}$. To
+where $\mathcal{P} \sim \|\boldsymbol{\beta}\|/\varepsilon$ (referred
+to as the <i>Peclet</i> number). This implies that we may have poor
+numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|$. To
 combat this, we will consider the new weak form
-
 @f{align*}{
-a(u_h,\,v_h) + (-\varepsilon \Delta u_h + \vec{\beta}\cdot
-\nabla u_h-f,\,\delta \vec{\beta}\cdot \nabla v_h) = F(v_h)
+a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h + \boldsymbol{\beta}\cdot
+\nabla u_h-f,\,\delta \boldsymbol{\beta}_K\cdot \nabla v_h)_K = F(v_h)
 @f}
-
-where $\delta$ is a stabilization parameter defined in <a
-href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
-On Discontinuity—Capturing Methods for Convection—Diffusion Equations
-by Volker and Petr</a>. Essentially, adding in the discrete strong
-form residual enhances the coercivity of the bilinear form
-$a(\cdot,\cdot)$ which increases the stability of the discrete
-solution. This method is commonly referred to as \textit{streamline
-diffusion} or \textit{SUPG} (streamline upwind/Petrov-Galerkin).
+where the sum is done over all cells $K$ with the inner product is understood
+on that cell, and $\delta_K$ is a cell-wise constant stabilization parameter
+defined in <a href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27"> On
+Discontinuity-Capturing Methods for Convection-Diffusion Equations by Volker
+John and Petr Knobloch</a>. Essentially, adding in the discrete strong form
+residual enhances the coercivity of the bilinear form $a(\cdot,\cdot)$ which
+increases the stability of the discrete solution. This method is commonly
+referred to as <i>streamline diffusion</i> or <i>SUPG</i> (streamline
+upwind/Petrov-Galerkin).
 
 
 <h2>Smoothers</h2>
@@ -98,12 +89,13 @@ best be explained within the framework of additive and multiplicative
 Schwarz methods.
 
 In contrast to step-16, our test problem contains an advective
-term. Especially with small viscosity, information is transported along
-streamlines in the given advection direction. This means that smoothers are
-likely to be more effective, if they allow information to travel in downstream
-direction within a single smoother application. This requires reordering
-degrees of freedom or cells (for the cell-based smoothers) accordingly. The
-influence of the ordering will be visible in the results section.
+term. Especially with a small diffusion constant $\varepsilon$, information is
+transported along streamlines in the given advection direction. This means
+that smoothers are likely to be more effective, if they allow information to
+travel in downstream direction within a single smoother application. This
+requires reordering degrees of freedom or cells (for the cell-based smoothers)
+accordingly. The influence of the ordering will be visible in the results
+section.
 
 Let us now briefly define the smoothers used in this tutorial. A Schwarz
 preconditioner requires a decomposition
@@ -137,12 +129,13 @@ logic for the Schwarz operator operating on the subproblems (in deal.II they
 are called "blocks"), is done in the class RelaxationBlock. The "Block
 Jacobi" method is implemented in the class RelaxationBlockJacobi. Many
 aspects of the class (for example how the blocks are defined and how to invert
-the local subproblems $A_j$ can be configured in the smoother data (see
-RelaxationBlock::AdditionalData and DoFTools::make_cell_patches).
+the local subproblems $A_j$) can be configured in the smoother data, see
+RelaxationBlock::AdditionalData and DoFTools::make_cell_patches for details.
 
 So far, we discussed additive smoothers where the updates can be applied
 independently and there is no information flowing within a single smoother
-application. A <i>multiplicative Schwarz preconditioner</i> addresses this by
+application. A <i>multiplicative Schwarz preconditioner</i> addresses this
+and is defined by
 @f{align*}{
  B^{-1} = \left( I- \prod_{j=1}^J I-P_J \right) A^{-1}.
 @f}
@@ -162,29 +155,27 @@ seen as a multiplicative Schwarz method with a subproblem for each DoF.
 <h2>Test problem</h2>
 
 We will be considering the following test problem: $\Omega =
-[-1,\,1]\times[-1,\,1]$ with circle of radius 0.3 centered at the
-origin removed, $\varepsilon=0.005$, $\vec{\beta} =
+[-1,\,1]\times[-1,\,1]$ with a circle of radius 0.3 centered at the
+origin removed, $\varepsilon=0.005$, $\boldsymbol{\beta} =
 [-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and the boundary function 
-
 @f{align*}{
 g = \left\{\begin{array}{ll} 1 & x=-1 \text{ OR } y=-1,\,x\geq 0.5 \\ 
 0 & \text{else} \end{array}\right.
 @f}
 
 The following figures depict the solutions with (left) and without
-(right) streamline diffusion. Without streamline diffusion we see high
+(right) streamline diffusion. Without streamline diffusion we see large
 oscillations around the boundary layer, demonstrating the instability
-of the standard Galerkin finite elements for this problem.
+of the standard Galerkin finite element method for this problem.
 
-<TABLE WIDTH="60%" ALIGN="center">
+<table width="60%" align="center">
   <tr>
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-63-solution.png" alt="">
     </td>
 
-    <td ALIGN="center">
+    <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
     </td>
   </tr>
 </table>
-

@@ -9,10 +9,21 @@ tutorial is also $\mathcal{O}(n)$, all one needs to do is show that
 the iteration counts for the GMRES solve stay roughly constant as we
 refine the mesh.
 
-Each of the following tables gives the GMRES iteration counts to
-reduce the initial residual by 1e8.
+Each of the following tables gives the GMRES iteration counts to reduce the
+initial residual by 1e8. We selected a sufficient number of smoothing steps
+(based on the method) to get iteration numbers independent of mesh size. In
+this case, the method is indeed $\mathcal{O}(n)$.
 
 <h4> DoF/Cell Renumbering </h4>
+
+The point-wise smoothers ("Jacobi" and "SOR") get applied in the order the
+DoFs are numbered on each level. We can influence this using the
+DoFRenumbering namespace. The block smoothers are applied based on the
+ordering we set in @p setup_smoother. We can visualize this numbering. The
+following picture shows the cell numbering of the active cells in upstream,
+random, and downstream numbering (left to right):
+
+<img src="https://www.dealii.org/images/steps/developer/step-63-cell-order.png" alt="">
 
 Starting with the additive smoothers, we see that renumbering the
 DoFs/cells has no effect on convergence speed. This is because these

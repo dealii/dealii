@@ -200,7 +200,7 @@ namespace Step63
     smoother_type   = prm.get("Smoother type");
     smoothing_steps = prm.get_integer("Smoothing steps");
 
-    std::string renumbering = prm.get("DoF renumbering");
+    const std::string renumbering = prm.get("DoF renumbering");
     if (renumbering == "none")
       dof_renumbering = DoFRenumberingStrategy::none;
     else if (renumbering == "downstream")
@@ -1143,7 +1143,7 @@ namespace Step63
     data_out.add_data_vector(cell_indices, "cell_index");
     data_out.build_patches();
 
-    std::string filename =
+    const std::string filename =
       "solution-" + Utilities::int_to_string(cycle) + ".vtu";
     std::ofstream output(filename.c_str());
     data_out.write_vtu(output);
