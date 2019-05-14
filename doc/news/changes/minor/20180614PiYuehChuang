@@ -1,4 +1,0 @@
-Fixed: Mismatched numbers of components between the exact solution and 
-underlying FE in Step-51.
-<br>
-(Pi-Yueh Chuang, 2018/06/14)

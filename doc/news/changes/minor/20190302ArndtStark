@@ -1,4 +1,0 @@
-Fixed: CellAccessor::material_id interfered with the manifold object
-for refining the mesh in case its dimension was less than the space dimension.
-<br>
-(Daniel Arndt, Sebastian Stark, 2019/03/02)

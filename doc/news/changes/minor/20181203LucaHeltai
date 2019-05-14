@@ -1,4 +1,0 @@
-New: Added entries to GridTools::Cache to build a vertices RTree, and a bounding boxes RTree. 
-<br>
-(Luca Heltai, 2018/12/03)
-

@@ -1,4 +1,0 @@
-New: FEValuesExtractor classes now have a new method get_name() that returns a unique string identifier
-for each extractor. 
-<br>
-(Luca Heltai, 2019/03/19)

@@ -1,5 +1,0 @@
-Fixed: The operation FEEvaluation::read_dof_values performed invalid array
-accesses with AVX512 vectorization in rare circumstances of particular 1d
-meshes. This is now fixed.
-<br>
-(Martin Kronbichler, 2018/11/10)

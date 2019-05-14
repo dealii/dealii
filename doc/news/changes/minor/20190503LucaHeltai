@@ -1,4 +1,0 @@
-New: Mapping::get_bounding_box() returns the correct bounding box for mappings that do not preserve vertex
-locations.
-<br>
-(Luca Heltai, 2019/05/03)

@@ -1,5 +1,0 @@
-New: Triangulation::n_faces, Triangulation::n_active_faces, and Triangulation::n_raw_faces now work also
-in one dimension. 
-<br>
-(Luca Heltai, 2018/11/22)
-

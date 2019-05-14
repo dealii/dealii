@@ -1,5 +1,0 @@
-Changed: Time is described by a real-valued scalar in Function, TensorFunction,
-ConstantTensorFunction and ZeroTensorFunction, i.e. all of them derive from
-FunctionTime with a real-valued scalar template parameter.
-<br>
-(Daniel Arndt, 2018/10/26)

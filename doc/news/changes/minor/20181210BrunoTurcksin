@@ -1,4 +1,0 @@
-New: Add helpers functions to use varying coefficients when using
-CUDAWrappers::MatrixFree.
-<br>
-(Bruno Turcksin, 2018/12/10)

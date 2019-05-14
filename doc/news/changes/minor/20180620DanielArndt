@@ -1,4 +1,0 @@
-Fixed: FETools::back_interpolate can be used
-for TrilinosWrappers::MPI::BlockVector.
-<br>
-(Daniel Arndt, 2018/06/20)

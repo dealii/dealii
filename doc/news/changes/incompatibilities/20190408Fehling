@@ -1,6 +1,0 @@
-Changed: Tasks of member function
-hp::FECollection::find_face_dominating_fe_in_subset() are now divided
-into two functions hp::FECollection::find_common_subspace()
-and hp::FECollection::find_dominated_fe().
-<br>
-(Marc Fehling, 2019/04/08)

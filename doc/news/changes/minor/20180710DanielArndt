@@ -1,4 +1,0 @@
-Fixed: GridTools::delete_duplicated_vertices also treats the SubCellData
-object correctly when renumbering the vertices.
-<br>
-(Daniel Arndt, 2018/07/08)

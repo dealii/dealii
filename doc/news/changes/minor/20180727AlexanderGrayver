@@ -1,4 +1,0 @@
-Added support for high-order VTK output by using newly 
-introduced Lagrange VTK cells. 
-<br>
-(Alexander Grayver, 2018/07/27)

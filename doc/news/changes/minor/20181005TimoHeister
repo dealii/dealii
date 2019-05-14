@@ -1,3 +1,0 @@
-The computation of normal vectors on very small cells could fail. This is now fixed.
-<br>
-(Timo Heister, 2018/10/05)

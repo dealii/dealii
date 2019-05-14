@@ -1,8 +1,0 @@
-New: FE_NedelecSZ is a new H(curl)-conforming element which overcomes the sign conflict problem
-which can be encountered for Nedelec elements on hexahedral meshes. This is an implementation of
-the method described in the PhD thesis of Sabine Zaglmayr and should be considered over the
-FE_Nedelec element where meshes with non-standard orientation are used. Note that not all
-functionality (e.g. Hessians), has been implemented for this element.
-<br>
-(Ross Kynch, 2018/04/28)
-

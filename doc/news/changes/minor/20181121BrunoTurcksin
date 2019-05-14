@@ -1,4 +1,0 @@
-New: Add support for MPI when using CUDAWrappers::MatrixFree. This only works
-with LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
-<br>
-(Bruno Turcksin, 2018/11/21)

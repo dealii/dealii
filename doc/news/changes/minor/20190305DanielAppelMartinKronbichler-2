@@ -1,4 +1,0 @@
-Fixed: EllipiticalManifold::push_forward_gradient did previously not take the
-rotation into account. This is now fixed.
-<br>
-(Daniel Appel, Martin Kronbichler, 2019/03/05)

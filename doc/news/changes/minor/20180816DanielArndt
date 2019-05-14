@@ -1,4 +1,0 @@
-Fixed: CUDAWrappers::Vector performs now a deep copy instead of a shallow copy
-in its copy assignment operator.
-<br>
-(Daniel Arndt, 2018/08/16)

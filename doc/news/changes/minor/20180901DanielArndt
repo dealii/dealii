@@ -1,5 +1,0 @@
-New: Utilities::CUDA::allocate_device_data() and
-Utilities::CUDA::delete_device_data() help to manage data on CUDA devices
-using std::unique_ptr.
-<br>
-(Daniel Arndt, 2018/09/01)

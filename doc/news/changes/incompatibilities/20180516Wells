@@ -1,7 +1,0 @@
-Changed: The OpenCASCADE Manifold classes with names ending in Boundary (i.e.,
-NormalProjectionBoundary, DirectionalProjectionBoundary, and
-NormalToMeshProjectionBoundary) have been deprecated in favor of renamed classes
-ending in Manifold (i.e., NormalProjectionManifold,
-DirectionalProjectionManifold, and NormalToMeshProjectionManifold).
-<br>
-(David Wells, 2018/05/16)

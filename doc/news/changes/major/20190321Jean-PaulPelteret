@@ -1,9 +1,0 @@
-New: A new class Differentiation::AD::VectorFunction has been
-added to help implement point-wise vector functions using automatic 
-differentiation. In particular, this class is designed to compute the 
-Jacobian of a vector function that is parameterized in
-terms of scalar, vector, and tensor arguments. One example of its use
-would be to compute the linearization of a multi-field constitutive
-law that is expressed in terms of some kinetic variables.
-<br>
-(Jean-Paul Pelteret, 2019/03/21)

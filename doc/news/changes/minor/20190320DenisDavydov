@@ -1,4 +1,0 @@
-New: Add DynamicSparsityPattern::nonempty_cols()/DynamicSparsityPattern::nonempty_rows() to return columns/rows
-stored in the sparsity pattern.
-<br>
-(Denis Davydov, 2019/03/20)

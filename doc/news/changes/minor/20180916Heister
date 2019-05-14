@@ -1,3 +1,0 @@
-New: added the function TrilinosWrappers::MPI::Vector::import() to get data from a ReadWriteVector.
-<br>
-(Timo Heister, 2018/09/16)

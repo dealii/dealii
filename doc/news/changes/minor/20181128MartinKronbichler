@@ -1,4 +1,0 @@
-Fixed: The MatrixFree::initialize() function would sometimes run into an
-assertion when ghost faces occur on subdomain interfaces. This is now fixed.
-<br>
-(Martin Kronbichler, 2018/11/28)

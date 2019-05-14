@@ -1,4 +1,0 @@
-New: Add LAPACKFullMatrix::apply_givens_rotation() and Vector::apply_givens_rotation() to
-apply a Givens rotation matrix.
-<br>
-(Denis Davydov, 2018/12/30)

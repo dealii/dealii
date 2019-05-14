@@ -1,6 +1,0 @@
-Fixed: TrilinosWrappers::MPI::Vector::reinit check  now checks if
-parallel_partitioner is_ascending_and_one_to_one before calling
-make_trilinos_map because make_trilinos_map may be able to make
-a linear map if is_ascending_and_one_to_one is true.
-<br>
-(Joshua Hanophy, 2018/06/16)

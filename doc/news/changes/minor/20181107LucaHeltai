@@ -1,6 +1,0 @@
-New: GridOut::write_vtk and GridIn::read_vtk are now compatible with each other, and can be used to save 
-and restore a Triangulation with all manifold_ids and boundary_ids correctly saved.
-This is now the only format that supports both boundary_id and manifold_id both in reading and writing. 
-<br>
-(Luca Heltai, 2018/11/07)
-

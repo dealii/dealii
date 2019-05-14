@@ -1,3 +1,0 @@
-New: Added BoundingBox::extend() that allows extending and shrinking of BoundingBox objects. 
-<br>
-(Luca Heltai, 2019/04/11)

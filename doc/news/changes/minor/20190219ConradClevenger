@@ -1,4 +1,0 @@
-New: Function DoFRenumbering::random(dof_handler, level) which allows for a random renumbering 
-of degrees of freedom on a level in a mutilevel hierarchy. 
-<br>
-(Conrad Clevenger, 2019/02/19)

@@ -1,5 +1,0 @@
-Fixed: Two invalid off-by-one data accesses in the initialization of
-MatrixFree with face data enabled, that appeared in some rare cases on certain
-configurations of processors, have been fixed.
-<br>
-(Daniel Arndt, Martin Kronbichler, 2018/05/18)

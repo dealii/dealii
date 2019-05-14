@@ -1,4 +1,0 @@
-Fixed: MatrixFree::loop() would not zero a vector if all degrees of freedom
-are constrained. This is now fixed.
-<br>
-(Martin Kronbichler, 2018/09/20)

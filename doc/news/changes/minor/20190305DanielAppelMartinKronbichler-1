@@ -1,5 +1,0 @@
-Fixed: CylindricalManifold::get_new_point would previously return wrong
-results if the resulting point is on the axis, and the cylinder axis does not
-pass through the origin.
-<br>
-(Daniel Appel, Martin Kronbichler, 2019/03/05)

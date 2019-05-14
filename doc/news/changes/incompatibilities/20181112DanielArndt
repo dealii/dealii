@@ -1,8 +1,0 @@
-Changed: Subscriptor::subscribe cannot be called with rvalue references anymore.
-In particular, temporary string literals cannot be used as argument. Storing
-string literals with the same content at the same memory location is
-implementation defined and cannot be relied upon. On the other hand, the
-subscriber strings are not compared by their memory address anymore but by their
-actual content.
-<br>
-(Daniel Arndt, 2018/11/12)

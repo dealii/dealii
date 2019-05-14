@@ -1,8 +1,0 @@
-Improved: A new dummy enumeration AD::NumberTypes::none has been added.
-It exists to represent number types that are scalar arithmetic types, 
-i.e those that hold no derivatives. They are implemented primarily to 
-facilitate the use of template  meta-programming techniques to switch 
-between different AD types. This covers the case when the user does not 
-want an AD type at all, but rather a primitive type.
-<br>
-(Jean-Paul Pelteret, 2019/01/25)

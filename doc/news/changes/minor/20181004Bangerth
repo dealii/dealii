@@ -1,5 +1,0 @@
-New: There is now a constructor of hp::QCollection that, like the
-existing one of hp::FECollection, takes a variable number of
-quadrature objects and creates a collection from it.
-<br>
-(Wolfgang Bangerth, 2018/10/04)

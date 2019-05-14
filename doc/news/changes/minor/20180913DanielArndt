@@ -1,4 +1,0 @@
-Fixed: VectorTools::project_boundary_values_div_conforming works correctly
-in case the DoFHandler object contains more than one FE_RaviartThomas element.
-<br>
-(Daniel Arndt, 2018/09/13)

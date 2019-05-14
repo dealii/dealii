@@ -1,4 +1,0 @@
-Changed: Triangulation::create_triangulation() doesn't allow to set a boundary
-id different from numbers::internal_face_boundary_id for internal faces anymore.
-<br>
-(Daniel Arndt, 2018/08/07)

@@ -1,6 +1,0 @@
-Added: New function 
-Utilities::MPI::compute_n_point_to_point_communications()
-is implemented to be used for computing number of processes
-in an MPI universe to expect communication from.
-<br>
-(Eldar Khattatov, 2018/09/04)

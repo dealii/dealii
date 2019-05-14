@@ -1,5 +1,0 @@
-Fixed: DoFTools::make_flux_sparsity_pattern was accessing invalid dof indices
-in case neighboring cells were not using FiniteElement objects with the same
-number of degrees of freedom. This is fixed now.
-<br>
-(Daniel Arndt, 2018/05/19)

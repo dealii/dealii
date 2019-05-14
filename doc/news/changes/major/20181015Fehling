@@ -1,8 +1,0 @@
-Changed: hp::DoFHandler now automatically sets active_fe_indices
-on cells that will be refined and coarsened whenever a Triangulation or
-parallel::shared::Triangulation is used. Upon refinement, the
-active_fe_index will be passed on to the children. For coarsening, the
-parent's active_fe_index will be determined from its former children
-using the FiniteElementDomination logic.
-<br>
-(Marc Fehling, 2018/10/15)

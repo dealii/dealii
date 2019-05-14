@@ -1,3 +1,0 @@
-New: GridGenerator::merge_triangulations gained an option to copy manifold ids.
-<br>
-(Daniel Arndt, 2018/07/08)

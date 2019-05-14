@@ -1,3 +1,0 @@
-Fixed: Reinit blockvector only when necessary in MGTransferBlockMatrixFree::copy_to_mg.
-<br>
-(Daniel Jodlbauer, 2018/12/19)

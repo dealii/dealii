@@ -1,9 +1,0 @@
-Improved: The FEEvaluation::evaluate() and FEEvaluation::integrate() routines
-would previously unconditionally use an evaluation routine with a
-transformation to a collocation basis and subsequent collocation derivative
-for `n_q_points_1d > fe_degree` because it is faster for the usual case of
-`n_q_points_1d` close to the polynomial degree. Now, we switch back to the
-standard evaluation if `n_q_points_1d > 3 * (fe_degree+1) / 2` where that
-variant is faster.
-<br>
-(Martin Kronbichler, 2019/02/06)

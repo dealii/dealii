@@ -1,6 +1,0 @@
-New: The parallel::distributed::SolutionTransfer class is now capable
-of transferring data that has been associated with a hp::DoFHandler
-object. See the class documentation of the former on how to use this
-new functionality.
-<br>
-(Marc Fehling, 2018/08/15)

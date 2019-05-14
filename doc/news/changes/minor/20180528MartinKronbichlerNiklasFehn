@@ -1,5 +1,0 @@
-New: The function GridTools::find_all_active_cells_around_point() returns a
-list of all cells around a point, rather than only a single one for the old
-GridTools::find_active_cell_around_point.
-<br>
-(Martin Kronbichler, Niklas Fehn, 2018/05/28)

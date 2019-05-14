@@ -1,6 +1,0 @@
-Deprecated: The Threads::n_existing_threads() and
-Threads::this_thread_id() functions have been deprecated. There are
-equivalent C++11 functions that provide the same kind of
-functionality.
-<br>
-(Wolfgang Bangerth, 2018/10/05)

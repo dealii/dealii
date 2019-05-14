@@ -1,7 +1,0 @@
-Fixed: MGLevelGlobalTransfer::copy_to_mg would initialize the level vectors
-without ghosts. When combined with Chebyshev smoother and a DiagonalMatrix as
-well as specific matrix-free loops, this could lead to ghosted vectors in
-places where they were not supposed to be ghosted, leading to exceptions. This
-is now fixed.
-<br>
-(Martin Kronbichler, 2019/02/05)

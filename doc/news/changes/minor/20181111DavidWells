@@ -1,5 +1,0 @@
-New: A new function GridTools::get_coarse_mesh_description has been added. This
-function extracts the vertices, CellData, and SubCellData objects from a
-Triangulation (i.e., it is the inverse of Triangulation::create_triangulation).
-<br>
-(David Wells, 2018/11/11)

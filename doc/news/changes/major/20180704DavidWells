@@ -1,6 +1,0 @@
-New: A new function GridGenerator::channel_with_cylinder has been added. This
-function generates a grid corresponding to the classic flow past a cylinder test
-problem, and uses manifolds to blend between the description of the cylinder and
-the Cartesian bulk geometry.
-<br>
-(David Wells, 2018/07/04)

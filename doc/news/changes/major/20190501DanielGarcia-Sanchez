@@ -1,6 +1,0 @@
-New: The new tutorial program step-62 shows how to calculate the resonance
-frequency and the bandgap of a phononic crystal. The program solves the elastic
-wave equation with Perfectly Matches Layers in the frequency domain using
-complex algebra and parallelization via MUMPS and MPI.
-<br>
-(Daniel Garcia-Sanchez, 2019/05/01)

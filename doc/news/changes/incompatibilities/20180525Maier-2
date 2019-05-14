@@ -1,8 +1,0 @@
-Changed: MatrixCreator::create_mass_matrix and
-MatrixCreator::create_boundary_mass_matrix that had mixed number type (real
-valued for the matrix and complex valued for vectors) have been changed to
-support complex number types uniformly. This implies that now all
-underlying number types of matrix, vectors and AffineConstraint objects
-have to match; mixed variants are no longer supported.
-<br>
-(Matthias Maier, 2018/05/25)

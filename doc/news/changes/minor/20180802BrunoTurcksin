@@ -1,5 +1,0 @@
-Fixed: The import function for LinearAlgebra::distributed::Vector would fail if
-the IndexSet of the ReadWriteVector has no locally owned element
-<br>
-(Bruno Turcksin, 2018/08/02)
-

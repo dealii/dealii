@@ -1,5 +1,0 @@
-Deprecate project_boundary_values_curl_conforming in favor
-of project_boundary_values_curl_conforming_l2. The former
-has a number of known limitations and bugs.
-<br>
-(Alexander Grayver, 2018/07/26)

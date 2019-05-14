@@ -1,4 +1,0 @@
-Fixed: The function Particles::ParticleAccessor::serialize() was
-declared but not implemented. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2018/08/21)

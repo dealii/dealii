@@ -1,3 +1,0 @@
-New: make_const_array_view() creates a constant view from a non-const object.
-<br>
-(Daniel Arndt, 2019/02/09)

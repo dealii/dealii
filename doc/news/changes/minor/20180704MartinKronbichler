@@ -1,4 +1,0 @@
-New: The class MatrixFreeFunctions::CellwiseInverseMassMatrix can now also be
-used in 1D.
-<br>
-(Martin Kronbichler, 2018/07/04)

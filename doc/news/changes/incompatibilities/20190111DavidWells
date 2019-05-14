@@ -1,5 +1,0 @@
-Changed: The class VectorView has been removed. The suggested replacements are
-to either use an ArrayView, a BlockVector, or to copy the relevant subset into a
-Vector.
-<br>
-(David Wells, 2019/01/11)

@@ -1,4 +1,0 @@
-Fixed: The project_boundary_values_div_conforming() function now works correctly 
-with parallel::distributed::Triangulation.
-<br>
-(Jonathan Matthews, 2018/10/13)

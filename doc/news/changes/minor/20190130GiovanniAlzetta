@@ -1,5 +1,0 @@
-Changed: Function GridGenerator::general_cell() can now generate
-a cell of dimension `dim` inside a space of dimension `spacedim`
-with `dim <= spacedim`
-<br>
-(Giovanni Alzetta, 2019/01/30)

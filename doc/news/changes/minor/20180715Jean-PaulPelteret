@@ -1,6 +1,0 @@
-Changed: The Subscriptor class has been made thread-safe, and its behavior in
-debug and release modes are now identical. Although this makes subscription and 
-un-subscription slightly more expensive in release mode, debugging should be
-easier overall.
-<br>
-(Jean-Paul Pelteret, 2018/07/15)

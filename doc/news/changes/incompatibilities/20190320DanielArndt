@@ -1,4 +1,0 @@
-Removed: The IndexSet instantiations for FEValues::get_function_values()
-and DataOut_DoFData::add_data_vector() have been removed.
-<br>
-(Daniel Arndt, 2019/03/20)

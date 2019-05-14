@@ -1,7 +1,0 @@
-Deprecated: deal.II's NetCDF bindings have been deprecated. The present set of
-bindings are incompatible with recent releases of NetCDF and, at the present
-time, no one has volunteered to either maintain or upgrade our interface. The
-bindings will be removed in a future version if no one steps forward to update
-the bindings.
-<br>
-(David Wells, 2018/10/27)

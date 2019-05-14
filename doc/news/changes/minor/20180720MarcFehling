@@ -1,5 +1,0 @@
-Fixed: hp::DoFHandler::distribute_dofs() now works on
-parallel::distributed::Triangulation<3> objects that
-contain artificial cells.
-<br>
-(Marc Fehling, 2018/07/20)

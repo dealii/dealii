@@ -1,6 +1,0 @@
-Fixed: The TriaAccessor<0,dim,spacedim> and TriaAccessor<0,1,spacedim>
-classes were missing member functions `get_triangulation()` and
-`operator<()`. This prevented these objects from being stored in
-`std::map`s, among other issues.
-<br>
-(Wolfgang Bangerth, Luca Heltai, 2018/11/20)

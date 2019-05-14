@@ -1,6 +1,0 @@
-New: Member functions DoFHandler::set_fe() and hp::DoFHandler::set_fe()
-that will register a finite element object without enumerating all
-degrees of freedom. In the hp case, the active_fe_indices will be
-initialized and communicated amongst all processors, additionally.
-<br>
-(Marc Fehling, 2019/02/10)

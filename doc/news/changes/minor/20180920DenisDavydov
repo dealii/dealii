@@ -1,4 +1,0 @@
-New: Add optional flag to ParameterHandler to skip undefined
-sections and parameters.
-<br>
-(Denis Davydov, 2018/09/20)

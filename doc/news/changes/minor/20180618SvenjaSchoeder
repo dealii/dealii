@@ -1,6 +1,0 @@
-New: The LinearAlgebra::distributed::Vector::compress() function has
-gained two new combine operations VectorOperation::min and
-VectorOperation::max to define the entry at the owning processor as
-the minimum/maximum of its own value and the one coming from a ghost.
-<br>
-(Svenja Schoeder, 2018/06/18)

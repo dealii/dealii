@@ -1,5 +1,0 @@
-New: Functions DoFAccessor::get_active_fe_indices() and
-internal::DoFAccessorImplementation::get_active_vertex_fe_indices()
-return all active finite element indices on the corresponding object.
-<br>
-(Marc Fehling, 2018/10/08)

@@ -1,4 +1,0 @@
-New: Support for complex values can be controlled using the CMake flag
-DEAL_II_WITH_COMPLEX_VALUES.
-<br>
-(Daniel Arndt, 2019/09/26)
