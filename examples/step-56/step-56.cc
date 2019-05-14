@@ -296,7 +296,7 @@ namespace Step56
   // of a single preconditioner application.
   // 3. do not use InverseMatrix but explicitly call SolverCG.
   // This approach is also used in the ASPECT code
-  // (see http://aspect.dealii.org) that solves the Stokes equations in
+  // (see https://aspect.geodynamics.org) that solves the Stokes equations in
   // the context of simulating convection in the earth mantle, and which
   // has been used to solve problems on many thousands of processors.
   //

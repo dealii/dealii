@@ -120,7 +120,7 @@ earth's interior and surface structure.
 @note If you are interested in using the program as the basis for your own
 experiments, you will also want to take a look at its continuation in
 step-32. Furthermore, step-32 later was developed into the much larger open
-source code Aspect (see http://aspect.dealii.org/ ) that can solve realistic
+source code ASPECT (see https://aspect.geodynamics.org/ ) that can solve realistic
 problems and that you may want to investigate before trying to morph step-31
 into something that can solve whatever you want to solve.
 
@@ -246,8 +246,8 @@ means that the time step size $k$ may change from time step to time
 step, and that we have to modify the above formula slightly. If
 $k_n,k_{n-1}$ are the time steps sizes of the current and previous time
 step, then we use the approximations
-
-$\frac{\partial T}{\partial t} \approx
+@f{align*}{
+\frac{\partial T}{\partial t} \approx
  \frac 1{k_n}
  \left(
        \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^{n}
@@ -255,15 +255,18 @@ $\frac{\partial T}{\partial t} \approx
        \frac{k_n+k_{n-1}}{k_{n-1}}T^{n-1}
        +
        \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
- \right)$
+ \right)
+ @f}
 and
-$T^n \approx
+@f{align*}{
+T^n \approx
    T^{n-1} + k_n \frac{\partial T}{\partial t}
    \approx
    T^{n-1} + k_n
    \frac{T^{n-1}-T^{n-2}}{k_{n-1}}
    =
-   \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}$,
+   \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2},
+@f}
 and above equation is generalized as follows:
 @f{eqnarray*}
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n

@@ -77,38 +77,38 @@ If one does this, one finds the following pattern for the $L_2$ error
 in the pressure variable:
 <table align="center" class="doxtable">
   <tr>
-    <td></td>
-    <td colspan="3" align="center">Finite element order</td>
+    <th></th>
+    <th colspan="3" align="center">Finite element order</th>
   </tr>
   <tr>
-    <td>Refinement level</td>
-    <td>0</td>
-    <td>1</td>
-    <td>2</td>
+    <th>Refinement level</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
   </tr>
   <tr>
-    <td>0</td>  <td>1.45344</td>  <td>0.0831743</td>  <td>0.0235186</td>
+    <th>0</th>  <td>1.45344</td>  <td>0.0831743</td>  <td>0.0235186</td>
   </tr>
   <tr>
-    <td>1</td>  <td>0.715099</td>  <td>0.0245341</td>  <td>0.00293983</td>
+    <th>1</th>  <td>0.715099</td>  <td>0.0245341</td>  <td>0.00293983</td>
   </tr>
   <tr>
-    <td>2</td>  <td>0.356383</td>  <td>0.0063458</td>  <td>0.000367478</td>
+    <th>2</th>  <td>0.356383</td>  <td>0.0063458</td>  <td>0.000367478</td>
   </tr>
   <tr>
-    <td>3</td>  <td>0.178055</td>  <td>0.00159944</td>  <td>4.59349e-05</td>
+    <th>3</th>  <td>0.178055</td>  <td>0.00159944</td>  <td>4.59349e-05</td>
   </tr>
   <tr>
-    <td>4</td>  <td>0.0890105</td>  <td>0.000400669</td>  <td>5.74184e-06</td>
+    <th>4</th>  <td>0.0890105</td>  <td>0.000400669</td>  <td>5.74184e-06</td>
   </tr>
   <tr>
-    <td>5</td>  <td>0.0445032</td>  <td>0.000100218</td>  <td>7.17799e-07</td>
+    <th>5</th>  <td>0.0445032</td>  <td>0.000100218</td>  <td>7.17799e-07</td>
   </tr>
   <tr>
-    <td>6</td>  <td>0.0222513</td>  <td>2.50576e-05</td>  <td>9.0164e-08</td>
+    <th>6</th>  <td>0.0222513</td>  <td>2.50576e-05</td>  <td>9.0164e-08</td>
   </tr>
   <tr>
-    <td></td>  <td>$O(h)$</td>  <td>$O(h^2)$</td>  <td>$O(h^3)$</td>
+    <th></th>  <th>$O(h)$</th>  <th>$O(h^2)$</th>  <th>$O(h^3)$</th>
   </tr>
 </table>
 
@@ -121,38 +121,38 @@ One can make the same experiment with the $L_2$ error
 in the velocity variables:
 <table align="center" class="doxtable">
   <tr>
-    <td></td>
-    <td colspan="3" align="center">Finite element order</td>
+    <th></th>
+    <th colspan="3" align="center">Finite element order</th>
   </tr>
   <tr>
-    <td>Refinement level</td>
-    <td>0</td>
-    <td>1</td>
-    <td>2</td>
+    <th>Refinement level</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
   </tr>
   <tr>
-    <td>0</td> <td>0.367423</td> <td>0.127657</td> <td>5.10388e-14</td>
+    <th>0</th> <td>0.367423</td> <td>0.127657</td> <td>5.10388e-14</td>
   </tr>
   <tr>
-    <td>1</td> <td>0.175891</td> <td>0.0319142</td> <td>9.04414e-15</td>
+    <th>1</th> <td>0.175891</td> <td>0.0319142</td> <td>9.04414e-15</td>
   </tr>
   <tr>
-    <td>2</td> <td>0.0869402</td> <td>0.00797856</td> <td>1.23723e-14</td>
+    <th>2</th> <td>0.0869402</td> <td>0.00797856</td> <td>1.23723e-14</td>
   </tr>
   <tr>
-    <td>3</td> <td>0.0433435</td> <td>0.00199464</td> <td>1.86345e-07</td>
+    <th>3</th> <td>0.0433435</td> <td>0.00199464</td> <td>1.86345e-07</td>
   </tr>
   <tr>
-    <td>4</td> <td>0.0216559</td> <td>0.00049866</td> <td>2.72566e-07</td>
+    <th>4</th> <td>0.0216559</td> <td>0.00049866</td> <td>2.72566e-07</td>
   </tr>
   <tr>
-    <td>5</td> <td>0.010826</td> <td>0.000124664</td> <td>3.57141e-07</td>
+    <th>5</th> <td>0.010826</td> <td>0.000124664</td> <td>3.57141e-07</td>
   </tr>
   <tr>
-    <td>6</td> <td>0.00541274</td> <td>3.1166e-05</td> <td>4.46124e-07</td>
+    <th>6</th> <td>0.00541274</td> <td>3.1166e-05</td> <td>4.46124e-07</td>
   </tr>
   <tr>
-    <td></td>  <td>$O(h)$</td>  <td>$O(h^2)$</td>  <td>$O(h^3)$</td>
+    <th></th>  <td>$O(h)$</td>  <td>$O(h^2)$</td>  <td>$O(h^3)$</td>
   </tr>
 </table>
 The result concerning the convergence order is the same here.

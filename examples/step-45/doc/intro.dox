@@ -153,7 +153,7 @@ velocity component of a Stokes flow.
 On a quarter-circle defined by $\Omega=\{{\bf x}\in(0,1)^2:\|{\bf x}\|\in (0.5,1)\}$ we are
 going to solve the Stokes problem
 @f{eqnarray*}
-  -\Delta \; \textbf{u} + \nabla p &=& (\exp(-100*\|{\bf x}-(.75,0.1)^T\|^2),0)^T, \\
+  -\Delta \; \textbf{u} + \nabla p &=& (\exp(-100\|{\bf x}-(.75,0.1)^T\|^2),0)^T, \\
   -\textrm{div}\;  \textbf{u}&=&0,\\
   \textbf{u}|_{\Gamma_1}&=&{\bf 0},
 @f}

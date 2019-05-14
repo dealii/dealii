@@ -461,8 +461,9 @@ namespace Step16
 
       const unsigned int dofs_per_cell = cd.local_dof_indices.size();
 
-      // TODO EXPLAIN:
-
+      // Interface entries are ignored by the boundary_constraints object
+      // above when filling the mg_matrices[cd.level]. Instead, we copy these
+      // entries into the interface matrix of the current level manually:
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
           if (mg_constrained_dofs.is_interface_matrix_entry(
