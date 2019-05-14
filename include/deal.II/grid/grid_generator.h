@@ -401,7 +401,7 @@ namespace GridGenerator
    * or CylindricalManifold (in 3D) with manifold id $0$, a
    * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
    * everywhere else. For more information on this topic see
-   * @ref* GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
    * The
    * cell faces on the cylinder and surrounding shells have manifold ids of
    * $0$, while the cell volumes adjacent to the shells (or, if they do not
