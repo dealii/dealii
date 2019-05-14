@@ -35,9 +35,11 @@ direction</i>, and $f$ is a source. A few notes:
 2. If $\varepsilon=0$ then this is the stationary advection equation solved in
 step-9.
 
-3. If $\varepsilon \ll \|\boldsymbol{\beta}\|$, we say the problem is
-<i>advection-dominated</i>, else we say the problem is
-<i>diffusion-dominated</i>.
+3. Define the \textit{Peclet number}: $\mathcal{P}\coloneqq
+\|\boldsymbol{\beta}\| \cdot L/\varepsilon$. If $\mathcal{P}>1$, we say the
+problem is <i>advection-dominated</i>, else if $\mathcal{P}<1$ we will
+say the problem is <i>diffusion-dominated</i>. Here $L$ is the length
+scale of the domain.
 
 For the discussion in this tutorial we will be concerned with
 advection-dominated flow. 
@@ -49,33 +51,36 @@ a(u_h,v_h) = F(v_h)
 @f}
 where
 @f{align*}{
-a(u_h,v_h) &= (\varepsilon \nabla u_h,\, \nabla v_h) + (\boldsymbol{\beta}\cdot\nabla u_h,\,v_h),\\
-F(v_h) &= (f,\,v_h).
+a(u_h,v_h) &= (\varepsilon \nabla v_h,\, \nabla u_h) +
+(v_h,\,\boldsymbol{\beta}\cdot \nabla u_h),\\
+F(v_h) &= (v_h,\,f).
 @f}
 
 <h3>Streamline diffusion</h3>
 
 The following error estimate can be shown for this PDE:
 @f{align*}{
-\|\nabla (u-u_h)\| \leq (1+\mathcal{P}) \inf_{v_h} \|\nabla (u-v_h)\|
+\|\nabla (u-u_h)\| \leq (1+\mathcal{P}) \inf_{v_h} \|\nabla (u-v_h)\|.
 @f}
-where $\mathcal{P} \sim \|\boldsymbol{\beta}\|/\varepsilon$ (referred
-to as the <i>Peclet</i> number). This implies that we may have poor
-numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|$. To
-combat this, we will consider the new weak form
+
+Given the definition of $\mathcal{P}$ above, we may have poor
+numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|\cdot
+L$. To combat this, we will consider the new weak form
 @f{align*}{
-a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h + \boldsymbol{\beta}\cdot
-\nabla u_h-f,\,\delta \boldsymbol{\beta}_K\cdot \nabla v_h)_K = F(v_h)
+a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
+\boldsymbol{\beta}\cdot \nabla u_h-f,\,\delta
+\boldsymbol{\beta}_K\cdot \nabla v_h)_K = F(v_h)
 @f}
-where the sum is done over all cells $K$ with the inner product is understood
-on that cell, and $\delta_K$ is a cell-wise constant stabilization parameter
-defined in <a href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27"> On
-Discontinuity-Capturing Methods for Convection-Diffusion Equations by Volker
-John and Petr Knobloch</a>. Essentially, adding in the discrete strong form
-residual enhances the coercivity of the bilinear form $a(\cdot,\cdot)$ which
-increases the stability of the discrete solution. This method is commonly
-referred to as <i>streamline diffusion</i> or <i>SUPG</i> (streamline
-upwind/Petrov-Galerkin).
+where the sum is done over all cells $K$ with the inner product is
+understood on that cell, and $\delta_K$ is a cell-wise constant
+stabilization parameter defined in <a
+href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
+On Discontinuity-Capturing Methods for Convection-Diffusion Equations
+by Volker John and Petr Knobloch</a>. Essentially, adding in the
+discrete strong form residual enhances the coercivity of the bilinear
+form $a(\cdot,\cdot)$ which increases the stability of the discrete
+solution. This method is commonly referred to as <i>streamline
+diffusion</i> or <i>SUPG</i> (streamline upwind/Petrov-Galerkin).
 
 
 <h2>Smoothers</h2>
