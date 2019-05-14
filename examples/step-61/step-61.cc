@@ -119,6 +119,10 @@ namespace Step61
   class Coefficient : public TensorFunction<2, dim>
   {
   public:
+    Coefficient()
+      : TensorFunction<2, dim>()
+    {}
+
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<Tensor<2, dim>> &values) const override;
   };
@@ -164,6 +168,10 @@ namespace Step61
   class RightHandSide : public Function<dim>
   {
   public:
+    RightHandSide()
+      : Function<dim>()
+    {}
+
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
@@ -218,6 +226,10 @@ namespace Step61
   class ExactVelocity : public TensorFunction<1, dim>
   {
   public:
+    ExactVelocity()
+      : TensorFunction<1, dim>()
+    {}
+
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
   };
 
