@@ -210,20 +210,22 @@ because higher polynomial degrees often yield a vastly better solution, but
 especially also when having matrix-based schemes in mind where the denser
 coupling at higher degree leads to a monotonously decreasing throughput (and a
 drastic one in 3D, with $k=4$ being more than ten times slower than
-$k=1$!). For higher degres, the throughput decreases a bit, which is both due
+$k=1$!). For higher degrees, the throughput decreases a bit, which is both due
 to an increase in the number of iterations (going from 12 at $k=2,3,4$ to 19
 at $k=10$) and due to the $\mathcal O(k)$ complexity of operator
 evaluation. Nonetheless, efficiency as the time to solution would be still
-better at higher degrees because they have better convergence rates (at least
-for problems as simple as this one). For $k=12$, we reach roundoff accuracy
-already at 1 million Dofs (solver time less than a second), whereas for $k=8$
+better for higher polynomial degrees because they have better convergence rates (at least
+for problems as simple as this one): For $k=12$, we reach roundoff accuracy
+already with 1 million DoFs (solver time less than a second), whereas for $k=8$
 we need 24 million DoFs and 8 seconds. For $k=5$, the error is around
-$10^{-9}$ at 57m DoFs and thus still far away from roundoff, despite taking 16
+$10^{-9}$ with 57m DoFs and thus still far away from roundoff, despite taking 16
 seconds.
 
-Note that the above numbers are a bit pessimistic because they
-include the time it takes the Chebyshev smoother to compute an eigenvalue
-estimate, which is around 10 percent of the solver time.
+Note that the above numbers are a bit pessimistic because they include the
+time it takes the Chebyshev smoother to compute an eigenvalue estimate, which
+is around 10 percent of the solver time. If the system is solved several times
+(as e.g. common in fluid dynamics), this eigenvalue cost is only paid once and
+faster times become available.
 
 <h3>Evaluation of efficiency of ingredients</h3>
 
@@ -316,7 +318,7 @@ FEFaceEvaluation::integrate_scatter().
 </table>
 
 The data in the table shows that not using MatrixFree::DataAccessOnFaces
-increases timings by around 10% for higher polynomial degrees. For lower
+increases costs by around 10% for higher polynomial degrees. For lower
 degrees, the difference is obviously less pronounced because the
 volume-to-surface ratio is more beneficial and less data needs to be
 exchanged. The difference is larger when looking at the matrix-vector product
@@ -334,9 +336,9 @@ the effectiveness of these basis functions.
 As mentioned in the introduction, the fast diagonalization method is tied to a
 Cartesian mesh with constant coefficients. If we wanted to solve
 variable-coefficient problems, we would need to invest a bit more time in the
-design of the smoother parameters by selecting better values.
+design of the smoother parameters by selecting proper generalizations (e.g.,
+approximating the inverse on the nearest box-shaped element).
 
 Another way of extending the program would be to include support for adaptive
-meshes, for which an interface operation at edges of different refinement
-level becomes necessary, as discussed in step-39.
-
+meshes, for which interface operations at edges of different refinement
+level become necessary, as discussed in step-39.
