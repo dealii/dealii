@@ -1656,7 +1656,7 @@ namespace GridTools
   /**
    * Given a covering rtree (see GridTools::Cache::get_covering_rtree()), and an
    * array of points, find a superset of processes which, individually,
-   * may own the cell containing the point.
+   * may own the cell containing the points.
    *
    * For further details see GridTools::guess_point_owner; here only
    * different input/output types are reported:
@@ -1664,6 +1664,8 @@ namespace GridTools
    * @param[in] covering_rtree RTRee which enables us to identify which
    * process(es) in a parallel computation may own the cell that
    * surrounds a given point.
+   *
+   * @param[in] points A vector of points to consider.
    *
    * @return A tuple containing the following information:
    *  - A map indexed by processor ranks. For each rank it contains
