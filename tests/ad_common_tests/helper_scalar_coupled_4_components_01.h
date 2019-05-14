@@ -417,7 +417,7 @@ test_symmetric_tensor_tensor_vector_scalar_coupled()
   SymmetricTensor<2, dim, ScalarNumberType> st =
     unit_symmetric_tensor<dim, ScalarNumberType>();
   for (unsigned int i = 0; i < st.n_independent_components; ++i)
-    st[st.unrolled_to_component_indices(i)] += 0.72 * (1.5 * i + 0.12);
+    st[st.unrolled_to_component_indices(i)] += 0.1 * i;
   Tensor<2, dim, ScalarNumberType> t =
     unit_symmetric_tensor<dim, ScalarNumberType>();
   for (unsigned int i = 0; i < t.n_independent_components; ++i)
