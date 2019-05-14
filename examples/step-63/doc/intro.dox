@@ -35,7 +35,7 @@ direction</i>, and $f$ is a source. A few notes:
 2. If $\varepsilon=0$ then this is the stationary advection equation solved in
 step-9.
 
-3. Define the \textit{Peclet number}: $\mathcal{P}\coloneqq
+3. Define the <i>Peclet number</i>: $\mathcal{P}\coloneqq
 \|\boldsymbol{\beta}\| \cdot L/\varepsilon$. If $\mathcal{P}>1$, we say the
 problem is <i>advection-dominated</i>, else if $\mathcal{P}<1$ we will
 say the problem is <i>diffusion-dominated</i>. Here $L$ is the length
@@ -68,11 +68,11 @@ numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|\cdot
 L$. To combat this, we will consider the new weak form
 @f{align*}{
 a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
-\boldsymbol{\beta}\cdot \nabla u_h-f,\,\delta
-\boldsymbol{\beta}_K\cdot \nabla v_h)_K = F(v_h)
+\boldsymbol{\beta}\cdot \nabla u_h-f,\,\delta_K
+\boldsymbol{\beta}\cdot \nabla v_h)_K = F(v_h)
 @f}
-where the sum is done over all cells $K$ with the inner product is
-understood on that cell, and $\delta_K$ is a cell-wise constant
+where the sum is done over all cells $K$ with the inner product taken
+for each cell, and $\delta_K$ is a cell-wise constant
 stabilization parameter defined in <a
 href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
 On Discontinuity-Capturing Methods for Convection-Diffusion Equations
