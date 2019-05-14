@@ -1,0 +1,253 @@
+deal.II Authors
+===============
+
+deal.II is a global project. It is run by a group of principal developers.
+Former developers with significant contributions in the past who are no
+longer active, are listed under developers emeriti. A subset of the active
+developers are administrators and responsible for the upkeep of the
+technical infrastructure such as the website, discussion forums, and other
+pieces. Finally, a large number of contributors have provided substantial
+patches over the years. These groups are listed below.
+
+
+Principal developers:
+---------------------
+
+Daniel Arndt, Heidelberg University, Germany
+Wolfgang Bangerth, Colorado State University, CO, USA
+Denis Davydov, University of Erlangen-Nuremberg, Germany
+Timo Heister, Clemson University, SC, USA
+Luca Heltai, SISSA, Trieste, Italy
+Guido Kanschat, Heidelberg University, Germany
+Martin Kronbichler, Technical University of Munich, Germany
+Matthias Maier, University of Minnesota, Minneapolis, MN, USA
+Jean-Paul Pelteret, University of Erlangen-Nuremberg, Germany
+Bruno Turcksin, Oak Ridge National Laboratory, USA
+David Wells, Rensselaer Polytechnic Institute, NY, USA
+
+
+Developers emeriti:
+-------------------
+
+Ralf Hartmann, DLR, Germany
+Toby D. Young, Polish Academy of Sciences, Poland
+
+
+Contributors:
+-------------
+
+Mihai Alexe
+Moritz Allmaras
+Fahad Alrashed
+Giovanni Alzetta
+Michael Anderson
+Julian Andrej
+Mathias Anselmann
+Daniel Appel
+Daniel Arndt
+Rajat Arora
+Andrew Baker
+Wolfgang Bangerth
+Mauro Bardelloni
+Alistair Bentley
+Alexander Blank
+Vishal Boddu
+Andrea Bonito
+Marco Borelli
+Benjamin Brands
+Claire Bruna-Rosso
+Ralf B. Schulz
+Markus Bürg
+John Burnell
+Krysztof Bzowski
+Lucas Campos
+Juan Carlos Araujo Cabarcas
+Brian Carnes
+Nicola Cavallini
+Jordan Cazamias
+Praveen Chandrashekar
+Jie Cheng
+Ivan Christov
+Pi-Yueh Chuang
+Chih-Che Chueh
+Emma Cinatl
+T. Conrad Clevenger
+Ester Comellas
+Sam Cox
+Juliane Dannberg
+Sambit Das
+Denis Davydov
+ManuelQuezada de Luna
+Nicola Demo
+Ginkgo developers
+Giovanni Di Ilio
+Stefano Dominici
+Nivesh Dommaraju
+Minh Do-Quang
+Kevin Drzycimski
+Kevin Dugan
+Toby D. Young
+Marco Engelhard
+Patrick Esser
+Anton Evgrafov
+Marc Fehling
+Niklas Fehn
+Isuru Fernando
+Michael F. Herbst
+Andreas Fink
+Menno Fraters
+Jörg Frohne
+Anian Fuchs
+Daniel Garcia-Sanchez
+Rene Gassmoeller
+Joscha Gedicke
+Thomas Geenen
+Martin Genet
+Armin Ghajar Jazi
+Arezou Ghesmati
+Nicola Giuliani
+Anne Glerum
+Christoph Goering
+Christian Goll
+Sebastian Gonzalez-Pintor
+Alexander Grayver
+Ryan Grove
+Felix Gruber
+Maien Hamed
+Joshua Hanophy
+Logan Harbour
+Michael Harmon
+Graham Harper
+Eric Heien
+Christoph Heiniger
+Timo Heister
+Luca Heltai
+Dakshina Ilangovan
+GiovanniDi Ilio
+Samuel Imfeld
+Bärbel Janssen
+Jose JavierMunoz Criollo
+Xing Jin
+Daniel Jodlbauer
+Stefan Kaessmair
+Guido Kanschat
+Justin Kauffman
+Oliver Kayser-Herold
+Vishal Kenchan
+Andreas Kergassner
+Eldar Khattatov
+Seungil Kim
+Angela Klewinghaus
+Ingo Kligge
+Alexander Knieps
+Uwe Köcher
+Alex Kokomov
+Joachim Kopp
+Katharina Kormann
+Lukas Korous
+Aslan Kosakian
+Adam Kosik
+Giorgos Kourakos
+Oleh Krehel
+Kurt Kremitzki
+Martin Kronbichler
+Paul Kuberry
+Dustin Kumor
+Ross Kynch
+Konstantin Ladutenko
+Damien Lebrun-Grandie
+Tobias Leicht
+Yan Li
+Tulio Ligneul
+Karl Ljungkvist
+Vijay Mahadevan
+Matthias Maier
+Cataldo Manigrasso
+Andre Massing
+Jonathan Matthews
+Andrew McBride
+Stefan Meggendorfer
+Mathias Mentler
+Craig Michoski
+Scott Miller
+Andrea Mola
+Helmut Müller
+Stefan Nauber
+Pratik Nayak
+David Neckels
+Dragan Nikolic
+Santiago Ospina
+Alexey Ozeritsky
+Vaibhav Palkar
+Spencer Patty
+Jean-Paul Pelteret
+Jonathan Perry-Houts
+Dirk Peschka
+Jonathan Pitt
+Giuseppe Pitton
+Fernando Posada
+Adam Powell IV
+Florian Prill
+E. G. Puckett
+Simon Puchert
+Andreas Putz
+Lei Qiao
+Ce Qin
+DanielCastanon Quiroz
+Michael Rapson
+Reza Rastak
+Roland Richter
+Thomas Richter
+Gennadiy Rishin
+Jonathan Robey
+Angel Rodriguez
+Ian Rose
+Shiva Rudraraju
+Mayank Sabharwal
+Abner Salgado-Gonzalez
+Ali Samii
+Alberto Sartori
+Anna Schneebeli
+Svenja Schoeder
+Jan Schrage
+M. Sebastian Pauletti
+Daniel Shapero
+Jason Sheldon
+Benjamin Shelton Kirk
+Ben Shields
+Florian Sonner
+Michael Stadler
+Sebastian Stark
+Jan Stebel
+Martin Steigemann
+Simon Sticko
+Franz-Theo Suttmeier
+Oliver Sutton
+Habib Talavatifard
+Zhen Tao
+Marco Tezzele
+Ben Thompson
+Jihuan Tian
+Christophe Trophime
+Bruno Turcksin
+Antoni Vidal
+Heikki Virtanen
+Jiaxin Wang
+Kainan Wang
+Yaqi Wang
+Yuxiang Wang
+Zhuoran Wang
+Xiaoyu Wei
+David Wells
+Sven Wetterauer
+Daniel Weygand
+Joshua White
+Michał Wichrowski
+Julius Witte
+Christian Wülker
+Jaeryun Yim
+Feimi Yu
+Liang Zhao
+Weixiong Zheng
+Yuhan Zhou
+Valentin Zingan
