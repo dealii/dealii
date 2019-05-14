@@ -24,6 +24,7 @@
 #  include <deal.II/base/tensor.h>
 
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
+#  include <deal.II/differentiation/sd/symengine_scalar_operations.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
 
 #  include <utility>
