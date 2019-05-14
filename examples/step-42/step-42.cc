@@ -152,14 +152,11 @@ namespace Step42
                                         double nu,
                                         double sigma_0,
                                         double gamma)
-    : kappa(E / (3 * (1 - 2 * nu)))
-    , mu(E / (2 * (1 + nu)))
-    , sigma_0(sigma_0)
-    , gamma(gamma)
-    , stress_strain_tensor_kappa(kappa *
-                                 outer_product(unit_symmetric_tensor<dim>(),
-                                               unit_symmetric_tensor<dim>()))
-    , stress_strain_tensor_mu(
+    : kappa(E / (3 * (1 - 2 * nu))), mu(E / (2 * (1 + nu))), sigma_0(sigma_0),
+      gamma(gamma), stress_strain_tensor_kappa(
+                      kappa * outer_product(unit_symmetric_tensor<dim>(),
+                                            unit_symmetric_tensor<dim>())),
+      stress_strain_tensor_mu(
         2 * mu *
         (identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(),
                                                 unit_symmetric_tensor<dim>()) /
@@ -286,8 +283,7 @@ namespace Step42
     };
 
     template <int dim>
-    BoundaryForce<dim>::BoundaryForce()
-      : Function<dim>(dim)
+    BoundaryForce<dim>::BoundaryForce() : Function<dim>(dim)
     {}
 
 
@@ -320,8 +316,7 @@ namespace Step42
 
 
     template <int dim>
-    BoundaryValues<dim>::BoundaryValues()
-      : Function<dim>(dim)
+    BoundaryValues<dim>::BoundaryValues() : Function<dim>(dim)
     {}
 
 
@@ -364,8 +359,7 @@ namespace Step42
 
     template <int dim>
     SphereObstacle<dim>::SphereObstacle(const double z_surface)
-      : Function<dim>(dim)
-      , z_surface(z_surface)
+      : Function<dim>(dim), z_surface(z_surface)
     {}
 
 
@@ -444,11 +438,7 @@ namespace Step42
     // the obstacle from the given file name.
     template <int dim>
     BitmapFile<dim>::BitmapFile(const std::string &name)
-      : obstacle_data(0)
-      , hx(0)
-      , hy(0)
-      , nx(0)
-      , ny(0)
+      : obstacle_data(0), hx(0), hy(0), nx(0), ny(0)
     {
       std::ifstream f(name);
       AssertThrow(f,
@@ -541,9 +531,7 @@ namespace Step42
     template <int dim>
     ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
                                           const double       z_surface)
-      : Function<dim>(dim)
-      , input_obstacle(filename)
-      , z_surface(z_surface)
+      : Function<dim>(dim), input_obstacle(filename), z_surface(z_surface)
     {}
 
 
@@ -803,40 +791,37 @@ namespace Step42
   template <int dim>
   PlasticityContactProblem<dim>::PlasticityContactProblem(
     const ParameterHandler &prm)
-    : mpi_communicator(MPI_COMM_WORLD)
-    , pcout(std::cout,
-            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
-    , computing_timer(MPI_COMM_WORLD,
+    : mpi_communicator(MPI_COMM_WORLD),
+      pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+      computing_timer(MPI_COMM_WORLD,
                       pcout,
                       TimerOutput::never,
-                      TimerOutput::wall_times)
+                      TimerOutput::wall_times),
 
-    , n_initial_global_refinements(
-        prm.get_integer("number of initial refinements"))
-    , triangulation(mpi_communicator)
-    , fe_degree(prm.get_integer("polynomial degree"))
-    , fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim)
-    , dof_handler(triangulation)
+      n_initial_global_refinements(
+        prm.get_integer("number of initial refinements")),
+      triangulation(mpi_communicator),
+      fe_degree(prm.get_integer("polynomial degree")),
+      fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim),
+      dof_handler(triangulation),
 
-    , e_modulus(200000)
-    , nu(0.3)
-    , gamma(0.01)
-    , sigma_0(400.0)
-    , constitutive_law(e_modulus, nu, sigma_0, gamma)
+      e_modulus(200000), nu(0.3), gamma(0.01), sigma_0(400.0),
+      constitutive_law(e_modulus, nu, sigma_0, gamma),
 
-    , base_mesh(prm.get("base mesh"))
-    , obstacle(prm.get("obstacle") == "read from file" ?
+      base_mesh(prm.get("base mesh")),
+      obstacle(prm.get("obstacle") == "read from file" ?
                  static_cast<const Function<dim> *>(
                    new EquationData::ChineseObstacle<dim>(
                      "obstacle.pbm",
                      (base_mesh == "box" ? 1.0 : 0.5))) :
                  static_cast<const Function<dim> *>(
                    new EquationData::SphereObstacle<dim>(
-                     base_mesh == "box" ? 1.0 : 0.5)))
+                     base_mesh == "box" ? 1.0 : 0.5))),
 
-    , transfer_solution(prm.get_bool("transfer solution"))
-    , n_refinement_cycles(prm.get_integer("number of cycles"))
-    , current_refinement_cycle(0)
+      transfer_solution(prm.get_bool("transfer solution")),
+      n_refinement_cycles(prm.get_integer("number of cycles")),
+      current_refinement_cycle(0)
 
   {
     std::string strat = prm.get("refinement strategy");
