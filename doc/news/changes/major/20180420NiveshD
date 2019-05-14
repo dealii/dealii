@@ -1,9 +1,0 @@
-New: The new class ColorEnriched::Helper constructs an hp::FECollection, a 
-collection of finite element objects used by hp::DoFHandler, in a domain 
-with multiple, possibly overlapping, sub-domains with individual
-enrichment functions. Note that the overlapping regions may have
-multiple enrichment functions associated with them. This is implemented
-using a general constructor of FE_Enriched which allows different
-enrichment functions.
-<br>
-(Nivesh Dommaraju, Denis Davydov, 2018/04/20)

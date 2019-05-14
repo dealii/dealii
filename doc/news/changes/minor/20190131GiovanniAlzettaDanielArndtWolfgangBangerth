@@ -1,4 +1,0 @@
-New: added constructor to the class Point, which converts
-a boost::geometry::model::point to a dealii::Point
-<br>
-(Giovanni Alzetta, Daniel Arndt, Wolfgang Bangerth, 2019/01/31)

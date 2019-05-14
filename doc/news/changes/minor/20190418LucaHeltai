@@ -1,3 +1,0 @@
-New: Functions::CutOffFunctionBase now supports rescaling the function to keep its integral equal to one. 
-<br>
-(Luca Heltai, 2019/04/18)

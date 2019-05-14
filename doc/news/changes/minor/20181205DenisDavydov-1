@@ -1,3 +1,0 @@
-New: Add DEAL_II_LAPACK_WITH_MKL macro which will be set if Intel MKL is being used.
-<br>
-(Denis Davydov, 2018/12/05)

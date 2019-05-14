@@ -1,4 +1,0 @@
-New: Some utility functions that resolve explicit (and cyclic) dependencies
-between entries in symbolic substitution maps.
-<br>
-(Jean-Paul Pelteret, 2019/05/05)

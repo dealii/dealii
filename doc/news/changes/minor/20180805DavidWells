@@ -1,4 +1,0 @@
-New: A convenience function Triangulation::active_face_iterators() (which is like
-Triangulation::active_cell_iterators(), but for faces) has been added.
-<br>
-(David Wells, 2018/08/05)

@@ -1,9 +1,0 @@
-Changed: Calling GridGenerator::refine_and_coarsen_fixed_fraction()
-and GridGenerator::refine_and_coarsen_fixed_fraction() with values for
-the coarsen and refine fractions that added to 1.0 in exact
-arithmetic, but something slightly larger in floating point
-arithmetic, resulted in an error. These functions are now slightly
-more relaxed in that they allow arguments that add to 1.0 up to a
-small floating point round off error.
-<br>
-(Wolfgang Bangerth, 2018/06/18)

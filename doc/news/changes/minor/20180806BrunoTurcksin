@@ -1,4 +1,0 @@
-New: Add support for constraint when using matrix-free on GPU. Note you cannot
-set constraints in 2D if the degree of the finite element is even.
-<br>
-(Bruno Turcksin, 2018/08/06)

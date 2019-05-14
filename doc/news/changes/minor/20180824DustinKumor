@@ -1,4 +1,0 @@
-Fixed: Member function AffineConstraints::add_entries() now skips already
-existing entries.
-<br>
-(Dustin Kumor, 2018/08/24)

@@ -1,5 +1,0 @@
-New: Classes that act as an interface to the drivers of internally supported automatic
-differentiation libraries (ADOL-C and Sacado) have been implemented. A brief summary
-of what these classes are used for is given in the @ref auto_symb_diff module.
-<br>
-(Jean-Paul Pelteret, 2017/11/18)

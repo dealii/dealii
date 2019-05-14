@@ -1,4 +1,0 @@
-Fixed: TrilinosWrappers::SparseMatrix::mmult() sometimes gave the wrong result
-in parallel.
-<br>
-(Damien Lebrun-Grandie and Bruno Turcksin, 2018/08/22)

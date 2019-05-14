@@ -1,5 +1,0 @@
-New: Member function hp::FECollection::find_enclosing_fes()
-returns a set of indices from the full FECollection whose associated
-finite elements are dominated by all elements of a given set of indices.
-<br>
-(Marc Fehling, 2019/04/08)

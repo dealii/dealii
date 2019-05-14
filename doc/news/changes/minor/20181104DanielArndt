@@ -1,4 +1,0 @@
-Improved: GridIn::read_msh also support version 4 of MSH file format
-extracting the same information as for the older versions.
-<br>
-(Daniel Arndt, 2018/11/04)

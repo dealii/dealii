@@ -1,5 +1,0 @@
-New: Classes FESeries::Fourier and FESeries::Legendre now take two
-template arguments dim and spacedim, which allow them to use corresponding
-hp::FECollection objects.
-<br>
-(Marc Fehling, 2018/10/17)

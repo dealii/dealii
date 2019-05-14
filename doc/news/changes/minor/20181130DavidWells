@@ -1,5 +1,0 @@
-New: A new header <code>deal.II/base/undefine_macros.h</code> has been
-added. This header, as the name suggests, undefines all deal.II macros that are
-not prefixed with either <code>DEAL</code> or <code>deal</code>.
-<br>
-(David Wells, 2018/11/30)

@@ -1,5 +1,0 @@
-Changed: The constructor for Subscriptor requires providing a pointer to a boolean
-that can be used to signal validity of the object pointed to by the subscribing
-object.
-<br>
-(Daniel Arndt, 2018/11/02)

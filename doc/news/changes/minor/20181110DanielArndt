@@ -1,4 +1,0 @@
-Deprecated: The binary Tecplot output using the DataOutBase::tecplot_binary
-format has been deprecated.
-<br>
-(Daniel Arndt, 2018/11/10)

@@ -1,5 +1,0 @@
-Fixed: DoFHandler::renumber_dofs() called on levels would previously run into
-an assertion on distributed triangulation when used with continuous
-elements. This is now fixed.
-<br>
-(Martin Kronbichler, 2019/03/08)

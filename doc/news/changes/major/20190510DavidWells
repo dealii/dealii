@@ -1,4 +1,0 @@
-Deprecated: deal.II's nanoflann bindings (i.e., the KDTree class) have been
-deprecated in favor of using <code>boost::geometry::index::rtree</code>.
-<br>
-(David Wells, 2019/05/10)

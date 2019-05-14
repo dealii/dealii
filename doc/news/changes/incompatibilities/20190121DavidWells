@@ -1,6 +1,0 @@
-Changed: VectorSlice has been deprecated in favor of the more general ArrayView
-class. All public interfaces now take ArrayView arguments instead of VectorSlice
-arguments. Since VectorSlice now inherits from ArrayView this should be
-compatible with the overwhelming majority of use cases.
-<br>
-(David Wells, 2019/01/21)

@@ -1,5 +1,0 @@
-New: The GeneralDataStorage class facilitates the storage of any general data.
-It offers the ability to store any amount of data, of any type, which is then 
-made accessible by an identifier string.
-<br>
-(Luca Heltai, Jean-Paul Pelteret, 2019/04/02)

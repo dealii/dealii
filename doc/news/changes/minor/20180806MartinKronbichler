@@ -1,5 +1,0 @@
-Improved: FEEvaluation and FEFaceEvaluation have gained support for
-renumbering of degrees of freedom for fully discontinuous finite element
-spaces which can improve performance by around 10 percent.
-<br>
-(Martin Kronbichler, 2018/08/06)

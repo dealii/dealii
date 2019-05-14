@@ -1,7 +1,0 @@
-Changed: The PolynomialSpace::compute_index() and
-PolynomialsP::directional_degree() functions used to return their
-information through an array that they received as a reference
-argument. Instead, they now return a `std::array<unsigned int,dim>`
-by value.
-<br>
-(Wolfgang Bangerth, 2018/05/09)

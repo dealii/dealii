@@ -1,9 +1,0 @@
-Removed: The Threads::DummyMutex, Threads::DummyConditionVariable, and
-Threads::DummyThreadBarrier classes have been removed. These were only
-used if deal.II was compiled without thread support, in which case
-certain functionality from the TBB was not available. But the
-implementations of the underlying functionality is now unconditionally
-available via the C++11 standard library, and so we don't need the
-dummy implementations any more.
-<br>
-(Wolfgang Bangerth, 2018/09/27)

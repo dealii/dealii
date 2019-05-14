@@ -1,5 +1,0 @@
-New: A new function GridGenerator::concentric_hyper_shells has been added. This
-function generates a grid comprised of shells of varying widths, where the
-shells near the center are much thinner than those near the outer boundary.
-<br>
-(David Wells, 2018/07/15)

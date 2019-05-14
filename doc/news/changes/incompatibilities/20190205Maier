@@ -1,5 +1,0 @@
-Changed: The "debug" and "release" targets that are created by the
-DEAL_II_INVOKE_AUTOPILOT() macro no longer automatically rebuild the
-project.
-<br>
-(Matthias Maier, 2019/02/05)

@@ -1,6 +1,0 @@
-New: Class parallel::distributed::CellWeights allows to set the
-weight of a cell depending on the number of degrees of freedom
-associated with it. This guarantees an improved load balancing
-in case a hp::DoFHandler is used on a p::d::Triangulation.
-<br>
-(Marc Fehling, 2018/10/01)

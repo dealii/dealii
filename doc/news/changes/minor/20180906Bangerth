@@ -1,5 +1,0 @@
-New: The function DoFRenumbering::hierarchical() is now also available
-for hp::DoFHandler objects, as well as for DoFHandlers build on
-triangulations with `dim != spacedim`.
-<br>
-(Wolfgang Bangerth, 2018/09/06)

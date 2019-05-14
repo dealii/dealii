@@ -1,5 +1,0 @@
-Fixed: The functions FEFaceEvaluation::evaluate and
-FEFaceEvaluation::integrate would access invalid memory when only evaluating
-function values and using multiple components in 1D. This is now fixed.
-<br>
-(Martin Kronbichler, 2018/07/04)

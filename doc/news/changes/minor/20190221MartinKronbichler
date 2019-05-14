@@ -1,6 +1,0 @@
-Fixed: FEFaceEvaluation::evaluate() and FEFaceEvaluation::integrate() would
-provide wrong results for faces in non-standard orientation layout, namely
-with `orientation=true, face_flip={false,true}, face_rotation=true`. This is
-now fixed.
-<br>
-(Martin Kronbichler, 2019/02/21)

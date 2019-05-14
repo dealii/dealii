@@ -1,8 +1,0 @@
-Improved: DoFHandler::renumber_dofs() on parallel::distributed::Triangulation
-would scale linearly with the number of MPI ranks on more than 50k ranks,
-reaching times of more than 10 seconds on 150k ranks. This is now fixed for
-the case the renumbering does not lead to a change in the underlying IndexSet
-field of locally owned unknowns, i.e., in case the numbers merely change
-within each MPI rank but not across them.
-<br>
-(Martin Kronbichler, 2019/05/10)

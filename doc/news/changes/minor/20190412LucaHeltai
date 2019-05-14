@@ -1,4 +1,0 @@
-New: The new FunctionFromFunctionObjects class allows one to wrap a vector of
-std::function objects into a Function object, to allow fast prototyping of user codes. 
-<br>
-(Luca Heltai, 2019/04/12)

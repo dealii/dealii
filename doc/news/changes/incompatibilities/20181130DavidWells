@@ -1,5 +1,0 @@
-Changed: The particle MPI datatype macro <code>PARTICLE_INDEX_MPI_TYPE</code> is
-now properly namespaced: its new name is
-<code>DEAL_II_PARTICLE_INDEX_MPI_TYPE</code>.
-<br>
-(David Wells, 2018/11/30)

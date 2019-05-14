@@ -1,3 +1,0 @@
-Fix bug with FEFaceValues initialization when used with the FE_NedelecSZ
-<br>
-(Alexander Grayver, 2018/11/19)

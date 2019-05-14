@@ -1,5 +1,0 @@
-New: There is LinearAlgebra::CUDAWrappers::Vector::norm_sqr() for computing
-the squared l2-norm and LinearAlgebra::CUDAWrappers::Vector::swap()
-for swapping two vectors.
-<br>
-(Daniel Arndt, 2018/08/17)

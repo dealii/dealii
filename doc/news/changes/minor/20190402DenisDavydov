@@ -1,3 +1,0 @@
-New: Add ArraView::ArrayView() and ArrayView::reinit(value_type *, const std::size_t).
-<br>
-(Denis Davydov, 2019/04/02)

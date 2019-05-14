@@ -1,6 +1,0 @@
-Deprecated: The Threads::PosixThreadBarrier class and the
-corresponding Threads::Barrier `using` declaration are deprecated. The
-functionality implemented by these classes is easily replaced by C++11
-functionality.
-<br>
-(Wolfgang Bangerth, 2018/09/27)

@@ -1,5 +1,0 @@
-Fixed: SparsityPattern::begin() and DynamicSparsityPattern::begin()
-resulted in an invalid iterator if the sparsity pattern was actually
-empty.
-<br>
-(Wolfgang Bangerth, Denis Davydov, 2018/11/01)

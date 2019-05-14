@@ -1,5 +1,0 @@
-New: Function FiniteElement::compare_for_domination() inspects two
-FiniteElement objects upon FiniteElementDomination, and uses a codim
-parameter that determines in which subspace we actually compare them.
-<br>
-(Marc Fehling, 2018/10/11)

@@ -1,8 +1,0 @@
-Fixed: <code>make test</code> now runs in parallel automatically (i.e., it uses
-a CMake command to determine the number of cores available). Since <code>make
-test</code> just immediately invokes <code>ctest</code> as a subprocess, it is
-currently not possible to link the number of globally available
-<code>make</code> processes with the number of concurrently run tests; i.e.,
-the number of cores <code>make test</code> uses is not changeable by users.
-<br>
-(David Wells, 2018/09/13)

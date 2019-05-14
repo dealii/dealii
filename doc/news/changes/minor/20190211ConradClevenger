@@ -1,6 +1,0 @@
-New: Function MGConstrainedDoFs::make_no_normal_flux_constraints which adds 
-functionality for no normal flux constraints during geometric mutigrid computations. 
-Currently, this function is limited to meshes with no normal flux boundaries 
-normal to the x-, y-, or z-axis.
-<br>
-(Conrad Clevenger, 2019/02/11)

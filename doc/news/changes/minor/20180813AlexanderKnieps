@@ -1,3 +1,0 @@
-Fixed: MGConstrainedDofs::initialize(...) now handles refinement edges across periodic boundaries correctly.
-<br>
-(Alexander Knieps, 2018/08/13)

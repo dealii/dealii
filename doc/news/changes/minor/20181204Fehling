@@ -1,6 +1,0 @@
-Changed: FESeries::Fourier::calculate and FESeries::Legendre::calculate
-accept both Vector<float> and Vector<double> as input parameters for
-local dof values.
-<br>
-(Marc Fehling, 2018/12/04)
-

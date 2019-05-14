@@ -1,6 +1,0 @@
-Fixed: Iterating over the entries of a TrilinosWrappers::SparsityPattern object
-in parallel and after calling TrilinosWrappers::SparsityPattern::compress()
-works now.
-<br>
-(Mathias Anselmann, Daniel Arndt, 2018/07/11)
-

@@ -1,9 +1,0 @@
-New: GridTools::find_active_cell_around_point now allows you to specify an (optional) rtree, constructed
-from the used vertices of the triangulation. Once you have built a tree, querying for a nearest
-vertex is an O(log(N)) operation, where N is the number of used vertices. You can ask a GridTools::Cache
-object to return a tree that is compatible with the new function signature. 
-The previous version of this function had a cost that was O(N^2) when the point was not in the cell_hint
-object. 
-<br>
-(Luca Heltai, 2018/12/05)
-

@@ -1,3 +1,0 @@
-Fixed: Handle the case properly that a local matrix with all diagonal elements equal to zero is distributed with AffineConstraints::distribute_local_to_global() to the global matrix while constraints apply.
-<br>
-(Sebastian Stark, 2019/02/13)

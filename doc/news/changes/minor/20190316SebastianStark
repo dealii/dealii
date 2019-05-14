@@ -1,4 +1,0 @@
-New: VectorTools::interpolate_to_different_mesh() now works with
-hp::DoFHandler objects.
-<br>
-(Sebastian Stark, 2019/03/16)

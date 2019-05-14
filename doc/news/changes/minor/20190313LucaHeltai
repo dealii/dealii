@@ -1,6 +1,0 @@
-New: Added two new classes to the MeshWorker namespace: MeshWorker::ScratchData and 
-MeshWorker::CopyData, that can be used as good default classes with the 
-WorkStream::run() and MeshWorker::mesh_loop() functions.
-<br>
-(Luca Heltai, 2019/03/13)
-

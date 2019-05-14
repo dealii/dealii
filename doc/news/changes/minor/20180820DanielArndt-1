@@ -1,4 +1,0 @@
-New: There are nothrow versions of AssertCUDA and AssertCusparse, namely
-AssertNothrowCUDA and AssertNothrowCusparse.
-<br>
-(Daniel Arndt, 2018/08/20)

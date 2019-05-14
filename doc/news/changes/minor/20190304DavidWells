@@ -1,5 +1,0 @@
-Fixed: the DoFTools::make_sparsity_pattern variant that takes, as arguments, two
-different DoFHandler objects now works correctly with
-parallel::shared::Triangulation and parallel::distributed::Triangulation.
-<br>
-(David Wells, 2019/03/04)

@@ -1,5 +1,0 @@
-Fixed: Tensor indices of set_k_vectors() in FESeries::Fourier.
-Coefficients will now be distributed in every
-coordinate direction correctly.
-<br>
-(Marc Fehling, 2019/01/08)

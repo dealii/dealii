@@ -1,4 +1,0 @@
-Deprecated: The Threads::ConditionVariable class is now
-deprecated. Use `std::condition_variable` instead.
-<br>
-(Wolfgang Bangerth, 2018/09/27)

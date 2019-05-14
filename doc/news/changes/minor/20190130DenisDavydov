@@ -1,4 +1,0 @@
-New: Add internal::MatrixFreeFunctions::DoFInfo::get_dof_indices_on_cell_batch() to
-return locally owned DoFs used by matrix-free framework on a given cell.
-<br>
-(Denis Davydov, 2019/01/30)

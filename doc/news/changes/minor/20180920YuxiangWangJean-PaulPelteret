@@ -1,4 +1,0 @@
-Fixed: The GridIn::read_abaqus() function now correctly reads in grids designed
-for the co-dimension 1 case (specifically with dim == 2 and spacedim == 3).
-<br>
-(Yuxiang Wang, Jean-Paul Pelteret, 2018/09/20)

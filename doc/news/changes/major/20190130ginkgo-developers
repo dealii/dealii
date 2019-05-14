@@ -1,7 +1,0 @@
-New: Support for Ginkgo, a high-performance numerical linear algebra library
-has been added. Ginkgo provides advanced highly optimized linear solvers,
-matrix formats and an abstraction to easily create linear operators on both
-the cpu and the gpu. The deal.II's Ginkgo interface can currently be used to
-solve linear systems using Krylov solvers with the cuda and OpenMP paradigms.
-<br>
-(Ginkgo developers, 2019/01/30)

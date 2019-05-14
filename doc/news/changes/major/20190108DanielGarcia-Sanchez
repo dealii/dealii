@@ -1,7 +1,0 @@
-New: A new HDF5 interface has been added. The Hierarchical Data Format (HDF) is
-a cross platform and a high I/O performance format designed to store large
-amounts of data. It supports serial and MPI I/O access. The deal.II's HDF5
-interface can be used to write and read data, such the results of a simulation,
-in a HDF5 file.
-<br>
-(Daniel Garcia-Sanchez, 2019/01/09)

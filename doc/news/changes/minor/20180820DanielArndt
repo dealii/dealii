@@ -1,5 +1,0 @@
-New: There are new methods CUDAWrappers::SparseMatrix::print() and
-CUDAWrappers::SparseMatrix::print_formatted(). Additionally, 
-CUDAWrappers::SparseMatrix gained a move assignment operator.
-<br>
-(Daniel Arndt, 2018/08/20)

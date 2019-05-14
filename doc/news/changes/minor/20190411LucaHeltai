@@ -1,4 +1,0 @@
-New: The method Mapping::get_center() allows one to retrieve the cell center of a cell when the 
-mapping object does not preserve vertex locations. 
-<br>
-(Luca Heltai, 2019/04/11)

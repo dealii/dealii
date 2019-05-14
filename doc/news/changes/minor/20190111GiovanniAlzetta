@@ -1,5 +1,0 @@
-New: GridTools::Cache::get_covering_rtree() automatically stores and generates
-a rtree of bounding boxes covering the whole triangulation. In a distributed setting
-it can identify which processes have locally owned cells in any part of the mesh.
-<br>
-(Giovanni Alzetta, 2019/01/11)

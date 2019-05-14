@@ -1,6 +1,0 @@
-New: The new function
-MatrixFreeOperators::CellwiseInverseMassMatrix::transform_from_q_points_to_basis()
-enables to change the basis from a representation in quadrature points into
-the original basis of FEEvaluation.
-<br>
-(Martin Kronbichler, 2018/08/06)

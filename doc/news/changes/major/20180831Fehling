@@ -1,7 +1,0 @@
-Changed: hp::DoFHandler::distribute_dofs() called on
-parallel::distributed::Triangulation objects now assigns exactly
-one index for each degree of freedom located on interfaces with
-ghost cells. Previously, those degrees of freedom were assigned
-indices by each adjacent subdomain.
-<br>
-(Marc Fehling, 2018/08/31)

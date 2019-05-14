@@ -1,5 +1,0 @@
-Deprecated: FiniteElement::compare_for_face_domination() has been
-deprecated and will be replaced by the more versatile function
-FiniteElement::compare_for_domination().
-<br>
-(Marc Fehling, 2018/10/11)

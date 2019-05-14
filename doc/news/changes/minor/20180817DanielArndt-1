@@ -1,4 +1,0 @@
-Fixed: Throwing an exception in Assert doesn't slice objects derived from
-ExceptionBase anymore.
-<br>
-(Daniel Arndt, 2018/08/17)

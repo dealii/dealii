@@ -1,5 +1,0 @@
-New: Add default constructor to DynamicSparsityPatternIterators::Accessor() and
-DynamicSparsityPatternIterators::Iterator() to be able to store such objects
-in STL containers.
-<br>
-(Denis Davydov, 2019/01/18)

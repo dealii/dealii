@@ -1,5 +1,0 @@
-Improved: The class ArrayView checks the memory location of the data it presents
-and gained a template parameter indicating whether the data is stored in CPU or
-CUDA memory.
-<br>
-(Daniel Arndt, 2018/11/04)

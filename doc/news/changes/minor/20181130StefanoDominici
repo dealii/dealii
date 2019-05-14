@@ -1,5 +1,0 @@
-New: Class EllipticalManifold<dim,spacedim> derived from ChartManifold, 
-valid only for dim=2 and spacedim=2. It maps points from a system of 
-cartesian coordinates to a system of elliptical coordinates and vice-versa.
-<br>
-(Stefano Dominici, 2018/11/30)

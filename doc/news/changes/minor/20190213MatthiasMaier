@@ -1,5 +1,0 @@
-Fixed: inverse_operator() now handles a (composite) LinearOperator, the
-temporary PreconditionIdentity(), or no argument as preconditioner argument
-correctly.
-<br>
-(Matthias Maier, 2019/02/13)
