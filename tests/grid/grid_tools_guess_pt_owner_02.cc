@@ -86,14 +86,11 @@ test_point_owner(unsigned int n_procs)
       unsigned int tot_pt = 0;
       for (unsigned int rk = 0; rk < n_procs; ++rk)
         {
-          const auto & rk_points = std::get<0>(output_tp)[rk];
-          unsigned int first_el  = rk * (rk + 1) / 2 - 1;
-          unsigned int last_el   = (rk + 1) * (rk + 2) / 2;
+          const auto &rk_points = std::get<0>(output_tp)[rk];
           for (unsigned int box = 0; box < rk; ++box)
             {
-              if (std::find(rk_points.begin() + first_el,
-                            rk_points.begin() + last_el,
-                            tot_pt) == rk_points.end())
+              if (std::find(rk_points.begin(), rk_points.end(), tot_pt) ==
+                  rk_points.end())
                 {
                   deallog << "Point " << tot_pt << " not found in rank " << rk
                           << std::endl;

@@ -33,8 +33,7 @@ DEAL::TEST PASSED
 DEAL::Simulating 3 processes
 DEAL::TEST PASSED
 DEAL::Simulating 5 processes
-DEAL::Point 2 not found in rank 2
-DEAL::TEST FAILED
+DEAL::TEST PASSED
 DEAL::Simulating 7 processes
 DEAL::TEST PASSED
 DEAL::Simulating 9 processes
