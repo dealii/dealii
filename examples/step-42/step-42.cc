@@ -810,24 +810,21 @@ namespace Step42
                       pcout,
                       TimerOutput::never,
                       TimerOutput::wall_times)
-    ,
 
-    n_initial_global_refinements(
-      prm.get_integer("number of initial refinements"))
+    , n_initial_global_refinements(
+        prm.get_integer("number of initial refinements"))
     , triangulation(mpi_communicator)
     , fe_degree(prm.get_integer("polynomial degree"))
     , fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim)
     , dof_handler(triangulation)
-    ,
 
-    e_modulus(200000)
+    , e_modulus(200000)
     , nu(0.3)
     , gamma(0.01)
     , sigma_0(400.0)
     , constitutive_law(e_modulus, nu, sigma_0, gamma)
-    ,
 
-    base_mesh(prm.get("base mesh"))
+    , base_mesh(prm.get("base mesh"))
     , obstacle(prm.get("obstacle") == "read from file" ?
                  static_cast<const Function<dim> *>(
                    new EquationData::ChineseObstacle<dim>(
@@ -836,9 +833,8 @@ namespace Step42
                  static_cast<const Function<dim> *>(
                    new EquationData::SphereObstacle<dim>(
                      base_mesh == "box" ? 1.0 : 0.5)))
-    ,
 
-    transfer_solution(prm.get_bool("transfer solution"))
+    , transfer_solution(prm.get_bool("transfer solution"))
     , n_refinement_cycles(prm.get_integer("number of cycles"))
     , current_refinement_cycle(0)
 
