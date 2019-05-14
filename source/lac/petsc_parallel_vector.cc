@@ -85,6 +85,20 @@ namespace PETScWrappers
 
 
 
+    Vector::Vector(const Vector &v)
+      : VectorBase()
+      , communicator(v.communicator)
+    {
+      if (v.has_ghost_elements())
+        Vector::create_vector(v.size(), v.local_size(), v.ghost_indices);
+      else
+        Vector::create_vector(v.size(), v.local_size());
+
+      this->operator=(v);
+    }
+
+
+
     Vector::Vector(const IndexSet &local, const MPI_Comm &communicator)
       : communicator(communicator)
     {

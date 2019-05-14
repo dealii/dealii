@@ -263,6 +263,11 @@ namespace PETScWrappers
       explicit Vector(const IndexSet &local, const MPI_Comm &communicator);
 
       /**
+       * Copy constructor.
+       */
+      Vector(const Vector &v);
+
+      /**
        * Release all memory and return to a state just like after having
        * called the default constructor.
        */

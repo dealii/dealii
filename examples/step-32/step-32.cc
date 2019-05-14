@@ -628,6 +628,7 @@ namespace Step32
       {
         StokesPreconditioner(const FiniteElement<dim> &stokes_fe);
         StokesPreconditioner(const StokesPreconditioner &data);
+        StokesPreconditioner &operator=(const StokesPreconditioner &) = default;
 
         FullMatrix<double>                   local_matrix;
         std::vector<types::global_dof_index> local_dof_indices;
