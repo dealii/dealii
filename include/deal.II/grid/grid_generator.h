@@ -1120,7 +1120,7 @@ namespace GridGenerator
    *
    * @f[
    *     r = r_{\text{inner}} + (r_\text{outer} - r_\text{inner})
-   *     \frac{1 - \tanh(\text{skewness}(1 - k/\text{n_shells}))}
+   *     \frac{1 - \tanh(\text{skewness}(1 - k/\text{n\_shells}))}
    *          {\tanh(\text{skewness})}
    * @f]
    *
