@@ -90,17 +90,6 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: Subscriptor::subscribe cannot be called with rvalue references anymore.
-  In particular, temporary string literals cannot be used as argument. Storing
-  string literals with the same content at the same memory location is
-  implementation defined and cannot be relied upon. On the other hand, the
-  subscriber strings are not compared by their memory address anymore but by their
-  actual content.
-  <br>
-  (Daniel Arndt, 2018/11/12)
- </li>
-
- <li>
   Changed: The constructor for Subscriptor requires providing a pointer to a boolean
   that can be used to signal validity of the object pointed to by the subscribing
   object.
@@ -684,8 +673,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: SmartPointer and Subscriptor use a std::string
-  instead of a const char * as identifier.
+  Changed: SmartPointer and Subscriptor use a `std::string`
+  instead of a `const char *` for subscriber identification. As a result,
+  subscriber strings are no longer compared by their memory address but instead
+  by their content.
   <br>
   (Daniel Arndt, 2019/04/08)
  </li>
