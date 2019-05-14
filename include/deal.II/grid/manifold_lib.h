@@ -472,10 +472,10 @@ private:
  *
  * This is based on the definition of elliptic coordinates $(u,v)$
  * @f[
- *  \left\lbrace\begin{align*}
+ *  \left\lbrace\begin{aligned}
  *  x &=  x_0 + c \cosh(u) \cos(v) \\
  *  y &=  y_0 + c \sinh(u) \sin(v)
- *  \end{align*}\right.
+ *  \end{aligned}\right.
  * @f]
  * in which $(x_0,y_0)$ are coordinates of the center of the cartesian system.
  *

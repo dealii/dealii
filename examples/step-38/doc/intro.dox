@@ -118,7 +118,7 @@ This surface description given, in the codimension one surface case, the two
 routines FEValues::shape_grad and FEValues::JxW
 return
 @f{align*}
-\text{FEValues::shape_grad}(i,l)&=D \mathbf x_K(p_l) G^{-1}(p_l)D(\varphi_i \circ \mathbf x_K)
+\text{FEValues::shape\_grad}(i,l)&=D \mathbf x_K(p_l) G^{-1}(p_l)D(\varphi_i \circ \mathbf x_K)
   (p_l)
 \\
 \text{FEValues::JxW}(l) &=  \sqrt{\det (G(p_l))} \ w_l.
