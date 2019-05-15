@@ -480,6 +480,13 @@
  *       boundary conditions. Parallelization via MUMPS and MPI.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-63</td>
+ *       <td>Block smoothers for geometric multigrid. A scalar convection
+ *       diffusion equation is solved with different additive or
+ *       multiplicative multigrid smoothers.
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -809,7 +816,8 @@
  *       step-42,
  *       step-43,
  *       step-56,
- *       step-59
+ *       step-59,
+ *       step-63
  *     </td>
  *   </tr>
  *

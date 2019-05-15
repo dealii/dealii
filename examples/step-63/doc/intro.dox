@@ -1,9 +1,186 @@
 <br>
 
-<i>This program was contributed by Thomas Clevenger and Timo Heister.</i>
+<i>This program was contributed by Thomas C. Clevenger and Timo Heister.
+
+The creation of this tutorial was partially supported by NSF Award
+DMS-1522191, DMS-1901529, OAC-1835452, by the Computational
+Infrastructure in Geodynamics initiative (CIG), through the NSF under
+Award EAR-0949446 and EAR-1550901 and The University of California -
+Davis.
+</i>
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-Please note: This is work in progress and will be an example for block
-smoothers in geometric multigrid.
+This program solves an advection-diffusion problem using a geometric multigrid
+preconditioner. The basics of this preconditioner are discussed in step-16;
+here we discuss the necessary changes needed for a non-symmetric
+PDE. Additionally, we introduce the idea of block smoothing (as compared to
+point smoothing in step-16), and examine the effects of DoF renumbering for
+additive and multiplicative smoothers.
+
+<h2>Equation</h2>
+The advection-diffusion equation is given by
+@f{align*}{
+-\varepsilon \Delta u + \boldsymbol{\beta}\cdot \nabla u & = f &
+\text{ in } \Omega\\
+u &= g & \text{ on } \partial\Omega
+@f}
+where $\varepsilon>0$, $\boldsymbol{\beta}$ is the <i>advection
+direction</i>, and $f$ is a source. A few notes:
+
+1. If $\boldsymbol{\beta}=\boldsymbol{0}$, this is the Laplace equation solved in step-16
+(and many other places).
+
+2. If $\varepsilon=0$ then this is the stationary advection equation solved in
+step-9.
+
+3. Define the <i>Peclet number</i>: $\mathcal{P}\coloneqq
+\|\boldsymbol{\beta}\| \cdot L/\varepsilon$. If $\mathcal{P}>1$, we say the
+problem is <i>advection-dominated</i>, else if $\mathcal{P}<1$ we will
+say the problem is <i>diffusion-dominated</i>. Here $L$ is the length
+scale of the domain.
+
+For the discussion in this tutorial we will be concerned with
+advection-dominated flow. 
+
+Using the standard Galerkin finite element method, for suitable test
+functions $v_h$, the discrete weak form of the PDE reads
+@f{align*}{
+a(u_h,v_h) = F(v_h)
+@f}
+where
+@f{align*}{
+a(u_h,v_h) &= (\varepsilon \nabla v_h,\, \nabla u_h) +
+(v_h,\,\boldsymbol{\beta}\cdot \nabla u_h),\\
+F(v_h) &= (v_h,\,f).
+@f}
+
+<h3>Streamline diffusion</h3>
+
+The following error estimate can be shown for this PDE:
+@f{align*}{
+\|\nabla (u-u_h)\| \leq (1+\mathcal{P}) \inf_{v_h} \|\nabla (u-v_h)\|.
+@f}
+
+Given the definition of $\mathcal{P}$ above, we may have poor
+numerical solutions when $\varepsilon \ll \|\boldsymbol{\beta}\|\cdot
+L$. To combat this, we will consider the new weak form
+@f{align*}{
+a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
+\boldsymbol{\beta}\cdot \nabla u_h-f,\,\delta_K
+\boldsymbol{\beta}\cdot \nabla v_h)_K = F(v_h)
+@f}
+where the sum is done over all cells $K$ with the inner product taken
+for each cell, and $\delta_K$ is a cell-wise constant
+stabilization parameter defined in <a
+href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
+On Discontinuity-Capturing Methods for Convection-Diffusion Equations
+by Volker John and Petr Knobloch</a>. Essentially, adding in the
+discrete strong form residual enhances the coercivity of the bilinear
+form $a(\cdot,\cdot)$ which increases the stability of the discrete
+solution. This method is commonly referred to as <i>streamline
+diffusion</i> or <i>SUPG</i> (streamline upwind/Petrov-Galerkin).
+
+
+<h2>Smoothers</h2>
+
+One of the goals of this tutorial is to expand from using a simple
+(point-wise) Gauss-Seidel (SOR) smoother that is used in step-16
+(class PreconditionSOR) on each level of the multigrid hierarchy.
+Here, we consider point-wise smoothers (Jacobi and SOR) and cell-based
+smoothers (Block Jacobi and Block SOR). The cell-based smoothers can
+best be explained within the framework of additive and multiplicative
+Schwarz methods.
+
+In contrast to step-16, our test problem contains an advective
+term. Especially with a small diffusion constant $\varepsilon$, information is
+transported along streamlines in the given advection direction. This means
+that smoothers are likely to be more effective, if they allow information to
+travel in downstream direction within a single smoother application. This
+requires reordering degrees of freedom or cells (for the cell-based smoothers)
+accordingly. The influence of the ordering will be visible in the results
+section.
+
+Let us now briefly define the smoothers used in this tutorial. A Schwarz
+preconditioner requires a decomposition
+@f{align*}{
+V = \sum_{j=1}^J V_j
+@f}
+of our finite element space $V$. Each subproblem $V_j$ also has a Ritz
+projection $P_j: V \rightarrow V_j$ based on the bilinear form
+$a(\cdot,\cdot)$. This projection induces a local operator $A_j$ for each
+subproblem $V_j$. If $\Pi_j:V\rightarrow V_j$ is the orthogonal projector onto
+$V_j$, one can show $A_jP_j=\Pi_j^TA$.
+
+With this we can define an <i>additive Schwarz preconditioner</i> for the
+operator $A$ as
+@f{align*}{
+ B^{-1} = \sum_{j=1}^J P_j A^{-1} = \sum_{j=1}^J A_j^{-1} \Pi_j^T.
+@f}
+In other words, we project our solution into each subproblem, apply the
+inverse of the subproblem $A_j$, and sum the contributions up over all $j$.
+
+Note that one can interpret the point-wise Jacobi method as an additive
+Schwarz method by defining a subproblem $V_j$ for each degree of
+freedom. Then, $A_j^{-1}$ becomes a multiplication with the inverse of the
+diagonal entry of $A$.
+
+For the "Block Jacobi" method used in this tutorial, we define a subproblem
+$V_j$ for each cell of the mesh on the current level. Note that we use a
+continuous finite element, so these blocks are overlapping, as degrees of
+freedom on an interface between two cells belong to both subproblems. The
+logic for the Schwarz operator operating on the subproblems (in deal.II they
+are called "blocks"), is done in the class RelaxationBlock. The "Block
+Jacobi" method is implemented in the class RelaxationBlockJacobi. Many
+aspects of the class (for example how the blocks are defined and how to invert
+the local subproblems $A_j$) can be configured in the smoother data, see
+RelaxationBlock::AdditionalData and DoFTools::make_cell_patches for details.
+
+So far, we discussed additive smoothers where the updates can be applied
+independently and there is no information flowing within a single smoother
+application. A <i>multiplicative Schwarz preconditioner</i> addresses this
+and is defined by
+@f{align*}{
+ B^{-1} = \left( I- \prod_{j=1}^J I-P_J \right) A^{-1}.
+@f}
+In contrast to above, the updates on the subproblems $V_j$ are applied
+sequentially. This means that the update obtained when inverting the
+subproblem $A_j$ is immediately used in $A_{j+1}$.
+
+This method is implemented in the class RelaxationBlockSOR and used when you
+select "Block SOR" in this tutorial. The class RelaxationBlockSOR is also
+derived from RelaxationBlock. As such, both additive and multiplicative
+Schwarz methods are implemented in a unified framework.
+
+Finally, let us note that the standard Gauss-Seidel (or SOR) method can be
+seen as a multiplicative Schwarz method with a subproblem for each DoF.
+
+
+<h2>Test problem</h2>
+
+We will be considering the following test problem: $\Omega =
+[-1,\,1]\times[-1,\,1]$ with a circle of radius 0.3 centered at the
+origin removed, $\varepsilon=0.005$, $\boldsymbol{\beta} =
+[-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and the boundary function 
+@f{align*}{
+g = \left\{\begin{array}{ll} 1 & x=-1 \text{ OR } y=-1,\,x\geq 0.5 \\ 
+0 & \text{else} \end{array}\right.
+@f}
+
+The following figures depict the solutions with (left) and without
+(right) streamline diffusion. Without streamline diffusion we see large
+oscillations around the boundary layer, demonstrating the instability
+of the standard Galerkin finite element method for this problem.
+
+<table width="60%" align="center">
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-63-solution.png" alt="">
+    </td>
+
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-63-solution-no-sd.png" alt="">
+    </td>
+  </tr>
+</table>
