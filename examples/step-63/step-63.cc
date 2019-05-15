@@ -450,7 +450,7 @@ namespace Step63
   // from <a
   // href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27"> On
   // Discontinuity-Capturing Methods for Convection-Diffusion Equations by
-  // Volker John and Petr Knobloch</a>
+  // Volker John and Petr Knobloch</a>.
   template <int dim>
   double compute_stabilization_delta(const double         hk,
                                      const double         eps,
