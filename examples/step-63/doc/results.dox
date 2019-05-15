@@ -455,10 +455,10 @@ comparison of solve times for a $Q_3$ element with 74,496 DoFs:
 </tr>
 <tr>
   <th>74496</th>
-  <td>0.689 s</th>
-  <td>5.826 s</th>
-  <td>1.189 s</th>
-  <td>1.021 s</th>
+  <td>0.68s</th>
+  <td>5.82s</th>
+  <td>1.18s</th>
+  <td>1.02s</th>
 </tr>
 </table>
 
