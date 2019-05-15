@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class and classes derived from it are meant to build $Q$ and $R$
  * matrices one row/column at a time, i.e., by growing $R$ matrix from an empty
- * $0\times0$ matrix to $N\timesN$, where $N$ is the number of added column
+ * $0\times 0$ matrix to $N\times N$, where $N$ is the number of added column
  * vectors.
  *
  * As a consequence, matrices which have the same number of rows as each vector

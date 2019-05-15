@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
  * method for function minimization in which the Hessian matrix is only
  * approximated. In particular, the Hessian is updated using the formula of
  * Broyden, Fletcher, Goldfarb, and Shanno (BFGS):
- * \f[
+ * @f{align*}{
  * H^{(k+1)} &= \left[
  * I-\rho_{(k)} s^{(k)} \otimes y^{(k)}
  * \right]
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * y^{(k)} &\dealcoloneq g^{(k+1)} - g^{(k)} \\
  * s^{(k)} &\dealcoloneq x^{(k+1)} - x^{(k)} \\
  * \rho^{(k)} &\dealcoloneq \frac{1}{y^{(k)} \cdot s^{(k)}}
- * \f]
+ * @f}
  * for a symmetric positive definite $H$. Limited memory variant is
  * implemented via the two-loop recursion.
  *
