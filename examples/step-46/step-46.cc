@@ -483,7 +483,7 @@ namespace Step46
                                             common_face_quadrature,
                                             update_JxW_values |
                                               update_normal_vectors |
-                                              update_gradients);
+                                              update_gradients | update_values);
     FEFaceValues<dim>    elasticity_fe_face_values(elasticity_fe,
                                                 common_face_quadrature,
                                                 update_values);
@@ -491,7 +491,8 @@ namespace Step46
                                                   common_face_quadrature,
                                                   update_JxW_values |
                                                     update_normal_vectors |
-                                                    update_gradients);
+                                                    update_gradients |
+                                                    update_values);
     FESubfaceValues<dim> elasticity_fe_subface_values(elasticity_fe,
                                                       common_face_quadrature,
                                                       update_values);
@@ -798,8 +799,11 @@ namespace Step46
           stokes_fe_face_values.normal_vector(q);
 
         for (unsigned int k = 0; k < stokes_fe_face_values.dofs_per_cell; ++k)
-          stokes_symgrad_phi_u[k] =
-            stokes_fe_face_values[velocities].symmetric_gradient(k, q);
+          {
+            stokes_symgrad_phi_u[k] =
+              stokes_fe_face_values[velocities].symmetric_gradient(k, q);
+            stokes_phi_p[k] = stokes_fe_face_values[pressure].value(k, q);
+          }
         for (unsigned int k = 0; k < elasticity_fe_face_values.dofs_per_cell;
              ++k)
           elasticity_phi[k] =
