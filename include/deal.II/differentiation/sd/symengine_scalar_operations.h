@@ -1279,17 +1279,20 @@ namespace Differentiation
      * the map using the resolve_explicit_dependencies() function.
      *
      * Examples:
-     *   1. If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a" + 2</tt>,
-     *     then the function $f(a,b(a)) := a+b$ will be evaluated and the result
-     *     $f\vert_{a=1,b=a+2} = 3+a$ is returned. This return is because the
-     *     symbol "a" is substituted throughout the function first, and only
-     *     then is the symbol "b(a)" substituted, by which time its explicit
-     *     dependency on "a" cannot be resolved.
-     *  2. If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt>,
-     *     then the function $f(a(b),b): = a+b$ will be evaluated and the result
-     *     $f\vert_{a=b+2, b} = [b+2+b]_{b=1} = 4$ is returned. This is because
-     *     the explicitly dependent symbol "a(b)" is substituted first followed
-     *     by the symbol "b".
+     * <ol>
+     *   <li>If <tt>map["a"] == 1</tt> and <tt>map["b"] == "a" + 2</tt>, then
+     *   the function $f(a,b(a)) := a+b$ will be evaluated and the result
+     *   $f\vert_{a=1,b=a+2} = 3+a$ is returned. This return is because the
+     *   symbol "a" is substituted throughout the function first, and only
+     *   then is the symbol "b(a)" substituted, by which time its explicit
+     *   dependency on "a" cannot be resolved.</li>
+     *
+     *   <li>If <tt>map["a"] == "b"+2</tt> and <tt>map["b"] == 1</tt>, then
+     *   the function $f(a(b),b): = a+b$ will be evaluated and the result
+     *   $f\vert_{a=b+2, b} = [b+2+b]_{b=1} = 4$ is returned. This is because
+     *   the explicitly dependent symbol "a(b)" is substituted first followed
+     *   by the symbol "b".</li>
+     * </ol>
      */
     Expression
     substitute(const Expression &             expression,
