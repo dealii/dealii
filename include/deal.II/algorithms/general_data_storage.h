@@ -363,7 +363,7 @@ template <typename Type>
 void
 GeneralDataStorage::add_unique_copy(const std::string &name, const Type &entry)
 {
-  Assert(!stores_object_with_name(name), ExcNameHasBeenFound(name));
+  AssertThrow(!stores_object_with_name(name), ExcNameHasBeenFound(name));
   add_or_overwrite_copy(name, entry);
 }
 
@@ -381,7 +381,7 @@ template <typename Type>
 void
 GeneralDataStorage::add_unique_reference(const std::string &name, Type &entry)
 {
-  Assert(!stores_object_with_name(name), ExcNameHasBeenFound(name));
+  AssertThrow(!stores_object_with_name(name), ExcNameHasBeenFound(name));
   add_or_overwrite_reference(name, entry);
 }
 
@@ -400,7 +400,7 @@ template <typename Type>
 Type &
 GeneralDataStorage::get_object_with_name(const std::string &name)
 {
-  Assert(stores_object_with_name(name), ExcNameNotFound(name));
+  AssertThrow(stores_object_with_name(name), ExcNameNotFound(name));
 
   Type *p = nullptr;
 
