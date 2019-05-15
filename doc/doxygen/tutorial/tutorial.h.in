@@ -474,6 +474,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-61</td>
+ *       <td> Solving the Poisson problem with the "weak Galerkin" finite element
+ *       method.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-62</td>
  *       <td> Resonance frequency and bandgap of a phononic crystal. Elastic
  *       wave equation in the frequency domain with Perfectly Matched Layer
@@ -485,6 +491,12 @@
  *       <td>Block smoothers for geometric multigrid. A scalar convection
  *       diffusion equation is solved with different additive or
  *       multiplicative multigrid smoothers.
+ *       </td></tr>
+ *
+ *   <tr valign="top">    
+ *       <td>step-64</td>
+ *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
+ *       with MPI parallelization.
  *       </td></tr>
  *
  * </table>
@@ -621,6 +633,14 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> Parallelization via CUDA and MPI
+ *     </td>
+ *     <td>
+ *       step-64
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Parallelization on very large numbers of processors
  *     </td>
  *     <td>
@@ -698,7 +718,8 @@
  *       step-39,
  *       step-46,
  *       step-51,
- *       step-59
+ *       step-59,
+ *       step-61
  *     </td>
  *   </tr>
  *
@@ -896,7 +917,8 @@
  *     <td>
  *       step-7,
  *       step-29,
- *       step-62
+ *       step-62,
+ *       step-64
  *     </td>
  *   </tr>
  *
