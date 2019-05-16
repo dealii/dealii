@@ -2092,16 +2092,16 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       // and we should fail as early as possible. Since we cannot really
       // distinguish the two, we must continue here in any case.
       if (alpha <= 1e-4)
-        return outside;
-      // must_recompute_jacobian = true;
+        must_recompute_jacobian = true;
 
       // update the inverse Jacobian with "Broyden's good method" and
       // Sherman-Morrison formula for the update of the inverse, see
       // https://en.wikipedia.org/wiki/Broyden%27s_method
-      const Tensor<1, dim> delta_x = alpha * update;
+      // J^{-1}_n = J^{-1}_{n-1} + (delta x_n - J^{-1}_{n-1} delta f_n) /
+      // (delta x_n^T J_{-1}_{n-1} delta f_n) delta x_n^T J^{-1}_{n-1}
 
-      // switch sign in residual as compared to the wikipedia article because
-      // we use a negative definition of the residual with respect to the
+      // switch sign in residual as compared to the formula above because we
+      // use a negative definition of the residual with respect to the
       // Jacobian
       const Tensor<1, spacedim> delta_f = old_residual - residual;
 
@@ -2110,8 +2110,12 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
         for (unsigned int e = 0; e < dim; ++e)
           Jinv_deltaf[e] += inv_grad[d][e] * delta_f[d];
 
-      // prevent division by zero
-      if (delta_x * Jinv_deltaf != 0)
+      const Tensor<1, dim> delta_x = alpha * update;
+
+      // prevent division by zero. This number should be scale-invariant
+      // because Jinv_deltaf carries no units and x is in reference
+      // coordinates.
+      if (std::abs(delta_x * Jinv_deltaf) > 1e-12)
         {
           const Tensor<1, dim> factor =
             (delta_x - Jinv_deltaf) / (delta_x * Jinv_deltaf);
@@ -2345,65 +2349,73 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
 
 
 
-  auto compute_chart_point = [&](const typename Triangulation<dim, spacedim>::
-                                   cell_iterator &  cell,
-                                 const unsigned int i) {
-    Point<dim> guess;
-    // an optimization: keep track of whether or not we used the affine
-    // approximation so that we don't call pull_back with the same
-    // initial guess twice (i.e., if pull_back fails the first time,
-    // don't try again with the same function arguments).
-    bool used_affine_approximation = false;
-    // if we have already computed three points, we can guess the fourth
-    // to be the missing corner point of a rectangle
-    if (i == 3 && surrounding_points.size() >= 8)
-      guess = chart_points[1] + (chart_points[2] - chart_points[0]);
-    else if (use_structdim_2_guesses && 3 < i)
-      guess = guess_chart_point_structdim_2(i);
-    else if (use_structdim_3_guesses && 4 < i)
-      guess = guess_chart_point_structdim_3(i);
-    else if (dim == 3 && i > 7 && surrounding_points.size() == 26)
-      {
-        if (i < 20)
-          guess =
-            0.5 *
-              chart_points[GeometryInfo<dim>::line_to_cell_vertices(i - 8, 0)] +
-            0.5 *
-              chart_points[GeometryInfo<dim>::line_to_cell_vertices(i - 8, 1)];
-        else
-          guess =
-            0.25 *
-            (chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 0)] +
-             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 1)] +
-             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 2)] +
-             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 3)]);
-      }
-    else
-      {
-        guess =
-          cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
-        used_affine_approximation = true;
-      }
-    chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+  auto compute_chart_point =
+    [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        const unsigned int point_index) {
+      Point<dim> guess;
+      // an optimization: keep track of whether or not we used the affine
+      // approximation so that we don't call pull_back with the same
+      // initial guess twice (i.e., if pull_back fails the first time,
+      // don't try again with the same function arguments).
+      bool used_affine_approximation = false;
+      // if we have already computed three points, we can guess the fourth
+      // to be the missing corner point of a rectangle
+      if (point_index == 3 && surrounding_points.size() >= 8)
+        guess = chart_points[1] + (chart_points[2] - chart_points[0]);
+      else if (use_structdim_2_guesses && 3 < point_index)
+        guess = guess_chart_point_structdim_2(point_index);
+      else if (use_structdim_3_guesses && 4 < point_index)
+        guess = guess_chart_point_structdim_3(point_index);
+      else if (dim == 3 && point_index > 7 && surrounding_points.size() == 26)
+        {
+          if (point_index < 20)
+            guess =
+              0.5 * (chart_points[GeometryInfo<dim>::line_to_cell_vertices(
+                       point_index - 8, 0)] +
+                     chart_points[GeometryInfo<dim>::line_to_cell_vertices(
+                       point_index - 8, 1)]);
+          else
+            guess =
+              0.25 * (chart_points[GeometryInfo<dim>::face_to_cell_vertices(
+                        point_index - 20, 0)] +
+                      chart_points[GeometryInfo<dim>::face_to_cell_vertices(
+                        point_index - 20, 1)] +
+                      chart_points[GeometryInfo<dim>::face_to_cell_vertices(
+                        point_index - 20, 2)] +
+                      chart_points[GeometryInfo<dim>::face_to_cell_vertices(
+                        point_index - 20, 3)]);
+        }
+      else
+        {
+          guess = cell->real_to_unit_cell_affine_approximation(
+            surrounding_points[point_index]);
+          used_affine_approximation = true;
+        }
+      chart_points[point_index] =
+        pull_back(cell, surrounding_points[point_index], guess);
 
-    // the initial guess may not have been good enough: if applicable,
-    // try again with the affine approximation (which is more accurate
-    // than the cheap methods used above)
-    if (chart_points[i][0] == internal::invalid_pull_back_coordinate &&
-        !used_affine_approximation)
-      {
-        guess =
-          cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
-        chart_points[i] = pull_back(cell, surrounding_points[i], guess);
-      }
+      // the initial guess may not have been good enough: if applicable,
+      // try again with the affine approximation (which is more accurate
+      // than the cheap methods used above)
+      if (chart_points[point_index][0] ==
+            internal::invalid_pull_back_coordinate &&
+          !used_affine_approximation)
+        {
+          guess = cell->real_to_unit_cell_affine_approximation(
+            surrounding_points[point_index]);
+          chart_points[point_index] =
+            pull_back(cell, surrounding_points[point_index], guess);
+        }
 
-    if (chart_points[i][0] == internal::invalid_pull_back_coordinate)
-      {
-        for (unsigned int d = 0; d < dim; ++d)
-          guess[d] = 0.5;
-        chart_points[i] = pull_back(cell, surrounding_points[i], guess);
-      }
-  };
+      if (chart_points[point_index][0] ==
+          internal::invalid_pull_back_coordinate)
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            guess[d] = 0.5;
+          chart_points[point_index] =
+            pull_back(cell, surrounding_points[point_index], guess);
+        }
+    };
 
   // check whether all points are inside the unit cell of the current chart
   for (unsigned int c = 0; c < nearby_cells.size(); ++c)
