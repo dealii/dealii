@@ -1,0 +1,11 @@
+New: Mesh adjustment can now be performed using the Mesquite library. Mesh quality
+indicators, implemented by the Verdict library, have also been added. The smoothing
+or mesh adaptation can be performed on either the Triangulation itself (physically
+updating the vertex coordinates) or on a finite element field that is interpreted
+as the displacement field. This implies that both the Lagrangian and Eulerian
+descriptions of the mesh points can be adjusted. Furthermore, smoothing can be
+done on meshes having undergone adaptive mesh refinement: each hierarchy in the
+mesh is smoothed individually, rendering an "optimally" adapted mesh on all levels
+of the grid.
+<br>
+(Jean-Paul Pelteret, 2019/05/16)
