@@ -102,12 +102,12 @@ formulation of the problem,
 for all test functions $q$, where
 @f{equation*}
 \mathcal{A}\left(p,q\right)
-  := \int_\Omega \left(\mathbf{K} \nabla p\right) \cdot \nabla q \;\mathrm{d}x,
+  \dealcoloneq \int_\Omega \left(\mathbf{K} \nabla p\right) \cdot \nabla q \;\mathrm{d}x,
 @f}
 and 
 @f{equation*}
 \mathcal{F}\left(q\right)
-  := \int_\Omega f \, q \;\mathrm{d}x
+  \dealcoloneq \int_\Omega f \, q \;\mathrm{d}x
   - \int_{\Gamma^N} u_N q \; \mathrm{d}x.
 @f}
 Here, we have integrated by parts in the bilinear form, and we are evaluating 
@@ -139,13 +139,13 @@ that is only defined in cell interiors. Consequently,
 for all discrete test functions $q_h$, where
 @f{equation*}
 \mathcal{A}_h\left(p_h,q_h\right)
-  := \sum_{K \in \mathbb{T}}
+  \dealcoloneq \sum_{K \in \mathbb{T}}
     \int_K \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
 @f}
 and 
 @f{equation*}
 \mathcal{F}\left(q_h\right)
-  := \sum_{K \in \mathbb{T}} \int_K f \, q_h^\circ \;\mathrm{d}x
+  \dealcoloneq \sum_{K \in \mathbb{T}} \int_K f \, q_h^\circ \;\mathrm{d}x
   - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q_h^\partial \;\mathrm{d}x,
 @f}
 The key point is that here, we have replaced the gradient $\nabla p_h$ by the

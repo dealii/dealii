@@ -35,7 +35,7 @@ direction</i>, and $f$ is a source. A few notes:
 2. If $\varepsilon=0$ then this is the stationary advection equation solved in
 step-9.
 
-3. Define the <i>Peclet number</i>: $\mathcal{P}\:=\|\boldsymbol{\beta}\|
+3. Define the <i>Peclet number</i>: $\mathcal{P} \dealcoloneq \|\boldsymbol{\beta}\|
 \cdot L/\varepsilon$. If $\mathcal{P}>1$, we say the problem is
 <i>advection-dominated</i>, else if $\mathcal{P}<1$ we will say the problem is
 <i>diffusion-dominated</i>. Here $L$ is the length scale of the domain.
