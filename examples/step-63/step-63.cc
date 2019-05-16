@@ -70,7 +70,7 @@
 #include <iostream>
 #include <random>
 
-// We will be using Meshworker::mesh_loop functionality for assembling matrices:
+// We will be using MeshWorker::mesh_loop functionality for assembling matrices:
 #include <deal.II/meshworker/mesh_loop.h>
 
 
@@ -763,7 +763,7 @@ namespace Step63
 
   // @sect4{<code>AdvectionProblem::assemble_system_and_multigrid</code>}
 
-  // Here we employ Meshworker::mesh_loop() to go over cells and assemble the
+  // Here we employ MeshWorker::mesh_loop() to go over cells and assemble the
   // system_matrix, system_rhs, and all mg_matrices for us.
 
   template <int dim>
