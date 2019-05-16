@@ -337,7 +337,7 @@ namespace MeshWorker
     ScratchData(const ScratchData<dim, spacedim> &scratch);
 
     /**
-     * @name CurrentCellMethos Methods to work on current cell
+     * @name CurrentCellMethods Methods to work on current cell
      */
     /**@{*/
 
