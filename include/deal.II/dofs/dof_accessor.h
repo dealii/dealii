@@ -168,7 +168,7 @@ namespace internal
  * either type or the other. Additionally, they can be cast into each other,
  * in case this is needed, since they access the same data.
  *
- * It is highly recommended to use the function get_active_or_mg_dof_indices()
+ * It is recommended to use the function get_active_or_mg_dof_indices()
  * in generic loops in lieu of get_dof_indices() or get_mg_dof_indices().
  *
  * <h3>Inheritance</h3>
@@ -1832,13 +1832,10 @@ public:
   get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
-   * @deprecated Use get_active_or_mg_dof_indices() with level_cell_iterator
-   * returned from begin_mg().
-   *
    * Retrieve the global indices of the degrees of freedom on this cell in the
    * level vector associated to the level of the cell.
    */
-  DEAL_II_DEPRECATED void
+  void
   get_mg_dof_indices(std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
