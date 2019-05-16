@@ -17,7 +17,7 @@
 # Configuration for the ADOL-C library:
 #
 
-SET(FEATURE_ADOLC_AFTER BOOST)
+SET(FEATURE_ADOLC_AFTER BOOST TRILINOS)
 
 MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
   FIND_PACKAGE(ADOLC)
@@ -43,6 +43,27 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C links against external Boost but deal.II was configured "
         "with bundled Boost.\n\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    #
+    # We have to avoid a symbol clash with Trilinos' SEACASChaco library
+    # (the libchaco.so shared object exports the global symbol 'divide' but
+    # so does adolc itself).
+    #
+    ITEM_MATCHES(_module_found SEACASChaco ${Trilinos_PACKAGE_LIST})
+    IF(_module_found)
+      MESSAGE(STATUS
+        "Could not find a sufficient ADOL-C installation: "
+        "Possible symbol clash between the ADOL-C library and Trilinos' SEACASChaco detected"
+        )
+      SET(ADOLC_ADDITIONAL_ERROR_STRING
+        ${ADOLC_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient ADOL-C installation:\n"
+        "Possible symbol clash between the ADOL-C library and Trilinos' SEACASChaco detected."
+        "If you want to use ADOL-C, please configure deal.II to use a "
+        "Trilinos library with disabled SEACASChaco.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
