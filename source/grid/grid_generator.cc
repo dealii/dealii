@@ -757,7 +757,8 @@ namespace GridGenerator
     vertices[6] = p + Point<3>(-1, +1, 0) * (r / std::sqrt(2.0)),
     vertices[7] = p + Point<3>(+1, +1, 0) * (r / std::sqrt(2.0));
 
-    // create remaining vertices by rotating around positive y-axis
+    // create remaining vertices by rotating around negative y-axis (the
+    // direction is to ensure positive cell measures)
     double phi_cell = 2.0 * numbers::PI / n_cells_toroidal;
     for (unsigned int c = 1; c < n_cells_toroidal; ++c)
       {

@@ -1041,8 +1041,6 @@ namespace GridGenerator
                  const unsigned int  n_radial_cells = 0,
                  const unsigned int  n_axial_cells  = 0);
 
-
-
   /**
    * Produce the volume or surface mesh of a torus. The axis of the torus is
    * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
