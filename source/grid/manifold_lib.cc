@@ -1942,9 +1942,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::push_forward(
   AssertDimension(cell->level(), level_coarse);
 
   // check that the point is in the unit cell which is the current chart
-  // Tolerance 1e-6 chosen that the method also works with
-  // SphericalManifold
-  Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 1e-6),
+  // Tolerance 5e-4 chosen that the method also works with manifolds
+  // that have some discretization error like SphericalManifold
+  Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 5e-4),
          ExcMessage("chart_point is not in unit interval"));
 
   return compute_transfinite_interpolation(*cell,
