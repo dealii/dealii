@@ -69,15 +69,13 @@ namespace MeshWorker
    *   construction of these temporaries *on demand*, and easy access to
    *   values, gradients, etc., of already computed solution vectors.
    *
-   * The methods in
-   * @ref CurrentCellMethods
+   * The methods in the section "Methods to work on current cell"
    * initialize on demand internal FEValues,
    * FEFaceValues, and FESubfaceValues objects on the current cell, allowing the
    * use of this class as a single substitute for three different objects used
    * to integrate and query finite element values on cells, faces, and subfaces.
    *
-   * Similarly, the methods in
-   * @ref NeighborCellMethods
+   * Similarly, the methods in the section "Methods to work on neighbor cell"
    * initialize on demand
    * (different) internal FEValues, FEFaceValues, and FESubfaceValues, on
    * neighbor cells, allowing the use of this class also as a single substitute
@@ -87,11 +85,9 @@ namespace MeshWorker
    *
    * If you need to retrieve values or gradients of finite element solution
    * vectors, on the cell, face, or subface that has just been initialized
-   * with one of the functions in
-   * @ref CurrentCellMethods,
-   * you can use the
-   * methods in
-   * @ref CurrentCellEvaluation.
+   * with one of the functions in the section "Methods to work on current cell",
+   * you can use the methods in the section "Evaluation of finite element fields
+   * and their derivatives on the current cell".
    *
    * An example usage for this class is given by the following snippet of code:
    *
@@ -337,9 +333,9 @@ namespace MeshWorker
     ScratchData(const ScratchData<dim, spacedim> &scratch);
 
     /**
-     * @name CurrentCellMethods Methods to work on current cell
+     * @name Methods to work on current cell
      */
-    /**@{*/
+    /**@{*/ // CurrentCellMethods
 
     /**
      * Initialize the internal FEValues with the given @p cell, and return
@@ -419,9 +415,9 @@ namespace MeshWorker
     /** @} */ // CurrentCellMethods
 
     /**
-     * @name NeighborCellMethods Methods to work on neighbor cell
+     * @name Methods to work on neighbor cell
      */
-    /** @{ */
+    /** @{ */ // NeighborCellMethods
 
     /**
      * Initialize the internal neighbor FEValues to use the given @p cell, and
@@ -505,10 +501,12 @@ namespace MeshWorker
     GeneralDataStorage &
     get_general_data_storage();
 
-    /** @name CurrentCellEvaluation Evaluation of finite element fields
-     * and their derivatives on the current cell
-     *  @{
+    // clang-format off
+    /**
+     * @name Evaluation of finite element fields and their derivatives on the current cell
      */
+    /** @{ */ // CurrentCellEvaluation
+    // clang-format on
 
     /**
      * Extract the local dof values associated with the internally initialized
