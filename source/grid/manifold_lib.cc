@@ -2011,6 +2011,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
   const double tolerance = 1e-21 * Utilities::fixed_power<2>(cell->diameter());
   double       residual_norm_square = residual.norm_square();
   DerivativeForm<1, dim, spacedim> inv_grad;
+  bool                             must_recompute_jacobian = true;
   for (unsigned int i = 0; i < 100; ++i)
     {
       if (residual_norm_square < tolerance)
@@ -2026,7 +2027,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
           return chart_point + update;
         }
 
-      // every 8 iterations, including the first time around, we create an
+      // every 9 iterations, including the first time around, we create an
       // approximation of the Jacobian with finite differences. Broyden's
       // method usually does not need more than 5-8 iterations, but sometimes
       // we might have had a bad initial guess and then we can accelerate
@@ -2035,7 +2036,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       // much as 3 more iterations). this usually happens close to convergence
       // and one more step with the finite-differenced Jacobian leads to
       // convergence
-      if (i % 8 == 0)
+      if (must_recompute_jacobian || i % 9 == 0)
         {
           // if the determinant is zero or negative, the mapping is either not
           // invertible or already has inverted and we are outside the valid
@@ -2048,7 +2049,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
                                   Point<spacedim>(point - residual));
           if (grad.determinant() <= 0.0)
             return outside;
-          inv_grad = grad.covariant_form();
+          inv_grad                = grad.covariant_form();
+          must_recompute_jacobian = false;
         }
       Tensor<1, dim> update;
       for (unsigned int d = 0; d < spacedim; ++d)
@@ -2067,7 +2069,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
         alpha *= 0.5;
 
       const Tensor<1, spacedim> old_residual = residual;
-      while (alpha > 1e-7)
+      while (alpha > 1e-4)
         {
           Point<dim> guess = chart_point + alpha * update;
           residual =
@@ -2083,8 +2085,15 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
           else
             alpha *= 0.5;
         }
-      if (alpha < 1e-7)
+      // If alpha got very small, it is likely due to a bad Jacobian
+      // approximation with Broyden's method (relatively far away from the
+      // zero), which can be corrected by the outer loop when a Newton update
+      // is recomputed. The second case is when the Jacobian is actually bad
+      // and we should fail as early as possible. Since we cannot really
+      // distinguish the two, we must continue here in any case.
+      if (alpha <= 1e-4)
         return outside;
+      // must_recompute_jacobian = true;
 
       // update the inverse Jacobian with "Broyden's good method" and
       // Sherman-Morrison formula for the update of the inverse, see
@@ -2100,15 +2109,20 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       for (unsigned int d = 0; d < spacedim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
           Jinv_deltaf[e] += inv_grad[d][e] * delta_f[d];
-      const Tensor<1, dim> factor =
-        (delta_x - Jinv_deltaf) / (delta_x * Jinv_deltaf);
-      Tensor<1, spacedim> jac_update;
-      for (unsigned int d = 0; d < spacedim; ++d)
-        for (unsigned int e = 0; e < dim; ++e)
-          jac_update[d] += delta_x[e] * inv_grad[d][e];
-      for (unsigned int d = 0; d < spacedim; ++d)
-        for (unsigned int e = 0; e < dim; ++e)
-          inv_grad[d][e] += factor[e] * jac_update[d];
+
+      // prevent division by zero
+      if (delta_x * Jinv_deltaf != 0)
+        {
+          const Tensor<1, dim> factor =
+            (delta_x - Jinv_deltaf) / (delta_x * Jinv_deltaf);
+          Tensor<1, spacedim> jac_update;
+          for (unsigned int d = 0; d < spacedim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              jac_update[d] += delta_x[e] * inv_grad[d][e];
+          for (unsigned int d = 0; d < spacedim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              inv_grad[d][e] += factor[e] * jac_update[d];
+        }
     }
   return outside;
 }
@@ -2329,6 +2343,68 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
            (use_structdim_2_guesses ^ use_structdim_3_guesses),
          ExcInternalError());
 
+
+
+  auto compute_chart_point = [&](const typename Triangulation<dim, spacedim>::
+                                   cell_iterator &  cell,
+                                 const unsigned int i) {
+    Point<dim> guess;
+    // an optimization: keep track of whether or not we used the affine
+    // approximation so that we don't call pull_back with the same
+    // initial guess twice (i.e., if pull_back fails the first time,
+    // don't try again with the same function arguments).
+    bool used_affine_approximation = false;
+    // if we have already computed three points, we can guess the fourth
+    // to be the missing corner point of a rectangle
+    if (i == 3 && surrounding_points.size() >= 8)
+      guess = chart_points[1] + (chart_points[2] - chart_points[0]);
+    else if (use_structdim_2_guesses && 3 < i)
+      guess = guess_chart_point_structdim_2(i);
+    else if (use_structdim_3_guesses && 4 < i)
+      guess = guess_chart_point_structdim_3(i);
+    else if (dim == 3 && i > 7 && surrounding_points.size() == 26)
+      {
+        if (i < 20)
+          guess =
+            0.5 *
+              chart_points[GeometryInfo<dim>::line_to_cell_vertices(i - 8, 0)] +
+            0.5 *
+              chart_points[GeometryInfo<dim>::line_to_cell_vertices(i - 8, 1)];
+        else
+          guess =
+            0.25 *
+            (chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 0)] +
+             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 1)] +
+             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 2)] +
+             chart_points[GeometryInfo<dim>::face_to_cell_vertices(i - 20, 3)]);
+      }
+    else
+      {
+        guess =
+          cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
+        used_affine_approximation = true;
+      }
+    chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+
+    // the initial guess may not have been good enough: if applicable,
+    // try again with the affine approximation (which is more accurate
+    // than the cheap methods used above)
+    if (chart_points[i][0] == internal::invalid_pull_back_coordinate &&
+        !used_affine_approximation)
+      {
+        guess =
+          cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
+        chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+      }
+
+    if (chart_points[i][0] == internal::invalid_pull_back_coordinate)
+      {
+        for (unsigned int d = 0; d < dim; ++d)
+          guess[d] = 0.5;
+        chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+      }
+  };
+
   // check whether all points are inside the unit cell of the current chart
   for (unsigned int c = 0; c < nearby_cells.size(); ++c)
     {
@@ -2337,42 +2413,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
       bool inside_unit_cell = true;
       for (unsigned int i = 0; i < surrounding_points.size(); ++i)
         {
-          Point<dim> guess;
-          // an optimization: keep track of whether or not we used the affine
-          // approximation so that we don't call pull_back with the same
-          // initial guess twice (i.e., if pull_back fails the first time,
-          // don't try again with the same function arguments).
-          bool used_affine_approximation = false;
-          // if we have already computed three points, we can guess the fourth
-          // to be the missing corner point of a rectangle
-          if (i == 3 && surrounding_points.size() == 8)
-            guess = chart_points[1] + (chart_points[2] - chart_points[0]);
-          else if (use_structdim_2_guesses && 3 < i)
-            guess = guess_chart_point_structdim_2(i);
-          else if (use_structdim_3_guesses && 4 < i)
-            guess = guess_chart_point_structdim_3(i);
-          else
-            {
-              guess = cell->real_to_unit_cell_affine_approximation(
-                surrounding_points[i]);
-              used_affine_approximation = true;
-            }
-          chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+          compute_chart_point(cell, i);
 
-          // the initial guess may not have been good enough: if applicable,
-          // try again with the affine approximation (which is more accurate
-          // than the cheap methods used above)
-          if (chart_points[i][0] == internal::invalid_pull_back_coordinate &&
-              !used_affine_approximation)
-            {
-              guess = cell->real_to_unit_cell_affine_approximation(
-                surrounding_points[i]);
-              chart_points[i] = pull_back(cell, surrounding_points[i], guess);
-            }
-
-          // Tolerance 1e-6 chosen that the method also works with
-          // SphericalManifold
-          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points[i], 1e-6) ==
+          // Tolerance 5e-4 chosen that the method also works with manifolds
+          // that have some discretization error like SphericalManifold
+          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points[i], 5e-4) ==
               false)
             {
               inside_unit_cell = false;
@@ -2385,7 +2430,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         }
 
       // if we did not find a point and this was the last valid cell (the next
-      // iterate being the end of the array or an unvalid tag), we must stop
+      // iterate being the end of the array or an invalid tag), we must stop
       if (c == nearby_cells.size() - 1 ||
           nearby_cells[c + 1] == numbers::invalid_unsigned_int)
         {
@@ -2405,13 +2450,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
               message << "Transformation to chart coordinates: " << std::endl;
               for (unsigned int i = 0; i < surrounding_points.size(); ++i)
                 {
-                  message
-                    << surrounding_points[i] << " -> "
-                    << pull_back(cell,
-                                 surrounding_points[i],
-                                 cell->real_to_unit_cell_affine_approximation(
-                                   surrounding_points[i]))
-                    << std::endl;
+                  compute_chart_point(cell, i);
+                  message << surrounding_points[i] << " -> " << chart_points[i]
+                          << std::endl;
                 }
             }
 
