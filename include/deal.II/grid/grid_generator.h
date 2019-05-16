@@ -1047,9 +1047,15 @@ namespace GridGenerator
    * Produce the volume or surface mesh of a torus. The axis of the torus is
    * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
    *
-   * If @p dim is 3, the mesh will be the volume of the torus and this
-   * function attaches a TorusManifold to all boundary cells and faces (which
-   * are marked with a manifold id of 0).
+   * If @p dim is 3, the mesh will be the volume of the torus, using a mesh
+   * equivalent to the circle in the poloidal coordinates with 5 cells on the
+   * cross section. This function attaches a TorusManifold to all boundary
+   * faces which are marked with a manifold id of 0, a CylindricalManifold to
+   * the interior cells and all their faces which are marked with a manifold
+   * id of 2 (representing a flat state within the poloidal coordinates), and
+   * a TransfiniteInterpolationManifold to the cells between the TorusManifold
+   * on the surface and the ToroidalManifold in the center, with cells marked
+   * with manifold id 1.
    *
    * If @p dim is 2, the mesh will describe the surface of the torus and this
    * function attaches a TorusManifold to all cells and faces (which are
@@ -1062,11 +1068,17 @@ namespace GridGenerator
    *
    * @param r The inner radius of the torus.
    *
+   * @param n_cells_toroidal Optional argument to set the number of cell
+   * layers in toroidal direction. The default is 6 cell layers.
+   *
    * @note Implemented for Triangulation<2,3> and Triangulation<3,3>.
    */
   template <int dim, int spacedim>
   void
-  torus(Triangulation<dim, spacedim> &tria, const double R, const double r);
+  torus(Triangulation<dim, spacedim> &tria,
+        const double                  R,
+        const double                  r,
+        const unsigned int            n_cells_toroidal = 6);
 
   /**
    * This function produces a square in the <i>xy</i>-plane with a cylindrical

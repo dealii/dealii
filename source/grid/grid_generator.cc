@@ -589,7 +589,10 @@ namespace GridGenerator
 
 
   template <>
-  void torus<2, 3>(Triangulation<2, 3> &tria, const double R, const double r)
+  void torus<2, 3>(Triangulation<2, 3> &tria,
+                   const double         R,
+                   const double         r,
+                   const unsigned int)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
@@ -725,26 +728,111 @@ namespace GridGenerator
     tria.set_manifold(0, TorusManifold<2>(R, r));
   }
 
+
+
   template <>
-  void torus<3, 3>(Triangulation<3, 3> &tria, const double R, const double r)
+  void torus<3, 3>(Triangulation<3, 3> &tria,
+                   const double         R,
+                   const double         r,
+                   const unsigned int   n_cells_toroidal)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
                       "radius r."));
     Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
+    Assert(n_cells_toroidal > 2,
+           ExcMessage("Number of cells in toroidal direction has "
+                      "to be at least 3."));
 
-    // abuse the moebius function to generate a torus for us
-    GridGenerator::moebius(tria, 6 /*n_cells*/, 0 /*n_rotations*/, R, r);
+    // the first 8 vertices are in the x-y-plane
+    Point<3> const        p = Point<3>(R, 0.0, 0.0);
+    double const          a = 1. / (1 + std::sqrt(2.0));
+    std::vector<Point<3>> vertices(8 * n_cells_toroidal);
+    vertices[0] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0)),
+    vertices[1] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0)),
+    vertices[2] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0) * a),
+    vertices[3] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0) * a),
+    vertices[4] = p + Point<3>(-1, +1, 0) * (r / std::sqrt(2.0) * a),
+    vertices[5] = p + Point<3>(+1, +1, 0) * (r / std::sqrt(2.0) * a),
+    vertices[6] = p + Point<3>(-1, +1, 0) * (r / std::sqrt(2.0)),
+    vertices[7] = p + Point<3>(+1, +1, 0) * (r / std::sqrt(2.0));
 
-    // rotate by 90 degrees around the x axis to make the torus sit in the
-    // x-z plane instead of the x-y plane to be consistent with the other
-    // torus() function.
-    GridTools::rotate(numbers::PI / 2.0, 0, tria);
+    // create remaining vertices by rotating around positive y-axis
+    double phi_cell = 2.0 * numbers::PI / n_cells_toroidal;
+    for (unsigned int c = 1; c < n_cells_toroidal; ++c)
+      {
+        for (unsigned int v = 0; v < 8; ++v)
+          {
+            double const r_2d      = vertices[v][0];
+            vertices[8 * c + v][0] = r_2d * std::cos(phi_cell * c);
+            vertices[8 * c + v][1] = vertices[v][1];
+            vertices[8 * c + v][2] = r_2d * std::sin(phi_cell * c);
+          }
+      }
 
-    // set manifolds as documented
-    tria.set_all_manifold_ids(1);
-    tria.set_all_manifold_ids_on_boundary(0);
-    tria.set_manifold(0, TorusManifold<3>(R, r));
+    // cell connectivity
+    std::vector<CellData<3>> cells(5 * n_cells_toroidal);
+    for (unsigned int c = 0; c < n_cells_toroidal; ++c)
+      {
+        for (unsigned int j = 0; j < 2; ++j)
+          {
+            unsigned int offset = (8 * (c + j)) % (8 * n_cells_toroidal);
+            // cell 0 in x-y-plane
+            cells[5 * c].vertices[0 + j * 4] = offset + 0;
+            cells[5 * c].vertices[1 + j * 4] = offset + 1;
+            cells[5 * c].vertices[2 + j * 4] = offset + 2;
+            cells[5 * c].vertices[3 + j * 4] = offset + 3;
+            // cell 1 in x-y-plane
+            cells[5 * c + 1].vertices[0 + j * 4] = offset + 2;
+            cells[5 * c + 1].vertices[1 + j * 4] = offset + 3;
+            cells[5 * c + 1].vertices[2 + j * 4] = offset + 4;
+            cells[5 * c + 1].vertices[3 + j * 4] = offset + 5;
+            // cell 2 in x-y-plane
+            cells[5 * c + 2].vertices[0 + j * 4] = offset + 4;
+            cells[5 * c + 2].vertices[1 + j * 4] = offset + 5;
+            cells[5 * c + 2].vertices[2 + j * 4] = offset + 6;
+            cells[5 * c + 2].vertices[3 + j * 4] = offset + 7;
+            // cell 3 in x-y-plane
+            cells[5 * c + 3].vertices[0 + j * 4] = offset + 0;
+            cells[5 * c + 3].vertices[1 + j * 4] = offset + 2;
+            cells[5 * c + 3].vertices[2 + j * 4] = offset + 6;
+            cells[5 * c + 3].vertices[3 + j * 4] = offset + 4;
+            // cell 4 in x-y-plane
+            cells[5 * c + 4].vertices[0 + j * 4] = offset + 3;
+            cells[5 * c + 4].vertices[1 + j * 4] = offset + 1;
+            cells[5 * c + 4].vertices[2 + j * 4] = offset + 5;
+            cells[5 * c + 4].vertices[3 + j * 4] = offset + 7;
+          }
+
+        cells[5 * c].material_id     = 0;
+        cells[5 * c + 1].material_id = 0;
+        cells[5 * c + 2].material_id = 0;
+        cells[5 * c + 3].material_id = 0;
+        cells[5 * c + 4].material_id = 0;
+      }
+
+    tria.create_triangulation(vertices, cells, SubCellData());
+
+    tria.reset_all_manifolds();
+    tria.set_all_manifold_ids(0);
+
+    for (auto &cell : tria.cell_iterators())
+      {
+        bool cell_at_boundary = false;
+        for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+          if (cell->at_boundary(f))
+            cell_at_boundary = true;
+        if (cell_at_boundary == false)
+          cell->set_all_manifold_ids(2);
+      }
+    tria.set_all_manifold_ids_on_boundary(1);
+    tria.set_manifold(1, TorusManifold<3>(2, 0.5));
+    tria.set_manifold(2,
+                      CylindricalManifold<3>(Tensor<1, 3>({0., 1., 0.}),
+                                             Point<3>()));
+    TransfiniteInterpolationManifold<3> transfinite;
+    transfinite.initialize(tria);
+    tria.set_manifold(0, transfinite);
   }
 
 
