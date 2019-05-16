@@ -2138,7 +2138,7 @@ public:
   virtual ~FEValuesBase() override;
 
 
-  /// @name ShapeAccess Access to shape function values
+  /// @name Access to shape function values
   ///
   /// These fields are filled by the finite element.
   //@{
