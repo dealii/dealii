@@ -501,12 +501,10 @@ namespace MeshWorker
     GeneralDataStorage &
     get_general_data_storage();
 
-    // clang-format off
     /**
      * @name Evaluation of finite element fields and their derivatives on the current cell
      */
     /** @{ */ // CurrentCellEvaluation
-    // clang-format on
 
     /**
      * Extract the local dof values associated with the internally initialized
