@@ -24,7 +24,6 @@
 
 #  include <deal.II/lac/sparsity_tools.h>
 
-
 #  include <functional>
 #  include <set>
 #  include <unordered_map>
