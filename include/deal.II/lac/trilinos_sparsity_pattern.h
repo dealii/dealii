@@ -286,7 +286,7 @@ namespace TrilinosWrappers
     using const_iterator = SparsityPatternIterators::Iterator;
 
     /**
-     * @name Basic constructors and initialization.
+     * @name Basic constructors and initialization
      */
     //@{
     /**

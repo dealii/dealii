@@ -420,7 +420,9 @@ public:
   bool
   operator>(const TriaRawIterator &) const;
 
-  /**@name Advancement of iterators*/
+  /**
+   * @name Advancement of iterators
+   */
   /*@{*/
   /**
    * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
@@ -496,7 +498,9 @@ public:
   using pointer           = Accessor *;
   using reference         = Accessor &;
 
-  /**@name Exceptions*/
+  /**
+   * @name Exceptions
+   */
   /*@{*/
   /**
    * Exception for TriaObjects with level, i.e. cells.
@@ -684,7 +688,9 @@ public:
   TriaIterator<Accessor> &
   operator=(const TriaRawIterator<OtherAccessor> &);
 
-  /**@name Advancement of iterators*/
+  /**
+   * @name Advancement of iterators
+   */
   /*@{*/
   /**
    * Prefix <tt>++</tt> operator: <tt>++i</tt>. This operator advances the
@@ -891,7 +897,9 @@ public:
   TriaActiveIterator<Accessor> &
   operator++();
 
-  /**@name Advancement of iterators*/
+  /**
+   * @name Advancement of iterators
+   */
   /*@{*/
   /**
    * Postfix <tt>++</tt> operator: <tt>i++</tt>. This operator advances the

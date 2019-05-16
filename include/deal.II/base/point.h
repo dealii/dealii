@@ -176,7 +176,7 @@ public:
   Number &
   operator()(const unsigned int index);
 
-  /*
+  /**
    * @name Addition and subtraction of points.
    * @{
    */
@@ -216,7 +216,7 @@ public:
    * @}
    */
 
-  /*
+  /**
    * @name Multiplication and scaling of points. Dot products. Norms.
    * @{
    */

@@ -1520,8 +1520,9 @@ namespace GridGenerator
   ///@}
 
   /**
-   * @name Creating lower-dimensional meshes from parts of higher-dimensional
-   * meshes
+   * @name Creating lower-dimensional meshes
+   *
+   * Created from parts of higher-dimensional meshes.
    */
   ///@{
 
