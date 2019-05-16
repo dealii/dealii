@@ -403,6 +403,8 @@
  *   <tr valign="top">
  *       <td>step-45</td>
  *       <td> Periodic boundary conditions.
+ *       <br/> Keywords: GridTools::collect_periodic_faces,
+ *       GridTools::PeriodicFacePair, Triangulation::add_periodicity
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -442,6 +444,8 @@
  *   <tr valign="top">
  *       <td>step-54</td>
  *       <td> Using CAD files to describe the boundary of your domain.
+ *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES,
+ *       OpenCASCADE::NormalProjectionBoundary
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -491,6 +495,8 @@
  *       <td>Block smoothers for geometric multigrid. A scalar convection
  *       diffusion equation is solved with different additive or
  *       multiplicative multigrid smoothers.
+ *       <br/> Keywords: Multigrid, MeshWorker::mesh_loop,
+ *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream
  *       </td></tr>
  *
  *   <tr valign="top">    
