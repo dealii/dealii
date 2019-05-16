@@ -60,7 +60,7 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * @name Constructors and initialization.
+   * @name Constructors and initialization
    */
   /**
    * Constructor generating an empty matrix of dimension <tt>n</tt>.

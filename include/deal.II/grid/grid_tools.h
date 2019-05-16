@@ -2147,8 +2147,10 @@ namespace GridTools
 
   /*@}*/
   /**
-   * @name Extracting and creating patches of cells surrounding a single cell,
-   * and creating triangulation out of them
+   * @name Extracting and creating patches of cells
+   *
+   * These functions extract and create patches of cells surrounding a single
+   * cell, and creating triangulation out of them.
    */
   /*@{*/
 
