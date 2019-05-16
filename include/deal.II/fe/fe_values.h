@@ -2138,8 +2138,9 @@ public:
   virtual ~FEValuesBase() override;
 
 
-  /// @name ShapeAccess Access to shape function values. These fields are filled
-  /// by the finite element.
+  /// @name Access to shape function values
+  ///
+  /// These fields are filled by the finite element.
   //@{
 
   /**
@@ -2588,8 +2589,9 @@ public:
     bool quadrature_points_fastest = false) const;
 
   //@}
-  /// @name Access to second derivatives (Hessian matrices and Laplacians) of
-  /// global finite element fields
+  /// @name Access to second derivatives
+  ///
+  /// Hessian matrices and Laplacians of global finite element fields
   //@{
 
   /**

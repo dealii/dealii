@@ -1464,8 +1464,9 @@ public:
   //@}
 
   /**
-   * @name 5: Access of internal data structure (expert mode, interface not
-   * stable between releases)
+   * @name 5: Access of internal data structure
+   *
+   * Note: Expert mode, interface not stable between releases.
    */
   //@{
   /**

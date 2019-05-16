@@ -368,8 +368,10 @@ public:
   static const size_type invalid_entry = numbers::invalid_size_type;
 
   /**
-   * @name Construction and setup Constructors, destructor; functions
-   * initializing, copying and filling an object.
+   * @name Construction and Initialization
+   *
+   * Constructors, destructor, functions initializing, copying and filling an
+   * object.
    */
   // @{
   /**
@@ -885,8 +887,10 @@ public:
   using SparsityPatternBase::reinit;
 
   /**
-   * @name Construction and setup Constructors, destructor; functions
-   * initializing, copying and filling an object.
+   * @name Construction and setup
+   *
+   * Constructors, destructor, functions initializing, copying and filling an
+   * object.
    */
   // @{
   /**
