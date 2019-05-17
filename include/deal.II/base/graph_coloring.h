@@ -24,13 +24,10 @@
 
 #  include <deal.II/lac/sparsity_tools.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <boost/unordered_map.hpp>
-#  include <boost/unordered_set.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  include <functional>
 #  include <set>
+#  include <unordered_map>
+#  include <unordered_set>
 #  include <vector>
 
 
@@ -121,7 +118,7 @@ namespace GraphColoring
       unsigned int n_iterators = 0;
 
       // Create a map from conflict indices to iterators
-      boost::unordered_map<types::global_dof_index, std::vector<Iterator>>
+      std::unordered_map<types::global_dof_index, std::vector<Iterator>>
         indices_to_iterators;
       for (Iterator it = begin; it != end; ++it)
         {
@@ -273,7 +270,7 @@ namespace GraphColoring
         }
 
       // Color the graph.
-      std::vector<boost::unordered_set<unsigned int>> colors_used;
+      std::vector<std::unordered_set<unsigned int>> colors_used;
       for (unsigned int i = 0; i < partition_size; ++i)
         {
           const unsigned int current_vertex(sorted_vertices[i]);
@@ -306,7 +303,7 @@ namespace GraphColoring
             {
               partition_coloring.push_back(
                 std::vector<Iterator>(1, partition[current_vertex]));
-              boost::unordered_set<unsigned int> tmp;
+              std::unordered_set<unsigned int> tmp;
               tmp.insert(current_vertex);
               colors_used.push_back(tmp);
             }
@@ -363,7 +360,7 @@ namespace GraphColoring
         {
           if (i != i_color)
             {
-              boost::unordered_set<unsigned int> used_k;
+              std::unordered_set<unsigned int> used_k;
               for (unsigned int j = 0; j < colors_counter[i].size(); ++j)
                 {
                   // Find the color in the current partition with the largest
@@ -418,7 +415,7 @@ namespace GraphColoring
             {
               if (i != i_color)
                 {
-                  boost::unordered_set<unsigned int> used_k;
+                  std::unordered_set<unsigned int> used_k;
                   for (unsigned int j = 0; j < colors_counter[i].size(); ++j)
                     {
                       // Find the color in the current partition with the
