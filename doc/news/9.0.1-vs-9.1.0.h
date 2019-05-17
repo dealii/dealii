@@ -142,7 +142,7 @@ inconvenience this causes.
   function is allowed to read.
   <br>
   Further, the `register_data_attach()` function now requires a boolean
-  argument `returns_variable_size_data`, which denotes if the registered 
+  argument `returns_variable_size_data`, which denotes if the registered
   pack_callback function interacts with the fixed size (`=false`) or
   variable size (`=true`) buffer for data transfer.
   <br>
@@ -216,7 +216,7 @@ inconvenience this causes.
   Improved: All tutorial programs have been reviewed and updated with new features
   in the library and C++11.
   <br>
-  (Daniel Arndt, David Wells, Matthias Maier, Denis Davydov, Wolfgang Bangerth, Jean-Paul Pelteret, 2019/05/13)
+  (Daniel Arndt, David Wells, Matthias Maier, Denis Davydov, Wolfgang Bangerth, Jean-Paul Pelteret, Martin Kronbichler, 2019/05/13)
  </li>
 
  <li>
@@ -259,7 +259,7 @@ inconvenience this causes.
 
  <li>
   New: The ParsedConvergenceTable class allows convenient construction of convergence tables, exploiting
-  parameter files. 
+  parameter files.
   <br>
   (Luca Heltai, 2019/04/10)
  </li>
@@ -285,8 +285,8 @@ inconvenience this causes.
 
  <li>
   New: A new class Differentiation::AD::VectorFunction has been
-  added to help implement point-wise vector functions using automatic 
-  differentiation. In particular, this class is designed to compute the 
+  added to help implement point-wise vector functions using automatic
+  differentiation. In particular, this class is designed to compute the
   Jacobian of a vector function that is parameterized in
   terms of scalar, vector, and tensor arguments. One example of its use
   would be to compute the linearization of a multi-field constitutive
@@ -304,8 +304,8 @@ inconvenience this causes.
 
  <li>
   New: A new class Differentiation::AD::ScalarFunction has been
-  added to help implement point-wise scalar functions using automatic 
-  differentiation. In particular, this class is designed to compute the 
+  added to help implement point-wise scalar functions using automatic
+  differentiation. In particular, this class is designed to compute the
   gradient and Hessian of a scalar function that is parameterized in
   terms of scalar, vector, and tensor arguments. One example of its use
   would be to compute the derivatives of a multi-field constitutive law
@@ -375,8 +375,8 @@ inconvenience this causes.
 
  <li>
   New: A new class Differentiation::AD::ResidualLinearization has been
-  added to help compute the linearization of a residual vector defined on the 
-  level of a cell (a finite element residual), or for local nonlinear equations. 
+  added to help compute the linearization of a residual vector defined on the
+  level of a cell (a finite element residual), or for local nonlinear equations.
   <br>
   (Jean-Paul Pelteret, 2018/09/30)
  </li>
@@ -393,8 +393,8 @@ inconvenience this causes.
 
  <li>
   New: A new class Differentiation::AD::EnergyFunctional has been
-  added to help implement (incremental) variational formulations using automatic 
-  differentiation. In particular, this class is designed to compute the finite 
+  added to help implement (incremental) variational formulations using automatic
+  differentiation. In particular, this class is designed to compute the finite
   element residuals and their linearizations.
   <br>
   (Jean-Paul Pelteret, 2018/08/27)
@@ -472,8 +472,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The new class ColorEnriched::Helper constructs an hp::FECollection, a 
-  collection of finite element objects used by hp::DoFHandler, in a domain 
+  New: The new class ColorEnriched::Helper constructs an hp::FECollection, a
+  collection of finite element objects used by hp::DoFHandler, in a domain
   with multiple, possibly overlapping, sub-domains with individual
   enrichment functions. Note that the overlapping regions may have
   multiple enrichment functions associated with them. This is implemented
@@ -492,6 +492,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+ <li>
+  Improved: The point identification of TransfiniteInterpolationManifold has
+  been made more robust. It would previously sometimes fail for strongly curved,
+  long and skinny cells.
+  <br>
+  (Martin Kronbichler, 2019/05/16)
+ </li>
 
  <li>
   Improved: DoFHandler::renumber_dofs() on parallel::distributed::Triangulation
@@ -528,7 +536,7 @@ inconvenience this causes.
 
  <li>
   New: Some utility functions that perform symbolic substitution on, and
-  evaluation of, symbolic scalar and tensor expressions have been added to the 
+  evaluation of, symbolic scalar and tensor expressions have been added to the
   Differentiation::SD namespace.
   <br>
   (Jean-Paul Pelteret, 2019/05/07)
@@ -548,7 +556,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Some utility functions that facilitate the creation of symbolic maps and 
+  New: Some utility functions that facilitate the creation of symbolic maps and
   symbolic substitution maps have been added to the Differentiation::SD namespace.
   <br>
   (Jean-Paul Pelteret, 2019/05/05)
@@ -564,7 +572,7 @@ inconvenience this causes.
  <li>
   Improved: The `Meshworker::mesh_loop()` function is now capable of working with an
   IteratorRange, and also supports iterator ranges constructed from
-  FilteredIterators. 
+  FilteredIterators.
   <br>
   (Jean-Paul Pelteret, 2019/05/02)
  </li>
@@ -593,41 +601,41 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Some utility functions that facilitate the creation of both scalar and 
-  tensor symbolic variables and symbolic functions have been added to the 
+  New: Some utility functions that facilitate the creation of both scalar and
+  tensor symbolic variables and symbolic functions have been added to the
   Differentiation::SD namespace.
   <br>
   (Jean-Paul Pelteret, 2019/04/22)
  </li>
 
  <li>
-  New: Functions::CutOffFunctionBase now supports rescaling the function to keep its integral equal to one. 
+  New: Functions::CutOffFunctionBase now supports rescaling the function to keep its integral equal to one.
   <br>
   (Luca Heltai, 2019/04/18)
  </li>
 
  <li>
   New: The new FunctionFromFunctionObjects class allows one to wrap a vector of
-  std::function objects into a Function object, to allow fast prototyping of user codes. 
+  std::function objects into a Function object, to allow fast prototyping of user codes.
   <br>
   (Luca Heltai, 2019/04/12)
  </li>
 
  <li>
-  Fixed: Make sure that GridTools::Cache::get_cell_bounding_boxes_rtree() honors mappings. 
+  Fixed: Make sure that GridTools::Cache::get_cell_bounding_boxes_rtree() honors mappings.
   <br>
   (Luca Heltai, 2019/04/11)
  </li>
 
  <li>
-  New: Added BoundingBox::extend() that allows extending and shrinking of BoundingBox objects. 
+  New: Added BoundingBox::extend() that allows extending and shrinking of BoundingBox objects.
   <br>
   (Luca Heltai, 2019/04/11)
  </li>
 
  <li>
-  New: The method Mapping::get_center() allows one to retrieve the cell center of a cell when the 
-  mapping object does not preserve vertex locations. 
+  New: The method Mapping::get_center() allows one to retrieve the cell center of a cell when the
+  mapping object does not preserve vertex locations.
   <br>
   (Luca Heltai, 2019/04/11)
  </li>
@@ -693,7 +701,7 @@ inconvenience this causes.
 
  <li>
   New: The GeneralDataStorage class facilitates the storage of any general data.
-  It offers the ability to store any amount of data, of any type, which is then 
+  It offers the ability to store any amount of data, of any type, which is then
   made accessible by an identifier string.
   <br>
   (Luca Heltai, Jean-Paul Pelteret, 2019/04/02)
@@ -729,16 +737,16 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added a variant of MeshWorker::mesh_loop() that takes a class and its member functions as workers 
-  and copiers. 
+  New: Added a variant of MeshWorker::mesh_loop() that takes a class and its member functions as workers
+  and copiers.
   <br>
   (Luca Heltai, 2019/03/23)
  </li>
 
  <li>
-  New: The type alias FEValuesViews::View now allows one to infer the correct FEValuesViews type 
-  that would be returned by FEValuesBase::operator[]() when called with a specified extractor type from the 
-  FEValuesExtractors namespace. 
+  New: The type alias FEValuesViews::View now allows one to infer the correct FEValuesViews type
+  that would be returned by FEValuesBase::operator[]() when called with a specified extractor type from the
+  FEValuesExtractors namespace.
   <br>
   (Luca Heltai, 2019/03/20)
  </li>
@@ -751,16 +759,16 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The new method GridTools::assign_co_dimensional_manifold_indicators() propagate manifold ids from 
+  New: The new method GridTools::assign_co_dimensional_manifold_indicators() propagate manifold ids from
   cells to faces and edges, according to a disambiguation function that takes the set of manifold ids of
-  the cells that share the given face or edge. 
+  the cells that share the given face or edge.
   <br>
   (Luca Heltai, 2019/03/19)
  </li>
 
  <li>
   New: FEValuesExtractor classes now have a new method get_name() that returns a unique string identifier
-  for each extractor. 
+  for each extractor.
   <br>
   (Luca Heltai, 2019/03/19)
  </li>
@@ -799,8 +807,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added two new classes to the MeshWorker namespace: MeshWorker::ScratchData and 
-  MeshWorker::CopyData, that can be used as good default classes with the 
+  New: Added two new classes to the MeshWorker namespace: MeshWorker::ScratchData and
+  MeshWorker::CopyData, that can be used as good default classes with the
   WorkStream::run() and MeshWorker::mesh_loop() functions.
   <br>
   (Luca Heltai, 2019/03/13)
@@ -814,7 +822,7 @@ inconvenience this causes.
 
  <li>
   Changed: The TrilinosWrappers::PreconditionAMG::AdditionalData data structure
-  is now able to return a parameter list, which can be adjusted and fine-tuned by 
+  is now able to return a parameter list, which can be adjusted and fine-tuned by
   the user and later used to initialize the AMG preconditioner. It can also
   initialize the null space settings of an existing parameter list.
   <br>
@@ -913,8 +921,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function DoFRenumbering::random(dof_handler, level) which allows for a random renumbering 
-  of degrees of freedom on a level in a mutilevel hierarchy. 
+  New: Function DoFRenumbering::random(dof_handler, level) which allows for a random renumbering
+  of degrees of freedom on a level in a mutilevel hierarchy.
   <br>
   (Conrad Clevenger, 2019/02/19)
  </li>
@@ -934,9 +942,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function MGConstrainedDoFs::make_no_normal_flux_constraints which adds 
-  functionality for no normal flux constraints during geometric mutigrid computations. 
-  Currently, this function is limited to meshes with no normal flux boundaries 
+  New: Function MGConstrainedDoFs::make_no_normal_flux_constraints which adds
+  functionality for no normal flux constraints during geometric mutigrid computations.
+  Currently, this function is limited to meshes with no normal flux boundaries
   normal to the x-, y-, or z-axis.
   <br>
   (Conrad Clevenger, 2019/02/11)
@@ -1041,10 +1049,10 @@ inconvenience this causes.
 
  <li>
   Improved: A new dummy enumeration AD::NumberTypes::none has been added.
-  It exists to represent number types that are scalar arithmetic types, 
-  i.e those that hold no derivatives. They are implemented primarily to 
-  facilitate the use of template  meta-programming techniques to switch 
-  between different AD types. This covers the case when the user does not 
+  It exists to represent number types that are scalar arithmetic types,
+  i.e those that hold no derivatives. They are implemented primarily to
+  facilitate the use of template  meta-programming techniques to switch
+  between different AD types. This covers the case when the user does not
   want an AD type at all, but rather a primitive type.
   <br>
   (Jean-Paul Pelteret, 2019/01/25)
@@ -1119,7 +1127,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Class parallel::distributed::CellDataTransfer has been introduced to transfer 
+  New: Class parallel::distributed::CellDataTransfer has been introduced to transfer
   cell by cell data across distributed meshes in case of refinement/serialization.
   <br>
   (Marc Fehling, 2018/12/18)
@@ -1144,9 +1152,9 @@ inconvenience this causes.
   New: GridTools::find_active_cell_around_point now allows you to specify an (optional) rtree, constructed
   from the used vertices of the triangulation. Once you have built a tree, querying for a nearest
   vertex is an O(log(N)) operation, where N is the number of used vertices. You can ask a GridTools::Cache
-  object to return a tree that is compatible with the new function signature. 
+  object to return a tree that is compatible with the new function signature.
   The previous version of this function had a cost that was O(N^2) when the point was not in the cell_hint
-  object. 
+  object.
   <br>
   (Luca Heltai, 2018/12/05)
  </li>
@@ -1172,14 +1180,14 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added entries to GridTools::Cache to build a vertices RTree, and a bounding boxes RTree. 
+  New: Added entries to GridTools::Cache to build a vertices RTree, and a bounding boxes RTree.
   <br>
   (Luca Heltai, 2018/12/03)
  </li>
 
  <li>
-  New: Class EllipticalManifold<dim,spacedim> derived from ChartManifold, 
-  valid only for dim=2 and spacedim=2. It maps points from a system of 
+  New: Class EllipticalManifold<dim,spacedim> derived from ChartManifold,
+  valid only for dim=2 and spacedim=2. It maps points from a system of
   cartesian coordinates to a system of elliptical coordinates and vice-versa.
   <br>
   (Stefano Dominici, 2018/11/30)
@@ -1202,7 +1210,7 @@ inconvenience this causes.
 
  <li>
   New: Triangulation::n_faces, Triangulation::n_active_faces, and Triangulation::n_raw_faces now work also
-  in one dimension. 
+  in one dimension.
   <br>
   (Luca Heltai, 2018/11/22)
  </li>
@@ -1253,9 +1261,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: GridOut::write_vtk and GridIn::read_vtk are now compatible with each other, and can be used to save 
+  New: GridOut::write_vtk and GridIn::read_vtk are now compatible with each other, and can be used to save
   and restore a Triangulation with all manifold_ids and boundary_ids correctly saved.
-  This is now the only format that supports both boundary_id and manifold_id both in reading and writing. 
+  This is now the only format that supports both boundary_id and manifold_id both in reading and writing.
   <br>
   (Luca Heltai, 2018/11/07)
  </li>
@@ -1315,7 +1323,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The project_boundary_values_div_conforming() function now works correctly 
+  Fixed: The project_boundary_values_div_conforming() function now works correctly
   with parallel::distributed::Triangulation.
   <br>
   (Jonathan Matthews, 2018/10/13)
@@ -1330,8 +1338,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added RTree class and pack_rtree() function to create a boost::geometry::index::rtree from 
-  containers and/or iterators of BoundingBox, Point, or Segment objects. 
+  New: Added RTree class and pack_rtree() function to create a boost::geometry::index::rtree from
+  containers and/or iterators of BoundingBox, Point, or Segment objects.
   <br>
   (Luca Heltai, 2018/10/06)
  </li>
@@ -1502,7 +1510,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Added: New function 
+  Added: New function
   Utilities::MPI::compute_n_point_to_point_communications()
   is implemented to be used for computing number of processes
   in an MPI universe to expect communication from.
@@ -1540,7 +1548,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add a mask argument to filter out some vector lanes in FEEvaluationBase
+  New: Add a mask argument to filter out some vector lanes in FEEvaluationBase.
   This is required for local time stepping using the MatrixFree framework,
   because some cells of batches must be excluded from read/write operations
   when operating on different time steps compared to their neighbor cells.
@@ -1571,7 +1579,7 @@ inconvenience this causes.
 
  <li>
   New: There are new methods CUDAWrappers::SparseMatrix::print() and
-  CUDAWrappers::SparseMatrix::print_formatted(). Additionally, 
+  CUDAWrappers::SparseMatrix::print_formatted(). Additionally,
   CUDAWrappers::SparseMatrix gained a move assignment operator.
   <br>
   (Daniel Arndt, 2018/08/20)
@@ -1664,7 +1672,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: GridGenerator::merge_triangulations can merge multiple 
+  New: GridGenerator::merge_triangulations can merge multiple
   Triangulation objects at once.
   <br>
   (Daniel Arndt, 2018/08/01)
@@ -1679,15 +1687,15 @@ inconvenience this causes.
  </li>
 
  <li>
-  Added support for high-order VTU output by using newly 
-  introduced Lagrange VTK cells. 
+  Added support for high-order VTU output by using newly
+  introduced Lagrange VTK cells.
   <br>
   (Alexander Grayver, 2018/08/01)
  </li>
 
  <li>
-  Added support for high-order VTK output by using newly 
-  introduced Lagrange VTK cells. 
+  Added support for high-order VTK output by using newly
+  introduced Lagrange VTK cells.
   <br>
   (Alexander Grayver, 2018/07/27)
  </li>
@@ -1707,19 +1715,19 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add boost adaptor for dealii::BoundingBox. 
+  New: Add boost adaptor for dealii::BoundingBox.
   <br>
   (Luca Heltai, 2018/07/24)
  </li>
 
  <li>
-  New: Added geometry adaptors for boost. 
+  New: Added geometry adaptors for boost.
   <br>
   (Luca Heltai, Bruno Turcksin, 2018/07/22)
  </li>
 
  <li>
-  New: Add new constructor type for FunctionParser class. 
+  New: Add new constructor type for FunctionParser class.
   <br>
   (Luca Heltai, 2018/07/21)
  </li>
@@ -1734,7 +1742,7 @@ inconvenience this causes.
 
  <li>
   Changed: The Subscriptor class has been made thread-safe, and its behavior in
-  debug and release modes are now identical. Although this makes subscription and 
+  debug and release modes are now identical. Although this makes subscription and
   un-subscription slightly more expensive in release mode, debugging should be
   easier overall.
   <br>
@@ -1860,7 +1868,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Mismatched numbers of components between the exact solution and 
+  Fixed: Mismatched numbers of components between the exact solution and
   underlying FE in Step-51.
   <br>
   (Pi-Yueh Chuang, 2018/06/14)
