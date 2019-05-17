@@ -1,0 +1,5 @@
+Improved: The point identification of TransfiniteInterpolationManifold has
+been made more robust. It would previously fail sometimes for strongly curved,
+long and skinny cells.
+<br>
+(Martin Kronbichler, 2019/05/16)
