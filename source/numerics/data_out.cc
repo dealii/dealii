@@ -457,17 +457,18 @@ DataOut<dim, DoFHandlerType>::build_patches(
   // that maps the cell indices to the patch numbers, as this will be needed
   // for generation of neighborship information.
   // Note, there is a confusing mess of different indices here at play:
-  // patch_index - the index of a patch in all_cells
-  // cell->index - only unique on each level, used in cell_to_patch_index_map
-  // active_index - index for a cell when counting from begin_active() using
-  // ++cell cell_index - unique index of a cell counted using
-  // next_locally_owned_cell()
-  //              starting from first_locally_owned_cell()
+  // - patch_index: the index of a patch in all_cells
+  // - cell->index: only unique on each level, used in cell_to_patch_index_map
+  // - active_index: index for a cell when counting from begin_active() using
+  //   ++cell (identical to cell->active_cell_index())
+  // - cell_index: unique index of a cell counted using
+  //   next_locally_owned_cell() starting from first_locally_owned_cell()
   //
   // It turns out that we create one patch for each selected cell, so
   // patch_index==cell_index.
   //
-  // will be cell_to_patch_index_map[cell->level][cell->index] = patch_index
+  // Now construct the map such that
+  // cell_to_patch_index_map[cell->level][cell->index] = patch_index
   std::vector<std::vector<unsigned int>> cell_to_patch_index_map;
   cell_to_patch_index_map.resize(this->triangulation->n_levels());
   for (unsigned int l = 0; l < this->triangulation->n_levels(); ++l)
