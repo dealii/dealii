@@ -17,9 +17,9 @@
  *          Timo Heister, University of Utah
  */
 
-// @note: This is work in progress and will be an example for a non-linear problem
-// solved in parallel with matrix-free geometric multigrid.
-// For now, this is just step-1.
+// @note: This is work in progress and will be an example for a non-linear
+// problem solved in parallel with matrix-free geometric multigrid. For now,
+// this is just step-1.
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
