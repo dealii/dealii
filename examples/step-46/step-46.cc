@@ -481,20 +481,20 @@ namespace Step46
     FEFaceValues<dim>    stokes_fe_face_values(stokes_fe,
                                             common_face_quadrature,
                                             update_JxW_values |
-                                              update_normal_vectors |
                                               update_gradients | update_values);
     FEFaceValues<dim>    elasticity_fe_face_values(elasticity_fe,
                                                 common_face_quadrature,
-                                                update_values);
+                                                update_normal_vectors |
+                                                  update_values);
     FESubfaceValues<dim> stokes_fe_subface_values(stokes_fe,
                                                   common_face_quadrature,
                                                   update_JxW_values |
-                                                    update_normal_vectors |
                                                     update_gradients |
                                                     update_values);
     FESubfaceValues<dim> elasticity_fe_subface_values(elasticity_fe,
                                                       common_face_quadrature,
-                                                      update_values);
+                                                      update_normal_vectors |
+                                                        update_values);
 
     // ...to objects that are needed to describe the local contributions to
     // the global linear system...
@@ -795,7 +795,7 @@ namespace Step46
     for (unsigned int q = 0; q < n_face_quadrature_points; ++q)
       {
         const Tensor<1, dim> normal_vector =
-          stokes_fe_face_values.normal_vector(q);
+          elasticity_fe_face_values.normal_vector(q);
 
         for (unsigned int k = 0; k < stokes_fe_face_values.dofs_per_cell; ++k)
           {
@@ -812,7 +812,7 @@ namespace Step46
              ++i)
           for (unsigned int j = 0; j < stokes_fe_face_values.dofs_per_cell; ++j)
             local_interface_matrix(i, j) +=
-              -((2 * viscosity * (stokes_symgrad_phi_u[j] * normal_vector) +
+              -((2 * viscosity * (stokes_symgrad_phi_u[j] * normal_vector) -
                  stokes_phi_p[j] * normal_vector) *
                 elasticity_phi[i] * stokes_fe_face_values.JxW(q));
       }

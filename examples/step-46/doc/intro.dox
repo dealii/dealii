@@ -36,7 +36,7 @@ where you may want to read up on the individual equations):
   while we assume free-flow conditions on the remainder of the external
   boundary,
   @f{align*}
-    (2\eta \varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0
+    (2\eta \varepsilon(\mathbf v) - p \mathbf 1) \cdot \mathbf n = 0
      \qquad\qquad
      \text{on}\ \Gamma_{f,2} = \partial\Omega \cap \partial\Omega_f \backslash
      \Gamma_{f,1}.
@@ -69,9 +69,11 @@ where you may want to read up on the individual equations):
   Secondly, the forces (traction) on the solid equal the normal stress from the fluid,
   @f{align*}
     (C \varepsilon(\mathbf u)) \mathbf n =
-    (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n \qquad\qquad
-     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
+    (2 \eta \varepsilon(\mathbf v) - p \mathbf 1) \mathbf n \qquad\qquad
+     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f,
   @f}
+  where $\mathbf{n}$ is the normal vector on $\Gamma_{i}$ pointing from
+  the solid to the fluid.
 
 We get a weak formulation of this problem by following our usual rule of
 multiplying from the left by a test function and integrating over the
@@ -86,7 +88,7 @@ H^1(\Omega_s)^d$ such that
 	+ (\varepsilon(\mathbf b), C \varepsilon(\mathbf u))_{\Omega_s} &
 	\\
 	- (\mathbf b,
-           (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+           (2 \eta \varepsilon(\mathbf v) - p \mathbf 1) \mathbf n)_{\Gamma_i}
 	&=
 	0,
 @f}
@@ -308,7 +310,7 @@ discrete level we recall to be
 	+ (\varepsilon(\mathbf b_h), C \varepsilon(\mathbf u_h))_{\Omega_s} &
 	\\
 	- (\mathbf b_h,
-           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+           (2 \eta \varepsilon(\mathbf v_h) - p \mathbf 1) \mathbf n)_{\Gamma_i}
 	&=
 	0,
 @f}
@@ -323,8 +325,8 @@ in the @ref vector_valued module (rather than the one from step-8).
 
 The term that is of more interest is the interface term,
 @f[
-	(\mathbf b_h,
-           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}.
+	-(\mathbf b_h,
+           (2 \eta \varepsilon(\mathbf v_h) - p \mathbf 1) \mathbf n)_{\Gamma_i}.
 @f]
 Based on our assumption that the interface $\Gamma_i$ coincides with
 cell boundaries, this can in fact be written as a set of face
@@ -334,8 +336,8 @@ notation $\psi_i[\mathbf v],\psi_i[p], \psi_i[\mathbf u]$, then the
 term above yields the following contribution to the global matrix
 entry $i,j$:
 @f[
-	\sum_K (\psi_i[\mathbf u],
-           (2 \eta \varepsilon(\psi_j[\mathbf v]) + \psi_j[p] \mathbf 1)
+	-\sum_K (\psi_i[\mathbf u],
+           (2 \eta \varepsilon(\psi_j[\mathbf v]) - \psi_j[p] \mathbf 1)
 	   \mathbf n)_{\partial K \cap \Gamma_i}.
 @f]
 Although it isn't immediately obvious, this term presents a slight
@@ -558,7 +560,7 @@ prescribe Dirichlet conditions for the flow at the top so that we get
 inflow at the left and outflow at the right. At the left and right
 boundaries, no boundary conditions are imposed explicitly for the
 flow, yielding the implicit no-stress condition $(2\eta
-\varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0$.
+\varepsilon(\mathbf v) - p \mathbf 1) \cdot \mathbf n = 0$.
 The conditions on the interface between the two domains has already been
 discussed above.
 
