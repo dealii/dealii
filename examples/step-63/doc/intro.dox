@@ -125,20 +125,23 @@ One of the goals of this tutorial is to expand from using a simple
 (class PreconditionSOR) on each level of the multigrid hierarchy.
 The term "point-wise" is traditionally used in solvers to indicate that one
 solves at one "grid point" at a time; for scalar problems, this means
-to use a solver or smoother that updates one unknown of the linear
+to use a solver that updates one unknown of the linear
 system at a time, keeping all of the others fixed; one would then
 iterate over all unknowns in the problem and, once done, start over again
 from the first unknown until these "sweeps" converge. Jacobi,
 Gauss-Seidel, and SOR iterations can all be interpreted in this way.
-(In the context of multigrid, one does not think of these methods as
-"solvers", but as "smoothers", and only does one loop or "sweep" over all
-unknowns. This does not solve the linear system, of course, but is
-the kind of operation one needs in the multigrid context.)
+In the context of multigrid, one does not think of these methods as
+"solvers", but as "smoothers". As such, one is not interested in
+actually solving the linear system. It is enough to remove the high-frequency
+part of the residual for the multigrid method to work, because that allows
+restricting the solution to a coarser mesh.  Therefore, one only does a few,
+fixed number of "sweeps" over all unknowns. In the code in this
+tutorial this is controlled by the "Smoothing steps" parameter.
 
 But these methods are known to converge rather slowly when used as
 solvers. While as multigrid smoothers, they are surprisingly good,
-they can also be improved upon. In particular, we here also consider
-"cell-based" smoothers. These methods solve for all
+they can also be improved upon. In particular, we consider
+"cell-based" smoothers here as well. These methods solve for all
 unknowns on a cell at once, keeping all other unknowns fixed; they
 then move on to the next cell, and so on and so forth. One can think
 of them as "block" versions of Jacobi, Gauss-Seidel, or SOR, but
