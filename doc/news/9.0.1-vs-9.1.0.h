@@ -494,6 +494,14 @@ inconvenience this causes.
 <ol>
 
  <li>
+  Improved: The point identification of TransfiniteInterpolationManifold has
+  been made more robust. It would previously fail sometimes for strongly curved,
+  long and skinny cells.
+  <br>
+  (Martin Kronbichler, 2019/05/16)
+ </li>
+
+ <li>
   Improved: DoFHandler::renumber_dofs() on parallel::distributed::Triangulation
   would scale linearly with the number of MPI ranks on more than 50k ranks,
   reaching times of more than 10 seconds on 150k ranks. This is now fixed for
