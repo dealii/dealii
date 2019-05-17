@@ -20,8 +20,38 @@
  * to automatic and symbolic differentiation.
  *
  * Below we provide a very brief introduction as to what automatic and symbolic differentiation are,
- * what variations of these computational / numerical schemes exist, and how they are integrated
- * within deal.II's framework.
+ * what variations of these computational/numerical schemes exist, and how they are integrated
+ * within deal.II's framework. The purpose of all of these schemes is to automatically compute
+ * the derivative of functions, or approximations of it, in cases where one does not want to
+ * compute them by hand. Common examples are situations in the finite element context is where
+ * one wants to solve a nonlinear problem that is given by requiring that some residual
+ * $F(u,\nabla u)=0$ where $F$ is a complicated function that needs to be differentiated to
+ * apply Newton's method; and situations where one is given a parameter dependent problem
+ * ${\cal A}(q,u,\nabla u) = f$ and wants to form derivatives with regards to the parameters $q$, for example
+ * to optimize an output functional with regards to $q$, or for a sensitivity analysis with
+ * regards to $q$. One should think of $q$ as design parameters: say, the width
+ * or shape of a wing, the stiffness coefficients of a material chosen to
+ * build an object, the power sent to a device, the chemical composition of the
+ * gases sent to a burner. In all of these cases, one should think of $F$ and $\cal A$ as <i>complicated</i>
+ * and cumbersome to differentiate -- at least when doing it by hand. A relatively simple case of
+ * a nonlinear problem that already highlights the tedium of computing derivatives by hand is shown in
+ * step-15. However, in reality, one might, for example,
+ * think about problems such as chemically reactive flows where the fluid equations have coefficients
+ * such as the density and viscosity that depend strongly and nonlinearly on the chemical composition,
+ * temperature, and pressure of the fluid at each point; and where the chemical species react with
+ * each other based on reaction coefficients that also depend nonlinearly and in complicated
+ * ways on the chemical composition, temperature, and pressure. In many cases, the exact formulas
+ * for all of these coefficients can take several lines to write out, may include exponentials
+ * and (harmonic or geometric) averages of several nonlinear terms, and/or may contain table
+ * lookup of and interpolation between data points. Just getting these terms right is difficult
+ * enough; computing derivatives of these terms is impractical in most applications and, in
+ * reality, impossible to get right. Higher derivatives are even more impossible to do
+ * without computer aid. Automatic or symbolic differentiation is a way out of this:
+ * One only has to implement the function that computes these coefficients in terms
+ * of their inputs only once, and gets the (correct!) derivatives without
+ * further coding effort (though at a non-negligible computational cost either at run time, compile
+ * time, or both).
+ *
  *
  * @section auto_diff_1 Automatic differentiation
  *
@@ -33,10 +63,12 @@
  * significant. When used correctly the derivatives of often complicated functions can be computed
  * to a very high accuracy. Although the exact accuracy achievable by these frameworks largely
  * depends on their underlying mathematical formulation, some implementations compute with a precision
- * on the order of machine accuracy. Note that this is different to classical numerical differentiation,
+ * on the order of machine accuracy. Note that this is different to classical numerical
+ * differentiation (using, for example, a finite difference approximation of a function by
+ * evaluating it at different points),
  * which has an accuracy that depends on both the perturbation size as well as the chosen
- * finite-difference scheme (and is measurably larger than well-formulated automatic differentiation
- * approaches).
+ * finite-difference scheme; the error of these methods is measurably larger than
+ * well-formulated automatic differentiation approaches.
  *
  * Three practical examples of auto-differentiation use within a finite-element context
  * would then be
@@ -71,7 +103,7 @@
  * Implementations of specialized frameworks based on <em>operator overloading</em> typically fall into
  * one of three categories. In each, some customized data classes representing the floating point value
  * of an evaluated function and its derivative(s) by
- * -# exploiting <em>dual</em> / <em>complex-step</em> / <em>hyper-dual</em> formulations (occasionally
+ * -# exploiting <em>dual</em>/<em>complex-step</em>/<em>hyper-dual</em> formulations (occasionally
  *    called <em>tapeless</em> methods),
  * -# those utilizing <em>taping</em> strategies, and
  * -# those using compile-time optimization through <em>expression templates</em>.
@@ -91,9 +123,9 @@
  *    numerical perturbation. The dual number approach thus produces exact first derivatives, while the
  *    complex-step approximation does not. The standard implementation of the dual numbers, however, cannot yield
  *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with numbers
- *    begin represented in a form similar to quaternions (i.e. carrying additional non-real components) and the
+ *    being represented in a form similar to quaternions (i.e. carrying additional non-real components) and the
  *    derivatives being computed from a high-order truncation of the Taylor series all four components. The outcome
- *    that, with the appropriate implementation, both first and second derivatives can be computed exactly.
+ *    is that, with the appropriate implementation, both first and second derivatives can be computed exactly.
  * -# With <em>taped</em> approaches, a specified subregion of code is selected as one for which all
  *    operations executed with active (marked) input variables are tracked and recorded in a data structure
  *    referred to as a tape. At the end of the taped region, the recorded function(s) may be reevaluated
@@ -113,7 +145,9 @@
  *    The outermost leaves on the tree represent the independent variables or constants, and are transformed by unary
  *    operators and connected by binary operators (in the most simple case). Therefore, the operations performed on
  *    the function inputs is known at compile time, and with that the associated derivative operation can also be defined
- *    at the same time. The compiled output type returned by this operator need not be generic, but can rather be
+ *    at the same time using the well-known rules of computing the derivative of an operation (such as
+ *    the associativity of derivatives under addition and subtraction, the product rule, and the chain
+ *    rule). The compiled output type returned by this operator need not be generic, but can rather be
  *    specialized based on the specific inputs (possibly carrying a differential history) given to that specific
  *    operator on the vertex of the DAG. In this way, a compile-time optimized set of instructions can be generated
  *    for the very specialized individual operations used to evaluate each intermediate result of the dependent
@@ -166,6 +200,8 @@
  *
  * With the aid of the diagram below (it and some of the listed details courtesy of this
  * <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Wikipedia article</a>),
+ * let us think about the represention of the calculation of the function
+ * $f (\mathbf{x}) = \sin (x_{1}) + x_{1} x_{2}$ and its derivatives:
  *
  * <div class="twocolumn" style="width: 80%">
  *   <div class="parent">
@@ -190,8 +226,7 @@
  *   </div>
  * </div>
  *
- * representing the calculation of the function $f (\mathbf{x}) = x_{1} \times x_{2} + \sin (x_{1})$,
- * we will briefly describe what forward and reverse auto-differentiation are.
+ * Specifically, we will briefly describe what forward and reverse auto-differentiation are.
  * Note that in the diagram, along the edges of the graph in text are the directional
  * derivative of function $w$ with respect to the $i$-th variable, represented by
  * the notation $\dot{w} = \dfrac{d w}{d x_{i}}$.
