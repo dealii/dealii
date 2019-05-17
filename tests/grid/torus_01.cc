@@ -59,7 +59,7 @@ test<3, 3>()
       Tensor<1, 3> t = desc_torus.get_tangent_vector(p, x);
 
       deallog.get_file_stream()
-        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " rto "
+        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " to "
         << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
     }
   deallog.get_file_stream() << "set view equal xyz" << std::endl
