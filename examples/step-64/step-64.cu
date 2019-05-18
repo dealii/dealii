@@ -37,8 +37,8 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-// This includes the data structures for the implementation of matrix-free
-// methods on GPU
+// The following ones include the data structures for the
+// implementation of matrix-free methods on GPU:
 #include <deal.II/base/cuda.h>
 
 #include <deal.II/matrix_free/cuda_fe_evaluation.h>
@@ -47,17 +47,22 @@
 
 #include <fstream>
 
+
+// As usual, we enclose everything into a namespace of its own:
 namespace Step64
 {
   using namespace dealii;
 
 
-  // Define a class that implements the varying coefficients we want to use in
-  // the Helmholtz operator.
-  // Later, we want to pass an object of this type to a
-  // CUDAWrappers::MatrixFree<dim, double> object that expects the class to have
-  // an operator that fills the values provided in the constructor for a given
-  // cell.
+  // @sect3{Class <code>VaryingCoefficientFunctor</code>}
+
+  // Next, we define a class that implements the varying coefficients
+  // we want to use in the Helmholtz operator. Later, we want to pass
+  // an object of this type to a CUDAWrappers::MatrixFree
+  // object that expects the class to have an `operator()` that fills the
+  // values provided in the constructor for a given cell. This operator
+  // needs to run on the devide, so it needs to be marked as `__device__`
+  // for the compiler.
   template <int dim, int fe_degree>
   class VaryingCoefficientFunctor
   {
@@ -85,6 +90,9 @@ namespace Step64
 
 
 
+  // The following function implements this coefficient. Recall from
+  // the introduction that we have defined it as $a(\mathbf
+  // x)=\frac{10}{0.05 + 2\|\mathbf x\|^2}$
   template <int dim, int fe_degree>
   __device__ void VaryingCoefficientFunctor<dim, fe_degree>::operator()(
     const unsigned int                                          cell,
@@ -100,16 +108,21 @@ namespace Step64
     double p_square = 0.;
     for (unsigned int i = 0; i < dim; ++i)
       {
-        double coord = q_point[i];
+        const double coord = q_point[i];
         p_square += coord * coord;
       }
     coef[pos] = 10. / (0.05 + 2. * p_square);
   }
 
 
-  // The class `HelmholtzOperatorQuad` implements the evaluation of the
-  // Helmholtz operator at each quadrature point. It uses a similar mechanism as
-  // the MatrixFree framework introduced in step-37.
+  // @sect3{Class <code>HelmgholtzOperatorQuad</code>}
+
+  // The class `HelmholtzOperatorQuad` implements the evaluation of
+  // the Helmholtz operator at each quadrature point. It uses a
+  // similar mechanism as the MatrixFree framework introduced in
+  // step-37. As before, the functions of this class need to run on
+  // the device, so need to be marked as `__device__` for the
+  // compiler.
   template <int dim, int fe_degree>
   class HelmholtzOperatorQuad
   {
@@ -127,12 +140,13 @@ namespace Step64
   };
 
 
-  // The Helmholtz problem reads in weak form
+  // The Helmholtz problem we want to solve here reads in weak form as follows:
   // @f{eqnarray*}
   //   (\nabla v, \nabla u)+ (v, a(\mathbf x) u) &=&(v,1) \quad \forall v.
   // @f}
-  // The two terms on the left-hand side correspond to the two function calls
-  // here.
+  // If you have seen step-37, then it will be obvious that
+  // the two terms on the left-hand side correspond to the two function calls
+  // here:
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
                   operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
@@ -142,6 +156,8 @@ namespace Step64
     fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
   }
 
+
+  // @sect3{Class <code>LocalHelmholtzOperator</code>}
 
   // Finally, we need to define a class that implements the whole operator
   // evaluation that corresponds to a matrix-vector product in matrix-based
@@ -200,9 +216,14 @@ namespace Step64
   }
 
 
+  // @sect3{Class <code>HelmholtzOperator</code>}
 
-  // The HelmholtzOperator class acts as wrapper for LocalHelmholtzOperator
-  // defining an interface that can be used with linear solvers like SolverCG.
+  // The `HelmholtzOperator` class acts as wrapper for
+  // `LocalHelmholtzOperator` defining an interface that can be used
+  // with linear solvers like SolverCG. In particular, like every
+  // class that implements the interface of a linear operator, it
+  // needs to have a `vmult()` function that performs the product of
+  // the linear operator and a source vector.
   template <int dim, int fe_degree>
   class HelmholtzOperator
   {
@@ -222,6 +243,19 @@ namespace Step64
 
 
 
+  // The following is the implementation of the constructor of this
+  // class. In the first part, we initialize the `mf_data` member
+  // variable that is going to provide us with the necessary
+  // information when doing matrix-vector products.
+  //
+  // In the second half, we need to store the value of the coefficient
+  // for each quadrature point in every locally owned cells. In
+  // actuality, however, the code stores the coefficient on
+  // <i>every</i> cell of the local DoFHandler object, including the
+  // ghost and artificial cells. (See the glossary entries on
+  // @ref @ref GlossGhostCell "ghost cells"
+  // and
+  // @ref GlossArtificialCell "artificial cells".)
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim> &          dof_handler,
@@ -236,13 +270,13 @@ namespace Step64
     const QGauss<1> quad(fe_degree + 1);
     mf_data.reinit(mapping, dof_handler, constraints, quad, additional_data);
 
-    // We need to store the value of the coefficient for each quadrature point
-    // in every locally owned cells.
+
     const unsigned int n_owned_cells =
-      std::distance<decltype(dof_handler.begin_active())>(
+      std::distance<typename DoFHandler<dim>::active_cell_iterator>(
         dof_handler.begin_active(), dof_handler.end());
     coef.reinit(Utilities::pow(fe_degree + 1, dim) * n_owned_cells);
-    VaryingCoefficientFunctor<dim, fe_degree> functor(coef.get_values());
+
+    const VaryingCoefficientFunctor<dim, fe_degree> functor(coef.get_values());
     mf_data.evaluate_coefficients(functor);
   }
 
