@@ -78,8 +78,7 @@ namespace CUDAWrappers
   {
   public:
     using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;
-    // TODO this should really be a CUDAWrappers::Point
-    using point_type = Tensor<1, dim, Number>;
+    using point_type    = Point<dim, Number>;
 
     /**
      * Parallelization scheme used: parallel_in_elem (parallelism at the level
