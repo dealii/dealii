@@ -41,7 +41,7 @@ this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
 order system, and each field is then discretized via a DG method.  At this
 point, the  single-valued "trace" values on the skeleton of the
-mesh, i.e. element faces, are taken to be independent unknown quantities.
+mesh, i.e., element faces, are taken to be independent unknown quantities.
 This yields unknowns in the discrete formulation that fall into two categories:
 - Face unknowns that only couple with the cell unknowns from both sides of the face;
 - Cell unknowns that only couple with the cell and face unknowns
@@ -100,6 +100,13 @@ as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a
 super-convergence property can be used to post-process a new approximate
 solution that converges at the rate $\mathcal{O}(h^{p+2})$.
 
+
+<h4> Alternative approaches </h4>
+
+The hybridizable discontinuous Galerkin method is only one way in
+which the problems of the discontinuous Galerkin method can be
+addressed. Another idea is what is called the "weak Galerkin"
+method. It is explored in step-61.
 
 
 <h3> HDG applied to the convection-diffusion problem </h3>
