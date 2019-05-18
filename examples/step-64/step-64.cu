@@ -249,15 +249,13 @@ namespace Step64
   // information when doing matrix-vector products.
   //
   // In the second half, we need to store the value of the coefficient
-  // for each quadrature point in every locally owned cells. In
-  // actuality, however, the code stores the coefficient on
-  // <i>every</i> cell of the local DoFHandler object, including the
-  // ghost and artificial cells. (See the glossary entries on
-  // @ref @ref GlossGhostCell "ghost cells"
-  // and
-  // @ref GlossArtificialCell "artificial cells".) These will simply
-  // be ignored in the loop over all cells in the `vmult()` function
-  // below.
+  // for each quadrature point in every active, locally owned cell.
+  // We can ask the parallel triangulation for the number of active, locally
+  // owned cells but only have a DoFHandler object at hand. Since
+  // DoFHandler::get_triangulation() returns a Triangulation object, not a
+  // parallel::Triangulation object, we have to downcast the return value. This
+  // is safe to do here because we know that the triangulation is a
+  // parallel:distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim> &          dof_handler,
@@ -274,8 +272,9 @@ namespace Step64
 
 
     const unsigned int n_owned_cells =
-      std::distance<typename DoFHandler<dim>::active_cell_iterator>(
-        dof_handler.begin_active(), dof_handler.end());
+      dynamic_cast<const parallel::Triangulation<dim> *>(
+        &dof_handler.get_triangulation())
+        ->n_locally_owned_active_cells();
     coef.reinit(Utilities::pow(fe_degree + 1, dim) * n_owned_cells);
 
     const VaryingCoefficientFunctor<dim, fe_degree> functor(coef.get_values());
