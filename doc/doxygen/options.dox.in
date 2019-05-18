@@ -158,11 +158,14 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dirs@
 INCLUDE_FILE_PATTERNS  =
 
-# set a few variables that help us generate documentation for
-# things like the PETSc and Trilinos wrappers, even if they were
-# not configured
+# Set a few variables that help us generate documentation for things
+# like the PETSc and Trilinos wrappers, even if they were not
+# configured. We want to do that because we want the documentation to
+# reflect the most complete picture of the library, even if the system
+# on which the documentation was built doesn't actually have all
+# possible dependencies installed.
 #
-# in the case of DEAL_II_NAMESPACE_OPEN/CLOSE, just expand them
+# In the case of DEAL_II_NAMESPACE_OPEN/CLOSE, just expand them
 # to nothing so that they don't show up in the documentation
 # at all.
 PREDEFINED             = DOXYGEN=1 \
