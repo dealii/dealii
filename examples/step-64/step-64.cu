@@ -92,7 +92,7 @@ namespace Step64
   {
     const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
       cell, gpu_data, n_dofs_1d, n_q_points);
-    const Tensor<1, dim> q_point =
+    const Point<dim> q_point =
       CUDAWrappers::get_quadrature_point<dim, double>(cell,
                                                       gpu_data,
                                                       n_dofs_1d);
