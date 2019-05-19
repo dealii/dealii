@@ -61,7 +61,7 @@ namespace Step64
   // an object of this type to a CUDAWrappers::MatrixFree
   // object that expects the class to have an `operator()` that fills the
   // values provided in the constructor for a given cell. This operator
-  // needs to run on the devide, so it needs to be marked as `__device__`
+  // needs to run on the device, so it needs to be marked as `__device__`
   // for the compiler.
   template <int dim, int fe_degree>
   class VaryingCoefficientFunctor
@@ -115,7 +115,7 @@ namespace Step64
   }
 
 
-  // @sect3{Class <code>HelmgholtzOperatorQuad</code>}
+  // @sect3{Class <code>HelmholtzOperatorQuad</code>}
 
   // The class `HelmholtzOperatorQuad` implements the evaluation of
   // the Helmholtz operator at each quadrature point. It uses a
@@ -222,8 +222,8 @@ namespace Step64
   // `LocalHelmholtzOperator` defining an interface that can be used
   // with linear solvers like SolverCG. In particular, like every
   // class that implements the interface of a linear operator, it
-  // needs to have a `vmult()` function that performs the product of
-  // the linear operator and a source vector.
+  // needs to have a `vmult()` function that performs the action of
+  // the linear operator on a source vector.
   template <int dim, int fe_degree>
   class HelmholtzOperator
   {
@@ -246,7 +246,7 @@ namespace Step64
   // The following is the implementation of the constructor of this
   // class. In the first part, we initialize the `mf_data` member
   // variable that is going to provide us with the necessary
-  // information when doing matrix-vector products.
+  // information when evaluating the operator.
   //
   // In the second half, we need to store the value of the coefficient
   // for each quadrature point in every active, locally owned cell.
@@ -348,8 +348,8 @@ namespace Step64
     // be worth noticing that the communication between different MPI processes
     // can be improved if the MPI implementation is CUDA-aware and the configure
     // flag `DEAL_II_MPI_WITH_CUDA_SUPPORT` is enabled. (The value of this
-    // flag is automatically determined at the time you call `cmake` when
-    // installing deal.II.)
+    // flag needs to be set at the time you call `cmake` when installing
+    // deal.II.)
     //
     // In addition, we also keep a solution vector with CPU storage such that we
     // can view and display the solution as usual.
@@ -520,7 +520,7 @@ namespace Step64
   // solution. But we can easily compute the $L_2$ norm of the
   // solution by passing in a zero function instead. That is, instead
   // of evaluating the error $\|u_h-u\|_{L_2(\Omega)}$, we are just
-  // evaluating $\|u_h-\|_{L_2(\Omega)}=\|u_h\|_{L_2(\Omega)}$
+  // evaluating $\|u_h-0\|_{L_2(\Omega)}=\|u_h\|_{L_2(\Omega)}$
   // instead.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::output_results(
