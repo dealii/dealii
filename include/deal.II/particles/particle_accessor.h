@@ -31,6 +31,9 @@ namespace Particles
   template <int, int>
   class ParticleHandler;
 
+  /**
+   * Accessor class used by ParticleIterator to access particle data.
+   */
   template <int dim, int spacedim = dim>
   class ParticleAccessor
   {

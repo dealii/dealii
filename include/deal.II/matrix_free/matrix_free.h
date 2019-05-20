@@ -2633,6 +2633,9 @@ MatrixFree<dim, Number>::reinit(
 // additional helper functions to select the blocks and template magic.
 namespace internal
 {
+  /**
+   * Internal class for exchanging data between vectors.
+   */
   template <int dim, typename Number>
   struct VectorDataExchange
   {
