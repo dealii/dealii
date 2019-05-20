@@ -127,11 +127,12 @@ namespace hp
    *   the parent.
    * - When coarsening cells, the (now active) parent cell will be assigned
    *   an active FE index that is determined from its (no longer active)
-   *   children, following the FiniteElementDomination logic: We choose the
-   *   least dominant element of their common subspace. See
-   *   hp::FECollection::find_common_subspace() and
-   *   hp::FECollection::find_dominted_fe() for further information on this
-   *   topic.
+   *   children, following the FiniteElementDomination logic: Out of the set of
+   *   elements previously assigned to the former children, we choose the
+   *   dominating one for the parent cell. If none was found, we pick the least
+   *   dominant element in the whole collection that dominates all former
+   *   children. See hp::FECollection::find_dominating_fe_extended() for further
+   *   information on this topic.
    *
    * @note Finite elements need to be assigned to each cell by calling
    * distribute_dofs() first to make this functionality available.

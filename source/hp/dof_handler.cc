@@ -1080,14 +1080,14 @@ namespace internal
          * be distributed on on the updated triangulation later.
          *
          * On cells to be refined, the active_fe_index will be inherited to
-         * their childrean and thus will be stored as such.
+         * their children and thus will be stored as such.
          *
-         * On cells to be coarsened, the active_fe_index on parent cells will be
-         * determined by the least dominating finite element of its children's
-         * common subspace. We  will thus assign the corresponding fe_index to
-         * the parent cell. See documentation of
-         * hp::FECollection::find_common_subspace() and
-         * hp::FECollection::find_dominated_fe() for further information.
+         * On cells to be coarsened, we choose the finite element on the parent
+         * cell from those assigned to their children to be the one dominating
+         * all children. If none was found, we pick the least dominant element
+         * in the whole collection that dominates all children. See
+         * documentation of hp::FECollection::find_dominating_fe_extended() for
+         * further information.
          *
          * On cells intended for p-refinement or p-coarsening, those
          * active_fe_indices will be determined by the corresponding flags that
