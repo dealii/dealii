@@ -362,7 +362,7 @@ namespace CUDAWrappers
             transpose_in_place(q_points_host, n_cells, padding_length);
 
           alloc_and_copy(&data->q_points[color],
-                         ArrayView<const Tensor<1, dim, Number>>(
+                         ArrayView<const Point<dim, Number>>(
                            q_points_host.data(), q_points_host.size()),
                          n_cells * padding_length);
         }
