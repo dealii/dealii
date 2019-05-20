@@ -90,7 +90,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The constructor for Subscriptor requires providing a pointer to a boolean
+  Changed: Subscriptor::subscribe() requires providing a pointer to a boolean
   that can be used to signal validity of the object pointed to by the subscribing
   object.
   <br>
@@ -327,10 +327,11 @@ inconvenience this causes.
 
  <li>
   New: Support for Ginkgo, a high-performance numerical linear algebra library
-  has been added. Ginkgo provides advanced highly optimized linear solvers,
-  matrix formats and an abstraction to easily create linear operators on both
-  the cpu and the gpu. The deal.II's Ginkgo interface can currently be used to
-  solve linear systems using Krylov solvers with the cuda and OpenMP paradigms.
+  has been added with classes inheriting from GinkgoWrappers::SolverBase. Ginkgo
+  provides advanced highly optimized linear solvers, matrix formats and an
+  abstraction to easily create linear operators on both the cpu and the gpu. The
+  deal.II's Ginkgo interface can currently be used to solve linear systems using
+  Krylov solvers with the cuda and OpenMP paradigms.
   <br>
   (Ginkgo developers, 2019/01/30)
  </li>
@@ -370,7 +371,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function FiniteElement::compare_for_domination() inspects two
+  New: %Function FiniteElement::compare_for_domination() inspects two
   FiniteElement objects upon FiniteElementDomination, and uses a codim
   parameter that determines in which subspace we actually compare them.
   <br>
@@ -645,27 +646,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Member function hp::FECollection::find_dominated_fe_extended()
-  returns the index of the least dominating finite element out of a given
-  set of indices. If none was found, the search will be extended on the
-  complete collection.
-  <br>
-  (Marc Fehling, 2019/04/08)
- </li>
-
- <li>
   New: Member function hp::FECollection::find_dominating_fe_extended()
   returns the index of the most dominating finite element out of a given
   set of indices. If none was found, the search will be extended on the
   complete collection.
-  <br>
-  (Marc Fehling, 2019/04/08)
- </li>
-
- <li>
-  New: Member function hp::FECollection::find_dominated_fe()
-  returns the index of the least dominating finite element out of a given
-  set of indices.
   <br>
   (Marc Fehling, 2019/04/08)
  </li>
@@ -910,7 +894,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function GridTools::guess_point_owner(), which uses a covering rtree
+  New: %Function GridTools::guess_point_owner(), which uses a covering rtree
   to guess which processes own the points of the given vector of points.
   <br>
   (Giovanni Alzetta, 2019/02/25)
@@ -948,7 +932,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function MGConstrainedDoFs::make_no_normal_flux_constraints which adds
+  New: %Function MGConstrainedDoFs::make_no_normal_flux_constraints() which adds
   functionality for no normal flux constraints during geometric mutigrid computations.
   Currently, this function is limited to meshes with no normal flux boundaries
   normal to the x-, y-, or z-axis.
@@ -1039,7 +1023,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: Function GridGenerator::general_cell() can now generate
+  Changed: %Function GridGenerator::general_cell() can now generate
   a cell of dimension `dim` inside a space of dimension `spacedim`
   with `dim <= spacedim`
   <br>
@@ -1140,7 +1124,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Function GridTools::build_global_description_tree which exchanges a given
+  New: %Function GridTools::build_global_description_tree which exchanges a given
   vector of bounding boxes on all processes and uses the result to build an Rtree
   with packing algorithm.
   <br>
@@ -1695,13 +1679,6 @@ inconvenience this causes.
  </li>
 
  <li>
-  Added support for high-order VTU output by using newly
-  introduced Lagrange VTK cells.
-  <br>
-  (Alexander Grayver, 2018/08/01)
- </li>
-
- <li>
   Added support for high-order VTK output by using newly
   introduced Lagrange VTK cells.
   <br>
@@ -1852,10 +1829,11 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: TrilinosWrappers::MPI::Vector::reinit check  now checks if
-  parallel_partitioner is_ascending_and_one_to_one before calling
-  make_trilinos_map because make_trilinos_map may be able to make
-  a linear map if is_ascending_and_one_to_one is true.
+  Fixed: TrilinosWrappers::MPI::Vector::reinit now checks if
+  IndexSet::is_ascending_and_one_to_one is `true` for
+  TrilinosWrappers::MPI::Vector::parallel partitioner before calling
+  IndexSet::make_trilinos_map because IndexSet::make_trilinos_map may be able
+  to make a linear map if the property holds.
   <br>
   (Joshua Hanophy, 2018/06/16)
  </li>
