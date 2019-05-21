@@ -499,6 +499,12 @@ inconvenience this causes.
 <ol>
 
  <li>
+  Improved: GridIn::read_msh has been extended to allow for gmsh mesh format 4.1.
+  <br>
+  (Daniel Arndt, 2019/05/21)
+ </li>
+
+ <li>
   Improved: The point identification of TransfiniteInterpolationManifold has
   been made more robust. It would previously sometimes fail for strongly curved,
   long and skinny cells.

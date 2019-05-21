@@ -1421,23 +1421,24 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // first determine file format
   unsigned int gmsh_file_format = 0;
   if (line == "$NOD")
-    gmsh_file_format = 1;
+    gmsh_file_format = 10;
   else if (line == "$MeshFormat")
-    gmsh_file_format = 2;
+    gmsh_file_format = 20;
   else
     AssertThrow(false, ExcInvalidGMSHInput(line));
 
-  // if file format is 2 or greater then we also have to read the rest of the
+  // if file format is 2.0 or greater then we also have to read the rest of the
   // header
-  if (gmsh_file_format == 2)
+  if (gmsh_file_format == 20)
     {
       double       version;
       unsigned int file_type, data_size;
 
       in >> version >> file_type >> data_size;
 
-      Assert((version >= 2.0) && (version <= 4.0), ExcNotImplemented());
-      gmsh_file_format = static_cast<unsigned int>(version);
+      Assert((version >= 2.0) && (version <= 4.1), ExcNotImplemented());
+      gmsh_file_format = static_cast<unsigned int>(version * 10);
+
       Assert(file_type == 0, ExcNotImplemented());
       Assert(data_size == sizeof(double), ExcNotImplemented());
 
@@ -1473,8 +1474,19 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 box_max_z;
 
               // we only care for 'tag' as key for tag_maps[0]
-              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
-                box_max_y >> box_max_z >> n_physicals;
+              if (gmsh_file_format > 40)
+                {
+                  in >> tag >> box_min_x >> box_min_y >> box_min_z >>
+                    n_physicals;
+                  box_max_x = box_min_x;
+                  box_max_y = box_min_y;
+                  box_max_z = box_min_z;
+                }
+              else
+                {
+                  in >> tag >> box_min_x >> box_min_y >> box_min_z >>
+                    box_max_x >> box_max_y >> box_max_z >> n_physicals;
+                }
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
@@ -1584,7 +1596,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
   // now read the nodes list
   int n_entity_blocks = 1;
-  if (gmsh_file_format >= 4)
+  if (gmsh_file_format > 40)
+    {
+      int min_node_tag;
+      int max_node_tag;
+      in >> n_entity_blocks >> n_vertices >> min_node_tag >> max_node_tag;
+    }
+  else if (gmsh_file_format == 40)
     {
       in >> n_entity_blocks >> n_vertices;
     }
@@ -1603,16 +1621,30 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
         int           parametric;
         unsigned long numNodes;
 
-        if (gmsh_file_format < 4)
+        if (gmsh_file_format < 40)
           {
             numNodes   = n_vertices;
             parametric = 0;
           }
         else
           {
+            // for gmsh_file_format 4.1 the order of tag and dim is reversed,
+            // but we are ignoring both anyway.
             int tagEntity, dimEntity;
             in >> tagEntity >> dimEntity >> parametric >> numNodes;
           }
+
+        std::vector<int> vertex_numbers;
+        int              vertex_number;
+        if (gmsh_file_format > 40)
+          for (unsigned long vertex_per_entity = 0;
+               vertex_per_entity < numNodes;
+               ++vertex_per_entity)
+            {
+              in >> vertex_number;
+              vertex_numbers.push_back(vertex_number);
+            }
+
         for (unsigned long vertex_per_entity = 0; vertex_per_entity < numNodes;
              ++vertex_per_entity, ++global_vertex)
           {
@@ -1620,7 +1652,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             double x[3];
 
             // read vertex
-            in >> vertex_number >> x[0] >> x[1] >> x[2];
+            if (gmsh_file_format > 40)
+              {
+                vertex_number = vertex_numbers[vertex_per_entity];
+                in >> x[0] >> x[1] >> x[2];
+              }
+            else
+              in >> vertex_number >> x[0] >> x[1] >> x[2];
 
             for (unsigned int d = 0; d < spacedim; ++d)
               vertices[global_vertex](d) = x[d];
@@ -1644,17 +1682,23 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // Assert we reached the end of the block
   in >> line;
   static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes"};
-  AssertThrow(line == end_nodes_marker[gmsh_file_format == 1 ? 0 : 1],
+  AssertThrow(line == end_nodes_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
   // Now read in next bit
   in >> line;
   static const std::string begin_elements_marker[] = {"$ELM", "$Elements"};
-  AssertThrow(line == begin_elements_marker[gmsh_file_format == 1 ? 0 : 1],
+  AssertThrow(line == begin_elements_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
-  // now read the nodes list
-  if (gmsh_file_format >= 4)
+  // now read the cell list
+  if (gmsh_file_format > 40)
+    {
+      int min_node_tag;
+      int max_node_tag;
+      in >> n_entity_blocks >> n_cells >> min_node_tag >> max_node_tag;
+    }
+  else if (gmsh_file_format == 40)
     {
       in >> n_entity_blocks >> n_cells;
     }
@@ -1679,18 +1723,26 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
         unsigned long numElements;
         int           cell_type;
 
-        if (gmsh_file_format < 4)
+        if (gmsh_file_format < 40)
           {
             material_id = 0;
             cell_type   = 0;
             numElements = n_cells;
           }
-        else
+        else if (gmsh_file_format == 40)
           {
             int tagEntity, dimEntity;
             in >> tagEntity >> dimEntity >> cell_type >> numElements;
             material_id = tag_maps[dimEntity][tagEntity];
           }
+        else
+          {
+            // for gmsh_file_format 4.1 the order of tag and dim is reversed,
+            int tagEntity, dimEntity;
+            in >> dimEntity >> tagEntity >> cell_type >> numElements;
+            material_id = tag_maps[dimEntity][tagEntity];
+          }
+
         for (unsigned int cell_per_entity = 0; cell_per_entity < numElements;
              ++cell_per_entity, ++global_cell)
           {
@@ -1722,7 +1774,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             */
 
             unsigned int elm_number = 0;
-            if (gmsh_file_format < 4)
+            if (gmsh_file_format < 40)
               {
                 in >> elm_number // ELM-NUMBER
                   >> cell_type;  // ELM-TYPE
@@ -1730,7 +1782,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
             switch (gmsh_file_format)
               {
-                case 1:
+                case 10:
                   {
                     in >> material_id // REG-PHYS
                       >> dummy        // reg_elm
@@ -1738,7 +1790,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                     break;
                   }
 
-                case 2:
+                case 20:
                   {
                     // read the tags; ignore all but the first one which we will
                     // interpret as the material_id (for cells) or boundary_id
@@ -1758,7 +1810,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                     break;
                   }
 
-                case 4:
+                case 40:
+                case 41:
                   {
                     // ignore tag
                     int tag;
@@ -1927,14 +1980,15 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 unsigned int node_index = 0;
                 switch (gmsh_file_format)
                   {
-                    case 1:
+                    case 10:
                       {
                         for (unsigned int i = 0; i < nod_num; ++i)
                           in >> node_index;
                         break;
                       }
-                    case 2:
-                    case 4:
+                    case 20:
+                    case 40:
+                    case 41:
                       {
                         in >> node_index;
                         break;
@@ -1974,7 +2028,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // Assert we reached the end of the block
   in >> line;
   static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements"};
-  AssertThrow(line == end_elements_marker[gmsh_file_format == 1 ? 0 : 1],
+  AssertThrow(line == end_elements_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
   // check that no forbidden arrays are used
