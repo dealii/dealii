@@ -1,3 +1,3 @@
-Improved: GridIn::read_msh has been extended to alow for gmsh mesh format 4.1.
+Improved: GridIn::read_msh has been extended to allow for gmsh mesh format 4.1.
 <br>
 (Daniel Arndt, 2019/05/21)
