@@ -34,12 +34,15 @@ IF(NOT ${deal.II_FOUND})
     )
 ENDIF()
 
-IF(NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST) # keep in one line
+# keep in one line
+IF(NOT DEAL_II_WITH_LAPACK OR NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST)
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
+    DEAL_II_WITH_LAPACK = ON
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+    DEAL_II_WITH_LAPACK = ${DEAL_II_WITH_LAPACK}
     DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
     DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
 which conflict with the requirements."
