@@ -7,3 +7,112 @@
 
 Please note: This is work in progress and will be an example for a non-linear problem
 solved in parallel with matrix-free geometric multigrid.
+
+
+The aim of this tutorial program is to demonstarte how to solve a nonlinear
+problem using Newton's method within the matrix-free framework. This tutorial
+combines several techniques already introduced in step-15, step 16, step-37,
+step-48 and others.
+
+
+<h3>Problem formulation</h3>
+On the unit circle $\Omega = \bigl\{ x \in \mathbb{R}^2 : \|x\| \leq 1 \bigr\}$
+we consider the following nonlinear elliptic boundary value problem subject to a
+homogeneous Dirichlet boundary condition: Find a function
+$u\colon\Omega\to\mathbb{R}$ such that holds:
+@f{alignat*}{2}{
+ - \Delta u &= \exp(u) & \qquad & \text{in } \Omega,\\
+          u &= 0       & \qquad & \text{on } \partial\Omega.
+@f}
+This problem is also called the <i>Gelfand problem</i> and is a typical example
+for problems from combustion theory, see for example ???.
+
+
+<h3>Discretization with finite elements</h3>
+Even it is a nonlinear problem, we first derive the weak formulation for this
+problem by multiplying with a smooth test function $v\colon\Omega\to\mathbb{R}$
+respecting the boundary condition and integrate over the domain $\Omega$.
+Integration by parts and putting the term on the right hand side to the left
+yields the weak formulation: Find a function $u\colon\Omega \to\mathbb{R}$
+such that for all test functions $v$ holds:
+@f{align*}{
+ \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
+ -
+ \int_\Omega v \exp(u) \,\mathrm{d}x.
+@f}
+
+Choosing the Lagrangian finite element space $V_h$ we can define a basis
+$\{\varphi_i\}_{i=1,\dots,N}$ and it sufficies to test only with those basis
+functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
+for all $i=1,\dots,N$ holds:
+@f{align*}{
+ F(u_h)
+ \coloneqq
+ \int_\Omega \nabla \varphi_i \cdot \nabla u_h \,\mathrm{d}x
+ -
+ \int_\Omega \varphi_i \exp(u_h) \,\mathrm{d}x = 0.
+@f}
+We directly defined the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
+representing the discrete nonlinear problem.
+
+To solve this nonlinear problem we apply the Newton's method. So given an
+initial guess $u_h^0\inV_h$ we determine a sequence of Newton steps
+$\bigl( u_h^n \bigr)_n$ by successively apply the folowing scheme:
+@f{alignat*}{2}{
+ &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
+ &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
+@f}
+In the discrete version the Jacobian
+$F'(u_h^n)[\,\cdot\,]\colon\mathbb{R}^N\to\mathbb{R}^N$ represents just the
+system matrix $A$ and the negative resiudal $-F(u_h^n)$ the right hand side $b$
+of a linear system $Ax = b$. The solution vector $x$ is in that case the Newton
+update of the $n$-th Newton step.
+
+Unitl now we did not make use of the finite element ansatz at all, which means
+that we can represent any function of $V_h$ as linear combination of basis
+functions. More mathematically this means, that every element of $V_h$ can be
+identified with a vector $U\in\mathbb{R}^N$ via the representation:
+$u_h = \sum_{i=1}^N U_i \varphi_i$. So using this we can give an expression for
+the discrete Jacobian and the residual:
+@f{align*}{
+ \bigl( F'(u_h^n) \bigr)_{i,j}
+ =
+ \int_\Omega \nabla\varphi_i \cdot \nabla \varphi_j \,\mathrm{d} x
+ -
+ \int_\Omega \varphi_i \, \exp( u_h ) \varphi_j \,\mathrm{d} x,\\
+ \bigl( F(u_h^n) \bigr)_{i}
+ &=
+ \int_\Omega \nabla\varphi_i \cdot \nabla u_h^n \,\mathrm{d} x
+ -
+ \int_\Omega \varphi_i \, \exp( u_h^n ) \,\mathrm{d} x.
+@f}
+
+
+??? Important point to explain (maybe some lines of code can help):
+How to pass the old Newton iterate to the object representing the Jacobian matrix.
+
+Note, how the system matrix depends on the previous Newton step. Hence before
+applying the system matrix we have to tell it, what was the last Newton step. In
+the case of classical assembly of the system matrix this would be done by a call
+the fe_values.get_function_values and fe_values.get_fucntion_gradients. However,
+since we want to solve this problem without matrix, we need a new idea.
+Furthermore due to the usgae of a geometric multigrid preconditioner, we need to
+pass the last Newotn step also to the multilevel operators. This is kind of a
+tricky task, since the solution vector has to be interpolated to all levels of
+the triangulation. In the code this task will be done by the fucntion
+interpolate_to_mg, which is a member of the MGTransferMatrixFree class.
+
+
+Compared to step-15 we could also have formed the Frech{\'e}t derivative of the
+nonlinear function corresponding to the strong formulation of the problem and
+discretized it afterwards. However, in the end we would have get the same set of
+discrete equations.
+
+
+<h3>Triangulation</h3>
+As said in step-37 the matrix-free method works more efficient if we choose a
+higher order finite element space. Since we want to solve the problem on the
+unit circle, it would be good to have an approprioate boundary approximation to
+overcome convergence issues. For this reason we use the MappingC1 class to
+recover the smooth boundary. In addition, to get a good triangulation in total
+we make use of the TransfiniteInterpolationManifold.
