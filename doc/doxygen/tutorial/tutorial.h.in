@@ -569,6 +569,14 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-66</td>
+ *       <td> A matrix-free geometric multigrid solver for a nonlinear problem.
+ *       <br/> Keywords: MatrixFree, Multigrid,
+ *       MGTransferMatrixFree::interpolate_to_mg(), MatrixFreeTools::compute_diagonal(),
+ *       TransfiniteInterpolationManifold, MappingQGeneric
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-67</td>
  *        <td> Solving the Euler equations of compressible gas dynamics with an
  *        explicit time integrator and high-order discontinuous Galerkin
@@ -804,6 +812,7 @@
  *       step-50,
  *       step-55,
  *       step-59,
+ *       step-66,
  *       step-67,
  *       step-69,
  *       step-70,
@@ -842,6 +851,7 @@
  *       step-32,
  *       step-60,
  *       step-65,
+ *       step-66,
  *       step-67
  *     </td>
  *   </tr>
@@ -954,6 +964,7 @@
  *       step-48,
  *       step-59,
  *       step-64,
+ *       step-66,
  *       step-67,
  *       step-75,
  *       step-76
@@ -1050,6 +1061,7 @@
  *       step-56,
  *       step-59,
  *       step-63,
+ *       step-66,
  *       step-75
  *     </td>
  *   </tr>
@@ -1067,6 +1079,7 @@
  *       step-50,
  *       step-55,
  *       step-59,
+ *       step-66,
  *       step-75
  *     </td>
  *   </tr>

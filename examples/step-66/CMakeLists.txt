@@ -21,9 +21,9 @@ SET(TARGET_SRC
 
 # Usually, you will not need to modify anything beyond this point...
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 
-FIND_PACKAGE(deal.II 9.1.0 QUIET
+FIND_PACKAGE(deal.II 9.3.0 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})
@@ -34,8 +34,7 @@ IF(NOT ${deal.II_FOUND})
     )
 ENDIF()
 
-# keep in one line
-IF(NOT DEAL_II_WITH_LAPACK OR NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST)
+IF(NOT DEAL_II_WITH_LAPACK OR NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_LAPACK = ON
@@ -50,5 +49,6 @@ which conflict with the requirements."
 ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
+SET(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2 *.vtu *.pvtu)
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
