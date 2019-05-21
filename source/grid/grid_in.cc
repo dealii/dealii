@@ -1416,6 +1416,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // assign boundary ids.
   std::array<std::map<int, int>, 4> tag_maps;
 
+  // A double that identifies gmsh format version
+  double version;
+
   in >> line;
 
   // first determine file format
@@ -1431,12 +1434,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // header
   if (gmsh_file_format == 2)
     {
-      double       version;
       unsigned int file_type, data_size;
 
       in >> version >> file_type >> data_size;
 
-      Assert((version >= 2.0) && (version <= 4.0), ExcNotImplemented());
+      Assert((version >= 2.0) && (version <= 4.1), ExcNotImplemented());
       gmsh_file_format = static_cast<unsigned int>(version);
       Assert(file_type == 0, ExcNotImplemented());
       Assert(data_size == sizeof(double), ExcNotImplemented());
@@ -1473,8 +1475,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 box_max_z;
 
               // we only care for 'tag' as key for tag_maps[0]
-              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
-                box_max_y >> box_max_z >> n_physicals;
+              if (version < 4.1)
+                in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                  box_max_y >> box_max_z >> n_physicals;
+              else
+                in >> tag >> box_min_x >> box_min_y >> box_min_z >> n_physicals;
+
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
@@ -1584,9 +1590,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
   // now read the nodes list
   int n_entity_blocks = 1;
+  int min_tags        = 0;
+  int max_tags        = 0;
   if (gmsh_file_format >= 4)
     {
       in >> n_entity_blocks >> n_vertices;
+      if (version == 4.1)
+        in >> min_tags >> max_tags;
     }
   else
     in >> n_vertices;
@@ -1600,8 +1610,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     unsigned int global_vertex = 0;
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
       {
-        int           parametric;
-        unsigned long numNodes;
+        int           parametric = 0;
+        unsigned long numNodes   = 0;
 
         if (gmsh_file_format < 4)
           {
@@ -1611,7 +1621,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
         else
           {
             int tagEntity, dimEntity;
-            in >> tagEntity >> dimEntity >> parametric >> numNodes;
+            if (version == 4.0)
+              in >> tagEntity >> dimEntity >> parametric >> numNodes;
+            else if (version == 4.1)
+              in >> dimEntity >> tagEntity >> parametric >> numNodes;
+            else
+              Assert(false, ExcInternalError());
           }
         for (unsigned long vertex_per_entity = 0; vertex_per_entity < numNodes;
              ++vertex_per_entity, ++global_vertex)
@@ -1657,6 +1672,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   if (gmsh_file_format >= 4)
     {
       in >> n_entity_blocks >> n_cells;
+      if (version == 4.1)
+        {
+          unsigned int min_tag, max_tag;
+          in >> min_tag >> max_tag;
+        }
     }
   else
     {
@@ -1676,7 +1696,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
       {
         unsigned int  material_id;
-        unsigned long numElements;
+        unsigned long numElements = 0;
         int           cell_type;
 
         if (gmsh_file_format < 4)
@@ -1687,8 +1707,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           }
         else
           {
-            int tagEntity, dimEntity;
-            in >> tagEntity >> dimEntity >> cell_type >> numElements;
+            int tagEntity = 0, dimEntity = 0;
+            if (version == 4.0)
+              in >> tagEntity >> dimEntity >> cell_type >> numElements;
+            else if (version == 4.1)
+              in >> dimEntity >> tagEntity >> cell_type >> numElements;
+            else
+              Assert(false, ExcInternalError());
             material_id = tag_maps[dimEntity][tagEntity];
           }
         for (unsigned int cell_per_entity = 0; cell_per_entity < numElements;
