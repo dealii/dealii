@@ -274,8 +274,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename VectorType,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               typename T>
     void
     interpolate(const Mapping<dim, spacedim> &       mapping,
@@ -543,8 +542,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate(
     const Mapping<dim, spacedim> &                             mapping,
@@ -573,8 +571,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate(
     const DoFHandlerType<dim, spacedim> &                      dof,
@@ -649,24 +646,25 @@ namespace VectorTools
           dynamic_cast<const FESystem<dim, dim> *>(&fe);
         unsigned int degree = numbers::invalid_unsigned_int;
 
-        if(fe_system)
-        {
-        for (unsigned int i = 0; i < fe_mask.size(); ++i)
-          if (fe_mask[i])
-            {
-              const unsigned int base_i =
-                fe_system->component_to_base_index(i).first;
-              Assert(degree == numbers::invalid_unsigned_int ||
-                       degree == fe_system->base_element(base_i).degree,
-                     ExcNotImplemented());
-              Assert(fe_system->base_element(base_i).is_primitive(),
-                     ExcNotImplemented());
-              degree = fe_system->base_element(base_i).degree;
-            }
-        }
-        else{
+        if (fe_system)
+          {
+            for (unsigned int i = 0; i < fe_mask.size(); ++i)
+              if (fe_mask[i])
+                {
+                  const unsigned int base_i =
+                    fe_system->component_to_base_index(i).first;
+                  Assert(degree == numbers::invalid_unsigned_int ||
+                           degree == fe_system->base_element(base_i).degree,
+                         ExcNotImplemented());
+                  Assert(fe_system->base_element(base_i).is_primitive(),
+                         ExcNotImplemented());
+                  degree = fe_system->base_element(base_i).degree;
+                }
+          }
+        else
+          {
             degree = dof.get_fe().degree;
-        }
+          }
 
         FESystem<dim, spacedim>   feq(FE_Q<dim, spacedim>(degree),
                                     fe.get_nonzero_components(0).size());
@@ -781,8 +779,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate_based_on_material_id(
     const Mapping<dim, spacedim> &       mapping,
@@ -820,8 +817,7 @@ namespace VectorTools
      */
     template <int dim,
               int spacedim,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               typename number>
     void
     interpolate_zero_boundary_values(
@@ -877,8 +873,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(const DoFHandlerType<dim, spacedim> &dof1,
                                 const VectorType &                   u1,
@@ -903,8 +898,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(
     const DoFHandlerType<dim, spacedim> &                     dof1,
@@ -946,8 +940,7 @@ namespace VectorTools
   template <int dim,
             int spacedim,
             typename VectorType,
-            template <int, int>
-            class DoFHandlerType>
+            template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(
     const InterGridMap<DoFHandlerType<dim, spacedim>> &       intergridmap,
@@ -1045,8 +1038,7 @@ namespace VectorTools
      */
     template <int dim,
               int spacedim,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               template <int, int>
               class M_or_MC,
               template <int>
@@ -1155,8 +1147,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename VectorType,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               template <int, int>
               class M_or_MC,
               template <int>
@@ -2898,8 +2889,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename number,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               template <int, int>
               class M_or_MC>
     static inline void
@@ -3236,8 +3226,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3256,8 +3245,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3294,8 +3282,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3317,8 +3304,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3344,8 +3330,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3377,8 +3362,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3400,8 +3384,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3423,8 +3406,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename number>
   void
   interpolate_boundary_values(
@@ -3575,8 +3557,7 @@ namespace VectorTools
 
     template <int dim,
               int spacedim,
-              template <int, int>
-              class DoFHandlerType,
+              template <int, int> class DoFHandlerType,
               template <int, int>
               class M_or_MC,
               template <int>
@@ -9286,8 +9267,7 @@ namespace VectorTools
 
   template <int dim,
             int spacedim,
-            template <int, int>
-            class DoFHandlerType,
+            template <int, int> class DoFHandlerType,
             typename VectorType>
   void
   get_position_vector(const DoFHandlerType<dim, spacedim> &dh,
