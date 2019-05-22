@@ -589,7 +589,7 @@ namespace VectorTools
                 component_mask);
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, hp::DoFHandler>
   void
   interpolate(
     const hp::DoFHandler<dim, spacedim> &                      dof,
@@ -604,7 +604,7 @@ namespace VectorTools
                 component_mask);
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, dealii::DoFHandler>
   void
   interpolate(
     const DoFHandler<dim, spacedim> &                          dof,
@@ -612,6 +612,8 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
+    int d1;
+    int d2 = d1;
     if (dof.get_fe().has_support_points())
       {
         interpolate(StaticMappingQ1<dim, spacedim>::mapping,
@@ -650,7 +652,6 @@ namespace VectorTools
         Assert(fe_system, ExcNotImplemented());
         unsigned int degree = numbers::invalid_unsigned_int;
 
-        // Get information about the blocks
         for (unsigned int i = 0; i < fe_mask.size(); ++i)
           if (fe_mask[i])
             {
@@ -687,8 +688,6 @@ namespace VectorTools
           if (fe_mask[fe.system_to_component_index(i).first])
             fe_to_feq[i] = index++;
 
-        // If index is not the same as feq.dofs_per_cell, we won't
-        // know how to invert the resulting matrix. Bail out.
         Assert(index == feq.dofs_per_cell, ExcNotImplemented());
 
         for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
