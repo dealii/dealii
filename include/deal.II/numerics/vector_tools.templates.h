@@ -589,7 +589,7 @@ namespace VectorTools
                 component_mask);
   }
 
-  template <int dim, int spacedim, typename VectorType, hp::DoFHandler>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate(
     const hp::DoFHandler<dim, spacedim> &                      dof,
@@ -604,7 +604,7 @@ namespace VectorTools
                 component_mask);
   }
 
-  template <int dim, int spacedim, typename VectorType, dealii::DoFHandler>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate(
     const DoFHandler<dim, spacedim> &                          dof,
@@ -612,8 +612,6 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    int d1;
-    int d2 = d1;
     if (dof.get_fe().has_support_points())
       {
         interpolate(StaticMappingQ1<dim, spacedim>::mapping,
@@ -649,9 +647,10 @@ namespace VectorTools
 
         const FESystem<dim, dim> *fe_system =
           dynamic_cast<const FESystem<dim, dim> *>(&fe);
-        Assert(fe_system, ExcNotImplemented());
         unsigned int degree = numbers::invalid_unsigned_int;
 
+        if(fe_system)
+        {
         for (unsigned int i = 0; i < fe_mask.size(); ++i)
           if (fe_mask[i])
             {
@@ -664,6 +663,10 @@ namespace VectorTools
                      ExcNotImplemented());
               degree = fe_system->base_element(base_i).degree;
             }
+        }
+        else{
+            degree = dof.get_fe().degree;
+        }
 
         FESystem<dim, spacedim>   feq(FE_Q<dim, spacedim>(degree),
                                     fe.get_nonzero_components(0).size());
