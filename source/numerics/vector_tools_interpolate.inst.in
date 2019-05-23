@@ -69,16 +69,18 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
     \{
 
       template void
-      interpolate(const Mapping<deal_II_dimension> &,
-                  const hp::DoFHandler<deal_II_dimension> &,
-                  const Function<deal_II_dimension, VEC::value_type> &,
-                  VEC &,
-                  const ComponentMask &);
+      interpolate(
+        const Mapping<deal_II_dimension> &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Function<deal_II_dimension, VEC::value_type> &,
+        VEC &,
+        const ComponentMask &);
       template void
-      interpolate(const hp::DoFHandler<deal_II_dimension> &,
-                  const Function<deal_II_dimension, VEC::value_type> &,
-                  VEC &,
-                  const ComponentMask &);
+      interpolate(
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Function<deal_II_dimension, VEC::value_type> &,
+        VEC &,
+        const ComponentMask &);
 
       template void
       interpolate_based_on_material_id(
@@ -93,7 +95,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
       template void
       interpolate_based_on_material_id(
         const Mapping<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::material_id,
                        const Function<deal_II_dimension, VEC::value_type> *> &,
         VEC &,

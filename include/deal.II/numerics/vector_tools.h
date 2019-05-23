@@ -622,15 +622,26 @@ namespace VectorTools
 
   /**
    * Call the @p interpolate() function above with
-   * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
+   * <tt>mapping=MappingQGeneric1@<dim>@()</tt> for
+   * <tt>DoFHandlerType=hp::DoFHandler@<dim>@()</tt>.
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate(
-    const DoFHandlerType<dim, spacedim> &                      dof,
+    const hp::DoFHandler<dim, spacedim> &                      dof,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const ComponentMask &component_mask = ComponentMask());
+
+  /**
+   * Call the @p interpolate() function above with
+   * <tt>mapping=MappingQGeneric1@<dim>@()</tt> for
+   * <tt>DoFHandlerType=DoFHandler@<dim>@()</tt>.
+   */
+  template <int dim, int spacedim, typename VectorType>
+  void
+  interpolate(
+    const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
     const ComponentMask &component_mask = ComponentMask());

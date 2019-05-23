@@ -568,24 +568,6 @@ namespace VectorTools
       mapping, dof_handler, function_map, vec, component_mask);
   }
 
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
-  void
-  interpolate(
-    const DoFHandlerType<dim, spacedim> &                      dof,
-    const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
-    const ComponentMask &                                      component_mask)
-  {
-    interpolate(StaticMappingQ1<dim, spacedim>::mapping,
-                dof,
-                function,
-                vec,
-                component_mask);
-  }
-
   template <int dim, int spacedim, typename VectorType>
   void
   interpolate(
