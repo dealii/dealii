@@ -1780,49 +1780,35 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                   >> cell_type;  // ELM-TYPE
               }
 
-            switch (gmsh_file_format)
+            if (gmsh_file_format < 20)
               {
-                case 10:
-                  {
-                    in >> material_id // REG-PHYS
-                      >> dummy        // reg_elm
-                      >> nod_num;
-                    break;
-                  }
+                in >> material_id // REG-PHYS
+                  >> dummy        // reg_elm
+                  >> nod_num;
+              }
+            else if (gmsh_file_format < 40)
+              {
+                // read the tags; ignore all but the first one which we will
+                // interpret as the material_id (for cells) or boundary_id
+                // (for faces)
+                unsigned int n_tags;
+                in >> n_tags;
+                if (n_tags > 0)
+                  in >> material_id;
+                else
+                  material_id = 0;
 
-                case 20:
-                  {
-                    // read the tags; ignore all but the first one which we will
-                    // interpret as the material_id (for cells) or boundary_id
-                    // (for faces)
-                    unsigned int n_tags;
-                    in >> n_tags;
-                    if (n_tags > 0)
-                      in >> material_id;
-                    else
-                      material_id = 0;
+                for (unsigned int i = 1; i < n_tags; ++i)
+                  in >> dummy;
 
-                    for (unsigned int i = 1; i < n_tags; ++i)
-                      in >> dummy;
-
-                    nod_num = GeometryInfo<dim>::vertices_per_cell;
-
-                    break;
-                  }
-
-                case 40:
-                case 41:
-                  {
-                    // ignore tag
-                    int tag;
-                    in >> tag;
-                    nod_num = GeometryInfo<dim>::vertices_per_cell;
-                    break;
-                  }
-
-
-                default:
-                  AssertThrow(false, ExcNotImplemented());
+                nod_num = GeometryInfo<dim>::vertices_per_cell;
+              }
+            else
+              {
+                // ignore tag
+                int tag;
+                in >> tag;
+                nod_num = GeometryInfo<dim>::vertices_per_cell;
               }
 
 
@@ -1978,23 +1964,14 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               {
                 // read the indices of nodes given
                 unsigned int node_index = 0;
-                switch (gmsh_file_format)
+                if (gmsh_file_format < 20)
                   {
-                    case 10:
-                      {
-                        for (unsigned int i = 0; i < nod_num; ++i)
-                          in >> node_index;
-                        break;
-                      }
-                    case 20:
-                    case 40:
-                    case 41:
-                      {
-                        in >> node_index;
-                        break;
-                      }
-                    default:
-                      Assert(false, ExcInternalError());
+                    for (unsigned int i = 0; i < nod_num; ++i)
+                      in >> node_index;
+                  }
+                else
+                  {
+                    in >> node_index;
                   }
 
                 // we only care about boundary indicators assigned to individual
