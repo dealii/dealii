@@ -11,7 +11,7 @@ SET(target "step-1")
 # you may want to either replace the following statement by something like
 #    FILE(GLOB_RECURSE target_src  "source/*.cc")
 #    FILE(GLOB_RECURSE target_inc  "include/*.h")
-#    SET(target_src ${target_src}  ${target_inc}) 
+#    SET(target_src ${target_src}  ${target_inc})
 # or switch altogether to the large project CMakeLists.txt file discussed
 # in the "CMake in user projects" page accessible from the "User info"
 # page of the documentation.
