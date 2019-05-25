@@ -386,7 +386,7 @@ MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
 OPTION(DEAL_II_COMPILE_EXAMPLES
   "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
-  ON
+  OFF
   )
 MARK_AS_ADVANCED(DEAL_II_COMPILE_EXAMPLES)
 
