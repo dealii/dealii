@@ -52,16 +52,6 @@ INSTALL(FILES
   )
 
 #
-# Install summary.log
-#
-
-INSTALL(FILES
-  ${CMAKE_BINARY_DIR}/summary.log
-  DESTINATION ${DEAL_II_DOCREADME_RELDIR}
-  COMPONENT library
-  )
-
-#
 # Add a dummy target to make documentation files known to IDEs.
 #
 
