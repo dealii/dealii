@@ -199,10 +199,13 @@ public:
 
   /**
    * Return the first face which we want output for. The default
-   * implementation returns the first face of an active cell or the first such
-   * on the boundary.
+   * implementation returns the first face of a (locally owned) active cell
+   * or, if the @p surface_only option was set in the destructor (as is the
+   * default), the first such face that is located on the boundary.
    *
-   * For more general sets, overload this function in a derived class.
+   * If you want to use a different logic to determine which faces should
+   * contribute to the creation of graphical output, you can overload this
+   * function in a derived class.
    */
   virtual FaceDescriptor
   first_face();
@@ -212,12 +215,17 @@ public:
    * faces, <tt>dofs->end()</tt> is returned as the first component of the
    * return value.
    *
-   * The default implementation returns the next face of an active cell, or
-   * the next such on the boundary.
+   * The default implementation returns the next face of a (locally owned)
+   * active cell, or the next such on the boundary (depending on whether the
+   * @p surface_only option was provided to the constructor).
    *
-   * This function traverses the mesh cell by cell (active only), and then
-   * through all faces of the cell. As a result, interior faces are output
-   * twice.  This function can be overloaded in a derived class to select a
+   * This function traverses the mesh active cell by active cell (restricted to
+   * locally owned cells), and then through all faces of the cell. As a result,
+   * interior faces are output twice, a feature that is useful for
+   * discontinuous Galerkin methods or if a DataPostprocessor is used that
+   * might produce results that are discontinuous between cells).
+   *
+   * This function can be overloaded in a derived class to select a
    * different set of faces. Note that the default implementation assumes that
    * the given @p face is active, which is guaranteed as long as first_face()
    * is also used from the default implementation. Overloading only one of the
