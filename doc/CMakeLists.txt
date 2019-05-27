@@ -52,12 +52,11 @@ INSTALL(FILES
   )
 
 #
-# Install summary.log an detailed.log
+# Install summary.log
 #
 
 INSTALL(FILES
   ${CMAKE_BINARY_DIR}/summary.log
-  ${CMAKE_BINARY_DIR}/detailed.log
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
   COMPONENT library
   )
