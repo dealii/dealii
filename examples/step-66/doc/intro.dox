@@ -5,10 +5,6 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-Please note: This is work in progress and will be an example for a non-linear problem
-solved in parallel with matrix-free geometric multigrid.
-
-
 The aim of this tutorial program is to demonstarte how to solve a nonlinear
 problem using Newton's method within the matrix-free framework. This tutorial
 combines several techniques already introduced in step-15, step 16, step-37,
@@ -25,7 +21,10 @@ $u\colon\Omega\to\mathbb{R}$ such that holds:
           u &= 0       & \qquad & \text{on } \partial\Omega.
 @f}
 This problem is also called the <i>Gelfand problem</i> and is a typical example
-for problems from combustion theory, see for example ???.
+for problems from combustion theory, see for example in the book
+<a href="https://link.springer.com/book/10.1007/978-1-4612-4546-9">
+Mathematical Problems from Combustion Theory
+by Jerrold Bebernes and David Eberly</a>
 
 
 <h3>Discretization with finite elements</h3>
@@ -47,7 +46,7 @@ functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
 for all $i=1,\dots,N$ holds:
 @f{align*}{
  F(u_h)
- \coloneqq
+ \dealcoloneq
  \int_\Omega \nabla \varphi_i \cdot \nabla u_h \,\mathrm{d}x
  -
  \int_\Omega \varphi_i \exp(u_h) \,\mathrm{d}x = 0.
@@ -86,27 +85,149 @@ the discrete Jacobian and the residual:
  -
  \int_\Omega \varphi_i \, \exp( u_h^n ) \,\mathrm{d} x.
 @f}
-
-
-??? Important point to explain (maybe some lines of code can help):
-How to pass the old Newton iterate to the object representing the Jacobian matrix.
-
-Note, how the system matrix depends on the previous Newton step. Hence before
-applying the system matrix we have to tell it, what was the last Newton step. In
-the case of classical assembly of the system matrix this would be done by a call
-the fe_values.get_function_values and fe_values.get_fucntion_gradients. However,
-since we want to solve this problem without matrix, we need a new idea.
-Furthermore due to the usgae of a geometric multigrid preconditioner, we need to
-pass the last Newotn step also to the multilevel operators. This is kind of a
-tricky task, since the solution vector has to be interpolated to all levels of
-the triangulation. In the code this task will be done by the fucntion
-interpolate_to_mg, which is a member of the MGTransferMatrixFree class.
-
-
 Compared to step-15 we could also have formed the Frech{\'e}t derivative of the
 nonlinear function corresponding to the strong formulation of the problem and
 discretized it afterwards. However, in the end we would have get the same set of
 discrete equations.
+
+
+<h3>Numerical linear algebra</h3>
+Note, how the system matrix, actually the Jacobian, depends on the previous
+Newton step $A = F'(u^n)$. Hence before we can use the system matrix we have to
+tell it, what was the last Newton step. In an implemenation with a classical
+assemble_system function we would gather this information from the last Newton
+step during assembly by the use of the member functions get_function_values and
+get_function_gradients of the FEValuesBase class. The assemble_system function
+would then looks like:
+
+@code
+template<int dim>
+void
+BratuProblem<dim>::assemble_system()
+{
+  system_matrix = 0;
+  system_rhs    = 0;
+  
+  const QGauss<dim> quadrature_fomrula(fe.degree+1);
+  FEValues<dim> fe_values(fe, quadrature_formula,
+                          update_values | update_gradients | update_JxW_values);
+  
+  const unsigned int n_q_points    = fe_values.n_quadrature_points;
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell;
+  
+  FullMatrix<double>                   cell_matrix(dofs_per_cell);
+  Vector<double>                       cell_rhs(dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+  
+  std::vector<Tensor<1,dim> > newton_step_gradients(n_q_points);
+  std::vector<double>         newton_step_values(n_q_points);
+  
+  
+  for(const auto &cell : dof_handler.active_cell_iterators())
+  {
+	cell_matrix = 0.0;
+	cell_rhs    = 0.0;
+	
+	fe_values.reinit(cell);
+	
+	fe_values.get_function_values(solution, newton_step_values);
+	fe_values.get_function_gradients(solution, newton_step_gradients);
+	
+	for(unsigned int q=0; q<n_q_points; ++q)
+	{
+	  const double nonlinearity = std::exp(newton_step_values[q]);
+	  const double dx           = fe_values.JxW(q);
+	  
+	  for(unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
+		const double        phi_i      = fe_values.shape_value(i,q);
+		const Tensor<1,dim> grad_phi_i = fe_values.shape_grad(i,q);
+		
+		for(unsigned int j=0; j<dofs_per_cell; ++j)
+		{
+		  const double        phi_j      = fe_values.shape_value(j,q);
+		  const Tensor<1,dim> grad_phi_j = fe_values.shape_grad(j,q);
+		  
+		  cell_matrix(i,j) += ( grad_phi_i*grad_phi_j - phi_i*nonlinearity*phi_j ) * dx;
+		}
+		
+		cell_rhs(i) += ( -grad_phi_i*newton_step_gradients[q] + phi_i*newton_step_values[q] ) * dx;
+		
+	  }
+	}
+	
+	cell->get_dof_indices(local_dof_indices);
+	
+	constraints.distribute_local_to_global(cell_matrix, cell_rhs,
+	                                       local_dof_indices,
+	                                       system_matrix, system_rhs);
+	
+  }
+  
+}
+@endcode
+
+However, since we want to solve this problem without storing a matrix, we need
+to tell the MatrixFreeOperator this information before we use it. Therefore in
+the derived class JacobianMatrixFreeOperator we will implemenet a function
+called evaluate_nonlinearity, which will process the information of the last
+Newton step prior to usage of the matrix-vector implementation. Furthermore we
+want to use a geometric multigrid preconditioner for the linear solver, so in
+order to apply the multilevel operators we need to pass the last Newton step
+also to these operators. This is kind of a tricky task, since the vector
+containing the last Newton step has to be interpolated to all levels of the
+triangulation. In the code this task will be done by the fucntion
+interpolate_to_mg, which is a member of the MGTransferMatrixFree class:
+
+@code
+void
+GelfandProblem<dim>::compute_update()
+{
+  solution.update_ghost_values();
+  
+  system_matrix.evaluate_nonlinearity(solution);
+  
+  MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
+  
+  mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
+  
+  // Set up options for the multilevel preconditioner
+  for(unsigend int level=0; level<triangulation.n_levels()-1; ++level)
+  {
+	mg_matrices[level].evaluate_nonlinearity(mg_solution[level]);
+  }
+  
+  // Define the actual preconitioner
+  ...
+  
+  // Solve the linear system
+  ...
+}
+@endcode
+
+The function evaluating the nonlinearity works basically like the function
+evaluate_coefficient from step-37 evaluating a coefficient function. The idea is
+to use a FEEvaluation object to evaluate the Newton step and store the
+expression in a table for all cells and all quadrature points:
+
+@code
+void
+JacobianOperator<dim,fe_degree,number>::evaluate_nonlinearity(const LinearAlgebra::distributed::Vector<number> &src)
+{
+  const unsigned int n_cells = this->data->n_macro_cells();
+  FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*this->data);
+	
+  nl_values.reinit(n_cells, phi.n_q_points);
+  for(unsigned int cell=0; cell<n_cells; ++cell)
+  {
+	phi.reinit(cell);
+	phi.gather_evaluate(src, true, false);
+	  
+	for(unsigned int q=0; q<phi.n_q_points; ++q)
+	  nl_values(cell, q) = std::exp(phi.get_value(q));
+  }
+}
+@endcod
 
 
 <h3>Triangulation</h3>
