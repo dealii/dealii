@@ -1,3 +1,4 @@
-Fix: FullMatrix can now be packed into std::vector and unpacked from it using std::copy and the begin() and end() iterators
+Fixed: FullMatrix can now be packed into std::vector and unpacked from it using
+std::copy and the begin() and end() iterators.
 <br>
 (Reza Rastak, 2019/05/24)

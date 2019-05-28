@@ -919,7 +919,7 @@ namespace MatrixTableIterators
     value() const;
 
     /**
-     * Conversion operator that returns a constant reference to the element
+     * Conversion operator that returns a constant reference to the element.
      */
     operator const value_type &() const;
 
@@ -1049,7 +1049,7 @@ namespace MatrixTableIterators
     value() const;
 
     /**
-     * Conversion operator that returns a reference to the element
+     * Conversion operator that returns a reference to the element.
      */
     operator value_type &();
   };
