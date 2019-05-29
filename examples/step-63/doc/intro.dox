@@ -13,7 +13,7 @@ Davis.
 <h1>Introduction</h1>
 
 This program solves an advection-diffusion problem using a geometric multigrid
-preconditioner. The basics of this preconditioner are discussed in step-16;
+(GMG) preconditioner. The basics of this preconditioner are discussed in step-16;
 here we discuss the necessary changes needed for a non-symmetric
 PDE. Additionally, we introduce the idea of block smoothing (as compared to
 point smoothing in step-16), and examine the effects of DoF renumbering for
