@@ -607,7 +607,9 @@ namespace VectorTools
         // Construct default fe_mask;
         const ComponentMask fe_mask(fe.get_nonzero_components(0).size(), true);
 
-        AssertDimension(fe_mask.size(), fe.get_nonzero_components(0).size()); //A bit redundant, I think?
+        AssertDimension(
+          fe_mask.size(),
+          fe.get_nonzero_components(0).size()); // A bit redundant, I think?
 
         std::vector<unsigned int> fe_to_real(fe_mask.size(),
                                              numbers::invalid_unsigned_int);
