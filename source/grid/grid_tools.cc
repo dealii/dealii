@@ -201,6 +201,65 @@ namespace GridTools
 
   template <>
   double
+  cell_measure<2>(
+    const std::vector<Point<2>> &all_vertices,
+    const unsigned int (&vertex_indices)[GeometryInfo<2>::vertices_per_cell])
+  {
+    /*
+      Get the computation of the measure by this little Maple script. We
+      use the blinear mapping of the unit quad to the real quad. However,
+      every transformation mapping the unit faces to straight lines should
+      do.
+
+      Remember that the area of the quad is given by
+      \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
+
+      # x and y are arrays holding the x- and y-values of the four vertices
+      # of this cell in real space.
+      x := array(0..3);
+      y := array(0..3);
+      z := array(0..3);
+      tphi[0] := (1-xi)*(1-eta):
+      tphi[1] :=     xi*(1-eta):
+      tphi[2] := (1-xi)*eta:
+      tphi[3] :=     xi*eta:
+      x_real := sum(x[s]*tphi[s], s=0..3):
+      y_real := sum(y[s]*tphi[s], s=0..3):
+      z_real := sum(z[s]*tphi[s], s=0..3):
+
+      Jxi := <diff(x_real,xi)  | diff(y_real,xi) | diff(z_real,xi)>;
+      Jeta := <diff(x_real,eta)| diff(y_real,eta)| diff(z_real,eta)>;
+      with(VectorCalculus):
+      J := CrossProduct(Jxi, Jeta);
+      detJ := sqrt(J[1]^2 + J[2]^2 +J[3]^2);
+
+      # measure := evalf (Int (Int (detJ, xi=0..1, method = _NCrule ) ,
+      eta=0..1, method = _NCrule  ) ): # readlib(C):
+
+      # C(measure, optimized);
+
+      additional optimizaton: divide by 2 only one time
+    */
+
+    const double x[4] = {all_vertices[vertex_indices[0]](0),
+                         all_vertices[vertex_indices[1]](0),
+                         all_vertices[vertex_indices[2]](0),
+                         all_vertices[vertex_indices[3]](0)};
+
+    const double y[4] = {all_vertices[vertex_indices[0]](1),
+                         all_vertices[vertex_indices[1]](1),
+                         all_vertices[vertex_indices[2]](1),
+                         all_vertices[vertex_indices[3]](1)};
+
+    return (-x[1] * y[0] + x[1] * y[3] + y[0] * x[2] + x[0] * y[1] -
+            x[0] * y[2] - y[1] * x[3] - x[2] * y[3] + x[3] * y[2]) /
+           2;
+  }
+
+
+
+  template <>
+  double
   cell_measure<3>(
     const std::vector<Point<3>> &all_vertices,
     const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
@@ -352,65 +411,6 @@ namespace GridTools
                         t160 * z[7] + t145 * z[3] + x[4] * y[6] * z[2];
 
     return (t34 + t64 + t95 + t125 + t156 + t181 + t207 + t228) / 12.;
-  }
-
-
-
-  template <>
-  double
-  cell_measure<2>(
-    const std::vector<Point<2>> &all_vertices,
-    const unsigned int (&vertex_indices)[GeometryInfo<2>::vertices_per_cell])
-  {
-    /*
-      Get the computation of the measure by this little Maple script. We
-      use the blinear mapping of the unit quad to the real quad. However,
-      every transformation mapping the unit faces to straight lines should
-      do.
-
-      Remember that the area of the quad is given by
-      \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
-
-      # x and y are arrays holding the x- and y-values of the four vertices
-      # of this cell in real space.
-      x := array(0..3);
-      y := array(0..3);
-      z := array(0..3);
-      tphi[0] := (1-xi)*(1-eta):
-      tphi[1] :=     xi*(1-eta):
-      tphi[2] := (1-xi)*eta:
-      tphi[3] :=     xi*eta:
-      x_real := sum(x[s]*tphi[s], s=0..3):
-      y_real := sum(y[s]*tphi[s], s=0..3):
-      z_real := sum(z[s]*tphi[s], s=0..3):
-
-      Jxi := <diff(x_real,xi)  | diff(y_real,xi) | diff(z_real,xi)>;
-      Jeta := <diff(x_real,eta)| diff(y_real,eta)| diff(z_real,eta)>;
-      with(VectorCalculus):
-      J := CrossProduct(Jxi, Jeta);
-      detJ := sqrt(J[1]^2 + J[2]^2 +J[3]^2);
-
-      # measure := evalf (Int (Int (detJ, xi=0..1, method = _NCrule ) ,
-      eta=0..1, method = _NCrule  ) ): # readlib(C):
-
-      # C(measure, optimized);
-
-      additional optimizaton: divide by 2 only one time
-    */
-
-    const double x[4] = {all_vertices[vertex_indices[0]](0),
-                         all_vertices[vertex_indices[1]](0),
-                         all_vertices[vertex_indices[2]](0),
-                         all_vertices[vertex_indices[3]](0)};
-
-    const double y[4] = {all_vertices[vertex_indices[0]](1),
-                         all_vertices[vertex_indices[1]](1),
-                         all_vertices[vertex_indices[2]](1),
-                         all_vertices[vertex_indices[3]](1)};
-
-    return (-x[1] * y[0] + x[1] * y[3] + y[0] * x[2] + x[0] * y[1] -
-            x[0] * y[2] - y[1] * x[3] - x[2] * y[3] + x[3] * y[2]) /
-           2;
   }
 
 
