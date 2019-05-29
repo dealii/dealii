@@ -2670,6 +2670,59 @@ namespace Functions
     return interpolate(data_values, ix, p_unit);
   }
 
+
+
+  template <int dim>
+  Tensor<1, dim>
+  InterpolatedUniformGridData<dim>::gradient(const Point<dim> & p,
+                                             const unsigned int component) const
+  {
+    (void)component;
+    Assert(
+      component == 0,
+      ExcMessage(
+        "This is a scalar function object, the component can only be zero."));
+
+    // find out where this data point lies, relative to the given
+    // subdivision points
+    TableIndices<dim> ix;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        const double delta_x = ((this->interval_endpoints[d].second -
+                                 this->interval_endpoints[d].first) /
+                                this->n_subintervals[d]);
+        if (p[d] <= this->interval_endpoints[d].first)
+          ix[d] = 0;
+        else if (p[d] >= this->interval_endpoints[d].second - delta_x)
+          ix[d] = this->n_subintervals[d] - 1;
+        else
+          ix[d] = static_cast<unsigned int>(
+            (p[d] - this->interval_endpoints[d].first) / delta_x);
+      }
+
+    // now compute the relative point within the interval/rectangle/box
+    // defined by the point coordinates found above. truncate below and
+    // above to accommodate points that may lie outside the range
+    Point<dim> p_unit;
+    Point<dim> delta_x;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        delta_x[d] = ((this->interval_endpoints[d].second -
+                       this->interval_endpoints[d].first) /
+                      this->n_subintervals[d]);
+        p_unit[d] =
+          std::max(std::min((p[d] - this->interval_endpoints[d].first -
+                             ix[d] * delta_x[d]) /
+                              delta_x[d],
+                            1.),
+                   0.);
+      }
+
+    return gradient_interpolate(this->data_values, ix, p_unit, delta_x);
+  }
+
+
+
   /* ---------------------- Polynomial ----------------------- */
 
 

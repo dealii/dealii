@@ -1562,6 +1562,21 @@ namespace Functions
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
+    /**
+     * Compute the gradient of the function set by bilinear interpolation of the
+     * given data set.
+     *
+     * @param p The point at which the function is to be evaluated.
+     * @param component The vector component. Since this function is scalar,
+     *   only zero is a valid argument here.
+     * @return The gradient of the interpolated function at this point. If the
+     *   point lies outside the set of coordinates, the function is extended
+     *   by a constant whose gradient is then of course zero.
+     */
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
   private:
     /**
      * The set of interval endpoints in each of the coordinate directions.
