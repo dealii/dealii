@@ -75,6 +75,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const Function<deal_II_dimension, VEC::value_type> &,
         VEC &,
         const ComponentMask &);
+
       template void
       interpolate(
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
