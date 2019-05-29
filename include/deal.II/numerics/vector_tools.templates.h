@@ -2996,21 +2996,20 @@ namespace VectorTools
               else
                 {
                   // if not, then we should try a more clever way. the idea is
-                  // that a finite element may not offer support points for
-                  // all its shape functions, but maybe only some. if it
-                  // offers support points for the components we are
-                  // interested in in this function, then that's fine. if not,
-                  // the function we call in the finite element will raise an
-                  // exception. the support points for the other shape
-                  // functions are left uninitialized (well, initialized by
-                  // the default constructor), since we don't need them
-                  // anyway.
+                  // that a finite element may not offer support points for all
+                  // its shape functions, but maybe only some. if it offers
+                  // support points for the components we are interested in in
+                  // this function, then that's fine. if not, the function we
+                  // call in the finite element will raise an exception. the
+                  // support points for the other shape functions are left
+                  // uninitialized (well, initialized by the default
+                  // constructor), since we don't need them anyway.
                   //
                   // As a detour, we must make sure we only query
-                  // face_system_to_component_index if the index corresponds
-                  // to a primitive shape function. since we know that all the
-                  // components we are interested in are primitive (by the
-                  // above check), we can safely put such a check in front
+                  // face_system_to_component_index if the index corresponds to
+                  // a primitive shape function. since we know that all the
+                  // components we are interested in are primitive (by the above
+                  // check), we can safely put such a check in front
                   std::vector<Point<dim - 1>> unit_support_points(
                     fe.dofs_per_face);
 
@@ -3049,9 +3048,9 @@ namespace VectorTools
                   // we can presently deal only with primitive elements for
                   // boundary values. this does not preclude us using
                   // non-primitive elements in components that we aren't
-                  // interested in, however. make sure that all shape
-                  // functions that are non-zero for the components we are
-                  // interested in, are in fact primitive
+                  // interested in, however. make sure that all shape functions
+                  // that are non-zero for the components we are interested in,
+                  // are in fact primitive
                   for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell;
                        ++i)
                     {
@@ -3078,8 +3077,8 @@ namespace VectorTools
                   const types::boundary_id boundary_component =
                     face->boundary_id();
 
-                  // see if this face is part of the boundaries for which we
-                  // are supposed to do something, and also see if the finite
+                  // see if this face is part of the boundaries for which we are
+                  // supposed to do something, and also see if the finite
                   // element in use here has DoFs on the face at all
                   if ((function_map.find(boundary_component) !=
                        function_map.end()) &&
@@ -3114,8 +3113,8 @@ namespace VectorTools
 
                           // enter those dofs into the list that match the
                           // component signature. avoid the usual complication
-                          // that we can't just use
-                          // *_system_to_component_index for non-primitive FEs
+                          // that we can't just use *_system_to_component_index
+                          // for non-primitive FEs
                           for (unsigned int i = 0; i < face_dofs.size(); ++i)
                             {
                               unsigned int component;
@@ -3126,9 +3125,9 @@ namespace VectorTools
                                 {
                                   // non-primitive case. make sure that this
                                   // particular shape function _is_ primitive,
-                                  // and get at it's component. use usual
-                                  // trick to transfer face dof index to cell
-                                  // dof index
+                                  // and get at it's component. use usual trick
+                                  // to transfer face dof index to cell dof
+                                  // index
                                   const unsigned int cell_i =
                                     (dim == 1 ?
                                        i :
@@ -3149,9 +3148,8 @@ namespace VectorTools
                                          ExcInternalError());
 
                                   // make sure that if this is not a primitive
-                                  // shape function, then all the
-                                  // corresponding components in the mask are
-                                  // not set
+                                  // shape function, then all the corresponding
+                                  // components in the mask are not set
                                   if (!fe.is_primitive(cell_i))
                                     for (unsigned int c = 0; c < n_components;
                                          ++c)
@@ -3159,12 +3157,12 @@ namespace VectorTools
                                         Assert(component_mask[c] == false,
                                                FETools::ExcFENotPrimitive());
 
-                                  // let's pick the first of possibly more
-                                  // than one non-zero components. if shape
-                                  // function is non-primitive, then we will
-                                  // ignore the result in the following
-                                  // anyway, otherwise there's only one
-                                  // non-zero component which we will use
+                                  // let's pick the first of possibly more than
+                                  // one non-zero components. if shape function
+                                  // is non-primitive, then we will ignore the
+                                  // result in the following anyway, otherwise
+                                  // there's only one non-zero component which
+                                  // we will use
                                   component = fe.get_nonzero_components(cell_i)
                                                 .first_selected_component();
                                 }
@@ -3175,8 +3173,7 @@ namespace VectorTools
                             }
                         }
                       else
-                        // fe has only one component, so save some
-                        // computations
+                        // fe has only one component, so save some computations
                         {
                           // get only the one component that this function has
                           dof_values_scalar.resize(fe.dofs_per_face);
@@ -3400,8 +3397,7 @@ namespace VectorTools
 
 
 
-  // -------- implementation for project_boundary_values with std::map
-  // --------
+  // -------- implementation for project_boundary_values with std::map --------
 
 
   namespace internal
@@ -3811,8 +3807,7 @@ namespace VectorTools
   }
 
 
-  // ---- implementation for project_boundary_values with AffineConstraints
-  // ----
+  // ---- implementation for project_boundary_values with AffineConstraints ----
 
 
 
@@ -4638,8 +4633,8 @@ namespace VectorTools
                 [GeometryInfo<3>::faces_per_cell][2] = {
                   {1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
 
-              // The projection is divided into two steps.  In the first step
-              // we project the boundary function on the horizontal shape
+              // The projection is divided into two steps.  In the first step we
+              // project the boundary function on the horizontal shape
               // functions. Then the boundary function is projected on the
               // vertical shape functions.  We begin with the horizontal shape
               // functions and set up a linear system of equations to get the
@@ -5246,15 +5241,13 @@ namespace VectorTools
                      ++face)
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
-                      // if the FE is a FE_Nothing object there is no work to
-                      // do
+                      // if the FE is a FE_Nothing object there is no work to do
                       if (dynamic_cast<const FE_Nothing<dim> *>(
                             &cell->get_fe()) != nullptr)
                         return;
 
                       // This is only implemented, if the FE is a Nedelec
-                      // element. If the FE is a FESystem we cannot check
-                      // this.
+                      // element. If the FE is a FESystem we cannot check this.
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
@@ -5342,15 +5335,13 @@ namespace VectorTools
                      ++face)
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
-                      // if the FE is a FE_Nothing object there is no work to
-                      // do
+                      // if the FE is a FE_Nothing object there is no work to do
                       if (dynamic_cast<const FE_Nothing<dim> *>(
                             &cell->get_fe()) != nullptr)
                         return;
 
                       // This is only implemented, if the FE is a Nedelec
-                      // element. If the FE is a FESystem we cannot check
-                      // this.
+                      // element. If the FE is a FESystem we cannot check this.
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
@@ -5445,8 +5436,8 @@ namespace VectorTools
       // associated with the edge functions for the given cell.
       //
       // In the context of this function, by associated DoFs we mean:
-      // the DoFs corresponding to the group of components making up the
-      // vector with first component first_vector_component (length dim).
+      // the DoFs corresponding to the group of components making up the vector
+      // with first component first_vector_component (length dim).
       const unsigned int        dim = 3;
       const FiniteElement<dim> &fe  = cell->get_fe();
 
@@ -5489,8 +5480,8 @@ namespace VectorTools
           //
           // Then select which copy of that base element
           // [ each copy is of length
-          // fe.base_element(base_indices.first).n_components() ] corresponds
-          // to first_vector_component: base_index.second
+          // fe.base_element(base_indices.first).n_components() ] corresponds to
+          // first_vector_component: base_index.second
           for (; i < fe.n_base_elements(); ++i)
             {
               fe_index_old = fe_index;
@@ -5512,15 +5503,14 @@ namespace VectorTools
       //
       // Want to know which of these DoFs (there are degree+1 of interest)
       // are associated with the components given by first_vector_component.
-      // Then we can make a map from the associated line DoFs to the face
-      // DoFs.
+      // Then we can make a map from the associated line DoFs to the face DoFs.
       //
       // For a single FE_Nedelec<3> element this is simple:
       //    We know the ordering of local DoFs goes
       //    lines -> faces -> cells
       //
-      // For a set of FESystem<3> elements we need to pick out the matching
-      // base element and the index within this ordering.
+      // For a set of FESystem<3> elements we need to pick out the matching base
+      // element and the index within this ordering.
       //
       // We call the map associated_edge_dof_to_face_dof
       std::vector<unsigned int> associated_edge_dof_to_face_dof(degree + 1);
@@ -5539,8 +5529,8 @@ namespace VectorTools
       //       ++face_idx)
       for (unsigned int line_idx = 0; line_idx < fe.dofs_per_line; ++line_idx)
         {
-          // Assuming DoFs on a face are numbered in order by lines then
-          // faces. i.e. line 0 has degree+1 dofs numbered 0,..,degree
+          // Assuming DoFs on a face are numbered in order by lines then faces.
+          // i.e. line 0 has degree+1 dofs numbered 0,..,degree
           //      line 1 has degree+1 dofs numbered (degree+1),..,2*(degree+1)
           //      and so on.
           const unsigned int face_idx = line * fe.dofs_per_line + line_idx;
@@ -5548,8 +5538,8 @@ namespace VectorTools
           //       i.e. cell->line_orientation(line) = true.
           const unsigned int cell_idx = fe.face_to_cell_index(face_idx, face);
 
-          // Check this cell_idx belongs to the correct base_element,
-          // component and line:
+          // Check this cell_idx belongs to the correct base_element, component
+          // and line:
           if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
                (fe.system_to_base_index(cell_idx).first == base_indices) &&
                (lower_bound <= fe.system_to_base_index(cell_idx).second) &&
@@ -5596,8 +5586,8 @@ namespace VectorTools
         fe_values.get_quadrature().get_points();
 
       // Project the boundary function onto the shape functions for this edge
-      // and set up a linear system of equations to get the values for the
-      // DoFs associated with this edge.
+      // and set up a linear system of equations to get the values for the DoFs
+      // associated with this edge.
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
            ++q_point)
         {
@@ -5633,8 +5623,7 @@ namespace VectorTools
           //
           // The RHS entries are:
           // \int_{edge}
-          // (tangential*boundary_value)*(tangential*edge_shape_function_i)
-          // dS.
+          // (tangential*boundary_value)*(tangential*edge_shape_function_i) dS.
           for (unsigned int j = 0; j < associated_edge_dofs; ++j)
             {
               const unsigned int j_face_idx =
@@ -5705,13 +5694,13 @@ namespace VectorTools
     {
       // This function computes the L2-projection of the boundary
       // function on the interior of faces only. In 3D, this should only be
-      // called after first calling compute_edge_projection_l2, as it relies
-      // on edge constraints which are found.
+      // called after first calling compute_edge_projection_l2, as it relies on
+      // edge constraints which are found.
 
       // In the context of this function, by associated DoFs we mean:
-      // the DoFs corresponding to the group of components making up the
-      // vector with first component first_vector_component (with total
-      // components dim).
+      // the DoFs corresponding to the group of components making up the vector
+      // with first component first_vector_component (with total components
+      // dim).
 
       // Copy to the standard FEFaceValues object:
       hp_fe_face_values.reinit(cell, face);
@@ -5747,8 +5736,8 @@ namespace VectorTools
           //
           // Then select which copy of that base element
           // [ each copy is of length
-          // fe.base_element(base_indices.first).n_components() ] corresponds
-          // to first_vector_component: base_index.second
+          // fe.base_element(base_indices.first).n_components() ] corresponds to
+          // first_vector_component: base_index.second
           for (; i < fe.n_base_elements(); ++i)
             {
               fe_index_old = fe_index;
@@ -5766,8 +5755,8 @@ namespace VectorTools
       switch (dim)
         {
           case 2:
-            // NOTE: This is very similar to compute_edge_projection as used
-            // in 3D,
+            // NOTE: This is very similar to compute_edge_projection as used in
+            // 3D,
             //       and contains a lot of overlap with that function.
             {
               // Find the DoFs we want to constrain. There are degree+1 in
@@ -5813,9 +5802,9 @@ namespace VectorTools
 
               const FEValuesExtractors::Vector vec(first_vector_component);
 
-              // Project the boundary function onto the shape functions for
-              // this edge and set up a linear system of equations to get the
-              // values for the DoFs associated with this edge.
+              // Project the boundary function onto the shape functions for this
+              // edge and set up a linear system of equations to get the values
+              // for the DoFs associated with this edge.
               for (unsigned int q_point = 0;
                    q_point < fe_face_values.n_quadrature_points;
                    ++q_point)
@@ -5902,9 +5891,9 @@ namespace VectorTools
               const FEValuesExtractors::Vector vec(first_vector_component);
 
               // First group DoFs associated with edges which we already know.
-              // Sort these into groups of dofs (0 -> degree+1 of them) by
-              // each edge. This will help when computing the residual for the
-              // face projections.
+              // Sort these into groups of dofs (0 -> degree+1 of them) by each
+              // edge. This will help when computing the residual for the face
+              // projections.
               //
               // This matches with the search done in compute_edge_projection.
               const unsigned int lines_per_face =
@@ -5967,16 +5956,15 @@ namespace VectorTools
               // associated with each face (not including edges!).
               //
               // Create a map mapping from the consecutively numbered
-              // associated_dofs to the face DoF (which can be transferred to
-              // a local cell index).
+              // associated_dofs to the face DoF (which can be transferred to a
+              // local cell index).
               //
-              // For FE_Nedelec<3> we just need to have a face numbering
-              // greater than the number of edge DoFs
-              // (=lines_per_face*(degree+1).
+              // For FE_Nedelec<3> we just need to have a face numbering greater
+              // than the number of edge DoFs (=lines_per_face*(degree+1).
               //
-              // For FESystem<3> we need to base the base_indices (base
-              // element and copy within that base element) and ensure we're
-              // above the number of edge DoFs within that base element.
+              // For FESystem<3> we need to base the base_indices (base element
+              // and copy within that base element) and ensure we're above the
+              // number of edge DoFs within that base element.
               std::vector<unsigned int> associated_face_dof_to_face_dof(
                 2 * degree * (degree + 1));
 
@@ -6008,18 +5996,17 @@ namespace VectorTools
 
               // Storage for the linear system.
               // There are 2*degree*(degree+1) DoFs associated with a face in
-              // 3D. Note this doesn't include the DoFs associated with edges
-              // on that face.
+              // 3D. Note this doesn't include the DoFs associated with edges on
+              // that face.
               FullMatrix<double> face_matrix(2 * degree * (degree + 1));
               FullMatrix<double> face_matrix_inv(2 * degree * (degree + 1));
               Vector<double>     face_rhs(2 * degree * (degree + 1));
               Vector<double>     face_solution(2 * degree * (degree + 1));
 
-              // Project the boundary function onto the shape functions for
-              // this face and set up a linear system of equations to get the
-              // values for the DoFs associated with this face. We also must
-              // include the residuals from the shape functions associated
-              // with edges.
+              // Project the boundary function onto the shape functions for this
+              // face and set up a linear system of equations to get the values
+              // for the DoFs associated with this face. We also must include
+              // the residuals from the shape functions associated with edges.
               Tensor<1, dim> tmp;
               Tensor<1, dim> cross_product_i;
               Tensor<1, dim> cross_product_j;
@@ -6145,25 +6132,25 @@ namespace VectorTools
       AffineConstraints<double> &            constraints,
       const hp::MappingCollection<dim, dim> &mapping_collection)
     {
-      // L2-projection based interpolation formed in one (in 2D) or two (in
-      // 3D) steps.
+      // L2-projection based interpolation formed in one (in 2D) or two (in 3D)
+      // steps.
       //
       // In 2D we only need to constrain edge DoFs.
       //
-      // In 3D we need to constrain both edge and face DoFs. This is done in
-      // two parts.
+      // In 3D we need to constrain both edge and face DoFs. This is done in two
+      // parts.
       //
       // For edges, since the face shape functions are zero here ("bubble
       // functions"), we project the tangential component of the boundary
-      // function and compute the L2-projection. This returns the values for
-      // the DoFs associated with each edge shape function. In 3D, this is
-      // computed by internals::compute_edge_projection_l2, in 2D, it is
-      // handled by compute_face_projection_curl_conforming_l2.
+      // function and compute the L2-projection. This returns the values for the
+      // DoFs associated with each edge shape function. In 3D, this is computed
+      // by internals::compute_edge_projection_l2, in 2D, it is handled by
+      // compute_face_projection_curl_conforming_l2.
       //
       // For faces we compute the residual of the boundary function which is
-      // satisfied by the edge shape functions alone. Which can then be used
-      // to calculate the remaining face DoF values via a projection which
-      // leads to a linear system to solve. This is handled by
+      // satisfied by the edge shape functions alone. Which can then be used to
+      // calculate the remaining face DoF values via a projection which leads to
+      // a linear system to solve. This is handled by
       // compute_face_projection_curl_conforming_l2
       //
       // For details see (for example) section 4.2:
@@ -6173,8 +6160,8 @@ namespace VectorTools
       // 1267–1296, 20 March 2007:
       // http://onlinelibrary.wiley.com/doi/10.1002/fld.1223/abstract
 
-      // Create hp FEcollection, dof_handler can be either hp or standard
-      // type. From here on we can treat it like a hp-namespace object.
+      // Create hp FEcollection, dof_handler can be either hp or standard type.
+      // From here on we can treat it like a hp-namespace object.
       const hp::FECollection<dim> &fe_collection(
         dof_handler.get_fe_collection());
 
@@ -6253,9 +6240,8 @@ namespace VectorTools
                                   dofs_processed[dof] = false;
                                 }
 
-                              // Compute the projection of the boundary
-                              // function on the edge. In 2D this is all
-                              // that's required.
+                              // Compute the projection of the boundary function
+                              // on the edge. In 2D this is all that's required.
                               compute_face_projection_curl_conforming_l2(
                                 cell,
                                 face,
@@ -6398,9 +6384,8 @@ namespace VectorTools
                                     dofs_processed);
                                 }
 
-                              // If there are higher order shape functions,
-                              // then we still need to compute the face
-                              // projection
+                              // If there are higher order shape functions, then
+                              // we still need to compute the face projection
                               if (degree > 0)
                                 {
                                   compute_face_projection_curl_conforming_l2(
@@ -6413,8 +6398,7 @@ namespace VectorTools
                                     dofs_processed);
                                 }
 
-                              // Store the computed values in the global
-                              // vector.
+                              // Store the computed values in the global vector.
                               face_dof_indices.resize(dofs_per_face);
                               cell->face(face)->get_dof_indices(
                                 face_dof_indices, cell->active_fe_index());
@@ -7252,17 +7236,16 @@ namespace VectorTools
                     // of a cell it is on -- indicated by the face number. in
                     // other words, it may provide the inner or outer normal.
                     // by and large, there is no harm from this, since the
-                    // tangential vector we compute is still the same.
-                    // however, we do average over normal vectors from
-                    // adjacent cells and if they have recorded normal vectors
-                    // from the inside once and from the outside the other
-                    // time, then this averaging is going to run into trouble.
-                    // as a consequence we ask the mapping after all for its
-                    // normal vector, but we only ask it so that we can
-                    // possibly correct the sign of the normal vector provided
-                    // by the boundary if they should point in different
-                    // directions. this is the case in
-                    // tests/deal.II/no_flux_11.
+                    // tangential vector we compute is still the same. however,
+                    // we do average over normal vectors from adjacent cells
+                    // and if they have recorded normal vectors from the inside
+                    // once and from the outside the other time, then this
+                    // averaging is going to run into trouble. as a consequence
+                    // we ask the mapping after all for its normal vector,
+                    // but we only ask it so that we can possibly correct the
+                    // sign of the normal vector provided by the boundary
+                    // if they should point in different directions. this is the
+                    // case in tests/deal.II/no_flux_11.
                     Tensor<1, dim> normal_vector =
                       (cell->face(face_no)->get_manifold().normal_vector(
                         cell->face(face_no), fe_values.quadrature_point(i)));
@@ -7403,10 +7386,10 @@ namespace VectorTools
             // to this function
             case 1:
               {
-                // compute the average normal vector from all the ones that
-                // have the same set of dofs. we could add them up and divide
-                // them by the number of additions, or simply normalize them
-                // right away since we want them to have unit length anyway
+                // compute the average normal vector from all the ones that have
+                // the same set of dofs. we could add them up and divide them by
+                // the number of additions, or simply normalize them right away
+                // since we want them to have unit length anyway
                 Tensor<1, dim> normal;
                 for (typename CellToNormalsMap::const_iterator x =
                        cell_to_normals_map.begin();
@@ -7437,10 +7420,10 @@ namespace VectorTools
                 break;
               }
 
-            // this is the slightly more complicated case that a single cell
-            // has contributed with exactly DIM normal vectors to the same set
-            // of vector dofs. this is what happens in a corner in 2d and 3d
-            // (but not on an edge in 3d, where we have only 2, i.e. <DIM,
+            // this is the slightly more complicated case that a single cell has
+            // contributed with exactly DIM normal vectors to the same set of
+            // vector dofs. this is what happens in a corner in 2d and 3d (but
+            // not on an edge in 3d, where we have only 2, i.e. <DIM,
             // contributions. Here we do not want to average the normal
             // vectors. Since we have DIM contributions, let's assume (and
             // verify) that they are in fact all linearly independent; in that
@@ -7451,13 +7434,12 @@ namespace VectorTools
                 // assert that indeed only a single cell has contributed
                 Assert(cell_to_normals_map.size() == 1, ExcInternalError());
 
-                // check linear independence by computing the determinant of
-                // the matrix created from all the normal vectors. if they are
+                // check linear independence by computing the determinant of the
+                // matrix created from all the normal vectors. if they are
                 // linearly independent, then the determinant is nonzero. if
                 // they are orthogonal, then the matrix is in fact equal to 1
-                // (since they are all unit vectors); make sure the
-                // determinant is larger than 1e-3 to avoid cases where cells
-                // are degenerate
+                // (since they are all unit vectors); make sure the determinant
+                // is larger than 1e-3 to avoid cases where cells are degenerate
                 {
                   Tensor<2, dim> t;
 
@@ -7506,11 +7488,11 @@ namespace VectorTools
                 Assert(dim >= 3, ExcNotImplemented());
                 Assert(max_n_contributions_per_cell == 2, ExcInternalError());
 
-                // as described in the documentation, let us first collect
-                // what each of the cells contributed at the current point. we
-                // use a std::list instead of a std::set (which would be more
-                // natural) because std::set requires that the stored elements
-                // are comparable with operator<
+                // as described in the documentation, let us first collect what
+                // each of the cells contributed at the current point. we use a
+                // std::list instead of a std::set (which would be more natural)
+                // because std::set requires that the stored elements are
+                // comparable with operator<
                 using CellContributions = std::map<
                   typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
                   std::list<Tensor<1, dim>>>;
@@ -7528,8 +7510,7 @@ namespace VectorTools
                 // of normal vectors it has contributed. we currently only
                 // implement if this is dim-1 for all cells (if a single cell
                 // has contributed dim, or if all adjacent cells have
-                // contributed 1 normal vector, this is already handled
-                // above).
+                // contributed 1 normal vector, this is already handled above).
                 //
                 // we only implement the case that all cells contribute
                 // dim-1 because we assume that we are following an edge
@@ -7546,8 +7527,8 @@ namespace VectorTools
                 // once. this is also discussed at length in the
                 // documentation of this function.
                 //
-                // for each contributing cell compute the tangential vector
-                // that remains unconstrained
+                // for each contributing cell compute the tangential vector that
+                // remains unconstrained
                 std::list<Tensor<1, dim>> tangential_vectors;
                 for (typename CellContributions::const_iterator contribution =
                        cell_contributions.begin();
@@ -7584,14 +7565,13 @@ namespace VectorTools
                       Assert(index == dim - 1, ExcInternalError());
                     }
 
-                    // calculate the tangent as the outer product of the
-                    // normal vectors. since these vectors do not need to be
-                    // orthogonal (think, for example, the case of the
-                    // deal.II/no_flux_07 test: a sheared cube in 3d, with Q2
-                    // elements, where we have constraints from the two normal
-                    // vectors of two faces of the sheared cube that are not
-                    // perpendicular to each other), we have to normalize the
-                    // outer product
+                    // calculate the tangent as the outer product of the normal
+                    // vectors. since these vectors do not need to be orthogonal
+                    // (think, for example, the case of the deal.II/no_flux_07
+                    // test: a sheared cube in 3d, with Q2 elements, where we
+                    // have constraints from the two normal vectors of two faces
+                    // of the sheared cube that are not perpendicular to each
+                    // other), we have to normalize the outer product
                     Tensor<1, dim> tangent;
                     switch (dim)
                       {
@@ -7622,8 +7602,8 @@ namespace VectorTools
 
                 // go through the list of tangents and make sure that they all
                 // roughly point in the same direction as the first one (i.e.
-                // have an angle less than 90 degrees); if they don't then
-                // flip their sign
+                // have an angle less than 90 degrees); if they don't then flip
+                // their sign
                 {
                   const Tensor<1, dim> first_tangent =
                     tangential_vectors.front();
@@ -7644,8 +7624,8 @@ namespace VectorTools
                   average_tangent += *t;
                 average_tangent /= average_tangent.norm();
 
-                // now all that is left is that we add the constraints that
-                // the vector is parallel to the tangent
+                // now all that is left is that we add the constraints that the
+                // vector is parallel to the tangent
                 const internal::VectorDoFTuple<dim> &dof_indices =
                   same_dof_range[0]->first;
                 const Vector<double> b_values =
@@ -8290,8 +8270,7 @@ namespace VectorTools
                                    double(std::abs(data.psi_grads[q][k][d]) *
                                           data.weight_vectors[q](k)));
 
-              // then add seminorm to norm if that had previously been
-              // computed
+              // then add seminorm to norm if that had previously been computed
               diff += t;
             }
             break;
@@ -8605,8 +8584,8 @@ namespace VectorTools
         case mean:
           {
             // Note: mean is defined as int_\Omega f = sum_K \int_K f, so we
-            // need the sum of the cellwise errors not the Euclidean mean
-            // value that is returned by Vector<>::mean_value().
+            // need the sum of the cellwise errors not the Euclidean mean value
+            // that is returned by Vector<>::mean_value().
             const double local =
               cellwise_error.mean_value() * cellwise_error.size();
             return Utilities::MPI::sum(local, comm);
@@ -9200,9 +9179,9 @@ namespace VectorTools
       {
         // The type used to store the elements of the global vector may be a
         // real or a complex number. Do the global reduction always with real
-        // and imaginary types so that we don't have to distinguish, and to
-        // this end just copy everything into a complex number and, later,
-        // back into the original data type.
+        // and imaginary types so that we don't have to distinguish, and to this
+        // end just copy everything into a complex number and, later, back into
+        // the original data type.
         std::complex<double> mean_double = mean;
         double my_values[3] = {mean_double.real(), mean_double.imag(), area};
         double global_values[3];
