@@ -605,10 +605,9 @@ namespace VectorTools
         const FiniteElement<dim, spacedim> &fe = dof.get_fe();
 
         // Construct default fe_mask;
-        const ComponentMask fe_mask(
-          ComponentMask(fe.get_nonzero_components(0).size(), true));
+        const ComponentMask fe_mask(fe.get_nonzero_components(0).size(), true);
 
-        AssertDimension(fe_mask.size(), fe.get_nonzero_components(0).size());
+        AssertDimension(fe_mask.size(), fe.get_nonzero_components(0).size()); //A bit redundant, I think?
 
         std::vector<unsigned int> fe_to_real(fe_mask.size(),
                                              numbers::invalid_unsigned_int);
@@ -1180,11 +1179,10 @@ namespace VectorTools
       Vector<number>       tmp(mass_matrix.n());
 
       // If the constraints object does not conflict with the given boundary
-      // values (i.e., it either does not contain boundary values or it
-      // contains the same as boundary_values), we can let it call
+      // values (i.e., it either does not contain boundary values or it contains
+      // the same as boundary_values), we can let it call
       // distribute_local_to_global straight away, otherwise we need to first
-      // interpolate the boundary values and then condense the matrix and
-      // vector
+      // interpolate the boundary values and then condense the matrix and vector
       if (constraints_are_compatible)
         {
           const Function<spacedim, number> *dummy = nullptr;
@@ -2968,17 +2966,17 @@ namespace VectorTools
           std::vector<types::global_dof_index> face_dofs;
           face_dofs.reserve(DoFTools::max_dofs_per_face(dof));
 
-          // array to store the values of the boundary function at the
-          // boundary points. have two arrays for scalar and vector functions
-          // to use the more efficient one respectively
+          // array to store the values of the boundary function at the boundary
+          // points. have two arrays for scalar and vector functions to use the
+          // more efficient one respectively
           std::vector<number>         dof_values_scalar;
           std::vector<Vector<number>> dof_values_system;
           dof_values_scalar.reserve(DoFTools::max_dofs_per_face(dof));
           dof_values_system.reserve(DoFTools::max_dofs_per_face(dof));
 
-          // before we start with the loop over all cells create an
-          // hp::FEValues object that holds the interpolation points of all
-          // finite elements that may ever be in use
+          // before we start with the loop over all cells create an hp::FEValues
+          // object that holds the interpolation points of all finite elements
+          // that may ever be in use
           const dealii::hp::FECollection<dim, spacedim> &finite_elements =
             dof.get_fe_collection();
           dealii::hp::QCollection<dim - 1> q_collection;
