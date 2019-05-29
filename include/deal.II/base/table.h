@@ -919,6 +919,11 @@ namespace MatrixTableIterators
     value() const;
 
     /**
+     * Conversion operator that returns a constant reference to the element.
+     */
+    operator const value_type &() const;
+
+    /**
      * Return the row of the current entry.
      */
     size_type
@@ -1042,6 +1047,11 @@ namespace MatrixTableIterators
      */
     value_type &
     value() const;
+
+    /**
+     * Conversion operator that returns a reference to the element.
+     */
+    operator value_type &();
   };
 
   /**
@@ -2924,6 +2934,16 @@ namespace MatrixTableIterators
 
 
   template <typename TableType, bool Constness, Storage storage_order>
+  inline AccessorBase<TableType, Constness, storage_order>::
+  operator const value_type &() const
+  {
+    assert_valid_linear_index();
+    return this->container->values[linear_index];
+  }
+
+
+
+  template <typename TableType, bool Constness, Storage storage_order>
   inline typename AccessorBase<TableType, Constness, storage_order>::size_type
   AccessorBase<TableType, Constness, storage_order>::row() const
   {
@@ -3004,6 +3024,15 @@ namespace MatrixTableIterators
   template <typename TableType, Storage storage_order>
   inline typename Accessor<TableType, false, storage_order>::value_type &
   Accessor<TableType, false, storage_order>::value() const
+  {
+    this->assert_valid_linear_index();
+    return this->container->values[this->linear_index];
+  }
+
+
+
+  template <typename TableType, Storage storage_order>
+  inline Accessor<TableType, false, storage_order>::operator value_type &()
   {
     this->assert_valid_linear_index();
     return this->container->values[this->linear_index];
