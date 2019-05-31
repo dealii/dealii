@@ -138,7 +138,7 @@ test(const unsigned numRefinementLevels = 2)
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
 
-  const std::vector<IndexSet> &locally_owned_dofs =
+  const std::vector<IndexSet> locally_owned_dofs =
     dof_handler.locally_owned_dofs_per_processor();
 
   std::map<types::global_dof_index, Point<dim>> supportPoints;

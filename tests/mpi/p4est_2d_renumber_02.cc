@@ -80,6 +80,8 @@ test()
     IndexSet dof_set;
     DoFTools::extract_locally_active_dofs(dofh, dof_set);
 
+    const std::vector<IndexSet> owned_dofs =
+      dofh.locally_owned_dofs_per_processor();
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         dof_set.print(deallog);
@@ -88,7 +90,7 @@ test()
              ++i)
           {
             deallog << "Dofs owned by processor " << i << ": ";
-            dofh.locally_owned_dofs_per_processor()[i].print(deallog);
+            owned_dofs[i].print(deallog);
             deallog << std::endl;
           }
       }

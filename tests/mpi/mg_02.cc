@@ -94,18 +94,19 @@ test()
     deallog << "Levels: " << tr.n_global_levels() << std::endl;
     std::cout << "Levels: " << tr.n_global_levels() << std::endl;
 
+    const std::vector<types::global_dof_index>
+      n_locally_owned_dofs_per_processor =
+        dofh.n_locally_owned_dofs_per_processor();
     deallog << "n_locally_owned_dofs_per_processor:" << std::endl;
-    for (unsigned int i = 0;
-         i < dofh.n_locally_owned_dofs_per_processor().size();
-         ++i)
-      deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
+    for (unsigned int i = 0; i < n_locally_owned_dofs_per_processor.size(); ++i)
+      deallog << n_locally_owned_dofs_per_processor[i] << std::endl;
 
     deallog << "locally_owned_mg_dofs_per_processor:" << std::endl;
     for (unsigned int lvl = 0; lvl < tr.n_global_levels(); ++lvl)
       {
         deallog << "level " << lvl << ":" << std::endl;
 
-        const std::vector<IndexSet> &vec =
+        const std::vector<IndexSet> vec =
           dofh.locally_owned_mg_dofs_per_processor(lvl);
 
         for (unsigned int i = 0; i < vec.size(); ++i)

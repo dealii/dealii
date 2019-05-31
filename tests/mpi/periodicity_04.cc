@@ -205,7 +205,7 @@ check(const unsigned int orientation, bool reverse)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   constraints.print(deallog.get_file_stream());
 
-  const std::vector<IndexSet> &locally_owned_dofs_vector =
+  const std::vector<IndexSet> locally_owned_dofs_vector =
     dof_handler.locally_owned_dofs_per_processor();
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
