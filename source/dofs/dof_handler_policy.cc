@@ -5020,9 +5020,6 @@ namespace internal
               &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
-        const unsigned int n_cpus =
-          Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
-
         const types::subdomain_id subdomain_id =
           triangulation->locally_owned_subdomain();
 
@@ -5091,24 +5088,15 @@ namespace internal
 
         // --------- Phase 4: shift indices so that each processor has a unique
         //                    range of indices
-        std::vector<dealii::types::global_dof_index>
-          n_locally_owned_dofs_per_processor(n_cpus);
-
-        const int ierr =
-          MPI_Allgather(DEAL_II_MPI_CONST_CAST(&n_locally_owned_dofs),
-                        1,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        n_locally_owned_dofs_per_processor.data(),
-                        1,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        triangulation->get_communicator());
+        dealii::types::global_dof_index my_shift = 0;
+        const int                       ierr =
+          MPI_Exscan(DEAL_II_MPI_CONST_CAST(&n_locally_owned_dofs),
+                     &my_shift,
+                     1,
+                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                     MPI_SUM,
+                     triangulation->get_communicator());
         AssertThrowMPI(ierr);
-
-        const dealii::types::global_dof_index my_shift =
-          std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                          n_locally_owned_dofs_per_processor.begin() +
-                            subdomain_id,
-                          static_cast<dealii::types::global_dof_index>(0));
 
         // make dof indices globally consecutive
         for (auto &new_index : renumbering)
@@ -5125,39 +5113,17 @@ namespace internal
 
         // now a little bit of housekeeping
         const dealii::types::global_dof_index n_global_dofs =
-          std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                          n_locally_owned_dofs_per_processor.end(),
-                          dealii::types::global_dof_index(0));
+          Utilities::MPI::sum(n_locally_owned_dofs,
+                              triangulation->get_communicator());
 
-        std::vector<IndexSet> locally_owned_dofs_per_processor(
-          n_cpus, IndexSet(n_global_dofs));
-        {
-          dealii::types::global_dof_index current_shift = 0;
-          for (unsigned int i = 0; i < n_cpus; ++i)
-            {
-              locally_owned_dofs_per_processor[i].add_range(
-                current_shift,
-                current_shift + n_locally_owned_dofs_per_processor[i]);
-              current_shift += n_locally_owned_dofs_per_processor[i];
-            }
-        }
-        NumberCache number_cache(locally_owned_dofs_per_processor,
-                                 triangulation->locally_owned_subdomain());
-        Assert(number_cache
-                   .locally_owned_dofs_per_processor
-                     [triangulation->locally_owned_subdomain()]
-                   .n_elements() == number_cache.n_locally_owned_dofs,
-               ExcInternalError());
-        Assert(
-          !number_cache
-              .locally_owned_dofs_per_processor[triangulation
-                                                  ->locally_owned_subdomain()]
-              .n_elements() ||
-            number_cache
-                .locally_owned_dofs_per_processor[triangulation
-                                                    ->locally_owned_subdomain()]
-                .nth_index_in_set(0) == my_shift,
-          ExcInternalError());
+        NumberCache number_cache;
+        number_cache.n_global_dofs        = n_global_dofs;
+        number_cache.n_locally_owned_dofs = n_locally_owned_dofs;
+        number_cache.locally_owned_dofs   = IndexSet(n_global_dofs);
+        number_cache.locally_owned_dofs.add_range(my_shift,
+                                                  my_shift +
+                                                    n_locally_owned_dofs);
+        number_cache.locally_owned_dofs.compress();
 
         // this ends the phase where we enumerate degrees of freedom on
         // each processor. what is missing is communicating DoF indices
@@ -5305,10 +5271,6 @@ namespace internal
                       "Triangulation if the flag construct_multigrid_hierarchy "
                       "is set in the constructor."));
 
-
-        const unsigned int n_cpus =
-          Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
-
         // loop over all levels that exist globally (across all
         // processors), even if the current processor does not in fact
         // have any cells on that level or if the local part of the
@@ -5365,8 +5327,6 @@ namespace internal
                     }
               }
 
-            // TODO: make this code simpler with the new constructors of
-            // NumberCache make indices consecutive
             level_number_cache.n_locally_owned_dofs = 0;
             for (types::global_dof_index &index : renumbering)
               if (index != numbers::invalid_dof_index)
@@ -5374,27 +5334,20 @@ namespace internal
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
-            level_number_cache.n_locally_owned_dofs_per_processor.resize(
-              n_cpus);
-
-            int ierr = MPI_Allgather(
-              &level_number_cache.n_locally_owned_dofs,
-              1,
-              DEAL_II_DOF_INDEX_MPI_TYPE,
-              level_number_cache.n_locally_owned_dofs_per_processor.data(),
-              1,
-              DEAL_II_DOF_INDEX_MPI_TYPE,
-              triangulation->get_communicator());
+            dealii::types::global_dof_index my_shift = 0;
+            const int                       ierr =
+              MPI_Exscan(DEAL_II_MPI_CONST_CAST(
+                           &level_number_cache.n_locally_owned_dofs),
+                         &my_shift,
+                         1,
+                         DEAL_II_DOF_INDEX_MPI_TYPE,
+                         MPI_SUM,
+                         triangulation->get_communicator());
             AssertThrowMPI(ierr);
 
-            const dealii::types::global_dof_index shift = std::accumulate(
-              level_number_cache.n_locally_owned_dofs_per_processor.begin(),
-              level_number_cache.n_locally_owned_dofs_per_processor.begin() +
-                triangulation->locally_owned_subdomain(),
-              static_cast<dealii::types::global_dof_index>(0));
             for (types::global_dof_index &index : renumbering)
               if (index != numbers::invalid_dof_index)
-                index += shift;
+                index += my_shift;
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
@@ -5409,48 +5362,15 @@ namespace internal
                 renumbering, IndexSet(0), *dof_handler, level, false);
 
             // now a little bit of housekeeping
-            level_number_cache.n_global_dofs = std::accumulate(
-              level_number_cache.n_locally_owned_dofs_per_processor.begin(),
-              level_number_cache.n_locally_owned_dofs_per_processor.end(),
-              static_cast<dealii::types::global_dof_index>(0));
+            level_number_cache.n_global_dofs =
+              Utilities::MPI::sum(level_number_cache.n_locally_owned_dofs,
+                                  triangulation->get_communicator());
 
             level_number_cache.locally_owned_dofs =
               IndexSet(level_number_cache.n_global_dofs);
             level_number_cache.locally_owned_dofs.add_range(
-              shift, shift + level_number_cache.n_locally_owned_dofs);
+              my_shift, my_shift + level_number_cache.n_locally_owned_dofs);
             level_number_cache.locally_owned_dofs.compress();
-
-            // fill global_dof_indexsets
-            level_number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
-            {
-              dealii::types::global_dof_index current_shift = 0;
-              for (unsigned int i = 0; i < n_cpus; ++i)
-                {
-                  level_number_cache.locally_owned_dofs_per_processor[i] =
-                    IndexSet(level_number_cache.n_global_dofs);
-                  level_number_cache.locally_owned_dofs_per_processor[i]
-                    .add_range(current_shift,
-                               current_shift +
-                                 level_number_cache
-                                   .n_locally_owned_dofs_per_processor[i]);
-                  current_shift +=
-                    level_number_cache.n_locally_owned_dofs_per_processor[i];
-                }
-            }
-            Assert(level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
-                       .n_elements() == level_number_cache.n_locally_owned_dofs,
-                   ExcInternalError());
-            Assert(!level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
-                       .n_elements() ||
-                     level_number_cache
-                         .locally_owned_dofs_per_processor
-                           [triangulation->locally_owned_subdomain()]
-                         .nth_index_in_set(0) == shift,
-                   ExcInternalError());
 
             number_caches.emplace_back(level_number_cache);
           }
@@ -5679,11 +5599,12 @@ namespace internal
                                             *dof_handler,
                                             /*check_validity=*/false);
 
-            // Since we have not updated the number cache yet, we can use the
-            // index sets contained in the DoFHandler at this stage.
-            return NumberCache(dof_handler->locally_owned_dofs_per_processor(),
-                               Utilities::MPI::this_mpi_process(
-                                 triangulation->get_communicator()));
+            NumberCache number_cache;
+            number_cache.locally_owned_dofs = dof_handler->locally_owned_dofs();
+            number_cache.n_global_dofs      = dof_handler->n_dofs();
+            number_cache.n_locally_owned_dofs =
+              number_cache.locally_owned_dofs.n_elements();
+            return number_cache;
           }
         else
           {
@@ -5809,103 +5730,12 @@ namespace internal
               triangulation->load_user_flags(user_flags);
             }
 
-            // the last step is to update the NumberCache, including knowing
-            // which processor owns which DoF index. this requires
-            // communication.
-            //
-            // this step is substantially more complicated than it is in
-            // distribute_dofs() in case the IndexSets of locally owned DoFs
-            // after renumbering are not contiguous any more (which we have done
-            // at the top of this function). for distribute_dofs() it was enough
-            // to exchange the starting indices for each processor and the
-            // global number of DoFs, but here we actually have to serialize the
-            // IndexSet objects and shop them across the network.
-            const unsigned int n_cpus = Utilities::MPI::n_mpi_processes(
-              triangulation->get_communicator());
-            std::vector<IndexSet> locally_owned_dofs_per_processor(
-              n_cpus, IndexSet(dof_handler->n_dofs()));
-            // serialize our own IndexSet
-            std::vector<char> my_data;
-            {
-#  ifdef DEAL_II_WITH_ZLIB
-
-              boost::iostreams::filtering_ostream out;
-              out.push(
-                boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                  boost::iostreams::gzip::best_compression)));
-              out.push(boost::iostreams::back_inserter(my_data));
-
-              boost::archive::binary_oarchive archive(out);
-
-              archive << my_locally_owned_new_dof_indices;
-              out.flush();
-#  else
-              std::ostringstream              out;
-              boost::archive::binary_oarchive archive(out);
-              archive << my_locally_owned_new_dof_indices;
-              const std::string &s = out.str();
-              my_data.reserve(s.size());
-              my_data.assign(s.begin(), s.end());
-#  endif
-            }
-
-            // determine maximum size of IndexSet
-            const unsigned int max_size =
-              Utilities::MPI::max(my_data.size(),
-                                  triangulation->get_communicator());
-
-            // as the MPI_Allgather call will be reading max_size elements, and
-            // as this may be past the end of my_data, we need to increase the
-            // size of the local buffer. This is filled with zeros.
-            my_data.resize(max_size);
-
-            std::vector<char> buffer(max_size * n_cpus);
-            const int         ierr = MPI_Allgather(my_data.data(),
-                                           max_size,
-                                           MPI_BYTE,
-                                           buffer.data(),
-                                           max_size,
-                                           MPI_BYTE,
-                                           triangulation->get_communicator());
-            AssertThrowMPI(ierr);
-
-            for (unsigned int i = 0; i < n_cpus; ++i)
-              if (i == Utilities::MPI::this_mpi_process(
-                         triangulation->get_communicator()))
-                locally_owned_dofs_per_processor[i] =
-                  my_locally_owned_new_dof_indices;
-              else
-                {
-                  // copy the data previously received into a stringstream
-                  // object and then read the IndexSet from it
-                  std::string decompressed_buffer;
-
-                  // first decompress the buffer
-                  {
-#  ifdef DEAL_II_WITH_ZLIB
-
-                    boost::iostreams::filtering_ostream decompressing_stream;
-                    decompressing_stream.push(
-                      boost::iostreams::gzip_decompressor());
-                    decompressing_stream.push(
-                      boost::iostreams::back_inserter(decompressed_buffer));
-
-                    decompressing_stream.write(&buffer[i * max_size], max_size);
-#  else
-                    decompressed_buffer.assign(&buffer[i * max_size], max_size);
-#  endif
-                  }
-
-                  // then restore the object from the buffer
-                  std::istringstream              in(decompressed_buffer);
-                  boost::archive::binary_iarchive archive(in);
-
-                  archive >> locally_owned_dofs_per_processor[i];
-                }
-
-            return NumberCache(locally_owned_dofs_per_processor,
-                               Utilities::MPI::this_mpi_process(
-                                 triangulation->get_communicator()));
+            NumberCache number_cache;
+            number_cache.locally_owned_dofs = my_locally_owned_new_dof_indices;
+            number_cache.n_global_dofs      = dof_handler->n_dofs();
+            number_cache.n_locally_owned_dofs =
+              number_cache.locally_owned_dofs.n_elements();
+            return number_cache;
           }
 #endif
       }
@@ -5921,8 +5751,7 @@ namespace internal
         // we only implement the case where the multigrid numbers are
         // renumbered within the processor's partition, rather than the most
         // general case
-        const std::vector<IndexSet> &index_sets =
-          dof_handler->locally_owned_mg_dofs_per_processor(level);
+        const IndexSet index_set = dof_handler->locally_owned_mg_dofs(level);
 
         constexpr int dim      = DoFHandlerType::dimension;
         constexpr int spacedim = DoFHandlerType::space_dimension;
@@ -5938,7 +5767,7 @@ namespace internal
 #  ifdef DEBUG
         for (types::global_dof_index i : new_numbers)
           {
-            Assert(index_sets[my_rank].is_element(i),
+            Assert(index_set.is_element(i),
                    ExcNotImplemented(
                      "Renumberings that change the locally owned mg dofs "
                      "partitioning are currently not implemented for "
@@ -5956,7 +5785,7 @@ namespace internal
         std::vector<types::global_dof_index> ghosted_new_numbers(
           relevant_dofs.n_elements());
         {
-          Utilities::MPI::Partitioner          partitioner(index_sets[my_rank],
+          Utilities::MPI::Partitioner          partitioner(index_set,
                                                   relevant_dofs,
                                                   tr->get_communicator());
           std::vector<types::global_dof_index> temp_array(
@@ -6018,8 +5847,12 @@ namespace internal
         Assert(false, ExcNotImplemented());
 #endif
 
-        return NumberCache(
-          index_sets, Utilities::MPI::this_mpi_process(tr->get_communicator()));
+        NumberCache number_cache;
+        number_cache.locally_owned_dofs = index_set;
+        number_cache.n_global_dofs      = dof_handler->n_dofs();
+        number_cache.n_locally_owned_dofs =
+          number_cache.locally_owned_dofs.n_elements();
+        return number_cache;
       }
     } // namespace Policy
   }   // namespace DoFHandlerImplementation

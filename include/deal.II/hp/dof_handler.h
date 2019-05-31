@@ -838,7 +838,7 @@ namespace hp
      * processes but the Triangulation on which this DoFHandler builds
      * works only on one MPI process.)
      */
-    const std::vector<IndexSet> &
+    std::vector<IndexSet>
     locally_owned_dofs_per_processor() const;
 
     /**
@@ -857,7 +857,7 @@ namespace hp
      * process, or that there are multiple MPI processes but the Triangulation
      * on which this DoFHandler builds works only on one MPI process.)
      */
-    const std::vector<types::global_dof_index> &
+    std::vector<types::global_dof_index>
     n_locally_owned_dofs_per_processor() const;
 
     /**
@@ -875,7 +875,7 @@ namespace hp
      * support multilevel methods yet, this function throws an exception
      * ExcNotImplemented() independent of its argument.
      */
-    const std::vector<IndexSet> &
+    std::vector<IndexSet>
     locally_owned_mg_dofs_per_processor(const unsigned int level) const;
 
     /**
@@ -1487,19 +1487,33 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  const std::vector<types::global_dof_index> &
+  std::vector<types::global_dof_index>
   DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   {
-    return number_cache.n_locally_owned_dofs_per_processor;
+    const parallel::Triangulation<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        &this->get_triangulation()));
+    if (tr != nullptr)
+      return number_cache.get_n_locally_owned_dofs_per_processor(
+        tr->get_communicator());
+    else
+      return number_cache.get_n_locally_owned_dofs_per_processor(MPI_COMM_SELF);
   }
 
 
 
   template <int dim, int spacedim>
-  const std::vector<IndexSet> &
+  std::vector<IndexSet>
   DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
   {
-    return number_cache.locally_owned_dofs_per_processor;
+    const parallel::Triangulation<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        &this->get_triangulation()));
+    if (tr != nullptr)
+      return number_cache.get_locally_owned_dofs_per_processor(
+        tr->get_communicator());
+    else
+      return number_cache.get_locally_owned_dofs_per_processor(MPI_COMM_SELF);
   }
 
 
@@ -1518,7 +1532,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  const std::vector<IndexSet> &
+  std::vector<IndexSet>
   DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
     const unsigned int level) const
   {
@@ -1526,7 +1540,15 @@ namespace hp
     (void)level;
     Assert(level < this->get_triangulation().n_global_levels(),
            ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
-    return mg_number_cache[0].locally_owned_dofs_per_processor;
+    const parallel::Triangulation<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        &this->get_triangulation()));
+    if (tr != nullptr)
+      return mg_number_cache[level].get_locally_owned_dofs_per_processor(
+        tr->get_communicator());
+    else
+      return mg_number_cache[level].get_locally_owned_dofs_per_processor(
+        MPI_COMM_SELF);
   }
 
 

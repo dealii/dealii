@@ -1862,8 +1862,6 @@ namespace parallel
           const std::string fname_variable =
             std::string(filename) + "_variable.data";
 
-          const int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
           AssertThrowMPI(ierr);
@@ -1906,36 +1904,26 @@ namespace parallel
           // Gather size of data in bytes we want to store from this processor.
           const unsigned int size_on_proc = src_data_variable.size();
 
-          // Share information among all processors.
-          std::vector<unsigned int> sizes_on_all_procs(n_procs);
-          ierr = MPI_Allgather(DEAL_II_MPI_CONST_CAST(&size_on_proc),
-                               1,
-                               MPI_UNSIGNED,
-                               sizes_on_all_procs.data(),
-                               1,
-                               MPI_UNSIGNED,
-                               mpi_communicator);
+          // Compute prefix sum
+          unsigned int prefix_sum = 0;
+          ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+                            &prefix_sum,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            mpi_communicator);
           AssertThrowMPI(ierr);
-
-          // Generate accumulated sum to get an offset for writing variable
-          // size data.
-          std::partial_sum(sizes_on_all_procs.begin(),
-                           sizes_on_all_procs.end(),
-                           sizes_on_all_procs.begin());
 
           const char *data = src_data_variable.data();
 
           // Write data consecutively into file.
-          ierr = MPI_File_write_at(
-            fh,
-            offset_variable +
-              ((myrank == 0) ?
-                 0 :
-                 sizes_on_all_procs[myrank - 1]), // global position in file
-            DEAL_II_MPI_CONST_CAST(data),
-            src_data_variable.size(), // local buffer
-            MPI_CHAR,
-            MPI_STATUS_IGNORE);
+          ierr = MPI_File_write_at(fh,
+                                   offset_variable +
+                                     prefix_sum, // global position in file
+                                   DEAL_II_MPI_CONST_CAST(data),
+                                   src_data_variable.size(), // local buffer
+                                   MPI_CHAR,
+                                   MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           ierr = MPI_File_close(&fh);
@@ -2033,8 +2021,6 @@ namespace parallel
           const std::string fname_variable =
             std::string(filename) + "_variable.data";
 
-          const int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
           AssertThrowMPI(ierr);
@@ -2070,27 +2056,19 @@ namespace parallel
                             dest_sizes_variable.end(),
                             0);
 
-          // share information among all processors
-          std::vector<unsigned int> sizes_on_all_procs(n_procs);
-          ierr = MPI_Allgather(DEAL_II_MPI_CONST_CAST(&size_on_proc),
-                               1,
-                               MPI_UNSIGNED,
-                               sizes_on_all_procs.data(),
-                               1,
-                               MPI_UNSIGNED,
-                               mpi_communicator);
+          // share information among all processors by prefix sum
+          unsigned int prefix_sum = 0;
+          ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+                            &prefix_sum,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            mpi_communicator);
           AssertThrowMPI(ierr);
-
-          // generate accumulated sum
-          std::partial_sum(sizes_on_all_procs.begin(),
-                           sizes_on_all_procs.end(),
-                           sizes_on_all_procs.begin());
 
           dest_data_variable.resize(size_on_proc);
           ierr = MPI_File_read_at(fh,
-                                  offset + ((myrank == 0) ?
-                                              0 :
-                                              sizes_on_all_procs[myrank - 1]),
+                                  offset + prefix_sum,
                                   dest_data_variable.data(),
                                   dest_data_variable.size(),
                                   MPI_CHAR,

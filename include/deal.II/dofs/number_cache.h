@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/mpi.h>
 
 #include <vector>
 
@@ -106,6 +107,28 @@ namespace internal
        */
       void
       clear();
+
+      /**
+       * Return a representation of @p n_locally_owned_dofs_per_processor both
+       * in case it was set up (directly returning the array) or in case we
+       * need to accumulate some information over all processors. The latter
+       * case involves global communication and is typically expensive to set
+       * up because it invokes MPI_Allgather.
+       */
+      std::vector<types::global_dof_index>
+      get_n_locally_owned_dofs_per_processor(
+        const MPI_Comm mpi_communicator) const;
+
+      /**
+       * Return a representation of @p locally_owned_dofs_per_processor both
+       * in case it was set up (directly returning the array of IndexSet
+       * fields) or in case we need to accumulate some information over all
+       * processors. The latter case involves global communication and is
+       * typically expensive to set up because it invokes MPI_Allgather.
+       */
+      std::vector<IndexSet>
+      get_locally_owned_dofs_per_processor(
+        const MPI_Comm mpi_communicator) const;
 
       /**
        * Total number of dofs, accumulated over all processors that may
