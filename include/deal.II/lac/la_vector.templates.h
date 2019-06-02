@@ -562,6 +562,26 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
+  Vector<Number>::print_numpy_array(std::ostream &     out,
+                                    const unsigned int precision) const
+  {
+    AssertThrow(out, ExcIO());
+    boost::io::ios_flags_saver restore_flags(out);
+
+    out.precision(precision);
+
+    const unsigned int n_elements = this->n_elements();
+    for (unsigned int i = 0; i < n_elements; ++i)
+      out << this->values[i] << ' ';
+    out << '\n' << std::flush;
+
+    AssertThrow(out, ExcIO());
+  }
+
+
+
+  template <typename Number>
+  void
   Vector<Number>::block_write(std::ostream &out) const
   {
     AssertThrow(out, ExcIO());

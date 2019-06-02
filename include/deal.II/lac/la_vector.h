@@ -344,13 +344,25 @@ namespace LinearAlgebra
     locally_owned_elements() const override;
 
     /**
-     * Prints the vector to the output stream @p out.
+     * Print the vector to the output stream @p out.
      */
     virtual void
     print(std::ostream &     out,
           const unsigned int precision  = 3,
           const bool         scientific = true,
           const bool         across     = true) const override;
+
+    /**
+     * Print the vector to the output stream @p out in a format that can be
+     * read by numpy::readtxt(). Note that the IndexSet is not printed but only
+     * the values stored in the Vector. To load the vector in python just do
+     * <code>
+     * vector = numpy.loadtxt('my_vector.txt')
+     * </code>
+     */
+    void
+    print_numpy_array(std::ostream &     out,
+                      const unsigned int precision = 9) const;
 
     /**
      * Write the vector en bloc to a file. This is done in a binary mode, so
