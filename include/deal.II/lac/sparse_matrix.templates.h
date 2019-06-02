@@ -1967,6 +1967,54 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
 
 template <typename number>
 void
+SparseMatrix<number>::print_numpy_array(std::ostream &     out,
+                                        const unsigned int precision) const
+{
+  AssertThrow(out, ExcIO());
+  boost::io::ios_flags_saver restore_flags(out);
+
+  out.precision(precision);
+
+  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(val != nullptr, ExcNotInitialized());
+
+  std::vector<number> rows;
+  std::vector<number> columns;
+  std::vector<number> values;
+  rows.reserve(n_nonzero_elements());
+  columns.reserve(n_nonzero_elements());
+  values.reserve(n_nonzero_elements());
+
+  for (size_type i = 0; i < cols->rows; ++i)
+    {
+      for (size_type j = cols->rowstart[i]; j < cols->rowstart[i + 1]; ++j)
+        {
+          rows.push_back(i);
+          columns.push_back(cols->colnums[j]);
+          values.push_back(j);
+        }
+    }
+
+  for (auto d : values)
+    out << d << ' ';
+  out << '\n';
+
+  for (auto r : rows)
+    out << r << ' ';
+  out << '\n';
+
+  for (auto c : columns)
+    out << c << ' ';
+  out << '\n';
+  out << std::flush;
+
+  AssertThrow(out, ExcIO());
+}
+
+
+
+template <typename number>
+void
 SparseMatrix<number>::block_write(std::ostream &out) const
 {
   AssertThrow(out, ExcIO());
