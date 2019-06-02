@@ -54,8 +54,6 @@ namespace internal
       {}
     };
 
-
-
     template <int dim, int spacedim>
     void
     fill_copy_indices(
@@ -197,24 +195,66 @@ namespace internal
             tria->level_ghost_owners();
           std::map<int, std::vector<DoFPair>> send_data;
 
-          // * find owners of the level dofs and insert into send_data
-          // accordingly
-          for (const auto &dofpair : send_data_temp)
+          std::sort(send_data_temp.begin(),
+                    send_data_temp.end(),
+                    [](const DoFPair &lhs, const DoFPair &rhs) {
+                      if (lhs.level < rhs.level)
+                        return true;
+                      if (lhs.level > rhs.level)
+                        return false;
+
+                      if (lhs.level_dof_index < rhs.level_dof_index)
+                        return true;
+                      if (lhs.level_dof_index > rhs.level_dof_index)
+                        return false;
+
+                      if (lhs.global_dof_index < rhs.global_dof_index)
+                        return true;
+                      else
+                        return false;
+                    });
+          send_data_temp.erase(
+            std::unique(send_data_temp.begin(),
+                        send_data_temp.end(),
+                        [](const DoFPair &lhs, const DoFPair &rhs) {
+                          return (lhs.level == rhs.level) &&
+                                 (lhs.level_dof_index == rhs.level_dof_index) &&
+                                 (lhs.global_dof_index == rhs.global_dof_index);
+                        }),
+            send_data_temp.end());
+
+          for (unsigned int level = 0; level < n_levels; ++level)
             {
-              std::set<types::subdomain_id>::iterator it;
-              for (it = neighbors.begin(); it != neighbors.end(); ++it)
-                {
-                  if (locally_owned_mg_dofs_per_processor[dofpair.level][*it]
-                        .is_element(dofpair.level_dof_index))
-                    {
-                      send_data[*it].push_back(dofpair);
-                      break;
-                    }
-                }
-              // Is this level dof not owned by any of our neighbors? That would
-              // certainly be a bug!
-              Assert(it != neighbors.end(),
-                     ExcMessage("could not find DoF owner."));
+              const IndexSet &is_local = mg_dof.locally_owned_mg_dofs(level);
+
+              std::vector<unsigned int> level_dof_indices;
+              std::vector<unsigned int> global_dof_indices;
+              for (const auto &dofpair : send_data_temp)
+                if (dofpair.level == level)
+                  {
+                    level_dof_indices.push_back(dofpair.level_dof_index);
+                    global_dof_indices.push_back(dofpair.global_dof_index);
+                  }
+
+              IndexSet is_ghost(is_local.size());
+              is_ghost.add_indices(level_dof_indices.begin(),
+                                   level_dof_indices.end());
+
+              AssertThrow(level_dof_indices.size() == is_ghost.n_elements(),
+                          ExcMessage("Size does not match!"));
+
+              const auto index_owner =
+                Utilities::MPI::compute_index_owner(is_local,
+                                                    is_ghost,
+                                                    tria->get_communicator());
+
+              AssertThrow(level_dof_indices.size() == index_owner.size(),
+                          ExcMessage("Size does not match!"));
+
+              for (unsigned int i = 0; i < index_owner.size(); i++)
+                send_data[index_owner[i]].emplace_back(level,
+                                                       global_dof_indices[i],
+                                                       level_dof_indices[i]);
             }
 
           // * send
