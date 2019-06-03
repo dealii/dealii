@@ -1372,14 +1372,16 @@ namespace DoFRenumbering
           dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
             &dof_handler.get_triangulation()))
       {
-        const std::vector<types::global_dof_index>
-          &n_locally_owned_dofs_per_processor =
-            dof_handler.n_locally_owned_dofs_per_processor();
-        my_starting_index =
-          std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                          n_locally_owned_dofs_per_processor.begin() +
-                            tria->locally_owned_subdomain(),
-                          types::global_dof_index(0));
+#ifdef DEAL_II_WITH_MPI
+        types::global_dof_index local_size =
+          dof_handler.locally_owned_dofs().n_elements();
+        MPI_Exscan(&local_size,
+                   &my_starting_index,
+                   1,
+                   DEAL_II_DOF_INDEX_MPI_TYPE,
+                   MPI_SUM,
+                   tria->get_communicator());
+#endif
       }
 
     if (const parallel::distributed::Triangulation<dim, spacedim> *tria =

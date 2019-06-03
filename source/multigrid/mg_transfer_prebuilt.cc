@@ -284,7 +284,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
           // Compute # of locally owned MG dofs / processor for distribution
           const std::vector<::dealii::IndexSet>
             locally_owned_mg_dofs_per_processor =
-              mg_dof.locally_owned_mg_dofs_per_processor(level + 1);
+              mg_dof.compute_locally_owned_mg_dofs_per_processor(level + 1);
           std::vector<::dealii::types::global_dof_index>
             n_locally_owned_mg_dofs_per_processor(
               locally_owned_mg_dofs_per_processor.size(), 0);

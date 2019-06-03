@@ -191,7 +191,7 @@ namespace internal
             locally_owned_mg_dofs_per_processor;
           for (unsigned int l = 0; l < tria->n_global_levels(); ++l)
             locally_owned_mg_dofs_per_processor.push_back(
-              mg_dof.locally_owned_mg_dofs_per_processor(l));
+              mg_dof.compute_locally_owned_mg_dofs_per_processor(l));
 
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
