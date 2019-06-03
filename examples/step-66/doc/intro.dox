@@ -5,9 +5,9 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-The aim of this tutorial program is to demonstarte how to solve a nonlinear
+The aim of this tutorial program is to demonstrate how to solve a nonlinear
 problem using Newton's method within the matrix-free framework. This tutorial
-combines several techniques already introduced in step-15, step 16, step-37,
+combines several techniques already introduced in step-15, step-16, step-37,
 step-48 and others.
 
 
@@ -24,7 +24,7 @@ This problem is also called the <i>Gelfand problem</i> and is a typical example
 for problems from combustion theory, see for example in the book
 <a href="https://link.springer.com/book/10.1007/978-1-4612-4546-9">
 Mathematical Problems from Combustion Theory
-by Jerrold Bebernes and David Eberly</a>
+by Jerrold Bebernes and David Eberly</a>.
 
 
 <h3>Discretization with finite elements</h3>
@@ -37,11 +37,13 @@ such that for all test functions $v$ holds:
 @f{align*}{
  \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
  -
- \int_\Omega v \exp(u) \,\mathrm{d}x.
+ \int_\Omega v \exp(u) \,\mathrm{d}x
+ =
+ 0.
 @f}
 
 Choosing the Lagrangian finite element space $V_h$ we can define a basis
-$\{\varphi_i\}_{i=1,\dots,N}$ and it sufficies to test only with those basis
+$\{\varphi_i\}_{i=1,\dots,N}$ and it suffices to test only with those basis
 functions. So the discrete problem reads as follows: Find $u_h\in V_h$ such that
 for all $i=1,\dots,N$ holds:
 @f{align*}{
@@ -54,8 +56,8 @@ for all $i=1,\dots,N$ holds:
 We directly define the nonlinear function $F\colon\mathbb{R}^N\to\mathbb{R}^N$
 representing the discrete nonlinear problem.
 
-To solve this nonlinear problem we can apply Newton's method. So given an
-initial guess $u_h^0\inV_h$ we determine a sequence of Newton steps
+To solve this nonlinear problem we use Newton's method. So given an
+initial guess $u_h^0\in V_h$ we determine a sequence of Newton steps
 $\bigl( u_h^n \bigr)_n$ by successively apply the following scheme:
 @f{alignat*}{2}{
  &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
@@ -64,10 +66,10 @@ $\bigl( u_h^n \bigr)_n$ by successively apply the following scheme:
 So in each Newton step we have to solve a linear problem $A\,x = b$, where the
 system matrix $A$ is represented by the Jacobian
 $F'(u_h^n)[\,\cdot\,]\colon\mathbb{R}^N\to\mathbb{R}^N$ and the right hand side
-$b$ by the negative resiudal $-F(u_h^n)$. The solution vector $x$ is in that
+$b$ by the negative residual $-F(u_h^n)$. The solution vector $x$ is in that
 case the Newton update of the $n$-th Newton step.
 
-Unitl now we only tested with the basis functions, however, we can also
+Until now we only tested with the basis functions, however, we can also
 represent any function of $V_h$ as linear combination of basis functions. More
 mathematically this means, that every element of $V_h$ can be
 identified with a vector $U\in\mathbb{R}^N$ via the representation formula:
@@ -75,7 +77,7 @@ $u_h = \sum_{i=1}^N U_i \varphi_i$. So using this we can give an expression for
 the discrete Jacobian and the residual:
 @f{align*}{
  A_{i,j} = \bigl( F'(u_h^n) \bigr)_{i,j}
- =
+ &=
  \int_\Omega \nabla\varphi_i \cdot \nabla \varphi_j \,\mathrm{d} x
  -
  \int_\Omega \varphi_i \, \exp( u_h ) \varphi_j \,\mathrm{d} x,\\
@@ -87,23 +89,22 @@ the discrete Jacobian and the residual:
 @f}
 Compared to step-15 we could also have formed the Frech{\'e}t derivative of the
 nonlinear function corresponding to the strong formulation of the problem and
-discretized it afterwards. However, in the end we would have get the same set of
+discretized it afterwards. However, in the end we would get the same set of
 discrete equations.
 
 
 <h3>Numerical linear algebra</h3>
 Note, how the system matrix, actually the Jacobian, depends on the previous
 Newton step $A = F'(u^n)$. Hence before we can use the system matrix we have to
-tell it, what was the last Newton step. In an implemenation with a classical
+tell it, what was the last Newton step. In an implementation with a classical
 assemble_system function we would gather this information from the last Newton
 step during assembly by the use of the member functions get_function_values and
 get_function_gradients of the FEValuesBase class. The assemble_system function
 would then looks like:
-
 @code
 template<int dim>
 void
-BratuProblem<dim>::assemble_system()
+GelfandProblem<dim>::assemble_system()
 {
   system_matrix = 0;
   system_rhs    = 0;
@@ -169,23 +170,22 @@ BratuProblem<dim>::assemble_system()
 
 However, since we want to solve this problem without storing a matrix, we need
 to tell the MatrixFreeOperator this information before we use it. Therefore in
-the derived class JacobianMatrixFreeOperator we will implemenet a function
-called evaluate_nonlinearity, which will process the information of the last
-Newton step prior to usage of the matrix-vector implementation. Furthermore we
-want to use a geometric multigrid preconditioner for the linear solver, so in
-order to apply the multilevel operators we need to pass the last Newton step
-also to these operators. This is kind of a tricky task, since the vector
-containing the last Newton step has to be interpolated to all levels of the
-triangulation. In the code this task will be done by the fucntion
-interpolate_to_mg, which is a member of the MGTransferMatrixFree class:
-
+the derived class JacobianOperator we will implement a function called
+evaluate_newton_step, which will process the information of the last Newton step
+prior to the usage of the matrix-vector implementation. Furthermore we want to
+use a geometric multigrid preconditioner for the linear solver, so in order to
+apply the multilevel operators we need to pass the last Newton step also to
+these operators. This is kind of a tricky task, since the vector containing the
+last Newton step has to be interpolated to all levels of the triangulation. In
+the code this task will be done by the function interpolate_to_mg, which is a
+member of the MGTransferMatrixFree class:
 @code
 void
 GelfandProblem<dim>::compute_update()
 {
   solution.update_ghost_values();
   
-  system_matrix.evaluate_nonlinearity(solution);
+  system_matrix.evaluate_newton_step(solution);
   
   MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
   
@@ -194,7 +194,7 @@ GelfandProblem<dim>::compute_update()
   // Set up options for the multilevel preconditioner
   for(unsigend int level=0; level<triangulation.n_levels()-1; ++level)
   {
-	mg_matrices[level].evaluate_nonlinearity(mg_solution[level]);
+	mg_matrices[level].evaluate_newton_step(mg_solution[level]);
   }
   
   // Define the actual preconitioner
@@ -205,14 +205,13 @@ GelfandProblem<dim>::compute_update()
 }
 @endcode
 
-The function evaluating the nonlinearity works basically like the function
-evaluate_coefficient from step-37 evaluating a coefficient function. The idea is
-to use a FEEvaluation object to evaluate the Newton step and store the
-expression in a table for all cells and all quadrature points:
-
+The function evaluating the nonlinearity works basically in the same way as the
+function evaluate_coefficient from step-37 evaluating a coefficient function.
+The idea is to use a FEEvaluation object to evaluate the Newton step and store
+the expression in a table for all cells and all quadrature points:
 @code
 void
-JacobianOperator<dim,fe_degree,number>::evaluate_nonlinearity(const LinearAlgebra::distributed::Vector<number> &src)
+JacobianOperator<dim,fe_degree,number>::evaluate_newton_step(const LinearAlgebra::distributed::Vector<number> &src)
 {
   const unsigned int n_cells = this->data->n_macro_cells();
   FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*this->data);
@@ -227,13 +226,13 @@ JacobianOperator<dim,fe_degree,number>::evaluate_nonlinearity(const LinearAlgebr
 	  nl_values(cell, q) = std::exp(phi.get_value(q));
   }
 }
-@endcod
+@endcode
 
 
 <h3>Triangulation</h3>
 As said in step-37 the matrix-free method works more efficient if we choose a
 higher order finite element space. Since we want to solve the problem on the
-unit circle, it would be good to have an approprioate boundary approximation to
+unit circle, it would be good to have an appropriate boundary approximation to
 overcome convergence issues. For this reason we use the MappingC1 class to
 recover the smooth boundary. In addition, to get a good triangulation in total
 we make use of the TransfiniteInterpolationManifold.
