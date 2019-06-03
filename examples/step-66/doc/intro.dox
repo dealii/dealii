@@ -173,12 +173,12 @@ to tell the MatrixFreeOperator this information before we use it. Therefore in
 the derived class JacobianOperator we will implement a function called
 evaluate_newton_step, which will process the information of the last Newton step
 prior to the usage of the matrix-vector implementation. Furthermore we want to
-use a geometric multigrid preconditioner for the linear solver, so in order to
-apply the multilevel operators we need to pass the last Newton step also to
-these operators. This is kind of a tricky task, since the vector containing the
-last Newton step has to be interpolated to all levels of the triangulation. In
-the code this task will be done by the function interpolate_to_mg, which is a
-member of the MGTransferMatrixFree class:
+use a geometric multigrid (GMG) preconditioner for the linear solver, so in
+order to apply the multilevel operators we need to pass the last Newton step
+also to these operators. This is kind of a tricky task, since the vector
+containing the last Newton step has to be interpolated to all levels of the
+triangulation. In the code this task will be done by the function
+interpolate_to_mg, which is a member of the MGTransferMatrixFree class:
 @code
 void
 GelfandProblem<dim>::compute_update()
