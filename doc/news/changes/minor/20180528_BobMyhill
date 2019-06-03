@@ -1,0 +1,4 @@
+New: The InterpolatedUniformGridData::gradient() function was not
+previously implemented. It is now.
+<br>
+(Bob Myhill, Anne Glerum, Wolfgang Bangerth, 2018/09/27)
