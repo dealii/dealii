@@ -326,4 +326,100 @@ namespace Step66
       phi.distribute_local_to_global(dst);
     }
   }
-
+  
+  
+  
+  // @sect4{ResidualOperator}
+  
+  // The next class implements the ResidualOperator, which we use to evaluate
+  // the residual and to assemble the right hand side. Since we will not pass
+  // objects of this class to any other objects for example linear solvers, etc.
+  // we have not need to fulfill any interface requirements. The operator's main
+  // functionality is implemented in the apply function. We can actually think
+  // of ResidualOperator.apply(dst, src) is mathematically expressed as
+  // F(src) = dst, where $F\colon\mathbb{R}^N\to\mathbb{R}^N$ is the discrete
+  // residual introduced in the introduction. Further the ResidualOperator has
+  // an initialization function, which stores a shared pointer to the MatrixFree
+  // object handling the loop over all cells, and a local_apply function
+  // implementing the calculation of the cell contribution.
+  
+  // ??? As functor with operator() function.
+  
+  template <int dim, int fe_degree>
+  class ResidualOperator
+  {
+  public:
+    ResidualOperator() = default;
+    
+    void
+    initialize(std::shared_ptr<const MatrixFree<dim,double> > data_in);
+    
+    void
+    apply(LinearAlgebra::distributed::Vector<double> &dst,
+          const LinearAlgebra::distributed::Vector<double> &src) const;
+          
+  private:
+    void
+    local_apply(const MatrixFree<dim,double> &data, LinearAlgebra::distributed::Vector<double> &dst, const LinearAlgebra::distributed::Vector<double> &src, const std::pair<unsigned int,unsigned int> &cell_range) const;
+    
+    std::shared_ptr<const MatrixFree<dim,double> > data;
+  };
+  
+  
+  
+  // The initialize function checks if given shared pointer of the MatrixFree
+  // object is not empty and pass it to the class varaiable.
+  template <int dim, int fe_degree>
+  void
+  ResidualOperator<dim,fe_degree>::initialize(
+    std::shared_ptr<const MatrixFree<dim,double> > data_in)
+  {
+    Assert(data_in, ExcNotInitialized());
+    
+    data = data_in;
+  }
+  
+  
+  
+  // The main function evaluating the residual is just a wrapper around the
+  // cell_loop of the MatrixFree object.
+  template <int dim, int fe_degree>
+  void
+  ResidualOperator<dim, fe_degree>::apply(LinearAlgebra::distributed::Vector<double> &dst, const LinearAlgebra::distributed::Vector<double> &src) const
+  {
+    Assert(data, ExcNotInitialized());
+    
+    data->cell_loop(&ResidualOperator<dim,fe_degree>::local_apply, this, dst, src, true);
+  }
+  
+  
+  
+  // The heart of the ResidualOperator is the local_apply function. The
+  // implementation is similar to the local_apply function of the above
+  // JacobianOperator. We setup a FEEvaluation object, gather and evaluate the
+  // values and gradients, submit the new values and gradients and finally
+  // integrate and distribute the local contributions to the global vector.
+  // Different to the Jacobian we need no additional table storing the values of
+  // the old Newton step, instead we can evaluate the nonlinearity on the fly,
+  // since we have to evaluate the residual in the input vector src,
+  // representing the last Newton step.
+  template <int dim, int fe_degree>
+  void
+  ResidualOperator<dim, fe_degree>::local_apply(const MatrixFree<dim> &data, LinearAlgebra::distributed::Vector<double> &dst, const LinearAlgebra::distributed::Vector<double> &src, const std::pair<unsigned int,unsigned int> &cell_range) const
+  {
+    FEEvaluation<dim,fe_degree> phi(data);
+    
+    for(unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+    {
+      phi.reinit(cell);
+      phi.gather_evaluate(src, true, true);
+      
+      for(unsigned int q=0; q<phi.n_q_points; ++q)
+      {
+        phi.submit_value(-std::exp(phi.get_value(q)), q);
+        phi.submit_gradient(phi.get_gradient(q), q);
+      }
+      
+      phi.integrate_scatter(true, true, dst);
+    }
+  }
