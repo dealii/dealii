@@ -1036,3 +1036,50 @@ namespace Step66
     }
   }
 }
+
+
+
+// @sect3{The main function}
+
+// As typical for programs running in parallel with MPI we set up the MPI
+// framework and limit the number of threads to one. Finally to run the solver
+// for the <i>Gelfand problem</i> we create an object of the GelfandProblem
+// class and call the run function.
+int
+main(int argc, char *argv[])
+{
+  try
+  {    
+    using namespace Step66;
+    
+    Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
+    
+    GelfandProblem<dimension> gelfand_problem;
+    gelfand_problem.run();
+  }
+  catch(std::exception &exc)
+  {
+    std::cerr << std::endl << std::endl
+    << "----------------------------------------------------"
+    << std::endl;
+    std::cerr << "Exception on processing: " << std::endl
+    << exc.what() << std::endl
+    << "Aborting!" << std::endl
+    << "----------------------------------------------------"
+    << std::endl;
+    return 1;
+  }
+  catch(...)
+  {
+    std::cerr << std::endl << std::endl
+    << "----------------------------------------------------"
+    << std::endl;
+    std::cerr << "Unknown exception!" << std::endl
+    << "Aborting!" << std::endl
+    << "----------------------------------------------------"
+    << std::endl;
+    return 1;
+  }
+  
+  return 0;
+}
