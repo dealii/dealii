@@ -791,7 +791,8 @@ namespace TrilinosWrappers
     if (nonlocal_graph.get() != nullptr)
       {
         if (nonlocal_graph->IndicesAreGlobal() == false &&
-            nonlocal_graph->RowMap().NumMyElements() > 0)
+            nonlocal_graph->RowMap().NumMyElements() > 0 &&
+            column_space_map->NumGlobalElements() > 0)
           {
             // Insert dummy element at (row, column) that corresponds to row 0
             // in local index counting.
@@ -813,6 +814,7 @@ namespace TrilinosWrappers
             AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           }
         Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
+                 column_space_map->NumGlobalElements() == 0 ||
                  nonlocal_graph->IndicesAreGlobal() == true,
                ExcInternalError());
 
