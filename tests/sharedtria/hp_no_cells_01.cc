@@ -80,7 +80,7 @@ test()
 
   deallog << "n_locally_owned_dofs_per_processor: ";
   std::vector<types::global_dof_index> v =
-    dof_handler.n_locally_owned_dofs_per_processor();
+    dof_handler.compute_n_locally_owned_dofs_per_processor();
   unsigned int sum = 0;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -105,7 +105,7 @@ test()
   Assert(std::accumulate(v.begin(), v.end(), 0U) == N, ExcInternalError());
 
   std::vector<IndexSet> locally_owned_dofs_per_processor =
-    dof_handler.locally_owned_dofs_per_processor();
+    dof_handler.compute_locally_owned_dofs_per_processor();
   IndexSet all(N);
   for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
     {

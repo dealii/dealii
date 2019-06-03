@@ -76,7 +76,7 @@ test()
             complete_renumbering.begin());
   unsigned int                offset = renumbering.size();
   const std::vector<IndexSet> dofs_per_proc =
-    dofh.locally_owned_dofs_per_processor();
+    dofh.compute_locally_owned_dofs_per_processor();
   for (unsigned int i = 1; i < nprocs; ++i)
     {
       if (myid == i)

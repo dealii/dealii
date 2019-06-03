@@ -110,7 +110,7 @@ test()
   DoFTools::make_sparsity_pattern(dof_handler, bcsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(
     bcsp,
-    dof_handler.locally_owned_dofs_per_processor(),
+    dof_handler.compute_locally_owned_dofs_per_processor(),
     MPI_COMM_WORLD,
     locally_relevant_dofs);
 

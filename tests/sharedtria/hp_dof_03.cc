@@ -109,8 +109,9 @@ test()
       //
       //      deallog << "n_locally_owned_dofs_per_processor: ";
       //      std::vector<types::global_dof_index> v =
-      //      dof_handler.n_locally_owned_dofs_per_processor(); unsigned int sum
-      //      = 0; for (unsigned int i=0; i<v.size(); ++i)
+      //        dof_handler.compute_n_locally_owned_dofs_per_processor();
+      //      unsigned int sum = 0;
+      //      for (unsigned int i=0; i<v.size(); ++i)
       //        {
       //          deallog << v[i] << " ";
       //          sum += v[i];
@@ -119,7 +120,7 @@ test()
 
       const std::vector<types::global_dof_index>
         n_locally_owned_dofs_per_processor =
-          dof_handler.n_locally_owned_dofs_per_processor();
+          dof_handler.compute_n_locally_owned_dofs_per_processor();
       Assert(dof_handler.n_locally_owned_dofs() ==
                n_locally_owned_dofs_per_processor[triangulation
                                                     .locally_owned_subdomain()],
@@ -137,7 +138,7 @@ test()
              ExcInternalError());
 
       const std::vector<IndexSet> locally_owned_dofs_per_processor =
-        dof_handler.locally_owned_dofs_per_processor();
+        dof_handler.compute_locally_owned_dofs_per_processor();
       IndexSet all(N);
       for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
         {

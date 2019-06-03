@@ -75,7 +75,7 @@ test()
   data_out.build_patches();
 
   std::vector<types::global_dof_index> n_locally_owned_dofs_per_processor =
-    dofh.n_locally_owned_dofs_per_processor();
+    dofh.compute_n_locally_owned_dofs_per_processor();
   if (myid == 0)
     {
       for (unsigned int i = 0; i < n_locally_owned_dofs_per_processor.size();

@@ -358,7 +358,8 @@ namespace Step18
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
     n_local_cells = GridTools::count_cells_with_subdomain_association(
       triangulation, triangulation.locally_owned_subdomain());
-    local_dofs_per_process = dof_handler.n_locally_owned_dofs_per_processor();
+    local_dofs_per_process =
+      dof_handler.compute_n_locally_owned_dofs_per_processor();
     hanging_node_constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler,
                                             hanging_node_constraints);

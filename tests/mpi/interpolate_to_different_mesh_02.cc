@@ -153,7 +153,7 @@ SeventhProblem<dim>::setup_system()
   DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(
     csp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
+    dof_handler.compute_n_locally_owned_dofs_per_processor(),
     mpi_communicator,
     locally_relevant_dofs);
   system_matrix.reinit(locally_owned_dofs,

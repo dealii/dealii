@@ -61,7 +61,7 @@ test()
 
   const std::vector<types::global_dof_index>
     n_locally_owned_dofs_per_processor =
-      dofh.n_locally_owned_dofs_per_processor();
+      dofh.compute_n_locally_owned_dofs_per_processor();
   if (myid == 1)
     {
       deallog << "dofh.n_dofs() " << n_locally_owned_dofs_per_processor

@@ -220,7 +220,7 @@ Test_Solver_Output::setup_system()
 
   SparsityTools::distribute_sparsity_pattern(
     dsp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
+    dof_handler.compute_n_locally_owned_dofs_per_processor(),
     mpi_comm,
     locally_relevant_dofs);
 

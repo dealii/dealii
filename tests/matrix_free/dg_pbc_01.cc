@@ -97,7 +97,7 @@ test()
   solver.solve(mf, sol, rhs, PreconditionIdentity());
 
   const std::vector<IndexSet> locally_owned_dofs_per_processor =
-    dof.locally_owned_dofs_per_processor();
+    dof.compute_locally_owned_dofs_per_processor();
   // gather all data at root
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
