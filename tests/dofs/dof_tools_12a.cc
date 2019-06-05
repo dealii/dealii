@@ -96,11 +96,11 @@ check(const FiniteElement<dim> &fe, const std::string &name)
 
   // setup hp DoFHandler
   hp::FECollection<dim> fe_collection(fe);
-  hp::DoFHandler<dim> hp_dof_handler(tria);
+  hp::DoFHandler<dim>   hp_dof_handler(tria);
   hp_dof_handler.distribute_dofs(fe_collection);
 
-  check_this<dim, DoFHandler<dim> >(dof_handler);
-  check_this<dim, hp::DoFHandler<dim> >(hp_dof_handler);
+  check_this<dim, DoFHandler<dim>>(dof_handler);
+  check_this<dim, hp::DoFHandler<dim>>(hp_dof_handler);
 }
 
 
@@ -141,7 +141,7 @@ main(int argc, char **argv)
   try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      MPILogInitAll logfile;
+      MPILogInitAll                    logfile;
 
       CHECK_ALL(Q, 1)
       CHECK_ALL(Q, 2)
@@ -235,6 +235,4 @@ main(int argc, char **argv)
               << std::endl;
       return 1;
     };
-
 }
-
