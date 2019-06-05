@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-// test GridTools::torus() and TorusManifold, output visually checked
+// test GridTools::torus() the manifolds attached to the torus (TorusManifold,
+// ToriodalManifold, TransfiniteInterpolationManifold), output visually
+// checked
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -38,7 +40,6 @@ test<3, 3>()
   Triangulation<dim, spacedim> triangulation;
 
   GridGenerator::torus(triangulation, 1.0, 0.4);
-  triangulation.set_manifold(1, SphericalManifold<3>());
 
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
@@ -58,7 +59,7 @@ test<3, 3>()
       Tensor<1, 3> t = desc_torus.get_tangent_vector(p, x);
 
       deallog.get_file_stream()
-        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " rto "
+        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " to "
         << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
     }
   deallog.get_file_stream() << "set view equal xyz" << std::endl
