@@ -39,7 +39,11 @@
 #include "../tests.h"
 
 // check
-//   DoFTools::extract_dofs as in dof_tools_12 in parallel for fewer elements
+//  DoFTools::extract_dofs as in dof_tools_12 in parallel for fewer elements
+// The output of this file is for every process the (boolean) vector of
+// extracted locally owned DoFs (corresponding to local DoF indices), not the
+// extracted vector of the global DoF, which has to be mapped with the locally
+// owned IndexSet first.
 
 void
 output_bool_vector(std::vector<bool> &v)
