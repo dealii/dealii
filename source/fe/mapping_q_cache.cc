@@ -119,7 +119,9 @@ std::vector<Point<spacedim>>
 MappingQCache<dim, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  Assert(support_point_cache.get() != nullptr, ExcNotInitialized());
+  Assert(support_point_cache.get() != nullptr,
+         ExcMessage("Must call MappingQCache::initialize() before "
+                    "using it or after mesh has changed!"));
 
   AssertIndexRange(cell->level(), support_point_cache->size());
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
