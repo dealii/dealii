@@ -110,7 +110,7 @@ check_this()
   DoFHandler<dim> dof_handler(tr);
   dof_handler.distribute_dofs(fe);
 
-  check_this<DoFHandler<dim> >(dof_handler);
+  check_this<DoFHandler<dim>>(dof_handler);
 }
 
 

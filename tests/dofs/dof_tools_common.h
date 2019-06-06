@@ -106,8 +106,11 @@ check(const FiniteElement<dim> &fe, const std::string &name)
   hp_dof_handler.distribute_dofs(fe_collection);
 
   // call main function in .cc files
-  check_this<DoFHandler<dof_handler.dimension, dof_handler.space_dimension> >(dof_handler);
-  check_this<hp::DoFHandler<hp_dof_handler.dimension, hp_dof_handler.space_dimension> >(hp_dof_handler);
+  check_this<DoFHandler<dof_handler.dimension, dof_handler.space_dimension>>(
+    dof_handler);
+  check_this<
+    hp::DoFHandler<hp_dof_handler.dimension, hp_dof_handler.space_dimension>>(
+    hp_dof_handler);
 }
 
 

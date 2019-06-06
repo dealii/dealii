@@ -44,7 +44,8 @@ check_this(const DoFHandlerType &dof_handler)
   set.insert(0);
   DoFTools::map_dof_to_boundary_indices(dof_handler, set, map);
 
-  std::map<types::boundary_id, const Function<dof_handler.dimension> *> boundary_ids;
+  std::map<types::boundary_id, const Function<dof_handler.dimension> *>
+    boundary_ids;
   boundary_ids[0] = nullptr;
   const unsigned int n_boundary_dofs =
     dof_handler.n_boundary_dofs(boundary_ids);

@@ -48,7 +48,8 @@ template <typename DoFHandlerType>
 void
 check_this(const DoFHandlerType &dof_handler)
 {
-  Functions::CosineFunction<dof_handler.dimension> test_func(dof_handler.get_fe().n_components());
+  Functions::CosineFunction<dof_handler.dimension> test_func(
+    dof_handler.get_fe().n_components());
 
   AffineConstraints<double> cm;
 
