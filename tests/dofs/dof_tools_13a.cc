@@ -56,9 +56,8 @@ check_this(const DoFHandler<dim> &dof_handler)
     std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
                                      false);
     component_mask[0] = true;
-    DoFTools::extract_dofs(dof_handler,
-                           ComponentMask(component_mask),
-                           component_dofs);
+    DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(
+      dof_handler, ComponentMask(component_mask), component_dofs);
 
     for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
@@ -91,9 +90,8 @@ check_this(const DoFHandler<dim> &dof_handler)
     std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
                                      false);
     component_mask.back() = true;
-    DoFTools::extract_dofs(dof_handler,
-                           ComponentMask(component_mask),
-                           component_dofs);
+    DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(
+      dof_handler, ComponentMask(component_mask), component_dofs);
     for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
         dof_data(i) = i + 1;

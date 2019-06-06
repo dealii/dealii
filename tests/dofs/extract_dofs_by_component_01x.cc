@@ -63,7 +63,8 @@ check()
   component_mask[0] = true;
 
   std::vector<bool> dofs(dof.n_dofs());
-  DoFTools::extract_dofs(dof, ComponentMask(component_mask), dofs);
+  DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(
+    dof, ComponentMask(component_mask), dofs);
 
   for (unsigned int d = 0; d < dof.n_dofs(); ++d)
     deallog << dofs[d];

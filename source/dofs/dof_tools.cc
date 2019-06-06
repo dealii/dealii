@@ -397,59 +397,11 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename DoFHandlerType>
   void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof,
-               const ComponentMask &            component_mask,
-               std::vector<bool> &              selected_dofs)
-  {
-    const FiniteElement<dim, spacedim> &fe = dof.get_fe();
-    (void)fe;
-
-    Assert(component_mask.represents_n_components(fe.n_components()),
-           ExcMessage(
-             "The given component mask is not sized correctly to represent the "
-             "components of the given finite element."));
-    Assert(selected_dofs.size() == dof.n_locally_owned_dofs(),
-           ExcDimensionMismatch(selected_dofs.size(),
-                                dof.n_locally_owned_dofs()));
-
-    // two special cases: no component is selected, and all components are
-    // selected; both rather stupid, but easy to catch
-    if (component_mask.n_selected_components(n_components(dof)) == 0)
-      {
-        std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
-        return;
-      }
-    else if (component_mask.n_selected_components(n_components(dof)) ==
-             n_components(dof))
-      {
-        std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), true);
-        return;
-      }
-
-
-    // preset all values by false
-    std::fill_n(selected_dofs.begin(), dof.n_locally_owned_dofs(), false);
-
-    // get the component association of each DoF and then select the ones
-    // that match the given set of blocks
-    std::vector<unsigned char> dofs_by_component(dof.n_locally_owned_dofs());
-    internal::get_component_association(dof, component_mask, dofs_by_component);
-
-    for (types::global_dof_index i = 0; i < dof.n_locally_owned_dofs(); ++i)
-      if (component_mask[dofs_by_component[i]] == true)
-        selected_dofs[i] = true;
-  }
-
-
-  // TODO: Unify the following two functions with the non-hp case
-
-  template <int dim, int spacedim>
-  void
-  extract_dofs(const hp::DoFHandler<dim, spacedim> &dof,
-               const ComponentMask &                component_mask,
-               std::vector<bool> &                  selected_dofs)
+  extract_dofs(const DoFHandlerType &dof,
+               const ComponentMask & component_mask,
+               std::vector<bool> &   selected_dofs)
   {
     Assert(component_mask.represents_n_components(
              dof.get_fe_collection().n_components()),
@@ -492,26 +444,15 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename DoFHandlerType>
   void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof,
-               const BlockMask &                block_mask,
-               std::vector<bool> &              selected_dofs)
+  extract_dofs(const DoFHandlerType &dof,
+               const BlockMask &     block_mask,
+               std::vector<bool> &   selected_dofs)
   {
     // simply forward to the function that works based on a component mask
-    extract_dofs(dof, dof.get_fe().component_mask(block_mask), selected_dofs);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  extract_dofs(const hp::DoFHandler<dim, spacedim> &dof,
-               const BlockMask &                    block_mask,
-               std::vector<bool> &                  selected_dofs)
-  {
-    // simply forward to the function that works based on a component mask
-    extract_dofs(dof, dof.get_fe().component_mask(block_mask), selected_dofs);
+    extract_dofs<dim, spacedim, DoFHandlerType>(
+      dof, dof.get_fe_collection().component_mask(block_mask), selected_dofs);
   }
 
 
