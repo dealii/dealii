@@ -16,30 +16,27 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+//#include "dof_tools_fake_hp.inst.in"
 
 // check
 //   DoFTools::extract_dofs
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   std::vector<bool> selected_dofs(dof_handler.n_dofs());
   std::vector<bool> mask(dof_handler.get_fe().n_components(), false);
 
   // only select first component
   mask[0] = true;
-  DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(dof_handler,
-                                                    ComponentMask(mask),
-                                                    selected_dofs);
+  DoFTools::extract_dofs(dof_handler, ComponentMask(mask), selected_dofs);
   output_bool_vector(selected_dofs);
 
   // also select last component
   mask.back() = true;
-  DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(dof_handler,
-                                                    ComponentMask(mask),
-                                                    selected_dofs);
+  DoFTools::extract_dofs(dof_handler, ComponentMask(mask), selected_dofs);
   output_bool_vector(selected_dofs);
 }

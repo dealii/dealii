@@ -1351,7 +1351,7 @@ namespace DoFTools
    * first have to be mapped to the global degrees of freedom, to correspond
    * with them.
    */
-  template <int dim, int spacedim, typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_dofs(const DoFHandlerType &dof_handler,
                const ComponentMask & component_mask,
@@ -1381,7 +1381,7 @@ namespace DoFTools
    *   sequential computations of course equals DoFHandler::n_dofs(). The
    * previous contents of this array are overwritten.
    */
-  template <int dim, int spacedim, typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_dofs(const DoFHandlerType &dof_handler,
                const BlockMask &     block_mask,

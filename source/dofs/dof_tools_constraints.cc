@@ -3133,7 +3133,7 @@ namespace DoFTools
       {
         std::vector<bool> mask(coarse_grid.get_fe(0).n_components(), false);
         mask[coarse_component] = true;
-        extract_dofs<dim, spacedim, DoFHandler<dim, spacedim>>(
+        extract_dofs<DoFHandler<dim, spacedim>>(
           coarse_grid, ComponentMask(mask), coarse_dof_is_parameter);
       }
 

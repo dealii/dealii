@@ -689,33 +689,25 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
           &patch);
 
       template void
-      extract_dofs<deal_II_dimension,
-                   deal_II_space_dimension,
-                   DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const ComponentMask &,
         std::vector<bool> &);
 
       template void
-      extract_dofs<deal_II_dimension,
-                   deal_II_space_dimension,
-                   DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
         std::vector<bool> &);
 
       template void
-      extract_dofs<deal_II_dimension,
-                   deal_II_space_dimension,
-                   hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const ComponentMask &,
         std::vector<bool> &);
 
       template void
-      extract_dofs<deal_II_dimension,
-                   deal_II_space_dimension,
-                   hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
         std::vector<bool> &);

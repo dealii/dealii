@@ -18,6 +18,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_fake_hp.inst.in"
 
 // check
 //   DoFTools::distribute_cell_to_dof_vector
@@ -30,9 +31,9 @@
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // this doesn't make much sense if
   // the element is not primitive
@@ -56,8 +57,9 @@ check_this(const DoFHandler<dim> &dof_handler)
     std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
                                      false);
     component_mask[0] = true;
-    DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(
-      dof_handler, ComponentMask(component_mask), component_dofs);
+    DoFTools::extract_dofs(dof_handler,
+                           ComponentMask(component_mask),
+                           component_dofs);
 
     for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
@@ -90,8 +92,9 @@ check_this(const DoFHandler<dim> &dof_handler)
     std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
                                      false);
     component_mask.back() = true;
-    DoFTools::extract_dofs<dim, dim, DoFHandler<dim>>(
-      dof_handler, ComponentMask(component_mask), component_dofs);
+    DoFTools::extract_dofs(dof_handler,
+                           ComponentMask(component_mask),
+                           component_dofs);
     for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
         dof_data(i) = i + 1;

@@ -397,7 +397,7 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_dofs(const DoFHandlerType &dof,
                const ComponentMask & component_mask,
@@ -444,14 +444,14 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_dofs(const DoFHandlerType &dof,
                const BlockMask &     block_mask,
                std::vector<bool> &   selected_dofs)
   {
     // simply forward to the function that works based on a component mask
-    extract_dofs<dim, spacedim, DoFHandlerType>(
+    extract_dofs<DoFHandlerType>(
       dof, dof.get_fe_collection().component_mask(block_mask), selected_dofs);
   }
 

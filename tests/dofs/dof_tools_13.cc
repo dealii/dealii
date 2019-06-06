@@ -18,15 +18,16 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_fake_hp.inst.in"
 
 // check
 //   DoFTools::distribute_cell_to_dof_vector
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // this doesn't make much sense if
   // the element is not primitive

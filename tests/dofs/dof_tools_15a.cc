@@ -18,6 +18,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_fake_hp.inst.in"
 
 // check
 //   DoFTools::
@@ -27,9 +28,9 @@
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // test doesn't make much sense if
   // no boundary dofs exist
