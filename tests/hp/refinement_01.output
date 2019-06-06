@@ -17,7 +17,7 @@ DEAL:2d:: cellid=3_1:1 fe_index=3 feq_degree=2 coarsening
 DEAL:2d:: cellid=3_1:2 fe_index=4 feq_degree=1 coarsening
 DEAL:2d:: cellid=3_1:3 fe_index=0 feq_degree=5 coarsening
 DEAL:2d::cells after: 16
-DEAL:2d:: cellid=3_0: fe_index=4 feq_degree=1
+DEAL:2d:: cellid=3_0: fe_index=0 feq_degree=5
 DEAL:2d:: cellid=0_1:1 fe_index=1 feq_degree=4
 DEAL:2d:: cellid=0_1:2 fe_index=2 feq_degree=3
 DEAL:2d:: cellid=0_1:3 fe_index=3 feq_degree=2
@@ -100,7 +100,7 @@ DEAL:3d:: cellid=7_1:5 fe_index=7 feq_degree=2 coarsening
 DEAL:3d:: cellid=7_1:6 fe_index=8 feq_degree=1 coarsening
 DEAL:3d:: cellid=7_1:7 fe_index=0 feq_degree=9 coarsening
 DEAL:3d::cells after: 64
-DEAL:3d:: cellid=7_0: fe_index=8 feq_degree=1
+DEAL:3d:: cellid=7_0: fe_index=0 feq_degree=9
 DEAL:3d:: cellid=0_1:1 fe_index=1 feq_degree=8
 DEAL:3d:: cellid=0_1:2 fe_index=2 feq_degree=7
 DEAL:3d:: cellid=0_1:3 fe_index=3 feq_degree=6

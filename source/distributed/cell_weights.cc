@@ -143,19 +143,20 @@ namespace parallel
         case Triangulation<dim, spacedim>::CELL_COARSEN:
           {
             std::set<unsigned int> fe_indices_children;
-            for (unsigned int child_index = 0;
-                 child_index < GeometryInfo<dim>::max_children_per_cell;
+            for (unsigned int child_index = 0; child_index < cell->n_children();
                  ++child_index)
               fe_indices_children.insert(
                 cell->child(child_index)->future_fe_index());
 
-            Assert(dof_handler->get_fe_collection().find_dominating_fe_extended(
-                     fe_indices_children, /*codim=*/0) !=
-                     numbers::invalid_unsigned_int,
+            fe_index =
+              dof_handler->get_fe_collection().find_dominated_fe_extended(
+                fe_indices_children, /*codim=*/0);
+
+            Assert(fe_index != numbers::invalid_unsigned_int,
                    ExcMessage(
                      "No FiniteElement has been found in your FECollection "
-                     "that dominates all children of a cell you are trying "
-                     "to coarsen!"));
+                     "that is dominated by all children of a cell you are "
+                     "trying to coarsen!"));
           }
           break;
 

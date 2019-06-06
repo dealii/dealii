@@ -1083,11 +1083,12 @@ namespace internal
          * their children and thus will be stored as such.
          *
          * On cells to be coarsened, we choose the finite element on the parent
-         * cell from those assigned to their children to be the one dominating
-         * all children. If none was found, we pick the least dominant element
-         * in the whole collection that dominates all children. See
-         * documentation of hp::FECollection::find_dominating_fe_extended() for
-         * further information.
+         * cell from those assigned to their children to be the one that is
+         * dominated by all children. If none was found, we pick the most
+         * dominant element in the whole collection that is dominated by all
+         * children. See documentation of
+         * hp::FECollection::find_dominated_fe_extended() for further
+         * information.
          *
          * On cells intended for p-refinement or p-coarsening, those
          * active_fe_indices will be determined by the corresponding flags that
@@ -1125,7 +1126,7 @@ namespace internal
                         fe_transfer->coarsened_cells_fe_index.end())
                       {
                         // Find a suitable active_fe_index for the parent cell
-                        // based on the least dominating finite element of its
+                        // based on the 'least dominant finite element' of its
                         // children. Consider the childrens' hypothetical future
                         // index when they have been flagged for p-refinement.
                         std::set<unsigned int> fe_indices_children;
@@ -1143,16 +1144,15 @@ namespace internal
                                ExcInternalError());
 
                         const unsigned int fe_index =
-                          dof_handler.fe_collection.find_dominating_fe_extended(
-                            fe_indices_children,
-                            /*codim=*/0);
+                          dof_handler.fe_collection.find_dominated_fe_extended(
+                            fe_indices_children, /*codim=*/0);
 
                         Assert(
                           fe_index != numbers::invalid_unsigned_int,
                           ExcMessage(
                             "No FiniteElement has been found in your FECollection "
-                            "that dominates all children of a cell you are trying "
-                            "to coarsen!"));
+                            "that is dominated by all children of a cell you are "
+                            "trying to coarsen!"));
 
                         fe_transfer->coarsened_cells_fe_index.insert(
                           {parent, fe_index});

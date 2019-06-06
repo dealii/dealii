@@ -166,8 +166,9 @@ namespace parallel
      * data will be packed on the parent cell with its `active_fe_index` and
      * unpacked later with the same index on its children. If cells get
      * coarsened into one, data will be packed on the children with the least
-     * dominating finite element of their common subspace, and unpacked on the
-     * parent with this particular finite element.
+     * dominant finite element of their common subspace, and unpacked on the
+     * parent with this particular finite element (consult
+     * hp::FECollection::find_dominated_fe_extended() for more information).
      *
      * Transferring a solution across refinement works exactly like in the
      * non-hp case. However, when considering serialization, we also have to
