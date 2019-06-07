@@ -16,7 +16,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include "dof_tools_fake_hp.inst.in"
+#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::extract_hanging_node_constraints
