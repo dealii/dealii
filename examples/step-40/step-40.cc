@@ -316,7 +316,7 @@ namespace Step40
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
     SparsityTools::distribute_sparsity_pattern(
       dsp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
       mpi_communicator,
       locally_relevant_dofs);
 

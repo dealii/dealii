@@ -430,7 +430,7 @@ namespace Step55
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.locally_owned_dofs_per_processor(),
+        dof_handler.compute_locally_owned_dofs_per_processor(),
         mpi_communicator,
         locally_relevant_dofs);
 
@@ -457,7 +457,7 @@ namespace Step55
         dof_handler, coupling, dsp, constraints, false);
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.locally_owned_dofs_per_processor(),
+        dof_handler.compute_locally_owned_dofs_per_processor(),
         mpi_communicator,
         locally_relevant_dofs);
       preconditioner_matrix.reinit(owned_partitioning,
