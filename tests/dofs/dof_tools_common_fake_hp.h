@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_dof_tools_common_fake_hp.h
-#define dealii_dof_tools_common_fake_hp .h
+#ifndef dealii_dof_tools_common_fake_hp_h
+#define dealii_dof_tools_common_fake_hp_h
 // fake hp check_this function that does nothing
 
 template <>
@@ -80,4 +80,4 @@ check_this(const hp::DoFHandler<3, 3> &dof_handler)
   // nothing to do here
 }
 
-#endif // dealii_dof_tools_common_fake_hp.h
+#endif // dealii_dof_tools_common_fake_hp_h
