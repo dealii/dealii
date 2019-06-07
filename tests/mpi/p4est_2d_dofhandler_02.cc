@@ -89,10 +89,12 @@ test()
       static const FE_Q<dim> fe(2);
       dofh.distribute_dofs(fe);
 
+      std::vector<types::global_dof_index> n_locally_owned_dofs_per_processor =
+        dofh.compute_n_locally_owned_dofs_per_processor();
       if (myid == 0)
         {
-          deallog << "dofh.n_dofs() "
-                  << dofh.n_locally_owned_dofs_per_processor() << std::endl;
+          deallog << "dofh.n_dofs() " << n_locally_owned_dofs_per_processor
+                  << std::endl;
           deallog << "dofh.n_locally_owned_dofs() "
                   << dofh.n_locally_owned_dofs() << std::endl;
         }

@@ -222,14 +222,15 @@ namespace Step40
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     SparsityTools::distribute_sparsity_pattern(
       csp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
       mpi_communicator,
       locally_relevant_dofs);
-    system_matrix.reinit(mpi_communicator,
-                         csp,
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         Utilities::MPI::this_mpi_process(mpi_communicator));
+    system_matrix.reinit(
+      mpi_communicator,
+      csp,
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
 
@@ -388,10 +389,13 @@ namespace Step40
         pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl
               << "      ";
+        const std::vector<types::global_dof_index>
+          n_locally_owned_dofs_per_processor =
+            dof_handler.compute_n_locally_owned_dofs_per_processor();
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << dof_handler.n_locally_owned_dofs_per_processor()[i] << '+';
+          pcout << n_locally_owned_dofs_per_processor[i] << '+';
         pcout << std::endl;
 
         assemble_system();

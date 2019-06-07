@@ -107,23 +107,27 @@ test()
 
       Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
       for (unsigned int i = 0;
-           i < dof_handler.n_locally_owned_dofs_per_processor().size();
+           i < dof_handler.compute_n_locally_owned_dofs_per_processor().size();
            ++i)
-        AssertThrow(dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
-                    ExcInternalError());
-      AssertThrow(std::accumulate(
-                    dof_handler.n_locally_owned_dofs_per_processor().begin(),
-                    dof_handler.n_locally_owned_dofs_per_processor().end(),
-                    0U) == N,
+        AssertThrow(
+          dof_handler.compute_n_locally_owned_dofs_per_processor()[i] <= N,
+          ExcInternalError());
+      const std::vector<types::global_dof_index>
+        n_locally_owned_dofs_per_processor =
+          dof_handler.compute_n_locally_owned_dofs_per_processor();
+      AssertThrow(std::accumulate(n_locally_owned_dofs_per_processor.begin(),
+                                  n_locally_owned_dofs_per_processor.end(),
+                                  0U) == N,
                   ExcInternalError());
 
+      const std::vector<IndexSet> locally_owned_dofs_per_processor =
+        dof_handler.compute_locally_owned_dofs_per_processor();
       IndexSet all(N), really_all(N);
       // poor man's union operation
-      for (unsigned int i = 0;
-           i < dof_handler.n_locally_owned_dofs_per_processor().size();
+      for (unsigned int i = 0; i < n_locally_owned_dofs_per_processor.size();
            ++i)
         for (unsigned int j = 0; j < N; ++j)
-          if (dof_handler.locally_owned_dofs_per_processor()[i].is_element(j))
+          if (locally_owned_dofs_per_processor[i].is_element(j))
             {
               AssertThrow(all.is_element(j) == false, ExcInternalError());
               all.add_index(j);

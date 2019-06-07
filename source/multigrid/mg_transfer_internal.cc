@@ -187,6 +187,12 @@ namespace internal
           // The list of neighbors is symmetric (our neighbors have us as a
           // neighbor), so we can use it to send and to know how many messages
           // we will get.
+          std::vector<std::vector<IndexSet>>
+            locally_owned_mg_dofs_per_processor;
+          for (unsigned int l = 0; l < tria->n_global_levels(); ++l)
+            locally_owned_mg_dofs_per_processor.push_back(
+              mg_dof.compute_locally_owned_mg_dofs_per_processor(l));
+
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
           std::map<int, std::vector<DoFPair>> send_data;
@@ -198,8 +204,7 @@ namespace internal
               std::set<types::subdomain_id>::iterator it;
               for (it = neighbors.begin(); it != neighbors.end(); ++it)
                 {
-                  if (mg_dof
-                        .locally_owned_mg_dofs_per_processor(dofpair.level)[*it]
+                  if (locally_owned_mg_dofs_per_processor[dofpair.level][*it]
                         .is_element(dofpair.level_dof_index))
                     {
                       send_data[*it].push_back(dofpair);

@@ -77,7 +77,9 @@ test()
   std::copy(renumbering.begin(),
             renumbering.end(),
             complete_renumbering.begin());
-  unsigned int offset = renumbering.size();
+  unsigned int                offset = renumbering.size();
+  const std::vector<IndexSet> locally_owned_dofs_per_processor =
+    dofh.compute_locally_owned_dofs_per_processor();
   for (unsigned int i = 1; i < nprocs; ++i)
     {
       if (myid == i)
@@ -90,14 +92,14 @@ test()
                  MPI_COMM_WORLD);
       else if (myid == 0)
         MPI_Recv(&complete_renumbering[offset],
-                 dofh.locally_owned_dofs_per_processor()[i].n_elements(),
+                 locally_owned_dofs_per_processor[i].n_elements(),
                  Utilities::MPI::internal::mpi_type_id(
                    &complete_renumbering[0]),
                  i,
                  i,
                  MPI_COMM_WORLD,
                  MPI_STATUSES_IGNORE);
-      offset += dofh.locally_owned_dofs_per_processor()[i].n_elements();
+      offset += locally_owned_dofs_per_processor[i].n_elements();
     }
 
   if (myid == 0)

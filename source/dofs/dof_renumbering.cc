@@ -877,39 +877,26 @@ namespace DoFRenumbering
         for (unsigned int c = 0; c < n_buckets; ++c)
           local_dof_count[c] = component_to_dof_map[c].size();
 
-
-        // gather information from all CPUs
-        std::vector<types::global_dof_index> all_dof_counts(
-          fe_collection.n_components() *
-          Utilities::MPI::n_mpi_processes(tria->get_communicator()));
-
-        const int ierr = MPI_Allgather(local_dof_count.data(),
-                                       n_buckets,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       all_dof_counts.data(),
-                                       n_buckets,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       tria->get_communicator());
+        std::vector<types::global_dof_index> prefix_dof_count(n_buckets);
+        const int ierr = MPI_Exscan(local_dof_count.data(),
+                                    prefix_dof_count.data(),
+                                    n_buckets,
+                                    DEAL_II_DOF_INDEX_MPI_TYPE,
+                                    MPI_SUM,
+                                    tria->get_communicator());
         AssertThrowMPI(ierr);
 
-        for (unsigned int i = 0; i < n_buckets; ++i)
-          Assert(
-            all_dof_counts[n_buckets * tria->locally_owned_subdomain() + i] ==
-              local_dof_count[i],
-            ExcInternalError());
+        std::vector<types::global_dof_index> global_dof_count(n_buckets);
+        Utilities::MPI::sum(local_dof_count,
+                            tria->get_communicator(),
+                            global_dof_count);
 
         // calculate shifts
-        unsigned int cumulated = 0;
+        types::global_dof_index cumulated = 0;
         for (unsigned int c = 0; c < n_buckets; ++c)
           {
-            shifts[c] = cumulated;
-            for (types::subdomain_id i = 0; i < tria->locally_owned_subdomain();
-                 ++i)
-              shifts[c] += all_dof_counts[c + n_buckets * i];
-            for (unsigned int i = 0;
-                 i < Utilities::MPI::n_mpi_processes(tria->get_communicator());
-                 ++i)
-              cumulated += all_dof_counts[c + n_buckets * i];
+            shifts[c] = prefix_dof_count[c] + cumulated;
+            cumulated += global_dof_count[c];
           }
 #else
         (void)tria;
@@ -1193,39 +1180,26 @@ namespace DoFRenumbering
         for (unsigned int c = 0; c < n_buckets; ++c)
           local_dof_count[c] = block_to_dof_map[c].size();
 
-
-        // gather information from all CPUs
-        std::vector<types::global_dof_index> all_dof_counts(
-          fe_collection.n_components() *
-          Utilities::MPI::n_mpi_processes(tria->get_communicator()));
-
-        const int ierr = MPI_Allgather(local_dof_count.data(),
-                                       n_buckets,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       all_dof_counts.data(),
-                                       n_buckets,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       tria->get_communicator());
+        std::vector<types::global_dof_index> prefix_dof_count(n_buckets);
+        const int ierr = MPI_Exscan(local_dof_count.data(),
+                                    prefix_dof_count.data(),
+                                    n_buckets,
+                                    DEAL_II_DOF_INDEX_MPI_TYPE,
+                                    MPI_SUM,
+                                    tria->get_communicator());
         AssertThrowMPI(ierr);
 
-        for (unsigned int i = 0; i < n_buckets; ++i)
-          Assert(
-            all_dof_counts[n_buckets * tria->locally_owned_subdomain() + i] ==
-              local_dof_count[i],
-            ExcInternalError());
+        std::vector<types::global_dof_index> global_dof_count(n_buckets);
+        Utilities::MPI::sum(local_dof_count,
+                            tria->get_communicator(),
+                            global_dof_count);
 
         // calculate shifts
         types::global_dof_index cumulated = 0;
         for (unsigned int c = 0; c < n_buckets; ++c)
           {
-            shifts[c] = cumulated;
-            for (types::subdomain_id i = 0; i < tria->locally_owned_subdomain();
-                 ++i)
-              shifts[c] += all_dof_counts[c + n_buckets * i];
-            for (unsigned int i = 0;
-                 i < Utilities::MPI::n_mpi_processes(tria->get_communicator());
-                 ++i)
-              cumulated += all_dof_counts[c + n_buckets * i];
+            shifts[c] = prefix_dof_count[c] + cumulated;
+            cumulated += global_dof_count[c];
           }
 #else
         (void)tria;
@@ -1398,14 +1372,16 @@ namespace DoFRenumbering
           dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
             &dof_handler.get_triangulation()))
       {
-        const std::vector<types::global_dof_index>
-          &n_locally_owned_dofs_per_processor =
-            dof_handler.n_locally_owned_dofs_per_processor();
-        my_starting_index =
-          std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                          n_locally_owned_dofs_per_processor.begin() +
-                            tria->locally_owned_subdomain(),
-                          types::global_dof_index(0));
+#ifdef DEAL_II_WITH_MPI
+        types::global_dof_index local_size =
+          dof_handler.locally_owned_dofs().n_elements();
+        MPI_Exscan(&local_size,
+                   &my_starting_index,
+                   1,
+                   DEAL_II_DOF_INDEX_MPI_TYPE,
+                   MPI_SUM,
+                   tria->get_communicator());
+#endif
       }
 
     if (const parallel::distributed::Triangulation<dim, spacedim> *tria =

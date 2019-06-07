@@ -106,17 +106,21 @@ test()
       //
       //      deallog << "n_locally_owned_dofs_per_processor: ";
       //      std::vector<types::global_dof_index> v =
-      //      dof_handler.n_locally_owned_dofs_per_processor(); unsigned int sum
-      //      = 0; for (unsigned int i=0; i<v.size(); ++i)
+      //        dof_handler.compute_n_locally_owned_dofs_per_processor();
+      //      unsigned int sum = 0;
+      //      for (unsigned int i=0; i<v.size(); ++i)
       //        {
       //          deallog << v[i] << " ";
       //          sum += v[i];
       //        }
       //      deallog << " sum: " << sum << std::endl;
 
+      const std::vector<types::global_dof_index>
+        n_locally_owned_dofs_per_processor =
+          dof_handler.compute_n_locally_owned_dofs_per_processor();
       Assert(dof_handler.n_locally_owned_dofs() ==
-               dof_handler.n_locally_owned_dofs_per_processor()
-                 [triangulation.locally_owned_subdomain()],
+               n_locally_owned_dofs_per_processor[triangulation
+                                                    .locally_owned_subdomain()],
              ExcInternalError());
       Assert(dof_handler.n_locally_owned_dofs() ==
                dof_handler.locally_owned_dofs().n_elements(),
@@ -125,21 +129,19 @@ test()
       const unsigned int N = dof_handler.n_dofs();
 
       Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
-      Assert(std::accumulate(
-               dof_handler.n_locally_owned_dofs_per_processor().begin(),
-               dof_handler.n_locally_owned_dofs_per_processor().end(),
-               0U) == N,
+      Assert(std::accumulate(n_locally_owned_dofs_per_processor.begin(),
+                             n_locally_owned_dofs_per_processor.end(),
+                             0U) == N,
              ExcInternalError());
 
+      const std::vector<IndexSet> locally_owned_dofs_per_processor =
+        dof_handler.compute_locally_owned_dofs_per_processor();
       IndexSet all(N);
-      for (unsigned int i = 0;
-           i < dof_handler.locally_owned_dofs_per_processor().size();
-           ++i)
+      for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
         {
-          IndexSet intersect =
-            all & dof_handler.locally_owned_dofs_per_processor()[i];
+          IndexSet intersect = all & locally_owned_dofs_per_processor[i];
           Assert(intersect.n_elements() == 0, ExcInternalError());
-          all.add_indices(dof_handler.locally_owned_dofs_per_processor()[i]);
+          all.add_indices(locally_owned_dofs_per_processor[i]);
         }
 
       Assert(all == complete_index_set(N), ExcInternalError());

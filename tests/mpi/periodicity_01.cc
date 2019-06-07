@@ -168,7 +168,7 @@ namespace Step40
     constraints.close();
 
     const std::vector<IndexSet> &locally_owned_dofs =
-      dof_handler.locally_owned_dofs_per_processor();
+      dof_handler.compute_locally_owned_dofs_per_processor();
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -183,14 +183,15 @@ namespace Step40
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
     SparsityTools::distribute_sparsity_pattern(
       csp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
       mpi_communicator,
       locally_relevant_dofs);
-    system_matrix.reinit(mpi_communicator,
-                         csp,
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         dof_handler.n_locally_owned_dofs_per_processor(),
-                         Utilities::MPI::this_mpi_process(mpi_communicator));
+    system_matrix.reinit(
+      mpi_communicator,
+      csp,
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
   template <int dim>

@@ -188,7 +188,7 @@ test(const unsigned numRefinementLevels = 2)
   constraints.close();
 
   const std::vector<IndexSet> &locally_owned_dofs =
-    dof_handler.locally_owned_dofs_per_processor();
+    dof_handler.compute_locally_owned_dofs_per_processor();
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,

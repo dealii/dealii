@@ -57,9 +57,9 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
   shared_dofs.print(deallog.get_file_stream());
 
   std::vector<IndexSet> shared_dofs_per_proc =
-    shared_dof_handler.locally_owned_dofs_per_processor();
+    shared_dof_handler.compute_locally_owned_dofs_per_processor();
   std::vector<IndexSet> distributed_dofs_per_proc =
-    distributed_dof_handler.locally_owned_dofs_per_processor();
+    distributed_dof_handler.compute_locally_owned_dofs_per_processor();
   for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
        ++i)
     Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],

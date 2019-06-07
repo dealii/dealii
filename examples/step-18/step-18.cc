@@ -829,7 +829,8 @@ namespace Step18
     n_local_cells = GridTools::count_cells_with_subdomain_association(
       triangulation, triangulation.locally_owned_subdomain());
 
-    local_dofs_per_process = dof_handler.n_locally_owned_dofs_per_processor();
+    local_dofs_per_process =
+      dof_handler.compute_n_locally_owned_dofs_per_processor();
 
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
