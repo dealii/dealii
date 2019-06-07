@@ -21,6 +21,7 @@ SET(_unity_include_src
   fe_collection.cc
   fe_values.cc
   mapping_collection.cc
+  refinement.cc
   )
 
 SET(_separate_src
@@ -41,6 +42,7 @@ SET(_inst
   fe_collection.inst.in
   fe_values.inst.in
   mapping_collection.inst.in
+  refinement.inst.in
   )
 
 FILE(GLOB _header
