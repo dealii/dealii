@@ -319,13 +319,9 @@ namespace Step63
       ordered_cells.push_back(cell->index());
 
     std::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < ordered_cells.size(); ++i)
-      {
-        const unsigned int j =
-          std::uniform_int_distribution<>(0, i)(random_number_generator);
-        if (i != j)
-          std::swap(ordered_cells[i], ordered_cells[j]);
-      }
+    std::shuffle(ordered_cells.begin(),
+                 ordered_cells.end(),
+                 random_number_generator);
 
     return ordered_cells;
   }
@@ -342,13 +338,9 @@ namespace Step63
       ordered_cells.push_back(cell->index());
 
     std::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < ordered_cells.size(); ++i)
-      {
-        const unsigned int j =
-          std::uniform_int_distribution<>(0, i)(random_number_generator);
-        if (i != j)
-          std::swap(ordered_cells[i], ordered_cells[j]);
-      }
+    std::shuffle(ordered_cells.begin(),
+                 ordered_cells.end(),
+                 random_number_generator);
 
     return ordered_cells;
   }
