@@ -66,6 +66,7 @@
 #include <deal.II/multigrid/mg_matrix.h>
 
 // C++:
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <random>
