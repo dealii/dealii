@@ -1,0 +1,7 @@
+0:DEAL::n_owned_dofs: 21
+0:DEAL::n_row_blocks: 7
+0:DEAL::n_ghost_indices: 0
+0:DEAL::frobenius_norm src: 1.47264
+0:DEAL::frobenius_norm dst: 2.34020
+0:DEAL::linfty_norm diff:   0.00000
+0:DEAL::Ok

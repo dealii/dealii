@@ -1,0 +1,19 @@
+DEAL::has_local_element:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 1
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 1
+DEAL::has_partitioners_are_compatible:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 0
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 0
+DEAL::has_begin:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 0
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 0
+DEAL::is_vectorizable:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 0
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 0
+DEAL::has_add_local_element:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 0
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 1
+DEAL::has_set_local_element:
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, true> = 0
+DEAL::BlockCSRMatrixIterators::RowsAccessor<Number, false> = 1
+DEAL::OK
