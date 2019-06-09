@@ -45,28 +45,30 @@
 // 0 0 x x
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
-#include "bcsr_helper.h"
 #include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
 
+#include "bcsr_helper.h"
+
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
   const unsigned int myid =
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
 
   std::vector<IndexSet> local_support;
   std::vector<IndexSet> global_support;
-  IndexSet locally_owned_dofs;
-  IndexSet locally_relevant_dofs;
-  IndexSet column_partitioning;
+  IndexSet              locally_owned_dofs;
+  IndexSet              locally_relevant_dofs;
+  IndexSet              column_partitioning;
 
   setup_1d_sparsity(global_support,
                     locally_owned_dofs,
@@ -82,8 +84,9 @@ void test()
     local_support.push_back(g & locally_owned_dofs);
 
   std::shared_ptr<dealii::Utilities::MPI::Partitioner> partitioner_row =
-    std::make_shared<dealii::Utilities::MPI::Partitioner>(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    std::make_shared<dealii::Utilities::MPI::Partitioner>(locally_owned_dofs,
+                                                          locally_relevant_dofs,
+                                                          mpi_communicator);
 
   // setup 2 row blocks for local partitioning
   const std::vector<unsigned int> row_blocks = {
@@ -95,10 +98,10 @@ void test()
   //
 
   IndexSet locally_owned_blocks(6);
-  locally_owned_blocks.add_index(myid*2);
-  locally_owned_blocks.add_index(myid*2+1);
+  locally_owned_blocks.add_index(myid * 2);
+  locally_owned_blocks.add_index(myid * 2 + 1);
   IndexSet locally_relevant_blocks(locally_owned_blocks);
-  if (myid==0)
+  if (myid == 0)
     {
       locally_relevant_blocks.add_index(2);
     }
@@ -151,7 +154,7 @@ void test()
       global_sp_A.copy_from(global_dsp_A);
 
       const std::string filename = "sparsity_A.svg";
-      std::ofstream f(filename.c_str());
+      std::ofstream     f(filename.c_str());
       global_sp_A.print_svg(f);
     }
 
@@ -187,10 +190,10 @@ void test()
 
   auto set_row = [&](const unsigned int r,
                      const unsigned int shift = 0,
-                     const unsigned int mult = 1,
-                     const bool test = false) {
-    const auto end = A.end_local(r);
-    const auto data = A.get_block_data(r);
+                     const unsigned int mult  = 1,
+                     const bool         test  = false) {
+    const auto                           end  = A.end_local(r);
+    const auto                           data = A.get_block_data(r);
     std::vector<types::global_dof_index> row_indices;
     for (const auto &range : data.second)
       for (unsigned int ind = range.first; ind < range.second; ++ind)
@@ -200,16 +203,15 @@ void test()
     Assert(row_indices.size() == row_size, ExcInternalError());
     for (auto it = A.begin_local(r); it != end; ++it)
       {
-        const auto c = it->column();
+        const auto c         = it->column();
         const auto col_start = cb->block_start(c);
-        const auto col_size = cb->block_size(c);
+        const auto col_size  = cb->block_size(c);
 
         for (unsigned int ii = 0; ii < row_size; ++ii)
           for (unsigned int jj = 0; jj < col_size; ++jj)
             {
-              double &val =
-                *(it->data() + BlockCSRMatrix<double>::local_index(
-                                 ii, jj, row_size, col_size));
+              double &val = *(it->data() + BlockCSRMatrix<double>::local_index(
+                                             ii, jj, row_size, col_size));
               const double set_val =
                 (row_indices[ii] + 1) + (col_start + jj + 1) * 1000;
               const double expect = set_val * mult + shift;
@@ -266,24 +268,25 @@ void test()
   // check values
   if (myid == 0)
     {
-      set_row(0, 0, 1, true); // row 0 unchanged
-      set_row(1, p_mult*2, 2, true); // row 1 added from proc 1
+      set_row(0, 0, 1, true);          // row 0 unchanged
+      set_row(1, p_mult * 2, 2, true); // row 1 added from proc 1
     }
   else if (myid == 1)
     {
-      set_row(0, p_mult, 2, true); // row 0 added from proc 0
-      set_row(1, 3*p_mult, 2, true); // row 0 added from proc 2
+      set_row(0, p_mult, 2, true);     // row 0 added from proc 0
+      set_row(1, 3 * p_mult, 2, true); // row 0 added from proc 2
     }
   else
     {
-      set_row(0, 2*p_mult, 2, true); // row 0 added from proc 1
-      set_row(1, 0, 1, true); // row 1 unchanged
+      set_row(0, 2 * p_mult, 2, true); // row 0 added from proc 1
+      set_row(1, 0, 1, true);          // row 1 unchanged
     }
 
   deallog << "Ok" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
@@ -291,7 +294,7 @@ int main(int argc, char **argv)
   const unsigned int n_procs =
     dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  std::string deallogname = "output" + dealii::Utilities::int_to_string(myid);
+  std::string   deallogname = "output" + dealii::Utilities::int_to_string(myid);
   std::ofstream logfile(deallogname);
   dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
@@ -308,7 +311,7 @@ int main(int argc, char **argv)
         std::string deallogname =
           "output" + dealii::Utilities::int_to_string(p);
         std::ifstream f(deallogname);
-        std::string line;
+        std::string   line;
         while (std::getline(f, line))
           std::cout << p << ":" << line << std::endl;
       }

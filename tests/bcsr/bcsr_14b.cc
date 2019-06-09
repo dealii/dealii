@@ -27,28 +27,30 @@
 //  2   x    x               67
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
-#include "bcsr_helper.h"
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
 
+#include "bcsr_helper.h"
+
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
   // number of blocks:
   const std::vector<unsigned int> row_blocks = {{3, 2, 1, 2}};
   const std::vector<unsigned int> col_blocks = {{2, 2, 1, 1, 3}};
-  const unsigned int M = row_blocks.size();
-  const unsigned int N = col_blocks.size();
+  const unsigned int              M          = row_blocks.size();
+  const unsigned int              N          = col_blocks.size();
 
   std::vector<dealii::types::global_dof_index> row_offset;
   std::vector<dealii::types::global_dof_index> col_offset;
 
-  auto setup_offset = [](const std::vector<unsigned int> &blocks,
+  auto setup_offset = [](const std::vector<unsigned int> &             blocks,
                          std::vector<dealii::types::global_dof_index> &offset) {
     offset.resize(blocks.size() + 1, 0);
     std::partial_sum(blocks.begin(), blocks.end(), ++offset.begin());
@@ -58,12 +60,12 @@ void test()
   setup_offset(col_blocks, col_offset);
 
   deallog << "row blocks:";
-  for (auto el: row_blocks)
+  for (auto el : row_blocks)
     deallog << " " << el;
   deallog << std::endl;
 
   deallog << "col blocks:";
-  for (auto el: col_blocks)
+  for (auto el : col_blocks)
     deallog << " " << el;
   deallog << std::endl;
 
@@ -88,16 +90,14 @@ void test()
   dsp.add(3, 0);
   dsp.add(3, 1);
 
-  std::shared_ptr<BlockIndices> rb =
-    std::make_shared<BlockIndices>(row_blocks);
-  std::shared_ptr<BlockIndices> cb =
-    std::make_shared<BlockIndices>(col_blocks);
+  std::shared_ptr<BlockIndices> rb = std::make_shared<BlockIndices>(row_blocks);
+  std::shared_ptr<BlockIndices> cb = std::make_shared<BlockIndices>(col_blocks);
 
   auto bcsr_row_part =
     std::make_shared<dealii::Utilities::MPI::Partitioner>(rb->total_size());
 
   // setup matrices
-  BlockCSRMatrix<double> A;
+  BlockCSRMatrix<double>        A;
   const BlockCSRMatrix<double> &A_const = A;
   A.reinit(dsp, rb, cb, bcsr_row_part);
 
@@ -125,7 +125,7 @@ void test()
     }
 
   // now test:
-  const std::vector<unsigned int> my_rows = {{1,2,3,7}};
+  const std::vector<unsigned int> my_rows = {{1, 2, 3, 7}};
 
   DoFInfo dof_info;
   dof_info.initialize(my_rows, rb);
@@ -207,10 +207,11 @@ void test()
   deallog << "Ok" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  std::ofstream logfile("output");
+  std::ofstream                            logfile("output");
   dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 

@@ -18,14 +18,16 @@
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/lac/block_csr_matrix.h>
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 using namespace dealii;
 
@@ -33,11 +35,12 @@ using namespace dealii;
  * Build sparsity pattern of BCSR based on input @p local_support and
  * row and column blocking.
  */
-void setup_sparsity_pattern(const std::vector<types::global_dof_index> &row_blocks,
-                            const std::vector<types::global_dof_index> &col_blocks,
-                            const std::vector<IndexSet> &local_support,
-                            const types::global_dof_index owned_start,
-                            DynamicSparsityPattern &dsp)
+void
+setup_sparsity_pattern(const std::vector<types::global_dof_index> &row_blocks,
+                       const std::vector<types::global_dof_index> &col_blocks,
+                       const std::vector<IndexSet> & local_support,
+                       const types::global_dof_index owned_start,
+                       DynamicSparsityPattern &      dsp)
 {
   AssertDimension(std::accumulate(col_blocks.begin(),
                                   col_blocks.end(),
@@ -55,7 +58,7 @@ void setup_sparsity_pattern(const std::vector<types::global_dof_index> &row_bloc
       row_block.add_range(owned_start + row_start,
                           owned_start + row_start + row_blocks[row]);
       std::vector<types::global_dof_index> sparsity;
-      types::global_dof_index col_start = 0;
+      types::global_dof_index              col_start = 0;
       for (types::global_dof_index col = 0; col < col_blocks.size(); ++col)
         {
           const types::global_dof_index col_end = col_start + col_blocks[col];
@@ -85,10 +88,11 @@ void setup_sparsity_pattern(const std::vector<types::global_dof_index> &row_bloc
 /**
  * Gather sparsity pattern based on @p owned_rows partitioning.
  */
-void gather(DynamicSparsityPattern &local,
-            const DynamicSparsityPattern &ghost,
-            const IndexSet &owned_rows,
-            const MPI_Comm comm)
+void
+gather(DynamicSparsityPattern &      local,
+       const DynamicSparsityPattern &ghost,
+       const IndexSet &              owned_rows,
+       const MPI_Comm                comm)
 {
   const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(comm);
 
@@ -114,8 +118,8 @@ void gather(DynamicSparsityPattern &local,
   Cols cols;
   cols.reserve(ghost.max_entries_per_row());
   // 2. go through sparsity and populate what we need to send
-  unsigned int rank = 0;
-  auto rank_end = ++start_index.begin();
+  unsigned int rank     = 0;
+  auto         rank_end = ++start_index.begin();
   for (types::global_dof_index r = 0; r < ghost.n_rows(); ++r)
     {
       // 2.1. adjust rank if needed:
@@ -152,52 +156,54 @@ void gather(DynamicSparsityPattern &local,
       {
         cols = sp.second;
         Assert(sp.first >= b && sp.first < e, ExcInternalError());
-        local.add_entries(
-          sp.first - b, cols.begin(), cols.end(), true);
+        local.add_entries(sp.first - b, cols.begin(), cols.end(), true);
       }
 }
 
 
 
-void get_owned_columns(IndexSet &owned_columns,
-                       std::vector<unsigned int> & blocks_local,
-                       const std::vector<unsigned int> & blocks_global,
-                       const MPI_Comm comm)
-  {
-    const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(comm);
-    const unsigned int n_proc = dealii::Utilities::MPI::n_mpi_processes(comm);
+void
+get_owned_columns(IndexSet &                       owned_columns,
+                  std::vector<unsigned int> &      blocks_local,
+                  const std::vector<unsigned int> &blocks_global,
+                  const MPI_Comm                   comm)
+{
+  const unsigned int myid   = dealii::Utilities::MPI::this_mpi_process(comm);
+  const unsigned int n_proc = dealii::Utilities::MPI::n_mpi_processes(comm);
 
-    owned_columns.clear();
-    owned_columns.set_size(blocks_global.size());
+  owned_columns.clear();
+  owned_columns.set_size(blocks_global.size());
 
-    blocks_local.resize(0);
+  blocks_local.resize(0);
 
-    const auto &M = blocks_global.size();
-    const auto block = M / n_proc;
-    const auto start = block * myid;
-    const auto end = myid == n_proc - 1 ? M : block * (myid + 1);
+  const auto &M     = blocks_global.size();
+  const auto  block = M / n_proc;
+  const auto  start = block * myid;
+  const auto  end   = myid == n_proc - 1 ? M : block * (myid + 1);
 
-    owned_columns.add_range(start, end);
-    blocks_local.reserve(end-start);
-    for (unsigned int b = start; b < end; ++b)
-      blocks_local.push_back(blocks_global[b]);
-  }
+  owned_columns.add_range(start, end);
+  blocks_local.reserve(end - start);
+  for (unsigned int b = start; b < end; ++b)
+    blocks_local.push_back(blocks_global[b]);
+}
 
 
 /**
  * Given @p owned_size locally owned rows and MPI communicator @p comm,
  * create an index set of locally owned rows on this MPI process.
  */
-IndexSet get_owned_dofs(const types::global_dof_index owned_size,
-                        const MPI_Comm comm)
+IndexSet
+get_owned_dofs(const types::global_dof_index owned_size, const MPI_Comm comm)
 {
   const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(comm);
   const auto all_owned = dealii::Utilities::MPI::all_gather(comm, owned_size);
 
-  const auto start = std::accumulate(
-    all_owned.begin(), all_owned.begin() + myid, types::global_dof_index(0));
-  const auto total_size = std::accumulate(
-    all_owned.begin(), all_owned.end(), types::global_dof_index(0));
+  const auto start      = std::accumulate(all_owned.begin(),
+                                     all_owned.begin() + myid,
+                                     types::global_dof_index(0));
+  const auto total_size = std::accumulate(all_owned.begin(),
+                                          all_owned.end(),
+                                          types::global_dof_index(0));
 
   IndexSet owned_rows(total_size);
   owned_rows.add_range(start, start + owned_size);
@@ -211,7 +217,8 @@ IndexSet get_owned_dofs(const types::global_dof_index owned_size,
  * data types T, as long as boost::serialize accepts T as an argument.
  */
 template <typename T>
-void bcast(T &object, const MPI_Comm &comm, const unsigned int root)
+void
+bcast(T &object, const MPI_Comm &comm, const unsigned int root)
 {
 #ifndef DEAL_II_WITH_MPI
   (void)comm;
@@ -224,10 +231,10 @@ void bcast(T &object, const MPI_Comm &comm, const unsigned int root)
 
   // 1. serialize on root and let others know the size
   std::vector<char> buffer;
-  int n_local_data;
+  int               n_local_data;
   if (this_proc == root)
     {
-      buffer = dealii::Utilities::pack(object);
+      buffer       = dealii::Utilities::pack(object);
       n_local_data = buffer.size();
     }
 
@@ -254,12 +261,13 @@ void bcast(T &object, const MPI_Comm &comm, const unsigned int root)
 /**
  * Broadcast sparsity pattern
  */
-void bcast_sp(DynamicSparsityPattern & sp,
-              const MPI_Comm comm,
-              const unsigned int root)
+void
+bcast_sp(DynamicSparsityPattern &sp,
+         const MPI_Comm          comm,
+         const unsigned int      root)
 {
   std::vector<std::vector<DynamicSparsityPattern::size_type>> all_cols;
-  DynamicSparsityPattern::size_type n_cols;
+  DynamicSparsityPattern::size_type                           n_cols;
   const auto this_proc = dealii::Utilities::MPI::this_mpi_process(comm);
   if (this_proc == root)
     {
@@ -295,17 +303,17 @@ void bcast_sp(DynamicSparsityPattern & sp,
  * Reminder from the division will be put into the last block.
  */
 std::vector<unsigned int>
-get_local_col_blocks(const IndexSet &column_partitioning,
+get_local_col_blocks(const IndexSet &   column_partitioning,
                      const unsigned int smallest)
 {
-  Assert (smallest > 0, ExcInternalError());
+  Assert(smallest > 0, ExcInternalError());
   AssertDimension(column_partitioning.n_intervals(), 1);
   const auto b = column_partitioning.nth_index_in_set(0);
   const auto e =
     column_partitioning.nth_index_in_set(column_partitioning.n_elements() - 1) +
     1;
-  const auto size = e - b;
-  const auto n_blocks = size / smallest;
+  const auto                size     = e - b;
+  const auto                n_blocks = size / smallest;
   std::vector<unsigned int> blocks(n_blocks, smallest);
   if (n_blocks * smallest != size)
     blocks.back() += size - n_blocks * smallest;
@@ -319,19 +327,19 @@ get_local_col_blocks(const IndexSet &column_partitioning,
  * Given sparsity pattern @p global_dsp, extract its
  * subset based on @p owned_col_blocks.
  */
-void get_view(DynamicSparsityPattern &local_dsp,
-              const DynamicSparsityPattern &global_dsp,
-              const IndexSet &owned_col_blocks)
+void
+get_view(DynamicSparsityPattern &      local_dsp,
+         const DynamicSparsityPattern &global_dsp,
+         const IndexSet &              owned_col_blocks)
 {
   AssertDimension(owned_col_blocks.n_intervals(), 1);
   const auto begin = owned_col_blocks.nth_index_in_set(0);
   const auto end =
-    owned_col_blocks.nth_index_in_set(owned_col_blocks.n_elements() - 1) +
-    1;
+    owned_col_blocks.nth_index_in_set(owned_col_blocks.n_elements() - 1) + 1;
 
   local_dsp.reinit(end - begin, global_dsp.n_cols());
 
-  unsigned int local_row = 0;
+  unsigned int                                   local_row = 0;
   std::vector<DynamicSparsityPattern::size_type> cols;
   cols.reserve(global_dsp.max_entries_per_row());
   for (DynamicSparsityPattern::size_type r = begin; r < end; ++r, ++local_row)
@@ -346,11 +354,11 @@ void get_view(DynamicSparsityPattern &local_dsp,
 
 
 
-
 /**
  * Return index set of columns stored in the sparsity pattern @p dsp.
  */
-IndexSet columns(const DynamicSparsityPattern &dsp)
+IndexSet
+columns(const DynamicSparsityPattern &dsp)
 {
   std::set<DynamicSparsityPattern::size_type> cols;
   for (auto it = dsp.begin(); it != dsp.end(); ++it)
@@ -366,10 +374,11 @@ IndexSet columns(const DynamicSparsityPattern &dsp)
  * Given owned column blocks, setup global column blocks and index set
  * representing owned blocks.
  */
-void setup_column_blocks(IndexSet &owned_col_blocks,
-                         std::vector<unsigned int> &col_blocks,
-                         const std::vector<unsigned int> &col_blocks_local,
-                         const MPI_Comm mpi_communicator)
+void
+setup_column_blocks(IndexSet &                       owned_col_blocks,
+                    std::vector<unsigned int> &      col_blocks,
+                    const std::vector<unsigned int> &col_blocks_local,
+                    const MPI_Comm                   mpi_communicator)
 {
   const unsigned int myid =
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -398,49 +407,53 @@ void setup_column_blocks(IndexSet &owned_col_blocks,
  * pattern of `A` in `C=A^T B`, setup column partitioner and local
  * sparsity pattern for `C`.
  */
-void setup_col_partitioner_and_sparsity(
+void
+setup_col_partitioner_and_sparsity(
   std::shared_ptr<dealii::Utilities::MPI::Partitioner> &col_partitioner,
-  DynamicSparsityPattern &local_dsp,
-  const DynamicSparsityPattern &global_dsp,
-  const IndexSet &owned_col_blocks,
-  const DynamicSparsityPattern &local_dsp_A,
-  const MPI_Comm mpi_communicator)
+  DynamicSparsityPattern &                              local_dsp,
+  const DynamicSparsityPattern &                        global_dsp,
+  const IndexSet &                                      owned_col_blocks,
+  const DynamicSparsityPattern &                        local_dsp_A,
+  const MPI_Comm                                        mpi_communicator)
 {
   get_view(local_dsp, global_dsp, owned_col_blocks);
   const IndexSet ghost_columns = columns(local_dsp_A);
 
-  AssertThrow(
-    (ghost_columns & owned_col_blocks) == owned_col_blocks,
-    ExcMessage("ghost_columns is not a superset of owned_col_blocks "
-               " on process " +
-               std::to_string(
-                 dealii::Utilities::MPI::this_mpi_process(mpi_communicator))));
+  AssertThrow((ghost_columns & owned_col_blocks) == owned_col_blocks,
+              ExcMessage(
+                "ghost_columns is not a superset of owned_col_blocks "
+                " on process " +
+                std::to_string(
+                  dealii::Utilities::MPI::this_mpi_process(mpi_communicator))));
 
-  col_partitioner = std::make_shared<dealii::Utilities::MPI::Partitioner>(
-    owned_col_blocks, ghost_columns, mpi_communicator);
+  col_partitioner =
+    std::make_shared<dealii::Utilities::MPI::Partitioner>(owned_col_blocks,
+                                                          ghost_columns,
+                                                          mpi_communicator);
 }
 
 
 
 template <typename Number>
-void init_bcsr(BlockCSRMatrix<Number> & A)
+void
+init_bcsr(BlockCSRMatrix<Number> &A)
 {
-  const auto & rb = A.get_row_blocks();
-  const auto & cb = A.get_col_blocks();
+  const auto &rb = A.get_row_blocks();
+  const auto &cb = A.get_col_blocks();
 
   const unsigned int row_mult = static_cast<unsigned int>(
     std::pow(10, std::ceil(std::log10(static_cast<double>(A.n())))));
 
   for (unsigned int r = 0; r < rb->size(); ++r)
     {
-      const auto end = A.end_local(r);
+      const auto end       = A.end_local(r);
       const auto row_start = rb->block_start(r);
-      const auto row_size = rb->block_size(r);
+      const auto row_size  = rb->block_size(r);
       for (auto it = A.begin_local(r); it != end; ++it)
         {
-          const auto c = it->column();
+          const auto c         = it->column();
           const auto col_start = cb->block_start(c);
-          const auto col_size = cb->block_size(c);
+          const auto col_size  = cb->block_size(c);
 
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
@@ -452,24 +465,25 @@ void init_bcsr(BlockCSRMatrix<Number> & A)
 }
 
 template <typename NumberType>
-void init_bcsr(BlockCSRMatrix<NumberType> &A,
-               const NumberType row_mult,
-               const NumberType col_mult,
-               const NumberType shift)
+void
+init_bcsr(BlockCSRMatrix<NumberType> &A,
+          const NumberType            row_mult,
+          const NumberType            col_mult,
+          const NumberType            shift)
 {
-  const auto local_range = A.local_range();
-  const auto &rb = A.get_row_blocks();
-  const auto &cb = A.get_col_blocks();
+  const auto  local_range = A.local_range();
+  const auto &rb          = A.get_row_blocks();
+  const auto &cb          = A.get_col_blocks();
   for (unsigned int r = 0; r < A.n_local_row_blocks(); ++r)
     {
-      const auto end = A.end_local(r);
+      const auto end       = A.end_local(r);
       const auto row_start = local_range.first + rb->block_start(r);
-      const auto row_size = rb->block_size(r);
+      const auto row_size  = rb->block_size(r);
       for (auto it = A.begin_local(r); it != end; ++it)
         {
-          const auto c = it->column();
+          const auto c         = it->column();
           const auto col_start = cb->block_start(c);
-          const auto col_size = cb->block_size(c);
+          const auto col_size  = cb->block_size(c);
 
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
@@ -485,17 +499,18 @@ void init_bcsr(BlockCSRMatrix<NumberType> &A,
  * A helper function to renumber based on coordinates of node in lexicographic
  * order.
  *
- * Return row blocking for locally owned DoFs so that nodes are grouped according to
- * x coordinate.
+ * Return row blocking for locally owned DoFs so that nodes are grouped
+ * according to x coordinate.
  */
 template <int dim>
 std::vector<unsigned int>
 renumber_based_on_nodes(DoFHandler<dim> &dh)
 {
-  const IndexSet &owned = dh.locally_owned_dofs();
+  const IndexSet &                              owned = dh.locally_owned_dofs();
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    StaticMappingQ1<dim>::mapping, dh, support_points);
+  DoFTools::map_dofs_to_support_points(StaticMappingQ1<dim>::mapping,
+                                       dh,
+                                       support_points);
 
   // rework map into a vector
   using PAIR = std::pair<Point<dim>, types::global_dof_index>;
@@ -505,24 +520,25 @@ renumber_based_on_nodes(DoFHandler<dim> &dh)
     if (owned.is_element(m.first))
       to_sort[owned.index_within_set(m.first)] = {m.second, m.first};
 
-  std::sort(
-    to_sort.begin(), to_sort.end(), [](const PAIR &a, const PAIR &b) -> bool {
-      // return a < b
-      static const double eps = 1e-8;
-      for (unsigned int d = 0; d < dim; ++d)
-        if (std::abs(a.first[d] - b.first[d]) > eps)
-          return a.first[d] < b.first[d];
+  std::sort(to_sort.begin(),
+            to_sort.end(),
+            [](const PAIR &a, const PAIR &b) -> bool {
+              // return a < b
+              static const double eps = 1e-8;
+              for (unsigned int d = 0; d < dim; ++d)
+                if (std::abs(a.first[d] - b.first[d]) > eps)
+                  return a.first[d] < b.first[d];
 
-      // if points are the same according to the eps,
-      // compare based on current DoFs
-      return a.second < b.second;
-    });
+              // if points are the same according to the eps,
+              // compare based on current DoFs
+              return a.second < b.second;
+            });
 
   std::vector<types::global_dof_index> new_numbers(dh.n_locally_owned_dofs());
 
-  unsigned int block_size = 0;
+  unsigned int              block_size = 0;
   std::vector<unsigned int> row_blocks;
-  double x = to_sort[0].first[0];
+  double                    x = to_sort[0].first[0];
   for (unsigned int ind = 0; ind < to_sort.size(); ++ind, ++block_size)
     {
       const auto old = owned.index_within_set(to_sort[ind].second);
@@ -557,7 +573,8 @@ renumber_based_on_nodes(DoFHandler<dim> &dh)
  *
  * @parameter local_support for each localized vector, contains its support
  * @parameter locally_owned_dofs  locally owned DoFs from decomposing [0,N) using @p mpi_communicator
- * @parameter column_partitioning partitioning of columns based on the locaction of localization center.
+ * @parameter column_partitioning partitioning of columns based on the locaction
+ * of localization center.
  * @parameter mpi_communicator MPI communicator to be used
  * @parameter L sparsity radius
  * @parameter N number of DoFs
@@ -570,11 +587,11 @@ setup_1d_sparsity(std::vector<IndexSet> &global_support,
                   IndexSet &             locally_relevant_dofs,
                   IndexSet &             column_partitioning,
                   const MPI_Comm         mpi_communicator,
-                  const unsigned int     L    = 22,
-                  const unsigned int     N    = 100,
-                  const unsigned int     C0   = 5,
-                  const unsigned int     step = 10,
-                  const unsigned int     ghost_width  = 3)
+                  const unsigned int     L           = 22,
+                  const unsigned int     N           = 100,
+                  const unsigned int     C0          = 5,
+                  const unsigned int     step        = 10,
+                  const unsigned int     ghost_width = 3)
 {
   const unsigned int n_proc = Utilities::MPI::n_mpi_processes(mpi_communicator);
   const unsigned int this_proc =
@@ -583,8 +600,8 @@ setup_1d_sparsity(std::vector<IndexSet> &global_support,
   locally_owned_dofs.clear();
   locally_owned_dofs.set_size(N);
   const auto start = this_proc * N / n_proc;
-  const auto end = std::min((this_proc + 1) * N / n_proc, N);
-  locally_owned_dofs.add_range(start,end);
+  const auto end   = std::min((this_proc + 1) * N / n_proc, N);
+  locally_owned_dofs.add_range(start, end);
 
   locally_relevant_dofs = locally_owned_dofs;
   // setup ghost ranges:
@@ -638,14 +655,17 @@ setup_1d_sparsity(std::vector<IndexSet> &global_support,
  * local support of vectors @p local_support and locally owned dofs @p locally_owned_dofs,
  * create a local sparsity of Block Compressed Sparse Row matrix.
  */
-void setup_bcsr_sparsity(const std::vector<types::global_dof_index> &row_blocks,
-                         const std::vector<types::global_dof_index> &col_blocks,
-                         const std::vector<IndexSet> &local_support,
-                         const IndexSet & locally_owned_dofs,
-                         DynamicSparsityPattern &dsp)
+void
+setup_bcsr_sparsity(const std::vector<types::global_dof_index> &row_blocks,
+                    const std::vector<types::global_dof_index> &col_blocks,
+                    const std::vector<IndexSet> &               local_support,
+                    const IndexSet &        locally_owned_dofs,
+                    DynamicSparsityPattern &dsp)
 {
   const types::global_dof_index n_cols =
-    std::accumulate(col_blocks.begin(), col_blocks.end(), types::global_dof_index(0));
+    std::accumulate(col_blocks.begin(),
+                    col_blocks.end(),
+                    types::global_dof_index(0));
   (void)n_cols;
   Assert(n_cols == local_support.size(), ExcInternalError());
 
@@ -660,7 +680,7 @@ void setup_bcsr_sparsity(const std::vector<types::global_dof_index> &row_blocks,
       row_block.add_range(row_start, row_start + row_blocks[row]);
       row_block = (row_block & locally_owned_dofs);
       std::vector<types::global_dof_index> sparsity;
-      types::global_dof_index col_start = 0;
+      types::global_dof_index              col_start = 0;
       for (types::global_dof_index col = 0; col < col_blocks.size(); ++col)
         {
           const types::global_dof_index col_end = col_start + col_blocks[col];
@@ -692,9 +712,10 @@ void setup_bcsr_sparsity(const std::vector<types::global_dof_index> &row_blocks,
  * Take local sparsity pattern @p local on each process in @p mpi_communicator
  * and gather them into the global one @p global
  */
-void gather_sparsity(DynamicSparsityPattern &global,
-                     const DynamicSparsityPattern &local,
-                     const MPI_Comm mpi_communicator)
+void
+gather_sparsity(DynamicSparsityPattern &      global,
+                const DynamicSparsityPattern &local,
+                const MPI_Comm                mpi_communicator)
 {
   // both DSP and SP won't work through all_gather since they don't have
   // operator= for non-empty objects. So save local sparsity in some reasonable
@@ -718,6 +739,8 @@ void gather_sparsity(DynamicSparsityPattern &global,
   auto sparsities = Utilities::MPI::all_gather(mpi_communicator, sp_send);
   for (auto &sp : sparsities)
     for (auto &rows : sp)
-      global.add_entries(
-        rows.first, rows.second.begin(), rows.second.end(), true);
+      global.add_entries(rows.first,
+                         rows.second.begin(),
+                         rows.second.end(),
+                         true);
 }

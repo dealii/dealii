@@ -16,21 +16,22 @@
 // check BlockCSRMatrix::Tmmult() and Tr_Tmmult() in parallel using 1D example
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <deal.II/lac/block_csr_matrix.h>
-
-#include "bcsr_helper.h"
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
 
+#include "bcsr_helper.h"
+
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
   const unsigned int myid =
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
   const unsigned int n_proc =
@@ -39,9 +40,9 @@ void test()
 
   std::vector<IndexSet> local_support;
   std::vector<IndexSet> global_support;
-  IndexSet locally_owned_dofs;
-  IndexSet locally_relevant_dofs;
-  IndexSet column_partitioning;
+  IndexSet              locally_owned_dofs;
+  IndexSet              locally_relevant_dofs;
+  IndexSet              column_partitioning;
 
   setup_1d_sparsity(global_support,
                     locally_owned_dofs,
@@ -53,8 +54,9 @@ void test()
     local_support.push_back(g & locally_owned_dofs);
 
   const std::shared_ptr<dealii::Utilities::MPI::Partitioner> partitioner =
-    std::make_shared<dealii::Utilities::MPI::Partitioner>(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    std::make_shared<dealii::Utilities::MPI::Partitioner>(locally_owned_dofs,
+                                                          locally_relevant_dofs,
+                                                          mpi_communicator);
 
   // setup 2 row blocks for local row partitioning
   const std::vector<unsigned int> row_blocks_local = {
@@ -68,14 +70,16 @@ void test()
   std::vector<unsigned int> col_blocks_serial = {{3, 2, 2, 3}};
   Assert(local_support.size() == 10, ExcNotImplemented());
   const std::vector<unsigned int> col_blocks_local =
-    n_proc == 1 ? col_blocks_serial
-                : get_local_col_blocks(column_partitioning, 2);
+    n_proc == 1 ? col_blocks_serial :
+                  get_local_col_blocks(column_partitioning, 2);
 
   std::vector<unsigned int> col_blocks;
-  IndexSet owned_col_blocks;
+  IndexSet                  owned_col_blocks;
 
-  setup_column_blocks(
-    owned_col_blocks, col_blocks, col_blocks_local, mpi_communicator);
+  setup_column_blocks(owned_col_blocks,
+                      col_blocks,
+                      col_blocks_local,
+                      mpi_communicator);
 
   deallog << "Column blocks:" << std::endl;
   for (const auto &b : col_blocks)
@@ -98,7 +102,8 @@ void test()
   std::shared_ptr<BlockIndices> rb =
     std::make_shared<BlockIndices>(row_blocks_local);
   std::shared_ptr<BlockIndices> cb = std::make_shared<BlockIndices>(col_blocks);
-  std::shared_ptr<BlockIndices> cb_local = std::make_shared<BlockIndices>(col_blocks_local);
+  std::shared_ptr<BlockIndices> cb_local =
+    std::make_shared<BlockIndices>(col_blocks_local);
 
   DynamicSparsityPattern dsp_C_ghost(col_blocks.size(), col_blocks.size());
 
@@ -119,19 +124,18 @@ void test()
   gather_sparsity(dsp_C_global, dsp_C_ghost, mpi_communicator);
 
   // print local dsp_C_global:
-  if (myid==0)
+  if (myid == 0)
     {
       SparsityPattern sp;
       sp.copy_from(dsp_C_global);
 
-      const std::string filename =
-        "sparsity_C_global.svg";
-      std::ofstream f(filename.c_str());
+      const std::string filename = "sparsity_C_global.svg";
+      std::ofstream     f(filename.c_str());
       sp.print_svg(f);
     }
 
   std::shared_ptr<dealii::Utilities::MPI::Partitioner> col_partitioner;
-  DynamicSparsityPattern dsp_C;
+  DynamicSparsityPattern                               dsp_C;
 
   setup_col_partitioner_and_sparsity(col_partitioner,
                                      dsp_C,
@@ -162,7 +166,7 @@ void test()
   init_bcsr(B, 0.02, 0.7, 0.22);
 
   // call Tmmult:
-  A.Tmmult(C,B,false);
+  A.Tmmult(C, B, false);
 
   const double trace = A.Tr_Tmmult(B);
 
@@ -189,7 +193,8 @@ void test()
   deallog << "Ok" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
@@ -197,7 +202,7 @@ int main(int argc, char **argv)
   const unsigned int n_procs =
     dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  std::string deallogname = "output" + dealii::Utilities::int_to_string(myid);
+  std::string   deallogname = "output" + dealii::Utilities::int_to_string(myid);
   std::ofstream logfile(deallogname);
   dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
@@ -214,7 +219,7 @@ int main(int argc, char **argv)
         std::string deallogname =
           "output" + dealii::Utilities::int_to_string(p);
         std::ifstream f(deallogname);
-        std::string line;
+        std::string   line;
         while (std::getline(f, line))
           std::cout << p << ":" << line << std::endl;
       }

@@ -16,20 +16,22 @@
 // check BlockCSRMatrix::Tmmult() in parallel with MPI
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
-#include "bcsr_helper.h"
 #include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
 
+#include "bcsr_helper.h"
+
 
 using namespace dealii;
 
-void test ()
+void
+test()
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
   const unsigned int myid =
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
 
@@ -74,16 +76,16 @@ void test ()
     O_blocks.data(), O_blocks.size(), MPI_UNSIGNED, 0, mpi_communicator);
   AssertThrowMPI(ierr);
 
-  DynamicSparsityPattern dsp_A(M,N);
-  DynamicSparsityPattern dsp_B(M,O);
-  DynamicSparsityPattern dsp_C_ghost(N,O);
+  DynamicSparsityPattern dsp_A(M, N);
+  DynamicSparsityPattern dsp_B(M, O);
+  DynamicSparsityPattern dsp_C_ghost(N, O);
 
   const auto randomize_sp = [](DynamicSparsityPattern &sp) {
     for (unsigned int i = 0; i < sp.n_rows(); ++i)
       for (unsigned int j = 0; j < sp.n_cols(); ++j)
         if (Utilities::generate_normal_random_number(0, 0.2) > 0)
           {
-            sp.add(i,j);
+            sp.add(i, j);
           }
   };
 
@@ -91,12 +93,9 @@ void test ()
   randomize_sp(dsp_B);
   dsp_C_ghost.compute_Tmmult_pattern(dsp_A, dsp_B);
 
-  IndexSet owned_columns;
+  IndexSet                  owned_columns;
   std::vector<unsigned int> N_blocks_local;
-  get_owned_columns(owned_columns,
-                    N_blocks_local,
-                    N_blocks,
-                    mpi_communicator);
+  get_owned_columns(owned_columns, N_blocks_local, N_blocks, mpi_communicator);
 
   // get local sparsity based on Tmmult from each MPI process
   DynamicSparsityPattern dsp_C;
@@ -104,24 +103,24 @@ void test ()
 
   std::shared_ptr<BlockIndices> Nb_local =
     std::make_shared<BlockIndices>(N_blocks_local);
-  std::shared_ptr<BlockIndices> Nb =
-    std::make_shared<BlockIndices>(N_blocks);
-  std::shared_ptr<BlockIndices> Mb =
-    std::make_shared<BlockIndices>(M_blocks);
-  std::shared_ptr<BlockIndices> Ob =
-    std::make_shared<BlockIndices>(O_blocks);
+  std::shared_ptr<BlockIndices> Nb = std::make_shared<BlockIndices>(N_blocks);
+  std::shared_ptr<BlockIndices> Mb = std::make_shared<BlockIndices>(M_blocks);
+  std::shared_ptr<BlockIndices> Ob = std::make_shared<BlockIndices>(O_blocks);
 
   const IndexSet owned_rows =
     get_owned_dofs(Mb->total_size(), mpi_communicator);
-  auto bcsr_row_part = std::make_shared<dealii::Utilities::MPI::Partitioner>(
-    owned_rows, mpi_communicator);
+  auto bcsr_row_part =
+    std::make_shared<dealii::Utilities::MPI::Partitioner>(owned_rows,
+                                                          mpi_communicator);
 
   // columns we need to know about on this process
   IndexSet ghost_columns = columns(dsp_A);
   ghost_columns.add_indices(owned_columns);
 
-  auto bcsr_block_part = std::make_shared<dealii::Utilities::MPI::Partitioner>(
-    owned_columns, ghost_columns, mpi_communicator);
+  auto bcsr_block_part =
+    std::make_shared<dealii::Utilities::MPI::Partitioner>(owned_columns,
+                                                          ghost_columns,
+                                                          mpi_communicator);
 
   // setup matrices
   BlockCSRMatrix<double> A, B, C;
@@ -136,12 +135,13 @@ void test ()
         const auto M = mat.get_row_blocks()->block_size(i);
         for (auto it = mat.begin_local(i); it != mat.end_local(i); ++it)
           {
-            const auto j = it->column();
-            const auto N = mat.get_col_blocks()->block_size(j);
+            const auto   j     = it->column();
+            const auto   N     = mat.get_col_blocks()->block_size(j);
             unsigned int index = 0;
             for (unsigned int ii = 0; ii < M; ++ii)
               for (unsigned int jj = 0; jj < N; ++jj, ++index)
-                *(it->data() + index) = Utilities::generate_normal_random_number(0, 0.2);
+                *(it->data() + index) =
+                  Utilities::generate_normal_random_number(0, 0.2);
           }
       }
   };
@@ -150,7 +150,7 @@ void test ()
   randomize_mat(A);
   randomize_mat(B);
 
-  A.Tmmult(C,B,false);
+  A.Tmmult(C, B, false);
 
   // now compare to full matrices
   const auto full_M = dealii::Utilities::MPI::sum(
@@ -159,7 +159,8 @@ void test ()
   const auto full_N = std::accumulate(N_blocks.begin(), N_blocks.end(), 0);
   const auto full_O = std::accumulate(O_blocks.begin(), O_blocks.end(), 0);
 
-  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M,full_O), full_C(full_N,full_O), full_C_check(full_N,full_O);
+  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M, full_O),
+    full_C(full_N, full_O), full_C_check(full_N, full_O);
 
   A.copy_to(full_A);
   B.copy_to(full_B);
@@ -176,15 +177,16 @@ void test ()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  const unsigned int myid =
+  const unsigned int                       myid =
     dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  std::ofstream logfile(myid == 0 ? "output"
-                                  : "output_" + std::to_string(myid));
-  dealii::deallog.attach(logfile,/*do not print job id*/false);
+  std::ofstream logfile(myid == 0 ? "output" :
+                                    "output_" + std::to_string(myid));
+  dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 
-  test ();
+  test();
 }

@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-// check BlockCSRMatrix::Tr_Tmmult() when the result of Tmmult is a square matrix
-// similar to bcsr_07 but uses different sparsities for A and B
-// as we don't need the product to be symmetric
+// check BlockCSRMatrix::Tr_Tmmult() when the result of Tmmult is a square
+// matrix similar to bcsr_07 but uses different sparsities for A and B as we
+// don't need the product to be symmetric
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
@@ -30,7 +30,8 @@
 using namespace dealii;
 
 // params are number of blocks:
-void test (const unsigned int M = 100, const unsigned int N = 53)
+void
+test(const unsigned int M = 100, const unsigned int N = 53)
 {
   std::vector<unsigned int> M_blocks(M);
   std::vector<unsigned int> N_blocks(N);
@@ -58,16 +59,16 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
   const auto full_M = std::accumulate(M_blocks.begin(), M_blocks.end(), 0);
   const auto full_N = std::accumulate(N_blocks.begin(), N_blocks.end(), 0);
 
-  DynamicSparsityPattern dsp_A(M,N);
-  DynamicSparsityPattern dsp_B(M,N);
-  DynamicSparsityPattern dsp_C(N,N);
+  DynamicSparsityPattern dsp_A(M, N);
+  DynamicSparsityPattern dsp_B(M, N);
+  DynamicSparsityPattern dsp_C(N, N);
 
   const auto randomize_sp = [](DynamicSparsityPattern &sp) {
     for (unsigned int i = 0; i < sp.n_rows(); ++i)
       for (unsigned int j = 0; j < sp.n_cols(); ++j)
         if (Utilities::generate_normal_random_number(0, 0.2) > 0)
           {
-            sp.add(i,j);
+            sp.add(i, j);
           }
   };
 
@@ -75,10 +76,8 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
   randomize_sp(dsp_B);
   dsp_C.compute_Tmmult_pattern(dsp_A, dsp_B);
 
-  std::shared_ptr<BlockIndices> Nb =
-    std::make_shared<BlockIndices>(N_blocks);
-  std::shared_ptr<BlockIndices> Mb =
-    std::make_shared<BlockIndices>(M_blocks);
+  std::shared_ptr<BlockIndices> Nb = std::make_shared<BlockIndices>(N_blocks);
+  std::shared_ptr<BlockIndices> Mb = std::make_shared<BlockIndices>(M_blocks);
 
   auto bcsr_row_part =
     std::make_shared<dealii::Utilities::MPI::Partitioner>(Mb->total_size());
@@ -94,18 +93,19 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
 
   // randomize content of matrices
   const auto randomize_mat = [](BlockCSRMatrix<double> &mat) {
-    const auto & sp = mat.get_sparsity_pattern();
+    const auto &sp = mat.get_sparsity_pattern();
     for (unsigned int i = 0; i < sp.n_rows(); ++i)
       {
         const auto M = mat.get_row_blocks()->block_size(i);
         for (auto it = mat.begin_local(i); it != mat.end_local(i); ++it)
           {
-            const auto j = it->column();
-            const auto N = mat.get_col_blocks()->block_size(j);
+            const auto   j     = it->column();
+            const auto   N     = mat.get_col_blocks()->block_size(j);
             unsigned int index = 0;
             for (unsigned int ii = 0; ii < M; ++ii)
               for (unsigned int jj = 0; jj < N; ++jj, ++index)
-                *(it->data() + index) = Utilities::generate_normal_random_number(0, 0.2);
+                *(it->data() + index) =
+                  Utilities::generate_normal_random_number(0, 0.2);
           }
       }
   };
@@ -113,7 +113,7 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
   randomize_mat(A);
   randomize_mat(B);
 
-  A.Tmmult(C,B,false);
+  A.Tmmult(C, B, false);
 
   deallog << "symmetric A: " << A.is_symmetric() << std::endl
           << "symmetric B: " << B.is_symmetric() << std::endl
@@ -122,7 +122,8 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
   const double trace = A.Tr_Tmmult(B);
 
   // now compare to full matrices
-  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M,full_N), full_C(full_N,full_N), full_C_check(full_N,full_N);
+  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M, full_N),
+    full_C(full_N, full_N), full_C_check(full_N, full_N);
 
   A.copy_to(full_A);
   B.copy_to(full_B);
@@ -136,16 +137,20 @@ void test (const unsigned int M = 100, const unsigned int N = 53)
 
   deallog << "diff norm:  " << full_C_check.frobenius_norm() << std::endl;
 
-  deallog << "diff trace: " << std::abs(trace_full - trace)/std::abs(std::max(trace_full, trace)) << std::endl;
+  deallog << "diff trace: "
+          << std::abs(trace_full - trace) /
+               std::abs(std::max(trace_full, trace))
+          << std::endl;
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile,/*do not print job id*/false);
+  std::ofstream                            logfile("output");
+  dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 
-  test ();
+  test();
 }

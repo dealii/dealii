@@ -25,10 +25,11 @@ using namespace dealii;
 
 
 template <typename NumberType = double>
-void test(const std::vector<unsigned int> sizes)
+void
+test(const std::vector<unsigned int> sizes)
 {
-  const NumberType dummy = NumberType(0.);
-  const unsigned int CL = 64;
+  const NumberType   dummy = NumberType(0.);
+  const unsigned int CL    = 64;
   std::cout << "Testing  " << dealii::Utilities::type_to_string(dummy)
             << std::endl
             << "  size:  " << sizeof(NumberType) << std::endl
@@ -44,18 +45,17 @@ void test(const std::vector<unsigned int> sizes)
       Assert(internal::ceil_divisible_by(
                s, VectorizedArray<NumberType>::n_array_elements) <= upper,
              ExcInternalError());
-      Assert(internal::ceil_divisible_by(
-               s, CL / sizeof(NumberType)) == upper,
+      Assert(internal::ceil_divisible_by(s, CL / sizeof(NumberType)) == upper,
              ExcInternalError());
       std::cout << s << " -> " << upper << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
-
-  test<double>({3,4,7,8,12,15,16,24,32});
-  test<float>({3,4,7,8,12,15,16,24,32});
+  test<double>({3, 4, 7, 8, 12, 15, 16, 24, 32});
+  test<float>({3, 4, 7, 8, 12, 15, 16, 24, 32});
 
   return 0;
 }

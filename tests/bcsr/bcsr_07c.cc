@@ -13,17 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-// check BlockCSRMatrix::Tr_Tmmult() when the result of Tmmult is a square matrix
-// similar to bcsr_07b but simplified to small manually built sparsity patterns,
-// that are easy to debug. In particular we construct A and B such that
-// On 0-th row only the last element matches in sparsities
-// On 1-st row there are no matches
-// On 2-nd row one of the matrices is empty
+// check BlockCSRMatrix::Tr_Tmmult() when the result of Tmmult is a square
+// matrix similar to bcsr_07b but simplified to small manually built sparsity
+// patterns, that are easy to debug. In particular we construct A and B such
+// that On 0-th row only the last element matches in sparsities On 1-st row
+// there are no matches On 2-nd row one of the matrices is empty
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
@@ -32,52 +31,51 @@
 
 using namespace dealii;
 
-void test ()
+void
+test()
 {
   // number of blocks:
   const unsigned int M = 3;
   const unsigned int N = 5;
 
-  std::vector<unsigned int> M_blocks = {2,3,5};
-  std::vector<unsigned int> N_blocks = {2,3,4,5,6};
+  std::vector<unsigned int> M_blocks = {2, 3, 5};
+  std::vector<unsigned int> N_blocks = {2, 3, 4, 5, 6};
 
   const auto full_M = std::accumulate(M_blocks.begin(), M_blocks.end(), 0);
   const auto full_N = std::accumulate(N_blocks.begin(), N_blocks.end(), 0);
 
-  DynamicSparsityPattern dsp_A(M,N);
-  DynamicSparsityPattern dsp_B(M,N);
-  DynamicSparsityPattern dsp_C(N,N);
+  DynamicSparsityPattern dsp_A(M, N);
+  DynamicSparsityPattern dsp_B(M, N);
+  DynamicSparsityPattern dsp_C(N, N);
 
   // A:
   //     0  1  2  3  4
   // 0      x     x  x
   // 1  x      x     x
   // 2  x
-  dsp_A.add(0,1);
-  dsp_A.add(0,3);
-  dsp_A.add(0,4);
-  dsp_A.add(1,0);
-  dsp_A.add(1,2);
-  dsp_A.add(1,4);
-  dsp_A.add(2,0);
+  dsp_A.add(0, 1);
+  dsp_A.add(0, 3);
+  dsp_A.add(0, 4);
+  dsp_A.add(1, 0);
+  dsp_A.add(1, 2);
+  dsp_A.add(1, 4);
+  dsp_A.add(2, 0);
 
   // B:
   //     0  1  2  3  4
   // 0   x     x     x
   // 1      x     x
   // 2
-  dsp_B.add(0,0);
-  dsp_B.add(0,2);
-  dsp_B.add(0,4);
-  dsp_B.add(1,1);
-  dsp_B.add(1,3);
+  dsp_B.add(0, 0);
+  dsp_B.add(0, 2);
+  dsp_B.add(0, 4);
+  dsp_B.add(1, 1);
+  dsp_B.add(1, 3);
 
   dsp_C.compute_Tmmult_pattern(dsp_A, dsp_B);
 
-  std::shared_ptr<BlockIndices> Nb =
-    std::make_shared<BlockIndices>(N_blocks);
-  std::shared_ptr<BlockIndices> Mb =
-    std::make_shared<BlockIndices>(M_blocks);
+  std::shared_ptr<BlockIndices> Nb = std::make_shared<BlockIndices>(N_blocks);
+  std::shared_ptr<BlockIndices> Mb = std::make_shared<BlockIndices>(M_blocks);
 
   auto bcsr_row_part =
     std::make_shared<dealii::Utilities::MPI::Partitioner>(Mb->total_size());
@@ -93,18 +91,19 @@ void test ()
 
   // randomize content of matrices
   const auto randomize_mat = [](BlockCSRMatrix<double> &mat) {
-    const auto & sp = mat.get_sparsity_pattern();
+    const auto &sp = mat.get_sparsity_pattern();
     for (unsigned int i = 0; i < sp.n_rows(); ++i)
       {
         const auto M = mat.get_row_blocks()->block_size(i);
         for (auto it = mat.begin_local(i); it != mat.end_local(i); ++it)
           {
-            const auto j = it->column();
-            const auto N = mat.get_col_blocks()->block_size(j);
+            const auto   j     = it->column();
+            const auto   N     = mat.get_col_blocks()->block_size(j);
             unsigned int index = 0;
             for (unsigned int ii = 0; ii < M; ++ii)
               for (unsigned int jj = 0; jj < N; ++jj, ++index)
-                *(it->data() + index) = Utilities::generate_normal_random_number(0, 0.2);
+                *(it->data() + index) =
+                  Utilities::generate_normal_random_number(0, 0.2);
           }
       }
   };
@@ -112,7 +111,7 @@ void test ()
   randomize_mat(A);
   randomize_mat(B);
 
-  A.Tmmult(C,B,false);
+  A.Tmmult(C, B, false);
 
   deallog << "symmetric A: " << A.is_symmetric() << std::endl
           << "symmetric B: " << B.is_symmetric() << std::endl
@@ -121,7 +120,8 @@ void test ()
   const double trace = A.Tr_Tmmult(B);
 
   // now compare to full matrices
-  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M,full_N), full_C(full_N,full_N), full_C_check(full_N,full_N);
+  LAPACKFullMatrix<double> full_A(full_M, full_N), full_B(full_M, full_N),
+    full_C(full_N, full_N), full_C_check(full_N, full_N);
 
   A.copy_to(full_A);
   B.copy_to(full_B);
@@ -135,16 +135,20 @@ void test ()
 
   deallog << "diff norm:  " << full_C_check.frobenius_norm() << std::endl;
 
-  deallog << "diff trace: " << std::abs(trace_full - trace)/std::abs(std::max(trace_full, trace)) << std::endl;
+  deallog << "diff trace: "
+          << std::abs(trace_full - trace) /
+               std::abs(std::max(trace_full, trace))
+          << std::endl;
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  std::ofstream logfile("output");
-  dealii::deallog.attach(logfile,/*do not print job id*/false);
+  std::ofstream                            logfile("output");
+  dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 
-  test ();
+  test();
 }

@@ -23,9 +23,9 @@
 //  2   x    x              78
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <fstream>
 #include <iostream>
@@ -35,9 +35,11 @@
 using namespace dealii;
 
 template <typename Matrix>
-void print_const(const Matrix &matrix)
+void
+print_const(const Matrix &matrix)
 {
-  for (typename Matrix::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+  for (typename Matrix::const_iterator i = matrix.begin(); i != matrix.end();
+       ++i)
     // use both i-> and (*i)
     deallog << i->row() << ' ' << i->column() << ' ' << *(i->data())
             << std::endl;
@@ -45,7 +47,8 @@ void print_const(const Matrix &matrix)
 }
 
 template <typename Matrix>
-void print(Matrix &matrix)
+void
+print(Matrix &matrix)
 {
   for (typename Matrix::iterator i = matrix.begin(); i != matrix.end(); ++i)
     // use both i-> and (*i)
@@ -55,42 +58,49 @@ void print(Matrix &matrix)
 }
 
 template <typename Matrix>
-void print_const_rows(const Matrix &matrix)
+void
+print_const_rows(const Matrix &matrix)
 {
   const auto n_rows = matrix.get_sparsity_pattern().n_rows();
   for (unsigned int r = 0; r < n_rows; ++r)
-    for (typename Matrix::const_iterator i = matrix.begin_local(r); i != matrix.end_local(r); ++i)
-    // use both i-> and (*i)
-    deallog << i->row() << ' ' << i->column() << ' ' << *(i->data())
-            << std::endl;
+    for (typename Matrix::const_iterator i = matrix.begin_local(r);
+         i != matrix.end_local(r);
+         ++i)
+      // use both i-> and (*i)
+      deallog << i->row() << ' ' << i->column() << ' ' << *(i->data())
+              << std::endl;
   deallog << std::endl;
 }
 
 
 template <typename Matrix>
-void print_rows(Matrix &matrix)
+void
+print_rows(Matrix &matrix)
 {
   const auto n_rows = matrix.get_sparsity_pattern().n_rows();
   for (unsigned int r = 0; r < n_rows; ++r)
-    for (typename Matrix::iterator i = matrix.begin_local(r); i != matrix.end_local(r); ++i)
-    // use both i-> and (*i)
-    deallog << i->row() << ' ' << i->column() << ' ' << *(i->data())
-            << std::endl;
+    for (typename Matrix::iterator i = matrix.begin_local(r);
+         i != matrix.end_local(r);
+         ++i)
+      // use both i-> and (*i)
+      deallog << i->row() << ' ' << i->column() << ' ' << *(i->data())
+              << std::endl;
   deallog << std::endl;
 }
 
-void test()
+void
+test()
 {
   // number of blocks:
   const std::vector<unsigned int> row_blocks = {{3, 2, 1, 2}};
   const std::vector<unsigned int> col_blocks = {{2, 2, 1, 3}};
-  const unsigned int M = row_blocks.size();
-  const unsigned int N = col_blocks.size();
+  const unsigned int              M          = row_blocks.size();
+  const unsigned int              N          = col_blocks.size();
 
   std::vector<dealii::types::global_dof_index> row_offset;
   std::vector<dealii::types::global_dof_index> col_offset;
 
-  auto setup_offset = [](const std::vector<unsigned int> &blocks,
+  auto setup_offset = [](const std::vector<unsigned int> &             blocks,
                          std::vector<dealii::types::global_dof_index> &offset) {
     offset.resize(blocks.size() + 1, 0);
     std::partial_sum(blocks.begin(), blocks.end(), ++offset.begin());
@@ -100,12 +110,12 @@ void test()
   setup_offset(col_blocks, col_offset);
 
   deallog << "row blocks:";
-  for (auto el: row_blocks)
+  for (auto el : row_blocks)
     deallog << " " << el;
   deallog << std::endl;
 
   deallog << "col blocks:";
-  for (auto el: col_blocks)
+  for (auto el : col_blocks)
     deallog << " " << el;
   deallog << std::endl;
 
@@ -125,46 +135,44 @@ void test()
   dsp.add(3, 0);
   dsp.add(3, 1);
 
-  std::shared_ptr<BlockIndices> rb =
-    std::make_shared<BlockIndices>(row_blocks);
-  std::shared_ptr<BlockIndices> cb =
-    std::make_shared<BlockIndices>(col_blocks);
+  std::shared_ptr<BlockIndices> rb = std::make_shared<BlockIndices>(row_blocks);
+  std::shared_ptr<BlockIndices> cb = std::make_shared<BlockIndices>(col_blocks);
 
   auto bcsr_block_part =
     std::make_shared<dealii::Utilities::MPI::Partitioner>(rb->size());
 
   // setup matrices
-  BlockCSRMatrix<double> A;
+  BlockCSRMatrix<double>        A;
   const BlockCSRMatrix<double> &A_const = A;
   A.reinit(dsp, rb, cb, bcsr_block_part);
 
   // setup
   {
-    A(row_offset[1]+0,col_offset[1]+0) = 43;
-    A(row_offset[1]+1,col_offset[1]+0) = 53;
+    A(row_offset[1] + 0, col_offset[1] + 0) = 43;
+    A(row_offset[1] + 1, col_offset[1] + 0) = 53;
 
-    A(row_offset[1]+0,col_offset[1]+1) = 44;
-    A(row_offset[1]+1,col_offset[1]+1) = 54;
+    A(row_offset[1] + 0, col_offset[1] + 1) = 44;
+    A(row_offset[1] + 1, col_offset[1] + 1) = 54;
 
-    A(row_offset[1]+0,col_offset[3]+0) = 46;
-    A(row_offset[1]+0,col_offset[3]+1) = 47;
-    A(row_offset[1]+0,col_offset[3]+2) = 48;
+    A(row_offset[1] + 0, col_offset[3] + 0) = 46;
+    A(row_offset[1] + 0, col_offset[3] + 1) = 47;
+    A(row_offset[1] + 0, col_offset[3] + 2) = 48;
 
-    A(row_offset[1]+1,col_offset[3]+0) = 56;
-    A(row_offset[1]+1,col_offset[3]+1) = 57;
-    A(row_offset[1]+1,col_offset[3]+2) = 58;
+    A(row_offset[1] + 1, col_offset[3] + 0) = 56;
+    A(row_offset[1] + 1, col_offset[3] + 1) = 57;
+    A(row_offset[1] + 1, col_offset[3] + 2) = 58;
 
-    A(row_offset[3]+0,col_offset[0]+0) = 71;
-    A(row_offset[3]+0,col_offset[0]+1) = 72;
+    A(row_offset[3] + 0, col_offset[0] + 0) = 71;
+    A(row_offset[3] + 0, col_offset[0] + 1) = 72;
 
-    A(row_offset[3]+1,col_offset[0]+0) = 81;
-    A(row_offset[3]+1,col_offset[0]+1) = 82;
+    A(row_offset[3] + 1, col_offset[0] + 0) = 81;
+    A(row_offset[3] + 1, col_offset[0] + 1) = 82;
 
-    A(row_offset[3]+0,col_offset[1]+0) = 73;
-    A(row_offset[3]+0,col_offset[1]+1) = 74;
+    A(row_offset[3] + 0, col_offset[1] + 0) = 73;
+    A(row_offset[3] + 0, col_offset[1] + 1) = 74;
 
-    A(row_offset[3]+1,col_offset[1]+0) = 83;
-    A(row_offset[3]+1,col_offset[1]+1) = 84;
+    A(row_offset[3] + 1, col_offset[1] + 0) = 83;
+    A(row_offset[3] + 1, col_offset[1] + 1) = 84;
   }
 
   deallog << "m: " << A.m() << std::endl << "n: " << A.n() << std::endl;
@@ -195,10 +203,11 @@ void test()
   deallog << "Ok" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  std::ofstream logfile("output");
+  std::ofstream                            logfile("output");
   dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 

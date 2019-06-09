@@ -16,42 +16,45 @@
 // same as bcsr_13.cc but with multiple cells and in parallel
 
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/block_csr_matrix.h>
+
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
-#include <deal.II/numerics/vector_tools.h>
 
-#include "bcsr_helper.h"
-#include <deal.II/lac/block_csr_matrix.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iostream>
 
-using namespace dealii;
+#include "bcsr_helper.h"
 
+using namespace dealii;
 
 
 
 template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
-          typename Number = double,
-          int n_components = 1>
+          typename Number   = double,
+          int n_components  = 1>
 class MatrixFreeTest
 {
 public:
   MatrixFreeTest(const std::shared_ptr<const MatrixFree<dim, Number>> &data)
     : data(data)
-  {
-  }
+  {}
 
-  void vmult(BlockCSRMatrix<Number> &dst,
-             const BlockCSRMatrix<Number> &src) const
+  void
+  vmult(BlockCSRMatrix<Number> &dst, const BlockCSRMatrix<Number> &src) const
   {
     dst = 0;
     data->cell_loop(&MatrixFreeTest::local_apply_cell,
@@ -62,20 +65,20 @@ public:
   }
 
 private:
-
-  void local_apply_cell(
-    const MatrixFree<dim, Number> &/*data*/,
-    BlockCSRMatrix<Number> &dst,
-    const BlockCSRMatrix<Number> &src,
+  void
+  local_apply_cell(
+    const MatrixFree<dim, Number> & /*data*/,
+    BlockCSRMatrix<Number> &                     dst,
+    const BlockCSRMatrix<Number> &               src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       *data);
 
-    BlockCSRMatrixIterators::RowsAccessor<Number, true> src_row_accessor(&src);
+    BlockCSRMatrixIterators::RowsAccessor<Number, true>  src_row_accessor(&src);
     BlockCSRMatrixIterators::RowsAccessor<Number, false> dst_row_accessor(&dst);
 
-    const auto &dof_info = data->get_dof_info();
+    const auto &              dof_info = data->get_dof_info();
     std::vector<unsigned int> my_rows;
     my_rows.reserve(phi.dofs_per_component *
                     VectorizedArray<Number>::n_array_elements);
@@ -84,8 +87,9 @@ private:
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         // collect DoFs on all cell blocks
-        dof_info.get_dof_indices_on_cell_batch(
-          my_rows, cell, true /*apply_constraints*/);
+        dof_info.get_dof_indices_on_cell_batch(my_rows,
+                                               cell,
+                                               true /*apply_constraints*/);
 
         src_row_accessor.reinit(my_rows);
         dst_row_accessor.reinit(my_rows);
@@ -136,12 +140,13 @@ private:
 
 
 template <int dim,
-          typename Number = double,
-          int fe_degree = 2,
-          int n_q_points_1d = fe_degree+1>
-void test(const unsigned int n_cells = 1)
+          typename Number   = double,
+          int fe_degree     = 2,
+          int n_q_points_1d = fe_degree + 1>
+void
+test(const unsigned int n_cells = 1)
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
   const unsigned int this_mpi_core =
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
   parallel::distributed::Triangulation<dim> triangulation(
@@ -154,7 +159,7 @@ void test(const unsigned int n_cells = 1)
     std::vector<unsigned int> repetitions(dim, 1);
     repetitions[0] = n_cells;
     const Point<dim> p1;
-    Point<dim> p2;
+    Point<dim>       p2;
     for (unsigned int d = 1; d < dim; ++d)
       p2[d] = 1.;
     p2[0] = n_cells;
@@ -178,8 +183,10 @@ void test(const unsigned int n_cells = 1)
   AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dh, constraints);
-  VectorTools::interpolate_boundary_values(
-    dh, 0 /*left side*/, ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dh,
+                                           0 /*left side*/,
+                                           ZeroFunction<dim>(),
+                                           constraints);
 
   constraints.close();
 
@@ -210,7 +217,7 @@ void test(const unsigned int n_cells = 1)
 
   // 3: some blocks in src are empty, whereas dst is of course full
   {
-    Assert (n_row_blocks > 1, ExcInternalError());
+    Assert(n_row_blocks > 1, ExcInternalError());
     const unsigned int col = 2;
     sp_src.add(0, col);
     sp_src.add(1, col);
@@ -224,8 +231,10 @@ void test(const unsigned int n_cells = 1)
     std::make_shared<BlockIndices>(col_blocks);
 
   const types::global_dof_index full_rows = dh.n_dofs();
-  const types::global_dof_index full_cols = std::accumulate(
-    col_blocks.begin(), col_blocks.end(), types::global_dof_index(0));
+  const types::global_dof_index full_cols =
+    std::accumulate(col_blocks.begin(),
+                    col_blocks.end(),
+                    types::global_dof_index(0));
 
   // prepare MF data
   std::shared_ptr<MatrixFree<dim, Number>> fine_level_data =
@@ -238,14 +247,17 @@ void test(const unsigned int n_cells = 1)
     fine_level_additional_data.overlap_communication_computation = false;
     fine_level_additional_data.tasks_parallel_scheme =
       MatrixFree<dim, Number>::AdditionalData::none;
-    fine_level_data->reinit(
-      dh, constraints, QGauss<1>(n_q_points_1d), fine_level_additional_data);
+    fine_level_data->reinit(dh,
+                            constraints,
+                            QGauss<1>(n_q_points_1d),
+                            fine_level_additional_data);
   }
 
   const std::shared_ptr<const dealii::Utilities::MPI::Partitioner>
     bcsr_row_part = fine_level_data->get_vector_partitioner();
 
-  deallog << "n_ghost_indices: " << bcsr_row_part->n_ghost_indices() << std::endl;
+  deallog << "n_ghost_indices: " << bcsr_row_part->n_ghost_indices()
+          << std::endl;
 
   // setup matrices
   BlockCSRMatrix<Number> src, dst;
@@ -288,7 +300,8 @@ void test(const unsigned int n_cells = 1)
   LinearAlgebra::distributed::Vector<Number> src_col(bcsr_row_part);
   LinearAlgebra::distributed::Vector<Number> dst_col(bcsr_row_part);
 
-  const auto loc_w_ghost = bcsr_row_part->local_size() + bcsr_row_part->n_ghost_indices();
+  const auto loc_w_ghost =
+    bcsr_row_part->local_size() + bcsr_row_part->n_ghost_indices();
 
   full_dst = 0.;
 
@@ -335,7 +348,7 @@ void test(const unsigned int n_cells = 1)
   if (dim == 2)
     {
       std::map<types::global_dof_index, Point<dim>> support_points;
-      MappingQ1<dim> mapping;
+      MappingQ1<dim>                                mapping;
       DoFTools::map_dofs_to_support_points(mapping, dh, support_points);
 
       const std::string base_filename =
@@ -343,7 +356,7 @@ void test(const unsigned int n_cells = 1)
         dealii::Utilities::int_to_string(this_mpi_core);
 
       const std::string filename = base_filename + ".gp";
-      std::ofstream f(filename.c_str());
+      std::ofstream     f(filename.c_str());
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl
@@ -381,7 +394,8 @@ void test(const unsigned int n_cells = 1)
   deallog << "Ok" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
@@ -389,7 +403,7 @@ int main(int argc, char **argv)
   const unsigned int n_procs =
     dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  std::string deallogname = "output" + dealii::Utilities::int_to_string(myid);
+  std::string   deallogname = "output" + dealii::Utilities::int_to_string(myid);
   std::ofstream logfile(deallogname);
   deallog.attach(logfile, /*do not print job id*/ false);
   deallog.depth_console(0);
@@ -406,7 +420,7 @@ int main(int argc, char **argv)
         std::string deallogname =
           "output" + dealii::Utilities::int_to_string(p);
         std::ifstream f(deallogname);
-        std::string line;
+        std::string   line;
         while (std::getline(f, line))
           std::cout << p << ":" << line << std::endl;
       }
