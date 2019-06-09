@@ -5753,6 +5753,8 @@ namespace internal
         // general case
         const IndexSet index_set = dof_handler->locally_owned_mg_dofs(level);
 
+#ifdef DEAL_II_WITH_MPI
+
         constexpr int dim      = DoFHandlerType::dimension;
         constexpr int spacedim = DoFHandlerType::space_dimension;
         const parallel::Triangulation<dim, spacedim> *tr =
@@ -5760,7 +5762,6 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
-#ifdef DEAL_II_WITH_MPI
         const unsigned int my_rank =
           Utilities::MPI::this_mpi_process(tr->get_communicator());
 
