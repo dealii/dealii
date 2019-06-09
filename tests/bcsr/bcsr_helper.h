@@ -22,7 +22,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <RFAStDFT/block_csr_matrix.h>
+#include <deal.II/lac/block_csr_matrix.h>
 
 #include <vector>
 #include <algorithm>
@@ -423,7 +423,7 @@ void setup_col_partitioner_and_sparsity(
 
 
 template <typename Number>
-void init_bcsr(RealFAStDFT::BlockCSRMatrix<Number> & A)
+void init_bcsr(BlockCSRMatrix<Number> & A)
 {
   const auto & rb = A.get_row_blocks();
   const auto & cb = A.get_col_blocks();
@@ -444,7 +444,7 @@ void init_bcsr(RealFAStDFT::BlockCSRMatrix<Number> & A)
 
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
-              *(it->data() + RealFAStDFT::BlockCSRMatrix<Number>::local_index(
+              *(it->data() + BlockCSRMatrix<Number>::local_index(
                                ii, jj, row_size, col_size)) =
                 (row_start + ii + 1) * row_mult + (col_start + jj + 1);
         }
@@ -452,7 +452,7 @@ void init_bcsr(RealFAStDFT::BlockCSRMatrix<Number> & A)
 }
 
 template <typename NumberType>
-void init_bcsr(RealFAStDFT::BlockCSRMatrix<NumberType> &A,
+void init_bcsr(BlockCSRMatrix<NumberType> &A,
                const NumberType row_mult,
                const NumberType col_mult,
                const NumberType shift)
@@ -473,7 +473,7 @@ void init_bcsr(RealFAStDFT::BlockCSRMatrix<NumberType> &A,
 
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
-              *(it->data() + RealFAStDFT::BlockCSRMatrix<double>::local_index(
+              *(it->data() + BlockCSRMatrix<double>::local_index(
                                ii, jj, row_size, col_size)) =
                 row_mult * (row_start + ii + 1) +
                 col_mult * (col_start + jj + 1) + shift;

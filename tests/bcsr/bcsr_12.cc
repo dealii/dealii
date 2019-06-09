@@ -1,3 +1,18 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2019 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
 // test update_ghost_value() for a matrix with MPI partitioner via rows.
 
 // row partitioning and ghost blocks are as follows:
@@ -46,12 +61,12 @@
 #include <deal.II/lac/lapack_full_matrix.h>
 
 #include "bcsr_helper.h"
-#include <RFAStDFT/block_csr_matrix.h>
+#include <deal.II/lac/block_csr_matrix.h>
 
 #include <fstream>
 #include <iostream>
 
-using namespace RealFAStDFT;
+
 using namespace dealii;
 
 void test()
@@ -166,7 +181,7 @@ void test()
 
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
-              *(it->data() + RealFAStDFT::BlockCSRMatrix<double>::local_index(
+              *(it->data() + BlockCSRMatrix<double>::local_index(
                                ii, jj, row_size, col_size)) =
                 (row_start + ii + 1) + (col_start + jj + 1) * 1000;
         }
@@ -202,7 +217,7 @@ void test()
           for (unsigned int ii = 0; ii < row_size; ++ii)
             for (unsigned int jj = 0; jj < col_size; ++jj)
               AssertThrow(
-                *(it->data() + RealFAStDFT::BlockCSRMatrix<double>::local_index(
+                *(it->data() + BlockCSRMatrix<double>::local_index(
                                  ii, jj, row_size, col_size)) ==
                   (row_start + ii + 1) + (col_start + jj + 1) * 1000,
                 ExcInternalError());

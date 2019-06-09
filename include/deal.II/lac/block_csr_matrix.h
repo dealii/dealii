@@ -1,5 +1,20 @@
-#ifndef __realfastdft_b_csr_matrix_h
-#define __realfastdft_b_csr_matrix_h
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2019 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+#ifndef dealii_block_csr_matrix_h
+#define dealii_block_csr_matrix_h
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
@@ -23,10 +38,9 @@
 
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
 using namespace dealii;
 
-namespace RealFAStDFT
-{
   // forward declaration
   template <typename NumberType>
   class BlockCSRMatrix;
@@ -2676,16 +2690,11 @@ namespace RealFAStDFT
 
 #endif // doxygen
 
-} // namespace RealFAStDFT
-
-
-namespace dealii
-{
   /**
    * Declare BlockCSRMatrixIterators::RowsAccessor as distributed vector.
    */
   template <typename Number, bool Constness>
-  struct is_serial_vector<RealFAStDFT::BlockCSRMatrixIterators::RowsAccessor<Number, Constness>>
+  struct is_serial_vector<BlockCSRMatrixIterators::RowsAccessor<Number, Constness>>
     : std::false_type
   {};
 
@@ -2693,10 +2702,11 @@ namespace dealii
    * Declare BlockCSRMatrixIterators::RowsAccessor as distributed vector.
    */
   template <typename Number>
-  struct is_serial_vector<RealFAStDFT::BlockCSRMatrix<Number>>
+  struct is_serial_vector<BlockCSRMatrix<Number>>
     : std::false_type
   {};
 
-}
+DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#endif // dealii_block_csr_matrix_h
+
