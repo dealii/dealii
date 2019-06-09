@@ -48,7 +48,7 @@ template <typename DoFHandlerType>
 void
 check_this(const DoFHandlerType &dof_handler)
 {
-  Functions::CosineFunction<dof_handler.dimension> test_func(
+  Functions::CosineFunction<DoFHandlerType::dimension> test_func(
     dof_handler.get_fe().n_components());
 
   AffineConstraints<double> cm;
@@ -63,7 +63,7 @@ check_this(const DoFHandlerType &dof_handler)
   deallog << cm.n_constraints() << std::endl;
   deallog << cm.max_constraint_indirections() << std::endl;
 
-  QGauss<dof_handler.dimension> quadrature(6);
+  QGauss<DoFHandlerType::dimension> quadrature(6);
 
   Vector<double> unconstrained(dof_handler.n_dofs());
   Vector<double> constrained(dof_handler.n_dofs());

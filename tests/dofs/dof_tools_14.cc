@@ -33,7 +33,7 @@ check_this(const DoFHandlerType &dof_handler)
   deallog << dof_handler.n_boundary_dofs() << std::endl;
 
   // with std::map
-  std::map<types::boundary_id, const Function<dof_handler.dimension> *> fm;
+  std::map<types::boundary_id, const Function<DoFHandlerType::dimension> *> fm;
   fm[0] = nullptr;
   deallog << dof_handler.n_boundary_dofs(fm) << std::endl;
 

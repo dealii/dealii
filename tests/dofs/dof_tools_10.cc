@@ -36,8 +36,8 @@ check_this(const DoFHandlerType &dof_handler)
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;
 
-  std::vector<Point<dof_handler.dimension>> map(dof_handler.n_dofs());
-  MappingQ<dof_handler.dimension>           mapping(2);
+  std::vector<Point<DoFHandlerType::dimension>> map(dof_handler.n_dofs());
+  MappingQ<DoFHandlerType::dimension>           mapping(2);
 
   DoFTools::map_dofs_to_support_points(mapping, dof_handler, map);
 
