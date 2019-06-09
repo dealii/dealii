@@ -49,13 +49,12 @@
 #include <boost/graph/king_ordering.hpp>
 #include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/graph/properties.hpp>
-#include <boost/random.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
 
 #include <algorithm>
 #include <cmath>
 #include <functional>
 #include <map>
+#include <random>
 #include <vector>
 
 
@@ -2131,26 +2130,19 @@ namespace DoFRenumbering
                  const DoFHandlerType &                dof_handler)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs();
+    (void)n_dofs;
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    for (unsigned int i = 0; i < n_dofs; ++i)
-      new_indices[i] = i;
+    std::iota(new_indices.begin(),
+              new_indices.end(),
+              types::global_dof_index(0));
 
-    // shuffle the elements; the following is essentially std::shuffle (which
-    // is new in C++11) but with a boost URNG
-    ::boost::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < n_dofs; ++i)
-      {
-        // get a random number between 0 and i (inclusive)
-        const unsigned int j =
-          ::boost::random::uniform_int_distribution<>(0, i)(
-            random_number_generator);
-
-        // if possible, swap the elements
-        if (i != j)
-          std::swap(new_indices[i], new_indices[j]);
-      }
+    // shuffle the elements
+    std::mt19937 random_number_generator;
+    std::shuffle(new_indices.begin(),
+                 new_indices.end(),
+                 random_number_generator);
   }
 
 
@@ -2162,26 +2154,19 @@ namespace DoFRenumbering
                  const unsigned int                    level)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs(level);
+    (void)n_dofs;
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    for (unsigned int i = 0; i < n_dofs; ++i)
-      new_indices[i] = i;
+    std::iota(new_indices.begin(),
+              new_indices.end(),
+              types::global_dof_index(0));
 
-    // shuffle the elements; the following is essentially std::shuffle (which
-    // is new in C++11) but with a boost URNG
-    ::boost::mt19937 random_number_generator;
-    for (unsigned int i = 1; i < n_dofs; ++i)
-      {
-        // get a random number between 0 and i (inclusive)
-        const unsigned int j =
-          ::boost::random::uniform_int_distribution<>(0, i)(
-            random_number_generator);
-
-        // if possible, swap the elements
-        if (i != j)
-          std::swap(new_indices[i], new_indices[j]);
-      }
+    // shuffle the elements
+    std::mt19937 random_number_generator;
+    std::shuffle(new_indices.begin(),
+                 new_indices.end(),
+                 random_number_generator);
   }
 
 
