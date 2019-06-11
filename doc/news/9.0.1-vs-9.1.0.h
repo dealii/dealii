@@ -231,7 +231,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Ths step-64 tutorial demonstrates how to use the CUDAWrappers::MatrixFree
+  New: The step-64 tutorial demonstrates how to use the CUDAWrappers::MatrixFree
   framework (possibly with MPI) and discusses the peculiarities of using CUDA
   inside deal.II in general.
   <br>
@@ -1928,8 +1928,8 @@ inconvenience this causes.
   LinearAlgebra::distributed::BlockVector::update_ghost_values() and
   LinearAlgebra::distributed::BlockVector::compress() calls on block vectors
   with many blocks, rather than splitting each method into two parts for
-  overlapping communication and computation. The latter is inefficient as soon
-  as too many MPI requests are in flight.
+  overlapping communication and computation. The latter is inefficient once
+  too many MPI requests are in flight.
   <br>
   (Martin Kronbichler, Denis Davydov, 2018/05/24)
  </li>
