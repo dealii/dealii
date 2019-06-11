@@ -18,6 +18,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -26,9 +27,9 @@
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // we split up the matrix into
   // blocks according to the number

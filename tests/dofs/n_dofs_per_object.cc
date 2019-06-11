@@ -18,17 +18,18 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_common_fake_hp.h"
 
 // check
 //   FiniteElement::n_dofs_per_object
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
-  const FiniteElement<dim> &fe = dof_handler.get_fe();
+  const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_fe();
   deallog << fe.dofs_per_vertex << ' ' << fe.dofs_per_line << ' '
           << fe.dofs_per_quad << ' ' << fe.dofs_per_hex << std::endl;
   deallog << fe.template n_dofs_per_object<0>() << ' '

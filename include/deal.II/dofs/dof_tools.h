@@ -1346,22 +1346,16 @@ namespace DoFTools
    *   corresponds to a vector component selected by the mask above. The size
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
    *   sequential computations of course equals DoFHandler::n_dofs(). The
-   * previous contents of this array are overwritten.
+   * previous contents of this array are overwritten. Note that the resulting
+   * vector just holds the locally owned extracted degrees of freedom, which
+   * first have to be mapped to the global degrees of freedom, to correspond
+   * with them.
    */
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-               const ComponentMask &            component_mask,
-               std::vector<bool> &              selected_dofs);
-
-  /**
-   * The same function as above, but for a hp::DoFHandler.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_dofs(const hp::DoFHandler<dim, spacedim> &dof_handler,
-               const ComponentMask &                component_mask,
-               std::vector<bool> &                  selected_dofs);
+  extract_dofs(const DoFHandlerType &dof_handler,
+               const ComponentMask & component_mask,
+               std::vector<bool> &   selected_dofs);
 
   /**
    * This function is the equivalent to the DoFTools::extract_dofs() functions
@@ -1387,20 +1381,11 @@ namespace DoFTools
    *   sequential computations of course equals DoFHandler::n_dofs(). The
    * previous contents of this array are overwritten.
    */
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  extract_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-               const BlockMask &                block_mask,
-               std::vector<bool> &              selected_dofs);
-
-  /**
-   * The same function as above, but for a hp::DoFHandler.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_dofs(const hp::DoFHandler<dim, spacedim> &dof_handler,
-               const BlockMask &                    block_mask,
-               std::vector<bool> &                  selected_dofs);
+  extract_dofs(const DoFHandlerType &dof_handler,
+               const BlockMask &     block_mask,
+               std::vector<bool> &   selected_dofs);
 
   /**
    * Do the same thing as the corresponding extract_dofs() function for one
