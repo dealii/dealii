@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,22 +12,20 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
-
-
-#include "../tests.h"
-#include "dof_tools_common.h"
-//#include "dof_tools_common_fake_hp.h"
+#include "dof_tools_common_parallel.h"
 
 // check
-//   DoFTools::extract_dofs
-
-
+//  DoFTools::extract_dofs as in dof_tools_12 in parallel for fewer elements
+// The output of this file is for every process the (boolean) vector of
+// extracted locally owned DoFs (corresponding to local DoF indices), not the
+// extracted vector of the global DoF, which has to be mapped with the locally
+// owned IndexSet first.
 
 template <typename DoFHandlerType>
 void
 check_this(const DoFHandlerType &dof_handler)
 {
-  std::vector<bool> selected_dofs(dof_handler.n_dofs());
+  std::vector<bool> selected_dofs(dof_handler.n_locally_owned_dofs());
   std::vector<bool> mask(dof_handler.get_fe().n_components(), false);
 
   // only select first component

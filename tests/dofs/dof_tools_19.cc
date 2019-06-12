@@ -26,6 +26,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -44,9 +45,9 @@
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // there's presently a crash in the
   // Raviart-Thomas element. don't
@@ -57,7 +58,7 @@ check_this(const DoFHandler<dim> &dof_handler)
       std::string::npos)
     return;
 
-  Functions::ConstantFunction<dim> test_func(
+  Functions::ConstantFunction<DoFHandlerType::dimension> test_func(
     1, dof_handler.get_fe().n_components());
 
   // don't run this test if hanging
@@ -73,8 +74,8 @@ check_this(const DoFHandler<dim> &dof_handler)
   deallog << cm.max_constraint_indirections() << std::endl;
 
   // L_2 project constant function onto field
-  QGauss<dim>    quadrature(6);
-  Vector<double> solution(dof_handler.n_dofs());
+  QGauss<DoFHandlerType::dimension> quadrature(6);
+  Vector<double>                    solution(dof_handler.n_dofs());
 
   VectorTools::project(dof_handler, cm, quadrature, test_func, solution);
   cm.distribute(solution);

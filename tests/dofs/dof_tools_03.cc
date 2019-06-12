@@ -19,6 +19,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
+#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -27,9 +28,9 @@
 
 
 
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandlerType &dof_handler)
 {
   // use a higher output accuracy for this
   // test. the reason is that many of the

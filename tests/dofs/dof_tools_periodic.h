@@ -44,9 +44,9 @@
 
 // forward declaration of the function that must be provided in the
 // .cc files
-template <int dim>
+template <typename DoFHandlerType>
 void
-check_this(const DoFHandler<dim> &dof_handler);
+check_this(const DoFHandlerType &dof_handler);
 
 
 
