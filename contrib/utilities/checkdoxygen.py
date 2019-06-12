@@ -3,7 +3,7 @@
 # run this script on all headers of deal.II to check various doxygen related problems
 
 # for example:
-# find doc examples include -name "*.h" -o -name "*.dox" -print | xargs -n 1 contrib/utilities/checkdoxygen.py
+# find doc examples include \( -name "*.h" -o -name "*.dox" \) -print | xargs -n 1 contrib/utilities/checkdoxygen.py
 
 
 import sys
