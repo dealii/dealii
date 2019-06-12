@@ -18,10 +18,10 @@ def check_doxygen_groups(lines):
         elif "@}" in l:
             count = count -1
         if count < 0:
-            sys.exit("Error in file '%s' in line %d"%(args[0],lineno))
+            sys.exit("Error in file '%s' in line %d"%(args[0], lineno))
         lineno = lineno + 1
 
-    if (count != 0):
+    if count != 0:
         sys.exit("Error: missing closing braces in file '%s'"%(args[0]))
 
     return
@@ -36,21 +36,21 @@ def check_empty_lines_in_tables(lines):
         elif "</table>" in l:
             count = count -1
         if count < 0:
-            sys.exit("Error in file '%s' in line %d"%(args[0],lineno))
+            sys.exit("Error in file '%s' in line %d"%(args[0], lineno))
 
-        if count==1:
-            if l.strip()=="":
-                sys.exit("Error: empty line inside html table in file '%s' in line %d"%(args[0],lineno))
+        if count == 1:
+            if l.strip() == "":
+                sys.exit("Error: empty line inside html table in file '%s' in line %d"%(args[0], lineno))
 
         lineno = lineno + 1
 
-    if (count != 0):
+    if count != 0:
         sys.exit("Error: mismatched html table tags in file '%s'"%(args[0]))
 
     return
 
 
-args=sys.argv
+args = sys.argv
 args.pop(0)
 
 f = open(args[0])
