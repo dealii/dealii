@@ -42,7 +42,7 @@ Scanning dependencies of target step-65
 
 ====== Running with the optimized MappingQCache class ======
 
-   Memory consumption cache:     22.9976 MB
+   Memory consumption cache:     22.9981 MB
    Number of active cells:       6656
    Number of degrees of freedom: 181609
    Number of solver iterations:  285
