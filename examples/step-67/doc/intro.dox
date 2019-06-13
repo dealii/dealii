@@ -1,0 +1,14 @@
+
+<br>
+
+<i>
+This program was contributed by Martin Kronbichler.
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program implements an explicit time integrator with the
+matrix-free framework using high-order discontinuous Galerkin methods
+for the Euler equations.
+
