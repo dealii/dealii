@@ -99,7 +99,7 @@ DEAL:1:2d:: cellid=1_1:1 fe_index=0 feq_degree=5
 DEAL:1:2d:: cellid=1_1:2 fe_index=1 feq_degree=4
 DEAL:1:2d:: cellid=1_1:3 fe_index=2 feq_degree=3
 DEAL:1:2d::cells after: 16
-DEAL:1:2d:: cellid=3_0: fe_index=4 feq_degree=1
+DEAL:1:2d:: cellid=3_0: fe_index=0 feq_degree=5
 DEAL:1:2d:: cellid=1_1:1 fe_index=0 feq_degree=5
 DEAL:1:2d:: cellid=1_1:2 fe_index=1 feq_degree=4
 DEAL:1:2d:: cellid=1_1:3 fe_index=2 feq_degree=3
@@ -142,7 +142,7 @@ DEAL:1:3d:: cellid=5_1:5 fe_index=2 feq_degree=7
 DEAL:1:3d:: cellid=5_1:6 fe_index=3 feq_degree=6
 DEAL:1:3d:: cellid=5_1:7 fe_index=4 feq_degree=5
 DEAL:1:3d::cells after: 64
-DEAL:1:3d:: cellid=7_0: fe_index=8 feq_degree=1
+DEAL:1:3d:: cellid=7_0: fe_index=0 feq_degree=9
 DEAL:1:3d:: cellid=3_1:4 fe_index=3 feq_degree=6
 DEAL:1:3d:: cellid=3_1:5 fe_index=4 feq_degree=5
 DEAL:1:3d:: cellid=3_1:6 fe_index=5 feq_degree=4
