@@ -1972,8 +1972,8 @@ namespace FEValuesViews
    * @author Luca Heltai, 2019.
    */
   template <int dim, int spacedim, typename Extractor>
-  using View =
-    typename internal::FEValuesViews::ViewType<dim, spacedim, Extractor>::type;
+  using View = typename dealii::internal::FEValuesViews::
+    ViewType<dim, spacedim, Extractor>::type;
 } // namespace FEValuesViews
 
 
