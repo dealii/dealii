@@ -17,7 +17,6 @@
 #ifndef dealii_sparse_matrix_templates_h
 #define dealii_sparse_matrix_templates_h
 
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/parallel.h>
@@ -31,6 +30,8 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <boost/io/ios_state.hpp>
 
 #include <algorithm>
 #include <cmath>

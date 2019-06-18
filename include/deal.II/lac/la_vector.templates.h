@@ -20,6 +20,8 @@
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
+#include <boost/io/ios_state.hpp>
+
 #include <iomanip>
 #include <iostream>
 
