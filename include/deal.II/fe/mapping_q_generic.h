@@ -39,6 +39,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int, int>
 class MappingQ;
 
+template <int, int>
+class MappingQCache;
+
 
 /*!@addtogroup mapping */
 /*@{*/
@@ -735,6 +738,13 @@ protected:
    */
   template <int, int>
   friend class MappingQ;
+
+  /**
+   * Make MappingQCache a friend since it needs to call the
+   * compute_mapping_support_points() function.
+   */
+  template <int, int>
+  friend class MappingQCache;
 };
 
 

@@ -499,10 +499,16 @@
  *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream
  *       </td></tr>
  *
- *   <tr valign="top">    
+ *   <tr valign="top">
  *       <td>step-64</td>
  *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
  *       with MPI parallelization.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-65</td>
+ *        <td> The TransfiniteInterpolationManifold and MappingQCache classes for
+ *        advanced manifold operations.
  *       </td></tr>
  *
  * </table>
@@ -685,7 +691,8 @@
  *       step-10,
  *       step-11,
  *       step-32,
- *       step-60
+ *       step-60,
+ *       step-65
  *     </td>
  *   </tr>
  *
@@ -758,7 +765,8 @@
  *       step-34,
  *       step-38,
  *       step-53,
- *       step-54
+ *       step-54,
+ *       step-65
  *     </td>
  *   </tr>
  *
@@ -777,7 +785,8 @@
  *     <td>
  *       step-37,
  *       step-48,
- *       step-59
+ *       step-59,
+ *       step-64
  *     </td>
  *   </tr>
  *
@@ -787,7 +796,8 @@
  *     <td>
  *       step-49,
  *       step-53,
- *       step-54
+ *       step-54,
+ *       step-65
  *     </td>
  *   </tr>
  *
