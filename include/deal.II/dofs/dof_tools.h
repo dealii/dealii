@@ -1346,10 +1346,10 @@ namespace DoFTools
    *   corresponds to a vector component selected by the mask above. The size
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
    *   sequential computations of course equals DoFHandler::n_dofs(). The
-   * previous contents of this array are overwritten. Note that the resulting
-   * vector just holds the locally owned extracted degrees of freedom, which
-   * first have to be mapped to the global degrees of freedom, to correspond
-   * with them.
+   *   previous contents of this array are overwritten. Note that the resulting
+   *   vector just holds the locally owned extracted degrees of freedom, which
+   *   first have to be mapped to the global degrees of freedom, to correspond
+   *   with them.
    */
   template <typename DoFHandlerType>
   void
@@ -1379,7 +1379,7 @@ namespace DoFTools
    *   corresponds to a vector block selected by the mask above. The size
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
    *   sequential computations of course equals DoFHandler::n_dofs(). The
-   * previous contents of this array are overwritten.
+   *   previous contents of this array are overwritten.
    */
   template <typename DoFHandlerType>
   void
