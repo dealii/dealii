@@ -34,31 +34,10 @@ namespace hp
     void
     full_p_adaptivity(const hp::DoFHandler<dim, spacedim> &dof_handler)
     {
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (cell->refine_flag_set())
-              {
-                const unsigned int super_fe_index =
-                  dof_handler.get_fe_collection().next_in_hierarchy(
-                    cell->active_fe_index());
+      std::vector<bool> p_flags(
+        dof_handler.get_triangulation().n_active_cells(), true);
 
-                // Reject update if already most superordinate element.
-                if (super_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(super_fe_index);
-              }
-
-            if (cell->coarsen_flag_set())
-              {
-                const unsigned int sub_fe_index =
-                  dof_handler.get_fe_collection().previous_in_hierarchy(
-                    cell->active_fe_index());
-
-                // Reject update if already least subordinate element.
-                if (sub_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(sub_fe_index);
-              }
-          }
+      p_adaptivity_from_flags(dof_handler, p_flags);
     }
 
 
@@ -72,9 +51,9 @@ namespace hp
                       p_flags.size());
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
+        if (cell->is_locally_owned() && p_flags[cell->active_cell_index()])
           {
-            if (cell->refine_flag_set() && p_flags[cell->active_cell_index()])
+            if (cell->refine_flag_set())
               {
                 const unsigned int super_fe_index =
                   dof_handler.get_fe_collection().next_in_hierarchy(
@@ -84,8 +63,7 @@ namespace hp
                 if (super_fe_index != cell->active_fe_index())
                   cell->set_future_fe_index(super_fe_index);
               }
-
-            if (cell->coarsen_flag_set() && p_flags[cell->active_cell_index()])
+            else if (cell->coarsen_flag_set())
               {
                 const unsigned int sub_fe_index =
                   dof_handler.get_fe_collection().previous_in_hierarchy(
@@ -140,7 +118,7 @@ namespace hp
                   std::min(min_smoothness_refine,
                            smoothness_indicators(cell->active_cell_index()));
               }
-            if (cell->coarsen_flag_set())
+            else if (cell->coarsen_flag_set())
               {
                 max_smoothness_coarsen =
                   std::max(max_smoothness_coarsen,
@@ -164,34 +142,20 @@ namespace hp
 
       // We then compare each cell's smoothness indicator with the corresponding
       // threshold.
+      std::vector<bool> p_flags(
+        dof_handler.get_triangulation().n_active_cells(), false);
+
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (cell->refine_flag_set() &&
-                (smoothness_indicators(cell->active_cell_index()) >
-                 threshold_smoothness_refine))
-              {
-                const unsigned int super_fe_index =
-                  dof_handler.get_fe_collection().next_in_hierarchy(
-                    cell->active_fe_index());
+        if (cell->is_locally_owned() &&
+            ((cell->refine_flag_set() &&
+              (smoothness_indicators(cell->active_cell_index()) >
+               threshold_smoothness_refine)) ||
+             (cell->coarsen_flag_set() &&
+              (smoothness_indicators(cell->active_cell_index()) <
+               threshold_smoothness_coarsen))))
+          p_flags[cell->active_cell_index()] = true;
 
-                // Reject update if already most superordinate element.
-                if (super_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(super_fe_index);
-              }
-            if (cell->coarsen_flag_set() &&
-                (smoothness_indicators(cell->active_cell_index()) <
-                 threshold_smoothness_coarsen))
-              {
-                const unsigned int sub_fe_index =
-                  dof_handler.get_fe_collection().previous_in_hierarchy(
-                    cell->active_fe_index());
-
-                // Reject update if already least subordinate element.
-                if (sub_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(sub_fe_index);
-              }
-          }
+      p_adaptivity_from_flags(dof_handler, p_flags);
     }
 
 
@@ -225,7 +189,7 @@ namespace hp
                       cell->set_future_fe_index(super_fe_index);
                   }
               }
-            if (cell->coarsen_flag_set())
+            else if (cell->coarsen_flag_set())
               {
                 const unsigned int sub_fe_index =
                   dof_handler.get_fe_collection().previous_in_hierarchy(
@@ -259,35 +223,17 @@ namespace hp
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       predicted_errors.size());
 
+      std::vector<bool> p_flags(
+        dof_handler.get_triangulation().n_active_cells(), false);
+
       for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (cell->refine_flag_set() &&
-                (error_indicators[cell->active_cell_index()] <
-                 predicted_errors[cell->active_cell_index()]))
-              {
-                const unsigned int super_fe_index =
-                  dof_handler.get_fe_collection().next_in_hierarchy(
-                    cell->active_fe_index());
+        if (cell->is_locally_owned() &&
+            ((cell->refine_flag_set() || cell->coarsen_flag_set()) &&
+             (error_indicators[cell->active_cell_index()] <
+              predicted_errors[cell->active_cell_index()])))
+          p_flags[cell->active_cell_index()] = true;
 
-                // Reject update if already most superordinate element.
-                if (super_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(super_fe_index);
-              }
-
-            if (cell->coarsen_flag_set() &&
-                (error_indicators[cell->active_cell_index()] <
-                 predicted_errors[cell->active_cell_index()]))
-              {
-                const unsigned int sub_fe_index =
-                  dof_handler.get_fe_collection().previous_in_hierarchy(
-                    cell->active_fe_index());
-
-                // Reject update if already least subordinate element.
-                if (sub_fe_index != cell->active_fe_index())
-                  cell->set_future_fe_index(sub_fe_index);
-              }
-          }
+      p_adaptivity_from_flags(dof_handler, p_flags);
     }
 
 
