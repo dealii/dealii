@@ -281,6 +281,105 @@ namespace hp
      */
 
     /**
+     * @name Error prediction
+     * @{
+     */
+
+    /**
+     * Predict how the current @p error_indicators will adapt after refinement
+     * and coarsening has happened on the provided @p dof_handler, and write its
+     * results to @p predicted_errors. Each entry of @p error_indicators and
+     * @p predicted_errors corresponds to an active cell on the underlying
+     * Triangulation, thus each container has to be of size
+     * Triangulation::n_active_cells().
+     *
+     * For h adaptation, we expect the local error $\eta_K$ on cell $K$ to be
+     * proportional to $(h_K)^{p_K}$ in the energy norm, where $h_K$ denotes the
+     * cell diameter and $p_K$ the polynomial degree of the currently assigned
+     * finite element. Here, we assume that the finite element will not change
+     * in the adaptation process so that $p_K = \text{const}$. However during
+     * coarsening, the finite elements on siblings may be different, and their
+     * parent cell will be assigned to their least dominating finite element
+     * that belongs to its most general child. Thus, we will always interpolate
+     * on an enclosing finite element space. Additionaly assuming that the
+     * finite elements on the cells to be coarsened are sufficient to represent
+     * the solution correct (e.g. at least quadratic basis functions for a
+     * quadratic solution), we are confident to say that the error will not
+     * change by sole interpolation on the larger finite element space.
+     *
+     * Further, we expect that the local error will be divided equally on
+     * all $2^{dim}$ children during refinement, whereas local errors on
+     * siblings will be summed up on the parent cell in case of coarsening. When
+     * transferring the predicted error to the coarsened mesh, make sure to
+     * configure your CellDataTransfer object with
+     * GridTools::CoarseningStrategies::sum() as a coarsening strategy.
+     *
+     * For p adaptation, the local error is expected to converge exponentially
+     * with the polynomial degree of the assigned finite element. Each increase
+     * or decrease of the degree will thus change its value by a user-defined
+     * control parameter @p gamma_p. The assumption of exponential convergence
+     * is only valid if both h and p adaptive methods are combined. An exception
+     * is thrown if a cell is flagged for both h and p adaptation at once.
+     *
+     * The prediction algorithm is formulated as follows with control parameters
+     * @p gamma_p, @p gamma_h and @p gamma_n that may be used to influence
+     * prediction for each adaptation type individually.
+     * <table>
+     *   <tr><th>Adaptation type <th colspan="2">Prediction formula
+     *   <tr><td>no adaptation
+     *       <td>$\eta_{K,\text{pred}} = \eta_{K} \, \gamma_\text{n}$
+     *       <td>$\gamma_\text{n} \in (0,\infty)$
+     *   <tr><td>p adaptation
+     *       <td>$\eta_{K,\text{pred}} = \eta_{K} \,
+     *            \gamma_\text{p}^{(p_{K,\text{future}} - p_K)}$
+     *       <td>$\gamma_\text{p} \in (0,1)$
+     *   <tr><td>h refinement
+     *       <td>$\eta_{K_c,\text{pred}} = \eta_{K} \,
+     *            \gamma_\text{h} \, 0.5^{p_K} \, 0.5^{\text{dim}}
+     *            \quad \forall K_c \text{ children of } K$
+     *       <td rowspan="2">$\gamma_\text{h} \in (0,\infty)$
+     *   <tr><td>h coarsening
+     *       <td>$\eta_{K,\text{pred}} = \sum\limits_{K_c} \eta_{K_c} /
+     *            (\gamma_\text{h} \, 0.5^{p_{K_c}})
+     *            \quad \forall K_c \text{ children of } K$
+     * </table>
+     *
+     * For more theoretical details see
+     * @code{.bib}
+     * @article{Melenk2001,
+     *  author    = {Melenk, Jens Markus and Wohlmuth, Barbara I.},
+     *  title     = {{On residual-based a posteriori error estimation
+     *                in hp-FEM}},
+     *  journal   = {{Advances in Computational Mathematics}},
+     *  volume    = {15},
+     *  number    = {1},
+     *  pages     = {311--331},
+     *  publisher = {Springer US},
+     *  year      = {2001},
+     *  doi       = {10.1023/A:1014268310921}
+     * }
+     * @endcode
+     *
+     * @note This feature is currently only implemented for isotropic refinement.
+     *
+     * @note We want to predict the error by how adaptation will actually happen.
+     *   Thus, this function needs to be called after
+     *   Triangulation::prepare_for_coarsening_and_refinement().
+     */
+    template <int dim, typename Number, int spacedim>
+    void
+    predict_error(const hp::DoFHandler<dim, spacedim> &dof_handler,
+                  const Vector<Number> &               error_indicators,
+                  Vector<Number> &                     predicted_errors,
+                  const double                         gamma_p = std::sqrt(0.1),
+                  const double                         gamma_h = 1.,
+                  const double                         gamma_n = 1.);
+
+    /**
+     * @}
+     */
+
+    /**
      * @name Decide between h and p adaptivity
      * @{
      */
