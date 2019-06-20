@@ -4056,10 +4056,6 @@ inline DEAL_II_ALWAYS_INLINE
   operator*(const Tensor<rank_1, dim, Number> &              src1,
             const SymmetricTensor<rank_2, dim, OtherNumber> &src2s)
 {
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-                                         result;
   const Tensor<rank_2, dim, OtherNumber> src2(src2s);
   return src1 * src2;
 }
@@ -4098,10 +4094,6 @@ inline DEAL_II_ALWAYS_INLINE
   operator*(const SymmetricTensor<rank_1, dim, Number> &src1s,
             const Tensor<rank_2, dim, OtherNumber> &    src2)
 {
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-                                         result;
   const Tensor<rank_2, dim, OtherNumber> src1(src1s);
   return src1 * src2;
 }

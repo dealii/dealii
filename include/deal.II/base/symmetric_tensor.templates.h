@@ -924,7 +924,6 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           const double delta = sf * std::numeric_limits<scalar_type>::epsilon();
           const double rotation_angle = delta * numbers::PI / 180.0;
 
-          Tensor<2, dim, Number> T_prime_ns;
           if (dim == 2)
             {
               const Tensor<2, dim, Number> T_prime_ns =
@@ -935,9 +934,8 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               // cancel out. So we take the upper triangle as an approximation
               // instead.
               // TODO[JPP]: Perform the eigen-decomposition on the non-symmetric
-              // T_prime_ns.
-              //            This is, however, nontrivial to implement in this
-              //            context. See:
+              //            T_prime_ns. This is, however, nontrivial to
+              //            implement in this context. See:
               //            http://www.alglib.net/eigen/nonsymmetric/nonsymmetricevd.php
               //            https://groups.google.com/forum/#!topic/stan-users/QJe1TNioiyg
               SymmetricTensor<2, dim, Number> T_prime;
@@ -958,16 +956,16 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                 {
                   // This is a little bit hacky, so here's a brief explanation
                   // as to what the principal of this operation is: What we're
-                  // trying to do here is perturb our tenosr such that the
-                  // sensitivity of the eigen-vectors with respect to each other
+                  // trying to do here is perturb our tensor such that the
+                  // sensitivity of the eigenvectors with respect to each other
                   // can be established. So, one at a time, we compute the
                   // perturbation of the input tensor such that the maximal
                   // number of off-diagonal entries are non-zero for any given
                   // "i". This means that we rotation not about the "ith" axis,
                   // but rather some offset of it. Note: This does NOT lead to
-                  // an exact value or derivative of the eigen-data being
+                  // an exact value or derivative of the eigendata being
                   // computed, so one should be aware that for this case (where
-                  // the eigen-values are equal), the linearisation of any
+                  // the eigenvalues are equal), the linearization of any
                   // resulting quantities is only approximate.
                   const unsigned int axis = (i + 2) % 3;
                   T_prime_ns = internal::SymmetricTensorImplementation::
@@ -977,9 +975,9 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                   // cancel out. So we take the upper triangle as an
                   // approximation instead.
                   // TODO[JPP]: Keep the full row and perform the
-                  // eigen-decomposition on the
-                  //            non-symmetric T_prime_ns. See related comment
-                  //            above in 2d case.
+                  //            eigen-decomposition on the
+                  //            non-symmetric T_prime_ns. See the related
+                  //            comment above in the 2d case.
                   for (unsigned int j = i; j < dim; ++j)
                     T_prime[i][j] = T_prime_ns[i][j];
                 }
