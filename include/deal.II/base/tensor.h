@@ -2095,14 +2095,15 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
  * @relatesalso Tensor
  * @author Guido Kanschat, 2001
  */
-template <int dim, typename Number>
-inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
-                             cross_product_3d(const Tensor<1, dim, Number> &src1,
-                                              const Tensor<1, dim, Number> &src2)
+template <int dim, typename Number1, typename Number2>
+inline DEAL_II_ALWAYS_INLINE
+  Tensor<1, dim, typename ProductType<Number1, Number2>::type>
+  cross_product_3d(const Tensor<1, dim, Number1> &src1,
+                   const Tensor<1, dim, Number2> &src2)
 {
   Assert(dim == 3, ExcInternalError());
 
-  Tensor<1, dim, Number> result;
+  Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
   result[0] = src1[1] * src2[2] - src1[2] * src2[1];
   result[1] = src1[2] * src2[0] - src1[0] * src2[2];

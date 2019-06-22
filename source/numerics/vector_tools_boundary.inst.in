@@ -220,21 +220,41 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
       template void
-      project_boundary_values_curl_conforming_l2<deal_II_dimension>(
+      project_boundary_values_curl_conforming_l2(
         const DoFHandler<deal_II_dimension> &,
         const unsigned int,
-        const Function<deal_II_dimension> &,
+        const Function<deal_II_dimension, double> &,
         const types::boundary_id,
         AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
+#    ifdef DEAL_II_WITH_COMPLEX_VALUES
       template void
-      project_boundary_values_curl_conforming_l2<deal_II_dimension>(
+      project_boundary_values_curl_conforming_l2(
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension, std::complex<double>> &,
+        const types::boundary_id,
+        AffineConstraints<std::complex<double>> &,
+        const Mapping<deal_II_dimension> &);
+#    endif
+      template void
+      project_boundary_values_curl_conforming_l2(
         const hp::DoFHandler<deal_II_dimension> &,
         const unsigned int,
-        const Function<deal_II_dimension> &,
+        const Function<deal_II_dimension, double> &,
         const types::boundary_id,
         AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
+      template void
+#    ifdef DEAL_II_WITH_COMPLEX_VALUES
+      project_boundary_values_curl_conforming_l2(
+        const hp::DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension, std::complex<double>> &,
+        const types::boundary_id,
+        AffineConstraints<std::complex<double>> &,
+        const hp::MappingCollection<deal_II_dimension> &);
+#    endif
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
