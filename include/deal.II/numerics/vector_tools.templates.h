@@ -4374,16 +4374,16 @@ namespace VectorTools
     // projection of the boundary
     // function on the interior of
     // faces.
-    template <int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator, typename number>
     void
     compute_face_projection_curl_conforming(
-      const cell_iterator &cell,
-      const unsigned int   face,
-      hp::FEValues<dim> &  hp_fe_values,
-      const Function<dim> &boundary_function,
-      const unsigned int   first_vector_component,
-      std::vector<double> &dof_values,
-      std::vector<bool> &  dofs_processed)
+      const cell_iterator &        cell,
+      const unsigned int           face,
+      hp::FEValues<dim> &          hp_fe_values,
+      const Function<dim, number> &boundary_function,
+      const unsigned int           first_vector_component,
+      std::vector<double> &        dof_values,
+      std::vector<bool> &          dofs_processed)
     {
       const unsigned int spacedim = dim;
       hp_fe_values.reinit(cell,
@@ -5315,15 +5315,15 @@ namespace VectorTools
 
   namespace internals
   {
-    template <typename cell_iterator>
-    void
-    compute_edge_projection_l2(const cell_iterator &cell,
-                               const unsigned int   face,
-                               const unsigned int   line,
-                               hp::FEValues<3> &    hp_fe_values,
-                               const Function<3> &  boundary_function,
+    template <int dim, typename cell_iterator, typename number>
+    typename std::enable_if<dim == 3>::type
+    compute_edge_projection_l2(const cell_iterator &        cell,
+                               const unsigned int           face,
+                               const unsigned int           line,
+                               hp::FEValues<dim> &          hp_fe_values,
+                               const Function<dim, number> &boundary_function,
                                const unsigned int   first_vector_component,
-                               std::vector<double> &dof_values,
+                               std::vector<number> &dof_values,
                                std::vector<bool> &  dofs_processed)
     {
       // This function computes the L2-projection of the given
@@ -5333,8 +5333,7 @@ namespace VectorTools
       // In the context of this function, by associated DoFs we mean:
       // the DoFs corresponding to the group of components making up the vector
       // with first component first_vector_component (length dim).
-      const unsigned int        dim = 3;
-      const FiniteElement<dim> &fe  = cell->get_fe();
+      const FiniteElement<dim> &fe = cell->get_fe();
 
       // reinit for this cell, face and line.
       hp_fe_values.reinit(
@@ -5351,8 +5350,8 @@ namespace VectorTools
 
       const std::vector<Point<dim>> &quadrature_points =
         fe_values.get_quadrature_points();
-      std::vector<Vector<double>> values(fe_values.n_quadrature_points,
-                                         Vector<double>(fe.n_components()));
+      std::vector<Vector<number>> values(fe_values.n_quadrature_points,
+                                         Vector<number>(fe.n_components()));
 
       // Get boundary function values
       // at quadrature points.
@@ -5456,10 +5455,10 @@ namespace VectorTools
 
       // Matrix and RHS vectors to store linear system:
       // We have (degree+1) basis functions for an edge
-      FullMatrix<double> edge_matrix(degree + 1, degree + 1);
-      FullMatrix<double> edge_matrix_inv(degree + 1, degree + 1);
-      Vector<double>     edge_rhs(degree + 1);
-      Vector<double>     edge_solution(degree + 1);
+      FullMatrix<number> edge_matrix(degree + 1, degree + 1);
+      FullMatrix<number> edge_matrix_inv(degree + 1, degree + 1);
+      Vector<number>     edge_rhs(degree + 1);
+      Vector<number>     edge_solution(degree + 1);
 
       const FEValuesExtractors::Vector vec(first_vector_component);
 
@@ -5560,15 +5559,15 @@ namespace VectorTools
     }
 
 
-    template <int dim, typename cell_iterator>
-    void
+    template <int dim, typename cell_iterator, typename number>
+    typename std::enable_if<dim != 3>::type
     compute_edge_projection_l2(const cell_iterator &,
                                const unsigned int,
                                const unsigned int,
                                hp::FEValues<dim> &,
-                               const Function<dim> &,
+                               const Function<dim, number> &,
                                const unsigned int,
-                               std::vector<double> &,
+                               std::vector<number> &,
                                std::vector<bool> &)
     {
       // dummy implementation of above function
@@ -5576,16 +5575,16 @@ namespace VectorTools
       Assert(false, ExcInternalError());
     }
 
-    template <int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator, typename number>
     void
     compute_face_projection_curl_conforming_l2(
-      const cell_iterator &  cell,
-      const unsigned int     face,
-      hp::FEFaceValues<dim> &hp_fe_face_values,
-      const Function<dim> &  boundary_function,
-      const unsigned int     first_vector_component,
-      std::vector<double> &  dof_values,
-      std::vector<bool> &    dofs_processed)
+      const cell_iterator &        cell,
+      const unsigned int           face,
+      hp::FEFaceValues<dim> &      hp_fe_face_values,
+      const Function<dim, number> &boundary_function,
+      const unsigned int           first_vector_component,
+      std::vector<number> &        dof_values,
+      std::vector<bool> &          dofs_processed)
     {
       // This function computes the L2-projection of the boundary
       // function on the interior of faces only. In 3D, this should only be
@@ -5608,8 +5607,8 @@ namespace VectorTools
         fe_face_values.get_quadrature_points();
       const unsigned int degree = fe.degree - 1;
 
-      std::vector<Vector<double>> values(fe_face_values.n_quadrature_points,
-                                         Vector<double>(fe.n_components()));
+      std::vector<Vector<number>> values(fe_face_values.n_quadrature_points,
+                                         Vector<number>(fe.n_components()));
 
       // Get boundary function values at quadrature points.
       boundary_function.vector_value_list(quadrature_points, values);
@@ -5690,10 +5689,10 @@ namespace VectorTools
 
               // Matrix and RHS vectors to store:
               // We have (degree+1) edge basis functions
-              FullMatrix<double> edge_matrix(degree + 1, degree + 1);
-              FullMatrix<double> edge_matrix_inv(degree + 1, degree + 1);
-              Vector<double>     edge_rhs(degree + 1);
-              Vector<double>     edge_solution(degree + 1);
+              FullMatrix<number> edge_matrix(degree + 1, degree + 1);
+              FullMatrix<number> edge_matrix_inv(degree + 1, degree + 1);
+              Vector<number>     edge_rhs(degree + 1);
+              Vector<number>     edge_solution(degree + 1);
 
               const FEValuesExtractors::Vector vec(first_vector_component);
 
@@ -5893,19 +5892,19 @@ namespace VectorTools
               // There are 2*degree*(degree+1) DoFs associated with a face in
               // 3D. Note this doesn't include the DoFs associated with edges on
               // that face.
-              FullMatrix<double> face_matrix(2 * degree * (degree + 1));
-              FullMatrix<double> face_matrix_inv(2 * degree * (degree + 1));
-              Vector<double>     face_rhs(2 * degree * (degree + 1));
-              Vector<double>     face_solution(2 * degree * (degree + 1));
+              FullMatrix<number> face_matrix(2 * degree * (degree + 1));
+              FullMatrix<number> face_matrix_inv(2 * degree * (degree + 1));
+              Vector<number>     face_rhs(2 * degree * (degree + 1));
+              Vector<number>     face_solution(2 * degree * (degree + 1));
 
               // Project the boundary function onto the shape functions for this
               // face and set up a linear system of equations to get the values
               // for the DoFs associated with this face. We also must include
               // the residuals from the shape functions associated with edges.
-              Tensor<1, dim> tmp;
-              Tensor<1, dim> cross_product_i;
-              Tensor<1, dim> cross_product_j;
-              Tensor<1, dim> cross_product_rhs;
+              Tensor<1, dim, number> tmp;
+              Tensor<1, dim>         cross_product_i;
+              Tensor<1, dim>         cross_product_j;
+              Tensor<1, dim, number> cross_product_rhs;
 
               // Loop to construct face linear system.
               for (unsigned int q_point = 0;
@@ -6017,14 +6016,14 @@ namespace VectorTools
         }
     }
 
-    template <int dim, typename DoFHandlerType>
+    template <int dim, typename DoFHandlerType, typename number>
     void
     compute_project_boundary_values_curl_conforming_l2(
       const DoFHandlerType &                 dof_handler,
       const unsigned int                     first_vector_component,
-      const Function<dim> &                  boundary_function,
+      const Function<dim, number> &          boundary_function,
       const types::boundary_id               boundary_component,
-      AffineConstraints<double> &            constraints,
+      AffineConstraints<number> &            constraints,
       const hp::MappingCollection<dim, dim> &mapping_collection)
     {
       // L2-projection based interpolation formed in one (in 2D) or two (in 3D)
@@ -6079,7 +6078,7 @@ namespace VectorTools
 
       // Storage for dof values found and whether they have been processed:
       std::vector<bool>                             dofs_processed;
-      std::vector<double>                           dof_values;
+      std::vector<number>                           dof_values;
       std::vector<types::global_dof_index>          face_dof_indices;
       typename DoFHandlerType::active_cell_iterator cell =
         dof_handler.begin_active();
@@ -6332,15 +6331,15 @@ namespace VectorTools
   } // namespace internals
 
 
-  template <int dim>
+  template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
-    const DoFHandler<dim> &    dof_handler,
-    const unsigned int         first_vector_component,
-    const Function<dim> &      boundary_function,
-    const types::boundary_id   boundary_component,
-    AffineConstraints<double> &constraints,
-    const Mapping<dim> &       mapping)
+    const DoFHandler<dim> &      dof_handler,
+    const unsigned int           first_vector_component,
+    const Function<dim, number> &boundary_function,
+    const types::boundary_id     boundary_component,
+    AffineConstraints<number> &  constraints,
+    const Mapping<dim> &         mapping)
   {
     // non-hp version - calls the internal
     // compute_project_boundary_values_curl_conforming_l2() function
@@ -6356,14 +6355,14 @@ namespace VectorTools
       mapping_collection);
   }
 
-  template <int dim>
+  template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
     const hp::DoFHandler<dim> &            dof_handler,
     const unsigned int                     first_vector_component,
-    const Function<dim> &                  boundary_function,
+    const Function<dim, number> &          boundary_function,
     const types::boundary_id               boundary_component,
-    AffineConstraints<double> &            constraints,
+    AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     // hp version - calls the internal

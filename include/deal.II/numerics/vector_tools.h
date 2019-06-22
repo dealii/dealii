@@ -1682,14 +1682,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim>
+  template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
     const DoFHandler<dim> &      dof_handler,
     const unsigned int           first_vector_component,
-    const Function<dim, double> &boundary_function,
+    const Function<dim, number> &boundary_function,
     const types::boundary_id     boundary_component,
-    AffineConstraints<double> &  constraints,
+    AffineConstraints<number> &  constraints,
     const Mapping<dim> &         mapping = StaticMappingQ1<dim>::mapping);
 
 
@@ -1699,14 +1699,14 @@ namespace VectorTools
    *
    * @ingroup constraints
    */
-  template <int dim>
+  template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
     const hp::DoFHandler<dim> &            dof_handler,
     const unsigned int                     first_vector_component,
-    const Function<dim, double> &          boundary_function,
+    const Function<dim, number> &          boundary_function,
     const types::boundary_id               boundary_component,
-    AffineConstraints<double> &            constraints,
+    AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection =
       hp::StaticMappingQ1<dim>::mapping_collection);
 
