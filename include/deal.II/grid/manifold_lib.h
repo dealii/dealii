@@ -213,7 +213,7 @@ private:
  * Manifold to the cell containing the center. It is advisable to combine this
  * class with TransfiniteInterpolationManifold to ensure a smooth transition
  * from a curved shape to the straight coordinate system in the center of the
- * ball.
+ * ball. (See also the extensive discussion in step-65.)
  *
  * @ingroup manifold
  *
@@ -805,6 +805,7 @@ private:
  * assumed to be given by another manifold (e.g. a polar manifold on a circle).
  * The mechanism to extend the boundary information is a so-called transfinite
  * interpolation.
+ * The use of this class is discussed extensively in step-65.
  *
  * The formula for extending such a description in 2D is, for example,
  * described on

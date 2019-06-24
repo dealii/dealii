@@ -412,7 +412,9 @@ This code then generates the following, much better sequence of meshes:
 Creating good meshes, and in particular making them fit the geometry you
 want, is a complex topic in itself. You can find much more on this in
 step-49, step-53, and step-54, among other tutorial programs that cover
-the issue. Information on curved domains can also be found in the
+the issue. step-65 shows another, less manual way to achieve a mesh
+well fit to the problem here.
+Information on curved domains can also be found in the
 documentation module on @ref manifold "Manifold descriptions".
 
 Why does it make sense to choose a mesh that tracks the internal

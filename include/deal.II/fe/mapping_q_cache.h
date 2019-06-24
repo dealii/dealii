@@ -38,6 +38,8 @@ DEAL_II_NAMESPACE_OPEN
  * which is used in all operations of MappingQGeneric. The information of the
  * mapping is pre-computed by the MappingQCache::initialize() function.
  *
+ * The use of this class is discussed extensively in step-65.
+ *
  * @author Martin Kronbichler, 2019
  */
 template <int dim, int spacedim = dim>
