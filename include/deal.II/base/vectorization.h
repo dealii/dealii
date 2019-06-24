@@ -876,9 +876,9 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
 {
   // do not do full transpose because the code is long and will most
   // likely not pay off because many processors have two load units
-  // (for the top 16 instructions) but only 1 permute unit (for the 8
-  // shuffle/unpack instructions). rather do the transposition on the
-  // vectorized array of half the size, m256d
+  // (for the top 8 instructions) but only 1 permute unit (for the 8
+  // shuffle/unpack instructions). rather start the transposition on the
+  // vectorized array of half the size with 256 bits
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
@@ -902,6 +902,7 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
       out[4 * i + 2].data = _mm512_unpacklo_pd(v1, v3);
       out[4 * i + 3].data = _mm512_unpackhi_pd(v1, v3);
     }
+  // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
     out[i].gather(in + i, offsets);
 }
@@ -919,9 +920,8 @@ vectorized_transpose_and_store(const bool                     add_into,
                                const unsigned int *           offsets,
                                double *                       out)
 {
-  // do not do full transpose because the code is long and will most
-  // likely not pay off. rather do the transposition on the vectorized
-  // array of half the size, m256d
+  // as for the load, we split the store operations into 256 bit units to
+  // better balance between code size, shuffle instructions, and stores
   const unsigned int n_chunks = n_entries / 4;
   __m512i mask1 = _mm512_set_epi64(0xd, 0xc, 0x5, 0x4, 0x9, 0x8, 0x1, 0x0);
   __m512i mask2 = _mm512_set_epi64(0xf, 0xe, 0x7, 0x6, 0xb, 0xa, 0x3, 0x2);
@@ -978,6 +978,8 @@ vectorized_transpose_and_store(const bool                     add_into,
           _mm256_storeu_pd(out + 4 * i + offsets[7], res7);
         }
     }
+
+  // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 8; ++v)
@@ -1286,28 +1288,35 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
                               const unsigned int *    offsets,
                               VectorizedArray<float> *out)
 {
+  // Similar to the double case, we perform the work on smaller entities. In
+  // this case, we start from 128 bit arrays and insert them into a full 512
+  // bit index. This reduces the code size and register pressure because we do
+  // shuffles on 4 numbers rather than 16.
   const unsigned int n_chunks = n_entries / 4;
+
+  // To avoid warnings about uninitialized variables, need to initialize one
+  // variable to a pre-exisiting value in out, which will never get used in
+  // the end. Keep the initialization outside the loop because of a bug in
+  // gcc-9 which generates a "vmovapd" instruction instead of "vmovupd" in
+  // case t3 is initialized to zero (inside/outside of loop), see
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90991
+  __m512 t0, t1, t2, t3;
+  if (n_chunks > 0)
+    t3 = out[0];
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
-      // To avoid warnings about uninitialized variables, need to initialize
-      // one variable with some old value.
-      __m512 t0, t1, t2, t3 = out[0].data;
-
-      t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[0] + 4 * i), 0);
+      t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[0] + 4 * i), 0);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[4] + 4 * i), 1);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[8] + 4 * i), 2);
       t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in + offsets[12] + 4 * i), 3);
-
       t1 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[1] + 4 * i), 0);
       t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in + offsets[5] + 4 * i), 1);
       t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in + offsets[9] + 4 * i), 2);
       t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in + offsets[13] + 4 * i), 3);
-
       t2 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[2] + 4 * i), 0);
       t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in + offsets[6] + 4 * i), 1);
       t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in + offsets[10] + 4 * i), 2);
       t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in + offsets[14] + 4 * i), 3);
-
       t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[3] + 4 * i), 0);
       t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[7] + 4 * i), 1);
       t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[11] + 4 * i), 2);
@@ -1323,6 +1332,8 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
       out[4 * i + 2].data = _mm512_shuffle_ps(v1, v3, 0x88);
       out[4 * i + 3].data = _mm512_shuffle_ps(v1, v3, 0xdd);
     }
+
+  // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
     for (unsigned int v = 0; v < 8; ++v)
       out[i].gather(in + i, offsets);
@@ -1430,6 +1441,8 @@ vectorized_transpose_and_store(const bool                    add_into,
           _mm_storeu_ps(out + 4 * i + offsets[15], res15);
         }
     }
+
+  // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 16; ++v)
@@ -1752,9 +1765,10 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
       out[4 * i + 2].data = _mm256_unpacklo_pd(t2, t3);
       out[4 * i + 3].data = _mm256_unpackhi_pd(t2, t3);
     }
+
+  // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    for (unsigned int v = 0; v < 4; ++v)
-      out[i][v] = in[offsets[v] + i];
+    out[i].gather(in + i, offsets);
 }
 
 
@@ -1812,6 +1826,8 @@ vectorized_transpose_and_store(const bool                     add_into,
           _mm256_storeu_pd(out3 + 4 * i, res3);
         }
     }
+
+  // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 4; ++v)
@@ -2135,9 +2151,10 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
       out[4 * i + 2].data = _mm256_shuffle_ps(v1, v3, 0x88);
       out[4 * i + 3].data = _mm256_shuffle_ps(v1, v3, 0xdd);
     }
+
+  // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    for (unsigned int v = 0; v < 8; ++v)
-      out[i][v] = in[offsets[v] + i];
+    out[i].gather(in + i, offsets);
 }
 
 
@@ -2211,6 +2228,8 @@ vectorized_transpose_and_store(const bool                    add_into,
           _mm_storeu_ps(out + 4 * i + offsets[7], res7);
         }
     }
+
+  // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 8; ++v)
@@ -2506,6 +2525,8 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
       out[2 * i + 0].data = _mm_unpacklo_pd(u0, u1);
       out[2 * i + 1].data = _mm_unpackhi_pd(u0, u1);
     }
+
+  // remainder loop of work that does not divide by 2
   for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
     for (unsigned int v = 0; v < 2; ++v)
       out[i][v] = in[offsets[v] + i];
@@ -2540,6 +2561,7 @@ vectorized_transpose_and_store(const bool                     add_into,
                         _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[1]),
                                    res1));
         }
+      // remainder loop of work that does not divide by 2
       for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 2; ++v)
           out[offsets[v] + i] += in[i][v];
@@ -2555,6 +2577,7 @@ vectorized_transpose_and_store(const bool                     add_into,
           _mm_storeu_pd(out + 2 * i + offsets[0], res0);
           _mm_storeu_pd(out + 2 * i + offsets[1], res1);
         }
+      // remainder loop of work that does not divide by 2
       for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 2; ++v)
           out[offsets[v] + i] = in[i][v];
@@ -2852,6 +2875,8 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
       out[4 * i + 2].data = _mm_shuffle_ps(v1, v3, 0x88);
       out[4 * i + 3].data = _mm_shuffle_ps(v1, v3, 0xdd);
     }
+
+  // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
     for (unsigned int v = 0; v < 4; ++v)
       out[i][v] = in[offsets[v] + i];
@@ -2908,6 +2933,8 @@ vectorized_transpose_and_store(const bool                    add_into,
           _mm_storeu_ps(out + 4 * i + offsets[3], u3);
         }
     }
+
+  // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 4; ++v)
