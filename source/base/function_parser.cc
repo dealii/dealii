@@ -21,10 +21,9 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/random.hpp>
-
 #include <cmath>
 #include <map>
+#include <random>
 
 #ifdef DEAL_II_WITH_MUPARSER
 #  include <muParser.h>
@@ -243,15 +242,14 @@ namespace internal
     static Threads::Mutex       rand_mutex;
     std::lock_guard<std::mutex> lock(rand_mutex);
 
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
+    static std::uniform_real_distribution<> uniform_distribution(0, 1);
 
     // for each seed an unique random number generator is created,
     // which is initialized with the seed itself
-    static std::map<double, boost::random::mt19937> rng_map;
+    static std::map<double, std::mt19937> rng_map;
 
     if (rng_map.find(seed) == rng_map.end())
-      rng_map[seed] = boost::random::mt19937(static_cast<unsigned int>(seed));
+      rng_map[seed] = std::mt19937(static_cast<unsigned int>(seed));
 
     return uniform_distribution(rng_map[seed]);
   }
@@ -260,12 +258,10 @@ namespace internal
   double
   mu_rand()
   {
-    static Threads::Mutex                             rand_mutex;
-    std::lock_guard<std::mutex>                       lock(rand_mutex);
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
-    static boost::random::mt19937                     rng(
-                          static_cast<unsigned long>(std::time(nullptr)));
+    static Threads::Mutex                   rand_mutex;
+    std::lock_guard<std::mutex>             lock(rand_mutex);
+    static std::uniform_real_distribution<> uniform_distribution(0, 1);
+    static std::mt19937 rng(static_cast<unsigned long>(std::time(nullptr)));
     return uniform_distribution(rng);
   }
 
