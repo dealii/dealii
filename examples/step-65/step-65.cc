@@ -18,7 +18,9 @@
 
 // @sect3{Include files}
 
-// The include files for this tutorial are essentially the same as in step-6.
+// The include files for this tutorial are essentially the same as in
+// step-6. Importantly, the TransfiniteInterpolationManifold class we
+// will be using is provided by `deal.II/grid/manifold_lib.h`.
 
 #include <deal.II/base/timer.h>
 
@@ -50,23 +52,27 @@
 #include <deal.II/fe/mapping_q_cache.h>
 
 
-namespace step65
+namespace Step65
 {
   using namespace dealii;
 
 
   // @sect3{Analytical solution and coefficient}
 
-  // In this tutorial program, we want to solve the Poisson equation with a
-  // coefficient that jumps along a sphere of radius 0.5 and constant right
-  // hand side of value $f(\mathbf{x}) = -3$. Due to the jump in the
+  // In this tutorial program, we want to solve the Poisson equation
+  // with a coefficient that jumps along a sphere of radius 0.5 and
+  // constant right hand side of value $f(\mathbf{x}) = -3$. (This
+  // setup is similar to step-5 and step-6, but the concrete values
+  // for the coefficient and the right hand side are different.)
+  // Due to the jump in the
   // coefficient, the analytical solution must have a kink where the
   // coefficient switches from one value to the other. To keep things simple,
   // we select an analytical solution that is quadratic in all components,
   // i.e., $u(x,y,z) = x^2 + y^2 + z^2$ in the ball of radius 0.5 and
   // $u(x,y,z) = 0.1(x^2 + y^2 + z^2) + 0.25-0.025$ in the outer part of the
   // domain. This analytical solution is compatible with the right hand side
-  // in case the coefficient is 0.5 in the inner ball and 5 outside.
+  // in case the coefficient is 0.5 in the inner ball and 5 outside. It is
+  // also continuous along the circle of radius 0.5.
   template <int dim>
   class ExactSolution : public Function<dim>
   {
@@ -93,18 +99,13 @@ namespace step65
 
 
   template <int dim>
-  class Coefficient : public Function<dim>
+  double coefficient(const Point<dim> &p)
   {
-  public:
-    virtual double value(const Point<dim> &p,
-                         const unsigned int /*component*/ = 0) const override
-    {
-      if (p.norm_square() < 0.25)
-        return 0.5;
-      else
-        return 5.;
-    }
-  };
+    if (p.square() < 0.5 * 0.5)
+      return 0.5;
+    else
+      return 5.0;
+  }
 
 
 
@@ -374,7 +375,7 @@ namespace step65
         for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
           {
             const double current_coefficient =
-              Coefficient<dim>().value(fe_values.quadrature_point(q_index));
+              coefficient(fe_values.quadrature_point(q_index));
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int d = 0; d < dim; ++d)
@@ -601,13 +602,13 @@ namespace step65
       timer.print_summary();
     }
   }
-} // namespace step65
+} // namespace Step65
 
 
 
 int main()
 {
-  step65::PoissonProblem<3> test_program;
+  Step65::PoissonProblem<3> test_program;
   test_program.run();
   return 0;
 }
