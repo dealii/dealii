@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check that print_numpy_array works
+// Check that print_as_numpy_arrays works
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -39,7 +39,7 @@ print_sparse_matrix()
   for (unsigned int i = 0; i < n; ++i)
     for (unsigned int j = 0; j < n; ++j)
       A.set(i, j, static_cast<number>(i + j));
-  A.print_numpy_array(deallog.get_file_stream());
+  A.print_as_numpy_arrays(deallog.get_file_stream());
 }
 
 

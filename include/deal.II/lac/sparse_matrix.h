@@ -1584,7 +1584,7 @@ public:
   print_pattern(std::ostream &out, const double threshold = 0.) const;
 
   /**
-   * Print the vector to the output stream @p out in a format that can be
+   * Print the matrix to the output stream @p out in a format that can be
    * read by numpy::readtxt(). To load the matrix in python just do
    * <code>
    *  [data, row, column] = numpy.loadtxt('my_matrix.txt')
@@ -1592,7 +1592,8 @@ public:
    * </code>
    */
   void
-  print_numpy_array(std::ostream &out, const unsigned int precision = 9) const;
+  print_as_numpy_arrays(std::ostream &     out,
+                        const unsigned int precision = 9) const;
 
   /**
    * Write the data of this object en bloc to a file. This is done in a binary

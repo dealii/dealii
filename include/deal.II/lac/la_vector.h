@@ -361,8 +361,8 @@ namespace LinearAlgebra
      * </code>
      */
     void
-    print_numpy_array(std::ostream &     out,
-                      const unsigned int precision = 9) const;
+    print_as_numpy_array(std::ostream &     out,
+                         const unsigned int precision = 9) const;
 
     /**
      * Write the vector en bloc to a file. This is done in a binary mode, so

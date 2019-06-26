@@ -564,8 +564,8 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  Vector<Number>::print_numpy_array(std::ostream &     out,
-                                    const unsigned int precision) const
+  Vector<Number>::print_as_numpy_array(std::ostream &     out,
+                                       const unsigned int precision) const
   {
     AssertThrow(out, ExcIO());
     boost::io::ios_flags_saver restore_flags(out);

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check that print_numpy_array works
+// Check that print_as_numpy_array works
 
 #include <deal.II/lac/la_vector.h>
 
@@ -30,7 +30,7 @@ print_vector()
   for (unsigned int i = 0; i < size; ++i)
     vec(i) = static_cast<number>(i);
 
-  vec.print_numpy_array(deallog.get_file_stream());
+  vec.print_as_numpy_array(deallog.get_file_stream());
 }
 
 

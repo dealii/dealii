@@ -1968,8 +1968,8 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
 
 template <typename number>
 void
-SparseMatrix<number>::print_numpy_array(std::ostream &     out,
-                                        const unsigned int precision) const
+SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
+                                            const unsigned int precision) const
 {
   AssertThrow(out, ExcIO());
   boost::io::ios_flags_saver restore_flags(out);
