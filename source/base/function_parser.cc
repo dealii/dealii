@@ -248,6 +248,8 @@ namespace internal
 
     // for each seed an unique random number generator is created,
     // which is initialized with the seed itself
+    // we could use std::mt19937 but doing so results in compiler-dependent
+    // output.
     static std::map<double, boost::random::mt19937> rng_map;
 
     if (rng_map.find(seed) == rng_map.end())

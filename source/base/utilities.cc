@@ -764,7 +764,9 @@ namespace Utilities
     // in a thread context. one could use rand_r, but this does not
     // produce reproducible results between threads either (though at
     // least it is reentrant). these two approaches being
-    // non-workable, use a thread-local random number generator here
+    // non-workable, use a thread-local random number generator here.
+    // we could use std::mt19937 but doing so results in compiler-dependent
+    // output.
     static Threads::ThreadLocalStorage<boost::mt19937> random_number_generator;
     return boost::normal_distribution<>(a,
                                         sigma)(random_number_generator.get());

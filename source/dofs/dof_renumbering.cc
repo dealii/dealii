@@ -2134,11 +2134,14 @@ namespace DoFRenumbering
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    for (unsigned int i = 0; i < n_dofs; ++i)
-      new_indices[i] = i;
+    std::iota(new_indices.begin(),
+              new_indices.end(),
+              types::global_dof_index(0));
 
     // shuffle the elements; the following is essentially std::shuffle (which
     // is new in C++11) but with a boost URNG
+    // we could use std::mt19937 here but doing so results in compiler-dependent
+    // output
     ::boost::mt19937 random_number_generator;
     for (unsigned int i = 1; i < n_dofs; ++i)
       {
@@ -2165,11 +2168,14 @@ namespace DoFRenumbering
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    for (unsigned int i = 0; i < n_dofs; ++i)
-      new_indices[i] = i;
+    std::iota(new_indices.begin(),
+              new_indices.end(),
+              types::global_dof_index(0));
 
     // shuffle the elements; the following is essentially std::shuffle (which
     // is new in C++11) but with a boost URNG
+    // we could use std::mt19937 here but doing so results in
+    // compiler-dependent output
     ::boost::mt19937 random_number_generator;
     for (unsigned int i = 1; i < n_dofs; ++i)
       {

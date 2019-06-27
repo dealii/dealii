@@ -1172,6 +1172,8 @@ namespace GridTools
     // if you call the function twice on the same mesh, then you will
     // get the same mesh. this would not be the case if you used
     // the rand() function, which carries around some internal state
+    // we could use std::mt19937 but doing so results in compiler-dependent
+    // output.
     boost::random::mt19937                     rng;
     boost::random::uniform_real_distribution<> uniform_distribution(-1, 1);
 
