@@ -20,6 +20,8 @@
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
+#include <boost/io/ios_state.hpp>
+
 #include <iomanip>
 #include <iostream>
 
@@ -556,6 +558,26 @@ namespace LinearAlgebra
     AssertIsFinite(sum);
 
     return sum;
+  }
+
+
+
+  template <typename Number>
+  void
+  Vector<Number>::print_as_numpy_array(std::ostream &     out,
+                                       const unsigned int precision) const
+  {
+    AssertThrow(out, ExcIO());
+    boost::io::ios_flags_saver restore_flags(out);
+
+    out.precision(precision);
+
+    const unsigned int n_elements = this->n_elements();
+    for (unsigned int i = 0; i < n_elements; ++i)
+      out << this->values[i] << ' ';
+    out << '\n' << std::flush;
+
+    AssertThrow(out, ExcIO());
   }
 
 

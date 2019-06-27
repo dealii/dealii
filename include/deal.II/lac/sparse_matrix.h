@@ -1584,6 +1584,18 @@ public:
   print_pattern(std::ostream &out, const double threshold = 0.) const;
 
   /**
+   * Print the matrix to the output stream @p out in a format that can be
+   * read by numpy::readtxt(). To load the matrix in python just do
+   * <code>
+   *  [data, row, column] = numpy.loadtxt('my_matrix.txt')
+   *  sparse_matrix = scipy.sparse.csr_matrix((data, (row, column)))
+   * </code>
+   */
+  void
+  print_as_numpy_arrays(std::ostream &     out,
+                        const unsigned int precision = 9) const;
+
+  /**
    * Write the data of this object en bloc to a file. This is done in a binary
    * mode, so the output is neither readable by humans nor (probably) by other
    * computers using a different operating system of number format.
