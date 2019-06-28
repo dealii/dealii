@@ -29,6 +29,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/random.hpp>
 
 #include <algorithm>
 #include <bitset>
@@ -42,7 +43,6 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
-#include <random>
 #include <sstream>
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
@@ -764,9 +764,12 @@ namespace Utilities
     // in a thread context. one could use rand_r, but this does not
     // produce reproducible results between threads either (though at
     // least it is reentrant). these two approaches being
-    // non-workable, use a thread-local random number generator here
-    static Threads::ThreadLocalStorage<std::mt19937> random_number_generator;
-    return std::normal_distribution<>(a, sigma)(random_number_generator.get());
+    // non-workable, use a thread-local random number generator here.
+    // we could use std::mt19937 but doing so results in compiler-dependent
+    // output.
+    static Threads::ThreadLocalStorage<boost::mt19937> random_number_generator;
+    return boost::normal_distribution<>(a,
+                                        sigma)(random_number_generator.get());
   }
 
 

@@ -53,12 +53,14 @@
 
 #include <deal.II/numerics/matrix_tools.h>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+
 #include <array>
 #include <cmath>
 #include <iostream>
 #include <list>
 #include <numeric>
-#include <random>
 #include <set>
 #include <tuple>
 #include <unordered_map>
@@ -1170,8 +1172,10 @@ namespace GridTools
     // if you call the function twice on the same mesh, then you will
     // get the same mesh. this would not be the case if you used
     // the rand() function, which carries around some internal state
-    std::mt19937                     rng;
-    std::uniform_real_distribution<> uniform_distribution(-1, 1);
+    // we could use std::mt19937 but doing so results in compiler-dependent
+    // output.
+    boost::random::mt19937                     rng;
+    boost::random::uniform_real_distribution<> uniform_distribution(-1, 1);
 
     // If the triangulation is distributed, we need to
     // exchange the moved vertices across mpi processes
