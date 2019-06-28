@@ -879,7 +879,7 @@ private:
  *  x^{n+1} = x^{n} + \rho_n \rho_{n-1} (x^{n} - x^{n-1}) +
  *     \frac{\rho_n}{\lambda_{\max{}}-\lambda_{\min{}}} P^{-1} (b-Ax^n).
  * @f]
- * where the parameter $rho_0$ is set to $rho_0 =
+ * where the parameter $\rho_0$ is set to $\rho_0 =
  * \frac{\lambda_{\max{}}-\lambda_{\min{}}}{\lambda_{\max{}}+\lambda_{\min{}}}$
  * for the maximal eigenvalue $\lambda_{\max{}}$ and updated via $\rho_n =
  * \left(2\frac{\lambda_{\max{}}+\lambda_{\min{}}}
@@ -917,7 +917,7 @@ private:
  * many iterations should be performed. The iterations are started from an
  * initial vector that depends on the vector type. For the classes
  * dealii::Vector or dealii::LinearAlgebra::distributed::Vector, which have
- * fast element access, it is either a vector with entries `(-5.5, -4.5, -3.5,
+ * fast element access, it is a vector with entries `(-5.5, -4.5, -3.5,
  * -2.5, ..., 3.5, 4.5, 5.5)` with appropriate epilogue and adjusted such that
  * its mean is always zero, which works well for the Laplacian. This setup is
  * stable in parallel in the sense that for a different number of processors
