@@ -41,6 +41,17 @@ namespace Differentiation
       }
 
 
+      SD::types::substitution_map
+      convert_basic_map_to_expression_map(
+        const SymEngine::map_basic_basic &substitution_map)
+      {
+        SD::types::substitution_map sub_map;
+        for (const auto &entry : substitution_map)
+          sub_map[Expression(entry.first)] = SD::Expression(entry.second);
+        return sub_map;
+      }
+
+
       SE::vec_basic
       convert_expression_vector_to_basic_vector(
         const SD::types::symbol_vector &symbol_vector)

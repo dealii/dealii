@@ -16,8 +16,11 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  symengine_helpers.cc
   symengine_math.cc
   symengine_number_types.cc
+  symengine_number_visitor.cc
+  symengine_optimizer.cc
   symengine_scalar_operations.cc
   symengine_tensor_operations.cc
   symengine_types.cc
@@ -25,7 +28,10 @@ SET(_src
   )
 
 SET(_inst
+  symengine_helpers.inst.in
   symengine_tensor_operations.inst.in
+  symengine_number_visitor.inst.in
+  symengine_optimizer.inst.in
   )
 
 FILE(GLOB _header

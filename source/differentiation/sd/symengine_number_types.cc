@@ -284,8 +284,15 @@ namespace Differentiation
     Expression::substitute(
       const types::substitution_map &substitution_values) const
     {
-      return Expression(get_expression().subs(
-        Utilities::convert_expression_map_to_basic_map(substitution_values)));
+      return substitute(
+        Utilities::convert_expression_map_to_basic_map(substitution_values));
+    }
+
+
+    Expression
+    Expression::substitute(const SE::map_basic_basic &substitution_values) const
+    {
+      return Expression(get_expression().subs(substitution_values));
     }
 
 

@@ -42,6 +42,13 @@ namespace Differentiation
         const SD::types::substitution_map &substitution_map);
 
       /**
+       * Convert to a map of Expressions from its SymEngine counterpart.
+       */
+      SD::types::substitution_map
+      convert_basic_map_to_expression_map(
+        const SymEngine::map_basic_basic &substitution_map);
+
+      /**
        * Convert a vector of Expressions to its SymEngine counterpart.
        */
       SymEngine::vec_basic

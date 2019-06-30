@@ -20,9 +20,14 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
+#  include <deal.II/differentiation/sd/symengine_helpers.h>
+#  include <deal.II/differentiation/sd/symengine_la_vector_types.h>
+#  include <deal.II/differentiation/sd/symengine_linear_operator_types.h>
 #  include <deal.II/differentiation/sd/symengine_math.h>
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
+#  include <deal.II/differentiation/sd/symengine_number_visitor.h>
+#  include <deal.II/differentiation/sd/symengine_optimizer.h>
 #  include <deal.II/differentiation/sd/symengine_product_types.h>
 #  include <deal.II/differentiation/sd/symengine_scalar_operations.h>
 #  include <deal.II/differentiation/sd/symengine_tensor_operations.h>
