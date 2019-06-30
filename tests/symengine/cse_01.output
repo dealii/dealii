@@ -1,0 +1,15 @@
+
+DEAL:Independents::a
+DEAL:Independents::b
+DEAL:Independents::c
+DEAL:Dependents::a + b
+DEAL:Dependents::a + b + c
+DEAL:Dependents::c*(a + b)
+DEAL:Dependents::c*(a + b + c)
+DEAL:CSE elimination:Intermediate reduced expressions::0: x0 = a + b
+DEAL:CSE elimination:Intermediate reduced expressions::1: x1 = c + x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::0: x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::1: x1
+DEAL:CSE elimination:Final reduced expressions for dependent variables::2: c*x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::3: c*x1
+DEAL:CSE elimination::OK
