@@ -245,8 +245,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const types::boundary_id,
         AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
-      template void
 #    ifdef DEAL_II_WITH_COMPLEX_VALUES
+      template void
       project_boundary_values_curl_conforming_l2(
         const hp::DoFHandler<deal_II_dimension> &,
         const unsigned int,
