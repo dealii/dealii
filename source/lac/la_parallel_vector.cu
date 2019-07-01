@@ -25,6 +25,22 @@ namespace LinearAlgebra
   {
     template class Vector<float, ::dealii::MemorySpace::CUDA>;
     template class Vector<double, ::dealii::MemorySpace::CUDA>;
+
+    template Vector<float, ::dealii::MemorySpace::CUDA> &
+    Vector<float, ::dealii::MemorySpace::CUDA>::
+    operator=(const Vector<float, ::dealii::MemorySpace::Host> &);
+
+    template Vector<double, ::dealii::MemorySpace::CUDA> &
+    Vector<double, ::dealii::MemorySpace::CUDA>::
+    operator=(const Vector<double, ::dealii::MemorySpace::Host> &);
+
+    template Vector<float, ::dealii::MemorySpace::Host> &
+    Vector<float, ::dealii::MemorySpace::Host>::
+    operator=(const Vector<float, ::dealii::MemorySpace::CUDA> &);
+
+    template Vector<double, ::dealii::MemorySpace::Host> &
+    Vector<double, ::dealii::MemorySpace::Host>::
+    operator=(const Vector<double, ::dealii::MemorySpace::CUDA> &);
   } // namespace distributed
 } // namespace LinearAlgebra
 

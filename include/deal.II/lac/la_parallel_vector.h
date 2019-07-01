@@ -401,6 +401,21 @@ namespace LinearAlgebra
        * at all, the vector will also update its ghost values in analogy to
        * the respective setting the Trilinos and PETSc vectors.
        */
+      template <typename MemorySpace2>
+      Vector<Number, MemorySpace> &
+      operator=(const Vector<Number, MemorySpace2> &in_vector);
+
+      /**
+       * Assigns the vector to the parallel partitioning of the input vector
+       * @p in_vector, and copies all the data.
+       *
+       * If one of the input vector or the calling vector (to the left of the
+       * assignment operator) had ghost elements set before this operation,
+       * the calling vector will have ghost values set. Otherwise, it will be
+       * in write mode. If the input vector does not have any ghost elements
+       * at all, the vector will also update its ghost values in analogy to
+       * the respective setting the Trilinos and PETSc vectors.
+       */
       template <typename Number2>
       Vector<Number, MemorySpace> &
       operator=(const Vector<Number2, MemorySpace> &in_vector);
@@ -1384,6 +1399,15 @@ namespace LinearAlgebra
        */
       void
       resize_val(const size_type new_allocated_size);
+
+      /**
+       * A helper function for the different templated version of
+       * operator=(const Vector<Number, MemorySpace>&).
+       */
+      template <typename Number2, typename MemorySpace2>
+      void
+      assignment(const Vector<Number2, MemorySpace2> &c,
+                 bool &                               must_update_ghost_values);
 
       /*
        * Make all other vector types friends.

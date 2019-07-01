@@ -2544,6 +2544,69 @@ namespace internal
       }
     };
 #endif
+
+
+
+    template <typename Number,
+              typename MemorySpaceType,
+              typename Number2,
+              typename MemorySpaceType2,
+              typename std::enable_if<
+                std::is_same<MemorySpaceType, MemorySpaceType2>::value,
+                int>::type = 0>
+    void
+    copy(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+           &             partitioner,
+         const size_type size,
+         const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpaceType2>
+           &v_data,
+         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType> &data)
+    {
+      functions<Number, Number2, MemorySpaceType>::copy(partitioner,
+                                                        size,
+                                                        v_data,
+                                                        data);
+    }
+
+
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <typename Number,
+              typename MemorySpaceType,
+              typename Number2,
+              typename MemorySpaceType2,
+              typename std::enable_if<
+                !std::is_same<MemorySpaceType, MemorySpaceType2>::value,
+                int>::type = 0>
+    void
+    copy(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
+         const size_type size,
+         const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpaceType2>
+           &v_data,
+         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType> &data)
+    {
+      static_assert(std::is_same<Number, Number2>::value, "not implemented");
+      // copy from host to device
+      if (std::is_same<MemorySpaceType2, dealii::MemorySpace::Host>::value ==
+          true)
+        {
+          cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
+                                                   v_data.values.get(),
+                                                   size * sizeof(Number),
+                                                   cudaMemcpyHostToDevice);
+          AssertCuda(cuda_error_code);
+        }
+      // copy from device to host
+      else
+        {
+          cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
+                                                   v_data.values_dev.get(),
+                                                   size * sizeof(Number),
+                                                   cudaMemcpyDeviceToHost);
+          AssertCuda(cuda_error_code);
+        }
+    }
+#endif
   } // namespace VectorOperations
 } // namespace internal
 

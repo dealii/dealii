@@ -216,6 +216,8 @@ namespace LinearAlgebra
         }
       };
 
+
+
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
       template <typename Number>
       struct la_parallel_vector_templates_functions<Number,
@@ -629,11 +631,28 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::
     operator=(const Vector<Number, MemorySpaceType> &c)
     {
-#ifdef _MSC_VER
-      return this->operator=<Number>(c);
-#else
-      return this->template operator=<Number>(c);
-#endif
+      // we update ghost values whenever one of the input or output vector
+      // already held ghost values or when we import data from a vector with
+      // the same local range but different ghost layout
+      assignment(c, c.vector_is_ghosted);
+
+      return *this;
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    template <typename MemorySpaceType2>
+    inline Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
+    operator=(const Vector<Number, MemorySpaceType2> &c)
+    {
+      // we update ghost values whenever one of the input or output vector
+      // already held ghost values or when we import data from a vector with
+      // the same local range but different ghost layout
+      assignment(c, c.vector_is_ghosted);
+
+      return *this;
     }
 
 
@@ -644,64 +663,11 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::
     operator=(const Vector<Number2, MemorySpaceType> &c)
     {
-      Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
-
       // we update ghost values whenever one of the input or output vector
       // already held ghost values or when we import data from a vector with
       // the same local range but different ghost layout
-      bool must_update_ghost_values = c.vector_is_ghosted;
+      assignment(c, c.vector_is_ghosted);
 
-      // check whether the two vectors use the same parallel partitioner. if
-      // not, check if all local ranges are the same (that way, we can
-      // exchange data between different parallel layouts). One variant which
-      // is included here and necessary for compatibility with the other
-      // distributed vector classes (Trilinos, PETSc) is the case when vector
-      // c does not have any ghosts (constructed without ghost elements given)
-      // but the current vector does: In that case, we need to exchange data
-      // also when none of the two vector had updated its ghost values before.
-      if (partitioner.get() == nullptr)
-        reinit(c, true);
-      else if (partitioner.get() != c.partitioner.get())
-        {
-          // local ranges are also the same if both partitioners are empty
-          // (even if they happen to define the empty range as [0,0) or [c,c)
-          // for some c!=0 in a different way).
-          int local_ranges_are_identical =
-            (partitioner->local_range() == c.partitioner->local_range() ||
-             (partitioner->local_range().second ==
-                partitioner->local_range().first &&
-              c.partitioner->local_range().second ==
-                c.partitioner->local_range().first));
-          if ((c.partitioner->n_mpi_processes() > 1 &&
-               Utilities::MPI::min(local_ranges_are_identical,
-                                   c.partitioner->get_mpi_communicator()) ==
-                 0) ||
-              !local_ranges_are_identical)
-            reinit(c, true);
-          else
-            must_update_ghost_values |= vector_is_ghosted;
-
-          must_update_ghost_values |=
-            (c.partitioner->ghost_indices_initialized() == false &&
-             partitioner->ghost_indices_initialized() == true);
-        }
-      else
-        must_update_ghost_values |= vector_is_ghosted;
-
-      thread_loop_partitioner = c.thread_loop_partitioner;
-
-      const size_type this_size = partitioner->local_size();
-      if (this_size > 0)
-        {
-          dealii::internal::VectorOperations::
-            functions<Number, Number2, MemorySpaceType>::copy(
-              thread_loop_partitioner, this_size, c.data, data);
-        }
-
-      if (must_update_ghost_values)
-        update_ghost_values();
-      else
-        zero_out_ghosts();
       return *this;
     }
 
@@ -2097,6 +2063,66 @@ namespace LinearAlgebra
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    template <typename Number2, typename MemorySpaceType2>
+    void
+    Vector<Number, MemorySpaceType>::assignment(
+      const Vector<Number2, MemorySpaceType2> &c,
+      bool &                                   must_update_ghost_values)
+    {
+      auto c_partitioner = c.partitioner;
+      Assert(c_partitioner.get() != nullptr, ExcNotInitialized());
+
+      // check whether the two vectors use the same parallel partitioner. if
+      // not, check if all local ranges are the same (that way, we can
+      // exchange data between different parallel layouts). One variant which
+      // is included here and necessary for compatibility with the other
+      // distributed vector classes (Trilinos, PETSc) is the case when vector
+      // c does not have any ghosts (constructed without ghost elements given)
+      // but the current vector does: In that case, we need to exchange data
+      // also when none of the two vector had updated its ghost values before.
+      if (partitioner == nullptr)
+        {
+          reinit(c_partitioner);
+          ::dealii::internal::VectorOperations::copy(thread_loop_partitioner,
+                                                     local_size(),
+                                                     data,
+                                                     c.data);
+        }
+      else if (partitioner.get() != c_partitioner.get())
+        {
+          // local ranges are also the same if both partitioners are empty
+          // (even if they happen to define the empty range as [0,0) or [c,c)
+          // for some c!=0 in a different way).
+          int local_ranges_are_identical =
+            (partitioner->local_range() == c_partitioner->local_range() ||
+             (partitioner->local_range().second ==
+                partitioner->local_range().first &&
+              c_partitioner->local_range().second ==
+                c_partitioner->local_range().first));
+          if ((c_partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::min(local_ranges_are_identical,
+                                   c_partitioner->get_mpi_communicator()) ==
+                 0) ||
+              !local_ranges_are_identical)
+            {
+              reinit(c_partitioner);
+              ::dealii::internal::VectorOperations::copy(
+                thread_loop_partitioner, local_size(), data, c.data);
+            }
+          else
+            must_update_ghost_values |= has_ghost_elements();
+
+          must_update_ghost_values |=
+            (c_partitioner->ghost_indices_initialized() == false &&
+             partitioner->ghost_indices_initialized() == true);
+        }
+      else
+        must_update_ghost_values |= has_ghost_elements();
     }
 
   } // end of namespace distributed
