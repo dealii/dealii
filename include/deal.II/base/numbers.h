@@ -37,8 +37,55 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace internal
+{
+  template <typename Number>
+  struct VectorizedArrayWidthSpecifier
+  {
+    static const unsigned int max_width = 1;
+  };
+
+  template <>
+  struct VectorizedArrayWidthSpecifier<double>
+  {
+    static const unsigned int max_width =
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
+      2;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+      8;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+      4;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+      2;
+#else
+      1;
+#endif
+  };
+
+  template <>
+  struct VectorizedArrayWidthSpecifier<float>
+  {
+    static const unsigned int max_width =
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
+      4;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+      16;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+      8;
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+      4;
+#else
+      1;
+#endif
+  };
+
+
+} // namespace internal
+
 // forward declarations to support abs or sqrt operations on VectorizedArray
-template <typename Number>
+template <typename Number,
+          int width =
+            internal::VectorizedArrayWidthSpecifier<Number>::max_width>
 class VectorizedArray;
 template <typename T>
 struct EnableIfScalar;
@@ -62,38 +109,38 @@ DEAL_II_NAMESPACE_CLOSE
 
 namespace std
 {
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  sqrt(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  abs(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  max(const ::dealii::VectorizedArray<Number> &,
-      const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
-  min(const ::dealii::VectorizedArray<Number> &,
-      const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  pow(const ::dealii::VectorizedArray<Number> &, const Number p);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  sin(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  cos(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  tan(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  exp(const ::dealii::VectorizedArray<Number> &);
-  template <typename Number>
-  ::dealii::VectorizedArray<Number>
-  log(const ::dealii::VectorizedArray<Number> &);
+  template <typename Number, int width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  sqrt(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  abs(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  max(const ::dealii::VectorizedArray<Number, width> &,
+      const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
+  min(const ::dealii::VectorizedArray<Number, width> &,
+      const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &, const Number p);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  sin(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  cos(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  tan(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  exp(const ::dealii::VectorizedArray<Number, width> &);
+  template <typename Number, int width>
+  ::dealii::VectorizedArray<Number, width>
+  log(const ::dealii::VectorizedArray<Number, width> &);
 } // namespace std
 
 DEAL_II_NAMESPACE_OPEN

@@ -45,8 +45,6 @@ template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
 class Vector;
-template <typename Number>
-class VectorizedArray;
 
 #ifndef DOXYGEN
 // Overload invalid tensor types of negative rank that come up during
@@ -740,27 +738,27 @@ namespace internal
     }
   };
 
-  template <int rank, int dim, typename T>
-  struct NumberType<Tensor<rank, dim, VectorizedArray<T>>>
+  template <int rank, int dim, typename T, int width>
+  struct NumberType<Tensor<rank, dim, VectorizedArray<T, width>>>
   {
-    static constexpr const Tensor<rank, dim, VectorizedArray<T>> &
-    value(const Tensor<rank, dim, VectorizedArray<T>> &t)
+    static constexpr const Tensor<rank, dim, VectorizedArray<T, width>> &
+    value(const Tensor<rank, dim, VectorizedArray<T, width>> &t)
     {
       return t;
     }
 
-    static DEAL_II_CONSTEXPR Tensor<rank, dim, VectorizedArray<T>>
+    static DEAL_II_CONSTEXPR Tensor<rank, dim, VectorizedArray<T, width>>
                              value(const T &t)
     {
-      Tensor<rank, dim, VectorizedArray<T>> tmp;
-      tmp = internal::NumberType<VectorizedArray<T>>::value(t);
+      Tensor<rank, dim, VectorizedArray<T, width>> tmp;
+      tmp = internal::NumberType<VectorizedArray<T, width>>::value(t);
       return tmp;
     }
 
-    static DEAL_II_CONSTEXPR Tensor<rank, dim, VectorizedArray<T>>
-                             value(const VectorizedArray<T> &t)
+    static DEAL_II_CONSTEXPR Tensor<rank, dim, VectorizedArray<T, width>>
+                             value(const VectorizedArray<T, width> &t)
     {
-      Tensor<rank, dim, VectorizedArray<T>> tmp;
+      Tensor<rank, dim, VectorizedArray<T, width>> tmp;
       tmp = t;
       return tmp;
     }
