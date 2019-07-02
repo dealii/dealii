@@ -238,9 +238,8 @@ namespace CUDAWrappers
     // Use the read-only data cache.
     values[idx] = __ldg(&src[src_idx]);
 
-    if (constraint_mask)
-      internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
-                                                             values);
+    internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
+                                                           values);
 
     __syncthreads();
   }
@@ -258,9 +257,8 @@ namespace CUDAWrappers
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    if (constraint_mask)
-      internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
-                                                            values);
+    internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
+                                                          values);
 
     const unsigned int idx =
       (threadIdx.x % n_q_points_1d) +

@@ -758,7 +758,8 @@ namespace CUDAWrappers
                 bool         transpose,
                 typename Number>
       __device__ inline void
-      interpolate_boundary_2d(const unsigned int constr, Number *values)
+      interpolate_boundary_2d(const unsigned int constraint_mask,
+                              Number *           values)
       {
         const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
         const unsigned int y_idx = threadIdx.y;
@@ -766,72 +767,73 @@ namespace CUDAWrappers
         const unsigned int this_type =
           (direction == 0) ? internal::constr_type_x : internal::constr_type_y;
 
-        if (constr & (((direction == 0) ? internal::constr_face_y : 0) |
-                      ((direction == 1) ? internal::constr_face_x : 0)))
+        const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
+
+        Number t = 0;
+        // Flag is true if dof is constrained for the given direction and the
+        // given face.
+        const bool constrained_face =
+          (constraint_mask &
+           (((direction == 0) ? internal::constr_face_y : 0) |
+            ((direction == 1) ? internal::constr_face_x : 0)));
+
+        // Flag is true if for the given direction, the dof is constrained with
+        // the right type and is on the correct side (left (= 0) or right (=
+        // fe_degree))
+        const bool constrained_dof =
+          ((direction == 0) && ((constraint_mask & internal::constr_type_y) ?
+                                  (y_idx == 0) :
+                                  (y_idx == fe_degree))) ||
+          ((direction == 1) && ((constraint_mask & internal::constr_type_x) ?
+                                  (x_idx == 0) :
+                                  (x_idx == fe_degree)));
+        if (constrained_face && constrained_dof)
           {
-            const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
+            const bool type = constraint_mask & this_type;
 
-            __syncthreads();
-
-            Number     t = 0;
-            const bool flag =
-              ((direction == 0) &&
-               ((constr & internal::constr_type_y) ? (y_idx == 0) :
-                                                     (y_idx == fe_degree))) ||
-              ((direction == 1) &&
-               ((constr & internal::constr_type_x) ? (x_idx == 0) :
-                                                     (x_idx == fe_degree)));
-
-            if (flag)
+            if (type)
               {
-                const bool type = constr & this_type;
-
-                if (type)
+                for (unsigned int i = 0; i <= fe_degree; ++i)
                   {
-                    for (unsigned int i = 0; i <= fe_degree; ++i)
-                      {
-                        const unsigned int real_idx =
-                          (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
-                                             index2<fe_degree + 1>(x_idx, i);
+                    const unsigned int real_idx =
+                      (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
+                                         index2<fe_degree + 1>(x_idx, i);
 
-                        const Number w =
-                          transpose ?
-                            internal::constraint_weights[i * (fe_degree + 1) +
-                                                         interp_idx] :
-                            internal::constraint_weights[interp_idx *
-                                                           (fe_degree + 1) +
-                                                         i];
-                        t += w * values[real_idx];
-                      }
-                  }
-                else
-                  {
-                    for (unsigned int i = 0; i <= fe_degree; ++i)
-                      {
-                        const unsigned int real_idx =
-                          (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
-                                             index2<fe_degree + 1>(x_idx, i);
-
-                        const Number w =
-                          transpose ?
-                            internal::constraint_weights[(fe_degree - i) *
-                                                           (fe_degree + 1) +
-                                                         fe_degree -
-                                                         interp_idx] :
-                            internal::constraint_weights[(fe_degree -
-                                                          interp_idx) *
-                                                           (fe_degree + 1) +
-                                                         fe_degree - i];
-                        t += w * values[real_idx];
-                      }
+                    const Number w =
+                      transpose ?
+                        internal::constraint_weights[i * (fe_degree + 1) +
+                                                     interp_idx] :
+                        internal::constraint_weights[interp_idx *
+                                                       (fe_degree + 1) +
+                                                     i];
+                    t += w * values[real_idx];
                   }
               }
+            else
+              {
+                for (unsigned int i = 0; i <= fe_degree; ++i)
+                  {
+                    const unsigned int real_idx =
+                      (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
+                                         index2<fe_degree + 1>(x_idx, i);
 
-            __syncthreads();
-
-            if (flag)
-              values[index2<fe_degree + 1>(x_idx, y_idx)] = t;
+                    const Number w =
+                      transpose ?
+                        internal::constraint_weights[(fe_degree - i) *
+                                                       (fe_degree + 1) +
+                                                     fe_degree - interp_idx] :
+                        internal::constraint_weights[(fe_degree - interp_idx) *
+                                                       (fe_degree + 1) +
+                                                     fe_degree - i];
+                    t += w * values[real_idx];
+                  }
+              }
           }
+
+        __syncthreads();
+
+        if (constrained_face && constrained_dof)
+          values[index2<fe_degree + 1>(x_idx, y_idx)] = t;
       }
 
 
@@ -841,7 +843,8 @@ namespace CUDAWrappers
                 bool         transpose,
                 typename Number>
       __device__ inline void
-      interpolate_boundary_3d(const unsigned int constr, Number *values)
+      interpolate_boundary_3d(const unsigned int constraint_mask,
+                              Number *           values)
       {
         const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
         const unsigned int y_idx = threadIdx.y;
@@ -874,84 +877,81 @@ namespace CUDAWrappers
                                                      (direction == 1) ?
                                                      internal::constr_edge_zx :
                                                      internal::constr_edge_xy;
+        const unsigned int constrained_face =
+          constraint_mask & (face1 | face2 | edge);
 
-        if (constr & (face1 | face2 | edge))
+        const unsigned int interp_idx =
+          (direction == 0) ? x_idx : (direction == 1) ? y_idx : z_idx;
+        const unsigned int face1_idx =
+          (direction == 0) ? y_idx : (direction == 1) ? z_idx : x_idx;
+        const unsigned int face2_idx =
+          (direction == 0) ? z_idx : (direction == 1) ? x_idx : y_idx;
+
+        Number     t        = 0;
+        const bool on_face1 = (constraint_mask & face1_type) ?
+                                (face1_idx == 0) :
+                                (face1_idx == fe_degree);
+        const bool on_face2 = (constraint_mask & face2_type) ?
+                                (face2_idx == 0) :
+                                (face2_idx == fe_degree);
+        const bool constrained_dof =
+          (((constraint_mask & face1) && on_face1) ||
+           ((constraint_mask & face2) && on_face2) ||
+           ((constraint_mask & edge) && on_face1 && on_face2));
+        (direction == 0) ? z_idx : (direction == 1) ? x_idx : y_idx;
+
+        if (constrained_face && constrained_dof)
           {
-            const unsigned int interp_idx =
-              (direction == 0) ? x_idx : (direction == 1) ? y_idx : z_idx;
-            const unsigned int face1_idx =
-              (direction == 0) ? y_idx : (direction == 1) ? z_idx : x_idx;
-            const unsigned int face2_idx =
-              (direction == 0) ? z_idx : (direction == 1) ? x_idx : y_idx;
-
-            __syncthreads();
-
-            Number     t        = 0;
-            const bool on_face1 = (constr & face1_type) ?
-                                    (face1_idx == 0) :
-                                    (face1_idx == fe_degree);
-            const bool on_face2 = (constr & face2_type) ?
-                                    (face2_idx == 0) :
-                                    (face2_idx == fe_degree);
-            const bool flag = (((constr & face1) && on_face1) ||
-                               ((constr & face2) && on_face2) ||
-                               ((constr & edge) && on_face1 && on_face2));
-
-            if (flag)
+            const bool type = constraint_mask & this_type;
+            if (type)
               {
-                const bool type = constr & this_type;
-                if (type)
+                for (unsigned int i = 0; i <= fe_degree; ++i)
                   {
-                    for (unsigned int i = 0; i <= fe_degree; ++i)
-                      {
-                        const unsigned int real_idx =
-                          (direction == 0) ?
-                            index3<fe_degree + 1>(i, y_idx, z_idx) :
-                            (direction == 1) ?
-                            index3<fe_degree + 1>(x_idx, i, z_idx) :
-                            index3<fe_degree + 1>(x_idx, y_idx, i);
+                    const unsigned int real_idx =
+                      (direction == 0) ?
+                        index3<fe_degree + 1>(i, y_idx, z_idx) :
+                        (direction == 1) ?
+                        index3<fe_degree + 1>(x_idx, i, z_idx) :
+                        index3<fe_degree + 1>(x_idx, y_idx, i);
 
-                        const Number w =
-                          transpose ?
-                            internal::constraint_weights[i * (fe_degree + 1) +
-                                                         interp_idx] :
-                            internal::constraint_weights[interp_idx *
-                                                           (fe_degree + 1) +
-                                                         i];
-                        t += w * values[real_idx];
-                      }
-                  }
-                else
-                  {
-                    for (unsigned int i = 0; i <= fe_degree; ++i)
-                      {
-                        const unsigned int real_idx =
-                          (direction == 0) ?
-                            index3<fe_degree + 1>(i, y_idx, z_idx) :
-                            (direction == 1) ?
-                            index3<fe_degree + 1>(x_idx, i, z_idx) :
-                            index3<fe_degree + 1>(x_idx, y_idx, i);
-
-                        const Number w =
-                          transpose ?
-                            internal::constraint_weights[(fe_degree - i) *
-                                                           (fe_degree + 1) +
-                                                         fe_degree -
-                                                         interp_idx] :
-                            internal::constraint_weights[(fe_degree -
-                                                          interp_idx) *
-                                                           (fe_degree + 1) +
-                                                         fe_degree - i];
-                        t += w * values[real_idx];
-                      }
+                    const Number w =
+                      transpose ?
+                        internal::constraint_weights[i * (fe_degree + 1) +
+                                                     interp_idx] :
+                        internal::constraint_weights[interp_idx *
+                                                       (fe_degree + 1) +
+                                                     i];
+                    t += w * values[real_idx];
                   }
               }
+            else
+              {
+                for (unsigned int i = 0; i <= fe_degree; ++i)
+                  {
+                    const unsigned int real_idx =
+                      (direction == 0) ?
+                        index3<fe_degree + 1>(i, y_idx, z_idx) :
+                        (direction == 1) ?
+                        index3<fe_degree + 1>(x_idx, i, z_idx) :
+                        index3<fe_degree + 1>(x_idx, y_idx, i);
 
-            __syncthreads();
-
-            if (flag)
-              values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t;
+                    const Number w =
+                      transpose ?
+                        internal::constraint_weights[(fe_degree - i) *
+                                                       (fe_degree + 1) +
+                                                     fe_degree - interp_idx] :
+                        internal::constraint_weights[(fe_degree - interp_idx) *
+                                                       (fe_degree + 1) +
+                                                     fe_degree - i];
+                    t += w * values[real_idx];
+                  }
+              }
           }
+
+        __syncthreads();
+
+        if (constrained_face && constrained_dof)
+          values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t;
       }
     } // namespace internal
 
@@ -967,26 +967,27 @@ namespace CUDAWrappers
      */
     template <int dim, int fe_degree, bool transpose, typename Number>
     __device__ void
-    resolve_hanging_nodes(const unsigned int constr, Number *values)
+    resolve_hanging_nodes(const unsigned int constraint_mask, Number *values)
     {
       if (dim == 2)
         {
-          internal::interpolate_boundary_2d<fe_degree, 0, transpose>(constr,
-                                                                     values);
-          internal::interpolate_boundary_2d<fe_degree, 1, transpose>(constr,
-                                                                     values);
+          internal::interpolate_boundary_2d<fe_degree, 0, transpose>(
+            constraint_mask, values);
+
+          internal::interpolate_boundary_2d<fe_degree, 1, transpose>(
+            constraint_mask, values);
         }
       else if (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
-          internal::interpolate_boundary_3d<fe_degree, 0, transpose>(constr,
-                                                                     values);
+          internal::interpolate_boundary_3d<fe_degree, 0, transpose>(
+            constraint_mask, values);
           // Interpolate x and z faces (y-direction)
-          internal::interpolate_boundary_3d<fe_degree, 1, transpose>(constr,
-                                                                     values);
+          internal::interpolate_boundary_3d<fe_degree, 1, transpose>(
+            constraint_mask, values);
           // Interpolate x and y faces (z-direction)
-          internal::interpolate_boundary_3d<fe_degree, 2, transpose>(constr,
-                                                                     values);
+          internal::interpolate_boundary_3d<fe_degree, 2, transpose>(
+            constraint_mask, values);
         }
     }
   } // namespace internal
