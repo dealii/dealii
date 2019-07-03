@@ -1992,7 +1992,7 @@ SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
         {
           rows.push_back(i);
           columns.push_back(cols->colnums[j]);
-          values.push_back(j);
+          values.push_back(val[j]);
         }
     }
 

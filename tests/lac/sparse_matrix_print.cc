@@ -38,7 +38,7 @@ print_sparse_matrix()
 
   for (unsigned int i = 0; i < n; ++i)
     for (unsigned int j = 0; j < n; ++j)
-      A.set(i, j, static_cast<number>(i + j));
+      A.set(i, j, static_cast<number>(i + j) / 2.);
   A.print_as_numpy_arrays(deallog.get_file_stream());
 }
 
