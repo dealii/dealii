@@ -64,7 +64,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 //#  include <deal.II/differentiation/sd/symengine_linear_operator_types.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 //#  include <deal.II/differentiation/sd/symengine_number_traits.h>
-//#  include <deal.II/differentiation/sd/symengine_number_utilities.h>
+//#  include <deal.II/differentiation/sd/symengine_utilities.h>
 
 //#  include <deal.II/lac/linear_operator.h>
 //
