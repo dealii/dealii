@@ -341,7 +341,7 @@ namespace MeshWorker
                 {
                   // If iterator is active and neighbor is refined, skip
                   // internal face.
-                  if (internal::is_active_iterator(cell) &&
+                  if (dealii::internal::is_active_iterator(cell) &&
                       neighbor->has_children())
                     {
                       Assert(
@@ -476,7 +476,7 @@ namespace MeshWorker
                 boundary_worker,
                 face_worker,
                 lctrl),
-      std::bind(&internal::assemble<dim, DOFINFO, ASSEMBLER>,
+      std::bind(&dealii::internal::assemble<dim, DOFINFO, ASSEMBLER>,
                 std::placeholders::_1,
                 &assembler),
       info,
