@@ -38,11 +38,11 @@ namespace hp
    * complexity of the numerical solution. Error estimates are an appropriate
    * means of determining where adjustments need to be made.
    *
-   * However with hp adaptivity, we have two ways to realise these adjustments:
+   * However with hp adaptivity, we have two ways to realize these adjustments:
    * For irregular solutions, h adaptive methods which dynamically assign cell
    * sizes tend to reduce the approximation error, while for smooth solutions p
    * adaptive methods are better suited in which function spaces will be
-   * selected dynamically. This namespace offers all tools to decide which type
+   * selected dynamically. This namespace collects tools to decide which type
    * of adaptive methods to apply.
    *
    * <h3>Usage</h3>
@@ -192,7 +192,7 @@ namespace hp
      *
      * With an approximation of the local Sobolev regularity index $k_K$,
      * we may assess to which finite element space our local solution on cell
-     * $K$ belongs. Since the regularity index is only an etimate, we won't
+     * $K$ belongs. Since the regularity index is only an estimate, we won't
      * use it to assign the finite element space directly, but rather consider
      * it as an indicator for adaptation. If a cell is flagged for refinement,
      * we will perform p refinement once it satisfies
