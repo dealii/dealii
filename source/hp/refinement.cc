@@ -14,6 +14,10 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/mpi.h>
+
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/hp/dof_handler.h>
@@ -128,6 +132,24 @@ namespace hp
                            smoothness_indicators(cell->active_cell_index()));
               }
           }
+
+      if (const parallel::Triangulation<dim, spacedim> *parallel_tria =
+            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              &dof_handler.get_triangulation()))
+        {
+          max_smoothness_refine =
+            Utilities::MPI::max(max_smoothness_refine,
+                                parallel_tria->get_communicator());
+          min_smoothness_refine =
+            Utilities::MPI::min(min_smoothness_refine,
+                                parallel_tria->get_communicator());
+          max_smoothness_coarsen =
+            Utilities::MPI::max(max_smoothness_coarsen,
+                                parallel_tria->get_communicator());
+          min_smoothness_coarsen =
+            Utilities::MPI::min(min_smoothness_coarsen,
+                                parallel_tria->get_communicator());
+        }
 
       // Absent any better strategies, we will set the threshold by linear
       // interpolation for both classes of cells individually.
