@@ -70,10 +70,7 @@ ENDIF()
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-  #include <emmintrin.h>
-#ifdef __AVX512F__
-  #include <immintrin.h>
-#endif
+  #include <x86intrin.h>
   int main()
   {
     __m128d a, b;
