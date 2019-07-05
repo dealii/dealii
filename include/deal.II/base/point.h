@@ -353,12 +353,14 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x)
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim == 1,
          ExcMessage(
            "You can only initialize Point<1> objects using the constructor "
            "that takes only one argument. Point<dim> objects with dim!=1 "
            "require initialization with the constructor that takes 'dim' "
            "arguments."));
+#  endif
 
   // we can only get here if we pass the assertion. use the switch anyway so
   // as to avoid compiler warnings about uninitialized elements or writing
@@ -379,12 +381,15 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y)
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim == 2,
          ExcMessage(
            "You can only initialize Point<2> objects using the constructor "
            "that takes two arguments. Point<dim> objects with dim!=2 "
            "require initialization with the constructor that takes 'dim' "
            "arguments."));
+#  endif
+
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
@@ -399,12 +404,14 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim == 3,
          ExcMessage(
            "You can only initialize Point<3> objects using the constructor "
            "that takes three arguments. Point<dim> objects with dim!=3 "
            "require initialization with the constructor that takes 'dim' "
            "arguments."));
+#  endif
 
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
@@ -454,7 +461,9 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Number
 Point<dim, Number>::operator()(const unsigned int index) const
 {
+#  ifndef __CUDA_ARCH__
   AssertIndexRange(index, dim);
+#  endif
   return this->values[index];
 }
 
@@ -464,7 +473,9 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Number &
 Point<dim, Number>::operator()(const unsigned int index)
 {
+#  ifndef __CUDA_ARCH__
   AssertIndexRange(index, dim);
+#  endif
   return this->values[index];
 }
 
