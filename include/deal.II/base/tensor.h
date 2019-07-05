@@ -940,8 +940,7 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
-#if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING) && \
-  !defined(DEAL_II_COMPILER_CUDA_AWARE)
+#if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
@@ -1037,18 +1036,21 @@ Tensor<0, dim, Number>::operator-() const
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline typename Tensor<0, dim, Number>::real_type
-Tensor<0, dim, Number>::norm() const
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline
+  typename Tensor<0, dim, Number>::real_type
+  Tensor<0, dim, Number>::norm() const
 {
+#ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#endif
   return numbers::NumberTraits<Number>::abs(value);
 }
 
 
 template <int dim, typename Number>
-inline typename Tensor<0, dim, Number>::real_type DEAL_II_CUDA_HOST_DEV
-                                                  Tensor<0, dim, Number>::norm_square() const
+DEAL_II_CUDA_HOST_DEV inline typename Tensor<0, dim, Number>::real_type
+Tensor<0, dim, Number>::norm_square() const
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -1201,8 +1203,7 @@ DEAL_II_ALWAYS_INLINE constexpr DEAL_II_CUDA_HOST_DEV const typename Tensor<
   Number>::value_type &Tensor<rank_, dim, Number>::
                        operator[](const unsigned int i) const
 {
-  return values[i]; /*dealii::internal::TensorSubscriptor::subscript(
-     values, i, std::integral_constant<int, dim>());*/
+  return values[i];
 }
 
 
