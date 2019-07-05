@@ -504,6 +504,9 @@ ENDIF()
 
 CTEST_START(Experimental TRACK ${TRACK})
 
+MESSAGE("-- Running CTEST_UPDATE() to query git information")
+CTEST_UPDATE(SOURCE ${CTEST_SOURCE_DIRECTORY})
+
 MESSAGE("-- Running CTEST_CONFIGURE()")
 CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
 
@@ -573,18 +576,6 @@ Unable to determine test submission files from TAG. Bailing out.
 "
     )
 ENDIF()
-
-FILE(WRITE ${_path}/Update.xml
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Update mode=\"Client\" Generator=\"ctest-${CTEST_VERSION}\">
-<Site>${CTEST_SITE}</Site>
-<BuildName>${CTEST_BUILD_NAME}</BuildName>
-<BuildStamp>${_tag}-${TRACK}</BuildStamp>
-<UpdateType>GIT</UpdateType>
-<Revision>${_git_WC_SHORTREV}</Revision>
-<Path>${_git_WC_BRANCH}</Path>
-</Update>"
-  )
 
 #
 # And finally submit:
