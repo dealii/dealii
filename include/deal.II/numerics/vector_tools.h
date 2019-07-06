@@ -44,7 +44,7 @@ template <int dim>
 class Quadrature;
 template <int dim>
 class QGauss;
-template <int dim, typename number>
+template <int dim, typename number, typename VectorizedArrayType>
 class MatrixFree;
 
 template <typename number>
@@ -1007,15 +1007,18 @@ namespace VectorTools
    */
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> data,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const unsigned int      n_q_points_1d,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &func,
-          VectorType &            vec_result,
-          const unsigned int      fe_component = 0);
+  project(
+    std::shared_ptr<
+      const MatrixFree<dim,
+                       typename VectorType::value_type,
+                       VectorizedArray<typename VectorType::value_type>>> data,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const unsigned int                                        n_q_points_1d,
+    const std::function<VectorizedArray<typename VectorType::value_type>(
+      const unsigned int,
+      const unsigned int)> &                                  func,
+    VectorType &                                              vec_result,
+    const unsigned int                                        fe_component = 0);
 
   /**
    * Same as above but for <code>n_q_points_1d =
@@ -1023,14 +1026,17 @@ namespace VectorTools
    */
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> data,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &                                  func,
-          VectorType &                                              vec_result,
-          const unsigned int fe_component = 0);
+  project(
+    std::shared_ptr<
+      const MatrixFree<dim,
+                       typename VectorType::value_type,
+                       VectorizedArray<typename VectorType::value_type>>> data,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const std::function<VectorizedArray<typename VectorType::value_type>(
+      const unsigned int,
+      const unsigned int)> &                                  func,
+    VectorType &                                              vec_result,
+    const unsigned int                                        fe_component = 0);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of

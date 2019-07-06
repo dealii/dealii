@@ -25,7 +25,31 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "mapping_info.inst"
 
-template struct internal::MatrixFreeFunctions::FPArrayComparator<double>;
-template struct internal::MatrixFreeFunctions::FPArrayComparator<float>;
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<double, VectorizedArray<double, 1>>;
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<float, VectorizedArray<float, 1>>;
+
+#if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
+  (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<double, VectorizedArray<double, 2>>;
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<float, VectorizedArray<float, 4>>;
+#endif
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<double, VectorizedArray<double, 4>>;
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<float, VectorizedArray<float, 8>>;
+#endif
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<double, VectorizedArray<double, 8>>;
+template struct internal::MatrixFreeFunctions::
+  FPArrayComparator<float, VectorizedArray<float, 16>>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

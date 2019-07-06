@@ -47,9 +47,9 @@ namespace internal
       return a;
     }
 
-    template <typename Number>
+    template <typename Number, int width>
     Number
-    get_first_array_element(const VectorizedArray<Number> a)
+    get_first_array_element(const VectorizedArray<Number, width> a)
     {
       return a[0];
     }
