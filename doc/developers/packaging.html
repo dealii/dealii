@@ -16,13 +16,12 @@
     <p>
       This page describes how to write packaging scripts
       for <acronym>deal.II</acronym>. <acronym>deal.II</acronym> is written in
-      C++11 and is known to work with fairly recent GCC, Clang, and Intel
-      compilers. It is licensed under the LGPL v2.1. We recommend reading
-      the <a href="porting.html">porting</a> document first for
-      a description of the requirements of the build
-      system. <acronym>deal.II</acronym> does not support any type of plug-in
-      architecture for dependencies: all dependencies must be provided at
-      compile-time.
+      C++11 and is known to work with GCC, Clang, and Intel compilers. It is
+      licensed under the LGPL v2.1. We recommend reading
+      the <a href="porting.html">porting</a> document first for a description of
+      the requirements of the build system. <acronym>deal.II</acronym> does not
+      support any type of plug-in architecture for dependencies: all
+      dependencies must be provided at compile-time.
 
       The only required dependency of <acronym>deal.II</acronym> is boost.
     </p>
@@ -30,7 +29,7 @@
 
     <h2>Examples</h2>
     <acronym>deal.II</acronym> is already available in many Linux distributions:
-    for example packaging scripts see, e.g.,
+    for examples of packaging scripts see, e.g.,
     <p>
       <ul>
         <li>
@@ -59,8 +58,8 @@
         correct directory for software licenses.
       </li>
       <li>
-        By default, all examples are compiled in both debug and release mode and
-        installed in the <tt>bin</tt> subdirectory of the installation
+        By default, all tutorial programs are compiled in both debug and release
+        mode and installed in the <tt>bin</tt> subdirectory of the installation
         prefix. We recommend disabling the examples by configuring with
         the <tt>-DDEAL_II_COMPILE_EXAMPLES=OFF</tt> option.
       </li>
@@ -85,10 +84,16 @@
       <li>
         <acronym>deal.II</acronym> includes copies of boost, muParser, TBB, and
         UMFPACK. These bundled packages should be disabled
-        via <tt>-DDEAL_II_ALLOW_BUNDLED=OFF<tt>.
+        via <tt>-DDEAL_II_ALLOW_BUNDLED=OFF</tt> and these dependencies should
+        instead be resolved by ensuring that whenever <acronym>deal.II</acronym>
+        is installed, the packages above are also installed.
       </li>
       <li>
-        Underlinkage with GSL may cause problems, depending on how GSL is set up.
+        The standard build of GSL does not link <tt>libgsl.so</tt> against a
+        CBLAS implementation, which results in underlinkage
+        in <acronym>deal.II</acronym>. This is resolved, for example, in the
+        Arch Linux PKGBUILD script by stripping the <tt>-Wl,--as-needed</tt>
+        flag from the linker flags.
       </li>
     </ul>
 
