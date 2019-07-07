@@ -73,7 +73,7 @@ main()
 
   test_gpu<1, double>();
   test_gpu<2, double>();
-  test_gpu<3, float>();
+  test_gpu<3, double>();
   test_gpu<1, float>();
   test_gpu<2, float>();
   test_gpu<3, float>();
