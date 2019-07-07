@@ -256,7 +256,7 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::register_functions(
-      const typename SD::types::symbol_vector &functions)
+      const SD::types::symbol_vector &functions)
     {
       Assert(optimized() == false,
              ExcMessage(
@@ -295,7 +295,7 @@ namespace Differentiation
       create_optimizer(optimizer);
       Assert(optimizer, ExcNotInitialized());
 
-      const typename SD::types::symbol_vector symbol_vec =
+      const SD::types::symbol_vector symbol_vec =
         Utilities::extract_symbols(independent_variables_symbols);
       if (typename internal::DictionaryOptimizer<ReturnType>::OptimizerType
             *opt = dynamic_cast<typename internal::DictionaryOptimizer<
@@ -409,9 +409,9 @@ namespace Differentiation
       // Check that the registered symbol map and the input map are compatible
       // with one another
 #  ifdef DEBUG
-      const typename SD::types::symbol_vector symbol_sub_vec =
+      const SD::types::symbol_vector symbol_sub_vec =
         Utilities::extract_symbols(substitution_values);
-      const typename SD::types::symbol_vector symbol_vec =
+      const SD::types::symbol_vector symbol_vec =
         Utilities::extract_symbols(independent_variables_symbols);
       Assert(symbol_sub_vec.size() == symbol_vec.size(),
              ExcDimensionMismatch(symbol_sub_vec.size(), symbol_vec.size()));
@@ -648,7 +648,7 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::register_vector_functions(
-      const typename SD::types::symbol_vector &funcs)
+      const SD::types::symbol_vector &funcs)
     {
       Assert(
         dependent_variables_output.size() == 0,

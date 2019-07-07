@@ -897,7 +897,7 @@ namespace Differentiation
        * Register a collection of symbols that represents dependent variables.
        */
       void
-      register_functions(const typename SD::types::symbol_vector &functions);
+      register_functions(const SD::types::symbol_vector &functions);
 
       template <typename T, typename... Args>
       void
@@ -1147,7 +1147,7 @@ namespace Differentiation
        * variables.
        */
       void
-      register_vector_functions(const typename SD::types::symbol_vector &funcs);
+      register_vector_functions(const SD::types::symbol_vector &funcs);
 
       /**
        * Create an instance of the selected optimizer.
