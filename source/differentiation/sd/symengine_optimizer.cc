@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_SYMENGINE
 
 #  include <deal.II/differentiation/sd/symengine_optimizer.h>
+#  include <deal.II/differentiation/sd/symengine_utilities.h>
 
 #  include <utility>
 
@@ -175,7 +176,16 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::register_symbols(
-      const typename SD::types::symbol_vector &symbols)
+      const SymEngine::map_basic_basic &symbol_values)
+    {
+      register_symbols(SD::Utilities::convert_basic_map_to_expression_map(symbol_values));
+    }
+
+
+    template <typename ReturnType>
+    void
+    BatchOptimizer<ReturnType>::register_symbols(
+      const SD::types::symbol_vector &symbols)
     {
       Assert(optimized() == false,
              ExcMessage(
@@ -192,6 +202,15 @@ namespace Differentiation
           independent_variables_symbols.insert(
             std::make_pair(*it, SD::Expression(0.0)));
         }
+    }
+
+
+    template <typename ReturnType>
+    void
+    BatchOptimizer<ReturnType>::register_symbols(
+      const SymEngine::vec_basic &symbols)
+    {
+      register_symbols(SD::Utilities::convert_basic_vector_to_expression_vector(symbols));
     }
 
 
@@ -416,13 +435,32 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::substitute(
-      const typename SD::types::symbol_vector &symbols,
+      const SymEngine::map_basic_basic &substitution_values) const
+    {
+      substitute(SD::Utilities::convert_basic_map_to_expression_map(substitution_values));
+    }
+
+
+    template <typename ReturnType>
+    void
+    BatchOptimizer<ReturnType>::substitute(
+      const SD::types::symbol_vector &symbols,
       const std::vector<ReturnType> &          substitution_values) const
     {
       // Zip the two vectors and use the other function call
       // This ensures the ordering of the input vectors matches that of the
       // stored map.
       substitute(make_substitution_map(symbols, substitution_values));
+    }
+
+
+    template <typename ReturnType>
+    void
+    BatchOptimizer<ReturnType>::substitute(
+      const SymEngine::vec_basic &symbols,
+      const std::vector<ReturnType> &          substitution_values) const
+    {
+      substitute(SD::Utilities::convert_basic_vector_to_expression_vector(symbols), substitution_values);
     }
 
 

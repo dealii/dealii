@@ -823,6 +823,14 @@ namespace Differentiation
       register_symbols(const SD::types::substitution_map &symbol_values);
 
       /**
+       * Register a collection of symbols that represents an independent
+       * variable.
+       * These symbols are stored as the <tt>key</tt> to the @p symbol_values map.
+       */
+      void
+      register_symbols(const SymEngine::map_basic_basic &symbol_values);
+
+      /**
        * Register a collection of symbols that represents independent variables.
        *
        * @warning When using this function is no mechanism to check that the ordering
@@ -833,7 +841,20 @@ namespace Differentiation
        * interface, the management of symbol ordering is maintained by the user.
        */
       void
-      register_symbols(const typename SD::types::symbol_vector &symbols);
+      register_symbols(const SD::types::symbol_vector &symbols);
+
+      /**
+       * Register a collection of symbols that represents independent variables.
+       *
+       * @warning When using this function is no mechanism to check that the ordering
+       * of the later used @p substitution_values vector or map matches the internal
+       * ordering of the registered symbols. This function is therefore
+       * typically used in conjunction with the substitute() function that takes
+       * in a vector of values. With this pair of functions to the class
+       * interface, the management of symbol ordering is maintained by the user.
+       */
+      void
+      register_symbols(const SymEngine::vec_basic &symbols);
 
       /**
        * Return the list of symbols that have been registered as independent
@@ -945,7 +966,32 @@ namespace Differentiation
        * results.
        */
       void
-      substitute(const typename SD::types::symbol_vector &symbols,
+      substitute(const SymEngine::map_basic_basic &substitution_values) const;
+
+      /**
+       * Perform batch substitution of all of the registered symbols
+       * into the registered functions. The result is cached and can
+       * be extracted by calls to evaluate().
+       *
+       * @note Calling substitute() again with a new set of
+       * @p substitution_values overwrites any previously computed
+       * results.
+       */
+      void
+      substitute(const SD::types::symbol_vector &symbols,
+                 const std::vector<ReturnType> &substitution_values) const;
+
+      /**
+       * Perform batch substitution of all of the registered symbols
+       * into the registered functions. The result is cached and can
+       * be extracted by calls to evaluate().
+       *
+       * @note Calling substitute() again with a new set of
+       * @p substitution_values overwrites any previously computed
+       * results.
+       */
+      void
+      substitute(const SymEngine::vec_basic &symbols,
                  const std::vector<ReturnType> &substitution_values) const;
 
       /**
