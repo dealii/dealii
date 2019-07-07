@@ -17,8 +17,6 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   symengine_helpers.cc
-  symengine_la_vector_types.cc
-  symengine_linear_operator_types.cc
   symengine_math.cc
   symengine_number_types.cc
   symengine_number_visitor.cc
@@ -31,9 +29,6 @@ SET(_src
 
 SET(_inst
   symengine_helpers.inst.in
-  symengine_la_vector_types.inst.in
-  symengine_linear_operator_types.inst.in
-  symengine_linear_operator_types.inst1.in
   symengine_tensor_operations.inst.in
   symengine_number_visitor.inst.in
   symengine_optimizer.inst.in

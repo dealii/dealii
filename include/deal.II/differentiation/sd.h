@@ -21,8 +21,6 @@
 #ifdef DEAL_II_WITH_SYMENGINE
 
 #  include <deal.II/differentiation/sd/symengine_helpers.h>
-#  include <deal.II/differentiation/sd/symengine_la_vector_types.h>
-#  include <deal.II/differentiation/sd/symengine_linear_operator_types.h>
 #  include <deal.II/differentiation/sd/symengine_math.h>
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
