@@ -129,11 +129,13 @@ DEAL_II_NAMESPACE_OPEN
  * transformations can be selected from the set MappingType and stored in
  * #mapping_type. Therefore, each constructor should contain a line like:
  * @code
- * this->mapping_type = mapping_none;
+ * this->mapping_type = {mapping_none};
  * @endcode
  * (in case no mapping is required) or using whatever value among
  * the ones defined in MappingType is appropriate for the element you
- * are implementing.
+ * are implementing. If each shape function may be mapped by different
+ * mappings, then @p mapping_type may be a vector with the same number
+ * of elements as there are shape functions.
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
  * @ingroup febase
