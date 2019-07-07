@@ -899,6 +899,9 @@ namespace Differentiation
       void
       register_functions(const SD::types::symbol_vector &functions);
 
+      void
+      register_functions(const SymEngine::vec_basic &functions);
+
       template <typename T, typename... Args>
       void
       register_functions(const T &function, const Args &... other_functions);

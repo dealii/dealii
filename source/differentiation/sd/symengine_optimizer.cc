@@ -267,6 +267,15 @@ namespace Differentiation
 
 
     template <typename ReturnType>
+    void
+    BatchOptimizer<ReturnType>::register_functions(
+      const SymEngine::vec_basic &functions)
+    {
+      register_functions(Utilities::convert_basic_vector_to_expression_vector(functions));
+    }
+
+
+    template <typename ReturnType>
     const SD::types::symbol_vector &
     BatchOptimizer<ReturnType>::get_dependent_functions(void) const
     {
