@@ -76,9 +76,9 @@ test_scalar(const int n_runs, TimerOutput &timer)
   deallog << "symb_ds_dx: " << symb_ds_dx << std::endl;
   timer.leave_subsection("Differentiation");
 
-  SD_number_t::substitution_map_t sub_vals;
-  SD::add_to_symbol_value_map(sub_vals, SD::make_symbol_value_map(x, 2.5));
-  SD::add_to_symbol_value_map(sub_vals, SD::make_symbol_value_map(y, 1.5));
+  SD::types::substitution_map sub_vals;
+  SD::add_to_substitution_map(sub_vals, SD::make_substitution_map(x, 2.5));
+  SD::add_to_substitution_map(sub_vals, SD::make_substitution_map(y, 1.5));
 
   deallog.push("Substitution");
   {
@@ -146,8 +146,8 @@ test_tensor(const int n_runs, TimerOutput &timer)
 
   const NumberType       a = NumberType(1.5);
   const SD_number_t      x("x");
-  const SD_tensor_t      y(SD::make_symbol_tensor<2, dim>("y"));
-  const SD_symm_tensor_t z(SD::make_symbol_symmetric_tensor<2, dim>("z"));
+  const SD_tensor_t      y(SD::make_tensor_of_symbols<2, dim>("y"));
+  const SD_symm_tensor_t z(SD::make_symmetric_tensor_of_symbols<2, dim>("z"));
 
   timer.enter_subsection("Value calculation");
   const SD_number_t symb_s =
@@ -164,13 +164,13 @@ test_tensor(const int n_runs, TimerOutput &timer)
   deallog << "symb_ds_dy: " << symb_ds_dy << std::endl;
   timer.leave_subsection("Differentiation");
 
-  SD_number_t::substitution_map_t sub_vals;
-  SD::add_to_symbol_value_map(sub_vals, SD::make_symbol_value_map(x, 2.5));
-  SD::add_to_symbol_value_map(
-    sub_vals, SD::make_symbol_value_map(y, make_tensor<dim>(NumberType(2.2))));
-  SD::add_to_symbol_value_map(
+  SD::types::substitution_map sub_vals;
+  SD::add_to_substitution_map(sub_vals, SD::make_substitution_map(x, 2.5));
+  SD::add_to_substitution_map(
+    sub_vals, SD::make_substitution_map(y, make_tensor<dim>(NumberType(2.2))));
+  SD::add_to_substitution_map(
     sub_vals,
-    SD::make_symbol_value_map(z, make_symm_tensor<dim>(NumberType(3.7))));
+    SD::make_substitution_map(z, make_symm_tensor<dim>(NumberType(3.7))));
 
   deallog.push("Substitution");
   {

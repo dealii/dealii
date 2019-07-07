@@ -549,7 +549,7 @@ test_functions()
     deallog.push("Symbolic computation: Optimization");
     SD::BatchOptimizer<double> optimizer;
     optimizer.set_optimization_method(opt_method, opt_flags);
-    SD::Expression::substitution_map_t sub_vals_optim;
+    SD::types::substitution_map sub_vals_optim;
     SD::add_to_symbol_map(sub_vals_optim, symb_s0, symb_s1);
     optimizer.register_symbols(sub_vals_optim); // Independent symbols
     optimizer.register_functions(
@@ -567,9 +567,9 @@ test_functions()
     deallog.pop();
 
     deallog.push("Symbolic computation: Substitution");
-    typename SDNumberType::substitution_map_t sub_vals;
-    SD::add_to_symbol_value_map(sub_vals, symb_s0, s1);
-    SD::add_to_symbol_value_map(sub_vals, symb_s1, s2);
+    SD::types::substitution_map sub_vals;
+    SD::add_to_substitution_map(sub_vals, symb_s0, s1);
+    SD::add_to_substitution_map(sub_vals, symb_s1, s2);
 
     // Perform substitution of symbols
     std::cout << FunctionStruct<number_t>::name() << ": About to substitute... "

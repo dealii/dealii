@@ -45,9 +45,9 @@ test_derived()
   const SD::Expression sf_sat_0("sf_sat_0");
   const SD::Expression H_sat_0("H_sat_0");
 
-  const Tensor<1, dim, SD::Expression> H = SD::make_symbol_tensor<1, dim>("H");
+  const Tensor<1, dim, SD::Expression> H = SD::make_tensor_of_symbols<1, dim>("H");
   const SymmetricTensor<2, dim, SD::Expression> C =
-    SD::make_symbol_symmetric_tensor<2, dim>("C");
+    SD::make_symmetric_tensor_of_symbols<2, dim>("C");
 
   const SymmetricTensor<2, dim, SD::Expression> C_inv = invert(C);
   const SymmetricTensor<2, dim, SD::Expression> C_bar =
@@ -83,17 +83,17 @@ test_derived()
   const SymmetricTensor<2, dim, SD::Expression> S = 2.0 * differentiate(psi, C);
   const Tensor<1, dim, SD::Expression>          B = -differentiate(psi, H);
 
-  typename SD::Expression::substitution_map_t symbol_value_map;
-  SD::add_to_symbol_value_map(symbol_value_map, mu_r, 5.0);
-  SD::add_to_symbol_value_map(symbol_value_map, mu_e, 30000.0);
-  SD::add_to_symbol_value_map(symbol_value_map, kappa, 14990000.0);
-  SD::add_to_symbol_value_map(symbol_value_map, sf_sat_0, 2.0);
-  SD::add_to_symbol_value_map(symbol_value_map, H_sat_0, 200000.0);
+  typename SD::types::substitution_map symbol_value_map;
+  SD::add_to_substitution_map(symbol_value_map, mu_r, 5.0);
+  SD::add_to_substitution_map(symbol_value_map, mu_e, 30000.0);
+  SD::add_to_substitution_map(symbol_value_map, kappa, 14990000.0);
+  SD::add_to_substitution_map(symbol_value_map, sf_sat_0, 2.0);
+  SD::add_to_substitution_map(symbol_value_map, H_sat_0, 200000.0);
   Tensor<1, dim> H_vals;
   H_vals[2] = 75000;
   //  H_vals[0] = 1000; // New
   //  H_vals[1] = 2000; // New
-  SD::add_to_symbol_value_map(symbol_value_map, H, H_vals);
+  SD::add_to_substitution_map(symbol_value_map, H, H_vals);
   SymmetricTensor<2, dim> C_vals;
   C_vals[0][0] = 1.05263;
   C_vals[1][1] = 1.05263;
@@ -101,7 +101,7 @@ test_derived()
   //  C_vals[0][1] = 0.05; // New
   //  C_vals[0][2] = 0.1; // New
   //  C_vals[1][2] = 0.15; // New
-  SD::add_to_symbol_value_map(symbol_value_map, C, C_vals);
+  SD::add_to_substitution_map(symbol_value_map, C, C_vals);
 
   auto eval_deal_II = [&symbol_value_map,
                        &psi,

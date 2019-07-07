@@ -72,7 +72,7 @@ test_number_functions()
   const SD_number_t inv_a(inv_a_);
 
   // SD_number_t f; // Temporary value; Check default constructor
-  // SD_number_t::substitution_map_t sub_vals;
+  // SD::types::substitution_map sub_vals;
 
   // --- Values ---
   // NOTE: The returned results from SymEngineWrapper functions are actually

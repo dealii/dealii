@@ -597,7 +597,7 @@ namespace Step44
 
       // Define some symbols
       const SymmetricTensor<2, dim, SDNumberType> C_SD(
-        SD::make_symbol_symmetric_tensor<2, dim>("C"));
+        SD::make_symmetric_tensor_of_symbols<2, dim>("C"));
       const SDNumberType p_tilde_SD("p");
       const SDNumberType J_tilde_SD(
         SD::make_symbol("J")); // Check an unnecessary complication
@@ -608,13 +608,13 @@ namespace Step44
       // this problem so I do it up front
       const SymmetricTensor<2, dim>    C = symmetrize(transpose(F) * F);
       SDNumberType::substitution_map_t sub_vals_unresolved;
-      SD::add_to_symbol_value_map(sub_vals_unresolved,
-                                  SD::make_symbol_value_map(C_SD, C));
-      SD::add_to_symbol_value_map(sub_vals_unresolved,
-                                  SD::make_symbol_value_map(p_tilde_SD,
+      SD::add_to_substitution_map(sub_vals_unresolved,
+                                  SD::make_substitution_map(C_SD, C));
+      SD::add_to_substitution_map(sub_vals_unresolved,
+                                  SD::make_substitution_map(p_tilde_SD,
                                                             p_tilde));
-      SD::add_to_symbol_value_map(sub_vals_unresolved,
-                                  SD::make_symbol_value_map(J_tilde_SD,
+      SD::add_to_substitution_map(sub_vals_unresolved,
+                                  SD::make_substitution_map(J_tilde_SD,
                                                             J_tilde));
       // NOTE: The recursive substitution is not really required in this case,
       // but good to use in practise in case a more complex energy function is

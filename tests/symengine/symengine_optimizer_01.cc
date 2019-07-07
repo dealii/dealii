@@ -342,9 +342,9 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
   // ahead of time, and store them for each run of the function
   // Symbols
   static const Tensor<2, dim, SDNumberType> symb_t(
-    SD::make_symbol_tensor<2, dim>("t"));
+    SD::make_tensor_of_symbols<2, dim>("t"));
   static const Tensor<1, dim, SDNumberType> symb_v(
-    SD::make_symbol_tensor<1, dim>("v"));
+    SD::make_tensor_of_symbols<1, dim>("v"));
   static const SDNumberType symb_s(SD::make_symbol("s"));
   // Value
   static SDNumberType symb_psi;
@@ -409,7 +409,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       print(deallog, "symb_d2psi_ds_ds", symb_d2psi_ds_ds);
 #endif
 
-      const typename SDNumberType::substitution_map_t sub_vals_optim =
+      const SD::types::substitution_map sub_vals_optim =
         SD::make_symbol_map(symb_t, symb_v, symb_s);
       optimizer.register_symbols(sub_vals_optim);
 
@@ -447,10 +447,10 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
         }
     }
 
-  typename SDNumberType::substitution_map_t sub_vals;
-  SD::add_to_symbol_value_map(sub_vals, symb_t, t);
-  SD::add_to_symbol_value_map(sub_vals, symb_v, v);
-  SD::add_to_symbol_value_map(sub_vals, symb_s, s);
+  SD::types::substitution_map sub_vals;
+  SD::add_to_substitution_map(sub_vals, symb_t, t);
+  SD::add_to_substitution_map(sub_vals, symb_v, v);
+  SD::add_to_substitution_map(sub_vals, symb_s, s);
 
   optimizer.substitute(sub_vals);
 

@@ -554,9 +554,9 @@ test_functions()
     deallog.pop();
 
     deallog.push("Symbolic computation: Substitution");
-    typename SDNumberType::substitution_map_t sub_vals;
-    SD::add_to_symbol_value_map(sub_vals, symb_s0, s1);
-    SD::add_to_symbol_value_map(sub_vals, symb_s1, s2);
+    SD::types::substitution_map sub_vals;
+    SD::add_to_substitution_map(sub_vals, symb_s0, s1);
+    SD::add_to_substitution_map(sub_vals, symb_s1, s2);
 
     const SDNumberType subs_psi      = symb_psi.substitute(sub_vals);
     const SDNumberType subs_dpsi_ds0 = symb_dpsi_ds0.substitute(sub_vals);
