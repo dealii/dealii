@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGNedelec<dim, spacedim>::FE_DGNedelec(const unsigned int p)
-  : FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>(p, mapping_nedelec)
+  : FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>(p, {mapping_nedelec})
 {}
 
 
@@ -52,7 +52,7 @@ template <int dim, int spacedim>
 FE_DGRaviartThomas<dim, spacedim>::FE_DGRaviartThomas(const unsigned int p)
   : FE_DGVector<PolynomialsRaviartThomas<dim>, dim, spacedim>(
       p,
-      mapping_raviart_thomas)
+      {mapping_raviart_thomas})
 {}
 
 
@@ -77,7 +77,7 @@ FE_DGRaviartThomas<dim, spacedim>::get_name() const
 
 template <int dim, int spacedim>
 FE_DGBDM<dim, spacedim>::FE_DGBDM(const unsigned int p)
-  : FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>(p, mapping_bdm)
+  : FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>(p, {mapping_bdm})
 {}
 
 

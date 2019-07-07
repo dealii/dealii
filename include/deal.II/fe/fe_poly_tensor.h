@@ -207,9 +207,12 @@ public:
 protected:
   /**
    * The mapping type to be used to map shape functions from the reference
-   * cell to the mesh cell.
+   * cell to the mesh cell. If this vector is length one, the same mapping
+   * will be applied to all shape functions. If the vector size is equal to
+   * the finite element dofs per cell, then each shape function will be mapped
+   * according to the corresponding entry in the vector.
    */
-  MappingType mapping_type;
+  std::vector<MappingType> mapping_type;
 
 
   /* NOTE: The following function has its definition inlined into the class
@@ -247,11 +250,30 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
+
+    const bool update_transformed_shape_values =
+      (std::find_if(this->mapping_type.begin(),
+                    this->mapping_type.end(),
+                    [](const MappingType t) { return t != mapping_none; }) !=
+       this->mapping_type.end());
+
+    const bool update_transformed_shape_grads =
+      (std::find_if(this->mapping_type.begin(),
+                    this->mapping_type.end(),
+                    [](const MappingType t) {
+                      return (t == mapping_raviart_thomas ||
+                              t == mapping_piola || t == mapping_nedelec ||
+                              t == mapping_contravariant);
+                    }) != this->mapping_type.end());
+
+    const bool update_transformed_shape_hessian_tensors =
+      update_transformed_shape_values;
+
     if (update_flags & update_values)
       {
         values.resize(this->dofs_per_cell);
         data.shape_values.reinit(this->dofs_per_cell, n_q_points);
-        if (mapping_type != mapping_none)
+        if (update_transformed_shape_values)
           data.transformed_shape_values.resize(n_q_points);
       }
 
@@ -261,10 +283,7 @@ protected:
         data.shape_grads.reinit(this->dofs_per_cell, n_q_points);
         data.transformed_shape_grads.resize(n_q_points);
 
-        if ((mapping_type == mapping_raviart_thomas) ||
-            (mapping_type == mapping_piola) ||
-            (mapping_type == mapping_nedelec) ||
-            (mapping_type == mapping_contravariant))
+        if (update_transformed_shape_grads)
           data.untransformed_shape_grads.resize(n_q_points);
       }
 
@@ -273,7 +292,7 @@ protected:
         grad_grads.resize(this->dofs_per_cell);
         data.shape_grad_grads.reinit(this->dofs_per_cell, n_q_points);
         data.transformed_shape_hessians.resize(n_q_points);
-        if (mapping_type != mapping_none)
+        if (update_transformed_shape_hessian_tensors)
           data.untransformed_shape_hessian_tensors.resize(n_q_points);
       }
 

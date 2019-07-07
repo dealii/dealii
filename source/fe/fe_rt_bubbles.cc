@@ -55,7 +55,7 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
       "Lowest order RT_Bubbles element is degree 1, but you requested for degree 0"));
   const unsigned int n_dofs = this->dofs_per_cell;
 
-  this->mapping_type = mapping_raviart_thomas;
+  this->mapping_type = {mapping_raviart_thomas};
   // Initialize support points and quadrature weights
   initialize_support_points(deg);
   // Compute the inverse node matrix to get
