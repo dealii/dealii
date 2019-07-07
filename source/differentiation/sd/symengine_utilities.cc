@@ -65,6 +65,18 @@ namespace Differentiation
 
 
       SD::types::symbol_vector
+      convert_basic_vector_to_expression_vector(
+        const SE::vec_basic &symbol_vector)
+      {
+        SD::types::symbol_vector symb_vec;
+        symb_vec.reserve(symbol_vector.size());
+        for (const auto &entry : symbol_vector)
+          symb_vec.push_back(SD::Expression(entry));
+        return symb_vec;
+      }
+
+
+      SD::types::symbol_vector
       extract_symbols(const SD::types::substitution_map &substitution_values)
       {
         SD::types::symbol_vector symbols;

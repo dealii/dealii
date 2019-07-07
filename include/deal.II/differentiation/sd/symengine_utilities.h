@@ -56,6 +56,13 @@ namespace Differentiation
         const SD::types::symbol_vector &symbol_vector);
 
       /**
+       * Convert to a vector of Expressions from its SymEngine counterpart.
+       */
+      SD::types::symbol_vector
+      convert_basic_vector_to_expression_vector(
+        const SymEngine::vec_basic &symbol_vector);
+
+      /**
        * Extract the symbols (key entries) from a substitution map.
        *
        * @note It is guaranteed that the order of extraction of data into the
