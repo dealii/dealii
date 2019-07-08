@@ -34,7 +34,7 @@ main(int argc, char **argv)
   using namespace Step44;
   try
     {
-      const unsigned int dim = 3;
+      const unsigned int dim = 2;
       Solid<dim>         solid(SOURCE_DIR "/prm/parameters-step-44.prm");
       solid.run();
     }
