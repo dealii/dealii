@@ -27,6 +27,8 @@
 
 #include <iostream>
 #include <numeric>
+#include <set>
+#include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
@@ -812,7 +814,938 @@ namespace Utilities
 #endif
     }
 
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmProcess<T1, T2>::process_request(const unsigned int,
+                                                       const std::vector<T1> &,
+                                                       std::vector<T2> &)
+    {
+      // noting to do
+    }
 
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmProcess<T1, T2>::pack_recv_buffer(const int,
+                                                        std::vector<T1> &)
+    {
+      // noting to do
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmProcess<T1, T2>::prepare_recv_buffer(const int,
+                                                           std::vector<T2> &)
+    {
+      // noting to do
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmProcess<T1, T2>::unpack_recv_buffer(
+      const int,
+      const std::vector<T2> &)
+    {
+      // noting to do
+    }
+
+
+
+    template <typename T1, typename T2>
+    ConsensusAlgorithm<T1, T2>::ConsensusAlgorithm(
+      ConsensusAlgorithmProcess<T1, T2> &process,
+      const MPI_Comm &                   comm)
+      : process(process)
+      , comm(comm)
+      , my_rank(this_mpi_process(comm))
+      , n_procs(n_mpi_processes(comm))
+    {}
+
+
+
+    template <typename T1, typename T2>
+    ConsensusAlgorithm_NBX<T1, T2>::ConsensusAlgorithm_NBX(
+      ConsensusAlgorithmProcess<T1, T2> &process,
+      const MPI_Comm &                   comm)
+      : ConsensusAlgorithm<T1, T2>(process, comm)
+    {}
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_NBX<T1, T2>::run()
+    {
+      // 1) send requests and start receiving the answers
+      start_communication();
+
+      // 2) answer requests and check if all requests of this process have been
+      //    answered
+      while (!check_own_state())
+        process_requests();
+
+      // 3) signal to all other processes that all requests of this process have
+      //    been answered
+      signal_finish();
+
+      // 4) nevertheless, this process has to keep on answering (potential)
+      //    incoming requests until all processes have received the
+      //    answer to all requests
+      while (!check_global_state())
+        process_requests();
+
+      // 5) process the answer to all requests
+      clean_up_and_end_communication();
+    }
+
+
+
+    template <typename T1, typename T2>
+    bool
+    ConsensusAlgorithm_NBX<T1, T2>::check_own_state()
+    {
+#ifdef DEAL_II_WITH_MPI
+      int        all_receive_requests_are_done;
+      const auto ierr = MPI_Testall(recv_requests.size(),
+                                    recv_requests.data(),
+                                    &all_receive_requests_are_done,
+                                    MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+
+      return all_receive_requests_are_done;
+#else
+      return true;
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_NBX<T1, T2>::signal_finish()
+    {
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+      const auto ierr = MPI_Ibarrier(this->comm, &barrier_request);
+      AssertThrowMPI(ierr);
+#  else
+      AssertThrow(
+        false,
+        ExcMessage(
+          "ConsensusAlgorithm_NBX uses MPI 3.0 features. You should compile with at least MPI 3.0."));
+#  endif
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    bool
+    ConsensusAlgorithm_NBX<T1, T2>::check_global_state()
+    {
+#ifdef DEAL_II_WITH_MPI
+      int        all_ranks_reached_barrier;
+      const auto ierr = MPI_Test(&barrier_request,
+                                 &all_ranks_reached_barrier,
+                                 MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+      return all_ranks_reached_barrier;
+#else
+      return true;
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_NBX<T1, T2>::process_requests()
+    {
+#ifdef DEAL_II_WITH_MPI
+      // check if there is a request pending
+      MPI_Status status;
+      int        request_is_pending;
+      const auto ierr = MPI_Iprobe(
+        MPI_ANY_SOURCE, tag_request, this->comm, &request_is_pending, &status);
+      AssertThrowMPI(ierr);
+
+      if (request_is_pending) // request is pending
+        {
+          // get rank of requesting process
+          const auto other_rank = status.MPI_SOURCE;
+
+#  ifdef DEBUG
+          Assert(requesting_processes.find(other_rank) ==
+                   requesting_processes.end(),
+                 ExcMessage("Process is requesting a second time!"));
+          requesting_processes.insert(other_rank);
+#  endif
+
+          std::vector<T1> buffer_recv;
+          // get size of of incoming message
+          int  number_amount;
+          auto ierr = MPI_Get_count(&status,
+                                    internal::mpi_type_id(buffer_recv.data()),
+                                    &number_amount);
+          AssertThrowMPI(ierr);
+
+          // allocate memory for incoming message
+          buffer_recv.resize(number_amount);
+          ierr = MPI_Recv(buffer_recv.data(),
+                          number_amount,
+                          internal::mpi_type_id(buffer_recv.data()),
+                          other_rank,
+                          tag_request,
+                          this->comm,
+                          &status);
+          AssertThrowMPI(ierr);
+
+          // allocate memory for answer message
+          request_buffers.emplace_back();
+          request_requests.emplace_back(new MPI_Request);
+
+          // process request
+          auto &request_buffer = request_buffers.back();
+          this->process.process_request(other_rank,
+                                        buffer_recv,
+                                        request_buffer);
+
+          // start to send answer back
+          ierr = MPI_Isend(request_buffer.data(),
+                           request_buffer.size(),
+                           internal::mpi_type_id(request_buffer.data()),
+                           other_rank,
+                           tag_delivery,
+                           this->comm,
+                           request_requests.back().get());
+          AssertThrowMPI(ierr);
+        }
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_NBX<T1, T2>::start_communication()
+    {
+#ifdef DEAL_II_WITH_MPI
+      // 1)
+      targets              = this->process.compute_targets();
+      const auto n_targets = targets.size();
+
+      // 2) allocate memory
+      recv_buffers.resize(n_targets);
+      recv_requests.resize(n_targets);
+      send_requests.resize(n_targets);
+      send_buffers.resize(n_targets);
+
+      {
+        // 4) send and receive
+        for (unsigned int i = 0; i < n_targets; i++)
+          {
+            const unsigned int rank  = targets[i];
+            const unsigned int index = i;
+
+            // translate index set to a list of pairs
+            auto &send_buffer = send_buffers[index];
+            this->process.pack_recv_buffer(rank, send_buffer);
+
+            // start to send data
+            auto ierr = MPI_Isend(send_buffer.data(),
+                                  send_buffer.size(),
+                                  internal::mpi_type_id(send_buffer.data()),
+                                  rank,
+                                  tag_request,
+                                  this->comm,
+                                  &send_requests[index]);
+            AssertThrowMPI(ierr);
+
+            // start to receive data
+            auto &recv_buffer = recv_buffers[index];
+            this->process.prepare_recv_buffer(rank, recv_buffer);
+            ierr = MPI_Irecv(recv_buffer.data(),
+                             recv_buffer.size(),
+                             internal::mpi_type_id(recv_buffer.data()),
+                             rank,
+                             tag_delivery,
+                             this->comm,
+                             &recv_requests[index]);
+            AssertThrowMPI(ierr);
+          }
+      }
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_NBX<T1, T2>::clean_up_and_end_communication()
+    {
+#ifdef DEAL_II_WITH_MPI
+      // clean up
+      {
+        auto ierr = MPI_Waitall(send_requests.size(),
+                                send_requests.data(),
+                                MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Waitall(recv_requests.size(),
+                           recv_requests.data(),
+                           MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        for (auto &i : request_requests)
+          {
+            const auto ierr = MPI_Wait(i.get(), MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+          }
+
+#  ifdef DEBUG
+        // note: IBarrier seems to make problem during testing, this additional
+        // Barrier seems to help
+        MPI_Barrier(this->comm);
+#  endif
+      }
+
+      // unpack data
+      {
+        for (unsigned int i = 0; i < targets.size(); i++)
+          this->process.unpack_recv_buffer(targets[i], recv_buffers[i]);
+      }
+#endif
+    }
+
+
+
+    /**
+     * A re-implementation of compute_point_to_point_communication_pattern
+     * using the ConsensusAlgorithm.
+     */
+    class ConsensusAlgorithmProcessTargets
+      : public ConsensusAlgorithmProcess<int, int>
+    {
+    public:
+      ConsensusAlgorithmProcessTargets(std::vector<unsigned int> &target)
+        : target(target)
+      {}
+
+      using T1 = int;
+      using T2 = int;
+
+      virtual void
+      process_request(const unsigned int     other_rank,
+                      const std::vector<T1> &buffer_recv,
+                      std::vector<T2> &      request_buffer) override
+      {
+        (void)buffer_recv;
+        (void)request_buffer;
+        this->sources.push_back(other_rank);
+      }
+
+      /**
+       * Simply return the user-provided list.
+       *
+       * @return List of processes this process wants to send requests to.
+       */
+      virtual std::vector<unsigned int>
+      compute_targets() override
+      {
+        return target;
+      }
+
+      /**
+       * The result of the consensus algorithm.
+       * @return Sorted list of ranks of processes wanting to send a request to
+       *         this process.
+       */
+      std::vector<unsigned int>
+      get_result()
+      {
+        std::sort(sources.begin(), sources.end());
+        return sources;
+      }
+
+    private:
+      /**
+       * List of processes this process wants to send requests to.
+       */
+      const std::vector<unsigned int> &target;
+
+      /**
+       * List of ranks of processes wanting to send a request to this process.
+       */
+      std::vector<unsigned int> sources;
+    };
+
+
+
+    template <typename T1, typename T2>
+    ConsensusAlgorithm_PEX<T1, T2>::ConsensusAlgorithm_PEX(
+      ConsensusAlgorithmProcess<T1, T2> &process,
+      const MPI_Comm &                   comm)
+      : ConsensusAlgorithm<T1, T2>(process, comm)
+    {}
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_PEX<T1, T2>::run()
+    {
+      // 1) send requests and start receiving the answers
+      //    especially determine how many requests are expected
+      const unsigned int n_requests = start_communication();
+
+      // 2) answer requests
+      for (unsigned int request = 0; request < n_requests; request++)
+        process_requests(request);
+
+      // 3) process answers
+      clean_up_and_end_communication();
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_PEX<T1, T2>::process_requests(int index)
+    {
+#ifdef DEAL_II_WITH_MPI
+      MPI_Status status;
+      MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+
+      // get rank of incoming message
+      const auto other_rank = status.MPI_SOURCE;
+
+      std::vector<T1> buffer_recv;
+
+      // get size of incoming message
+      int  number_amount;
+      auto ierr = MPI_Get_count(&status,
+                                internal::mpi_type_id(buffer_recv.data()),
+                                &number_amount);
+      AssertThrowMPI(ierr);
+
+      // allocate memory for incoming message
+      buffer_recv.resize(number_amount);
+      ierr = MPI_Recv(buffer_recv.data(),
+                      number_amount,
+                      internal::mpi_type_id(buffer_recv.data()),
+                      other_rank,
+                      tag_request,
+                      this->comm,
+                      &status);
+      AssertThrowMPI(ierr);
+
+      // process request
+      auto &request_buffer = requests_buffers[index];
+      this->process.process_request(other_rank, buffer_recv, request_buffer);
+
+      // start to send answer back
+      ierr = MPI_Isend(request_buffer.data(),
+                       request_buffer.size(),
+                       MPI_UNSIGNED,
+                       other_rank,
+                       tag_delivery,
+                       this->comm,
+                       &requests_answers[index]);
+      AssertThrowMPI(ierr);
+#else
+      (void)index;
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    unsigned int
+    ConsensusAlgorithm_PEX<T1, T2>::start_communication()
+    {
+#ifdef DEAL_II_WITH_MPI
+      // 1) determine with which processes this process wants to communicate
+      targets = this->process.compute_targets();
+
+      // 2) determine who wants to communicate with this process
+      const bool use_nbx = false;
+      if (!use_nbx)
+        {
+          sources =
+            compute_point_to_point_communication_pattern(this->comm, targets);
+        }
+      else
+        {
+          ConsensusAlgorithmProcessTargets process(targets);
+          ConsensusAlgorithm_NBX<ConsensusAlgorithmProcessTargets::T1,
+                                 ConsensusAlgorithmProcessTargets::T2>
+            consensus_algorithm(process, this->comm);
+          consensus_algorithm.run();
+          sources = process.get_result();
+        }
+
+      const auto n_targets = targets.size();
+      const auto n_sources = sources.size();
+
+      // 2) allocate memory
+      recv_buffers.resize(n_targets);
+      send_buffers.resize(n_targets);
+      send_and_recv_buffers.resize(2 * n_targets);
+
+      requests_answers.resize(n_sources);
+      requests_buffers.resize(n_sources);
+
+      // 4) send and receive
+      for (unsigned int i = 0; i < n_targets; i++)
+        {
+          const unsigned int rank = targets[i];
+
+          // pack data which should be sent
+          auto &send_buffer = send_buffers[i];
+          this->process.pack_recv_buffer(rank, send_buffer);
+
+          // start to send data
+          auto ierr = MPI_Isend(send_buffer.data(),
+                                send_buffer.size(),
+                                internal::mpi_type_id(send_buffer.data()),
+                                rank,
+                                tag_request,
+                                this->comm,
+                                &send_and_recv_buffers[n_targets + i]);
+          AssertThrowMPI(ierr);
+
+          // start to receive data
+          auto &recv_buffer = recv_buffers[i];
+          this->process.prepare_recv_buffer(rank, recv_buffer);
+          ierr = MPI_Irecv(recv_buffer.data(),
+                           recv_buffer.size(),
+                           MPI_UNSIGNED,
+                           rank,
+                           tag_delivery,
+                           this->comm,
+                           &send_and_recv_buffers[i]);
+          AssertThrowMPI(ierr);
+        }
+
+      return sources.size();
+#else
+      return 0;
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithm_PEX<T1, T2>::clean_up_and_end_communication()
+    {
+#ifdef DEAL_II_WITH_MPI
+      // finalize all MPI_Requests
+      MPI_Waitall(send_and_recv_buffers.size(),
+                  send_and_recv_buffers.data(),
+                  MPI_STATUSES_IGNORE);
+      MPI_Waitall(requests_answers.size(),
+                  requests_answers.data(),
+                  MPI_STATUSES_IGNORE);
+
+      // unpack received data
+      for (unsigned int i = 0; i < targets.size(); i++)
+        this->process.unpack_recv_buffer(targets[i], recv_buffers[i]);
+#endif
+    }
+
+
+
+    template <typename T1, typename T2>
+    ConsensusAlgorithmSelector<T1, T2>::ConsensusAlgorithmSelector(
+      ConsensusAlgorithmProcess<T1, T2> &process,
+      const MPI_Comm &                   comm)
+      : ConsensusAlgorithm<T1, T2>(process, comm)
+    {
+      // Depending on the number of processes we switch between implementations.
+      // We reduce the threshold for debug mode to be able to test also the
+      // non-blocking implementation. This feature is tested by:
+      // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=15.output
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+#    ifdef DEBUG
+      if (Utilities::MPI::n_mpi_processes(comm) > 14)
+#    else
+      if (Utilities::MPI::n_mpi_processes(comm) > 99)
+#    endif
+        consensus_algo.reset(new ConsensusAlgorithm_NBX<T1, T2>(process, comm));
+      else
+#  endif
+#endif
+        consensus_algo.reset(new ConsensusAlgorithm_PEX<T1, T2>(process, comm));
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmSelector<T1, T2>::run()
+    {
+      consensus_algo->run();
+    }
+
+
+
+    namespace ComputeIndexOwner
+    {
+      struct Dictionary
+      {
+        static const unsigned int tag_setup = 11;
+
+        std::vector<unsigned int> actually_owning_ranks;
+
+        types::global_dof_index dofs_per_process;
+        std::pair<types::global_dof_index, types::global_dof_index> local_range;
+        types::global_dof_index                                     local_size;
+        types::global_dof_index                                     size;
+
+        void
+        reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
+        {
+          this->partition(owned_indices, comm);
+
+#ifdef DEAL_II_WITH_MPI
+          unsigned int my_rank = this_mpi_process(comm);
+
+          types::global_dof_index              dic_local_rececived = 0;
+          std::map<unsigned int, unsigned int> relevant_procs_map;
+
+          // 2) collect relevant processes and process local dict entries
+          {
+            std::vector<unsigned int> relevant_procs;
+            for (auto i : owned_indices)
+              {
+                unsigned int other_rank = this->dof_to_dict_rank(i);
+                if (other_rank == my_rank)
+                  {
+                    this->actually_owning_ranks[i - this->local_range.first] =
+                      my_rank;
+                    dic_local_rececived++;
+                  }
+                else if (relevant_procs.empty() ||
+                         relevant_procs.back() != other_rank)
+                  relevant_procs.push_back(other_rank);
+              }
+
+            {
+              unsigned int c = 0;
+              for (auto i : relevant_procs)
+                relevant_procs_map[i] = c++;
+            }
+          }
+
+          const unsigned int n_relevant_procs = relevant_procs_map.size();
+          std::vector<std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>>
+                                   buffers(n_relevant_procs);
+          std::vector<MPI_Request> request(n_relevant_procs);
+
+          // 3) send messages with local dofs to the right dict process
+          {
+            std::vector<std::vector<types::global_dof_index>> temp(
+              n_relevant_procs);
+
+            // collect dofs of each dict process
+            for (auto i : owned_indices)
+              {
+                unsigned int other_rank = this->dof_to_dict_rank(i);
+                if (other_rank != my_rank)
+                  temp[relevant_procs_map[other_rank]].push_back(i);
+              }
+
+            // send dofs to each process
+            for (auto rank_pair : relevant_procs_map)
+              {
+                const int rank  = rank_pair.first;
+                const int index = rank_pair.second;
+
+                // create index set and compress data to be sent
+                auto &   indices_i = temp[index];
+                IndexSet is(this->size);
+                is.add_indices(indices_i.begin(), indices_i.end());
+                is.compress();
+
+                // translate index set to a list of pairs
+                auto &buffer = buffers[index];
+                for (auto interval = is.begin_intervals();
+                     interval != is.end_intervals();
+                     interval++)
+                  buffer.emplace_back(*interval->begin(), interval->last() + 1);
+
+                // send data
+                const auto ierr = MPI_Isend(buffer.data(),
+                                            buffer.size() * 2,
+                                            DEAL_II_DOF_INDEX_MPI_TYPE,
+                                            rank,
+                                            tag_setup,
+                                            comm,
+                                            &request[index]);
+                AssertThrowMPI(ierr);
+              }
+          }
+
+
+          // 4) receive messages until all dofs in dict are processed
+          while (this->local_size != dic_local_rececived)
+            {
+              // wait for an incoming message
+              MPI_Status status;
+              auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_setup, comm, &status);
+              AssertThrowMPI(ierr);
+
+              // retrieve size of incoming message
+              int number_amount;
+              ierr = MPI_Get_count(&status,
+                                   DEAL_II_DOF_INDEX_MPI_TYPE,
+                                   &number_amount);
+              AssertThrowMPI(ierr);
+
+              const auto other_rank = status.MPI_SOURCE;
+
+              // receive message
+              Assert(number_amount % 2 == 0, ExcInternalError());
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>
+                buffer(number_amount / 2);
+              ierr = MPI_Recv(buffer.data(),
+                              number_amount,
+                              DEAL_II_DOF_INDEX_MPI_TYPE,
+                              other_rank,
+                              tag_setup,
+                              comm,
+                              &status);
+              AssertThrowMPI(ierr);
+
+              // process message: loop over all intervals
+              for (auto interval : buffer)
+                for (types::global_dof_index i = interval.first;
+                     i < interval.second;
+                     i++)
+                  {
+                    this->actually_owning_ranks[i - this->local_range.first] =
+                      other_rank;
+                    dic_local_rececived++;
+                  }
+            }
+
+          // 5) make sure that all messages have been sent
+          const auto ierr =
+            MPI_Waitall(n_relevant_procs, request.data(), MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+#else
+          (void)owned_indices;
+          (void)comm;
+#endif
+        }
+
+        unsigned int
+        dof_to_dict_rank(const types::global_dof_index i)
+        {
+          return i / dofs_per_process;
+        }
+
+      private:
+        void
+        partition(const IndexSet &owned_indices, const MPI_Comm &comm)
+        {
+#ifdef DEAL_II_WITH_MPI
+          const unsigned int n_procs = n_mpi_processes(comm);
+          const unsigned int my_rank = this_mpi_process(comm);
+
+          size               = owned_indices.size();
+          dofs_per_process   = (size + n_procs - 1) / n_procs;
+          local_range.first  = std::min(dofs_per_process * my_rank, size);
+          local_range.second = std::min(dofs_per_process * (my_rank + 1), size);
+          local_size         = local_range.second - local_range.first;
+
+          actually_owning_ranks.resize(local_size);
+#else
+          (void)owned_indices;
+          (void)comm;
+#endif
+        }
+      };
+
+      class ConsensusAlgorithmProcess
+        : public dealii::Utilities::MPI::
+            ConsensusAlgorithmProcess<types::global_dof_index, unsigned int>
+      {
+      public:
+        ConsensusAlgorithmProcess(const IndexSet &           owned_indices,
+                                  const IndexSet &           indices_to_look_up,
+                                  const MPI_Comm &           comm,
+                                  std::vector<unsigned int> &owning_ranks)
+          : owned_indices(owned_indices)
+          , indices_to_look_up(indices_to_look_up)
+          , comm(comm)
+          , my_rank(this_mpi_process(comm))
+          , n_procs(n_mpi_processes(comm))
+          , owning_ranks(owning_ranks)
+        {
+          this->dict.reinit(owned_indices, comm);
+        }
+
+        const IndexSet &           owned_indices;
+        const IndexSet &           indices_to_look_up;
+        const MPI_Comm &           comm;
+        const unsigned int         my_rank;
+        const unsigned int         n_procs;
+        std::vector<unsigned int> &owning_ranks;
+
+        Dictionary dict;
+
+        std::map<unsigned int, std::vector<types::global_dof_index>> temp;
+        std::map<unsigned int, std::vector<unsigned int>> recv_indices;
+
+        virtual void
+        process_request(const unsigned int                          other_rank,
+                        const std::vector<types::global_dof_index> &buffer_recv,
+                        std::vector<unsigned int> &request_buffer) override
+        {
+          (void)other_rank;
+          Assert(buffer_recv.size() % 2 == 0, ExcInternalError());
+          for (unsigned int j = 0; j < buffer_recv.size(); j += 2)
+            for (auto i = buffer_recv[j]; i < buffer_recv[j + 1]; i++)
+              request_buffer.push_back(
+                dict.actually_owning_ranks[i - dict.local_range.first]);
+        }
+
+        virtual std::vector<unsigned int>
+        compute_targets() override
+        {
+          std::vector<unsigned int> targets;
+
+          // 1) collect relevant processes and process local dict entries
+          {
+            unsigned int index = 0;
+            for (auto i : indices_to_look_up)
+              {
+                unsigned int other_rank = dict.dof_to_dict_rank(i);
+                if (other_rank == my_rank)
+                  owning_ranks[index] =
+                    dict.actually_owning_ranks[i - dict.local_range.first];
+                else if (targets.empty() || targets.back() != other_rank)
+                  targets.push_back(other_rank);
+                index++;
+              }
+          }
+
+
+          for (auto i : targets)
+            {
+              recv_indices[i] = {};
+              temp[i]         = {};
+            }
+
+          // 3) collect indices for each process
+          {
+            unsigned int index = 0;
+            for (auto i : indices_to_look_up)
+              {
+                unsigned int other_rank = dict.dof_to_dict_rank(i);
+                if (other_rank != my_rank)
+                  {
+                    recv_indices[other_rank].push_back(index);
+                    temp[other_rank].push_back(i);
+                  }
+                index++;
+              }
+          }
+
+          Assert(targets.size() == recv_indices.size() &&
+                   targets.size() == temp.size(),
+                 ExcMessage("Size does not match!"));
+
+          return targets;
+        }
+
+        virtual void
+        pack_recv_buffer(
+          const int                             other_rank,
+          std::vector<types::global_dof_index> &send_buffer) override
+        {
+          // create index set and compress data to be sent
+          auto &   indices_i = temp[other_rank];
+          IndexSet is(dict.size);
+          is.add_indices(indices_i.begin(), indices_i.end());
+          is.compress();
+
+          for (auto interval = is.begin_intervals();
+               interval != is.end_intervals();
+               interval++)
+            {
+              send_buffer.push_back(*interval->begin());
+              send_buffer.push_back(interval->last() + 1);
+            }
+        }
+
+        virtual void
+        prepare_recv_buffer(const int                  other_rank,
+                            std::vector<unsigned int> &recv_buffer) override
+        {
+          recv_buffer.resize(recv_indices[other_rank].size());
+        }
+
+        virtual void
+        unpack_recv_buffer(
+          const int                        other_rank,
+          const std::vector<unsigned int> &recv_buffer) override
+        {
+          Assert(recv_indices[other_rank].size() == recv_buffer.size(),
+                 ExcMessage("Sizes do not match!"));
+
+          for (unsigned int j = 0; j < recv_indices[other_rank].size(); j++)
+            owning_ranks[recv_indices[other_rank][j]] = recv_buffer[j];
+        }
+      };
+
+    } // namespace ComputeIndexOwner
+
+
+
+    std::vector<unsigned int>
+    compute_index_owner(const IndexSet &owned_indices,
+                        const IndexSet &indices_to_look_up,
+                        const MPI_Comm &comm)
+    {
+      Assert(owned_indices.size() == indices_to_look_up.size(),
+             ExcMessage("IndexSets have to have the same sizes."));
+
+      std::vector<unsigned int> owning_ranks(indices_to_look_up.n_elements());
+
+      // Step 1: setup dictionary
+      // The input owned_indices can be partitioned arbitrarily. In the
+      // dictionary, the index set is statically repartitioned among the
+      // processes again and extended with information with the actual owner
+      // of that the index.
+      ComputeIndexOwner::ConsensusAlgorithmProcess process(owned_indices,
+                                                           indices_to_look_up,
+                                                           comm,
+                                                           owning_ranks);
+
+      // Step 2: read dictionary
+      // Communicate with the process who owns the index in the static
+      // partition (i.e. in the partition). This process returns the actual
+      // owner of the index.
+      ConsensusAlgorithmSelector<types::global_dof_index, unsigned int>
+        consensus_algorithm(process, comm);
+      consensus_algorithm.run();
+
+      return owning_ranks;
+    }
 
 #include "mpi.inst"
   } // end of namespace MPI

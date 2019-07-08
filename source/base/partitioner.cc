@@ -233,56 +233,32 @@ namespace Utilities
             }
         }
 
-      // Allocate memory for data that will be exported
-      std::vector<types::global_dof_index> expanded_ghost_indices(
-        n_ghost_indices_data);
       unsigned int n_ghost_targets = 0;
-      if (n_ghost_indices_data > 0)
-        {
-          // Create first a vector of ghost_targets from the list of ghost
-          // indices and then push back new values. When we are done, copy the
-          // data to that field of the partitioner. This way, the variable
-          // ghost_targets will have exactly the size we need, whereas the
-          // vector filled with emplace_back might actually be too long.
-          unsigned int current_proc = 0;
-          ghost_indices_data.fill_index_vector(expanded_ghost_indices);
-          types::global_dof_index current_index = expanded_ghost_indices[0];
-          while (current_index >= first_index[current_proc + 1])
-            current_proc++;
-          AssertIndexRange(current_proc, n_procs);
+      {
+        const auto index_owner =
+          Utilities::MPI::compute_index_owner(this->locally_owned_range_data,
+                                              this->ghost_indices_data,
+                                              this->communicator);
 
-          // since DoFs are contiguous, populate a vector which stores
-          // a process rank and the number of ghosts
-          std::vector<std::pair<unsigned int, unsigned int>> ghost_targets_temp(
-            1, std::pair<unsigned int, unsigned int>(current_proc, 0));
-          n_ghost_targets++;
+        ghost_targets_data.clear();
 
-          // find which process is the owner of other indices:
-          for (unsigned int iterator = 1; iterator < n_ghost_indices_data;
-               ++iterator)
-            {
-              current_index = expanded_ghost_indices[iterator];
-              while (current_index >= first_index[current_proc + 1])
-                current_proc++;
-              AssertIndexRange(current_proc, n_procs);
-              // if we found a new target (i.e. higher rank) then adjust the
-              // pair.second in the last element so that it stores the total
-              // number of ghosts owned by pair.first
-              if (ghost_targets_temp[n_ghost_targets - 1].first < current_proc)
-                {
-                  ghost_targets_temp[n_ghost_targets - 1].second =
-                    iterator - ghost_targets_temp[n_ghost_targets - 1].second;
-                  ghost_targets_temp.emplace_back(current_proc, iterator);
-                  n_ghost_targets++;
-                }
-            }
-          // adjust the last element so that pair.second stores the number of
-          // elements
-          ghost_targets_temp[n_ghost_targets - 1].second =
-            n_ghost_indices_data -
-            ghost_targets_temp[n_ghost_targets - 1].second;
-          ghost_targets_data = ghost_targets_temp;
-        }
+        if (index_owner.size() > 0)
+          {
+            ghost_targets_data.emplace_back(index_owner[0], 0);
+            for (auto i : index_owner)
+              {
+                Assert(i >= ghost_targets_data.back().first,
+                       ExcInternalError(
+                         "Expect result of compute_index_owner to be sorted"));
+                if (i == ghost_targets_data.back().first)
+                  ghost_targets_data.back().second++;
+                else
+                  ghost_targets_data.emplace_back(i, 1);
+              }
+          }
+
+        n_ghost_targets = ghost_targets_data.size();
+      }
       // find the processes that want to import to me
       {
         std::vector<int> send_buffer(n_procs, 0);
@@ -316,9 +292,9 @@ namespace Utilities
       // now that we know how many indices each process will receive from
       // ghosts, send and receive indices for import data. non-blocking receives
       // and blocking sends
-      std::vector<types::global_dof_index> expanded_import_indices(
-        n_import_indices_data);
       {
+        std::vector<types::global_dof_index> expanded_import_indices(
+          n_import_indices_data);
         unsigned int             current_index_start = 0;
         std::vector<MPI_Request> import_requests(import_targets_data.size() +
                                                  n_ghost_targets);
@@ -339,6 +315,10 @@ namespace Utilities
 
         // use non-blocking send for ghost indices stored in
         // expanded_ghost_indices
+        std::vector<types::global_dof_index> expanded_ghost_indices;
+        if (n_ghost_indices_data > 0)
+          ghost_indices_data.fill_index_vector(expanded_ghost_indices);
+
         current_index_start = 0;
         for (unsigned int i = 0; i < n_ghost_targets; i++)
           {
