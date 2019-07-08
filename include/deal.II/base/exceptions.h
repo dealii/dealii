@@ -683,7 +683,7 @@ namespace StandardExceptions
     << "finite, but that the actual error that computed the number "
     << "may have happened far earlier. To find this location, you "
     << "may want to add checks for finiteness in places of your "
-    << "program visited before the place where this error is produced."
+    << "program visited before the place where this error is produced. "
     << "One way to check for finiteness is to use the 'AssertIsFinite' "
     << "macro.");
 
