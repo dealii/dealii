@@ -323,11 +323,9 @@ public:
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
-   *
-   * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV real_type
-                                          norm() const;
+  DEAL_II_CONSTEXPR real_type
+                    norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -1036,14 +1034,11 @@ Tensor<0, dim, Number>::operator-() const
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline
-  typename Tensor<0, dim, Number>::real_type
-  Tensor<0, dim, Number>::norm() const
+DEAL_II_CONSTEXPR inline typename Tensor<0, dim, Number>::real_type
+Tensor<0, dim, Number>::norm() const
 {
-#ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
   return numbers::NumberTraits<Number>::abs(value);
 }
 

@@ -21,20 +21,29 @@
 
 template <int rank, int dim, typename Number>
 __global__ void
-miscellaneous_kernel()
+miscellaneous_kernel(Number *check_1,
+                     Number *check_2,
+                     Number *check_3,
+                     Number *check_4,
+                     Number *check_5)
 {
   // constructors
   typename Tensor<rank, dim, Number>::array_type array{};
   Tensor<rank, dim, Number>                      dummy_1(array);
-  Tensor<rank, dim, Number>                      dummy_2;
-  Tensor<rank, dim, Number>                      dummy_3 = dummy_2;
+  *check_1 = dummy_1.norm_square();
+  Tensor<rank, dim, Number> dummy_2;
+  *check_2                          = dummy_2.norm_square();
+  Tensor<rank, dim, Number> dummy_3 = dummy_2;
+  *check_3                          = dummy_3.norm_square();
 
   // access
-  Tensor<rank + 1, dim, Number> initializer_1;
-  const auto                    dummy_5 = initializer_1[0];
+  Tensor<rank + 1, dim, Number>   initializer_1;
+  const Tensor<rank, dim, Number> dummy_5 = initializer_1[0];
+  *check_4                                = dummy_5.norm_square();
 
   // assignment
-  dummy_2 = dummy_3;
+  dummy_2  = dummy_3;
+  *check_5 = dummy_2.norm_square();
 }
 
 template <int rank, int dim, typename Number>
@@ -224,9 +233,6 @@ test_gpu()
   AssertThrow((t2_host - reference_host).norm() < tolerance,
               ExcInternalError());
 
-  // Miscellaneous
-  miscellaneous_kernel<rank, dim, Number><<<1, 1>>>();
-
   // Free memory
   cuda_error = cudaFree(t_dev);
   AssertCuda(cuda_error);
@@ -234,6 +240,74 @@ test_gpu()
   AssertCuda(cuda_error);
   cuda_error = cudaFree(t2_dev);
   AssertCuda(cuda_error);
+
+  // Miscellaneous
+  {
+    Number *check_1;
+    Number *check_2;
+    Number *check_3;
+    Number *check_4;
+    Number *check_5;
+
+    cuda_error = cudaMalloc(&check_1, sizeof(Number));
+    AssertCuda(cuda_error);
+    cuda_error = cudaMalloc(&check_2, sizeof(Number));
+    AssertCuda(cuda_error);
+    cuda_error = cudaMalloc(&check_3, sizeof(Number));
+    AssertCuda(cuda_error);
+    cuda_error = cudaMalloc(&check_4, sizeof(Number));
+    AssertCuda(cuda_error);
+    cuda_error = cudaMalloc(&check_5, sizeof(Number));
+    AssertCuda(cuda_error);
+
+    miscellaneous_kernel<rank, dim, Number>
+      <<<1, 1>>>(check_1, check_2, check_3, check_4, check_5);
+
+    Number check_1_host, check_2_host, check_3_host, check_4_host, check_5_host;
+
+    cuda_error = cudaMemcpy(&check_1_host,
+                            check_1,
+                            sizeof(Number),
+                            cudaMemcpyDeviceToHost);
+    AssertCuda(cuda_error);
+    cuda_error = cudaMemcpy(&check_2_host,
+                            check_2,
+                            sizeof(Number),
+                            cudaMemcpyDeviceToHost);
+    AssertCuda(cuda_error);
+    cuda_error = cudaMemcpy(&check_3_host,
+                            check_3,
+                            sizeof(Number),
+                            cudaMemcpyDeviceToHost);
+    AssertCuda(cuda_error);
+    cuda_error = cudaMemcpy(&check_4_host,
+                            check_4,
+                            sizeof(Number),
+                            cudaMemcpyDeviceToHost);
+    AssertCuda(cuda_error);
+    cuda_error = cudaMemcpy(&check_5_host,
+                            check_5,
+                            sizeof(Number),
+                            cudaMemcpyDeviceToHost);
+    AssertCuda(cuda_error);
+
+    AssertThrow(std::abs(check_1_host) < tolerance, ExcInternalError());
+    AssertThrow(std::abs(check_2_host) < tolerance, ExcInternalError());
+    AssertThrow(std::abs(check_3_host) < tolerance, ExcInternalError());
+    AssertThrow(std::abs(check_4_host) < tolerance, ExcInternalError());
+    AssertThrow(std::abs(check_5_host) < tolerance, ExcInternalError());
+
+    cuda_error = cudaFree(check_1);
+    AssertCuda(cuda_error);
+    cuda_error = cudaFree(check_2);
+    AssertCuda(cuda_error);
+    cuda_error = cudaFree(check_3);
+    AssertCuda(cuda_error);
+    cuda_error = cudaFree(check_4);
+    AssertCuda(cuda_error);
+    cuda_error = cudaFree(check_5);
+    AssertCuda(cuda_error);
+  }
 }
 
 int
