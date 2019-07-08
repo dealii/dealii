@@ -830,6 +830,8 @@ namespace CUDAWrappers
               }
           }
 
+        // The synchronization is done for all the threads in one block with
+        // each block being assigned to one element.
         __syncthreads();
 
         if (constrained_face && constrained_dof)
