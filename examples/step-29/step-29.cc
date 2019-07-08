@@ -199,7 +199,7 @@ namespace Step29
     // configuration file, which is the purpose of the last subsection:
     prm.enter_subsection("Output parameters");
     {
-      prm.declare_entry("Output file",
+      prm.declare_entry("Output filename",
                         "solution",
                         Patterns::Anything(),
                         "Name of the output file (without extension)");
@@ -803,7 +803,7 @@ namespace Step29
     // corresponding properties of the DataOut object accordingly.
     prm.enter_subsection("Output parameters");
 
-    const std::string output_file = prm.get("Output file");
+    const std::string output_filename = prm.get("Output filename");
     data_out.parse_parameters(prm);
 
     prm.leave_subsection();
@@ -812,7 +812,7 @@ namespace Step29
     // ParameterHandler and the suffix which is provided by the DataOut class
     // (the default suffix is set to the right type that matches the one set
     // in the .prm file through parse_parameters()):
-    const std::string filename = output_file + data_out.default_suffix();
+    const std::string filename = output_filename + data_out.default_suffix();
 
     std::ofstream output(filename);
 
