@@ -602,13 +602,13 @@ namespace Polynomials
    * Polynomials for a variant of Hermite polynomials with better condition
    * number in the interpolation than the basis from HermiteInterpolation.
    *
-   * In analogy to the actual Hermite polynomials this basis evaluates the
+   * In analogy to the proper Hermite polynomials, this basis evaluates the
    * first polynomial $p_0$ to 1 at $x=0$ and has both a zero value and zero
    * derivative at $x=1$. Likewise, the last polynomial $p_n$ evaluates to 1
-   * at $x=1$ but has zero value and zero derivative at $x=0$. The second
+   * at $x=1$ with a zero value and zero derivative at $x=0$. The second
    * polynomial $p_1$ and the second to last polynomial $p_{n-1}$ represent
-   * the derivative degree of freedom at $x=0$ and $x=1$, respectively. As
-   * such, they are zero at both the end points $x=0, x=1$ and have zero
+   * the derivative degree of freedom at $x=0$ and $x=1$, respectively.
+   * They are zero at both the end points $x=0, x=1$ and have zero
    * derivative at the opposite end, $p_1'(1)=0$ and $p_{n-1}'(0)=0$. As
    * opposed to the original Hermite polynomials, $p_0$ does not have zero
    * derivative at $x=0$. The additional degree of freedom is used to make
@@ -617,7 +617,7 @@ namespace Polynomials
    * respectively. Furthermore, the extension of these polynomials to higher
    * degrees $n>3$ is constructed by adding additional nodes inside the unit
    * interval, again ensuring better conditioning. The nodes are computed as
-   * the roots of the Jacobi polynomials for $\alpha=\beta=2$ which are
+   * the roots of the Jacobi polynomials for $\alpha=\beta=2$, which are
    * orthogonal against the generating function $x^2(1-x)^2$ with the Hermite
    * property. Then, these polynomials are constructed in the usual way as
    * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example at
@@ -625,12 +625,14 @@ namespace Polynomials
    * through the factor $(x-0.5)$. In summary, this basis is dominated by
    * nodal contributions, but it is not a nodal one because the second and
    * second to last polynomials that are non-nodal, and due to the presence of
-   * double nodes in $x=0$ and $x=1$.
+   * double nodes in $x=0$ and $x=1$. The weights of the basis functions are
+   * set such that the sum of all polynomials with unit weight represents the
+   * constant function 1, similarly to Lagrange polynomials.
    *
    * The basis only contains Hermite information at <code>degree>=3</code>,
    * but it is also implemented for degrees between 0 and two. For the linear
    * case, the usual hat functions are implemented, whereas the polynomials
-   * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=4x(x-1)$, and
+   * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=2x(x-1)$, and
    * $p_2(x)=x^2$, in accordance with the construction principle for degree 3
    * that allows a non-zero of $p_0$ and $p_2$.
    *
@@ -692,9 +694,10 @@ namespace Polynomials
    *
    * This polynomial inherits the advantageous property of Hermite polynomials
    * where only two functions have value and/or derivative nonzero on a face
+   * advantageous for discontinuous Galerkin methods
    * but gives better condition numbers of interpolation, which improves the
    * performance of some iterative schemes like conjugate gradients with
-   * point-Jacobi.
+   * point-Jacobi. This polynomial is used in FE_DGQHermite.
    *
    * @author Martin Kronbichler
    * @date 2018
