@@ -21,7 +21,7 @@ end
 
 subsection Output parameters
   # Name of the output file (without extension)
-  set Output file   = solution
+  set Output filename = solution
 
   # A name for the output format to be used
   set Output format = vtu
