@@ -17,11 +17,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && !defined(DEAL_II_MSVC)
-const unsigned int VectorizedArray<double>::n_array_elements;
-const unsigned int VectorizedArray<float>::n_array_elements;
-#endif
-
 // VectorizedArray must be a POD (plain old data) type to make sure it
 // can use maximum level of compiler optimization.
 // A type is POD if it has standard layout (similar to a C struct)
@@ -34,5 +29,34 @@ static_assert(std::is_standard_layout<VectorizedArray<double>>::value &&
 static_assert(std::is_standard_layout<VectorizedArray<float>>::value &&
                 std::is_trivial<VectorizedArray<float>>::value,
               "VectorizedArray<float> must be a POD type");
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && !defined(DEAL_II_MSVC)
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+const unsigned int VectorizedArray<double, 8>::n_array_elements;
+#  endif
+
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+const unsigned int VectorizedArray<double, 4>::n_array_elements;
+#  endif
+
+#  if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
+    (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+const unsigned int VectorizedArray<double, 2>::n_array_elements;
+#  endif
+
+
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+const unsigned int VectorizedArray<float, 16>::n_array_elements;
+#  endif
+
+#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+const unsigned int VectorizedArray<float, 8>::n_array_elements;
+#  endif
+
+#  if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
+    (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+const unsigned int VectorizedArray<float, 4>::n_array_elements;
+#  endif
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

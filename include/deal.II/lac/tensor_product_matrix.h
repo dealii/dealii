@@ -32,8 +32,6 @@ template <typename>
 class Vector;
 template <typename>
 class FullMatrix;
-template <typename>
-class VectorizedArray;
 
 /**
  * This is an abstract base class used for a special matrix class, namely the

@@ -30,12 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-// forward declaration
-template <typename T>
-class VectorizedArray;
-
-
 /**
  * This namespace provides functions helping to determine the amount of memory
  * used by objects. The goal is not necessarily to give the amount of memory
@@ -134,9 +128,9 @@ namespace MemoryConsumption
    * Determine the amount of memory in bytes consumed by a
    * <tt>VectorizedArray</tt> variable.
    */
-  template <typename T>
+  template <typename T, int width>
   inline std::size_t
-  memory_consumption(const VectorizedArray<T> &);
+  memory_consumption(const VectorizedArray<T, width> &);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
@@ -302,11 +296,11 @@ namespace MemoryConsumption
 
 
 
-  template <typename T>
+  template <typename T, int width>
   inline std::size_t
-  memory_consumption(const VectorizedArray<T> &)
+  memory_consumption(const VectorizedArray<T, width> &)
   {
-    return sizeof(VectorizedArray<T>);
+    return sizeof(VectorizedArray<T, width>);
   }
 
 

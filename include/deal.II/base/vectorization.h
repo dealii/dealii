@@ -88,19 +88,19 @@ namespace internal
    * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for other
    * specializations.
    */
-  template <typename T>
-  struct NumberType<VectorizedArray<T>>
+  template <typename T, int width>
+  struct NumberType<VectorizedArray<T, width>>
   {
-    static const VectorizedArray<T> &
-    value(const VectorizedArray<T> &t)
+    static const VectorizedArray<T, width> &
+    value(const VectorizedArray<T, width> &t)
     {
       return t;
     }
 
-    static VectorizedArray<T>
+    static VectorizedArray<T, width>
     value(const T &t)
     {
-      VectorizedArray<T> tmp;
+      VectorizedArray<T, width> tmp;
       tmp = t;
       return tmp;
     }
@@ -111,8 +111,8 @@ namespace internal
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
 // that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
 
-template <typename Number>
-struct EnableIfScalar<VectorizedArray<Number>>
+template <typename Number, int width>
+struct EnableIfScalar<VectorizedArray<Number, width>>
 {
   using type = VectorizedArray<typename EnableIfScalar<Number>::type>;
 };
@@ -167,9 +167,42 @@ struct EnableIfScalar<VectorizedArray<Number>>
  * similar to std::vector otherwise but always makes sure that data is
  * correctly aligned.
  *
- * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
+ * The user can explicitly control the width of a particular instruction set
+ * architecture (ISA) extension by specifying the number of lanes via the second
+ * template parameter of this wrapper class. For example on Intel Skylake,
+ * you have the following options for the data type double:
+ *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
+ *  - VectorizedArray<double, 2> // SSE2
+ *  - VectorizedArray<double, 4> // AVX
+ *  - VectorizedArray<double, 8> // AVX-512 (default)
+ *
+ * and for Intel Sandy Bridge, Haswell, Broadwell, AMD Bulldozer and Zen/Ryzen:
+ *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
+ *  - VectorizedArray<double, 2> // SSE2
+ *  - VectorizedArray<double, 4> // AVX (default)
+ *
+ * and for processors with AltiVec support:
+ *  - VectorizedArray<double, 1>
+ *  - VectorizedArray<double, 2>
+ *
+ * for older x86 processors or in case no processor-specific compilation flags
+ * were added (i.e., without `-D CMAKE_CXX_FLAGS=-march=native` or similar
+ * flags):
+ *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
+ *  - VectorizedArray<double, 2> // SSE2
+ *
+ * Similar considerations also apply to the data type `float`.
+ *
+ * Wrongly selecting the width i.e width=3 or width>8 for Skylake leads to
+ * a static assert.
+ *
+ * @tparam Number underlying data type
+ * @tparam width  vector length (optional; if not set, the maximal width of the
+ *                architecture is used)
+ *
+ * @author Katharina Kormann, Martin Kronbichler, Peter Munch, 2010, 2011, 2019
  */
-template <typename Number>
+template <typename Number, int width>
 class VectorizedArray
 {
 public:
@@ -179,6 +212,9 @@ public:
    * can work on multiple elements at the same time.
    */
   static const unsigned int n_array_elements = 1;
+
+  static_assert(width == n_array_elements,
+                "You specified an illegal width that is not supported.");
 
   // POD means that there should be no user-defined constructors, destructors
   // and copy functions (the standard is somewhat relaxed in C++2011, though).
@@ -221,7 +257,7 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator+=(const VectorizedArray<Number> &vec)
+  operator+=(const VectorizedArray &vec)
   {
     data += vec.data;
     return *this;
@@ -232,7 +268,7 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator-=(const VectorizedArray<Number> &vec)
+  operator-=(const VectorizedArray &vec)
   {
     data -= vec.data;
     return *this;
@@ -243,7 +279,7 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator*=(const VectorizedArray<Number> &vec)
+  operator*=(const VectorizedArray &vec)
   {
     data *= vec.data;
     return *this;
@@ -254,7 +290,7 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator/=(const VectorizedArray<Number> &vec)
+  operator/=(const VectorizedArray &vec)
   {
     data /= vec.data;
     return *this;
@@ -437,23 +473,27 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
+
+
 // We need to have a separate declaration for static const members
-template <typename Number>
-const unsigned int VectorizedArray<Number>::n_array_elements;
+template <typename Number, int width>
+const unsigned int VectorizedArray<Number, width>::n_array_elements;
 
 
 
@@ -463,11 +503,13 @@ const unsigned int VectorizedArray<Number>::n_array_elements;
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
+template <
+  typename Number,
+  int width = internal::VectorizedArrayWidthSpecifier<Number>::max_width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              make_vectorized_array(const Number &u)
 {
-  VectorizedArray<Number> result;
+  VectorizedArray<Number, width> result;
   result = u;
   return result;
 }
@@ -499,15 +541,17 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
+template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int       n_entries,
-                              const Number *           in,
-                              const unsigned int *     offsets,
-                              VectorizedArray<Number> *out)
+vectorized_load_and_transpose(const unsigned int              n_entries,
+                              const Number *                  in,
+                              const unsigned int *            offsets,
+                              VectorizedArray<Number, width> *out)
 {
   for (unsigned int i = 0; i < n_entries; ++i)
-    for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements; ++v)
+    for (unsigned int v = 0;
+         v < VectorizedArray<Number, width>::n_array_elements;
+         ++v)
       out[i][v] = in[offsets[v] + i];
 }
 
@@ -551,26 +595,27 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
+template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                     add_into,
-                               const unsigned int             n_entries,
-                               const VectorizedArray<Number> *in,
-                               const unsigned int *           offsets,
-                               Number *                       out)
+vectorized_transpose_and_store(const bool                            add_into,
+                               const unsigned int                    n_entries,
+                               const VectorizedArray<Number, width> *in,
+                               const unsigned int *                  offsets,
+                               Number *                              out)
 {
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
+      for (unsigned int v = 0;
+           v < VectorizedArray<Number, width>::n_array_elements;
            ++v)
         out[offsets[v] + i] += in[i][v];
   else
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
+      for (unsigned int v = 0;
+           v < VectorizedArray<Number, width>::n_array_elements;
            ++v)
         out[offsets[v] + i] = in[i][v];
 }
-
 
 
 // for safety, also check that __AVX512F__ is defined in case the user manually
@@ -582,7 +627,7 @@ vectorized_transpose_and_store(const bool                     add_into,
  * Specialization of VectorizedArray class for double and AVX-512.
  */
 template <>
-class VectorizedArray<double>
+class VectorizedArray<double, 8>
 {
 public:
   /**
@@ -848,18 +893,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -869,10 +916,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int       n_entries,
-                              const double *           in,
-                              const unsigned int *     offsets,
-                              VectorizedArray<double> *out)
+vectorized_load_and_transpose(const unsigned int          n_entries,
+                              const double *              in,
+                              const unsigned int *        offsets,
+                              VectorizedArray<double, 8> *out)
 {
   // do not do full transpose because the code is long and will most
   // likely not pay off because many processors have two load units
@@ -914,11 +961,11 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                     add_into,
-                               const unsigned int             n_entries,
-                               const VectorizedArray<double> *in,
-                               const unsigned int *           offsets,
-                               double *                       out)
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 8> *in,
+                               const unsigned int *              offsets,
+                               double *                          out)
 {
   // as for the load, we split the store operations into 256 bit units to
   // better balance between code size, shuffle instructions, and stores
@@ -996,7 +1043,7 @@ vectorized_transpose_and_store(const bool                     add_into,
  * Specialization for float and AVX512.
  */
 template <>
-class VectorizedArray<float>
+class VectorizedArray<float, 16>
 {
 public:
   /**
@@ -1262,18 +1309,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -1283,10 +1332,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int      n_entries,
-                              const float *           in,
-                              const unsigned int *    offsets,
-                              VectorizedArray<float> *out)
+vectorized_load_and_transpose(const unsigned int          n_entries,
+                              const float *               in,
+                              const unsigned int *        offsets,
+                              VectorizedArray<float, 16> *out)
 {
   // Similar to the double case, we perform the work on smaller entities. In
   // this case, we start from 128 bit arrays and insert them into a full 512
@@ -1346,11 +1395,11 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                    add_into,
-                               const unsigned int            n_entries,
-                               const VectorizedArray<float> *in,
-                               const unsigned int *          offsets,
-                               float *                       out)
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<float, 16> *in,
+                               const unsigned int *              offsets,
+                               float *                           out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -1453,15 +1502,15 @@ vectorized_transpose_and_store(const bool                    add_into,
         out[offsets[v] + i] = in[i][v];
 }
 
+#endif
 
-
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX.
  */
 template <>
-class VectorizedArray<double>
+class VectorizedArray<double, 4>
 {
 public:
   /**
@@ -1718,18 +1767,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -1739,10 +1790,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int       n_entries,
-                              const double *           in,
-                              const unsigned int *     offsets,
-                              VectorizedArray<double> *out)
+vectorized_load_and_transpose(const unsigned int          n_entries,
+                              const double *              in,
+                              const unsigned int *        offsets,
+                              VectorizedArray<double, 4> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   const double *     in0      = in + offsets[0];
@@ -1778,11 +1829,11 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                     add_into,
-                               const unsigned int             n_entries,
-                               const VectorizedArray<double> *in,
-                               const unsigned int *           offsets,
-                               double *                       out)
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 4> *in,
+                               const unsigned int *              offsets,
+                               double *                          out)
 {
   const unsigned int n_chunks = n_entries / 4;
   double *           out0     = out + offsets[0];
@@ -1844,7 +1895,7 @@ vectorized_transpose_and_store(const bool                     add_into,
  * Specialization for float and AVX.
  */
 template <>
-class VectorizedArray<float>
+class VectorizedArray<float, 8>
 {
 public:
   /**
@@ -2101,18 +2152,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -2122,10 +2175,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int      n_entries,
-                              const float *           in,
-                              const unsigned int *    offsets,
-                              VectorizedArray<float> *out)
+vectorized_load_and_transpose(const unsigned int         n_entries,
+                              const float *              in,
+                              const unsigned int *       offsets,
+                              VectorizedArray<float, 8> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -2164,11 +2217,11 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                    add_into,
-                               const unsigned int            n_entries,
-                               const VectorizedArray<float> *in,
-                               const unsigned int *          offsets,
-                               float *                       out)
+vectorized_transpose_and_store(const bool                       add_into,
+                               const unsigned int               n_entries,
+                               const VectorizedArray<float, 8> *in,
+                               const unsigned int *             offsets,
+                               float *                          out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -2240,15 +2293,15 @@ vectorized_transpose_and_store(const bool                    add_into,
         out[offsets[v] + i] = in[i][v];
 }
 
+#endif
 
-
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
  */
 template <>
-class VectorizedArray<double>
+class VectorizedArray<double, 2>
 {
 public:
   /**
@@ -2491,18 +2544,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -2512,10 +2567,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int       n_entries,
-                              const double *           in,
-                              const unsigned int *     offsets,
-                              VectorizedArray<double> *out)
+vectorized_load_and_transpose(const unsigned int          n_entries,
+                              const double *              in,
+                              const unsigned int *        offsets,
+                              VectorizedArray<double, 2> *out)
 {
   const unsigned int n_chunks = n_entries / 2;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -2539,11 +2594,11 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                     add_into,
-                               const unsigned int             n_entries,
-                               const VectorizedArray<double> *in,
-                               const unsigned int *           offsets,
-                               double *                       out)
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 2> *in,
+                               const unsigned int *              offsets,
+                               double *                          out)
 {
   const unsigned int n_chunks = n_entries / 2;
   if (add_into)
@@ -2590,7 +2645,7 @@ vectorized_transpose_and_store(const bool                     add_into,
  * Specialization for float and SSE2.
  */
 template <>
-class VectorizedArray<float>
+class VectorizedArray<float, 4>
 {
 public:
   /**
@@ -2833,18 +2888,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
@@ -2854,10 +2911,10 @@ private:
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int      n_entries,
-                              const float *           in,
-                              const unsigned int *    offsets,
-                              VectorizedArray<float> *out)
+vectorized_load_and_transpose(const unsigned int         n_entries,
+                              const float *              in,
+                              const unsigned int *       offsets,
+                              VectorizedArray<float, 4> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -2889,11 +2946,11 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_transpose_and_store(const bool                    add_into,
-                               const unsigned int            n_entries,
-                               const VectorizedArray<float> *in,
-                               const unsigned int *          offsets,
-                               float *                       out)
+vectorized_transpose_and_store(const bool                       add_into,
+                               const unsigned int               n_entries,
+                               const VectorizedArray<float, 4> *in,
+                               const unsigned int *             offsets,
+                               float *                          out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -2949,12 +3006,11 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 #endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
 
-
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && \
   defined(__VSX__)
 
 template <>
-class VectorizedArray<double>
+class VectorizedArray<double, 2>
 {
 public:
   /**
@@ -3150,24 +3206,26 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 
 
 template <>
-class VectorizedArray<float>
+class VectorizedArray<float, 4>
 {
 public:
   /**
@@ -3363,18 +3421,20 @@ private:
   /**
    * Make a few functions friends.
    */
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::sqrt(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::abs(const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::max(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
-  template <typename Number2>
-  friend VectorizedArray<Number2>
-  std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, int width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
 };
 
 #endif // if DEAL_II_VECTORIZATION_LEVEL >=1 && defined(__ALTIVEC__) &&
@@ -3387,12 +3447,13 @@ private:
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
+template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE bool
-operator==(const VectorizedArray<Number> &lhs,
-           const VectorizedArray<Number> &rhs)
+operator==(const VectorizedArray<Number, width> &lhs,
+           const VectorizedArray<Number, width> &rhs)
 {
-  for (unsigned int i = 0; i < VectorizedArray<Number>::n_array_elements; ++i)
+  for (unsigned int i = 0; i < VectorizedArray<Number, width>::n_array_elements;
+       ++i)
     if (lhs[i] != rhs[i])
       return false;
 
@@ -3405,11 +3466,12 @@ operator==(const VectorizedArray<Number> &lhs,
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator+(const VectorizedArray<Number> &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator+(const VectorizedArray<Number, width> &u,
+          const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp += v;
 }
 
@@ -3418,11 +3480,12 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator-(const VectorizedArray<Number> &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator-(const VectorizedArray<Number, width> &u,
+          const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp -= v;
 }
 
@@ -3431,11 +3494,12 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const VectorizedArray<Number> &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator*(const VectorizedArray<Number, width> &u,
+          const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp *= v;
 }
 
@@ -3444,11 +3508,12 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator/(const VectorizedArray<Number> &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator/(const VectorizedArray<Number, width> &u,
+          const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp /= v;
 }
 
@@ -3458,11 +3523,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator+(const Number &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return tmp += v;
 }
@@ -3475,10 +3540,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator+(const double u, const VectorizedArray<float> &v)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator+(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = u;
   return tmp += v;
 }
@@ -3489,9 +3555,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator+(const VectorizedArray<Number> &v, const Number &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator+(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u + v;
 }
@@ -3504,8 +3570,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator+(const VectorizedArray<float> &v, const double u)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator+(const VectorizedArray<float, width> &v, const double u)
 {
   return u + v;
 }
@@ -3516,11 +3583,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator-(const Number &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return tmp -= v;
 }
@@ -3533,10 +3600,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator-(const double u, const VectorizedArray<float> &v)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator-(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = float(u);
   return tmp -= v;
 }
@@ -3547,11 +3615,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator-(const VectorizedArray<Number> &v, const Number &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return v - tmp;
 }
@@ -3564,10 +3632,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator-(const VectorizedArray<float> &v, const double u)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator-(const VectorizedArray<float, width> &v, const double u)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = float(u);
   return v - tmp;
 }
@@ -3578,11 +3647,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const Number &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return tmp *= v;
 }
@@ -3595,10 +3664,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const double u, const VectorizedArray<float> &v)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator*(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = float(u);
   return tmp *= v;
 }
@@ -3609,9 +3679,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const VectorizedArray<Number> &v, const Number &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator*(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u * v;
 }
@@ -3624,8 +3694,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const VectorizedArray<float> &v, const double u)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator*(const VectorizedArray<float, width> &v, const double u)
 {
   return u * v;
 }
@@ -3636,11 +3707,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator/(const Number &u, const VectorizedArray<Number> &v)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return tmp /= v;
 }
@@ -3653,10 +3724,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator/(const double u, const VectorizedArray<float> &v)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator/(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = float(u);
   return tmp /= v;
 }
@@ -3667,11 +3739,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator/(const VectorizedArray<Number> &v, const Number &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
-  VectorizedArray<Number> tmp;
+  VectorizedArray<Number, width> tmp;
   tmp = u;
   return v / tmp;
 }
@@ -3684,10 +3756,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator/(const VectorizedArray<float> &v, const double u)
+template <int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+                             operator/(const VectorizedArray<float, width> &v, const double u)
 {
-  VectorizedArray<float> tmp;
+  VectorizedArray<float, width> tmp;
   tmp = float(u);
   return v / tmp;
 }
@@ -3697,9 +3770,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator+(const VectorizedArray<Number> &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator+(const VectorizedArray<Number, width> &u)
 {
   return u;
 }
@@ -3709,13 +3782,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator-(const VectorizedArray<Number> &u)
+template <typename Number, int width>
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+                             operator-(const VectorizedArray<Number, width> &u)
 {
   // to get a negative sign, subtract the input from zero (could also
   // multiply by -1, but this one is slightly simpler)
-  return VectorizedArray<Number>() - u;
+  return VectorizedArray<Number, width>() - u;
 }
 
 
@@ -3737,21 +3810,21 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  sin(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  sin(const ::dealii::VectorizedArray<Number, width> &x)
   {
     // put values in an array and later read in that array with an unaligned
     // read. This should save some instructions as compared to directly
     // setting the individual elements and also circumvents a compiler
     // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
     // from April 2014, topic "matrix_free/step-48 Test").
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::sin(x[i]);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3765,16 +3838,16 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  cos(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  cos(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::cos(x[i]);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3788,16 +3861,16 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  tan(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  tan(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::tan(x[i]);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3811,16 +3884,16 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  exp(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  exp(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::exp(x[i]);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3834,16 +3907,16 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  log(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  log(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::log(x[i]);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3857,9 +3930,9 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  sqrt(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  sqrt(const ::dealii::VectorizedArray<Number, width> &x)
   {
     return x.get_sqrt();
   }
@@ -3873,16 +3946,16 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  pow(const ::dealii::VectorizedArray<Number> &x, const Number p)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &x, const Number p)
   {
-    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
     for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
          ++i)
       values[i] = std::pow(x[i], p);
-    ::dealii::VectorizedArray<Number> out;
+    ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;
   }
@@ -3896,9 +3969,9 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  abs(const ::dealii::VectorizedArray<Number> &x)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  abs(const ::dealii::VectorizedArray<Number, width> &x)
   {
     return x.get_abs();
   }
@@ -3912,10 +3985,10 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  max(const ::dealii::VectorizedArray<Number> &x,
-      const ::dealii::VectorizedArray<Number> &y)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  max(const ::dealii::VectorizedArray<Number, width> &x,
+      const ::dealii::VectorizedArray<Number, width> &y)
   {
     return x.get_max(y);
   }
@@ -3929,10 +4002,10 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number>
-  inline ::dealii::VectorizedArray<Number>
-  min(const ::dealii::VectorizedArray<Number> &x,
-      const ::dealii::VectorizedArray<Number> &y)
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  min(const ::dealii::VectorizedArray<Number, width> &x,
+      const ::dealii::VectorizedArray<Number, width> &y)
   {
     return x.get_min(y);
   }
