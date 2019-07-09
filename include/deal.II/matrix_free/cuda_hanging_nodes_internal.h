@@ -900,7 +900,6 @@ namespace CUDAWrappers
           (((constraint_mask & face1) && on_face1) ||
            ((constraint_mask & face2) && on_face2) ||
            ((constraint_mask & edge) && on_face1 && on_face2));
-        (direction == 0) ? z_idx : (direction == 1) ? x_idx : y_idx;
 
         if (constrained_face && constrained_dof)
           {
