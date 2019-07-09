@@ -20,6 +20,7 @@ DEAL_II_NAMESPACE_OPEN
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && !defined(DEAL_II_MSVC)
 const unsigned int VectorizedArray<double>::n_array_elements;
 const unsigned int VectorizedArray<float>::n_array_elements;
+#endif
 
 // VectorizedArray must be a POD (plain old data) type to make sure it
 // can use maximum level of compiler optimization.
@@ -33,6 +34,5 @@ static_assert(std::is_standard_layout<VectorizedArray<double>>::value &&
 static_assert(std::is_standard_layout<VectorizedArray<float>>::value &&
                 std::is_trivial<VectorizedArray<float>>::value,
               "VectorizedArray<float> must be a POD type");
-#endif
 
 DEAL_II_NAMESPACE_CLOSE
