@@ -8,6 +8,10 @@ BOOL            := { true; false }
 // real scalar floating point types
 REAL_SCALARS    := { double; float }
 
+// real scalar floating point types (vectorized)
+REAL_SCALARS_VECTORIZED    := { @DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED@; }
+FLOAT_VECTORIZED           := { @DEAL_II_EXPAND_FLOAT_VECTORIZED@; }
+
 // complex scalar types
 COMPLEX_SCALARS := { 
     @DEAL_II_EXPAND_COMPLEX_SCALARS@;
