@@ -497,8 +497,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
           eps_phi_j = get_strain (fe_values, j, q_point);
 
         cell_matrix(i,j)
-          += (eps_phi_i * stress_strain_tensor * eps_phi_j
-              *
+          += (eps_phi_i * stress_strain_tensor * eps_phi_j *
               fe_values.JxW (q_point));
       }
   @endcode
@@ -542,8 +541,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
                         fe_values.shape_value (i,q_point)
                         -
                         old_stress *
-                        get_strain (fe_values,i,q_point))
-                       *
+                        get_strain (fe_values,i,q_point)) *
                        fe_values.JxW (q_point);
       }
   }
