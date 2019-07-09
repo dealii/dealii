@@ -261,6 +261,75 @@ namespace hp
 
 
     /**
+     * Error prediction
+     */
+    template <int dim, typename Number, int spacedim>
+    void
+    predict_error(const hp::DoFHandler<dim, spacedim> &dof_handler,
+                  const Vector<Number> &               error_indicators,
+                  Vector<Number> &                     predicted_errors,
+                  const double                         gamma_p,
+                  const double                         gamma_h,
+                  const double                         gamma_n)
+    {
+      AssertDimension(dof_handler.get_triangulation().n_active_cells(),
+                      error_indicators.size());
+      AssertDimension(dof_handler.get_triangulation().n_active_cells(),
+                      predicted_errors.size());
+      Assert(0 < gamma_p && gamma_p < 1,
+             dealii::GridRefinement::ExcInvalidParameterValue());
+      Assert(0 < gamma_h, dealii::GridRefinement::ExcInvalidParameterValue());
+      Assert(0 < gamma_n, dealii::GridRefinement::ExcInvalidParameterValue());
+
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->is_locally_owned())
+          {
+            const unsigned int active_cell_index = cell->active_cell_index();
+
+            if (cell->future_fe_index_set()) // p adaptation
+              {
+                Assert(!cell->refine_flag_set() && !cell->coarsen_flag_set(),
+                       ExcMessage("Cell has to be either flagged for h or p "
+                                  "adaptation, and not for both!"));
+
+                const int degree_difference =
+                  dof_handler.get_fe_collection()[cell->future_fe_index()]
+                    .degree -
+                  cell->get_fe().degree;
+
+                predicted_errors[active_cell_index] =
+                  error_indicators[active_cell_index] *
+                  std::pow(gamma_p, degree_difference);
+              }
+            else if (cell->refine_flag_set()) // h refinement
+              {
+                Assert(
+                  cell->refine_flag_set() ==
+                    RefinementCase<dim>::isotropic_refinement,
+                  ExcMessage(
+                    "Error prediction is only valid for isotropic refinement!"));
+
+                predicted_errors[active_cell_index] =
+                  error_indicators[active_cell_index] *
+                  (gamma_h * std::pow(.5, dim + cell->get_fe().degree));
+              }
+            else if (cell->coarsen_flag_set()) // h coarsening
+              {
+                predicted_errors[active_cell_index] =
+                  error_indicators[active_cell_index] /
+                  (gamma_h * std::pow(.5, cell->get_fe().degree));
+              }
+            else // no changes
+              {
+                predicted_errors[active_cell_index] =
+                  error_indicators[active_cell_index] * gamma_n;
+              }
+          }
+    }
+
+
+
+    /**
      * Decide between h and p adaptivity
      */
     template <int dim, int spacedim>
