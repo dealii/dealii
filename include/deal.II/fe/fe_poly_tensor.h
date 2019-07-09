@@ -216,6 +216,18 @@ protected:
    */
   std::vector<MappingType> mapping_type;
 
+  /**
+   * Returns a boolean that is true when the finite element uses a single
+   * mapping and false when the finite element uses multiple mappings.
+   */
+  bool
+  single_mapping() const;
+
+  /**
+   * Returns MappingType @p i for the finite element.
+   */
+  MappingType
+  get_mapping_type(unsigned int i) const;
 
   /* NOTE: The following function has its definition inlined into the class
      declaration because we otherwise run into a compiler error with MS Visual
@@ -254,19 +266,17 @@ protected:
     // allocate memory
 
     const bool update_transformed_shape_values =
-      (std::find_if(this->mapping_type.begin(),
-                    this->mapping_type.end(),
-                    [](const MappingType t) { return t != mapping_none; }) !=
-       this->mapping_type.end());
+      std::any_of(this->mapping_type.begin(),
+                  this->mapping_type.end(),
+                  [](const MappingType t) { return t != mapping_none; });
 
     const bool update_transformed_shape_grads =
-      (std::find_if(this->mapping_type.begin(),
-                    this->mapping_type.end(),
-                    [](const MappingType t) {
-                      return (t == mapping_raviart_thomas ||
-                              t == mapping_piola || t == mapping_nedelec ||
-                              t == mapping_contravariant);
-                    }) != this->mapping_type.end());
+      std::any_of(this->mapping_type.begin(),
+                  this->mapping_type.end(),
+                  [](const MappingType t) {
+                    return (t == mapping_raviart_thomas || t == mapping_piola ||
+                            t == mapping_nedelec || t == mapping_contravariant);
+                  });
 
     const bool update_transformed_shape_hessian_tensors =
       update_transformed_shape_values;

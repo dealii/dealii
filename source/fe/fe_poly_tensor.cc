@@ -158,7 +158,8 @@ namespace internal
         // TODO: This is probably only going to work for those elements for
         // which all dofs are face dofs
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) & mapping_type[0] == mapping_nedelec)
+          if (!(cell->line_orientation(l)) &&
+              mapping_type[0] == mapping_nedelec)
             face_sign[l] = -1.0;
       }
     } // namespace
@@ -189,6 +190,28 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::FE_PolyTensor(
   // the component itself
   for (unsigned int comp = 0; comp < this->n_components(); ++comp)
     this->component_to_base_table[comp].first.second = comp;
+}
+
+
+
+template <class PolynomialType, int dim, int spacedim>
+bool
+FE_PolyTensor<PolynomialType, dim, spacedim>::single_mapping() const
+{
+  return mapping_type.size() == 1;
+}
+
+
+
+template <class PolynomialType, int dim, int spacedim>
+MappingType
+FE_PolyTensor<PolynomialType, dim, spacedim>::get_mapping_type(
+  unsigned int i) const
+{
+  if (single_mapping())
+    return mapping_type[0];
+  Assert(i < mapping_type.size(), ExcIndexRange(i, 0, mapping_type.size()));
+  return mapping_type[i];
 }
 
 
@@ -392,9 +415,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      MappingType mapping_type =
-        (this->mapping_type.size() > 1 ? this->mapping_type[i] :
-                                         this->mapping_type[0]);
+      const MappingType mapping_type = get_mapping_type(i);
 
       const unsigned int first =
         output_data.shape_function_to_row_table[i * this->n_components() +
@@ -972,9 +993,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      const MappingType mapping_type =
-        (this->mapping_type.size() > 1 ? this->mapping_type[i] :
-                                         this->mapping_type[0]);
+      const MappingType mapping_type = get_mapping_type(i);
 
       const unsigned int first =
         output_data.shape_function_to_row_table[i * this->n_components() +
@@ -1604,9 +1623,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      MappingType mapping_type =
-        (this->mapping_type.size() > 1 ? this->mapping_type[i] :
-                                         this->mapping_type[0]);
+      const MappingType mapping_type = get_mapping_type(i);
 
       const unsigned int first =
         output_data.shape_function_to_row_table[i * this->n_components() +
@@ -2170,9 +2187,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::requires_update_flags(
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      MappingType mapping_type =
-        (this->mapping_type.size() > 1 ? this->mapping_type[i] :
-                                         this->mapping_type[0]);
+      const MappingType mapping_type = get_mapping_type(i);
 
       switch (mapping_type)
         {
