@@ -28,6 +28,7 @@
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
+#   DEAL_II_CONSTEXPR
 #   DEAL_II_FALLTHROUGH
 #
 
@@ -752,6 +753,18 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+
+#
+# The macro DEAL_II_CONSTEXPR allows using c++ constexpr features in a portable way.
+# Here we enable it only when a constexpr function can call simple non-constexpr
+# functions. This requirement is probabely very conservative in most cases, but
+# it will prevent breaking builds with certain compilers.
+#
+IF (DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+  SET(DEAL_II_CONSTEXPR "constexpr")
+ELSE()
+  SET(DEAL_II_CONSTEXPR " ")
+ENDIF()
 
 #
 # Not all compilers with C++17 support include the new special math
