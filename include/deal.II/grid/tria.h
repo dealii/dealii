@@ -3556,6 +3556,18 @@ public:
                  << "The given boundary_id " << arg1
                  << " is not defined in this Triangulation!");
 
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(
+    ExcInconsistentCoarseningFlags,
+    "A cell is flagged for coarsening, but either not all of its siblings "
+    "are active or flagged for coarsening as well. Please clean up all "
+    "coarsen flags on your triangulation via "
+    "Triangulation::prepare_coarsening_and_refinement() beforehand!");
+
   /*
    * @}
    */

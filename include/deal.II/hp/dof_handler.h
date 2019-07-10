@@ -26,8 +26,6 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <deal.II/distributed/cell_data_transfer.templates.h>
-
 #include <deal.II/dofs/deprecated_function_map.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
@@ -46,6 +44,15 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 class Triangulation;
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int dim, int spacedim, typename VectorType>
+    class CellDataTransfer;
+  }
+} // namespace parallel
 
 namespace internal
 {

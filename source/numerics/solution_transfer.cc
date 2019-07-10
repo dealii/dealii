@@ -356,17 +356,6 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
       // CASE 2: cell is inactive but will become active
       else if (cell->has_children() && cell->child(0)->coarsen_flag_set())
         {
-          // note that if one child has the
-          // coarsen flag, then all should
-          // have if Tria::prepare_* has
-          // worked correctly
-          for (unsigned int i = 1; i < cell->n_children(); ++i)
-            Assert(cell->child(i)->coarsen_flag_set(),
-                   ExcMessage(
-                     "It looks like you didn't call "
-                     "Triangulation::prepare_coarsening_and_refinement before "
-                     "calling the current function. This can't work."));
-
           // we will need to interpolate from the children of this cell
           // to the current one. in the hp context, this also means
           // we need to figure out which finite element space to interpolate
@@ -376,18 +365,23 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           std::set<unsigned int> fe_indices_children;
           for (unsigned int child_index = 0; child_index < cell->n_children();
                ++child_index)
-            fe_indices_children.insert(
-              cell->child(child_index)->active_fe_index());
+            {
+              const auto child = cell->child(child_index);
+              Assert(child->active() && child->coarsen_flag_set(),
+                     typename dealii::Triangulation<
+                       dim>::ExcInconsistentCoarseningFlags());
+
+              fe_indices_children.insert(child->active_fe_index());
+            }
+          Assert(!fe_indices_children.empty(), ExcInternalError());
 
           const unsigned int target_fe_index =
             dof_handler->get_fe_collection().find_dominated_fe_extended(
               fe_indices_children, /*codim=*/0);
 
           Assert(target_fe_index != numbers::invalid_unsigned_int,
-                 ExcMessage(
-                   "No FiniteElement has been found in your FECollection "
-                   "that is dominated by all children of a cell you are "
-                   "trying to coarsen!"));
+                 typename dealii::hp::FECollection<
+                   dim>::ExcNoDominatedFiniteElementAmongstChildren());
 
           const unsigned int dofs_per_cell =
             dof_handler->get_fe(target_fe_index).dofs_per_cell;

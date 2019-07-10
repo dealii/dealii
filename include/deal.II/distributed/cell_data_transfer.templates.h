@@ -63,17 +63,60 @@ namespace parallel
     template <int dim, int spacedim, typename VectorType>
     CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
       const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
-      const bool                         transfer_variable_size_data,
-      const std::function<typename VectorType::value_type(
-        const typename parallel::distributed::Triangulation<dim, spacedim>::
-          cell_iterator & parent,
-        const VectorType &input_vector)> coarsening_strategy)
+      const bool transfer_variable_size_data,
+      const std::function<value_type(
+        const std::vector<value_type> &children_values)> coarsening_strategy)
       : triangulation(&triangulation, typeid(*this).name())
       , transfer_variable_size_data(transfer_variable_size_data)
       , coarsening_strategy(coarsening_strategy)
       , handle(numbers::invalid_unsigned_int)
     {}
 
+    template <int dim, int spacedim, typename VectorType>
+    DEAL_II_DEPRECATED
+    CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
+      const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
+      const bool transfer_variable_size_data,
+      const std::function<
+        value_type(const typename parallel::distributed::
+                     Triangulation<dim, spacedim>::cell_iterator &parent,
+                   const VectorType &input_vector)> coarsening_strategy)
+      : triangulation(&triangulation, typeid(*this).name())
+      , transfer_variable_size_data(transfer_variable_size_data)
+      , handle(numbers::invalid_unsigned_int)
+    {
+      value_type (*const *old_strategy)(
+        const typename parallel::distributed::Triangulation<dim, spacedim>::
+          cell_iterator &,
+        const VectorType &) =
+        coarsening_strategy.template target<
+          value_type (*)(const typename parallel::distributed::
+                           Triangulation<dim, spacedim>::cell_iterator &,
+                         const VectorType &)>();
+
+      if (*old_strategy == CoarseningStrategies::check_equality)
+        const_cast<
+          std::function<value_type(const std::vector<value_type> &)> &>(
+          this->coarsening_strategy) =
+          &dealii::CoarseningStrategies::check_equality<value_type>;
+      else if (*old_strategy == CoarseningStrategies::sum)
+        const_cast<
+          std::function<value_type(const std::vector<value_type> &)> &>(
+          this->coarsening_strategy) =
+          &dealii::CoarseningStrategies::sum<value_type>;
+      else if (*old_strategy == CoarseningStrategies::mean)
+        const_cast<
+          std::function<value_type(const std::vector<value_type> &)> &>(
+          this->coarsening_strategy) =
+          &dealii::CoarseningStrategies::mean<value_type>;
+      else
+        Assert(
+          false,
+          ExcMessage(
+            "The constructor using the former function type of the "
+            "coarsening_strategy parameter is no longer supported. Please use "
+            "the latest function type instead"));
+    }
 
 
     // Interface for packing
@@ -226,8 +269,7 @@ namespace parallel
                                                           spacedim>::CellStatus
         status)
     {
-      std::vector<typename VectorType::value_type> cell_data(
-        input_vectors.size());
+      std::vector<value_type> cell_data(input_vectors.size());
 
       // Extract data from input_vectors for this particular cell.
       auto it_input  = input_vectors.cbegin();
@@ -247,10 +289,26 @@ namespace parallel
 
               case parallel::distributed::Triangulation<dim,
                                                         spacedim>::CELL_COARSEN:
-                // Cell is parent whose children will get coarsened to.
-                // Decide data to store on parent by provided strategy.
-                *it_output = coarsening_strategy(cell, *(*it_input));
-                break;
+                {
+                  // Cell is parent whose children will get coarsened to.
+                  // Decide data to store on parent by provided strategy.
+                  std::vector<value_type> children_values(cell->n_children());
+                  for (unsigned int child_index = 0;
+                       child_index < cell->n_children();
+                       ++child_index)
+                    {
+                      const auto child = cell->child(child_index);
+                      Assert(child->active() && child->coarsen_flag_set(),
+                             typename dealii::Triangulation<
+                               dim>::ExcInconsistentCoarseningFlags());
+
+                      children_values[child_index] =
+                        (**it_input)[child->active_cell_index()];
+                    }
+
+                  *it_output = coarsening_strategy(children_values);
+                  break;
+                }
 
               default:
                 Assert(false, ExcInternalError());
@@ -281,21 +339,20 @@ namespace parallel
         &                        data_range,
       std::vector<VectorType *> &all_out)
     {
-      std::vector<typename VectorType::value_type> cell_data;
+      std::vector<value_type> cell_data;
 
       // We have to unpack the corresponding datatype that has been packed
       // beforehand.
       if (all_out.size() == 1)
-        cell_data.push_back(Utilities::unpack<typename VectorType::value_type>(
+        cell_data.push_back(Utilities::unpack<value_type>(
           data_range.begin(),
           data_range.end(),
           /*allow_compression=*/transfer_variable_size_data));
       else
-        cell_data =
-          Utilities::unpack<std::vector<typename VectorType::value_type>>(
-            data_range.begin(),
-            data_range.end(),
-            /*allow_compression=*/transfer_variable_size_data);
+        cell_data = Utilities::unpack<std::vector<value_type>>(
+          data_range.begin(),
+          data_range.end(),
+          /*allow_compression=*/transfer_variable_size_data);
 
       // Check if sizes match.
       Assert(cell_data.size() == all_out.size(), ExcInternalError());

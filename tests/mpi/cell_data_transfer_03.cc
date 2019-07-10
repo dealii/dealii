@@ -29,13 +29,10 @@
 #include "../tests.h"
 
 
-template <int dim, int spacedim>
 std::vector<int>
-get_data_of_first_child(const typename parallel::distributed::
-                          Triangulation<dim, spacedim>::cell_iterator &parent,
-                        const std::vector<std::vector<int>> &input_vector)
+get_data_of_first_child(const std::vector<std::vector<int>> &children_values)
 {
-  return input_vector[parent->child(0)->active_cell_index()];
+  return children_values[0];
 }
 
 
@@ -89,10 +86,9 @@ test()
   // ----- transfer -----
   parallel::distributed::
     CellDataTransfer<dim, spacedim, std::vector<std::vector<int>>>
-      cell_data_transfer(
-        tria,
-        /*transfer_variable_size_data=*/true,
-        /*coarsening_strategy=*/&get_data_of_first_child<dim, spacedim>);
+      cell_data_transfer(tria,
+                         /*transfer_variable_size_data=*/true,
+                         /*coarsening_strategy=*/&get_data_of_first_child);
 
   cell_data_transfer.prepare_for_coarsening_and_refinement(cell_data);
   tria.execute_coarsening_and_refinement();

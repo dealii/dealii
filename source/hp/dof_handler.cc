@@ -18,6 +18,7 @@
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/distributed/cell_data_transfer.templates.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -35,6 +36,8 @@
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
+
+#include <deal.II/numerics/coarsening_strategies.h>
 
 #include <boost/serialization/array.hpp>
 
@@ -1120,6 +1123,7 @@ namespace internal
                     // particular cell has a parent at all.
                     Assert(cell->level() > 0, ExcInternalError());
                     const auto &parent = cell->parent();
+
                     // Check if the active_fe_index for the current cell has
                     // been determined already.
                     if (fe_transfer->coarsened_cells_fe_index.find(parent) ==
@@ -1134,11 +1138,14 @@ namespace internal
                              child_index < parent->n_children();
                              ++child_index)
                           {
-                            Assert(parent->child(child_index)->active(),
-                                   ExcInternalError());
+                            const auto sibling = parent->child(child_index);
+                            Assert(sibling->active() &&
+                                     sibling->coarsen_flag_set(),
+                                   typename dealii::Triangulation<
+                                     dim>::ExcInconsistentCoarseningFlags());
 
                             fe_indices_children.insert(
-                              parent->child(child_index)->future_fe_index());
+                              sibling->future_fe_index());
                           }
                         Assert(!fe_indices_children.empty(),
                                ExcInternalError());
@@ -1147,12 +1154,9 @@ namespace internal
                           dof_handler.fe_collection.find_dominated_fe_extended(
                             fe_indices_children, /*codim=*/0);
 
-                        Assert(
-                          fe_index != numbers::invalid_unsigned_int,
-                          ExcMessage(
-                            "No FiniteElement has been found in your FECollection "
-                            "that is dominated by all children of a cell you are "
-                            "trying to coarsen!"));
+                        Assert(fe_index != numbers::invalid_unsigned_int,
+                               typename dealii::hp::FECollection<dim>::
+                                 ExcNoDominatedFiniteElementAmongstChildren());
 
                         fe_transfer->coarsened_cells_fe_index.insert(
                           {parent, fe_index});
@@ -1184,22 +1188,22 @@ namespace internal
           const auto &fe_transfer = dof_handler.active_fe_index_transfer;
 
           // Set active_fe_indices on persisting cells.
-          for (const auto &pair : fe_transfer->persisting_cells_fe_index)
+          for (const auto &persist : fe_transfer->persisting_cells_fe_index)
             {
-              const auto &cell = pair.first;
+              const auto &cell = persist.first;
 
               if (cell->is_locally_owned())
                 {
                   Assert(cell->active(), ExcInternalError());
-                  cell->set_active_fe_index(pair.second);
+                  cell->set_active_fe_index(persist.second);
                 }
             }
 
           // Distribute active_fe_indices from all refined cells on their
           // respective children.
-          for (const auto &pair : fe_transfer->refined_cells_fe_index)
+          for (const auto &refine : fe_transfer->refined_cells_fe_index)
             {
-              const auto &parent = pair.first;
+              const auto &parent = refine.first;
 
               for (unsigned int child_index = 0;
                    child_index < parent->n_children();
@@ -1208,18 +1212,18 @@ namespace internal
                   const auto &child = parent->child(child_index);
                   Assert(child->is_locally_owned() && child->active(),
                          ExcInternalError());
-                  child->set_active_fe_index(pair.second);
+                  child->set_active_fe_index(refine.second);
                 }
             }
 
           // Set active_fe_indices on coarsened cells that have been determined
           // before the actual coarsening happened.
-          for (const auto &pair : fe_transfer->coarsened_cells_fe_index)
+          for (const auto &coarsen : fe_transfer->coarsened_cells_fe_index)
             {
-              const auto &cell = pair.first;
+              const auto &cell = coarsen.first;
               Assert(cell->is_locally_owned() && cell->active(),
                      ExcInternalError());
-              cell->set_active_fe_index(pair.second);
+              cell->set_active_fe_index(coarsen.second);
             }
         }
       };
@@ -2085,10 +2089,7 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &parallel::distributed::CellDataTransfer<
-            dim,
-            spacedim,
-            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+          &CoarseningStrategies::check_equality<unsigned int>);
 
         active_fe_index_transfer->cell_data_transfer
           ->prepare_for_coarsening_and_refinement(
@@ -2191,10 +2192,7 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &parallel::distributed::CellDataTransfer<
-            dim,
-            spacedim,
-            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+          &CoarseningStrategies::check_equality<unsigned int>);
 
         // If we work on a p::d::Triangulation, we have to transfer all
         // active fe indices since ownership of cells may change.
@@ -2267,10 +2265,7 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &parallel::distributed::CellDataTransfer<
-            dim,
-            spacedim,
-            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+          &CoarseningStrategies::check_equality<unsigned int>);
 
         // Unpack active_fe_indices.
         active_fe_index_transfer->active_fe_indices.resize(
