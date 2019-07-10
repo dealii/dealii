@@ -148,15 +148,21 @@ public:
    * Constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  constexpr Tensor(const Tensor<0, dim, OtherNumber> &initializer);
+  constexpr DEAL_II_CUDA_HOST_DEV
+  Tensor(const Tensor<0, dim, OtherNumber> &initializer);
 
   /**
    * Constructor, where the data is copied from a C-style array.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  constexpr Tensor(const OtherNumber &initializer);
+  constexpr DEAL_II_CUDA_HOST_DEV
+  Tensor(const OtherNumber &initializer);
 
   /**
    * Return a pointer to the first element of the underlying storage.
@@ -208,10 +214,12 @@ public:
    * Assignment from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator=(const Tensor<0, dim, OtherNumber> &rhs);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator=(const Tensor<0, dim, OtherNumber> &rhs);
 
 #ifdef __INTEL_COMPILER
   /**
@@ -219,18 +227,22 @@ public:
    * This is needed for ICC15 because it can't generate a suitable
    * copy constructor for Sacado::Rad::ADvar types automatically.
    * See https://github.com/dealii/dealii/pull/5865.
+   *
+   * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CONSTEXPR Tensor &
-                    operator=(const Tensor<0, dim, Number> &rhs);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator=(const Tensor<0, dim, Number> &rhs);
 #endif
 
   /**
    * This operator assigns a scalar to a tensor. This obviously requires
    * that the @p OtherNumber type is convertible to @p Number.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator=(const OtherNumber &d);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator=(const OtherNumber &d);
 
   /**
    * Test for equality of two tensors.
@@ -247,18 +259,22 @@ public:
   operator!=(const Tensor<0, dim, OtherNumber> &rhs) const;
 
   /**
-   * Add another scalar
+   * Add another scalar.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator+=(const Tensor<0, dim, OtherNumber> &rhs);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator+=(const Tensor<0, dim, OtherNumber> &rhs);
 
   /**
    * Subtract another scalar.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator-=(const Tensor<0, dim, OtherNumber> &rhs);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator-=(const Tensor<0, dim, OtherNumber> &rhs);
 
   /**
    * Multiply the scalar with a <tt>factor</tt>.
@@ -271,16 +287,20 @@ public:
 
   /**
    * Divide the scalar by <tt>factor</tt>.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator/=(const OtherNumber &factor);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator/=(const OtherNumber &factor);
 
   /**
    * Tensor with inverted entries.
+   *
+   * @note This function can also be used in CUDA device code.
    */
-  constexpr Tensor
-  operator-() const;
+  constexpr DEAL_II_CUDA_HOST_DEV Tensor
+                                  operator-() const;
 
   /**
    * Reset all values to zero.
@@ -442,16 +462,22 @@ public:
 
   /**
    * Constructor, where the data is copied from a C-style array.
+   *
+   * @note This function can also be used in CUDA device code.
    */
-  constexpr explicit Tensor(const array_type &initializer);
+  constexpr DEAL_II_CUDA_HOST_DEV explicit Tensor(
+    const array_type &initializer);
 
   /**
    * Constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  constexpr Tensor(const Tensor<rank_, dim, OtherNumber> &initializer);
+  constexpr DEAL_II_CUDA_HOST_DEV
+  Tensor(const Tensor<rank_, dim, OtherNumber> &initializer);
 
   /**
    * Constructor that converts from a "tensor of tensors".
@@ -522,10 +548,12 @@ public:
    * Assignment operator from tensors with different underlying scalar type.
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator=(const Tensor<rank_, dim, OtherNumber> &rhs);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator=(const Tensor<rank_, dim, OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -552,17 +580,21 @@ public:
 
   /**
    * Add another tensor.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator+=(const Tensor<rank_, dim, OtherNumber> &);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator+=(const Tensor<rank_, dim, OtherNumber> &);
 
   /**
    * Subtract another tensor.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator-=(const Tensor<rank_, dim, OtherNumber> &);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator-=(const Tensor<rank_, dim, OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
@@ -576,16 +608,20 @@ public:
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR Tensor &
-                    operator/=(const OtherNumber &factor);
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor &
+                                          operator/=(const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
+   *
+   * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CONSTEXPR Tensor
-                    operator-() const;
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Tensor
+                                          operator-() const;
 
   /**
    * Reset all values to zero.
@@ -606,10 +642,13 @@ public:
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
+   *
+   * @note This function can also be used in CUDA device code.
    */
 
-  DEAL_II_CONSTEXPR typename numbers::NumberTraits<Number>::real_type
-  norm() const;
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV
+    typename numbers::NumberTraits<Number>::real_type
+    norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -685,11 +724,13 @@ private:
 
   /**
    * This constructor is for internal use. It provides a way
-   *  to create constexpr constructors for Tensor<rank, dim, Number>
+   * to create constexpr constructors for Tensor<rank, dim, Number>
+   *
+   * @note This function can also be used in CUDA device code.
    */
   template <typename ArrayLike, std::size_t... Indices>
-  constexpr Tensor(const ArrayLike &initializer,
-                   std_cxx14::index_sequence<Indices...>);
+  constexpr DEAL_II_CUDA_HOST_DEV
+  Tensor(const ArrayLike &initializer, std_cxx14::index_sequence<Indices...>);
 
   /**
    * Allow an arbitrary Tensor to access the underlying values.
@@ -781,7 +822,8 @@ Tensor<0, dim, Number>::Tensor()
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr Tensor<0, dim, Number>::Tensor(const OtherNumber &initializer)
+constexpr DEAL_II_CUDA_HOST_DEV
+Tensor<0, dim, Number>::Tensor(const OtherNumber &initializer)
   : value(internal::NumberType<Number>::value(initializer))
 {}
 
@@ -789,7 +831,8 @@ constexpr Tensor<0, dim, Number>::Tensor(const OtherNumber &initializer)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, OtherNumber> &p)
+constexpr DEAL_II_CUDA_HOST_DEV
+Tensor<0, dim, Number>::Tensor(const Tensor<0, dim, OtherNumber> &p)
   : Tensor{p.value}
 {}
 
@@ -859,7 +902,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 {
   value = internal::NumberType<Number>::value(p);
@@ -869,7 +912,7 @@ Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 
 #ifdef __INTEL_COMPILER
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOS_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
 {
   value = p.value;
@@ -880,7 +923,7 @@ Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const OtherNumber &d)
 {
   value = internal::NumberType<Number>::value(d);
@@ -893,7 +936,7 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
-#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+#if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
@@ -916,7 +959,7 @@ Tensor<0, dim, Number>::operator!=(const Tensor<0, dim, OtherNumber> &p) const
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator+=(const Tensor<0, dim, OtherNumber> &p)
 {
   value += p.value;
@@ -926,7 +969,7 @@ Tensor<0, dim, Number>::operator+=(const Tensor<0, dim, OtherNumber> &p)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator-=(const Tensor<0, dim, OtherNumber> &p)
 {
   value -= p.value;
@@ -972,7 +1015,7 @@ Tensor<0, dim, Number>::operator*=(const OtherNumber &s)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator/=(const OtherNumber &s)
 {
   value /= s;
@@ -981,7 +1024,7 @@ Tensor<0, dim, Number>::operator/=(const OtherNumber &s)
 
 
 template <int dim, typename Number>
-constexpr Tensor<0, dim, Number>
+constexpr DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>
 Tensor<0, dim, Number>::operator-() const
 {
   return -value;
@@ -999,8 +1042,8 @@ Tensor<0, dim, Number>::norm() const
 
 
 template <int dim, typename Number>
-inline typename Tensor<0, dim, Number>::real_type DEAL_II_CUDA_HOST_DEV
-                                                  Tensor<0, dim, Number>::norm_square() const
+DEAL_II_CUDA_HOST_DEV inline typename Tensor<0, dim, Number>::real_type
+Tensor<0, dim, Number>::norm_square() const
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -1047,9 +1090,9 @@ Tensor<0, dim, Number>::serialize(Archive &ar, const unsigned int)
 
 template <int rank_, int dim, typename Number>
 template <typename ArrayLike, std::size_t... indices>
-DEAL_II_ALWAYS_INLINE constexpr Tensor<rank_, dim, Number>::Tensor(
-  const ArrayLike &initializer,
-  std_cxx14::index_sequence<indices...>)
+DEAL_II_ALWAYS_INLINE constexpr DEAL_II_CUDA_HOST_DEV
+Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
+                                   std_cxx14::index_sequence<indices...>)
   : values{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}
 {
   static_assert(sizeof...(indices) == dim,
@@ -1058,15 +1101,16 @@ DEAL_II_ALWAYS_INLINE constexpr Tensor<rank_, dim, Number>::Tensor(
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_ALWAYS_INLINE constexpr Tensor<rank_, dim, Number>::Tensor(
-  const array_type &initializer)
+DEAL_II_ALWAYS_INLINE constexpr DEAL_II_CUDA_HOST_DEV
+Tensor<rank_, dim, Number>::Tensor(const array_type &initializer)
   : Tensor(initializer, std_cxx14::make_index_sequence<dim>{})
 {}
 
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_ALWAYS_INLINE constexpr Tensor<rank_, dim, Number>::Tensor(
+DEAL_II_ALWAYS_INLINE constexpr DEAL_II_CUDA_HOST_DEV
+Tensor<rank_, dim, Number>::Tensor(
   const Tensor<rank_, dim, OtherNumber> &initializer)
   : Tensor(initializer, std_cxx14::make_index_sequence<dim>{})
 {}
@@ -1152,8 +1196,7 @@ DEAL_II_ALWAYS_INLINE constexpr DEAL_II_CUDA_HOST_DEV const typename Tensor<
   Number>::value_type &Tensor<rank_, dim, Number>::
                        operator[](const unsigned int i) const
 {
-  return dealii::internal::TensorSubscriptor::subscript(
-    values, i, std::integral_constant<int, dim>());
+  return values[i];
 }
 
 
@@ -1283,7 +1326,7 @@ operator!=(const Tensor<rank_, dim, OtherNumber> &p) const
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<rank_, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator+=(const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -1294,7 +1337,7 @@ Tensor<rank_, dim, Number>::operator+=(const Tensor<rank_, dim, OtherNumber> &p)
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<rank_, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator-=(const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -1316,7 +1359,7 @@ Tensor<rank_, dim, Number>::operator*=(const OtherNumber &s)
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline Tensor<rank_, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -1326,7 +1369,7 @@ Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Tensor<rank_, dim, Number>
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<rank_, dim, Number>
 Tensor<rank_, dim, Number>::operator-() const
 {
   Tensor<rank_, dim, Number> tmp;
@@ -1541,11 +1584,14 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Other, Number>::type
-operator*(const Other &object, const Tensor<0, dim, Number> &t)
+constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+  typename ProductType<Other, Number>::type
+  operator*(const Other &object, const Tensor<0, dim, Number> &t)
 {
   return object * static_cast<const Number &>(t);
 }
@@ -1558,11 +1604,14 @@ operator*(const Other &object, const Tensor<0, dim, Number> &t)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Number, Other>::type
-operator*(const Tensor<0, dim, Number> &t, const Other &object)
+constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+  typename ProductType<Number, Other>::type
+  operator*(const Tensor<0, dim, Number> &t, const Other &object)
 {
   return static_cast<const Number &>(t) * object;
 }
@@ -1575,12 +1624,15 @@ operator*(const Tensor<0, dim, Number> &t, const Other &object)
  * OtherNumber that are stored within the Tensor and multiplies them. It
  * returns an unwrapped number of product type.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
-operator*(const Tensor<0, dim, Number> &     src1,
-          const Tensor<0, dim, OtherNumber> &src2)
+DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
+  typename ProductType<Number, OtherNumber>::type
+  operator*(const Tensor<0, dim, Number> &     src1,
+            const Tensor<0, dim, OtherNumber> &src2)
 {
   return static_cast<const Number &>(src1) *
          static_cast<const OtherNumber &>(src2);
@@ -1590,10 +1642,12 @@ operator*(const Tensor<0, dim, Number> &     src1,
 /**
  * Division of a tensor of rank 0 by a scalar number.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_ALWAYS_INLINE
+DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
   Tensor<0,
          dim,
          typename ProductType<Number,
@@ -1607,12 +1661,14 @@ constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Add two tensors of rank 0.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_ALWAYS_INLINE
-  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<0, dim, Number> &     p,
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+                                operator+(const Tensor<0, dim, Number> &     p,
             const Tensor<0, dim, OtherNumber> &q)
 {
   return static_cast<const Number &>(p) + static_cast<const OtherNumber &>(q);
@@ -1622,12 +1678,14 @@ constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Subtract two tensors of rank 0.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_ALWAYS_INLINE
-  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<0, dim, Number> &     p,
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+                                operator-(const Tensor<0, dim, Number> &     p,
             const Tensor<0, dim, OtherNumber> &q)
 {
   return static_cast<const Number &>(p) - static_cast<const OtherNumber &>(q);
@@ -1642,15 +1700,17 @@ constexpr DEAL_II_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                  Tensor<rank,
          dim,
          typename ProductType<Number,
                               typename EnableIfScalar<OtherNumber>::type>::type>
-  operator*(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
+                  operator*(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
   // recurse over the base objects
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
@@ -1668,10 +1728,12 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_ALWAYS_INLINE
+DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank,
          dim,
          typename ProductType<typename EnableIfScalar<Number>::type,
@@ -1688,15 +1750,17 @@ constexpr DEAL_II_ALWAYS_INLINE
  * discussion on operator*() above for more information about template
  * arguments and the return type.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                  Tensor<rank,
          dim,
          typename ProductType<Number,
                               typename EnableIfScalar<OtherNumber>::type>::type>
-  operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
+                  operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
   // recurse over the base objects
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
@@ -1711,12 +1775,14 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<rank, dim, Number> &     p,
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                  operator+(const Tensor<rank, dim, Number> &     p,
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
@@ -1733,12 +1799,14 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
+ * @note This function can also be used in CUDA device code.
+ *
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<rank, dim, Number> &     p,
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                  operator-(const Tensor<rank, dim, Number> &     p,
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
