@@ -24,11 +24,6 @@
 
 #include "../tests.h"
 
-// forward declare this function
-template <int dim, int fe_degree>
-void
-test();
-
 template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
@@ -59,19 +54,21 @@ public:
       (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
       (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
 
-    bool const evaluate_values    = true;
-    bool const evaluate_gradients = true;
-
     // set to unit vector
     fe_eval.submit_dof_value(1., tid);
     __syncthreads();
-    fe_eval.evaluate(evaluate_values, evaluate_gradients);
+    fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
 
+#ifndef __APPLE__
     // values should evaluate to one, derivatives to zero
-    assert(fe_eval.get_dof_value(tid) == 1.);
     assert(fe_eval.get_value(tid) == 1.);
     for (unsigned int e = 0; e < dim; ++e)
       assert(fe_eval.get_gradient(tid)[e] == 0.);
+
+    fe_eval.integrate(/*integrate_values = */ true,
+                      /*integrate_gradients=*/true);
+    assert(fe_eval.get_dof_value(tid) == 1.);
+#endif
   }
 
 
@@ -88,6 +85,7 @@ public:
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
     AssertCuda(cudaDeviceSynchronize());
+
     deallog << "OK" << std::endl;
   };
 
@@ -114,16 +112,6 @@ do_test(const DoFHandler<dim> &          dof,
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);
   mf.test();
-}
-
-
-int
-main()
-{
-  initlog();
-  deal_II_exceptions::disable_abort_on_exception();
-
-  test<2, 1>();
 }
 
 
@@ -155,4 +143,16 @@ test()
   constraints.close();
 
   do_test<dim, fe_degree, double>(dof, constraints);
+}
+
+
+
+int
+main()
+{
+  initlog();
+
+  init_cuda();
+
+  test<2, 1>();
 }
