@@ -132,19 +132,35 @@ namespace CUDAWrappers
 
     /**
      * Return the value of a finite element function at quadrature point
-     * number @p q_point after a call to @p evalue(true,...).
+     * number @p q_point after a call to @p evaluate(true,...).
      */
     __device__ value_type
                get_value(const unsigned int q_point) const;
 
     /**
+     * Return the value of a finite element function at degree of freedom
+     * @p dof after a call to integrate() or before a call to evaluate().
+     */
+    __device__ value_type
+               get_dof_value(const unsigned int dof) const;
+
+    /**
      * Write a value to the field containing the values on quadrature points
      * with component @p q_point. Access to the same fields as through @p
-     * get_value(), This specifies the value which is tested by all basis
+     * get_value(). This specifies the value which is tested by all basis
      * function on the current cell and integrated over.
      */
     __device__ void
     submit_value(const value_type &val_in, const unsigned int q_point);
+
+    /**
+     * Write a value to the field containing the values for the degree of
+     * freedom with index @p dof after a call to integrate() or before
+     * calling evaluate(). Access through the same fields as through
+     * get_dof_value().
+     */
+    __device__ void
+    submit_dof_value(const value_type &val_in, const unsigned int dof);
 
     /**
      * Return the gradient of a finite element function at quadrature point
@@ -365,11 +381,43 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
+  __device__ typename FEEvaluation<dim,
+                                   fe_degree,
+                                   n_q_points_1d,
+                                   n_components_,
+                                   Number>::value_type
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_dof_value(const unsigned int dof) const
+  {
+    return values[dof];
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
   __device__ void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_value(const value_type &val_in, const unsigned int q_point)
   {
     values[q_point] = val_in * JxW[q_point];
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  __device__ void
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    submit_dof_value(const value_type &val_in, const unsigned int dof)
+  {
+    values[dof] = val_in;
   }
 
 
