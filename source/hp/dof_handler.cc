@@ -991,10 +991,10 @@ namespace internal
         communicate_active_fe_indices(
           dealii::hp::DoFHandler<dim, spacedim> &dof_handler)
         {
-          if (const parallel::shared::Triangulation<dim, spacedim> *tr =
+          if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<
-                  const parallel::shared::Triangulation<dim, spacedim> *>(
-                  &dof_handler.get_triangulation()))
+                  const dealii::parallel::shared::Triangulation<dim, spacedim>
+                    *>(&dof_handler.get_triangulation()))
             {
               // we have a shared triangulation. in this case, every processor
               // knows about all cells, but every processor only has knowledge
@@ -1029,10 +1029,11 @@ namespace internal
                     cell->index(),
                     active_fe_indices[cell->active_cell_index()]);
             }
-          else if (const parallel::distributed::Triangulation<dim, spacedim>
-                     *tr = dynamic_cast<
-                       const parallel::distributed::Triangulation<dim, spacedim>
-                         *>(&dof_handler.get_triangulation()))
+          else if (const dealii::parallel::distributed::Triangulation<dim,
+                                                                      spacedim>
+                     *tr = dynamic_cast<const dealii::parallel::distributed::
+                                          Triangulation<dim, spacedim> *>(
+                       &dof_handler.get_triangulation()))
             {
               // For completely distributed meshes, use the function that is
               // able to move data from locally owned cells on one processor to
@@ -1068,10 +1069,10 @@ namespace internal
           else
             {
               // a sequential triangulation. there is nothing we need to do here
-              Assert(
-                (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-                   &dof_handler.get_triangulation()) == nullptr),
-                ExcInternalError());
+              Assert((dynamic_cast<
+                        const dealii::parallel::Triangulation<dim, spacedim> *>(
+                        &dof_handler.get_triangulation()) == nullptr),
+                     ExcInternalError());
             }
         }
 

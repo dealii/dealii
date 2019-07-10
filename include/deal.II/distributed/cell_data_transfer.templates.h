@@ -37,23 +37,33 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  template <typename VectorType>
-  void
-  post_refinement_action(std::vector<VectorType *> &all_out)
+  namespace parallel
   {
-    for (auto &out : all_out)
-      out->compress(::dealii::VectorOperation::insert);
-  }
+    namespace distributed
+    {
+      namespace CellDataTransferImplementation
+      {
+        template <typename VectorType>
+        void
+        post_unpack_action(std::vector<VectorType *> &all_out)
+        {
+          for (auto &out : all_out)
+            out->compress(::dealii::VectorOperation::insert);
+        }
 
-  template <typename ValueType>
-  void
-  post_refinement_action(std::vector<std::vector<ValueType> *> &)
-  {
-    // Do nothing for std::vector as VectorType.
-  }
-} // namespace
+        template <typename value_type>
+        void
+        post_unpack_action(std::vector<std::vector<value_type> *> &)
+        {
+          // Do nothing for std::vector as VectorType.
+        }
+      } // namespace CellDataTransferImplementation
+    }   // namespace distributed
+  }     // namespace parallel
+} // namespace internal
+
 
 
 namespace parallel
@@ -212,7 +222,8 @@ namespace parallel
                   std::placeholders::_3,
                   std::ref(all_out)));
 
-      post_refinement_action(all_out);
+      dealii::internal::parallel::distributed::CellDataTransferImplementation::
+        post_unpack_action(all_out);
 
       input_vectors.clear();
     }
