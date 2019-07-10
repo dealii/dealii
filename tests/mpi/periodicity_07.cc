@@ -107,7 +107,7 @@ test(const unsigned numRefinementLevels = 2)
               if (dist < 1e-08)
                 cell->set_refine_flag();
             }
-          catch (typename MappingQ1<dim>::ExcTransformationFailed)
+          catch (const typename MappingQ1<dim>::ExcTransformationFailed &)
             {}
         }
       triangulation.execute_coarsening_and_refinement();
