@@ -912,7 +912,7 @@ Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 
 #ifdef __INTEL_COMPILER
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOS_DEV Tensor<0, dim, Number> &
+DEAL_II_CONSTEXPR inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
 {
   value = p.value;
