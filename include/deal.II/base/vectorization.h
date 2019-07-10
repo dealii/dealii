@@ -1351,7 +1351,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90991
   __m512 t0, t1, t2, t3;
   if (n_chunks > 0)
-    t3 = out[0];
+    t3 = out[0].data;
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
       t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in + offsets[0] + 4 * i), 0);
