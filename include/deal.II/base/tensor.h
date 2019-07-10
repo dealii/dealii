@@ -1817,6 +1817,73 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   return tmp;
 }
 
+/**
+ * Entrywise multiplication of two tensor objects of rank 0 (i.e. the
+ * multiplication of two scalar values).
+ *
+ * @relatesalso Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE
+  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+  schur_product(const Tensor<0, dim, Number> &     src1,
+                const Tensor<0, dim, OtherNumber> &src2)
+{
+  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
+
+  tmp *= src2;
+
+  return tmp;
+}
+
+/**
+ * Entrywise multiplication of two tensor objects of rank 1.
+ *
+ * @relatesalso Tensor
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE
+  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
+  schur_product(const Tensor<1, dim, Number> &     src1,
+                const Tensor<1, dim, OtherNumber> &src2)
+{
+  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
+
+  for (unsigned int i = 0; i < dim; ++i)
+    tmp[i] *= src2[i];
+
+  return tmp;
+}
+
+/**
+ * Entrywise multiplication of two tensor objects of general rank.
+ *
+ * This multiplication is also called "Hadamard-product" (c.f.
+ * https://en.wikipedia.org/wiki/Hadamard_product_(matrices)), and generates a
+ * new tensor of size <rank, dim>:
+ * @f[
+ *   \text{result}_{i, j}
+ *   = \text{left}_{i, j}\cdot
+ *     \text{right}_{i, j}
+ * @f]
+ *
+ * @tparam rank The rank of both tensors.
+ *
+ * @relatesalso Tensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+  schur_product(const Tensor<rank, dim, Number> &     src1,
+                const Tensor<rank, dim, OtherNumber> &src2)
+{
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
+
+  for (unsigned int i = 0; i < dim; ++i)
+    tmp[i] = schur_product(src1[i], src2[i]);
+
+  return tmp;
+}
 
 //@}
 /**
