@@ -1024,7 +1024,6 @@ public:
      */
     AdditionalData(const unsigned int degree              = 1,
                    const double       smoothing_range     = 0.,
-                   const bool         nonzero_starting    = false,
                    const unsigned int eig_cg_n_iterations = 8,
                    const double       eig_cg_residual     = 1e-2,
                    const double       max_eigenvalue      = 1);
@@ -1056,20 +1055,6 @@ public:
     double smoothing_range;
 
     /**
-     * When this flag is set to <tt>true</tt>, it enables the method
-     * <tt>vmult(dst, src)</tt> to use non-zero data in the vector
-     * <tt>dst</tt>, appending to it the Chebyshev corrections. This can be
-     * useful in some situations (e.g. when used for high-frequency error
-     * smoothing in a multigrid algorithm), but not the way the solver classes
-     * expect a preconditioner to work (where one ignores the content in
-     * <tt>dst</tt> for the preconditioner application).
-     *
-     * @deprecated For non-zero starting, use the step() and Tstep()
-     * interfaces, whereas vmult() provides the preconditioner interface.
-     */
-    bool nonzero_starting DEAL_II_DEPRECATED;
-
-    /**
      * Maximum number of CG iterations performed for finding the maximum
      * eigenvalue. If set to zero, no computations are performed. Instead, the
      * user must supply a largest eigenvalue via the variable
@@ -1089,13 +1074,6 @@ public:
      * ignored.
      */
     double max_eigenvalue;
-
-    /**
-     * Stores the inverse of the diagonal of the underlying matrix.
-     *
-     * @deprecated Set the variable @p preconditioner defined below instead.
-     */
-    VectorType matrix_diagonal_inverse DEAL_II_DEPRECATED;
 
     /**
      * Stores the preconditioner object that the Chebyshev is wrapped around.
@@ -2008,14 +1986,11 @@ namespace internal
         solution.swap(solution_old);
     }
 
-    template <typename MatrixType,
-              typename VectorType,
-              typename PreconditionerType>
+    template <typename MatrixType, typename PreconditionerType>
     inline void
     initialize_preconditioner(
       const MatrixType &                   matrix,
-      std::shared_ptr<PreconditionerType> &preconditioner,
-      VectorType &)
+      std::shared_ptr<PreconditionerType> &preconditioner)
     {
       (void)matrix;
       (void)preconditioner;
@@ -2026,8 +2001,7 @@ namespace internal
     inline void
     initialize_preconditioner(
       const MatrixType &                           matrix,
-      std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner,
-      VectorType &                                 diagonal_inverse)
+      std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner)
     {
       if (preconditioner.get() == nullptr || preconditioner->m() != matrix.m())
         {
@@ -2038,14 +2012,6 @@ namespace internal
             preconditioner->m() == 0,
             ExcMessage(
               "Preconditioner appears to be initialized but not sized correctly"));
-
-          // Check if we can initialize from vector that then gets set to zero
-          // as the matrix will own the memory
-          preconditioner->reinit(diagonal_inverse);
-          {
-            VectorType empty_vector;
-            diagonal_inverse.reinit(empty_vector);
-          }
 
           // This part only works in serial
           if (preconditioner->m() != matrix.m())
@@ -2118,19 +2084,15 @@ namespace internal
 
 
 
-// avoid warning about deprecated variable nonzero_starting
-
 template <typename MatrixType, class VectorType, typename PreconditionerType>
 inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   AdditionalData::AdditionalData(const unsigned int degree,
                                  const double       smoothing_range,
-                                 const bool         nonzero_starting,
                                  const unsigned int eig_cg_n_iterations,
                                  const double       eig_cg_residual,
                                  const double       max_eigenvalue)
   : degree(degree)
   , smoothing_range(smoothing_range)
-  , nonzero_starting(nonzero_starting)
   , eig_cg_n_iterations(eig_cg_n_iterations)
   , eig_cg_residual(eig_cg_residual)
   , max_eigenvalue(max_eigenvalue)
@@ -2151,8 +2113,6 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 }
 
 
-// avoid warning about deprecated variable
-// AdditionalData::matrix_diagonal_inverse
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
@@ -2165,7 +2125,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::initialize(
   Assert(data.degree > 0,
          ExcMessage("The degree of the Chebyshev method must be positive."));
   internal::PreconditionChebyshevImplementation::initialize_preconditioner(
-    matrix, data.preconditioner, data.matrix_diagonal_inverse);
+    matrix, data.preconditioner);
   eigenvalues_are_initialized = false;
 }
 
@@ -2180,7 +2140,6 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::clear()
   matrix_ptr    = nullptr;
   {
     VectorType empty_vector;
-    data.matrix_diagonal_inverse.reinit(empty_vector);
     solution_old.reinit(empty_vector);
     temp_vector1.reinit(empty_vector);
     temp_vector2.reinit(empty_vector);
