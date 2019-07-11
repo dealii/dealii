@@ -879,7 +879,7 @@ private:
  *  x^{n+1} = x^{n} + \rho_n \rho_{n-1} (x^{n} - x^{n-1}) +
  *     \frac{\rho_n}{\lambda_{\max{}}-\lambda_{\min{}}} P^{-1} (b-Ax^n).
  * @f]
- * where the parameter $\rho_0$ is set to $\rho_0 =
+ * where the parameter $\rho_0$ is set to $\rho_0 = 2
  * \frac{\lambda_{\max{}}-\lambda_{\min{}}}{\lambda_{\max{}}+\lambda_{\min{}}}$
  * for the maximal eigenvalue $\lambda_{\max{}}$ and updated via $\rho_n =
  * \left(2\frac{\lambda_{\max{}}+\lambda_{\min{}}}
@@ -910,9 +910,9 @@ private:
  *
  * The Chebyshev method relies on an estimate of the eigenvalues of the matrix
  * which are computed during the first invocation of vmult(). The algorithm
- * invokes a conjugate gradient solver so symmetry and positive definiteness
- * of the (preconditioned) matrix system are requirements. The eigenvalue
- * algorithm can be controlled by
+ * invokes a conjugate gradient solver (i.e., Lanczos iteration) so symmetry
+ * and positive definiteness of the (preconditioned) matrix system are
+ * requirements. The eigenvalue algorithm can be controlled by
  * PreconditionChebyshev::AdditionalData::eig_cg_n_iterations specifying how
  * many iterations should be performed. The iterations are started from an
  * initial vector that depends on the vector type. For the classes
