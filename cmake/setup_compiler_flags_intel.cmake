@@ -109,6 +109,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #   -w3415  the "always_inline" attribute is ignored on non-inline functions
 #           incorrectly triggered by inline functions in tensor.h
 #   -w15531 A portion of SIMD loop is serialized
+#   -w15552 loop was not vectorized with "simd"
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
@@ -129,6 +130,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2651")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd3415")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15552")
 
 
 #
