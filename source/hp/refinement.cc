@@ -108,7 +108,7 @@ namespace hp
                *std::max_element(smoothness_indicators.begin(),
                                  smoothness_indicators.end());
       Number max_smoothness_coarsen = max_smoothness_refine,
-             min_smoothness_coarsen = min_smoothness_coarsen;
+             min_smoothness_coarsen = min_smoothness_refine;
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
