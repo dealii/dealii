@@ -840,8 +840,10 @@ namespace DoFTools
                        ExcInternalError());
                 for (unsigned int c = 0; c < cell->face(face)->n_children();
                      ++c)
-                  AssertDimension(
-                    cell->face(face)->child(c)->n_active_fe_indices(), 1);
+                  if (!cell->neighbor_child_on_subface(face, c)
+                         ->is_artificial())
+                    AssertDimension(
+                      cell->face(face)->child(c)->n_active_fe_indices(), 1);
 
                 // right now, all that is implemented is the case that both
                 // sides use the same fe, and not only that but also that all
@@ -1115,8 +1117,11 @@ namespace DoFTools
                        ExcInternalError());
                 for (unsigned int c = 0; c < cell->face(face)->n_children();
                      ++c)
-                  Assert(cell->face(face)->child(c)->n_active_fe_indices() == 1,
-                         ExcInternalError());
+                  if (!cell->neighbor_child_on_subface(face, c)
+                         ->is_artificial())
+                    Assert(cell->face(face)->child(c)->n_active_fe_indices() ==
+                             1,
+                           ExcInternalError());
 
                 // first find out whether we can constrain each of the subfaces
                 // to the mother face. in the lingo of the hp paper, this would
