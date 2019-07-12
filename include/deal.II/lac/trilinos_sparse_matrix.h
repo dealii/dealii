@@ -27,6 +27,7 @@
 #    include <deal.II/lac/exceptions.h>
 #    include <deal.II/lac/full_matrix.h>
 #    include <deal.II/lac/trilinos_epetra_vector.h>
+#    include <deal.II/lac/trilinos_index_access.h>
 #    include <deal.II/lac/trilinos_tpetra_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 #    include <deal.II/lac/vector_memory.h>
@@ -3132,11 +3133,7 @@ namespace TrilinosWrappers
     // sparsity pattern), it does not know about the number of columns so we
     // must always take this from the additional column space map
     Assert(column_space_map.get() != nullptr, ExcInternalError());
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    return column_space_map->NumGlobalElements();
-#      else
-    return column_space_map->NumGlobalElements64();
-#      endif
+    return n_global_elements(*column_space_map);
   }
 
 
