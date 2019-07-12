@@ -104,6 +104,25 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
+    # deal.II has to be configured with MPI if both Trilinos and PETSc are
+    # enabled.
+    #
+    IF( DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI )
+      MESSAGE(STATUS "Incompatible configuration settings: "
+        "MPI must be enabled to use both Trilinos and PETSc."
+        )
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "To enable both Trilinos and PETSc, deal.II must be configured with MPI "
+        "or enable one between Trilinos and PETSc removing MPI, but found:\n"
+        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "  DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}\n"
+        "  DEAL_II_WITH_PETSC = ${DEAL_II_WITH_PETSC}\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    #
     # Trilinos has to be configured with 32bit indices if deal.II uses
     # unsigned int.
     #
