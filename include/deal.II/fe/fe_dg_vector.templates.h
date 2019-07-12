@@ -43,7 +43,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
       std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
                                  ComponentMask(dim, true)))
 {
-  this->mapping_type                   = map;
+  this->mapping_type                   = {map};
   const unsigned int polynomial_degree = this->tensor_degree();
 
   QGauss<dim> quadrature(polynomial_degree + 1);

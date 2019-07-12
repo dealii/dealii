@@ -55,7 +55,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
 
   // const unsigned int n_dofs = this->dofs_per_cell;
 
-  this->mapping_type = mapping_none;
+  this->mapping_type = {mapping_none};
   // These must be done first, since
   // they change the evaluation of
   // basis functions

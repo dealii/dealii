@@ -87,7 +87,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
   const unsigned int n_dofs = this->dofs_per_cell;
 
-  this->mapping_type = mapping_nedelec;
+  this->mapping_type = {mapping_nedelec};
   // First, initialize the
   // generalized support points and
   // quadrature weights, since they
