@@ -405,8 +405,10 @@ do_test(const DoFHandler<dim> &dof)
       smoother_data[level].smoothing_range     = 15.;
       smoother_data[level].degree              = 5;
       smoother_data[level].eig_cg_n_iterations = 15;
-      smoother_data[level].matrix_diagonal_inverse =
-        mg_matrices[level].get_matrix_diagonal_inverse();
+      auto preconditioner                      = std::make_shared<
+        DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>>();
+      preconditioner->reinit(mg_matrices[level].get_matrix_diagonal_inverse());
+      smoother_data[level].preconditioner = std::move(preconditioner);
     }
 
   // temporarily disable deallog for the setup of the preconditioner that

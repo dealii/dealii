@@ -77,8 +77,10 @@ check()
   deallog << std::endl;
 
   Vector<double> matrix_diagonal(size);
-  matrix_diagonal              = 1;
-  data.matrix_diagonal_inverse = matrix_diagonal;
+  matrix_diagonal     = 1;
+  auto preconditioner = std::make_shared<DiagonalMatrix<Vector<double>>>();
+  preconditioner->reinit(matrix_diagonal);
+  data.preconditioner = std::move(preconditioner);
   prec.initialize(m, data);
 
   deallog << "Check  vmult diag: ";
