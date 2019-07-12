@@ -207,6 +207,11 @@ class VectorizedArray
 {
 public:
   /**
+   * This gives the type of the array elements.
+   */
+  using value_type = Number;
+
+  /**
    * This gives the number of elements collected in this class. In the general
    * case, there is only one element. Specializations use SIMD intrinsics and
    * can work on multiple elements at the same time.
@@ -631,6 +636,11 @@ class VectorizedArray<double, 8>
 {
 public:
   /**
+   * This gives the type of the array elements.
+   */
+  using value_type = double;
+
+  /**
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 8;
@@ -1046,6 +1056,11 @@ template <>
 class VectorizedArray<float, 16>
 {
 public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = float;
+
   /**
    * This gives the number of vectors collected in this class.
    */
@@ -1514,6 +1529,11 @@ class VectorizedArray<double, 4>
 {
 public:
   /**
+   * This gives the type of the array elements.
+   */
+  using value_type = double;
+
+  /**
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 4;
@@ -1898,6 +1918,11 @@ template <>
 class VectorizedArray<float, 8>
 {
 public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = float;
+
   /**
    * This gives the number of vectors collected in this class.
    */
@@ -2305,6 +2330,11 @@ class VectorizedArray<double, 2>
 {
 public:
   /**
+   * This gives the type of the array elements.
+   */
+  using value_type = double;
+
+  /**
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 2;
@@ -2648,6 +2678,11 @@ template <>
 class VectorizedArray<float, 4>
 {
 public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = float;
+
   /**
    * This gives the number of vectors collected in this class.
    */
@@ -3014,6 +3049,11 @@ class VectorizedArray<double, 2>
 {
 public:
   /**
+   * This gives the type of the array elements.
+   */
+  using value_type = double;
+
+  /**
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 2;
@@ -3228,6 +3268,11 @@ template <>
 class VectorizedArray<float, 4>
 {
 public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = float;
+
   /**
    * This gives the number of vectors collected in this class.
    */

@@ -53,8 +53,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // --------------------- MatrixFree -----------------------------------
 
-template <int dim, typename Number>
-MatrixFree<dim, Number>::MatrixFree()
+template <int dim, typename Number, typename VectorizedArrayType>
+MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
   : Subscriptor()
   , indices_are_initialized(false)
   , mapping_is_initialized(false)
@@ -62,8 +62,9 @@ MatrixFree<dim, Number>::MatrixFree()
 
 
 
-template <int dim, typename Number>
-MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim, Number> &other)
+template <int dim, typename Number, typename VectorizedArrayType>
+MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree(
+  const MatrixFree<dim, Number, VectorizedArrayType> &other)
   : Subscriptor()
 {
   copy_from(other);
@@ -71,9 +72,9 @@ MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim, Number> &other)
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 std::pair<unsigned int, unsigned int>
-MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
+MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
   const std::pair<unsigned int, unsigned int> &range,
   const unsigned int                           fe_index,
   const unsigned int                           vector_component) const
@@ -115,9 +116,9 @@ MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::renumber_dofs(
+MatrixFree<dim, Number, VectorizedArrayType>::renumber_dofs(
   std::vector<types::global_dof_index> &renumbering,
   const unsigned int                    vector_component)
 {
@@ -127,9 +128,10 @@ MatrixFree<dim, Number>::renumber_dofs(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 const DoFHandler<dim> &
-MatrixFree<dim, Number>::get_dof_handler(const unsigned int dof_index) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
+  const unsigned int dof_index) const
 {
   AssertIndexRange(dof_index, n_components());
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
@@ -149,14 +151,15 @@ MatrixFree<dim, Number>::get_dof_handler(const unsigned int dof_index) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::cell_iterator
-MatrixFree<dim, Number>::get_cell_iterator(const unsigned int macro_cell_number,
-                                           const unsigned int vector_number,
-                                           const unsigned int dof_index) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
+  const unsigned int macro_cell_number,
+  const unsigned int vector_number,
+  const unsigned int dof_index) const
 {
   const unsigned int vectorization_length =
-    VectorizedArray<Number>::n_array_elements;
+    VectorizedArrayType::n_array_elements;
   AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
@@ -185,15 +188,15 @@ MatrixFree<dim, Number>::get_cell_iterator(const unsigned int macro_cell_number,
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 typename hp::DoFHandler<dim>::active_cell_iterator
-MatrixFree<dim, Number>::get_hp_cell_iterator(
+MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int macro_cell_number,
   const unsigned int vector_number,
   const unsigned int dof_index) const
 {
   constexpr unsigned int vectorization_length =
-    VectorizedArray<Number>::n_array_elements;
+    VectorizedArrayType::n_array_elements;
   AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
@@ -211,9 +214,10 @@ MatrixFree<dim, Number>::get_hp_cell_iterator(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::copy_from(const MatrixFree<dim, Number> &v)
+MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
+  const MatrixFree<dim, Number, VectorizedArrayType> &v)
 {
   clear();
   dof_handlers              = v.dof_handlers;
@@ -230,16 +234,17 @@ MatrixFree<dim, Number>::copy_from(const MatrixFree<dim, Number> &v)
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2>
 void
-MatrixFree<dim, Number>::internal_reinit(
-  const Mapping<dim> &                                    mapping,
-  const std::vector<const DoFHandler<dim> *> &            dof_handler,
-  const std::vector<const AffineConstraints<number2> *> & constraint,
-  const std::vector<IndexSet> &                           locally_owned_set,
-  const std::vector<hp::QCollection<1>> &                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData &additional_data)
+MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
+  const Mapping<dim> &                                   mapping,
+  const std::vector<const DoFHandler<dim> *> &           dof_handler,
+  const std::vector<const AffineConstraints<number2> *> &constraint,
+  const std::vector<IndexSet> &                          locally_owned_set,
+  const std::vector<hp::QCollection<1>> &                quad,
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    &additional_data)
 {
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
@@ -327,11 +332,10 @@ MatrixFree<dim, Number>::internal_reinit(
       initialize_dof_handlers(dof_handler, additional_data);
       std::vector<unsigned int>  dummy;
       std::vector<unsigned char> dummy2;
-      task_info.collect_boundary_cells(
-        cell_level_index.size(),
-        cell_level_index.size(),
-        VectorizedArray<Number>::n_array_elements,
-        dummy);
+      task_info.collect_boundary_cells(cell_level_index.size(),
+                                       cell_level_index.size(),
+                                       VectorizedArrayType::n_array_elements,
+                                       dummy);
       task_info.create_blocks_serial(
         dummy, dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i = 0; i < dof_info.size(); ++i)
@@ -357,7 +361,7 @@ MatrixFree<dim, Number>::internal_reinit(
           // divisible by the vectorization length. But it must be for
           // mapping_info...
           while (cell_level_index.size() %
-                   VectorizedArray<Number>::n_array_elements !=
+                   VectorizedArrayType::n_array_elements !=
                  0)
             cell_level_index.push_back(cell_level_index.back());
         }
@@ -390,16 +394,17 @@ MatrixFree<dim, Number>::internal_reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2>
 void
-MatrixFree<dim, Number>::internal_reinit(
-  const Mapping<dim> &                                    mapping,
-  const std::vector<const hp::DoFHandler<dim> *> &        dof_handler,
-  const std::vector<const AffineConstraints<number2> *> & constraint,
-  const std::vector<IndexSet> &                           locally_owned_set,
-  const std::vector<hp::QCollection<1>> &                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData &additional_data)
+MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
+  const Mapping<dim> &                                   mapping,
+  const std::vector<const hp::DoFHandler<dim> *> &       dof_handler,
+  const std::vector<const AffineConstraints<number2> *> &constraint,
+  const std::vector<IndexSet> &                          locally_owned_set,
+  const std::vector<hp::QCollection<1>> &                quad,
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    &additional_data)
 {
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
@@ -496,11 +501,10 @@ MatrixFree<dim, Number>::internal_reinit(
       initialize_dof_handlers(dof_handler, additional_data);
       std::vector<unsigned int>  dummy;
       std::vector<unsigned char> dummy2;
-      task_info.collect_boundary_cells(
-        cell_level_index.size(),
-        cell_level_index.size(),
-        VectorizedArray<Number>::n_array_elements,
-        dummy);
+      task_info.collect_boundary_cells(cell_level_index.size(),
+                                       cell_level_index.size(),
+                                       VectorizedArrayType::n_array_elements,
+                                       dummy);
       task_info.create_blocks_serial(
         dummy, dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i = 0; i < dof_info.size(); ++i)
@@ -528,7 +532,7 @@ MatrixFree<dim, Number>::internal_reinit(
           // divisible by the vectorization length. But it must be for
           // mapping_info...
           while (cell_level_index.size() %
-                   VectorizedArray<Number>::n_array_elements !=
+                   VectorizedArrayType::n_array_elements !=
                  0)
             cell_level_index.push_back(cell_level_index.back());
         }
@@ -556,10 +560,11 @@ MatrixFree<dim, Number>::internal_reinit(
 }
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <int spacedim>
 bool
-MatrixFree<dim, Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
+MatrixFree<dim, Number, VectorizedArrayType>::is_supported(
+  const FiniteElement<dim, spacedim> &fe)
 {
   if (dim != spacedim)
     return false;
@@ -618,9 +623,9 @@ namespace internal
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::initialize_dof_handlers(
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const std::vector<const DoFHandler<dim> *> &dof_handler,
   const AdditionalData &                      additional_data)
 {
@@ -634,8 +639,7 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
 
   dof_info.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length =
-      VectorizedArray<Number>::n_array_elements;
+    dof_info[no].vectorization_length = VectorizedArrayType::n_array_elements;
 
   // Go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
@@ -688,9 +692,9 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::initialize_dof_handlers(
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const std::vector<const hp::DoFHandler<dim> *> &dof_handler,
   const AdditionalData &                          additional_data)
 {
@@ -706,8 +710,7 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
 
   dof_info.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length =
-      VectorizedArray<Number>::n_array_elements;
+    dof_info[no].vectorization_length = VectorizedArrayType::n_array_elements;
 
   // go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
@@ -746,10 +749,10 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2>
 void
-MatrixFree<dim, Number>::initialize_indices(
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<IndexSet> &                          locally_owned_set,
   const AdditionalData &                                 additional_data)
@@ -995,7 +998,7 @@ MatrixFree<dim, Number>::initialize_indices(
     }
 
   const unsigned int vectorization_length =
-    VectorizedArray<Number>::n_array_elements;
+    VectorizedArrayType::n_array_elements;
   task_info.collect_boundary_cells(cell_level_index_end_local,
                                    n_active_cells,
                                    vectorization_length,
@@ -1374,7 +1377,7 @@ MatrixFree<dim, Number>::initialize_indices(
 
       cell_level_index.resize(
         cell_level_index.size() +
-        VectorizedArray<Number>::n_array_elements *
+        VectorizedArrayType::n_array_elements *
           (task_info.refinement_edge_face_partition_data[1] -
            task_info.refinement_edge_face_partition_data[0]));
 
@@ -1386,50 +1389,48 @@ MatrixFree<dim, Number>::initialize_indices(
       face_info.cell_and_face_to_plain_faces.reinit(
         TableIndices<3>(task_info.cell_partition_data.back(),
                         GeometryInfo<dim>::faces_per_cell,
-                        VectorizedArray<Number>::n_array_elements),
+                        VectorizedArrayType::n_array_elements),
         true);
       face_info.cell_and_face_to_plain_faces.fill(
         numbers::invalid_unsigned_int);
       face_info.cell_and_face_boundary_id.reinit(
         TableIndices<3>(task_info.cell_partition_data.back(),
                         GeometryInfo<dim>::faces_per_cell,
-                        VectorizedArray<Number>::n_array_elements),
+                        VectorizedArrayType::n_array_elements),
         true);
       face_info.cell_and_face_boundary_id.fill(numbers::invalid_boundary_id);
 
       for (unsigned int f = 0; f < task_info.boundary_partition_data.back();
            ++f)
-        for (unsigned int v = 0;
-             v < VectorizedArray<Number>::n_array_elements &&
-             face_info.faces[f].cells_interior[v] !=
-               numbers::invalid_unsigned_int;
+        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
+                                 face_info.faces[f].cells_interior[v] !=
+                                   numbers::invalid_unsigned_int;
              ++v)
           {
             TableIndices<3> index(face_info.faces[f].cells_interior[v] /
-                                    VectorizedArray<Number>::n_array_elements,
+                                    VectorizedArrayType::n_array_elements,
                                   face_info.faces[f].interior_face_no,
                                   face_info.faces[f].cells_interior[v] %
-                                    VectorizedArray<Number>::n_array_elements);
+                                    VectorizedArrayType::n_array_elements);
 
             // Assert(cell_and_face_to_plain_faces(index) ==
             // numbers::invalid_unsigned_int,
             //       ExcInternalError("Should only visit each face once"));
             face_info.cell_and_face_to_plain_faces(index) =
-              f * VectorizedArray<Number>::n_array_elements + v;
+              f * VectorizedArrayType::n_array_elements + v;
             if (face_info.faces[f].cells_exterior[v] !=
                 numbers::invalid_unsigned_int)
               {
-                TableIndices<3> index(
-                  face_info.faces[f].cells_exterior[v] /
-                    VectorizedArray<Number>::n_array_elements,
-                  face_info.faces[f].exterior_face_no,
-                  face_info.faces[f].cells_exterior[v] %
-                    VectorizedArray<Number>::n_array_elements);
+                TableIndices<3> index(face_info.faces[f].cells_exterior[v] /
+                                        VectorizedArrayType::n_array_elements,
+                                      face_info.faces[f].exterior_face_no,
+                                      face_info.faces[f].cells_exterior[v] %
+                                        VectorizedArrayType::n_array_elements);
                 // Assert(cell_and_face_to_plain_faces(index) ==
                 // numbers::invalid_unsigned_int,
                 //       ExcInternalError("Should only visit each face once"));
                 face_info.cell_and_face_to_plain_faces(index) =
-                  f * VectorizedArray<Number>::n_array_elements + v;
+                  f * VectorizedArrayType::n_array_elements + v;
               }
             else
               face_info.cell_and_face_boundary_id(index) =
@@ -1449,8 +1450,8 @@ MatrixFree<dim, Number>::initialize_indices(
           std::vector<types::global_dof_index> ghost_indices;
           {
             for (unsigned int cell = 0;
-                 cell < VectorizedArray<Number>::n_array_elements *
-                          n_macro_cells_before;
+                 cell <
+                 VectorizedArrayType::n_array_elements * n_macro_cells_before;
                  ++cell)
               if (cell > 0 &&
                   cell_level_index[cell] != cell_level_index[cell - 1])
@@ -1520,15 +1521,14 @@ MatrixFree<dim, Number>::initialize_indices(
                 bool has_noncontiguous_cell = false;
                 for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
                   for (unsigned int v = 0;
-                       v < VectorizedArray<Number>::n_array_elements &&
+                       v < VectorizedArrayType::n_array_elements &&
                        face_info.faces[f].cells_interior[v] !=
                          numbers::invalid_unsigned_int;
                        ++v)
                     {
-                      AssertIndexRange(
-                        face_info.faces[f].cells_interior[v],
-                        n_macro_cells_before *
-                          VectorizedArray<Number>::n_array_elements);
+                      AssertIndexRange(face_info.faces[f].cells_interior[v],
+                                       n_macro_cells_before *
+                                         VectorizedArrayType::n_array_elements);
                       if (dof_info[no].index_storage_variants
                               [internal::MatrixFreeFunctions::DoFInfo::
                                  dof_access_face_exterior][f] >=
@@ -1553,7 +1553,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                  ++c)
                               {
                                 const internal::MatrixFreeFunctions::ShapeInfo<
-                                  VectorizedArray<Number>> &shape =
+                                  VectorizedArrayType> &shape =
                                   shape_info(
                                     dof_info[no].global_base_element_offset + e,
                                     0,
@@ -1638,15 +1638,14 @@ MatrixFree<dim, Number>::initialize_indices(
               {
                 for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
                   for (unsigned int v = 0;
-                       v < VectorizedArray<Number>::n_array_elements &&
+                       v < VectorizedArrayType::n_array_elements &&
                        face_info.faces[f].cells_interior[v] !=
                          numbers::invalid_unsigned_int;
                        ++v)
                     {
-                      AssertIndexRange(
-                        face_info.faces[f].cells_interior[v],
-                        n_macro_cells_before *
-                          VectorizedArray<Number>::n_array_elements);
+                      AssertIndexRange(face_info.faces[f].cells_interior[v],
+                                       n_macro_cells_before *
+                                         VectorizedArrayType::n_array_elements);
                       if (dof_info[no].index_storage_variants
                               [internal::MatrixFreeFunctions::DoFInfo::
                                  dof_access_face_exterior][f] >=
@@ -1671,7 +1670,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                  ++c)
                               {
                                 const internal::MatrixFreeFunctions::ShapeInfo<
-                                  VectorizedArray<Number>> &shape =
+                                  VectorizedArrayType> &shape =
                                   shape_info(
                                     dof_info[no].global_base_element_offset + e,
                                     0,
@@ -1738,9 +1737,9 @@ MatrixFree<dim, Number>::initialize_indices(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::clear()
+MatrixFree<dim, Number, VectorizedArrayType>::clear()
 {
   dof_info.clear();
   mapping_info.clear();
@@ -1858,9 +1857,9 @@ namespace internal
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::make_connectivity_graph_faces(
+MatrixFree<dim, Number, VectorizedArrayType>::make_connectivity_graph_faces(
   DynamicSparsityPattern &connectivity)
 {
   (void)connectivity;
@@ -1916,9 +1915,9 @@ MatrixFree<dim, Number>::make_connectivity_graph_faces(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 std::size_t
-MatrixFree<dim, Number>::memory_consumption() const
+MatrixFree<dim, Number, VectorizedArrayType>::memory_consumption() const
 {
   std::size_t memory = MemoryConsumption::memory_consumption(dof_info);
   memory += MemoryConsumption::memory_consumption(cell_level_index);
@@ -1934,10 +1933,11 @@ MatrixFree<dim, Number>::memory_consumption() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename StreamType>
 void
-MatrixFree<dim, Number>::print_memory_consumption(StreamType &out) const
+MatrixFree<dim, Number, VectorizedArrayType>::print_memory_consumption(
+  StreamType &out) const
 {
   out << "  Memory matrix-free data total: --> ";
   task_info.print_memory_statistics(out, memory_consumption());
@@ -1972,9 +1972,9 @@ MatrixFree<dim, Number>::print_memory_consumption(StreamType &out) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::print(std::ostream &out) const
+MatrixFree<dim, Number, VectorizedArrayType>::print(std::ostream &out) const
 {
   // print indices local to global
   for (unsigned int no = 0; no < dof_info.size(); ++no)

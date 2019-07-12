@@ -610,17 +610,26 @@ namespace MatrixFreeOperators
    */
   template <int dim,
             int fe_degree,
-            int n_components = 1,
-            typename Number  = double>
+            int n_components             = 1,
+            typename Number              = double,
+            typename VectorizedArrayType = VectorizedArray<Number>>
   class CellwiseInverseMassMatrix
   {
+    static_assert(
+      std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+      "Type of Number and of VectorizedArrayType do not match.");
+
   public:
     /**
      * Constructor. Initializes the shape information from the ShapeInfo field
      * in the class FEEval.
      */
     CellwiseInverseMassMatrix(
-      const FEEvaluationBase<dim, n_components, Number> &fe_eval);
+      const FEEvaluationBase<dim,
+                             n_components,
+                             Number,
+                             false,
+                             VectorizedArrayType> &fe_eval);
 
     /**
      * Applies the inverse mass matrix operation on an input array. It is
@@ -631,10 +640,10 @@ namespace MatrixFreeOperators
      * coefficient is allowed.
      */
     void
-    apply(const AlignedVector<VectorizedArray<Number>> &inverse_coefficient,
-          const unsigned int                            n_actual_components,
-          const VectorizedArray<Number> *               in_array,
-          VectorizedArray<Number> *                     out_array) const;
+    apply(const AlignedVector<VectorizedArrayType> &inverse_coefficient,
+          const unsigned int                        n_actual_components,
+          const VectorizedArrayType *               in_array,
+          VectorizedArrayType *                     out_array) const;
 
     /**
      * This operation performs a projection from the data given in quadrature
@@ -671,8 +680,8 @@ namespace MatrixFreeOperators
      */
     void
     transform_from_q_points_to_basis(const unsigned int n_actual_components,
-                                     const VectorizedArray<Number> *in_array,
-                                     VectorizedArray<Number> *out_array) const;
+                                     const VectorizedArrayType *in_array,
+                                     VectorizedArrayType *out_array) const;
 
     /**
      * Fills the given array with the inverse of the JxW values, i.e., a mass
@@ -681,18 +690,22 @@ namespace MatrixFreeOperators
      */
     void
     fill_inverse_JxW_values(
-      AlignedVector<VectorizedArray<Number>> &inverse_jxw) const;
+      AlignedVector<VectorizedArrayType> &inverse_jxw) const;
 
   private:
     /**
      * A reference to the FEEvaluation object for getting the JxW_values.
      */
-    const FEEvaluationBase<dim, n_components, Number> &fe_eval;
+    const FEEvaluationBase<dim,
+                           n_components,
+                           Number,
+                           false,
+                           VectorizedArrayType> &fe_eval;
 
     /**
      * A structure to hold inverse shape functions
      */
-    AlignedVector<VectorizedArray<Number>> inverse_shape;
+    AlignedVector<VectorizedArrayType> inverse_shape;
   };
 
 
@@ -912,10 +925,22 @@ namespace MatrixFreeOperators
 
   // ------------------------------------ inline functions ---------------------
 
-  template <int dim, int fe_degree, int n_components, typename Number>
-  inline CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  inline CellwiseInverseMassMatrix<dim,
+                                   fe_degree,
+                                   n_components,
+                                   Number,
+                                   VectorizedArrayType>::
     CellwiseInverseMassMatrix(
-      const FEEvaluationBase<dim, n_components, Number> &fe_eval)
+      const FEEvaluationBase<dim,
+                             n_components,
+                             Number,
+                             false,
+                             VectorizedArrayType> &fe_eval)
     : fe_eval(fe_eval)
   {
     FullMatrix<double> shapes_1d(fe_degree + 1, fe_degree + 1);
@@ -940,11 +965,19 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::
+  CellwiseInverseMassMatrix<dim,
+                            fe_degree,
+                            n_components,
+                            Number,
+                            VectorizedArrayType>::
     fill_inverse_JxW_values(
-      AlignedVector<VectorizedArray<Number>> &inverse_jxw) const
+      AlignedVector<VectorizedArrayType> &inverse_jxw) const
   {
     constexpr unsigned int dofs_per_component_on_cell =
       Utilities::pow(fe_degree + 1, dim);
@@ -965,13 +998,21 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::apply(
-    const AlignedVector<VectorizedArray<Number>> &inverse_coefficients,
-    const unsigned int                            n_actual_components,
-    const VectorizedArray<Number> *               in_array,
-    VectorizedArray<Number> *                     out_array) const
+  CellwiseInverseMassMatrix<dim,
+                            fe_degree,
+                            n_components,
+                            Number,
+                            VectorizedArrayType>::
+    apply(const AlignedVector<VectorizedArrayType> &inverse_coefficients,
+          const unsigned int                        n_actual_components,
+          const VectorizedArrayType *               in_array,
+          VectorizedArrayType *                     out_array) const
   {
     constexpr unsigned int dofs_per_component =
       Utilities::pow(fe_degree + 1, dim);
@@ -989,18 +1030,17 @@ namespace MatrixFreeOperators
                                      dim,
                                      fe_degree + 1,
                                      fe_degree + 1,
-                                     VectorizedArray<Number>>
+                                     VectorizedArrayType>
       evaluator(inverse_shape, inverse_shape, inverse_shape);
 
     const unsigned int shift_coefficient =
       inverse_coefficients.size() > dofs_per_component ? dofs_per_component : 0;
-    const VectorizedArray<Number> *inv_coefficient =
-      inverse_coefficients.data();
-    VectorizedArray<Number> temp_data_field[dofs_per_component];
+    const VectorizedArrayType *inv_coefficient = inverse_coefficients.data();
+    VectorizedArrayType        temp_data_field[dofs_per_component];
     for (unsigned int d = 0; d < n_actual_components; ++d)
       {
-        const VectorizedArray<Number> *in  = in_array + d * dofs_per_component;
-        VectorizedArray<Number> *      out = out_array + d * dofs_per_component;
+        const VectorizedArrayType *in  = in_array + d * dofs_per_component;
+        VectorizedArrayType *      out = out_array + d * dofs_per_component;
         // Need to select 'apply' method with hessian slot because values
         // assume symmetries that do not exist in the inverse shapes
         evaluator.template hessians<0, false, false>(in, temp_data_field);
@@ -1036,27 +1076,35 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  CellwiseInverseMassMatrix<dim, fe_degree, n_components, Number>::
+  CellwiseInverseMassMatrix<dim,
+                            fe_degree,
+                            n_components,
+                            Number,
+                            VectorizedArrayType>::
     transform_from_q_points_to_basis(const unsigned int n_actual_components,
-                                     const VectorizedArray<Number> *in_array,
-                                     VectorizedArray<Number> *out_array) const
+                                     const VectorizedArrayType *in_array,
+                                     VectorizedArrayType *      out_array) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                      dim,
                                      fe_degree + 1,
                                      fe_degree + 1,
-                                     VectorizedArray<Number>>
-      evaluator(AlignedVector<VectorizedArray<Number>>(),
-                AlignedVector<VectorizedArray<Number>>(),
+                                     VectorizedArrayType>
+      evaluator(AlignedVector<VectorizedArrayType>(),
+                AlignedVector<VectorizedArrayType>(),
                 inverse_shape);
 
     for (unsigned int d = 0; d < n_actual_components; ++d)
       {
-        const VectorizedArray<Number> *in  = in_array + d * dofs_per_cell;
-        VectorizedArray<Number> *      out = out_array + d * dofs_per_cell;
+        const VectorizedArrayType *in  = in_array + d * dofs_per_cell;
+        VectorizedArrayType *      out = out_array + d * dofs_per_cell;
 
         if (dim == 3)
           {
@@ -1937,12 +1985,11 @@ namespace MatrixFreeOperators
 
   namespace Implementation
   {
-    template <typename Number>
+    template <typename VectorizedArrayType>
     bool
-    non_negative(const VectorizedArray<Number> &n)
+    non_negative(const VectorizedArrayType &n)
     {
-      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
         if (n[v] < 0.)
           return false;
 
@@ -2031,16 +2078,20 @@ namespace MatrixFreeOperators
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using Number = typename Base<dim, VectorType>::value_type;
+    using vectorized_value_type =
+      typename MatrixFree<dim, typename Base<dim, VectorType>::value_type>::
+        vectorized_value_type;
+
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        VectorizedArray<Number> local_diagonal_vector[phi.static_dofs_per_cell];
+        vectorized_value_type local_diagonal_vector[phi.static_dofs_per_cell];
         for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_component; ++j)
-              phi.begin_dof_values()[j] = VectorizedArray<Number>();
+              phi.begin_dof_values()[j] = vectorized_value_type();
             phi.begin_dof_values()[i] = 1.;
             do_operation_on_cell(phi, cell);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];

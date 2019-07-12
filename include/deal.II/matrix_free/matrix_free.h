@@ -109,15 +109,22 @@ DEAL_II_NAMESPACE_OPEN
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 
-template <int dim, typename Number = double>
+template <int dim,
+          typename Number              = double,
+          typename VectorizedArrayType = VectorizedArray<Number>>
 class MatrixFree : public Subscriptor
 {
+  static_assert(
+    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    "Type of Number and of VectorizedArrayType do not match.");
+
 public:
   /**
    * An alias for the underlying number type specified by the template
    * argument.
    */
-  using value_type = Number;
+  using value_type            = Number;
+  using vectorized_value_type = VectorizedArrayType;
 
   /**
    * The dimension set by the template argument `dim`.
@@ -469,7 +476,7 @@ public:
   /**
    * Copy constructor, calls copy_from
    */
-  MatrixFree(const MatrixFree<dim, Number> &other);
+  MatrixFree(const MatrixFree<dim, Number, VectorizedArrayType> &other);
 
   /**
    * Destructor.
@@ -611,7 +618,8 @@ public:
    * should not be needed very often.
    */
   void
-  copy_from(const MatrixFree<dim, Number> &matrix_free_base);
+  copy_from(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_base);
 
   /**
    * Clear all data fields and brings the class into a condition similar to
@@ -717,15 +725,14 @@ public:
    */
   template <typename OutVector, typename InVector>
   void
-  cell_loop(
-    const std::function<void(const MatrixFree<dim, Number> &,
-                             OutVector &,
-                             const InVector &,
-                             const std::pair<unsigned int, unsigned int> &)>
-      &             cell_operation,
-    OutVector &     dst,
-    const InVector &src,
-    const bool      zero_dst_vector = false) const;
+  cell_loop(const std::function<void(
+              const MatrixFree<dim, Number, VectorizedArrayType> &,
+              OutVector &,
+              const InVector &,
+              const std::pair<unsigned int, unsigned int> &)> &cell_operation,
+            OutVector &                                        dst,
+            const InVector &                                   src,
+            const bool zero_dst_vector = false) const;
 
   /**
    * This is the second variant to run the loop over all cells, now providing
@@ -872,23 +879,23 @@ public:
    */
   template <typename OutVector, typename InVector>
   void
-  loop(const std::function<void(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &)>
-         &cell_operation,
-       const std::function<void(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &)>
-         &face_operation,
-       const std::function<void(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &)>
-         &                     boundary_operation,
-       OutVector &             dst,
-       const InVector &        src,
+  loop(const std::function<
+         void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+              OutVector &,
+              const InVector &,
+              const std::pair<unsigned int, unsigned int> &)> &cell_operation,
+       const std::function<
+         void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+              OutVector &,
+              const InVector &,
+              const std::pair<unsigned int, unsigned int> &)> &face_operation,
+       const std::function<void(
+         const MatrixFree<dim, Number, VectorizedArrayType> &,
+         OutVector &,
+         const InVector &,
+         const std::pair<unsigned int, unsigned int> &)> &boundary_operation,
+       OutVector &                                        dst,
+       const InVector &                                   src,
        const bool              zero_dst_vector = false,
        const DataAccessOnFaces dst_vector_face_access =
          DataAccessOnFaces::unspecified,
@@ -1276,7 +1283,7 @@ public:
    * Return the boundary ids for the faces within a cell, using the cells'
    * sorting by lanes in the VectorizedArray.
    */
-  std::array<types::boundary_id, VectorizedArray<Number>::n_array_elements>
+  std::array<types::boundary_id, VectorizedArrayType::n_array_elements>
   get_faces_by_cells_boundary_id(const unsigned int macro_cell,
                                  const unsigned int face_number) const;
 
@@ -1485,8 +1492,9 @@ public:
   /*
    * Return geometry-dependent information on the cells.
    */
-  const internal::MatrixFreeFunctions::MappingInfo<dim, Number> &
-  get_mapping_info() const;
+  const internal::MatrixFreeFunctions::
+    MappingInfo<dim, Number, VectorizedArrayType> &
+    get_mapping_info() const;
 
   /**
    * Return information on indexation degrees of freedom.
@@ -1518,7 +1526,7 @@ public:
   /**
    * Return the unit cell information for given hp index.
    */
-  const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
+  const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &
   get_shape_info(const unsigned int dof_handler_index_component = 0,
                  const unsigned int quad_index                  = 0,
                  const unsigned int fe_base_element             = 0,
@@ -1529,7 +1537,7 @@ public:
    * Return the connectivity information of a face.
    */
   const internal::MatrixFreeFunctions::FaceToCellTopology<
-    VectorizedArray<Number>::n_array_elements> &
+    VectorizedArrayType::n_array_elements> &
   get_face_info(const unsigned int face_batch_number) const;
 
   /**
@@ -1545,15 +1553,14 @@ public:
    * local contributions of WorkStream, see
    * @ref workstream_paper "the WorkStream paper".
    */
-  AlignedVector<VectorizedArray<Number>> *
+  AlignedVector<VectorizedArrayType> *
   acquire_scratch_data() const;
 
   /**
    * Makes the object of the scratchpad available again.
    */
   void
-  release_scratch_data(
-    const AlignedVector<VectorizedArray<Number>> *memory) const;
+  release_scratch_data(const AlignedVector<VectorizedArrayType> *memory) const;
 
   /**
    * Obtains a scratch data object for internal use. Make sure to release it
@@ -1699,12 +1706,13 @@ private:
    * Holds information on transformation of cells from reference cell to real
    * cell that is needed for evaluating integrals.
    */
-  internal::MatrixFreeFunctions::MappingInfo<dim, Number> mapping_info;
+  internal::MatrixFreeFunctions::MappingInfo<dim, Number, VectorizedArrayType>
+    mapping_info;
 
   /**
    * Contains shape value information on the unit cell.
    */
-  Table<4, internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>>
+  Table<4, internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>>
     shape_info;
 
   /**
@@ -1735,8 +1743,7 @@ private:
    * Vector holding face information. Only initialized if
    * build_face_info=true.
    */
-  internal::MatrixFreeFunctions::FaceInfo<
-    VectorizedArray<Number>::n_array_elements>
+  internal::MatrixFreeFunctions::FaceInfo<VectorizedArrayType::n_array_elements>
     face_info;
 
   /**
@@ -1757,7 +1764,7 @@ private:
    * objects.
    */
   mutable Threads::ThreadLocalStorage<
-    std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>>
+    std::list<std::pair<bool, AlignedVector<VectorizedArrayType>>>>
     scratch_pad;
 
   /**
@@ -1776,11 +1783,12 @@ private:
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename VectorType>
 inline void
-MatrixFree<dim, Number>::initialize_dof_vector(VectorType &       vec,
-                                               const unsigned int comp) const
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
+  VectorType &       vec,
+  const unsigned int comp) const
 {
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner->size());
@@ -1788,10 +1796,10 @@ MatrixFree<dim, Number>::initialize_dof_vector(VectorType &       vec,
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename Number2>
 inline void
-MatrixFree<dim, Number>::initialize_dof_vector(
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   LinearAlgebra::distributed::Vector<Number2> &vec,
   const unsigned int                           comp) const
 {
@@ -1801,9 +1809,10 @@ MatrixFree<dim, Number>::initialize_dof_vector(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
-MatrixFree<dim, Number>::get_vector_partitioner(const unsigned int comp) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_vector_partitioner(
+  const unsigned int comp) const
 {
   AssertIndexRange(comp, n_components());
   return dof_info[comp].vector_partitioner;
@@ -1811,9 +1820,10 @@ MatrixFree<dim, Number>::get_vector_partitioner(const unsigned int comp) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const std::vector<unsigned int> &
-MatrixFree<dim, Number>::get_constrained_dofs(const unsigned int comp) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_constrained_dofs(
+  const unsigned int comp) const
 {
   AssertIndexRange(comp, n_components());
   return dof_info[comp].constrained_dofs;
@@ -1821,9 +1831,9 @@ MatrixFree<dim, Number>::get_constrained_dofs(const unsigned int comp) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_components() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_components() const
 {
   AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
   return dof_handlers.n_dof_handlers;
@@ -1831,9 +1841,10 @@ MatrixFree<dim, Number>::n_components() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_base_elements(const unsigned int dof_no) const
+MatrixFree<dim, Number, VectorizedArrayType>::n_base_elements(
+  const unsigned int dof_no) const
 {
   AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
   AssertIndexRange(dof_no, dof_handlers.n_dof_handlers);
@@ -1842,54 +1853,54 @@ MatrixFree<dim, Number>::n_base_elements(const unsigned int dof_no) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::TaskInfo &
-MatrixFree<dim, Number>::get_task_info() const
+MatrixFree<dim, Number, VectorizedArrayType>::get_task_info() const
 {
   return task_info;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::TaskInfo &
-MatrixFree<dim, Number>::get_size_info() const
+MatrixFree<dim, Number, VectorizedArrayType>::get_size_info() const
 {
   return task_info;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_macro_cells() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_macro_cells() const
 {
   return *(task_info.cell_partition_data.end() - 2);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_physical_cells() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_physical_cells() const
 {
   return task_info.n_active_cells;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_cell_batches() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_cell_batches() const
 {
   return *(task_info.cell_partition_data.end() - 2);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_ghost_cell_batches() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_ghost_cell_batches() const
 {
   return *(task_info.cell_partition_data.end() - 1) -
          *(task_info.cell_partition_data.end() - 2);
@@ -1897,9 +1908,9 @@ MatrixFree<dim, Number>::n_ghost_cell_batches() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_inner_face_batches() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_inner_face_batches() const
 {
   if (task_info.face_partition_data.size() == 0)
     return 0;
@@ -1908,9 +1919,9 @@ MatrixFree<dim, Number>::n_inner_face_batches() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_boundary_face_batches() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_boundary_face_batches() const
 {
   if (task_info.face_partition_data.size() == 0)
     return 0;
@@ -1920,9 +1931,9 @@ MatrixFree<dim, Number>::n_boundary_face_batches() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_ghost_inner_face_batches() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_ghost_inner_face_batches() const
 {
   if (task_info.face_partition_data.size() == 0)
     return 0;
@@ -1931,9 +1942,10 @@ MatrixFree<dim, Number>::n_ghost_inner_face_batches() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline types::boundary_id
-MatrixFree<dim, Number>::get_boundary_id(const unsigned int macro_face) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
+  const unsigned int macro_face) const
 {
   Assert(macro_face >= task_info.boundary_partition_data[0] &&
            macro_face < task_info.boundary_partition_data.back(),
@@ -1945,9 +1957,9 @@ MatrixFree<dim, Number>::get_boundary_id(const unsigned int macro_face) const
 
 
 
-template <int dim, typename Number>
-inline std::array<types::boundary_id, VectorizedArray<Number>::n_array_elements>
-MatrixFree<dim, Number>::get_faces_by_cells_boundary_id(
+template <int dim, typename Number, typename VectorizedArrayType>
+inline std::array<types::boundary_id, VectorizedArrayType::n_array_elements>
+MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
   const unsigned int macro_cell,
   const unsigned int face_number) const
 {
@@ -1955,8 +1967,7 @@ MatrixFree<dim, Number>::get_faces_by_cells_boundary_id(
   AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
   Assert(face_info.cell_and_face_boundary_id.size(0) >= n_macro_cells(),
          ExcNotInitialized());
-  std::array<types::boundary_id, VectorizedArray<Number>::n_array_elements>
-    result;
+  std::array<types::boundary_id, VectorizedArrayType::n_array_elements> result;
   result.fill(numbers::invalid_boundary_id);
   for (unsigned int v = 0; v < n_active_entries_per_cell_batch(macro_cell); ++v)
     result[v] = face_info.cell_and_face_boundary_id(macro_cell, face_number, v);
@@ -1965,18 +1976,20 @@ MatrixFree<dim, Number>::get_faces_by_cells_boundary_id(
 
 
 
-template <int dim, typename Number>
-inline const internal::MatrixFreeFunctions::MappingInfo<dim, Number> &
-MatrixFree<dim, Number>::get_mapping_info() const
+template <int dim, typename Number, typename VectorizedArrayType>
+inline const internal::MatrixFreeFunctions::
+  MappingInfo<dim, Number, VectorizedArrayType> &
+  MatrixFree<dim, Number, VectorizedArrayType>::get_mapping_info() const
 {
   return mapping_info;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::DoFInfo &
-MatrixFree<dim, Number>::get_dof_info(const unsigned int dof_index) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_dof_info(
+  const unsigned int dof_index) const
 {
   AssertIndexRange(dof_index, n_components());
   return dof_info[dof_index];
@@ -1984,18 +1997,19 @@ MatrixFree<dim, Number>::get_dof_info(const unsigned int dof_index) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_constraint_pool_entries() const
+MatrixFree<dim, Number, VectorizedArrayType>::n_constraint_pool_entries() const
 {
   return constraint_pool_row_index.size() - 1;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const Number *
-MatrixFree<dim, Number>::constraint_pool_begin(const unsigned int row) const
+MatrixFree<dim, Number, VectorizedArrayType>::constraint_pool_begin(
+  const unsigned int row) const
 {
   AssertIndexRange(row, constraint_pool_row_index.size() - 1);
   return constraint_pool_data.empty() ?
@@ -2005,9 +2019,10 @@ MatrixFree<dim, Number>::constraint_pool_begin(const unsigned int row) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const Number *
-MatrixFree<dim, Number>::constraint_pool_end(const unsigned int row) const
+MatrixFree<dim, Number, VectorizedArrayType>::constraint_pool_end(
+  const unsigned int row) const
 {
   AssertIndexRange(row, constraint_pool_row_index.size() - 1);
   return constraint_pool_data.empty() ?
@@ -2017,9 +2032,9 @@ MatrixFree<dim, Number>::constraint_pool_end(const unsigned int row) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline std::pair<unsigned int, unsigned int>
-MatrixFree<dim, Number>::create_cell_subrange_hp(
+MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp(
   const std::pair<unsigned int, unsigned int> &range,
   const unsigned int                           degree,
   const unsigned int                           dof_handler_component) const
@@ -2048,25 +2063,26 @@ MatrixFree<dim, Number>::create_cell_subrange_hp(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline bool
-MatrixFree<dim, Number>::at_irregular_cell(const unsigned int macro_cell) const
+MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
+  const unsigned int macro_cell) const
 {
   AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
-  return VectorizedArray<Number>::n_array_elements > 1 &&
+  return VectorizedArrayType::n_array_elements > 1 &&
          cell_level_index[(macro_cell + 1) *
-                            VectorizedArray<Number>::n_array_elements -
+                            VectorizedArrayType::n_array_elements -
                           1] ==
            cell_level_index[(macro_cell + 1) *
-                              VectorizedArray<Number>::n_array_elements -
+                              VectorizedArrayType::n_array_elements -
                             2];
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_components_filled(
+MatrixFree<dim, Number, VectorizedArrayType>::n_components_filled(
   const unsigned int cell_batch_number) const
 {
   return n_active_entries_per_cell_batch(cell_batch_number);
@@ -2074,47 +2090,47 @@ MatrixFree<dim, Number>::n_components_filled(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_active_entries_per_cell_batch(
+MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
   const unsigned int cell_batch_number) const
 {
   AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
-  unsigned int n_components = VectorizedArray<Number>::n_array_elements;
-  while (n_components > 1 &&
-         cell_level_index[cell_batch_number *
-                            VectorizedArray<Number>::n_array_elements +
-                          n_components - 1] ==
-           cell_level_index[cell_batch_number *
-                              VectorizedArray<Number>::n_array_elements +
-                            n_components - 2])
+  unsigned int n_components = VectorizedArrayType::n_array_elements;
+  while (
+    n_components > 1 &&
+    cell_level_index[cell_batch_number * VectorizedArrayType::n_array_elements +
+                     n_components - 1] ==
+      cell_level_index[cell_batch_number *
+                         VectorizedArrayType::n_array_elements +
+                       n_components - 2])
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArray<Number>::n_array_elements);
+  AssertIndexRange(n_components - 1, VectorizedArrayType::n_array_elements);
   return n_components;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::n_active_entries_per_face_batch(
+MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
   const unsigned int face_batch_number) const
 {
   AssertIndexRange(face_batch_number, face_info.faces.size());
-  unsigned int n_components = VectorizedArray<Number>::n_array_elements;
+  unsigned int n_components = VectorizedArrayType::n_array_elements;
   while (n_components > 1 &&
          face_info.faces[face_batch_number].cells_interior[n_components - 1] ==
            numbers::invalid_unsigned_int)
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArray<Number>::n_array_elements);
+  AssertIndexRange(n_components - 1, VectorizedArrayType::n_array_elements);
   return n_components;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::get_dofs_per_cell(
+MatrixFree<dim, Number, VectorizedArrayType>::get_dofs_per_cell(
   const unsigned int dof_handler_index,
   const unsigned int active_fe_index) const
 {
@@ -2123,9 +2139,9 @@ MatrixFree<dim, Number>::get_dofs_per_cell(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::get_n_q_points(
+MatrixFree<dim, Number, VectorizedArrayType>::get_n_q_points(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
@@ -2137,9 +2153,9 @@ MatrixFree<dim, Number>::get_n_q_points(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::get_dofs_per_face(
+MatrixFree<dim, Number, VectorizedArrayType>::get_dofs_per_face(
   const unsigned int dof_handler_index,
   const unsigned int active_fe_index) const
 {
@@ -2148,9 +2164,9 @@ MatrixFree<dim, Number>::get_dofs_per_face(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::get_n_q_points_face(
+MatrixFree<dim, Number, VectorizedArrayType>::get_n_q_points_face(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
@@ -2162,9 +2178,9 @@ MatrixFree<dim, Number>::get_n_q_points_face(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const IndexSet &
-MatrixFree<dim, Number>::get_locally_owned_set(
+MatrixFree<dim, Number, VectorizedArrayType>::get_locally_owned_set(
   const unsigned int dof_handler_index) const
 {
   return dof_info[dof_handler_index].vector_partitioner->locally_owned_range();
@@ -2172,9 +2188,9 @@ MatrixFree<dim, Number>::get_locally_owned_set(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const IndexSet &
-MatrixFree<dim, Number>::get_ghost_set(
+MatrixFree<dim, Number, VectorizedArrayType>::get_ghost_set(
   const unsigned int dof_handler_index) const
 {
   return dof_info[dof_handler_index].vector_partitioner->ghost_indices();
@@ -2182,9 +2198,9 @@ MatrixFree<dim, Number>::get_ghost_set(
 
 
 
-template <int dim, typename Number>
-inline const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
-MatrixFree<dim, Number>::get_shape_info(
+template <int dim, typename Number, typename VectorizedArrayType>
+inline const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_shape_info(
   const unsigned int dof_handler_index,
   const unsigned int index_quad,
   const unsigned int index_fe,
@@ -2203,10 +2219,11 @@ MatrixFree<dim, Number>::get_shape_info(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::FaceToCellTopology<
-  VectorizedArray<Number>::n_array_elements> &
-MatrixFree<dim, Number>::get_face_info(const unsigned int macro_face) const
+  VectorizedArrayType::n_array_elements> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_info(
+  const unsigned int macro_face) const
 {
   AssertIndexRange(macro_face, face_info.faces.size());
   return face_info.faces[macro_face];
@@ -2214,9 +2231,9 @@ MatrixFree<dim, Number>::get_face_info(const unsigned int macro_face) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const Quadrature<dim> &
-MatrixFree<dim, Number>::get_quadrature(
+MatrixFree<dim, Number, VectorizedArrayType>::get_quadrature(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
@@ -2228,9 +2245,9 @@ MatrixFree<dim, Number>::get_quadrature(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline const Quadrature<dim - 1> &
-MatrixFree<dim, Number>::get_face_quadrature(
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_quadrature(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
@@ -2242,9 +2259,10 @@ MatrixFree<dim, Number>::get_face_quadrature(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number>::get_cell_category(const unsigned int macro_cell) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_category(
+  const unsigned int macro_cell) const
 {
   AssertIndexRange(0, dof_info.size());
   AssertIndexRange(macro_cell, dof_info[0].cell_active_fe_index.size());
@@ -2256,16 +2274,17 @@ MatrixFree<dim, Number>::get_cell_category(const unsigned int macro_cell) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline std::pair<unsigned int, unsigned int>
-MatrixFree<dim, Number>::get_face_category(const unsigned int macro_face) const
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
+  const unsigned int macro_face) const
 {
   AssertIndexRange(macro_face, face_info.faces.size());
   if (dof_info[0].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result;
-  for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements &&
+  for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
                            face_info.faces[macro_face].cells_interior[v] !=
                              numbers::invalid_unsigned_int;
        ++v)
@@ -2275,7 +2294,7 @@ MatrixFree<dim, Number>::get_face_category(const unsigned int macro_face) const
         .cell_active_fe_index[face_info.faces[macro_face].cells_interior[v]]);
   if (face_info.faces[macro_face].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
-    for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements &&
+    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
                              face_info.faces[macro_face].cells_exterior[v] !=
                                numbers::invalid_unsigned_int;
          ++v)
@@ -2290,30 +2309,30 @@ MatrixFree<dim, Number>::get_face_category(const unsigned int macro_face) const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline bool
-MatrixFree<dim, Number>::indices_initialized() const
+MatrixFree<dim, Number, VectorizedArrayType>::indices_initialized() const
 {
   return indices_are_initialized;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 inline bool
-MatrixFree<dim, Number>::mapping_initialized() const
+MatrixFree<dim, Number, VectorizedArrayType>::mapping_initialized() const
 {
   return mapping_is_initialized;
 }
 
 
 
-template <int dim, typename Number>
-AlignedVector<VectorizedArray<Number>> *
-MatrixFree<dim, Number>::acquire_scratch_data() const
+template <int dim, typename Number, typename VectorizedArrayType>
+AlignedVector<VectorizedArrayType> *
+MatrixFree<dim, Number, VectorizedArrayType>::acquire_scratch_data() const
 {
   using list_type =
-    std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>;
+    std::list<std::pair<bool, AlignedVector<VectorizedArrayType>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
     if (it->first == false)
@@ -2321,20 +2340,19 @@ MatrixFree<dim, Number>::acquire_scratch_data() const
         it->first = true;
         return &it->second;
       }
-  data.push_front(
-    std::make_pair(true, AlignedVector<VectorizedArray<Number>>()));
+  data.emplace_front(true, AlignedVector<VectorizedArrayType>());
   return &data.front().second;
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::release_scratch_data(
-  const AlignedVector<VectorizedArray<Number>> *scratch) const
+MatrixFree<dim, Number, VectorizedArrayType>::release_scratch_data(
+  const AlignedVector<VectorizedArrayType> *scratch) const
 {
   using list_type =
-    std::list<std::pair<bool, AlignedVector<VectorizedArray<Number>>>>;
+    std::list<std::pair<bool, AlignedVector<VectorizedArrayType>>>;
   list_type &data = scratch_pad.get();
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
     if (&it->second == scratch)
@@ -2348,9 +2366,10 @@ MatrixFree<dim, Number>::release_scratch_data(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 AlignedVector<Number> *
-MatrixFree<dim, Number>::acquire_scratch_data_non_threadsafe() const
+MatrixFree<dim, Number, VectorizedArrayType>::
+  acquire_scratch_data_non_threadsafe() const
 {
   for (typename std::list<std::pair<bool, AlignedVector<Number>>>::iterator it =
          scratch_pad_non_threadsafe.begin();
@@ -2368,10 +2387,11 @@ MatrixFree<dim, Number>::acquire_scratch_data_non_threadsafe() const
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 void
-MatrixFree<dim, Number>::release_scratch_data_non_threadsafe(
-  const AlignedVector<Number> *scratch) const
+MatrixFree<dim, Number, VectorizedArrayType>::
+  release_scratch_data_non_threadsafe(
+    const AlignedVector<Number> *scratch) const
 {
   for (typename std::list<std::pair<bool, AlignedVector<Number>>>::iterator it =
          scratch_pad_non_threadsafe.begin();
@@ -2430,14 +2450,15 @@ namespace internal
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
-  const DoFHandlerType &                                 dof_handler,
-  const AffineConstraints<number2> &                     constraints_in,
-  const QuadratureType &                                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
+  const DoFHandlerType &            dof_handler,
+  const AffineConstraints<number2> &constraints_in,
+  const QuadratureType &            quad,
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<const DoFHandlerType *>             dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
@@ -2464,15 +2485,16 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
-  const Mapping<dim> &                                   mapping,
-  const DoFHandlerType &                                 dof_handler,
-  const AffineConstraints<number2> &                     constraints_in,
-  const QuadratureType &                                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
+  const Mapping<dim> &              mapping,
+  const DoFHandlerType &            dof_handler,
+  const AffineConstraints<number2> &constraints_in,
+  const QuadratureType &            quad,
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<const DoFHandlerType *>             dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
@@ -2497,14 +2519,15 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2522,14 +2545,15 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2546,15 +2570,16 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const Mapping<dim> &                                   mapping,
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2571,15 +2596,16 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const Mapping<dim> &                                   mapping,
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2597,16 +2623,17 @@ MatrixFree<dim, Number>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename DoFHandlerType, typename QuadratureType, typename number2>
 void
-MatrixFree<dim, Number>::reinit(
+MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const Mapping<dim> &                                   mapping,
   const std::vector<const DoFHandlerType *> &            dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<IndexSet> &                          locally_owned_set,
   const std::vector<QuadratureType> &                    quad,
-  const typename MatrixFree<dim, Number>::AdditionalData additional_data)
+  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
+    additional_data)
 {
   // find out whether we use a hp Quadrature or a standard quadrature
   std::vector<hp::QCollection<1>> quad_hp;
@@ -2637,7 +2664,7 @@ namespace internal
   /**
    * Internal class for exchanging data between vectors.
    */
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename VectorizedArrayType>
   struct VectorDataExchange
   {
     // An arbitrary shift for communication to reduce the risk for accidental
@@ -2652,14 +2679,15 @@ namespace internal
      * number of components.
      */
     VectorDataExchange(
-      const dealii::MatrixFree<dim, Number> &matrix_free,
-      const typename dealii::MatrixFree<dim, Number>::DataAccessOnFaces
-                         vector_face_access,
-      const unsigned int n_components)
+      const dealii::MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const typename dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+        DataAccessOnFaces vector_face_access,
+      const unsigned int  n_components)
       : matrix_free(matrix_free)
       , vector_face_access(
           matrix_free.get_task_info().face_partition_data.empty() ?
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified :
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified :
             vector_face_access)
       , ghosts_were_set(false)
 #  ifdef DEAL_II_WITH_MPI
@@ -2669,7 +2697,8 @@ namespace internal
     {
       (void)n_components;
       if (this->vector_face_access !=
-          dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified)
+          dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+            DataAccessOnFaces::unspecified)
         for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
           AssertDimension(
             matrix_free.get_dof_info(c).vector_partitioner_face_variants.size(),
@@ -2732,11 +2761,13 @@ namespace internal
                         .vector_partitioner_face_variants.size(),
                       3);
       if (vector_face_access ==
-          dealii::MatrixFree<dim, Number>::DataAccessOnFaces::none)
+          dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+            DataAccessOnFaces::none)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[0];
       else if (vector_face_access ==
-               dealii::MatrixFree<dim, Number>::DataAccessOnFaces::values)
+               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                 DataAccessOnFaces::values)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[1];
       else
@@ -2828,7 +2859,8 @@ namespace internal
       if (ghosts_set)
         ghosts_were_set = true;
       if (vector_face_access ==
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified ||
           vec.size() == 0)
         vec.update_ghost_values_start(component_in_block_vector +
                                       channel_shift);
@@ -2925,7 +2957,8 @@ namespace internal
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       if (vector_face_access ==
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified ||
           vec.size() == 0)
         vec.update_ghost_values_finish();
       else
@@ -3041,7 +3074,8 @@ namespace internal
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
       if (vector_face_access ==
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified ||
           vec.size() == 0)
         vec.compress_start(component_in_block_vector + channel_shift);
       else
@@ -3135,7 +3169,8 @@ namespace internal
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       if (vector_face_access ==
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified ||
           vec.size() == 0)
         vec.compress_finish(dealii::VectorOperation::add);
       else
@@ -3227,7 +3262,8 @@ namespace internal
         return;
 
       if (vector_face_access ==
-            dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+            dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+              DataAccessOnFaces::unspecified ||
           vec.size() == 0)
         vec.zero_out_ghosts();
       else
@@ -3354,10 +3390,10 @@ namespace internal
 
 
 
-    const dealii::MatrixFree<dim, Number> &matrix_free;
-    const typename dealii::MatrixFree<dim, Number>::DataAccessOnFaces
-         vector_face_access;
-    bool ghosts_were_set;
+    const dealii::MatrixFree<dim, Number, VectorizedArrayType> &matrix_free;
+    const typename dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+      DataAccessOnFaces vector_face_access;
+    bool                ghosts_were_set;
 #  ifdef DEAL_II_WITH_MPI
     std::vector<AlignedVector<Number> *>  tmp_data;
     std::vector<std::vector<MPI_Request>> requests;
@@ -3461,12 +3497,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   void
-  update_ghost_values_start(const VectorStruct &             vec,
-                            VectorDataExchange<dim, Number> &exchanger,
-                            const unsigned int               channel = 0)
+  update_ghost_values_start(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
       {
@@ -3488,12 +3526,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   void
-  update_ghost_values_start(const VectorStruct &             vec,
-                            VectorDataExchange<dim, Number> &exchanger,
-                            const unsigned int               channel = 0)
+  update_ghost_values_start(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     exchanger.update_ghost_values_start(channel, vec);
   }
@@ -3501,10 +3541,14 @@ namespace internal
 
 
   // update_ghost_values_start() for vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  update_ghost_values_start(const std::vector<VectorStruct> &vec,
-                            VectorDataExchange<dim, Number> &exchanger)
+  update_ghost_values_start(
+    const std::vector<VectorStruct> &                     vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3517,10 +3561,14 @@ namespace internal
 
 
   // update_ghost_values_start() for vector of pointers to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  update_ghost_values_start(const std::vector<VectorStruct *> &vec,
-                            VectorDataExchange<dim, Number> &  exchanger)
+  update_ghost_values_start(
+    const std::vector<VectorStruct *> &                   vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3540,12 +3588,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   void
-  update_ghost_values_finish(const VectorStruct &             vec,
-                             VectorDataExchange<dim, Number> &exchanger,
-                             const unsigned int               channel = 0)
+  update_ghost_values_finish(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
       {
@@ -3563,12 +3613,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   void
-  update_ghost_values_finish(const VectorStruct &             vec,
-                             VectorDataExchange<dim, Number> &exchanger,
-                             const unsigned int               channel = 0)
+  update_ghost_values_finish(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     exchanger.update_ghost_values_finish(channel, vec);
   }
@@ -3576,10 +3628,14 @@ namespace internal
 
 
   // for vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  update_ghost_values_finish(const std::vector<VectorStruct> &vec,
-                             VectorDataExchange<dim, Number> &exchanger)
+  update_ghost_values_finish(
+    const std::vector<VectorStruct> &                     vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3592,10 +3648,14 @@ namespace internal
 
 
   // for vector of pointers to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  update_ghost_values_finish(const std::vector<VectorStruct *> &vec,
-                             VectorDataExchange<dim, Number> &  exchanger)
+  update_ghost_values_finish(
+    const std::vector<VectorStruct *> &                   vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3615,12 +3675,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  compress_start(VectorStruct &                   vec,
-                 VectorDataExchange<dim, Number> &exchanger,
-                 const unsigned int               channel = 0)
+  compress_start(
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
       vec.compress(dealii::VectorOperation::add);
@@ -3635,12 +3697,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  compress_start(VectorStruct &                   vec,
-                 VectorDataExchange<dim, Number> &exchanger,
-                 const unsigned int               channel = 0)
+  compress_start(
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     exchanger.compress_start(channel, vec);
   }
@@ -3648,10 +3712,14 @@ namespace internal
 
 
   // for std::vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  compress_start(std::vector<VectorStruct> &      vec,
-                 VectorDataExchange<dim, Number> &exchanger)
+  compress_start(
+    std::vector<VectorStruct> &                           vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3664,10 +3732,14 @@ namespace internal
 
 
   // for std::vector of pointer to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  compress_start(std::vector<VectorStruct *> &    vec,
-                 VectorDataExchange<dim, Number> &exchanger)
+  compress_start(
+    std::vector<VectorStruct *> &                         vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3687,12 +3759,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  compress_finish(VectorStruct &                   vec,
-                  VectorDataExchange<dim, Number> &exchanger,
-                  const unsigned int               channel = 0)
+  compress_finish(
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
       {
@@ -3710,12 +3784,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  compress_finish(VectorStruct &                   vec,
-                  VectorDataExchange<dim, Number> &exchanger,
-                  const unsigned int               channel = 0)
+  compress_finish(
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger,
+    const unsigned int                                    channel = 0)
   {
     exchanger.compress_finish(channel, vec);
   }
@@ -3723,10 +3799,14 @@ namespace internal
 
 
   // for std::vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  compress_finish(std::vector<VectorStruct> &      vec,
-                  VectorDataExchange<dim, Number> &exchanger)
+  compress_finish(
+    std::vector<VectorStruct> &                           vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3739,10 +3819,14 @@ namespace internal
 
 
   // for std::vector of pointer to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  compress_finish(std::vector<VectorStruct *> &    vec,
-                  VectorDataExchange<dim, Number> &exchanger)
+  compress_finish(
+    std::vector<VectorStruct *> &                         vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp = 0; comp < vec.size(); comp++)
@@ -3766,11 +3850,13 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  reset_ghost_values(const VectorStruct &             vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  reset_ghost_values(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
     if (exchanger.ghosts_were_set == true)
@@ -3786,11 +3872,13 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  reset_ghost_values(const VectorStruct &             vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  reset_ghost_values(
+    const VectorStruct &                                  vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     exchanger.reset_ghost_values(vec);
   }
@@ -3798,10 +3886,14 @@ namespace internal
 
 
   // for std::vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  reset_ghost_values(const std::vector<VectorStruct> &vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  reset_ghost_values(
+    const std::vector<VectorStruct> &                     vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
     if (exchanger.ghosts_were_set == true)
@@ -3814,10 +3906,14 @@ namespace internal
 
 
   // for std::vector of pointer to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  reset_ghost_values(const std::vector<VectorStruct *> &vec,
-                     VectorDataExchange<dim, Number> &  exchanger)
+  reset_ghost_values(
+    const std::vector<VectorStruct *> &                   vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     // return immediately if there is nothing to do.
     if (exchanger.ghosts_were_set == true)
@@ -3837,12 +3933,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  zero_vector_region(const unsigned int               range_index,
-                     VectorStruct &                   vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  zero_vector_region(
+    const unsigned int                                    range_index,
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     for (unsigned int i = 0; i < vec.n_blocks(); ++i)
       exchanger.zero_vector_region(range_index, vec.block(i));
@@ -3854,12 +3952,14 @@ namespace internal
   template <int dim,
             typename VectorStruct,
             typename Number,
+            typename VectorizedArrayType,
             typename std::enable_if<!IsBlockVector<VectorStruct>::value,
                                     VectorStruct>::type * = nullptr>
   inline void
-  zero_vector_region(const unsigned int               range_index,
-                     VectorStruct &                   vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  zero_vector_region(
+    const unsigned int                                    range_index,
+    VectorStruct &                                        vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     exchanger.zero_vector_region(range_index, vec);
   }
@@ -3867,11 +3967,15 @@ namespace internal
 
 
   // for std::vector of vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  zero_vector_region(const unsigned int               range_index,
-                     std::vector<VectorStruct> &      vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  zero_vector_region(
+    const unsigned int                                    range_index,
+    std::vector<VectorStruct> &                           vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     for (unsigned int comp = 0; comp < vec.size(); comp++)
       zero_vector_region(range_index, vec[comp], exchanger);
@@ -3880,11 +3984,15 @@ namespace internal
 
 
   // for std::vector of pointers to vectors
-  template <int dim, typename VectorStruct, typename Number>
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
   inline void
-  zero_vector_region(const unsigned int               range_index,
-                     std::vector<VectorStruct *> &    vec,
-                     VectorDataExchange<dim, Number> &exchanger)
+  zero_vector_region(
+    const unsigned int                                    range_index,
+    std::vector<VectorStruct *> &                         vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
     for (unsigned int comp = 0; comp < vec.size(); comp++)
       zero_vector_region(range_index, *vec[comp], exchanger);
@@ -4060,9 +4168,13 @@ namespace internal
 
     const InVector &src;
     OutVector &     dst;
-    VectorDataExchange<MF::dimension, typename MF::value_type>
+    VectorDataExchange<MF::dimension,
+                       typename MF::value_type,
+                       typename MF::vectorized_value_type>
       src_data_exchanger;
-    VectorDataExchange<MF::dimension, typename MF::value_type>
+    VectorDataExchange<MF::dimension,
+                       typename MF::value_type,
+                       typename MF::vectorized_value_type>
                dst_data_exchanger;
     const bool src_and_dst_are_same;
     const bool zero_dst_vector_setting;
@@ -4131,11 +4243,11 @@ namespace internal
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::cell_loop(
-  const std::function<void(const MatrixFree<dim, Number> &,
+MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                            OutVector &,
                            const InVector &,
                            const std::pair<unsigned int, unsigned int> &)>
@@ -4145,39 +4257,44 @@ MatrixFree<dim, Number>::cell_loop(
   const bool      zero_dst_vector) const
 {
   using Wrapper =
-    internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>;
+    internal::MFClassWrapper<MatrixFree<dim, Number, VectorizedArrayType>,
+                             InVector,
+                             OutVector>;
   Wrapper wrap(cell_operation, nullptr, nullptr);
-  internal::
-    MFWorker<MatrixFree<dim, Number>, InVector, OutVector, Wrapper, true>
-      worker(*this,
-             src,
-             dst,
-             zero_dst_vector,
-             wrap,
-             &Wrapper::cell_integrator,
-             &Wrapper::face_integrator,
-             &Wrapper::boundary_integrator);
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     Wrapper,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           zero_dst_vector,
+           wrap,
+           &Wrapper::cell_integrator,
+           &Wrapper::face_integrator,
+           &Wrapper::boundary_integrator);
 
   task_info.loop(worker);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::loop(
-  const std::function<void(const MatrixFree<dim, Number> &,
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                            OutVector &,
                            const InVector &,
                            const std::pair<unsigned int, unsigned int> &)>
     &cell_operation,
-  const std::function<void(const MatrixFree<dim, Number> &,
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                            OutVector &,
                            const InVector &,
                            const std::pair<unsigned int, unsigned int> &)>
     &face_operation,
-  const std::function<void(const MatrixFree<dim, Number> &,
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                            OutVector &,
                            const InVector &,
                            const std::pair<unsigned int, unsigned int> &)>
@@ -4189,41 +4306,50 @@ MatrixFree<dim, Number>::loop(
   const DataAccessOnFaces src_vector_face_access) const
 {
   using Wrapper =
-    internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector>;
+    internal::MFClassWrapper<MatrixFree<dim, Number, VectorizedArrayType>,
+                             InVector,
+                             OutVector>;
   Wrapper wrap(cell_operation, face_operation, boundary_operation);
-  internal::
-    MFWorker<MatrixFree<dim, Number>, InVector, OutVector, Wrapper, true>
-      worker(*this,
-             src,
-             dst,
-             zero_dst_vector,
-             wrap,
-             &Wrapper::cell_integrator,
-             &Wrapper::face_integrator,
-             &Wrapper::boundary_integrator,
-             src_vector_face_access,
-             dst_vector_face_access);
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     Wrapper,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           zero_dst_vector,
+           wrap,
+           &Wrapper::cell_integrator,
+           &Wrapper::face_integrator,
+           &Wrapper::boundary_integrator,
+           src_vector_face_access,
+           dst_vector_face_access);
 
   task_info.loop(worker);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename CLASS, typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::cell_loop(
-  void (CLASS::*function_pointer)(const MatrixFree<dim, Number> &,
-                                  OutVector &,
-                                  const InVector &,
-                                  const std::pair<unsigned int, unsigned int> &)
-    const,
+MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
+  void (CLASS::*function_pointer)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &) const,
   const CLASS *   owning_class,
   OutVector &     dst,
   const InVector &src,
   const bool      zero_dst_vector) const
 {
-  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, true>
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     true>
     worker(*this,
            src,
            dst,
@@ -4237,22 +4363,22 @@ MatrixFree<dim, Number>::cell_loop(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename CLASS, typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::loop(
-  void (CLASS::*cell_operation)(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &)
-    const,
-  void (CLASS::*face_operation)(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &)
-    const,
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  void (CLASS::*cell_operation)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &) const,
+  void (CLASS::*face_operation)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &) const,
   void (CLASS::*boundary_operation)(
-    const MatrixFree<dim, Number> &,
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
     OutVector &,
     const InVector &,
     const std::pair<unsigned int, unsigned int> &) const,
@@ -4263,7 +4389,11 @@ MatrixFree<dim, Number>::loop(
   const DataAccessOnFaces dst_vector_face_access,
   const DataAccessOnFaces src_vector_face_access) const
 {
-  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, true>
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     true>
     worker(*this,
            src,
            dst,
@@ -4279,12 +4409,12 @@ MatrixFree<dim, Number>::loop(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename CLASS, typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::cell_loop(
+MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
   void (CLASS::*function_pointer)(
-    const MatrixFree<dim, Number> &,
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
     OutVector &,
     const InVector &,
     const std::pair<unsigned int, unsigned int> &),
@@ -4293,7 +4423,11 @@ MatrixFree<dim, Number>::cell_loop(
   const InVector &src,
   const bool      zero_dst_vector) const
 {
-  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, false>
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     false>
     worker(*this,
            src,
            dst,
@@ -4307,20 +4441,22 @@ MatrixFree<dim, Number>::cell_loop(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename VectorizedArrayType>
 template <typename CLASS, typename OutVector, typename InVector>
 inline void
-MatrixFree<dim, Number>::loop(
-  void (CLASS::*cell_operation)(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &),
-  void (CLASS::*face_operation)(const MatrixFree<dim, Number> &,
-                                OutVector &,
-                                const InVector &,
-                                const std::pair<unsigned int, unsigned int> &),
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  void (CLASS::*cell_operation)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &),
+  void (CLASS::*face_operation)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &),
   void (CLASS::*boundary_operation)(
-    const MatrixFree<dim, Number> &,
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
     OutVector &,
     const InVector &,
     const std::pair<unsigned int, unsigned int> &),
@@ -4331,7 +4467,11 @@ MatrixFree<dim, Number>::loop(
   const DataAccessOnFaces dst_vector_face_access,
   const DataAccessOnFaces src_vector_face_access) const
 {
-  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, false>
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     false>
     worker(*this,
            src,
            dst,

@@ -37,19 +37,26 @@ namespace internal
   {
     /* ------------------------ MappingInfoStorage implementation ---------- */
 
-    template <int structdim, int spacedim, typename Number>
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      QuadratureDescriptor()
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor ::QuadratureDescriptor()
       : n_q_points(numbers::invalid_unsigned_int)
     {}
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     void
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      initialize(const Quadrature<1> &quadrature_1d,
-                 const UpdateFlags    update_flags_inner_faces)
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor ::initialize(
+        const Quadrature<1> &quadrature_1d,
+        const UpdateFlags    update_flags_inner_faces)
     {
       Assert(structdim + 1 <= spacedim ||
                update_flags_inner_faces == update_default,
@@ -98,10 +105,13 @@ namespace internal
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor ::
-      memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      QuadratureDescriptor ::memory_consumption() const
     {
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
                            quadrature_weights.memory_consumption() +
@@ -113,9 +123,13 @@ namespace internal
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
-    MappingInfoStorage<structdim, spacedim, Number>::memory_consumption() const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      memory_consumption() const
     {
       return MemoryConsumption::memory_consumption(descriptor) +
              MemoryConsumption::memory_consumption(data_index_offsets) +
@@ -133,12 +147,14 @@ namespace internal
 
 
 
-    template <int structdim, int spacedim, typename Number>
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     template <typename StreamType>
     void
-    MappingInfoStorage<structdim, spacedim, Number>::print_memory_consumption(
-      StreamType &    out,
-      const SizeInfo &task_info) const
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      print_memory_consumption(StreamType &out, const SizeInfo &task_info) const
     {
       // print_memory_statistics involves global communication, so we can
       // disable the check here only if no processor has any such data
@@ -192,9 +208,9 @@ namespace internal
 
     /* ------------------------ MappingInfo implementation ----------------- */
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::clear()
+    MappingInfo<dim, Number, VectorizedArrayType>::clear()
     {
       cell_data.clear();
       face_data.clear();
@@ -205,9 +221,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     UpdateFlags
-    MappingInfo<dim, Number>::compute_update_flags(
+    MappingInfo<dim, Number, VectorizedArrayType>::compute_update_flags(
       const UpdateFlags                              update_flags,
       const std::vector<dealii::hp::QCollection<1>> &quad)
     {
@@ -252,16 +268,16 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize(
-      const dealii::Triangulation<dim> &                         tria,
-      const std::vector<std::pair<unsigned int, unsigned int>> & cells,
-      const FaceInfo<VectorizedArray<Number>::n_array_elements> &face_info,
-      const std::vector<unsigned int> &              active_fe_index,
-      const Mapping<dim> &                           mapping,
-      const std::vector<dealii::hp::QCollection<1>> &quad,
-      const UpdateFlags                              update_flags_cells,
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize(
+      const dealii::Triangulation<dim> &                        tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+      const FaceInfo<VectorizedArrayType::n_array_elements> &   face_info,
+      const std::vector<unsigned int> &                         active_fe_index,
+      const Mapping<dim> &                                      mapping,
+      const std::vector<dealii::hp::QCollection<1>> &           quad,
+      const UpdateFlags update_flags_cells,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces,
       const UpdateFlags update_flags_faces_by_cells)
@@ -303,53 +319,55 @@ namespace internal
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct CompressedCellData
       {
         CompressedCellData(const double expected_size)
-          : data(FPArrayComparator<Number>(expected_size))
+          : data(FPArrayComparator<Number, VectorizedArrayType>(expected_size))
         {}
 
         std::map<
           Tensor<2,
                  dim,
-                 Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>,
+                 Tensor<1, VectorizedArrayType::n_array_elements, Number>>,
           unsigned int,
-          FPArrayComparator<Number>>
+          FPArrayComparator<Number, VectorizedArrayType>>
           data;
       };
 
       /**
        * Internal temporary data used for the initialization.
        */
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct LocalData
       {
         LocalData(const double jac_size);
         void
         resize(const unsigned int size);
 
-        AlignedVector<Point<dim, VectorizedArray<Number>>> quadrature_points;
-        AlignedVector<Tensor<2, dim, VectorizedArray<Number>>> general_jac;
-        AlignedVector<VectorizedArray<Number>>                 JxW_values;
-        AlignedVector<Tensor<3, dim, VectorizedArray<Number>>> general_jac_grad;
-        AlignedVector<Tensor<1, dim, VectorizedArray<Number>>> normal_vectors;
-        Tensor<2, dim, VectorizedArray<Number>>                const_jac;
-        const double                                           jac_size;
+        AlignedVector<Point<dim, VectorizedArrayType>>     quadrature_points;
+        AlignedVector<Tensor<2, dim, VectorizedArrayType>> general_jac;
+        AlignedVector<VectorizedArrayType>                 JxW_values;
+        AlignedVector<Tensor<3, dim, VectorizedArrayType>> general_jac_grad;
+        AlignedVector<Tensor<1, dim, VectorizedArrayType>> normal_vectors;
+        Tensor<2, dim, VectorizedArrayType>                const_jac;
+        const double                                       jac_size;
       };
 
 
 
-      template <int dim, typename Number>
-      LocalData<dim, Number>::LocalData(const double jac_size_in)
+      template <int dim, typename Number, typename VectorizedArrayType>
+      LocalData<dim, Number, VectorizedArrayType>::LocalData(
+        const double jac_size_in)
         : jac_size(jac_size_in)
       {}
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
-      LocalData<dim, Number>::resize(const unsigned int size)
+      LocalData<dim, Number, VectorizedArrayType>::resize(
+        const unsigned int size)
       {
         if (JxW_values.size() != size)
           {
@@ -364,28 +382,27 @@ namespace internal
       /**
        * Helper function called internally during the initialize function.
        */
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       evaluate_on_cell(
         const dealii::Triangulation<dim> &           tria,
         const std::pair<unsigned int, unsigned int> *cells,
         const unsigned int                           my_q,
         GeometryType &                               cell_t_prev,
-        GeometryType (&cell_t)[VectorizedArray<Number>::n_array_elements],
-        dealii::FEValues<dim, dim> &fe_val,
-        LocalData<dim, Number> &    cell_data)
+        GeometryType (&cell_t)[VectorizedArrayType::n_array_elements],
+        dealii::FEValues<dim, dim> &                 fe_val,
+        LocalData<dim, Number, VectorizedArrayType> &cell_data)
       {
         const unsigned int n_q_points   = fe_val.n_quadrature_points;
         const UpdateFlags  update_flags = fe_val.get_update_flags();
 
-        cell_data.const_jac = Tensor<2, dim, VectorizedArray<Number>>();
+        cell_data.const_jac = Tensor<2, dim, VectorizedArrayType>();
 
         // this should be the same value as used in HashValue::scaling (but we
         // not have that field here)
         const double zero_tolerance_double =
           cell_data.jac_size * std::numeric_limits<double>::epsilon() * 1024.;
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArrayType::n_array_elements; ++j)
           {
             typename dealii::Triangulation<dim>::cell_iterator cell_it(
               &tria, cells[j].first, cells[j].second);
@@ -550,12 +567,12 @@ namespace internal
           } // end loop over entries of vectorization (n_array_elements cells)
 
         // set information for next cell
-        cell_t_prev = cell_t[VectorizedArray<Number>::n_array_elements - 1];
+        cell_t_prev = cell_t[VectorizedArrayType::n_array_elements - 1];
       }
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_cell_range(
         const std::pair<unsigned int, unsigned int>               cell_range,
@@ -565,14 +582,15 @@ namespace internal
         const Mapping<dim> &                           mapping,
         const std::vector<dealii::hp::QCollection<1>> &quad,
         const UpdateFlags                              update_flags,
-        MappingInfo<dim, Number> &                     mapping_info,
-        std::pair<std::vector<MappingInfoStorage<dim, dim, Number>>,
-                  CompressedCellData<dim, Number>> &   data)
+        MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
+        std::pair<std::vector<
+                    MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
+                  CompressedCellData<dim, Number, VectorizedArrayType>> &data)
       {
         FE_Nothing<dim> dummy_fe;
 
-        Tensor<3, dim, VectorizedArray<Number>> jac_grad, grad_jac_inv;
-        Tensor<1, dim, VectorizedArray<Number>> tmp;
+        Tensor<3, dim, VectorizedArrayType> jac_grad, grad_jac_inv;
+        Tensor<1, dim, VectorizedArrayType> tmp;
 
         // when we make comparisons about the size of Jacobians we need to
         // know the approximate size of typical entries in Jacobians. We need
@@ -587,12 +605,12 @@ namespace internal
         // we fill them up. Only after all vectorization_width cells have been
         // processed, we can insert the data into the data structures of this
         // class
-        LocalData<dim, Number> cell_data(jacobian_size);
+        LocalData<dim, Number, VectorizedArrayType> cell_data(jacobian_size);
 
         // encodes the cell types of the current cell. Since several cells
         // must be considered together, this variable holds the individual
         // info of the last chunk of cells
-        GeometryType cell_t[VectorizedArray<Number>::n_array_elements];
+        GeometryType cell_t[VectorizedArrayType::n_array_elements];
         GeometryType cell_t_prev = general;
 
         // fe_values object that is used to compute the mapping data. for
@@ -670,9 +688,9 @@ namespace internal
                        active_fe_index[cell] != active_fe_index[cell - 1])
                 cell_t_prev = general;
 
-              evaluate_on_cell(
+              evaluate_on_cell<dim, Number, VectorizedArrayType>(
                 tria,
-                &cells[cell * VectorizedArray<Number>::n_array_elements],
+                &cells[cell * VectorizedArrayType::n_array_elements],
                 my_q,
                 cell_t_prev,
                 cell_t,
@@ -690,7 +708,7 @@ namespace internal
                   // (general cell))
                   GeometryType most_general_type = cartesian;
                   for (unsigned int j = 0;
-                       j < VectorizedArray<Number>::n_array_elements;
+                       j < VectorizedArrayType::n_array_elements;
                        ++j)
                     if (cell_t[j] > most_general_type)
                       most_general_type = cell_t[j];
@@ -718,7 +736,7 @@ namespace internal
                         Tensor<2,
                                dim,
                                Tensor<1,
-                                      VectorizedArray<Number>::n_array_elements,
+                                      VectorizedArrayType::n_array_elements,
                                       Number>>,
                         unsigned int>
                         new_entry;
@@ -729,7 +747,7 @@ namespace internal
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int e = 0; e < dim; ++e)
                           for (unsigned int v = 0;
-                               v < VectorizedArray<Number>::n_array_elements;
+                               v < VectorizedArrayType::n_array_elements;
                                ++v)
                             new_entry.first[d][e][v] =
                               cell_data.const_jac[d][e][v];
@@ -750,12 +768,12 @@ namespace internal
                 {
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
-                      Tensor<2, dim, VectorizedArray<Number>> &jac =
+                      Tensor<2, dim, VectorizedArrayType> &jac =
                         cell_data.general_jac[q];
-                      Tensor<3, dim, VectorizedArray<Number>> &jacobian_grad =
+                      Tensor<3, dim, VectorizedArrayType> &jacobian_grad =
                         cell_data.general_jac_grad[q];
                       for (unsigned int j = 0;
-                           j < VectorizedArray<Number>::n_array_elements;
+                           j < VectorizedArrayType::n_array_elements;
                            ++j)
                         if (cell_t[j] < general)
                           {
@@ -770,7 +788,7 @@ namespace internal
 
                       data.first[my_q].JxW_values.push_back(
                         determinant(jac) * fe_val.get_quadrature().weight(q));
-                      Tensor<2, dim, VectorizedArray<Number>> inv_jac =
+                      Tensor<2, dim, VectorizedArrayType> inv_jac =
                         transpose(invert(jac));
                       data.first[my_q].jacobians[0].push_back(inv_jac);
 
@@ -810,7 +828,7 @@ namespace internal
                               {
                                 for (unsigned int f = 0; f < dim; ++f)
                                   {
-                                    tmp[f] = VectorizedArray<Number>();
+                                    tmp[f] = VectorizedArrayType();
                                     for (unsigned int g = 0; g < dim; ++g)
                                       tmp[f] -=
                                         jac_grad[d][f][g] * inv_jac[g][e];
@@ -831,7 +849,7 @@ namespace internal
                           // the diagonal part of Jacobian gradient comes first
                           Tensor<1,
                                  dim *(dim + 1) / 2,
-                                 Tensor<1, dim, VectorizedArray<Number>>>
+                                 Tensor<1, dim, VectorizedArrayType>>
                             final_grad;
                           for (unsigned int d = 0; d < dim; ++d)
                             for (unsigned int e = 0; e < dim; ++e)
@@ -871,7 +889,7 @@ namespace internal
                            q < n_q_points_1d[my_q][fe_index];
                            ++q)
                         {
-                          Point<dim, VectorizedArray<Number>> quad_point;
+                          Point<dim, VectorizedArrayType> quad_point;
                           for (unsigned int d = 0; d < dim; ++d)
                             quad_point[d] =
                               cell_data.quadrature_points
@@ -916,14 +934,19 @@ namespace internal
 
 
 
-      template <int structdim, int dim, typename Number>
+      template <int structdim,
+                int dim,
+                typename Number,
+                typename VectorizedArrayType>
       void
-      copy_data(const unsigned int                          first_cell,
-                const std::array<std::size_t, 2> &          data_shift,
-                const std::vector<unsigned int> &           indices_compressed,
-                const std::vector<GeometryType> &           cell_type,
-                MappingInfoStorage<structdim, dim, Number> &data_cells_local,
-                MappingInfoStorage<structdim, dim, Number> &data_cells)
+      copy_data(const unsigned int                first_cell,
+                const std::array<std::size_t, 2> &data_shift,
+                const std::vector<unsigned int> & indices_compressed,
+                const std::vector<GeometryType> & cell_type,
+                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
+                  &data_cells_local,
+                MappingInfoStorage<structdim, dim, Number, VectorizedArrayType>
+                  &data_cells)
       {
         // Copy the index offsets and shift by the appropriate value
         for (unsigned int lcell = 0;
@@ -944,9 +967,9 @@ namespace internal
         // Copy quadrature points
         if (data_cells.quadrature_point_offsets.empty() == false)
           {
-            Point<dim, VectorizedArray<Number>> *out_point =
+            Point<dim, VectorizedArrayType> *out_point =
               &data_cells.quadrature_points[data_shift[1]];
-            for (const Point<dim, VectorizedArray<Number>> *point =
+            for (const Point<dim, VectorizedArrayType> *point =
                    data_cells_local.quadrature_points.begin();
                  point != data_cells_local.quadrature_points.end();
                  ++point, ++out_point)
@@ -989,9 +1012,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_cells(
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<unsigned int> &                         active_fe_index,
@@ -1002,7 +1025,7 @@ namespace internal
       const unsigned int n_quads = quad.size();
       const unsigned int n_cells = cells.size();
       const unsigned int vectorization_width =
-        VectorizedArray<Number>::n_array_elements;
+        VectorizedArrayType::n_array_elements;
       Assert(n_cells % vectorization_width == 0, ExcInternalError());
       const unsigned int n_macro_cells = n_cells / vectorization_width;
       cell_data.resize(n_quads);
@@ -1032,8 +1055,10 @@ namespace internal
                  (n_macro_cells + MultithreadInfo::n_threads() - 1) /
                    MultithreadInfo::n_threads());
 
-      std::vector<std::pair<std::vector<MappingInfoStorage<dim, dim, Number>>,
-                            ExtractCellHelper::CompressedCellData<dim, Number>>>
+      std::vector<std::pair<
+        std::vector<MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
+        ExtractCellHelper::
+          CompressedCellData<dim, Number, VectorizedArrayType>>>
         data_cells_local;
       // Reserve enough space to avoid re-allocation (which would break the
       // references to the data fields passed to the tasks!)
@@ -1045,11 +1070,15 @@ namespace internal
         while (cell_range.first < n_macro_cells)
           {
             data_cells_local.push_back(std::make_pair(
-              std::vector<MappingInfoStorage<dim, dim, Number>>(n_quads),
-              ExtractCellHelper::CompressedCellData<dim, Number>(
-                ExtractCellHelper::get_jacobian_size(tria))));
+              std::vector<
+                MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>(
+                n_quads),
+              ExtractCellHelper::
+                CompressedCellData<dim, Number, VectorizedArrayType>(
+                  ExtractCellHelper::get_jacobian_size(tria))));
             tasks += Threads::new_task(
-              &ExtractCellHelper::initialize_cell_range<dim, Number>,
+              &ExtractCellHelper::
+                initialize_cell_range<dim, Number, VectorizedArrayType>,
               cell_range,
               tria,
               cells,
@@ -1114,14 +1143,15 @@ namespace internal
           // Start tasks that copy the local data
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_cells_local.size(); ++i)
-            tasks +=
-              Threads::new_task(&ExtractCellHelper::copy_data<dim, dim, Number>,
-                                work_per_chunk * i,
-                                shift[i],
-                                indices_compressed[i],
-                                cell_type,
-                                data_cells_local[i].first[my_q],
-                                cell_data[my_q]);
+            tasks += Threads::new_task(
+              &ExtractCellHelper::
+                copy_data<dim, dim, Number, VectorizedArrayType>,
+              work_per_chunk * i,
+              shift[i],
+              indices_compressed[i],
+              cell_type,
+              data_cells_local[i].first[my_q],
+              cell_data[my_q]);
 
           // finally, insert the constant cell data at the beginning (the
           // other tasks can already start copying the non-constant data)
@@ -1129,11 +1159,11 @@ namespace internal
             {
               for (const auto &it : data_cells_local[0].second.data)
                 {
-                  Tensor<2, dim, VectorizedArray<Number>> jac;
+                  Tensor<2, dim, VectorizedArrayType> jac;
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int e = 0; e < dim; ++e)
                       for (unsigned int v = 0;
-                           v < VectorizedArray<Number>::n_array_elements;
+                           v < VectorizedArrayType::n_array_elements;
                            ++v)
                         jac[d][e][v] = it.first[d][e][v];
                   AssertIndexRange(it.second, n_constant_jacobians);
@@ -1167,7 +1197,7 @@ namespace internal
     // range
     namespace ExtractFaceHelper
     {
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       struct CompressedFaceData
       {
         // Constructor. As a scaling factor for the FPArrayComparator, we
@@ -1175,7 +1205,8 @@ namespace internal
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
         CompressedFaceData(const Number jacobian_size)
-          : data(FPArrayComparator<Number>(512. / jacobian_size))
+          : data(FPArrayComparator<Number, VectorizedArrayType>(512. /
+                                                                jacobian_size))
           , jacobian_size(jacobian_size)
         {}
 
@@ -1188,9 +1219,9 @@ namespace internal
         std::map<
           Tensor<1,
                  2 * dim * dim + dim + 1,
-                 Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>,
+                 Tensor<1, VectorizedArrayType::n_array_elements, Number>>,
           unsigned int,
-          FPArrayComparator<Number>>
+          FPArrayComparator<Number, VectorizedArrayType>>
           data;
 
         // Store the scaling factor
@@ -1230,20 +1261,22 @@ namespace internal
 
 
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_face_range(
         const std::pair<unsigned int, unsigned int>               face_range,
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<
-          FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-        const Mapping<dim> &                        mapping,
-        const UpdateFlags                           update_flags_boundary,
-        const UpdateFlags                           update_flags_inner,
-        MappingInfo<dim, Number> &                  mapping_info,
-        std::pair<std::vector<MappingInfoStorage<dim - 1, dim, Number>>,
-                  CompressedFaceData<dim, Number>> &data)
+          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
+        const Mapping<dim> &                                          mapping,
+        const UpdateFlags                              update_flags_boundary,
+        const UpdateFlags                              update_flags_inner,
+        MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
+        std::pair<
+          std::vector<
+            MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+          CompressedFaceData<dim, Number, VectorizedArrayType>> &data)
       {
         FE_Nothing<dim> dummy_fe;
 
@@ -1268,8 +1301,8 @@ namespace internal
           fe_subface_values_container[my_q].resize(
             mapping_info.face_data[my_q].descriptor.size());
 
-        ExtractCellHelper::LocalData<dim, Number> face_data(
-          ExtractCellHelper::get_jacobian_size(tria));
+        ExtractCellHelper::LocalData<dim, Number, VectorizedArrayType>
+          face_data(ExtractCellHelper::get_jacobian_size(tria));
 
         const unsigned int end_face =
           std::min(std::size_t(face_range.second), faces.size());
@@ -1306,7 +1339,7 @@ namespace internal
               bool JxW_is_similar    = true;
               bool cell_is_cartesian = true;
               for (unsigned int v = 0;
-                   v < VectorizedArray<Number>::n_array_elements;
+                   v < VectorizedArrayType::n_array_elements;
                    ++v)
                 {
                   Tensor<2, dim> jacobian_0;
@@ -1529,7 +1562,7 @@ namespace internal
                 }
 
               using VEC_ARRAY =
-                Tensor<1, VectorizedArray<Number>::n_array_elements, Number>;
+                Tensor<1, VectorizedArrayType::n_array_elements, Number>;
               unsigned int insert_position = data.first[my_q].JxW_values.size();
 
               // Fill in JxW values, apply compression
@@ -1543,7 +1576,7 @@ namespace internal
                         new_entry;
                       new_entry.second = data.second.data.size();
                       for (unsigned int v = 0;
-                           v < VectorizedArray<Number>::n_array_elements;
+                           v < VectorizedArrayType::n_array_elements;
                            ++v)
                         new_entry.first[2 * dim * dim + dim][v] =
                           face_data.JxW_values[0][v] / quadrature.weight(0) /
@@ -1553,7 +1586,7 @@ namespace internal
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int e = 0; e < dim; ++e)
                           for (unsigned int v = 0;
-                               v < VectorizedArray<Number>::n_array_elements;
+                               v < VectorizedArrayType::n_array_elements;
                                ++v)
                             new_entry.first[d * dim + e][v] =
                               face_data.general_jac[0][d][e][v];
@@ -1561,7 +1594,7 @@ namespace internal
                         for (unsigned int d = 0; d < dim; ++d)
                           for (unsigned int e = 0; e < dim; ++e)
                             for (unsigned int v = 0;
-                                 v < VectorizedArray<Number>::n_array_elements;
+                                 v < VectorizedArrayType::n_array_elements;
                                  ++v)
                               new_entry.first[dim * dim + d * dim + e][v] =
                                 face_data.general_jac[n_q_points][d][e][v];
@@ -1574,7 +1607,7 @@ namespace internal
                       // size to get the right scaling
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int v = 0;
-                             v < VectorizedArray<Number>::n_array_elements;
+                             v < VectorizedArrayType::n_array_elements;
                              ++v)
                           new_entry.first[2 * dim * dim + d][v] =
                             face_data.normal_vectors[0][d][v] /
@@ -1606,15 +1639,16 @@ namespace internal
             }
       }
 
-      template <int dim, typename Number>
+      template <int dim, typename Number, typename VectorizedArrayType>
       void
       compute_normal_times_jacobian(
         const unsigned int               first_face,
         const unsigned int               last_face,
         const std::vector<GeometryType> &face_type,
         const std::vector<
-          FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-        MappingInfoStorage<dim - 1, dim, Number> &data_faces)
+          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
+        MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>
+          &data_faces)
       {
         for (unsigned int face = first_face; face < last_face; ++face)
           {
@@ -1642,15 +1676,15 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_faces(
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<
-        FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-      const Mapping<dim> &                                              mapping,
-      const std::vector<dealii::hp::QCollection<1>> &                   quad,
+        FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
+      const Mapping<dim> &                                          mapping,
+      const std::vector<dealii::hp::QCollection<1>> &               quad,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces)
     {
@@ -1692,9 +1726,11 @@ namespace internal
                  (faces.size() + MultithreadInfo::n_threads() - 1) /
                    MultithreadInfo::n_threads());
 
-      std::vector<
-        std::pair<std::vector<MappingInfoStorage<dim - 1, dim, Number>>,
-                  ExtractFaceHelper::CompressedFaceData<dim, Number>>>
+      std::vector<std::pair<
+        std::vector<
+          MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>,
+        ExtractFaceHelper::
+          CompressedFaceData<dim, Number, VectorizedArrayType>>>
         data_faces_local;
       // Reserve enough space to avoid re-allocation (which would destroy the
       // references passed to the tasks!)
@@ -1706,12 +1742,15 @@ namespace internal
         while (face_range.first < faces.size())
           {
             data_faces_local.push_back(std::make_pair(
-              std::vector<MappingInfoStorage<dim - 1, dim, Number>>(
+              std::vector<
+                MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>(
                 quad.size()),
-              ExtractFaceHelper::CompressedFaceData<dim, Number>(
-                ExtractCellHelper::get_jacobian_size(tria))));
+              ExtractFaceHelper::
+                CompressedFaceData<dim, Number, VectorizedArrayType>(
+                  ExtractCellHelper::get_jacobian_size(tria))));
             tasks += Threads::new_task(
-              &ExtractFaceHelper::initialize_face_range<dim, Number>,
+              &ExtractFaceHelper::
+                initialize_face_range<dim, Number, VectorizedArrayType>,
               face_range,
               tria,
               cells,
@@ -1790,7 +1829,8 @@ namespace internal
           Threads::TaskGroup<> tasks;
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
             tasks += Threads::new_task(
-              &ExtractCellHelper::copy_data<dim - 1, dim, Number>,
+              &ExtractCellHelper::
+                copy_data<dim - 1, dim, Number, VectorizedArrayType>,
               work_per_chunk * i,
               shift[i],
               indices_compressed[i],
@@ -1807,7 +1847,7 @@ namespace internal
                 {
                   // JxW values; invert previously applied scaling
                   for (unsigned int v = 0;
-                       v < VectorizedArray<Number>::n_array_elements;
+                       v < VectorizedArrayType::n_array_elements;
                        ++v)
                     face_data[my_q].JxW_values[it.second][v] =
                       it.first[2 * dim * dim + dim][v] *
@@ -1818,7 +1858,7 @@ namespace internal
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int e = 0; e < dim; ++e)
                         for (unsigned int v = 0;
-                             v < VectorizedArray<Number>::n_array_elements;
+                             v < VectorizedArrayType::n_array_elements;
                              ++v)
                           face_data[my_q].jacobians[i][it.second][d][e][v] =
                             it.first[i * dim * dim + d * dim + e][v];
@@ -1826,7 +1866,7 @@ namespace internal
                   // normal vectors; invert previously applied scaling
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int v = 0;
-                         v < VectorizedArray<Number>::n_array_elements;
+                         v < VectorizedArrayType::n_array_elements;
                          ++v)
                       face_data[my_q].normal_vectors[it.second][d][v] =
                         it.first[2 * dim * dim + d][v] * jac_size;
@@ -1851,7 +1891,8 @@ namespace internal
           // finally compute the normal times the jacobian
           for (unsigned int i = 0; i < data_faces_local.size(); ++i)
             tasks += Threads::new_task(
-              &ExtractFaceHelper::compute_normal_times_jacobian<dim, Number>,
+              &ExtractFaceHelper::
+                compute_normal_times_jacobian<dim, Number, VectorizedArrayType>,
               work_per_chunk * i,
               std::min<unsigned int>(work_per_chunk * (i + 1), faces.size()),
               face_type,
@@ -1863,9 +1904,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     void
-    MappingInfo<dim, Number>::initialize_faces_by_cells(
+    MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces_by_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const Mapping<dim> &                                      mapping,
@@ -1878,7 +1919,7 @@ namespace internal
       face_data_by_cells.resize(quad.size());
       const unsigned int n_quads = quad.size();
       const unsigned int vectorization_width =
-        VectorizedArray<Number>::n_array_elements;
+        VectorizedArrayType::n_array_elements;
       UpdateFlags update_flags =
         (update_flags_faces_by_cells & update_quadrature_points ?
            update_quadrature_points :
@@ -2078,9 +2119,9 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     std::size_t
-    MappingInfo<dim, Number>::memory_consumption() const
+    MappingInfo<dim, Number, VectorizedArrayType>::memory_consumption() const
     {
       std::size_t memory = MemoryConsumption::memory_consumption(cell_data);
       memory += MemoryConsumption::memory_consumption(face_data);
@@ -2092,10 +2133,10 @@ namespace internal
 
 
 
-    template <int dim, typename Number>
+    template <int dim, typename Number, typename VectorizedArrayType>
     template <typename StreamType>
     void
-    MappingInfo<dim, Number>::print_memory_consumption(
+    MappingInfo<dim, Number, VectorizedArrayType>::print_memory_consumption(
       StreamType &    out,
       const SizeInfo &task_info) const
     {
@@ -2119,17 +2160,19 @@ namespace internal
 
     /* ------------------------------------------------------------------ */
 
-    template <typename Number>
-    FPArrayComparator<Number>::FPArrayComparator(const Number scaling)
+    template <typename Number, typename VectorizedArrayType>
+    FPArrayComparator<Number, VectorizedArrayType>::FPArrayComparator(
+      const Number scaling)
       : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
     {}
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number>::operator()(const std::vector<Number> &v1,
-                                          const std::vector<Number> &v2) const
+    FPArrayComparator<Number, VectorizedArrayType>::
+    operator()(const std::vector<Number> &v1,
+               const std::vector<Number> &v2) const
     {
       const unsigned int s1 = v1.size(), s2 = v2.size();
       if (s1 < s2)
@@ -2147,15 +2190,13 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number>::operator()(
-      const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t1,
-      const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t2)
-      const
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+      const Tensor<1, VectorizedArrayType::n_array_elements, Number> &t1,
+      const Tensor<1, VectorizedArrayType::n_array_elements, Number> &t2) const
     {
-      for (unsigned int k = 0; k < VectorizedArray<Number>::n_array_elements;
-           ++k)
+      for (unsigned int k = 0; k < VectorizedArrayType::n_array_elements; ++k)
         if (t1[k] < t2[k] - tolerance)
           return true;
         else if (t1[k] > t2[k] + tolerance)
@@ -2165,22 +2206,21 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number>::operator()(
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
       const Tensor<1,
                    dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
+                   Tensor<1, VectorizedArrayType::n_array_elements, Number>>
         &t1,
       const Tensor<1,
                    dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
+                   Tensor<1, VectorizedArrayType::n_array_elements, Number>>
         &t2) const
     {
       for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int k = 0; k < VectorizedArray<Number>::n_array_elements;
-             ++k)
+        for (unsigned int k = 0; k < VectorizedArrayType::n_array_elements; ++k)
           if (t1[d][k] < t2[d][k] - tolerance)
             return true;
           else if (t1[d][k] > t2[d][k] + tolerance)
@@ -2190,23 +2230,22 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number>::operator()(
+    FPArrayComparator<Number, VectorizedArrayType>::operator()(
       const Tensor<2,
                    dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
+                   Tensor<1, VectorizedArrayType::n_array_elements, Number>>
         &t1,
       const Tensor<2,
                    dim,
-                   Tensor<1, VectorizedArray<Number>::n_array_elements, Number>>
+                   Tensor<1, VectorizedArrayType::n_array_elements, Number>>
         &t2) const
     {
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
-          for (unsigned int k = 0;
-               k < VectorizedArray<Number>::n_array_elements;
+          for (unsigned int k = 0; k < VectorizedArrayType::n_array_elements;
                ++k)
             if (t1[d][e][k] < t2[d][e][k] - tolerance)
               return true;

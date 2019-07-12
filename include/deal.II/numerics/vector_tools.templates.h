@@ -1723,8 +1723,10 @@ namespace VectorTools
 
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> matrix_free,
+  project(std::shared_ptr<const MatrixFree<
+            dim,
+            typename VectorType::value_type,
+            VectorizedArray<typename VectorType::value_type>>>      matrix_free,
           const AffineConstraints<typename VectorType::value_type> &constraints,
           const unsigned int      n_q_points_1d,
           const std::function<VectorizedArray<typename VectorType::value_type>(
@@ -1764,8 +1766,10 @@ namespace VectorTools
 
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> matrix_free,
+  project(std::shared_ptr<const MatrixFree<
+            dim,
+            typename VectorType::value_type,
+            VectorizedArray<typename VectorType::value_type>>>      matrix_free,
           const AffineConstraints<typename VectorType::value_type> &constraints,
           const std::function<VectorizedArray<typename VectorType::value_type>(
             const unsigned int,
