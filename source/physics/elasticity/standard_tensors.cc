@@ -20,6 +20,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
+#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
 
 template <int dim>
 const SymmetricTensor<2, dim>
@@ -43,7 +44,8 @@ template <int dim>
 const SymmetricTensor<4, dim>
   Physics::Elasticity::StandardTensors<dim>::dev_P = deviator_tensor<dim>();
 
-#endif // DOXYGEN
+#  endif // DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#endif   // DOXYGEN
 
 // explicit instantiations
 #include "standard_tensors.inst"

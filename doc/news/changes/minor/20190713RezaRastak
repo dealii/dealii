@@ -1,0 +1,3 @@
+Improved: constexpr evaluation is enabled in SymmetricTensor and TableIndices
+<br>
+(Reza Rastak, 2019/07/13)
