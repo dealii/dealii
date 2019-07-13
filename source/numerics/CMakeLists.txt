@@ -35,6 +35,7 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
+  cell_data_transfer.cc
   data_out_dof_data.cc
   data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
@@ -73,6 +74,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
+  cell_data_transfer.inst.in
   data_out_dof_data.inst.in
   data_out_dof_data_codim.inst.in
   data_out_faces.inst.in

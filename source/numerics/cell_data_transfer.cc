@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,15 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/numerics/cell_data_transfer.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     SCALAR : REAL_SCALARS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension
-    template class parallel::distributed::CellDataTransfer<
-      deal_II_dimension,
-      deal_II_space_dimension,
-      Vector<SCALAR>>;
-#endif
-  }
+// explicit instantiations
+#include "cell_data_transfer.inst"
+
+DEAL_II_NAMESPACE_CLOSE

@@ -1,0 +1,178 @@
+
+DEAL:0:1d::cells before: 4
+DEAL:0:1d::cellid=0_1:0 parentid=0 refining
+DEAL:0:1d::cellid=0_1:1 parentid=0
+DEAL:0:1d::cellid=1_1:0 parentid=1 coarsening
+DEAL:0:1d::cellid=1_1:1 parentid=1 coarsening
+DEAL:0:1d::cells after: 4
+DEAL:0:1d::cellid=1_0: parentid=1
+DEAL:0:1d::cellid=0_1:1 parentid=0
+DEAL:0:1d::cellid=0_2:00 parentid=0
+DEAL:0:1d::cellid=0_2:01 parentid=0
+DEAL:0:1d::OK
+DEAL:0:2d::cells before: 16
+DEAL:0:2d::cellid=0_1:0 parentid=0 refining
+DEAL:0:2d::cellid=0_1:1 parentid=0
+DEAL:0:2d::cellid=0_1:2 parentid=0
+DEAL:0:2d::cellid=0_1:3 parentid=0
+DEAL:0:2d::cellid=1_1:0 parentid=1
+DEAL:0:2d::cellid=1_1:1 parentid=1
+DEAL:0:2d::cellid=1_1:2 parentid=1
+DEAL:0:2d::cellid=1_1:3 parentid=1
+DEAL:0:2d::cellid=2_1:0 parentid=2
+DEAL:0:2d::cellid=2_1:1 parentid=2
+DEAL:0:2d::cellid=2_1:2 parentid=2
+DEAL:0:2d::cellid=2_1:3 parentid=2
+DEAL:0:2d::cellid=3_1:0 parentid=3 coarsening
+DEAL:0:2d::cellid=3_1:1 parentid=3 coarsening
+DEAL:0:2d::cellid=3_1:2 parentid=3 coarsening
+DEAL:0:2d::cellid=3_1:3 parentid=3 coarsening
+DEAL:0:2d::cells after: 16
+DEAL:0:2d::cellid=3_0: parentid=3
+DEAL:0:2d::cellid=0_1:1 parentid=0
+DEAL:0:2d::cellid=0_1:2 parentid=0
+DEAL:0:2d::cellid=0_1:3 parentid=0
+DEAL:0:2d::cellid=1_1:0 parentid=1
+DEAL:0:2d::cellid=1_1:1 parentid=1
+DEAL:0:2d::cellid=1_1:2 parentid=1
+DEAL:0:2d::cellid=1_1:3 parentid=1
+DEAL:0:2d::cellid=2_1:0 parentid=2
+DEAL:0:2d::cellid=2_1:1 parentid=2
+DEAL:0:2d::cellid=2_1:2 parentid=2
+DEAL:0:2d::cellid=2_1:3 parentid=2
+DEAL:0:2d::cellid=0_2:00 parentid=0
+DEAL:0:2d::cellid=0_2:01 parentid=0
+DEAL:0:2d::cellid=0_2:02 parentid=0
+DEAL:0:2d::cellid=0_2:03 parentid=0
+DEAL:0:2d::OK
+DEAL:0:3d::cells before: 64
+DEAL:0:3d::cellid=0_1:0 parentid=0 refining
+DEAL:0:3d::cellid=0_1:1 parentid=0
+DEAL:0:3d::cellid=0_1:2 parentid=0
+DEAL:0:3d::cellid=0_1:3 parentid=0
+DEAL:0:3d::cellid=0_1:4 parentid=0
+DEAL:0:3d::cellid=0_1:5 parentid=0
+DEAL:0:3d::cellid=0_1:6 parentid=0
+DEAL:0:3d::cellid=0_1:7 parentid=0
+DEAL:0:3d::cellid=1_1:0 parentid=1
+DEAL:0:3d::cellid=1_1:1 parentid=1
+DEAL:0:3d::cellid=1_1:2 parentid=1
+DEAL:0:3d::cellid=1_1:3 parentid=1
+DEAL:0:3d::cellid=1_1:4 parentid=1
+DEAL:0:3d::cellid=1_1:5 parentid=1
+DEAL:0:3d::cellid=1_1:6 parentid=1
+DEAL:0:3d::cellid=1_1:7 parentid=1
+DEAL:0:3d::cellid=2_1:0 parentid=2
+DEAL:0:3d::cellid=2_1:1 parentid=2
+DEAL:0:3d::cellid=2_1:2 parentid=2
+DEAL:0:3d::cellid=2_1:3 parentid=2
+DEAL:0:3d::cellid=2_1:4 parentid=2
+DEAL:0:3d::cellid=2_1:5 parentid=2
+DEAL:0:3d::cellid=2_1:6 parentid=2
+DEAL:0:3d::cellid=2_1:7 parentid=2
+DEAL:0:3d::cellid=3_1:0 parentid=3
+DEAL:0:3d::cellid=3_1:1 parentid=3
+DEAL:0:3d::cellid=3_1:2 parentid=3
+DEAL:0:3d::cellid=3_1:3 parentid=3
+DEAL:0:3d::cellid=3_1:4 parentid=3
+DEAL:0:3d::cellid=3_1:5 parentid=3
+DEAL:0:3d::cellid=3_1:6 parentid=3
+DEAL:0:3d::cellid=3_1:7 parentid=3
+DEAL:0:3d::cellid=4_1:0 parentid=4
+DEAL:0:3d::cellid=4_1:1 parentid=4
+DEAL:0:3d::cellid=4_1:2 parentid=4
+DEAL:0:3d::cellid=4_1:3 parentid=4
+DEAL:0:3d::cellid=4_1:4 parentid=4
+DEAL:0:3d::cellid=4_1:5 parentid=4
+DEAL:0:3d::cellid=4_1:6 parentid=4
+DEAL:0:3d::cellid=4_1:7 parentid=4
+DEAL:0:3d::cellid=5_1:0 parentid=5
+DEAL:0:3d::cellid=5_1:1 parentid=5
+DEAL:0:3d::cellid=5_1:2 parentid=5
+DEAL:0:3d::cellid=5_1:3 parentid=5
+DEAL:0:3d::cellid=5_1:4 parentid=5
+DEAL:0:3d::cellid=5_1:5 parentid=5
+DEAL:0:3d::cellid=5_1:6 parentid=5
+DEAL:0:3d::cellid=5_1:7 parentid=5
+DEAL:0:3d::cellid=6_1:0 parentid=6
+DEAL:0:3d::cellid=6_1:1 parentid=6
+DEAL:0:3d::cellid=6_1:2 parentid=6
+DEAL:0:3d::cellid=6_1:3 parentid=6
+DEAL:0:3d::cellid=6_1:4 parentid=6
+DEAL:0:3d::cellid=6_1:5 parentid=6
+DEAL:0:3d::cellid=6_1:6 parentid=6
+DEAL:0:3d::cellid=6_1:7 parentid=6
+DEAL:0:3d::cellid=7_1:0 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:1 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:2 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:3 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:4 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:5 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:6 parentid=7 coarsening
+DEAL:0:3d::cellid=7_1:7 parentid=7 coarsening
+DEAL:0:3d::cells after: 64
+DEAL:0:3d::cellid=7_0: parentid=7
+DEAL:0:3d::cellid=0_1:1 parentid=0
+DEAL:0:3d::cellid=0_1:2 parentid=0
+DEAL:0:3d::cellid=0_1:3 parentid=0
+DEAL:0:3d::cellid=0_1:4 parentid=0
+DEAL:0:3d::cellid=0_1:5 parentid=0
+DEAL:0:3d::cellid=0_1:6 parentid=0
+DEAL:0:3d::cellid=0_1:7 parentid=0
+DEAL:0:3d::cellid=1_1:0 parentid=1
+DEAL:0:3d::cellid=1_1:1 parentid=1
+DEAL:0:3d::cellid=1_1:2 parentid=1
+DEAL:0:3d::cellid=1_1:3 parentid=1
+DEAL:0:3d::cellid=1_1:4 parentid=1
+DEAL:0:3d::cellid=1_1:5 parentid=1
+DEAL:0:3d::cellid=1_1:6 parentid=1
+DEAL:0:3d::cellid=1_1:7 parentid=1
+DEAL:0:3d::cellid=2_1:0 parentid=2
+DEAL:0:3d::cellid=2_1:1 parentid=2
+DEAL:0:3d::cellid=2_1:2 parentid=2
+DEAL:0:3d::cellid=2_1:3 parentid=2
+DEAL:0:3d::cellid=2_1:4 parentid=2
+DEAL:0:3d::cellid=2_1:5 parentid=2
+DEAL:0:3d::cellid=2_1:6 parentid=2
+DEAL:0:3d::cellid=2_1:7 parentid=2
+DEAL:0:3d::cellid=3_1:0 parentid=3
+DEAL:0:3d::cellid=3_1:1 parentid=3
+DEAL:0:3d::cellid=3_1:2 parentid=3
+DEAL:0:3d::cellid=3_1:3 parentid=3
+DEAL:0:3d::cellid=3_1:4 parentid=3
+DEAL:0:3d::cellid=3_1:5 parentid=3
+DEAL:0:3d::cellid=3_1:6 parentid=3
+DEAL:0:3d::cellid=3_1:7 parentid=3
+DEAL:0:3d::cellid=4_1:0 parentid=4
+DEAL:0:3d::cellid=4_1:1 parentid=4
+DEAL:0:3d::cellid=4_1:2 parentid=4
+DEAL:0:3d::cellid=4_1:3 parentid=4
+DEAL:0:3d::cellid=4_1:4 parentid=4
+DEAL:0:3d::cellid=4_1:5 parentid=4
+DEAL:0:3d::cellid=4_1:6 parentid=4
+DEAL:0:3d::cellid=4_1:7 parentid=4
+DEAL:0:3d::cellid=5_1:0 parentid=5
+DEAL:0:3d::cellid=5_1:1 parentid=5
+DEAL:0:3d::cellid=5_1:2 parentid=5
+DEAL:0:3d::cellid=5_1:3 parentid=5
+DEAL:0:3d::cellid=5_1:4 parentid=5
+DEAL:0:3d::cellid=5_1:5 parentid=5
+DEAL:0:3d::cellid=5_1:6 parentid=5
+DEAL:0:3d::cellid=5_1:7 parentid=5
+DEAL:0:3d::cellid=6_1:0 parentid=6
+DEAL:0:3d::cellid=6_1:1 parentid=6
+DEAL:0:3d::cellid=6_1:2 parentid=6
+DEAL:0:3d::cellid=6_1:3 parentid=6
+DEAL:0:3d::cellid=6_1:4 parentid=6
+DEAL:0:3d::cellid=6_1:5 parentid=6
+DEAL:0:3d::cellid=6_1:6 parentid=6
+DEAL:0:3d::cellid=6_1:7 parentid=6
+DEAL:0:3d::cellid=0_2:00 parentid=0
+DEAL:0:3d::cellid=0_2:01 parentid=0
+DEAL:0:3d::cellid=0_2:02 parentid=0
+DEAL:0:3d::cellid=0_2:03 parentid=0
+DEAL:0:3d::cellid=0_2:04 parentid=0
+DEAL:0:3d::cellid=0_2:05 parentid=0
+DEAL:0:3d::cellid=0_2:06 parentid=0
+DEAL:0:3d::cellid=0_2:07 parentid=0
+DEAL:0:3d::OK
