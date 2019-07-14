@@ -1389,22 +1389,24 @@ namespace Polynomials
         //
         //     | x  0  x  x         x  x  x |
         //     | 0  x  x  x  . . .  x  x  x |
-        //     | x  x  x  x         x  x  x |
-        //     | x  x  x  x         x  x  x |
+        //     | x  x  x  0         0  x  x |
+        //     | x  x  0  x         0  x  x |
         //     |     .       .         .    |
         // M = |     .         .       .    |
         //     |     .           .     .    |
-        //     | x  x  x  x         x  x  x |
+        //     | x  x  0  0         x  x  x |
         //     | x  x  x  x  . . .  x  x  0 |
         //     | x  x  x  x         x  0  x |
         //
         // We find the inner points as the zeros of the Jacobi polynomials
-        // with alpha = beta = 2 which is the polynomial with the kernel
-        // (1-x)^2 (1+x)^2, the two polynomials achieving zero value and zero
-        // derivative at the boundary.
+        // with alpha = beta = 4 which is the polynomial with the kernel
+        // (1-x)^4 (1+x)^4. Since polynomials (1-x)^2 (1+x)^2 are contained
+        // in every interior polynomial (bubble function), their product
+        // leads us to the orthogonality condition of the Jacobi(4,4)
+        // polynomials.
 
         std::vector<double> jacobi_roots =
-          jacobi_polynomial_roots<double>(degree - 3, 2, 2);
+          jacobi_polynomial_roots<double>(degree - 3, 4, 4);
         AssertDimension(jacobi_roots.size(), degree - 3);
 
         // iteration from variable support point N with secant method
