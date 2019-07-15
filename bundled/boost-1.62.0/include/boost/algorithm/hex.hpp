@@ -73,7 +73,7 @@ namespace detail {
         else if ( c >= 'A' && c <= 'F' ) retval = c - 'A' + 10;
         else if ( c >= 'a' && c <= 'f' ) retval = c - 'a' + 10;
         else BOOST_THROW_EXCEPTION (non_hex_input() << bad_char (c));
-        return retval;
+        return static_cast<char>(retval);
         }
 
 //  My own iterator_traits class.

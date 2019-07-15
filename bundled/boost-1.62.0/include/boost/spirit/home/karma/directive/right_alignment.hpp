@@ -26,7 +26,6 @@
 #include <boost/spirit/home/support/unused.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/integer_traits.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>

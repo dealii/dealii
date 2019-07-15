@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //
 // Copyright (c) 2003 Eric Friedman, Itay Maman
-// Copyright (c) 2014 Antony Polukhin
+// Copyright (c) 2014-2019 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -22,9 +22,11 @@
 #include <boost/utility/addressof.hpp>
 #include <boost/variant/variant_fwd.hpp>
 #include <boost/variant/detail/element_index.hpp>
+#include <boost/variant/detail/move.hpp>
 
 #include <boost/type_traits/add_reference.hpp>
 #include <boost/type_traits/add_pointer.hpp>
+#include <boost/type_traits/is_lvalue_reference.hpp>
 
 namespace boost {
 
@@ -42,7 +44,7 @@ class BOOST_SYMBOL_VISIBLE bad_get
 {
 public: // std::exception implementation
 
-    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW override
+    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW
     {
         return "boost::bad_get: "
                "failed value get using boost::get";
@@ -170,7 +172,34 @@ relaxed_get(
     return *result;
 }
 
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
+#if defined(BOOST_MSVC) && (_MSC_VER < 1900) // MSVC-2014 has fixed the incorrect diagnostics.
+#   pragma warning(push)
+#   pragma warning(disable: 4172) // returning address of local variable or temporary
+#endif
+
+template <typename U, BOOST_VARIANT_ENUM_PARAMS(typename T) >
+inline
+    U&&
+relaxed_get(
+      boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) >&& operand
+      BOOST_VARIANT_AUX_GET_EXPLICIT_TEMPLATE_TYPE(U)
+    )
+{
+    typedef typename add_pointer<U>::type U_ptr;
+    U_ptr result = relaxed_get<U>(boost::addressof(operand));
+
+    if (!result)
+        boost::throw_exception(bad_get());
+    return static_cast<U&&>(*result);
+}
+
+#if defined(BOOST_MSVC) && (_MSC_VER < 1900)
+#   pragma warning(pop)
+#endif
+
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // strict_get<U>(variant) methods
@@ -243,6 +272,30 @@ strict_get(
     return relaxed_get<U>(operand);
 }
 
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+template <typename U, BOOST_VARIANT_ENUM_PARAMS(typename T) >
+inline
+    U&&
+strict_get(
+      boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) >&& operand
+      BOOST_VARIANT_AUX_GET_EXPLICIT_TEMPLATE_TYPE(U)
+    )
+{
+    BOOST_STATIC_ASSERT_MSG(
+        (!boost::is_lvalue_reference<U>::value),
+        "remove ampersand '&' from template type U in boost::get<U>(boost::variant<T...>&&) "
+    );
+
+    BOOST_STATIC_ASSERT_MSG(
+        (boost::detail::variant::holds_element<boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) >, U >::value),
+        "boost::variant does not contain specified type U, "
+        "call to boost::get<U>(const boost::variant<T...>&) will always throw boost::bad_get exception"
+    );
+
+    return relaxed_get<U>(detail::variant::move(operand));
+}
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // get<U>(variant) methods
 //
@@ -307,6 +360,23 @@ get(
     return strict_get<U>(operand);
 #endif
 }
+
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+template <typename U, BOOST_VARIANT_ENUM_PARAMS(typename T) >
+inline
+    U&&
+get(
+      boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) >&& operand
+      BOOST_VARIANT_AUX_GET_EXPLICIT_TEMPLATE_TYPE(U)
+    )
+{
+#ifdef BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+    return relaxed_get<U>(detail::variant::move(operand));
+#else
+    return strict_get<U>(detail::variant::move(operand));
+#endif
+}
+#endif
 
 } // namespace boost
 

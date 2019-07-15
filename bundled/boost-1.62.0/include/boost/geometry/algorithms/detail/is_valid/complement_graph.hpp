@@ -1,8 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2014, Oracle and/or its affiliates.
+// Copyright (c) 2014, 2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Licensed under the Boost Software License version 1.0.
 // http://www.boost.org/users/license.html
@@ -19,6 +20,7 @@
 
 #include <boost/core/addressof.hpp>
 
+#include <boost/geometry/algorithms/detail/signed_size_type.hpp>
 #include <boost/geometry/core/assert.hpp>
 #include <boost/geometry/policies/compare.hpp>
 
@@ -221,9 +223,11 @@ public:
         return false;
     }
 
+#ifdef BOOST_GEOMETRY_TEST_DEBUG
     template <typename OStream, typename TP>
     friend inline
     void debug_print_complement_graph(OStream&, complement_graph<TP> const&);
+#endif // BOOST_GEOMETRY_TEST_DEBUG
 
 private:
     std::size_t m_num_rings, m_num_turns;

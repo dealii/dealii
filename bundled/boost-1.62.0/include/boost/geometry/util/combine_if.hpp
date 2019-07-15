@@ -2,10 +2,11 @@
 
 // Copyright (c) 2014-2015 Samuel Debionne, Grenoble, France.
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015, 2018.
+// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -17,13 +18,13 @@
 #ifndef BOOST_GEOMETRY_UTIL_COMBINE_IF_HPP
 #define BOOST_GEOMETRY_UTIL_COMBINE_IF_HPP
 
+#include <boost/mpl/bind.hpp>
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/mpl/bind.hpp>
-#include <boost/mpl/set.hpp>
 #include <boost/mpl/insert.hpp>
+#include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
-
+#include <boost/mpl/set.hpp>
 
 namespace boost { namespace geometry
 {

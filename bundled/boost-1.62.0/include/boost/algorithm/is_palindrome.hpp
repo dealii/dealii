@@ -35,7 +35,7 @@ namespace boost {  namespace algorithm {
 ///     For other sequences function will return false.
 ///     Complexity: O(N).
 template <typename BidirectionalIterator, typename Predicate>
-bool is_palindrome(BidirectionalIterator begin, BidirectionalIterator end, Predicate p )
+bool is_palindrome(BidirectionalIterator begin, BidirectionalIterator end, Predicate p)
 {
     if(begin == end)
     {
@@ -63,7 +63,7 @@ bool is_palindrome(BidirectionalIterator begin, BidirectionalIterator end, Predi
 /// \return true if the entire sequence is palindrome
 ///
 /// \param begin    The start of the input sequence
-/// \param end		One past the end of the input sequence
+/// \param end	    One past the end of the input sequence
 ///
 /// \note This function will return true for empty sequences and for palindromes.
 ///     For other sequences function will return false.
@@ -71,26 +71,8 @@ bool is_palindrome(BidirectionalIterator begin, BidirectionalIterator end, Predi
 template <typename BidirectionalIterator>
 bool is_palindrome(BidirectionalIterator begin, BidirectionalIterator end)
 {
-    if(begin == end)
-    {
-        return true;
-    }
-
-    --end;
-    while(begin != end)
-    {
-        if(!(*begin == *end))
-        {
-            return false;
-        }
-        ++begin;
-        if(begin == end)
-        {
-            break;
-        }
-        --end;
-    }
-    return true;
+    return is_palindrome(begin, end,
+                         std::equal_to<typename std::iterator_traits<BidirectionalIterator>::value_type> ());
 }
 
 /// \fn is_palindrome ( const R& range )
@@ -122,7 +104,6 @@ bool is_palindrome(const R& range, Predicate p)
     return is_palindrome(boost::begin(range), boost::end(range), p);
 }
 
-
 /// \fn is_palindrome ( const char* str )
 /// \return true if the entire sequence is palindrome
 ///
@@ -137,7 +118,6 @@ bool is_palindrome(const char* str)
 	    return true;
     return is_palindrome(str, str + strlen(str));
 }
-
 
 /// \fn is_palindrome ( const char* str, Predicate p )
 /// \return true if the entire sequence is palindrome
@@ -155,7 +135,6 @@ bool is_palindrome(const char* str, Predicate p)
 	    return true;
     return is_palindrome(str, str + strlen(str), p);
 }
-
 }}
 
 #endif // BOOST_ALGORITHM_IS_PALINDROME_HPP

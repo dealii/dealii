@@ -52,42 +52,9 @@ struct segments_intersection_points
     {
         return_type result;
         result.count = 1;
+        sinfo.calculate(result.intersections[0], s1, s2);
 
-        bool use_a = true;
-
-        // Prefer one segment if one is on or near an endpoint
-        bool const a_near_end = sinfo.robust_ra.near_end();
-        bool const b_near_end = sinfo.robust_rb.near_end();
-        if (a_near_end && ! b_near_end)
-        {
-            use_a = true;
-        }
-        else if (b_near_end && ! a_near_end)
-        {
-            use_a = false;
-        }
-        else
-        {
-            // Prefer shorter segment
-            typedef typename SegmentIntersectionInfo::promoted_type ptype;
-            ptype const len_a = sinfo.comparable_length_a();
-            ptype const len_b = sinfo.comparable_length_b();
-            if (len_b < len_a)
-            {
-                use_a = false;
-            }
-            // else use_a is true but was already assigned like that
-        }
-
-        if (use_a)
-        {
-            sinfo.assign_a(result.intersections[0], s1, s2);
-        }
-        else
-        {
-            sinfo.assign_b(result.intersections[0], s1, s2);
-        }
-
+        // Temporary - this should go later
         result.fractions[0].assign(sinfo);
 
         return result;

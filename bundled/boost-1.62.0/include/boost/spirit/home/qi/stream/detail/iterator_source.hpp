@@ -12,21 +12,19 @@
 #endif
 
 #include <boost/iostreams/stream.hpp>
-#include <boost/detail/iterator.hpp>
+#include <iterator> // for std::iterator_traits, std::distance
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace spirit { namespace qi { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    struct iterator_source
+    struct base_iterator_source
     {
-        typedef typename
-            boost::detail::iterator_traits<Iterator>::value_type
-        char_type;
+        typedef typename std::iterator_traits<Iterator>::value_type char_type;
         typedef boost::iostreams::seekable_device_tag category;
 
-        iterator_source (Iterator const& first_, Iterator const& last_)
+        base_iterator_source (Iterator const& first_, Iterator const& last_)
           : first(first_), last(last_), pos(0)
         {}
 
@@ -62,6 +60,7 @@ namespace boost { namespace spirit { namespace qi { namespace detail
 
         std::streampos seek(boost::iostreams::stream_offset, std::ios_base::seekdir way)
         {
+            (void)way;
             BOOST_ASSERT(way == std::ios_base::cur);    // only support queries
             return pos;                              // return current position
         }
@@ -72,7 +71,56 @@ namespace boost { namespace spirit { namespace qi { namespace detail
 
     private:
         // silence MSVC warning C4512: assignment operator could not be generated
-        iterator_source& operator= (iterator_source const&);
+        base_iterator_source& operator= (base_iterator_source const&);
+    };
+
+    template <typename Iterator, typename Enable = void>
+    struct iterator_source : base_iterator_source<Iterator>
+    {
+        typedef base_iterator_source<Iterator> base_type;
+
+        iterator_source (Iterator const& first_, Iterator const& last_) 
+            : base_type(first_, last_) {}
+    };
+
+    // Specialization for random-access iterators. This also allows compilers
+    // to fully optimize the case when the source range is contiguous
+    template <typename Iterator>
+    struct iterator_source<
+            Iterator, 
+            typename boost::enable_if_c<boost::is_convertible<
+                typename std::iterator_traits<Iterator>::iterator_category, std::random_access_iterator_tag>::value>::type
+        > : base_iterator_source<Iterator>
+    {
+        typedef base_iterator_source<Iterator> base_type;
+
+        iterator_source (Iterator const& first_, Iterator const& last_) 
+            : base_type(first_, last_) {}
+
+        typedef typename base_type::char_type char_type;
+        using base_type::first;
+        using base_type::last;
+        using base_type::pos;
+
+        // Read up to n characters from the input sequence into the buffer s,
+        // returning the number of characters read, or -1 to indicate
+        // end-of-sequence.
+        std::streamsize read (char_type* s, std::streamsize n)
+        {
+            if (first == last)
+                return -1;
+
+            n = (std::min)(static_cast<std::streamsize>(last - first), n);
+
+            typedef typename std::iterator_traits<Iterator>::difference_type diff_type;
+
+            // copy_n is only part of c++11, so emulate it
+            std::copy(first, first + static_cast<diff_type>(n), s);
+            first += static_cast<diff_type>(n);
+            pos += n;
+
+            return n;
+        }
     };
 
 }}}}

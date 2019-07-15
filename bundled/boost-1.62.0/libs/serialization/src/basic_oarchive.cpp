@@ -106,8 +106,9 @@ class basic_oarchive_impl {
             m_class_id(class_id),
             m_initialized(false)
         {}
-        cobject_type(const basic_oserializer & bos)
-            : m_bos_ptr(& bos)
+        cobject_type(const basic_oserializer & bos) :
+            m_bos_ptr(& bos),
+            m_initialized(false)
         {}
         cobject_type(
             const cobject_type & rhs
@@ -193,7 +194,7 @@ basic_oarchive_impl::find(const serialization::extended_type_info & ti) const {
             return version_type(0);
         }
         // returns true if this class is polymorphic
-        bool is_polymorphic() const override{
+        bool is_polymorphic() const override {
             BOOST_ASSERT(false);
             return false;
         }

@@ -67,7 +67,7 @@ namespace detail { namespace variant {
 
 #define BOOST_VARIANT_VISIT(z, n, data)                                                     \
     template <BOOST_PP_ENUM_PARAMS(BOOST_PP_ADD(n, 1), class VisitableUnwrapped)>           \
-    BOOST_VARIANT_AUX_GENERIC_RESULT_TYPE(result_type) operator()(                          \
+    result_type operator()(                                                                 \
         BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ADD(n, 1), VisitableUnwrapped, & vis)          \
     ) const                                                                                 \
     {                                                                                       \
@@ -119,7 +119,7 @@ BOOST_PP_REPEAT( BOOST_PP_SUB(BOOST_VARAINT_MAX_MULTIVIZITOR_PARAMS, 2), BOOST_V
 
 #define BOOST_VARIANT_VISIT(z, n, data)                                                                 \
     template <class Visitor BOOST_PP_COMMA() BOOST_PP_ENUM_PARAMS(BOOST_PP_ADD(n, 3), class T)>         \
-    inline BOOST_VARIANT_AUX_GENERIC_RESULT_TYPE(BOOST_DEDUCED_TYPENAME Visitor::result_type) apply_visitor( \
+    inline BOOST_DEDUCED_TYPENAME Visitor::result_type apply_visitor(                                   \
         data BOOST_PP_COMMA() BOOST_PP_ENUM_BINARY_PARAMS(BOOST_PP_ADD(n, 3), T, & var)     \
     )                                                                                                   \
     {                                                                                                   \

@@ -15,6 +15,7 @@
 #define BOOST_GEOMETRY_GEOMETRIES_CONCEPTS_POLYGON_CONCEPT_HPP
 
 #include <boost/concept_check.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/range/concepts.hpp>
 
 #include <boost/geometry/core/access.hpp>
@@ -65,12 +66,8 @@ class Polygon
             ring_const_type ce = traits::exterior_ring<PolygonType>::get(*cpoly);
             interior_const_type ci = traits::interior_rings<PolygonType>::get(*cpoly);
 
-            boost::ignore_unused_variable_warning(e);
-            boost::ignore_unused_variable_warning(i);
-            boost::ignore_unused_variable_warning(ce);
-            boost::ignore_unused_variable_warning(ci);
-            boost::ignore_unused_variable_warning(poly);
-            boost::ignore_unused_variable_warning(cpoly);
+            boost::ignore_unused(poly, cpoly);
+            boost::ignore_unused(e, i, ce, ci);
         }
     };
 
@@ -115,9 +112,7 @@ class ConstPolygon
             ring_const_type ce = traits::exterior_ring<const_polygon_type>::get(*cpoly);
             interior_const_type ci = traits::interior_rings<const_polygon_type>::get(*cpoly);
 
-            boost::ignore_unused_variable_warning(ce);
-            boost::ignore_unused_variable_warning(ci);
-            boost::ignore_unused_variable_warning(cpoly);
+            boost::ignore_unused(ce, ci, cpoly);
         }
     };
 

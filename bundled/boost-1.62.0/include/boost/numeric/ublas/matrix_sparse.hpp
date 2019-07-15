@@ -368,7 +368,7 @@ namespace boost { namespace numeric { namespace ublas {
 
         // Reserving
         BOOST_UBLAS_INLINE
-        void reserve (size_type non_zeros, bool preserve = true) {
+	void reserve (size_type non_zeros, bool /*preserve*/ = true) {
             detail::map_reserve (data (), restrict_capacity (non_zeros));
         }
 
@@ -1461,7 +1461,7 @@ namespace boost { namespace numeric { namespace ublas {
             data_ [layout_type::size_M (size1_, size2_)] = vector_data_value_type ();
         }
         BOOST_UBLAS_INLINE
-        mapped_vector_of_mapped_vector (size_type size1, size_type size2, size_type non_zeros = 0):
+        mapped_vector_of_mapped_vector (size_type size1, size_type size2, size_type /*non_zeros*/ = 0):
             matrix_container<self_type> (),
             size1_ (size1), size2_ (size2), data_ () {
             data_ [layout_type::size_M (size1_, size2_)] = vector_data_value_type ();
@@ -1472,7 +1472,7 @@ namespace boost { namespace numeric { namespace ublas {
             size1_ (m.size1_), size2_ (m.size2_), data_ (m.data_) {}
         template<class AE>
         BOOST_UBLAS_INLINE
-        mapped_vector_of_mapped_vector (const matrix_expression<AE> &ae, size_type non_zeros = 0):
+        mapped_vector_of_mapped_vector (const matrix_expression<AE> &ae, size_type /*non_zeros*/ = 0):
             matrix_container<self_type> (),
             size1_ (ae ().size1 ()), size2_ (ae ().size2 ()), data_ () {
             data_ [layout_type::size_M (size1_, size2_)] = vector_data_value_type ();

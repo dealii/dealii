@@ -86,7 +86,7 @@ protected:
     text_oarchive_impl(std::ostream & os, unsigned int flags);
     // don't import inline definitions! leave this as a reminder.
     //BOOST_ARCHIVE_DECL 
-    ~text_oarchive_impl() override{};
+    ~text_oarchive_impl(){};
 public:
     BOOST_ARCHIVE_DECL void 
     save_binary(const void *address, std::size_t count);
@@ -103,7 +103,7 @@ public:
         // note: added _ to suppress useless gcc warning
         text_oarchive_impl<text_oarchive>(os_, flags)
     {}
-    ~text_oarchive() override{}
+    ~text_oarchive(){}
 };
 
 } // namespace archive

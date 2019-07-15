@@ -26,7 +26,7 @@ namespace boost { namespace algorithm {
 /// \param p        A predicate for testing the elements of the range
 /// \note           This function is part of the C++2011 standard library.
 template<typename InputIterator, typename Predicate> 
-InputIterator find_if_not ( InputIterator first, InputIterator last, Predicate p )
+BOOST_CXX14_CONSTEXPR InputIterator find_if_not ( InputIterator first, InputIterator last, Predicate p )
 {
     for ( ; first != last; ++first )
         if ( !p(*first))
@@ -42,7 +42,7 @@ InputIterator find_if_not ( InputIterator first, InputIterator last, Predicate p
 /// \param p        A predicate for testing the elements of the range
 ///
 template<typename Range, typename Predicate>
-typename boost::range_iterator<const Range>::type find_if_not ( const Range &r, Predicate p )
+BOOST_CXX14_CONSTEXPR typename boost::range_iterator<const Range>::type find_if_not ( const Range &r, Predicate p )
 {
     return boost::algorithm::find_if_not (boost::begin (r), boost::end(r), p);
 }

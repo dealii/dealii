@@ -89,22 +89,9 @@ namespace boost { namespace spirit { namespace qi
         }
 
         ///////////////////////////////////////////////////////////////////////
-        //  The parse_nan() and parse_inf() functions get called whenever:
-        //
-        //    - a number to parse does not start with a digit (after having
-        //      successfully parsed an optional sign)
-        //
-        //  or
-        //
-        //    - after a floating point number of the value 1 (having no
-        //      exponential part and a fractional part value of 0) has been
-        //      parsed.
-        //
-        //  The first call allows to recognize representations of NaN or Inf
-        //  starting with a non-digit character (such as NaN, Inf, QNaN etc.).
-        //
-        //  The second call allows to recognize representation formats starting
-        //  with a 1.0 (such as 1.0#NAN or 1.0#INF etc.).
+        //  The parse_nan() and parse_inf() functions get called whenever
+        //  a number to parse does not start with a digit (after having
+        //  successfully parsed an optional sign).
         //
         //  The functions should return true if a Nan or Inf has been found. In
         //  this case the attr should be set to the matched value (NaN or

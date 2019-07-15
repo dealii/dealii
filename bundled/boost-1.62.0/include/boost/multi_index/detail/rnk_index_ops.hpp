@@ -1,4 +1,4 @@
-/* Copyright 2003-2015 Joaquin M Lopez Munoz.
+/* Copyright 2003-2018 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -14,9 +14,9 @@
 #endif
 
 #include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
+#include <boost/core/pointer_traits.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/multi_index/detail/promotes_arg.hpp>
-#include <cstddef>
 #include <utility>
 
 namespace boost{
@@ -30,19 +30,30 @@ namespace detail{
  */
 
 template<typename Pointer>
-inline std::size_t ranked_node_size(Pointer x)
+struct ranked_node_size_type
+{
+  typedef typename boost::pointer_traits<Pointer>::
+    element_type::size_type type;
+};
+
+template<typename Pointer>
+inline typename ranked_node_size_type<Pointer>::type
+ranked_node_size(Pointer x)
 {
   return x!=Pointer(0)?x->size:0;
 }
 
 template<typename Pointer>
-inline Pointer ranked_index_nth(std::size_t n,Pointer end_)
+inline Pointer ranked_index_nth(
+  BOOST_DEDUCED_TYPENAME ranked_node_size_type<Pointer>::type n,Pointer end_)
 {
+  typedef typename ranked_node_size_type<Pointer>::type size_type;
+
   Pointer top=end_->parent();
   if(top==Pointer(0)||n>=top->size)return end_;
 
   for(;;){
-    std::size_t s=ranked_node_size(top->left());
+    size_type s=ranked_node_size(top->left());
     if(n==s)return top;
     if(n<s)top=top->left();
     else{
@@ -53,13 +64,16 @@ inline Pointer ranked_index_nth(std::size_t n,Pointer end_)
 }
 
 template<typename Pointer>
-inline std::size_t ranked_index_rank(Pointer x,Pointer end_)
+inline typename ranked_node_size_type<Pointer>::type
+ranked_index_rank(Pointer x,Pointer end_)
 {
+  typedef typename ranked_node_size_type<Pointer>::type size_type;
+
   Pointer top=end_->parent();
   if(top==Pointer(0))return 0;
   if(x==end_)return top->size;
 
-  std::size_t s=ranked_node_size(x->left());
+  size_type s=ranked_node_size(x->left());
   while(x!=top){
     Pointer z=x->parent();
     if(x==z->right()){
@@ -74,7 +88,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_find_rank(
+inline typename Node::size_type ranked_index_find_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp)
 {
@@ -91,7 +105,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleCompare
 >
-inline std::size_t ranked_index_find_rank(
+inline typename Node::size_type ranked_index_find_rank(
   Node* top,Node* y,const KeyFromValue& key,
   const BOOST_DEDUCED_TYPENAME KeyFromValue::result_type& x,
   const CompatibleCompare& comp,mpl::true_)
@@ -103,15 +117,17 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_find_rank(
+inline typename Node::size_type ranked_index_find_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp,mpl::false_)
 {
+  typedef typename Node::size_type size_type;
+
   if(!top)return 0;
 
-  std::size_t s=top->size,
-              s0=s;
-  Node*       y0=y;
+  size_type s=top->impl()->size,
+            s0=s;
+  Node*     y0=y;
 
   do{
     if(!comp(key(top->value()),x)){
@@ -129,7 +145,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_lower_bound_rank(
+inline typename Node::size_type ranked_index_lower_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp)
 {
@@ -144,7 +160,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleCompare
 >
-inline std::size_t ranked_index_lower_bound_rank(
+inline typename Node::size_type ranked_index_lower_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,
   const BOOST_DEDUCED_TYPENAME KeyFromValue::result_type& x,
   const CompatibleCompare& comp,mpl::true_)
@@ -156,13 +172,15 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_lower_bound_rank(
+inline typename Node::size_type ranked_index_lower_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp,mpl::false_)
 {
+  typedef typename Node::size_type size_type;
+
   if(!top)return 0;
 
-  std::size_t s=top->size;
+  size_type s=top->impl()->size;
 
   do{
     if(!comp(key(top->value()),x)){
@@ -180,7 +198,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_upper_bound_rank(
+inline typename Node::size_type ranked_index_upper_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp)
 {
@@ -195,7 +213,7 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleCompare
 >
-inline std::size_t ranked_index_upper_bound_rank(
+inline typename Node::size_type ranked_index_upper_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,
   const BOOST_DEDUCED_TYPENAME KeyFromValue::result_type& x,
   const CompatibleCompare& comp,mpl::true_)
@@ -207,13 +225,15 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::size_t ranked_index_upper_bound_rank(
+inline typename Node::size_type ranked_index_upper_bound_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp,mpl::false_)
 {
+  typedef typename Node::size_type size_type;
+
   if(!top)return 0;
 
-  std::size_t s=top->size;
+  size_type s=top->impl()->size;
 
   do{
     if(comp(x,key(top->value()))){
@@ -231,7 +251,8 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::pair<std::size_t,std::size_t> ranked_index_equal_range_rank(
+inline std::pair<typename Node::size_type,typename Node::size_type>
+ranked_index_equal_range_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp)
 {
@@ -248,7 +269,8 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleCompare
 >
-inline std::pair<std::size_t,std::size_t> ranked_index_equal_range_rank(
+inline std::pair<typename Node::size_type,typename Node::size_type>
+ranked_index_equal_range_rank(
   Node* top,Node* y,const KeyFromValue& key,
   const BOOST_DEDUCED_TYPENAME KeyFromValue::result_type& x,
   const CompatibleCompare& comp,mpl::true_)
@@ -260,13 +282,16 @@ template<
   typename Node,typename KeyFromValue,
   typename CompatibleKey,typename CompatibleCompare
 >
-inline std::pair<std::size_t,std::size_t> ranked_index_equal_range_rank(
+inline std::pair<typename Node::size_type,typename Node::size_type>
+ranked_index_equal_range_rank(
   Node* top,Node* y,const KeyFromValue& key,const CompatibleKey& x,
   const CompatibleCompare& comp,mpl::false_)
 {
-  if(!top)return std::pair<std::size_t,std::size_t>(0,0);
+  typedef typename Node::size_type size_type;
 
-  std::size_t s=top->size;
+  if(!top)return std::pair<size_type,size_type>(0,0);
+
+  size_type s=top->impl()->size;
 
   do{
     if(comp(key(top->value()),x)){
@@ -278,8 +303,8 @@ inline std::pair<std::size_t,std::size_t> ranked_index_equal_range_rank(
       top=Node::from_impl(top->left());
     }
     else{
-      return std::pair<std::size_t,std::size_t>(
-        s-top->size+
+      return std::pair<size_type,size_type>(
+        s-top->impl()->size+
           ranked_index_lower_bound_rank(
            Node::from_impl(top->left()),top,key,x,comp,mpl::false_()),
         s-ranked_node_size(top->right())+
@@ -288,7 +313,7 @@ inline std::pair<std::size_t,std::size_t> ranked_index_equal_range_rank(
     }
   }while(top);
 
-  return std::pair<std::size_t,std::size_t>(s,s);
+  return std::pair<size_type,size_type>(s,s);
 }
 
 } /* namespace multi_index::detail */

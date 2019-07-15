@@ -46,7 +46,7 @@ public:
         const char * e2 = NULL
     );
     BOOST_ARCHIVE_DECL xml_archive_exception(xml_archive_exception const &) ;
-    virtual BOOST_ARCHIVE_DECL ~xml_archive_exception() BOOST_NOEXCEPT_OR_NOTHROW override ;
+    virtual BOOST_ARCHIVE_DECL ~xml_archive_exception() BOOST_NOEXCEPT_OR_NOTHROW ;
 };
 
 }// namespace archive

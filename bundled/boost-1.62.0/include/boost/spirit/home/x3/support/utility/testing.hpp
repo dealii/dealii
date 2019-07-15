@@ -230,7 +230,7 @@ namespace boost { namespace spirit { namespace x3 { namespace testing
         std::string output = f(load(input_path), input_path);
         std::string expected = load(expect_path);
 
-        auto result = compare(output, expected);
+        auto result = compare(output, expected, re_prefix, re_suffix);
         if (!result.full_match)
         {
             std::cout << "=============================================" << std::endl;

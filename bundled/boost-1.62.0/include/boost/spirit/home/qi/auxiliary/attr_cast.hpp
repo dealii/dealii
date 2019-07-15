@@ -101,7 +101,7 @@ namespace boost { namespace spirit { namespace qi
 
             // do up-stream transformation, this mainly integrates the results
             // back into the original attribute value, if appropriate
-            traits::post_transform(attr_param, attr_);
+            transform::post(attr_param, attr_);
             return true;
         }
 

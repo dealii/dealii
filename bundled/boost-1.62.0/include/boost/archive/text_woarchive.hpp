@@ -136,7 +136,7 @@ public:
     text_woarchive(std::wostream & os, unsigned int flags = 0) :
         text_woarchive_impl<text_woarchive>(os, flags)
     {}
-    ~text_woarchive() override{}
+    ~text_woarchive(){}
 };
 
 } // namespace archive

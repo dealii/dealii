@@ -4,8 +4,8 @@
 // Copyright (c) 2008-2015 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015, 2018.
+// Modifications copyright (c) 2015, 2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -31,6 +31,7 @@
 #include <boost/geometry/core/coordinate_type.hpp>
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/strategies/centroid.hpp>
+#include <boost/geometry/util/math.hpp>
 #include <boost/geometry/util/select_coordinate_type.hpp>
 
 

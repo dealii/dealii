@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //
 // Copyright (c) 2003 Eric Friedman, Itay Maman
-// Copyright (c) 2013-2016 Antony Polukhin
+// Copyright (c) 2013-2019 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -59,7 +59,7 @@
     GCC before 4.0 had no variadic tempaltes; 
     GCC 4.6 has incomplete implementation of variadic templates.
 
-    MSVC2013 has variadic templates, but they have issues.
+    MSVC2015 Update 1 has variadic templates, but they have issues.
 
     NOTE: Clang compiler defines __GNUC__
 */

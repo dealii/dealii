@@ -21,13 +21,10 @@
 #include <boost/spirit/home/support/char_encoding/standard.hpp>
 #include <boost/spirit/home/support/char_encoding/standard_wide.hpp>
 
-#include <boost/fusion/include/at.hpp>
-#include <boost/range.hpp>
-#include <boost/type_traits/add_reference.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include <initializer_list>
+#include <iterator> // std::begin
+#include <memory> // std::shared_ptr
+#include <type_traits>
 
 #if defined(BOOST_MSVC)
 # pragma warning(push)
@@ -48,21 +45,21 @@ namespace boost { namespace spirit { namespace x3
         typedef value_type attribute_type;
 
         static bool const has_attribute =
-            !is_same<unused_type, attribute_type>::value;
+            !std::is_same<unused_type, attribute_type>::value;
         static bool const handles_container =
             traits::is_container<attribute_type>::value;
 
         symbols_parser(std::string const& name = "symbols")
-          : add(*this)
-          , remove(*this)
-          , lookup(new Lookup())
+          : add{*this}
+          , remove{*this}
+          , lookup(std::make_shared<Lookup>())
           , name_(name)
         {
         }
 
         symbols_parser(symbols_parser const& syms)
-          : add(*this)
-          , remove(*this)
+          : add{*this}
+          , remove{*this}
           , lookup(syms.lookup)
           , name_(syms.name_)
         {
@@ -70,54 +67,37 @@ namespace boost { namespace spirit { namespace x3
 
         template <typename Symbols>
         symbols_parser(Symbols const& syms, std::string const& name = "symbols")
-          : add(*this)
-          , remove(*this)
-          , lookup(new Lookup())
-          , name_(name)
+          : symbols_parser(name)
         {
-            typename range_const_iterator<Symbols>::type si = boost::begin(syms);
-            while (si != boost::end(syms))
-                add(*si++);
+            for (auto& sym : syms)
+                add(sym);
         }
 
         template <typename Symbols, typename Data>
         symbols_parser(Symbols const& syms, Data const& data
               , std::string const& name = "symbols")
-          : add(*this)
-          , remove(*this)
-          , lookup(new Lookup())
-          , name_(name)
+          : symbols_parser(name)
         {
-            typename range_const_iterator<Symbols>::type si = boost::begin(syms);
-            typename range_const_iterator<Data>::type di = boost::begin(data);
-            while (si != boost::end(syms))
-                add(*si++, *di++);
+            using std::begin;
+            auto di = begin(data);
+            for (auto& sym : syms)
+                add(sym, *di++);
         }
 
         symbols_parser(std::initializer_list<std::pair<char_type const*, T>> syms
               , std::string const & name="symbols")
-          : add(*this)
-          , remove(*this)
-          , lookup(new Lookup())
-          , name_(name)
+          : symbols_parser(name)
         {
-            typedef std::initializer_list<std::pair<char_type const*, T>> symbols_t;
-            typename range_const_iterator<symbols_t>::type si = boost::begin(syms);
-            for (;si != boost::end(syms); ++si)
-                add(si->first, si->second);
+            for (auto& sym : syms)
+                add(sym.first, sym.second);
         }
 
         symbols_parser(std::initializer_list<char_type const*> syms
               , std::string const &name="symbols")
-          : add(*this)
-          , remove(*this)
-          , lookup(new Lookup())
-          , name_(name)
+          : symbols_parser(name)
         {
-            typedef std::initializer_list<char_type const*> symbols_t;
-            typename range_const_iterator<symbols_t>::type si = boost::begin(syms);
-            while (si != boost::end(syms))
-                add(*si++);
+            for (auto str : syms)
+                add(str);
         }
 
         symbols_parser&
@@ -241,14 +221,6 @@ namespace boost { namespace spirit { namespace x3
 
         struct adder
         {
-            template <typename, typename = unused_type, typename = unused_type>
-            struct result { typedef adder const& type; };
-
-            adder(symbols_parser& sym)
-              : sym(sym)
-            {
-            }
-
             template <typename Iterator>
             adder const&
             operator()(Iterator first, Iterator last, T const& val) const
@@ -280,14 +252,6 @@ namespace boost { namespace spirit { namespace x3
 
         struct remover
         {
-            template <typename, typename = unused_type, typename = unused_type>
-            struct result { typedef remover const& type; };
-
-            remover(symbols_parser& sym)
-              : sym(sym)
-            {
-            }
-
             template <typename Iterator>
             remover const&
             operator()(Iterator const& first, Iterator const& last) const
@@ -319,7 +283,7 @@ namespace boost { namespace spirit { namespace x3
 
         adder add;
         remover remove;
-        shared_ptr<Lookup> lookup;
+        std::shared_ptr<Lookup> lookup;
         std::string name_;
     };
 
@@ -343,11 +307,13 @@ namespace boost { namespace spirit { namespace x3
 
     using standard::symbols;
 
+#ifndef BOOST_SPIRIT_NO_STANDARD_WIDE
     namespace standard_wide
     {
         template <typename T = unused_type>
         using symbols = symbols_parser<char_encoding::standard_wide, T>;
     }
+#endif
 
     namespace ascii
     {

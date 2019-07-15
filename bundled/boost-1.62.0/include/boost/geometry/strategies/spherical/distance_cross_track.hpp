@@ -2,10 +2,12 @@
 
 // Copyright (c) 2007-2014 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2014.
-// Modifications copyright (c) 2014, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2014-2018.
+// Modifications copyright (c) 2014-2018, Oracle and/or its affiliates.
 
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,11 +28,12 @@
 #include <boost/geometry/core/radian_access.hpp>
 #include <boost/geometry/core/tags.hpp>
 
-#include <boost/geometry/algorithms/detail/course.hpp>
+#include <boost/geometry/formulas/spherical.hpp>
 
 #include <boost/geometry/strategies/distance.hpp>
 #include <boost/geometry/strategies/concepts/distance_concept.hpp>
 #include <boost/geometry/strategies/spherical/distance_haversine.hpp>
+#include <boost/geometry/strategies/spherical/point_in_point.hpp>
 
 #include <boost/geometry/util/math.hpp>
 #include <boost/geometry/util/promote_floating_point.hpp>
@@ -327,6 +330,8 @@ template
 class cross_track
 {
 public :
+    typedef within::spherical_point_point equals_point_point_strategy_type;
+
     template <typename Point, typename PointOfSegment>
     struct return_type
         : promote_floating_point
@@ -353,7 +358,6 @@ public :
         : m_strategy(s)
     {}
 
-
     // It might be useful in the future
     // to overload constructor with strategy info.
     // crosstrack(...) {}
@@ -373,19 +377,6 @@ public :
 
         typedef typename return_type<Point, PointOfSegment>::type return_type;
 
-#ifdef BOOST_GEOMETRY_DEBUG_CROSS_TRACK
-        std::cout << "Course " << dsv(sp1) << " to " << dsv(p) << " "
-                  << crs_AD * geometry::math::r2d<return_type>() << std::endl;
-        std::cout << "Course " << dsv(sp1) << " to " << dsv(sp2) << " "
-                  << crs_AB * geometry::math::r2d<return_type>() << std::endl;
-        std::cout << "Course " << dsv(sp2) << " to " << dsv(p) << " "
-                  << crs_BD * geometry::math::r2d << std::endl;
-        std::cout << "Projection AD-AB " << projection1 << " : "
-                  << d_crs1 * geometry::math::r2d<return_type>() << std::endl;
-        std::cout << "Projection BD-BA " << projection2 << " : "
-                  << d_crs2 * geometry::math::r2d<return_type>() << std::endl;
-#endif
-
         // http://williams.best.vwh.net/avform.htm#XTE
         return_type d1 = m_strategy.apply(sp1, p);
         return_type d3 = m_strategy.apply(sp1, sp2);
@@ -398,16 +389,49 @@ public :
 
         return_type d2 = m_strategy.apply(sp2, p);
 
-        return_type crs_AD = geometry::detail::course<return_type>(sp1, p);
-        return_type crs_AB = geometry::detail::course<return_type>(sp1, sp2);
-        return_type crs_BA = crs_AB - geometry::math::pi<return_type>();
-        return_type crs_BD = geometry::detail::course<return_type>(sp2, p);
+        return_type lon1 = geometry::get_as_radian<0>(sp1);
+        return_type lat1 = geometry::get_as_radian<1>(sp1);
+        return_type lon2 = geometry::get_as_radian<0>(sp2);
+        return_type lat2 = geometry::get_as_radian<1>(sp2);
+        return_type lon = geometry::get_as_radian<0>(p);
+        return_type lat = geometry::get_as_radian<1>(p);
+
+        return_type crs_AD = geometry::formula::spherical_azimuth<return_type, false>
+                             (lon1, lat1, lon, lat).azimuth;
+
+        geometry::formula::result_spherical<return_type> result =
+                geometry::formula::spherical_azimuth<return_type, true>
+                    (lon1, lat1, lon2, lat2);
+        return_type crs_AB = result.azimuth;
+        return_type crs_BA = result.reverse_azimuth - geometry::math::pi<return_type>();
+
+        return_type crs_BD = geometry::formula::spherical_azimuth<return_type, false>
+                             (lon2, lat2, lon, lat).azimuth;
+
         return_type d_crs1 = crs_AD - crs_AB;
         return_type d_crs2 = crs_BD - crs_BA;
 
         // d1, d2, d3 are in principle not needed, only the sign matters
         return_type projection1 = cos( d_crs1 ) * d1 / d3;
         return_type projection2 = cos( d_crs2 ) * d2 / d3;
+
+#ifdef BOOST_GEOMETRY_DEBUG_CROSS_TRACK
+        std::cout << "Course " << dsv(sp1) << " to " << dsv(p) << " "
+                  << crs_AD * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << "Course " << dsv(sp1) << " to " << dsv(sp2) << " "
+                  << crs_AB * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << "Course " << dsv(sp2) << " to " << dsv(sp1) << " "
+                  << crs_BA * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << "Course " << dsv(sp2) << " to " << dsv(p) << " "
+                  << crs_BD * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << "Projection AD-AB " << projection1 << " : "
+                  << d_crs1 * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << "Projection BD-BA " << projection2 << " : "
+                  << d_crs2 * geometry::math::r2d<return_type>() << std::endl;
+        std::cout << " d1: " << (d1 )
+                  << " d2: " << (d2 )
+                  << std::endl;
+#endif
 
         if (projection1 > 0.0 && projection2 > 0.0)
         {
@@ -449,6 +473,12 @@ public :
         }
     }
 
+    template <typename T1, typename T2>
+    inline radius_type vertical_or_meridian(T1 lat1, T2 lat2) const
+    {
+        return m_strategy.radius() * (lat1 - lat2);
+    }
+
     inline typename Strategy::radius_type radius() const
     { return m_strategy.radius(); }
 
@@ -481,6 +511,8 @@ template
 class cross_track
 {
 public :
+    typedef within::spherical_point_point equals_point_point_strategy_type;
+
     template <typename Point, typename PointOfSegment>
     struct return_type
         : promote_floating_point
@@ -506,7 +538,6 @@ public :
     inline cross_track(Strategy const& s)
         : m_strategy(s)
     {}
-
 
     // It might be useful in the future
     // to overload constructor with strategy info.
@@ -538,6 +569,12 @@ public :
         return_type const a = cstrategy.apply(p, sp1, sp2);
         return_type const c = return_type(2.0) * asin(math::sqrt(a));
         return c * radius();
+    }
+
+    template <typename T1, typename T2>
+    inline radius_type vertical_or_meridian(T1 lat1, T2 lat2) const
+    {
+        return m_strategy.radius() * (lat1 - lat2);
     }
 
     inline typename Strategy::radius_type radius() const

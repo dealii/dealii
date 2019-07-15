@@ -28,6 +28,16 @@
 #  include <boost/assert.hpp>
 #endif
 
+#if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
+//
+// This is the only way we can avoid
+// warning: non-standard suffix on floating constant [-Wpedantic]
+// when building with -Wall -pedantic.  Neither __extension__
+// nor #pragma dianostic ignored work :(
+//
+#pragma GCC system_header
+#endif
+
 namespace boost{ namespace math{
 
 namespace detail
@@ -107,6 +117,10 @@ T expm1_imp(T x, const mpl::int_<0>&, const Policy& pol)
    BOOST_MATH_STD_USING
 
    T a = fabs(x);
+   if((boost::math::isnan)(a))
+   {
+      return policies::raise_domain_error<T>("boost::math::expm1<%1%>(%1%)", "expm1 requires a finite argument, but got %1%", a, pol);
+   }
    if(a > T(0.5f))
    {
       if(a >= tools::log_max_value<T>())

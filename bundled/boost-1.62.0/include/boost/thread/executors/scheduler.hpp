@@ -8,6 +8,7 @@
 #define BOOST_THREAD_EXECUTORS_SCHEDULER_HPP
 
 #include <boost/thread/detail/config.hpp>
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CONTINUATION && defined BOOST_THREAD_PROVIDES_EXECUTORS && defined BOOST_THREAD_USES_MOVE
 #include <boost/thread/executors/detail/scheduled_executor_base.hpp>
 
 #include <boost/chrono/time_point.hpp>
@@ -15,6 +16,11 @@
 #include <boost/chrono/system_clocks.hpp>
 
 #include <boost/config/abi_prefix.hpp>
+
+#if defined(BOOST_MSVC)
+# pragma warning(push)
+# pragma warning(disable: 4355) // 'this' : used in base member initializer list
+#endif
 
 namespace boost
 {
@@ -231,6 +237,7 @@ namespace boost
       ~scheduler()
       {
         this->close();
+        thr.interrupt();
         thr.join();
       }
       template <class Ex>
@@ -266,6 +273,11 @@ namespace boost
   using executors::scheduler;
 }
 
+#if defined(BOOST_MSVC)
+# pragma warning(pop)
+#endif
+
 #include <boost/config/abi_suffix.hpp>
 
+#endif
 #endif

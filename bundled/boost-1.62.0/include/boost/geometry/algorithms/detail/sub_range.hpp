@@ -2,21 +2,29 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2013, 2014.
-// Modifications copyright (c) 2013-2014, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013, 2014, 2018.
+// Modifications copyright (c) 2013-2018, Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
-
 #ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_SUB_RANGE_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_SUB_RANGE_HPP
 
 #include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+
+#include <boost/geometry/algorithms/not_implemented.hpp>
 
 #include <boost/geometry/core/assert.hpp>
+#include <boost/geometry/core/exterior_ring.hpp>
+#include <boost/geometry/core/interior_rings.hpp>
+#include <boost/geometry/core/tag.hpp>
+#include <boost/geometry/core/tags.hpp>
+
 #include <boost/geometry/util/range.hpp>
 
 namespace boost { namespace geometry {

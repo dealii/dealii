@@ -1,23 +1,26 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2014 Oracle and/or its affiliates.
+// Copyright (c) 2014-2018 Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
-
 #ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_BOUNDARY_CHECKER_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_BOUNDARY_CHECKER_HPP
 
-#include <boost/geometry/util/range.hpp>
-#include <boost/geometry/algorithms/num_points.hpp>
-#include <boost/geometry/algorithms/detail/sub_range.hpp>
+#include <boost/core/ignore_unused.hpp>
 
 #include <boost/geometry/algorithms/detail/equals/point_point.hpp>
+#include <boost/geometry/algorithms/detail/sub_range.hpp>
+#include <boost/geometry/algorithms/num_points.hpp>
+
+#include <boost/geometry/policies/compare.hpp>
 
 #include <boost/geometry/util/has_nan_coordinate.hpp>
+#include <boost/geometry/util/range.hpp>
 
 namespace boost { namespace geometry
 {
@@ -28,46 +31,57 @@ namespace detail { namespace relate {
 enum boundary_query { boundary_front, boundary_back, boundary_any };
 
 template <typename Geometry,
+          typename WithinStrategy, // Point/Point equals (within) strategy
           typename Tag = typename geometry::tag<Geometry>::type>
 class boundary_checker {};
 
-template <typename Geometry>
-class boundary_checker<Geometry, linestring_tag>
+template <typename Geometry, typename WithinStrategy>
+class boundary_checker<Geometry, WithinStrategy, linestring_tag>
 {
     typedef typename point_type<Geometry>::type point_type;
 
 public:
+    typedef WithinStrategy equals_strategy_type;
+
     boundary_checker(Geometry const& g)
         : has_boundary( boost::size(g) >= 2
-                     && !detail::equals::equals_point_point(range::front(g), range::back(g)) )
+                     && !detail::equals::equals_point_point(range::front(g),
+                                                            range::back(g),
+                                                            equals_strategy_type()) )
+#ifdef BOOST_GEOMETRY_DEBUG_RELATE_BOUNDARY_CHECKER
         , geometry(g)
+#endif
     {}
 
     template <boundary_query BoundaryQuery>
     bool is_endpoint_boundary(point_type const& pt) const
     {
-        boost::ignore_unused_variable_warning(pt);
+        boost::ignore_unused(pt);
 #ifdef BOOST_GEOMETRY_DEBUG_RELATE_BOUNDARY_CHECKER
         // may give false positives for INT
         BOOST_GEOMETRY_ASSERT( (BoundaryQuery == boundary_front || BoundaryQuery == boundary_any)
-                   && detail::equals::equals_point_point(pt, range::front(geometry))
+                   && detail::equals::equals_point_point(pt, range::front(geometry), WithinStrategy())
                    || (BoundaryQuery == boundary_back || BoundaryQuery == boundary_any)
-                   && detail::equals::equals_point_point(pt, range::back(geometry)) );
+                   && detail::equals::equals_point_point(pt, range::back(geometry), WithinStrategy()) );
 #endif
         return has_boundary;
     }
 
 private:
     bool has_boundary;
+#ifdef BOOST_GEOMETRY_DEBUG_RELATE_BOUNDARY_CHECKER
     Geometry const& geometry;
+#endif
 };
 
-template <typename Geometry>
-class boundary_checker<Geometry, multi_linestring_tag>
+template <typename Geometry, typename WithinStrategy>
+class boundary_checker<Geometry, WithinStrategy, multi_linestring_tag>
 {
     typedef typename point_type<Geometry>::type point_type;
 
 public:
+    typedef WithinStrategy equals_strategy_type;
+
     boundary_checker(Geometry const& g)
         : is_filled(false), geometry(g)
     {}
@@ -110,7 +124,7 @@ public:
                 point_reference back_pt = range::back(ls);
 
                 // linear ring or point - no boundary
-                if (! equals::equals_point_point(front_pt, back_pt))
+                if (! equals::equals_point_point(front_pt, back_pt, equals_strategy_type()))
                 {
                     // do not add points containing NaN coordinates
                     // because they cannot be reasonably compared, e.g. with MSVC

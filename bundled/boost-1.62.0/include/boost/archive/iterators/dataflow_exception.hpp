@@ -46,7 +46,7 @@ public:
     dataflow_exception(exception_code c = other_exception) : code(c)
     {}
 
-    virtual const char *what( ) const throw( ) override
+    virtual const char *what( ) const throw( )
     {
         const char *msg = "unknown exception code";
         switch(code){

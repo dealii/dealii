@@ -233,16 +233,16 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
         struct concrete_parser : abstract_parser<ScannerT, AttrT>
         {
             concrete_parser(ParserT const& p_) : p(p_) {}
-            virtual ~concrete_parser() override {}
+            virtual ~concrete_parser() {}
 
             virtual typename match_result<ScannerT, AttrT>::type
-            do_parse_virtual(ScannerT const& scan) const override
+            do_parse_virtual(ScannerT const& scan) const
             {
                 return p.parse(scan);
             }
 
             virtual abstract_parser<ScannerT, AttrT>*
-            clone() const override
+            clone() const
             {
                 return new concrete_parser(p);
             }

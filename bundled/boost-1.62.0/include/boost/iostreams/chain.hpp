@@ -16,12 +16,12 @@
 #include <exception>
 #include <iterator>                             // advance.
 #include <list>
-#include <memory>                               // allocator, auto_ptr.
-#include <typeinfo>
+#include <memory>                               // allocator, auto_ptr or unique_ptr.
 #include <stdexcept>                            // logic_error, out_of_range.
 #include <boost/checked_delete.hpp>
 #include <boost/config.hpp>                     // BOOST_MSVC, template friends,
 #include <boost/detail/workaround.hpp>          // BOOST_NESTED_TEMPLATE 
+#include <boost/core/typeinfo.hpp>
 #include <boost/iostreams/constants.hpp>
 #include <boost/iostreams/detail/access_control.hpp>
 #include <boost/iostreams/detail/char_traits.hpp>
@@ -164,7 +164,7 @@ public:
 
     //----------Direct component access---------------------------------------//
 
-    const std::type_info& component_type(int n) const
+    const boost::core::typeinfo& component_type(int n) const
     {
         if (static_cast<size_type>(n) >= size())
             boost::throw_exception(std::out_of_range("bad chain offset"));
@@ -173,7 +173,7 @@ public:
 
     // Deprecated.
     template<int N>
-    const std::type_info& component_type() const { return component_type(N); }
+    const boost::core::typeinfo& component_type() const { return component_type(N); }
 
     template<typename T>
     T* component(int n) const { return component(n, boost::type<T>()); }
@@ -191,7 +191,7 @@ public:
         if (static_cast<size_type>(n) >= size())
             boost::throw_exception(std::out_of_range("bad chain offset"));
         streambuf_type* link = *boost::next(list().begin(), n);
-        if (BOOST_IOSTREAMS_COMPARE_TYPE_ID(link->component_type(), typeid(T)))
+        if (BOOST_IOSTREAMS_COMPARE_TYPE_ID(link->component_type(), BOOST_CORE_TYPEID(T)))
             return static_cast<T*>(link->component_impl());
         else
             return 0;
@@ -242,13 +242,19 @@ private:
             pback_size != -1 ?
                 pback_size :
                 pimpl_->pback_size_;
+                
 #if defined(BOOST_NO_CXX11_SMART_PTR)
+
         std::auto_ptr<streambuf_t>
             buf(new streambuf_t(t, buffer_size, pback_size));
+            
 #else
+
         std::unique_ptr<streambuf_t>
             buf(new streambuf_t(t, buffer_size, pback_size));
+            
 #endif
+            
         list().push_back(buf.get());
         buf.release();
         if (is_device<component_type>::value) {
@@ -449,12 +455,12 @@ public:
     chain_client(chain_client* client) : chain_(client->chain_) { }
     virtual ~chain_client() { }
 
-    const std::type_info& component_type(int n) const
+    const boost::core::typeinfo& component_type(int n) const
     { return chain_->component_type(n); }
 
     // Deprecated.
     template<int N>
-    const std::type_info& component_type() const
+    const boost::core::typeinfo& component_type() const
     { return chain_->BOOST_NESTED_TEMPLATE component_type<N>(); }
 
     template<typename T>
@@ -478,7 +484,7 @@ public:
     BOOST_IOSTREAMS_DEFINE_PUSH(push, mode, char_type, push_impl)
     void pop() { chain_->pop(); }
     bool empty() const { return chain_->empty(); }
-    size_type size() { return chain_->size(); }
+    size_type size() const { return chain_->size(); }
     void reset() { chain_->reset(); }
 
     // Returns a copy of the underlying chain.

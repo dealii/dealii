@@ -903,21 +903,14 @@ namespace boost { namespace numeric { namespace ublas {
             vector_assign<scalar_assign> (*this, ae);
         }
 
-        /// \brief Construct a fixed_vector from a list of values
-        /// This constructor enables initialization by using any of:
-        /// fixed_vector<double, 3> v = { 1, 2, 3 } or fixed_vector<double,3> v( {1, 2, 3} ) or fixed_vector<double,3> v( 1, 2, 3 )
-#if defined(BOOST_MSVC)
-        // This may or may not work. Maybe use this for all instead only for MSVC
-        template <typename... U>
-        fixed_vector(U&&... values) :
-            vector_container<self_type> (),
-            data_{{ std::forward<U>(values)... }} {}
-#else
+    /// \brief Construct a fixed_vector from a list of values
+    /// This constructor enables initialization by using any of:
+    /// fixed_vector<double, 3> v = { 1, 2, 3 } or fixed_vector<double,3> v( {1, 2, 3} ) or fixed_vector<double,3> v( 1, 2, 3 )
         template <typename... Types>
+        BOOST_UBLAS_INLINE
         fixed_vector(value_type v0, Types... vrest) :
             vector_container<self_type> (),
-            data_{ { v0, vrest... } } {}
-#endif
+            data_( array_type{ v0, vrest... } ) {}
 
     // -----------------------
     // Random Access Container

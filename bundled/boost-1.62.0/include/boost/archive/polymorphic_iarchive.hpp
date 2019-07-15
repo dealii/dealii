@@ -156,7 +156,7 @@ class BOOST_SYMBOL_VISIBLE polymorphic_iarchive :
     public polymorphic_iarchive_impl
 {
 public:
-    virtual ~polymorphic_iarchive() override{};
+    virtual ~polymorphic_iarchive(){};
 };
 
 } // namespace archive

@@ -1,10 +1,9 @@
 /*
-(c) 2014-2015 Glen Joseph Fernandes
-<glenjofe -at- gmail.com>
+Copyright 2014-2015 Glen Joseph Fernandes
+(glenjofe@gmail.com)
 
-Distributed under the Boost Software
-License, Version 1.0.
-http://boost.org/LICENSE_1_0.txt
+Distributed under the Boost Software License, Version 1.0.
+(http://www.boost.org/LICENSE_1_0.txt)
 */
 #ifndef BOOST_ALIGN_ALIGNED_ALLOCATOR_HPP
 #define BOOST_ALIGN_ALIGNED_ALLOCATOR_HPP
@@ -29,8 +28,7 @@ namespace alignment {
 
 template<class T, std::size_t Alignment>
 class aligned_allocator {
-    BOOST_STATIC_ASSERT(detail::
-        is_alignment_constant<Alignment>::value);
+    BOOST_STATIC_ASSERT(detail::is_alignment_constant<Alignment>::value);
 
 public:
     typedef T value_type;
@@ -43,13 +41,6 @@ public:
     typedef T& reference;
     typedef const T& const_reference;
 
-private:
-    enum {
-        min_align = detail::max_size<Alignment,
-            alignment_of<value_type>::value>::value
-    };
-
-public:
     template<class U>
     struct rebind {
         typedef aligned_allocator<U, Alignment> other;
@@ -74,12 +65,16 @@ public:
     }
 
     pointer allocate(size_type size, const_void_pointer = 0) {
-        void* p = 0;
-        if (size > 0) {
-            p = aligned_alloc(min_align, sizeof(T) * size);
-            if (!p) {
-                boost::throw_exception(std::bad_alloc());
-            }
+        enum {
+            m = detail::max_size<Alignment,
+                alignment_of<value_type>::value>::value
+        };
+        if (size == 0) {
+            return 0;
+        }
+        void* p = boost::alignment::aligned_alloc(m, sizeof(T) * size);
+        if (!p) {
+            boost::throw_exception(std::bad_alloc());
         }
         return static_cast<T*>(p);
     }
@@ -125,8 +120,7 @@ public:
 
 template<std::size_t Alignment>
 class aligned_allocator<void, Alignment> {
-    BOOST_STATIC_ASSERT(detail::
-        is_alignment_constant<Alignment>::value);
+    BOOST_STATIC_ASSERT(detail::is_alignment_constant<Alignment>::value);
 
 public:
     typedef void value_type;
@@ -139,21 +133,23 @@ public:
     };
 };
 
-template<class T1, class T2, std::size_t Alignment>
-inline bool operator==(const aligned_allocator<T1, Alignment>&,
-    const aligned_allocator<T2, Alignment>&) BOOST_NOEXCEPT
+template<class T, class U, std::size_t Alignment>
+inline bool
+operator==(const aligned_allocator<T, Alignment>&,
+    const aligned_allocator<U, Alignment>&) BOOST_NOEXCEPT
 {
     return true;
 }
 
-template<class T1, class T2, std::size_t Alignment>
-inline bool operator!=(const aligned_allocator<T1, Alignment>&,
-    const aligned_allocator<T2, Alignment>&) BOOST_NOEXCEPT
+template<class T, class U, std::size_t Alignment>
+inline bool
+operator!=(const aligned_allocator<T, Alignment>&,
+    const aligned_allocator<U, Alignment>&) BOOST_NOEXCEPT
 {
     return false;
 }
 
-} /* .alignment */
-} /* .boost */
+} /* alignment */
+} /* boost */
 
 #endif

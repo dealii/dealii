@@ -258,6 +258,30 @@ namespace boost { namespace numeric {
             return at_element (i, j);
         }
 
+	/** Access a matrix element. Here we return a reference
+	 * \param i the first coordinate of the element. By default it's the row
+	 * \param j the second coordinate of the element. By default it's the column
+	 * \return a reference to the element
+	 */
+		BOOST_UBLAS_INLINE
+		reference operator () (size_type i) {
+			return data()[i];
+		}
+
+		BOOST_UBLAS_INLINE
+		const_reference operator () (size_type i) const {
+			return data()[i];
+		}
+
+//		/** Access a matrix element. Here we return a reference
+//		 * \param i the first coordinate of the element. By default it's the row
+//		 * \param j the second coordinate of the element. By default it's the column
+//		 * \return a reference to the element
+//		 */
+//			BOOST_UBLAS_INLINE
+//			const_reference operator () const (size_type i) {
+//				return data()[i];
+//			}
         // Element assignment
 
     /** Change the value of a matrix element. Return back a reference to it
@@ -1234,14 +1258,6 @@ namespace boost { namespace numeric {
             matrix_container<self_type> (),
             data_ () {}
 
-        /// \brief Construct a fixed_matrix from a list of values
-        /// The list may be included in curly braces. Typical syntax is choices are :
-        /// fixed_matrix<double, 2,2> v = { 1, 2, 3, 4 } or fixed_matrix<double,4> v( {1, 2, 3, 4} ) or fixed_matrix<double,2,2> v( 1, 2, 3, 4 )
-        template <typename... Types>
-        fixed_matrix(value_type v0, Types... vrest) :
-            matrix_container<self_type> (),
-            data_{ { v0, vrest... } } {}
-
       /** Dense fixed_matrix constructor with defined initial value for all the matrix elements
        * \param init initial value assigned to all elements
        */
@@ -1277,6 +1293,15 @@ namespace boost { namespace numeric {
             data_ () {
             matrix_assign<scalar_assign> (*this, ae);
         }
+
+        /// \brief Construct a fixed_matrix from a list of values
+        /// The list may be included in curly braces. Typical syntax is choices are :
+        /// fixed_matrix<double, 2,2> v = { 1, 2, 3, 4 } or fixed_matrix<double,4> v( {1, 2, 3, 4} ) or fixed_matrix<double,2,2> v( 1, 2, 3, 4 )
+        template <typename... Types>
+        BOOST_UBLAS_INLINE
+        fixed_matrix(value_type v0, Types... vrest) :
+            matrix_container<self_type> (),
+            data_( array_type{ v0, vrest... } ) {}
 
         // Accessors
       /** Return the number of rows of the fixed_matrix
@@ -1384,7 +1409,7 @@ namespace boost { namespace numeric {
 
         /*! @note "pass by value" the key idea to enable move semantics */
         BOOST_UBLAS_INLINE
-        fixed_matrix &operator = (matrix m) {
+        fixed_matrix &operator = (fixed_matrix m) {
             assign_temporary(m);
             return *this;
         }

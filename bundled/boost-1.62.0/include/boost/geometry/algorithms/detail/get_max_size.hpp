@@ -5,6 +5,11 @@
 // Copyright (c) 2014 Mateusz Loskot, London, UK.
 // Copyright (c) 2014 Adam Wulkiewicz, Lodz, Poland.
 
+// This file was modified by Oracle on 2018.
+// Modifications copyright (c) 2018, Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -12,10 +17,10 @@
 #ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_GET_MAX_SIZE_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_GET_MAX_SIZE_HPP
 
-
 #include <cstddef>
 
 #include <boost/geometry/core/access.hpp>
+#include <boost/geometry/core/coordinate_dimension.hpp>
 #include <boost/geometry/util/math.hpp>
 
 namespace boost { namespace geometry

@@ -6,8 +6,8 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
-#if !defined(SPIRIT_EXTRACT_REAL_APRIL_18_2006_0901AM)
-#define SPIRIT_EXTRACT_REAL_APRIL_18_2006_0901AM
+#if !defined(BOOST_SPIRIT_X3_EXTRACT_REAL_APRIL_18_2006_0901AM)
+#define BOOST_SPIRIT_X3_EXTRACT_REAL_APRIL_18_2006_0901AM
 
 #include <cmath>
 #include <boost/limits.hpp>
@@ -103,20 +103,6 @@ namespace boost { namespace spirit { namespace x3 { namespace extension
         // no-op for unused_type
         return n;
     }
-
-    template <typename T>
-    inline bool
-    is_equal_to_one(T const& value)
-    {
-        return value == 1.0;
-    }
-
-    inline bool
-    is_equal_to_one(unused_type)
-    {
-        // no-op for unused_type
-        return false;
-    }
 }}}}
 
 namespace boost { namespace spirit { namespace x3
@@ -180,6 +166,7 @@ namespace boost { namespace spirit { namespace x3
                     if (!is_same<T, unused_type>::value)
                         frac_digits =
                             static_cast<int>(std::distance(savef, first));
+                    BOOST_ASSERT(frac_digits >= 0);
                 }
                 else if (!got_a_number || !p.allow_trailing_dot)
                 {
@@ -234,20 +221,6 @@ namespace boost { namespace spirit { namespace x3
             {
                 // No exponent found. Scale the number by -frac_digits.
                 extension::scale(-frac_digits, n);
-            }
-            else if (extension::is_equal_to_one(n))
-            {
-                // There is a chance of having to parse one of the 1.0#...
-                // styles some implementations use for representing NaN or Inf.
-
-                // Check whether the number to parse is a NaN or Inf
-                if (p.parse_nan(first, last, n) ||
-                    p.parse_inf(first, last, n))
-                {
-                    // If we got a negative sign, negate the number
-                    traits::move_to(extension::negate(neg, n), attr);
-                    return true;    // got a NaN or Inf, return immediately
-                }
             }
 
             // If we got a negative sign, negate the number

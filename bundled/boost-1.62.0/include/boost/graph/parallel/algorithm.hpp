@@ -26,29 +26,20 @@ namespace boost { namespace parallel {
   };
 
   template<typename T>
-  struct minimum
+  struct minimum : std::binary_function<T, T, T>
   {
-    typedef T first_argument_type;
-    typedef T second_argument_type;
-    typedef T result_type;
     const T& operator()(const T& x, const T& y) const { return x < y? x : y; }
   };
 
   template<typename T>
-  struct maximum
+  struct maximum : std::binary_function<T, T, T>
   {
-    typedef T first_argument_type;
-    typedef T second_argument_type;
-    typedef T result_type;
     const T& operator()(const T& x, const T& y) const { return x < y? y : x; }
   };
 
   template<typename T>
-  struct sum
+  struct sum : std::binary_function<T, T, T>
   {
-    typedef T first_argument_type;
-    typedef T second_argument_type;
-    typedef T result_type;
     const T operator()(const T& x, const T& y) const { return x + y; }
   };
 

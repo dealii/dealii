@@ -57,7 +57,9 @@ namespace std{
 
 #include <boost/serialization/assume_abstract.hpp>
 
-#if BOOST_WORKAROUND(__IBMCPP__, < 1210) || (defined(__SUNPRO_CC) && (__SUNPRO_CC < 0x590))
+#if !defined(BOOST_MSVC) && \
+    (BOOST_WORKAROUND(__IBMCPP__, < 1210) || \
+    defined(__SUNPRO_CC) && (__SUNPRO_CC < 0x590))
     #define DONT_USE_HAS_NEW_OPERATOR 1
 #else
     #define DONT_USE_HAS_NEW_OPERATOR 0
@@ -74,10 +76,10 @@ namespace std{
 #include <boost/serialization/type_info_implementation.hpp>
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/void_cast.hpp>
-#include <boost/serialization/array.hpp>
 #include <boost/serialization/collection_size_type.hpp>
 #include <boost/serialization/singleton.hpp>
 #include <boost/serialization/wrapper.hpp>
+#include <boost/serialization/array_wrapper.hpp>
 
 // the following is need only for dynamic cast of polymorphic pointers
 #include <boost/archive/archive_exception.hpp>
@@ -86,6 +88,8 @@ namespace std{
 #include <boost/archive/detail/basic_pointer_iserializer.hpp>
 #include <boost/archive/detail/archive_serializer_map.hpp>
 #include <boost/archive/detail/check.hpp>
+
+#include <boost/core/addressof.hpp>
 
 namespace boost {
 
@@ -116,11 +120,10 @@ template<class Archive, class T>
 class iserializer : public basic_iserializer
 {
 private:
-    virtual void destroy(/*const*/ void *address) const override {
+    virtual void destroy(/*const*/ void *address) const {
         boost::serialization::access::destroy(static_cast<T *>(address));
     }
-protected:
-    // protected constructor since it's always created by singleton
+public:
     explicit iserializer() :
         basic_iserializer(
             boost::serialization::singleton<
@@ -129,30 +132,29 @@ protected:
             >::get_const_instance()
         )
     {}
-public:
     virtual BOOST_DLLEXPORT void load_object_data(
         basic_iarchive & ar,
         void *x, 
         const unsigned int file_version
-    ) const override BOOST_USED;
-    virtual bool class_info() const override {
+    ) const BOOST_USED;
+    virtual bool class_info() const {
         return boost::serialization::implementation_level< T >::value 
             >= boost::serialization::object_class_info;
     }
-    virtual bool tracking(const unsigned int /* flags */) const override {
+    virtual bool tracking(const unsigned int /* flags */) const {
         return boost::serialization::tracking_level< T >::value 
                 == boost::serialization::track_always
             || ( boost::serialization::tracking_level< T >::value 
                 == boost::serialization::track_selectively
                 && serialized_as_pointer());
     }
-    virtual version_type version() const override {
+    virtual version_type version() const {
         return version_type(::boost::serialization::version< T >::value);
     }
-    virtual bool is_polymorphic() const override {
+    virtual bool is_polymorphic() const {
         return boost::is_polymorphic< T >::value;
     }
-    virtual ~iserializer() override{};
+    virtual ~iserializer(){};
 };
 
 #ifdef BOOST_MSVC
@@ -231,7 +233,7 @@ struct heap_allocation {
                 // that the class might have class specific new with NO
                 // class specific delete at all.  Patches (compatible with
                 // C++03) welcome!
-                delete t;
+                (operator delete)(t);
             }
         };
         struct doesnt_have_new_operator {
@@ -240,7 +242,7 @@ struct heap_allocation {
             }
             static void invoke_delete(T * t) {
                 // Note: I'm reliance upon automatic conversion from T * to void * here
-                delete t;
+                (operator delete)(t);
             }
         };
         static T * invoke_new() {
@@ -287,13 +289,13 @@ class pointer_iserializer :
     public basic_pointer_iserializer
 {
 private:
-    virtual void * heap_allocation() const override {
+    virtual void * heap_allocation() const {
         detail::heap_allocation<T> h;
         T * t = h.get();
         h.release();
         return t;
     }
-    virtual const basic_iserializer & get_basic_serializer() const override {
+    virtual const basic_iserializer & get_basic_serializer() const {
         return boost::serialization::singleton<
             iserializer<Archive, T>
         >::get_const_instance();
@@ -302,11 +304,11 @@ private:
         basic_iarchive & ar, 
         void * x,
         const unsigned int file_version
-    ) const override BOOST_USED;
-protected:
+    ) const BOOST_USED;
+public:
     // this should alway be a singleton so make the constructor protected
     pointer_iserializer();
-    ~pointer_iserializer() override;
+    ~pointer_iserializer();
 };
 
 #ifdef BOOST_MSVC
@@ -403,7 +405,7 @@ struct load_non_pointer_type {
     struct load_standard {
         template<class T>
         static void invoke(Archive &ar, const T & t){
-            void * x = & const_cast<T &>(t);
+            void * x = boost::addressof(const_cast<T &>(t));
             ar.load_object(
                 x, 
                 boost::serialization::singleton<
@@ -585,7 +587,14 @@ struct load_array_type {
                     boost::archive::archive_exception::array_size_too_short
                 )
             );
-        ar >> serialization::make_array(static_cast<value_type*>(&t[0]),count);
+        // explict template arguments to pass intel C++ compiler
+        ar >> serialization::make_array<
+            value_type,
+            boost::serialization::collection_size_type
+        >(
+            static_cast<value_type *>(&t[0]),
+            count
+        );
     }
 };
 
@@ -595,7 +604,7 @@ template<class Archive, class T>
 inline void load(Archive & ar, T &t){
     // if this assertion trips. It means we're trying to load a
     // const object with a compiler that doesn't have correct
-    // funtion template ordering.  On other compilers, this is
+    // function template ordering.  On other compilers, this is
     // handled below.
     detail::check_const_loading< T >();
     typedef

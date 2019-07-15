@@ -14,10 +14,8 @@
 #include <boost/spirit/home/x3/support/traits/variant_has_substitute.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/fusion/include/front.hpp>
-#include <boost/fusion/include/size.hpp>
 #include <boost/fusion/include/move.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <utility>
 
 namespace boost { namespace spirit { namespace x3 { namespace traits
@@ -152,6 +150,13 @@ namespace boost { namespace spirit { namespace x3 { namespace traits
             move_to(src, dest, tag, is_size_one_sequence<Source>());
         }
 
+        template <typename Source, typename Dest>
+        inline void
+        move_to(Source&& src, Dest& dest, optional_attribute)
+        {
+            dest = std::move(src);
+        }
+
         template <typename Iterator>
         inline void
         move_to(Iterator, Iterator, unused_type, unused_attribute) {}
@@ -165,10 +170,19 @@ namespace boost { namespace spirit { namespace x3 { namespace traits
             else
                 append(dest, first, last);
         }
+
+        template <typename Iterator, typename Dest>
+        inline typename enable_if<
+            is_size_one_sequence<Dest>
+        >::type
+        move_to(Iterator first, Iterator last, Dest& dest, tuple_attribute)
+        {
+            traits::move_to(first, last, fusion::front(dest));
+        }
         
         template <typename Iterator>
         inline void
-        move_to(Iterator first, Iterator last, boost::iterator_range<Iterator>& rng, container_attribute)
+        move_to(Iterator first, Iterator last, boost::iterator_range<Iterator>& rng, range_attribute)
         {
             rng = {first, last};
         }

@@ -89,8 +89,7 @@ protected:
     // leaving the archive in an undetermined state
     BOOST_ARCHIVE_OR_WARCHIVE_DECL void
     load_override(class_id_type & t);
-    BOOST_ARCHIVE_OR_WARCHIVE_DECL void
-    load_override(class_id_optional_type & /* t */){}
+    void load_override(class_id_optional_type & /* t */){}
     BOOST_ARCHIVE_OR_WARCHIVE_DECL void
     load_override(object_id_type & t);
     BOOST_ARCHIVE_OR_WARCHIVE_DECL void
@@ -105,7 +104,7 @@ protected:
     BOOST_ARCHIVE_OR_WARCHIVE_DECL
     basic_xml_iarchive(unsigned int flags);
     BOOST_ARCHIVE_OR_WARCHIVE_DECL
-    ~basic_xml_iarchive() override;
+    ~basic_xml_iarchive();
 };
 
 } // namespace archive

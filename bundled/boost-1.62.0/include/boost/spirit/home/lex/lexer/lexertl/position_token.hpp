@@ -23,7 +23,6 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/value_at.hpp>
-#include <boost/detail/iterator.hpp>
 #include <boost/variant.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/bool.hpp>

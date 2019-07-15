@@ -2,8 +2,8 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2016.
-// Modifications copyright (c) 2016, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2016, 2017.
+// Modifications copyright (c) 2016-2017, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -22,10 +22,10 @@
 #include <boost/geometry/policies/relate/tupled.hpp>
 
 #include <boost/geometry/strategies/intersection.hpp>
-#include <boost/geometry/strategies/side.hpp>
 #include <boost/geometry/strategies/intersection_result.hpp>
+#include <boost/geometry/strategies/side.hpp>
 
-#include <boost/geometry/strategies/cartesian/cart_intersect.hpp>
+#include <boost/geometry/strategies/cartesian/intersection.hpp>
 #include <boost/geometry/strategies/cartesian/side_by_triangle.hpp>
 #include <boost/geometry/strategies/spherical/intersection.hpp>
 #include <boost/geometry/strategies/spherical/ssf.hpp>
@@ -70,17 +70,18 @@ private :
     > ip_type;
 
 public:
+    typedef policies::relate::segments_tupled
+        <
+            policies::relate::segments_intersection_points
+                <
+                    ip_type
+                > ,
+            policies::relate::segments_direction
+        > intersection_policy_type;
+
     typedef typename strategy::intersection::services::default_strategy
             <
                 Tag,
-                policies::relate::segments_tupled
-                    <
-                        policies::relate::segments_intersection_points
-                            <
-                                ip_type
-                            > ,
-                        policies::relate::segments_direction
-                    >,
                 CalculationType
             >::type segment_intersection_strategy_type;
 

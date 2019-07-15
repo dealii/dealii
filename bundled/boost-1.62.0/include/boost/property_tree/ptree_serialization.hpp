@@ -41,7 +41,7 @@ namespace boost { namespace property_tree
     template<class Archive, class K, class D, class C>
     inline void save(Archive &ar,
                      const basic_ptree<K, D, C> &t,
-                     const unsigned int /*file_version*/)
+                     const unsigned int file_version)
     {
         using namespace boost::serialization;
         stl::save_collection<Archive, basic_ptree<K, D, C> >(ar, t);
@@ -99,7 +99,7 @@ namespace boost { namespace property_tree
     template<class Archive, class K, class D, class C>
     inline void load(Archive &ar,
                      basic_ptree<K, D, C> &t,
-                     const unsigned int /*file_version*/)
+                     const unsigned int file_version)
     {
         namespace bsl = boost::serialization;
 

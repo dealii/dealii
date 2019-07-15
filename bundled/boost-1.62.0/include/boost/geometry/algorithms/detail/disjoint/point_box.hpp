@@ -5,8 +5,8 @@
 // Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
 // Copyright (c) 2013-2015 Adam Wulkiewicz, Lodz, Poland
 
-// This file was modified by Oracle on 2013-2016.
-// Modifications copyright (c) 2013-2016, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013-2018.
+// Modifications copyright (c) 2013-2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
@@ -28,7 +28,7 @@
 #include <boost/geometry/core/tags.hpp>
 
 #include <boost/geometry/algorithms/dispatch/disjoint.hpp>
-#include <boost/geometry/strategies/cartesian/point_in_box.hpp>
+#include <boost/geometry/strategies/disjoint.hpp>
 
 namespace boost { namespace geometry
 {
@@ -41,16 +41,11 @@ namespace detail { namespace disjoint
 /*!
     \brief Internal utility function to detect if point/box are disjoint
  */
-template <typename Point, typename Box>
-inline bool disjoint_point_box(Point const& point, Box const& box)
+template <typename Point, typename Box, typename Strategy>
+inline bool disjoint_point_box(Point const& point, Box const& box, Strategy const& )
 {
     // ! covered_by(point, box)
-    return ! strategy::within::relate_point_box_loop
-                <
-                    strategy::within::covered_by_range,
-                    Point, Box,
-                    0, dimension<Point>::type::value
-                >::apply(point, box);
+    return ! Strategy::apply(point, box);
 }
 
 
@@ -66,15 +61,11 @@ namespace dispatch
 template <typename Point, typename Box, std::size_t DimensionCount>
 struct disjoint<Point, Box, DimensionCount, point_tag, box_tag, false>
 {
-    static inline bool apply(Point const& point, Box const& box)
+    template <typename Strategy>
+    static inline bool apply(Point const& point, Box const& box, Strategy const& )
     {
         // ! covered_by(point, box)
-        return ! strategy::within::relate_point_box_loop
-                    <
-                        strategy::within::covered_by_range,
-                        Point, Box,
-                        0, DimensionCount
-                    >::apply(point, box);
+        return ! Strategy::apply(point, box);
     }
 };
 

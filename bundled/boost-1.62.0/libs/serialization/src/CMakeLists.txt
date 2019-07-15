@@ -44,7 +44,6 @@ SET(src_boost_serialization
   extended_type_info_typeid.cpp
   polymorphic_iarchive.cpp
   polymorphic_oarchive.cpp
-  singleton.cpp
   stl_port.cpp
   text_iarchive.cpp
   text_oarchive.cpp

@@ -86,7 +86,7 @@ protected:
     BOOST_ARCHIVE_DECL 
     xml_oarchive_impl(std::ostream & os, unsigned int flags);
     BOOST_ARCHIVE_DECL 
-    ~xml_oarchive_impl() override;
+    ~xml_oarchive_impl();
 public:
     BOOST_ARCHIVE_DECL
     void save_binary(const void *address, std::size_t count);
@@ -121,7 +121,7 @@ public:
     xml_oarchive(std::ostream & os, unsigned int flags = 0) :
         xml_oarchive_impl<xml_oarchive>(os, flags)
     {}
-    ~xml_oarchive() override{}
+    ~xml_oarchive(){}
 };
 
 } // namespace archive

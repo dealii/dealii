@@ -145,8 +145,8 @@ namespace boost
           m_slot(new SlotType(slot_in)), _mutex(signal_mutex)
         {
         }
-        virtual ~connection_body() override {}
-        virtual bool connected() const override
+        virtual ~connection_body() {}
+        virtual bool connected() const
         {
           garbage_collecting_lock<mutex_type> local_lock(*_mutex);
           nolock_grab_tracked_objects(local_lock, detail::null_output_iterator());
@@ -191,11 +191,11 @@ namespace boost
           }
         }
         // expose Lockable concept of mutex
-        virtual void lock() override
+        virtual void lock()
         {
           _mutex->lock();
         }
-        virtual void unlock() override
+        virtual void unlock()
         {
           _mutex->unlock();
         }
@@ -208,7 +208,7 @@ namespace boost
           return *m_slot;
         }
       protected:
-        virtual shared_ptr<void> release_slot() const override
+        virtual shared_ptr<void> release_slot() const
         {
           
           shared_ptr<void> released_slot = m_slot;

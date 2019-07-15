@@ -178,7 +178,7 @@ namespace boost { namespace spirit { namespace karma
         }
 
         template <typename Auto, typename Expr>
-        static void define(rule& lhs, Expr const& expr, mpl::false_)
+        static void define(rule& /* lhs */, Expr const& /* expr */, mpl::false_)
         {
             // Report invalid expression error as early as possible.
             // If you got an error_invalid_expression error message here,
@@ -286,15 +286,11 @@ namespace boost { namespace spirit { namespace karma
             if (f)
             {
                 // Create an attribute if none is supplied.
-                typedef traits::make_attribute<attr_type, Attribute>
-                    make_attribute;
                 typedef traits::transform_attribute<
-                    typename make_attribute::type, attr_type, domain>
+                    Attribute const, attr_type, domain>
                 transform;
 
-                typename transform::type attr_ =
-                    traits::pre_transform<domain, attr_type>(
-                        make_attribute::call(attr));
+                typename transform::type attr_ = transform::pre(attr);
 
                 // If you are seeing a compilation error here, you are probably
                 // trying to use a rule or a grammar which has inherited
@@ -326,15 +322,11 @@ namespace boost { namespace spirit { namespace karma
             if (f)
             {
                 // Create an attribute if none is supplied.
-                typedef traits::make_attribute<attr_type, Attribute>
-                    make_attribute;
                 typedef traits::transform_attribute<
-                    typename make_attribute::type, attr_type, domain>
+                    Attribute const, attr_type, domain>
                 transform;
 
-                typename transform::type attr_ =
-                    traits::pre_transform<domain, attr_type>(
-                        make_attribute::call(attr));
+                typename transform::type attr_ = transform::pre(attr);
 
                 // If you are seeing a compilation error here, you are probably
                 // trying to use a rule or a grammar which has inherited

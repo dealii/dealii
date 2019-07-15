@@ -1149,26 +1149,26 @@ namespace boost { namespace spirit { namespace traits
     template <>
     struct extract_from_container<utree, utf8_symbol_type>
     {
-        typedef std::string type;
+        typedef utf8_symbol_type type;
 
         template <typename Context>
         static type call(utree const& t, Context&)
         {
             utf8_symbol_range_type r = detail::get_or_deref<utf8_symbol_range_type>(t);
-            return std::string(traits::begin(r), traits::end(r));
+            return type(traits::begin(r), traits::end(r));
         }
     };
 
     template <>
     struct extract_from_container<utree, utf8_string_type>
     {
-        typedef std::string type;
+        typedef utf8_string_type type;
 
         template <typename Context>
         static type call(utree const& t, Context&)
         {
             utf8_string_range_type r = detail::get_or_deref<utf8_string_range_type>(t);
-            return std::string(traits::begin(r), traits::end(r));
+            return type(traits::begin(r), traits::end(r));
         }
     };
 
@@ -1264,24 +1264,24 @@ namespace boost { namespace spirit { namespace traits
     template <>
     struct transform_attribute<utree const, utf8_string_type, karma::domain>
     {
-        typedef std::string type;
+        typedef utf8_string_type type;
 
         static type pre(utree const& t)
         {
             utf8_string_range_type r = detail::get_or_deref<utf8_string_range_type>(t);
-            return std::string(traits::begin(r), traits::end(r));
+            return type(traits::begin(r), traits::end(r));
         }
     };
 
     template <>
     struct transform_attribute<utree const, utf8_symbol_type, karma::domain>
     {
-        typedef std::string type;
+        typedef utf8_symbol_type type;
 
         static type pre(utree const& t)
         {
             utf8_symbol_range_type r = detail::get_or_deref<utf8_symbol_range_type>(t);
-            return std::string(traits::begin(r), traits::end(r));
+            return type(traits::begin(r), traits::end(r));
         }
     };
 

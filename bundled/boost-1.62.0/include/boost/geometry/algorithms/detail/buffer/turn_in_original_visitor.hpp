@@ -2,8 +2,8 @@
 
 // Copyright (c) 2014 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2016.
-// Modifications copyright (c) 2016 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2016, 2018.
+// Modifications copyright (c) 2016-2018 Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -16,6 +16,7 @@
 
 #include <boost/core/ignore_unused.hpp>
 
+#include <boost/geometry/algorithms/detail/buffer/buffer_policies.hpp>
 #include <boost/geometry/algorithms/expand.hpp>
 #include <boost/geometry/strategies/agnostic/point_in_poly_winding.hpp>
 #include <boost/geometry/strategies/buffer.hpp>
@@ -38,12 +39,14 @@ struct original_get_box
     }
 };
 
+template <typename DisjointBoxBoxStrategy>
 struct original_ovelaps_box
 {
     template <typename Box, typename Original>
     static inline bool apply(Box const& box, Original const& original)
     {
-        return ! detail::disjoint::disjoint_box_box(box, original.m_box);
+        return ! detail::disjoint::disjoint_box_box(box, original.m_box,
+                                                    DisjointBoxBoxStrategy());
     }
 };
 
@@ -56,6 +59,7 @@ struct include_turn_policy
     }
 };
 
+template <typename DisjointPointBoxStrategy>
 struct turn_in_original_ovelaps_box
 {
     template <typename Box, typename Turn>
@@ -68,7 +72,7 @@ struct turn_in_original_ovelaps_box
         }
 
         return ! geometry::detail::disjoint::disjoint_point_box(
-                    turn.robust_point, box);
+                    turn.robust_point, box, DisjointPointBoxStrategy());
     }
 };
 
@@ -212,27 +216,27 @@ public:
     {}
 
     template <typename Turn, typename Original>
-    inline void apply(Turn const& turn, Original const& original, bool first = true)
+    inline bool apply(Turn const& turn, Original const& original, bool first = true)
     {
-        boost::ignore_unused_variable_warning(first);
+        boost::ignore_unused(first);
 
         if (turn.location != location_ok || turn.within_original)
         {
             // Skip all points already processed
-            return;
+            return true;
         }
 
         if (geometry::disjoint(turn.robust_point, original.m_box))
         {
             // Skip all disjoint
-            return;
+            return true;
         }
 
         int const code = point_in_original(turn.robust_point, original);
 
         if (code == -1)
         {
-            return;
+            return true;
         }
 
         Turn& mutable_turn = m_mutable_turns[turn.turn_index];
@@ -259,6 +263,8 @@ public:
             mutable_turn.within_original = true;
             mutable_turn.count_in_original = 1;
         }
+
+        return true;
     }
 
 private :

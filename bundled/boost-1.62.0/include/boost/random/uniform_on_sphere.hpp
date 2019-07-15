@@ -19,7 +19,7 @@
 
 #include <vector>
 #include <algorithm>     // std::transform
-#include <functional>    // std::divides
+#include <functional>    // std::bind2nd, std::divides
 #include <boost/assert.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/operators.hpp>

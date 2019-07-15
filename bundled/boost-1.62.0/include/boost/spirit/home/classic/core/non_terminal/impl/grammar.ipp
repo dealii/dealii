@@ -15,7 +15,7 @@
 #include <boost/spirit/home/classic/core/non_terminal/impl/object_with_id.ipp>
 #include <algorithm>
 #include <functional>
-#include <memory> // for std::auto_ptr
+#include <boost/move/unique_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #endif
 
@@ -70,7 +70,7 @@ struct grammar_definition
         {   // Does _not_ copy the helpers member !
         }
 
-        grammar_helper_list& operator=(grammar_helper_list const& x)
+        grammar_helper_list& operator=(grammar_helper_list const& /*x*/)
         {   // Does _not_ copy the helpers member !
             return *this;
         }
@@ -156,13 +156,8 @@ struct grammar_definition
             if (definitions[id]!=0)
                 return *definitions[id];
 
-#if defined(BOOST_NO_CXX11_SMART_PTR)
-            std::auto_ptr<definition_t>
+            boost::movelib::unique_ptr<definition_t>
                 result(new definition_t(target_grammar->derived()));
-#else
-            std::unique_ptr<definition_t>
-                result(new definition_t(target_grammar->derived()));
-#endif
 
 #ifdef BOOST_SPIRIT_THREADSAFE
             boost::unique_lock<boost::mutex> lock(helpers.mutex());

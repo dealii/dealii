@@ -9,8 +9,8 @@
 
 #include <boost/spirit/home/support/iterators/multi_pass_fwd.hpp>
 #include <boost/spirit/home/support/iterators/detail/multi_pass.hpp>
-#include <boost/detail/iterator.hpp> // for boost::detail::iterator_traits
 #include <boost/assert.hpp>
+#include <iterator> // for std::iterator_traits
 
 namespace boost { namespace spirit { namespace iterator_policies
 {
@@ -38,21 +38,21 @@ namespace boost { namespace spirit { namespace iterator_policies
         {
         private:
             typedef
-                typename boost::detail::iterator_traits<T>::value_type
+                typename std::iterator_traits<T>::value_type
             result_type;
 
         public:
             typedef
-                typename boost::detail::iterator_traits<T>::difference_type
+                typename std::iterator_traits<T>::difference_type
             difference_type;
             typedef
-                typename boost::detail::iterator_traits<T>::difference_type
+                typename std::iterator_traits<T>::difference_type
             distance_type;
             typedef
-                typename boost::detail::iterator_traits<T>::pointer
+                typename std::iterator_traits<T>::pointer
             pointer;
             typedef
-                typename boost::detail::iterator_traits<T>::reference
+                typename std::iterator_traits<T>::reference
             reference;
             typedef result_type value_type;
 

@@ -44,13 +44,15 @@ namespace boost { namespace spirit { namespace detail
 
     inline short fast_string::tag() const
     {
-        return (int(buff[small_string_size-2]) << 8) + (unsigned char)buff[small_string_size-1];
+        boost::int16_t tmp;
+        std::memcpy(&tmp, &buff[small_string_size-2], sizeof(tmp));
+        return tmp;
     }
 
     inline void fast_string::tag(short tag)
     {
-        buff[small_string_size-2] = tag >> 8;
-        buff[small_string_size-1] = tag & 0xff;
+        boost::int16_t tmp = tag;
+        std::memcpy(&buff[small_string_size-2], &tmp, sizeof(tmp));
     }
 
     inline bool fast_string::is_heap_allocated() const
@@ -77,7 +79,7 @@ namespace boost { namespace spirit { namespace detail
     template <typename Iterator>
     inline void fast_string::construct(Iterator f, Iterator l)
     {
-        unsigned const size = l-f;
+        std::size_t const size = static_cast<std::size_t>(l-f);
         char* str;
         if (size < max_string_len)
         {
@@ -931,11 +933,11 @@ namespace boost { namespace spirit
         return *this;
     }
 
-    inline utree& utree::operator=(any_ptr const& p)
+    inline utree& utree::operator=(any_ptr const& p_)
     {
         free();
-        v.p = p.p;
-        v.i = p.i;
+        v.p = p_.p;
+        v.i = p_.i;
         set_type(type::any_type);
         return *this;
     }

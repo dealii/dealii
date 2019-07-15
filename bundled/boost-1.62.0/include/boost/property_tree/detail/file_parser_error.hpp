@@ -34,7 +34,7 @@ namespace boost { namespace property_tree
         {
         }
 
-        ~file_parser_error() throw() override
+        ~file_parser_error() throw()
             // gcc 3.4.2 complains about lack of throw specifier on compiler
             // generated dtor
         {

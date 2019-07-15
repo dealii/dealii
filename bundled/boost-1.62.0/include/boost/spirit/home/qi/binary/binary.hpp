@@ -195,11 +195,11 @@ namespace boost { namespace spirit { namespace qi
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <BOOST_SCOPED_ENUM(boost::endian::endianness) bits>
+        template <BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) bits>
         struct what;
 
         template <>
-        struct what<boost::endian::endianness::native>
+        struct what<boost::spirit::endian::endianness::native>
         {
             static std::string is()
             {
@@ -208,7 +208,7 @@ namespace boost { namespace spirit { namespace qi
         };
 
         template <>
-        struct what<boost::endian::endianness::little>
+        struct what<boost::spirit::endian::endianness::little>
         {
             static char const* is()
             {
@@ -217,7 +217,7 @@ namespace boost { namespace spirit { namespace qi
         };
 
         template <>
-        struct what<boost::endian::endianness::big>
+        struct what<boost::spirit::endian::endianness::big>
         {
             static char const* is()
             {
@@ -227,13 +227,13 @@ namespace boost { namespace spirit { namespace qi
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+    template <typename T, BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct any_binary_parser : primitive_parser<any_binary_parser<T, endian, bits> >
     {
         template <typename Context, typename Iterator>
         struct attribute
         {
-            typedef boost::endian::endian<endian, typename T::type,
+            typedef boost::spirit::endian::endian<endian, typename T::type,
                 bits> type;
         };
 
@@ -270,7 +270,7 @@ namespace boost { namespace spirit { namespace qi
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename V, typename T
-      , BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+      , BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct binary_lit_parser
       : primitive_parser<binary_lit_parser<V, T, endian, bits> >
     {
@@ -295,7 +295,7 @@ namespace boost { namespace spirit { namespace qi
             // definition of C++03) it seems to be safe to assume they are
             // (but in C++0x the endian types _are_ PODs).
             // This allows us to treat them as a sequence of consecutive bytes.
-            boost::endian::endian<endian, typename T::type, bits> attr_;
+            boost::spirit::endian::endian<endian, typename T::type, bits> attr_;
 
 #if defined(BOOST_MSVC)
 // warning C4244: 'argument' : conversion from 'const int' to 'foo', possible loss of data
@@ -333,7 +333,7 @@ namespace boost { namespace spirit { namespace qi
     ///////////////////////////////////////////////////////////////////////////
     // Parser generators: make_xxx function (objects)
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+    template <typename T, BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct make_binary_parser
     {
         typedef any_binary_parser<T, endian, bits> result_type;
@@ -344,7 +344,7 @@ namespace boost { namespace spirit { namespace qi
     };
 
     template <typename V, typename T
-      , BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+      , BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct make_binary_lit_parser
     {
         typedef binary_lit_parser<V, T, endian, bits> result_type;
@@ -359,13 +359,13 @@ namespace boost { namespace spirit { namespace qi
     template <typename Modifiers>                                             \
     struct make_primitive<tag::name, Modifiers>                               \
       : make_binary_parser<detail::integer<bits>,                             \
-        boost::endian::endianness::endiantype, bits> {};                      \
+        boost::spirit::endian::endianness::endiantype, bits> {};              \
                                                                               \
     template <typename Modifiers, typename A0>                                \
     struct make_primitive<                                                    \
         terminal_ex<tag::name, fusion::vector1<A0> > , Modifiers>             \
       : make_binary_lit_parser<A0, detail::integer<bits>,                     \
-        boost::endian::endianness::endiantype, bits> {};                      \
+        boost::spirit::endian::endianness::endiantype, bits> {};              \
                                                                               \
     /***/
 
@@ -388,13 +388,13 @@ namespace boost { namespace spirit { namespace qi
     template<typename Modifiers>                                              \
     struct make_primitive<tag::name, Modifiers>                               \
       : make_binary_parser<detail::floating_point<bits>,                      \
-        boost::endian::endianness::endiantype, bits> {};                      \
+        boost::spirit::endian::endianness::endiantype, bits> {};              \
                                                                               \
     template<typename Modifiers, typename A0>                                 \
     struct make_primitive<                                                    \
         terminal_ex<tag::name, fusion::vector1<A0> >, Modifiers>              \
       : make_binary_lit_parser<A0, detail::floating_point<bits>,              \
-        boost::endian::endianness::endiantype,                                \
+        boost::spirit::endian::endianness::endiantype,                        \
         bits> {};                                                             \
                                                                               \
     /***/

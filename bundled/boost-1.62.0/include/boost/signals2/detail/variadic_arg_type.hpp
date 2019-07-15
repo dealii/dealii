@@ -36,7 +36,7 @@ namespace boost
         struct std_functional_base
       {};
       template <typename T1>
-	    struct std_functional_base<T1>
+        struct std_functional_base<T1>
       {
         typedef T1 argument_type;
       };

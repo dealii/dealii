@@ -14,6 +14,7 @@
 
 #include <utility>  // for std::pair
 
+#include <boost/config.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 
@@ -35,7 +36,7 @@ namespace boost { namespace algorithm {
 /// \note            This function is part of the C++2011 standard library.
 template <typename InputIterator, 
         typename OutputIterator1, typename OutputIterator2, typename UnaryPredicate>
-std::pair<OutputIterator1, OutputIterator2>
+BOOST_CXX14_CONSTEXPR std::pair<OutputIterator1, OutputIterator2>
 partition_copy ( InputIterator first, InputIterator last,
         OutputIterator1 out_true, OutputIterator2 out_false, UnaryPredicate p )
 {
@@ -57,7 +58,7 @@ partition_copy ( InputIterator first, InputIterator last,
 ///
 template <typename Range, typename OutputIterator1, typename OutputIterator2, 
             typename UnaryPredicate>
-std::pair<OutputIterator1, OutputIterator2>
+BOOST_CXX14_CONSTEXPR std::pair<OutputIterator1, OutputIterator2>
 partition_copy ( const Range &r, OutputIterator1 out_true, OutputIterator2 out_false, 
                                 UnaryPredicate p )
 {

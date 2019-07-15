@@ -326,7 +326,7 @@ namespace boost {
         bool decreased =
           relax(e, g, weight, predecessor, distance,
                 combine, compare);
-        Distance w_d = combine(get(distance, v), e_weight);
+        combine(get(distance, v), e_weight);
         if (decreased) {
           vis.edge_relaxed(e, g);
           Distance w_rank = combine(get(distance, w), h(w));

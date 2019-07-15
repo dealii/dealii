@@ -66,7 +66,7 @@ namespace boost { namespace numeric { namespace ublas {
             storage_invariants ();
         }
         BOOST_UBLAS_INLINE
-        generalized_vector_of_vector (size_type size1, size_type size2, size_type non_zeros = 0):
+				generalized_vector_of_vector (size_type size1, size_type size2, size_type /*non_zeros = 0*/):
             matrix_container<self_type> (),
             size1_ (size1), size2_ (size2), data_ (layout_type::size_M (size1_, size2_) + 1) {
             const size_type sizeM = layout_type::size_M (size1_, size2_);
@@ -84,7 +84,7 @@ namespace boost { namespace numeric { namespace ublas {
         }
         template<class AE>
         BOOST_UBLAS_INLINE
-        generalized_vector_of_vector (const matrix_expression<AE> &ae, size_type non_zeros = 0):
+				generalized_vector_of_vector (const matrix_expression<AE> &ae, size_type /*non_zeros = 0*/):
             matrix_container<self_type> (),
             size1_ (ae ().size1 ()), size2_ (ae ().size2 ()), data_ (layout_type::size_M (size1_, size2_) + 1) {
             const size_type sizeM = layout_type::size_M (size1_, size2_);

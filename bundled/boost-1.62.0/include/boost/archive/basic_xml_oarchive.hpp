@@ -123,7 +123,7 @@ protected:
     BOOST_ARCHIVE_OR_WARCHIVE_DECL
     basic_xml_oarchive(unsigned int flags);
     BOOST_ARCHIVE_OR_WARCHIVE_DECL
-    ~basic_xml_oarchive() override;
+    ~basic_xml_oarchive();
 };
 
 } // namespace archive

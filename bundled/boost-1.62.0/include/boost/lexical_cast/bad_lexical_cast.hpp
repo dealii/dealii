@@ -1,6 +1,6 @@
 // Copyright Kevlin Henney, 2000-2005.
 // Copyright Alexander Nasonov, 2006-2010.
-// Copyright Antony Polukhin, 2011-2014.
+// Copyright Antony Polukhin, 2011-2019.
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -51,12 +51,12 @@ namespace boost
 #endif
         {}
 
-        virtual const char *what() const BOOST_NOEXCEPT_OR_NOTHROW override {
+        virtual const char *what() const BOOST_NOEXCEPT_OR_NOTHROW {
             return "bad lexical cast: "
                    "source type value could not be interpreted as target";
         }
 
-        virtual ~bad_lexical_cast() BOOST_NOEXCEPT_OR_NOTHROW override
+        virtual ~bad_lexical_cast() BOOST_NOEXCEPT_OR_NOTHROW
         {}
 
 #ifndef BOOST_NO_TYPEID

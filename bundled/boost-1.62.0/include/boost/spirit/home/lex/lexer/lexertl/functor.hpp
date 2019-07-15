@@ -11,10 +11,10 @@
 #endif
 
 #include <boost/mpl/bool.hpp>
-#include <boost/detail/iterator.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/spirit/home/lex/lexer/pass_flags.hpp>
 #include <boost/assert.hpp>
+#include <iterator> // for std::iterator_traits
 
 #if 0 != __COMO_VERSION__ || !BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
 #define BOOST_SPIRIT_STATIC_EOF 1
@@ -66,7 +66,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
     {
     public:
         typedef typename 
-            boost::detail::iterator_traits<Iterator>::value_type 
+            std::iterator_traits<Iterator>::value_type 
         char_type;
 
     private:
@@ -98,11 +98,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         };
 
     public:
-        functor()
-#if defined(__PGI)
-          : eof()
-#endif 
-        {}
+        functor() {}
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
         // somehow VC7.1 needs this (meaningless) assignment operator

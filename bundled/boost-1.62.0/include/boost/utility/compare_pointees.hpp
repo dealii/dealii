@@ -44,6 +44,7 @@ struct equal_pointees_t
 } ;
 
 // template<class OP> bool less_pointees(OP const& x, OP const& y);
+// template<class OP> struct less_pointees_t;
 //
 // Being OP a model of OptionalPointee (either a pointer or an optional):
 //

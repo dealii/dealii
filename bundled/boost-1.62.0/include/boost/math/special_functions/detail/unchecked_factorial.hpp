@@ -10,7 +10,6 @@
 #pragma once
 #endif
 
-#include <boost/array.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push) // Temporary until lexical cast fixed.
 #pragma warning(disable: 4127 4701)
@@ -21,8 +20,24 @@
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
-#include <boost/config/no_tr1/cmath.hpp>
+#include <cmath>
 #include <boost/math/special_functions/math_fwd.hpp>
+
+#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
+#include <array>
+#else
+#include <boost/array.hpp>
+#endif
+
+#if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
+//
+// This is the only way we can avoid
+// warning: non-standard suffix on floating constant [-Wpedantic]
+// when building with -Wall -pedantic.  Neither __extension__
+// nor #pragma dianostic ignored work :(
+//
+#pragma GCC system_header
+#endif
 
 namespace boost { namespace math
 {
@@ -32,9 +47,13 @@ struct max_factorial;
 
 // Definitions:
 template <>
-inline float unchecked_factorial<float>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(float))
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION float unchecked_factorial<float>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(float))
 {
+#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
+   constexpr std::array<float, 35> factorials = { {
+#else
    static const boost::array<float, 35> factorials = {{
+#endif
       1.0F,
       1.0F,
       2.0F,
@@ -83,9 +102,13 @@ struct max_factorial<float>
 
 
 template <>
-inline long double unchecked_factorial<long double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(long double))
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION long double unchecked_factorial<long double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(long double))
 {
+#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
+   constexpr std::array<long double, 171> factorials = { {
+#else
    static const boost::array<long double, 171> factorials = {{
+#endif
       1L,
       1L,
       2L,
@@ -271,9 +294,13 @@ struct max_factorial<long double>
 #ifdef BOOST_MATH_USE_FLOAT128
 
 template <>
-inline BOOST_MATH_FLOAT128_TYPE unchecked_factorial<BOOST_MATH_FLOAT128_TYPE>(unsigned i)
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION BOOST_MATH_FLOAT128_TYPE unchecked_factorial<BOOST_MATH_FLOAT128_TYPE>(unsigned i)
 {
+#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
+   constexpr std::array<BOOST_MATH_FLOAT128_TYPE, 171> factorials = { {
+#else
    static const boost::array<BOOST_MATH_FLOAT128_TYPE, 171> factorials = { {
+#endif
       1,
       1,
       2,
@@ -459,7 +486,7 @@ struct max_factorial<BOOST_MATH_FLOAT128_TYPE>
 #endif
 
 template <>
-inline double unchecked_factorial<double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(double))
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION double unchecked_factorial<double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(double))
 {
    return static_cast<double>(boost::math::unchecked_factorial<long double>(i));
 }

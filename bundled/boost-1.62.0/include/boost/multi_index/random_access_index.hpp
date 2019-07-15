@@ -1,4 +1,4 @@
-/* Copyright 2003-2015 Joaquin M Lopez Munoz.
+/* Copyright 2003-2018 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -17,16 +17,18 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/call_traits.hpp>
+#include <boost/core/addressof.hpp>
 #include <boost/detail/no_exceptions_support.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/foreach_fwd.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
 #include <boost/move/core.hpp>
-#include <boost/move/utility.hpp>
+#include <boost/move/utility_core.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/push_front.hpp>
 #include <boost/multi_index/detail/access_specifier.hpp>
+#include <boost/multi_index/detail/allocator_traits.hpp>
 #include <boost/multi_index/detail/do_not_copy_elements_tag.hpp>
 #include <boost/multi_index/detail/index_node_base.hpp>
 #include <boost/multi_index/detail/rnd_node_iterator.hpp>
@@ -40,7 +42,6 @@
 #include <boost/throw_exception.hpp> 
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_integral.hpp>
-#include <cstddef>
 #include <functional>
 #include <stdexcept> 
 #include <utility>
@@ -95,46 +96,50 @@ class random_access_index:
 #pragma parse_mfunc_templ off
 #endif
 
-  typedef typename SuperMeta::type                 super;
+  typedef typename SuperMeta::type               super;
 
 protected:
   typedef random_access_index_node<
-    typename super::node_type>                     node_type;
+    typename super::node_type>                   node_type;
 
 private:
-  typedef typename node_type::impl_type            node_impl_type;
+  typedef typename node_type::impl_type          node_impl_type;
   typedef random_access_index_ptr_array<
-    typename super::final_allocator_type>          ptr_array;
-  typedef typename ptr_array::pointer              node_impl_ptr_pointer;
+    typename super::final_allocator_type>        ptr_array;
+  typedef typename ptr_array::pointer            node_impl_ptr_pointer;
 
 public:
   /* types */
 
-  typedef typename node_type::value_type           value_type;
-  typedef tuples::null_type                        ctor_args;
-  typedef typename super::final_allocator_type     allocator_type;
-  typedef typename allocator_type::reference       reference;
-  typedef typename allocator_type::const_reference const_reference;
+  typedef typename node_type::value_type         value_type;
+  typedef tuples::null_type                      ctor_args;
+  typedef typename super::final_allocator_type   allocator_type;
+  typedef value_type&                            reference;
+  typedef const value_type&                      const_reference;
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
   typedef safe_mode::safe_iterator<
     rnd_node_iterator<node_type>,
-    random_access_index>                           iterator;
+    random_access_index>                         iterator;
 #else
-  typedef rnd_node_iterator<node_type>             iterator;
+  typedef rnd_node_iterator<node_type>           iterator;
 #endif
 
-  typedef iterator                                 const_iterator;
+  typedef iterator                               const_iterator;
 
-  typedef std::size_t                              size_type;      
-  typedef std::ptrdiff_t                           difference_type;
-  typedef typename allocator_type::pointer         pointer;
-  typedef typename allocator_type::const_pointer   const_pointer;
+private:
+  typedef allocator_traits<allocator_type>       alloc_traits;
+
+public:
+  typedef typename alloc_traits::pointer         pointer;
+  typedef typename alloc_traits::const_pointer   const_pointer;
+  typedef typename alloc_traits::size_type       size_type;
+  typedef typename alloc_traits::difference_type difference_type;
   typedef typename
-    boost::reverse_iterator<iterator>              reverse_iterator;
+    boost::reverse_iterator<iterator>            reverse_iterator;
   typedef typename
-    boost::reverse_iterator<const_iterator>        const_reverse_iterator;
-  typedef TagList                                  tag_list;
+    boost::reverse_iterator<const_iterator>      const_reverse_iterator;
+  typedef TagList                                tag_list;
 
 protected:
   typedef typename super::final_node_type     final_node_type;
@@ -249,12 +254,12 @@ public:
 
   iterator iterator_to(const value_type& x)
   {
-    return make_iterator(node_from_value<node_type>(&x));
+    return make_iterator(node_from_value<node_type>(boost::addressof(x)));
   }
 
   const_iterator iterator_to(const value_type& x)const
   {
-    return make_iterator(node_from_value<node_type>(&x));
+    return make_iterator(node_from_value<node_type>(boost::addressof(x)));
   }
 
   /* capacity */
@@ -408,7 +413,7 @@ public:
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(last,*this);
     BOOST_MULTI_INDEX_CHECK_VALID_RANGE(first,last);
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    difference_type n=last-first;
+    difference_type n=static_cast<difference_type>(last-first);
     relocate(end(),first,last);
     while(n--)pop_back();
     return last;
@@ -875,6 +880,11 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
   bool modify_rollback_(node_type* x)
   {
     return super::modify_rollback_(x);
+  }
+
+  bool check_rollback_(node_type* x)const
+  {
+    return super::check_rollback_(x);
   }
 
 #if !defined(BOOST_MULTI_INDEX_DISABLE_SERIALIZATION)

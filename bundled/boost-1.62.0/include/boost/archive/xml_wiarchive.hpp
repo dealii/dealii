@@ -62,6 +62,7 @@ protected:
     friend class basic_xml_iarchive<Archive>;
     friend class load_access;
 #endif
+    std::locale archive_locale;
     boost::scoped_ptr<xml_wgrammar> gimpl;
     std::wistream & get_is(){
         return is;
@@ -106,7 +107,7 @@ protected:
     BOOST_WARCHIVE_DECL 
     xml_wiarchive_impl(std::wistream & is, unsigned int flags) ;
     BOOST_WARCHIVE_DECL 
-    ~xml_wiarchive_impl() override;
+    ~xml_wiarchive_impl();
 };
 
 } // namespace archive
@@ -132,7 +133,7 @@ public:
     xml_wiarchive(std::wistream & is, unsigned int flags = 0) :
         xml_wiarchive_impl<xml_wiarchive>(is, flags)
     {}
-    ~xml_wiarchive() override{}
+    ~xml_wiarchive(){}
 };
 
 } // namespace archive

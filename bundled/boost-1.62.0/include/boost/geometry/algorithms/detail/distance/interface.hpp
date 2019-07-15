@@ -6,10 +6,11 @@
 // Copyright (c) 2013-2014 Adam Wulkiewicz, Lodz, Poland.
 // Copyright (c) 2014 Samuel Debionne, Grenoble, France.
 
-// This file was modified by Oracle on 2014.
-// Modifications copyright (c) 2014, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2014, 2018.
+// Modifications copyright (c) 2014-2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -94,9 +95,10 @@ struct distance
 namespace resolve_strategy
 {
 
+template <typename Strategy>
 struct distance
 {
-    template <typename Geometry1, typename Geometry2, typename Strategy>
+    template <typename Geometry1, typename Geometry2>
     static inline typename distance_result<Geometry1, Geometry2, Strategy>::type
     apply(Geometry1 const& geometry1,
           Geometry2 const& geometry2,
@@ -107,7 +109,11 @@ struct distance
                 Geometry1, Geometry2, Strategy
             >::apply(geometry1, geometry2, strategy);
     }
+};
 
+template <>
+struct distance<default_strategy>
+{
     template <typename Geometry1, typename Geometry2>
     static inline
     typename distance_result<Geometry1, Geometry2, default_strategy>::type
@@ -143,8 +149,10 @@ struct distance
           Geometry2 const& geometry2,
           Strategy const& strategy)
     {
-        return
-            resolve_strategy::distance::apply(geometry1, geometry2, strategy);
+        return resolve_strategy::distance
+            <
+                Strategy
+            >::apply(geometry1, geometry2, strategy);
     }
 };
 
@@ -320,10 +328,10 @@ struct distance
 
 
 /*!
-\brief \brief_calc2{distance} \brief_strategy
+\brief Calculate the distance between two geometries \brief_strategy
 \ingroup distance
 \details
-\details \details_calc{area}. \brief_strategy. \details_strategy_reasons
+\details The free function distance calculates the distance between two geometries \brief_strategy. \details_strategy_reasons
 
 \tparam Geometry1 \tparam_geometry
 \tparam Geometry2 \tparam_geometry
@@ -376,9 +384,10 @@ distance(Geometry1 const& geometry1,
 
 
 /*!
-\brief \brief_calc2{distance}
+\brief Calculate the distance between two geometries.
 \ingroup distance
-\details The default strategy is used, corresponding to the coordinate system of the geometries
+\details The free function distance calculates the distance between two geometries. \details_default_strategy
+
 \tparam Geometry1 \tparam_geometry
 \tparam Geometry2 \tparam_geometry
 \param geometry1 \param_geometry

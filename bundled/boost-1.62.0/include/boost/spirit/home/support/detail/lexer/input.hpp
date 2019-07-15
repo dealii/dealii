@@ -7,16 +7,16 @@
 #define BOOST_LEXER_INPUT
 
 #include "char_traits.hpp"
-#include <boost/detail/iterator.hpp>
 #include "size_t.hpp"
 #include "state_machine.hpp"
+#include <iterator> // for std::iterator_traits
 
 namespace boost
 {
 namespace lexer
 {
 template<typename FwdIter, typename Traits =
-    char_traits<typename boost::detail::iterator_traits<FwdIter>::value_type> >
+    char_traits<typename std::iterator_traits<FwdIter>::value_type> >
 class basic_input
 {
 public:

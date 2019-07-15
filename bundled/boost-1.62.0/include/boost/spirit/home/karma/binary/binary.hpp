@@ -194,11 +194,11 @@ namespace boost { namespace spirit { namespace karma
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <BOOST_SCOPED_ENUM(boost::endian::endianness) bits>
+        template <BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) bits>
         struct what;
 
         template <>
-        struct what<boost::endian::endianness::native>
+        struct what<boost::spirit::endian::endianness::native>
         {
             static info is()
             {
@@ -207,7 +207,7 @@ namespace boost { namespace spirit { namespace karma
         };
 
         template <>
-        struct what<boost::endian::endianness::little>
+        struct what<boost::spirit::endian::endianness::little>
         {
             static info is()
             {
@@ -216,7 +216,7 @@ namespace boost { namespace spirit { namespace karma
         };
 
         template <>
-        struct what<boost::endian::endianness::big>
+        struct what<boost::spirit::endian::endianness::big>
         {
             static info is()
             {
@@ -226,7 +226,7 @@ namespace boost { namespace spirit { namespace karma
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+    template <typename T, BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct any_binary_generator
       : primitive_generator<any_binary_generator<T, endian, bits> >
     {
@@ -245,7 +245,7 @@ namespace boost { namespace spirit { namespace karma
             // Even if the endian types are not pod's (at least not in the
             // definition of C++03) it seems to be safe to assume they are.
             // This allows us to treat them as a sequence of consecutive bytes.
-            boost::endian::endian<endian, typename T::type, bits> p;
+            boost::spirit::endian::endian<endian, typename T::type, bits> p;
 
 #if defined(BOOST_MSVC)
 // warning C4244: 'argument' : conversion from 'const int' to 'foo', possible loss of data
@@ -293,7 +293,7 @@ namespace boost { namespace spirit { namespace karma
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+    template <typename T, BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
     struct literal_binary_generator
       : primitive_generator<literal_binary_generator<T, endian, bits> >
     {
@@ -344,7 +344,7 @@ namespace boost { namespace spirit { namespace karma
             return karma::detail::what<endian>::is();
         }
 
-        typedef boost::endian::endian<endian, typename T::type,
+        typedef boost::spirit::endian::endian<endian, typename T::type,
             bits> data_type;
 
         data_type data_;
@@ -355,7 +355,7 @@ namespace boost { namespace spirit { namespace karma
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename T, BOOST_SCOPED_ENUM(boost::endian::endianness) endian
+        template <typename T, BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian
           , int bits>
         struct basic_binary
         {
@@ -368,7 +368,7 @@ namespace boost { namespace spirit { namespace karma
         };
 
         template <typename Modifiers, typename T
-          , BOOST_SCOPED_ENUM(boost::endian::endianness) endian, int bits>
+          , BOOST_SCOPED_ENUM(boost::spirit::endian::endianness) endian, int bits>
         struct basic_binary_literal
         {
             typedef literal_binary_generator<T, endian, bits> result_type;
@@ -385,13 +385,13 @@ namespace boost { namespace spirit { namespace karma
     template <typename Modifiers>                                             \
     struct make_primitive<tag::name, Modifiers>                               \
       : detail::basic_binary<detail::integer<bits>,                           \
-        boost::endian::endianness::endiantype, bits> {};                      \
+        boost::spirit::endian::endianness::endiantype, bits> {};              \
                                                                               \
     template <typename Modifiers, typename A0>                                \
     struct make_primitive<terminal_ex<tag::name, fusion::vector1<A0> >        \
           , Modifiers>                                                        \
       : detail::basic_binary_literal<Modifiers, detail::integer<bits>         \
-        , boost::endian::endianness::endiantype, bits> {};                    \
+        , boost::spirit::endian::endianness::endiantype, bits> {};            \
                                                                               \
     /***/
 
@@ -414,13 +414,13 @@ namespace boost { namespace spirit { namespace karma
     template <typename Modifiers>                                             \
     struct make_primitive<tag::name, Modifiers>                               \
       : detail::basic_binary<detail::floating_point<bits>,                    \
-        boost::endian::endianness::endiantype, bits> {};                      \
+        boost::spirit::endian::endianness::endiantype, bits> {};              \
                                                                               \
     template <typename Modifiers, typename A0>                                \
     struct make_primitive<terminal_ex<tag::name, fusion::vector1<A0> >        \
           , Modifiers>                                                        \
       : detail::basic_binary_literal<Modifiers, detail::floating_point<bits>  \
-        , boost::endian::endianness::endiantype, bits> {};                    \
+        , boost::spirit::endian::endianness::endiantype, bits> {};            \
                                                                               \
     /***/
 

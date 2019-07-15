@@ -24,7 +24,7 @@ namespace boost { namespace algorithm {
 /// \param result   An output iterator to write the results into
 /// \note           This function is part of the C++2011 standard library.
 template <typename InputIterator, typename Size, typename OutputIterator>
-OutputIterator copy_n ( InputIterator first, Size n, OutputIterator result )
+BOOST_CXX14_CONSTEXPR OutputIterator copy_n ( InputIterator first, Size n, OutputIterator result )
 {
     for ( ; n > 0; --n, ++first, ++result )
         *result = *first;

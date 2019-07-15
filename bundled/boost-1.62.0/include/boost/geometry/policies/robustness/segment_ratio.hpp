@@ -145,11 +145,10 @@ public :
 
         m_approximation =
             m_denominator == 0 ? 0
-            : boost::numeric_cast<double>
-                (
-                    boost::numeric_cast<fp_type>(m_numerator) * scale()
-                  / boost::numeric_cast<fp_type>(m_denominator)
-                );
+            : (
+                boost::numeric_cast<fp_type>(m_numerator) * scale()
+                / boost::numeric_cast<fp_type>(m_denominator)
+            );
     }
 
     inline bool is_zero() const { return math::equals(m_numerator, 0); }
@@ -187,7 +186,7 @@ public :
             return false;
         }
 
-        static fp_type const small_part_of_scale = scale() / 100.0;
+        static fp_type const small_part_of_scale = scale() / 100;
         return m_approximation < small_part_of_scale
             || m_approximation > scale() - small_part_of_scale;
     }
@@ -236,7 +235,14 @@ public :
 
 
 private :
-    typedef typename promote_floating_point<Type>::type fp_type;
+    // NOTE: if this typedef is used then fp_type is non-fundamental type
+    // if Type is non-fundamental type
+    //typedef typename promote_floating_point<Type>::type fp_type;
+
+    typedef typename boost::mpl::if_c
+        <
+            boost::is_float<Type>::value, Type, double
+        >::type fp_type;
 
     Type m_numerator;
     Type m_denominator;

@@ -4,10 +4,11 @@
 // Copyright (c) 2008-2015 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015, 2017, 2018.
+// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -26,9 +27,13 @@
 #include <boost/geometry/arithmetic/determinant.hpp>
 #include <boost/geometry/core/access.hpp>
 #include <boost/geometry/util/select_coordinate_type.hpp>
+
+#include <boost/geometry/strategies/cartesian/disjoint_segment_box.hpp>
+#include <boost/geometry/strategies/cartesian/envelope.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_point.hpp>
+#include <boost/geometry/strategies/compare.hpp>
 #include <boost/geometry/strategies/side.hpp>
 
-#include <boost/geometry/algorithms/detail/relate/less.hpp>
 #include <boost/geometry/algorithms/detail/equals/point_point.hpp>
 
 
@@ -66,6 +71,25 @@ class side_by_triangle
     };
 
 public :
+    typedef strategy::envelope::cartesian<CalculationType> envelope_strategy_type;
+
+    static inline envelope_strategy_type get_envelope_strategy()
+    {
+        return envelope_strategy_type();
+    }
+
+    typedef strategy::disjoint::segment_box disjoint_strategy_type;
+
+    static inline disjoint_strategy_type get_disjoint_strategy()
+    {
+        return disjoint_strategy_type();
+    }
+
+    typedef strategy::within::cartesian_point_point equals_point_point_strategy_type;
+    static inline equals_point_point_strategy_type get_equals_point_point_strategy()
+    {
+        return equals_point_point_strategy_type();
+    }
 
     // Template member function, because it is not always trivial
     // or convenient to explicitly mention the typenames in the
@@ -149,9 +173,9 @@ public :
             // For robustness purposes, first check if any two points are
             // the same; in this case simply return that the points are
             // collinear
-            if (geometry::detail::equals::equals_point_point(p1, p2)
-                || geometry::detail::equals::equals_point_point(p1, p)
-                || geometry::detail::equals::equals_point_point(p2, p))
+            if (equals_point_point(p1, p2)
+                || equals_point_point(p1, p)
+                || equals_point_point(p2, p))
             {
                 return PromotedType(0);
             }
@@ -166,10 +190,11 @@ public :
             // arguments, we cyclically permute them so that the first
             // argument is always the lexicographically smallest point.
 
-            geometry::detail::relate::less less;
-            if (less(p, p1))
+            typedef compare::cartesian<compare::less> less;
+
+            if (less::apply(p, p1))
             {
-                if (less(p, p2))
+                if (less::apply(p, p2))
                 {
                     // p is the lexicographically smallest
                     return side_value<CoordinateType, PromotedType>(p, p1, p2, epsp);
@@ -181,7 +206,7 @@ public :
                 }
             }
 
-            if (less(p1, p2))
+            if (less::apply(p1, p2))
             {
                 // p1 is the lexicographically smallest
                 return side_value<CoordinateType, PromotedType>(p1, p2, p, epsp);
@@ -240,6 +265,13 @@ public :
             : -1;
     }
 
+private:
+    template <typename P1, typename P2>
+    static inline bool equals_point_point(P1 const& p1, P2 const& p2)
+    {
+        typedef equals_point_point_strategy_type strategy_t;
+        return geometry::detail::equals::equals_point_point(p1, p2, strategy_t());
+    }
 };
 
 

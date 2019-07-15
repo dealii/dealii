@@ -52,7 +52,7 @@ namespace typeid_system {
 class BOOST_SYMBOL_VISIBLE extended_type_info_typeid_0 :
     public extended_type_info
 {
-    virtual const char * get_debug_info() const override {
+    virtual const char * get_debug_info() const {
         if(static_cast<const std::type_info *>(0) == m_ti)
             return static_cast<const char *>(0);
         return m_ti->name();
@@ -60,16 +60,16 @@ class BOOST_SYMBOL_VISIBLE extended_type_info_typeid_0 :
 protected:
     const std::type_info * m_ti;
     BOOST_SERIALIZATION_DECL extended_type_info_typeid_0(const char * key);
-    BOOST_SERIALIZATION_DECL ~extended_type_info_typeid_0() override;
+    BOOST_SERIALIZATION_DECL ~extended_type_info_typeid_0();
     BOOST_SERIALIZATION_DECL void type_register(const std::type_info & ti);
     BOOST_SERIALIZATION_DECL void type_unregister();
     BOOST_SERIALIZATION_DECL const extended_type_info *
     get_extended_type_info(const std::type_info & ti) const;
 public:
     virtual BOOST_SERIALIZATION_DECL bool
-    is_less_than(const extended_type_info &rhs) const override;
+    is_less_than(const extended_type_info &rhs) const;
     virtual BOOST_SERIALIZATION_DECL bool
-    is_equal(const extended_type_info &rhs) const override;
+    is_equal(const extended_type_info &rhs) const;
     const std::type_info & get_typeid() const {
         return *m_ti;
     }
@@ -91,7 +91,7 @@ public:
         type_register(typeid(T));
         key_register();
     }
-    ~extended_type_info_typeid() override{
+    ~extended_type_info_typeid(){
         key_unregister();
         type_unregister();
     }
@@ -110,7 +110,7 @@ public:
     const char * get_key() const {
         return boost::serialization::guid< T >();
     }
-    virtual void * construct(unsigned int count, ...) const override{
+    virtual void * construct(unsigned int count, ...) const{
         // count up the arguments
         std::va_list ap;
         va_start(ap, count);
@@ -131,7 +131,7 @@ public:
             return NULL;
         }
     }
-    virtual void destroy(void const * const p) const override {
+    virtual void destroy(void const * const p) const {
         boost::serialization::access::destroy(
             static_cast<T const *>(p)
         );

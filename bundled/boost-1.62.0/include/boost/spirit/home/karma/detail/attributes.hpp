@@ -44,22 +44,6 @@ namespace boost { namespace spirit { namespace karma
         // Karma only, no post() and no fail() required
     };
 
-    // reference types need special handling
-    template <typename Exposed, typename Transformed>
-    struct transform_attribute<Exposed&, Transformed>
-      : transform_attribute<Exposed, Transformed>
-    {};
-
-    template <typename Exposed, typename Transformed>
-    struct transform_attribute<Exposed const&, Transformed>
-      : transform_attribute<Exposed const, Transformed>
-    {};
-
-    template <typename Attribute>
-    struct transform_attribute<Attribute const&, Attribute>
-      : transform_attribute<Attribute const, Attribute>
-    {};
-
     // unused_type needs some special handling as well
     template <>
     struct transform_attribute<unused_type, unused_type>
@@ -70,16 +54,6 @@ namespace boost { namespace spirit { namespace karma
 
     template <>
     struct transform_attribute<unused_type const, unused_type>
-      : transform_attribute<unused_type, unused_type>
-    {};
-
-    template <typename Attribute>
-    struct transform_attribute<unused_type, Attribute>
-      : transform_attribute<unused_type, unused_type>
-    {};
-
-    template <typename Attribute>
-    struct transform_attribute<unused_type const, Attribute>
       : transform_attribute<unused_type, unused_type>
     {};
 
@@ -95,14 +69,12 @@ namespace boost { namespace spirit { namespace karma
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace spirit { namespace traits
+namespace boost { namespace spirit { namespace traits { namespace detail
 {
     template <typename Exposed, typename Transformed>
-    struct transform_attribute<Exposed, Transformed, karma::domain>
+    struct transform_attribute_base<Exposed, Transformed, karma::domain>
       : karma::transform_attribute<Exposed, Transformed>
     {};
-}}}
+}}}}
 
 #endif
-
-

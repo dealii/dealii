@@ -16,9 +16,9 @@
 #include <algorithm>                             // min, max.
 #include <cassert>
 #include <exception>
-#include <typeinfo>
 #include <boost/config.hpp>                      // Member template friends.
 #include <boost/detail/workaround.hpp>
+#include <boost/core/typeinfo.hpp>
 #include <boost/iostreams/constants.hpp>
 #include <boost/iostreams/detail/adapter/concept_adapter.hpp>
 #include <boost/iostreams/detail/buffer.hpp>
@@ -66,9 +66,9 @@ public:
     void open(const T& t BOOST_IOSTREAMS_PUSH_PARAMS());
     bool is_open() const;
     void close();
-    bool auto_close() const override;
-    void set_auto_close(bool close) override;
-    bool strict_sync() override;
+    bool auto_close() const;
+    void set_auto_close(bool close);
+    bool strict_sync();
 
     // Declared in linked_streambuf.
     T* component() { return &*obj(); }
@@ -78,24 +78,24 @@ protected:
     //----------virtual functions---------------------------------------------//
 
 #ifndef BOOST_IOSTREAMS_NO_LOCALE
-    void imbue(const std::locale& loc) override;
+    void imbue(const std::locale& loc);
 #endif
 #ifdef BOOST_IOSTREAMS_NO_STREAM_TEMPLATES
     public:
 #endif
-    int_type underflow() override;
-    int_type pbackfail(int_type c) override;
-    int_type overflow(int_type c) override;
-    int sync() override;
+    int_type underflow();
+    int_type pbackfail(int_type c);
+    int_type overflow(int_type c);
+    int sync();
     pos_type seekoff( off_type off, BOOST_IOS::seekdir way,
-                      BOOST_IOS::openmode which ) override;
-    pos_type seekpos(pos_type sp, BOOST_IOS::openmode which) override;
+                      BOOST_IOS::openmode which );
+    pos_type seekpos(pos_type sp, BOOST_IOS::openmode which);
 
     // Declared in linked_streambuf.
-    void set_next(streambuf_type* next) override;
-    void close_impl(BOOST_IOS::openmode m) override;
-    const std::type_info& component_type() const override { return typeid(T); }
-    void* component_impl() override { return component(); }
+    void set_next(streambuf_type* next);
+    void close_impl(BOOST_IOS::openmode m);
+    const boost::core::typeinfo& component_type() const { return BOOST_CORE_TYPEID(T); }
+    void* component_impl() { return component(); }
 private:
 
     //----------Accessor functions--------------------------------------------//
@@ -107,7 +107,7 @@ private:
     bool can_read() const { return is_convertible<Mode, input>::value; }
     bool can_write() const { return is_convertible<Mode, output>::value; }
     bool output_buffered() const { return (flags_ & f_output_buffered) != 0; }
-    bool shared_buffer() const { return is_convertible<Mode, seekable>::value; }
+    bool shared_buffer() const { return is_convertible<Mode, seekable>::value || is_convertible<Mode, dual_seekable>::value; }
     void set_flags(int f) { flags_ = f; }
 
     //----------State changing functions--------------------------------------//
@@ -169,16 +169,16 @@ void indirect_streambuf<T, Tr, Alloc, Mode>::open
         pback_size_ = (std::max)(std::streamsize(2), pback_size); // STLPort needs 2.
         std::streamsize size =
             pback_size_ +
-            ( buffer_size ? buffer_size: 1 );
-        in().resize(size);
+            ( buffer_size ? buffer_size: std::streamsize(1) );
+        in().resize(static_cast<int>(size));
         if (!shared_buffer())
             init_get_area();
     }
 
     // Construct output buffer.
     if (can_write() && !shared_buffer()) {
-        if (buffer_size != 0)
-            out().resize(buffer_size);
+        if (buffer_size != std::streamsize(0))
+            out().resize(static_cast<int>(buffer_size));
         init_put_area();
     }
 
@@ -346,16 +346,31 @@ indirect_streambuf<T, Tr, Alloc, Mode>::seek_impl
     if ( gptr() != 0 && way == BOOST_IOS::cur && which == BOOST_IOS::in && 
          eback() - gptr() <= off && off <= egptr() - gptr() ) 
     {   // Small seek optimization
-        gbump(off);
-        return obj().seek(0, BOOST_IOS::cur, BOOST_IOS::in, next_) -
+        gbump(static_cast<int>(off));
+        return obj().seek(stream_offset(0), BOOST_IOS::cur, BOOST_IOS::in, next_) -
                static_cast<off_type>(egptr() - gptr());
     }
     if (pptr() != 0) 
         this->BOOST_IOSTREAMS_PUBSYNC(); // sync() confuses VisualAge 6.
     if (way == BOOST_IOS::cur && gptr())
         off -= static_cast<off_type>(egptr() - gptr());
-    setg(0, 0, 0);
-    setp(0, 0);
+    bool two_head = is_convertible<category, dual_seekable>::value ||
+                    is_convertible<category, bidirectional_seekable>::value;
+    if (two_head) {
+        BOOST_IOS::openmode both = BOOST_IOS::in | BOOST_IOS::out;
+        if ((which & both) == both)
+            boost::throw_exception(bad_seek());
+        if (which & BOOST_IOS::in) {
+            setg(0, 0, 0);
+        }
+        if (which & BOOST_IOS::out) {
+            setp(0, 0);
+        }
+    }
+    else {
+        setg(0, 0, 0);
+        setp(0, 0);
+    }
     return obj().seek(off, way, which, next_);
 }
 
@@ -394,7 +409,7 @@ void indirect_streambuf<T, Tr, Alloc, Mode>::sync_impl()
         else {
             const char_type* ptr = pptr();
             setp(out().begin() + amt, out().end());
-            pbump(ptr - pptr());
+            pbump(static_cast<int>(ptr - pptr()));
         }
     }
 }
@@ -413,8 +428,10 @@ template<typename T, typename Tr, typename Alloc, typename Mode>
 void indirect_streambuf<T, Tr, Alloc, Mode>::init_put_area()
 {
     using namespace std;
-    if (shared_buffer() && gptr() != 0)
+    if (shared_buffer() && gptr() != 0) {
+        obj().seek(static_cast<off_type>(gptr() - egptr()), BOOST_IOS::cur, BOOST_IOS::in, next_);
         setg(0, 0, 0);
+    }
     if (output_buffered())
         setp(out().begin(), out().end());
     else

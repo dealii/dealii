@@ -79,9 +79,9 @@ void merge_sort_copy( RandIt first, RandIt last
    }
 }
 
-template<class RandIt, class Compare>
+template<class RandIt, class RandItRaw, class Compare>
 void merge_sort_uninitialized_copy( RandIt first, RandIt last
-                                 , typename iterator_traits<RandIt>::value_type* uninitialized
+                                 , RandItRaw uninitialized
                                  , Compare comp)
 {
    typedef typename iterator_traits<RandIt>::size_type  size_type;
@@ -94,7 +94,7 @@ void merge_sort_uninitialized_copy( RandIt first, RandIt last
    else{
       size_type const half = count/2;
       merge_sort_uninitialized_copy(first + half, last, uninitialized + half, comp);
-      destruct_n<value_type> d(uninitialized+half);
+      destruct_n<value_type, RandItRaw> d(uninitialized+half);
       d.incr(count-half);
       merge_sort_copy(first, first + half, first + half, comp);
       uninitialized_merge_with_right_placed
@@ -105,9 +105,9 @@ void merge_sort_uninitialized_copy( RandIt first, RandIt last
    }
 }
 
-template<class RandIt, class Compare>
+template<class RandIt, class RandItRaw, class Compare>
 void merge_sort( RandIt first, RandIt last, Compare comp
-               , typename iterator_traits<RandIt>::value_type* uninitialized)
+               , RandItRaw uninitialized)
 {
    typedef typename iterator_traits<RandIt>::size_type  size_type;
    typedef typename iterator_traits<RandIt>::value_type value_type;
@@ -123,7 +123,7 @@ void merge_sort( RandIt first, RandIt last, Compare comp
       RandIt const rest_it = first + rest;
 
       merge_sort_uninitialized_copy(half_it, last, uninitialized, comp);
-      destruct_n<value_type> d(uninitialized);
+      destruct_n<value_type, RandItRaw> d(uninitialized);
       d.incr(rest);
       merge_sort_copy(first, half_it, rest_it, comp);
       merge_with_right_placed
@@ -131,6 +131,74 @@ void merge_sort( RandIt first, RandIt last, Compare comp
          , first, rest_it, last, antistable<Compare>(comp));
    }
 }
+
+///@cond
+
+template<class RandIt, class RandItRaw, class Compare>
+void merge_sort_with_constructed_buffer( RandIt first, RandIt last, Compare comp, RandItRaw buffer)
+{
+   typedef typename iterator_traits<RandIt>::size_type  size_type;
+
+   size_type const count = size_type(last - first);
+   if(count <= MergeSortInsertionSortThreshold){
+      insertion_sort(first, last, comp);
+   }
+   else{
+      size_type const half = count/2;
+      size_type const rest = count -  half;
+      RandIt const half_it = first + half;
+      RandIt const rest_it = first + rest;
+
+      merge_sort_copy(half_it, last, buffer, comp);
+      merge_sort_copy(first, half_it, rest_it, comp);
+      merge_with_right_placed
+         (buffer, buffer + rest
+         , first, rest_it, last, antistable<Compare>(comp));
+   }
+}
+
+template<typename RandIt, typename Pointer,
+         typename Distance, typename Compare>
+void stable_sort_ONlogN_recursive(RandIt first, RandIt last, Pointer buffer, Distance buffer_size, Compare comp)
+{
+   typedef typename iterator_traits<RandIt>::size_type  size_type;
+   if (size_type(last - first) <= size_type(MergeSortInsertionSortThreshold)) {
+      insertion_sort(first, last, comp);
+   }
+   else {
+      const size_type len = (last - first) / 2;
+      const RandIt middle = first + len;
+      if (len > ((buffer_size+1)/2)){
+         stable_sort_ONlogN_recursive(first, middle, buffer, buffer_size, comp);
+         stable_sort_ONlogN_recursive(middle, last, buffer, buffer_size, comp);
+      }
+      else{
+         merge_sort_with_constructed_buffer(first, middle, comp, buffer);
+         merge_sort_with_constructed_buffer(middle, last, comp, buffer);
+      }
+      merge_adaptive_ONlogN_recursive(first, middle, last,
+         size_type(middle - first),
+         size_type(last - middle),
+         buffer, buffer_size,
+         comp);
+   }
+}
+
+template<typename BidirectionalIterator, typename Compare, typename RandRawIt>
+void stable_sort_adaptive_ONlogN2(BidirectionalIterator first,
+		                           BidirectionalIterator last,
+		                           Compare comp,
+                                 RandRawIt uninitialized,
+                                 std::size_t uninitialized_len)
+{
+   typedef typename iterator_traits<BidirectionalIterator>::value_type  value_type;
+
+   ::boost::movelib::adaptive_xbuf<value_type, RandRawIt> xbuf(uninitialized, uninitialized_len);
+   xbuf.initialize_until(uninitialized_len, *first);
+   stable_sort_ONlogN_recursive(first, last, uninitialized, uninitialized_len, comp);
+}
+
+///@endcond
 
 }} //namespace boost {  namespace movelib{
 

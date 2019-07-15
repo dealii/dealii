@@ -2,6 +2,11 @@
 
 // Copyright (c) 2012-2014 Barend Gehrels, Amsterdam, the Netherlands.
 
+// This file was modified by Oracle on 2018.
+// Modifications copyright (c) 2018, Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,15 +14,12 @@
 #ifndef BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_END_FLAT_HPP
 #define BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_END_FLAT_HPP
 
-#include <boost/geometry/core/cs.hpp>
+#include <boost/geometry/core/coordinate_type.hpp>
+#include <boost/geometry/strategies/buffer.hpp>
 #include <boost/geometry/strategies/tags.hpp>
 #include <boost/geometry/strategies/side.hpp>
 #include <boost/geometry/util/math.hpp>
 #include <boost/geometry/util/select_most_precise.hpp>
-
-#include <boost/geometry/strategies/buffer.hpp>
-
-
 
 namespace boost { namespace geometry
 {

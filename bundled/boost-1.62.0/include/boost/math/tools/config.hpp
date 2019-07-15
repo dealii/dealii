@@ -11,7 +11,7 @@
 #endif
 
 #include <boost/config.hpp>
-#include <boost/predef.h>
+#include <boost/predef/architecture/x86.h>
 #include <boost/cstdint.hpp> // for boost::uintmax_t
 #include <boost/detail/workaround.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -209,7 +209,7 @@
 // constexpr support, early GCC implementations can't cope so disable
 // constexpr for them:
 //
-#if !defined(__clang) && defined(__GNUC__)
+#if !defined(__clang__) && defined(__GNUC__)
 #if (__GNUC__ * 100 + __GNUC_MINOR__) < 490
 #  define BOOST_MATH_DISABLE_CONSTEXPR
 #endif
@@ -450,6 +450,17 @@ namespace boost{ namespace math{
 #else
 #  define BOOST_MATH_THREAD_LOCAL
 #endif
+
+//
+// Can we have constexpr tables?
+//
+#if (!defined(BOOST_NO_CXX11_HDR_ARRAY) && !defined(BOOST_NO_CXX14_CONSTEXPR)) || BOOST_WORKAROUND(BOOST_MSVC, >= 1910)
+#define BOOST_MATH_HAVE_CONSTEXPR_TABLES
+#define BOOST_MATH_CONSTEXPR_TABLE_FUNCTION constexpr
+#else
+#define BOOST_MATH_CONSTEXPR_TABLE_FUNCTION
+#endif
+
 
 #endif // BOOST_MATH_TOOLS_CONFIG_HPP
 

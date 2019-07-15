@@ -18,7 +18,7 @@
 
 namespace boost
 {
-  namespace functional
+    namespace functional
     {
         namespace detail {
 #if defined(_HAS_AUTO_PTR_ETC) && !_HAS_AUTO_PTR_ETC
@@ -211,7 +211,8 @@ namespace boost
     // --------------------------------------------------------------------------
     template <class Predicate>
     class binary_negate
-        : public boost::functional::detail::binary_function<typename binary_traits<Predicate>::first_argument_type,
+        : public boost::functional::detail::binary_function<
+                                      typename binary_traits<Predicate>::first_argument_type,
                                       typename binary_traits<Predicate>::second_argument_type,
                                       bool>
     {
@@ -248,7 +249,8 @@ namespace boost
     // --------------------------------------------------------------------------
     template <class Operation>
     class binder1st
-        : public boost::functional::detail::unary_function<typename binary_traits<Operation>::second_argument_type,
+        : public boost::functional::detail::unary_function<
+                                     typename binary_traits<Operation>::second_argument_type,
                                      typename binary_traits<Operation>::result_type>
     {       
       public:
@@ -294,7 +296,8 @@ namespace boost
     // --------------------------------------------------------------------------
     template <class Operation>
     class binder2nd
-        : public boost::functional::detail::unary_function<typename binary_traits<Operation>::first_argument_type,
+        : public boost::functional::detail::unary_function<
+                                     typename binary_traits<Operation>::first_argument_type,
                                      typename binary_traits<Operation>::result_type>
     {
       public:

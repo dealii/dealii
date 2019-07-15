@@ -56,7 +56,7 @@ class istream_iterator :
 
     //Access the value referred to 
     Elem dereference() const {
-        return m_istream->peek();
+        return static_cast<Elem>(m_istream->peek());
     }
 
     void increment(){
@@ -69,22 +69,20 @@ class istream_iterator :
     Elem m_current_value;
 public:
     istream_iterator(istream_type & is) :
-        m_istream(& is),
-        m_current_value()
+        m_istream(& is)
     {
         //increment();
     }
 
     istream_iterator() :
         m_istream(NULL),
-        m_current_value()
+        m_current_value(NULL)
     {}
 
     istream_iterator(const istream_iterator<Elem> & rhs) :
         m_istream(rhs.m_istream),
         m_current_value(rhs.m_current_value)
     {}
-
 };
 
 } // namespace iterators

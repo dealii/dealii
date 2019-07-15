@@ -2,6 +2,11 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
+// This file was modified by Oracle on 2018.
+// Modifications copyright (c) 2018 Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,11 +14,18 @@
 #ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_CHECK_ENRICH_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_CHECK_ENRICH_HPP
 
+#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
+#include <iostream>
+#endif // BOOST_GEOMETRY_DEBUG_ENRICH
 
 #include <cstddef>
+#include <vector>
 
-#include <boost/range.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/value_type.hpp>
 
+#include <boost/geometry/algorithms/detail/overlay/overlay_type.hpp>
 #include <boost/geometry/algorithms/detail/ring_identifier.hpp>
 
 
@@ -42,7 +54,7 @@ struct meta_turn
 
 
 template <typename MetaTurn>
-inline void display(MetaTurn const& meta_turn, std::string const& reason = "")
+inline void display(MetaTurn const& meta_turn, const char* reason = "")
 {
 #ifdef BOOST_GEOMETRY_DEBUG_ENRICH
     std::cout << meta_turn.index

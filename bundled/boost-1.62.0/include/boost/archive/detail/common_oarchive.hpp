@@ -38,29 +38,30 @@ class BOOST_SYMBOL_VISIBLE common_oarchive :
     public interface_oarchive<Archive>
 {
     friend class interface_oarchive<Archive>;
+    friend class basic_oarchive;
 private:
-    virtual void vsave(const version_type t) override{
+    virtual void vsave(const version_type t){
         * this->This() << t;
     }
-    virtual void vsave(const object_id_type t) override{
+    virtual void vsave(const object_id_type t){
         * this->This() << t;
     }
-    virtual void vsave(const object_reference_type t) override{
+    virtual void vsave(const object_reference_type t){
         * this->This() << t;
     }
-    virtual void vsave(const class_id_type t) override{
+    virtual void vsave(const class_id_type t){
         * this->This() << t;
     }
-    virtual void vsave(const class_id_reference_type t) override{
+    virtual void vsave(const class_id_reference_type t){
         * this->This() << t;
     }
-    virtual void vsave(const class_id_optional_type t) override{
+    virtual void vsave(const class_id_optional_type t){
         * this->This() << t;
     }
-    virtual void vsave(const class_name_type & t) override{
+    virtual void vsave(const class_name_type & t){
         * this->This() << t;
     }
-    virtual void vsave(const tracking_type t) override{
+    virtual void vsave(const tracking_type t){
         * this->This() << t;
     }
 protected:

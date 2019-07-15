@@ -154,26 +154,26 @@ template <class Derived, class Base>
 class BOOST_SYMBOL_VISIBLE void_caster_primitive :
     public void_caster
 {
-    virtual void const * downcast(void const * const t) const override {
+    virtual void const * downcast(void const * const t) const {
         const Derived * d = 
             boost::serialization::smart_cast<const Derived *, const Base *>(
                 static_cast<const Base *>(t)
             );
         return d;
     }
-    virtual void const * upcast(void const * const t) const override {
+    virtual void const * upcast(void const * const t) const {
         const Base * b = 
             boost::serialization::smart_cast<const Base *, const Derived *>(
                 static_cast<const Derived *>(t)
             );
         return b;
     }
-    virtual bool has_virtual_base() const override {
+    virtual bool has_virtual_base() const {
         return false;
     }
 public:
     void_caster_primitive();
-    virtual ~void_caster_primitive() override;
+    virtual ~void_caster_primitive();
 };
 
 template <class Derived, class Base>
@@ -181,13 +181,14 @@ void_caster_primitive<Derived, Base>::void_caster_primitive() :
     void_caster( 
         & type_info_implementation<Derived>::type::get_const_instance(), 
         & type_info_implementation<Base>::type::get_const_instance(),
-        // note:I wanted to displace from 0 here, but at least one compiler
-        // treated 0 by not shifting it at all.
+        /* note about displacement:
+         * displace 0: at least one compiler treated 0 by not shifting it at all
+         * displace by small value (8): caused ICE on certain mingw gcc versions */
         reinterpret_cast<std::ptrdiff_t>(
             static_cast<Derived *>(
-                reinterpret_cast<Base *>(8)
+                reinterpret_cast<Base *>(1 << 20)
             )
-        ) - 8
+        ) - (1 << 20)
     )
 {
     recursive_register();
@@ -202,18 +203,18 @@ template <class Derived, class Base>
 class BOOST_SYMBOL_VISIBLE void_caster_virtual_base :
     public void_caster
 {
-    virtual bool has_virtual_base() const override {
+    virtual bool has_virtual_base() const {
         return true;
     }
 public:
-    virtual void const * downcast(void const * const t) const override {
+    virtual void const * downcast(void const * const t) const {
         const Derived * d = 
             dynamic_cast<const Derived *>(
                 static_cast<const Base *>(t)
             );
         return d;
     }
-    virtual void const * upcast(void const * const t) const override {
+    virtual void const * upcast(void const * const t) const {
         const Base * b = 
             dynamic_cast<const Base *>(
                 static_cast<const Derived *>(t)
@@ -221,7 +222,7 @@ public:
         return b;
     }
     void_caster_virtual_base();
-    virtual ~void_caster_virtual_base() override;
+    virtual ~void_caster_virtual_base();
 };
 
 #ifdef BOOST_MSVC

@@ -659,7 +659,7 @@ namespace boost
         const group_compare_type &group_compare = group_compare_type()):
         _pimpl(new impl_class(combiner_arg, group_compare))
       {};
-      virtual ~BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)() override
+      virtual ~BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)()
       {
       }
       
@@ -747,7 +747,7 @@ namespace boost
         swap(_pimpl, other._pimpl);
       }
     protected:
-      virtual shared_ptr<void> lock_pimpl() const override
+      virtual shared_ptr<void> lock_pimpl() const
       {
         return _pimpl;
       }

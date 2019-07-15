@@ -92,7 +92,7 @@ class extended_type_info_arg : public extended_type_info
     virtual const char * get_debug_info() const override {
         return get_key();
     }
-    virtual void * construct(unsigned int /*count*/, ...) const override{
+    virtual void * construct(unsigned int /*count*/, ...) const override {
         BOOST_ASSERT(false);
         return NULL;
     }
@@ -104,7 +104,7 @@ public:
         extended_type_info(0, key)
     {}
 
-    ~extended_type_info_arg() override{
+    ~extended_type_info_arg(){
     }
 };
 
@@ -125,6 +125,10 @@ BOOST_SERIALIZATION_DECL void
 extended_type_info::key_unregister() const{
     if(NULL == get_key())
         return;
+    // note: it's been discovered that at least one platform is not guaranteed
+    // to destroy singletons reverse order of construction.  So we can't
+    // use a runtime assert here.  Leave this in a reminder not to do this!
+    // BOOST_ASSERT(! singleton<detail::ktmap>::is_destroyed());
     if(! singleton<detail::ktmap>::is_destroyed()){
         detail::ktmap & x = singleton<detail::ktmap>::get_mutable_instance();
         detail::ktmap::iterator start = x.lower_bound(this);

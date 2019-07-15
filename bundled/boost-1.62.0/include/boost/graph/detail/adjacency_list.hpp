@@ -289,10 +289,10 @@ namespace boost {
       // invalidation for add_edge() with EdgeList=vecS. Instead we
       // hold a pointer to the property. std::auto_ptr is not
       // a perfect fit for the job, but it is darn close.
-#if defined(BOOST_NO_CXX11_SMART_PTR)
-      std::auto_ptr<Property> m_property;
-#else
+#ifdef BOOST_NO_AUTO_PTR
       std::unique_ptr<Property> m_property;
+#else
+      std::auto_ptr<Property> m_property;
 #endif
     };
 #else

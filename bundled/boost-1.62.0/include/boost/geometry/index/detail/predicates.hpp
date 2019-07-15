@@ -11,7 +11,11 @@
 #ifndef BOOST_GEOMETRY_INDEX_DETAIL_PREDICATES_HPP
 #define BOOST_GEOMETRY_INDEX_DETAIL_PREDICATES_HPP
 
-#include <boost/geometry/index/predicates.hpp>
+//#include <utility>
+
+#include <boost/mpl/assert.hpp>
+#include <boost/tuple/tuple.hpp>
+
 #include <boost/geometry/index/detail/tags.hpp>
 
 namespace boost { namespace geometry { namespace index { namespace detail {

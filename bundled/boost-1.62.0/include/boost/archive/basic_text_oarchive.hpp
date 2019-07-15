@@ -104,7 +104,7 @@ protected:
         detail::common_oarchive<Archive>(flags),
         delimiter(none)
     {}
-    ~basic_text_oarchive() override{}
+    ~basic_text_oarchive(){}
 };
 
 } // namespace archive

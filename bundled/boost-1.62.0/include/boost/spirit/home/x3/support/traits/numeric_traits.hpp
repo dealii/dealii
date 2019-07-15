@@ -8,9 +8,8 @@
 #define BOOST_SPIRIT_X3_NUMERIC_TRAITS_JAN_07_2011_0722AM
 
 #include <boost/config.hpp>
-#include <boost/integer_traits.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <limits>
 
 namespace boost { namespace spirit { namespace x3 { namespace traits
 {
@@ -112,13 +111,9 @@ namespace boost { namespace spirit { namespace x3 { namespace traits
 
     template <typename T, typename Enable = void>
     struct is_infinite;
-    
+
     template <typename T, typename Enable = void>
-    struct check_overflow : mpl::false_ {};
-        
-    template <typename T>
-    struct check_overflow<T, typename enable_if_c<integer_traits<T>::is_integral>::type>
-        : mpl::true_ {};
+    struct check_overflow : mpl::bool_<std::numeric_limits<T>::is_bounded> {};
 }}}}
 
 #endif

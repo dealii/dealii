@@ -155,9 +155,9 @@ namespace boost { namespace algorithm {
     
 
         void preKmp ( patIter first, patIter last ) {
-           const /*std::size_t*/ int count = std::distance ( first, last );
+           const difference_type count = std::distance ( first, last );
         
-           int i, j;
+           difference_type i, j;
         
            i = 0;
            j = skip_[0] = -1;
@@ -177,7 +177,7 @@ namespace boost { namespace algorithm {
         void init_skip_table ( patIter first, patIter last ) {
             const difference_type count = std::distance ( first, last );
     
-            int j;
+            difference_type j;
             skip_ [ 0 ] = -1;
             for ( int i = 1; i <= count; ++i ) {
                 j = skip_ [ i - 1 ];

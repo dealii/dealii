@@ -1,6 +1,6 @@
 // Boost.Geometry
 
-// Copyright (c) 2016, Oracle and/or its affiliates.
+// Copyright (c) 2016-2017, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -30,10 +30,9 @@ namespace services
 \brief Traits class binding a segments intersection strategy to a coordinate system
 \ingroup util
 \tparam CSTag tag of coordinate system of point-type
-\tparam Policy intersection policy
 \tparam CalculationType \tparam_calculation
 */
-template <typename CSTag, typename Policy, typename CalculationType = void>
+template <typename CSTag, typename CalculationType = void>
 struct default_strategy
 {
     BOOST_MPL_ASSERT_MSG

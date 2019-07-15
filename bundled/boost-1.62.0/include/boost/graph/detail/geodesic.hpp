@@ -99,7 +99,7 @@ namespace detail {
     struct reciprocal
     {
         typedef T result_type;
-        typedef T first_argument_type;
+        typedef T argument_type;
         T operator ()(T t)
         { return T(1) / t; }
     };

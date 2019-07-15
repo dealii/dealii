@@ -27,6 +27,8 @@
 
 #include <boost/foreach.hpp>
 
+#include <iterator> // for std::iterator_traits
+
 namespace boost { namespace spirit { namespace lex { namespace lexertl
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -158,8 +160,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         operator safe_bool() const
             { return initialized_dfa_ ? &dummy::true_ : 0; }
 
-        typedef typename boost::detail::iterator_traits<Iterator>::value_type
-            char_type;
+        typedef typename std::iterator_traits<Iterator>::value_type char_type;
         typedef std::basic_string<char_type> string_type;
 
         typedef boost::lexer::basic_rules<char_type> basic_rules_type;

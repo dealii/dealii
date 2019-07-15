@@ -20,6 +20,7 @@
 #include <boost/geometry/core/interior_rings.hpp>
 #include <boost/geometry/core/tags.hpp>
 #include <boost/geometry/algorithms/convert.hpp>
+#include <boost/geometry/algorithms/detail/signed_size_type.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/util/range.hpp>
 #include <boost/geometry/iterators/ever_circling_iterator.hpp>

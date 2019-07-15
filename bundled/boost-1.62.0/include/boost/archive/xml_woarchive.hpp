@@ -95,7 +95,7 @@ protected:
     BOOST_WARCHIVE_DECL 
     xml_woarchive_impl(std::wostream & os, unsigned int flags);
     BOOST_WARCHIVE_DECL
-    ~xml_woarchive_impl() override;
+    ~xml_woarchive_impl();
 public:
     BOOST_WARCHIVE_DECL void
     save_binary(const void *address, std::size_t count);
@@ -115,7 +115,7 @@ public:
     xml_woarchive(std::wostream & os, unsigned int flags = 0) :
         xml_woarchive_impl<xml_woarchive>(os, flags)
     {}
-    ~xml_woarchive() override{}
+    ~xml_woarchive(){}
 };
 
 } // namespace archive

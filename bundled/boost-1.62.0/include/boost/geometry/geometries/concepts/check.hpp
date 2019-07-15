@@ -18,6 +18,7 @@
 
 #include <boost/concept_check.hpp>
 #include <boost/concept/requires.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/type_traits/is_const.hpp>
 #include <boost/variant/variant_fwd.hpp>
 
@@ -216,7 +217,7 @@ template <typename Geometry>
 inline void check()
 {
     detail::checker<Geometry> c;
-    boost::ignore_unused_variable_warning(c);
+    boost::ignore_unused(c);
 }
 
 

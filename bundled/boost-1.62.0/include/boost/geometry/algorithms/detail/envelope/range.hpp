@@ -4,10 +4,12 @@
 // Copyright (c) 2008-2015 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015, 2016, 2018.
+// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
 
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -22,23 +24,17 @@
 #include <iterator>
 #include <vector>
 
-#include <boost/range.hpp>
-
-#include <boost/geometry/core/coordinate_dimension.hpp>
-
-#include <boost/geometry/util/range.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 
 #include <boost/geometry/algorithms/is_empty.hpp>
 
 #include <boost/geometry/algorithms/detail/envelope/initialize.hpp>
-#include <boost/geometry/algorithms/detail/envelope/range_of_boxes.hpp>
-
 #include <boost/geometry/algorithms/detail/expand/box.hpp>
 #include <boost/geometry/algorithms/detail/expand/point.hpp>
 #include <boost/geometry/algorithms/detail/expand/segment.hpp>
 
-#include <boost/geometry/algorithms/dispatch/envelope.hpp>
-
+#include <boost/geometry/core/coordinate_dimension.hpp>
 
 namespace boost { namespace geometry
 {
@@ -51,32 +47,40 @@ namespace detail { namespace envelope
 // implementation for simple ranges
 struct envelope_range
 {
-    template <typename Iterator, typename Box>
-    static inline void apply(Iterator first, Iterator last, Box& mbr)
+    template <typename Iterator, typename Box, typename Strategy>
+    static inline void apply(Iterator it,
+                             Iterator last,
+                             Box& mbr,
+                             Strategy const& strategy)
     {
         typedef typename std::iterator_traits<Iterator>::value_type value_type;
 
         // initialize MBR
         initialize<Box, 0, dimension<Box>::value>::apply(mbr);
 
-        Iterator it = first;
         if (it != last)
         {
             // initialize box with first element in range
-            dispatch::envelope<value_type>::apply(*it, mbr);
+            dispatch::envelope
+                <
+                    value_type
+                >::apply(*it, mbr, strategy.get_element_envelope_strategy());
 
             // consider now the remaining elements in the range (if any)
             for (++it; it != last; ++it)
             {
-                dispatch::expand<Box, value_type>::apply(mbr, *it);
+                dispatch::expand
+                    <
+                        Box, value_type
+                    >::apply(mbr, *it, strategy.get_element_expand_strategy());
             }
         }
     }
 
-    template <typename Range, typename Box>
-    static inline void apply(Range const& range, Box& mbr)
+    template <typename Range, typename Box, typename Strategy>
+    static inline void apply(Range const& range, Box& mbr, Strategy const& strategy)
     {
-        return apply(boost::begin(range), boost::end(range), mbr);
+        return apply(Strategy::begin(range), Strategy::end(range), mbr, strategy);
     }
 };
 
@@ -85,87 +89,31 @@ struct envelope_range
 template <typename EnvelopePolicy>
 struct envelope_multi_range
 {
-    template <typename MultiRange, typename Box>
-    static inline void apply(MultiRange const& multirange, Box& mbr)
+    template <typename MultiRange, typename Box, typename Strategy>
+    static inline void apply(MultiRange const& multirange,
+                             Box& mbr,
+                             Strategy const& strategy)
     {
-        typedef typename boost::range_iterator
-            <
-                MultiRange const
-            >::type iterator_type;
-
-        bool initialized = false;
-        for (iterator_type it = boost::begin(multirange);
-             it != boost::end(multirange);
-             ++it)
-        {
-            if (! geometry::is_empty(*it))
-            {
-                if (initialized)
-                {
-                    Box helper_mbr;
-                    EnvelopePolicy::apply(*it, helper_mbr);
-
-                    dispatch::expand<Box, Box>::apply(mbr, helper_mbr);
-                }
-                else
-                {
-                    // compute the initial envelope
-                    EnvelopePolicy::apply(*it, mbr);
-                    initialized = true;
-                }
-            }
-        }
-
-        if (! initialized)
-        {
-            // if not already initialized, initialize MBR
-            initialize<Box, 0, dimension<Box>::value>::apply(mbr);
-        }
+        apply(boost::begin(multirange), boost::end(multirange), mbr, strategy);
     }
-};
 
-
-// implementation for multi-range on a spheroid (longitude is periodic)
-template <typename EnvelopePolicy>
-struct envelope_multi_range_on_spheroid
-{
-    template <typename MultiRange, typename Box>
-    static inline void apply(MultiRange const& multirange, Box& mbr)
+    template <typename Iter, typename Box, typename Strategy>
+    static inline void apply(Iter it,
+                             Iter last,
+                             Box& mbr,
+                             Strategy const& strategy)
     {
-        typedef typename boost::range_iterator
-            <
-                MultiRange const
-            >::type iterator_type;
-
-        // due to the periodicity of longitudes we need to compute the boxes
-        // of all the single geometries and keep them in a container
-        std::vector<Box> boxes;
-        for (iterator_type it = boost::begin(multirange);
-             it != boost::end(multirange);
-             ++it)
+        typename Strategy::template multi_state<Box> state;
+        for (; it != last; ++it)
         {
             if (! geometry::is_empty(*it))
             {
-                Box helper_box;
-                EnvelopePolicy::apply(*it, helper_box);
-                boxes.push_back(helper_box);
+                Box helper_mbr;
+                EnvelopePolicy::apply(*it, helper_mbr, strategy);
+                state.apply(helper_mbr);
             }
         }
-
-        // now we need to compute the envelope of the range of boxes
-        // (cannot be done in an incremental fashion as in the
-        // Cartesian coordinate system)
-        // if all single geometries are empty no boxes have been found
-        // and the MBR is simply initialized
-        if (! boxes.empty())
-        {
-            envelope_range_of_boxes::apply(boxes, mbr);
-        }
-        else
-        {
-            initialize<Box, 0, dimension<Box>::value>::apply(mbr);
-        }
-
+        state.result(mbr);
     }
 };
 

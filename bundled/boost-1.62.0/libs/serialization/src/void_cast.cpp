@@ -99,10 +99,10 @@ class void_caster_shortcut : public void_caster
             return vbc_downcast(t);
         return static_cast<const char *> ( t ) + m_difference;
     }
-    virtual bool is_shortcut() const {
+    virtual bool is_shortcut() const{
         return true;
     }
-    virtual bool has_virtual_base() const override {
+    virtual bool has_virtual_base() const override{
         return m_includes_virtual_base;
     }
 public:
@@ -118,7 +118,7 @@ public:
     {
         recursive_register(includes_virtual_base);
     }
-    virtual ~void_caster_shortcut() override{
+    virtual ~void_caster_shortcut(){
         recursive_unregister();
     }
 };
@@ -208,7 +208,7 @@ public:
     ) :
         void_caster(derived, base)
     {}
-    virtual ~void_caster_argument() override{};
+    virtual ~void_caster_argument(){};
 };
 
 #ifdef BOOST_MSVC
@@ -276,6 +276,10 @@ void_caster::recursive_register(bool includes_virtual_base) const {
 
 BOOST_SERIALIZATION_DECL void
 void_caster::recursive_unregister() const {
+    // note: it's been discovered that at least one platform is not guaranteed
+    // to destroy singletons reverse order of construction.  So we can't
+    // use a runtime assert here.  Leave this in a reminder not to do this!
+    // BOOST_ASSERT(! void_caster_registry::is_destroyed());
     if(void_caster_registry::is_destroyed())
         return;
 

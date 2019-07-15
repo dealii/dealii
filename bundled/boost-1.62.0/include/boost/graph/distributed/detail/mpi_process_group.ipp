@@ -842,7 +842,7 @@ all_gather(const mpi_process_group& pg, InputIterator first,
 
   // Adjust sizes based on the number of bytes
   std::transform(sizes.begin(), sizes.end(), sizes.begin(),
-                 [](const int& size){return std::multiplies<int>(size, sizeof(T))});
+                 std::bind2nd(std::multiplies<int>(), sizeof(T)));
 
   // Compute displacements
   std::vector<int> displacements;

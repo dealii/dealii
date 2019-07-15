@@ -43,7 +43,7 @@ thread_clock::time_point thread_clock::now( system::error_code & ec )
                 ((static_cast<duration::rep>(system_time.dwHighDateTime) << 32)
                         | system_time.dwLowDateTime) * 100 );
 
-        if (!BOOST_CHRONO_IS_THROWS(ec))
+        if (!::boost::chrono::is_throws(ec))
         {
             ec.clear();
         }
@@ -52,17 +52,17 @@ thread_clock::time_point thread_clock::now( system::error_code & ec )
     }
     else
     {
-        if (BOOST_CHRONO_IS_THROWS(ec))
+        if (::boost::chrono::is_throws(ec))
         {
             boost::throw_exception(
                     system::system_error(
                             boost::detail::winapi::GetLastError(),
-                            BOOST_CHRONO_SYSTEM_CATEGORY,
+                            ::boost::system::system_category(),
                             "chrono::thread_clock" ));
         }
         else
         {
-            ec.assign( boost::detail::winapi::GetLastError(), BOOST_CHRONO_SYSTEM_CATEGORY );
+            ec.assign( boost::detail::winapi::GetLastError(), ::boost::system::system_category() );
             return thread_clock::time_point(duration(0));
         }
     }

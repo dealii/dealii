@@ -14,6 +14,7 @@
 #include <iterator>
 #include <functional>
 #include <boost/config.hpp>
+#include <boost/iterator.hpp>
 
 namespace boost {
 

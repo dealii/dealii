@@ -18,8 +18,11 @@
 
 #include <locale>
 #include <cstddef> // NULL, size_t
+#ifndef BOOST_NO_CWCHAR
 #include <cwchar>   // for mbstate_t
+#endif
 #include <boost/config.hpp>
+#include <boost/serialization/force_include.hpp>
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
@@ -49,20 +52,21 @@ class codecvt_null;
 template<>
 class codecvt_null<char> : public std::codecvt<char, char, std::mbstate_t>
 {
-    virtual bool do_always_noconv() const throw() override {
+    virtual bool do_always_noconv() const throw() {
         return true;
     }
 public:
     explicit codecvt_null(std::size_t no_locale_manage = 0) :
         std::codecvt<char, char, std::mbstate_t>(no_locale_manage)
     {}
-    virtual ~codecvt_null() override{};
+    virtual ~codecvt_null(){};
 };
 
 template<>
-class BOOST_SYMBOL_VISIBLE codecvt_null<wchar_t> : public std::codecvt<wchar_t, char, std::mbstate_t>
+class BOOST_WARCHIVE_DECL codecvt_null<wchar_t> :
+    public std::codecvt<wchar_t, char, std::mbstate_t>
 {
-    virtual BOOST_WARCHIVE_DECL std::codecvt_base::result
+    virtual std::codecvt_base::result
     do_out(
         std::mbstate_t & state,
         const wchar_t * first1,
@@ -71,8 +75,8 @@ class BOOST_SYMBOL_VISIBLE codecvt_null<wchar_t> : public std::codecvt<wchar_t, 
         char * first2,
         char * last2,
         char * & next2
-    ) const override;
-    virtual BOOST_WARCHIVE_DECL std::codecvt_base::result
+    ) const;
+    virtual std::codecvt_base::result
     do_in(
         std::mbstate_t & state,
         const char * first1,
@@ -81,18 +85,18 @@ class BOOST_SYMBOL_VISIBLE codecvt_null<wchar_t> : public std::codecvt<wchar_t, 
         wchar_t * first2,
         wchar_t * last2,
         wchar_t * & next2
-    ) const override;
-    virtual int do_encoding( ) const throw( ) override{
+    ) const;
+    virtual int do_encoding( ) const throw( ){
         return sizeof(wchar_t) / sizeof(char);
     }
-    virtual int do_max_length( ) const throw( ) override{
+    virtual int do_max_length( ) const throw( ){
         return do_encoding();
     }
 public:
     explicit codecvt_null(std::size_t no_locale_manage = 0) :
         std::codecvt<wchar_t, char, std::mbstate_t>(no_locale_manage)
     {}
-    virtual ~codecvt_null() override{};
+    //virtual ~codecvt_null(){};
 };
 
 } // namespace archive

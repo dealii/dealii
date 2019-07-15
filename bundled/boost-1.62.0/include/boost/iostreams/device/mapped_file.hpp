@@ -309,7 +309,7 @@ public:
     const char* const_data() const { return delegate_.data(); }
     iterator begin() const { return data(); }
     const_iterator const_begin() const { return const_data(); }
-    iterator end() const { return data() + size(); }
+    iterator end() const;
     const_iterator const_end() const { return const_data() + size(); }
 
     //--------------Query admissible offsets----------------------------------//
@@ -468,6 +468,9 @@ void mapped_file::open(
 
 inline char* mapped_file::data() const 
 { return (flags() != readonly) ? const_cast<char*>(delegate_.data()) : 0; }
+
+inline mapped_file::iterator mapped_file::end() const 
+{ return (flags() != readonly) ? data() + size() : 0; }
 
 //------------------Implementation of mapped_file_sink------------------------//
 

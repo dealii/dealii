@@ -41,9 +41,9 @@ namespace boost
   {
     template < typename TheContainer, typename ST = std::size_t,
       typename VT = typename TheContainer::value_type >
-    struct subscript_t
+      struct subscript_t
     {
-      typedef ST& argument_type;
+      typedef ST argument_type;
       typedef VT& result_type;
 
       subscript_t(TheContainer & c):container(&c)

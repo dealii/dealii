@@ -18,6 +18,7 @@
 #if defined(BOOST_SPIRIT_DEBUG)
 #include <boost/spirit/home/support/detail/lexer/debug.hpp>
 #endif
+#include <iterator> // for std::iterator_traits
 
 namespace boost { namespace spirit { namespace lex { namespace lexertl
 { 
@@ -119,8 +120,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         // object is always valid
         operator safe_bool() const { return &dummy::true_; }
 
-        typedef typename boost::detail::iterator_traits<Iterator>::value_type 
-            char_type;
+        typedef typename std::iterator_traits<Iterator>::value_type char_type;
         typedef std::basic_string<char_type> string_type;
 
         //  Every lexer type to be used as a lexer for Spirit has to conform to 

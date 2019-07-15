@@ -21,6 +21,16 @@
 
 #include <limits.h>
 
+#if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
+//
+// This is the only way we can avoid
+// warning: non-standard suffix on floating constant [-Wpedantic]
+// when building with -Wall -pedantic.  Neither __extension__
+// nor #pragma dianostic ignored work :(
+//
+#pragma GCC system_header
+#endif
+
 namespace boost{ namespace math{ namespace lanczos{
 
 //
@@ -1284,7 +1294,7 @@ struct lanczos
 } // namespace boost
 
 #if !defined(_CRAYC) && !defined(__CUDACC__) && (!defined(__GNUC__) || (__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ > 3)))
-#if (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || defined(__SSE2__) || defined(_M_AMD64) || defined(_M_X64)
+#if ((defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || defined(__SSE2__) || defined(_M_AMD64) || defined(_M_X64)) && !defined(_MANAGED)
 #include <boost/math/special_functions/detail/lanczos_sse2.hpp>
 #endif
 #endif

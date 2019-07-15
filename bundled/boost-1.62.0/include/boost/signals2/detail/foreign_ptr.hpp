@@ -70,7 +70,7 @@ namespace boost
       public:
         foreign_shared_ptr_impl(const FSP &p): _p(p)
         {}
-        virtual foreign_shared_ptr_impl * clone() const override
+        virtual foreign_shared_ptr_impl * clone() const
         {
           return new foreign_shared_ptr_impl(*this);
         }
@@ -123,15 +123,15 @@ namespace boost
       public:
         foreign_weak_ptr_impl(const FWP &p): _p(p)
         {}
-        virtual foreign_void_shared_ptr lock() const override
+        virtual foreign_void_shared_ptr lock() const
         {
           return foreign_void_shared_ptr(_p.lock());
         }
-        virtual bool expired() const override
+        virtual bool expired() const
         {
           return _p.expired();
         }
-        virtual foreign_weak_ptr_impl * clone() const override
+        virtual foreign_weak_ptr_impl * clone() const
         {
           return new foreign_weak_ptr_impl(*this);
         }

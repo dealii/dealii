@@ -5,7 +5,8 @@
 // Copyright (c) 2014-2015 Mateusz Loskot, London, UK.
 // Copyright (c) 2014-2015 Adam Wulkiewicz, Lodz, Poland.
 
-// Copyright (c) 2015, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015, 2018.
+// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -17,6 +18,8 @@
 #define BOOST_GEOMETRY_POLICIES_ROBUSTNESS_RESCALE_POLICY_HPP
 
 #include <cstddef>
+
+#include <boost/geometry/core/coordinate_type.hpp>
 
 #include <boost/geometry/policies/robustness/segment_ratio.hpp>
 #include <boost/geometry/policies/robustness/segment_ratio_type.hpp>

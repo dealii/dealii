@@ -10,7 +10,6 @@
 #include "consts.hpp"
 #include "internals.hpp"
 #include <iostream>
-#include <boost/detail/iterator.hpp>
 #include "runtime_error.hpp"
 #include "size_t.hpp"
 #include "state_machine.hpp"

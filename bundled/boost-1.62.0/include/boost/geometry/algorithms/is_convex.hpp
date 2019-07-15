@@ -2,6 +2,11 @@
 
 // Copyright (c) 2015 Barend Gehrels, Amsterdam, the Netherlands.
 
+// This file was modified by Oracle on 2017, 2018.
+// Modifications copyright (c) 2017-2018 Oracle and/or its affiliates.
+
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,16 +15,22 @@
 #define BOOST_GEOMETRY_ALGORITHMS_IS_CONVEX_HPP
 
 
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/variant_fwd.hpp>
+
+#include <boost/geometry/algorithms/detail/equals/point_point.hpp>
 #include <boost/geometry/core/access.hpp>
 #include <boost/geometry/core/closure.hpp>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/core/coordinate_dimension.hpp>
 #include <boost/geometry/core/point_type.hpp>
-#include <boost/geometry/algorithms/detail/equals/point_point.hpp>
+#include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/iterators/ever_circling_iterator.hpp>
+#include <boost/geometry/strategies/default_strategy.hpp>
 #include <boost/geometry/strategies/side.hpp>
-#include <boost/geometry/strategies/cartesian/side_by_triangle.hpp>
 #include <boost/geometry/views/detail/normalized_view.hpp>
+
 
 namespace boost { namespace geometry
 {
@@ -31,14 +42,11 @@ namespace detail { namespace is_convex
 
 struct ring_is_convex
 {
-    template <typename Ring>
-    static inline bool apply(Ring const& ring)
+    template <typename Ring, typename SideStrategy>
+    static inline bool apply(Ring const& ring, SideStrategy const& strategy)
     {
-        typedef typename geometry::point_type<Ring>::type point_type;
-        typedef typename strategy::side::services::default_strategy
-        <
-            typename cs_tag<point_type>::type
-        >::type side_strategy_type;
+        typename SideStrategy::equals_point_point_strategy_type
+            eq_pp_strategy = strategy.get_equals_point_point_strategy();
 
         std::size_t n = boost::size(ring);
         if (boost::size(ring) < core_detail::closure::minimum_ring_size
@@ -62,7 +70,8 @@ struct ring_is_convex
         current++;
 
         std::size_t index = 1;
-        while (equals::equals_point_point(*current, *previous) && index < n)
+        while (equals::equals_point_point(*current, *previous, eq_pp_strategy)
+            && index < n)
         {
             current++;
             index++;
@@ -76,7 +85,7 @@ struct ring_is_convex
 
         it_type next = current;
         next++;
-        while (equals::equals_point_point(*current, *next))
+        while (equals::equals_point_point(*current, *next, eq_pp_strategy))
         {
             next++;
         }
@@ -86,7 +95,7 @@ struct ring_is_convex
         // iterator
         for (std::size_t i = 0; i < n; i++)
         {
-            int const side = side_strategy_type::apply(*previous, *current, *next);
+            int const side = strategy.apply(*previous, *current, *next);
             if (side == 1)
             {
                 // Next is on the left side of clockwise ring:
@@ -100,7 +109,7 @@ struct ring_is_convex
             // Advance next to next different point
             // (because there are non-equal points, this loop is not infinite)
             next++;
-            while (equals::equals_point_point(*current, *next))
+            while (equals::equals_point_point(*current, *next, eq_pp_strategy))
             {
                 next++;
             }
@@ -129,7 +138,8 @@ struct is_convex : not_implemented<Tag>
 template <typename Box>
 struct is_convex<Box, box_tag>
 {
-    static inline bool apply(Box const& )
+    template <typename Strategy>
+    static inline bool apply(Box const& , Strategy const& )
     {
         // Any box is convex (TODO: consider spherical boxes)
         return true;
@@ -144,13 +154,71 @@ struct is_convex<Box, ring_tag> : detail::is_convex::ring_is_convex
 } // namespace dispatch
 #endif // DOXYGEN_NO_DISPATCH
 
-// TODO: variants
+namespace resolve_variant {
+
+template <typename Geometry>
+struct is_convex
+{
+    template <typename Strategy>
+    static bool apply(Geometry const& geometry, Strategy const& strategy)
+    {
+        concepts::check<Geometry>();
+        return dispatch::is_convex<Geometry>::apply(geometry, strategy);
+    }
+
+    static bool apply(Geometry const& geometry, geometry::default_strategy const&)
+    {
+        typedef typename strategy::side::services::default_strategy
+            <
+                typename cs_tag<Geometry>::type
+            >::type side_strategy;
+
+        return apply(geometry, side_strategy());
+    }
+};
+
+template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
+struct is_convex<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
+{
+    template <typename Strategy>
+    struct visitor: boost::static_visitor<bool>
+    {
+        Strategy const& m_strategy;
+
+        visitor(Strategy const& strategy) : m_strategy(strategy) {}
+
+        template <typename Geometry>
+        bool operator()(Geometry const& geometry) const
+        {
+            return is_convex<Geometry>::apply(geometry, m_strategy);
+        }
+    };
+
+    template <typename Strategy>
+    static inline bool apply(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> const& geometry,
+                             Strategy const& strategy)
+    {
+        return boost::apply_visitor(visitor<Strategy>(strategy), geometry);
+    }
+};
+
+} // namespace resolve_variant
 
 // TODO: documentation / qbk
 template<typename Geometry>
 inline bool is_convex(Geometry const& geometry)
 {
-    return dispatch::is_convex<Geometry>::apply(geometry);
+    return resolve_variant::is_convex
+            <
+                Geometry
+            >::apply(geometry, geometry::default_strategy());
+}
+
+// TODO: documentation / qbk
+template<typename Geometry, typename Strategy>
+inline bool is_convex(Geometry const& geometry, Strategy const& strategy)
+{
+    return resolve_variant::is_convex<Geometry>::apply(geometry, strategy);
 }
 
 

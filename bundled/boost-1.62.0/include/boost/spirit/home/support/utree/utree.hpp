@@ -29,6 +29,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/ref.hpp>
+#include <boost/config.hpp>
 
 #include <boost/spirit/home/support/utree/detail/utree_detail1.hpp>
 
@@ -43,7 +44,7 @@ namespace boost { namespace spirit
 {
     //[utree_exceptions
     /*` All exceptions thrown by utree are derived from utree_exception. */
-    struct utree_exception : std::exception {};
+    struct BOOST_SYMBOL_VISIBLE utree_exception : std::exception {};
 
     /*`The `bad_type_exception` is thrown whenever somebody calls a member 
        function, which applies to certain stored utree_type's only, but this 
@@ -143,9 +144,9 @@ namespace boost { namespace spirit
             msg = oss.str();
         }
 
-        virtual ~bad_type_exception() throw() {}
+        virtual ~bad_type_exception() BOOST_NOEXCEPT_OR_NOTHROW {}
 
-        virtual char const* what() const throw()
+        virtual char const* what() const BOOST_NOEXCEPT_OR_NOTHROW
         { return msg.c_str(); }
     };
     
@@ -155,9 +156,9 @@ namespace boost { namespace spirit
 
         empty_exception(char const* error) : msg(error) {}
         
-        virtual ~empty_exception() throw() {}
+        virtual ~empty_exception() BOOST_NOEXCEPT_OR_NOTHROW {}
 
-        virtual char const* what() const throw()
+        virtual char const* what() const BOOST_NOEXCEPT_OR_NOTHROW
         { return msg; }
     };
 
