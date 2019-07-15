@@ -107,19 +107,17 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # deal.II has to be configured with MPI if both Trilinos and PETSc are
     # enabled.
     #
-    IF( DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI )
+    IF(DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI)
       MESSAGE(STATUS "Incompatible configuration settings: "
         "MPI must be enabled to use both Trilinos and PETSc, as both libraries "
-	"provide mutually incompatible MPI stubs."
+      	"provide mutually incompatible MPI stubs."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "To enable both Trilinos and PETSc, deal.II must be configured with MPI "
-        "or enable one between Trilinos and PETSc removing MPI. Both Trilinos and PETSc "
-	"provide mutually incompatible MPI stubs, but found:\n"
-        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
-        "  DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}\n"
-        "  DEAL_II_WITH_PETSC = ${DEAL_II_WITH_PETSC}\n"
+        "Incompatible Trilinos and PETSc libraries found. Both libraries were "
+        "configured without MPI support and cannot be used at the same time due "
+        "to incompatible MPI stub files. Either reconfigure deal.II, Trilinos, "
+        "and PETSc with MPI support, or disable one of the libraries.\n"
         )
       SET(${var} FALSE)
     ENDIF()
