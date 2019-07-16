@@ -1626,7 +1626,7 @@ namespace internal
 
     const unsigned int data_dim = SymmetricTensorAccessors::
       StorageType<2, dim, value_type>::n_independent_components;
-    value_type tmp[data_dim];
+    value_type tmp[data_dim]{};
     for (unsigned int i = 0; i < data_dim; ++i)
       tmp[i] =
         perform_double_contraction<dim, Number, OtherNumber>(data[i], sdata);

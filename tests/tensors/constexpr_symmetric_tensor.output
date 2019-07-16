@@ -1,0 +1,7 @@
+
+DEAL:SymmetricTensor<2,2>::calculation result = -8.00000
+DEAL:SymmetricTensor<2,2>::invariants = 4.00000, -22.0000, -22.0000
+DEAL:SymmetricTensor<2,2>::norm square = 60.0000
+DEAL:SymmetricTensor<4,2>::calculation result = 0.200000
+DEAL:SymmetricTensor<4,2>::B times A (0,0) = 1.00000
+DEAL::OK
