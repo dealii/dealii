@@ -53,6 +53,12 @@
 #include <boost/container/vector.hpp>
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_VARRAY_ENABLE_VECTOR_OPTIMIZATION && !BOOST_NO_EXCEPTIONS
 
+//pair memcpy optimizations rightfully detected by GCC
+#if defined(BOOST_GCC) && (BOOST_GCC >= 80000)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 namespace boost { namespace geometry { namespace index { namespace detail { namespace varray_detail {
 
 template <typename I>
@@ -756,5 +762,10 @@ private:
 };
 
 }}}}} // namespace boost::geometry::index::detail::varray_detail
+
+//#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#if defined(BOOST_GCC) && (BOOST_GCC >= 80000)
+#  pragma GCC diagnostic pop
+#endif
 
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_VARRAY_DETAIL_HPP
