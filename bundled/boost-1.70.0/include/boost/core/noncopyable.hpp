@@ -38,12 +38,17 @@ namespace noncopyable_  // protection from unintended ADL
   class noncopyable: base_token
   {
   protected:
-#if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS) && !defined(BOOST_NO_CXX11_NON_PUBLIC_DEFAULTED_FUNCTIONS)
+#if defined(BOOST_CUDA_VERSION) && (BOOST_CUDA_VERSION < 9020000)
+    noncopyable() {}
+    ~noncopyable() {}
+#else
+  #if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS) && !defined(BOOST_NO_CXX11_NON_PUBLIC_DEFAULTED_FUNCTIONS)
       BOOST_CONSTEXPR noncopyable() = default;
       ~noncopyable() = default;
-#else
+  #else
       noncopyable() {}
       ~noncopyable() {}
+  #endif
 #endif
 #if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
       noncopyable( const noncopyable& ) = delete;
