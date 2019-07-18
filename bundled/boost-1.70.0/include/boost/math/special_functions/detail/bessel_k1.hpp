@@ -82,7 +82,7 @@ namespace boost { namespace math { namespace detail{
 
 
    template <typename T, int N>
-   inline T bessel_k1_imp(const T& x, const mpl::int_<N>&)
+   inline T bessel_k1_imp(const T&, const mpl::int_<N>&)
    {
       BOOST_ASSERT(0);
       return 0;

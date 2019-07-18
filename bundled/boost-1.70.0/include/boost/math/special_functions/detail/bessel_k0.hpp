@@ -81,7 +81,7 @@ const typename bessel_k0_initializer<T, tag>::init bessel_k0_initializer<T, tag>
 
 
 template <typename T, int N>
-T bessel_k0_imp(const T& x, const mpl::int_<N>&)
+T bessel_k0_imp(const T&, const mpl::int_<N>&)
 {
    BOOST_ASSERT(0);
    return 0;
