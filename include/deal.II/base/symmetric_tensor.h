@@ -1800,9 +1800,8 @@ namespace internal
         default:
           // to do the rest, sort our indices before comparing
           {
-            TableIndices<2> sorted_indices(indices);
-            sorted_indices.sort();
-
+            TableIndices<2> sorted_indices(std::min(indices[0], indices[1]),
+                                           std::max(indices[0], indices[1]));
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
