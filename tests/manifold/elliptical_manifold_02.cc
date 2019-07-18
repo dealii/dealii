@@ -105,9 +105,9 @@ test()
     // test on a rotated manifold
     const Tensor<1, 2> axis({1.0, -1.0});
     const double       eccentricity(0.1);
-    local_test(axis, eccentricity, Point<2>(1.1, 0.0));
-    local_test(axis, eccentricity, Point<2>(2.0, 0.0));
-    local_test(axis, eccentricity, Point<2>(3.0, 0.0));
+    local_test(axis, eccentricity, Point<2>(1.1, 0.25 * TOLERANCE));
+    local_test(axis, eccentricity, Point<2>(2.0, 0.25 * TOLERANCE));
+    local_test(axis, eccentricity, Point<2>(3.0, 0.25 * TOLERANCE));
     local_test(axis, eccentricity, Point<2>(4.0, 2.0));
   }
 }
