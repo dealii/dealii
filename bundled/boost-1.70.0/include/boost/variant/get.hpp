@@ -44,7 +44,7 @@ class BOOST_SYMBOL_VISIBLE bad_get
 {
 public: // std::exception implementation
 
-    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW
+    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW override
     {
         return "boost::bad_get: "
                "failed value get using boost::get";

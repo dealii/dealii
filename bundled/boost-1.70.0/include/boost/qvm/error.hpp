@@ -22,7 +22,7 @@ boost
             virtual std::exception
             {
             char const *
-            what() const throw()
+            what() const throw() override
                 {
                 return "Boost QVM error";
                 }

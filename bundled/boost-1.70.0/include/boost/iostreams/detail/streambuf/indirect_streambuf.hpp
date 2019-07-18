@@ -66,9 +66,9 @@ public:
     void open(const T& t BOOST_IOSTREAMS_PUSH_PARAMS());
     bool is_open() const;
     void close();
-    bool auto_close() const;
-    void set_auto_close(bool close);
-    bool strict_sync();
+    bool auto_close() const override;
+    void set_auto_close(bool close) override;
+    bool strict_sync() override;
 
     // Declared in linked_streambuf.
     T* component() { return &*obj(); }
@@ -78,24 +78,24 @@ protected:
     //----------virtual functions---------------------------------------------//
 
 #ifndef BOOST_IOSTREAMS_NO_LOCALE
-    void imbue(const std::locale& loc);
+    void imbue(const std::locale& loc) override;
 #endif
 #ifdef BOOST_IOSTREAMS_NO_STREAM_TEMPLATES
     public:
 #endif
-    int_type underflow();
-    int_type pbackfail(int_type c);
-    int_type overflow(int_type c);
-    int sync();
+    int_type underflow() override;
+    int_type pbackfail(int_type c) override;
+    int_type overflow(int_type c) override;
+    int sync() override;
     pos_type seekoff( off_type off, BOOST_IOS::seekdir way,
-                      BOOST_IOS::openmode which );
-    pos_type seekpos(pos_type sp, BOOST_IOS::openmode which);
+                      BOOST_IOS::openmode which ) override;
+    pos_type seekpos(pos_type sp, BOOST_IOS::openmode which) override;
 
     // Declared in linked_streambuf.
-    void set_next(streambuf_type* next);
-    void close_impl(BOOST_IOS::openmode m);
-    const boost::core::typeinfo& component_type() const { return BOOST_CORE_TYPEID(T); }
-    void* component_impl() { return component(); }
+    void set_next(streambuf_type* next) override;
+    void close_impl(BOOST_IOS::openmode m) override;
+    const boost::core::typeinfo& component_type() const override { return BOOST_CORE_TYPEID(T); }
+    void* component_impl() override { return component(); }
 private:
 
     //----------Accessor functions--------------------------------------------//

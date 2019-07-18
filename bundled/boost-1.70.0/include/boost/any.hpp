@@ -183,12 +183,12 @@ namespace boost
 #endif
         public: // queries
 
-            virtual const boost::typeindex::type_info& type() const BOOST_NOEXCEPT
+            virtual const boost::typeindex::type_info& type() const BOOST_NOEXCEPT override
             {
                 return boost::typeindex::type_id<ValueType>().type_info();
             }
 
-            virtual placeholder * clone() const
+            virtual placeholder * clone() const override
             {
                 return new holder(held);
             }
@@ -234,7 +234,7 @@ namespace boost
 #endif
     {
     public:
-        virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW
+        virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW override
         {
             return "boost::bad_any_cast: "
                    "failed conversion using boost::any_cast";

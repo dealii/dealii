@@ -747,7 +747,7 @@ namespace boost
         swap(_pimpl, other._pimpl);
       }
     protected:
-      virtual shared_ptr<void> lock_pimpl() const
+      virtual shared_ptr<void> lock_pimpl() const override
       {
         return _pimpl;
       }

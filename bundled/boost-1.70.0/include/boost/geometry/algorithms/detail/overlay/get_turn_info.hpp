@@ -58,7 +58,7 @@ public:
     virtual ~turn_info_exception() throw()
     {}
 
-    virtual char const* what() const throw()
+    virtual char const* what() const throw() override
     {
         return message.c_str();
     }

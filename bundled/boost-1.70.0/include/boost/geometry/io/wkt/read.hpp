@@ -93,7 +93,7 @@ struct read_wkt_exception : public geometry::exception
 
     virtual ~read_wkt_exception() throw() {}
 
-    virtual const char* what() const throw()
+    virtual const char* what() const throw() override
     {
         return complete.c_str();
     }

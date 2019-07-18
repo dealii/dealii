@@ -42,22 +42,22 @@ class BOOST_SYMBOL_VISIBLE common_iarchive :
     friend class interface_iarchive<Archive>;
     friend class basic_iarchive;
 private:
-    virtual void vload(version_type & t){
+    virtual void vload(version_type & t) override{
         * this->This() >> t; 
     }
-    virtual void vload(object_id_type & t){
+    virtual void vload(object_id_type & t) override{
         * this->This() >> t;
     }
-    virtual void vload(class_id_type & t){
+    virtual void vload(class_id_type & t) override{
         * this->This() >> t;
     }
-    virtual void vload(class_id_optional_type & t){
+    virtual void vload(class_id_optional_type & t) override{
         * this->This() >> t;
     }
-    virtual void vload(tracking_type & t){
+    virtual void vload(tracking_type & t) override{
         * this->This() >> t;
     }
-    virtual void vload(class_name_type &s){
+    virtual void vload(class_name_type &s) override{
         * this->This() >> s;
     }
 protected:

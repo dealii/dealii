@@ -124,7 +124,7 @@ protected:
         wchar_t * to, 
         wchar_t * to_end, 
         wchar_t*& to_next
-    ) const;
+    ) const override;
 
     virtual std::codecvt_base::result do_out(
         std::mbstate_t & state,
@@ -134,7 +134,7 @@ protected:
         char * to,
         char * to_end,
         char * & to_next
-    ) const;
+    ) const override;
 
     bool invalid_continuing_octet(unsigned char octet_1) const {
         return (octet_1 < 0x80|| 0xbf< octet_1);
@@ -156,7 +156,7 @@ protected:
     // ==   total octets - 1.
     int get_cont_octet_out_count(wchar_t word) const ;
 
-    virtual bool do_always_noconv() const BOOST_NOEXCEPT_OR_NOTHROW {
+    virtual bool do_always_noconv() const BOOST_NOEXCEPT_OR_NOTHROW override {
         return false;
     }
 
@@ -166,12 +166,12 @@ protected:
         char * from,
         char * /*to*/,
         char * & next
-    ) const {
+    ) const override {
         next = from;
         return ok;
     }
 
-    virtual int do_encoding() const BOOST_NOEXCEPT_OR_NOTHROW {
+    virtual int do_encoding() const BOOST_NOEXCEPT_OR_NOTHROW override {
         const int variable_byte_external_encoding=0;
         return variable_byte_external_encoding;
     }
@@ -183,7 +183,7 @@ protected:
         const char * from,
         const char * from_end, 
         std::size_t max_limit
-    ) const
+    ) const override
 #if BOOST_WORKAROUND(__IBMCPP__, BOOST_TESTED_AT(600))
     throw()
 #endif
@@ -209,7 +209,7 @@ protected:
     }
 
     // Largest possible value do_length(state,from,from_end,1) could return.
-    virtual int do_max_length() const BOOST_NOEXCEPT_OR_NOTHROW {
+    virtual int do_max_length() const BOOST_NOEXCEPT_OR_NOTHROW override {
         return 6; // largest UTF-8 encoding of a UCS-4 character
     }
 };

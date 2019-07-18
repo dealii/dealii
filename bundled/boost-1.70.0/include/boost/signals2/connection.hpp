@@ -146,7 +146,7 @@ namespace boost
         {
         }
         virtual ~connection_body() {}
-        virtual bool connected() const
+        virtual bool connected() const override
         {
           garbage_collecting_lock<mutex_type> local_lock(*_mutex);
           nolock_grab_tracked_objects(local_lock, detail::null_output_iterator());
@@ -191,11 +191,11 @@ namespace boost
           }
         }
         // expose Lockable concept of mutex
-        virtual void lock()
+        virtual void lock() override
         {
           _mutex->lock();
         }
-        virtual void unlock()
+        virtual void unlock() override
         {
           _mutex->unlock();
         }
@@ -208,7 +208,7 @@ namespace boost
           return *m_slot;
         }
       protected:
-        virtual shared_ptr<void> release_slot() const
+        virtual shared_ptr<void> release_slot() const override
         {
           
           shared_ptr<void> released_slot = m_slot;

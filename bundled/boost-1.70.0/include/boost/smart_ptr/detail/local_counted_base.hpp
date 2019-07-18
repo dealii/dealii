@@ -113,12 +113,12 @@ public:
 
 #endif
 
-    virtual void local_cb_destroy() BOOST_SP_NOEXCEPT
+    virtual void local_cb_destroy() BOOST_SP_NOEXCEPT override
     {
         delete this;
     }
 
-    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
+    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT override
     {
         return pn_;
     }
@@ -130,12 +130,12 @@ public:
 
     shared_count pn_;
 
-    virtual void local_cb_destroy() BOOST_SP_NOEXCEPT
+    virtual void local_cb_destroy() BOOST_SP_NOEXCEPT override
     {
         shared_count().swap( pn_ );
     }
 
-    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
+    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT override
     {
         return pn_;
     }

@@ -28,7 +28,7 @@ struct BOOST_SYMBOL_VISIBLE bad_visit
 {
 public: // std::exception interface
 
-    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW
+    virtual const char * what() const BOOST_NOEXCEPT_OR_NOTHROW override
     {
         return "boost::bad_visit: "
                "failed visitation using boost::apply_visitor";

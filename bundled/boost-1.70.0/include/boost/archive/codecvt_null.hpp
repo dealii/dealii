@@ -52,7 +52,7 @@ class codecvt_null;
 template<>
 class codecvt_null<char> : public std::codecvt<char, char, std::mbstate_t>
 {
-    virtual bool do_always_noconv() const throw() {
+    virtual bool do_always_noconv() const throw() override {
         return true;
     }
 public:
@@ -75,7 +75,7 @@ class BOOST_WARCHIVE_DECL codecvt_null<wchar_t> :
         char * first2,
         char * last2,
         char * & next2
-    ) const;
+    ) const override;
     virtual std::codecvt_base::result
     do_in(
         std::mbstate_t & state,
@@ -85,11 +85,11 @@ class BOOST_WARCHIVE_DECL codecvt_null<wchar_t> :
         wchar_t * first2,
         wchar_t * last2,
         wchar_t * & next2
-    ) const;
-    virtual int do_encoding( ) const throw( ){
+    ) const override;
+    virtual int do_encoding( ) const throw( ) override{
         return sizeof(wchar_t) / sizeof(char);
     }
-    virtual int do_max_length( ) const throw( ){
+    virtual int do_max_length( ) const throw( ) override{
         return do_encoding();
     }
 public:

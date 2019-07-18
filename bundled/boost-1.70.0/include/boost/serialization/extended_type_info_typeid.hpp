@@ -52,7 +52,7 @@ namespace typeid_system {
 class BOOST_SYMBOL_VISIBLE extended_type_info_typeid_0 :
     public extended_type_info
 {
-    virtual const char * get_debug_info() const {
+    virtual const char * get_debug_info() const override{
         if(static_cast<const std::type_info *>(0) == m_ti)
             return static_cast<const char *>(0);
         return m_ti->name();
@@ -67,9 +67,9 @@ protected:
     get_extended_type_info(const std::type_info & ti) const;
 public:
     virtual BOOST_SERIALIZATION_DECL bool
-    is_less_than(const extended_type_info &rhs) const;
+    is_less_than(const extended_type_info &rhs) const override;
     virtual BOOST_SERIALIZATION_DECL bool
-    is_equal(const extended_type_info &rhs) const;
+    is_equal(const extended_type_info &rhs) const override;
     const std::type_info & get_typeid() const {
         return *m_ti;
     }
@@ -110,7 +110,7 @@ public:
     const char * get_key() const {
         return boost::serialization::guid< T >();
     }
-    virtual void * construct(unsigned int count, ...) const{
+    virtual void * construct(unsigned int count, ...) const override{
         // count up the arguments
         std::va_list ap;
         va_start(ap, count);
@@ -131,7 +131,7 @@ public:
             return NULL;
         }
     }
-    virtual void destroy(void const * const p) const {
+    virtual void destroy(void const * const p) const override{
         boost::serialization::access::destroy(
             static_cast<T const *>(p)
         );

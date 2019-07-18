@@ -60,9 +60,9 @@ protected:
     BOOST_SERIALIZATION_DECL ~extended_type_info_no_rtti_0();
 public:
     virtual BOOST_SERIALIZATION_DECL bool
-    is_less_than(const boost::serialization::extended_type_info &rhs) const ;
+    is_less_than(const boost::serialization::extended_type_info &rhs) const override;
     virtual BOOST_SERIALIZATION_DECL bool
-    is_equal(const boost::serialization::extended_type_info &rhs) const ;
+    is_equal(const boost::serialization::extended_type_info &rhs) const override;
 };
 
 } // no_rtti_system

@@ -51,7 +51,7 @@ namespace boost
 #endif
         {}
 
-        virtual const char *what() const BOOST_NOEXCEPT_OR_NOTHROW {
+        virtual const char *what() const BOOST_NOEXCEPT_OR_NOTHROW override{
             return "bad lexical cast: "
                    "source type value could not be interpreted as target";
         }
