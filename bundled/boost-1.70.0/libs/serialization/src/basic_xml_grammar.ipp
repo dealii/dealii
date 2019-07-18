@@ -85,6 +85,7 @@ struct assign_impl<std::string> {
     assign_impl<std::string> & operator=(
         assign_impl<std::string> & rhs
     );
+    assign_impl(const assign_impl &) = default;
     assign_impl(std::string & t_)
         : t(t_)
     {}
