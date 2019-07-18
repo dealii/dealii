@@ -42,8 +42,12 @@ MappingQCache<dim, spacedim>::MappingQCache(
 template <int dim, int spacedim>
 MappingQCache<dim, spacedim>::~MappingQCache()
 {
-  if (clear_signal.connected())
-    clear_signal.disconnect();
+  // When this object goes out of scope, we want the cache to get cleared and
+  // free its memory before the signal is disconnected in order to not work on
+  // invalid memory that has been left back by freeing an object of this
+  // class.
+  support_point_cache.reset();
+  clear_signal.disconnect();
 }
 
 
