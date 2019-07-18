@@ -57,8 +57,15 @@ check()
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot is ";
+      if (std::abs(prod - prod_check) <
+          4. * std::numeric_limits<number>::epsilon() *
+            std::sqrt(static_cast<number>(size)) * size)
+        deallog << "correct" << std::endl;
+      else
+        deallog << "wrong; should be " << prod / static_cast<number>(size)
+                << ", is " << prod_check / static_cast<number>(size)
+                << std::endl;
     }
 }
 

@@ -1,9 +1,9 @@
 
-DEAL::Add and dot should be (1334.7905,349.71042), is (1334.7905,349.71042)
-DEAL::Add and dot should be (91530.086,22094.701), is (91530.086,22094.701)
-DEAL::Add and dot should be (181725.41,43834.066), is (181725.41,43834.066)
-DEAL::Add and dot should be (271920.69,65573.367), is (271920.69,65573.367)
-DEAL::Add and dot should be (362116.03,87312.656), is (362116.03,87312.656)
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
 IndexSet: {[0,16]}
 
 [0]: (2.554e-02,1.842e+00)
@@ -44,9 +44,9 @@ IndexSet: {[0,16]}
 [15]: (1.392e-01,1.909e+02)
 [16]: (1.468e-01,2.035e+02)
 DEAL::Vector check reference: 
-DEAL::Add and dot should be (1334.7906,349.71041), is (1334.7906,349.71041)
-DEAL::Add and dot should be (91530.091,22094.701), is (91530.091,22094.701)
-DEAL::Add and dot should be (181725.40,43834.063), is (181725.40,43834.063)
-DEAL::Add and dot should be (271920.71,65573.368), is (271920.71,65573.368)
-DEAL::Add and dot should be (362116.02,87312.657), is (362116.02,87312.657)
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
+DEAL::Add and dot is correct
 DEAL::OK
