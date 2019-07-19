@@ -40,7 +40,7 @@
  * @code
  *   Triangulation<dim> triangulation;
  *   ...
- *   for (auto cell : triangulation.active_cell_iterators())
+ *   for (auto &cell : triangulation.active_cell_iterators())
  *     cell->set_refine_flag();
  * @endcode
  * This relies on functions such as Triangulation::active_cell_iterators(),
