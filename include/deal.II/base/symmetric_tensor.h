@@ -32,36 +32,36 @@ template <int rank, int dim, typename Number = double>
 class SymmetricTensor;
 
 template <int dim, typename Number>
-SymmetricTensor<2, dim, Number>
-unit_symmetric_tensor();
+DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                  unit_symmetric_tensor();
 
 template <int dim, typename Number>
-SymmetricTensor<4, dim, Number>
-deviator_tensor();
+DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
+                  deviator_tensor();
 
 template <int dim, typename Number>
-SymmetricTensor<4, dim, Number>
-identity_tensor();
+DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
+                  identity_tensor();
 
 template <int dim, typename Number>
-SymmetricTensor<2, dim, Number>
+constexpr SymmetricTensor<2, dim, Number>
 invert(const SymmetricTensor<2, dim, Number> &);
 
 template <int dim, typename Number>
-SymmetricTensor<4, dim, Number>
+constexpr SymmetricTensor<4, dim, Number>
 invert(const SymmetricTensor<4, dim, Number> &);
 
 template <int dim2, typename Number>
-Number
-trace(const SymmetricTensor<2, dim2, Number> &);
+DEAL_II_CONSTEXPR Number
+                  trace(const SymmetricTensor<2, dim2, Number> &);
 
 template <int dim, typename Number>
-SymmetricTensor<2, dim, Number>
-deviator(const SymmetricTensor<2, dim, Number> &);
+DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                  deviator(const SymmetricTensor<2, dim, Number> &);
 
 template <int dim, typename Number>
-Number
-determinant(const SymmetricTensor<2, dim, Number> &);
+DEAL_II_CONSTEXPR Number
+                  determinant(const SymmetricTensor<2, dim, Number> &);
 
 
 
@@ -93,7 +93,7 @@ namespace internal
      * put at position <tt>position</tt>. The remaining indices remain in
      * invalid state.
      */
-    inline TableIndices<2>
+    DEAL_II_CONSTEXPR inline TableIndices<2>
     merge(const TableIndices<2> &previous_indices,
           const unsigned int     new_index,
           const unsigned int     position)
@@ -114,7 +114,7 @@ namespace internal
      * put at position <tt>position</tt>. The remaining indices remain in
      * invalid state.
      */
-    inline TableIndices<4>
+    DEAL_II_CONSTEXPR inline TableIndices<4>
     merge(const TableIndices<4> &previous_indices,
           const unsigned int     new_index,
           const unsigned int     position)
@@ -143,9 +143,10 @@ namespace internal
                     previous_indices[1],
                     previous_indices[2],
                     new_index};
+          default:
+            Assert(false, ExcInternalError());
+            return {};
         }
-      Assert(false, ExcInternalError());
-      return {};
     }
 
 
@@ -293,12 +294,12 @@ namespace internal
      * @internal
      *
      * Class that acts as accessor to elements of type SymmetricTensor. The
-     * template parameter <tt>C</tt> may be either true or false, and
+     * template parameter <tt>constness</tt> may be either true or false, and
      * indicates whether the objects worked on are constant or not (i.e. write
      * access is only allowed if the value is false).
      *
      * Since with <tt>N</tt> indices, the effect of applying
-     * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
+     * <tt>operator[]</tt> is getting access to something with <tt>N-1</tt>
      * indices, we have to implement these accessor classes recursively, with
      * stopping when we have only one index left. For the latter case, a
      * specialization of this class is declared below, where calling
@@ -354,24 +355,25 @@ namespace internal
        * This guarantees that the accessor objects go out of scope earlier
        * than the mother object, avoid problems with data consistency.
        */
-      Accessor(tensor_type &tensor, const TableIndices<rank> &previous_indices);
+      constexpr Accessor(tensor_type &             tensor,
+                         const TableIndices<rank> &previous_indices);
 
       /**
        * Copy constructor.
        */
-      Accessor(const Accessor &) = default;
+      constexpr Accessor(const Accessor &) = default;
 
     public:
       /**
        * Index operator.
        */
-      Accessor<rank, dim, constness, P - 1, Number>
-      operator[](const unsigned int i);
+      DEAL_II_CONSTEXPR Accessor<rank, dim, constness, P - 1, Number>
+                        operator[](const unsigned int i);
 
       /**
        * Index operator.
        */
-      Accessor<rank, dim, constness, P - 1, Number>
+      constexpr Accessor<rank, dim, constness, P - 1, Number>
       operator[](const unsigned int i) const;
 
     private:
@@ -440,23 +442,24 @@ namespace internal
        * This guarantees that the accessor objects go out of scope earlier
        * than the mother object, avoid problems with data consistency.
        */
-      Accessor(tensor_type &tensor, const TableIndices<rank> &previous_indices);
+      constexpr Accessor(tensor_type &             tensor,
+                         const TableIndices<rank> &previous_indices);
 
       /**
        * Copy constructor.
        */
-      Accessor(const Accessor &) = default;
+      constexpr Accessor(const Accessor &) = default;
 
     public:
       /**
        * Index operator.
        */
-      reference operator[](const unsigned int);
+      DEAL_II_CONSTEXPR reference operator[](const unsigned int);
 
       /**
        * Index operator.
        */
-      reference operator[](const unsigned int) const;
+      constexpr reference operator[](const unsigned int) const;
 
     private:
       /**
@@ -580,7 +583,7 @@ public:
   /**
    * Default constructor. Creates a tensor with all entries equal to zero.
    */
-  SymmetricTensor();
+  constexpr SymmetricTensor() = default;
 
   /**
    * Constructor. Generate a symmetric tensor from a general one. Assumes that
@@ -593,7 +596,8 @@ public:
    * practice to check before calling <tt>symmetrize</tt>.
    */
   template <typename OtherNumber>
-  explicit SymmetricTensor(const Tensor<2, dim, OtherNumber> &t);
+  DEAL_II_CONSTEXPR explicit SymmetricTensor(
+    const Tensor<2, dim, OtherNumber> &t);
 
   /**
    * A constructor that creates a symmetric tensor from an array holding its
@@ -610,6 +614,7 @@ public:
    * the object from the internal namespace is to work around bugs in some
    * older compilers.
    */
+  DEAL_II_CONSTEXPR
   SymmetricTensor(const Number (&array)[n_independent_components]);
 
   /**
@@ -618,32 +623,32 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  explicit SymmetricTensor(
+  constexpr explicit SymmetricTensor(
     const SymmetricTensor<rank_, dim, OtherNumber> &initializer);
 
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  Number *
-  begin_raw();
+  DEAL_II_CONSTEXPR Number *
+                    begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  const Number *
+  constexpr const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  Number *
-  end_raw();
+  DEAL_II_CONSTEXPR Number *
+                    end_raw();
 
   /**
    * Return a const pointer to the element past the end of the underlying
    * storage.
    */
-  const Number *
+  constexpr const Number *
   end_raw() const;
 
   /**
@@ -653,8 +658,8 @@ public:
    * @p Number.
    */
   template <typename OtherNumber>
-  SymmetricTensor &
-  operator=(const SymmetricTensor<rank_, dim, OtherNumber> &rhs);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator=(const SymmetricTensor<rank_, dim, OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -662,61 +667,61 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  SymmetricTensor &
-  operator=(const Number &d);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator=(const Number &d);
 
   /**
    * Convert the present symmetric tensor into a full tensor with the same
    * elements, but using the different storage scheme of full tensors.
    */
-  operator Tensor<rank_, dim, Number>() const;
+  constexpr operator Tensor<rank_, dim, Number>() const;
 
   /**
    * Test for equality of two tensors.
    */
-  bool
+  constexpr bool
   operator==(const SymmetricTensor &) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool
+  constexpr bool
   operator!=(const SymmetricTensor &) const;
 
   /**
    * Add another tensor.
    */
   template <typename OtherNumber>
-  SymmetricTensor &
-  operator+=(const SymmetricTensor<rank_, dim, OtherNumber> &);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator+=(const SymmetricTensor<rank_, dim, OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
   template <typename OtherNumber>
-  SymmetricTensor &
-  operator-=(const SymmetricTensor<rank_, dim, OtherNumber> &);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator-=(const SymmetricTensor<rank_, dim, OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    */
   template <typename OtherNumber>
-  SymmetricTensor &
-  operator*=(const OtherNumber &factor);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator*=(const OtherNumber &factor);
 
   /**
    * Scale the tensor by <tt>1/factor</tt>.
    */
   template <typename OtherNumber>
-  SymmetricTensor &
-  operator/=(const OtherNumber &factor);
+  DEAL_II_CONSTEXPR SymmetricTensor &
+                    operator/=(const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
    */
-  SymmetricTensor
-  operator-() const;
+  DEAL_II_CONSTEXPR SymmetricTensor
+                    operator-() const;
 
   /**
    * Product between the present symmetric tensor and a tensor of rank 2. For
@@ -743,7 +748,7 @@ public:
    * they write it into the first argument to the function.
    */
   template <typename OtherNumber>
-  typename internal::SymmetricTensorAccessors::
+  DEAL_II_CONSTEXPR typename internal::SymmetricTensorAccessors::
     double_contraction_result<rank_, 2, dim, Number, OtherNumber>::type
     operator*(const SymmetricTensor<2, dim, OtherNumber> &s) const;
 
@@ -752,27 +757,27 @@ public:
    * symmetric tensor given as argument.
    */
   template <typename OtherNumber>
-  typename internal::SymmetricTensorAccessors::
+  DEAL_II_CONSTEXPR typename internal::SymmetricTensorAccessors::
     double_contraction_result<rank_, 4, dim, Number, OtherNumber>::type
     operator*(const SymmetricTensor<4, dim, OtherNumber> &s) const;
 
   /**
    * Return a read-write reference to the indicated element.
    */
-  Number &
-  operator()(const TableIndices<rank_> &indices);
+  DEAL_II_CONSTEXPR Number &
+                    operator()(const TableIndices<rank_> &indices);
 
   /**
    * Return a @p const reference to the value referred to by the argument.
    */
-  const Number &
-  operator()(const TableIndices<rank_> &indices) const;
+  DEAL_II_CONSTEXPR const Number &
+                          operator()(const TableIndices<rank_> &indices) const;
 
   /**
    * Access the elements of a row of this symmetric tensor. This function is
    * called for constant tensors.
    */
-  internal::SymmetricTensorAccessors::
+  constexpr internal::SymmetricTensorAccessors::
     Accessor<rank_, dim, true, rank_ - 1, Number>
     operator[](const unsigned int row) const;
 
@@ -780,7 +785,7 @@ public:
    * Access the elements of a row of this symmetric tensor. This function is
    * called for non-constant tensors.
    */
-  internal::SymmetricTensorAccessors::
+  DEAL_II_CONSTEXPR internal::SymmetricTensorAccessors::
     Accessor<rank_, dim, false, rank_ - 1, Number>
     operator[](const unsigned int row);
 
@@ -789,30 +794,30 @@ public:
    *
    * Exactly the same as operator().
    */
-  const Number &operator[](const TableIndices<rank_> &indices) const;
+  constexpr const Number &operator[](const TableIndices<rank_> &indices) const;
 
   /**
    * Return a read-write reference to the indicated element.
    *
    * Exactly the same as operator().
    */
-  Number &operator[](const TableIndices<rank_> &indices);
+  DEAL_II_CONSTEXPR Number &operator[](const TableIndices<rank_> &indices);
 
   /**
    * Access to an element according to unrolled index. The function
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
    */
-  const Number &
-  access_raw_entry(const unsigned int unrolled_index) const;
+  DEAL_II_CONSTEXPR const Number &
+                          access_raw_entry(const unsigned int unrolled_index) const;
 
   /**
    * Access to an element according to unrolled index. The function
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
    */
-  Number &
-  access_raw_entry(const unsigned int unrolled_index);
+  DEAL_II_CONSTEXPR Number &
+                    access_raw_entry(const unsigned int unrolled_index);
 
   /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
@@ -823,7 +828,7 @@ public:
    * upper right as well as lower left entries, not just one of them, although
    * they are equal for symmetric tensors).
    */
-  typename numbers::NumberTraits<Number>::real_type
+  constexpr typename numbers::NumberTraits<Number>::real_type
   norm() const;
 
   /**
@@ -833,7 +838,7 @@ public:
    * <code>[0,n_independent_components)</code> the given entry in a symmetric
    * tensor has.
    */
-  static unsigned int
+  static constexpr unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
@@ -841,7 +846,7 @@ public:
    * form of the tensor, return what set of indices $(k,l)$ (for rank-2
    * tensors) or $(k,l,m,n)$ (for rank-4 tensors) corresponds to it.
    */
-  static TableIndices<rank_>
+  static constexpr TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
 
   /**
@@ -856,14 +861,14 @@ public:
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
    */
-  void
+  DEAL_II_CONSTEXPR void
   clear();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  static std::size_t
+  static constexpr std::size_t
   memory_consumption();
 
   /**
@@ -901,28 +906,28 @@ private:
    * Make a few more functions friends.
    */
   template <int dim2, typename Number2>
-  friend Number2
-  trace(const SymmetricTensor<2, dim2, Number2> &d);
+  friend DEAL_II_CONSTEXPR Number2
+                           trace(const SymmetricTensor<2, dim2, Number2> &d);
 
   template <int dim2, typename Number2>
-  friend Number2
-  determinant(const SymmetricTensor<2, dim2, Number2> &t);
+  friend DEAL_II_CONSTEXPR Number2
+                           determinant(const SymmetricTensor<2, dim2, Number2> &t);
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<2, dim2, Number2>
-  deviator(const SymmetricTensor<2, dim2, Number2> &t);
+  friend DEAL_II_CONSTEXPR SymmetricTensor<2, dim2, Number2>
+                           deviator(const SymmetricTensor<2, dim2, Number2> &t);
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<2, dim2, Number2>
-  unit_symmetric_tensor();
+  friend DEAL_II_CONSTEXPR SymmetricTensor<2, dim2, Number2>
+                           unit_symmetric_tensor();
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<4, dim2, Number2>
-  deviator_tensor();
+  friend DEAL_II_CONSTEXPR SymmetricTensor<4, dim2, Number2>
+                           deviator_tensor();
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<4, dim2, Number2>
-  identity_tensor();
+  friend DEAL_II_CONSTEXPR SymmetricTensor<4, dim2, Number2>
+                           identity_tensor();
 
 
   /**
@@ -954,7 +959,7 @@ namespace internal
   namespace SymmetricTensorAccessors
   {
     template <int rank_, int dim, bool constness, int P, typename Number>
-    Accessor<rank_, dim, constness, P, Number>::Accessor(
+    constexpr Accessor<rank_, dim, constness, P, Number>::Accessor(
       tensor_type &              tensor,
       const TableIndices<rank_> &previous_indices)
       : tensor(tensor)
@@ -964,7 +969,7 @@ namespace internal
 
 
     template <int rank_, int dim, bool constness, int P, typename Number>
-    Accessor<rank_, dim, constness, P - 1, Number>
+    DEAL_II_CONSTEXPR inline Accessor<rank_, dim, constness, P - 1, Number>
       Accessor<rank_, dim, constness, P, Number>::
       operator[](const unsigned int i)
     {
@@ -975,7 +980,7 @@ namespace internal
 
 
     template <int rank_, int dim, bool constness, int P, typename Number>
-    Accessor<rank_, dim, constness, P - 1, Number>
+    constexpr Accessor<rank_, dim, constness, P - 1, Number>
       Accessor<rank_, dim, constness, P, Number>::
       operator[](const unsigned int i) const
     {
@@ -986,7 +991,7 @@ namespace internal
 
 
     template <int rank_, int dim, bool constness, typename Number>
-    Accessor<rank_, dim, constness, 1, Number>::Accessor(
+    constexpr Accessor<rank_, dim, constness, 1, Number>::Accessor(
       tensor_type &              tensor,
       const TableIndices<rank_> &previous_indices)
       : tensor(tensor)
@@ -996,16 +1001,17 @@ namespace internal
 
 
     template <int rank_, int dim, bool constness, typename Number>
-    typename Accessor<rank_, dim, constness, 1, Number>::reference
-      Accessor<rank_, dim, constness, 1, Number>::
-      operator[](const unsigned int i)
+    DEAL_II_CONSTEXPR inline
+      typename Accessor<rank_, dim, constness, 1, Number>::reference
+        Accessor<rank_, dim, constness, 1, Number>::
+        operator[](const unsigned int i)
     {
       return tensor(merge(previous_indices, i, rank_ - 1));
     }
 
 
     template <int rank_, int dim, bool constness, typename Number>
-    typename Accessor<rank_, dim, constness, 1, Number>::reference
+    constexpr typename Accessor<rank_, dim, constness, 1, Number>::reference
       Accessor<rank_, dim, constness, 1, Number>::
       operator[](const unsigned int i) const
     {
@@ -1017,18 +1023,8 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor()
-{
-  // Some auto-differentiable numbers need explicit
-  // zero initialization.
-  for (unsigned int i = 0; i < base_tensor_type::dimension; ++i)
-    data[i] = internal::NumberType<Number>::value(0.0);
-}
-
-
-template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
   Assert(rank == 2, ExcNotImplemented());
@@ -1073,19 +1069,15 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
+constexpr SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const SymmetricTensor<rank_, dim, OtherNumber> &initializer)
-{
-  for (unsigned int i = 0; i < base_tensor_type::dimension; ++i)
-    data[i] =
-      internal::NumberType<typename base_tensor_type::value_type>::value(
-        initializer.data[i]);
-}
+  : data(initializer.data)
+{}
 
 
 
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Number (&array)[n_independent_components])
   : data(
       *reinterpret_cast<const typename base_tensor_type::array_type *>(array))
@@ -1099,19 +1091,18 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline SymmetricTensor<rank_, dim, Number> &
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim, Number> &
 SymmetricTensor<rank_, dim, Number>::
 operator=(const SymmetricTensor<rank_, dim, OtherNumber> &t)
 {
-  for (unsigned int i = 0; i < base_tensor_type::dimension; ++i)
-    data[i] = t.data[i];
+  data = t.data;
   return *this;
 }
 
 
 
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number> &
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim, Number> &
 SymmetricTensor<rank_, dim, Number>::operator=(const Number &d)
 {
   Assert(numbers::value_is_zero(d),
@@ -1129,8 +1120,9 @@ namespace internal
   namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
-    inline DEAL_II_ALWAYS_INLINE dealii::Tensor<2, dim, Number>
-                                 convert_to_tensor(const dealii::SymmetricTensor<2, dim, Number> &s)
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+      dealii::Tensor<2, dim, Number>
+      convert_to_tensor(const dealii::SymmetricTensor<2, dim, Number> &s)
     {
       dealii::Tensor<2, dim, Number> t;
 
@@ -1150,8 +1142,8 @@ namespace internal
 
 
     template <int dim, typename Number>
-    dealii::Tensor<4, dim, Number>
-    convert_to_tensor(const dealii::SymmetricTensor<4, dim, Number> &st)
+    DEAL_II_CONSTEXPR dealii::Tensor<4, dim, Number>
+                      convert_to_tensor(const dealii::SymmetricTensor<4, dim, Number> &st)
     {
       // utilize the symmetry properties of SymmetricTensor<4,dim>
       // discussed in the class documentation to avoid accessing all
@@ -1174,7 +1166,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 1, Number>
     {
-      static inline dealii::SymmetricTensor<2, 1, Number>
+      DEAL_II_CONSTEXPR static inline dealii::SymmetricTensor<2, 1, Number>
       value(const dealii::SymmetricTensor<2, 1, Number> &t)
       {
         dealii::SymmetricTensor<2, 1, Number> tmp;
@@ -1189,7 +1181,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 2, Number>
     {
-      static inline dealii::SymmetricTensor<2, 2, Number>
+      DEAL_II_CONSTEXPR static inline dealii::SymmetricTensor<2, 2, Number>
       value(const dealii::SymmetricTensor<2, 2, Number> &t)
       {
         dealii::SymmetricTensor<2, 2, Number> tmp;
@@ -1215,7 +1207,7 @@ namespace internal
     template <typename Number>
     struct Inverse<2, 3, Number>
     {
-      static dealii::SymmetricTensor<2, 3, Number>
+      DEAL_II_CONSTEXPR static dealii::SymmetricTensor<2, 3, Number>
       value(const dealii::SymmetricTensor<2, 3, Number> &t)
       {
         dealii::SymmetricTensor<2, 3, Number> tmp;
@@ -1282,7 +1274,7 @@ namespace internal
     template <typename Number>
     struct Inverse<4, 1, Number>
     {
-      static inline dealii::SymmetricTensor<4, 1, Number>
+      DEAL_II_CONSTEXPR static inline dealii::SymmetricTensor<4, 1, Number>
       value(const dealii::SymmetricTensor<4, 1, Number> &t)
       {
         dealii::SymmetricTensor<4, 1, Number> tmp;
@@ -1295,7 +1287,7 @@ namespace internal
     template <typename Number>
     struct Inverse<4, 2, Number>
     {
-      static inline dealii::SymmetricTensor<4, 2, Number>
+      DEAL_II_CONSTEXPR static inline dealii::SymmetricTensor<4, 2, Number>
       value(const dealii::SymmetricTensor<4, 2, Number> &t)
       {
         dealii::SymmetricTensor<4, 2, Number> tmp;
@@ -1471,8 +1463,8 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>::
-                             operator Tensor<rank_, dim, Number>() const
+constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>::
+                                operator Tensor<rank_, dim, Number>() const
 {
   return internal::SymmetricTensorImplementation::convert_to_tensor(*this);
 }
@@ -1480,7 +1472,7 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>::
 
 
 template <int rank_, int dim, typename Number>
-inline bool
+constexpr bool
 SymmetricTensor<rank_, dim, Number>::
 operator==(const SymmetricTensor<rank_, dim, Number> &t) const
 {
@@ -1490,7 +1482,7 @@ operator==(const SymmetricTensor<rank_, dim, Number> &t) const
 
 
 template <int rank_, int dim, typename Number>
-inline bool
+constexpr bool
 SymmetricTensor<rank_, dim, Number>::
 operator!=(const SymmetricTensor<rank_, dim, Number> &t) const
 {
@@ -1501,9 +1493,10 @@ operator!=(const SymmetricTensor<rank_, dim, Number> &t) const
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
-                             SymmetricTensor<rank_, dim, Number>::
-                             operator+=(const SymmetricTensor<rank_, dim, OtherNumber> &t)
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<rank_, dim, Number> &
+  SymmetricTensor<rank_, dim, Number>::
+  operator+=(const SymmetricTensor<rank_, dim, OtherNumber> &t)
 {
   data += t.data;
   return *this;
@@ -1513,9 +1506,10 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
-                             SymmetricTensor<rank_, dim, Number>::
-                             operator-=(const SymmetricTensor<rank_, dim, OtherNumber> &t)
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<rank_, dim, Number> &
+  SymmetricTensor<rank_, dim, Number>::
+  operator-=(const SymmetricTensor<rank_, dim, OtherNumber> &t)
 {
   data -= t.data;
   return *this;
@@ -1525,8 +1519,9 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
-SymmetricTensor<rank_, dim, Number>::operator*=(const OtherNumber &d)
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<rank_, dim, Number> &
+  SymmetricTensor<rank_, dim, Number>::operator*=(const OtherNumber &d)
 {
   data *= d;
   return *this;
@@ -1536,8 +1531,9 @@ SymmetricTensor<rank_, dim, Number>::operator*=(const OtherNumber &d)
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number> &
-SymmetricTensor<rank_, dim, Number>::operator/=(const OtherNumber &d)
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<rank_, dim, Number> &
+  SymmetricTensor<rank_, dim, Number>::operator/=(const OtherNumber &d)
 {
   data /= d;
   return *this;
@@ -1546,8 +1542,9 @@ SymmetricTensor<rank_, dim, Number>::operator/=(const OtherNumber &d)
 
 
 template <int rank_, int dim, typename Number>
-inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
-SymmetricTensor<rank_, dim, Number>::operator-() const
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<rank_, dim, Number>
+  SymmetricTensor<rank_, dim, Number>::operator-() const
 {
   SymmetricTensor tmp = *this;
   tmp.data            = -tmp.data;
@@ -1557,7 +1554,7 @@ SymmetricTensor<rank_, dim, Number>::operator-() const
 
 
 template <int rank_, int dim, typename Number>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE void
 SymmetricTensor<rank_, dim, Number>::clear()
 {
   data.clear();
@@ -1566,7 +1563,7 @@ SymmetricTensor<rank_, dim, Number>::clear()
 
 
 template <int rank_, int dim, typename Number>
-inline std::size_t
+constexpr std::size_t
 SymmetricTensor<rank_, dim, Number>::memory_consumption()
 {
   // all memory consists of statically allocated memory of the current
@@ -1579,13 +1576,14 @@ SymmetricTensor<rank_, dim, Number>::memory_consumption()
 namespace internal
 {
   template <int dim, typename Number, typename OtherNumber = Number>
-  inline DEAL_II_ALWAYS_INLINE typename SymmetricTensorAccessors::
-    double_contraction_result<2, 2, dim, Number, OtherNumber>::type
-    perform_double_contraction(
-      const typename SymmetricTensorAccessors::StorageType<2, dim, Number>::
-        base_tensor_type &data,
-      const typename SymmetricTensorAccessors::
-        StorageType<2, dim, OtherNumber>::base_tensor_type &sdata)
+  DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+    typename SymmetricTensorAccessors::
+      double_contraction_result<2, 2, dim, Number, OtherNumber>::type
+      perform_double_contraction(
+        const typename SymmetricTensorAccessors::StorageType<2, dim, Number>::
+          base_tensor_type &data,
+        const typename SymmetricTensorAccessors::
+          StorageType<2, dim, OtherNumber>::base_tensor_type &sdata)
   {
     using result_type = typename SymmetricTensorAccessors::
       double_contraction_result<2, 2, dim, Number, OtherNumber>::type;
@@ -1613,7 +1611,7 @@ namespace internal
 
 
   template <int dim, typename Number, typename OtherNumber = Number>
-  inline typename SymmetricTensorAccessors::
+  DEAL_II_CONSTEXPR inline typename SymmetricTensorAccessors::
     double_contraction_result<4, 2, dim, Number, OtherNumber>::type
     perform_double_contraction(
       const typename SymmetricTensorAccessors::StorageType<4, dim, Number>::
@@ -1628,7 +1626,7 @@ namespace internal
 
     const unsigned int data_dim = SymmetricTensorAccessors::
       StorageType<2, dim, value_type>::n_independent_components;
-    value_type tmp[data_dim];
+    value_type tmp[data_dim]{};
     for (unsigned int i = 0; i < data_dim; ++i)
       tmp[i] =
         perform_double_contraction<dim, Number, OtherNumber>(data[i], sdata);
@@ -1638,7 +1636,7 @@ namespace internal
 
 
   template <int dim, typename Number, typename OtherNumber = Number>
-  inline typename SymmetricTensorAccessors::StorageType<
+  DEAL_II_CONSTEXPR inline typename SymmetricTensorAccessors::StorageType<
     2,
     dim,
     typename SymmetricTensorAccessors::
@@ -1675,7 +1673,7 @@ namespace internal
 
 
   template <int dim, typename Number, typename OtherNumber = Number>
-  inline typename SymmetricTensorAccessors::StorageType<
+  DEAL_II_CONSTEXPR inline typename SymmetricTensorAccessors::StorageType<
     4,
     dim,
     typename SymmetricTensorAccessors::
@@ -1716,10 +1714,11 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE typename internal::SymmetricTensorAccessors::
-  double_contraction_result<rank_, 2, dim, Number, OtherNumber>::type
-    SymmetricTensor<rank_, dim, Number>::
-    operator*(const SymmetricTensor<2, dim, OtherNumber> &s) const
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+  typename internal::SymmetricTensorAccessors::
+    double_contraction_result<rank_, 2, dim, Number, OtherNumber>::type
+      SymmetricTensor<rank_, dim, Number>::
+      operator*(const SymmetricTensor<2, dim, OtherNumber> &s) const
 {
   // need to have two different function calls
   // because a scalar and rank-2 tensor are not
@@ -1733,7 +1732,7 @@ inline DEAL_II_ALWAYS_INLINE typename internal::SymmetricTensorAccessors::
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline typename internal::SymmetricTensorAccessors::
+DEAL_II_CONSTEXPR inline typename internal::SymmetricTensorAccessors::
   double_contraction_result<rank_, 4, dim, Number, OtherNumber>::type
     SymmetricTensor<rank_, dim, Number>::
     operator*(const SymmetricTensor<4, dim, OtherNumber> &s) const
@@ -1758,8 +1757,23 @@ inline typename internal::SymmetricTensorAccessors::
 // into a separate namespace
 namespace internal
 {
+  // The variables within this struct will be referenced in the next functions.
+  // It is a workaround that allows returning a reference to a static variable
+  // while allowing constexpr evaluation of the function.
+  // It has to be defined outside the function because constexpr functions
+  // cannot define static variables.
+  // A similar struct has also been defined in tensor.h
+  template <typename Type>
+  struct Uninitialized
+  {
+    static Type value;
+  };
+
+  template <typename Type>
+  Type Uninitialized<Type>::value;
+
   template <int dim, typename Number>
-  inline Number &
+  DEAL_II_CONSTEXPR inline Number &
   symmetric_tensor_access(const TableIndices<2> &indices,
                           typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
@@ -1786,9 +1800,8 @@ namespace internal
         default:
           // to do the rest, sort our indices before comparing
           {
-            TableIndices<2> sorted_indices(indices);
-            sorted_indices.sort();
-
+            TableIndices<2> sorted_indices(std::min(indices[0], indices[1]),
+                                           std::max(indices[0], indices[1]));
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
@@ -1797,14 +1810,16 @@ namespace internal
           }
       }
 
-    static Number dummy_but_referenceable = Number();
-    return dummy_but_referenceable;
+    // The code should never reach there.
+    // Returns a dummy reference to a dummy variable just to make the
+    // compiler happy.
+    return Uninitialized<Number>::value;
   }
 
 
 
   template <int dim, typename Number>
-  inline const Number &
+  DEAL_II_CONSTEXPR inline const Number &
   symmetric_tensor_access(const TableIndices<2> &indices,
                           const typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
@@ -1831,9 +1846,8 @@ namespace internal
         default:
           // to do the rest, sort our indices before comparing
           {
-            TableIndices<2> sorted_indices(indices);
-            sorted_indices.sort();
-
+            TableIndices<2> sorted_indices(std::min(indices[0], indices[1]),
+                                           std::max(indices[0], indices[1]));
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
@@ -1842,14 +1856,16 @@ namespace internal
           }
       }
 
-    static Number dummy_but_referenceable = Number();
-    return dummy_but_referenceable;
+    // The code should never reach there.
+    // Returns a dummy reference to a dummy variable just to make the
+    // compiler happy.
+    return Uninitialized<Number>::value;
   }
 
 
 
   template <int dim, typename Number>
-  inline Number &
+  DEAL_II_CONSTEXPR inline Number &
   symmetric_tensor_access(const TableIndices<4> &indices,
                           typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
@@ -1860,100 +1876,43 @@ namespace internal
           return data[0][0];
 
         case 2:
-          // each entry of the tensor can be
-          // thought of as an entry in a
-          // matrix that maps the rolled-out
-          // rank-2 tensors into rolled-out
-          // rank-2 tensors. this is the
-          // format in which we store rank-4
-          // tensors. determine which
-          // position the present entry is
+          // each entry of the tensor can be thought of as an entry in a
+          // matrix that maps the rolled-out rank-2 tensors into rolled-out
+          // rank-2 tensors. this is the format in which we store rank-4
+          // tensors. determine which position the present entry is
           // stored in
           {
-            unsigned int base_index[2];
-            if ((indices[0] == 0) && (indices[1] == 0))
-              base_index[0] = 0;
-            else if ((indices[0] == 1) && (indices[1] == 1))
-              base_index[0] = 1;
-            else
-              base_index[0] = 2;
-
-            if ((indices[2] == 0) && (indices[3] == 0))
-              base_index[1] = 0;
-            else if ((indices[2] == 1) && (indices[3] == 1))
-              base_index[1] = 1;
-            else
-              base_index[1] = 2;
-
-            return data[base_index[0]][base_index[1]];
+            constexpr std::size_t base_index[2][2] = {{0, 2}, {2, 1}};
+            return data[base_index[indices[0]][indices[1]]]
+                       [base_index[indices[2]][indices[3]]];
           }
-
         case 3:
-          // each entry of the tensor can be
-          // thought of as an entry in a
-          // matrix that maps the rolled-out
-          // rank-2 tensors into rolled-out
-          // rank-2 tensors. this is the
-          // format in which we store rank-4
-          // tensors. determine which
-          // position the present entry is
+          // each entry of the tensor can be thought of as an entry in a
+          // matrix that maps the rolled-out rank-2 tensors into rolled-out
+          // rank-2 tensors. this is the format in which we store rank-4
+          // tensors. determine which position the present entry is
           // stored in
           {
-            unsigned int base_index[2];
-            if ((indices[0] == 0) && (indices[1] == 0))
-              base_index[0] = 0;
-            else if ((indices[0] == 1) && (indices[1] == 1))
-              base_index[0] = 1;
-            else if ((indices[0] == 2) && (indices[1] == 2))
-              base_index[0] = 2;
-            else if (((indices[0] == 0) && (indices[1] == 1)) ||
-                     ((indices[0] == 1) && (indices[1] == 0)))
-              base_index[0] = 3;
-            else if (((indices[0] == 0) && (indices[1] == 2)) ||
-                     ((indices[0] == 2) && (indices[1] == 0)))
-              base_index[0] = 4;
-            else
-              {
-                Assert(((indices[0] == 1) && (indices[1] == 2)) ||
-                         ((indices[0] == 2) && (indices[1] == 1)),
-                       ExcInternalError());
-                base_index[0] = 5;
-              }
-
-            if ((indices[2] == 0) && (indices[3] == 0))
-              base_index[1] = 0;
-            else if ((indices[2] == 1) && (indices[3] == 1))
-              base_index[1] = 1;
-            else if ((indices[2] == 2) && (indices[3] == 2))
-              base_index[1] = 2;
-            else if (((indices[2] == 0) && (indices[3] == 1)) ||
-                     ((indices[2] == 1) && (indices[3] == 0)))
-              base_index[1] = 3;
-            else if (((indices[2] == 0) && (indices[3] == 2)) ||
-                     ((indices[2] == 2) && (indices[3] == 0)))
-              base_index[1] = 4;
-            else
-              {
-                Assert(((indices[2] == 1) && (indices[3] == 2)) ||
-                         ((indices[2] == 2) && (indices[3] == 1)),
-                       ExcInternalError());
-                base_index[1] = 5;
-              }
-
-            return data[base_index[0]][base_index[1]];
+            constexpr std::size_t base_index[3][3] = {{0, 3, 4},
+                                                      {3, 1, 5},
+                                                      {4, 5, 2}};
+            return data[base_index[indices[0]][indices[1]]]
+                       [base_index[indices[2]][indices[3]]];
           }
 
         default:
           Assert(false, ExcNotImplemented());
       }
 
-    static Number dummy;
-    return dummy;
+    // The code should never reach there.
+    // Returns a dummy reference to a dummy variable just to make the
+    // compiler happy.
+    return Uninitialized<Number>::value;
   }
 
 
   template <int dim, typename Number>
-  inline const Number &
+  DEAL_II_CONSTEXPR inline const Number &
   symmetric_tensor_access(const TableIndices<4> &indices,
                           const typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
@@ -1964,95 +1923,38 @@ namespace internal
           return data[0][0];
 
         case 2:
-          // each entry of the tensor can be
-          // thought of as an entry in a
-          // matrix that maps the rolled-out
-          // rank-2 tensors into rolled-out
-          // rank-2 tensors. this is the
-          // format in which we store rank-4
-          // tensors. determine which
-          // position the present entry is
+          // each entry of the tensor can be thought of as an entry in a
+          // matrix that maps the rolled-out rank-2 tensors into rolled-out
+          // rank-2 tensors. this is the format in which we store rank-4
+          // tensors. determine which position the present entry is
           // stored in
           {
-            unsigned int base_index[2];
-            if ((indices[0] == 0) && (indices[1] == 0))
-              base_index[0] = 0;
-            else if ((indices[0] == 1) && (indices[1] == 1))
-              base_index[0] = 1;
-            else
-              base_index[0] = 2;
-
-            if ((indices[2] == 0) && (indices[3] == 0))
-              base_index[1] = 0;
-            else if ((indices[2] == 1) && (indices[3] == 1))
-              base_index[1] = 1;
-            else
-              base_index[1] = 2;
-
-            return data[base_index[0]][base_index[1]];
+            constexpr std::size_t base_index[2][2] = {{0, 2}, {2, 1}};
+            return data[base_index[indices[0]][indices[1]]]
+                       [base_index[indices[2]][indices[3]]];
           }
-
         case 3:
-          // each entry of the tensor can be
-          // thought of as an entry in a
-          // matrix that maps the rolled-out
-          // rank-2 tensors into rolled-out
-          // rank-2 tensors. this is the
-          // format in which we store rank-4
-          // tensors. determine which
-          // position the present entry is
+          // each entry of the tensor can be thought of as an entry in a
+          // matrix that maps the rolled-out rank-2 tensors into rolled-out
+          // rank-2 tensors. this is the format in which we store rank-4
+          // tensors. determine which position the present entry is
           // stored in
           {
-            unsigned int base_index[2];
-            if ((indices[0] == 0) && (indices[1] == 0))
-              base_index[0] = 0;
-            else if ((indices[0] == 1) && (indices[1] == 1))
-              base_index[0] = 1;
-            else if ((indices[0] == 2) && (indices[1] == 2))
-              base_index[0] = 2;
-            else if (((indices[0] == 0) && (indices[1] == 1)) ||
-                     ((indices[0] == 1) && (indices[1] == 0)))
-              base_index[0] = 3;
-            else if (((indices[0] == 0) && (indices[1] == 2)) ||
-                     ((indices[0] == 2) && (indices[1] == 0)))
-              base_index[0] = 4;
-            else
-              {
-                Assert(((indices[0] == 1) && (indices[1] == 2)) ||
-                         ((indices[0] == 2) && (indices[1] == 1)),
-                       ExcInternalError());
-                base_index[0] = 5;
-              }
-
-            if ((indices[2] == 0) && (indices[3] == 0))
-              base_index[1] = 0;
-            else if ((indices[2] == 1) && (indices[3] == 1))
-              base_index[1] = 1;
-            else if ((indices[2] == 2) && (indices[3] == 2))
-              base_index[1] = 2;
-            else if (((indices[2] == 0) && (indices[3] == 1)) ||
-                     ((indices[2] == 1) && (indices[3] == 0)))
-              base_index[1] = 3;
-            else if (((indices[2] == 0) && (indices[3] == 2)) ||
-                     ((indices[2] == 2) && (indices[3] == 0)))
-              base_index[1] = 4;
-            else
-              {
-                Assert(((indices[2] == 1) && (indices[3] == 2)) ||
-                         ((indices[2] == 2) && (indices[3] == 1)),
-                       ExcInternalError());
-                base_index[1] = 5;
-              }
-
-            return data[base_index[0]][base_index[1]];
+            constexpr std::size_t base_index[3][3] = {{0, 3, 4},
+                                                      {3, 1, 5},
+                                                      {4, 5, 2}};
+            return data[base_index[indices[0]][indices[1]]]
+                       [base_index[indices[2]][indices[3]]];
           }
 
         default:
           Assert(false, ExcNotImplemented());
       }
 
-    static Number dummy;
-    return dummy;
+    // The code should never reach there.
+    // Returns a dummy reference to a dummy variable just to make the
+    // compiler happy.
+    return Uninitialized<Number>::value;
   }
 
 } // end of namespace internal
@@ -2060,7 +1962,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline Number &
+DEAL_II_CONSTEXPR inline Number &
 SymmetricTensor<rank_, dim, Number>::
 operator()(const TableIndices<rank_> &indices)
 {
@@ -2072,7 +1974,7 @@ operator()(const TableIndices<rank_> &indices)
 
 
 template <int rank_, int dim, typename Number>
-inline const Number &
+DEAL_II_CONSTEXPR inline const Number &
 SymmetricTensor<rank_, dim, Number>::
 operator()(const TableIndices<rank_> &indices) const
 {
@@ -2088,7 +1990,7 @@ namespace internal
   namespace SymmetricTensorImplementation
   {
     template <int rank_>
-    TableIndices<rank_>
+    constexpr TableIndices<rank_>
     get_partially_filled_indices(const unsigned int row,
                                  const std::integral_constant<int, 2> &)
     {
@@ -2097,7 +1999,7 @@ namespace internal
 
 
     template <int rank_>
-    TableIndices<rank_>
+    constexpr TableIndices<rank_>
     get_partially_filled_indices(const unsigned int row,
                                  const std::integral_constant<int, 4> &)
     {
@@ -2111,7 +2013,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-internal::SymmetricTensorAccessors::
+constexpr internal::SymmetricTensorAccessors::
   Accessor<rank_, dim, true, rank_ - 1, Number>
     SymmetricTensor<rank_, dim, Number>::
     operator[](const unsigned int row) const
@@ -2126,7 +2028,7 @@ internal::SymmetricTensorAccessors::
 
 
 template <int rank_, int dim, typename Number>
-internal::SymmetricTensorAccessors::
+DEAL_II_CONSTEXPR inline internal::SymmetricTensorAccessors::
   Accessor<rank_, dim, false, rank_ - 1, Number>
     SymmetricTensor<rank_, dim, Number>::operator[](const unsigned int row)
 {
@@ -2140,8 +2042,8 @@ internal::SymmetricTensorAccessors::
 
 
 template <int rank_, int dim, typename Number>
-inline const Number &SymmetricTensor<rank_, dim, Number>::
-                     operator[](const TableIndices<rank_> &indices) const
+constexpr const Number &SymmetricTensor<rank_, dim, Number>::
+                        operator[](const TableIndices<rank_> &indices) const
 {
   return operator()(indices);
 }
@@ -2149,8 +2051,8 @@ inline const Number &SymmetricTensor<rank_, dim, Number>::
 
 
 template <int rank_, int dim, typename Number>
-inline Number &SymmetricTensor<rank_, dim, Number>::
-               operator[](const TableIndices<rank_> &indices)
+DEAL_II_CONSTEXPR inline Number &SymmetricTensor<rank_, dim, Number>::
+                                 operator[](const TableIndices<rank_> &indices)
 {
   return operator()(indices);
 }
@@ -2158,7 +2060,7 @@ inline Number &SymmetricTensor<rank_, dim, Number>::
 
 
 template <int rank_, int dim, typename Number>
-inline Number *
+DEAL_II_CONSTEXPR inline Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw()
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2167,7 +2069,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw()
 
 
 template <int rank_, int dim, typename Number>
-inline const Number *
+constexpr const Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw() const
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2176,7 +2078,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw() const
 
 
 template <int rank_, int dim, typename Number>
-inline Number *
+DEAL_II_CONSTEXPR inline Number *
 SymmetricTensor<rank_, dim, Number>::end_raw()
 {
   return begin_raw() + n_independent_components;
@@ -2185,7 +2087,7 @@ SymmetricTensor<rank_, dim, Number>::end_raw()
 
 
 template <int rank_, int dim, typename Number>
-inline const Number *
+constexpr const Number *
 SymmetricTensor<rank_, dim, Number>::end_raw() const
 {
   return begin_raw() + n_independent_components;
@@ -2198,7 +2100,7 @@ namespace internal
   namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
-    unsigned int
+    constexpr unsigned int
     entry_to_indices(const dealii::SymmetricTensor<2, dim, Number> &,
                      const unsigned int index)
     {
@@ -2207,7 +2109,7 @@ namespace internal
 
 
     template <int dim, typename Number>
-    dealii::TableIndices<2>
+    constexpr dealii::TableIndices<2>
     entry_to_indices(const dealii::SymmetricTensor<4, dim, Number> &,
                      const unsigned int index)
     {
@@ -2221,7 +2123,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline const Number &
+DEAL_II_CONSTEXPR inline const Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(
   const unsigned int index) const
 {
@@ -2233,7 +2135,7 @@ SymmetricTensor<rank_, dim, Number>::access_raw_entry(
 
 
 template <int rank_, int dim, typename Number>
-inline Number &
+DEAL_II_CONSTEXPR inline Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(const unsigned int index)
 {
   AssertIndexRange(index, n_independent_components);
@@ -2246,7 +2148,7 @@ SymmetricTensor<rank_, dim, Number>::access_raw_entry(const unsigned int index)
 namespace internal
 {
   template <int dim, typename Number>
-  inline typename numbers::NumberTraits<Number>::real_type
+  DEAL_II_CONSTEXPR inline typename numbers::NumberTraits<Number>::real_type
   compute_norm(const typename SymmetricTensorAccessors::
                  StorageType<2, dim, Number>::base_tensor_type &data)
   {
@@ -2290,7 +2192,7 @@ namespace internal
 
 
   template <int dim, typename Number>
-  inline typename numbers::NumberTraits<Number>::real_type
+  DEAL_II_CONSTEXPR inline typename numbers::NumberTraits<Number>::real_type
   compute_norm(const typename SymmetricTensorAccessors::
                  StorageType<4, dim, Number>::base_tensor_type &data)
   {
@@ -2333,7 +2235,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline typename numbers::NumberTraits<Number>::real_type
+constexpr typename numbers::NumberTraits<Number>::real_type
 SymmetricTensor<rank_, dim, Number>::norm() const
 {
   return internal::compute_norm<dim, Number>(data);
@@ -2351,7 +2253,7 @@ namespace internal
     //
     // this function is for rank-2 tensors
     template <int dim>
-    inline unsigned int
+    DEAL_II_CONSTEXPR inline unsigned int
     component_to_unrolled_index(const TableIndices<2> &indices)
     {
       Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
@@ -2366,24 +2268,24 @@ namespace internal
 
           case 2:
             {
-              static const unsigned int table[2][2] = {{0, 2}, {2, 1}};
+              constexpr unsigned int table[2][2] = {{0, 2}, {2, 1}};
               return table[indices[0]][indices[1]];
             }
 
           case 3:
             {
-              static const unsigned int table[3][3] = {{0, 3, 4},
-                                                       {3, 1, 5},
-                                                       {4, 5, 2}};
+              constexpr unsigned int table[3][3] = {{0, 3, 4},
+                                                    {3, 1, 5},
+                                                    {4, 5, 2}};
               return table[indices[0]][indices[1]];
             }
 
           case 4:
             {
-              static const unsigned int table[4][4] = {{0, 4, 5, 6},
-                                                       {4, 1, 7, 8},
-                                                       {5, 7, 2, 9},
-                                                       {6, 8, 9, 3}};
+              constexpr unsigned int table[4][4] = {{0, 4, 5, 6},
+                                                    {4, 1, 7, 8},
+                                                    {5, 7, 2, 9},
+                                                    {6, 8, 9, 3}};
               return table[indices[0]][indices[1]];
             }
 
@@ -2415,7 +2317,7 @@ namespace internal
     // this function is for tensors of ranks not already handled
     // above
     template <int dim, int rank_>
-    inline unsigned int
+    DEAL_II_CONSTEXPR inline unsigned int
     component_to_unrolled_index(const TableIndices<rank_> &indices)
     {
       (void)indices;
@@ -2427,7 +2329,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline unsigned int
+constexpr unsigned int
 SymmetricTensor<rank_, dim, Number>::component_to_unrolled_index(
   const TableIndices<rank_> &indices)
 {
@@ -2449,7 +2351,7 @@ namespace internal
     //
     // this function is for rank-2 tensors
     template <int dim>
-    inline TableIndices<2>
+    DEAL_II_CONSTEXPR inline TableIndices<2>
     unrolled_to_component_indices(const unsigned int i,
                                   const std::integral_constant<int, 2> &)
     {
@@ -2509,7 +2411,7 @@ namespace internal
     // this function is for tensors of a rank not already handled
     // above
     template <int dim, int rank_>
-    inline TableIndices<rank_>
+    DEAL_II_CONSTEXPR inline TableIndices<rank_>
     unrolled_to_component_indices(const unsigned int i,
                                   const std::integral_constant<int, rank_> &)
     {
@@ -2529,7 +2431,7 @@ namespace internal
 } // namespace internal
 
 template <int rank_, int dim, typename Number>
-inline TableIndices<rank_>
+constexpr TableIndices<rank_>
 SymmetricTensor<rank_, dim, Number>::unrolled_to_component_indices(
   const unsigned int i)
 {
@@ -2566,9 +2468,10 @@ SymmetricTensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline SymmetricTensor<rank_,
-                       dim,
-                       typename ProductType<Number, OtherNumber>::type>
+DEAL_II_CONSTEXPR inline SymmetricTensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
 operator+(const SymmetricTensor<rank_, dim, Number> &     left,
           const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
@@ -2592,9 +2495,10 @@ operator+(const SymmetricTensor<rank_, dim, Number> &     left,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline SymmetricTensor<rank_,
-                       dim,
-                       typename ProductType<Number, OtherNumber>::type>
+DEAL_II_CONSTEXPR inline SymmetricTensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
 operator-(const SymmetricTensor<rank_, dim, Number> &     left,
           const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
@@ -2613,7 +2517,7 @@ operator-(const SymmetricTensor<rank_, dim, Number> &     left,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
+constexpr Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
 operator+(const SymmetricTensor<rank_, dim, Number> &left,
           const Tensor<rank_, dim, OtherNumber> &    right)
 {
@@ -2629,7 +2533,7 @@ operator+(const SymmetricTensor<rank_, dim, Number> &left,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
+constexpr Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
 operator+(const Tensor<rank_, dim, Number> &              left,
           const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
@@ -2645,7 +2549,7 @@ operator+(const Tensor<rank_, dim, Number> &              left,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
+constexpr Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
 operator-(const SymmetricTensor<rank_, dim, Number> &left,
           const Tensor<rank_, dim, OtherNumber> &    right)
 {
@@ -2661,7 +2565,7 @@ operator-(const SymmetricTensor<rank_, dim, Number> &left,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
+constexpr Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
 operator-(const Tensor<rank_, dim, Number> &              left,
           const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
@@ -2684,7 +2588,7 @@ operator-(const Tensor<rank_, dim, Number> &              left,
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline Number
+DEAL_II_CONSTEXPR inline Number
 determinant(const SymmetricTensor<2, dim, Number> &t)
 {
   switch (dim)
@@ -2722,7 +2626,7 @@ determinant(const SymmetricTensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline Number
+constexpr Number
 third_invariant(const SymmetricTensor<2, dim, Number> &t)
 {
   return determinant(t);
@@ -2738,8 +2642,8 @@ third_invariant(const SymmetricTensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-Number
-trace(const SymmetricTensor<2, dim, Number> &d)
+DEAL_II_CONSTEXPR Number
+                  trace(const SymmetricTensor<2, dim, Number> &d)
 {
   Number t = d.data[0];
   for (unsigned int i = 1; i < dim; ++i)
@@ -2758,7 +2662,7 @@ trace(const SymmetricTensor<2, dim, Number> &d)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline Number
+constexpr Number
 first_invariant(const SymmetricTensor<2, dim, Number> &t)
 {
   return trace(t);
@@ -2778,7 +2682,7 @@ first_invariant(const SymmetricTensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
-inline Number
+constexpr Number
 second_invariant(const SymmetricTensor<2, 1, Number> &)
 {
   return internal::NumberType<Number>::value(0.0);
@@ -2806,7 +2710,7 @@ second_invariant(const SymmetricTensor<2, 1, Number> &)
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
-inline Number
+constexpr Number
 second_invariant(const SymmetricTensor<2, 2, Number> &t)
 {
   return t[0][0] * t[1][1] - t[0][1] * t[0][1];
@@ -2824,7 +2728,7 @@ second_invariant(const SymmetricTensor<2, 2, Number> &t)
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
-inline Number
+constexpr Number
 second_invariant(const SymmetricTensor<2, 3, Number> &t)
 {
   return (t[0][0] * t[1][1] + t[1][1] * t[2][2] + t[2][2] * t[0][0] -
@@ -3243,7 +3147,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
  * @author Wolfgang Bangerth, 2005
  */
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number>
+constexpr SymmetricTensor<rank_, dim, Number>
 transpose(const SymmetricTensor<rank_, dim, Number> &t)
 {
   return t;
@@ -3261,7 +3165,7 @@ transpose(const SymmetricTensor<rank_, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<2, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim, Number>
 deviator(const SymmetricTensor<2, dim, Number> &t)
 {
   SymmetricTensor<2, dim, Number> tmp = t;
@@ -3284,7 +3188,7 @@ deviator(const SymmetricTensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<2, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim, Number>
 unit_symmetric_tensor()
 {
   // create a default constructed matrix filled with
@@ -3319,7 +3223,7 @@ unit_symmetric_tensor()
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
-inline SymmetricTensor<2, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim>
 unit_symmetric_tensor()
 {
   return unit_symmetric_tensor<dim, double>();
@@ -3342,7 +3246,7 @@ unit_symmetric_tensor()
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<4, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 deviator_tensor()
 {
   SymmetricTensor<4, dim, Number> tmp;
@@ -3383,7 +3287,7 @@ deviator_tensor()
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
-inline SymmetricTensor<4, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim>
 deviator_tensor()
 {
   return deviator_tensor<dim, double>();
@@ -3414,7 +3318,7 @@ deviator_tensor()
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<4, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 identity_tensor()
 {
   SymmetricTensor<4, dim, Number> tmp;
@@ -3461,7 +3365,7 @@ identity_tensor()
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
-inline SymmetricTensor<4, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim>
 identity_tensor()
 {
   return identity_tensor<dim, double>();
@@ -3480,7 +3384,7 @@ identity_tensor()
  * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
-inline SymmetricTensor<2, dim, Number>
+constexpr SymmetricTensor<2, dim, Number>
 invert(const SymmetricTensor<2, dim, Number> &t)
 {
   return internal::SymmetricTensorImplementation::Inverse<2, dim, Number>::
@@ -3501,7 +3405,7 @@ invert(const SymmetricTensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<4, dim, Number>
+constexpr SymmetricTensor<4, dim, Number>
 invert(const SymmetricTensor<4, dim, Number> &t)
 {
   return internal::SymmetricTensorImplementation::Inverse<4, dim, Number>::
@@ -3525,7 +3429,7 @@ invert(const SymmetricTensor<4, dim, Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<4, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 outer_product(const SymmetricTensor<2, dim, Number> &t1,
               const SymmetricTensor<2, dim, Number> &t2)
 {
@@ -3552,7 +3456,7 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-inline SymmetricTensor<2, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim, Number>
 symmetrize(const Tensor<2, dim, Number> &t)
 {
   Number array[(dim * dim + dim) / 2];
@@ -3574,7 +3478,7 @@ symmetrize(const Tensor<2, dim, Number> &t)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number>
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim, Number>
 operator*(const SymmetricTensor<rank_, dim, Number> &t, const Number &factor)
 {
   SymmetricTensor<rank_, dim, Number> tt = t;
@@ -3592,7 +3496,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t, const Number &factor)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number>
-inline SymmetricTensor<rank_, dim, Number>
+constexpr SymmetricTensor<rank_, dim, Number>
 operator*(const Number &factor, const SymmetricTensor<rank_, dim, Number> &t)
 {
   // simply forward to the other operator
@@ -3627,7 +3531,7 @@ operator*(const Number &factor, const SymmetricTensor<rank_, dim, Number> &t)
  * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline SymmetricTensor<
+DEAL_II_CONSTEXPR inline SymmetricTensor<
   rank_,
   dim,
   typename ProductType<Number,
@@ -3666,7 +3570,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
  * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline SymmetricTensor<
+DEAL_II_CONSTEXPR inline SymmetricTensor<
   rank_,
   dim,
   typename ProductType<OtherNumber,
@@ -3686,7 +3590,7 @@ operator*(const Number &                                  factor,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-inline SymmetricTensor<
+DEAL_II_CONSTEXPR inline SymmetricTensor<
   rank_,
   dim,
   typename ProductType<Number,
@@ -3709,7 +3613,7 @@ operator/(const SymmetricTensor<rank_, dim, Number> &t,
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
-inline SymmetricTensor<rank_, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim>
 operator*(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
   SymmetricTensor<rank_, dim> tt = t;
@@ -3726,7 +3630,7 @@ operator*(const SymmetricTensor<rank_, dim> &t, const double factor)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
-inline SymmetricTensor<rank_, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim>
 operator*(const double factor, const SymmetricTensor<rank_, dim> &t)
 {
   SymmetricTensor<rank_, dim> tt = t;
@@ -3742,7 +3646,7 @@ operator*(const double factor, const SymmetricTensor<rank_, dim> &t)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
-inline SymmetricTensor<rank_, dim>
+DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim>
 operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
   SymmetricTensor<rank_, dim> tt = t;
@@ -3760,7 +3664,7 @@ operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
-inline typename ProductType<Number, OtherNumber>::type
+constexpr typename ProductType<Number, OtherNumber>::type
 scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
                const SymmetricTensor<2, dim, OtherNumber> &t2)
 {
@@ -3778,7 +3682,7 @@ scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
  * @relatesalso Tensor @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
-inline typename ProductType<Number, OtherNumber>::type
+DEAL_II_CONSTEXPR inline typename ProductType<Number, OtherNumber>::type
 scalar_product(const SymmetricTensor<2, dim, Number> &t1,
                const Tensor<2, dim, OtherNumber> &    t2)
 {
@@ -3801,7 +3705,7 @@ scalar_product(const SymmetricTensor<2, dim, Number> &t1,
  * @relatesalso Tensor @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
-inline typename ProductType<Number, OtherNumber>::type
+constexpr typename ProductType<Number, OtherNumber>::type
 scalar_product(const Tensor<2, dim, Number> &              t1,
                const SymmetricTensor<2, dim, OtherNumber> &t2)
 {
@@ -3825,7 +3729,7 @@ scalar_product(const Tensor<2, dim, Number> &              t1,
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 1, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<4, 1, Number> &                                   t,
   const SymmetricTensor<2, 1, OtherNumber> &                              s)
@@ -3851,7 +3755,7 @@ inline void double_contract(
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 1, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<2, 1, Number> &                                   s,
   const SymmetricTensor<4, 1, OtherNumber> &                              t)
@@ -3876,7 +3780,7 @@ inline void double_contract(
  * @relatesalso SymmetricTensor @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 2, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<4, 2, Number> &                                   t,
   const SymmetricTensor<2, 2, OtherNumber> &                              s)
@@ -3907,7 +3811,7 @@ inline void double_contract(
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 2, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<2, 2, Number> &                                   s,
   const SymmetricTensor<4, 2, OtherNumber> &                              t)
@@ -3938,7 +3842,7 @@ inline void double_contract(
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 3, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<4, 3, Number> &                                   t,
   const SymmetricTensor<2, 3, OtherNumber> &                              s)
@@ -3970,7 +3874,7 @@ inline void double_contract(
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
-inline void double_contract(
+DEAL_II_CONSTEXPR inline void double_contract(
   SymmetricTensor<2, 3, typename ProductType<Number, OtherNumber>::type> &tmp,
   const SymmetricTensor<2, 3, Number> &                                   s,
   const SymmetricTensor<4, 3, OtherNumber> &                              t)
@@ -3994,9 +3898,10 @@ inline void double_contract(
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
-Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
-operator*(const SymmetricTensor<2, dim, Number> &src1,
-          const Tensor<1, dim, OtherNumber> &    src2)
+DEAL_II_CONSTEXPR
+  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
+  operator*(const SymmetricTensor<2, dim, Number> &src1,
+            const Tensor<1, dim, OtherNumber> &    src2)
 {
   Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> dest;
   for (unsigned int i = 0; i < dim; ++i)
@@ -4014,7 +3919,7 @@ operator*(const SymmetricTensor<2, dim, Number> &src1,
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
-Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
+constexpr Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
 operator*(const Tensor<1, dim, Number> &              src1,
           const SymmetricTensor<2, dim, OtherNumber> &src2)
 {
@@ -4049,15 +3954,14 @@ template <int rank_1,
           int dim,
           typename Number,
           typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
+constexpr DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
   operator*(const Tensor<rank_1, dim, Number> &              src1,
-            const SymmetricTensor<rank_2, dim, OtherNumber> &src2s)
+            const SymmetricTensor<rank_2, dim, OtherNumber> &src2)
 {
-  const Tensor<rank_2, dim, OtherNumber> src2(src2s);
-  return src1 * src2;
+  return src1 * Tensor<rank_2, dim, OtherNumber>(src2);
 }
 
 
@@ -4087,15 +3991,14 @@ template <int rank_1,
           int dim,
           typename Number,
           typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
+constexpr DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-  operator*(const SymmetricTensor<rank_1, dim, Number> &src1s,
+  operator*(const SymmetricTensor<rank_1, dim, Number> &src1,
             const Tensor<rank_2, dim, OtherNumber> &    src2)
 {
-  const Tensor<rank_2, dim, OtherNumber> src1(src1s);
-  return src1 * src2;
+  return Tensor<rank_2, dim, OtherNumber>(src1) * src2;
 }
 
 

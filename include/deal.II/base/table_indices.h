@@ -51,7 +51,7 @@ public:
   /**
    * Default constructor. This constructor sets all indices to zero.
    */
-  TableIndices();
+  constexpr TableIndices() = default;
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -61,7 +61,7 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from one.
    */
-  explicit TableIndices(const std::size_t index0);
+  constexpr explicit TableIndices(const std::size_t index0);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -71,7 +71,7 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from two.
    */
-  TableIndices(const std::size_t index0, const std::size_t index1);
+  constexpr TableIndices(const std::size_t index0, const std::size_t index1);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -81,9 +81,9 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from three.
    */
-  TableIndices(const std::size_t index0,
-               const std::size_t index1,
-               const std::size_t index2);
+  constexpr TableIndices(const std::size_t index0,
+                         const std::size_t index1,
+                         const std::size_t index2);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -93,10 +93,10 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from four.
    */
-  TableIndices(const std::size_t index0,
-               const std::size_t index1,
-               const std::size_t index2,
-               const std::size_t index3);
+  constexpr TableIndices(const std::size_t index0,
+                         const std::size_t index1,
+                         const std::size_t index2,
+                         const std::size_t index3);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -106,11 +106,11 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from five.
    */
-  TableIndices(const std::size_t index0,
-               const std::size_t index1,
-               const std::size_t index2,
-               const std::size_t index3,
-               const std::size_t index4);
+  constexpr TableIndices(const std::size_t index0,
+                         const std::size_t index1,
+                         const std::size_t index2,
+                         const std::size_t index3,
+                         const std::size_t index4);
 
   /**
    * Convenience constructor that takes up to 9 arguments. It can be used to
@@ -140,30 +140,30 @@ public:
   /**
    * Read-only access the value of the <tt>i</tt>th index.
    */
-  std::size_t operator[](const unsigned int i) const;
+  DEAL_II_CONSTEXPR std::size_t operator[](const unsigned int i) const;
 
   /**
    * Write access the value of the <tt>i</tt>th index.
    */
-  std::size_t &operator[](const unsigned int i);
+  DEAL_II_CONSTEXPR std::size_t &operator[](const unsigned int i);
 
   /**
    * Compare two index fields for equality.
    */
-  bool
+  constexpr bool
   operator==(const TableIndices<N> &other) const;
 
   /**
    * Compare two index fields for inequality.
    */
-  bool
+  constexpr bool
   operator!=(const TableIndices<N> &other) const;
 
   /**
    * Sort the indices in ascending order. While this operation is not very
    * useful for Table objects, it is used for the SymmetricTensor class.
    */
-  void
+  DEAL_II_CONSTEXPR void
   sort();
 
   /**
@@ -178,7 +178,7 @@ protected:
   /**
    * Store the indices in an array.
    */
-  std::size_t indices[N];
+  std::size_t indices[N]{};
 };
 
 
@@ -186,81 +186,63 @@ protected:
 /* --------------------- Template and inline functions ---------------- */
 
 
-template <int N>
-TableIndices<N>::TableIndices()
-{
-  for (unsigned int i = 0; i < N; ++i)
-    indices[i] = 0;
-}
-
-
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0)
+constexpr TableIndices<N>::TableIndices(const std::size_t index0)
+  : indices{index0}
 {
   static_assert(
     N == 1, "This constructor is only available for TableIndices<1> objects.");
-  indices[0] = index0;
 }
 
 
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1)
+constexpr TableIndices<N>::TableIndices(const std::size_t index0,
+                                        const std::size_t index1)
+  : indices{index0, index1}
 {
   static_assert(
     N == 2, "This constructor is only available for TableIndices<2> objects.");
-  indices[0] = index0;
-  indices[1] = index1;
 }
 
 
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1,
-                              const std::size_t index2)
+constexpr TableIndices<N>::TableIndices(const std::size_t index0,
+                                        const std::size_t index1,
+                                        const std::size_t index2)
+  : indices{index0, index1, index2}
 {
   static_assert(
     N == 3, "This constructor is only available for TableIndices<3> objects.");
-  indices[0] = index0;
-  indices[1] = index1;
-  indices[2] = index2;
 }
 
 
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1,
-                              const std::size_t index2,
-                              const std::size_t index3)
+constexpr TableIndices<N>::TableIndices(const std::size_t index0,
+                                        const std::size_t index1,
+                                        const std::size_t index2,
+                                        const std::size_t index3)
+  : indices{index0, index1, index2, index3}
 {
   static_assert(
     N == 4, "This constructor is only available for TableIndices<4> objects.");
-  indices[0] = index0;
-  indices[1] = index1;
-  indices[2] = index2;
-  indices[3] = index3;
 }
 
 
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1,
-                              const std::size_t index2,
-                              const std::size_t index3,
-                              const std::size_t index4)
+constexpr TableIndices<N>::TableIndices(const std::size_t index0,
+                                        const std::size_t index1,
+                                        const std::size_t index2,
+                                        const std::size_t index3,
+                                        const std::size_t index4)
+  : indices{index0, index1, index2, index3, index4}
 {
   static_assert(
     N == 5, "This constructor is only available for TableIndices<5> objects.");
-  indices[0] = index0;
-  indices[1] = index1;
-  indices[2] = index2;
-  indices[3] = index3;
-  indices[4] = index4;
 }
 
 
@@ -354,7 +336,8 @@ TableIndices<N>::TableIndices(const std::size_t index0,
 
 
 template <int N>
-inline std::size_t TableIndices<N>::operator[](const unsigned int i) const
+DEAL_II_CONSTEXPR inline std::size_t TableIndices<N>::
+                                     operator[](const unsigned int i) const
 {
   AssertIndexRange(i, N);
   return indices[i];
@@ -362,7 +345,8 @@ inline std::size_t TableIndices<N>::operator[](const unsigned int i) const
 
 
 template <int N>
-inline std::size_t &TableIndices<N>::operator[](const unsigned int i)
+DEAL_II_CONSTEXPR inline std::size_t &TableIndices<N>::
+                                      operator[](const unsigned int i)
 {
   AssertIndexRange(i, N);
   return indices[i];
@@ -370,18 +354,17 @@ inline std::size_t &TableIndices<N>::operator[](const unsigned int i)
 
 
 template <int N>
-inline bool
+constexpr bool
 TableIndices<N>::operator==(const TableIndices<N> &other) const
 {
-  for (unsigned int i = 0; i < N; ++i)
-    if (indices[i] != other.indices[i])
-      return false;
-  return true;
+  return std::equal(std::begin(indices),
+                    std::end(indices),
+                    std::begin(other.indices));
 }
 
 
 template <int N>
-inline bool
+constexpr bool
 TableIndices<N>::operator!=(const TableIndices<N> &other) const
 {
   return !(*this == other);
@@ -389,7 +372,7 @@ TableIndices<N>::operator!=(const TableIndices<N> &other) const
 
 
 template <int N>
-inline void
+DEAL_II_CONSTEXPR inline void
 TableIndices<N>::sort()
 {
   std::sort(std::begin(indices), std::end(indices));
