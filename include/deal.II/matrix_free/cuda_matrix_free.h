@@ -241,6 +241,23 @@ namespace CUDAWrappers
     set_constrained_values(const Number val, VectorType &dst) const;
 
     /**
+     * Initialize a serial vector. The size corresponds to the number of degrees
+     * of freedom in the DoFHandler object.
+     */
+    void
+    initialize_dof_vector(
+      LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const;
+
+    /**
+     * Initialize a distributed vector. The local elements correspond to the
+     * locally owned degrees of freedom and the ghost elements correspond to the
+     * (additional) locally relevant dofs.
+     */
+    void
+    initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
+
+    /**
      * Free all the memory allocated.
      */
     void
@@ -359,6 +376,11 @@ namespace CUDAWrappers
      * over cells.
      */
     ParallelizationScheme parallelization_scheme;
+
+    /**
+     * Total number of degrees of freedom.
+     */
+    types::global_dof_index n_dofs;
 
     /**
      * Degree of the finite element used.
