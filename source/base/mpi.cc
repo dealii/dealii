@@ -1724,6 +1724,10 @@ namespace Utilities
       Assert(owned_indices.size() == indices_to_look_up.size(),
              ExcMessage("IndexSets have to have the same sizes."));
 
+      Assert(
+        owned_indices.size() == Utilities::MPI::max(owned_indices.size(), comm),
+        ExcMessage("IndexSets have to have the same size on all processes."));
+
       std::vector<unsigned int> owning_ranks(indices_to_look_up.n_elements());
 
       // Step 1: setup dictionary
