@@ -114,7 +114,7 @@ namespace internal
 template <typename Number, int width>
 struct EnableIfScalar<VectorizedArray<Number, width>>
 {
-  using type = VectorizedArray<typename EnableIfScalar<Number>::type>;
+  using type = VectorizedArray<typename EnableIfScalar<Number>::type, width>;
 };
 
 
