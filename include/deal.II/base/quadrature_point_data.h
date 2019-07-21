@@ -46,7 +46,11 @@ DEAL_II_NAMESPACE_OPEN
  * The underlying structure and the initialize() method of this class are
  * designed in such a way that one could use different child classes derived
  * from the base DataType class to store data on a given cell. This implies the
- * usage of pointers, in our case -- std::shared_ptr().
+ * usage of pointers, in our case -- std::shared_ptr.
+ *
+ * The type @p DataType is arbitrary, but when using a class derived from
+ * TransferableQuadraturePointData one can use the facilities of
+ * parallel::distributed::ContinuousQuadratureDataTransfer.
  *
  * @note The data type stored on each cell can be different.
  * However, within the cell this class stores a vector of objects of a single
@@ -176,7 +180,11 @@ private:
  * The transfer of quadrature point data between parent and child cells requires
  * some kind of projection and/or interpolation.
  * One possible implementation is via the L2 projection and prolongation
- * matrices as implemented in ContinuousQuadratureDataTransfer class.
+ * matrices as implemented in
+ * parallel::distributed::ContinuousQuadratureDataTransfer class.
+ *
+ * To store and access instances of classes derived from this class, see the
+ * CellDataStorage class.
  *
  * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
@@ -281,16 +289,16 @@ namespace parallel
      *   // a function to pack scalars into a vector
      *   void pack_values(std::vector<double> &values) const
      *   {
-     *     Assert (scalars.size()==2, ExcInternalError());
-     *     scalars[0] = elasticity_parameter_lambda;
-     *     scalars[1] = elasticity_parameter_mu;
+     *     Assert (values.size()==2, ExcInternalError());
+     *     values[0] = elasticity_parameter_lambda;
+     *     values[1] = elasticity_parameter_mu;
      *   }
      *
      *   void unpack_values(const std::vector<double> &values)
      *   {
-     *     Assert (scalars.size() ==2, ExcInternalError());
-     *     elasticity_parameter_lambda = scalars[0];
-     *     elasticity_parameter_mu     = scalars[1];
+     *     Assert (values.size() ==2, ExcInternalError());
+     *     elasticity_parameter_lambda = values[0];
+     *     elasticity_parameter_mu     = values[1];
      *   }
      * };
      * @endcode
