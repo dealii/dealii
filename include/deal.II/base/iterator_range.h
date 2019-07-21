@@ -52,7 +52,7 @@ class IteratorOverIterators;
  * @code
  *   Triangulation<dim> triangulation;
  *   ...
- *   for (auto & cell : triangulation.active_cell_iterators())
+ *   for (auto &cell : triangulation.active_cell_iterators())
  *     cell->set_user_flag();
  * @endcode
  * In other words, the <code>cell</code> objects are iterators, and the range
