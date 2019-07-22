@@ -61,14 +61,18 @@ check()
         }
 
       deallog << "Add and dot is ";
-      if (std::abs(prod - prod_check) <
-          4. * std::numeric_limits<number>::epsilon() *
-            std::sqrt(static_cast<number>(size)) * size)
+      // check tolerance with respect to the expected size of result which is
+      // ~ size^2 including the roundoff error ~ sqrt(size) we expect
+      const number tolerance = 4. * std::numeric_limits<number>::epsilon() *
+                               std::sqrt(static_cast<number>(size)) * size *
+                               size;
+      if (std::abs(prod - prod_check) < tolerance)
         deallog << "correct" << std::endl;
       else
-        deallog << "wrong; should be " << prod / static_cast<number>(size)
-                << ", is " << prod_check / static_cast<number>(size)
-                << std::endl;
+        deallog << "wrong by " << std::abs(prod - prod_check)
+                << " with tolerance " << tolerance << "; should be "
+                << prod / static_cast<number>(size) << ", is "
+                << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 
