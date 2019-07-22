@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -117,6 +118,31 @@ public:
   MappingFEField(const DoFHandlerType &euler_dof_handler,
                  const VectorType &    euler_vector,
                  const ComponentMask & mask = ComponentMask());
+
+  /**
+   * Constructor taking vectors on the multigrid levels rather than the active
+   * cells only. The vector of vectors is expected to have as many entries as
+   * there are levels in the triangulation and provide valid data on each
+   * level, i.e., be of compatible length DoFHandler::n_dofs(level). Apart
+   * from the source of the vectors, the same arguments as in the other
+   * constructor need to be provided.
+   */
+  MappingFEField(const DoFHandlerType &         euler_dof_handler,
+                 const std::vector<VectorType> &euler_vector,
+                 const ComponentMask &          mask = ComponentMask());
+
+  /**
+   * Constructor taking vectors on the multigrid levels rather than the active
+   * cells only, variant with MGLevelObject instead of std::vector. The vector
+   * of vectors is expected to have as many entries as there are levels in the
+   * triangulation and provide valid data on each level, i.e., be of
+   * compatible length DoFHandler::n_dofs(level). Apart from the source of the
+   * vectors, the same arguments as in the other constructor need to be
+   * provided.
+   */
+  MappingFEField(const DoFHandlerType &           euler_dof_handler,
+                 const MGLevelObject<VectorType> &euler_vector,
+                 const ComponentMask &            mask = ComponentMask());
 
   /**
    * Copy constructor.
@@ -504,12 +530,18 @@ private:
    * @}
    */
 
+  /**
+   * Specifies whether we access unknowns on the active dofs (with a single
+   * Euler vector) or on the level dofs (via a vector of Euler vectors).
+   */
+  const bool uses_level_dofs;
 
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType,
-               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>>
+  std::vector<
+    SmartPointer<const VectorType,
+                 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>>>
     euler_vector;
 
   /**
