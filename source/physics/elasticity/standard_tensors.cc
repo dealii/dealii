@@ -20,32 +20,46 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
+
+template <int dim>
+DEAL_II_CONSTEXPR const SymmetricTensor<2, dim>
+                        Physics::Elasticity::StandardTensors<dim>::I
 #  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
-
-template <int dim>
-const SymmetricTensor<2, dim>
-  Physics::Elasticity::StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
-
-
-
-template <int dim>
-const SymmetricTensor<4, dim>
-  Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
+  = unit_symmetric_tensor<dim>()
+#  endif
+  ;
 
 
 
 template <int dim>
-const SymmetricTensor<4, dim> Physics::Elasticity::StandardTensors<dim>::IxI =
-  outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::S
+#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+  = identity_tensor<dim>()
+#  endif
+  ;
 
 
 
 template <int dim>
-const SymmetricTensor<4, dim>
-  Physics::Elasticity::StandardTensors<dim>::dev_P = deviator_tensor<dim>();
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::IxI
+#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+  = outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())
+#  endif
+  ;
 
-#  endif // DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
-#endif   // DOXYGEN
+
+
+template <int dim>
+DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
+                        Physics::Elasticity::StandardTensors<dim>::dev_P
+#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+  = deviator_tensor<dim>()
+#  endif
+  ;
+
+#endif // DOXYGEN
 
 // explicit instantiations
 #include "standard_tensors.inst"
