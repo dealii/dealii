@@ -920,46 +920,55 @@ namespace LinearAlgebra
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      // Move the data to the host and then move it back to the
-      // device. We use values to store the elements because the function
-      // uses a view of the array and thus we need the data on the host to
-      // outlive the scope of the function.
-      Number *new_val;
-      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
-                                        64,
-                                        sizeof(Number) * allocated_size);
+      if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
+        {
+          // Move the data to the host and then move it back to the
+          // device. We use values to store the elements because the function
+          // uses a view of the array and thus we need the data on the host to
+          // outlive the scope of the function.
+          Number *new_val;
+          Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
+                                            64,
+                                            sizeof(Number) * allocated_size);
 
-      data.values.reset(new_val);
+          data.values.reset(new_val);
 
-      cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
-                                               data.values_dev.get(),
-                                               allocated_size * sizeof(Number),
-                                               cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
+          cudaError_t cuda_error_code =
+            cudaMemcpy(data.values.get(),
+                       data.values_dev.get(),
+                       allocated_size * sizeof(Number),
+                       cudaMemcpyDeviceToHost);
+          AssertCuda(cuda_error_code);
+        }
 #  endif
 
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-      partitioner->import_from_ghosted_array_start(
-        operation,
-        counter,
-        ArrayView<Number, MemorySpace::Host>(data.values.get() +
-                                               partitioner->local_size(),
-                                             partitioner->n_ghost_indices()),
-        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
-                                             partitioner->n_import_indices()),
-        compress_requests);
-#  else
-      partitioner->import_from_ghosted_array_start(
-        operation,
-        counter,
-        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
-                                               partitioner->local_size(),
-                                             partitioner->n_ghost_indices()),
-        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
-                                             partitioner->n_import_indices()),
-        compress_requests);
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+      if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
+        {
+          partitioner->import_from_ghosted_array_start(
+            operation,
+            counter,
+            ArrayView<Number, MemorySpace::CUDA>(
+              data.values_dev.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::CUDA>(
+              import_data.values_dev.get(), partitioner->n_import_indices()),
+            compress_requests);
+        }
+      else
 #  endif
+        {
+          partitioner->import_from_ghosted_array_start(
+            operation,
+            counter,
+            ArrayView<Number, MemorySpace::Host>(
+              data.values.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              import_data.values.get(), partitioner->n_import_indices()),
+            compress_requests);
+        }
 #endif
     }
 
@@ -979,36 +988,43 @@ namespace LinearAlgebra
 
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-      Assert(partitioner->n_import_indices() == 0 ||
-               import_data.values != nullptr,
-             ExcNotInitialized());
-      partitioner->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
-        operation,
-        ArrayView<const Number, MemorySpace::Host>(
-          import_data.values.get(), partitioner->n_import_indices()),
-        ArrayView<Number, MemorySpace::Host>(data.values.get(),
-                                             partitioner->local_size()),
-        ArrayView<Number, MemorySpace::Host>(data.values.get() +
-                                               partitioner->local_size(),
-                                             partitioner->n_ghost_indices()),
-        compress_requests);
-#  else
-      Assert(partitioner->n_import_indices() == 0 ||
-               import_data.values_dev != nullptr,
-             ExcNotInitialized());
-      partitioner->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
-        operation,
-        ArrayView<const Number, MemorySpace::CUDA>(
-          import_data.values_dev.get(), partitioner->n_import_indices()),
-        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get(),
-                                             partitioner->local_size()),
-        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
-                                               partitioner->local_size(),
-                                             partitioner->n_ghost_indices()),
-        compress_requests);
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+        {
+          Assert(partitioner->n_import_indices() == 0 ||
+                   import_data.values_dev != nullptr,
+                 ExcNotInitialized());
+          partitioner
+            ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
+              operation,
+              ArrayView<const Number, MemorySpace::CUDA>(
+                import_data.values_dev.get(), partitioner->n_import_indices()),
+              ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get(),
+                                                   partitioner->local_size()),
+              ArrayView<Number, MemorySpace::CUDA>(
+                data.values_dev.get() + partitioner->local_size(),
+                partitioner->n_ghost_indices()),
+              compress_requests);
+        }
+      else
 #  endif
+        {
+          Assert(partitioner->n_import_indices() == 0 ||
+                   import_data.values != nullptr,
+                 ExcNotInitialized());
+          partitioner
+            ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
+              operation,
+              ArrayView<const Number, MemorySpace::Host>(
+                import_data.values.get(), partitioner->n_import_indices()),
+              ArrayView<Number, MemorySpace::Host>(data.values.get(),
+                                                   partitioner->local_size()),
+              ArrayView<Number, MemorySpace::Host>(
+                data.values.get() + partitioner->local_size(),
+                partitioner->n_ghost_indices()),
+              compress_requests);
+        }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
