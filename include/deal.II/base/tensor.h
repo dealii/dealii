@@ -362,9 +362,7 @@ private:
   unroll_recursion(Vector<OtherNumber> &result,
                    unsigned int &       start_index) const;
 
-  /**
-   * Allow an arbitrary Tensor to access the underlying values.
-   */
+  // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
   friend class Tensor;
 };
@@ -732,16 +730,12 @@ private:
   constexpr DEAL_II_CUDA_HOST_DEV
   Tensor(const ArrayLike &initializer, std_cxx14::index_sequence<Indices...>);
 
-  /**
-   * Allow an arbitrary Tensor to access the underlying values.
-   */
+  // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
   friend class Tensor;
 
-  /**
-   * Point is allowed access to the coordinates. This is supposed to improve
-   * speed.
-   */
+  // Point is allowed access to the coordinates. This is supposed to improve
+  // speed.
   friend class Point<dim, Number>;
 };
 
