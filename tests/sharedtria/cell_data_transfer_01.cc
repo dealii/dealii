@@ -61,7 +61,7 @@ test()
 
   // ----- gather -----
   // store parent id of all locally owned cells
-  Vector<unsigned int> cell_ids_pre(tria.n_active_cells());
+  Vector<PetscScalar> cell_ids_pre(tria.n_active_cells());
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       {
@@ -88,8 +88,8 @@ test()
   // output initial situation
   for (const auto &cell : tria.active_cell_iterators())
     {
-      deallog << "cellid=" << cell->id()
-              << " parentid=" << cell_ids_pre(cell->active_cell_index());
+      deallog << "cellid=" << cell->id() << " parentid="
+              << std::real(cell_ids_pre(cell->active_cell_index()));
       if (cell->coarsen_flag_set())
         deallog << " coarsening";
       else if (cell->refine_flag_set())
@@ -98,22 +98,20 @@ test()
     }
 
   // ----- transfer -----
-  CellDataTransfer<dim, spacedim, Vector<unsigned int>> cell_data_transfer(
-    tria);
+  CellDataTransfer<dim, spacedim, Vector<PetscScalar>> cell_data_transfer(tria);
 
   cell_data_transfer.prepare_for_coarsening_and_refinement();
   tria.execute_coarsening_and_refinement();
   deallog << "cells after: " << tria.n_global_active_cells() << std::endl;
 
-  Vector<unsigned int> cell_ids_post(tria.n_active_cells());
+  Vector<PetscScalar> cell_ids_post(tria.n_active_cells());
   cell_data_transfer.unpack(cell_ids_pre, cell_ids_post);
 
   // ------ verify ------
   // check if all children adopted the correct id
   for (auto &cell : tria.active_cell_iterators())
-    deallog << "cellid=" << cell->id()
-            << " parentid=" << cell_ids_post(cell->active_cell_index())
-            << std::endl;
+    deallog << "cellid=" << cell->id() << " parentid="
+            << std::real(cell_ids_post(cell->active_cell_index())) << std::endl;
 
   deallog << "OK" << std::endl;
 }
