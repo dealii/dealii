@@ -527,7 +527,8 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   MatrixFree<dim, Number>::MatrixFree()
-    : constrained_dofs(nullptr)
+    : n_dofs(0)
+    , constrained_dofs(nullptr)
     , padding_length(0)
   {}
 
@@ -699,6 +700,29 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
+  void
+  MatrixFree<dim, Number>::initialize_dof_vector(
+    LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const
+  {
+    vec.reinit(n_dofs);
+  }
+
+
+
+  template <int dim, typename Number>
+  void
+  MatrixFree<dim, Number>::initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const
+  {
+    if (partitioner)
+      vec.reinit(partitioner);
+    else
+      vec.reinit(n_dofs);
+  }
+
+
+
+  template <int dim, typename Number>
   unsigned int
   MatrixFree<dim, Number>::get_padding_length() const
   {
@@ -782,6 +806,8 @@ namespace CUDAWrappers
 
     // TODO: only free if we actually need arrays of different length
     free();
+
+    n_dofs = dof_handler.n_dofs();
 
     const FiniteElement<dim> &fe = dof_handler.get_fe();
 
