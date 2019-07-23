@@ -22,6 +22,11 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
       namespace distributed
       \{
         template class Vector<SCALAR, ::dealii::MemorySpace::Host>;
+        template void
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::import<
+          ::dealii::MemorySpace::Host>(
+          const Vector<SCALAR, ::dealii::MemorySpace::Host> &,
+          VectorOperation::values);
       \}
     \}
   }

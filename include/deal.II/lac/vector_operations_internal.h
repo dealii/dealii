@@ -26,6 +26,7 @@
 
 #include <deal.II/lac/cuda_kernels.h>
 #include <deal.II/lac/cuda_kernels.templates.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <cstdio>
 #include <cstring>
@@ -1657,6 +1658,18 @@ namespace internal
       {
         return Number();
       }
+
+      template <typename MemorySpace2>
+      static void
+      import(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
+        /*thread_loop_partitioner*/,
+        const size_type /*size*/,
+        VectorOperation::values /*operation*/,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          & /*v_data*/,
+        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      {}
     };
 
 
@@ -2002,6 +2015,66 @@ namespace internal
 
         return sum;
       }
+
+      template <typename MemorySpace2>
+      static void
+      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &                     thread_loop_partitioner,
+             const size_type         size,
+             VectorOperation::values operation,
+             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+               &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data,
+             typename std::enable_if<
+               std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
+               int>::type = 0)
+      {
+        if (operation == VectorOperation::insert)
+          {
+            copy(thread_loop_partitioner, size, v_data, data);
+          }
+        else if (operation == VectorOperation::add)
+          {
+            add_vector(thread_loop_partitioner, size, v_data, data);
+          }
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+          }
+      }
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+      template <typename MemorySpace2>
+      static void
+      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               & /*thread_loop_partitioner*/,
+             const size_type         size,
+             VectorOperation::values operation,
+             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+               &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::Host>
+               &data,
+             typename std::enable_if<
+               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+               int>::type = 0)
+      {
+        if (operation == VectorOperation::insert)
+          {
+            cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
+                                                     v_data.values_dev.get(),
+                                                     size * sizeof(Number),
+                                                     cudaMemcpyDeviceToHost);
+            AssertCuda(cuda_error_code);
+          }
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+          }
+      }
+#endif
     };
 
 
@@ -2541,6 +2614,64 @@ namespace internal
         error_code = cudaFree(res_d);
 
         return res;
+      }
+
+      template <typename MemorySpace2>
+      static void
+      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               &                     thread_loop_partitioner,
+             const size_type         size,
+             VectorOperation::values operation,
+             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+               &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data,
+             typename std::enable_if<
+               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+               int>::type = 0)
+      {
+        if (operation == VectorOperation::insert)
+          {
+            copy(thread_loop_partitioner, size, v_data, data);
+          }
+        else if (operation == VectorOperation::add)
+          {
+            add_vector(thread_loop_partitioner, size, v_data, data);
+          }
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+          }
+      }
+
+      template <typename MemorySpace2>
+      static void
+      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+               & /*thread_loop_partitioner*/,
+             const size_type         size,
+             VectorOperation::values operation,
+             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+               &v_data,
+             ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                    ::dealii::MemorySpace::CUDA>
+               &data,
+             typename std::enable_if<
+               std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
+               int>::type = 0)
+      {
+        if (operation == VectorOperation::insert)
+          {
+            cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
+                                                     v_data.values.get(),
+                                                     size * sizeof(Number),
+                                                     cudaMemcpyHostToDevice);
+            AssertCuda(cuda_error_code);
+          }
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+          }
       }
     };
 #endif
