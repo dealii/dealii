@@ -383,10 +383,8 @@ namespace internal
       tensor_type &            tensor;
       const TableIndices<rank> previous_indices;
 
-      // declare some other classes
-      // as friends. make sure to
-      // work around bugs in some
-      // compilers
+      // Declare some other classes as friends. Make sure to work around bugs
+      // in some compilers:
       template <int, int, typename>
       friend class dealii::SymmetricTensor;
       template <int, int, bool, int, typename>
@@ -468,10 +466,8 @@ namespace internal
       tensor_type &            tensor;
       const TableIndices<rank> previous_indices;
 
-      // declare some other classes
-      // as friends. make sure to
-      // work around bugs in some
-      // compilers
+      // Declare some other classes as friends. Make sure to work around bugs
+      // in some compilers:
       template <int, int, typename>
       friend class dealii::SymmetricTensor;
       template <int, int, bool, int, typename>
@@ -896,15 +892,11 @@ private:
    */
   base_tensor_type data;
 
-  /**
-   * Make all other symmetric tensors friends.
-   */
+  // Make all other symmetric tensors friends.
   template <int, int, typename>
   friend class SymmetricTensor;
 
-  /**
-   * Make a few more functions friends.
-   */
+  // Make a few more functions friends.
   template <int dim2, typename Number2>
   friend DEAL_II_CONSTEXPR Number2
                            trace(const SymmetricTensor<2, dim2, Number2> &d);
@@ -930,9 +922,7 @@ private:
                            identity_tensor();
 
 
-  /**
-   * Make a few helper classes friends as well.
-   */
+  // Make a few helper classes friends as well.
   friend struct internal::SymmetricTensorImplementation::
     Inverse<2, dim, Number>;
 
