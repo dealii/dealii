@@ -3468,10 +3468,8 @@ private:
    */
   dealii::internal::FEValuesViews::Cache<dim, spacedim> fe_values_views_cache;
 
-  /**
-   * Make the view classes friends of this class, since they access internal
-   * data.
-   */
+  // Make the view classes friends of this class, since they access internal
+  // data.
   template <int, int>
   friend class FEValuesViews::Scalar;
   template <int, int>

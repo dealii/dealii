@@ -323,14 +323,12 @@ private:
    */
   Table<2, double> boundary_weights;
 
-  /*
+  /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
 
-  /**
-   * Allow access from other dimensions.
-   */
+  // Allow access from other dimensions.
   template <int dim1>
   friend class FE_Nedelec;
 };

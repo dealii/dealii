@@ -365,10 +365,8 @@ namespace internal
       normalize_active_fe_indices();
 
 
-      /**
-       * Make hp::DoFHandler and its auxiliary class a friend since it is the
-       * class that needs to create these data structures.
-       */
+      // Make hp::DoFHandler and its auxiliary class a friend since it is the
+      // class that needs to create these data structures.
       template <int, int>
       friend class dealii::hp::DoFHandler;
       friend struct dealii::internal::hp::DoFHandlerImplementation::

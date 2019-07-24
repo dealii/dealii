@@ -411,9 +411,7 @@ namespace LinearAlgebra
 
     friend class boost::serialization::access;
 
-    /**
-     * Make all other ReadWriteVector types friends.
-     */
+    // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class Vector;
   };

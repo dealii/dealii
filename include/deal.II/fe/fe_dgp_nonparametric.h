@@ -579,9 +579,7 @@ private:
    */
   const PolynomialSpace<dim> polynomial_space;
 
-  /**
-   * Allow access from other dimensions.
-   */
+  // Allow access from other dimensions.
   template <int, int>
   friend class FE_DGPNonparametric;
 };

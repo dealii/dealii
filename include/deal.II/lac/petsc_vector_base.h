@@ -198,10 +198,8 @@ namespace PETScWrappers
        */
       const size_type index;
 
-      /**
-       * Make the vector class a friend, so that it can create objects of the
-       * present type.
-       */
+      // Make the vector class a friend, so that it can create objects of the
+      // present type.
       friend class ::dealii::PETScWrappers::VectorBase;
     };
   } // namespace internal
@@ -791,9 +789,7 @@ namespace PETScWrappers
      */
     mutable VectorOperation::values last_action;
 
-    /**
-     * Make the reference class a friend.
-     */
+    // Make the reference class a friend.
     friend class internal::VectorReference;
 
     /**

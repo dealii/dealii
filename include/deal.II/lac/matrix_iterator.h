@@ -118,9 +118,7 @@ private:
    */
   ACCESSOR accessor;
 
-  /**
-   * Allow other iterators access to private data.
-   */
+  // Allow other iterators access to private data.
   template <class OtherAccessor>
   friend class MatrixIterator;
 };

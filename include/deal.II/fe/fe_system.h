@@ -1226,7 +1226,7 @@ private:
       base_fe_output_objects;
   };
 
-  /*
+  /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;

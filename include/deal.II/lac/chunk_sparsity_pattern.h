@@ -155,9 +155,7 @@ namespace ChunkSparsityPatternIterators
     void
     advance();
 
-    /**
-     * Grant access to iterator class.
-     */
+    // Grant access to iterator class.
     friend class Iterator;
   };
 
@@ -852,15 +850,11 @@ private:
    */
   SparsityPattern sparsity_pattern;
 
-  /**
-   * Make all the chunk sparse matrix kinds friends.
-   */
+  // Make all the chunk sparse matrix kinds friends.
   template <typename>
   friend class ChunkSparseMatrix;
 
-  /**
-   * Make the accessor class a friend.
-   */
+  // Make the accessor class a friend.
   friend class ChunkSparsityPatternIterators::Accessor;
 };
 

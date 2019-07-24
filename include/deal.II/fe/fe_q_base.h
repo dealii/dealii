@@ -330,18 +330,16 @@ protected:
    */
   struct Implementation;
 
-  /*
-   * Declare implementation friend.
-   */
+  // Declare implementation friend.
   friend struct FE_Q_Base<PolynomialType, dim, spacedim>::Implementation;
 
 private:
-  /*
+  /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
   mutable Threads::Mutex mutex;
 
-  /*
+  /**
    * The highest polynomial degree of the underlying tensor product space
    * without any enrichment. For FE_Q*(p) this is p. Note that enrichments
    * may lead to a difference to degree.

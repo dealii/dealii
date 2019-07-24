@@ -674,9 +674,7 @@ protected:
    */
   TableIndices<N> table_size;
 
-  /**
-   * Make all other table classes friends.
-   */
+  // Make all other table classes friends.
   template <int, typename>
   friend class TableBase;
 };
@@ -955,14 +953,10 @@ namespace MatrixTableIterators
     void
     assert_valid_linear_index() const;
 
-    /**
-     * Make the const version a friend for copying.
-     */
+    // Make the const version a friend for copying.
     friend class AccessorBase<TableType, true, storage_order>;
 
-    /**
-     * Make the underlying iterator class a friend.
-     */
+    // Make the underlying iterator class a friend.
     friend class LinearIndexIterator<
       Iterator<TableType, Constness, storage_order>,
       Accessor<TableType, Constness, storage_order>>;
@@ -1352,19 +1346,15 @@ protected:
   typename AlignedVector<T>::const_reference
   el(const size_type i, const size_type j) const;
 
-  /**
-   * Make the AccessorBase class a friend so that it may directly index into
-   * the array.
-   */
+  // Make the AccessorBase class a friend so that it may directly index into
+  // the array.
   friend class MatrixTableIterators::
     AccessorBase<Table<2, T>, true, MatrixTableIterators::Storage::row_major>;
   friend class MatrixTableIterators::
     AccessorBase<Table<2, T>, false, MatrixTableIterators::Storage::row_major>;
 
-  /**
-   * Make the mutable accessor class a friend so that we can write to array
-   * entries with iterators.
-   */
+  // Make the mutable accessor class a friend so that we can write to array
+  // entries with iterators.
   friend class MatrixTableIterators::
     Accessor<Table<2, T>, false, MatrixTableIterators::Storage::row_major>;
 };
@@ -2084,10 +2074,8 @@ protected:
   const_reference
   el(const size_type i, const size_type j) const;
 
-  /**
-   * Make the AccessorBase class a friend so that it may directly index into
-   * the array.
-   */
+  // Make the AccessorBase class a friend so that it may directly index into
+  // the array.
   friend class MatrixTableIterators::AccessorBase<
     TransposeTable<T>,
     true,
@@ -2097,10 +2085,8 @@ protected:
     false,
     MatrixTableIterators::Storage::column_major>;
 
-  /**
-   * Make the mutable accessor class a friend so that we can write to array
-   * entries with iterators.
-   */
+  // Make the mutable accessor class a friend so that we can write to array
+  // entries with iterators.
   friend class MatrixTableIterators::Accessor<
     TransposeTable<T>,
     false,

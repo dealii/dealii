@@ -1385,15 +1385,11 @@ namespace LinearAlgebra
       void
       resize_val(const size_type new_allocated_size);
 
-      /*
-       * Make all other vector types friends.
-       */
+      // Make all other vector types friends.
       template <typename Number2, typename MemorySpace2>
       friend class Vector;
 
-      /**
-       * Make BlockVector type friends.
-       */
+      // Make BlockVector type friends.
       template <typename Number2>
       friend class BlockVector;
     };

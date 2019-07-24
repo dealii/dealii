@@ -197,9 +197,7 @@ private:
    */
   Table<3, double> interior_weights;
 
-  /**
-   * Allow access from other dimensions.
-   */
+  // Allow access from other dimensions.
   template <int dim1>
   friend class FE_RaviartThomas;
 };

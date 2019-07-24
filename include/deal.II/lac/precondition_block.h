@@ -458,9 +458,7 @@ public:
        */
       typename FullMatrix<inverse_type>::const_iterator b_end;
 
-      /**
-       * Make enclosing class a friend.
-       */
+      // Make enclosing class a friend.
       friend class const_iterator;
     };
 

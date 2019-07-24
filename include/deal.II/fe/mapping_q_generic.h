@@ -732,17 +732,13 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     std::vector<Point<spacedim>> &                              a) const;
 
-  /**
-   * Make MappingQ a friend since it needs to call the fill_fe_values()
-   * functions on its MappingQGeneric(1) sub-object.
-   */
+  // Make MappingQ a friend since it needs to call the fill_fe_values()
+  // functions on its MappingQGeneric(1) sub-object.
   template <int, int>
   friend class MappingQ;
 
-  /**
-   * Make MappingQCache a friend since it needs to call the
-   * compute_mapping_support_points() function.
-   */
+  // Make MappingQCache a friend since it needs to call the
+  // compute_mapping_support_points() function.
   template <int, int>
   friend class MappingQCache;
 };

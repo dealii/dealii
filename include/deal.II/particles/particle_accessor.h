@@ -214,10 +214,8 @@ namespace Particles
     typename std::multimap<internal::LevelInd,
                            Particle<dim, spacedim>>::iterator particle;
 
-    /**
-     * Make ParticleIterator a friend to allow it constructing
-     * ParticleAccessors.
-     */
+    // Make ParticleIterator a friend to allow it constructing
+    // ParticleAccessors.
     template <int, int>
     friend class ParticleIterator;
     template <int, int>

@@ -1233,10 +1233,8 @@ public:
    */
 
 
-  /**
-   * Give class @p FEValues access to the private <tt>get_...data</tt> and
-   * <tt>fill_fe_...values</tt> functions.
-   */
+  // Give class @p FEValues access to the private <tt>get_...data</tt> and
+  // <tt>fill_fe_...values</tt> functions.
   friend class FEValuesBase<dim, spacedim>;
   friend class FEValues<dim, spacedim>;
   friend class FEFaceValues<dim, spacedim>;

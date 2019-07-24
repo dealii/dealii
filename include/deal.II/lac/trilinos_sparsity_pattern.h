@@ -158,9 +158,7 @@ namespace TrilinosWrappers
       void
       visit_present_row();
 
-      /**
-       * Make enclosing class a friend.
-       */
+      // Make enclosing class a friend.
       friend class Iterator;
     };
 

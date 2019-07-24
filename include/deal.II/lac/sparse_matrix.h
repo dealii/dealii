@@ -173,9 +173,7 @@ namespace SparseMatrixIterators
      */
     using SparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -308,9 +306,7 @@ namespace SparseMatrixIterators
      */
     using SparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -1733,24 +1729,18 @@ private:
   template <typename>
   friend class SparseILU;
 
-  /**
-   * To allow it calling private prepare_add() and prepare_set().
-   */
+  // To allow it calling private prepare_add() and prepare_set().
   template <typename>
   friend class BlockMatrixBase;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   template <typename, bool>
   friend class SparseMatrixIterators::Iterator;
   template <typename, bool>
   friend class SparseMatrixIterators::Accessor;
 
 #  ifdef DEAL_II_WITH_MPI
-  /**
-   * Give access to internal datastructures to perform MPI operations.
-   */
+  // Give access to internal datastructures to perform MPI operations.
   template <typename Number>
   friend void
   Utilities::MPI::sum(const SparseMatrix<Number> &,

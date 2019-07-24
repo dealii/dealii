@@ -398,10 +398,7 @@ namespace internal
       void
       move_backward();
 
-
-      /**
-       * Mark all other instances of this template as friends.
-       */
+      // Mark all other instances of this template as friends.
       template <typename, bool>
       friend class Iterator;
     };
@@ -971,9 +968,7 @@ protected:
    */
   BlockIndices block_indices;
 
-  /**
-   * Make the iterator class a friend.
-   */
+  // Make the iterator class a friend.
   template <typename N, bool C>
   friend class dealii::internal::BlockVectorIterators::Iterator;
 

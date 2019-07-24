@@ -377,10 +377,8 @@ private:
    */
   std::vector<std::vector<size_type>> block_column_indices;
 
-  /**
-   * Make the block sparse matrix a friend, so that it can use our
-   * #row_indices and #column_indices objects.
-   */
+  // Make the block sparse matrix a friend, so that it can use our
+  // #row_indices and #column_indices objects.
   template <typename number>
   friend class BlockSparseMatrix;
 };

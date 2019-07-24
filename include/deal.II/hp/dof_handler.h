@@ -1355,9 +1355,7 @@ namespace hp
      */
     std::vector<boost::signals2::connection> tria_listeners;
 
-    /**
-     * Make accessor objects friends.
-     */
+    // Make accessor objects friends.
     template <int, class, bool>
     friend class dealii::DoFAccessor;
     template <class, bool>
@@ -1366,10 +1364,8 @@ namespace hp
     friend struct dealii::internal::DoFCellAccessorImplementation::
       Implementation;
 
-    /**
-     * Likewise for DoFLevel objects since they need to access the vertex dofs
-     * in the functions that set and retrieve vertex dof indices.
-     */
+    // Likewise for DoFLevel objects since they need to access the vertex dofs
+    // in the functions that set and retrieve vertex dof indices.
     template <int>
     friend class dealii::internal::hp::DoFIndicesOnFacesOrEdges;
     friend struct dealii::internal::hp::DoFHandlerImplementation::
