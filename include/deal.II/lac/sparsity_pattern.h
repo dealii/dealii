@@ -243,14 +243,10 @@ namespace SparsityPatternIterators
     void
     advance();
 
-    /**
-     * Grant access to iterator class.
-     */
+    // Grant access to iterator class.
     friend class LinearIndexIterator<Iterator, Accessor>;
 
-    /**
-     * Grant access to accessor class of ChunkSparsityPattern.
-     */
+    // Grant access to accessor class of ChunkSparsityPattern.
     friend class ChunkSparsityPatternIterators::Accessor;
   };
 
@@ -803,9 +799,7 @@ protected:
    */
   bool compressed;
 
-  /**
-   * Make all sparse matrices friends of this class.
-   */
+  // Make all sparse matrices friends of this class.
   template <typename number>
   friend class SparseMatrix;
   template <typename number>
@@ -818,9 +812,7 @@ protected:
   friend class ChunkSparsityPattern;
   friend class DynamicSparsityPattern;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;
   friend class ChunkSparsityPatternIterators::Accessor;
@@ -1293,9 +1285,7 @@ private:
    */
   bool store_diagonal_first_in_row;
 
-  /**
-   * Make all sparse matrices friends of this class.
-   */
+  // Make all sparse matrices friends of this class.
   template <typename number>
   friend class SparseMatrix;
   template <typename number>
@@ -1308,9 +1298,7 @@ private:
   friend class ChunkSparsityPattern;
   friend class DynamicSparsityPattern;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;
   friend class ChunkSparsityPatternIterators::Accessor;

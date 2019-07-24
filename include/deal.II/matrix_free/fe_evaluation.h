@@ -1125,9 +1125,7 @@ private:
   void
   set_data_pointers();
 
-  /**
-   * Make other FEEvaluationBase as well as FEEvaluation objects friends.
-   */
+  // Make other FEEvaluationBase as well as FEEvaluation objects friends.
   template <int, int, typename, bool, typename>
   friend class FEEvaluationBase;
   template <int, int, int, int, typename, typename>

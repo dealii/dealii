@@ -729,20 +729,16 @@ protected:
     const types::global_dof_index index,
     const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
-  /**
-   * Iterator classes need to be friends because they need to access
-   * operator== and operator!=.
-   */
+  // Iterator classes need to be friends because they need to access
+  // operator== and operator!=.
   template <typename>
   friend class TriaRawIterator;
   template <int, class, bool>
   friend class DoFAccessor;
 
 private:
-  /**
-   * Make the DoFHandler class a friend so that it can call the set_xxx()
-   * functions.
-   */
+  // Make the DoFHandler class a friend so that it can call the set_xxx()
+  // functions.
   template <int dim, int spacedim>
   friend class DoFHandler;
   template <int dim, int spacedim>
@@ -1206,18 +1202,14 @@ protected:
     const types::global_dof_index index,
     const unsigned int fe_index = AccessorData::default_fe_index) const;
 
-  /**
-   * Iterator classes need to be friends because they need to access
-   * operator== and operator!=.
-   */
+  // Iterator classes need to be friends because they need to access
+  // operator== and operator!=.
   template <typename>
   friend class TriaRawIterator;
 
 
-  /**
-   * Make the DoFHandler class a friend so that it can call the set_xxx()
-   * functions.
-   */
+  // Make the DoFHandler class a friend so that it can call the set_xxx()
+  // functions.
   template <int, int>
   friend class DoFHandler;
   template <int, int>
@@ -2008,10 +2000,8 @@ public:
    */
 
 private:
-  /**
-   * Make the DoFHandler class a friend so that it can call the
-   * update_cell_dof_indices_cache() function
-   */
+  // Make the DoFHandler class a friend so that it can call the
+  // update_cell_dof_indices_cache() function
   template <int dim, int spacedim>
   friend class DoFHandler;
   friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;

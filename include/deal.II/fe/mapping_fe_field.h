@@ -618,9 +618,7 @@ private:
                     InternalData &         data) const;
 
 
-  /**
-   * Declare other MappingFEField classes friends.
-   */
+  // Declare other MappingFEField classes friends.
   template <int, int, class, class>
   friend class MappingFEField;
 };

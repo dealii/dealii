@@ -111,10 +111,8 @@ namespace PETScWrappers
      */
     operator Mat() const;
 
-    /**
-     * Make the solver class a friend, since it needs to call the conversion
-     * operator.
-     */
+    // Make the solver class a friend, since it needs to call the conversion
+    // operator.
     friend class SolverBase;
   };
 

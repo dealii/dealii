@@ -99,9 +99,7 @@ namespace BlockMatrixIterators
      */
     unsigned int col_block;
 
-    /**
-     * Let the iterator class be a friend.
-     */
+    // Let the iterator class be a friend.
     template <typename>
     friend class MatrixIterator;
   };
@@ -280,9 +278,7 @@ namespace BlockMatrixIterators
     bool
     operator==(const Accessor &a) const;
 
-    /**
-     * Let the iterator class be a friend.
-     */
+    // Let the iterator class be a friend.
     template <typename>
     friend class dealii::MatrixIterator;
   };
@@ -1060,10 +1056,8 @@ private:
    */
   TemporaryData temporary_data;
 
-  /**
-   * Make the iterator class a friend. We have to work around a compiler bug
-   * here again.
-   */
+  // Make the iterator class a friend. We have to work around a compiler bug
+  // here again.
   template <typename, bool>
   friend class BlockMatrixIterators::Accessor;
 

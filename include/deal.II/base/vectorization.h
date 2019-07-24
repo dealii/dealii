@@ -475,9 +475,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -900,9 +898,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -1321,9 +1317,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -1784,9 +1778,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -2174,9 +2166,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -2571,9 +2561,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -2920,9 +2908,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -3243,9 +3229,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
@@ -3463,9 +3447,7 @@ private:
     return res;
   }
 
-  /**
-   * Make a few functions friends.
-   */
+  // Make a few functions friends.
   template <typename Number2, int width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);

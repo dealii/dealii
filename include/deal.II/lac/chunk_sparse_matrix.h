@@ -141,9 +141,7 @@ namespace ChunkSparseMatrixIterators
      */
     using ChunkSparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -274,9 +272,7 @@ namespace ChunkSparseMatrixIterators
      */
     using ChunkSparsityPatternIterators::Accessor::advance;
 
-    /**
-     * Make iterator class a friend.
-     */
+    // Make iterator class a friend.
     template <typename, bool>
     friend class Iterator;
   };
@@ -1409,9 +1405,7 @@ private:
   template <typename somenumber>
   friend class ChunkSparseMatrix;
 
-  /**
-   * Also give access to internal details to the iterator/accessor classes.
-   */
+  // Also give access to internal details to the iterator/accessor classes.
   template <typename, bool>
   friend class ChunkSparseMatrixIterators::Iterator;
   template <typename, bool>

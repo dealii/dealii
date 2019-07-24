@@ -707,9 +707,7 @@ namespace LinearAlgebra
     mutable std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
       thread_loop_partitioner;
 
-    /**
-     * Make all other ReadWriteVector types friends.
-     */
+    // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class ReadWriteVector;
 

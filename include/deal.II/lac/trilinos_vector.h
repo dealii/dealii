@@ -179,10 +179,8 @@ namespace TrilinosWrappers
        */
       const size_type index;
 
-      /**
-       * Make the vector class a friend, so that it can create objects of the
-       * present type.
-       */
+      // Make the vector class a friend, so that it can create objects of the
+      // present type.
       friend class ::dealii::TrilinosWrappers::MPI::Vector;
     };
   } // namespace internal
@@ -1335,9 +1333,7 @@ namespace TrilinosWrappers
        */
       IndexSet owned_elements;
 
-      /**
-       * Make the reference class a friend.
-       */
+      // Make the reference class a friend.
       friend class internal::VectorReference;
     };
 

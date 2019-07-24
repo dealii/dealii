@@ -62,9 +62,7 @@ namespace Utilities
     class ProcessGrid
     {
     public:
-      /**
-       * Declare class ScaLAPACK as friend to provide access to private members.
-       */
+      // Declare class ScaLAPACK as friend to provide access to private members.
       template <typename NumberType>
       friend class dealii::ScaLAPACKMatrix;
 

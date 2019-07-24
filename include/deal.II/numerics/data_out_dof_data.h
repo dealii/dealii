@@ -992,10 +992,8 @@ protected:
                DataComponentInterpretation::DataComponentInterpretation>>
   get_nonscalar_data_ranges() const override;
 
-  /**
-   * Make all template siblings friends. Needed for the merge_patches()
-   * function.
-   */
+  // Make all template siblings friends. Needed for the merge_patches()
+  // function.
   template <class, int, int>
   friend class DataOut_DoFData;
 

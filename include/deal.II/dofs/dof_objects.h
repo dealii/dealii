@@ -149,10 +149,8 @@ namespace internal
       void
       serialize(Archive &ar, const unsigned int version);
 
-      /**
-       * Declare the classes that store levels and faces of DoFs friends so
-       * that they can resize arrays.
-       */
+      // Declare the classes that store levels and faces of DoFs friends so
+      // that they can resize arrays.
       template <int>
       friend class DoFLevel;
       template <int>

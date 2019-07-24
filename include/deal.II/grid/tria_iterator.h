@@ -548,15 +548,13 @@ protected:
   Accessor accessor;
 
 
-  /**
-   * Make all other iterator class templates friends of this class. This is
-   * necessary for the implementation of conversion constructors.
-   *
-   * In fact, we would not need them to be friends if they were for different
-   * dimensions, but the compiler dislikes giving a fixed dimension and
-   * variable accessor since then it says that would be a partial
-   * specialization.
-   */
+  // Make all other iterator class templates friends of this class. This is
+  // necessary for the implementation of conversion constructors.
+  //
+  // In fact, we would not need them to be friends if they were for different
+  // dimensions, but the compiler dislikes giving a fixed dimension and
+  // variable accessor since then it says that would be a partial
+  // specialization.
   template <typename SomeAccessor>
   friend class TriaRawIterator;
   template <typename SomeAccessor>

@@ -280,9 +280,7 @@ namespace PETScWrappers
     do_reinit(const SparsityPatternType &sparsity_pattern,
               const bool                 preset_nonzero_locations);
 
-    /**
-     * To allow calling protected prepare_add() and prepare_set().
-     */
+    // To allow calling protected prepare_add() and prepare_set().
     friend class BlockMatrixBase<SparseMatrix>;
   };
 
@@ -756,9 +754,7 @@ namespace PETScWrappers
                 const IndexSet &           local_columns,
                 const SparsityPatternType &sparsity_pattern);
 
-      /**
-       * To allow calling protected prepare_add() and prepare_set().
-       */
+      // To allow calling protected prepare_add() and prepare_set().
       friend class BlockMatrixBase<SparseMatrix>;
     };
 

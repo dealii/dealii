@@ -785,12 +785,10 @@ private:
    */
   const std::vector<unsigned int> face_renumber;
 
-  /**
-   * Allow access from other dimensions. We need this since we want to call
-   * the functions @p get_dpo_vector and @p
-   * lexicographic_to_hierarchic_numbering for the faces of the finite element
-   * of dimension dim+1.
-   */
+  // Allow access from other dimensions. We need this since we want to call
+  // the functions @p get_dpo_vector and @p
+  // lexicographic_to_hierarchic_numbering for the faces of the finite element
+  // of dimension dim+1.
   template <int dim1>
   friend class FE_Q_Hierarchical;
 };

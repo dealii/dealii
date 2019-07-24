@@ -245,9 +245,7 @@ namespace TrilinosWrappers
       value() const;
 
     private:
-      /**
-       * Make iterator class a friend.
-       */
+      // Make iterator class a friend.
       template <bool>
       friend class Iterator;
     };
@@ -329,14 +327,11 @@ namespace TrilinosWrappers
       value() const;
 
     private:
-      /**
-       * Make iterator class a friend.
-       */
+      // Make iterator class a friend.
       template <bool>
       friend class Iterator;
-      /**
-       * Make Reference object a friend.
-       */
+
+      // Make Reference object a friend.
       friend class Reference;
     };
 
@@ -2149,9 +2144,7 @@ namespace TrilinosWrappers
      */
     bool compressed;
 
-    /**
-     * To allow calling protected prepare_add() and prepare_set().
-     */
+    // To allow calling protected prepare_add() and prepare_set().
     friend class BlockMatrixBase<SparseMatrix>;
   };
 

@@ -1418,9 +1418,7 @@ private:
   std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
     mg_faces;
 
-  /**
-   * Make accessor objects friends.
-   */
+  // Make accessor objects friends.
   template <int, class, bool>
   friend class DoFAccessor;
   template <class, bool>

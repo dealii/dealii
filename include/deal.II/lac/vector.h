@@ -1036,9 +1036,7 @@ private:
   mutable std::shared_ptr<parallel::internal::TBBPartitioner>
     thread_loop_partitioner;
 
-  /**
-   * Make all other vector types friends.
-   */
+  // Make all other vector types friends.
   template <typename Number2>
   friend class Vector;
 };

@@ -106,10 +106,8 @@ namespace SLEPcWrappers
      */
     ST st;
 
-    /**
-     * Make the solver class a friend, since it needs to set spectral
-     * transformation object.
-     */
+    // Make the solver class a friend, since it needs to set spectral
+    // transformation object.
     friend class SolverBase;
   };
 
@@ -192,10 +190,8 @@ namespace SLEPcWrappers
      */
     const AdditionalData additional_data;
 
-    /**
-     * Make the solver class a friend, since it may need to set target
-     * equal the provided shift value.
-     */
+    // Make the solver class a friend, since it may need to set target
+    // equal the provided shift value.
     friend class SolverBase;
   };
 

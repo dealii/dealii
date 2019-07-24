@@ -167,9 +167,7 @@ namespace PETScWrappers
         void
         visit_present_row();
 
-        /**
-         * Make enclosing class a friend.
-         */
+        // Make enclosing class a friend.
         friend class const_iterator;
       };
 
@@ -1068,9 +1066,7 @@ namespace PETScWrappers
     mutable std::vector<PetscScalar> column_values;
 
 
-    /**
-     * To allow calling protected prepare_add() and prepare_set().
-     */
+    // To allow calling protected prepare_add() and prepare_set().
     template <class>
     friend class dealii::BlockMatrixBase;
   };
