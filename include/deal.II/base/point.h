@@ -196,6 +196,15 @@ public:
                         operator()(const unsigned int index);
 
   /**
+   * Assignment operator from Tensor<1, dim, Number> with different underlying
+   * scalar type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  Point<dim, Number> &
+  operator=(const Tensor<1, dim, OtherNumber> &p);
+
+  /**
    * @name Addition and subtraction of points.
    * @{
    */
@@ -477,6 +486,17 @@ Point<dim, Number>::operator()(const unsigned int index)
   AssertIndexRange(index, dim);
 #  endif
   return this->values[index];
+}
+
+
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE Point<dim, Number> &
+Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p)
+{
+  Tensor<1, dim, Number>::operator=(p);
+  return *this;
 }
 
 
