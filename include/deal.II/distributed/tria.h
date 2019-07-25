@@ -647,7 +647,7 @@ namespace parallel
        * of classes that do this is parallel::distributed::SolutionTransfer
        * where each parallel::distributed::SolutionTransfer object that works
        * on the current Triangulation object then needs to register its intent.
-       * Each of these parties registers a callback function (the second
+       * Each of these parties registers a callback function (the first
        * argument here, @p pack_callback) that will be called whenever the
        * triangulation's execute_coarsening_and_refinement() or save()
        * functions are called.
