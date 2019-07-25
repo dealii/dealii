@@ -196,7 +196,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::FE_PolyTensor(
 
 template <class PolynomialType, int dim, int spacedim>
 bool
-FE_PolyTensor<PolynomialType, dim, spacedim>::single_mapping() const
+FE_PolyTensor<PolynomialType, dim, spacedim>::single_mapping_type() const
 {
   return mapping_type.size() == 1;
 }
@@ -206,10 +206,11 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::single_mapping() const
 template <class PolynomialType, int dim, int spacedim>
 MappingType
 FE_PolyTensor<PolynomialType, dim, spacedim>::get_mapping_type(
-  unsigned int i) const
+  const unsigned int i) const
 {
-  if (single_mapping())
+  if (single_mapping_type())
     return mapping_type[0];
+
   Assert(i < mapping_type.size(), ExcIndexRange(i, 0, mapping_type.size()));
   return mapping_type[i];
 }
