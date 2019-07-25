@@ -272,3 +272,9 @@ DOT_CLEANUP            = YES
 
 SEARCHENGINE           = YES
 SERVER_BASED_SEARCH    = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to bibtex citations
+#---------------------------------------------------------------------------
+
+CITE_BIB_FILES         = @CMAKE_CURRENT_SOURCE_DIR@/references.bib
