@@ -293,28 +293,44 @@ namespace hp
      * results to @p predicted_errors. Each entry of @p error_indicators and
      * @p predicted_errors corresponds to an active cell on the underlying
      * Triangulation, thus each container has to be of size
-     * Triangulation::n_active_cells().
+     * Triangulation::n_active_cells(). The errors are interpreted to be
+     * measured in the energy norm; this assumption enters the rate of
+     * convergence that is used in the prediction. The `predicted_errors` output
+     * argument has one entry per <i>current</i> cell, with the $2^d$ values for
+     * each cell that will be coarsened away equal, and with the value stored on
+     * a cell to be refined interpreted as applying to each of the future
+     * children.
      *
      * For h adaptation, we expect the local error $\eta_K$ on cell $K$ to be
      * proportional to $(h_K)^{p_K}$ in the energy norm, where $h_K$ denotes the
      * cell diameter and $p_K$ the polynomial degree of the currently assigned
-     * finite element. Here, we assume that the finite element will not change
-     * in the adaptation process so that $p_K = \text{const}$. However during
-     * coarsening, the finite elements on siblings may be different, and their
-     * parent cell will be assigned to their least dominating finite element
-     * that belongs to its most general child. Thus, we will always interpolate
-     * on an enclosing finite element space. Additionaly assuming that the
-     * finite elements on the cells to be coarsened are sufficient to represent
-     * the solution correct (e.g. at least quadratic basis functions for a
-     * quadratic solution), we are confident to say that the error will not
-     * change by sole interpolation on the larger finite element space.
+     * finite element on cell $K$. Here, we assume that the finite element will
+     * not change in the adaptation process so that $p_K = \text{const}$.
+     * However during coarsening, the finite elements on siblings may be
+     * different, and their parent cell will be assigned to their least
+     * dominating finite element that belongs to its most general child. Thus,
+     * we will always interpolate on an enclosing finite element space.
+     * Additionaly assuming that the finite elements on the cells to be
+     * coarsened are sufficient to represent the solution correctly (e.g. at
+     * least quadratic basis functions for a quadratic solution), we are
+     * confident to say that the error will not change by sole interpolation on
+     * the larger finite element space.
      *
-     * Further, we expect that the local error will be divided equally on
-     * all $2^{dim}$ children during refinement, whereas local errors on
-     * siblings will be summed up on the parent cell in case of coarsening. When
-     * transferring the predicted error to the coarsened mesh, make sure to
-     * configure your CellDataTransfer object with
-     * GridTools::CoarseningStrategies::sum() as a coarsening strategy.
+     * Further, the function assumes that the local error on a cell
+     * that will be refined, will lead to errors on the $2^{dim}$
+     * children that are all equal, whereas local errors on siblings
+     * will be summed up on the parent cell in case of
+     * coarsening. This assumption is often not satisfied in practice:
+     * For example, if a cell is at a corner singularity, then the one
+     * child cell that ends up closest to the singularity will inherit
+     * the majority of the remaining error -- but this function can
+     * not know where the singularity will be, and consequently
+     * assumes equal distribution.
+     *
+     * When transferring the predicted error to the coarsened mesh,
+     * make sure to configure your CellDataTransfer object with
+     * CoarseningStrategies::sum() as a coarsening
+     * strategy.
      *
      * For p adaptation, the local error is expected to converge exponentially
      * with the polynomial degree of the assigned finite element. Each increase
