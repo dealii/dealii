@@ -520,6 +520,29 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 
 /**
+ * Create a vectorized array of given type and broadcast the scalar value
+ * to all array elements.
+ *
+ *  @relatesalso VectorizedArray
+ */
+template <typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
+                             make_vectorized_array(const typename VectorizedArrayType::value_type &u)
+{
+  static_assert(
+    std::is_same<VectorizedArrayType,
+                 VectorizedArray<typename VectorizedArrayType::value_type,
+                                 VectorizedArrayType::n_array_elements>>::value,
+    "VectorizedArrayType is not a VectorizedArray.");
+
+  VectorizedArrayType result;
+  result = u;
+  return result;
+}
+
+
+
+/**
  * This method loads VectorizedArray::n_array_elements data streams from the
  * given array @p in. The offsets to the input array are given by the array @p
  * offsets. From each stream, n_entries are read. The data is then transposed
