@@ -86,8 +86,6 @@ namespace internal
                   for (unsigned int j = 0; j < fe.dofs_per_face; ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
-                      // something in FiniteElement or FiniteElementData base
-                      // classes
 
                       Assert(f * fe.dofs_per_face + j < face_sign.size(),
                              ExcInternalError());
