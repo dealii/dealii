@@ -120,14 +120,21 @@ CHECK_CXX_COMPILER_BUG(
 # prediction unit in some cases. We use it in the AssertThrow
 # macros.
 #
+# Intel compilers don't handle __builtin_expect in C++14 constexpr contexts
+# properly so we disable this feature in case we are going to use
+# DEAL_II_CONSTEXPR with an Intel compiler.
+#
 # - Matthias Maier, rewritten 2012
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  bool f() { return true; }
-  int main(){ if (__builtin_expect(f(),false)) {} }
-  "
-  DEAL_II_HAVE_BUILTIN_EXPECT)
+IF(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND
+       DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR))
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    bool f() { return true; }
+    int main(){ if (__builtin_expect(f(),false)) {} }
+    "
+    DEAL_II_HAVE_BUILTIN_EXPECT)
+ENDIF()
 
 
 #
