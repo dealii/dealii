@@ -221,13 +221,13 @@ protected:
    * mapping and false when the finite element uses multiple mappings.
    */
   bool
-  single_mapping() const;
+  single_mapping_type() const;
 
   /**
    * Returns MappingType @p i for the finite element.
    */
   MappingType
-  get_mapping_type(unsigned int i) const;
+  get_mapping_type(const unsigned int i) const;
 
   /* NOTE: The following function has its definition inlined into the class
      declaration because we otherwise run into a compiler error with MS Visual
