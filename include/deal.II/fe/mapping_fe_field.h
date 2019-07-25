@@ -122,23 +122,22 @@ public:
   /**
    * Constructor taking vectors on the multigrid levels rather than the active
    * cells only. The vector of vectors is expected to have as many entries as
-   * there are levels in the triangulation and provide valid data on each
-   * level, i.e., be of compatible length DoFHandler::n_dofs(level). Apart
-   * from the source of the vectors, the same arguments as in the other
-   * constructor need to be provided.
+   * there are global levels in the triangulation and provide valid data on
+   * each level, i.e., be of compatible length DoFHandler::n_dofs(level). A
+   * prerequisite of this constructor is that DoFHandler::distribute_mg_dofs()
+   * has been called. Apart from the level vectors, the same arguments as in
+   * the other constructor need to be provided.
    */
   MappingFEField(const DoFHandlerType &         euler_dof_handler,
                  const std::vector<VectorType> &euler_vector,
                  const ComponentMask &          mask = ComponentMask());
 
   /**
-   * Constructor taking vectors on the multigrid levels rather than the active
-   * cells only, variant with MGLevelObject instead of std::vector. The vector
-   * of vectors is expected to have as many entries as there are levels in the
-   * triangulation and provide valid data on each level, i.e., be of
-   * compatible length DoFHandler::n_dofs(level). Apart from the source of the
-   * vectors, the same arguments as in the other constructor need to be
-   * provided.
+   * Constructor with MGLevelObject instead of std::vector, otherwise the same
+   * as above. It is required that `euler_vector.max_level()+1` equals the
+   * global number of levels in the triangulation. The minimum level may be
+   * zero or more &mdash; it only needs to be consistent between what is set
+   * here and later used for evaluation of the mapping.
    */
   MappingFEField(const DoFHandlerType &           euler_dof_handler,
                  const MGLevelObject<VectorType> &euler_vector,
