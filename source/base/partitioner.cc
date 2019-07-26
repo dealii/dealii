@@ -432,7 +432,7 @@ namespace Utilities
           for (dealii::IndexSet::size_type index : ghost_indices_data)
             {
               Assert(larger_ghost_index_set.is_element(index),
-                     ExcMessage("The given larger ghost index set must contain"
+                     ExcMessage("The given larger ghost index set must contain "
                                 "all indices in the actual index set."));
               Assert(
                 larger_ghost_index_set.index_within_set(index) <

@@ -123,7 +123,7 @@ namespace SLEPcWrappers
     Assert((false),
            ExcMessage(
              "Folding transformation has been removed in SLEPc 3.5.0 and newer."
-             "You cannot use this transformation anymore."));
+             " You cannot use this transformation anymore."));
 #  endif
   }
 

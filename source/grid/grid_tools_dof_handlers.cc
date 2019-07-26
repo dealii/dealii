@@ -1064,7 +1064,7 @@ namespace GridTools
       contains_artificial_cells<MeshType>(ghost_cell_layer_within_distance) ==
         false,
       ExcMessage(
-        "Ghost cells within layer_thickness contains artificial cells."
+        "Ghost cells within layer_thickness contains artificial cells. "
         "The function compute_ghost_cell_layer_within_distance "
         "is probably called while using parallel::distributed::Triangulation. "
         "In such case please refer to the description of this function."));

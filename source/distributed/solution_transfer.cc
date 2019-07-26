@@ -401,7 +401,7 @@ namespace parallel
               dof_handler->get_fe(fe_index).dofs_per_cell ==
                 it_dofvalues->size(),
               ExcMessage(
-                "The transferred data was packed with a different number of dofs than the"
+                "The transferred data was packed with a different number of dofs than the "
                 "currently registered FE object assigned to the DoFHandler has."));
 
           // distribute data for each registered vector on mesh
@@ -422,7 +422,7 @@ namespace parallel
             Assert(
               cell->get_fe().dofs_per_cell == it_dofvalues->size(),
               ExcMessage(
-                "The transferred data was packed with a different number of dofs than the"
+                "The transferred data was packed with a different number of dofs than the "
                 "currently registered FE object assigned to the DoFHandler has."));
 
           // distribute data for each registered vector on mesh

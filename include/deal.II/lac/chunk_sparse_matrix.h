@@ -1336,7 +1336,7 @@ public:
                  int,
                  << "You are trying to access the matrix entry with index <"
                  << arg1 << ',' << arg2
-                 << ">, but this entry does not exist in the sparsity pattern"
+                 << ">, but this entry does not exist in the sparsity pattern "
                     "of this matrix."
                     "\n\n"
                     "The most common cause for this problem is that you used "

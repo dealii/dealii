@@ -218,7 +218,7 @@ namespace GridOutFlags
     param.declare_entry("Size by",
                         "width",
                         Patterns::Selection("width|height"),
-                        "Depending on this parameter, either the"
+                        "Depending on this parameter, either the "
                         "width or height "
                         "of the eps is scaled to \"Size\"");
     param.declare_entry("Size",
@@ -319,7 +319,7 @@ namespace GridOutFlags
     param.declare_entry("Level number",
                         "false",
                         Patterns::Bool(),
-                        "(2D only) if \"Cell number\" is true, write"
+                        "(2D only) if \"Cell number\" is true, write "
                         "numbers in the form level.number");
     param.declare_entry("Vertex number",
                         "false",

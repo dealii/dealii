@@ -367,7 +367,7 @@ namespace internal
     {
       AssertThrow(false,
                   ExcMessage(
-                    "FESeries::process_coefficients() can not be used with"
+                    "FESeries::process_coefficients() can not be used with "
                     "complex-valued coefficients and VectorTools::mean norm."));
       return std::abs(value);
     }

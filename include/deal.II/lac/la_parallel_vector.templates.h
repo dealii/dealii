@@ -1324,8 +1324,8 @@ namespace LinearAlgebra
               AssertThrowMPI(ierr);
               Assert(flag == 1,
                      ExcMessage(
-                       "MPI found unfinished update_ghost_values() requests"
-                       "when calling swap, which is not allowed"));
+                       "MPI found unfinished update_ghost_values() requests "
+                       "when calling swap, which is not allowed."));
             }
           if (compress_requests.size() > 0)
             {
@@ -1336,7 +1336,7 @@ namespace LinearAlgebra
               AssertThrowMPI(ierr);
               Assert(flag == 1,
                      ExcMessage("MPI found unfinished compress() requests "
-                                "when calling swap, which is not allowed"));
+                                "when calling swap, which is not allowed."));
             }
         }
 #  endif

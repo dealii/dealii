@@ -58,7 +58,7 @@ namespace
     (void)x_q;
     (void)indices;
     AssertThrow(false,
-                ExcMessage("deal.II has to be configured with GSL"
+                ExcMessage("deal.II has to be configured with GSL "
                            "in order to use Legendre transformation."));
     return 0;
 #endif
