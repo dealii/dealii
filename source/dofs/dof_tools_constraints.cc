@@ -2504,7 +2504,7 @@ namespace DoFTools
            ExcIndexRange(direction, 0, space_dim));
 
     Assert(b_id1 != b_id2,
-           ExcMessage("The boundary indicators b_id1 and b_id2 must be"
+           ExcMessage("The boundary indicators b_id1 and b_id2 must be "
                       "different to denote different boundaries."));
 
     std::vector<

@@ -2520,25 +2520,25 @@ namespace TrilinosWrappers
       {
         vmult = [](Range &, const Domain &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::vmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::vmult called "
                             "(Default constructor)"));
         };
 
         Tvmult = [](Domain &, const Range &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::Tvmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::Tvmult called "
                             "(Default constructor)"));
         };
 
         inv_vmult = [](Domain &, const Range &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::inv_vmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::inv_vmult called "
                             "(Default constructor)"));
         };
 
         inv_Tvmult = [](Range &, const Domain &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::inv_Tvmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::inv_Tvmult called "
                             "(Default constructor)"));
         };
       }
@@ -2617,13 +2617,13 @@ namespace TrilinosWrappers
 
         inv_vmult = [](Domain &, const Range &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::inv_vmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::inv_vmult called "
                             "(Matrix constructor with matrix exemplar)"));
         };
 
         inv_Tvmult = [](Range &, const Domain &) {
           Assert(false,
-                 ExcMessage("Uninitialized TrilinosPayload::inv_Tvmult called"
+                 ExcMessage("Uninitialized TrilinosPayload::inv_Tvmult called "
                             "(Matrix constructor with matrix exemplar)"));
         };
       }

@@ -289,7 +289,7 @@ DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
            "not be used to copy a non-empty sparsity pattern."));
 
   Assert(rows == 0 && cols == 0,
-         ExcMessage("This operator can only be called if the current object is"
+         ExcMessage("This operator can only be called if the current object is "
                     "empty."));
 
   return *this;

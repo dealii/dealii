@@ -1719,7 +1719,7 @@ namespace MatrixFreeOperators
 #ifndef DEAL_II_MSVC
     static_assert(
       std::is_same<typename VectorType::value_type, value_type>::value,
-      "The vector type must be based on the same value type as this"
+      "The vector type must be based on the same value type as this "
       "operator");
 #endif
 
@@ -1739,7 +1739,7 @@ namespace MatrixFreeOperators
 #ifndef DEAL_II_MSVC
     static_assert(
       std::is_same<typename VectorType::value_type, value_type>::value,
-      "The vector type must be based on the same value type as this"
+      "The vector type must be based on the same value type as this "
       "operator");
 #endif
 

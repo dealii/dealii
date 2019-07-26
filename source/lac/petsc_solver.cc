@@ -89,7 +89,7 @@ namespace PETScWrappers
         // make sure the preconditioner has an associated matrix set
         const Mat B = preconditioner;
         AssertThrow(B != nullptr,
-                    ExcMessage("PETSc preconditioner should have an"
+                    ExcMessage("PETSc preconditioner should have an "
                                "associated matrix set to be used in solver."));
 
         // setting the preconditioner overwrites the used matrices.

@@ -81,7 +81,7 @@ namespace parallel
       Assert(
         max_active_cells == this->n_active_cells(),
         ExcMessage(
-          "A parallel::shared::Triangulation needs to be refined in the same"
+          "A parallel::shared::Triangulation needs to be refined in the same "
           "way on all processors, but the participating processors don't "
           "agree on the number of active cells."));
 #  endif

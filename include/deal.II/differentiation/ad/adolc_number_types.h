@@ -275,7 +275,7 @@ namespace Differentiation
           AssertThrow(false,
                       ExcMessage(
                         "The derivative values for taped ADOL-C numbers must be"
-                        "computed through the ::gradient function."));
+                        " computed through the ::gradient function."));
           return 0.0;
         }
       };

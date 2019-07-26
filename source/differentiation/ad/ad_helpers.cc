@@ -121,7 +121,7 @@ namespace Differentiation
           Assert(this->is_recording() == true,
                  ExcMessage(
                    "Cannot change the value of an independent variable "
-                   "of the tapeless variety while this class is not set"
+                   "of the tapeless variety while this class is not set "
                    "in recording operations."));
         }
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -944,7 +944,7 @@ namespace Differentiation
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
              ExcMessage(
-               "Cannot computed function Hessian: AD number type does"
+               "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1483,7 +1483,7 @@ namespace Differentiation
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
              ExcMessage(
-               "Cannot computed function Hessian: AD number type does"
+               "Cannot computed function Hessian: AD number type does "
                "not support the calculation of second order derivatives."));
 
       if ((ADNumberTraits<ad_type>::is_taped == true &&

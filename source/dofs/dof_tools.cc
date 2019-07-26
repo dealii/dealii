@@ -540,7 +540,7 @@ namespace DoFTools
               DoFHandlerType::space_dimension> *>(
               &dof_handler.get_triangulation()) == nullptr),
            ExcMessage(
-             "This function can not be used with distributed triangulations."
+             "This function can not be used with distributed triangulations. "
              "See the documentation for more information."));
 
     IndexSet indices;
@@ -2170,7 +2170,7 @@ namespace DoFTools
               const parallel::distributed::Triangulation<dim, spacedim> *>(
               &dof_handler.get_triangulation()) == nullptr),
            ExcMessage(
-             "This function can not be used with distributed triangulations."
+             "This function can not be used with distributed triangulations. "
              "See the documentation for more information."));
 
     // Let the internal function do all the work, just make sure that it
@@ -2195,7 +2195,7 @@ namespace DoFTools
               const parallel::distributed::Triangulation<dim, spacedim> *>(
               &dof_handler.get_triangulation()) == nullptr),
            ExcMessage(
-             "This function can not be used with distributed triangulations."
+             "This function can not be used with distributed triangulations. "
              "See the documentation for more information."));
 
     // Let the internal function do all the work, just make sure that it
