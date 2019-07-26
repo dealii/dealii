@@ -614,6 +614,21 @@ namespace LinearAlgebra
       void
       copy_locally_owned_data_from(const Vector<Number2, MemorySpace> &src);
 
+      /**
+       * Import all the elements present in the distributed vector @p src.
+       * VectorOperation::values @p operation is used to decide if the elements
+       * in @p V should be added to the current vector or replace the current
+       * elements. The main purpose of this function is to get data from one
+       * memory space, e.g. CUDA, to the other, e.g. the Host.
+       *
+       * @note The partitioners of the two distributed vectors need to be the
+       * same as no MPI communication is performed.
+       */
+      template <typename MemorySpace2>
+      void
+      import(const Vector<Number, MemorySpace2> &src,
+             VectorOperation::values             operation);
+
       //@}
 
       /**

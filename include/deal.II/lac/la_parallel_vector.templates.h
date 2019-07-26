@@ -727,6 +727,26 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number, typename MemorySpaceType>
+    template <typename MemorySpaceType2>
+    void
+    Vector<Number, MemorySpaceType>::import(
+      const Vector<Number, MemorySpaceType2> &src,
+      VectorOperation::values                 operation)
+    {
+      Assert(src.partitioner.get() != nullptr, ExcNotInitialized());
+      Assert(partitioner->locally_owned_range() ==
+               src.partitioner->locally_owned_range(),
+             ExcMessage("Locally owned indices should be identical."));
+      Assert(partitioner->ghost_indices() == src.partitioner->ghost_indices(),
+             ExcMessage("Ghost indices should be identical."));
+      ::dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::import(
+          thread_loop_partitioner, allocated_size, operation, src.data, data);
+    }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 
     namespace petsc_helpers
