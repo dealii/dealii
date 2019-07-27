@@ -296,8 +296,6 @@ namespace internal
          */
         SmartPointer<DoFHandlerType> dof_handler;
       };
-
-
     } // namespace Policy
   }   // namespace DoFHandlerImplementation
 } // namespace internal

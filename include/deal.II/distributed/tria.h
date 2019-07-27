@@ -1424,33 +1424,33 @@ namespace parallel
 
 #endif
 
-struct Part_
-{
-  Part_()
-  {}
-
-  Part_(CellId::binary_type index,
-        unsigned int        subdomain_id,
-        unsigned int        level_subdomain_id)
-    : index(index)
-    , subdomain_id(subdomain_id)
-    , level_subdomain_id(level_subdomain_id){};
-
-  CellId::binary_type index;
-  unsigned int        subdomain_id;
-  unsigned int        level_subdomain_id;
-};
-
-class Part
-{
-public:
-  std::vector<Part_> cells;
-};
 
 namespace parallel
 {
   namespace fullydistributed
   {
+    struct Part_
+    {
+      Part_()
+      {}
+
+      Part_(CellId::binary_type index,
+            unsigned int        subdomain_id,
+            unsigned int        level_subdomain_id)
+        : index(index)
+        , subdomain_id(subdomain_id)
+        , level_subdomain_id(level_subdomain_id){};
+
+      CellId::binary_type index;
+      unsigned int        subdomain_id;
+      unsigned int        level_subdomain_id;
+    };
+
+    class Part
+    {
+    public:
+      std::vector<Part_> cells;
+    };
     template <int dim, int spacedim>
     struct ConstructionData
     {

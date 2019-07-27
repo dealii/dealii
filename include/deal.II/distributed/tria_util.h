@@ -1,13 +1,26 @@
-#ifndef PARALLEL_FULLY_DISTRIBUTED_MESH_UTIL
-#define PARALLEL_FULLY_DISTRIBUTED_MESH_UTIL
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2008 - 2019 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+#ifndef dealii_distributed_tria_util_h
+#define dealii_distributed_tria_util_h
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -39,7 +52,9 @@ namespace boost
 
     template <class Archive>
     void
-    serialize(Archive &ar, dealii::Part_ &g, const unsigned int /*version*/)
+    serialize(Archive &                                  ar,
+              dealii::parallel::fullydistributed::Part_ &g,
+              const unsigned int /*version*/)
     {
       ar &g.index;
       ar &g.subdomain_id;
@@ -48,7 +63,9 @@ namespace boost
 
     template <class Archive>
     void
-    serialize(Archive &ar, dealii::Part &g, const unsigned int /*version*/)
+    serialize(Archive &                                 ar,
+              dealii::parallel::fullydistributed::Part &g,
+              const unsigned int /*version*/)
     {
       ar &g.cells;
     }
@@ -662,10 +679,9 @@ namespace dealii
               MPI_Probe(0, 0, comm_shared, &status);
               int l;
               MPI_Get_count(&status, MPI_CHAR, &l);
-              char *buf = new char[l];
-              MPI_Recv(buf, l, MPI_CHAR, 0, 0, comm_shared, &status);
-              std::string serial_str(buf, l);
-              delete[] buf;
+              std::vector<char> buf(l);
+              MPI_Recv(buf.data(), l, MPI_CHAR, 0, 0, comm_shared, &status);
+              std::string serial_str(buf.data(), l);
 
               // unpack
               boost::iostreams::basic_array_source<char> device(
