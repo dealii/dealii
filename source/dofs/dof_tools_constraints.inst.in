@@ -49,7 +49,6 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       AffineConstraints<std::complex<double>> &);
 #endif
 
-#if deal_II_dimension != 1
     template void DoFTools::make_periodicity_constraints(
       const DH<deal_II_dimension>::face_iterator &,
       const DH<deal_II_dimension>::face_iterator &,
@@ -83,7 +82,6 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       const int,
       AffineConstraints<double> &,
       const ComponentMask &);
-#endif
   }
 
 for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
