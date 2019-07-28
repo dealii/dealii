@@ -52,20 +52,25 @@ struct Tester<double>
   test()
   {
     do_test(make_vectorized_array<double>(2.0), 2.0);
+    do_test(VectorizedArray<double>(2.0), 2.0);
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
     do_test(make_vectorized_array<VectorizedArray<double, 8>>(2.0), 2.0);
+    do_test(VectorizedArray<double, 8>(2.0), 2.0);
 #endif
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
     do_test(make_vectorized_array<VectorizedArray<double, 4>>(2.0), 2.0);
+    do_test(VectorizedArray<double, 4>(2.0), 2.0);
 #endif
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
     do_test(make_vectorized_array<VectorizedArray<double, 2>>(2.0), 2.0);
+    do_test(VectorizedArray<double, 2>(2.0), 2.0);
 #endif
 
     do_test(make_vectorized_array<VectorizedArray<double, 1>>(2.0), 2.0);
+    do_test(VectorizedArray<double, 1>(2.0), 2.0);
   }
 };
 
@@ -76,20 +81,25 @@ struct Tester<float>
   test()
   {
     do_test(make_vectorized_array<float>(2.0), 2.0);
+    do_test(VectorizedArray<float>(2.0), 2.0);
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
     do_test(make_vectorized_array<VectorizedArray<float, 16>>(2.0), 2.0);
+    do_test(VectorizedArray<float, 16>(2.0), 2.0);
 #endif
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
     do_test(make_vectorized_array<VectorizedArray<float, 8>>(2.0), 2.0);
+    do_test(VectorizedArray<float, 8>(2.0), 2.0);
 #endif
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
     do_test(make_vectorized_array<VectorizedArray<float, 4>>(2.0), 2.0);
+    do_test(VectorizedArray<float, 4>(2.0), 2.0);
 #endif
 
     do_test(make_vectorized_array<VectorizedArray<float, 1>>(2.0), 2.0);
+    do_test(VectorizedArray<float, 1>(2.0), 2.0);
   }
 };
 

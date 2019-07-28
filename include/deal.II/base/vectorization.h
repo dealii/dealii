@@ -225,6 +225,20 @@ public:
   // and copy functions (the standard is somewhat relaxed in C++2011, though).
 
   /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const Number scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
    * This function assigns a scalar to this class.
    */
   DEAL_II_ALWAYS_INLINE
@@ -667,6 +681,20 @@ public:
   static const unsigned int n_array_elements = 8;
 
   /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const double scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1084,6 +1112,20 @@ public:
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 16;
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const float scalar)
+  {
+    this->operator=(scalar);
+  }
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -1556,6 +1598,20 @@ public:
   static const unsigned int n_array_elements = 4;
 
   /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const double scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1942,6 +1998,20 @@ public:
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 8;
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const float scalar)
+  {
+    this->operator=(scalar);
+  }
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -2353,6 +2423,20 @@ public:
   static const unsigned int n_array_elements = 2;
 
   /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const double scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2702,6 +2786,20 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const float scalar)
+  {
+    this->operator=(scalar);
+  }
 
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3068,6 +3166,20 @@ public:
   static const unsigned int n_array_elements = 2;
 
   /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const double scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
    * This function assigns a scalar to this class.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3284,6 +3396,20 @@ public:
    * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 4;
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes
+   */
+  VectorizedArray(const float scalar)
+  {
+    this->operator=(scalar);
+  }
 
   /**
    * This function assigns a scalar to this class.
