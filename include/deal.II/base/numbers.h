@@ -681,8 +681,8 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static constexpr DEAL_II_CUDA_HOST_DEV const T &
-                                                 value(const T &t)
+    static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV const T &
+                                                                       value(const T &t)
     {
       return t;
     }
@@ -696,9 +696,9 @@ namespace internal
 
     // Type T is constructible from F.
     template <typename F>
-    static constexpr DEAL_II_CUDA_HOST_DEV T
-                                           value(const F &f,
-                                                 typename std::enable_if<
+    static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV T
+                                                                 value(const F &f,
+                                                                       typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             std::is_constructible<T, F>::value>::type * = nullptr)
@@ -708,9 +708,9 @@ namespace internal
 
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
-    static constexpr T
-    value(const F &f,
-          typename std::enable_if<
+    static constexpr DEAL_II_ALWAYS_INLINE T
+                                           value(const F &f,
+                                                 typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             !std::is_constructible<T, F>::value &&
