@@ -2149,6 +2149,10 @@ namespace hp
         // Update all locally owned active_fe_indices.
         set_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
+        // Update active_fe_indices on ghost cells.
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          communicate_active_fe_indices(*this);
+
         // Free memory.
         active_fe_index_transfer.reset();
       }
