@@ -3841,9 +3841,24 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
   return VectorizedArray<Number, width>() - u;
 }
 
+/**
+ * Output operator for vectorized array.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number, int width>
+inline std::ostream &
+operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
+{
+  constexpr unsigned int n = VectorizedArray<Number, width>::n_array_elements;
+  for (unsigned int i = 0; i < n - 1; ++i)
+    out << p[i] << ' ';
+  out << p[n - 1];
+
+  return out;
+}
 
 DEAL_II_NAMESPACE_CLOSE
-
 
 /**
  * Implementation of functions from cmath on VectorizedArray. These functions
