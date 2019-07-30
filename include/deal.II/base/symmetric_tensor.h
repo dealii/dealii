@@ -3469,15 +3469,14 @@ template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
                                                symmetrize(const Tensor<2, dim, Number> &t)
 {
-  Number array[(dim * dim + dim) / 2];
+  SymmetricTensor<2, dim, Number> result;
   for (unsigned int d = 0; d < dim; ++d)
-    array[d] = t[d][d];
-  Number half = {};
-  half        = 0.5;
-  for (unsigned int d = 0, c = dim; d < dim; ++d)
-    for (unsigned int e = d + 1; e < dim; ++e, ++c)
-      array[c] = (t[d][e] + t[e][d]) * half;
-  return SymmetricTensor<2, dim, Number>(array);
+    result[d][d] = t[d][d];
+  Number half = 0.5;
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int e = d + 1; e < dim; ++e)
+      result[d][e] = (t[d][e] + t[e][d]) * half;
+  return result;
 }
 
 
