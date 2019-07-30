@@ -559,6 +559,8 @@ bool
 CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
   const auto it = map.find(cell);
+  if (it == map.end())
+    return false;
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
       Assert(
