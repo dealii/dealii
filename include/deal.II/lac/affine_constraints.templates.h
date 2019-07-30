@@ -16,6 +16,7 @@
 #ifndef dealii_affine_constraints_templates_h
 #define dealii_affine_constraints_templates_h
 
+#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
@@ -1883,6 +1884,58 @@ namespace internal
       vec.zero_out_ghosts();
     }
 
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <typename Number>
+    __global__ void
+    set_zero_kernel(const size_type *  constrained_dofs,
+                    const unsigned int n_constrained_dofs,
+                    Number *           dst)
+    {
+      const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
+      if (index < n_constrained_dofs)
+        dst[constrained_dofs[index]] = 0;
+    }
+
+    template <typename number>
+    void
+    set_zero_parallel(
+      const std::vector<size_type> &                                 cm,
+      LinearAlgebra::distributed::Vector<number, MemorySpace::CUDA> &vec,
+      size_type                                                      shift = 0)
+    {
+      Assert(shift == 0, ExcNotImplemented());
+      const int              n_constraints = cm.size();
+      std::vector<size_type> constrained_local_dofs_host(n_constraints);
+
+      std::transform(cm.begin(),
+                     cm.end(),
+                     constrained_local_dofs_host.begin(),
+                     [&vec](const size_type global_index) {
+                       return vec.get_partitioner()->global_to_local(
+                         global_index);
+                     });
+
+      size_type *constrained_local_dofs_device;
+      Utilities::CUDA::malloc(constrained_local_dofs_device, n_constraints);
+      Utilities::CUDA::copy_to_dev(constrained_local_dofs_host,
+                                   constrained_local_dofs_device);
+
+      const int n_blocks = 1 + (n_constraints - 1) / CUDAWrappers::block_size;
+      set_zero_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
+        constrained_local_dofs_device, cm.size(), vec.get_values());
+#  ifdef DEBUG
+      // Check that the kernel was launched correctly
+      AssertCuda(cudaGetLastError());
+      // Check that there was no problem during the execution of the kernel
+      AssertCuda(cudaDeviceSynchronize());
+#  endif
+
+      Utilities::CUDA::free(constrained_local_dofs_device);
+
+      vec.zero_out_ghosts();
+    }
+#endif
+
     template <class VectorType>
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
@@ -1947,7 +2000,7 @@ template <class VectorType>
 void
 AffineConstraints<number>::set_zero(VectorType &vec) const
 {
-  // since we lines is a private member, we cannot pass it to the functions
+  // since lines is a private member, we cannot pass it to the functions
   // above. therefore, copy the content which is cheap
   std::vector<size_type> constrained_lines(lines.size());
   for (unsigned int i = 0; i < lines.size(); ++i)
@@ -2087,7 +2140,7 @@ namespace internal
   // this is an operation that is different for all vector types and so we
   // need a few overloads
 #ifdef DEAL_II_WITH_TRILINOS
-  void
+  inline void
   import_vector_with_ghost_elements(
     const TrilinosWrappers::MPI::Vector &vec,
     const IndexSet & /*locally_owned_elements*/,
@@ -2110,7 +2163,7 @@ namespace internal
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-  void
+  inline void
   import_vector_with_ghost_elements(
     const PETScWrappers::MPI::Vector &vec,
     const IndexSet &                  locally_owned_elements,

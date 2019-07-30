@@ -65,6 +65,7 @@ IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
     vector_memory.cu
+    affine_constraints.cu
     )
 ENDIF()
 
