@@ -35,6 +35,7 @@
 #include <deal.II/lac/read_write_vector.h>
 
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -2565,8 +2566,11 @@ inline unsigned int
 DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
   n_active_fe_indices() const
 {
-  Assert(false, ExcNotImplemented());
-  return numbers::invalid_unsigned_int;
+  Assert((std::is_same<DoFHandlerType<1, spacedim>,
+                       dealii::DoFHandler<1, spacedim>>::value == true),
+         ExcNotImplemented());
+
+  return 1;
 }
 
 
@@ -2578,8 +2582,11 @@ inline unsigned int
 DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
   nth_active_fe_index(const unsigned int /*n*/) const
 {
-  Assert(false, ExcNotImplemented());
-  return numbers::invalid_unsigned_int;
+  Assert((std::is_same<DoFHandlerType<1, spacedim>,
+                       dealii::DoFHandler<1, spacedim>>::value == true),
+         ExcNotImplemented());
+
+  return 0;
 }
 
 

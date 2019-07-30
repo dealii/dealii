@@ -950,7 +950,12 @@ namespace
     Assert(face_1->at_boundary() && face_2->at_boundary(),
            ExcMessage("Periodic faces must be on the boundary"));
 
-    Assert(std::abs(cell_1->level() - cell_2->level()) < 2, ExcInternalError());
+    // Check if the requirement that each edge can only have at most one hanging
+    // node, and as a consequence neighboring cells can differ by at most
+    // one refinement level is enforced. In 1d, there are no hanging nodes and
+    // so neighboring cells can differ by more than one refinement level.
+    Assert(dim == 1 || std::abs(cell_1->level() - cell_2->level()) < 2,
+           ExcInternalError());
 
     // insert periodic face pair for both cells
     using CellFace =
@@ -968,132 +973,161 @@ namespace
     Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
     periodic_face_map.insert(periodic_faces);
 
-    // A lookup table on how to go through the child cells depending on the
-    // orientation:
-    // see Documentation of GeometryInfo for details
-
-    static const int lookup_table_2d[2][2] =
-      //               flip:
+    if (dim == 1)
       {
-        {0, 1}, // false
-        {1, 0}  // true
-      };
-
-    static const int lookup_table_3d[2][2][2][4] =
-      //                           orientation flip  rotation
-      {{{
-          {0, 2, 1, 3}, // false       false false
-          {2, 3, 0, 1}  // false       false true
-        },
-        {
-          {3, 1, 2, 0}, // false       true  false
-          {1, 0, 3, 2}  // false       true  true
-        }},
-       {{
-          {0, 1, 2, 3}, // true        false false
-          {1, 3, 0, 2}  // true        false true
-        },
-        {
-          {3, 2, 1, 0}, // true        true  false
-          {2, 0, 3, 1}  // true        true  true
-        }}};
-
-    if (cell_1->has_children())
-      {
-        if (cell_2->has_children())
+        if (cell_1->has_children())
           {
-            // In the case that both faces have children, we loop over all
-            // children and apply update_periodic_face_map_recursively
-            // recursively:
-
-            Assert(face_1->n_children() ==
-                       GeometryInfo<dim>::max_children_per_face &&
-                     face_2->n_children() ==
-                       GeometryInfo<dim>::max_children_per_face,
-                   ExcNotImplemented());
-
-            for (unsigned int i = 0;
-                 i < GeometryInfo<dim>::max_children_per_face;
-                 ++i)
+            if (cell_2->has_children())
               {
-                // Lookup the index for the second face
-                unsigned int j = 0;
-                switch (dim)
-                  {
-                    case 2:
-                      j = lookup_table_2d[face_flip][i];
-                      break;
-                    case 3:
-                      j = lookup_table_3d[face_orientation][face_flip]
-                                         [face_rotation][i];
-                      break;
-                    default:
-                      AssertThrow(false, ExcNotImplemented());
-                  }
-
-                // find subcell ids that belong to the subface indices
-                unsigned int child_cell_1 =
-                  GeometryInfo<dim>::child_cell_on_face(
-                    cell_1->refinement_case(),
-                    n_face_1,
-                    i,
-                    cell_1->face_orientation(n_face_1),
-                    cell_1->face_flip(n_face_1),
-                    cell_1->face_rotation(n_face_1),
-                    face_1->refinement_case());
-                unsigned int child_cell_2 =
-                  GeometryInfo<dim>::child_cell_on_face(
-                    cell_2->refinement_case(),
-                    n_face_2,
-                    j,
-                    cell_2->face_orientation(n_face_2),
-                    cell_2->face_flip(n_face_2),
-                    cell_2->face_rotation(n_face_2),
-                    face_2->refinement_case());
-
-                Assert(cell_1->child(child_cell_1)->face(n_face_1) ==
-                         face_1->child(i),
-                       ExcInternalError());
-                Assert(cell_2->child(child_cell_2)->face(n_face_2) ==
-                         face_2->child(j),
-                       ExcInternalError());
-
-                // precondition: subcell has the same orientation as cell (so
-                // that the face numbers coincide) recursive call
                 update_periodic_face_map_recursively<dim, spacedim>(
-                  cell_1->child(child_cell_1),
-                  cell_2->child(child_cell_2),
+                  cell_1->child(n_face_1),
+                  cell_2->child(n_face_2),
+                  n_face_1,
+                  n_face_2,
+                  orientation,
+                  periodic_face_map);
+              }
+            else // only face_1 has children
+              {
+                update_periodic_face_map_recursively<dim, spacedim>(
+                  cell_1->child(n_face_1),
+                  cell_2,
                   n_face_1,
                   n_face_2,
                   orientation,
                   periodic_face_map);
               }
           }
-        else // only face_1 has children
-          {
-            for (unsigned int i = 0;
-                 i < GeometryInfo<dim>::max_children_per_face;
-                 ++i)
-              {
-                // find subcell ids that belong to the subface indices
-                unsigned int child_cell_1 =
-                  GeometryInfo<dim>::child_cell_on_face(
-                    cell_1->refinement_case(),
-                    n_face_1,
-                    i,
-                    cell_1->face_orientation(n_face_1),
-                    cell_1->face_flip(n_face_1),
-                    cell_1->face_rotation(n_face_1),
-                    face_1->refinement_case());
+      }
+    else // dim == 2 || dim == 3
+      {
+        // A lookup table on how to go through the child cells depending on the
+        // orientation:
+        // see Documentation of GeometryInfo for details
 
-                // recursive call
-                update_periodic_face_map_recursively<dim, spacedim>(
-                  cell_1->child(child_cell_1),
-                  cell_2,
-                  n_face_1,
-                  n_face_2,
-                  orientation,
-                  periodic_face_map);
+        static const int lookup_table_2d[2][2] =
+          //               flip:
+          {
+            {0, 1}, // false
+            {1, 0}  // true
+          };
+
+        static const int lookup_table_3d[2][2][2][4] =
+          //                           orientation flip  rotation
+          {{{
+              {0, 2, 1, 3}, // false       false false
+              {2, 3, 0, 1}  // false       false true
+            },
+            {
+              {3, 1, 2, 0}, // false       true  false
+              {1, 0, 3, 2}  // false       true  true
+            }},
+           {{
+              {0, 1, 2, 3}, // true        false false
+              {1, 3, 0, 2}  // true        false true
+            },
+            {
+              {3, 2, 1, 0}, // true        true  false
+              {2, 0, 3, 1}  // true        true  true
+            }}};
+
+        if (cell_1->has_children())
+          {
+            if (cell_2->has_children())
+              {
+                // In the case that both faces have children, we loop over all
+                // children and apply update_periodic_face_map_recursively
+                // recursively:
+
+                Assert(face_1->n_children() ==
+                           GeometryInfo<dim>::max_children_per_face &&
+                         face_2->n_children() ==
+                           GeometryInfo<dim>::max_children_per_face,
+                       ExcNotImplemented());
+
+                for (unsigned int i = 0;
+                     i < GeometryInfo<dim>::max_children_per_face;
+                     ++i)
+                  {
+                    // Lookup the index for the second face
+                    unsigned int j = 0;
+                    switch (dim)
+                      {
+                        case 2:
+                          j = lookup_table_2d[face_flip][i];
+                          break;
+                        case 3:
+                          j = lookup_table_3d[face_orientation][face_flip]
+                                             [face_rotation][i];
+                          break;
+                        default:
+                          AssertThrow(false, ExcNotImplemented());
+                      }
+
+                    // find subcell ids that belong to the subface indices
+                    unsigned int child_cell_1 =
+                      GeometryInfo<dim>::child_cell_on_face(
+                        cell_1->refinement_case(),
+                        n_face_1,
+                        i,
+                        cell_1->face_orientation(n_face_1),
+                        cell_1->face_flip(n_face_1),
+                        cell_1->face_rotation(n_face_1),
+                        face_1->refinement_case());
+                    unsigned int child_cell_2 =
+                      GeometryInfo<dim>::child_cell_on_face(
+                        cell_2->refinement_case(),
+                        n_face_2,
+                        j,
+                        cell_2->face_orientation(n_face_2),
+                        cell_2->face_flip(n_face_2),
+                        cell_2->face_rotation(n_face_2),
+                        face_2->refinement_case());
+
+                    Assert(cell_1->child(child_cell_1)->face(n_face_1) ==
+                             face_1->child(i),
+                           ExcInternalError());
+                    Assert(cell_2->child(child_cell_2)->face(n_face_2) ==
+                             face_2->child(j),
+                           ExcInternalError());
+
+                    // precondition: subcell has the same orientation as cell
+                    // (so that the face numbers coincide) recursive call
+                    update_periodic_face_map_recursively<dim, spacedim>(
+                      cell_1->child(child_cell_1),
+                      cell_2->child(child_cell_2),
+                      n_face_1,
+                      n_face_2,
+                      orientation,
+                      periodic_face_map);
+                  }
+              }
+            else // only face_1 has children
+              {
+                for (unsigned int i = 0;
+                     i < GeometryInfo<dim>::max_children_per_face;
+                     ++i)
+                  {
+                    // find subcell ids that belong to the subface indices
+                    unsigned int child_cell_1 =
+                      GeometryInfo<dim>::child_cell_on_face(
+                        cell_1->refinement_case(),
+                        n_face_1,
+                        i,
+                        cell_1->face_orientation(n_face_1),
+                        cell_1->face_flip(n_face_1),
+                        cell_1->face_rotation(n_face_1),
+                        face_1->refinement_case());
+
+                    // recursive call
+                    update_periodic_face_map_recursively<dim, spacedim>(
+                      cell_1->child(child_cell_1),
+                      cell_2,
+                      n_face_1,
+                      n_face_2,
+                      orientation,
+                      periodic_face_map);
+                  }
               }
           }
       }
