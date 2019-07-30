@@ -102,6 +102,10 @@ test()
           fe_values.reinit(dof_cell);
           const std::vector<Point<dim>> &q_points =
             fe_values.get_quadrature_points();
+          // before initialization, you can erase it without any consequences
+          const bool erased_nonexisting_data = data_storage.erase(cell);
+          Assert(!erased_nonexisting_data, ExcInternalError());
+          // initialize
           data_storage.initialize(cell, rhs.size());
           {
             std::vector<std::shared_ptr<MyQData>> qpd =
