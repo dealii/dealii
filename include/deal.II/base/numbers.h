@@ -39,16 +39,48 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for a specified data type Number for the given processor architecture and
+   * optimization level.
+   *
+   * The value of the maximal vector length is used as default template
+   * argument in VectorizedArray, such that VectorizedArray<Number> is
+   * equivalent to VectorizedArray<Number,
+   * VectorizedArrayWidthSpecifier<Number>::max_width>.
+   *
+   * @note This class is the default implementation for data types for which
+   * no vectorization is supported.
+   *
+   * @tparam Number The underlying data type for which one wants to find out
+   *   the maximal length of hardware supported vectors.
+   *
+   * @author Peter Munch, 2019
+   */
   template <typename Number>
   struct VectorizedArrayWidthSpecifier
   {
-    static const unsigned int max_width = 1;
+    /**
+     * Maximal vector length of VectorizedArray for an arbitrary type.
+     */
+    constexpr static unsigned int max_width = 1;
   };
 
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for the data type `double` for the given processor architecture and
+   * optimization level. For a detailed description of supported maximal vector
+   * lengths, see the the documentation of VectorizedArray.
+   *
+   * @author Peter Munch, 2019
+   */
   template <>
   struct VectorizedArrayWidthSpecifier<double>
   {
-    static const unsigned int max_width =
+    /**
+     * Maximal vector length of VectorizedArray for double.
+     */
+    constexpr static unsigned int max_width =
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
       2;
 #elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
@@ -62,10 +94,21 @@ namespace internal
 #endif
   };
 
+  /**
+   * A helper class specifying the maximal vector length of VectorizedArray
+   * for the data type `float` for the given processor architecture and
+   * optimization level. For a detailed description of supported maximal vector
+   * lengths, see the the documentation of VectorizedArray.
+   *
+   * @author Peter Munch, 2019
+   */
   template <>
   struct VectorizedArrayWidthSpecifier<float>
   {
-    static const unsigned int max_width =
+    /**
+     * Maximal vector length of VectorizedArray for float.
+     */
+    constexpr static unsigned int max_width =
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
       4;
 #elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
