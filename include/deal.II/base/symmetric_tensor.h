@@ -3536,16 +3536,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
   // (as well as with switched arguments and double<->float).
   using product_type = typename ProductType<Number, OtherNumber>::type;
   SymmetricTensor<rank_, dim, product_type> tt(t);
-  // we used to shorten the following by 'tt *= product_type(factor);'
-  // which requires that a converting constructor
-  // 'product_type::product_type(const OtherNumber) is defined.
-  // however, a user-defined constructor is not allowed for aggregates,
-  // e.g. VectorizedArray. therefore, we work around this issue using a
-  // copy-assignment operator 'product_type::operator=(const OtherNumber)'
-  // which we assume to be defined.
-  product_type new_factor;
-  new_factor = factor;
-  tt *= new_factor;
+  tt *= product_type(factor);
   return tt;
 }
 
