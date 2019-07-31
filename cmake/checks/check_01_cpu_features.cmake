@@ -290,6 +290,15 @@ IF(DEAL_II_HAVE_ALTIVEC)
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
 ENDIF()
 
+#
+# We need to disable SIMD vectorization for CUDA device code.
+# Otherwise, nvcc compilers from version 9 on will emit an error message like:
+# "[...] contains a vector, which is not supported in device code"
+#
+
+IF(DEAL_II_WITH_CUDA)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
+ENDIF()
 
 #
 # If we have OpenMP SIMD support (i.e. DEAL_II_HAVE_OPENMP_SIMD is true)
