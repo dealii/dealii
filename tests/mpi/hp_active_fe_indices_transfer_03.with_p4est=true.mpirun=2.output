@@ -1,175 +1,215 @@
 
 DEAL:0:2d::cells before: 16
-DEAL:0:2d::myid=0 cellid=0_1:0 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:1 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:2 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:3 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:0 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:1 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:2 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:3 fe_index=0
+DEAL:0:2d::cellid=0_1:0 fe_index=0
+DEAL:0:2d::cellid=0_1:1 fe_index=0
+DEAL:0:2d::cellid=0_1:2 fe_index=0
+DEAL:0:2d::cellid=0_1:3 fe_index=0
+DEAL:0:2d::cellid=1_1:0 fe_index=0
+DEAL:0:2d::cellid=1_1:1 fe_index=0
+DEAL:0:2d::cellid=1_1:2 fe_index=0
+DEAL:0:2d::cellid=1_1:3 fe_index=0
 DEAL:0:2d::cells after: 16
-DEAL:0:2d::myid=0 cellid=0_1:0 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:1 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:2 fe_index=0
-DEAL:0:2d::myid=0 cellid=0_1:3 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:0 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:1 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:2 fe_index=0
-DEAL:0:2d::myid=0 cellid=1_1:3 fe_index=0
-DEAL:0:2d::myid=0 cellid=2_1:0 fe_index=1
-DEAL:0:2d::myid=0 cellid=2_1:1 fe_index=1
-DEAL:0:2d::myid=0 cellid=2_1:2 fe_index=1
-DEAL:0:2d::myid=0 cellid=2_1:3 fe_index=1
+DEAL:0:2d::cellid=0_1:0 fe_index=0
+DEAL:0:2d::cellid=0_1:1 fe_index=0
+DEAL:0:2d::cellid=0_1:2 fe_index=0
+DEAL:0:2d::cellid=0_1:3 fe_index=0
+DEAL:0:2d::cellid=1_1:0 fe_index=0
+DEAL:0:2d::cellid=1_1:1 fe_index=0
+DEAL:0:2d::cellid=1_1:2 fe_index=0
+DEAL:0:2d::cellid=1_1:3 fe_index=0
+DEAL:0:2d::cellid=2_1:0 fe_index=1
+DEAL:0:2d::cellid=2_1:1 fe_index=1
+DEAL:0:2d::cellid=2_1:2 fe_index=1
+DEAL:0:2d::cellid=2_1:3 fe_index=1
+DEAL:0:2d::cellid=3_1:0 fe_index=1 ghost
+DEAL:0:2d::cellid=3_1:1 fe_index=1 ghost
+DEAL:0:2d::cellid=3_1:2 fe_index=1 ghost
 DEAL:0:2d::OK
 DEAL:0:3d::cells before: 64
-DEAL:0:3d::myid=0 cellid=0_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:7 fe_index=0
+DEAL:0:3d::cellid=0_1:0 fe_index=0
+DEAL:0:3d::cellid=0_1:1 fe_index=0
+DEAL:0:3d::cellid=0_1:2 fe_index=0
+DEAL:0:3d::cellid=0_1:3 fe_index=0
+DEAL:0:3d::cellid=0_1:4 fe_index=0
+DEAL:0:3d::cellid=0_1:5 fe_index=0
+DEAL:0:3d::cellid=0_1:6 fe_index=0
+DEAL:0:3d::cellid=0_1:7 fe_index=0
+DEAL:0:3d::cellid=1_1:0 fe_index=0
+DEAL:0:3d::cellid=1_1:1 fe_index=0
+DEAL:0:3d::cellid=1_1:2 fe_index=0
+DEAL:0:3d::cellid=1_1:3 fe_index=0
+DEAL:0:3d::cellid=1_1:4 fe_index=0
+DEAL:0:3d::cellid=1_1:5 fe_index=0
+DEAL:0:3d::cellid=1_1:6 fe_index=0
+DEAL:0:3d::cellid=1_1:7 fe_index=0
+DEAL:0:3d::cellid=2_1:0 fe_index=0
+DEAL:0:3d::cellid=2_1:1 fe_index=0
+DEAL:0:3d::cellid=2_1:2 fe_index=0
+DEAL:0:3d::cellid=2_1:3 fe_index=0
+DEAL:0:3d::cellid=2_1:4 fe_index=0
+DEAL:0:3d::cellid=2_1:5 fe_index=0
+DEAL:0:3d::cellid=2_1:6 fe_index=0
+DEAL:0:3d::cellid=2_1:7 fe_index=0
+DEAL:0:3d::cellid=3_1:0 fe_index=0
+DEAL:0:3d::cellid=3_1:1 fe_index=0
+DEAL:0:3d::cellid=3_1:2 fe_index=0
+DEAL:0:3d::cellid=3_1:3 fe_index=0
+DEAL:0:3d::cellid=3_1:4 fe_index=0
+DEAL:0:3d::cellid=3_1:5 fe_index=0
+DEAL:0:3d::cellid=3_1:6 fe_index=0
+DEAL:0:3d::cellid=3_1:7 fe_index=0
 DEAL:0:3d::cells after: 64
-DEAL:0:3d::myid=0 cellid=0_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=0_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=1_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=2_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:0 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:1 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:2 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:3 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:4 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:5 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:6 fe_index=0
-DEAL:0:3d::myid=0 cellid=3_1:7 fe_index=0
-DEAL:0:3d::myid=0 cellid=4_1:0 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:1 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:2 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:3 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:4 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:5 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:6 fe_index=1
-DEAL:0:3d::myid=0 cellid=4_1:7 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:0 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:1 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:2 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:3 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:4 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:5 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:6 fe_index=1
-DEAL:0:3d::myid=0 cellid=5_1:7 fe_index=1
+DEAL:0:3d::cellid=0_1:0 fe_index=0
+DEAL:0:3d::cellid=0_1:1 fe_index=0
+DEAL:0:3d::cellid=0_1:2 fe_index=0
+DEAL:0:3d::cellid=0_1:3 fe_index=0
+DEAL:0:3d::cellid=0_1:4 fe_index=0
+DEAL:0:3d::cellid=0_1:5 fe_index=0
+DEAL:0:3d::cellid=0_1:6 fe_index=0
+DEAL:0:3d::cellid=0_1:7 fe_index=0
+DEAL:0:3d::cellid=1_1:0 fe_index=0
+DEAL:0:3d::cellid=1_1:1 fe_index=0
+DEAL:0:3d::cellid=1_1:2 fe_index=0
+DEAL:0:3d::cellid=1_1:3 fe_index=0
+DEAL:0:3d::cellid=1_1:4 fe_index=0
+DEAL:0:3d::cellid=1_1:5 fe_index=0
+DEAL:0:3d::cellid=1_1:6 fe_index=0
+DEAL:0:3d::cellid=1_1:7 fe_index=0
+DEAL:0:3d::cellid=2_1:0 fe_index=0
+DEAL:0:3d::cellid=2_1:1 fe_index=0
+DEAL:0:3d::cellid=2_1:2 fe_index=0
+DEAL:0:3d::cellid=2_1:3 fe_index=0
+DEAL:0:3d::cellid=2_1:4 fe_index=0
+DEAL:0:3d::cellid=2_1:5 fe_index=0
+DEAL:0:3d::cellid=2_1:6 fe_index=0
+DEAL:0:3d::cellid=2_1:7 fe_index=0
+DEAL:0:3d::cellid=3_1:0 fe_index=0
+DEAL:0:3d::cellid=3_1:1 fe_index=0
+DEAL:0:3d::cellid=3_1:2 fe_index=0
+DEAL:0:3d::cellid=3_1:3 fe_index=0
+DEAL:0:3d::cellid=3_1:4 fe_index=0
+DEAL:0:3d::cellid=3_1:5 fe_index=0
+DEAL:0:3d::cellid=3_1:6 fe_index=0
+DEAL:0:3d::cellid=3_1:7 fe_index=0
+DEAL:0:3d::cellid=4_1:0 fe_index=1
+DEAL:0:3d::cellid=4_1:1 fe_index=1
+DEAL:0:3d::cellid=4_1:2 fe_index=1
+DEAL:0:3d::cellid=4_1:3 fe_index=1
+DEAL:0:3d::cellid=4_1:4 fe_index=1
+DEAL:0:3d::cellid=4_1:5 fe_index=1
+DEAL:0:3d::cellid=4_1:6 fe_index=1
+DEAL:0:3d::cellid=4_1:7 fe_index=1
+DEAL:0:3d::cellid=5_1:0 fe_index=1
+DEAL:0:3d::cellid=5_1:1 fe_index=1
+DEAL:0:3d::cellid=5_1:2 fe_index=1
+DEAL:0:3d::cellid=5_1:3 fe_index=1
+DEAL:0:3d::cellid=5_1:4 fe_index=1
+DEAL:0:3d::cellid=5_1:5 fe_index=1
+DEAL:0:3d::cellid=5_1:6 fe_index=1
+DEAL:0:3d::cellid=5_1:7 fe_index=1
+DEAL:0:3d::cellid=6_1:0 fe_index=1 ghost
+DEAL:0:3d::cellid=6_1:1 fe_index=1 ghost
+DEAL:0:3d::cellid=6_1:2 fe_index=1 ghost
+DEAL:0:3d::cellid=6_1:3 fe_index=1 ghost
+DEAL:0:3d::cellid=6_1:4 fe_index=1 ghost
+DEAL:0:3d::cellid=6_1:5 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:0 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:1 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:2 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:3 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:4 fe_index=1 ghost
+DEAL:0:3d::cellid=7_1:5 fe_index=1 ghost
 DEAL:0:3d::OK
 
 DEAL:1:2d::cells before: 16
-DEAL:1:2d::myid=1 cellid=2_1:0 fe_index=1
-DEAL:1:2d::myid=1 cellid=2_1:1 fe_index=1
-DEAL:1:2d::myid=1 cellid=2_1:2 fe_index=1
-DEAL:1:2d::myid=1 cellid=2_1:3 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:0 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:1 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:2 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:3 fe_index=1
+DEAL:1:2d::cellid=2_1:0 fe_index=1
+DEAL:1:2d::cellid=2_1:1 fe_index=1
+DEAL:1:2d::cellid=2_1:2 fe_index=1
+DEAL:1:2d::cellid=2_1:3 fe_index=1
+DEAL:1:2d::cellid=3_1:0 fe_index=1
+DEAL:1:2d::cellid=3_1:1 fe_index=1
+DEAL:1:2d::cellid=3_1:2 fe_index=1
+DEAL:1:2d::cellid=3_1:3 fe_index=1
 DEAL:1:2d::cells after: 16
-DEAL:1:2d::myid=1 cellid=3_1:0 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:1 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:2 fe_index=1
-DEAL:1:2d::myid=1 cellid=3_1:3 fe_index=1
+DEAL:1:2d::cellid=0_1:3 fe_index=0 ghost
+DEAL:1:2d::cellid=1_1:2 fe_index=0 ghost
+DEAL:1:2d::cellid=1_1:3 fe_index=0 ghost
+DEAL:1:2d::cellid=2_1:1 fe_index=1 ghost
+DEAL:1:2d::cellid=2_1:3 fe_index=1 ghost
+DEAL:1:2d::cellid=3_1:0 fe_index=1
+DEAL:1:2d::cellid=3_1:1 fe_index=1
+DEAL:1:2d::cellid=3_1:2 fe_index=1
+DEAL:1:2d::cellid=3_1:3 fe_index=1
 DEAL:1:2d::OK
 DEAL:1:3d::cells before: 64
-DEAL:1:3d::myid=1 cellid=4_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=4_1:7 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=5_1:7 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:7 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:7 fe_index=1
+DEAL:1:3d::cellid=4_1:0 fe_index=1
+DEAL:1:3d::cellid=4_1:1 fe_index=1
+DEAL:1:3d::cellid=4_1:2 fe_index=1
+DEAL:1:3d::cellid=4_1:3 fe_index=1
+DEAL:1:3d::cellid=4_1:4 fe_index=1
+DEAL:1:3d::cellid=4_1:5 fe_index=1
+DEAL:1:3d::cellid=4_1:6 fe_index=1
+DEAL:1:3d::cellid=4_1:7 fe_index=1
+DEAL:1:3d::cellid=5_1:0 fe_index=1
+DEAL:1:3d::cellid=5_1:1 fe_index=1
+DEAL:1:3d::cellid=5_1:2 fe_index=1
+DEAL:1:3d::cellid=5_1:3 fe_index=1
+DEAL:1:3d::cellid=5_1:4 fe_index=1
+DEAL:1:3d::cellid=5_1:5 fe_index=1
+DEAL:1:3d::cellid=5_1:6 fe_index=1
+DEAL:1:3d::cellid=5_1:7 fe_index=1
+DEAL:1:3d::cellid=6_1:0 fe_index=1
+DEAL:1:3d::cellid=6_1:1 fe_index=1
+DEAL:1:3d::cellid=6_1:2 fe_index=1
+DEAL:1:3d::cellid=6_1:3 fe_index=1
+DEAL:1:3d::cellid=6_1:4 fe_index=1
+DEAL:1:3d::cellid=6_1:5 fe_index=1
+DEAL:1:3d::cellid=6_1:6 fe_index=1
+DEAL:1:3d::cellid=6_1:7 fe_index=1
+DEAL:1:3d::cellid=7_1:0 fe_index=1
+DEAL:1:3d::cellid=7_1:1 fe_index=1
+DEAL:1:3d::cellid=7_1:2 fe_index=1
+DEAL:1:3d::cellid=7_1:3 fe_index=1
+DEAL:1:3d::cellid=7_1:4 fe_index=1
+DEAL:1:3d::cellid=7_1:5 fe_index=1
+DEAL:1:3d::cellid=7_1:6 fe_index=1
+DEAL:1:3d::cellid=7_1:7 fe_index=1
 DEAL:1:3d::cells after: 64
-DEAL:1:3d::myid=1 cellid=6_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=6_1:7 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:0 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:1 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:2 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:3 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:4 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:5 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:6 fe_index=1
-DEAL:1:3d::myid=1 cellid=7_1:7 fe_index=1
+DEAL:1:3d::cellid=0_1:6 fe_index=0 ghost
+DEAL:1:3d::cellid=0_1:7 fe_index=0 ghost
+DEAL:1:3d::cellid=1_1:6 fe_index=0 ghost
+DEAL:1:3d::cellid=1_1:7 fe_index=0 ghost
+DEAL:1:3d::cellid=2_1:4 fe_index=0 ghost
+DEAL:1:3d::cellid=2_1:5 fe_index=0 ghost
+DEAL:1:3d::cellid=2_1:6 fe_index=0 ghost
+DEAL:1:3d::cellid=2_1:7 fe_index=0 ghost
+DEAL:1:3d::cellid=3_1:4 fe_index=0 ghost
+DEAL:1:3d::cellid=3_1:5 fe_index=0 ghost
+DEAL:1:3d::cellid=3_1:6 fe_index=0 ghost
+DEAL:1:3d::cellid=3_1:7 fe_index=0 ghost
+DEAL:1:3d::cellid=4_1:2 fe_index=1 ghost
+DEAL:1:3d::cellid=4_1:3 fe_index=1 ghost
+DEAL:1:3d::cellid=4_1:6 fe_index=1 ghost
+DEAL:1:3d::cellid=4_1:7 fe_index=1 ghost
+DEAL:1:3d::cellid=5_1:2 fe_index=1 ghost
+DEAL:1:3d::cellid=5_1:3 fe_index=1 ghost
+DEAL:1:3d::cellid=5_1:6 fe_index=1 ghost
+DEAL:1:3d::cellid=5_1:7 fe_index=1 ghost
+DEAL:1:3d::cellid=6_1:0 fe_index=1
+DEAL:1:3d::cellid=6_1:1 fe_index=1
+DEAL:1:3d::cellid=6_1:2 fe_index=1
+DEAL:1:3d::cellid=6_1:3 fe_index=1
+DEAL:1:3d::cellid=6_1:4 fe_index=1
+DEAL:1:3d::cellid=6_1:5 fe_index=1
+DEAL:1:3d::cellid=6_1:6 fe_index=1
+DEAL:1:3d::cellid=6_1:7 fe_index=1
+DEAL:1:3d::cellid=7_1:0 fe_index=1
+DEAL:1:3d::cellid=7_1:1 fe_index=1
+DEAL:1:3d::cellid=7_1:2 fe_index=1
+DEAL:1:3d::cellid=7_1:3 fe_index=1
+DEAL:1:3d::cellid=7_1:4 fe_index=1
+DEAL:1:3d::cellid=7_1:5 fe_index=1
+DEAL:1:3d::cellid=7_1:6 fe_index=1
+DEAL:1:3d::cellid=7_1:7 fe_index=1
 DEAL:1:3d::OK
 
