@@ -29,10 +29,10 @@ SET_IF_EMPTY(ZLIB_DIR "$ENV{ZLIB_DIR}")
 IF(NOT "${ZLIB_DIR}" STREQUAL "")
   SET(ZLIB_ROOT ${ZLIB_DIR})
 ENDIF()
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+# temporarily disable ${deal.II_SOURCE_DIR}/cmake/modules for module lookup
+LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(ZLIB)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+LIST(APPEND CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 
 SET(ZLIB_VERSION ${ZLIB_VERSION_STRING})
 

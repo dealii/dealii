@@ -18,31 +18,31 @@ IF(DEAL_II_COMPONENT_PACKAGE)
   SET(CPACK_GENERATOR "Bundle")
 
   CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/mac_startup_script.sh.in
-    ${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh
+    ${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/mac_startup_script.sh.in
+    ${deal.II_BINARY_DIR}/cpack/mac_startup_script.sh
     @ONLY
     )
 
   CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-terminal.in
-    ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
+    ${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-terminal.in
+    ${deal.II_BINARY_DIR}/cpack/dealii-terminal
     @ONLY
     )
 
   CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii.conf.in
-    ${CMAKE_BINARY_DIR}/cpack/dealii.conf
+    ${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii.conf.in
+    ${deal.II_BINARY_DIR}/cpack/dealii.conf
     @ONLY
     )
 
   CONFIGURE_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/Info.plist.in
-    ${CMAKE_BINARY_DIR}/cpack/Info.plist
+    ${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/Info.plist.in
+    ${deal.II_BINARY_DIR}/cpack/Info.plist
     @ONLY
     )
 
   SET(CPACK_PACKAGE_ICON
-    "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
+    "${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
     )
 
   set(CPACK_PACKAGE_FILE_NAME
@@ -56,24 +56,24 @@ IF(DEAL_II_COMPONENT_PACKAGE)
   MESSAGE(STATUS "  Application: ${DEAL_II_CPACK_BUNDLE_NAME}.app")
 
   SET(CPACK_BUNDLE_ICON
-    "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
+    "${deal.II_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
     )
 
   SET(CPACK_BUNDLE_PLIST
-    "${CMAKE_BINARY_DIR}/cpack/Info.plist"
+    "${deal.II_BINARY_DIR}/cpack/Info.plist"
     )
 
   SET(CPACK_BUNDLE_STARTUP_COMMAND
-    "${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh"
+    "${deal.II_BINARY_DIR}/cpack/mac_startup_script.sh"
     )
 
   INSTALL(FILES
-    ${CMAKE_BINARY_DIR}/cpack/dealii.conf
+    ${deal.II_BINARY_DIR}/cpack/dealii.conf
     DESTINATION ${DEAL_II_SHARE_RELDIR}
     )
 
   INSTALL(PROGRAMS
-    ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
+    ${deal.II_BINARY_DIR}/cpack/dealii-terminal
     DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
     )
 

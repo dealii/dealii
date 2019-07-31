@@ -17,7 +17,7 @@
 
 # Collect all of the directory names for the tutorial programs
 FILE(GLOB _deal_ii_steps
-  ${CMAKE_SOURCE_DIR}/examples/step-*
+  ${deal.II_SOURCE_DIR}/examples/step-*
   )
 
 # Also collect the names of all code gallery projects. To
@@ -27,7 +27,7 @@ FILE(GLOB _deal_ii_steps
 # For unclear reasons, the glob returns these files as
 # "/a/b/c/name//doc//author", so make sure we eat the
 # double slashes in the second step
-SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${deal.II_SOURCE_DIR}/code-gallery)
 FILE(GLOB _code_gallery_names 
      "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
 STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
@@ -63,17 +63,17 @@ ADD_CUSTOM_TARGET(tutorial)
 #
 
 file(GLOB _deal_ii_steps_tooltip
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
+  ${deal.II_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
 FOREACH(_gallery ${_code_gallery_names})
   LIST(APPEND _deal_ii_code_gallery_tooltip
        ${_gallery}/doc/tooltip)
 ENDFOREACH()
 file(GLOB _deal_ii_steps_kind
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
+  ${deal.II_SOURCE_DIR}/examples/step-*/doc/kind
   )
 file(GLOB _deal_ii_steps_buildson
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  ${deal.II_SOURCE_DIR}/examples/step-*/doc/builds-on
   )
 FOREACH(_gallery ${_code_gallery_names})
   LIST(APPEND _deal_ii_code_gallery_buildson
@@ -85,13 +85,13 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   COMMAND ${PERL_EXECUTABLE}
   ARGS
-    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
+    ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps}
     ${_code_gallery_names}
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
-    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
+    ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps_tooltip}
     ${_deal_ii_steps_kind}
@@ -113,7 +113,7 @@ ADD_DEPENDENCIES(tutorial build_tutorial_h)
 FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
-  IF(EXISTS "${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cu")
+  IF(EXISTS "${deal.II_SOURCE_DIR}/examples/${_step}/${_step}.cu")
     SET(_FILE_EXTENSION "cu")
   ELSE()
     SET(_FILE_EXTENSION "cc")
@@ -123,12 +123,12 @@ FOREACH(_step ${_deal_ii_steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/program2plain
+      < ${deal.II_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
       > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/program2plain
+      ${deal.II_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
     VERBATIM
     )
 
@@ -136,19 +136,19 @@ FOREACH(_step ${_deal_ii_steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
-      ${_step} ${CMAKE_SOURCE_DIR}
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${_step} ${deal.II_SOURCE_DIR}
       > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     WORKING_DIRECTORY
       ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+      ${deal.II_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
+      ${deal.II_SOURCE_DIR}/examples/${_step}/doc/intro.dox
+      ${deal.II_SOURCE_DIR}/examples/${_step}/doc/results.dox
     )
 
   ADD_CUSTOM_TARGET(tutorial_${_step}

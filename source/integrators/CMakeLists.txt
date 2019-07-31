@@ -19,7 +19,7 @@ SET(_src
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/integrators/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/integrators/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_integrators OBJECT ${_src} ${_header})

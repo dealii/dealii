@@ -24,7 +24,7 @@
 
 MACRO(EVALUATE_EXPRESSION _the_expression)
   SET(_tmp_name
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/evaluate_expression.tmp"
+    "${deal.II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/evaluate_expression.tmp"
     )
   FILE(WRITE ${_tmp_name} "${_the_expression}")
   INCLUDE("${_tmp_name}")

@@ -130,11 +130,11 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
-  ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.cuh
+  ${deal.II_SOURCE_DIR}/include/deal.II/base/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/base/*.cuh
   )
 
 DEAL_II_ADD_LIBRARY(obj_base OBJECT ${_src} ${_header} ${_inst}
-  ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+  ${deal.II_BINARY_DIR}/include/deal.II/base/config.h
   )
 EXPAND_INSTANTIATIONS(obj_base "${_inst}")

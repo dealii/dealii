@@ -51,10 +51,10 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       DEPENDS ${_dependency}
-              ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
+              ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
       COMMAND ${_command}
-      ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
+      ARGS ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
            > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp
       COMMAND ${CMAKE_COMMAND}

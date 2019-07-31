@@ -110,7 +110,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
       CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
+    VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
@@ -118,7 +118,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   # Setup for ICC compiler (version >= 10):
   #
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
+    VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
@@ -126,7 +126,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   # Setup for MSVC compiler (version >= 2012):
   #
    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
+    VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 

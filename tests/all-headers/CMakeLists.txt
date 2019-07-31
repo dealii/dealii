@@ -91,7 +91,7 @@ FOREACH(_header ${_headers})
       # And finally add the test:
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
-          -DBINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${deal.II_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

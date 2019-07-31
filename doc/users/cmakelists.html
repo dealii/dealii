@@ -214,14 +214,14 @@ compile automatically:
 
 <pre class="cmake">
 ADD_CUSTOM_TARGET(debug
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${deal.II_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} --build ${deal.II_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
   )
 
 ADD_CUSTOM_TARGET(release
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${deal.II_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} --build ${deal.II_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Release"
   )
 </pre>
@@ -307,7 +307,7 @@ like:
 
 INCLUDE_DIRECTORIES(
   include
-  ${CMAKE_SOURCE_DIR}/mylib/include
+  ${deal.II_SOURCE_DIR}/mylib/include
   )
 
 ADD_EXECUTABLE(mycode source/mycode.cc)
@@ -323,18 +323,18 @@ current directory (and subdirectories, included with
 <code>ADD_SUBDIRECTORY</code>. The level above will not be affected.
 Therefore, we have to specify the include directories for "mylib" again in
 the subdirectory <code>mycode</code> - this time with full path
-<code>${CMAKE_SOURCE_DIR}/mylib/include</code>.
+<code>${deal.II_SOURCE_DIR}/mylib/include</code>.
 </p>
 
 <p>
 CMake defines the following variables for access to important directories:
 
 <pre class="cmake">
-CMAKE_SOURCE_DIR
+deal.II_SOURCE_DIR
   - the source directory (i.e. the directory of the top level
     CMakeLists.txt file)
 
-CMAKE_BINARY_DIR
+deal.II_BINARY_DIR
   - the (top level) build directory
 
 CMAKE_CURRENT_SOURCE_DIR
@@ -429,7 +429,7 @@ The following example will pick up every source file under
 <code>SOURCE_DIR/sources/</code> and add it to an executable:</p>
 
 <pre class="cmake">
-FILE(GLOB sources ${CMAKE_SOURCE_DIR}/source/*.cc)
+FILE(GLOB sources ${deal.II_SOURCE_DIR}/source/*.cc)
 ADD_EXECUTABLE(mycode ${sources})
 </pre>
 
@@ -591,15 +591,15 @@ a copy of a skeleton <code>run</code> folder from the source directory:
 
 <pre class="cmake">
 # Copy folder run from the source to the build directory:
-FILE(COPY ${CMAKE_SOURCE_DIR}/run DESTINATION ${CMAKE_BINARY_DIR})
+FILE(COPY ${deal.II_SOURCE_DIR}/run DESTINATION ${deal.II_BINARY_DIR})
 
 ADD_EXECUTABLE(mycode mycode.cc)
 SET_PROPERTY(TARGET mycode
-  PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/run
+  PROPERTY RUNTIME_OUTPUT_DIRECTORY ${deal.II_BINARY_DIR}/run
   )
 ADD_CUSTOM_TARGET(run
   COMMAND mycode
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/run
+  WORKING_DIRECTORY ${deal.II_BINARY_DIR}/run
   )
 </pre>
 Here, we modify the <code>RUNTIME_OUTPUT_DIRECTORY</code> property of our

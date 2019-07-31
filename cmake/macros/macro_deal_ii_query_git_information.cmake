@@ -22,7 +22,7 @@
 #       DEAL_II_QUERY_GIT_INFORMATION("CUSTOM_PREFIX")
 #
 # This will try to gather information about current branch, as well as
-# short and long revision. If ${CMAKE_SOURCE_DIR} is the root of a git
+# short and long revision. If ${deal.II_SOURCE_DIR} is the root of a git
 # repository the following variables will be populated:
 #
 #       GIT_BRANCH
@@ -55,21 +55,21 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
   # Only run the following if we have git and the source directory seems to
   # be under version control.
   #
-  IF(GIT_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
+  IF(GIT_FOUND AND EXISTS ${deal.II_SOURCE_DIR}/.git/HEAD)
     #
     # Bogus configure_file calls to trigger a reconfigure, and thus an
     # update of branch and commit information every time HEAD has changed.
     #
     CONFIGURE_FILE(
-      ${CMAKE_SOURCE_DIR}/.git/HEAD
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD
+      ${deal.II_SOURCE_DIR}/.git/HEAD
+      ${deal.II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD
       )
-    FILE(STRINGS ${CMAKE_SOURCE_DIR}/.git/HEAD _head_ref LIMIT_COUNT 1)
+    FILE(STRINGS ${deal.II_SOURCE_DIR}/.git/HEAD _head_ref LIMIT_COUNT 1)
     STRING(REPLACE "ref: " "" _head_ref ${_head_ref})
-    IF(EXISTS ${CMAKE_SOURCE_DIR}/.git/${_head_ref})
+    IF(EXISTS ${deal.II_SOURCE_DIR}/.git/${_head_ref})
       CONFIGURE_FILE(
-        ${CMAKE_SOURCE_DIR}/.git/${_head_ref}
-        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD_REF
+        ${deal.II_SOURCE_DIR}/.git/${_head_ref}
+        ${deal.II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD_REF
         )
     ENDIF()
 
@@ -79,7 +79,7 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
 
     EXECUTE_PROCESS(
        COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H %h"
-       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+       WORKING_DIRECTORY ${deal.II_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -97,7 +97,7 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
 
     EXECUTE_PROCESS(
        COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD
-       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+       WORKING_DIRECTORY ${deal.II_SOURCE_DIR}
        OUTPUT_VARIABLE _branch
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -110,15 +110,15 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     # Query for tag:
     #
     SET(_script "")
-    IF(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
-      SET(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    IF(EXISTS     ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      SET(_script ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
     ELSEIF(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
       SET(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
     ENDIF()
     IF(NOT "${_script}" STREQUAL "")
        EXECUTE_PROCESS(
           COMMAND ${_script}
-          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          WORKING_DIRECTORY ${deal.II_SOURCE_DIR}
           OUTPUT_VARIABLE _tag
           RESULT_VARIABLE _result
           OUTPUT_STRIP_TRAILING_WHITESPACE

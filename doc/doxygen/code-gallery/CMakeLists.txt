@@ -28,7 +28,7 @@ ADD_CUSTOM_TARGET(code-gallery)
 # a top-level code-gallery/ directory alongside the tutorial/
 # directory
 #
-SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${deal.II_SOURCE_DIR}/code-gallery)
 IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
 
   MESSAGE(STATUS "Setting up code gallery documentation from ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
@@ -60,13 +60,13 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
       ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
       ${DEAL_II_CODE_GALLERY_DIRECTORY}
       ${_code_gallery_names_sans_dir}
       > ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
       ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
       ${_code_gallery_h_deps}
     )
@@ -119,8 +119,8 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       COMMAND ${PERL_EXECUTABLE}
       ARGS
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR} 
+        ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${deal.II_SOURCE_DIR} 
         ${_step} 
         ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
         ${_relative_src_files} 
@@ -128,8 +128,8 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+        ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
         ${_src_files}
       )
 

@@ -50,14 +50,14 @@ IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
   CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/)
 
 #
 # Load all macros:
 #
 FILE(GLOB _macro_files "cmake/macros/*.cmake")
-MESSAGE(STATUS "Include ${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake")
-INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake)
+MESSAGE(STATUS "Include ${CMAKE_CURRENT_SOURCE_DIR}/cmake/setup_external_macros.cmake")
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/setup_external_macros.cmake)
 FOREACH(_file ${_macro_files})
   MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
@@ -71,15 +71,15 @@ SET_IF_EMPTY(CMAKE_INSTALL_MESSAGE "LAZY")
 #
 # Check for the existence of various optional folders:
 #
-IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
+IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/bundled/CMakeLists.txt)
   SET(DEAL_II_HAVE_BUNDLED_DIRECTORY TRUE)
 ENDIF()
 
-IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
+IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/doc/CMakeLists.txt)
   SET(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
 ENDIF()
 
-IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt)
+IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)
   SET(DEAL_II_HAVE_TESTS_DIRECTORY TRUE)
 ENDIF()
 
@@ -87,7 +87,7 @@ ENDIF()
 # We have to initialize some cached variables before PROJECT is called, so
 # do it at this point:
 #
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
+VERBOSE_INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 
 #
 # Now, set the project and set up the rest:
@@ -95,15 +95,15 @@ VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 PROJECT(deal.II CXX C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
 
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_compiler_flags.cmake)
 
 #
 # Include information about bundled libraries:
 #
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
+  VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/bundled/setup_bundled.cmake)
 ENDIF()
 
 #
@@ -127,10 +127,10 @@ ENDFOREACH()
 #
 # Finalize the configuration:
 #
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_cpack.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_finalize.cmake)
+VERBOSE_INCLUDE(${deal.II_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 ########################################################################
 #                                                                      #
@@ -166,5 +166,5 @@ ENDIF()
 #
 # And finally, print the configuration:
 #
-FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
+FILE(READ ${deal.II_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
 MESSAGE("${DEAL_II_LOG_SUMMARY}")

@@ -48,8 +48,8 @@ IF(NOT BUILD_SHARED_LIBS)
   SET(Boost_USE_STATIC_LIBS TRUE)
 ENDIF()
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+# temporarily disable ${deal.II_SOURCE_DIR}/cmake/modules for module lookup
+LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 
 # Work around a CMake compatibility issue with boost-1.70.0
 # compare https://gitlab.kitware.com/cmake/cmake/issues/18865
@@ -65,7 +65,7 @@ ELSE()
     serialization system thread
     )
 ENDIF()
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+LIST(APPEND CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 
 #
 # Fall back to dynamic libraries if no static libraries could be found:
@@ -73,14 +73,14 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   SET(Boost_USE_STATIC_LIBS FALSE)
 
-  # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  # temporarily disable ${deal.II_SOURCE_DIR}/cmake/modules for module lookup
+  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
   IF(DEAL_II_WITH_ZLIB)
     FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS iostreams serialization system thread)
   ELSE()
     FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS serialization system thread)
   ENDIF()
-  LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  LIST(APPEND CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 ENDIF()
 
 UNSET(Boost_NO_BOOST_CMAKE)

@@ -34,8 +34,8 @@ MACRO(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
 
   TARGET_INCLUDE_DIRECTORIES(${_target}
     PRIVATE
-      "${CMAKE_BINARY_DIR}/include"
-      "${CMAKE_SOURCE_DIR}/include"
+      "${deal.II_BINARY_DIR}/include"
+      "${deal.II_SOURCE_DIR}/include"
       ${DEAL_II_BUNDLED_INCLUDE_DIRS}
     )
   TARGET_INCLUDE_DIRECTORIES(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})

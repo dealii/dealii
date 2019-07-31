@@ -35,7 +35,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_differentiation_ad OBJECT ${_src} ${_header} ${_inst})

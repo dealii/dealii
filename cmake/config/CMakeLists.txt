@@ -31,7 +31,7 @@ MESSAGE(STATUS "Setting up project configuration")
 #
 CONFIGURE_FILE( # for binary dir:
   ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
+  ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
   )
 
 
@@ -42,15 +42,15 @@ CONFIGURE_FILE( # for binary dir:
 ########################################################################
 
 SET(_macros
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
+  ${deal.II_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
   )
 FILE(COPY ${_macros}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
+  DESTINATION ${deal.II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
   )
 INSTALL(FILES ${_macros}
   DESTINATION ${DEAL_II_SHARE_RELDIR}/macros
@@ -130,19 +130,19 @@ ENDFOREACH()
 SET(CONFIG_BUILD_DIR TRUE)
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
-  ${CMAKE_SOURCE_DIR}/include/
+  ${deal.II_SOURCE_DIR}/include/
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   @ONLY
   )
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  ${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
 
@@ -170,7 +170,7 @@ CONFIGURE_FILE(
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake
+  ${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
@@ -180,7 +180,7 @@ INSTALL(FILES
 #
 
 SET(_files
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   )
 FOREACH(_file ${_files})
@@ -329,11 +329,11 @@ ENDFOREACH()
 # For binary dir (aka build dir):
 #
 
-SET(CONFIG_PATH_PC "${CMAKE_BINARY_DIR}")
+SET(CONFIG_PATH_PC "${deal.II_BINARY_DIR}")
 
 TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
   \\\${prefix}/include
-  ${CMAKE_SOURCE_DIR}/include
+  ${deal.II_SOURCE_DIR}/include
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
@@ -341,7 +341,7 @@ TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build_lowercase)
 
-  SET(_config_directory "${CMAKE_BINARY_DIR}/${DEAL_II_PKGCONF_RELDIR}")
+  SET(_config_directory "${deal.II_BINARY_DIR}/${DEAL_II_PKGCONF_RELDIR}")
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/config_${_build_lowercase}.pc.in

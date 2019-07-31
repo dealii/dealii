@@ -341,7 +341,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
-          -DBINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${deal.II_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/interrupt_guard.cc
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}

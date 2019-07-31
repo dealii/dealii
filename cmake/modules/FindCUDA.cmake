@@ -34,10 +34,10 @@ IF(NOT "${CUDA_DIR}" STREQUAL "")
   SET(CUDA_TOOLKIT_ROOT_DIR "${CUDA_DIR}")
 ENDIF()
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+# temporarily disable ${deal.II_SOURCE_DIR}/cmake/modules for module lookup
+LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(CUDA)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+LIST(APPEND CMAKE_MODULE_PATH ${deal.II_SOURCE_DIR}/cmake/modules/)
 
 IF(CUDA_FOUND)
   MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")

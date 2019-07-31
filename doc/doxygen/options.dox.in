@@ -25,8 +25,8 @@ CASE_SENSE_NAMES       = YES
 
 
 INLINE_INHERITED_MEMB  = NO
-STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
-STRIP_FROM_INC_PATH    = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+STRIP_FROM_PATH        = @deal.II_SOURCE_DIR@/include @deal.II_BINARY_DIR@/include
+STRIP_FROM_INC_PATH    = @deal.II_SOURCE_DIR@/include @deal.II_BINARY_DIR@/include
 FULL_PATH_NAMES        = YES
 JAVADOC_AUTOBRIEF      = NO
 INHERIT_DOCS           = YES
@@ -68,11 +68,11 @@ WARN_IF_DOC_ERROR      = YES
 INPUT                  =
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = *.templates.h
-EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
-                         @CMAKE_SOURCE_DIR@/examples/doxygen
+EXAMPLE_PATH           = @deal.II_BINARY_DIR@/doc/doxygen/tutorial \
+                         @deal.II_SOURCE_DIR@/examples/doxygen
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
-INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
+INPUT_FILTER           = ${deal.II_SOURCE_DIR}/doc/doxygen/scripts/filter
 FILTER_SOURCE_FILES    = YES
 
 # Have some user defined commands that we can use in the documentation
@@ -155,7 +155,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dirs@
+INCLUDE_PATH           = @deal.II_SOURCE_DIR@/include @deal.II_BINARY_DIR@/include @_inst_in_dirs@
 INCLUDE_FILE_PATTERNS  =
 
 # Set a few variables that help us generate documentation for things

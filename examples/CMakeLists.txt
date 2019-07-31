@@ -94,7 +94,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
           DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
           SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
             PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${deal.II_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
           #
           # In case CMake is instructed to add rpaths to the library and

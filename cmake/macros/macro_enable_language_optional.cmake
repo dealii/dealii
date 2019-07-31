@@ -37,7 +37,7 @@ MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
     #
     SET(${_language}_CHECKED TRUE CACHE INTERNAL "" FORCE)
 
-    SET(_tmp ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_language}_test)
+    SET(_tmp ${deal.II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_language}_test)
     file(REMOVE ${_tmp})
 
     IF(DEFINED CMAKE_${_language}_COMPILER)

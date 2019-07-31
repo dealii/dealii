@@ -27,7 +27,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/physics/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/physics/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_physics OBJECT ${_src} ${_header} ${_inst})

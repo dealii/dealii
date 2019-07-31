@@ -26,7 +26,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/algorithms/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/algorithms/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_algorithms OBJECT ${_src} ${_header} ${_inst})

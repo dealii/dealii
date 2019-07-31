@@ -26,7 +26,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/sundials/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/sundials/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_sundials OBJECT ${_src} ${_header} ${_inst})

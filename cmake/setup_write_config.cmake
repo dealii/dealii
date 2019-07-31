@@ -22,7 +22,7 @@
 
 DEAL_II_QUERY_GIT_INFORMATION("DEAL_II")
 
-FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
+FILE(WRITE ${deal.II_BINARY_DIR}/revision.log
 "###
 #
 #  Git information:
@@ -39,9 +39,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
 #                                                                      #
 ########################################################################
 
-SET(_log_detailed "${CMAKE_BINARY_DIR}/detailed.log")
-SET(_log_summary  "${CMAKE_BINARY_DIR}/summary.log")
-SET(_log_feature "${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
+SET(_log_detailed "${deal.II_BINARY_DIR}/detailed.log")
+SET(_log_summary  "${deal.II_BINARY_DIR}/summary.log")
+SET(_log_feature "${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
 FILE(REMOVE ${_log_detailed} ${_log_summary} ${_log_feature})
 
 MACRO(_both)
@@ -72,7 +72,7 @@ _both(
 #        CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
 #        BUILD_SHARED_LIBS:      ${BUILD_SHARED_LIBS}
 #        CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
-#        CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
+#        deal.II_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
 "
   )
 IF("${DEAL_II_GIT_SHORTREV}" STREQUAL "")
@@ -81,7 +81,7 @@ ELSE()
   _both("#                                (version ${DEAL_II_PACKAGE_VERSION}, shortrev ${DEAL_II_GIT_SHORTREV})\n")
 ENDIF()
 _both(
-"#        CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
+"#        deal.II_BINARY_DIR:       ${CMAKE_BINARY_DIR}
 #        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}
 #                                ${CMAKE_CXX_COMPILER}
 "

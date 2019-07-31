@@ -22,7 +22,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/optimization/rol/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/optimization/rol/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_rol OBJECT ${_src} ${_header} ${_inst})

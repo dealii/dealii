@@ -41,7 +41,7 @@ IF(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   FIND_PACKAGE(deal.II 9.2.0 REQUIRED HINTS ${DEAL_II_DIR})
   DEAL_II_INITIALIZE_CACHED_VARIABLES()
   PROJECT(TESTSUITE CXX)
-  FILE(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+  FILE(WRITE ${deal.II_BINARY_DIR}/detailed.log
     "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
     )
 ENDIF()
@@ -72,19 +72,19 @@ IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   MESSAGE(STATUS "Setting up testsuite")
 
   #
-  # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
-  # CMAKE_BINARY_DIR/tests:
+  # Write minimalistic CTestTestfile.cmake files to deal.II_BINARY_DIR and
+  # deal.II_BINARY_DIR/tests:
   #
-  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
+  FILE(WRITE ${deal.II_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
 
-  SET(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
+  SET(_options "-DDEAL_II_DIR=${deal.II_BINARY_DIR}")
 
 ELSE()
 
   MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
   MESSAGE(STATUS "")
 
-  IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+  IF("${deal.II_SOURCE_DIR}" STREQUAL "${deal.II_BINARY_DIR}")
     MESSAGE(FATAL_ERROR "The testsuite cannot be configured in-source. "
       "Please create a separate build directory!"
       )

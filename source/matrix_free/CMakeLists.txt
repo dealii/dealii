@@ -29,7 +29,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
+  ${deal.II_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
 IF(DEAL_II_WITH_CUDA)

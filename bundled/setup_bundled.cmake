@@ -28,7 +28,7 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
-SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
+SET(BOOST_FOLDER "${deal.II_SOURCE_DIR}/bundled/boost-1.70.0")
 
 
 #
@@ -47,7 +47,7 @@ IF( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     "Always use the bundled tbb library instead of an external one."
     OFF)
 
-  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
+  SET(TBB_FOLDER "${deal.II_SOURCE_DIR}/bundled/tbb-2018_U2")
 ENDIF()
 
 #
@@ -60,7 +60,7 @@ OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
 
-SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+SET(UMFPACK_FOLDER "${deal.II_SOURCE_DIR}/bundled/umfpack")
 
 
 #
@@ -72,4 +72,4 @@ OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_4/")
+SET(MUPARSER_FOLDER "${deal.II_SOURCE_DIR}/bundled/muparser_v2_2_4/")

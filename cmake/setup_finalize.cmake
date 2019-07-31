@@ -149,5 +149,5 @@ ENDFOREACH()
 # Clean up deal.IITargets.cmake in the build directory:
 #
 FILE(REMOVE
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+  ${deal.II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
   )
