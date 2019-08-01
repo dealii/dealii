@@ -1,0 +1,23 @@
+
+DEAL:0::dim, spacedim: 2, 2
+DEAL:0::cells: 65, dofs: 674
+DEAL:0::OK
+DEAL:0::dim, spacedim: 3, 3
+DEAL:0::cells: 392, dofs: 11451
+DEAL:0::OK
+
+DEAL:1::dim, spacedim: 2, 2
+DEAL:1::cells: 74, dofs: 674
+DEAL:1::OK
+DEAL:1::dim, spacedim: 3, 3
+DEAL:1::cells: 448, dofs: 11451
+DEAL:1::OK
+
+
+DEAL:2::dim, spacedim: 2, 2
+DEAL:2::cells: 65, dofs: 674
+DEAL:2::OK
+DEAL:2::dim, spacedim: 3, 3
+DEAL:2::cells: 420, dofs: 11451
+DEAL:2::OK
+

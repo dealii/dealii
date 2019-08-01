@@ -1,0 +1,7 @@
+
+DEAL::dim, spacedim: 2, 2
+DEAL::cells: 20, dofs: 178
+DEAL::OK
+DEAL::dim, spacedim: 3, 3
+DEAL::cells: 56, dofs: 1551
+DEAL::OK

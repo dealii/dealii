@@ -240,7 +240,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
   const DoFHandlerType &euler_dof_handler,
   const VectorType &    euler_vector,
   const ComponentMask & mask)
-  : euler_vector(&euler_vector)
+  : uses_level_dofs(false)
+  , euler_vector({&euler_vector})
   , euler_dof_handler(&euler_dof_handler)
   , fe_mask(mask.size() ?
               mask :
@@ -262,10 +263,92 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
 }
 
 
+
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
+  const DoFHandlerType &         euler_dof_handler,
+  const std::vector<VectorType> &euler_vector,
+  const ComponentMask &          mask)
+  : uses_level_dofs(true)
+  , euler_dof_handler(&euler_dof_handler)
+  , fe_mask(mask.size() ?
+              mask :
+              ComponentMask(
+                euler_dof_handler.get_fe().get_nonzero_components(0).size(),
+                true))
+  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , fe_values(this->euler_dof_handler->get_fe(),
+              get_vertex_quadrature<dim>(),
+              update_values)
+{
+  unsigned int size = 0;
+  for (unsigned int i = 0; i < fe_mask.size(); ++i)
+    {
+      if (fe_mask[i])
+        fe_to_real[i] = size++;
+    }
+  AssertDimension(size, spacedim);
+
+  Assert(euler_dof_handler.has_level_dofs(),
+         ExcMessage("The underlying DoFHandler object did not call "
+                    "distribute_mg_dofs(). In this case, the construction via "
+                    "level vectors does not make sense."));
+  AssertDimension(euler_vector.size(),
+                  euler_dof_handler.get_triangulation().n_global_levels());
+  this->euler_vector.clear();
+  this->euler_vector.resize(euler_vector.size());
+  for (unsigned int i = 0; i < euler_vector.size(); ++i)
+    this->euler_vector[i] = &euler_vector[i];
+}
+
+
+
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
+  const DoFHandlerType &           euler_dof_handler,
+  const MGLevelObject<VectorType> &euler_vector,
+  const ComponentMask &            mask)
+  : uses_level_dofs(true)
+  , euler_dof_handler(&euler_dof_handler)
+  , fe_mask(mask.size() ?
+              mask :
+              ComponentMask(
+                euler_dof_handler.get_fe().get_nonzero_components(0).size(),
+                true))
+  , fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  , fe_values(this->euler_dof_handler->get_fe(),
+              get_vertex_quadrature<dim>(),
+              update_values)
+{
+  unsigned int size = 0;
+  for (unsigned int i = 0; i < fe_mask.size(); ++i)
+    {
+      if (fe_mask[i])
+        fe_to_real[i] = size++;
+    }
+  AssertDimension(size, spacedim);
+
+  Assert(euler_dof_handler.has_level_dofs(),
+         ExcMessage("The underlying DoFHandler object did not call "
+                    "distribute_mg_dofs(). In this case, the construction via "
+                    "level vectors does not make sense."));
+  AssertDimension(euler_vector.max_level() + 1,
+                  euler_dof_handler.get_triangulation().n_global_levels());
+  this->euler_vector.clear();
+  this->euler_vector.resize(
+    euler_dof_handler.get_triangulation().n_global_levels());
+  for (unsigned int i = euler_vector.min_level(); i <= euler_vector.max_level();
+       ++i)
+    this->euler_vector[i] = &euler_vector[i];
+}
+
+
+
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
   const MappingFEField<dim, spacedim, VectorType, DoFHandlerType> &mapping)
-  : euler_vector(mapping.euler_vector)
+  : uses_level_dofs(mapping.uses_level_dofs)
+  , euler_vector(mapping.euler_vector)
   , euler_dof_handler(mapping.euler_dof_handler)
   , fe_mask(mapping.fe_mask)
   , fe_to_real(mapping.fe_to_real)
@@ -311,28 +394,51 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, euler_dof_handler);
 
-  Assert(dof_cell->active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs || dof_cell->active() == true, ExcInactiveCell());
   AssertDimension(GeometryInfo<dim>::vertices_per_cell,
                   fe_values.n_quadrature_points);
   AssertDimension(fe_to_real.size(),
                   euler_dof_handler->get_fe().n_components());
-
-  std::vector<Vector<typename VectorType::value_type>> values(
-    fe_values.n_quadrature_points,
-    Vector<typename VectorType::value_type>(
-      euler_dof_handler->get_fe().n_components()));
+  if (uses_level_dofs)
+    {
+      AssertIndexRange(cell->level(), euler_vector.size());
+      AssertDimension(euler_vector[cell->level()]->size(),
+                      euler_dof_handler->n_dofs(cell->level()));
+    }
+  else
+    AssertDimension(euler_vector[0]->size(), euler_dof_handler->n_dofs());
 
   {
     std::lock_guard<std::mutex> lock(fe_values_mutex);
     fe_values.reinit(dof_cell);
-    fe_values.get_function_values(*euler_vector, values);
   }
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  const unsigned int dofs_per_cell = euler_dof_handler->get_fe().dofs_per_cell;
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+  if (uses_level_dofs)
+    dof_cell->get_mg_dof_indices(dof_indices);
+  else
+    dof_cell->get_dof_indices(dof_indices);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
-    for (unsigned int j = 0; j < fe_to_real.size(); ++j)
-      if (fe_to_real[j] != numbers::invalid_unsigned_int)
-        vertices[i][fe_to_real[j]] = values[i][j];
+  const VectorType &vector =
+    uses_level_dofs ? *euler_vector[cell->level()] : *euler_vector[0];
+
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+    {
+      const unsigned int comp = fe_to_real
+        [euler_dof_handler->get_fe().system_to_component_index(i).first];
+      if (comp != numbers::invalid_unsigned_int)
+        {
+          typename VectorType::value_type value =
+            internal::ElementAccess<VectorType>::get(vector, dof_indices[i]);
+          if (euler_dof_handler->get_fe().is_primitive(i))
+            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+                 ++v)
+              vertices[v][comp] += fe_values.shape_value(i, v) * value;
+          else
+            Assert(false, ExcNotImplemented());
+        }
+    }
 
   return vertices;
 }
@@ -2349,13 +2455,27 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::update_internal_dofs(
          ExcMessage("euler_dof_handler is empty"));
 
   typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
-  Assert(dof_cell->active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs || dof_cell->active() == true, ExcInactiveCell());
+  if (uses_level_dofs)
+    {
+      AssertIndexRange(cell->level(), euler_vector.size());
+      AssertDimension(euler_vector[cell->level()]->size(),
+                      euler_dof_handler->n_dofs(cell->level()));
+    }
+  else
+    AssertDimension(euler_vector[0]->size(), euler_dof_handler->n_dofs());
 
-  dof_cell->get_dof_indices(data.local_dof_indices);
+  if (uses_level_dofs)
+    dof_cell->get_mg_dof_indices(data.local_dof_indices);
+  else
+    dof_cell->get_dof_indices(data.local_dof_indices);
+
+  const VectorType &vector =
+    uses_level_dofs ? *euler_vector[cell->level()] : *euler_vector[0];
 
   for (unsigned int i = 0; i < data.local_dof_values.size(); ++i)
     data.local_dof_values[i] =
-      internal::ElementAccess<VectorType>::get(*euler_vector,
+      internal::ElementAccess<VectorType>::get(vector,
                                                data.local_dof_indices[i]);
 }
 
