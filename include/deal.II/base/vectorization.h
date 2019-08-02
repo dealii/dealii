@@ -73,41 +73,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
-{
-  /**
-   * The structs below are needed since VectorizedArray<T1> is a POD-type
-   * without a constructor and can be a template argument for
-   * SymmetricTensor<...,T2> where T2 would equal VectorizedArray<T1>.
-   * Internally, in previous versions of deal.II, SymmetricTensor<...,T2> would
-   * make use of the constructor of T2 leading to a compile-time error. However
-   * simply adding a constructor for VectorizedArray<T1> breaks the POD-idioms
-   * needed elsewhere. Calls to constructors of T2 subsequently got replaced by
-   * a call to internal::NumberType<T2> which then determines the right function
-   * to use by template deduction. A detailed discussion can be found at
-   * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for other
-   * specializations.
-   */
-  template <typename T, int width>
-  struct NumberType<VectorizedArray<T, width>>
-  {
-    static const VectorizedArray<T, width> &
-    value(const VectorizedArray<T, width> &t)
-    {
-      return t;
-    }
-
-    static VectorizedArray<T, width>
-    value(const T &t)
-    {
-      VectorizedArray<T, width> tmp;
-      tmp = t;
-      return tmp;
-    }
-  };
-} // namespace internal
-
-
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
 // that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
 
@@ -526,8 +491,7 @@ template <
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              make_vectorized_array(const Number &u)
 {
-  VectorizedArray<Number, width> result;
-  result = u;
+  VectorizedArray<Number, width> result = u;
   return result;
 }
 
@@ -549,8 +513,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                                  VectorizedArrayType::n_array_elements>>::value,
     "VectorizedArrayType is not a VectorizedArray.");
 
-  VectorizedArrayType result;
-  result = u;
+  VectorizedArrayType result = u;
   return result;
 }
 
@@ -3703,8 +3666,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp += v;
 }
 
@@ -3720,8 +3682,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator+(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = u;
+  VectorizedArray<float, width> tmp = u;
   return tmp += v;
 }
 
@@ -3763,8 +3724,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp -= v;
 }
 
@@ -3780,8 +3740,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator-(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = float(u);
+  VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp -= v;
 }
 
@@ -3795,8 +3754,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return v - tmp;
 }
 
@@ -3812,8 +3770,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator-(const VectorizedArray<float, width> &v, const double u)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = float(u);
+  VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v - tmp;
 }
 
@@ -3827,8 +3784,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp *= v;
 }
 
@@ -3844,8 +3800,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator*(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = float(u);
+  VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp *= v;
 }
 
@@ -3887,8 +3842,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return tmp /= v;
 }
 
@@ -3904,8 +3858,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator/(const double u, const VectorizedArray<float, width> &v)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = float(u);
+  VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp /= v;
 }
 
@@ -3919,8 +3872,7 @@ template <typename Number, int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
-  VectorizedArray<Number, width> tmp;
-  tmp = u;
+  VectorizedArray<Number, width> tmp = u;
   return v / tmp;
 }
 
@@ -3936,8 +3888,7 @@ template <int width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator/(const VectorizedArray<float, width> &v, const double u)
 {
-  VectorizedArray<float, width> tmp;
-  tmp = float(u);
+  VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v / tmp;
 }
 

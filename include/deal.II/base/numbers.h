@@ -708,18 +708,9 @@ namespace internal
     static bool const value = test<From, To>(0);
   };
 
-  /**
-   * The structs below are needed since VectorizedArray<T1> is a POD-type
-   * without a constructor and can be a template argument for
-   * SymmetricTensor<...,T2> where T2 would equal VectorizedArray<T1>.
-   * Internally, in previous versions of deal.II, SymmetricTensor<...,T2> would
-   * make use of the constructor of T2 leading to a compile-time error. However
-   * simply adding a constructor for VectorizedArray<T1> breaks the POD-idioms
-   * needed elsewhere. Calls to constructors of T2 subsequently got replaced by
-   * a call to internal::NumberType<T2> which then determines the right function
-   * to use by template deduction. A detailed discussion can be found at
-   * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for another
-   * specialization.
+  /*
+   * The structs below are needed to convert between some special number types.
+   * Also see tensor.h for another specialization.
    */
   template <typename T>
   struct NumberType
