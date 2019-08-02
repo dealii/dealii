@@ -222,7 +222,7 @@ namespace TensorAccessors
    * @author Matthias Maier, 2015
    */
   template <int rank, typename T, typename ArrayType>
-  constexpr typename ReturnType<rank, T>::value_type &
+  constexpr DEAL_II_ALWAYS_INLINE typename ReturnType<rank, T>::value_type &
   extract(T &t, const ArrayType &indices)
   {
     return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(
