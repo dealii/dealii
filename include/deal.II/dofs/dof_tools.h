@@ -1153,12 +1153,12 @@ namespace DoFTools
    *
    * @author Matthias Maier, 2012 - 2015
    */
-  template <typename FaceIterator>
+  template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
     const FaceIterator &                         face_1,
     const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<double> &                  constraints,
+    AffineConstraints<number> &                  constraints,
     const ComponentMask &            component_mask   = ComponentMask(),
     const bool                       face_orientation = true,
     const bool                       face_flip        = false,
@@ -1190,13 +1190,13 @@ namespace DoFTools
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(
     const std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
       &                              periodic_faces,
-    AffineConstraints<double> &      constraints,
+    AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>());
@@ -1233,14 +1233,14 @@ namespace DoFTools
    *
    * @author Matthias Maier, 2012
    */
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(
     const DoFHandlerType &     dof_handler,
     const types::boundary_id   b_id1,
     const types::boundary_id   b_id2,
     const int                  direction,
-    AffineConstraints<double> &constraints,
+    AffineConstraints<number> &constraints,
     const ComponentMask &      component_mask = ComponentMask());
 
 
@@ -1269,13 +1269,13 @@ namespace DoFTools
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
    * for further information.
    */
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(
     const DoFHandlerType &     dof_handler,
     const types::boundary_id   b_id,
     const int                  direction,
-    AffineConstraints<double> &constraints,
+    AffineConstraints<number> &constraints,
     const ComponentMask &      component_mask = ComponentMask());
 
   /**

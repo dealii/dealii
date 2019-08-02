@@ -1817,13 +1817,13 @@ namespace DoFTools
      * such "identity constraints" if the opposite constraint already
      * exists.
      */
-    template <typename FaceIterator>
+    template <typename FaceIterator, typename number>
     void
     set_periodicity_constraints(
       const FaceIterator &                         face_1,
       const typename identity<FaceIterator>::type &face_2,
       const FullMatrix<double> &                   transformation,
-      AffineConstraints<double> &                  affine_constraints,
+      AffineConstraints<number> &                  affine_constraints,
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
@@ -2073,7 +2073,7 @@ namespace DoFTools
           // a dependency cycle:
 
           bool   constraints_are_cyclic = true;
-          double cycle_factor           = factor;
+          number cycle_factor           = factor;
 
           for (auto test_dof = dof_right; test_dof != dof_left;)
             {
@@ -2220,12 +2220,12 @@ namespace DoFTools
   // Low level interface:
 
 
-  template <typename FaceIterator>
+  template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
     const FaceIterator &                         face_1,
     const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<double> &                  affine_constraints,
+    AffineConstraints<number> &                  affine_constraints,
     const ComponentMask &                        component_mask,
     const bool                                   face_orientation,
     const bool                                   face_flip,
@@ -2449,13 +2449,13 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(
     const std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
       &                              periodic_faces,
-    AffineConstraints<double> &      constraints,
+    AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask,
     const std::vector<unsigned int> &first_vector_components)
   {
@@ -2489,13 +2489,13 @@ namespace DoFTools
   // High level interface variants:
 
 
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(const DoFHandlerType &             dof_handler,
                                const types::boundary_id           b_id1,
                                const types::boundary_id           b_id2,
                                const int                          direction,
-                               dealii::AffineConstraints<double> &constraints,
+                               dealii::AffineConstraints<number> &constraints,
                                const ComponentMask &component_mask)
   {
     static const int space_dim = DoFHandlerType::space_dimension;
@@ -2522,12 +2522,12 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
   make_periodicity_constraints(const DoFHandlerType &     dof_handler,
                                const types::boundary_id   b_id,
                                const int                  direction,
-                               AffineConstraints<double> &constraints,
+                               AffineConstraints<number> &constraints,
                                const ComponentMask &      component_mask)
   {
     static const int dim       = DoFHandlerType::dimension;
