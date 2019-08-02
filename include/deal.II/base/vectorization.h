@@ -73,41 +73,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
-{
-  /**
-   * The structs below are needed since VectorizedArray<T1> is a POD-type
-   * without a constructor and can be a template argument for
-   * SymmetricTensor<...,T2> where T2 would equal VectorizedArray<T1>.
-   * Internally, in previous versions of deal.II, SymmetricTensor<...,T2> would
-   * make use of the constructor of T2 leading to a compile-time error. However
-   * simply adding a constructor for VectorizedArray<T1> breaks the POD-idioms
-   * needed elsewhere. Calls to constructors of T2 subsequently got replaced by
-   * a call to internal::NumberType<T2> which then determines the right function
-   * to use by template deduction. A detailed discussion can be found at
-   * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for other
-   * specializations.
-   */
-  template <typename T, int width>
-  struct NumberType<VectorizedArray<T, width>>
-  {
-    static const VectorizedArray<T, width> &
-    value(const VectorizedArray<T, width> &t)
-    {
-      return t;
-    }
-
-    static VectorizedArray<T, width>
-    value(const T &t)
-    {
-      VectorizedArray<T, width> tmp;
-      tmp = t;
-      return tmp;
-    }
-  };
-} // namespace internal
-
-
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
 // that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
 
@@ -127,19 +92,21 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
  * of type <tt>long double</tt> and overloaded arithmetic operations. This
  * means that <tt>VectorizedArray<ComplicatedType></tt> has a similar layout
  * as ComplicatedType, provided that ComplicatedType defines basic arithmetic
- * operations. For floats and doubles, an array of numbers are packed
- * together, though. The number of elements packed together depend on the
- * computer system and compiler flags that are used for compilation of
- * deal.II. The fundamental idea of these packed data types is to use one
- * single CPU instruction to perform arithmetic operations on the whole array
- * using the processor's vector units. Most computer systems by 2010 standards
- * will use an array of two doubles and four floats, respectively (this
- * corresponds to the SSE/SSE2 data sets) when compiling deal.II on 64-bit
- * operating systems. On Intel Sandy Bridge processors and newer or AMD
- * Bulldozer processors and newer, four doubles and eight floats are used when
- * deal.II is configured e.g. using gcc with --with-cpu=native or --with-
- * cpu=corei7-avx. On compilations with AVX-512 support, eight doubles and
- * sixteen floats are used.
+ * operations. For floats and doubles, an array of numbers are packed together
+ * with the goal to be processed in a single-instruction/multiple-data (SIMD)
+ * fashion. In the SIMD context, the elements of such a short vector are often
+ * called lanes. The number of elements packed together, i.e., the number of
+ * lanes, depends on the computer system and compiler flags that are used for
+ * compilation of deal.II. The fundamental idea of these packed data types is
+ * to use one single CPU instruction to perform arithmetic operations on the
+ * whole array using the processor's vector (SIMD) units. Most computer
+ * systems by 2010 standards will use an array of two doubles or four floats,
+ * respectively (this corresponds to the SSE/SSE2 data sets) when compiling
+ * deal.II on 64-bit operating systems. On Intel Sandy Bridge processors and
+ * newer or AMD Bulldozer processors and newer, four doubles or eight floats
+ * are used when deal.II is configured using gcc with --with-cpu=native
+ * or --with-cpu=corei7-avx. On compilations with AVX-512 support (e.g.,
+ * Intel Skylake Server from 2017), eight doubles or sixteen floats are used.
  *
  * This behavior of this class is made similar to the basic data types double
  * and float. The definition of a vectorized array does not initialize the
@@ -169,8 +136,8 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
  *
  * The user can explicitly control the width of a particular instruction set
  * architecture (ISA) extension by specifying the number of lanes via the second
- * template parameter of this wrapper class. For example on Intel Skylake,
- * you have the following options for the data type double:
+ * template parameter of this wrapper class. For example on Intel Skylake
+ * Server, you have the following options for the data type double:
  *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
  *  - VectorizedArray<double, 2> // SSE2
  *  - VectorizedArray<double, 4> // AVX
@@ -193,8 +160,8 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
  *
  * Similar considerations also apply to the data type `float`.
  *
- * Wrongly selecting the width i.e width=3 or width>8 for Skylake leads to
- * a static assert.
+ * Wrongly selecting the width, e.g., width=3 or width=8 on a processor which
+ * does not support AVX-512 leads to a static assert.
  *
  * @tparam Number underlying data type
  * @tparam width  vector length (optional; if not set, the maximal width of the
@@ -231,7 +198,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const Number scalar)
   {
@@ -250,7 +217,8 @@ public:
   }
 
   /**
-   * Access operator (only valid with component 0)
+   * Access operator (only valid with component 0 in the base class without
+   * specialization).
    */
   DEAL_II_ALWAYS_INLINE
   Number &operator[](const unsigned int comp)
@@ -261,7 +229,8 @@ public:
   }
 
   /**
-   * Constant access operator (only valid with component 0)
+   * Constant access operator (only valid with component 0 in the base class
+   * without specialization).
    */
   DEAL_II_ALWAYS_INLINE
   const Number &operator[](const unsigned int comp) const
@@ -317,9 +286,9 @@ public:
 
   /**
    * Load @p n_array_elements from memory into the calling class, starting at
-   * the given address. The memory need not be aligned by the amount of bytes
-   * in the vectorized array, as opposed to casting a double address to
-   * VectorizedArray<double>*.
+   * the given address. The pointer `ptr` needs not be aligned by the amount
+   * of bytes in the vectorized array, as opposed to casting a double address
+   * to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -330,9 +299,9 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
-   * the amount of bytes in the vectorized array, as opposed to casting a
-   * double address to VectorizedArray<double>*.
+   * n_array_elements to the given address. The pointer `ptr` needs not be
+   * aligned by the amount of bytes in the vectorized array, as opposed to
+   * casting a double address to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -368,18 +337,20 @@ public:
    * article on the MESI protocol</a> for details. The instruction underlying
    * this function call signals to the processor that these two prerequisites
    * on a store are relaxed: Firstly, one expects the whole cache line to be
-   * overwritten (that the memory subsystem then handles appropriately), so no
-   * need to first read the "remainder" of the cache line. Secondly, the data
-   * behind that particular memory will not be subject to cache coherency
-   * protocol as it will be in main memory both when the same processor wants
-   * to access it again as well as any other processors in a multicore
-   * chip. Due to this particular setup, any subsequent access to the data
-   * written by this function will need to query main memory, which is slower
-   * than an access from a cache both latency-wise and throughput-wise. Thus,
-   * this command should only be used for large stores that will collectively
-   * not fit into caches, as performance will be degraded otherwise. For a
-   * typical use case, see also <a
-   * href="https://blogs.fau.de/hager/archives/2103">this blog article</a>.
+   * overwritten (meaning that the memory subsystem makes sure that
+   * consecutive stores that together span a cache line are merged, and
+   * appropriately handling the case where only part of a cache line is
+   * written), so there is no need to first read the "remainder" of the cache
+   * line. Secondly, the data behind that particular memory will not be
+   * subject to cache coherency protocol as it will be in main memory both
+   * when the same processor wants to access it again as well as any other
+   * processors in a multicore chip. Due to this particular setup, any
+   * subsequent access to the data written by this function will need to query
+   * main memory, which is slower than an access from a cache both
+   * latency-wise and throughput-wise. Thus, this command should only be used
+   * for storing large arrays that will collectively not fit into caches, as
+   * performance will be degraded otherwise. For a typical use case, see also
+   * <a href="https://blogs.fau.de/hager/archives/2103">this blog article</a>.
    *
    * Note that streaming stores are only available in the specialized SSE/AVX
    * classes of VectorizedArray of type @p double or @p float, not in the
@@ -516,7 +487,7 @@ const unsigned int VectorizedArray<Number, width>::n_array_elements;
 
 /**
  * Create a vectorized array that sets all entries in the array to the given
- * scalar.
+ * scalar, i.e., broadcasts the scalar to all array elements.
  *
  * @relatesalso VectorizedArray
  */
@@ -687,7 +658,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const double scalar)
   {
@@ -1120,7 +1091,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const float scalar)
   {
@@ -1604,7 +1575,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const double scalar)
   {
@@ -2006,7 +1977,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const float scalar)
   {
@@ -2429,7 +2400,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const double scalar)
   {
@@ -2794,7 +2765,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const float scalar)
   {
@@ -3172,7 +3143,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const double scalar)
   {
@@ -3404,7 +3375,7 @@ public:
   VectorizedArray() = default;
 
   /**
-   * Construct an array with the given scalar broadcast to all lanes
+   * Construct an array with the given scalar broadcast to all lanes.
    */
   VectorizedArray(const float scalar)
   {
