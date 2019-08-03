@@ -743,17 +743,8 @@ private:
 namespace internal
 {
   /**
-   * The structs below are needed since VectorizedArray<T1> is a POD-type
-   * without a constructor and can be a template argument for Tensor<...,T2>
-   * where T2 would equal Tensor<1, dim, VectorizedArray >. Internally, in
-   * previous versions of deal.II, Tensor<...,T2> would make use of the
-   * constructor of T2 leading to a compile-time error. However simply adding a
-   * constructor for VectorizedArray<T1> breaks the POD-idioms needed elsewhere.
-   * Calls to constructors of T2 subsequently got replaced by a call to
-   * internal::NumberType<T2> which then determines the right function to use by
-   * template deduction. A detailed discussion can be found at
-   * https://github.com/dealii/dealii/pull/3967 . Also see numbers.h for another
-   * specialization.
+   * The structs below are needed to initialize nested Tensor objects.
+   * Also see numbers.h for another specialization.
    */
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank, dim, T>>
@@ -768,35 +759,6 @@ namespace internal
                                                    value(const T &t)
     {
       Tensor<rank, dim, T> tmp;
-      tmp = t;
-      return tmp;
-    }
-  };
-
-  template <int rank, int dim, typename T, int width>
-  struct NumberType<Tensor<rank, dim, VectorizedArray<T, width>>>
-  {
-    static constexpr DEAL_II_ALWAYS_INLINE const
-      Tensor<rank, dim, VectorizedArray<T, width>> &
-      value(const Tensor<rank, dim, VectorizedArray<T, width>> &t)
-    {
-      return t;
-    }
-
-    static DEAL_II_CONSTEXPR
-      DEAL_II_ALWAYS_INLINE Tensor<rank, dim, VectorizedArray<T, width>>
-                            value(const T &t)
-    {
-      Tensor<rank, dim, VectorizedArray<T, width>> tmp;
-      tmp = internal::NumberType<VectorizedArray<T, width>>::value(t);
-      return tmp;
-    }
-
-    static DEAL_II_CONSTEXPR
-      DEAL_II_ALWAYS_INLINE Tensor<rank, dim, VectorizedArray<T, width>>
-                            value(const VectorizedArray<T, width> &t)
-    {
-      Tensor<rank, dim, VectorizedArray<T, width>> tmp;
       tmp = t;
       return tmp;
     }
