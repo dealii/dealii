@@ -560,50 +560,6 @@ inline DEAL_II_CUDA_HOST_DEV
 
 
 
-namespace internal
-{
-  namespace PointImplementation
-  {
-    template <int dim,
-              typename Number,
-              typename OtherNumber,
-              typename std::enable_if<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int>::type = 0>
-    inline DEAL_II_CUDA_HOST_DEV
-      Point<dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Point<dim, Number> &p, const OtherNumber factor)
-    {
-      using common_type = typename ProductType<Number, OtherNumber>::type;
-      Point<dim, common_type> tmp;
-      const auto              inverse_factor =
-        static_cast<common_type>(1.) / static_cast<common_type>(factor);
-      for (unsigned int i = 0; i < dim; ++i)
-        tmp[i] = p[i] * inverse_factor;
-      return tmp;
-    }
-
-    template <int dim,
-              typename Number,
-              typename OtherNumber,
-              typename std::enable_if<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int>::type = 0>
-    inline DEAL_II_CUDA_HOST_DEV
-      Point<dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Point<dim, Number> &p, const OtherNumber factor)
-    {
-      Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
-      for (unsigned int i = 0; i < dim; ++i)
-        tmp[i] = p[i] / factor;
-      return tmp;
-    }
-  } // namespace PointImplementation
-} // namespace internal
-
-
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
@@ -612,7 +568,12 @@ inline DEAL_II_CUDA_HOST_DEV
                              typename EnableIfScalar<OtherNumber>::type>::type>
   Point<dim, Number>::operator/(const OtherNumber factor) const
 {
-  return internal::PointImplementation::division_operator(*this, factor);
+  const Tensor<1, dim, Number> &base_object = *this;
+  return Point<
+    dim,
+    typename ProductType<Number,
+                         typename EnableIfScalar<OtherNumber>::type>::type>(
+    dealii::operator/(base_object, factor));
 }
 
 
