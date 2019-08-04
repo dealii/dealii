@@ -806,7 +806,8 @@ int main()
       using namespace dealii;
       using namespace Step20;
 
-      MixedLaplaceProblem<2> mixed_laplace_problem(0);
+      const unsigned int     fe_degree = 0;
+      MixedLaplaceProblem<2> mixed_laplace_problem(fe_degree);
       mixed_laplace_problem.run();
     }
   catch (std::exception &exc)
