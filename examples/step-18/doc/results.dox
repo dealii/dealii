@@ -441,11 +441,7 @@ Without going into further details of this model, we refer to the excellent
 book by Simo and Hughes on &ldquo;Computational Inelasticity&rdquo; for a
 comprehensive overview of computational strategies for solving plastic
 models. Alternatively, a brief but concise description of an algorithm for
-plasticity is given in an article by S. Commend, A. Truty, and Th. Zimmermann,
-titled &ldquo;Stabilized finite elements applied to
-elastoplasticity: I. Mixed displacement-pressure formulation&rdquo;
-(Computer Methods in Applied Mechanics and Engineering, vol. 193,
-pp. 3559-3586, 2004).
+plasticity is given in @cite CTZ04.
 
 
 <h5>Stabilization issues</h5>
