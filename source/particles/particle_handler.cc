@@ -234,7 +234,7 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     const internal::LevelInd level_index =
-      std::make_pair<int, int>(cell->level(), cell->index());
+      std::make_pair(cell->level(), cell->index());
 
     if (cell->is_ghost())
       {
@@ -410,7 +410,7 @@ namespace Particles
     const
   {
     const internal::LevelInd found_cell =
-      std::make_pair<int, int>(cell->level(), cell->index());
+      std::make_pair(cell->level(), cell->index());
 
     if (cell->is_locally_owned())
       return particles.count(found_cell);

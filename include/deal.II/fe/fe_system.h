@@ -1263,8 +1263,7 @@ namespace internal
     std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>
     promote_to_fe_pair(const FiniteElement<dim, spacedim> &fe)
     {
-      return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                            unsigned int>(std::move(fe.clone()), 1u);
+      return std::make_pair(std::move(fe.clone()), 1u);
     }
 
 
