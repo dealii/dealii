@@ -1517,6 +1517,71 @@ GridOut::write_xfig(const Triangulation<2> &tria,
 
 
 
+namespace
+{
+  /**
+   * This function projects a three-dimensional point (Point<3> point) onto a
+   * two-dimensional image plane, specified by the position of the camera
+   * viewing system (Point<3> camera_position), camera direction (Point<3>
+   * camera_position), camera horizontal (Point<3> camera_horizontal,
+   * necessary for the correct alignment of the later images), and the focus
+   * of the camera (float camera_focus).
+   *
+   * For SVG output of grids.
+   */
+  Point<2> svg_project_point(Point<3>     point,
+                             Point<3>     camera_position,
+                             Tensor<1, 3> camera_direction,
+                             Tensor<1, 3> camera_horizontal,
+                             float        camera_focus)
+  {
+    // ...
+    Point<3> camera_vertical;
+    camera_vertical[0] = camera_horizontal[1] * camera_direction[2] -
+                         camera_horizontal[2] * camera_direction[1];
+    camera_vertical[1] = camera_horizontal[2] * camera_direction[0] -
+                         camera_horizontal[0] * camera_direction[2];
+    camera_vertical[2] = camera_horizontal[0] * camera_direction[1] -
+                         camera_horizontal[1] * camera_direction[0];
+
+    float phi;
+    phi = camera_focus;
+    phi /= (point[0] - camera_position[0]) * camera_direction[0] +
+           (point[1] - camera_position[1]) * camera_direction[1] +
+           (point[2] - camera_position[2]) * camera_direction[2];
+
+    Point<3> projection;
+    projection[0] = camera_position[0] + phi * (point[0] - camera_position[0]);
+    projection[1] = camera_position[1] + phi * (point[1] - camera_position[1]);
+    projection[2] = camera_position[2] + phi * (point[2] - camera_position[2]);
+
+    Point<2> projection_decomposition;
+    projection_decomposition[0] = (projection[0] - camera_position[0] -
+                                   camera_focus * camera_direction[0]) *
+                                  camera_horizontal[0];
+    projection_decomposition[0] += (projection[1] - camera_position[1] -
+                                    camera_focus * camera_direction[1]) *
+                                   camera_horizontal[1];
+    projection_decomposition[0] += (projection[2] - camera_position[2] -
+                                    camera_focus * camera_direction[2]) *
+                                   camera_horizontal[2];
+
+    projection_decomposition[1] = (projection[0] - camera_position[0] -
+                                   camera_focus * camera_direction[0]) *
+                                  camera_vertical[0];
+    projection_decomposition[1] += (projection[1] - camera_position[1] -
+                                    camera_focus * camera_direction[1]) *
+                                   camera_vertical[1];
+    projection_decomposition[1] += (projection[2] - camera_position[2] -
+                                    camera_focus * camera_direction[2]) *
+                                   camera_vertical[2];
+
+    return projection_decomposition;
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 void
 GridOut::write_svg(const Triangulation<dim, spacedim> &,
@@ -1555,11 +1620,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // time_stamp = time(0);
   // now = localtime(&time_stamp);
 
-  // vectors and variables for the perspective view
-  Point<3> camera_position;
-  Point<3> camera_direction;
-  Point<3> camera_horizontal;
-  float    camera_focus;
+  float camera_focus;
 
   Point<3> point;
   Point<2> projection_decomposition;
@@ -1657,14 +1718,18 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
     }
 
   // set the camera position to top view, targeting at the origin
+  // vectors and variables for the perspective view
+  Point<3> camera_position;
   camera_position[0] = 0;
   camera_position[1] = 0;
   camera_position[2] = 2. * std::max(x_dimension, y_dimension);
 
+  Tensor<1, 3> camera_direction;
   camera_direction[0] = 0;
   camera_direction[1] = 0;
   camera_direction[2] = -1;
 
+  Tensor<1, 3> camera_horizontal;
   camera_horizontal[0] = 1;
   camera_horizontal[1] = 0;
   camera_horizontal[2] = 0;
@@ -1767,7 +1832,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                  std::max(x_dimension, y_dimension);
     }
 
-  projection_decomposition = GridOut::svg_project_point(
+  projection_decomposition = svg_project_point(
     point, camera_position, camera_direction, camera_horizontal, camera_focus);
 
   x_max_perspective = projection_decomposition[0];
@@ -1792,11 +1857,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
             std::max(x_dimension, y_dimension);
         }
 
-      projection_decomposition = GridOut::svg_project_point(point,
-                                                            camera_position,
-                                                            camera_direction,
-                                                            camera_horizontal,
-                                                            camera_focus);
+      projection_decomposition = svg_project_point(point,
+                                                   camera_position,
+                                                   camera_direction,
+                                                   camera_horizontal,
+                                                   camera_focus);
 
       if (x_max_perspective < projection_decomposition[0])
         x_max_perspective = projection_decomposition[0];
@@ -1811,11 +1876,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       point[0] = cell->vertex(1)[0];
       point[1] = cell->vertex(1)[1];
 
-      projection_decomposition = GridOut::svg_project_point(point,
-                                                            camera_position,
-                                                            camera_direction,
-                                                            camera_horizontal,
-                                                            camera_focus);
+      projection_decomposition = svg_project_point(point,
+                                                   camera_position,
+                                                   camera_direction,
+                                                   camera_horizontal,
+                                                   camera_focus);
 
       if (x_max_perspective < projection_decomposition[0])
         x_max_perspective = projection_decomposition[0];
@@ -1830,11 +1895,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       point[0] = cell->vertex(2)[0];
       point[1] = cell->vertex(2)[1];
 
-      projection_decomposition = GridOut::svg_project_point(point,
-                                                            camera_position,
-                                                            camera_direction,
-                                                            camera_horizontal,
-                                                            camera_focus);
+      projection_decomposition = svg_project_point(point,
+                                                   camera_position,
+                                                   camera_direction,
+                                                   camera_horizontal,
+                                                   camera_focus);
 
       if (x_max_perspective < projection_decomposition[0])
         x_max_perspective = projection_decomposition[0];
@@ -1849,11 +1914,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       point[0] = cell->vertex(3)[0];
       point[1] = cell->vertex(3)[1];
 
-      projection_decomposition = GridOut::svg_project_point(point,
-                                                            camera_position,
-                                                            camera_direction,
-                                                            camera_horizontal,
-                                                            camera_focus);
+      projection_decomposition = svg_project_point(point,
+                                                   camera_position,
+                                                   camera_direction,
+                                                   camera_horizontal,
+                                                   camera_focus);
 
       if (x_max_perspective < projection_decomposition[0])
         x_max_perspective = projection_decomposition[0];
@@ -2143,12 +2208,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                          std::max(x_dimension, y_dimension);
             }
 
-          projection_decomposition =
-            GridOut::svg_project_point(point,
-                                       camera_position,
-                                       camera_direction,
-                                       camera_horizontal,
-                                       camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
           out << static_cast<unsigned int>(
                    .5 +
@@ -2168,12 +2232,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           point[0] = cell->vertex(1)[0];
           point[1] = cell->vertex(1)[1];
 
-          projection_decomposition =
-            GridOut::svg_project_point(point,
-                                       camera_position,
-                                       camera_direction,
-                                       camera_horizontal,
-                                       camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
           out << static_cast<unsigned int>(
                    .5 +
@@ -2193,12 +2256,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           point[0] = cell->vertex(3)[0];
           point[1] = cell->vertex(3)[1];
 
-          projection_decomposition =
-            GridOut::svg_project_point(point,
-                                       camera_position,
-                                       camera_direction,
-                                       camera_horizontal,
-                                       camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
           out << static_cast<unsigned int>(
                    .5 +
@@ -2218,12 +2280,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           point[0] = cell->vertex(2)[0];
           point[1] = cell->vertex(2)[1];
 
-          projection_decomposition =
-            GridOut::svg_project_point(point,
-                                       camera_position,
-                                       camera_direction,
-                                       camera_horizontal,
-                                       camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
           out << static_cast<unsigned int>(
                    .5 +
@@ -2243,12 +2304,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           point[0] = cell->vertex(0)[0];
           point[1] = cell->vertex(0)[1];
 
-          projection_decomposition =
-            GridOut::svg_project_point(point,
-                                       camera_position,
-                                       camera_direction,
-                                       camera_horizontal,
-                                       camera_focus);
+          projection_decomposition = svg_project_point(point,
+                                                       camera_position,
+                                                       camera_direction,
+                                                       camera_horizontal,
+                                                       camera_focus);
 
           out << static_cast<unsigned int>(
                    .5 +
@@ -2289,12 +2349,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               float distance_factor =
                 distance_to_camera / (2. * std::max(x_dimension, y_dimension));
 
-              projection_decomposition =
-                GridOut::svg_project_point(point,
-                                           camera_position,
-                                           camera_direction,
-                                           camera_horizontal,
-                                           camera_focus);
+              projection_decomposition = svg_project_point(point,
+                                                           camera_position,
+                                                           camera_direction,
+                                                           camera_horizontal,
+                                                           camera_focus);
 
               const auto font_size_this_cell = static_cast<unsigned int>(
                 .5 +
@@ -2326,7 +2385,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               if (svg_flags.label_cell_index)
                 {
                   if (svg_flags.label_level_number)
-                    out << ',';
+                    out << '.';
                   out << cell->index();
                 }
 
@@ -2389,11 +2448,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                         }
 
                       projection_decomposition =
-                        GridOut::svg_project_point(point,
-                                                   camera_position,
-                                                   camera_direction,
-                                                   camera_horizontal,
-                                                   camera_focus);
+                        svg_project_point(point,
+                                          camera_position,
+                                          camera_direction,
+                                          camera_horizontal,
+                                          camera_focus);
 
                       out << "  <line x1=\""
                           << static_cast<unsigned int>(
@@ -2427,11 +2486,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                         }
 
                       projection_decomposition =
-                        GridOut::svg_project_point(point,
-                                                   camera_position,
-                                                   camera_direction,
-                                                   camera_horizontal,
-                                                   camera_focus);
+                        svg_project_point(point,
+                                          camera_position,
+                                          camera_direction,
+                                          camera_horizontal,
+                                          camera_focus);
 
                       out << "\" x2=\""
                           << static_cast<unsigned int>(
@@ -2505,12 +2564,12 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                            (++line_offset) * 1.5 * font_size)
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:"
               << font_size << "px\">"
-              << "level_number";
+              << "cell_level";
 
           if (svg_flags.label_cell_index || svg_flags.label_material_id ||
               svg_flags.label_subdomain_id ||
               svg_flags.label_level_subdomain_id)
-            out << ',';
+            out << '.';
 
           out << "</text>" << '\n';
         }
@@ -3742,57 +3801,6 @@ GridOut::write_ucd_lines(const Triangulation<dim, spacedim> &tria,
   const_cast<dealii::Triangulation<dim, spacedim> &>(tria).load_user_flags_line(
     line_flags);
   return current_element_index;
-}
-
-
-Point<2> GridOut::svg_project_point(Point<3> point,
-                                    Point<3> camera_position,
-                                    Point<3> camera_direction,
-                                    Point<3> camera_horizontal,
-                                    float    camera_focus)
-{
-  // ...
-  Point<3> camera_vertical;
-  camera_vertical[0] = camera_horizontal[1] * camera_direction[2] -
-                       camera_horizontal[2] * camera_direction[1];
-  camera_vertical[1] = camera_horizontal[2] * camera_direction[0] -
-                       camera_horizontal[0] * camera_direction[2];
-  camera_vertical[2] = camera_horizontal[0] * camera_direction[1] -
-                       camera_horizontal[1] * camera_direction[0];
-
-  float phi;
-  phi = camera_focus;
-  phi /= (point[0] - camera_position[0]) * camera_direction[0] +
-         (point[1] - camera_position[1]) * camera_direction[1] +
-         (point[2] - camera_position[2]) * camera_direction[2];
-
-  Point<3> projection;
-  projection[0] = camera_position[0] + phi * (point[0] - camera_position[0]);
-  projection[1] = camera_position[1] + phi * (point[1] - camera_position[1]);
-  projection[2] = camera_position[2] + phi * (point[2] - camera_position[2]);
-
-  Point<2> projection_decomposition;
-  projection_decomposition[0] =
-    (projection[0] - camera_position[0] - camera_focus * camera_direction[0]) *
-    camera_horizontal[0];
-  projection_decomposition[0] +=
-    (projection[1] - camera_position[1] - camera_focus * camera_direction[1]) *
-    camera_horizontal[1];
-  projection_decomposition[0] +=
-    (projection[2] - camera_position[2] - camera_focus * camera_direction[2]) *
-    camera_horizontal[2];
-
-  projection_decomposition[1] =
-    (projection[0] - camera_position[0] - camera_focus * camera_direction[0]) *
-    camera_vertical[0];
-  projection_decomposition[1] +=
-    (projection[1] - camera_position[1] - camera_focus * camera_direction[1]) *
-    camera_vertical[1];
-  projection_decomposition[1] +=
-    (projection[2] - camera_position[2] - camera_focus * camera_direction[2]) *
-    camera_vertical[2];
-
-  return projection_decomposition;
 }
 
 

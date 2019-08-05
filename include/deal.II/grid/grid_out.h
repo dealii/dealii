@@ -1724,22 +1724,6 @@ private:
 
 
   /**
-   * This function projects a three-dimensional point (Point<3> point) onto a
-   * two-dimensional image plane, specified by the position of the camera
-   * viewing system (Point<3> camera_position), camera direction (Point<3>
-   * camera_position), camera horizontal (Point<3> camera_horizontal,
-   * necessary for the correct alignment of the later images), and the focus
-   * of the camera (float camera_focus).
-   *
-   * For SVG output of grids.
-   */
-  static Point<2> svg_project_point(Point<3> point,
-                                    Point<3> camera_position,
-                                    Point<3> camera_direction,
-                                    Point<3> camera_horizontal,
-                                    float    camera_focus);
-
-  /**
    * Return the number of faces in the triangulation which have a boundary
    * indicator not equal to zero. Only these faces are explicitly printed in
    * the <tt>write_*</tt> functions; all faces with indicator
