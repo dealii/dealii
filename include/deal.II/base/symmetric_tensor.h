@@ -2652,8 +2652,8 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE Number
-                                        trace(const SymmetricTensor<2, dim, Number> &d)
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
+                                               trace(const SymmetricTensor<2, dim, Number> &d)
 {
   Number t = d.data[0];
   for (unsigned int i = 1; i < dim; ++i)
