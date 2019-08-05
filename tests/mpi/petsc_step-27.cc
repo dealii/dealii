@@ -229,6 +229,19 @@ namespace Step27
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              constraints);
+#ifdef DEBUG
+    // We have not dealt with chains of constraints on ghost cells yet.
+    // Thus, we are content with verifying their consistency for now.
+    IndexSet locally_active_dofs;
+    DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+    AssertThrow(constraints.is_consistent_in_parallel(
+                  dof_handler.locally_owned_dofs_per_processor(),
+                  locally_active_dofs,
+                  mpi_communicator,
+                  /*verbose=*/true),
+                ExcMessage(
+                  "AffineConstraints object contains inconsistencies!"));
+#endif
     constraints.close();
 
     DynamicSparsityPattern dsp(locally_relevant_dofs);
