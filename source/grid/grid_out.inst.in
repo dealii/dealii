@@ -24,6 +24,11 @@ for (deal_II_dimension : DIMENSIONS)
       const Triangulation<deal_II_dimension> &, std::ostream &) const;
 #endif
 
+#if deal_II_dimension != 2
+    template void GridOut::write_svg(const Triangulation<deal_II_dimension> &,
+                                     std::ostream &) const;
+#endif
+
     template void GridOut::write_msh(const Triangulation<deal_II_dimension> &,
                                      std::ostream &) const;
 
@@ -68,6 +73,13 @@ for (deal_II_dimension : DIMENSIONS)
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension < deal_II_space_dimension
+
+#  if deal_II_dimension != 2
+    template void GridOut::write_svg(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &) const;
+#  endif
+
     template void GridOut::write_msh(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       std::ostream &) const;
