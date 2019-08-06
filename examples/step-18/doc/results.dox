@@ -441,7 +441,8 @@ Without going into further details of this model, we refer to the excellent
 book by Simo and Hughes on &ldquo;Computational Inelasticity&rdquo; for a
 comprehensive overview of computational strategies for solving plastic
 models. Alternatively, a brief but concise description of an algorithm for
-plasticity is given in @cite CTZ04.
+plasticity is given in an article by S. Commend, A. Truty, and Th. Zimmermann;
+@cite CTZ04.
 
 
 <h5>Stabilization issues</h5>
@@ -471,10 +472,7 @@ solution of such problems, and stabilization techniques have to be employed
 for a stable and accurate solution. The book and paper cited above give
 indications as to how to do this, but there is also a large volume of
 literature on this subject; a good start to get an overview of the topic can
-be found in the references of the paper by
-H.-Y. Duan and Q. Lin on &ldquo;Mixed finite elements of least-squares type for
-elasticity&rdquo; (Computer Methods in Applied Mechanics and Engineering, vol. 194,
-pp. 1093-1112, 2005).
+be found in the references of the paper by H.-Y. Duan and Q. Lin; @cite DL05. 
 
 
 <h5>Refinement during timesteps</h5>
