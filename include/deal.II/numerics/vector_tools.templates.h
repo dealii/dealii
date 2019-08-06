@@ -111,7 +111,7 @@ namespace VectorTools
     // FIXME: This should be refactored into the mapping (i.e.
     // implement the inverse function of Mapping<dim, spacedim>::transform).
     // Further, the finite element should make the information about
-    // the correct mapping directly accessible (i.e. which MappingType
+    // the correct mapping directly accessible (i.e. which MappingKind
     // should be used). Using fe.conforming_space might be a bit of a
     // problem because we only support doing nothing, Hcurl, and Hdiv
     // conforming mappings.
