@@ -163,6 +163,13 @@ private:
    * A map to store a vector of data on a cell.
    */
   std::map<CellIteratorType, std::vector<std::shared_ptr<DataType>>> map;
+
+  /**
+   * @addtogroup Exceptions
+   */
+  DeclExceptionMsg(
+    ExcCellDataTypeMismatch,
+    "Cell data is being retrieved with a type which is different than the type used to initialize it");
 };
 
 
@@ -617,7 +624,10 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // the T==DataType:
   std::vector<std::shared_ptr<T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
-    res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
+    {
+      res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
+      Assert(res[q], ExcCellDataTypeMismatch());
+    }
   return res;
 }
 
@@ -640,7 +650,10 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // does not modify the content of QP objects
   std::vector<std::shared_ptr<const T>> res(it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)
-    res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
+    {
+      res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
+      Assert(res[q], ExcCellDataTypeMismatch());
+    }
   return res;
 }
 
