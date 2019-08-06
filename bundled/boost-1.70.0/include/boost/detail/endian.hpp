@@ -6,6 +6,6 @@
 #define BOOST_DETAIL_ENDIAN_HPP
 
 // Use the Predef library for the detection of endianess.
-#include <boost/predef/detail/endian_compat.h>
+#include <boost/predef/other/endian.h>
 
 #endif

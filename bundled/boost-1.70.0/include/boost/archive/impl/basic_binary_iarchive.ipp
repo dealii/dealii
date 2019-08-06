@@ -89,7 +89,7 @@ basic_binary_iarchive<Archive>::init(void){
     {
         int v = 0;
         v = this->This()->m_sb.sbumpc();
-        #if defined(BOOST_LITTLE_ENDIAN)
+        #if defined(BOOST_ENDIAN_LITTLE_BYTE)
         if(v < 6){
             ;
         }
@@ -111,7 +111,7 @@ basic_binary_iarchive<Archive>::init(void){
             // version 8+ followed by a zero
             this->This()->m_sb.sbumpc();
         }
-        #elif defined(BOOST_BIG_ENDIAN)
+        #elif defined(BOOST_ENDIAN_BIG_BYTE)
         if(v == 0)
             v = this->This()->m_sb.sbumpc();
         #endif
