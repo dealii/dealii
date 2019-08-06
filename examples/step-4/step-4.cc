@@ -158,7 +158,7 @@ public:
 
 
 
-// For this example, we choose as right hand side function to function
+// For this example, we choose as right hand side the function
 // $4(x^4+y^4)$ in 2D, or $4(x^4+y^4+z^4)$ in 3D. We could write this
 // distinction using an if-statement on the space dimension, but here is a
 // simple way that also allows us to use the same function in 1D (or in 4D, if
@@ -167,10 +167,10 @@ public:
 // time when you define the template, the compiler doesn't know the value of
 // <code>dim</code>, but when it later encounters a statement or declaration
 // <code>RightHandSide@<2@></code>, it will take the template, replace all
-// occurrences of dim by 2 and compile the resulting function); in other
+// occurrences of dim by 2 and compile the resulting function).  In other
 // words, at the time of compiling this function, the number of times the body
-// will be executed is known, and the compiler can optimize away the overhead
-// needed for the loop and the result will be as fast as if we had used the
+// will be executed is known, and the compiler can minimize the overhead
+// needed for the loop; the result will be as fast as if we had used the
 // formulas above right away.
 //
 // The last thing to note is that a <code>Point@<dim@></code> denotes a point
