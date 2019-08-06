@@ -53,6 +53,8 @@ maximal values of the right hand side function are at the corners of
 the domain, where also the solution is moving most rapidly.
 It is also nice to see that the solution follows the desired quadratic
 boundary values along the boundaries of the domain.
+It can also be useful to verify a computed solution against an analytical
+solution. For an explanation of this technique, see step-7.
 
 On the other hand, even though the picture does not show the mesh lines
 explicitly, you can see them as little kinks in the solution. This clearly
@@ -80,7 +82,7 @@ so that it is possible to see through them and see what's behind.
 </table>
 
 @note
-A final remark on visualization: The idea of visualization is to give insight,
+A final remark on visualization: the idea of visualization is to give insight,
 which is not the same as displaying information. In particular, it is easy to
 overload a picture with information, but while it shows more information it
 makes it also more difficult to glean insight. As an example, the program I
@@ -92,7 +94,7 @@ of this is important
 here: the axes are equally easy to make out because the tripod at the bottom
 left is still visible, and we know from the program that the domain is
 $[-1,1]^3$, so there is no need for tick marks. As a consequence, I have
-switched off all the extraneous stuff in the picture: The art of visualization
+switched off all the extraneous stuff in the picture: the art of visualization
 is to reduce the picture to those parts that are important to see what one
 wants to see, but no more.
 
