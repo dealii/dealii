@@ -493,15 +493,15 @@ void Step3::assemble_system()
   // example, you may have inflow and outflow boundaries in fluid dynamics, or
   // clamped and free parts of bodies in deformation computations of
   // bodies. Then you will want to denote these different parts of the
-  // boundary by different numbers and tell the interpolate_boundary_values
+  // boundary by indicators, and tell the interpolate_boundary_values
   // function to only compute the boundary values on a certain part of the
-  // boundary (e.g. the clamped part, or the inflow boundary). By default, all
-  // boundaries have the number `0`, and since we have not changed that, this
-  // is still so; therefore, if we give `0` as the desired portion of the
-  // boundary, this means we get the whole boundary. If you have boundaries
-  // with kinds of boundaries, you have to number them differently. The
-  // function call below will then only determine boundary values for parts of
-  // the boundary.
+  // boundary (e.g. the clamped part, or the inflow boundary). By default,
+  // all boundaries have a 0 boundary indicator, unless otherwise specified. If
+  // sections of the boundary have different boundary conditions, you have to
+  // number those parts with different boundary indicators. The function call
+  // below will then only determine boundary values for those parts of the
+  // boundary for which the boundary indicator is in fact the zero specified as
+  // the second argument.
   //
   // The function describing the boundary values is an object of type Function
   // or of a derived class. One of the derived classes is
