@@ -699,6 +699,13 @@ public:
   matrix_norm_square(const BlockVectorType &v) const;
 
   /**
+   * Return the frobenius norm of the matrix, i.e. the square root of the sum
+   * of squares of all entries in the matrix.
+   */
+  value_type
+  frobenius_norm() const;
+
+  /**
    * Compute the matrix scalar product $\left(u,Mv\right)$.
    */
   template <class BlockVectorType>
@@ -2397,6 +2404,29 @@ BlockMatrixBase<MatrixType>::matrix_norm_square(const BlockVectorType &v) const
         norm_sqr +=
           block(row, col).matrix_scalar_product(v.block(row), v.block(col));
   return norm_sqr;
+}
+
+
+
+template <class MatrixType>
+typename BlockMatrixBase<MatrixType>::value_type
+BlockMatrixBase<MatrixType>::frobenius_norm() const
+{
+  value_type norm_sqr = 0;
+
+
+  // For each block, get the Frobenius norm, and add the square to the
+  // accumulator for the full matrix
+  for (unsigned int row = 0; row < n_block_rows(); ++row)
+    {
+      for (unsigned int col = 0; col < n_block_cols(); ++col)
+        {
+          const value_type block_norm = block(row, col).frobenius_norm();
+          norm_sqr += block_norm * block_norm;
+        }
+    }
+
+  return std::sqrt(norm_sqr);
 }
 
 
