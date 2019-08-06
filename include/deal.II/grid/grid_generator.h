@@ -1031,12 +1031,12 @@ namespace GridGenerator
    * to the triangulation.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
-   * 
+   *
    * @image html cylinder_shell.png
    *
-   * In this picture, a cylinder shell of length 2, inner radius 0.5, outer radius 1. is 
-   * shown. The default argument for n_radial_cells and n_axial_cells are used and a single 
-   * global refinement is carried out.
+   * In this picture, a cylinder shell of length 2, inner radius 0.5, outer
+   * radius 1. is shown. The default argument for n_radial_cells and
+   * n_axial_cells are used and a single global refinement is carried out.
    *
    */
   template <int dim>
