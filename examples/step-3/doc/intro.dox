@@ -63,7 +63,7 @@ we need the following:
 - A finite element that describes the shape functions we want to use on the
   reference cell (which in deal.II is always the unit interval $[0,1]$, the
   unit square $[0,1]^2$ or the unit cube $[0,1]^3$, depending on which space
-  dimension you work in. In step-2, we had already used an object of type
+  dimension you work in). In step-2, we had already used an object of type
   FE_Q<2>, which denotes the usual Lagrange elements that define shape
   functions by interpolation on support points. The simplest one is
   FE_Q<2>(1), which uses polynomial degree 1. In 2d, these are often referred
