@@ -68,11 +68,12 @@ void first_grid()
 
   // Now we want to write a graphical representation of the mesh to an output
   // file. The GridOut class of deal.II can do that in a number of different
-  // output formats; here, we choose encapsulated postscript (eps) format:
-  std::ofstream out("grid-1.eps");
+  // output formats; here, we choose scalable vector graphics (SVG) format
+  // that you can visualize using the web browser of your choice:
+  std::ofstream out("grid-1.svg");
   GridOut       grid_out;
-  grid_out.write_eps(triangulation, out);
-  std::cout << "Grid written to grid-1.eps" << std::endl;
+  grid_out.write_svg(triangulation, out);
+  std::cout << "Grid written to grid-1.svg" << std::endl;
 }
 
 
@@ -238,13 +239,13 @@ void second_grid()
 
 
   // Finally, after these five iterations of refinement, we want to again
-  // write the resulting mesh to a file, again in eps format. This works just
+  // write the resulting mesh to a file, again in SVG format. This works just
   // as above:
-  std::ofstream out("grid-2.eps");
+  std::ofstream out("grid-2.svg");
   GridOut       grid_out;
-  grid_out.write_eps(triangulation, out);
+  grid_out.write_svg(triangulation, out);
 
-  std::cout << "Grid written to grid-2.eps" << std::endl;
+  std::cout << "Grid written to grid-2.svg" << std::endl;
 }
 
 
