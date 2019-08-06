@@ -265,8 +265,7 @@ KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
 
       double permeability = 0;
       for (unsigned int i=0; i<centers.size(); ++i)
-        permeability += std::exp(-(points[p]-centers[i]).square()
-                                 / (0.1 * 0.1));
+        permeability += std::exp(-(points[p] - centers[i]).norm_square() / (0.1 * 0.1));
 
       const double normalized_permeability
         = std::max(permeability, 0.005);
