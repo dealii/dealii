@@ -53,15 +53,16 @@ main()
 
   for (unsigned int i = 0; i < bsm.m(); ++i)
     for (unsigned int j = 0; j < bsm.n(); ++j)
-    {
-      bsm.add(i, j,  1.0);
-    }
+      {
+        bsm.add(i, j, 1.0);
+      }
 
-  const double accuracy = 1e-12;
+  const double accuracy          = 1e-12;
   const double correct_frob_norm = 10.0;
-  const double frob_norm = bsm.frobenius_norm();
+  const double frob_norm         = bsm.frobenius_norm();
 
-  Assert(std::fabs(frob_norm - correct_frob_norm) < accuracy, ExcInternalError());
+  Assert(std::fabs(frob_norm - correct_frob_norm) < accuracy,
+         ExcInternalError());
 
   deallog << "OK" << std::endl;
   deallog << std::flush;
