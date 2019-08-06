@@ -1529,54 +1529,26 @@ namespace
    *
    * For SVG output of grids.
    */
-  Point<2> svg_project_point(Point<3>     point,
-                             Point<3>     camera_position,
-                             Tensor<1, 3> camera_direction,
-                             Tensor<1, 3> camera_horizontal,
-                             float        camera_focus)
+  Point<2>
+  svg_project_point(const Point<3> &    point,
+                    const Point<3> &    camera_position,
+                    const Tensor<1, 3> &camera_direction,
+                    const Tensor<1, 3> &camera_horizontal,
+                    const float         camera_focus)
   {
-    // ...
-    Point<3> camera_vertical;
-    camera_vertical[0] = camera_horizontal[1] * camera_direction[2] -
-                         camera_horizontal[2] * camera_direction[1];
-    camera_vertical[1] = camera_horizontal[2] * camera_direction[0] -
-                         camera_horizontal[0] * camera_direction[2];
-    camera_vertical[2] = camera_horizontal[0] * camera_direction[1] -
-                         camera_horizontal[1] * camera_direction[0];
+    const Tensor<1, 3> camera_vertical =
+      cross_product_3d(camera_horizontal, camera_direction);
 
-    float phi;
-    phi = camera_focus;
-    phi /= (point[0] - camera_position[0]) * camera_direction[0] +
-           (point[1] - camera_position[1]) * camera_direction[1] +
-           (point[2] - camera_position[2]) * camera_direction[2];
+    const float phi =
+      camera_focus / ((point - camera_position) * camera_direction);
 
-    Point<3> projection;
-    projection[0] = camera_position[0] + phi * (point[0] - camera_position[0]);
-    projection[1] = camera_position[1] + phi * (point[1] - camera_position[1]);
-    projection[2] = camera_position[2] + phi * (point[2] - camera_position[2]);
+    const Point<3> projection =
+      camera_position + phi * (point - camera_position);
 
-    Point<2> projection_decomposition;
-    projection_decomposition[0] = (projection[0] - camera_position[0] -
-                                   camera_focus * camera_direction[0]) *
-                                  camera_horizontal[0];
-    projection_decomposition[0] += (projection[1] - camera_position[1] -
-                                    camera_focus * camera_direction[1]) *
-                                   camera_horizontal[1];
-    projection_decomposition[0] += (projection[2] - camera_position[2] -
-                                    camera_focus * camera_direction[2]) *
-                                   camera_horizontal[2];
-
-    projection_decomposition[1] = (projection[0] - camera_position[0] -
-                                   camera_focus * camera_direction[0]) *
-                                  camera_vertical[0];
-    projection_decomposition[1] += (projection[1] - camera_position[1] -
-                                    camera_focus * camera_direction[1]) *
-                                   camera_vertical[1];
-    projection_decomposition[1] += (projection[2] - camera_position[2] -
-                                    camera_focus * camera_direction[2]) *
-                                   camera_vertical[2];
-
-    return projection_decomposition;
+    return {(projection - camera_position - camera_focus * camera_direction) *
+              camera_horizontal,
+            (projection - camera_position - camera_focus * camera_direction) *
+              camera_vertical};
   }
 } // namespace
 
