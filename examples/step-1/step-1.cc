@@ -31,7 +31,7 @@
 // This is needed for C++ output:
 #include <iostream>
 #include <fstream>
-// And this for the declarations of the `sqrt' and `fabs' functions:
+// And this for the declarations of the `sqrt` and `fabs` functions:
 #include <cmath>
 
 // The final step in importing deal.II is this: All deal.II functions and
