@@ -37,7 +37,7 @@ struct ProductType;
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>, std::complex<U>>::type inline
+inline typename ProductType<std::complex<T>, std::complex<U>>::type
 operator*(const std::complex<T> &left, const std::complex<U> &right)
 {
   using result_type =
@@ -53,7 +53,7 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>, std::complex<U>>::type inline
+inline typename ProductType<std::complex<T>, std::complex<U>>::type
 operator/(const std::complex<T> &left, const std::complex<U> &right)
 {
   using result_type =
@@ -70,9 +70,9 @@ operator/(const std::complex<T> &left, const std::complex<U> &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>,
-                     typename EnableIfScalar<U>::type>::type inline
-operator*(const std::complex<T> &left, const U &right)
+inline
+  typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
+  operator*(const std::complex<T> &left, const U &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) * static_cast<result_type>(right);
@@ -87,9 +87,9 @@ operator*(const std::complex<T> &left, const U &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>,
-                     typename EnableIfScalar<U>::type>::type inline
-operator/(const std::complex<T> &left, const U &right)
+inline
+  typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
+  operator/(const std::complex<T> &left, const U &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) / static_cast<result_type>(right);
@@ -104,9 +104,9 @@ operator/(const std::complex<T> &left, const U &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<typename EnableIfScalar<T>::type,
-                     std::complex<U>>::type inline
-operator*(const T &left, const std::complex<U> &right)
+inline
+  typename ProductType<typename EnableIfScalar<T>::type, std::complex<U>>::type
+  operator*(const T &left, const std::complex<U> &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) * static_cast<result_type>(right);
@@ -121,9 +121,9 @@ operator*(const T &left, const std::complex<U> &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<typename EnableIfScalar<T>::type,
-                     std::complex<U>>::type inline
-operator/(const T &left, const std::complex<U> &right)
+inline
+  typename ProductType<typename EnableIfScalar<T>::type, std::complex<U>>::type
+  operator/(const T &left, const std::complex<U> &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) / static_cast<result_type>(right);
