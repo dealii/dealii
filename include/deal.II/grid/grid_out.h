@@ -1159,7 +1159,9 @@ public:
    * further possible in order to visualize a certain property of the cells
    * such as their level or material id. A colorbar can be drawn to encode the
    * chosen coloring.  Moreover, a cell label can be added, showing level
-   * index, etc.
+   * index, etc. Indeed, by using the set_flags() with an appropriately
+   * generated object of type GridOutFlags::Svg, many aspects of how and
+   * what is being visualized by this function can be customized.
    *
    * @note This function is currently only implemented for two-dimensional
    * grids in two space dimensions.
