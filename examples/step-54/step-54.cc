@@ -36,7 +36,7 @@
 // specifying <code>-DDEAL_II_WITH_OPENCASCADE=ON</code> and
 // <code>-DOPENCASCADE_DIR=/path/to/your/opencascade/installation</code>
 // when calling <code>cmake</code> during deal.II configuration.
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 
@@ -262,17 +262,17 @@ namespace Step54
     // The surface projector is created according to what is specified
     // with the @p surface_projection_kind option of the constructor. In particular,
     // if the surface_projection_kind value equals @p NormalProjection, we select the
-    // OpenCASCADE::NormalProjectionBoundary. The new mesh points will
+    // OpenCASCADE::NormalProjectionManifold. The new mesh points will
     // then initially be generated at the barycenter of the cell/edge
     // considered, and then projected on the CAD surface along its
-    // normal direction.  The NormalProjectionBoundary constructor
+    // normal direction.  The NormalProjectionManifold constructor
     // only needs a shape and a tolerance, and we then assign it to
     // the triangulation for use with all parts that manifold having id 1:
     switch (surface_projection_kind)
       {
         case NormalProjection:
           {
-            OpenCASCADE::NormalProjectionBoundary<2, 3> normal_projector(
+            OpenCASCADE::NormalProjectionManifold<2, 3> normal_projector(
               bow_surface, tolerance);
             tria.set_manifold(1, normal_projector);
 
@@ -280,15 +280,15 @@ namespace Step54
           }
 
         // @p If surface_projection_kind value is @p DirectionalProjection, we select the
-        // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points
+        // OpenCASCADE::DirectionalProjectionManifold class. The new mesh points
         // will then initially be generated at the barycenter of the cell/edge
         // considered, and then projected on the CAD surface along a
         // direction that is specified to the
-        // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
+        // OpenCASCADE::DirectionalProjectionManifold constructor. In this case,
         // the projection is done along the y-axis.
         case DirectionalProjection:
           {
-            OpenCASCADE::DirectionalProjectionBoundary<2, 3>
+            OpenCASCADE::DirectionalProjectionManifold<2, 3>
               directional_projector(bow_surface,
                                     Point<3>(0.0, 1.0, 0.0),
                                     tolerance);
@@ -299,16 +299,16 @@ namespace Step54
 
         // As a third option, if @p surface_projection_kind value
         // is @p NormalToMeshProjection, we select the
-        // OpenCASCADE::NormalToMeshProjectionBoundary. The new mesh points will
+        // OpenCASCADE::NormalToMeshProjectionManifold. The new mesh points will
         // again initially be generated at the barycenter of the cell/edge
         // considered, and then projected on the CAD surface along a
         // direction that is an estimate of the mesh normal direction.
-        // The OpenCASCADE::NormalToMeshProjectionBoundary constructor only
+        // The OpenCASCADE::NormalToMeshProjectionManifold constructor only
         // requires a shape (containing at least a face) and a
         // tolerance.
         case NormalToMeshProjection:
           {
-            OpenCASCADE::NormalToMeshProjectionBoundary<2, 3>
+            OpenCASCADE::NormalToMeshProjectionManifold<2, 3>
               normal_to_mesh_projector(bow_surface, tolerance);
             tria.set_manifold(1, normal_to_mesh_projector);
 
