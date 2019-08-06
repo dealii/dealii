@@ -86,6 +86,11 @@ main()
   svg_flags.level_height_factor            = .5;
   svg_flags.height                         = 0;
   svg_flags.width                          = 2000;
+  svg_flags.label_level_number             = true;
+  svg_flags.label_cell_index               = true;
+  svg_flags.draw_legend                    = true;
+  svg_flags.draw_colorbar                  = true;
+
   grid_out.set_flags(svg_flags);
   grid_out.write_svg(create_grid(), deallog.get_file_stream());
 

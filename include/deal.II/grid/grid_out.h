@@ -819,12 +819,12 @@ namespace GridOutFlags
         const int          polar_angle                    = 0,
         const Coloring     coloring                       = level_number,
         const bool         convert_level_number_to_height = false,
-        const bool         label_level_number             = true,
-        const bool         label_cell_index               = true,
+        const bool         label_level_number             = false,
+        const bool         label_cell_index               = false,
         const bool         label_material_id              = false,
         const bool         label_subdomain_id             = false,
-        const bool         draw_colorbar                  = true,
-        const bool         draw_legend                    = true);
+        const bool         draw_colorbar                  = false,
+        const bool         draw_legend                    = false);
   };
 
   /**
