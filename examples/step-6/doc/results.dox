@@ -504,14 +504,13 @@ methods because the mesh will have to resolve the singularity that causes
 the solution to not be in $W^{1,\infty}$ any more.
 
 The typical example one uses for this is called the <i>Kellogg problem</i>
-(referring to the paper "On the Poisson equation with intersecting interfaces"
-by R. B. Kellogg, Applicable Analysis, vol. 4, pp. 101-129, 1974), which
-in the commonly used form has a coefficient $a(\mathbf x)$ that has different values
-in the four quadrants of the plane (or eight different values in the octants
-of ${\mathbb R}^3$). The exact degree of regularity (the $s$ in the
-index of the Sobolev space above) depends on the values of $a(\mathbf x)$ coming
-together at the origin, and by choosing the jumps large enough, the
-regularity of the solution can be made as close as desired to $H^1$.
+(referring to @cite Kel74), which in the commonly used form has a coefficient 
+$a(\mathbf x)$ that has different values in the four quadrants of the plane 
+(or eight different values in the octants of ${\mathbb R}^3$). The exact degree 
+of regularity (the $s$ in the index of the Sobolev space above) depends on the 
+values of $a(\mathbf x)$ coming together at the origin, and by choosing the 
+jumps large enough, the regularity of the solution can be made as close as 
+desired to $H^1$.
 
 To implement something like this, one could replace the coefficient
 function by the following (shown here only for the 2d case):

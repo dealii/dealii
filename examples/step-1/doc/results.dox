@@ -28,9 +28,7 @@ refined the same number of times.
 
 (While the second mesh is entirely artificial and made-up, and
 certainly not very practical in applications, to everyone's surprise it
-has found its way into the literature: see the paper by M. Mu
-titled "PDE.MART: A network-based problem-solving environment", ACM
-Trans. Math. Software, vol. 31, pp. 508-531, 2005. Apparently it is
+has found its way into the literature: see @cite Mu05. Apparently it is
 good for some things at least.)
 
 
