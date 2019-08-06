@@ -33,7 +33,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
-  this->mapping_type = mapping_nedelec;
+  this->mapping_kind = mapping_nedelec;
   // Set up the table converting components to base components. Since we have
   // only one base element, everything remains zero except the component in the
   // base, which is the component itself.
@@ -2170,7 +2170,7 @@ template <int dim, int spacedim>
 UpdateFlags
 FE_NedelecSZ<dim, spacedim>::update_once(const UpdateFlags flags) const
 {
-  const bool values_once = (mapping_type == mapping_none);
+  const bool values_once = (mapping_kind == mapping_none);
 
   UpdateFlags out = update_default;
   if (values_once && (flags & update_values))

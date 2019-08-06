@@ -137,7 +137,7 @@ public:
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed only
-   * for the reference cell. Make sure, that #mapping_type is set by the
+   * for the reference cell. Make sure, that #mapping_kind is set by the
    * derived class, such that this function can operate correctly.
    */
   UpdateFlags
@@ -145,7 +145,7 @@ public:
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed in
-   * each cell cell. Make sure, that #mapping_type is set by the derived
+   * each cell cell. Make sure, that #mapping_kind is set by the derived
    * class, such that this function can operate correctly.
    */
   UpdateFlags
@@ -153,10 +153,10 @@ public:
 
 protected:
   /**
-   * The mapping type to be used to map shape functions from the reference
+   * The mapping kind to be used to map shape functions from the reference
    * cell to the mesh cell.
    */
-  MappingType mapping_type;
+  MappingKind mapping_kind;
 
   virtual std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>

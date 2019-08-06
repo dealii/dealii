@@ -48,7 +48,7 @@ class FESubfaceValues;
 
 
 /**
- * The transformation type used for the Mapping::transform() functions.
+ * The transformation kind used for the Mapping::transform() functions.
  *
  * Special finite elements may need special Mapping from the reference cell to
  * the actual mesh cell. In order to be most flexible, this enum provides an
@@ -58,7 +58,7 @@ class FESubfaceValues;
  *
  * @ingroup mapping
  */
-enum MappingType
+enum MappingKind
 {
   /**
    * No mapping, i.e., shape functions are not mapped from a reference cell
@@ -106,7 +106,7 @@ enum MappingType
    * The mapping used for Nedelec elements.
    *
    * Curl-conforming elements are mapped as covariant vectors. Nevertheless,
-   * we introduce a separate mapping type, such that we can use the same flag
+   * we introduce a separate mapping kind, such that we can use the same flag
    * for the vector and its gradient (see Mapping::transform() for details).
    */
   mapping_nedelec = 0x0200,
@@ -229,7 +229,7 @@ enum MappingType
  * The differential forms <b>A</b> and <b>B</b> are determined by the kind of
  * object being transformed. These transformations are performed through the
  * transform() functions, and the type of object being transformed is
- * specified by their MappingType argument. See the documentation there for
+ * specified by their MappingKind argument. See the documentation there for
  * possible choices.
  *
  * <h4>Derivatives of the mapping</h4>
@@ -950,14 +950,14 @@ public:
 
   /**
    * Transform a field of vectors or 1-differential forms according to the
-   * selected MappingType.
+   * selected MappingKind.
    *
    * @note Normally, this function is called by a finite element, filling
    * FEValues objects. For this finite element, there should be an alias
-   * MappingType like @p mapping_bdm, @p mapping_nedelec, etc. This alias
-   * should be preferred to using the types below.
+   * MappingKind like @p mapping_bdm, @p mapping_nedelec, etc. This alias
+   * should be preferred to using the kinds below.
    *
-   * The mapping types currently implemented by derived classes are:
+   * The mapping kinds currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_contravariant: maps a vector field on the reference cell
    * to the physical cell through the Jacobian:
@@ -998,7 +998,7 @@ public:
    *
    * @param[in] input An array (or part of an array) of input objects that
    * should be mapped.
-   * @param[in] type The kind of mapping to be applied.
+   * @param[in] kind The kind of mapping to be applied.
    * @param[in] internal A pointer to an object of type
    * Mapping::InternalDataBase that contains information previously stored by
    * the mapping. The object pointed to was created by the get_data(),
@@ -1013,7 +1013,7 @@ public:
    */
   virtual void
   transform(const ArrayView<const Tensor<1, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const = 0;
 
@@ -1021,7 +1021,7 @@ public:
    * Transform a field of differential forms from the reference cell to the
    * physical cell.  It is useful to think of $\mathbf{T} = \nabla \mathbf u$
    * and $\hat{\mathbf  T} = \hat \nabla \hat{\mathbf  u}$, with $\mathbf u$ a
-   * vector field.  The mapping types currently implemented by derived classes
+   * vector field.  The mapping kinds currently implemented by derived classes
    * are:
    * <ul>
    * <li> @p mapping_covariant: maps a field of forms on the reference cell to
@@ -1051,7 +1051,7 @@ public:
    *
    * @param[in] input An array (or part of an array) of input objects that
    * should be mapped.
-   * @param[in] type The kind of mapping to be applied.
+   * @param[in] kind The kind of mapping to be applied.
    * @param[in] internal A pointer to an object of type
    * Mapping::InternalDataBase that contains information previously stored by
    * the mapping. The object pointed to was created by the get_data(),
@@ -1066,7 +1066,7 @@ public:
    */
   virtual void
   transform(const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const = 0;
 
@@ -1074,7 +1074,7 @@ public:
    * Transform a tensor field from the reference cell to the physical cell.
    * These tensors are usually the Jacobians in the reference cell of vector
    * fields that have been pulled back from the physical cell.  The mapping
-   * types currently implemented by derived classes are:
+   * kinds currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_contravariant_gradient: it assumes $\mathbf u(\mathbf x)
    * = J \hat{\mathbf  u}$ so that
@@ -1109,7 +1109,7 @@ public:
    *
    * @param[in] input An array (or part of an array) of input objects that
    * should be mapped.
-   * @param[in] type The kind of mapping to be applied.
+   * @param[in] kind The kind of mapping to be applied.
    * @param[in] internal A pointer to an object of type
    * Mapping::InternalDataBase that contains information previously stored by
    * the mapping. The object pointed to was created by the get_data(),
@@ -1124,7 +1124,7 @@ public:
    */
   virtual void
   transform(const ArrayView<const Tensor<2, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const = 0;
 
@@ -1133,7 +1133,7 @@ public:
    * This tensors are most of times the hessians in the reference cell of
    * vector fields that have been pulled back from the physical cell.
    *
-   * The mapping types currently implemented by derived classes are:
+   * The mapping kinds currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_covariant_gradient: maps a field of forms on the
    * reference cell to a field of forms on the physical cell. Mathematically,
@@ -1156,7 +1156,7 @@ public:
    *
    * @param[in] input An array (or part of an array) of input objects that
    * should be mapped.
-   * @param[in] type The kind of mapping to be applied.
+   * @param[in] kind The kind of mapping to be applied.
    * @param[in] internal A pointer to an object of type
    * Mapping::InternalDataBase that contains information previously stored by
    * the mapping. The object pointed to was created by the get_data(),
@@ -1171,7 +1171,7 @@ public:
    */
   virtual void
   transform(const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const = 0;
 
@@ -1181,7 +1181,7 @@ public:
    * \mathbf u_i$ and $\mathbf{\hat T}_{IJK} = \hat D^2_{JK} \mathbf{\hat
    * u}_I$, with $\mathbf u_i$ a vector field.
    *
-   * The mapping types currently implemented by derived classes are:
+   * The mapping kinds currently implemented by derived classes are:
    * <ul>
    * <li> @p mapping_contravariant_hessian: it assumes $\mathbf u_i(\mathbf x)
    * = J_{iI} \hat{\mathbf  u}_I$ so that
@@ -1210,7 +1210,7 @@ public:
    *
    * @param[in] input An array (or part of an array) of input objects that
    * should be mapped.
-   * @param[in] type The kind of mapping to be applied.
+   * @param[in] kind The kind of mapping to be applied.
    * @param[in] internal A pointer to an object of type
    * Mapping::InternalDataBase that contains information previously stored by
    * the mapping. The object pointed to was created by the get_data(),
@@ -1224,7 +1224,7 @@ public:
    */
   virtual void
   transform(const ArrayView<const Tensor<3, dim>> &                  input,
-            const MappingType                                        type,
+            const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const = 0;
 

@@ -871,7 +871,7 @@ namespace internal
       void
       transform_fields(
         const ArrayView<const Tensor<rank, dim>> &               input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
@@ -885,7 +885,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant:
               {
@@ -949,7 +949,7 @@ namespace internal
       void
       transform_gradients(
         const ArrayView<const Tensor<rank, dim>> &               input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
@@ -963,7 +963,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant_gradient:
               {
@@ -1051,7 +1051,7 @@ namespace internal
       void
       transform_hessians(
         const ArrayView<const Tensor<3, dim>> &                  input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<3, spacedim>> &                   output)
       {
@@ -1065,7 +1065,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant_hessian:
               {
@@ -1220,7 +1220,7 @@ namespace internal
       void
       transform_differential_forms(
         const ArrayView<const DerivativeForm<rank, dim, spacedim>> &input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
@@ -1234,7 +1234,7 @@ namespace internal
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
                           InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_covariant:
               {
@@ -1329,12 +1329,12 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
   internal::MappingManifoldImplementation::transform_fields(input,
-                                                            mapping_type,
+                                                            mapping_kind,
                                                             mapping_data,
                                                             output);
 }
@@ -1345,12 +1345,12 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
   internal::MappingManifoldImplementation::transform_differential_forms(
-    input, mapping_type, mapping_data, output);
+    input, mapping_kind, mapping_data, output);
 }
 
 
@@ -1359,15 +1359,15 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<2, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_contravariant:
         internal::MappingManifoldImplementation::transform_fields(input,
-                                                                  mapping_type,
+                                                                  mapping_kind,
                                                                   mapping_data,
                                                                   output);
         return;
@@ -1376,7 +1376,7 @@ MappingManifold<dim, spacedim>::transform(
       case mapping_contravariant_gradient:
       case mapping_covariant_gradient:
         internal::MappingManifoldImplementation::transform_gradients(
-          input, mapping_type, mapping_data, output);
+          input, mapping_kind, mapping_data, output);
         return;
       default:
         Assert(false, ExcNotImplemented());
@@ -1389,7 +1389,7 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -1398,7 +1398,7 @@ MappingManifold<dim, spacedim>::transform(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_covariant_gradient:
         {
@@ -1438,17 +1438,17 @@ template <int dim, int spacedim>
 void
 MappingManifold<dim, spacedim>::transform(
   const ArrayView<const Tensor<3, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_piola_hessian:
       case mapping_contravariant_hessian:
       case mapping_covariant_hessian:
         internal::MappingManifoldImplementation::transform_hessians(
-          input, mapping_type, mapping_data, output);
+          input, mapping_kind, mapping_data, output);
         return;
       default:
         Assert(false, ExcNotImplemented());

@@ -384,7 +384,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
@@ -395,10 +395,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -407,7 +407,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -419,10 +419,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -431,7 +431,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<2, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -443,10 +443,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -455,7 +455,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -467,10 +467,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 
@@ -479,7 +479,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
   const ArrayView<const Tensor<3, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -491,10 +491,10 @@ MappingQ<dim, spacedim>::transform(
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
-    q1_mapping->transform(input, mapping_type, *data->mapping_q1_data, output);
+    q1_mapping->transform(input, mapping_kind, *data->mapping_q1_data, output);
   else
     // otherwise use the full mapping
-    qp_mapping->transform(input, mapping_type, *data->mapping_qp_data, output);
+    qp_mapping->transform(input, mapping_kind, *data->mapping_qp_data, output);
 }
 
 

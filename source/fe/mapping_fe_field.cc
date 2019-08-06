@@ -1965,7 +1965,7 @@ namespace internal
       void
       transform_fields(
         const ArrayView<const Tensor<rank, dim>> &               input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
@@ -1984,7 +1984,7 @@ namespace internal
               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
                 InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_contravariant:
               {
@@ -2051,7 +2051,7 @@ namespace internal
       void
       transform_differential_forms(
         const ArrayView<const DerivativeForm<rank, dim, spacedim>> &input,
-        const MappingType                                        mapping_type,
+        const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
@@ -2070,7 +2070,7 @@ namespace internal
               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
                 InternalData &>(mapping_data);
 
-        switch (mapping_type)
+        switch (mapping_kind)
           {
             case mapping_covariant:
               {
@@ -2098,7 +2098,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const ArrayView<const Tensor<1, dim>> &                  input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
@@ -2106,7 +2106,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
 
   internal::MappingFEFieldImplementation::
     transform_fields<dim, spacedim, 1, VectorType, DoFHandlerType>(input,
-                                                                   mapping_type,
+                                                                   mapping_kind,
                                                                    mapping_data,
                                                                    output);
 }
@@ -2117,7 +2117,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -2125,7 +2125,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
 
   internal::MappingFEFieldImplementation::
     transform_differential_forms<dim, spacedim, 1, VectorType, DoFHandlerType>(
-      input, mapping_type, mapping_data, output);
+      input, mapping_kind, mapping_data, output);
 }
 
 
@@ -2134,7 +2134,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const ArrayView<const Tensor<2, dim>> &input,
-  const MappingType,
+  const MappingKind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
@@ -2152,7 +2152,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
-  const MappingType                                        mapping_type,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
@@ -2161,7 +2161,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
-  switch (mapping_type)
+  switch (mapping_kind)
     {
       case mapping_covariant_gradient:
         {
@@ -2200,7 +2200,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const ArrayView<const Tensor<3, dim>> &input,
-  const MappingType /*mapping_type*/,
+  const MappingKind /*mapping_kind*/,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {

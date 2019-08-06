@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class PolynomialType, int dim, int spacedim>
 FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
-                                                        MappingType        map)
+                                                        MappingKind        map)
   : FE_PolyTensor<PolynomialType, dim, spacedim>(
       deg,
       FiniteElementData<dim>(get_dpo_vector(deg),
@@ -43,7 +43,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
       std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
                                  ComponentMask(dim, true)))
 {
-  this->mapping_type                   = {map};
+  this->mapping_kind                   = {map};
   const unsigned int polynomial_degree = this->tensor_degree();
 
   QGauss<dim> quadrature(polynomial_degree + 1);

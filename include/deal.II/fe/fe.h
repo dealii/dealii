@@ -2289,7 +2289,7 @@ public:
    *   the node functionals of the element applied to the given function.
    *
    * @note It is safe to call this function for (transformed) values on the
-   * real cell only for elements with trivial MappingType. For all other
+   * real cell only for elements with trivial MappingKind. For all other
    * elements (for example for H(curl), or H(div) conforming elements)
    * vector values have to be transformed to the reference cell first.
    *
