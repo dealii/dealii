@@ -672,42 +672,67 @@ namespace GridOutFlags
    */
   struct Svg
   {
-    /// Height of the plot in SVG units, computed from width if zero. Defaults
-    /// to 1000
+    /**
+     *  Height of the plot in SVG units, computed from width if zero. Defaults
+     *  to 1000.
+     */
     unsigned int height;
-    /// The width of the plot. Computed automatically from height if zero
-    /// (default)
+
+    /**
+     *  The width of the plot. Computed automatically from height if zero
+     *  (default).
+     */
     unsigned int width;
-    /// Thickness of the lines between cells
+
+    /**
+     *  Thickness of the lines between cells.
+     */
     unsigned int line_thickness;
-    /// Thickness of lines at the boundary
+    /**
+     * Thickness of lines at the boundary.
+     */
     unsigned int boundary_line_thickness;
 
-    /// Margin around the plotted area
+    /**
+     *  Margin around the plotted area.
+     */
     bool margin;
 
     /**
-     * Background style.
+     * An `enum` describing all possible background styles.
      */
     enum Background
     {
-      /// Use transparent value of SVG
+      /**
+       * Use transparent value of SVG.
+       */
       transparent,
-      /// Use white background
+
+      /**
+       * Use white background.
+       */
       white,
-      /// Use a gradient from white (top) to steelblue (bottom), and add date
-      /// and time plus a deal.II logo. Automatically draws a margin.
+
+      /**
+       * Use a gradient from white (top) to steelblue (bottom), and add date
+       * and time plus a deal.II logo. Automatically draws a margin.
+       */
       dealii
     };
 
+    /**
+     * The style used for the background of the mesh.
+     */
     Background background;
 
     // View angles for the perspective view of the grid; Default is 0, 0 (top
     // view).
+
     /**
      * The azimuth angle measured from ??? in degrees. Default is 0.
      */
     int azimuth_angle;
+
     /**
      * The angle from vertically above the xy-plane. Default is 0.
      */
@@ -736,28 +761,51 @@ namespace GridOutFlags
     /// (useful in the perspective view).
     bool convert_level_number_to_height;
 
-    /// The factor determining the vertical distance between levels (default =
-    /// 0.3)
+    /**
+     * The factor determining the vertical distance between levels (default =
+     * 0.3.
+     */
     float level_height_factor;
 
-    /// Scaling of the font for cell annotations. Defaults to 1.
+    /**
+     * Scaling of the font for cell annotations. Defaults to 1.
+     */
     float cell_font_scaling;
-    /// Write level number into each cell. Defaults to true
+    /**
+     * Write level number into each cell. Defaults to true.
+     */
     bool label_level_number;
-    /// Write cell index into each cell. Defaults to true
+
+    /**
+     * Write cell index into each cell. Defaults to true.
+     */
     bool label_cell_index;
-    /// Write material id of each cell. Defaults to false
+
+    /**
+     * Write material id of each cell. Defaults to false.
+     */
     bool label_material_id;
-    /// Write subdomain id of each cell. Defaults to false
+
+    /**
+     * Write subdomain id of each cell. Defaults to false.
+     */
     bool label_subdomain_id;
-    /// Write level subdomain id of each cell. Defaults to false
+
+    /**
+     * Write level subdomain id of each cell. Defaults to false.
+     */
     bool label_level_subdomain_id;
 
-    /// Draw a colorbar next to the plotted grid with respect to the chosen
-    /// coloring of the cells
+    /**
+     * Draw a colorbar next to the plotted grid with respect to the chosen
+     * coloring of the cells.
+     */
     bool draw_colorbar;
-    /// Draw a legend next to the plotted grid, explaining the label of the
-    /// cells
+
+    /**
+     * Draw a legend next to the plotted grid, explaining the label of the
+     * cells.
+     */
     bool draw_legend;
 
     /**
@@ -765,7 +813,7 @@ namespace GridOutFlags
      */
     Svg(const unsigned int line_thickness                 = 2,
         const unsigned int boundary_line_thickness        = 4,
-        bool               margin                         = true,
+        const bool         margin                         = true,
         const Background   background                     = white,
         const int          azimuth_angle                  = 0,
         const int          polar_angle                    = 0,
