@@ -13,6 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+
+// Test that the frobenius_norm function returns the correct value
+// for a block matrix
+
+
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
