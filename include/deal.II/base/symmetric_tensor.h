@@ -593,10 +593,12 @@ public:
    * is symmetric only up to round-off, then you may want to call the
    * <tt>symmetrize</tt> function first. If you aren't sure, it is good
    * practice to check before calling <tt>symmetrize</tt>.
+   *
+   * If you want to use this function in a `constexpr` context,
+   * use symmetrize() instead.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR explicit SymmetricTensor(
-    const Tensor<2, dim, OtherNumber> &t);
+  explicit SymmetricTensor(const Tensor<2, dim, OtherNumber> &t);
 
   /**
    * A constructor that creates a symmetric tensor from an array holding its
@@ -628,26 +630,26 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    begin_raw();
+  Number *
+  begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  constexpr const Number *
+  const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    end_raw();
+  Number *
+  end_raw();
 
   /**
    * Return a const pointer to the element past the end of the underlying
    * storage.
    */
-  constexpr const Number *
+  const Number *
   end_raw() const;
 
   /**
@@ -1022,7 +1024,7 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
@@ -2070,7 +2072,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw()
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2079,7 +2081,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw() const
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2088,7 +2090,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw() const
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 SymmetricTensor<rank_, dim, Number>::end_raw()
 {
   return begin_raw() + n_independent_components;
@@ -2097,7 +2099,7 @@ SymmetricTensor<rank_, dim, Number>::end_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 SymmetricTensor<rank_, dim, Number>::end_raw() const
 {
   return begin_raw() + n_independent_components;
