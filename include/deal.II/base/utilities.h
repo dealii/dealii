@@ -453,7 +453,7 @@ namespace Utilities
     // // we need to account for that.
     // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
     //
-    // // a^b = (a*a)^(b/2)      for b evenb
+    // // a^b = (a*a)^(b/2)      for b even
     // // a^b = a*(a*a)^((b-1)/2 for b odd
     // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
     // </code>
