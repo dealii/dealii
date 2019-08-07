@@ -1026,42 +1026,17 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
-  Assert(rank == 2, ExcNotImplemented());
-  switch (dim)
-    {
-      case 2:
-        Assert(t[0][1] == t[1][0], ExcInternalError());
+  static_assert(rank == 2, "This function is only implemented for rank==2");
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int e = 0; e < d; ++e)
+      Assert(t[d][e] == t[e][d], ExcInternalError());
 
-        data[0] = t[0][0];
-        data[1] = t[1][1];
-        data[2] = t[0][1];
+  for (unsigned int d = 0; d < dim; ++d)
+    data[d] = t[d][d];
 
-        break;
-      case 3:
-        Assert(t[0][1] == t[1][0], ExcInternalError());
-        Assert(t[0][2] == t[2][0], ExcInternalError());
-        Assert(t[1][2] == t[2][1], ExcInternalError());
-
-        data[0] = t[0][0];
-        data[1] = t[1][1];
-        data[2] = t[2][2];
-        data[3] = t[0][1];
-        data[4] = t[0][2];
-        data[5] = t[1][2];
-
-        break;
-      default:
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < d; ++e)
-            Assert(t[d][e] == t[e][d], ExcInternalError());
-
-        for (unsigned int d = 0; d < dim; ++d)
-          data[d] = t[d][d];
-
-        for (unsigned int d = 0, c = 0; d < dim; ++d)
-          for (unsigned int e = d + 1; e < dim; ++e, ++c)
-            data[dim + c] = t[d][e];
-    }
+  for (unsigned int d = 0, c = 0; d < dim; ++d)
+    for (unsigned int e = d + 1; e < dim; ++e, ++c)
+      data[dim + c] = t[d][e];
 }
 
 
