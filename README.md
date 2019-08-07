@@ -6,8 +6,8 @@ of partial differential equations using adaptive finite elements. It uses
 state-of-the-art programming techniques to offer you a modern interface
 to the complex data structures and algorithms required.
 
-For the impatient:
-------------------
+For the impatients:
+-------------------
 
 Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources. 
 Then configure, compile, and install the deal.II library with:
