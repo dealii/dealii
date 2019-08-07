@@ -839,7 +839,7 @@ namespace GridGenerator
    * hypercube made out of the interval [<i>(left+right)/2,right</i>]
    * for each coordinate. Because the domain is about the simplest one
    * with a reentrant (i.e., non-convex) corner, solutions of many
-   * partial differential equation have singularities at this
+   * partial differential equations have singularities at this
    * corner. That is, at the corner, the gradient or a higher
    * derivative (depending on the boundary conditions chosen) does not
    * remain bounded. As a consequence, this domain is often used to
