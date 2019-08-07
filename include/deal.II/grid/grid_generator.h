@@ -598,14 +598,14 @@ namespace GridGenerator
                             const bool                       colorize = false);
 
   /**
-   * Hypercube with a layer of hypercubes around it. The first two parameters
-   * give the lower and upper bound of the inner hypercube in all coordinate
-   * directions.  @p thickness marks the size of the layer cells.
+   * Hypercube with a layer of hypercubes around it. Parameters @p left and
+   * @p right give the lower and upper bound of the inner hypercube in all
+   * coordinate directions.  @p thickness marks the size of the layer cells.
    *
    * If the flag @p colorize is set, the outer cells get material ids
    * according to the following scheme: extending over the inner cube in (+/-)
-   * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
-   * corners and edges (3d) get these values bitwise or'd (see also
+   * x-direction 1/2, y-direction 4/8, z-direction 16/32. A bitwise OR operation
+   * is used to get these values at the corners and edges (3d), (see also
    * @ref GlossColorization "the glossary entry on colorization").
    *
    * Presently only available in 2d and 3d.
@@ -1224,7 +1224,7 @@ namespace GridGenerator
    * @param tria        The triangulation to be worked on.
    * @param n_cells     The number of cells in the loop. Must be greater than
    * 4.
-   * @param n_rotations The number of rotations (Pi/2 each) to be performed
+   * @param n_rotations The number of rotations ($\pi$/2 each) to be performed
    * before gluing the loop together.
    * @param R           The radius of the circle, which forms the middle line
    * of the torus containing the loop of cells. Must be greater than @p r.
