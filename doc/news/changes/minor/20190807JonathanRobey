@@ -1,0 +1,2 @@
+New: Added l1_norm and linfty_norm methods to BlockMatrixBase.
+(Jonathan Robey, 2019/08/07)
