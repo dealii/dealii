@@ -88,8 +88,8 @@ public:
    * Constructor. Creates all basis functions for Bernardi-Raugel polynomials
    * of given degree.
    *
-   * @arg k: the degree of the Bernardi-Raugel-space, which is currently
-   * limited to the case <tt>k=1</tt>
+   * @arg k The degree of the Bernardi-Raugel-space, which is currently
+   * limited to the case <tt>k=1</tt>.
    */
   PolynomialsBernardiRaugel(const unsigned int k);
 
@@ -115,8 +115,8 @@ public:
   name() const;
 
   /**
-   * Compute the value and derivatives of each Bernardi-
-   * Raugel polynomial at @p unit_point.
+   * Compute the value and derivatives of each Bernardi-Raugel
+   * polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.
