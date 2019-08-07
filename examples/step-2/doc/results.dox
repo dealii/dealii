@@ -73,3 +73,5 @@ Terminal type set to 'x11'
 gnuplot> set style data points
 gnuplot> plot "sparsity_pattern.1"
 @endcode
+
+Another practice based on <ahref="http://www.gnuplot.info/">GNUPLOT</a> is trying to print out the mesh with locations and numberings of the support points where you might need to use GridOut and MappingQ1.
