@@ -129,16 +129,16 @@ main()
     Assert(is_same && !is_not_same, ExcInternalError());
   }
   {
-    DEAL_II_CONSTEXPR const double initializer_1[3] = {1., 0., 0.};
-    DEAL_II_CONSTEXPR const Tensor<1, 3> c_1{initializer_1};
-    DEAL_II_CONSTEXPR const double       initializer_2[3] = {0., 1., 0.};
-    DEAL_II_CONSTEXPR const Tensor<1, 3> c_2{initializer_2};
+    constexpr double       initializer_1[3] = {1., 0., 0.};
+    constexpr Tensor<1, 3> c_1{initializer_1};
+    constexpr double       initializer_2[3] = {0., 1., 0.};
+    constexpr Tensor<1, 3> c_2{initializer_2};
 
-    DEAL_II_CONSTEXPR const auto   c_cross = cross_product_3d(c_1, c_2);
-    DEAL_II_CONSTEXPR const double initializer_ref[3] = {0., 0., 1.};
-    DEAL_II_CONSTEXPR const Tensor<1, 3> ref{initializer_ref};
-    DEAL_II_CONSTEXPR const bool         is_same     = (c_cross == ref);
-    DEAL_II_CONSTEXPR const bool         is_not_same = (c_cross != ref);
+    DEAL_II_CONSTEXPR const auto c_cross = cross_product_3d(c_1, c_2);
+    constexpr double             initializer_ref[3] = {0., 0., 1.};
+    constexpr Tensor<1, 3>       ref{initializer_ref};
+    DEAL_II_CONSTEXPR const bool is_same     = (c_cross == ref);
+    DEAL_II_CONSTEXPR const bool is_not_same = (c_cross != ref);
     Assert(is_same && !is_not_same, ExcInternalError());
   }
 
@@ -152,27 +152,21 @@ main()
   deallog << "Used memory: " << used_memory << std::endl;
 
   {
-    DEAL_II_CONSTEXPR const double a_init[3][3] = {{1., 0., 0.},
-                                                   {2., 1., 0.},
-                                                   {3., 2., 1.}};
-    DEAL_II_CONSTEXPR const Tensor<2, 3> a{a_init};
-    DEAL_II_CONSTEXPR const auto         inverted       = invert(a);
-    DEAL_II_CONSTEXPR const double       ref_init[3][3] = {{1., 0., 0.},
-                                                     {-2., 1., 0.},
-                                                     {1., -2., 1}};
-    DEAL_II_CONSTEXPR const Tensor<2, 3> ref{ref_init};
+    constexpr double a_init[3][3] = {{1., 0., 0.}, {2., 1., 0.}, {3., 2., 1.}};
+    constexpr Tensor<2, 3>       a{a_init};
+    DEAL_II_CONSTEXPR const auto inverted       = invert(a);
+    constexpr double             ref_init[3][3] = {{1., 0., 0.},
+                                       {-2., 1., 0.},
+                                       {1., -2., 1}};
+    constexpr Tensor<2, 3>       ref{ref_init};
     Assert(inverted == ref, ExcInternalError());
   }
   {
-    DEAL_II_CONSTEXPR const double a_init[3][3] = {{1., 0., 0.},
-                                                   {2., 1., 0.},
-                                                   {3., 2., 1.}};
-    DEAL_II_CONSTEXPR const Tensor<2, 3> a{a_init};
-    DEAL_II_CONSTEXPR const auto         transposed     = transpose(a);
-    DEAL_II_CONSTEXPR const double       ref_init[3][3] = {{1., 2., 3.},
-                                                     {0., 1., 2.},
-                                                     {0., 0., 1}};
-    DEAL_II_CONSTEXPR const Tensor<2, 3> ref{ref_init};
+    constexpr double a_init[3][3] = {{1., 0., 0.}, {2., 1., 0.}, {3., 2., 1.}};
+    constexpr Tensor<2, 3>       a{a_init};
+    DEAL_II_CONSTEXPR const auto transposed = transpose(a);
+    constexpr double ref_init[3][3] = {{1., 2., 3.}, {0., 1., 2.}, {0., 0., 1}};
+    constexpr Tensor<2, 3> ref{ref_init};
     Assert(transposed == ref, ExcInternalError());
     DEAL_II_CONSTEXPR const auto dummy    = scalar_product(a, ref);
     DEAL_II_CONSTEXPR const auto dummy_2  = contract<0, 0>(a, ref);

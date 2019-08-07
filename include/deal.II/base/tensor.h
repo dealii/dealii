@@ -1564,7 +1564,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename ProductType<Other, Number>::type
   operator*(const Other &object, const Tensor<0, dim, Number> &t)
 {
@@ -1584,7 +1584,7 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, Other>::type
   operator*(const Tensor<0, dim, Number> &t, const Other &object)
 {
@@ -1708,12 +1708,12 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
-                                        Tensor<rank,
+DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+                      Tensor<rank,
          dim,
          typename ProductType<typename EnableIfScalar<Number>::type,
                               OtherNumber>::type>
-                                        operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
+                      operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
 {
   // simply forward to the operator above
   return t * factor;
@@ -2146,7 +2146,7 @@ template <template <int, int, typename> class TensorT1,
           typename T1,
           typename T2,
           typename T3>
-DEAL_II_CONSTEXPR
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename ProductType<T1, typename ProductType<T2, T3>::type>::type
   contract3(const TensorT1<rank_1, dim, T1> &         left,
             const TensorT2<rank_1 + rank_2, dim, T2> &middle,
