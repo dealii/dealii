@@ -420,10 +420,7 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler
-                                                            .begin_active(),
-                                                   endc = mg_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : mg_dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
@@ -555,13 +552,8 @@ namespace Step50
     // <code>assemble_system</code>, with two exceptions: (i) we don't
     // need a right hand side, and more significantly (ii) we don't
     // just loop over all active cells, but in fact all cells, active
-    // or not. Consequently, the correct iterator to use is
-    // DoFHandler::cell_iterator rather than
-    // DoFHandler::active_cell_iterator. Let's go about it:
-    typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                            endc = mg_dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    // or not.
+    for (const auto &cell : mg_dof_handler.cell_iterators())
       if (cell->level_subdomain_id() == triangulation.locally_owned_subdomain())
         {
           cell_matrix = 0;
