@@ -82,13 +82,13 @@ using namespace dealii;
 
 // Instead of the procedural programming of previous examples, we encapsulate
 // everything into a class for this program. The class consists of functions
-// which each perform certain aspects of a finite element program, a `main'
+// which each perform certain aspects of a finite element program, a `main`
 // function which controls what is done first and what is done next, and a
 // list of member variables.
 
 // The public part of the class is rather short: it has a constructor and a
-// function `run' that is called from the outside and acts as something like
-// the `main' function: it coordinates which operations of this class shall be
+// function `run` that is called from the outside and acts as something like
+// the `main` function: it coordinates which operations of this class shall be
 // run in which order. Everything else in the class, i.e. all the functions
 // that actually do anything, are in the private section of the class:
 class Step3
