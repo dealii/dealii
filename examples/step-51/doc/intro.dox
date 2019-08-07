@@ -30,12 +30,7 @@ for systems of equations in 2 or 3 dimensions.
 To alleviate the computational cost of solving such large linear systems,
 the hybridizable discontinuous Galerkin (HDG) methodology was introduced
 by Cockburn and co-workers
-(see the references in the recent HDG overview article by
- N.C. Nguyen and J. Peraire:
-   <i>Hybridizable discontinuous Galerkin methods for partial differential
-   equations in continuum mechanics</i>, Journal of Computational Physics,
-   2012, 231:18, 5955-5988.
-   <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>).
+(see the references in the recent HDG overview article by N.C. Nguyen and J. Peraire @cite{Ngu2012}).
 The HDG method achieves
 this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
