@@ -93,12 +93,12 @@ reloaded by pressing "reload" under the "Geometry" tab.
 
 This tutorial contains an example <code>.geo</code> file, that describes a box
 with two objects cut out in the interior. This is how
-<code>untitled.geo</code> looks like in Gmsh (displaying the boundary
+<code>example.geo</code> looks like in Gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
 
-You might want to open the <code>untitled.geo</code> file in a text editor (it
+You might want to open the <code>example.geo</code> file in a text editor (it
 is located in the same directory as the <code>step-49.cc</code> source file) to
 see how it is structured. You can see how the boundary of the domain is
 composed of a number of lines and how later on we combine several lines into
@@ -117,7 +117,7 @@ Gmsh and that contains a mesh created for the geometry described by the
 <code>.geo</code> by running the commands
 
 @code
-gmsh -2 untitled.geo
+gmsh -2 example.geo
 @endcode
 
 on the command line, or by clicking "Mesh" and then "2D" inside Gmsh after

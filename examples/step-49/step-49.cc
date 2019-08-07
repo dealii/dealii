@@ -113,7 +113,7 @@ void grid_1()
 
   GridIn<2> gridin;
   gridin.attach_triangulation(triangulation);
-  std::ifstream f("untitled.msh");
+  std::ifstream f("example.msh");
   gridin.read_msh(f);
 
   print_mesh_info(triangulation, "grid-1.eps");
