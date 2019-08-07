@@ -135,6 +135,16 @@ namespace GridGenerator
    * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
+   *
+   * @param tria The Triangulation to create. It needs to be empty upon
+   * calling this function.
+   *
+   * @param repetitions A vector of @p dim positive values denoting the number
+   * of cells to generate in that direction.
+   *
+   * @param left Lower bound for the interval used to create the hyper cube.
+   *
+   * @param right Upper bound for the interval used to create the hyper cube.
    */
   template <int dim, int spacedim>
   void
@@ -176,6 +186,8 @@ namespace GridGenerator
    * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
+
+ 
    */
   template <int dim, int spacedim>
   void
