@@ -700,11 +700,37 @@ public:
   matrix_norm_square(const BlockVectorType &v) const;
 
   /**
+   * @name Matrix norms
+   */
+  //@{
+
+  /**
+   * Return the $l_1$-norm of the matrix, that is $|M|_1=\max_{\mathrm{all\
+   * columns\ }j}\sum_{\mathrm{all\ rows\ } i} |M_{ij}|$, (max. sum of
+   * columns).  This is the natural matrix norm that is compatible to the
+   * $l_1$-norm for vectors, i.e.  $|Mv|_1\leq |M|_1 |v|_1$. (cf. Haemmerlin-
+   * Hoffmann: Numerische Mathematik)
+   */
+  real_type
+  l1_norm() const;
+
+  /**
+   * Return the $l_\infty$-norm of the matrix, that is
+   * $|M|_\infty=\max_{\mathrm{all\ rows\ }i}\sum_{\mathrm{all\ columns\ }j}
+   * |M_{ij}|$, (max. sum of rows).  This is the natural matrix norm that is
+   * compatible to the $l_\infty$-norm of vectors, i.e.  $|Mv|_\infty \leq
+   * |M|_\infty |v|_\infty$.  (cf. Haemmerlin-Hoffmann: Numerische Mathematik)
+   */
+  real_type
+  linfty_norm() const;
+
+  /**
    * Return the frobenius norm of the matrix, i.e. the square root of the sum
    * of squares of all entries in the matrix.
    */
   real_type
   frobenius_norm() const;
+  //@}
 
   /**
    * Compute the matrix scalar product $\left(u,Mv\right)$.
@@ -2427,6 +2453,49 @@ BlockMatrixBase<MatrixType>::frobenius_norm() const
     }
 
   return std::sqrt(norm_sqr);
+}
+
+
+
+template <class MatrixType>
+typename BlockMatrixBase<MatrixType>::real_type
+BlockMatrixBase<MatrixType>::l1_norm() const
+{
+  Vector<real_type> column_sums(n());
+  // Because we only need to reference the column indicies, we only need one
+  // loop
+  for (BlockMatrixBase<MatrixType>::const_iterator iter = begin();
+       iter != end();
+       ++iter)
+    {
+      column_sums(iter->column()) +=
+        numbers::NumberTraits<value_type>::abs(iter->value());
+    }
+  return column_sums.linfty_norm();
+}
+
+
+
+template <class MatrixType>
+typename BlockMatrixBase<MatrixType>::real_type
+BlockMatrixBase<MatrixType>::linfty_norm() const
+{
+  real_type max = 0;
+
+  const unsigned int n_rows = m();
+  for (unsigned int row = 0; row < n_rows; ++row)
+    {
+      real_type sum = 0;
+      for (BlockMatrixBase<MatrixType>::const_iterator iter = begin(row);
+           iter != end(row);
+           ++iter)
+        {
+          sum += numbers::NumberTraits<value_type>::abs(iter->value());
+        }
+      if (sum > max)
+        max = sum;
+    }
+  return max;
 }
 
 
