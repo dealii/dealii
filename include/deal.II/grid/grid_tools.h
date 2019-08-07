@@ -3000,6 +3000,24 @@ namespace GridTools
 
 namespace GridTools
 {
+  // declare specializations
+  template <>
+  double
+  cell_measure<1>(const std::vector<Point<1>> &,
+                  const unsigned int (&)[GeometryInfo<1>::vertices_per_cell]);
+
+  template <>
+  double
+  cell_measure<2>(const std::vector<Point<2>> &,
+                  const unsigned int (&)[GeometryInfo<2>::vertices_per_cell]);
+
+  template <>
+  double
+  cell_measure<3>(const std::vector<Point<3>> &,
+                  const unsigned int (&)[GeometryInfo<3>::vertices_per_cell]);
+
+
+
   template <int dim, typename T>
   double
   cell_measure(const T &, ...)
@@ -3007,6 +3025,8 @@ namespace GridTools
     Assert(false, ExcNotImplemented());
     return std::numeric_limits<double>::quiet_NaN();
   }
+
+
 
   template <int dim, typename Predicate, int spacedim>
   void
