@@ -26,8 +26,9 @@
  * <dl>
  *
  * <dt class="glossary">@anchor GlossActive <b>Active cells</b></dt>
- * <dd>A cell, face or edge is defined as <i>active</i> if it is not
- * refined any further, i.e., if it does not have children. Unless
+ * <dd>A cell, face, or edge is defined as <i>active</i> if it is not
+ * refined any further, i.e., if it does not have children. Once a cell,
+ * face, or edge becomes a parent it is no longer active. Unless
  * working with a multigrid algorithm, active cells are the only
  * ones carrying degrees of freedom.
  * </dd>
