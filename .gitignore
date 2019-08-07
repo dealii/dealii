@@ -14,9 +14,10 @@ qtcreator/
 /.clang_complete
 /contrib/utilities/programs
 
-# emacs temporary and backup files
+# temporary and backup files
 *~
 *#
+.DS_Store
 
 # configuration, executable, and output files from examples
 examples/step-*/*dat
