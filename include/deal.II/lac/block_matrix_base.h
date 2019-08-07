@@ -360,6 +360,7 @@ public:
    * library containers.
    */
   using value_type      = typename BlockType::value_type;
+  using real_type       = typename numbers::NumberTraits<value_type>::real_type;
   using pointer         = value_type *;
   using const_pointer   = const value_type *;
   using reference       = value_type &;
@@ -702,7 +703,7 @@ public:
    * Return the frobenius norm of the matrix, i.e. the square root of the sum
    * of squares of all entries in the matrix.
    */
-  value_type
+  real_type
   frobenius_norm() const;
 
   /**
@@ -2409,7 +2410,7 @@ BlockMatrixBase<MatrixType>::matrix_norm_square(const BlockVectorType &v) const
 
 
 template <class MatrixType>
-typename BlockMatrixBase<MatrixType>::value_type
+typename BlockMatrixBase<MatrixType>::real_type
 BlockMatrixBase<MatrixType>::frobenius_norm() const
 {
   value_type norm_sqr = 0;
