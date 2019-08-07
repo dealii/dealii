@@ -1,0 +1,28 @@
+
+DEAL::first refinement done
+DEAL::initializing history
+DEAL::initializing cell 1_0:
+DEAL::initializing cell 0_1:0
+DEAL::initializing cell 0_1:1
+DEAL::initializing cell 0_1:2
+DEAL::initializing cell 0_1:3
+DEAL::reading history
+DEAL::Cell with material id = 1 contains the data 8.00000
+DEAL::Cell with material id = 0 contains the data 5.00000
+DEAL::Cell with material id = 0 contains the data 5.00000
+DEAL::Cell with material id = 0 contains the data 5.00000
+DEAL::Cell with material id = 0 contains the data 5.00000
+DEAL::second refinement done
+DEAL::initializing history
+DEAL::initializing cell 0_0:
+DEAL::initializing cell 1_1:0
+DEAL::initializing cell 1_1:1
+DEAL::initializing cell 1_1:2
+DEAL::initializing cell 1_1:3
+DEAL::reading history
+DEAL::Cell with material id = 0 contains the data 5.00000
+DEAL::Cell with material id = 1 contains the data 8.00000
+DEAL::Cell with material id = 1 contains the data 8.00000
+DEAL::Cell with material id = 1 contains the data 8.00000
+DEAL::Cell with material id = 1 contains the data 8.00000
+DEAL::OK

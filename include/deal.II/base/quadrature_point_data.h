@@ -160,9 +160,31 @@ public:
 
 private:
   /**
-   * A map to store a vector of data on a cell.
+   * Depending on @p CellIteratorType we need to define a triangulation type
    */
-  std::map<CellIteratorType, std::vector<std::shared_ptr<DataType>>> map;
+  using triangulation_type =
+    Triangulation<CellIteratorType::AccessorType::dimension,
+                  CellIteratorType::AccessorType::space_dimension>;
+
+  /**
+   * The key is used as identified for a cell data structure.
+   * We need to use CellId as part of the key because it remains unique during
+   * adaptive refinement. We need to use a pointer to the triangulation in the
+   * key because we want to allow the data storage class to keep information on
+   * multiple meshes simultaneously.
+   */
+  using key_type = std::pair<const triangulation_type *, CellId>;
+
+  /**
+   * A map to store a vector of data on each cell.
+   */
+  std::map<key_type, std::vector<std::shared_ptr<DataType>>> map;
+
+  /**
+   * Computes the key from a cell iterator
+   */
+  static key_type
+  get_key(const CellIteratorType &cell);
 
   /**
    * @addtogroup Exceptions
@@ -523,6 +545,14 @@ namespace parallel
 //--------------------------------------------------------------------
 
 template <typename CellIteratorType, typename DataType>
+typename CellDataStorage<CellIteratorType, DataType>::key_type
+CellDataStorage<CellIteratorType, DataType>::get_key(
+  const CellIteratorType &cell)
+{
+  return {&cell->get_triangulation(), cell->id()};
+}
+
+template <typename CellIteratorType, typename DataType>
 template <typename T>
 void
 CellDataStorage<CellIteratorType, DataType>::initialize(
@@ -532,13 +562,14 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
 
-  if (map.find(cell) == map.end())
+  const auto key = get_key(cell);
+  if (map.find(key) == map.end())
     {
-      map[cell] = std::vector<std::shared_ptr<DataType>>(n_q_points);
+      map[key] = std::vector<std::shared_ptr<DataType>>(n_q_points);
       // we need to initialize one-by-one as the std::vector<>(q, T())
       // will end with a single same T object stored in each element of the
       // vector:
-      auto it = map.find(cell);
+      const auto it = map.find(key);
       for (unsigned int q = 0; q < n_q_points; q++)
         it->second[q] = std::make_shared<T>();
     }
@@ -565,7 +596,8 @@ template <typename CellIteratorType, typename DataType>
 bool
 CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
-  const auto it = map.find(cell);
+  const auto key = get_key(cell);
+  const auto it  = map.find(key);
   if (it == map.end())
     return false;
   for (unsigned int i = 0; i < it->second.size(); i++)
@@ -576,7 +608,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
           "Can not erase the cell data multiple objects reference its data."));
     }
 
-  return (map.erase(cell) == 1);
+  return (map.erase(key) == 1);
 }
 
 
@@ -614,7 +646,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
 
-  auto it = map.find(cell);
+  const auto it = map.find(get_key(cell));
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for
@@ -642,7 +674,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
 
-  auto it = map.find(cell);
+  const auto it = map.find(get_key(cell));
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
