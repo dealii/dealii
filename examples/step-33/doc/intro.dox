@@ -91,7 +91,7 @@ of air (mainly nitrogen and oxygen) and other diatomic gases, the ratio of
 specific heats is $\gamma=1.4$.
 
 This problem obviously falls into the class of vector-valued
-problem. A general overview of how to deal with these problems in
+problems. A general overview of how to deal with these problems in
 deal.II can be found in the @ref vector_valued module.
 
 <h3>Discretization</h3>
