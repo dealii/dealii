@@ -76,8 +76,22 @@ can solve right away with the techniques of the first few tutorial programs
 similar). However, we have not said anything yet about the saturation, which
 of course is going to change as the fluids move around.
 
-The second part of the equations is a therefore description of the
-dynamics of the saturation. We model this as an advected quantity:
+The second part of the equations is the description of the
+dynamics of the saturation. The saturation equation for the displacing fluid (water) is:
+@f{eqnarray*}
+  S_{t} + \nabla \cdot (F(S) \mathbf{u}) = \{q}_{w},
+  \\
+  S_{t} + F(S) \nabla \mathbf{u} + \mathbf{u} \cdot \nabla F(S) = S_{t} + F(S) * \q + \mathbf{u} \cdot \nabla F(S) = \{q}_{w}.
+@f}
+where $\{q}_{w}$ is the flow rate of the displacing fluid (water) and is related to the fractional flow F(S) through:
+@f[
+  \{q}_{w} = F(S) * \q,
+  \\
+  F(S)
+  =
+  \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}.
+@f]
+Thus, we obtain the saturation equation in the following advected form:
 @f{eqnarray*}
   S_{t} + \mathbf{u} \cdot \nabla F(S) = 0,
 @f}
@@ -85,12 +99,6 @@ where $\mathbf u$ is the total velocity
 @f[
   \mathbf{u} =
   \mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla p.
-@f]
-In addition,
-@f[
-  F(S)
-  =
-  \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}
 @f]
 Note that the advection equation contains the term $\mathbf{u} \cdot \nabla
 F(S)$ rather than $\mathbf{u} \cdot \nabla S$ to indicate that the saturation
@@ -108,7 +116,7 @@ In summary, what we get are the following two equations:
   - \nabla \cdot (\mathbf{K}\lambda(S) \nabla p) &=& q
   \qquad \textrm{in}\ \Omega\times[0,T],
   \\
-  S_{t} + \nabla (F(S) \cdot \mathbf{u}) &=& 0
+  S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0
   \qquad \textrm{in}\ \Omega\times[0,T].
 @f}
 Here, $p=p(\mathbf x, t), S=S(\mathbf x, t)$ are now time dependent
