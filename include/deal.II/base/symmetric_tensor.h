@@ -596,6 +596,9 @@ public:
    *
    * If you want to use this function in a `constexpr` context,
    * use symmetrize() instead.
+   *
+   * Because we check for symmetry via a non-constexpr function call, you will
+   * have to use the symmetrize() function in constexpr contexts instead.
    */
   template <typename OtherNumber>
   explicit SymmetricTensor(const Tensor<2, dim, OtherNumber> &t);

@@ -358,7 +358,7 @@ private:
    * Internal helper function for unroll.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR void
+  void
   unroll_recursion(Vector<OtherNumber> &result,
                    unsigned int &       start_index) const;
 
@@ -1006,7 +1006,7 @@ Tensor<0, dim, Number>::norm() const
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename Tensor<0, dim, Number>::real_type
   Tensor<0, dim, Number>::norm_square() const
 {
@@ -1021,7 +1021,7 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_CONSTEXPR void
+inline void
 Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
                                          unsigned int &       index) const
 {
@@ -1233,7 +1233,8 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 {
-  // std::copy is constexpr only from C++20 on.
+  // The following loop could be written more concisely using std::copy, but
+  // that function is only constexpr from C++20 on.
   for (unsigned int i = 0; i < dim; ++i)
     values[i] = t.values[i];
   return *this;
@@ -1431,7 +1432,7 @@ namespace internal
   inline unsigned int
   mod<0>(const unsigned int x)
   {
-    // Assert(false, ExcInternalError());
+    Assert(false, ExcInternalError());
     return x;
   }
 
@@ -1563,7 +1564,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
   typename ProductType<Other, Number>::type
   operator*(const Other &object, const Tensor<0, dim, Number> &t)
 {
@@ -1583,7 +1584,7 @@ constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, Other>::type
   operator*(const Tensor<0, dim, Number> &t, const Other &object)
 {
@@ -1707,12 +1708,12 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
+DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
+                                        Tensor<rank,
          dim,
          typename ProductType<typename EnableIfScalar<Number>::type,
                               OtherNumber>::type>
-  operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
+                                        operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
 {
   // simply forward to the operator above
   return t * factor;
