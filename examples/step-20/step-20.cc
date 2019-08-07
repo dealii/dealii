@@ -116,7 +116,7 @@ namespace Step20
 
   // Our next task is to define the right hand side of our problem (i.e., the
   // scalar right hand side for the pressure in the original Laplace
-  // equation), boundary values for the pressure, as well as a function that
+  // equation), boundary values for the pressure, and a function that
   // describes both the pressure and the velocity of the exact solution for
   // later computations of the error. Note that these functions have one, one,
   // and <code>dim+1</code> components, respectively, and that we pass the
@@ -166,7 +166,7 @@ namespace Step20
 
   // And then we also have to define these respective functions, of
   // course. Given our discussion in the introduction of how the solution
-  // should look like, the following computations should be straightforward:
+  // should look, the following computations should be straightforward:
   template <int dim>
   double RightHandSide<dim>::value(const Point<dim> & /*p*/,
                                    const unsigned int /*component*/) const
@@ -220,7 +220,7 @@ namespace Step20
   // real-life porous media flow simulations, and we would like to use the
   // opportunity to demonstrate the technique to use tensor valued functions.
   //
-  // Possibly unsurprising, deal.II also has a base class not only for scalar
+  // Possibly unsurprisingly, deal.II also has a base class not only for scalar
   // and generally vector-valued functions (the <code>Function</code> base
   // class) but also for functions that return tensors of fixed dimension and
   // rank, the <code>TensorFunction</code> template. Here, the function under
@@ -257,9 +257,9 @@ namespace Step20
                                  std::vector<Tensor<2, dim>> &  values) const
   {
     // The value we are going to store for a given point does not depend on its
-    // coordinates and we use the `points` object only for checking that the
+    // coordinates, and we use the `points` object only for checking that the
     // `values` object has the correct size. In release mode, `AssertDimension`
-    // is defined empty and the compiler will complain that the `points` object
+    // is defined empty, and the compiler will complain that the `points` object
     // is unused. The following line silences this warning.
     (void)points;
     AssertDimension(points.size(), values.size());
@@ -334,7 +334,7 @@ namespace Step20
     // velocities and pressures are not intermingled: First all velocity
     // degrees of freedom, then all pressure DoFs. This way, the global matrix
     // separates nicely into a $2 \times 2$ system. To achieve this, we have to
-    // renumber degrees of freedom base on their vector component, an
+    // renumber degrees of freedom based on their vector component, an
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise(dof_handler);
 
