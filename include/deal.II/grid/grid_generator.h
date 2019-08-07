@@ -1224,7 +1224,7 @@ namespace GridGenerator
    * @param tria        The triangulation to be worked on.
    * @param n_cells     The number of cells in the loop. Must be greater than
    * 4.
-   * @param n_rotations The number of rotations ($\pi$/2 each) to be performed
+   * @param n_rotations The number of rotations ($\pi/2$ each) to be performed
    * before gluing the loop together.
    * @param R           The radius of the circle, which forms the middle line
    * of the torus containing the loop of cells. Must be greater than @p r.
