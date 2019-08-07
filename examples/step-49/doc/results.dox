@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The program produces a series of <code>.eps</code> files of the
+The program produces a series of <code>.vtu</code> files of the
 triangulations. The methods are discussed above.
 
 
@@ -328,3 +328,27 @@ the nice detail of the boundary fitted mesh if we refine two more times:
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.yuhan.11.png"
      alt="" width="400" height="355">
+
+
+<h3> Possible extensions </h3>
+
+<h4> Modify a mesh </h4>
+
+Similar to the operations in step-1, iterate over a mesh and change boundary
+indicators.
+
+<h4> Extracting a boundary mesh </h4>
+
+To compute on surfaces on manifolds, you can use the function
+GridTools::extract_boundary_mesh() to extract the surface elements of a
+mesh. For example, using the function on a 3d mesh (a Triangulation<3,3>),
+this will return a Triangulation<2,3> that you can use in step-38 for example.
+
+
+<!--
+
+Possible Extensions for this tutorial:
+
+- Database of unstructured meshes for convergence studies
+- how to remove or disable a cell inside a mesh
+-->

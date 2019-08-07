@@ -11,7 +11,7 @@ dimensions. We will discuss several ways to do this, but this list is not
 exhaustive. Additionally, there is not one approach that fits all problems.
 
 This example program shows some of ways to create and modify meshes for
-computations and outputs them as <code>.eps</code> files in much the same way
+computations and outputs them as <code>.vtu</code> files in much the same way
 as we do in step-1. No other computations or adaptive
 refinements are done; the idea is that you can use the techniques used here as
 building blocks in other, more involved simulators. Please note that the
@@ -279,14 +279,3 @@ just creating the mesh are necessary. We will go over some of these steps in
 the <a href="#Results">results section</a> below.
 
 
-<!--
-
-Possible Extensions
-
-- Modify a mesh:
-  - change boundary indicators
-  - relax inner vertices
-- Database of unstructured meshes for convergence studies
-- discuss GridTools::extract_boundary_mesh
-- how to remove or disable a cell inside a mesh
--->
