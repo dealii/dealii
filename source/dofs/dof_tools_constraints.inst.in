@@ -60,13 +60,36 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       const FullMatrix<double> &,
       const std::vector<unsigned int> &);
 
-    template void DoFTools::make_periodicity_constraints<DH<deal_II_dimension>>(
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+    template void DoFTools::make_periodicity_constraints(
+      const DH<deal_II_dimension>::face_iterator &,
+      const DH<deal_II_dimension>::face_iterator &,
+      AffineConstraints<std::complex<double>> &,
+      const ComponentMask &,
+      bool,
+      bool,
+      bool,
+      const FullMatrix<double> &,
+      const std::vector<unsigned int> &);
+#endif
+
+    template void
+    DoFTools::make_periodicity_constraints<DH<deal_II_dimension>, double>(
       const std::vector<
         GridTools::PeriodicFacePair<DH<deal_II_dimension>::cell_iterator>> &,
       AffineConstraints<double> &,
       const ComponentMask &,
       const std::vector<unsigned int> &);
 
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+    template void DoFTools::make_periodicity_constraints<DH<deal_II_dimension>,
+                                                         std::complex<double>>(
+      const std::vector<
+        GridTools::PeriodicFacePair<DH<deal_II_dimension>::cell_iterator>> &,
+      AffineConstraints<std::complex<double>> &,
+      const ComponentMask &,
+      const std::vector<unsigned int> &);
+#endif
 
     template void DoFTools::make_periodicity_constraints(
       const DH<deal_II_dimension> &,
@@ -76,12 +99,31 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       AffineConstraints<double> &,
       const ComponentMask &);
 
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+    template void DoFTools::make_periodicity_constraints(
+      const DH<deal_II_dimension> &,
+      const types::boundary_id,
+      const types::boundary_id,
+      const int,
+      AffineConstraints<std::complex<double>> &,
+      const ComponentMask &);
+#endif
+
     template void DoFTools::make_periodicity_constraints(
       const DH<deal_II_dimension> &,
       const types::boundary_id,
       const int,
       AffineConstraints<double> &,
       const ComponentMask &);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+    template void DoFTools::make_periodicity_constraints(
+      const DH<deal_II_dimension> &,
+      const types::boundary_id,
+      const int,
+      AffineConstraints<std::complex<double>> &,
+      const ComponentMask &);
+#endif
   }
 
 for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
