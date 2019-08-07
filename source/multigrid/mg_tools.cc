@@ -1661,6 +1661,58 @@ namespace MGTools
 
     return global_min;
   }
+
+
+
+  template <int dim, int spacedim>
+  double
+  workload_imbalance(const Triangulation<dim, spacedim> &tria)
+  {
+    double workload_imbalance = 1.0;
+
+    // It is only necessary to calculate the imbalance
+    // on a distributed mesh. The imbalance is always
+    // 1.0 for the serial case.
+    if (const parallel::Triangulation<dim, spacedim> *tr =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
+      {
+        const unsigned int n_proc =
+          Utilities::MPI::n_mpi_processes(tr->get_communicator());
+        const unsigned int n_global_levels = tr->n_global_levels();
+
+        // This value will represent the sum over the multigrid
+        // levels of the maximum number of cells owned by any
+        // one processesor on that level.
+        types::global_dof_index work_estimate = 0;
+
+        // Sum of all cells in the multigrid hierarchy
+        types::global_dof_index total_cells_in_hierarchy = 0;
+
+        for (int lvl = n_global_levels - 1; lvl >= 0; --lvl)
+          {
+            // Number of cells this processor owns on this level
+            types::global_dof_index n_owned_cells_on_lvl = 0;
+
+            for (const auto &cell : tr->cell_iterators_on_level(lvl))
+              if (cell->is_locally_owned_on_level())
+                ++n_owned_cells_on_lvl;
+
+            work_estimate +=
+              dealii::Utilities::MPI::max(n_owned_cells_on_lvl,
+                                          tr->get_communicator());
+
+            total_cells_in_hierarchy +=
+              dealii::Utilities::MPI::sum(n_owned_cells_on_lvl,
+                                          tr->get_communicator());
+          }
+
+        const double ideal_work =
+          total_cells_in_hierarchy / static_cast<double>(n_proc);
+        workload_imbalance = work_estimate / ideal_work;
+      }
+
+    return workload_imbalance;
+  }
 } // namespace MGTools
 
 

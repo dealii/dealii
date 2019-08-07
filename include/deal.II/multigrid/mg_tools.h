@@ -279,6 +279,19 @@ namespace MGTools
   template <int dim, int spacedim>
   unsigned int
   max_level_for_coarse_mesh(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Return the imbalance of the parallel distribution of the multigrid
+   * mesh hierarchy. Ideally this value is equal to 1 (every processor owns
+   * the same number of cells on each level, approximately true for most
+   * globally refined meshes). Values greater than 1 estimate the slowdown
+   * one should see in a geometric multigrid v-cycle as compared with the same
+   * computation on a perfectly distributed mesh hierarchy.
+   */
+  template <int dim, int spacedim>
+  double
+  workload_imbalance(const Triangulation<dim, spacedim> &tria);
+
 } // namespace MGTools
 
 /* @} */
