@@ -2414,7 +2414,6 @@ BlockMatrixBase<MatrixType>::frobenius_norm() const
 {
   value_type norm_sqr = 0;
 
-
   // For each block, get the Frobenius norm, and add the square to the
   // accumulator for the full matrix
   for (unsigned int row = 0; row < n_block_rows(); ++row)

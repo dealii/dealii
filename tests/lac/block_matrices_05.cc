@@ -15,7 +15,7 @@
 
 
 // Test that the frobenius_norm function returns the correct value
-// for a block matrix
+// for a block matrix.
 
 
 #include <deal.II/lac/block_sparse_matrix.h>
@@ -31,10 +31,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::fixed;
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
 
   BlockSparsityPattern bsp(2, 2);
   // set sizes
@@ -65,7 +62,6 @@ main()
          ExcInternalError());
 
   deallog << "OK" << std::endl;
-  deallog << std::flush;
 
   return 0;
 }
