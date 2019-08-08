@@ -38,6 +38,20 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    std::vector<char>
+    pack_particles(std::vector<Particle<dim, spacedim>> &particles);
+
+    template <int dim, int spacedim>
+    std::vector<Particle<dim, spacedim>>
+    unpack_particles(
+      const boost::iterator_range<std::vector<char>::const_iterator>
+        &           data_range,
+      PropertyPool &property_pool = PropertyPool(0));
+  } // namespace internal
+
   /**
    * This class manages the storage and handling of particles. It provides
    * the data structures necessary to store particles efficiently, accessor

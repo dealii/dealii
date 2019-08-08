@@ -28,6 +28,65 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    std::vector<char>
+    pack_particles(std::vector<Particle<dim, spacedim>> &particles)
+    {
+      std::vector<char> buffer;
+
+      if (particles.size() == 0)
+        return buffer;
+
+      buffer.resize(particles.size() *
+                    particles.front().serialized_size_in_bytes());
+      void *current_data = buffer.data();
+
+      for (const auto &particle : particles)
+        {
+          particle.write_data(current_data);
+        }
+
+      return buffer;
+    }
+
+    template <int dim, int spacedim>
+    std::vector<Particle<dim, spacedim>>
+    unpack_particles(
+      const boost::iterator_range<std::vector<char>::const_iterator>
+        &           data_range,
+      PropertyPool &property_pool)
+    {
+      std::vector<Particle<dim, spacedim>> particles;
+
+      if (data_range.empty())
+        return particles;
+
+      Particle<dim, spacedim> particle;
+      particle.set_property_pool(property_pool);
+      const unsigned int particle_size = particle.serialized_size_in_bytes();
+
+      particles.reserve(data_range.size() / particle_size);
+
+      const void *data = static_cast<const void *>(&(*data_range.begin()));
+
+      while (data < &(*data_range.end()))
+        {
+          particles.push_back(Particle<dim, spacedim>(data, &property_pool));
+        }
+
+      Assert(
+        data == &(*data_range.end()),
+        ExcMessage(
+          "The particle data could not be deserialized successfully. "
+          "Check that when deserializing the particles you expect the same "
+          "number of properties that were serialized."));
+
+      return particles;
+    }
+  } // namespace internal
+
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler()
     : triangulation()
@@ -1182,8 +1241,7 @@ namespace Particles
           break;
       }
 
-    return Utilities::pack(stored_particles_on_cell,
-                           /*allow_compression=*/true);
+    return internal::pack_particles(stored_particles_on_cell);
   }
 
   template <int dim, int spacedim>
@@ -1196,10 +1254,7 @@ namespace Particles
     // We leave this container non-const to be able to `std::move`
     // its contents directly into the particles multimap later.
     std::vector<Particle<dim, spacedim>> loaded_particles_on_cell =
-      Utilities::unpack<std::vector<Particle<dim, spacedim>>>(
-        data_range.begin(),
-        data_range.end(),
-        /*allow_compression=*/true);
+      internal::unpack_particles<dim, spacedim>(data_range, *property_pool);
 
     // Update the reference to the current property pool for all particles.
     // This was not stored, because they might be transported across process

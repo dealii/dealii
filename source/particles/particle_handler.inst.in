@@ -19,6 +19,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace Particles
     \{
+      namespace internal
+      \{
+        template std::vector<char>
+        pack_particles(
+          std::vector<Particle<deal_II_dimension, deal_II_space_dimension>>
+            &particles);
+
+        template std::vector<
+          Particle<deal_II_dimension, deal_II_space_dimension>>
+        unpack_particles(
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &           data_range,
+          PropertyPool &property_pool);
+      \}
+
       template class ParticleHandler<deal_II_dimension,
                                      deal_II_space_dimension>;
     \}
