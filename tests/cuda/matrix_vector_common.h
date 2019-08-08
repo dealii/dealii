@@ -78,7 +78,8 @@ void
 do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints,
         const unsigned int               n_locally_owned_cells,
-        const bool                       constant_coefficient = true)
+        const bool                       constant_coefficient = true,
+        const bool                       coloring             = false)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
@@ -89,6 +90,7 @@ do_test(const DoFHandler<dim> &          dof,
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
+  additional_data.use_coloring = coloring;
   const QGauss<1> quad(n_q_points_1d);
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
