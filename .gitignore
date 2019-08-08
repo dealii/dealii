@@ -9,6 +9,9 @@ qtcreator/
 # visual studio code
 /.vscode
 
+# qt creator
+CMakeLists.txt.user
+
 # misc
 /compile_commands.json
 /.clang_complete
