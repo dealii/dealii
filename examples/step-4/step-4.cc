@@ -410,12 +410,20 @@ void Step4<dim>::assemble_system()
         }
     }
 
-
   // As the final step in this function, we wanted to have non-homogeneous
   // boundary values in this example, unlike the one before. This is a simple
   // task, we only have to replace the Functions::ZeroFunction used there by an
   // object of the class which describes the boundary values we would like to
   // use (i.e. the <code>BoundaryValues</code> class declared above):
+  //
+  // The function VectorTools::interpolate_boundary_values() will only work
+  // on faces that have been marked with boundary indicator 0 (because that's
+  // what we say the function should work on with the second argument below).
+  // If there are faces with boundary id other than 0, then the function
+  // interpolate_boundary_values will do nothing on these faces. For
+  // the Laplace equation doing nothing is equivalent to assuming that
+  // on those parts of the boundary, zero Neumann
+  // boundary condition hold.
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
