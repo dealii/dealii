@@ -88,7 +88,7 @@ checks() {
 	  echo "invalid author '$name' without firstname and lastname"
 	  exit 2
       fi
-  done
+  done || exit 2
 
   # now emails:
   git log --since "2019-01-01" --format="%aE" | sort -u | while read email ; do
@@ -101,7 +101,7 @@ checks() {
 	  echo "invalid email '$email'"
 	  exit 3
       fi
-  done
+  done || exit 3
 
 }
 
