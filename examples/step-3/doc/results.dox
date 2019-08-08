@@ -124,6 +124,31 @@ suggestions:
   potentially non-zero Neumann conditions). You will see this if you
   run the program.
 
+  An alternative way to change the boundary indicator is to label
+  the boundaries by the cartesian coordinates of the cell centers.
+  For example, we can label all of the cells along the top and
+  bottom boundaries with a boundary indicator 1 by checking to
+  see if the cell centers' y-coordiantes are within a tolerance
+  (here 1e-12) of -1 and 1. Try this immediately after calling
+  <code>GridGenerator::hyper_cube</code>, as before:
+  @code
+  for (; cell != endc; ++cell)
+    {
+      {
+        for (unsigned int face_number = 0;
+             face_number < GeometryInfo<2>::faces_per_cell;
+             ++face_number)
+          if ((std::fabs(cell->face(face_number)->center()(1) - (-1)) <
+               1e-12) ||
+              (std::fabs(cell->face(face_number)->center()(1) - (1)) < 1e-12))
+            cell->face(face_number)->set_boundary_id(1);
+      }
+    }
+    @code
+    Although this code is significantly longer than before, it is
+    useful for complex geometries, as it does not require knowledge
+    of face labels.
+
   <li>
   A slight variation of the last point would be to set different boundary
   values as above, but then use a different boundary value function for
