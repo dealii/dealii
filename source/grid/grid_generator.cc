@@ -3019,7 +3019,7 @@ namespace GridGenerator
     Assert(
       outer_radius - inner_radius > outer_center.distance(inner_center),
       ExcInternalError(
-        "Inner radius superior or equal to outer radius plus eccentricity."));
+        "The inner radius is greater than or equal to the outer radius plus eccentricity."));
 
     // shift nodes along the inner boundary according to the position of
     // inner_circle
