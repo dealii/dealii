@@ -66,6 +66,43 @@ checks() {
     echo "***   to install a compatible binary into './contrib/utilities/programs'."
     exit 1
   fi
+
+
+  # check formatting of usernames and email addresses, examples that will be detected:
+  # not-using-a-name <a@b.com>
+  # John Doe <doe@macbook.local>
+  # Jane Doe <a@nodomain>
+  #
+  # For commits already in the history, please see .mailmap in the root directory.
+  #
+  # Note that we currently allow email addresses of the form
+  # Luca Heltai <luca-heltai@users.noreply.github.com>
+  # as these are generated when using the website to commit.
+  #
+  # Finally, to stay sane, just go back until the beginning of 2019 for now.
+  #
+  # first user names:
+  git log --since "2019-01-01" --format="%aN" | sort -u | while read name ; do
+      words=($name)
+      if [ "${#words[@]}" -lt "2" ]; then
+	  echo "invalid author '$name' without firstname and lastname"
+	  exit 2
+      fi
+  done
+
+  # now emails:
+  git log --since "2019-01-01" --format="%aE" | sort -u | while read email ; do
+      words=($name)
+      if ! echo "$email" | grep -q "\."; then
+	  echo "invalid email '$email'"
+	  exit 3
+      fi
+      if ! echo "$email" | grep -q -v -e "\.local$"; then
+	  echo "invalid email '$email'"
+	  exit 3
+      fi
+  done
+
 }
 
 #
