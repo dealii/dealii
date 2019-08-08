@@ -140,7 +140,8 @@ namespace GridGenerator
    * calling this function.
    *
    * @param repetitions A vector of @p dim positive values denoting the number
-   * of cells to generate in that direction.
+   * of cells to generate in that direction. FOr example, first component of the vector specifies the number of cells
+   * in the x-direction, second component specifies that for the y-direction for dim=2.
    *
    * @param left Lower bound for the interval used to create the hyper cube.
    *
@@ -186,8 +187,6 @@ namespace GridGenerator
    * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
-
- 
    */
   template <int dim, int spacedim>
   void
