@@ -23,6 +23,7 @@
 #  include <deal.II/base/tensor.h>
 #  include <deal.II/base/utilities.h>
 
+#  include <deal.II/lac/cuda_atomic.h>
 #  include <deal.II/lac/cuda_vector.h>
 
 #  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
@@ -199,6 +200,8 @@ namespace CUDAWrappers
 
     const unsigned int constraint_mask;
 
+    const bool use_coloring;
+
     Number *inv_jac;
     Number *JxW;
 
@@ -222,6 +225,7 @@ namespace CUDAWrappers
     : n_cells(data->n_cells)
     , padding_length(data->padding_length)
     , constraint_mask(data->constraint_mask[cell_id])
+    , use_coloring(data->use_coloring)
     , values(shdata->values)
   {
     local_to_global = data->local_to_global + padding_length * cell_id;
@@ -282,7 +286,11 @@ namespace CUDAWrappers
       (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
     const types::global_dof_index destination_idx = local_to_global[idx];
 
-    dst[destination_idx] += values[idx];
+    if (use_coloring)
+      dst[destination_idx] += values[idx];
+    else
+      LinearAlgebra::CUDAWrappers::atomicAdd_wrapper(&dst[destination_idx],
+                                                     values[idx]);
   }
 
 
