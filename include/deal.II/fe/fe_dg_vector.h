@@ -58,7 +58,7 @@ public:
   /**
    * Constructor for the vector element of degree @p p.
    */
-  FE_DGVector(const unsigned int p, MappingType m);
+  FE_DGVector(const unsigned int p, MappingKind m);
 
   /**
    * Return a string that uniquely identifies a finite element. This class

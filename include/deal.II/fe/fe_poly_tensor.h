@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Similarly, in many cases, node functionals depend on the shape of the mesh
  * cell, since they evaluate normal or tangential components on the faces. In
- * order to allow for a set of transformations, the variable #mapping_type has
+ * order to allow for a set of transformations, the variable #mapping_kind has
  * been introduced. It should needs be set in the constructor of a derived
  * class.
  *
@@ -126,15 +126,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In most cases, vector valued basis functions must be transformed when
  * mapped from the reference cell to the actual grid cell. These
- * transformations can be selected from the set MappingType and stored in
- * #mapping_type. Therefore, each constructor should contain a line like:
+ * transformations can be selected from the set MappingKind and stored in
+ * #mapping_kind. Therefore, each constructor should contain a line like:
  * @code
- * this->mapping_type = {mapping_none};
+ * this->mapping_kind = {mapping_none};
  * @endcode
  * (in case no mapping is required) or using whatever value among
- * the ones defined in MappingType is appropriate for the element you
+ * the ones defined in MappingKind is appropriate for the element you
  * are implementing. If each shape function may be mapped by different
- * mappings, then @p mapping_type may be a vector with the same number
+ * mappings, then @p mapping_kind may be a vector with the same number
  * of elements as there are shape functions.
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
@@ -214,20 +214,20 @@ protected:
    * the finite element dofs per cell, then each shape function will be mapped
    * according to the corresponding entry in the vector.
    */
-  std::vector<MappingType> mapping_type;
+  std::vector<MappingKind> mapping_kind;
 
   /**
    * Returns a boolean that is true when the finite element uses a single
    * mapping and false when the finite element uses multiple mappings.
    */
   bool
-  single_mapping_type() const;
+  single_mapping_kind() const;
 
   /**
-   * Returns MappingType @p i for the finite element.
+   * Returns MappingKind @p i for the finite element.
    */
-  MappingType
-  get_mapping_type(const unsigned int i) const;
+  MappingKind
+  get_mapping_kind(const unsigned int i) const;
 
   /* NOTE: The following function has its definition inlined into the class
      declaration because we otherwise run into a compiler error with MS Visual
@@ -266,14 +266,14 @@ protected:
     // allocate memory
 
     const bool update_transformed_shape_values =
-      std::any_of(this->mapping_type.begin(),
-                  this->mapping_type.end(),
-                  [](const MappingType t) { return t != mapping_none; });
+      std::any_of(this->mapping_kind.begin(),
+                  this->mapping_kind.end(),
+                  [](const MappingKind t) { return t != mapping_none; });
 
     const bool update_transformed_shape_grads =
-      std::any_of(this->mapping_type.begin(),
-                  this->mapping_type.end(),
-                  [](const MappingType t) {
+      std::any_of(this->mapping_kind.begin(),
+                  this->mapping_kind.end(),
+                  [](const MappingKind t) {
                     return (t == mapping_raviart_thomas || t == mapping_piola ||
                             t == mapping_nedelec || t == mapping_contravariant);
                   });
