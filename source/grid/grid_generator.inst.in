@@ -201,6 +201,14 @@ for (deal_II_dimension : DIMENSIONS)
                               const unsigned int,
                               const bool);
 
+      template void
+      eccentric_hyper_shell(Triangulation<deal_II_dimension> &,
+                            const Point<deal_II_dimension> &,
+                            const Point<deal_II_dimension> &,
+                            const double,
+                            const double,
+                            const unsigned int);
+
     \}
   }
 

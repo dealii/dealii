@@ -146,7 +146,7 @@ namespace GridGenerator
       // data, we do this only based on
       // topology.
 
-      // For the mesh based on  cube,
+      // For the mesh based on cube,
       // this is highly irregular
       for (Triangulation<2>::cell_iterator cell = tria.begin();
            cell != tria.end();
@@ -2662,7 +2662,6 @@ namespace GridGenerator
     Assert(false, ExcNotImplemented());
   }
 
-
   template <>
   void cylinder_shell(Triangulation<1> &,
                       const double,
@@ -3002,6 +3001,58 @@ namespace GridGenerator
 
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, SphericalManifold<2>(center));
+  }
+
+
+
+  template <int dim>
+  void
+  eccentric_hyper_shell(Triangulation<dim> &tria,
+                        const Point<dim> &  inner_center,
+                        const Point<dim> &  outer_center,
+                        const double        inner_radius,
+                        const double        outer_radius,
+                        const unsigned int  n_cells)
+  {
+    GridGenerator::hyper_shell(
+      tria, outer_center, inner_radius, outer_radius, n_cells, true);
+
+    // check the consistency of the dimensions provided
+    Assert(
+      outer_radius - inner_radius > outer_center.distance(inner_center),
+      ExcInternalError(
+        "The inner radius is greater than or equal to the outer radius plus eccentricity."));
+
+    // shift nodes along the inner boundary according to the position of
+    // inner_circle
+    std::set<Point<dim> *> vertices_to_move;
+
+    for (const auto &face : tria.active_face_iterators())
+      if (face->boundary_id() == 0)
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
+          vertices_to_move.insert(&face->vertex(v));
+
+    const auto shift = inner_center - outer_center;
+    for (const auto &p : vertices_to_move)
+      (*p) += shift;
+
+    // the original hyper_shell function assigns the same manifold id
+    // to all cells and faces. Set all manifolds ids to a different
+    // value (2), then use boundary ids to assign different manifolds to
+    // the inner (0) and outer manifolds (1). Use a transfinite manifold
+    // for all faces and cells aside from the boundaries.
+    tria.set_all_manifold_ids(2);
+    GridTools::copy_boundary_to_manifold_id(tria);
+
+    SphericalManifold<dim> inner_manifold(inner_center);
+    SphericalManifold<dim> outer_manifold(outer_center);
+
+    TransfiniteInterpolationManifold<dim> transfinite;
+    transfinite.initialize(tria);
+
+    tria.set_manifold(0, inner_manifold);
+    tria.set_manifold(1, outer_manifold);
+    tria.set_manifold(2, transfinite);
   }
 
 
