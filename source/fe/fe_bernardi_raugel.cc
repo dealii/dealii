@@ -177,6 +177,48 @@ FE_BernardiRaugel<dim>::initialize_support_points()
     }
 }
 
+
+
+template <int dim>
+void
+FE_BernardiRaugel<dim>::fill_fe_values(
+  const typename Triangulation<dim, dim>::cell_iterator &cell,
+  const CellSimilarity::Similarity                       cell_similarity,
+  const Quadrature<dim> &                                quadrature,
+  const Mapping<dim, dim> &                              mapping,
+  const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
+  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
+    &                                                       mapping_data,
+  const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
+    &output_data) const
+{
+  FE_PolyTensor<PolynomialsBernardiRaugel<dim>, dim, dim>::fill_fe_values(
+    cell,
+    cell_similarity,
+    quadrature,
+    mapping,
+    mapping_internal,
+    mapping_data,
+    fe_internal,
+    output_data);
+
+  std::cout << "fill_fe_values called!" << std::endl;
+  std::cout << "Is the finite element primitive?" << this->is_primitive() << std::endl;
+  for(unsigned int k=0; k < this->dofs_per_cell; ++k)
+  {
+    std::cout << "dof " << k << std::endl;
+    for(unsigned int i=0; i < quadrature.size(); ++i)
+      std::cout << "qp " << i << ": " << output_data.shape_values[k][i] << std::endl;
+  }
+
+  for(unsigned int i=0; i < this->dofs_per_cell; ++i)
+    for(unsigned int d=0; d < dim; ++d)
+      std::cout << "Result of fe.get_nonzero_components(" << i << ")[" << d << "] = " << this->get_nonzero_components(i)[d] << std::endl;
+
+  //this->n_nonzero_components(0);
+}
+
 template class FE_BernardiRaugel<2>;
 template class FE_BernardiRaugel<3>;
 
