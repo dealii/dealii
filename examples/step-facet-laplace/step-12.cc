@@ -301,9 +301,9 @@ namespace Step12
 
     typedef decltype(dof_handler.begin_active()) Iterator;
     const Beta<dim> beta_function;
-    const RHS<dim> rhs_function;
-    const Viscosity<dim> viscosity_function;
-    const Solution<dim> boundary_function;
+    RHS<dim> rhs_function;
+    Viscosity<dim> viscosity_function;
+    Solution<dim> boundary_function;
 
     auto cell_worker = [&] (const Iterator &cell, ScratchData<dim> &scratch_data, CopyData &copy_data)
     {

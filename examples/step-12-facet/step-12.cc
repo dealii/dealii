@@ -337,7 +337,7 @@ namespace Step12
   void AdvectionProblem<dim>::assemble_system2()
   {
     typedef decltype(dof_handler.begin_active()) Iterator;
-    const BoundaryValues<dim>                    boundary_function;
+    BoundaryValues<dim>                    boundary_function;
 
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
