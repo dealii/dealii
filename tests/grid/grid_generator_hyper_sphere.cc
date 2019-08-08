@@ -15,7 +15,7 @@
 
 
 
-// Test GridGenerator::create_triangulation_with_removed_cells
+// Test GridGenerator::hyper_sphere()
 
 #include <deal.II/base/tensor.h>
 
