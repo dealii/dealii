@@ -40,10 +40,26 @@ namespace Particles
 {
   namespace internal
   {
+    /**
+     * This function packs a vector of particles into a vector
+     * of bytes. If there are properties associated with the
+     * particles they are also serialized. The function does
+     * not perform compression, but is faster
+     * than the corresponding function Utilities::pack().
+     */
     template <int dim, int spacedim>
     std::vector<char>
     pack_particles(std::vector<Particle<dim, spacedim>> &particles);
 
+    /**
+     * This function unpacks a vector of bytes into a vector
+     * of particles. It assumes the vector of bytes was created
+     * with the pack_particles() function above. If the particles
+     * had properties when they were serialized this function
+     * requires an additional argument that is a PropertyPool
+     * object with the correct number of properties per particle
+     * to be able to correctly unpack the particles.
+     */
     template <int dim, int spacedim>
     std::vector<Particle<dim, spacedim>>
     unpack_particles(
