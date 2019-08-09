@@ -238,11 +238,12 @@ namespace FEFacetViews
  * Basically, it provides a way to access average and jump terms used in
  * Discontinuous Galerkin methods on faces between two neighboring cells.
  *
- * Internally, it provides an abstraction for two FEFaceValues. The class is
- * made to be used inside MeshWorker::mesh_loop.
+ * Internally, it provides an abstraction for two FEFaceValues.
+ * The class introduces a new "facet dof index" that walks over the union of the
+ * dof indices of the two FEFaceValues objects.
  *
- * Note: This class is intended to be a low level replacement for MeshWorker and
- * LocalIntegrators.
+ * The class is made to be used inside MeshWorker::mesh_loop. It is intended to
+ * be a low level replacement for MeshWorker and LocalIntegrators.
  */
 template <int dim, int spacedim = dim>
 class FEFacetValues
