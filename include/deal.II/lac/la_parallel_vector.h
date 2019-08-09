@@ -251,6 +251,9 @@ namespace LinearAlgebra
 
       /**
        * Copy constructor. Uses the parallel partitioning of @p in_vector.
+       * It should be noted that this constructor automatically sets ghost
+       * values to zero. Call @p update_ghost_values() directly following
+       * construction if a ghosted vector is required.
        */
       Vector(const Vector<Number, MemorySpace> &in_vector);
 
