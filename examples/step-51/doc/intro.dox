@@ -33,9 +33,14 @@ by Cockburn and co-workers (see the references in the recent HDG overview
 article by Nguyen and Peraire @cite Ngu2012).
 
 The HDG method achieves this goal by formulating the mathematical problem using
+<<<<<<< HEAD
 Dirichlet-to-Neumann mappings.  The partial diffeirential equations are first
 written as a first order system, and each field is then discretized via a DG 
 method.  At this point, the  single-valued "trace" values on the skeleton of the
+=======
+Dirichlet-to-Neumann mappings.  The partial differential equations are first
+ written as a first order system, and each field is then discretized via a DG method.  At this point, the  single-valued "trace" values on the skeleton of the
+>>>>>>> c2a14ce4efbf3286c9520776f67303585900b8bb
 mesh, i.e., element faces, are taken to be independent unknown quantities.
 This yields unknowns in the discrete formulation that fall into two categories:
 - Face unknowns that only couple with the cell unknowns from both sides of the face;
@@ -57,6 +62,7 @@ element-level solutions.  This is known as the 'local solver', and is an
 <h4> Relation with Static Condensation </h4>
 The above procedure also has a linear algebra interpretation---referred to
 as <i>static condensation</i>---that was exploited to reduce the size of the
+<<<<<<< HEAD
 global linear system by Guyan in the context of continuous Finite Elements
 @cite G65, and by Fraeijs de Veubeke for mixed methods @cite F65. In the 
 latter case (mixed formulation), the system reduction was achieved through the
@@ -71,6 +77,21 @@ the <i>hybridizable discontinuous Galerkin</i> (HDG) method.
 Let us write the complete linear system associated to the HDG problem as a 
 block system with the discrete DG (cell interior) variables $U$ as first block
 and the skeleton (face) variables $\Lambda$ as the second block:
+=======
+ global linear system by Guyan in the context of continuous Finite Elements
+ @cite G65, and by Fraeijs de Veubeke for mixed methods @cite F65. In the latter
+ case (mixed formulation), the system reduction was achieved through the use of
+ discontinuous fluxes combined with the introduction of an additional auxiliary
+ <i>hybrid</i> variable that approximates the trace of the unknown at the
+ boundary of every element. This procedure became known as hybridization 
+and---by analogy---is the reason why the local discontinuous Galerkin method
+ introduced by Cockburn  and collaborators eventually became known as the
+ <i>hybridizable discontinuous Galerkin</i> (HDG) method.
+
+Let us write the complete linear system associated to the HDG problem as a 
+block system with the discrete DG (cell interior) variables $U$ as first block
+ and the skeleton (face) variables $\Lambda$ as the second block:
+>>>>>>> c2a14ce4efbf3286c9520776f67303585900b8bb
 @f{eqnarray*}
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
 \begin{pmatrix} U \\ \Lambda \end{pmatrix}
