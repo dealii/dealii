@@ -1535,6 +1535,10 @@ namespace GridGenerator
    * parallel::distributed::Triangulation, as well as when the input
    * Triangulation contains hanging nodes.
    *
+   * @param[in] in_tria The base input for a new flat triangulation.
+   * @param[out] out_tria The desired flattened triangulation constructed from
+   * the in_tria.
+   *
    * @note Since @p input and @p output have different spatial dimensions no
    * manifold objects are copied by this function: you must attach new
    * manifold objects to @p out_tria.
