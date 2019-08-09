@@ -1355,39 +1355,6 @@ namespace FETools
         fe2.get_interpolation_matrix(fe1, tmp);
         interpolation_matrix = tmp;
       }
-
-
-
-      // return how many characters
-      // starting at the given position
-      // of the string match either the
-      // generic string "<dim>" or the
-      // specialized string with "dim"
-      // replaced with the numeric value
-      // of the template argument
-      template <int dim, int spacedim>
-      inline unsigned int
-      match_dimension(const std::string &name, const unsigned int position)
-      {
-        if (position >= name.size())
-          return 0;
-
-        if ((position + 5 < name.size()) && (name[position] == '<') &&
-            (name[position + 1] == 'd') && (name[position + 2] == 'i') &&
-            (name[position + 3] == 'm') && (name[position + 4] == '>'))
-          return 5;
-
-        Assert(dim < 10, ExcNotImplemented());
-        const char dim_char = '0' + dim;
-
-        if ((position + 3 < name.size()) && (name[position] == '<') &&
-            (name[position + 1] == dim_char) && (name[position + 2] == '>'))
-          return 3;
-
-        // some other string that doesn't
-        // match
-        return 0;
-      }
     } // namespace FEToolsGetInterpolationMatrixHelper
   }   // namespace internal
 
