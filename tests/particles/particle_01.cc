@@ -29,8 +29,6 @@ test()
   {
     Particles::Particle<dim> particle;
 
-    deallog << "Particle location: " << particle.get_location() << std::endl;
-
     Point<dim> position;
     position(0) = 1.0;
     particle.set_location(position);
