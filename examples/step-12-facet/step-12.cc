@@ -825,6 +825,7 @@ namespace Step12
 // well, and need not be commented on.
 int main()
 {
+  dealii::deallog.depth_console(10);
   try
     {
       Step12::AdvectionProblem<2> dgmethod;
