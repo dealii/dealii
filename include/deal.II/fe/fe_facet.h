@@ -365,7 +365,7 @@ public:
   unsigned
   n_facet_dofs() const
   {
-    return n_dofs_fe + is_boundary_facet() ? n_dofs_fe_neighbor : 0;
+    return n_dofs_fe + (is_boundary_facet() ? 0 : n_dofs_fe_neighbor);
   }
 
   /**
