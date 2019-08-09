@@ -644,6 +644,8 @@ int main()
 {
   try
     {
+      dealii::deallog.depth_console(5);
+
       Step12::AdvectionProblem<2> dgmethod;
       dgmethod.run();
     }
