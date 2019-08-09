@@ -32,36 +32,36 @@ template <int rank, int dim, typename Number = double>
 class SymmetricTensor;
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
-                  unit_symmetric_tensor();
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                                               unit_symmetric_tensor();
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
-                  deviator_tensor();
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
+                                               deviator_tensor();
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
-                  identity_tensor();
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
+                                               identity_tensor();
 
 template <int dim, typename Number>
-constexpr SymmetricTensor<2, dim, Number>
-invert(const SymmetricTensor<2, dim, Number> &);
+constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                                invert(const SymmetricTensor<2, dim, Number> &);
 
 template <int dim, typename Number>
-constexpr SymmetricTensor<4, dim, Number>
-invert(const SymmetricTensor<4, dim, Number> &);
+constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
+                                invert(const SymmetricTensor<4, dim, Number> &);
 
 template <int dim2, typename Number>
-DEAL_II_CONSTEXPR Number
-                  trace(const SymmetricTensor<2, dim2, Number> &);
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
+                                               trace(const SymmetricTensor<2, dim2, Number> &);
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
-                  deviator(const SymmetricTensor<2, dim, Number> &);
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
+                                               deviator(const SymmetricTensor<2, dim, Number> &);
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR Number
-                  determinant(const SymmetricTensor<2, dim, Number> &);
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
+                                               determinant(const SymmetricTensor<2, dim, Number> &);
 
 
 
