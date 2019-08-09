@@ -2891,6 +2891,77 @@ namespace GridGenerator
 
 
 
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_L(Triangulation<dim, spacedim> &   tria,
+                     const std::vector<unsigned int> &repetitions,
+                     const Point<dim> &               bottom_left,
+                     const Point<dim> &               top_right,
+                     const std::vector<int> &         num_cells_to_cut)
+  {
+    Assert(dim > 1, ExcNotImplemented());
+    // Check the consistency of the dimensions provided.
+    AssertDimension(repetitions.size(), dim);
+    AssertDimension(num_cells_to_cut.size(), dim);
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(std::fabs(num_cells_to_cut[d]) <= repetitions[d],
+               ExcMessage("Attempting to cut away too many cells."));
+      }
+    // Create the domain to be cut
+    Triangulation<dim, spacedim> rectangle;
+    GridGenerator::subdivided_hyper_rectangle(rectangle,
+                                              repetitions,
+                                              bottom_left,
+                                              top_right);
+    // compute the vertex of the cut step, we will cut according to the
+    // location of the cartesian coordinates of the cell centers
+    std::vector<double> h;
+    Point<dim>          cut_step;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        // mesh spacing in each direction in cartesian coordinates
+        h.push_back((top_right[d] - bottom_left[d]) / repetitions[d]);
+        // left to right, bottom to top, front to back
+        if (num_cells_to_cut[d] >= 0)
+          {
+            // cartesian coordinates of vertex location
+            cut_step[d] =
+              h[d] * std::fabs(num_cells_to_cut[d]) + bottom_left[d];
+          }
+        // right to left, top to bottom, back to front
+        else
+          {
+            cut_step[d] = top_right[d] - h[d] * std::fabs(num_cells_to_cut[d]);
+          }
+      }
+
+
+    // compute cells to remove
+    std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>
+      cells_to_remove;
+    std::copy_if(
+      rectangle.active_cell_iterators().begin(),
+      rectangle.active_cell_iterators().end(),
+      std::inserter(cells_to_remove, cells_to_remove.end()),
+      [&](
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+        -> bool {
+        for (unsigned int d = 0; d < dim; ++d)
+          if ((num_cells_to_cut[d] > 0 && cell->center()[d] >= cut_step[d]) ||
+              (num_cells_to_cut[d] < 0 && cell->center()[d] <= cut_step[d]))
+            return false;
+
+        return true;
+      });
+
+    GridGenerator::create_triangulation_with_removed_cells(rectangle,
+                                                           cells_to_remove,
+                                                           tria);
+  }
+
+
+
   // Implementation for 2D only
   template <>
   void hyper_ball(Triangulation<2> &tria,
