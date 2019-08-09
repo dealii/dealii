@@ -91,6 +91,10 @@ public:
    * may reflect, for example, different constitutive models of continuum
    * mechanics in different parts of the domain.
    *
+   * @note The first time this method is called, it stores a SmartPointer to the
+   * Triangulation object that owns the cell. The future invocations of this
+   * method expects the cell to be from the same stored triangulation.
+   *
    * @pre The type @p T needs to either equal @p DataType, or be a class derived
    * from @p DataType. @p T needs to be default constructible.
    */
@@ -138,6 +142,9 @@ public:
    * cell-by-cell basis.
    *
    * @pre The type @p T needs to match the class provided to initialize() .
+   *
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
    */
   template <typename T = DataType>
   std::vector<std::shared_ptr<T>>
@@ -153,6 +160,9 @@ public:
    * cell-by-cell basis.
    *
    * @pre The type @p T needs to match the class provided to initialize() .
+   *
+   * @pre @p cell must be from the same Triangulation that is used to
+   * initialize() the cell data.
    */
   template <typename T = DataType>
   std::vector<std::shared_ptr<const T>>
@@ -160,9 +170,32 @@ public:
 
 private:
   /**
-   * A map to store a vector of data on a cell.
+   * Number of dimensions
    */
-  std::map<CellIteratorType, std::vector<std::shared_ptr<DataType>>> map;
+  static constexpr unsigned int dimension =
+    CellIteratorType::AccessorType::dimension;
+
+  /**
+   * Number of space dimensions
+   */
+  static constexpr unsigned int space_dimension =
+    CellIteratorType::AccessorType::space_dimension;
+
+  /**
+   * To ensure that all the cells in the CellDataStorage come from the same
+   * Triangulation, we need to store a reference to that Triangulation within
+   * the class.
+   */
+  SmartPointer<const Triangulation<dimension, space_dimension>,
+               CellDataStorage<CellIteratorType, DataType>>
+    tria;
+
+  /**
+   * A map to store a vector of data on each cell.
+   * We need to use CellId as the key because it remains unique during
+   * adaptive refinement.
+   */
+  std::map<CellId, std::vector<std::shared_ptr<DataType>>> map;
 
   /**
    * @addtogroup Exceptions
@@ -170,6 +203,13 @@ private:
   DeclExceptionMsg(
     ExcCellDataTypeMismatch,
     "Cell data is being retrieved with a type which is different than the type used to initialize it");
+
+  /**
+   * @addtogroup Exceptions
+   */
+  DeclExceptionMsg(
+    ExcTriangulationMismatch,
+    "The provided cell iterator does not belong to the triangulation that corresponds to the CellDataStorage object.");
 };
 
 
@@ -531,14 +571,20 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  // The first time this method is called, it has to initialize the reference
+  // to the triangulation object
+  if (!tria)
+    tria = &cell->get_triangulation();
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  if (map.find(cell) == map.end())
+  const auto key = cell->id();
+  if (map.find(key) == map.end())
     {
-      map[cell] = std::vector<std::shared_ptr<DataType>>(n_q_points);
+      map[key] = std::vector<std::shared_ptr<DataType>>(n_q_points);
       // we need to initialize one-by-one as the std::vector<>(q, T())
       // will end with a single same T object stored in each element of the
       // vector:
-      auto it = map.find(cell);
+      const auto it = map.find(key);
       for (unsigned int q = 0; q < n_q_points; q++)
         it->second[q] = std::make_shared<T>();
     }
@@ -565,9 +611,11 @@ template <typename CellIteratorType, typename DataType>
 bool
 CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
-  const auto it = map.find(cell);
+  const auto key = cell->id();
+  const auto it  = map.find(key);
   if (it == map.end())
     return false;
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
       Assert(
@@ -576,7 +624,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
           "Can not erase the cell data multiple objects reference its data."));
     }
 
-  return (map.erase(cell) == 1);
+  return (map.erase(key) == 1);
 }
 
 
@@ -613,8 +661,9 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  auto it = map.find(cell);
+  const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for
@@ -641,8 +690,9 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
+  Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
-  auto it = map.find(cell);
+  const auto it = map.find(cell->id());
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
