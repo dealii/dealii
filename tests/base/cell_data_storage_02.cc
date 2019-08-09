@@ -104,7 +104,7 @@ test()
             fe_values.get_quadrature_points();
           // before initialization, you can erase it without any consequences
           const bool erased_nonexisting_data = data_storage.erase(cell);
-          Assert(!erased_nonexisting_data, ExcInternalError());
+          AssertThrow(!erased_nonexisting_data, ExcInternalError());
           // initialize
           data_storage.initialize(cell, rhs.size());
           {
@@ -116,7 +116,7 @@ test()
 
           // do erase
           const bool erased = data_storage.erase(cell);
-          Assert(erased, ExcInternalError());
+          AssertThrow(erased, ExcInternalError());
           // initialize with default constructor
           data_storage.initialize(cell, rhs.size());
           // check that values are now zero (see default constructor)
