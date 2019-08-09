@@ -132,7 +132,7 @@ suggestions:
   (here 1e-12) of -1 and 1. Try this immediately after calling
   <code>GridGenerator::hyper_cube</code>, as before:
   @code
-  for (; cell != endc; ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
         for (unsigned int face_number = 0;
              face_number < GeometryInfo<2>::faces_per_cell;
