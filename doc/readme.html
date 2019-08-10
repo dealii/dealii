@@ -161,7 +161,7 @@
 
     <p>
         <acronym>deal.II</acronym> uses the
-        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps to configure the build process:</p>
+        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps to configure the build process (make sure the installation directory is not the same as the location where you unpacked <tt>deal.II/</tt>):</p>
 
     <pre>
   mkdir build
@@ -183,7 +183,7 @@
         <b>Note:</b></p>
     <ul>
         <li> <code>/path/to/install/dir</code> is the directory which deal.II should be installed into. This can be a directory in your home directory (e.g., <code>~/bin/deal.II</code>) or a directory such as <code>/usr/local</code> if you have root privileges.
-            Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks). Make sure the installation directory is not the same as the location where you unpacked <tt>deal.II/</tt>.
+            Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks). 
         </li>
 
         <li> <code>make test</code> automatically runs in parallel and no <code>-jN</code> flag should be supplied to it.
