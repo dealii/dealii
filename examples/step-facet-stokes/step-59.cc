@@ -2347,21 +2347,62 @@ int main()
                         << test.dofs_per_cell << std::endl;
             }
         }
-      const int degree = 0;
 
-      // FESystem<dim> fe(FESystem<dim>(FE_Q<dim>(degree), dim), 1,
-      // FE_Q<dim>(degree-1), 1); // min=2 FESystem<dim>
-      // fe(FESystem<dim>(FE_DGQ<dim>(degree), dim), 1, FE_DGQ<dim>(degree-1),
-      // 1);
-      FESystem<dim> fe(FE_RaviartThomas<dim>(degree),
-                       1,
-                       FE_DGQ<dim>(degree),
-                       1); // min=1
-      // FESystem<dim> fe(FE_BDM<dim>(degree), 1, FE_DGP<dim>(degree-1), 1);
-      // //min=
-      std::cout << fe.get_name() << ": degree=" << fe.degree
-                << " tensor_degree=" << fe.tensor_degree() << std::endl;
-      StokesProblem<dim> flow_problem(fe,
+      std::unique_ptr<FiniteElement<dim>> fe;
+      const int                           degree = 2;
+
+      if (false)
+        {
+          // C0: Taylor-Hood
+          Assert(degree >= 2, ExcMessage("invalid degree!"));
+          fe = std::make_unique<FESystem<dim>>(
+            FESystem<dim>(FE_Q<dim>(degree), dim), 1, FE_Q<dim>(degree - 1), 1);
+        }
+      if (false)
+        {
+          // C0: Taylor-Hood disc pressure
+          Assert(degree >= 2, ExcMessage("invalid degree!"));
+          fe = std::make_unique<FESystem<dim>>(FESystem<dim>(FE_Q<dim>(degree),
+                                                             dim),
+                                               1,
+                                               FE_DGQ<dim>(degree - 1),
+                                               1);
+        }
+      if (true)
+        {
+          // DG
+          Assert(degree >= 1, ExcMessage("invalid degree!"));
+          fe =
+            std::make_unique<FESystem<dim>>(FESystem<dim>(FE_DGQ<dim>(degree),
+                                                          dim),
+                                            1,
+                                            FE_DGQ<dim>(degree - 1),
+                                            1);
+        }
+      if (false)
+        {
+          // Hdiv: RT
+          Assert(degree >= 1, ExcMessage("invalid degree!"));
+          fe = std::make_unique<FESystem<dim>>(FE_RaviartThomas<dim>(degree),
+                                               1,
+                                               FE_DGQ<dim>(degree),
+                                               1);
+        }
+      if (false)
+        {
+          // Hdiv: BDM
+          Assert(degree >= 1, ExcMessage("invalid degree!"));
+          fe =
+            std::make_unique<FESystem<dim>>(FESystem<dim>(FE_BDM<dim>(degree),
+                                                          dim),
+                                            1,
+                                            FE_DGP<dim>(degree - 1),
+                                            1);
+        }
+
+      std::cout << fe->get_name() << ": degree=" << fe->degree
+                << " tensor_degree=" << fe->tensor_degree() << std::endl;
+      StokesProblem<dim> flow_problem(*fe.get(),
                                       degree,
                                       SolverType::FGMRES_ILU,
                                       GeoType::Cube);
