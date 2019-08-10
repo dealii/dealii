@@ -188,7 +188,7 @@ namespace Step11
     // beforehand the maximal number of entries per row, either for all rows
     // or for each row separately. There are functions in the library which
     // can tell you this number in case you just have hanging node constraints
-    // (namely <code>DoFHandler::max_coupling_between_dofs</code>), but how is
+    // (namely DoFHandler::max_couplings_between_dofs), but how is
     // this for the present case? The difficulty arises because the
     // elimination of the constrained degree of freedom requires a number of
     // additional entries in the matrix at places that are not so simple to
