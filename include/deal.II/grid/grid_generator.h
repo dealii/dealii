@@ -136,12 +136,13 @@ namespace GridGenerator
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
+   * @param tria The triangulation to create. It needs to be empty upon
    * calling this function.
    *
    * @param repetitions A vector of @p dim positive values denoting the number
-   * of cells to generate in that direction. For example, first component of the vector specifies the number of cells
-   * in the x-direction, second component specifies that for the y-direction for dim=2.
+   * of cells to generate in that direction. For example, the first component of
+   * the vector specifies the number of cells in the x-direction, the second
+   * component specifies that for the y-direction for dim=2.
    *
    * @param left Lower bound for the interval used to create the hyper cube.
    *
