@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/particles/particle.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -21,8 +23,8 @@ namespace Particles
 {
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle()
-    : location()
-    , reference_location()
+    : location(numbers::signaling_nan<Point<spacedim>>())
+    , reference_location(numbers::signaling_nan<Point<dim>>())
     , id(0)
     , property_pool(nullptr)
     , properties(PropertyPool::invalid_handle)
