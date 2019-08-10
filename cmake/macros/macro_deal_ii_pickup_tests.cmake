@@ -98,7 +98,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   MARK_AS_ADVANCED(NUMDIFF_EXECUTABLE)
 
-  IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
+  IF( "${NUMDIFF_EXECUTABLE}" MATCHES "NUMDIFF_EXECUTABLE-NOTFOUND")
     MESSAGE(FATAL_ERROR
       "Could not find numdiff, which is required for running the testsuite.\n"
       "Please specify NUMDIFF_DIR to a location containing the binary."
@@ -117,9 +117,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   IF(NOT "${_diff_program_status}" STREQUAL "0")
     MESSAGE(FATAL_ERROR
-      "\nThe command \"${_diff_program} -v\" did not run correctly: it either "
-      "failed to exit after a few seconds or returned a nonzero exit code. "
-      "The test suite cannot be set up without this program, so please "
+      "\nThe command \"${NUMDIFF_EXECUTABLE} -v\" did not run correctly: it "
+      "either failed to exit after a few seconds or returned a nonzero exit "
+      "code. The test suite cannot be set up without this program, so please "
       "reinstall it and then run the test suite setup command again.\n")
   ENDIF()
 
