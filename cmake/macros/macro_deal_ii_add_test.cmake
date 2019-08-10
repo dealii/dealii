@@ -100,17 +100,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
-  # A "binary" in the output file indicates binary output. In this case we
-  # have to switch to plain diff instead of (possibly) numdiff, which can
-  # only work on plain text files.
-  #
-  IF(_file MATCHES "\\.binary\\.")
-    SET(_test_diff ${DIFF_EXECUTABLE})
-  ELSE()
-    SET(_test_diff ${NUMDIFF_EXECUTABLE})
-  ENDIF()
-
-  #
   # Determine whether the test should be run with mpirun:
   #
   STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
