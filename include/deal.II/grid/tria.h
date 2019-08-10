@@ -1780,9 +1780,8 @@ public:
    * for non-linear (i.e.: non-Q1) transformations of cells to the unit cell
    * in shape function calculations.
    *
-   * The @p manifold_object is not copied and MUST persist until the
-   * triangulation is destroyed. This is also true for triangulations
-   * generated from this one by @p copy_triangulation.
+   * A copy of @p manifold_object is created using
+   * Manifold<dim, spacedim>::clone() and stored internally.
    *
    * It is possible to remove or replace the boundary object during the
    * lifetime of a non-empty triangulation. Usually, this is done before the
