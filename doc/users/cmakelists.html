@@ -475,7 +475,7 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
   invocation. This means they take precedence over all flags defined via
   globally via <code>CMAKE_CXX_FLAGS</code>, etc., or as a directory
   property. If you wish to modify flags or preprocessor definitions set up
-  with <code>DEAL_II_SETUP_TARGET</code> modify on of the following
+  with <code>DEAL_II_SETUP_TARGET</code> modify one of the following
   variables (see the section about <a
     href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a> for
   details):
@@ -515,7 +515,7 @@ is not equal to <code>Debug</code>, <code>Release</code>, or
 </p>
 <p>
 Furthermore, this macro sets the C++ compiler to the one used for compiling
-the deal.II library. The variables will <code>CMAKE_CXX_FLAGS</code>,
+the deal.II library. The variables <code>CMAKE_CXX_FLAGS</code>,
 <code>CMAKE_CXX_FLAGS_DEBUG</code>, and
 <code>CMAKE_CXX_FLAGS_RELEASE</code> will be initialized with the empty
 string.
@@ -560,7 +560,7 @@ project "foo" at least of version 8.0 write:
 FIND_PACKAGE(foo 8.0 REQUIRED)
 </pre>
 Alternatively, the version number and <code>REQUIRED</code> keyword can be
-omitted. (Depending on the external library) the project configuration or
+omitted. Depending on the external library, the project configuration or
 find macro will usually define variables like <code>FOO_INCLUDE_DIRS</code>
 and <code>FOO_LIBRARIES</code> that can be directly used in your
 <code>CMakeLists.txt</code> file:
