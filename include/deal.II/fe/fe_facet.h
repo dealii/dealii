@@ -56,7 +56,8 @@ namespace FEFacetViews
     typedef double value_type;
 
     /**
-     * This is the type returned for gradients, for example from gradient_avg
+     * This is the type returned for gradients, for example from
+     * gradient_average
      */
     typedef dealii::Tensor<1, spacedim> gradient_type;
 
@@ -100,7 +101,7 @@ namespace FEFacetViews
      * function @p idx in the quadrature point @p q_point.
      */
     value_type
-    avg(const unsigned int idx, const unsigned int q_point) const
+    average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
         this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
@@ -116,7 +117,7 @@ namespace FEFacetViews
      * function @p idx in the quadrature point @p q_point.
      */
     gradient_type
-    gradient_avg(const unsigned int idx, const unsigned int q_point) const
+    gradient_average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
         this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
@@ -192,7 +193,11 @@ namespace FEFacetViews
       else
         {
           if (this->fe_facet->is_boundary_facet())
-            return value_type(); // return 0 tensor
+            {
+              // we should not get here
+              Assert(false, ExcInternalError());
+              return value_type(); // return 0 tensor
+            }
           else
             return -this->fe_facet->get_fe_values_neighbor()[extractor].value(
               shape_fct, q_point);
@@ -200,13 +205,32 @@ namespace FEFacetViews
     }
 
     value_type
-    avg(const unsigned int idx, const unsigned int q_point) const;
+    average(const unsigned int idx, const unsigned int q_point) const
+    {
+      const unsigned int shape_fct =
+        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+      const unsigned int fe_idx =
+        this->fe_facet->facet_dof_index_to_fe_index(idx);
+
+      return (fe_idx == 0 ? 0.5 : -0.5) *
+             this->fe_facet->get_fe_values(fe_idx)[extractor].value(shape_fct,
+                                                                    q_point);
+    }
 
     gradient_type
-    gradient_avg(const unsigned int idx, const unsigned int q_point) const;
+    gradient_average(const unsigned int idx, const unsigned int q_point) const
+    {
+      const unsigned int shape_fct =
+        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+      const unsigned int fe_idx =
+        this->fe_facet->facet_dof_index_to_fe_index(idx);
+      return 0.5 * this->fe_facet->get_fe_values(fe_idx)[extractor].gradient(
+                     shape_fct, q_point);
+    }
 
     value_type
-    gradient_dot_n_avg(const unsigned int idx, const unsigned int q_point) const
+    gradient_dot_n_average(const unsigned int idx,
+                           const unsigned int q_point) const
     {
       const unsigned int shape_fct =
         this->fe_facet->facet_dof_index_to_fe_dof_index(idx);

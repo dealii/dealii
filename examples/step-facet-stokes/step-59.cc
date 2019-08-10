@@ -1621,16 +1621,18 @@ namespace Step59
               copy_data_face.cell_matrix(i, j) +=
                 (
                   // - nu {\nabla u}n . [v] (consistency)
-                  -nu * fe_fv[velocities].gradient_dot_n_avg(j, point) *
+                  -nu *
+                    (fe_fv[velocities].gradient_average(j, point) *
+                     normals[point]) *
                     fe_fv[velocities].jump(i, point)
 
                   // - nu [u] . {\nabla v}n  (symmetry) // NIPG: use +
                   - nu * fe_fv[velocities].jump(j, point) *
-                      fe_fv[velocities].gradient_dot_n_avg(i, point)
+                      (fe_fv[velocities].gradient_average(i, point) *
+                       normals[point])
 
                   // alternatively:
-                  //* fe_fv[velocities].gradient_avg(i, point)
-                  //* normals[point]
+                  // fe_fv[velocities].gradient_dot_n_average(i, point)
 
                   // nu sigma [u].[v] (penalty)
                   + nu * penalty *
@@ -1638,12 +1640,12 @@ namespace Step59
                                      fe_fv[velocities].jump(i, point))
 
                   // {p} ([v].n)
-                  + fe_fv[pressure].avg(j, point) *
+                  + fe_fv[pressure].average(j, point) *
                       scalar_product(fe_fv[velocities].jump(i, point),
                                      normals[point])
 
                   // {q} ([u].n)
-                  + fe_fv[pressure].avg(i, point) *
+                  + fe_fv[pressure].average(i, point) *
                       scalar_product(fe_fv[velocities].jump(j, point),
                                      normals[point])) *
                 JxW[point];

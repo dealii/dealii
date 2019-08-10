@@ -448,14 +448,14 @@ namespace Step12
                 (
                   // - nu {\nabla u}.n [v] (consistency)
                   -nu[point] *
-                    (fe_facet.scalar().gradient_avg(j, point) *
+                    (fe_facet.scalar().gradient_average(j, point) *
                      normals[point]) *
                     fe_facet.scalar().jump(i, point)
 
                   // - nu [u] {\nabla v}.n  (symmetry) // NIPG: use +
-                  -
-                  nu[point] * fe_facet.scalar().jump(j, point) *
-                    (fe_facet.scalar().gradient_avg(i, point) * normals[point])
+                  - nu[point] * fe_facet.scalar().jump(j, point) *
+                      (fe_facet.scalar().gradient_average(i, point) *
+                       normals[point])
 
                   // nu sigma [u] [v] (penalty)
                   + nu[point] * penalty * fe_facet.scalar().jump(j, point) *
