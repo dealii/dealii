@@ -1,0 +1,71 @@
+
+DEAL::Number of dofs: 25 without overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 25 with overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 81 without overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 81 with overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 81 without overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 81 with overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 289 without overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 289 with overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 729 without overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
+DEAL::Number of dofs: 729 with overlap
+DEAL::Error loop 1: 0.00000
+DEAL::Error loop 2: 0.00000
+DEAL::Error loop 3: 0.00000
+DEAL::Error loop 4: 0.00000
+DEAL::Error loop 5: 0.00000
+DEAL::Error cell loop: 0.00000
