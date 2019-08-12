@@ -1349,15 +1349,17 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         hard_vectorization_boundary,
         task_info.face_partition_data,
         face_info.faces);
-      hard_vectorization_boundary.clear();
-      hard_vectorization_boundary.resize(
-        task_info.boundary_partition_data.size(),
-        task_info.scheme != internal::MatrixFreeFunctions::TaskInfo::none);
+
+      // on boundary faces, we must also respect the vectorization boundary of
+      // the inner faces because we might have dependencies on ghosts of
+      // remote vector entries for continuous elements
       internal::MatrixFreeFunctions::collect_faces_vectorization(
         face_setup.boundary_faces,
         hard_vectorization_boundary,
         task_info.boundary_partition_data,
         face_info.faces);
+
+      // for the other ghosted faces, there are no scheduling restrictions
       hard_vectorization_boundary.clear();
       hard_vectorization_boundary.resize(
         task_info.ghost_face_partition_data.size(), false);
@@ -1453,7 +1455,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                  cell <
                  VectorizedArrayType::n_array_elements * n_macro_cells_before;
                  ++cell)
-              if (cell > 0 &&
+              if (cell == 0 ||
                   cell_level_index[cell] != cell_level_index[cell - 1])
                 {
                   for (unsigned int i =
@@ -1466,14 +1468,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                          dof_info[no].start_components.back()]
                              .first;
                        ++i)
-                    if (dof_info[no].dof_indices[i] > part.local_size())
+                    if (dof_info[no].dof_indices[i] >= part.local_size())
                       ghost_indices.push_back(
                         part.local_to_global(dof_info[no].dof_indices[i]));
                   for (unsigned int i =
                          dof_info[no].row_starts_plain_indices[cell];
                        i < dof_info[no].row_starts_plain_indices[cell + 1];
                        ++i)
-                    if (dof_info[no].plain_dof_indices[i] > part.local_size())
+                    if (dof_info[no].plain_dof_indices[i] >= part.local_size())
                       ghost_indices.push_back(part.local_to_global(
                         dof_info[no].plain_dof_indices[i]));
                 }
