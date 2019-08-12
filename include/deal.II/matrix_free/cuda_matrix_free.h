@@ -91,14 +91,19 @@ namespace CUDAWrappers
       parallel_over_elem
     };
 
+    /**
+     * Standardized data struct to pipe additional data to MatrixFree.
+     */
     struct AdditionalData
     {
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values)
+                                                 update_JxW_values,
+        const bool use_coloring = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
+        , use_coloring(use_coloring)
       {}
 
       /**
@@ -120,6 +125,13 @@ namespace CUDAWrappers
        * must be specified by this field.
        */
       UpdateFlags mapping_update_flags;
+
+      /**
+       * If true, use graph coloring. Otherwise, use atomic operations. Graph
+       * coloring ensures bitwise reproducibility but is slower on Pascal and
+       * newer architectures.
+       */
+      bool use_coloring;
     };
 
     /**
@@ -136,6 +148,7 @@ namespace CUDAWrappers
       unsigned int             padding_length;
       unsigned int             row_start;
       unsigned int *           constraint_mask;
+      bool                     use_coloring;
     };
 
     /**
@@ -376,6 +389,13 @@ namespace CUDAWrappers
      * over cells.
      */
     ParallelizationScheme parallelization_scheme;
+
+    /**
+     * If true, use graph coloring. Otherwise, use atomic operations. Graph
+     * coloring ensures bitwise reproducibility but is slower on Pascal and
+     * newer architectures.
+     */
+    bool use_coloring;
 
     /**
      * Total number of degrees of freedom.

@@ -588,6 +588,7 @@ namespace CUDAWrappers
     data_copy.n_cells         = n_cells[color];
     data_copy.padding_length  = padding_length;
     data_copy.row_start       = row_start[color];
+    data_copy.use_coloring    = use_coloring;
 
     return data_copy;
   }
@@ -803,6 +804,7 @@ namespace CUDAWrappers
       AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
+    this->use_coloring           = additional_data.use_coloring;
 
     // TODO: only free if we actually need arrays of different length
     free();
@@ -861,13 +863,27 @@ namespace CUDAWrappers
     CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                      dof_handler.begin_active());
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    const auto fun = [&](const CellFilter &filter) {
-      return internal::get_conflict_indices<dim, Number>(filter, constraints);
-    };
-
     std::vector<std::vector<CellFilter>> graph;
+
     if (begin != end)
-      graph = GraphColoring::make_graph_coloring(begin, end, fun);
+      {
+        if (additional_data.use_coloring)
+          {
+            const auto fun = [&](const CellFilter &filter) {
+              return internal::get_conflict_indices<dim, Number>(filter,
+                                                                 constraints);
+            };
+            graph = GraphColoring::make_graph_coloring(begin, end, fun);
+          }
+        else
+          {
+            // If we are not using coloring, all the cells belong to the same
+            // color.
+            graph.resize(1, std::vector<CellFilter>());
+            for (auto cell = begin; cell != end; ++cell)
+              graph[0].emplace_back(cell);
+          }
+      }
     n_colors = graph.size();
 
     helper.setup_color_arrays(n_colors);
