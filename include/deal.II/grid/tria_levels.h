@@ -120,13 +120,19 @@ namespace internal
       /**
        * One integer per cell to store which subdomain it belongs to. This
        * field is most often used in parallel computations, where it denotes
-       * which processor shall work on the cells with a given subdomain
+       * which processor shall work on/owns the cells with a given subdomain
        * number.
+       *
+       * This number is only used on active cells.
        */
       std::vector<types::subdomain_id> subdomain_ids;
 
       /**
-       * for parallel multigrid
+       * The subdomain id used on each level for parallel multigrid.
+       *
+       * In contrast to the subdomain_id, this number is also used on inactive
+       * cells once the mesh has been partitioned also on the lower levels of
+       * the multigrid hierarchy.
        */
       std::vector<types::subdomain_id> level_subdomain_ids;
 
