@@ -652,7 +652,8 @@ namespace MatrixCreator
  * respect for fixed degrees of freedom, and in a second step eliminate them
  * again from the linear system. The inclusion into the assembly process is as
  * follows: when the matrix and vectors are set up, a list of nodes subject to
- * Dirichlet B.C. is made and matrix and vectors are modified accordingly. This
+ * Dirichlet boundary conditions is made and matrix and vectors are
+ * modified accordingly. This
  * is done by deleting all entries in the matrix in the line of this degree of
  * freedom, setting the main diagonal entry to a suitable positive value and
  * the right hand side element to a value so that the solution of the linear
