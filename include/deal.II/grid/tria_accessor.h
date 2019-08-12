@@ -3260,7 +3260,11 @@ public:
 
   /**
    * Get the level subdomain id of this cell. This is used for parallel
-   * multigrid.
+   * multigrid where not only the global mesh (consisting of the active cells)
+   * is partitioned among processors, but also the individual levels of the
+   * hierarchy of recursively refined cells that make up the mesh. In
+   * other words, the level subdomain id is a property that is also defined
+   * for non-active cells if a multigrid hierarchy is used.
    */
   types::subdomain_id
   level_subdomain_id() const;
