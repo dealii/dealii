@@ -663,8 +663,25 @@ public:
 
 
   DeclException0(ExcGmshNoCellInformation);
+  
+  /**
+   * 
+   */
+  std::map< std::string, std::map<int,double> > get_field_data()
+  {
+      
+      return this->field_data;
+  }
 
 protected:
+    
+  /**
+  * Data member that stores cell data. The format is as follows:
+  * std::string stores identified
+  * std::map<int, double> stores cell_id and value for the given identifier.
+  */
+  std::map< std::string, std::map<int,double> > field_data;
+  
   /**
    * Store address of the triangulation to be fed with the data read in.
    */

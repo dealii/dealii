@@ -340,139 +340,181 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       for (unsigned int i = 0; i < n_ints; ++i)
         in >> tmp_int;
 
-      // Ignore everything up to CELL_DATA
-      while (in >> keyword)
-        if (keyword == "CELL_DATA")
+      /////////////////////Processing the CELL_DATA
+      /// section////////////////////////
+      in >> keyword;
+
+      AssertThrow(
+        keyword == "CELL_DATA",
+        ExcMessage(std::string(
+          "While reading VTK file, missing CELL_DATA section. Found <" +  
+          keyword + "> instead.")));
+      
+      unsigned int n_ids;
+      in >> n_ids;
+      
+      AssertThrow(n_ids == n_geometric_objects,
+                  ExcMessage("The VTK reader found a CELL_DATA statement "
+                  "that lists a total of " + Utilities::int_to_string(n_ids) +
+                  " cell data objects, but this needs to equal the number of cells (which is " +
+                  Utilities::int_to_string(cells.size()) + ") plus the number of quads (" +
+                  Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                  " in 3d or the number of lines (" + Utilities::int_to_string(
+                    subcelldata.boundary_lines.size()) + ") in 2d."));
+      
+      const std::vector<std::string> data_sets{"MaterialID", "ManifoldID"};
+      
+      in >> keyword;
+      
+      for (unsigned int i = 0; i < data_sets.size(); ++i)
+      { 
+        if (keyword == "SCALARS")
+          {          
+          // Now see if we know about this type of data set,
+          // if not, just ignore everything till the next SCALARS
+          // keyword
+          std::string set = "";
+          in >> keyword;
+          for (const auto &set_cmp : data_sets)
           {
-            unsigned int n_ids;
-            in >> n_ids;
-
-            AssertThrow(n_ids == n_geometric_objects,
-                        ExcMessage("The VTK reader found a CELL_DATA statement "
-                                   "that lists a total of " +
-                                   Utilities::int_to_string(n_ids) +
-                                   " cell data objects, but this needs to "
-                                   "equal the number of cells (which is " +
-                                   Utilities::int_to_string(cells.size()) +
-                                   ") plus the number of quads (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_quads.size()) +
-                                   " in 3d or the number of lines (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_lines.size()) +
-                                   ") in 2d."));
-
-            const std::vector<std::string> data_sets{"MaterialID",
-                                                     "ManifoldID"};
-
-            for (unsigned int i = 0; i < data_sets.size(); ++i)
-              {
-                // Ignore everything until we get to a SCALARS data set
-                while (in >> keyword)
-                  if (keyword == "SCALARS")
-                    {
-                      // Now see if we know about this type of data set,
-                      // if not, just ignore everything till the next SCALARS
-                      // keyword
-                      std::string set = "";
-                      in >> keyword;
-                      for (const auto &set_cmp : data_sets)
-                        if (keyword == set_cmp)
-                          {
-                            set = keyword;
-                            break;
-                          }
-                      if (set.empty())
-                        // keep ignoring everything until the next SCALARS
-                        // keyword
-                        continue;
-
-                      // Now we got somewhere. Proceed from here.
-                      // Ignore everything till the end of the line.
-                      // SCALARS MaterialID 1
-                      // (the last number is optional)
-                      in.ignore(256, '\n');
-
-                      in >> keyword;
-                      AssertThrow(
-                        keyword == "LOOKUP_TABLE",
-                        ExcMessage(
-                          "While reading VTK file, missing keyword LOOKUP_TABLE"));
-
-                      in >> keyword;
-                      AssertThrow(
-                        keyword == "default",
-                        ExcMessage(
-                          "While reading VTK file, missing keyword default"));
-
-                      // read material or manifold ids first for all cells,
-                      // then for all faces, and finally for all lines. the
-                      // assumption that cells come before all faces and
-                      // lines has been verified above via an assertion, so
-                      // the order used in the following blocks makes sense
-                      for (unsigned int i = 0; i < cells.size(); i++)
-                        {
-                          double id;
-                          in >> id;
-                          if (set == "MaterialID")
-                            cells[i].material_id =
-                              static_cast<types::material_id>(id);
-                          else if (set == "ManifoldID")
-                            cells[i].manifold_id =
-                              static_cast<types::manifold_id>(id);
-                          else
-                            Assert(false, ExcInternalError());
-                        }
-
-                      if (dim == 3)
-                        {
-                          for (auto &boundary_quad : subcelldata.boundary_quads)
-                            {
-                              double id;
-                              in >> id;
-                              if (set == "MaterialID")
-                                boundary_quad.material_id =
-                                  static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
-                                boundary_quad.manifold_id =
-                                  static_cast<types::manifold_id>(id);
-                              else
-                                Assert(false, ExcInternalError());
-                            }
-                          for (auto &boundary_line : subcelldata.boundary_lines)
-                            {
-                              double id;
-                              in >> id;
-                              if (set == "MaterialID")
-                                boundary_line.material_id =
-                                  static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
-                                boundary_line.manifold_id =
-                                  static_cast<types::manifold_id>(id);
-                              else
-                                Assert(false, ExcInternalError());
-                            }
-                        }
-                      else if (dim == 2)
-                        {
-                          for (auto &boundary_line : subcelldata.boundary_lines)
-                            {
-                              double id;
-                              in >> id;
-                              if (set == "MaterialID")
-                                boundary_line.material_id =
-                                  static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
-                                boundary_line.manifold_id =
-                                  static_cast<types::manifold_id>(id);
-                              else
-                                Assert(false, ExcInternalError());
-                            }
-                        }
-                    }
-              }
+            if (keyword == set_cmp)
+            {
+              set = keyword;
+              break;           
+            }
           }
+          if (set.empty())
+              // keep ignoring everything until the next SCALARS
+              // keyword
+              continue;
+            
+            // Now we got somewhere. Proceed from here.
+            // Ignore everything till the end of the line. SCALARS MaterialID 1
+            // (the last number is optional)
+            in.ignore(256, '\n');
+            
+            in >> keyword;
+            AssertThrow(
+              keyword == "LOOKUP_TABLE",
+              ExcMessage(
+                "While reading VTK file, missing keyword LOOKUP_TABLE"));
+            
+            in >> keyword;
+            AssertThrow(
+              keyword == "default",
+              ExcMessage("While reading VTK file, missing keyword default"));
+            
+            // read material or manifold ids first for all cells,
+            // then for all faces, and finally for all lines. the
+            // assumption that cells come before all faces and
+            // lines has been verified above via an assertion, so
+            // the order used in the following blocks makes sense
+            for (unsigned int i = 0; i < cells.size(); i++)
+            {
+              double id;
+              in >> id;
+              if (set == "MaterialID")
+                cells[i].material_id =
+                static_cast<types::material_id>(id);
+              else if (set == "ManifoldID")
+                cells[i].manifold_id =
+                static_cast<types::manifold_id>(id);
+              else
+                Assert(false, ExcInternalError());
+              
+            }
+            if (dim == 3)
+            {
+              for (auto &boundary_quad : subcelldata.boundary_quads)
+              {
+                double id;
+                in >> id;
+                if (set == "MaterialID")
+                  boundary_quad.material_id = static_cast<types::material_id>(id);
+                else if (set == "ManifoldID")
+                  boundary_quad.manifold_id = static_cast<types::manifold_id>(id);
+                else
+                  Assert(false, ExcInternalError());             
+              }
+              for (auto &boundary_line : subcelldata.boundary_lines)
+              {
+                double id;
+                in >> id;
+                if (set == "MaterialID")
+                  boundary_line.material_id = static_cast<types::material_id>(id);
+                else if (set == "ManifoldID")
+                  boundary_line.manifold_id = static_cast<types::manifold_id>(id);
+                else
+                  Assert(false, ExcInternalError());
+              }
+            }
+            else if (dim == 2)
+            {
+              for (auto &boundary_line : subcelldata.boundary_lines)
+              {
+                double id;
+                in >> id;
+                if (set == "MaterialID")
+                  boundary_line.material_id = static_cast<types::material_id>(id);
+                else if (set == "ManifoldID")
+                  boundary_line.manifold_id = static_cast<types::manifold_id>(id);
+                else
+                  Assert(false, ExcInternalError());             
+              }
+            }
+            in >> keyword;
+        }
+      }
+      
+      //////////////////
+      //// Addition of FIELD DATA:
+      //////////////////      
+      if(keyword == "FIELD")
+      {
+        std::cout<<std::endl<<"Processing FIELD_DATA...."<<std::endl;
+        unsigned int no_fields;
+        /*char word[10];                                     //FieldData in the Field Section
+        in>>word;
+        */
+       in>>keyword;
+        AssertThrow(
+          keyword == "FieldData",
+          ExcMessage("While reading VTK file, missing keyword FieldData"));
+        
+        //if (strcmp(word,"FieldData")==0)
+          in>>no_fields;
+        
+        for(unsigned int i = 0;i < no_fields;i++)
+        {
+          std::string section_name;
+          std::string data_type;
+          unsigned int temp,n_ids;
+          double data;
+          in>>section_name;
+          in>>temp;
+          in>>n_ids;
+          AssertThrow(n_ids == n_geometric_objects,
+                        ExcMessage("The VTK reader found a FIELD statement "
+                        "that lists a total of " + Utilities::int_to_string(n_ids) +
+                        " cell data objects, but this needs to equal the number of cells (which is " +
+                        Utilities::int_to_string(cells.size()) + ") plus the number of quads (" +
+                        Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                        " in 3d or the number of lines (" + Utilities::int_to_string(
+                          subcelldata.boundary_lines.size()) + ") in 2d."));
+          in>>data_type;
+          std::map<int,double> temp_data;
+          for (unsigned int j=0;j<n_ids;j++)
+          {
+            in>>data;
+            if (j<cells.size())
+              temp_data[j]=data;
+          }
+          this->field_data[section_name]=temp_data;
+        }
+      }
+      std::cout<<std::endl<<"Processing FIELD section complete."<<std::endl;
 
+      //////////////////
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
