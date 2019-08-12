@@ -1,2 +1,3 @@
-New: Added frobenius_norm method to BlockMatrixBase.
+New: Added BlockMatrixBase::frobenius_norm().
+<br>
 (Jonathan Robey, 2019/08/06)
