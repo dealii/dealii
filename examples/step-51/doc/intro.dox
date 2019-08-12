@@ -33,9 +33,9 @@ by Cockburn and co-workers (see the references in the recent HDG overview
 article by Nguyen and Peraire @cite Ngu2012).
 
 The HDG method achieves this goal by formulating the mathematical problem using
-Dirichlet-to-Neumann mappings.  The partial diffeirential equations are first
-written as a first order system, and each field is then discretized via a DG 
-method.  At this point, the  single-valued "trace" values on the skeleton of the
+Dirichlet-to-Neumann mappings.  The partial differential equations are first
+written as a first order system, and each field is then discretized via a DG
+method.  At this point, the single-valued "trace" values on the skeleton of the
 mesh, i.e., element faces, are taken to be independent unknown quantities.
 This yields unknowns in the discrete formulation that fall into two categories:
 - Face unknowns that only couple with the cell unknowns from both sides of the face;
@@ -93,9 +93,9 @@ matrix $A$ element by element (the local solution of the Dirichlet
 problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann
 map concept hence correspond to
 <ol>
-  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hands
-side $G - C A^{-1} F$  <i>locally on each cell</i>
-and inserting the contribution into the global trace matrix in the usual way,
+  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand
+    side $G - C A^{-1} F$  <i>locally on each cell</i>
+    and inserting the contribution into the global trace matrix in the usual way,
   <li> solving the Schur complement system for $\Lambda$, and
   <li> solving for $U$ using the second equation, given $\Lambda$.
 </ol>
