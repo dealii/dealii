@@ -663,6 +663,8 @@ public:
 
 
   DeclException0(ExcGmshNoCellInformation);
+  
+  std::map<std::string,std::map<int,double>> field_data;
 
 protected:
   /**

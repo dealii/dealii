@@ -341,7 +341,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         in >> tmp_int;
 
       // Ignore everything up to CELL_DATA
-      while (in >> keyword)
+      while (keyword != "CELL_DATA")          
+          in >> keyword;
+          
         if (keyword == "CELL_DATA")
           {
             unsigned int n_ids;
@@ -368,7 +370,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
             for (unsigned int i = 0; i < data_sets.size(); ++i)
               {
                 // Ignore everything until we get to a SCALARS data set
-                while (in >> keyword)
+                while (keyword != "SCALARS")
+                    in >> keyword;
+                
                   if (keyword == "SCALARS")
                     {
                       // Now see if we know about this type of data set,
@@ -473,6 +477,58 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               }
           }
 
+        //////////////////
+        //// Addition of FIELD DATA:
+        //////////////////
+        in>>keyword;
+        if (keyword=="FIELD")
+        {
+            std::cout<<std::endl<<"Processing FIELD_DATA...."<<std::endl;
+            int no_fields;
+            char word[10];   //FieldData in the Field Section
+            in>>word;
+            
+            AssertThrow(
+                        keyword == "FieldData",
+                        ExcMessage(
+                          "While reading VTK file, missing keyword FieldData"));
+            
+            if (strcmp(word,"FieldData")==0)
+              in>>no_fields;
+
+            
+            for(unsigned int i = 0;i < no_fields;i++)
+            {
+              std::string section_name;
+              std::string data_type;
+              int temp,n_ids;
+              double data;
+              in>>section_name;
+              in>>temp;
+              in>>n_ids;
+              AssertThrow(
+                        n_ids == cells.size(),
+                        ExcMessage(
+                          "The VTK reader found a FIELD statement "
+                                   "that lists a total of " +
+                                   Utilities::int_to_string(n_ids) +
+                                   " cell data objects, but this needs to "
+                                   "equal the number of cells (which is " +
+                                   Utilities::int_to_string(cells.size()) ));
+              in>>data_type;
+              std::map<int,double> temp_data;
+              for (unsigned int j=0;j<n_ids;j++)
+              {
+                in>>data;
+                if (j<cells.size())
+                  temp_data[j]=data;
+              }
+              this->field_data[section_name]=temp_data;
+            }
+            std::cout<<std::endl<<"Processing FIELD section complete."<<std::endl;
+        }
+
+//////////////////
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
