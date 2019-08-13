@@ -875,13 +875,13 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation in 2D or 3D with a generalized
-   * subdivided_hyper_L.
+   * subdivided hyper-L.
    *
-   * This function produces a subdivided_hyper_rectangle with dimensions given
+   * This function produces a subdivided hyper rectangle with dimensions given
    * by @p bottom_left and @p top_right, with the given number of
    * subdivisions in each direction given in the vector @p repetitions,
-   * and with a number of cells removed, given in the vector @p num_cells_to_cut.
-   * Note that @p num_cells_to_cut contains integers, meaning that its entries
+   * and with a number of cells removed, given in the vector @p n_cells_to_remove.
+   * Note that @p n_cells_to_remove contains integers, meaning that its entries
    * can be both positive and negative. A positive number denotes
    * cutting away cells in the 'positive' orientation, for example
    * left to right in the x-direction, bottom to top in
@@ -910,7 +910,7 @@ namespace GridGenerator
                      const std::vector<unsigned int> &repetitions,
                      const Point<dim> &               bottom_left,
                      const Point<dim> &               top_right,
-                     const std::vector<int> &         num_cells_to_cut);
+                     const std::vector<int> &         n_cells_to_remove);
 
   /**
    * Initialize the given Triangulation with a hypercube with a slit. In each
