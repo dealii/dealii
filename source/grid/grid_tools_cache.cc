@@ -114,7 +114,7 @@ namespace GridTools
         for (const auto &it : used_vertices)
           vertices[i++] = std::make_pair(it.second, it.first);
         used_vertices_rtree = pack_rtree(vertices);
-        update_flags = update_flags & ~update_used_vertices_rtree;
+        update_flags        = update_flags & ~update_used_vertices_rtree;
       }
     return used_vertices_rtree;
   }
