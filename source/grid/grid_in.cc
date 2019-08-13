@@ -3007,10 +3007,10 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
                         aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
 
   // If the import failed, report it
-  AssertThrow(scene, ExcMessage(importer.GetErrorString()))
+  AssertThrow(scene != nullptr, ExcMessage(importer.GetErrorString()));
 
-    AssertThrow(scene->mNumMeshes,
-                ExcMessage("Input file contains no meshes."));
+  AssertThrow(scene->mNumMeshes != 0,
+              ExcMessage("Input file contains no meshes."));
 
   AssertThrow((mesh_index == numbers::invalid_unsigned_int) ||
                 (mesh_index < scene->mNumMeshes),
