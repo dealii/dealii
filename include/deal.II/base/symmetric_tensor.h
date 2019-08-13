@@ -594,9 +594,6 @@ public:
    * <tt>symmetrize</tt> function first. If you aren't sure, it is good
    * practice to check before calling <tt>symmetrize</tt>.
    *
-   * If you want to use this function in a `constexpr` context,
-   * use symmetrize() instead.
-   *
    * Because we check for symmetry via a non-constexpr function call, you will
    * have to use the symmetrize() function in constexpr contexts instead.
    */
