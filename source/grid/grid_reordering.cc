@@ -1166,12 +1166,9 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
           ++n_negative_cells;
           std::swap(cell.vertices[1], cell.vertices[3]);
 
-          // check whether the
-          // resulting cell is now ok.
-          // if not, then the grid is
-          // seriously broken and
-          // should be sticked into the
-          // bin
+          // Check whether the resulting cell is now ok.
+          // If not, then the grid is seriously broken and
+          // we just give up.
           for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
             vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
           AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) >
@@ -1238,12 +1235,9 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
           for (unsigned int i = 0; i < 4; ++i)
             std::swap(cell.vertices[i], cell.vertices[i + 4]);
 
-          // check whether the
-          // resulting cell is now ok.
-          // if not, then the grid is
-          // seriously broken and
-          // should be sticked into the
-          // bin
+          // Check whether the resulting cell is now ok.
+          // If not, then the grid is seriously broken and
+          // we just give up.
           for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
             vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
           AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) >
