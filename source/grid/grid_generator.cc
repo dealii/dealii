@@ -2916,8 +2916,8 @@ namespace GridGenerator
                                               top_right);
     // compute the vertex of the cut step, we will cut according to the
     // location of the cartesian coordinates of the cell centers
-    std::array<double,dim> h;
-    Point<dim>          cut_step;
+    std::array<double, dim> h;
+    Point<dim>              cut_step;
     for (unsigned int d = 0; d < dim; ++d)
       {
         // mesh spacing in each direction in cartesian coordinates
