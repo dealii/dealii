@@ -59,6 +59,7 @@ SET(_unity_include_src
   polynomial.cc
   polynomials_abf.cc
   polynomials_adini.cc
+  tensor_polynomials_base.cc
   polynomials_bernstein.cc
   polynomials_bdm.cc
   polynomials_bernardi_raugel.cc
