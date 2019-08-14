@@ -168,17 +168,25 @@ main()
     constexpr double ref_init[3][3] = {{1., 2., 3.}, {0., 1., 2.}, {0., 0., 1}};
     constexpr Tensor<2, 3> ref{ref_init};
     Assert(transposed == ref, ExcInternalError());
-    DEAL_II_CONSTEXPR const auto dummy    = scalar_product(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_2  = contract<0, 0>(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_3  = double_contract<0, 0, 1, 1>(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_4  = schur_product(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_5  = a * ref;
-    DEAL_II_CONSTEXPR const auto middle   = outer_product(a, a);
-    DEAL_II_CONSTEXPR const auto dummy_6  = contract3(a, middle, a);
-    DEAL_II_CONSTEXPR const auto dummy_7  = adjugate(a);
-    DEAL_II_CONSTEXPR const auto dummy_8  = cofactor(a);
-    DEAL_II_CONSTEXPR const auto dummy_9  = l1_norm(a);
-    DEAL_II_CONSTEXPR const auto dummy_10 = linfty_norm(a);
+    DEAL_II_CONSTEXPR const auto dummy   = scalar_product(a, ref);
+    DEAL_II_CONSTEXPR const auto dummy_2 = contract<0, 0>(a, ref);
+    DEAL_II_CONSTEXPR const auto dummy_3 = double_contract<0, 0, 1, 1>(a, ref);
+    DEAL_II_CONSTEXPR const auto dummy_4 = schur_product(a, ref);
+    DEAL_II_CONSTEXPR const auto dummy_5 = a * ref;
+    DEAL_II_CONSTEXPR const auto middle  = outer_product(a, a);
+    DEAL_II_CONSTEXPR const auto dummy_6 = contract3(a, middle, a);
+    DEAL_II_CONSTEXPR const auto dummy_7 = adjugate(a);
+    DEAL_II_CONSTEXPR const auto dummy_8 = cofactor(a);
+  }
+
+  {
+    constexpr Tensor<1, 3> dummy_1;
+    constexpr Tensor<0, 3> dummy_0;
+    DEAL_II_CONSTEXPR auto product_result = dummy_1 * dummy_1;
+    DEAL_II_CONSTEXPR auto constraction_result =
+      contract<0, 0>(dummy_1, dummy_1);
+    DEAL_II_CONSTEXPR auto outer_product_result =
+      outer_product(dummy_0, dummy_0);
   }
 
   deallog << "OK" << std::endl;

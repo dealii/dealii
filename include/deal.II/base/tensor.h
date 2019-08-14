@@ -2491,8 +2491,8 @@ cofactor(const Tensor<2, dim, Number> &t)
  * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>
-inline DEAL_II_CONSTEXPR Number
-                         l1_norm(const Tensor<2, dim, Number> &t)
+inline Number
+l1_norm(const Tensor<2, dim, Number> &t)
 {
   Number max = internal::NumberType<Number>::value(0.0);
   for (unsigned int j = 0; j < dim; ++j)
@@ -2517,8 +2517,8 @@ inline DEAL_II_CONSTEXPR Number
  * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>
-inline DEAL_II_CONSTEXPR Number
-                         linfty_norm(const Tensor<2, dim, Number> &t)
+inline Number
+linfty_norm(const Tensor<2, dim, Number> &t)
 {
   Number max = internal::NumberType<Number>::value(0.0);
   for (unsigned int i = 0; i < dim; ++i)
