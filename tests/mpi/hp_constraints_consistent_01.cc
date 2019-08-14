@@ -18,7 +18,7 @@
 // Check whether chains of constraints traverse over dofs on faces,
 // and if this is an issue in parallel applications.
 //
-// Domain in 2D/3D with no normal flux constraints on the boundary:
+// Domain in 2D/3D:
 //           +---------+
 //           |         |
 //           | FE_Q(1) |
@@ -29,6 +29,8 @@
 // |         |         |         |
 // +---------+---------+---------+
 
+
+#include <deal.II/base/geometry_info.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -55,8 +57,7 @@ template <int dim>
 void
 test(const unsigned int degree_center,
      const unsigned int degree_other,
-     const bool         enable_no_flux_constraints = false,
-     const bool         print_constraints          = false)
+     const bool         print_constraints = false)
 {
   Assert(dim > 1, ExcNotImplemented());
 
@@ -80,14 +81,14 @@ test(const unsigned int degree_center,
   // prepare DoFHandler
   hp::DoFHandler<dim> dh(tria);
 
-  // center cell has ID 0
   const auto &center = dh.begin_active();
-  if (center->is_locally_owned() && center->id().to_string() == "0_0:")
+  if (center->is_locally_owned() &&
+      center->id().to_string() == "0_0:") // center cell has ID 0
     {
       center->set_active_fe_index(1);
 
 #ifdef DEBUG
-      // verify if our scenario is initialized correctly
+      // verify that our scenario is initialized correctly
       // by checking the number of neighbors of the center cell
       unsigned int n_neighbors = 0;
       for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
@@ -109,13 +110,6 @@ test(const unsigned int degree_center,
   constraints.reinit(locally_relevant_dofs);
 
   DoFTools::make_hanging_node_constraints(dh, constraints);
-
-  if (enable_no_flux_constraints)
-    VectorTools::compute_no_normal_flux_constraints(
-      dh,
-      0, /*first component*/
-      std::set<types::boundary_id>{0},
-      constraints);
 
   constraints.close();
 
@@ -147,20 +141,10 @@ main(int argc, char *argv[])
   MPILogInitAll                    log;
 
   deallog.push("2d");
-  deallog.push("hanging_nodes");
-  test<2>(2, 1, false);
-  deallog.pop();
-  deallog.push("hanging_nodes+no_flux");
-  test<2>(2, 1, true);
-  deallog.pop();
+  test<2>(2, 1);
   deallog.pop();
 
   deallog.push("3d");
-  deallog.push("hanging_nodes");
-  test<3>(2, 1, false);
-  deallog.pop();
-  deallog.push("hanging_nodes+no_flux");
-  test<3>(2, 1, true);
-  deallog.pop();
+  test<3>(2, 1);
   deallog.pop();
 }
