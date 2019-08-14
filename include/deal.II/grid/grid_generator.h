@@ -977,11 +977,11 @@ namespace GridGenerator
    * Here, the number <tt>n_cells</tt> of elements has the same meaning as in
    * GridGenerator::hyper_shell.
    *
-   * The grids with 12 initial cells and 3 levels of global refinement are
-   * plotted below:
+   * The grids with a 30% offset of the inner shell in the x direction, 12
+   * initial cells and 3 levels of global refinement are plotted below:
    *
    * @image html eccentric_hyper_shell_2D.png
-   * @image html eccentric_hyper_shell_2D.png
+   * @image html eccentric_hyper_shell_3D.png
    *
    * @note Because it uses the definition of the hyper shell, this function is
    * declared to exist for triangulations of all space dimensions, but throws an
