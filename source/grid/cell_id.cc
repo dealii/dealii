@@ -158,9 +158,8 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 CellId::to_cell(const Triangulation<dim, spacedim> &tria) const
 {
-  typename Triangulation<dim, spacedim>::cell_iterator cell(&tria,
-                                                            0,
-                                                            coarse_cell_id);
+  typename Triangulation<dim, spacedim>::cell_iterator cell(
+    &tria, 0, tria.coarse_cell_id_to_coarse_cell_index(coarse_cell_id));
 
   for (unsigned int i = 0; i < n_child_indices; ++i)
     cell = cell->child(static_cast<unsigned int>(child_indices[i]));

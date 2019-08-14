@@ -2179,7 +2179,9 @@ CellAccessor<dim, spacedim>::id() const
   Assert(ptr.level() == 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
-  return {coarse_index, n_child_indices, id.data()};
+  return {this->tria->coarse_cell_index_to_coarse_cell_id(coarse_index),
+          n_child_indices,
+          id.data()};
 }
 
 

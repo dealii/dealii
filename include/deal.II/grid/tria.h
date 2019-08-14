@@ -3502,7 +3502,7 @@ public:
    * Translate the index of coarse cell to its unique id.
    *
    * @note: See the note of the method
-   * translate_coarse_cell_id_to_coarse_cell_index().
+   * coarse_cell_id_to_coarse_cell_index().
    *
    * @param coarse_cell_index Index of the coarse cell.
    * @return Id of the coarse cell.
