@@ -2733,6 +2733,14 @@ public:
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
   face(const unsigned int i) const;
 
+
+  /**
+   * Return an array of iterators to all faces of this cell.
+   */
+  std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+             GeometryInfo<dim>::faces_per_cell>
+  face_iterators() const;
+
   /**
    * Return the (global) index of the @p ith face of this cell.
    *

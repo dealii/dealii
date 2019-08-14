@@ -3174,6 +3174,24 @@ CellAccessor<dim, spacedim>::face(const unsigned int i) const
 
 
 template <int dim, int spacedim>
+inline std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+                  GeometryInfo<dim>::faces_per_cell>
+CellAccessor<dim, spacedim>::face_iterators() const
+{
+  std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+             GeometryInfo<dim>::faces_per_cell>
+    face_iterators;
+
+  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    face_iterators[i] =
+      dealii::internal::CellAccessorImplementation::get_face(*this, i);
+
+  return face_iterators;
+}
+
+
+
+template <int dim, int spacedim>
 inline unsigned int
 CellAccessor<dim, spacedim>::face_index(const unsigned int i) const
 {
