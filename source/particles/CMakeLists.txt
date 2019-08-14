@@ -21,6 +21,7 @@ SET(_src
   particle_accessor.cc
   particle_iterator.cc
   particle_handler.cc
+  particle_generator.cc
   property_pool.cc
   )
 
@@ -29,6 +30,7 @@ SET(_inst
   particle_accessor.inst.in
   particle_iterator.inst.in
   particle_handler.inst.in
+  particle_generator.inst.in
   )
 
 FILE(GLOB _header
