@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
-  namespace internal
+  namespace
   {
     template <int dim, int spacedim>
     std::vector<char>
@@ -73,7 +73,7 @@ namespace Particles
 
       while (data < &(*data_range.end()))
         {
-          particles.push_back(Particle<dim, spacedim>(data, &property_pool));
+          particles.emplace_back(data, &property_pool);
         }
 
       Assert(
@@ -85,7 +85,7 @@ namespace Particles
 
       return particles;
     }
-  } // namespace internal
+  } // namespace
 
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler()
@@ -1241,7 +1241,7 @@ namespace Particles
           break;
       }
 
-    return internal::pack_particles(stored_particles_on_cell);
+    return pack_particles(stored_particles_on_cell);
   }
 
   template <int dim, int spacedim>
@@ -1254,7 +1254,7 @@ namespace Particles
     // We leave this container non-const to be able to `std::move`
     // its contents directly into the particles multimap later.
     std::vector<Particle<dim, spacedim>> loaded_particles_on_cell =
-      internal::unpack_particles<dim, spacedim>(data_range, *property_pool);
+      unpack_particles<dim, spacedim>(data_range, *property_pool);
 
     // Update the reference to the current property pool for all particles.
     // This was not stored, because they might be transported across process
