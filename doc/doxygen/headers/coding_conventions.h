@@ -53,7 +53,7 @@ in whatever directory you set up the library to be compiled in, to indent all
 source files that have been changed recently. If you want to make sure that
 the indenting is correct for all your commits, you might want to set up a
 pre-commit hook. One way to do so, is to copy
-<code>\${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
+<code>\${SOURCE_DIR}/contrib/git-hooks/pre-commit</code> to
 <code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
 </p>
