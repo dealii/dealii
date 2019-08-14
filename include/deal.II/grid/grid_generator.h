@@ -958,6 +958,40 @@ namespace GridGenerator
               bool                colorize = false);
 
   /**
+   * Produce an eccentric hyper-shell, the region between two spheres centered
+   * on two distinct center points. One has to specify the <tt>inner_center</tt>
+   * and <tt>outer_center</tt>, with given <tt>inner_radius</tt> and
+   * <tt>outer_radius</tt>. The number <tt>n_cells</tt> indicates the number of
+   * cells of the resulting triangulation, i.e., how many cells form the ring
+   * (in 2d) or the shell (in 3d).
+   *
+   * By default, the outer boundary has the indicator 1 while the inner boundary
+   * has id 0. In 3d, this applies to both the faces and the edges of these
+   * boundaries.
+   *
+   * A SphericalManifold is attached to the outer boundary with an id of 1 while
+   * another SphericalManifold is attached to the inner boundary with an id of
+   * 0. A TransfiniteInterpolationManifold is attached to all other cells and
+   * faces of the triangulation with an id of 2.
+   *
+   * Here, the number <tt>n_cells</tt> of elements has the same meaning as in
+   * GridGenerator::hyper_shell.
+   *
+   * @note This function is declared to exist for triangulations of all space
+   * dimensions, but throws an error if called in 1d.
+   *
+   * @note The triangulation passed as argument needs to be empty when calling this function.
+   */
+  template <int dim>
+  void
+  eccentric_hyper_shell(Triangulation<dim> &triangulation,
+                        const Point<dim> &  inner_center,
+                        const Point<dim> &  outer_center,
+                        const double        inner_radius,
+                        const double        outer_radius,
+                        const unsigned int  n_cells);
+
+  /**
    * Produce a half hyper-shell, i.e. the space between two circles in two
    * space dimensions and the region between two spheres in 3d, with given
    * inner and outer radius and a given number of elements for this initial
