@@ -2100,8 +2100,10 @@ BlockVectorBase<VectorType>::operator/=(const value_type factor)
   AssertIsFinite(factor);
   Assert(factor != 0., ExcDivideByZero());
 
+  const value_type inverse_factor = value_type(1.) / factor;
+
   for (size_type i = 0; i < n_blocks(); ++i)
-    components[i] /= factor;
+    components[i] *= inverse_factor;
 
   return *this;
 }

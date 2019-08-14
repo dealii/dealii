@@ -37,7 +37,7 @@ struct ProductType;
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>, std::complex<U>>::type inline
+inline typename ProductType<std::complex<T>, std::complex<U>>::type
 operator*(const std::complex<T> &left, const std::complex<U> &right)
 {
   using result_type =
@@ -45,6 +45,21 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
   return static_cast<result_type>(left) * static_cast<result_type>(right);
 }
 
+/**
+ * Provide an <tt>operator/</tt> that operates on mixed complex floating point
+ * types. Annoyingly, the standard library does not provide such an
+ * operator...
+ *
+ * @relatesalso ProductType
+ */
+template <typename T, typename U>
+inline typename ProductType<std::complex<T>, std::complex<U>>::type
+operator/(const std::complex<T> &left, const std::complex<U> &right)
+{
+  using result_type =
+    typename ProductType<std::complex<T>, std::complex<U>>::type;
+  return static_cast<result_type>(left) / static_cast<result_type>(right);
+}
 
 /**
  * Provide an <tt>operator*</tt> for a scalar multiplication of a complex
@@ -55,14 +70,30 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<std::complex<T>,
-                     typename EnableIfScalar<U>::type>::type inline
-operator*(const std::complex<T> &left, const U &right)
+inline
+  typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
+  operator*(const std::complex<T> &left, const U &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) * static_cast<result_type>(right);
 }
 
+/**
+ * Provide an <tt>operator/</tt> for a scalar division of a complex
+ * floating point type with a different real floating point type. Annoyingly,
+ * the standard library does not provide such an operator...
+ *
+ * @relatesalso EnableIfScalar
+ * @relatesalso ProductType
+ */
+template <typename T, typename U>
+inline
+  typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
+  operator/(const std::complex<T> &left, const U &right)
+{
+  using result_type = typename ProductType<std::complex<T>, U>::type;
+  return static_cast<result_type>(left) / static_cast<result_type>(right);
+}
 
 /**
  * Provide an <tt>operator*</tt> for a scalar multiplication of a real
@@ -73,12 +104,29 @@ operator*(const std::complex<T> &left, const U &right)
  * @relatesalso ProductType
  */
 template <typename T, typename U>
-typename ProductType<typename EnableIfScalar<T>::type,
-                     std::complex<U>>::type inline
-operator*(const T &left, const std::complex<U> &right)
+inline
+  typename ProductType<typename EnableIfScalar<T>::type, std::complex<U>>::type
+  operator*(const T &left, const std::complex<U> &right)
 {
   using result_type = typename ProductType<std::complex<T>, U>::type;
   return static_cast<result_type>(left) * static_cast<result_type>(right);
+}
+
+/**
+ * Provide an <tt>operator/</tt> for a scalar division of a real
+ * floating point type with a different complex floating point type.
+ * Annoyingly, the standard library does not provide such an operator...
+ *
+ * @relatesalso EnableIfScalar
+ * @relatesalso ProductType
+ */
+template <typename T, typename U>
+inline
+  typename ProductType<typename EnableIfScalar<T>::type, std::complex<U>>::type
+  operator/(const T &left, const std::complex<U> &right)
+{
+  using result_type = typename ProductType<std::complex<T>, U>::type;
+  return static_cast<result_type>(left) / static_cast<result_type>(right);
 }
 #endif /* DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS */
 

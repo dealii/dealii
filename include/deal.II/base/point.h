@@ -568,10 +568,12 @@ inline DEAL_II_CUDA_HOST_DEV
                              typename EnableIfScalar<OtherNumber>::type>::type>
   Point<dim, Number>::operator/(const OtherNumber factor) const
 {
-  Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = this->operator[](i) / factor;
-  return tmp;
+  const Tensor<1, dim, Number> &base_object = *this;
+  return Point<
+    dim,
+    typename ProductType<Number,
+                         typename EnableIfScalar<OtherNumber>::type>::type>(
+    dealii::operator/(base_object, factor));
 }
 
 
