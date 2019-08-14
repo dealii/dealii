@@ -3462,7 +3462,7 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A =
+                    const DerivativeForm<1, spacedim, dim> A =
                       apply_transformation(data.contravariant[i],
                                            transpose(input[i]));
                     output[i] =
@@ -3482,7 +3482,7 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A =
+                    const DerivativeForm<1, spacedim, dim> A =
                       apply_transformation(data.covariant[i],
                                            transpose(input[i]));
                     output[i] =
@@ -3510,9 +3510,9 @@ namespace internal
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
-                    DerivativeForm<1, spacedim, dim> A =
+                    const DerivativeForm<1, spacedim, dim> A =
                       apply_transformation(data.covariant[i], input[i]);
-                    Tensor<2, spacedim> T =
+                    const Tensor<2, spacedim> T =
                       apply_transformation(data.contravariant[i],
                                            A.transpose());
 
