@@ -40,7 +40,7 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  std::map<typename Triangulation<dim, spacedim>::face_iterator, double> mymap;
+  std::map<typename Triangulation<dim, spacedim>::face_iterator, int> mymap;
 
   for (auto &cell : tria.active_cell_iterators())
     {
