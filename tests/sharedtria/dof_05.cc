@@ -73,12 +73,10 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
       if (cell->subdomain_id() == numbers::artificial_subdomain_id)
         continue;
 
-      typename Triangulation<dim>::active_cell_iterator tria_shared_cell =
-        cell->id().to_cell(shared_dof_handler.get_triangulation());
       typename DoFHandler<dim>::active_cell_iterator dof_shared_cell(
         &shared_dof_handler.get_triangulation(),
-        tria_shared_cell->level(),
-        tria_shared_cell->index(),
+        cell->level(),
+        cell->index(),
         &shared_dof_handler);
 
       std::vector<types::global_dof_index> distributed_cell_dofs(

@@ -1221,6 +1221,16 @@ namespace parallel
       std::vector<bool>
       mark_locally_active_vertices_on_level(const int level) const;
 
+      virtual unsigned int
+      coarse_cell_id_to_coarse_cell_index(
+        const types::coarse_cell_id coarse_cell_id) const override;
+
+      virtual types::coarse_cell_id
+      coarse_cell_index_to_coarse_cell_id(
+        const unsigned int coarse_cell_index) const override;
+
+
+
       template <typename>
       friend class dealii::internal::DoFHandlerImplementation::Policy::
         ParallelDistributed;
@@ -1388,6 +1398,14 @@ namespace parallel
        */
       virtual std::vector<bool>
       mark_locally_active_vertices_on_level(const unsigned int level) const;
+
+      virtual unsigned int
+      coarse_cell_id_to_coarse_cell_index(
+        const types::coarse_cell_id coarse_cell_id) const override;
+
+      virtual types::coarse_cell_id
+      coarse_cell_index_to_coarse_cell_id(
+        const unsigned int coarse_cell_index) const override;
     };
   } // namespace distributed
 } // namespace parallel
