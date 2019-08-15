@@ -517,7 +517,7 @@ namespace Differentiation
        * to that of the @p rhs object.
        */
       Expression &
-      operator=(Expression &&rhs);
+      operator=(Expression &&rhs) noexcept;
 
       /**
        * Addition assignment.

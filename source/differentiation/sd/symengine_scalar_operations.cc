@@ -239,7 +239,7 @@ namespace Differentiation
                 }
 
               // Compute and store the hash of the new object
-              hash_old = std::move(hash_new);
+              hash_old = hash_new;
               hash_new = out.get_RCP()->hash();
               AssertThrow(
                 iter < size,
