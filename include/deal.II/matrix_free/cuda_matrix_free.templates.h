@@ -540,7 +540,7 @@ namespace CUDAWrappers
                                   const DoFHandler<dim> &          dof_handler,
                                   const AffineConstraints<Number> &constraints,
                                   const Quadrature<1> &            quad,
-                                  const AdditionalData additional_data)
+                                  const AdditionalData &additional_data)
   {
     const auto &triangulation = dof_handler.get_triangulation();
     if (const auto parallel_triangulation =
@@ -564,7 +564,7 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::reinit(const DoFHandler<dim> &          dof_handler,
                                   const AffineConstraints<Number> &constraints,
                                   const Quadrature<1> &            quad,
-                                  const AdditionalData additional_data)
+                                  const AdditionalData &additional_data)
   {
     reinit(StaticMappingQ1<dim>::mapping,
            dof_handler,

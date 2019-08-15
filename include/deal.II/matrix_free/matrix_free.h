@@ -501,7 +501,7 @@ public:
          const DoFHandlerType &            dof_handler,
          const AffineConstraints<number2> &constraint,
          const QuadratureType &            quad,
-         const AdditionalData              additional_data = AdditionalData());
+         const AdditionalData &            additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but using a $Q_1$
@@ -512,7 +512,7 @@ public:
   reinit(const DoFHandlerType &            dof_handler,
          const AffineConstraints<number2> &constraint,
          const QuadratureType &            quad,
-         const AdditionalData              additional_data = AdditionalData());
+         const AdditionalData &            additional_data = AdditionalData());
 
   /**
    * Same as above.
@@ -528,7 +528,7 @@ public:
          const AffineConstraints<number2> &constraint,
          const IndexSet &                  locally_owned_dofs,
          const QuadratureType &            quad,
-         const AdditionalData              additional_data = AdditionalData());
+         const AdditionalData &            additional_data = AdditionalData());
 
   /**
    * Extracts the information needed to perform loops over cells. The
@@ -557,7 +557,7 @@ public:
          const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
-         const AdditionalData additional_data = AdditionalData());
+         const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
@@ -568,7 +568,7 @@ public:
   reinit(const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
-         const AdditionalData additional_data = AdditionalData());
+         const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Same as above.
@@ -584,7 +584,7 @@ public:
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<IndexSet> &      locally_owned_set,
          const std::vector<QuadratureType> &quad,
-         const AdditionalData               additional_data = AdditionalData());
+         const AdditionalData &             additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as before, but now the index set
@@ -599,7 +599,7 @@ public:
          const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,
-         const AdditionalData additional_data = AdditionalData());
+         const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
@@ -610,7 +610,7 @@ public:
   reinit(const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,
-         const AdditionalData additional_data = AdditionalData());
+         const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Copy function. Creates a deep copy of all data structures. It is usually
@@ -2458,7 +2458,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const AffineConstraints<number2> &constraints_in,
   const QuadratureType &            quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<const DoFHandlerType *>             dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
@@ -2494,7 +2494,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const AffineConstraints<number2> &constraints_in,
   const QuadratureType &            quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<const DoFHandlerType *>             dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
@@ -2527,7 +2527,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2553,7 +2553,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2579,7 +2579,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const QuadratureType &                                 quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2605,7 +2605,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<QuadratureType> &                    quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
@@ -2633,7 +2633,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const std::vector<IndexSet> &                          locally_owned_set,
   const std::vector<QuadratureType> &                    quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    additional_data)
+    &additional_data)
 {
   // find out whether we use a hp Quadrature or a standard quadrature
   std::vector<hp::QCollection<1>> quad_hp;
