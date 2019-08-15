@@ -48,27 +48,20 @@ namespace Particles
 
       types::particle_index particle_index = local_start_index;
 
-      typename Triangulation<dim, spacedim>::active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
-
-      for (; cell != endc; cell++)
+      for (const auto &cell : triangulation.active_cell_iterators())
         {
           if (cell->is_locally_owned())
             {
-              for (typename std::vector<Point<dim>>::const_iterator
-                     itr_particles_in_unit_cell =
-                       particle_reference_locations.begin();
-                   itr_particles_in_unit_cell !=
-                   particle_reference_locations.end();
-                   itr_particles_in_unit_cell++)
+              for (const auto &reference_location :
+                   particle_reference_locations)
                 {
                   const Point<spacedim> position_real =
-                    mapping.transform_unit_to_real_cell(
-                      cell, *itr_particles_in_unit_cell);
+                    mapping.transform_unit_to_real_cell(cell,
+                                                        reference_location);
 
-                  const Particle<dim, spacedim> particle(
-                    position_real, *itr_particles_in_unit_cell, particle_index);
+                  const Particle<dim, spacedim> particle(position_real,
+                                                         reference_location,
+                                                         particle_index);
                   particle_handler.insert_particle(particle, cell);
                   ++particle_index;
                 }
