@@ -197,6 +197,15 @@ public:
              const std::vector<double> &    weights);
 
   /**
+   * Extend the given formula by an additional quadrature point.
+   *
+   * @note This function should only be used during construction of the
+   * quadrature formula.
+   */
+  void
+  push_back(const Point<dim> &point, const double weight);
+
+  /**
    * Number of quadrature points.
    */
   unsigned int

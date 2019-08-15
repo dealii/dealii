@@ -1,0 +1,10 @@
+
+DEAL::point: 1.00000
+DEAL::weight: 0.500000
+DEAL::OK
+DEAL::point: 1.00000 0.00000
+DEAL::weight: 0.500000
+DEAL::OK
+DEAL::point: 1.00000 0.00000 0.00000
+DEAL::weight: 0.500000
+DEAL::OK

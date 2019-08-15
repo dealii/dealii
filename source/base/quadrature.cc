@@ -58,6 +58,16 @@ Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
 
 
 template <int dim>
+void
+Quadrature<dim>::push_back(const Point<dim> &point, const double weight)
+{
+  quadrature_points.push_back(point);
+  weights.push_back(weight);
+}
+
+
+
+template <int dim>
 Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
                             const std::vector<double> &    weights)
   : quadrature_points(points)
