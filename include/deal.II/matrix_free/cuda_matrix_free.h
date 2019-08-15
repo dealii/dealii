@@ -175,7 +175,7 @@ namespace CUDAWrappers
            const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData             additional_data = AdditionalData());
+           const AdditionalData &           additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
@@ -184,7 +184,7 @@ namespace CUDAWrappers
     reinit(const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData             AdditionalData = AdditionalData());
+           const AdditionalData &           AdditionalData = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
