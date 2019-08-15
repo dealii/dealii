@@ -1215,7 +1215,7 @@ namespace Utilities
             boost::iostreams::filtering_ostream out;
             out.push(
               boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::best_compression)));
+                boost::iostreams::gzip::default_compression)));
             out.push(boost::iostreams::back_inserter(dest_buffer));
 
             boost::archive::binary_oarchive archive(out);
