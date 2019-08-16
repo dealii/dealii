@@ -85,7 +85,7 @@ public:
    * and the number of children of a cell in the current space dimension (i.e.,
    * GeometryInfo<dim>::max_children_per_cell).
    */
-  CellId(const unsigned int               coarse_cell_id,
+  CellId(const types::coarse_cell_id      coarse_cell_id,
          const std::vector<std::uint8_t> &child_indices);
 
   /**
@@ -99,9 +99,9 @@ public:
    * GeometryInfo<dim>::max_children_per_cell). The array
    * @p child_indices must have at least @p n_child_indices valid entries.
    */
-  CellId(const unsigned int  coarse_cell_id,
-         const unsigned int  n_child_indices,
-         const std::uint8_t *child_indices);
+  CellId(const types::coarse_cell_id coarse_cell_id,
+         const unsigned int          n_child_indices,
+         const std::uint8_t *        child_indices);
 
   /**
    * Construct a CellId object with a given binary representation that was
@@ -161,12 +161,18 @@ public:
   void
   serialize(Archive &ar, const unsigned int version);
 
+  /**
+   * Return the id of the coarse cell.
+   */
+  types::coarse_cell_id
+  get_coarse_cell_id() const;
+
 private:
   /**
    * The number of the coarse cell within whose tree the cell
    * represented by the current object is located.
    */
-  unsigned int coarse_cell_id;
+  types::coarse_cell_id coarse_cell_id;
 
   /**
    * The number of child indices stored in the child_indices array. This is
@@ -307,6 +313,14 @@ CellId::operator<(const CellId &other) const
     return false;
   return true; // other.id is longer
 }
+
+
+inline types::coarse_cell_id
+CellId::get_coarse_cell_id() const
+{
+  return coarse_cell_id;
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

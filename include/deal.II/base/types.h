@@ -95,6 +95,18 @@ namespace types
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  /**
+   * The type used for coarse-cell ids.
+   */
+  using coarse_cell_id = unsigned long long int;
+#else
+  /**
+   * The type used for coarse-cell ids.
+   */
+  using coarse_cell_id = unsigned int;
+#endif
+
   /**
    * The type used to denote boundary indicators associated with every piece
    * of the boundary and, in the case of meshes that describe manifolds in
@@ -187,6 +199,12 @@ namespace numbers
    */
   const types::global_dof_index invalid_dof_index =
     static_cast<types::global_dof_index>(-1);
+
+  /**
+   * An invalid value for coarse-cell ids.
+   */
+  const types::coarse_cell_id invalid_coarse_cell_id =
+    static_cast<types::coarse_cell_id>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.
