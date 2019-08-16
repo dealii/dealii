@@ -20,7 +20,16 @@ CMakeLists.txt.user
 # temporary and backup files
 *~
 *#
+*.swp
+
+# MacOS self-generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # configuration, executable, and output files from examples
 examples/step-*/*dat
