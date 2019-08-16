@@ -317,7 +317,7 @@ namespace Differentiation
 
 
     Expression &
-    Expression::operator=(Expression &&rhs)
+    Expression::operator=(Expression &&rhs) noexcept
     {
       if (this != &rhs)
         this->expression = std::move(rhs.expression);
