@@ -834,6 +834,73 @@ namespace internal
       return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
               (coarse_grid_cell <= parallel_forest->last_local_tree));
     }
+
+
+
+    template <>
+    bool
+    quadrant_is_equal<1>(const typename types<1>::quadrant &q1,
+                         const typename types<1>::quadrant &q2)
+    {
+      return q1 == q2;
+    }
+
+
+
+    template <>
+    bool quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
+                                 types<1>::quadrant const &q2)
+    {
+      // determine level of quadrants
+      const int level_1 = (q1 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+      const int level_2 = (q2 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+
+      // q1 can be an ancestor of q2 if q1's level is smaller
+      if (level_1 >= level_2)
+        return false;
+
+      // extract path of quadrants up to level of possible ancestor q1
+      const int truncated_id_1 = (q1 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+      const int truncated_id_2 = (q2 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+
+      // compare paths
+      return truncated_id_1 == truncated_id_2;
+    }
+
+
+
+    template <>
+    void
+    init_quadrant_children<1>(
+      const typename types<1>::quadrant &q,
+      typename types<1>::quadrant (
+        &p4est_children)[dealii::GeometryInfo<1>::max_children_per_cell])
+    {
+      // determine the current level of quadrant
+      const int level_parent = (q << types<1>::max_n_child_indices_bits) >>
+                               types<1>::max_n_child_indices_bits;
+      const int level_child = level_parent + 1;
+
+      // left child: only n_child_indices has to be incremented
+      p4est_children[0] = (q + 1);
+
+      // right child: increment and set a bit to 1 indicating that it is a right
+      // child
+      p4est_children[1] = (q + 1) | (1 << (types<1>::n_bits - 1 - level_child));
+    }
+
+
+
+    template <>
+    void init_coarse_quadrant<1>(typename types<1>::quadrant &quad)
+    {
+      quad = 0;
+    }
+
   } // namespace p4est
 } // namespace internal
 
