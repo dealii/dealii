@@ -2127,7 +2127,7 @@ namespace parallel
       : // Do not check for distorted cells.
         // For multigrid, we need limit_level_difference_at_vertices
         // to make sure the transfer operators only need to consider two levels.
-      dealii::parallel::TriangulationBase<dim, spacedim>(
+      dealii::parallel::DistributedTriangulationBase<dim, spacedim>(
         mpi_communicator,
         (settings_ & construct_multigrid_hierarchy) ?
           static_cast<
@@ -2593,6 +2593,16 @@ namespace parallel
       dealii::Triangulation<dim, spacedim>::clear();
 
       this->update_number_cache();
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return settings &
+             Triangulation<dim, spacedim>::construct_multigrid_hierarchy;
     }
 
 
@@ -4967,9 +4977,10 @@ namespace parallel
       const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
         smooth_grid,
       const Settings /*settings*/)
-      : dealii::parallel::TriangulationBase<1, spacedim>(mpi_communicator,
-                                                         smooth_grid,
-                                                         false)
+      : dealii::parallel::DistributedTriangulationBase<1, spacedim>(
+          mpi_communicator,
+          smooth_grid,
+          false)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -5102,6 +5113,16 @@ namespace parallel
     Triangulation<1, spacedim>::save(const std::string &) const
     {
       Assert(false, ExcNotImplemented());
+    }
+
+
+
+    template <int spacedim>
+    bool
+    Triangulation<1, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      Assert(false, ExcNotImplemented());
+      return false;
     }
 
   } // namespace distributed

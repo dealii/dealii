@@ -246,6 +246,32 @@ namespace parallel
   template <int dim, int spacedim = dim>
   using Triangulation DEAL_II_DEPRECATED = TriangulationBase<dim, spacedim>;
 
+  /**
+   * A base class for distributed triangulations. It can be used to test
+   * (via <tt>dynamic_cast</tt>) whether a particular triangulation object
+   * is able to distribute meshes between processes.
+   */
+  template <int dim, int spacedim = dim>
+  class DistributedTriangulationBase
+    : public dealii::parallel::TriangulationBase<dim, spacedim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    DistributedTriangulationBase(
+      MPI_Comm mpi_communicator,
+      const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
+                 smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
+      const bool check_for_distorted_cells = false);
+
+    /**
+     * Return if multilevel hierarchy is supported and has been constructed.
+     */
+    virtual bool
+    is_multilevel_hierarchy_constructed() const = 0;
+  };
+
 } // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
