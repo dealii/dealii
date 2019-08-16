@@ -1,0 +1,3 @@
+New: Add an iterator over all faces of a cell(accessor).
+<br>
+(Peter Munch, Wolfgang Bangerth, Daniel Arndt, 2019/08/14)
