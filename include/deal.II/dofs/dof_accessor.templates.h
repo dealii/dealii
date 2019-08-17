@@ -1408,12 +1408,29 @@ namespace internal
       template <typename DoFHandlerType, bool level_dof_access>
       static void
       set_mg_dof_indices(
-        const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access> &,
-        const int,
-        const std::vector<types::global_dof_index> &,
-        const unsigned int)
+        const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access>
+          &                                         accessor,
+        const int                                   level,
+        const std::vector<types::global_dof_index> &dof_indices,
+        const unsigned int                          fe_index)
       {
-        AssertThrow(false, ExcNotImplemented()); // TODO[TH]: implement
+        const FiniteElement<DoFHandlerType::dimension,
+                            DoFHandlerType::space_dimension> &fe =
+          accessor.get_dof_handler().get_fe(fe_index);
+        std::vector<types::global_dof_index>::const_iterator next =
+          dof_indices.begin();
+
+        for (unsigned int vertex = 0;
+             vertex < GeometryInfo<1>::vertices_per_cell;
+             ++vertex)
+          for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+            accessor.set_mg_vertex_dof_index(
+              level, vertex, dof, *next++, fe_index);
+
+        for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+          accessor.set_mg_dof_index(level, dof, *next++);
+
+        Assert(next == dof_indices.end(), ExcInternalError());
       }
 
 
@@ -2509,18 +2526,16 @@ template <template <int, int> class DoFHandlerType,
           bool level_dof_access>
 inline void
 DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  get_mg_dof_indices(const int,
+  get_mg_dof_indices(const int                             level,
                      std::vector<types::global_dof_index> &dof_indices,
                      const unsigned int                    fe_index) const
 {
-  (void)dof_indices;
-  (void)fe_index;
-  Assert(this->dof_handler != nullptr, ExcInvalidObject());
-  Assert(dof_indices.size() ==
-           this->dof_handler->get_fe(fe_index).dofs_per_vertex,
-         ExcVectorDoesNotMatch());
+  AssertThrow(fe_index == 0, ExcMessage("Unknown triangulation!"));
 
-  Assert(false, ExcNotImplemented());
+  for (unsigned int i = 0; i < dof_indices.size(); ++i)
+    dof_indices[i] =
+      dealii::internal::DoFAccessorImplementation::Implementation::
+        mg_vertex_dof_index(*dof_handler, level, this->global_vertex_index, i);
 }
 
 

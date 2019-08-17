@@ -1,0 +1,3 @@
+New: Implement DoFAccessor::set_mg_dof_indices and get_mg_dof_indices for 1D.
+<br>
+(Peter Munch, 2019/08/18)
