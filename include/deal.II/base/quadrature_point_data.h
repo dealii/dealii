@@ -564,7 +564,7 @@ namespace parallel
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell,
   const unsigned int      n_q_points)
@@ -594,7 +594,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell_start,
   const CellIteratorType &cell_end,
@@ -608,7 +608,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
 
 
 template <typename CellIteratorType, typename DataType>
-bool
+inline bool
 CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 {
   const auto key = cell->id();
@@ -630,7 +630,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
 
 
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 CellDataStorage<CellIteratorType, DataType>::clear()
 {
   // Do not call
@@ -655,7 +655,7 @@ CellDataStorage<CellIteratorType, DataType>::clear()
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-std::vector<std::shared_ptr<T>>
+inline std::vector<std::shared_ptr<T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell)
 {
@@ -684,7 +684,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-std::vector<std::shared_ptr<const T>>
+inline std::vector<std::shared_ptr<const T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell) const
 {
@@ -720,7 +720,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
  * quadrature point in the DataType class.
  */
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 pack_cell_data(const CellIteratorType &                           cell,
                const CellDataStorage<CellIteratorType, DataType> *data_storage,
                FullMatrix<double> &                               matrix_data)
@@ -754,7 +754,7 @@ pack_cell_data(const CellIteratorType &                           cell,
  * the opposite of the pack function above.
  */
 template <typename CellIteratorType, typename DataType>
-void
+inline void
 unpack_to_cell_data(const CellIteratorType &                     cell,
                     const FullMatrix<double> &                   values_at_qp,
                     CellDataStorage<CellIteratorType, DataType> *data_storage)
@@ -787,7 +787,7 @@ namespace parallel
   namespace distributed
   {
     template <int dim, typename DataType>
-    ContinuousQuadratureDataTransfer<dim, DataType>::
+    inline ContinuousQuadratureDataTransfer<dim, DataType>::
       ContinuousQuadratureDataTransfer(const FiniteElement<dim> &projection_fe_,
                                        const Quadrature<dim> &   lhs_quadrature,
                                        const Quadrature<dim> &   rhs_quadrature)
@@ -819,7 +819,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::
       prepare_for_coarsening_and_refinement(
         parallel::distributed::Triangulation<dim> &  tr_,
@@ -867,7 +867,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::interpolate()
     {
       triangulation->notify_ready_to_unpack(
@@ -887,7 +887,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    std::vector<char>
+    inline std::vector<char>
     ContinuousQuadratureDataTransfer<dim, DataType>::pack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
@@ -907,7 +907,7 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void
+    inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
