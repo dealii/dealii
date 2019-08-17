@@ -61,8 +61,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 // forward declare Point
+#ifndef DOXYGEN
 template <int dim, typename Number>
 class Point;
+#endif
 
 /**
  * A namespace for utility functions that are not particularly specific to

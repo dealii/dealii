@@ -28,9 +28,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 class CommunicationPatternBase;
 template <typename Number>
 class ReadWriteVector;
+#  endif
 
 namespace LinearAlgebra
 {

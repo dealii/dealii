@@ -37,9 +37,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class MatrixIterator;
-
+#endif
 
 
 /*! @addtogroup Matrix1

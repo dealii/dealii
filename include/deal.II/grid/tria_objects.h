@@ -39,12 +39,15 @@ DEAL_II_NAMESPACE_OPEN
 // bool and then an integer and then a double, etc. Verify that this is
 // actually the case.
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <class Accessor>
 class TriaRawIterator;
 template <int, int, int>
 class TriaAccessor;
+#endif
 
 namespace internal
 {

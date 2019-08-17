@@ -31,11 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <int rank, int dim, typename Number>
 class TensorFunction;
+#endif
 
 /**
  * This class is a model for a general function that, given a point at which

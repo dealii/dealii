@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <int, int, int>
@@ -41,6 +43,7 @@ template <typename>
 class TriaIterator;
 template <typename>
 class TriaActiveIterator;
+#  endif
 
 
 

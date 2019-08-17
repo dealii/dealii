@@ -31,8 +31,10 @@ DEAL_II_NAMESPACE_OPEN
 // Forward type declaration to have special treatment of
 // LAPACKFullMatrix<number>
 // in multivector_inner_product()
+#ifndef DOXYGEN
 template <typename Number>
 class LAPACKFullMatrix;
+#endif
 
 namespace LinearAlgebra
 {

@@ -30,7 +30,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class BlockIndices;
+#endif
 
 /**
  * A collection of functions and classes for the mesh loops that are an

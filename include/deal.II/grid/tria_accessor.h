@@ -33,6 +33,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <typename Accessor>
@@ -44,7 +46,7 @@ class TriaActiveIterator;
 
 template <int dim, int spacedim>
 class Manifold;
-
+#endif
 
 namespace internal
 {

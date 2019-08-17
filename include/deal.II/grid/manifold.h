@@ -33,8 +33,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 template <int, typename>
 class Table;
+#endif
 
 /**
  * We collect here some helper functions used in the Manifold<dim,spacedim>

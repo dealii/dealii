@@ -43,8 +43,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   // Forward declaration
+#  ifndef DOXYGEN
   template <typename Number>
   class ReadWriteVector;
+#  endif
 
   namespace TpetraWrappers
   {

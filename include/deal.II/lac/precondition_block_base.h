@@ -31,10 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <typename number>
 class Vector;
+#endif
 
 /**
  * A class storing the inverse diagonal blocks for block preconditioners and

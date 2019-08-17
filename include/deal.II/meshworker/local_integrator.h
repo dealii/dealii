@@ -29,10 +29,13 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
+  // Forward declarations
+#ifndef DOXYGEN
   template <int dim, int spacedim, typename number>
   class DoFInfo;
   template <int dim, int spacedim>
   class IntegrationInfo;
+#endif
 
   /**
    * A local integrator object, which can be used to simplify the call of

@@ -39,6 +39,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <int dim>
@@ -51,7 +53,7 @@ template <int dim>
 class FiniteElementData;
 template <typename number>
 class AffineConstraints;
-
+#endif
 
 
 /*!@addtogroup feall */

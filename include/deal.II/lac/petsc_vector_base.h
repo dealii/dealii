@@ -36,9 +36,15 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#    ifndef DOXYGEN
 template <typename number>
 class Vector;
 
+namespace PETScWrappers
+{
+  class VectorBase;
+}
+#    endif
 
 /**
  * A namespace in which wrapper classes for PETSc objects reside.
@@ -49,9 +55,6 @@ class Vector;
  */
 namespace PETScWrappers
 {
-  // forward declaration
-  class VectorBase;
-
   /**
    * @cond internal
    */

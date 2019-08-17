@@ -22,8 +22,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
+#endif
 
 namespace Functions
 {

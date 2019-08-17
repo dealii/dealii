@@ -28,6 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward-definition
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   namespace CUDAWrappers
@@ -36,6 +37,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+#  endif
 
 namespace CUDAWrappers
 {

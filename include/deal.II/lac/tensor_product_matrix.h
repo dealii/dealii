@@ -28,10 +28,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename>
 class Vector;
 template <typename>
 class FullMatrix;
+#endif
 
 /**
  * This is an abstract base class used for a special matrix class, namely the

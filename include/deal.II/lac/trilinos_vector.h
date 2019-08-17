@@ -47,12 +47,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   // Forward declaration
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
+#  endif
 
 /**
  * @addtogroup TrilinosWrappers

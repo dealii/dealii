@@ -29,8 +29,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
+#endif
 
 
 /**

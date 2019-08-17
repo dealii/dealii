@@ -23,10 +23,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
+#ifndef DOXYGEN
 template <typename T>
 struct EnableIfScalar;
 template <typename T, typename U>
 struct ProductType;
+#endif
 
 #ifndef DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 /**

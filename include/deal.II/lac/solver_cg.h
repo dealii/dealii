@@ -32,7 +32,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 class PreconditionIdentity;
+#endif
 
 
 /*!@addtogroup Solvers */

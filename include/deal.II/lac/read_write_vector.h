@@ -43,6 +43,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace LinearAlgebra
 {
   class CommunicationPatternBase;
@@ -53,7 +55,7 @@ namespace LinearAlgebra
   } // namespace distributed
 } // namespace LinearAlgebra
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -61,9 +63,9 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -71,9 +73,9 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_CUDA
+#  ifdef DEAL_II_WITH_CUDA
 namespace LinearAlgebra
 {
   namespace CUDAWrappers
@@ -82,6 +84,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+#  endif
 #endif
 
 namespace LinearAlgebra

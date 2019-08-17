@@ -37,8 +37,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#    ifndef DOXYGEN
 template <typename Matrix>
 class BlockMatrixBase;
+#    endif
 
 
 namespace PETScWrappers

@@ -33,6 +33,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace LinearAlgebra
 {
   /**
@@ -48,7 +50,7 @@ namespace LinearAlgebra
   class ReadWriteVector;
 } // namespace LinearAlgebra
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -56,9 +58,9 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -66,6 +68,7 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 namespace LinearAlgebra

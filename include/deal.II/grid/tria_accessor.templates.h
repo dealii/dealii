@@ -35,11 +35,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 namespace parallel
 {
   template <int, int>
   class Triangulation;
 }
+#endif
 
 
 /*--------------------- Functions: TriaAccessorBase -------------------------*/

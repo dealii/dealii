@@ -40,22 +40,25 @@
 #    include <Teuchos_ParameterList.hpp>
 
 // forward declarations
+#    ifndef DOXYGEN
 class Ifpack_Preconditioner;
 class Ifpack_Chebyshev;
 namespace ML_Epetra
 {
   class MultiLevelPreconditioner;
 }
-
+#    endif
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#    ifndef DOXYGEN
 template <typename number>
 class SparseMatrix;
 template <typename number>
 class Vector;
 class SparsityPattern;
+#    endif
 
 /*! @addtogroup TrilinosWrappers
  *@{

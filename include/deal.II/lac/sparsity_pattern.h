@@ -41,6 +41,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class SparsityPattern;
 class SparsityPatternBase;
 class DynamicSparsityPattern;
@@ -58,7 +60,7 @@ namespace ChunkSparsityPatternIterators
 {
   class Accessor;
 }
-
+#endif
 
 /*! @addtogroup Sparsity
  *@{

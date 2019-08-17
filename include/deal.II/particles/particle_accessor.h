@@ -26,10 +26,13 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declarations
+#ifndef DOXYGEN
   template <int, int>
   class ParticleIterator;
   template <int, int>
   class ParticleHandler;
+#endif
 
   /**
    * Accessor class used by ParticleIterator to access particle data.

@@ -25,10 +25,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class MappingQ;
 template <int dim>
 class Quadrature;
+#endif
 
 /*!@addtogroup fe */
 /*@{*/

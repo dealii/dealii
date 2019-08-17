@@ -24,6 +24,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename VectorType>
 class VectorMemory;
 
@@ -44,6 +46,7 @@ template <typename number>
 class TridiagonalMatrix;
 template <typename number, typename BlockVectorType>
 class BlockMatrixArray;
+#endif
 
 /*! @addtogroup Matrix2
  *@{

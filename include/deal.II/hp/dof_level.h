@@ -26,6 +26,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace hp
 {
   template <int, int>
@@ -49,6 +51,7 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
+#endif
 
 
 namespace internal

@@ -22,9 +22,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int spacedim, typename RangeNumberType>
 class Function;
-
+#endif
 
 
 /**

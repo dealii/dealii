@@ -26,7 +26,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
-
+#ifndef DOXYGEN
 namespace internal
 {
   namespace BlockLinearOperatorImplementation
@@ -45,6 +45,7 @@ template <typename Range  = BlockVector<double>,
           typename BlockPayload =
             internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>>
 class BlockLinearOperator;
+#endif
 
 template <typename Range  = BlockVector<double>,
           typename Domain = Range,

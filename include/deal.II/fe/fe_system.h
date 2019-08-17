@@ -35,9 +35,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 class FE_Enriched;
-
+#  endif
 
 /**
  * This class provides an interface to group several elements together into

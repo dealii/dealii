@@ -32,8 +32,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 template <class VectorType>
 class FilteredMatrixBlock;
+#  endif
 
 /*! @addtogroup Matrix2
  *@{

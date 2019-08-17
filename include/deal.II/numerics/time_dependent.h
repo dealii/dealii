@@ -32,11 +32,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#  ifndef DOXYGEN
 class TimeStepBase;
 template <typename number>
 class Vector;
 template <int dim, int spacedim>
 class Triangulation;
+#  endif
 
 /**
  * This class provides an abstract interface to time dependent problems in

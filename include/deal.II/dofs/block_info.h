@@ -26,7 +26,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
 namespace hp
@@ -34,6 +34,7 @@ namespace hp
   template <int dim, int spacedim>
   class DoFHandler;
 }
+#endif
 
 
 /**

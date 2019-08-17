@@ -25,18 +25,22 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int>
 class DoFHandler;
+#endif
 
 namespace internal
 {
   namespace DoFHandlerImplementation
   {
+#ifndef DOXYGEN
     template <int>
     class DoFLevel;
     template <int>
     class DoFFaces;
-
+#endif
 
     /**
      * Store the indices of the degrees of freedom which are located on

@@ -33,11 +33,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#    ifndef DOXYGEN
 namespace PETScWrappers
 {
   // forward declarations
   class SolverBase;
 } // namespace PETScWrappers
+#    endif
 
 namespace SLEPcWrappers
 {

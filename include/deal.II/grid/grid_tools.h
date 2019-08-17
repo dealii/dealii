@@ -62,6 +62,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 namespace parallel
 {
   namespace distributed
@@ -78,6 +80,7 @@ namespace hp
 }
 
 class SparsityPattern;
+#  endif
 
 namespace internal
 {

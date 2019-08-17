@@ -30,7 +30,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int>
 class Mapping;
 template <int>
@@ -41,7 +42,7 @@ namespace hp
   template <int>
   class QCollection;
 }
-
+#endif
 
 
 /**

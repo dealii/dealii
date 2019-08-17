@@ -39,8 +39,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   // forward declarations
+#    ifndef DOXYGEN
   class SparseMatrix;
   class PreconditionBase;
+#    endif
 
 
   /**

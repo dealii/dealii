@@ -35,6 +35,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -43,7 +45,7 @@ template <typename Matrix>
 class BlockMatrixBase;
 template <typename number>
 class SparseILU;
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
 namespace Utilities
 {
   namespace MPI
@@ -53,13 +55,14 @@ namespace Utilities
     sum(const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
   }
 } // namespace Utilities
-#  endif
+#    endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
 }
+#    endif
 #  endif
 
 /**
