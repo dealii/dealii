@@ -1849,19 +1849,6 @@ namespace internal
                       "of freedom at these vertices have the same "
                       "value, using the AffineConstraints class."));
               }
-
-          // assert there are no more
-          // than two boundary
-          // nodes. note that if the
-          // space dimension is
-          // bigger than 1, then we
-          // can have fewer than 2
-          // nodes (for example a
-          // ring of cells -- no end
-          // points at all)
-          AssertThrow(((spacedim == 1) && (boundary_nodes == 2)) ||
-                        (spacedim > 1),
-                      ExcMessage("The Triangulation has too many end points"));
         }
 
 

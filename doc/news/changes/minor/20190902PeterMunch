@@ -1,0 +1,5 @@
+New: Add a function, which creates a parallel::fullydistributed::ConstructionData from a
+serial and a distributed triangulation. This data structure can be used to initialize
+parallel::fullydistributed::Triangulation. 
+<br>
+(Peter Munch, 2019/09/02)

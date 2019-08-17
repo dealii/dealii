@@ -1,0 +1,28 @@
+
+DEAL:0:2d::n_levels:                  5
+DEAL:0:2d::n_cells:                   488
+DEAL:0:2d::n_active_cells:            368
+DEAL:0:2d::n_cells on level=0:        8
+DEAL:0:2d::n_cells on level=1:        32
+DEAL:0:2d::n_cells on level=2:        64
+DEAL:0:2d::n_cells on level=3:        128
+DEAL:0:2d::n_cells on level=4:        256
+DEAL:0:2d::n_active_cells on level=0: 0
+DEAL:0:2d::n_active_cells on level=1: 16
+DEAL:0:2d::n_active_cells on level=2: 32
+DEAL:0:2d::n_active_cells on level=3: 64
+DEAL:0:2d::n_active_cells on level=4: 256
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             1840
+DEAL:0:2d::n_locally_owned_dofs:               1840
+DEAL:0:2d::n_dofs on level=0:                  48
+DEAL:0:2d::n_dofs on level=1:                  160
+DEAL:0:2d::n_dofs on level=2:                  320
+DEAL:0:2d::n_dofs on level=3:                  640
+DEAL:0:2d::n_dofs on level=4:                  1280
+DEAL:0:2d::n_locally_owned_mg_dofs on level=0: 48
+DEAL:0:2d::n_locally_owned_mg_dofs on level=1: 160
+DEAL:0:2d::n_locally_owned_mg_dofs on level=2: 320
+DEAL:0:2d::n_locally_owned_mg_dofs on level=3: 640
+DEAL:0:2d::n_locally_owned_mg_dofs on level=4: 1280
+DEAL:0:2d::

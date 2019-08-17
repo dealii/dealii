@@ -17,6 +17,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -2063,8 +2064,26 @@ namespace GridTools
     Assert(0 <= direction && direction < space_dim,
            ExcIndexRange(direction, 0, space_dim));
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+#ifdef DEBUG
+    {
+      constexpr int dim      = CellIterator::AccessorType::dimension;
+      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+      // For parallel::fullydistributed::Triangulation there might be unmatched
+      // faces on periodic boundaries on the coarse grid, which results that
+      // this assert is not fulfilled (not a bug!). See also the discussion in
+      // the method collect_periodic_faces.
+      if (!(((pairs1.size() > 0) &&
+             (dynamic_cast<const parallel::fullydistributed::
+                             Triangulation<dim, spacedim> *>(
+                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+            ((pairs2.size() > 0) &&
+             (dynamic_cast<
+                const parallel::fullydistributed::Triangulation<dim, spacedim>
+                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+        Assert(pairs1.size() == pairs2.size(),
+               ExcMessage("Unmatched faces on periodic boundaries"));
+    }
+#endif
 
     unsigned int n_matches = 0;
 
@@ -2100,9 +2119,25 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched
-    AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
-                ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assure that all faces are matched if not
+    // parallel::fullydistributed::Triangulation is used. This is related to the
+    // fact that the faces might not be successfully matched on the coarse grid
+    // (not a bug!). See also the comment above and in the
+    // method collect_periodic_faces.
+    {
+      constexpr int dim      = CellIterator::AccessorType::dimension;
+      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+      if (!(((pairs1.size() > 0) &&
+             (dynamic_cast<const parallel::fullydistributed::
+                             Triangulation<dim, spacedim> *>(
+                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+            ((pairs2.size() > 0) &&
+             (dynamic_cast<
+                const parallel::fullydistributed::Triangulation<dim, spacedim>
+                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+        AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
+                    ExcMessage("Unmatched faces on periodic boundaries"));
+    }
   }
 
 
@@ -2237,8 +2272,22 @@ namespace GridTools
           }
       }
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assure that all faces are matched on the coare grid. This requirement
+    // can only fulfilled if a process owns the complete coarse grid. This is
+    // not the case for a parallel::fullydistributed::Triangulation, i.e. this
+    // requirement has not to be met neither (consider faces on the outside of a
+    // ghost cell that are periodic but for which the ghost neighbor doesn't
+    // exist).
+    if (!(((pairs1.size() > 0) &&
+           (dynamic_cast<
+              const parallel::fullydistributed::Triangulation<dim, space_dim>
+                *>(&pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+          ((pairs2.size() > 0) &&
+           (dynamic_cast<
+              const parallel::fullydistributed::Triangulation<dim, space_dim>
+                *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+      Assert(pairs1.size() == pairs2.size(),
+             ExcMessage("Unmatched faces on periodic boundaries"));
 
     Assert(pairs1.size() > 0,
            ExcMessage("No new periodic face pairs have been found. "

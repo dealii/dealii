@@ -1,0 +1,15 @@
+
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   192
+DEAL:0:2d::n_active_cells:            192
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             833
+DEAL:0:2d::n_locally_owned_dofs:               833
+DEAL:0:2d::
+DEAL:0:3d::n_levels:                  1
+DEAL:0:3d::n_cells:                   3584
+DEAL:0:3d::n_active_cells:            3584
+DEAL:0:3d::
+DEAL:0:3d::n_dofs:                             31841
+DEAL:0:3d::n_locally_owned_dofs:               31841
+DEAL:0:3d::

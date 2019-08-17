@@ -1,0 +1,22 @@
+
+DEAL:0:1d::n_levels:                  1
+DEAL:0:1d::n_cells:                   128
+DEAL:0:1d::n_active_cells:            128
+DEAL:0:1d::
+DEAL:0:1d::n_dofs:                             257
+DEAL:0:1d::n_locally_owned_dofs:               257
+DEAL:0:1d::
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   16384
+DEAL:0:2d::n_active_cells:            16384
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             66049
+DEAL:0:2d::n_locally_owned_dofs:               66049
+DEAL:0:2d::
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   32768
+DEAL:0:2d::n_active_cells:            32768
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             274625
+DEAL:0:2d::n_locally_owned_dofs:               274625
+DEAL:0:2d::
