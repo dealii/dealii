@@ -18,6 +18,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx17/optional.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
 
@@ -29,8 +30,6 @@
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/vector.h>
-
-#include <boost/optional.hpp>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -473,9 +472,9 @@ namespace Functions
     /**
      * Given a cell, return the reference coordinates of the given point
      * within this cell if it indeed lies within the cell. Otherwise return an
-     * uninitialized boost::optional object.
+     * uninitialized std_cxx17::optional object.
      */
-    boost::optional<Point<dim>>
+    std_cxx17::optional<Point<dim>>
     get_reference_coordinates(
       const typename DoFHandlerType::active_cell_iterator &cell,
       const Point<dim> &                                   point) const;
