@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Eldar Khattatov, 2018
  */
 template <int dim>
-class FE_RT_Bubbles : public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
+class FE_RT_Bubbles : public FE_PolyTensor<dim>
 {
 public:
   /**

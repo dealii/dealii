@@ -22,6 +22,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe.h>
@@ -142,20 +143,23 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2005
  */
-template <class PolynomialType, int dim, int spacedim = dim>
+template <int dim, int spacedim = dim>
 class FE_PolyTensor : public FiniteElement<dim, spacedim>
 {
 public:
   /**
    * Constructor.
-   *
-   * @arg @c degree: constructor argument for poly. May be different from @p
-   * fe_data.degree.
    */
-  FE_PolyTensor(const unsigned int                degree,
+  FE_PolyTensor(const TensorPolynomialsBase<dim> &polynomials,
                 const FiniteElementData<dim> &    fe_data,
                 const std::vector<bool> &         restriction_is_additive_flags,
                 const std::vector<ComponentMask> &nonzero_components);
+
+
+  /**
+   * Copy constructor.
+   */
+  FE_PolyTensor(const FE_PolyTensor &fe);
 
   // for documentation, see the FiniteElement base class
   virtual UpdateFlags
@@ -318,12 +322,12 @@ protected:
     if (update_flags & (update_values | update_gradients))
       for (unsigned int k = 0; k < n_q_points; ++k)
         {
-          poly_space.compute(quadrature.point(k),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space->compute(quadrature.point(k),
+                              values,
+                              grads,
+                              grad_grads,
+                              third_derivatives,
+                              fourth_derivatives);
 
           if (update_flags & update_values)
             {
@@ -471,7 +475,7 @@ protected:
    * The polynomial space. Its type is given by the template parameter
    * PolynomialType.
    */
-  PolynomialType poly_space;
+  std::unique_ptr<TensorPolynomialsBase<dim>> poly_space;
 
   /**
    * The inverse of the matrix <i>a<sub>ij</sub></i> of node values

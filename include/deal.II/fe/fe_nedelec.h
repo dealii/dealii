@@ -110,7 +110,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2009, 2010, 2011
  */
 template <int dim>
-class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim>
+class FE_Nedelec : public FE_PolyTensor<dim>
 {
 public:
   /**

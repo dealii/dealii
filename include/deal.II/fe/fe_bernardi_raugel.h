@@ -84,8 +84,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  */
 template <int dim>
-class FE_BernardiRaugel
-  : public FE_PolyTensor<PolynomialsBernardiRaugel<dim>, dim>
+class FE_BernardiRaugel : public FE_PolyTensor<dim>
 {
 public:
   /**

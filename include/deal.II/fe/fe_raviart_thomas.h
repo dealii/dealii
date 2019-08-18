@@ -102,8 +102,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2005, based on previous work by Wolfgang Bangerth.
  */
 template <int dim>
-class FE_RaviartThomas
-  : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
+class FE_RaviartThomas : public FE_PolyTensor<dim>
 {
 public:
   /**
@@ -244,8 +243,7 @@ private:
  * @author Guido Kanschat, 2005, Zhu Liang, 2008
  */
 template <int dim>
-class FE_RaviartThomasNodal
-  : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
+class FE_RaviartThomasNodal : public FE_PolyTensor<dim>
 {
 public:
   /**

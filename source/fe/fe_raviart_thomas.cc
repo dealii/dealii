@@ -45,8 +45,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>(
-      deg,
+  : FE_PolyTensor<dim>(
+      PolynomialsRaviartThomas<dim>(deg),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,
