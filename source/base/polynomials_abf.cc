@@ -16,6 +16,7 @@
 
 #include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #include <iomanip>
 #include <iostream>
@@ -47,9 +48,8 @@ namespace
 
 template <int dim>
 PolynomialsABF<dim>::PolynomialsABF(const unsigned int k)
-  : my_degree(k)
+  : TensorPolynomialsBase<dim>(k, compute_n_pols(k))
   , polynomial_space(get_abf_polynomials<dim>(k))
-  , n_pols(compute_n_pols(k))
 {
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
@@ -69,16 +69,17 @@ PolynomialsABF<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch(values.size(), this->n()));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), this->n()));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), this->n()));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), this->n()));
+  Assert(fourth_derivatives.size() == this->n() ||
+           fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   const unsigned int n_sub = polynomial_space.n();
   // guard access to the scratch
@@ -177,6 +178,14 @@ PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
     }
 
   return 0;
+}
+
+
+template <int dim>
+std::unique_ptr<TensorPolynomialsBase<dim>>
+PolynomialsABF<dim>::clone() const
+{
+  return std_cxx14::make_unique<PolynomialsABF<dim>>(*this);
 }
 
 

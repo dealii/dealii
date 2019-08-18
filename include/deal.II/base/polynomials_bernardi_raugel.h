@@ -22,6 +22,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <vector>
@@ -81,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2018
  */
 template <int dim>
-class PolynomialsBernardiRaugel
+class PolynomialsBernardiRaugel : public TensorPolynomialsBase<dim>
 {
 public:
   /**
@@ -94,25 +95,10 @@ public:
   PolynomialsBernardiRaugel(const unsigned int k);
 
   /**
-   * Return the number of Bernardi-Raugel polynomials.
-   */
-  unsigned int
-  n() const;
-
-
-  /**
-   * Return the degree of Bernardi-Raugel polynomials.
-   * Since the bubble functions are quadratic in at least one variable,
-   * the degree of the Bernardi-Raugel polynomials is two.
-   */
-  unsigned int
-  degree() const;
-
-  /**
    * Return the name of the space, which is <tt>BernardiRaugel</tt>.
    */
   std::string
-  name() const;
+  name() const override;
 
   /**
    * Compute the value and derivatives of each Bernardi-Raugel
@@ -132,7 +118,7 @@ public:
           std::vector<Tensor<2, dim>> &grads,
           std::vector<Tensor<3, dim>> &grad_grads,
           std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
+          std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the number of polynomials in the space <tt>BR(degree)</tt> without
@@ -142,17 +128,13 @@ public:
   static unsigned int
   compute_n_pols(const unsigned int k);
 
+  /**
+   * @copydoc TensorPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  clone() const override;
+
 private:
-  /**
-   * The degree of this object given to the constructor (must be 1).
-   */
-  const unsigned int my_degree;
-
-  /**
-   * The number of Bernardi-Raugel polynomials.
-   */
-  const unsigned int n_pols;
-
   /**
    * An object representing the polynomial space of Q
    * functions which forms the <tt>BR</tt> polynomials through
@@ -182,24 +164,6 @@ private:
   static std::vector<std::vector<Polynomials::Polynomial<double>>>
   create_polynomials_bubble();
 };
-
-
-template <int dim>
-inline unsigned int
-PolynomialsBernardiRaugel<dim>::n() const
-{
-  return n_pols;
-}
-
-
-
-template <int dim>
-inline unsigned int
-PolynomialsBernardiRaugel<dim>::degree() const
-{
-  return 2;
-}
-
 
 
 template <int dim>

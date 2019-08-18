@@ -24,6 +24,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/thread_management.h>
 
@@ -51,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2006
  */
 template <int dim>
-class PolynomialsABF
+class PolynomialsABF : public TensorPolynomialsBase<dim>
 {
 public:
   /**
@@ -82,26 +83,13 @@ public:
           std::vector<Tensor<2, dim>> &grads,
           std::vector<Tensor<3, dim>> &grad_grads,
           std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
-
-  /**
-   * Return the number of ABF polynomials.
-   */
-  unsigned int
-  n() const;
-
-  /**
-   * Return the degree of the ABF space, which is two less than the highest
-   * polynomial degree.
-   */
-  unsigned int
-  degree() const;
+          std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the name of the space, which is <tt>ABF</tt>.
    */
   std::string
-  name() const;
+  name() const override;
 
   /**
    * Return the number of polynomials in the space <tt>RT(degree)</tt> without
@@ -111,23 +99,19 @@ public:
   static unsigned int
   compute_n_pols(unsigned int degree);
 
-private:
   /**
-   * The degree of this object as given to the constructor.
+   * @copydoc TensorPolynomialsBase<dim>::clone()
    */
-  const unsigned int my_degree;
+  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  clone() const override;
 
+private:
   /**
    * An object representing the polynomial space for a single component. We
    * can re-use it for the other vector components by rotating the
    * coordinates of the evaluation point.
    */
   const AnisotropicPolynomials<dim> polynomial_space;
-
-  /**
-   * Number of Raviart-Thomas polynomials.
-   */
-  unsigned int n_pols;
 
   /**
    * A mutex that guards the following scratch arrays.
@@ -159,22 +143,6 @@ private:
    */
   mutable std::vector<Tensor<4, dim>> p_fourth_derivatives;
 };
-
-
-template <int dim>
-inline unsigned int
-PolynomialsABF<dim>::n() const
-{
-  return n_pols;
-}
-
-
-template <int dim>
-inline unsigned int
-PolynomialsABF<dim>::degree() const
-{
-  return my_degree;
-}
 
 
 template <int dim>

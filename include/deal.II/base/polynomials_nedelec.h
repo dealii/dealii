@@ -25,6 +25,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <vector>
@@ -49,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2009, 2010
  */
 template <int dim>
-class PolynomialsNedelec
+class PolynomialsNedelec : public TensorPolynomialsBase<dim>
 {
 public:
   /**
@@ -79,26 +80,13 @@ public:
           std::vector<Tensor<2, dim>> &grads,
           std::vector<Tensor<3, dim>> &grad_grads,
           std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
-
-  /**
-   * Return the number of Nédélec polynomials.
-   */
-  unsigned int
-  n() const;
-
-  /**
-   * Return the degree of the Nédélec space, which is one less than the
-   * highest polynomial degree.
-   */
-  unsigned int
-  degree() const;
+          std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the name of the space, which is <tt>Nedelec</tt>.
    */
   std::string
-  name() const;
+  name() const override;
 
   /**
    * Return the number of polynomials in the space <tt>N(degree)</tt> without
@@ -108,22 +96,18 @@ public:
   static unsigned int
   compute_n_pols(unsigned int degree);
 
-private:
   /**
-   * The degree of this object as given to the constructor.
+   * @copydoc TensorPolynomialsBase<dim>::clone()
    */
-  const unsigned int my_degree;
+  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  clone() const override;
 
+private:
   /**
    * An object representing the polynomial space for a single component. We
    * can re-use it by rotating the coordinates of the evaluation point.
    */
   const AnisotropicPolynomials<dim> polynomial_space;
-
-  /**
-   * Number of Nédélec polynomials.
-   */
-  const unsigned int n_pols;
 
   /**
    * A static member function that creates the polynomial space we use to
@@ -132,22 +116,6 @@ private:
   static std::vector<std::vector<Polynomials::Polynomial<double>>>
   create_polynomials(const unsigned int k);
 };
-
-
-template <int dim>
-inline unsigned int
-PolynomialsNedelec<dim>::n() const
-{
-  return n_pols;
-}
-
-
-template <int dim>
-inline unsigned int
-PolynomialsNedelec<dim>::degree() const
-{
-  return my_degree;
-}
 
 
 template <int dim>
