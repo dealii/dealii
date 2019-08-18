@@ -29,7 +29,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
-
+#ifndef DOXYGEN
 namespace internal
 {
   namespace LinearOperatorImplementation
@@ -48,6 +48,7 @@ template <typename Range  = Vector<double>,
           typename Payload =
             internal::LinearOperatorImplementation::EmptyPayload>
 class LinearOperator;
+#endif
 
 template <
   typename Range   = Vector<double>,

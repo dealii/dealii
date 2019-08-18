@@ -41,9 +41,11 @@ DEAL_II_NAMESPACE_OPEN
  *@{
  */
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class BlockVectorBase;
-
+#endif
 
 /**
  * A class that can be used to determine whether a given type is a block

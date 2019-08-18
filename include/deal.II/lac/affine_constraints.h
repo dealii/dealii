@@ -35,6 +35,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename>
 class FullMatrix;
 class SparsityPattern;
@@ -55,6 +57,7 @@ namespace internals
 
 template <typename number>
 class AffineConstraints;
+#endif
 
 /**
  * ConstraintMatrix has been renamed to AffineConstraints. Provide a

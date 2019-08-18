@@ -21,6 +21,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int, int>
 class DoFInvalidAccessor;
 
@@ -35,6 +37,7 @@ template <typename Accessor>
 class TriaIterator;
 template <typename Accessor>
 class TriaActiveIterator;
+#endif
 
 namespace internal
 {

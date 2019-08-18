@@ -39,6 +39,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class BlockMask;
 template <int dim, typename RangeNumberType>
 class Function;
@@ -66,7 +68,7 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
-
+#endif
 
 /**
  * This is a collection of functions operating on, and manipulating the

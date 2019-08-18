@@ -28,8 +28,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
+#endif
 
 /**
  * A base class for iterative linear solvers. This class provides interfaces

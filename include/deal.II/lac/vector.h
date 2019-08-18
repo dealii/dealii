@@ -41,14 +41,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_PETSC
+// Forward declarations
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class VectorBase;
 }
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -56,7 +58,7 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
-#endif
+#  endif
 
 template <typename number>
 class LAPACKFullMatrix;
@@ -71,7 +73,7 @@ namespace parallel
     class TBBPartitioner;
   }
 } // namespace parallel
-
+#endif
 
 
 /*! @addtogroup Vectors

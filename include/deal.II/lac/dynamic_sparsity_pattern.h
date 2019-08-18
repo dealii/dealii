@@ -31,7 +31,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class DynamicSparsityPattern;
+#endif
 
 /*! @addtogroup Sparsity
  *@{

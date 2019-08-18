@@ -28,11 +28,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class ParameterHandler;
 template <int dim, int spacedim>
 class Triangulation;
 template <int dim, int spacedim>
 class Mapping;
+#endif
 
 
 /**

@@ -27,12 +27,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
+#ifndef DOXYGEN
 template <typename Number>
 class Vector;
 template <typename Range, typename Domain, typename Payload>
 class LinearOperator;
 template <typename Range = Vector<double>>
 class PackagedOperation;
+#endif
 
 
 /**

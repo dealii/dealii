@@ -33,7 +33,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_PETSC
+// Forward declarations
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -41,9 +43,9 @@ namespace PETScWrappers
     class BlockVector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -51,6 +53,7 @@ namespace TrilinosWrappers
     class BlockVector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 namespace LinearAlgebra

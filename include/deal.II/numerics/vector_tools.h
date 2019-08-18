@@ -38,6 +38,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, typename RangeNumberType>
 class Function;
 template <int dim>
@@ -62,7 +64,7 @@ namespace hp
 }
 template <typename number>
 class AffineConstraints;
-
+#endif
 
 // TODO: Move documentation of functions to the functions!
 

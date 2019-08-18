@@ -27,9 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // Forward declaration of class ScaLAPACKMatrix for ProcessGrid
+#  ifndef DOXYGEN
 template <typename NumberType>
 class ScaLAPACKMatrix;
-
+#  endif
 
 namespace Utilities
 {

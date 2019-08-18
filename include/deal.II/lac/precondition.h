@@ -34,7 +34,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -47,7 +47,7 @@ namespace LinearAlgebra
     class Vector;
   } // namespace distributed
 } // namespace LinearAlgebra
-
+#endif
 
 
 /*! @addtogroup Preconditioners

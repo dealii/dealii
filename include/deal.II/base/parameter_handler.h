@@ -36,8 +36,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations for interfaces and friendship
+#ifndef DOXYGEN
 class LogStream;
 class MultipleParameterLoop;
+#endif
 
 /**
  * The ParameterHandler class provides a standard interface to an input file

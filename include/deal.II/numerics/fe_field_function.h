@@ -35,10 +35,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 namespace VectorTools
 {
   class ExcPointNotAvailableHere;
 }
+#endif
 
 namespace Functions
 {

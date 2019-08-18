@@ -47,9 +47,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 class ParameterHandler;
 class XDMFEntry;
+#endif
 
 /**
  * This is a base class for output of data on meshes of very general form.

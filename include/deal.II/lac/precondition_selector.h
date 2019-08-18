@@ -26,10 +26,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <class number>
 class Vector;
 template <class number>
 class SparseMatrix;
+#endif
 
 
 /*! @addtogroup Preconditioners

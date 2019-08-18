@@ -31,8 +31,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int>
 class Triangulation;
+#endif
 
 /**
  * A class to represent a unique ID for a cell in a Triangulation. It is

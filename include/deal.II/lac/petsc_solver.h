@@ -34,20 +34,25 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#    ifdef DEAL_II_WITH_SLEPC
+// Forward declarations
+#    ifndef DOXYGEN
+#      ifdef DEAL_II_WITH_SLEPC
 namespace SLEPcWrappers
 {
   // forward declarations
   class TransformationBase;
 } // namespace SLEPcWrappers
+#      endif
 #    endif
 
 namespace PETScWrappers
 {
   // forward declarations
+#    ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
   class PreconditionerBase;
+#    endif
 
 
   /**

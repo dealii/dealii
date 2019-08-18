@@ -36,10 +36,11 @@ namespace mu
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class Vector;
-
+#endif
 
 /**
  * This class implements a function object that gets its value by parsing a

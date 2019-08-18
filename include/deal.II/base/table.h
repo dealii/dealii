@@ -31,6 +31,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 template <int N, typename T>
 class TableBase;
 template <int N, typename T>
@@ -49,6 +50,7 @@ template <typename T>
 class Table<5, T>;
 template <typename T>
 class Table<6, T>;
+#endif
 
 
 

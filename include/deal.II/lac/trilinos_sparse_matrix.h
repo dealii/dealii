@@ -55,6 +55,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#    ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
 
@@ -63,23 +64,26 @@ class SparseMatrix;
 class SparsityPattern;
 class DynamicSparsityPattern;
 
-
-
 namespace TrilinosWrappers
 {
-  // forward declarations
   class SparseMatrix;
   class SparsityPattern;
 
+  namespace SparseMatrixIterators
+  {
+    template <bool Constness>
+    class Iterator;
+  }
+} // namespace TrilinosWrappers
+#    endif
+
+namespace TrilinosWrappers
+{
   /**
    * Iterators for Trilinos matrices
    */
   namespace SparseMatrixIterators
   {
-    // forward declaration
-    template <bool Constness>
-    class Iterator;
-
     /**
      * Exception
      */

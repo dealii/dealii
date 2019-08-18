@@ -43,20 +43,26 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#    ifndef DOXYGEN
 class SparsityPattern;
 class DynamicSparsityPattern;
 
 namespace TrilinosWrappers
 {
-  // forward declarations
   class SparsityPattern;
   class SparseMatrix;
 
   namespace SparsityPatternIterators
   {
-    // forward declaration
     class Iterator;
+  }
+} // namespace TrilinosWrappers
+#    endif
 
+namespace TrilinosWrappers
+{
+  namespace SparsityPatternIterators
+  {
     /**
      * Accessor class for iterators into sparsity patterns. This class is also
      * the base class for both const and non-const accessor classes into

@@ -32,10 +32,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   // forward declarations
+#    ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
   class SolverBase;
-
+#    endif
 
   /**
    * Base class for preconditioner classes using the PETSc functionality. The

@@ -24,7 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class ParameterHandler;
+#endif
 
 namespace Algorithms
 {

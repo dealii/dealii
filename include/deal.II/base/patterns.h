@@ -54,10 +54,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations for interfaces and friendship
+#ifndef DOXYGEN
 class LogStream;
 class MultipleParameterLoop;
 template <int dim>
 class FunctionParser;
+#endif
 
 /**
  * Namespace for a few classes that act as patterns for the ParameterHandler

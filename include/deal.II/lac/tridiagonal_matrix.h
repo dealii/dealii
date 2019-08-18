@@ -28,9 +28,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
-
+#endif
 
 /*! @addtogroup Matrix1
  *@{

@@ -87,6 +87,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // Forward type declarations to allow MPI sums over tensorial types
+#ifndef DOXYGEN
 template <int rank, int dim, typename Number>
 class Tensor;
 template <int rank, int dim, typename Number>
@@ -94,6 +95,7 @@ class SymmetricTensor;
 template <typename Number>
 class SparseMatrix;
 class IndexSet;
+#endif
 
 namespace Utilities
 {

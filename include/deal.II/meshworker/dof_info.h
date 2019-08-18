@@ -34,9 +34,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int dim, class DOFINFO>
   class DoFInfoBox;
-
+#endif
 
   /**
    * A class containing information on geometry and degrees of freedom of a

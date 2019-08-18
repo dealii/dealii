@@ -29,6 +29,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <typename number>
@@ -41,7 +43,6 @@ class TriaRawIterator;
 
 template <int, int>
 class FiniteElement;
-
 
 namespace internal
 {
@@ -67,6 +68,7 @@ namespace internal
     }
   } // namespace hp
 } // namespace internal
+#endif
 
 // note: the file dof_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates and thus makes

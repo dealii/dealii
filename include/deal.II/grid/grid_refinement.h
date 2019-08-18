@@ -26,10 +26,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <typename Number>
 class Vector;
+#endif
 
 /**
  * This namespace provides a collection of functions that aid in refinement

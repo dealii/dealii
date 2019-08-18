@@ -37,6 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
+#ifndef DOXYGEN
 template <int dim>
 class Quadrature;
 
@@ -69,7 +70,7 @@ namespace hp
 } // namespace hp
 
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class MatrixBase;
@@ -80,9 +81,9 @@ namespace PETScWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -93,6 +94,7 @@ namespace TrilinosWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 

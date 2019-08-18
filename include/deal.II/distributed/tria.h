@@ -56,6 +56,8 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_P4EST
 
+// Forward declarations
+#  ifndef DOXYGEN
 namespace internal
 {
   namespace DoFHandlerImplementation
@@ -83,6 +85,7 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
+#  endif
 
 namespace parallel
 {

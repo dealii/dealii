@@ -38,6 +38,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 namespace parallel
 {
   namespace distributed
@@ -46,7 +48,7 @@ namespace parallel
     class Triangulation;
   }
 } // namespace parallel
-
+#  endif
 
 namespace internal
 {

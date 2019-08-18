@@ -31,10 +31,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class BlockSparseMatrix;
 class BlockDynamicSparsityPattern;
+#endif
 
 /*! @addtogroup Sparsity
  *@{

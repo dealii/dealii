@@ -27,6 +27,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class IndexSet;
 namespace LinearAlgebra
 {
@@ -34,6 +36,7 @@ namespace LinearAlgebra
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
+#endif
 
 namespace LinearAlgebra
 {

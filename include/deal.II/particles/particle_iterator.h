@@ -24,8 +24,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int, int>
   class ParticleHandler;
+#endif
 
   /**
    * A class that is used to iterate over particles. Together with the

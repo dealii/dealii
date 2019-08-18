@@ -33,6 +33,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -41,7 +42,7 @@ template <typename number>
 class FullMatrix;
 template <typename number>
 class SparseMatrix;
-
+#endif
 
 /**
  * A variant of FullMatrix using LAPACK functions wherever possible. In order

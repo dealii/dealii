@@ -34,10 +34,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#  ifndef DOXYGEN
 class BlockSparsityPattern;
 template <typename number>
 class BlockSparseMatrix;
-
+#  endif
 
 namespace TrilinosWrappers
 {

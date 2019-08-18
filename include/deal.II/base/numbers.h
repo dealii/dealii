@@ -126,12 +126,14 @@ namespace internal
 } // namespace internal
 
 // forward declarations to support abs or sqrt operations on VectorizedArray
+#ifndef DOXYGEN
 template <typename Number,
           int width =
             internal::VectorizedArrayWidthSpecifier<Number>::max_width>
 class VectorizedArray;
 template <typename T>
 struct EnableIfScalar;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

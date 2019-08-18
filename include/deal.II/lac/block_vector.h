@@ -32,7 +32,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+// Forward declaration
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -40,6 +42,7 @@ namespace TrilinosWrappers
     class BlockVector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 

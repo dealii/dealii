@@ -38,13 +38,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
-
+#ifndef DOXYGEN
 template <int dim, typename Number>
 class Point;
 template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
 class Vector;
+#endif
 
 #ifndef DOXYGEN
 // Overload invalid tensor types of negative rank that come up during

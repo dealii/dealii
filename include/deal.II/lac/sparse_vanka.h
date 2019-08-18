@@ -28,6 +28,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <typename number>
@@ -39,6 +41,7 @@ template <typename number>
 class SparseVanka;
 template <typename number>
 class SparseBlockVanka;
+#endif
 
 /*! @addtogroup Preconditioners
  *@{

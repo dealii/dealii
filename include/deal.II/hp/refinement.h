@@ -24,6 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <typename Number>
 class Vector;
 
@@ -32,6 +33,7 @@ namespace hp
   template <int dim, int spacedim>
   class DoFHandler;
 }
+#endif
 
 namespace hp
 {

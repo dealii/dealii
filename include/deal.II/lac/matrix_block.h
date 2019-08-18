@@ -34,8 +34,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename MatrixType>
 class MatrixBlock;
+#endif
 
 namespace internal
 {

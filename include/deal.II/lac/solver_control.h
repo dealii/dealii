@@ -25,7 +25,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 class ParameterHandler;
+#endif
 
 /*!@addtogroup Solvers */
 /*@{*/

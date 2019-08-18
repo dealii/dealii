@@ -44,6 +44,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class FiniteElement;
 template <int dim, int spacedim>
@@ -73,7 +75,7 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
-
+#endif
 
 /**
  * Given a triangulation and a description of a finite element, this

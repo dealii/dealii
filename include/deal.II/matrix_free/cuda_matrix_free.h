@@ -41,11 +41,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace CUDAWrappers
 {
   // forward declaration
+#  ifndef DOXYGEN
   namespace internal
   {
     template <int dim, typename Number>
     class ReinitHelper;
   }
+#  endif
 
   /**
    * This class collects all the data that is stored for the matrix free
