@@ -1,5 +1,5 @@
-#ifndef loop_stuff_h
-#define loop_stuff_h
+#ifndef dealii_fe_interface_h
+#define dealii_fe_interface_h
 
 #include <deal.II/meshworker/mesh_loop.h>
 
