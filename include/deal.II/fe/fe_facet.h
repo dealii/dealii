@@ -17,12 +17,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
-class FEFacetValues;
+class FEInterfaceValues;
 
 /**
- * Namespace for views you get from accessing FEFacetValues using an Extractor.
+ * Namespace for views you get from accessing FEInterfaceValues using an
+ * Extractor.
  */
-namespace FEFacetViews
+namespace FEInterfaceViews
 {
   /**
    * Base class for the views.
@@ -33,12 +34,12 @@ namespace FEFacetViews
   public:
     typedef double value_type;
 
-    Base(const FEFacetValues<dim, spacedim> &fe_facet)
-      : fe_facet(&fe_facet)
+    Base(const FEInterfaceValues<dim, spacedim> &fe_interface)
+      : fe_interface(&fe_interface)
     {}
 
   protected:
-    const FEFacetValues<dim, spacedim> *fe_facet;
+    const FEInterfaceValues<dim, spacedim> *fe_interface;
   };
 
   /**
@@ -64,72 +65,71 @@ namespace FEFacetViews
     /**
      * Constructor for an object that represents a single scalar component
      */
-    Scalar(const FEFacetValues<dim, spacedim> &fefacet,
-           const unsigned int                  component)
-      : Base<dim, spacedim>(fefacet)
+    Scalar(const FEInterfaceValues<dim, spacedim> &fe_interface,
+           const unsigned int                      component)
+      : Base<dim, spacedim>(fe_interface)
       , component(component)
       , extractor(component)
     {}
 
     /**
-     * Return the jump $[u]=u_1 - u_2$ on the facet for the shape function @p idx
+     * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function @p idx
      * in the quadrature point @p q_point.
      */
     value_type
     jump(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
 
       if (shape_fct == idx)
-        return this->fe_facet->get_fe_values().shape_value_component(shape_fct,
-                                                                     q_point,
-                                                                     component);
+        return this->fe_interface->get_fe_values().shape_value_component(
+          shape_fct, q_point, component);
       else
         {
-          if (this->fe_facet->is_boundary_facet())
+          if (this->fe_interface->is_boundary_facet())
             return 0.0;
           else
-            return -this->fe_facet->get_fe_values_neighbor()
+            return -this->fe_interface->get_fe_values_neighbor()
                       .shape_value_component(shape_fct, q_point, component);
         }
     }
 
     /**
-     * Return the average value $\{u\}=\frac{1}{2}(u_1 + u_2)$ on the facet for
-     * the shape
+     * Return the average value $\{u\}=\frac{1}{2}(u_1 + u_2)$ on the interface
+     * for the shape
      * function @p idx in the quadrature point @p q_point.
      */
     value_type
     average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
-      return 0.5 * this->fe_facet->get_fe_values(fe_idx).shape_value_component(
-                     shape_fct, q_point, component);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
+      return 0.5 * this->fe_interface->get_fe_values(fe_idx)
+                     .shape_value_component(shape_fct, q_point, component);
     }
 
     /**
-     * Return the average of the gradient $\{\nabla u\}$ on the facet for the
-     * shape
+     * Return the average of the gradient $\{\nabla u\}$ on the interface for
+     * the shape
      * function @p idx in the quadrature point @p q_point.
      */
     gradient_type
     gradient_average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
 
-      return 0.5 * this->fe_facet->get_fe_values(fe_idx)[extractor].gradient(
-                     shape_fct, q_point);
+      return 0.5 * this->fe_interface->get_fe_values(fe_idx)[extractor]
+                     .gradient(shape_fct, q_point);
     }
 
     /**
-     * Return the left or the right (if @p left is false) value on the facet for the shape
+     * Return the left or the right (if @p left is false) value on the interface for the shape
      * function @p idx in the quadrature point @p q_point.
      */
     value_type
@@ -138,17 +138,16 @@ namespace FEFacetViews
            const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
 
       if (left && fe_idx == 0)
-        return this->fe_facet->get_fe_values().shape_value_component(shape_fct,
-                                                                     q_point,
-                                                                     component);
-      if (!left && fe_idx == 1)
-        return this->fe_facet->get_fe_values_neighbor().shape_value_component(
+        return this->fe_interface->get_fe_values().shape_value_component(
           shape_fct, q_point, component);
+      if (!left && fe_idx == 1)
+        return this->fe_interface->get_fe_values_neighbor()
+          .shape_value_component(shape_fct, q_point, component);
 
       return 0.0;
     }
@@ -175,9 +174,9 @@ namespace FEFacetViews
     /**
      * Constructor for an object that represents a vector component
      */
-    Vector(const FEFacetValues<dim, spacedim> &fefacet,
-           const unsigned int                  first_vector_component)
-      : Base<dim, spacedim>(fefacet)
+    Vector(const FEInterfaceValues<dim, spacedim> &fe_interface,
+           const unsigned int                      first_vector_component)
+      : Base<dim, spacedim>(fe_interface)
       , first_vector_component(first_vector_component)
       , extractor(first_vector_component)
     {}
@@ -186,21 +185,21 @@ namespace FEFacetViews
     jump(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       if (shape_fct == idx)
-        return this->fe_facet->get_fe_values()[extractor].value(shape_fct,
-                                                                q_point);
+        return this->fe_interface->get_fe_values()[extractor].value(shape_fct,
+                                                                    q_point);
       else
         {
-          if (this->fe_facet->is_boundary_facet())
+          if (this->fe_interface->is_boundary_facet())
             {
               // we should not get here
               Assert(false, ExcInternalError());
               return value_type(); // return 0 tensor
             }
           else
-            return -this->fe_facet->get_fe_values_neighbor()[extractor].value(
-              shape_fct, q_point);
+            return -this->fe_interface->get_fe_values_neighbor()[extractor]
+                      .value(shape_fct, q_point);
         }
     }
 
@@ -208,24 +207,24 @@ namespace FEFacetViews
     average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
 
       return (fe_idx == 0 ? 0.5 : -0.5) *
-             this->fe_facet->get_fe_values(fe_idx)[extractor].value(shape_fct,
-                                                                    q_point);
+             this->fe_interface->get_fe_values(fe_idx)[extractor].value(
+               shape_fct, q_point);
     }
 
     gradient_type
     gradient_average(const unsigned int idx, const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
-      return 0.5 * this->fe_facet->get_fe_values(fe_idx)[extractor].gradient(
-                     shape_fct, q_point);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
+      return 0.5 * this->fe_interface->get_fe_values(fe_idx)[extractor]
+                     .gradient(shape_fct, q_point);
     }
 
     value_type
@@ -233,13 +232,13 @@ namespace FEFacetViews
                            const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_facet->facet_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
       const unsigned int fe_idx =
-        this->fe_facet->facet_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(idx);
       return 0.5 *
-             this->fe_facet->get_fe_values(fe_idx)[extractor].gradient(
+             this->fe_interface->get_fe_values(fe_idx)[extractor].gradient(
                shape_fct, q_point) *
-             this->fe_facet->get_fe_values().normal_vector(q_point);
+             this->fe_interface->get_fe_values().normal_vector(q_point);
     }
 
     value_type
@@ -252,34 +251,34 @@ namespace FEFacetViews
     FEValuesExtractors::Vector extractor;
   };
 
-} // namespace FEFacetViews
+} // namespace FEInterfaceViews
 
 
 /**
- * FEFacetValues is a data structure to access and assemble Finite Element data
- * on facets of a mesh.
+ * FEInterfaceValues is a data structure to access and assemble Finite Element
+ * data on facets or interfaces of a mesh.
  *
  * Basically, it provides a way to access average and jump terms used in
  * Discontinuous Galerkin methods on faces between two neighboring cells.
  *
  * Internally, it provides an abstraction for two FEFaceValues.
- * The class introduces a new "facet dof index" that walks over the union of the
- * dof indices of the two FEFaceValues objects.
+ * The class introduces a new "interface dof index" that walks over the union of
+ * the dof indices of the two FEFaceValues objects.
  *
  * The class is made to be used inside MeshWorker::mesh_loop. It is intended to
  * be a low level replacement for MeshWorker and LocalIntegrators.
  */
 template <int dim, int spacedim = dim>
-class FEFacetValues
+class FEInterfaceValues
 {
 public:
   /**
-   * Construct an FEFacetValues from existing FEFaceValues.
+   * Construct an FEInterfaceValues from existing FEFaceValues.
    */
-  FEFacetValues(const FEFaceValues<dim> &   fe,
-                const FESubfaceValues<dim> &fe_sub,
-                const FEFaceValues<dim> &   fe_neighbor,
-                const FESubfaceValues<dim> &fe_sub_neighbor)
+  FEInterfaceValues(const FEFaceValues<dim> &   fe,
+                    const FESubfaceValues<dim> &fe_sub,
+                    const FEFaceValues<dim> &   fe_neighbor,
+                    const FESubfaceValues<dim> &fe_sub_neighbor)
     : internal_fe_face_values(fe)
     , internal_fe_subface_values(fe_sub)
     , internal_fe_face_values_neighbor(fe_neighbor)
@@ -293,14 +292,14 @@ public:
   }
 
   /**
-   * Construct the FeFacetValues with a single FiniteElement (same on both
+   * Construct the FeInterfaceValues with a single FiniteElement (same on both
    * sides of the facet). The FeFaceValues objects will be initialized with the given @p mapping, @p quadrature, and @p update_flags.
    *
    */
-  FEFacetValues(const Mapping<dim, spacedim> &      mapping,
-                const FiniteElement<dim, spacedim> &fe,
-                const Quadrature<dim - 1> &         quadrature,
-                const UpdateFlags                   update_flags)
+  FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
+                    const FiniteElement<dim, spacedim> &fe,
+                    const Quadrature<dim - 1> &         quadrature,
+                    const UpdateFlags                   update_flags)
     : internal_fe_face_values(mapping, fe, quadrature, update_flags)
     , internal_fe_subface_values(mapping, fe, quadrature, update_flags)
     , internal_fe_face_values_neighbor(mapping, fe, quadrature, update_flags)
@@ -359,15 +358,19 @@ public:
     std::vector<types::global_dof_index> v2(n_dofs_fe_neighbor);
     cell_neighbor->get_dof_indices(v2);
 
-    facet_dof_indices.clear();
-    facet_dof_indices.insert(facet_dof_indices.end(), v.begin(), v.end());
-    facet_dof_indices.insert(facet_dof_indices.end(), v2.begin(), v2.end());
+    interface_dof_indices.clear();
+    interface_dof_indices.insert(interface_dof_indices.end(),
+                                 v.begin(),
+                                 v.end());
+    interface_dof_indices.insert(interface_dof_indices.end(),
+                                 v2.begin(),
+                                 v2.end());
   }
 
   /**
-   * Re-initialize this object to be used on a facet given by a single face of
-   * a cell. This is useful to use FEFacetValues to work on boundaries of the
-   * domain.
+   * Re-initialize this object to be used on a interface given by a single face
+   * of a cell. This is useful to use FEInterfaceValues to work on boundaries of
+   * the domain.
    *
    * As a consequence, queries like jump() will assume a value of zero for the
    * values on the "other" side.
@@ -380,8 +383,8 @@ public:
     fe_face_values          = &internal_fe_face_values;
     fe_face_values_neighbor = nullptr;
 
-    facet_dof_indices.resize(n_dofs_fe);
-    cell->get_dof_indices(facet_dof_indices);
+    interface_dof_indices.resize(n_dofs_fe);
+    cell->get_dof_indices(interface_dof_indices);
   }
 
   /**
@@ -394,7 +397,7 @@ public:
   }
 
   /**
-   * Return the normal vector of the Facet in each quadrature point.
+   * Return the normal vector of the facet in each quadrature point.
    */
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const
@@ -412,6 +415,15 @@ public:
   }
 
   /**
+   * Return a reference to the quadrature object in use.
+   */
+  const std::vector<Point<spacedim>> &
+  get_quadrature_points() const
+  {
+    return internal_fe_face_values.get_quadrature_points();
+  }
+
+  /**
    * Return the update flags set.
    */
   const UpdateFlags
@@ -422,11 +434,11 @@ public:
 
 
   /**
-   * Return the number of DoFs on this facet. This is the sum of the number of
-   * DoFs on the two adjacent cells.
+   * Return the number of DoFs on the current facet. This is the sum of the
+   * number of DoFs on the two adjacent cells.
    */
   unsigned
-  n_facet_dofs() const
+  n_interface_dofs() const
   {
     return n_dofs_fe + (is_boundary_facet() ? 0 : n_dofs_fe_neighbor);
   }
@@ -445,45 +457,47 @@ public:
    * Return the set of joint DoF indices. This includes indices from both cells.
    */
   std::vector<types::global_dof_index>
-  get_facet_dof_indices() const
+  get_interface_dof_indices() const
   {
-    Assert(facet_dof_indices.size() == n_facet_dofs(), ExcInternalError());
-    return facet_dof_indices;
+    Assert(interface_dof_indices.size() == n_interface_dofs(),
+           ExcInternalError());
+    return interface_dof_indices;
   }
 
   /**
-   * Translate a local facet_dof_index to a local dof_index of the underlying
-   * FEFaceValues.
+   * Translate a local interface_dof_index to a local dof_index of the
+   * underlying FEFaceValues.
    */
   unsigned int
-  facet_dof_index_to_fe_dof_index(unsigned int facet_dof_index) const
+  interface_dof_index_to_fe_dof_index(unsigned int interface_dof_index) const
   {
-    AssertIndexRange(facet_dof_index, n_facet_dofs());
-    return (facet_dof_index >= n_dofs_fe) ? (facet_dof_index - n_dofs_fe) :
-                                            facet_dof_index;
+    AssertIndexRange(interface_dof_index, n_interface_dofs());
+    return (interface_dof_index >= n_dofs_fe) ?
+             (interface_dof_index - n_dofs_fe) :
+             interface_dof_index;
   }
 
   /**
-   * For a given facet dof index return whether it belongs to the cell (0) or
-   * the neighbor (1).
+   * For a given interface dof index return whether it belongs to the cell (0)
+   * or the neighbor (1).
    */
   unsigned int
-  facet_dof_index_to_fe_index(const unsigned int facet_dof_index) const
+  interface_dof_index_to_fe_index(const unsigned int interface_dof_index) const
   {
-    AssertIndexRange(facet_dof_index, n_facet_dofs());
-    return (facet_dof_index < n_dofs_fe) ? 0 : 1;
+    AssertIndexRange(interface_dof_index, n_interface_dofs());
+    return (interface_dof_index < n_dofs_fe) ? 0 : 1;
   }
 
   /**
-   * Convert an FiniteElement index (0=cell, 1=neighbor) and dof index @p face_dof_idx
-   * into a facet DoF index.
+   * Convert an FiniteElement index (0=cell, 1=neighbor) and dof index @p face_dof_index
+   * into a interface DoF index.
    *
-   * The inverse of this operation is done with facet_dof_index_to_fe_index()
-   * and facet_dof_idx_to_fe_dof_idx().
+   * The inverse of this operation is done with
+   * interface_dof_index_to_fe_index() and interface_dof_idx_to_fe_dof_idx().
    */
   unsigned int
-  facet_dof_index(const unsigned int fe_index,
-                  const unsigned int face_dof_index) const
+  interface_dof_index(const unsigned int fe_index,
+                      const unsigned int face_dof_index) const
   {
     Assert(fe_index <= 1, ExcMessage("fe_index should be 0 or 1"));
     if (is_boundary_facet())
@@ -511,7 +525,7 @@ public:
   const FEFaceValuesBase<dim, spacedim> &
   get_fe_values(const unsigned int cell_or_neighbor) const
   {
-    AssertIndexRange(cell_or_neighbor, is_boundary_facet() ? 1 : 2);
+    AssertIndexRange(cell_or_neighbor, 2);
     return (cell_or_neighbor == 0) ? get_fe_values() : get_fe_values_neighbor();
   }
 
@@ -541,7 +555,7 @@ public:
   /**
    * Return a view of scalar FE.
    */
-  const FEFacetViews::Scalar<dim, spacedim> &
+  const FEInterfaceViews::Scalar<dim, spacedim> &
   operator[](const FEValuesExtractors::Scalar &scalar) const
   {
     Assert(scalar.component < fe_face_values->get_fe().n_components(),
@@ -556,13 +570,13 @@ public:
    *
    * Fail otherwise.
    */
-  const FEFacetViews::Scalar<dim, spacedim> &
+  const FEInterfaceViews::Scalar<dim, spacedim> &
   scalar() const
   {
     Assert(
       fe_face_values->get_fe().n_components() == 1,
       ExcMessage(
-        "FEFacet::scalar() is only valid if the FE has exactly one component!"));
+        "FEInterfaceValues::scalar() is only valid if the FE has exactly one component!"));
     return cached_views_scalar[0];
   }
 
@@ -574,7 +588,7 @@ public:
    * @ref vector_valued
    * module.
    */
-  const FEFacetViews::Vector<dim, spacedim> &
+  const FEInterfaceViews::Vector<dim, spacedim> &
   operator[](const FEValuesExtractors::Vector &vector) const
   {
     Assert(vector.first_vector_component + spacedim <=
@@ -606,14 +620,14 @@ private:
       cached_views_vector.emplace_back(*this, c);
   }
 
-  std::vector<types::global_dof_index> facet_dof_indices;
+  std::vector<types::global_dof_index> interface_dof_indices;
   unsigned int                         n_dofs_fe;
   unsigned int                         n_dofs_fe_neighbor;
 
-  std::vector<FEFacetViews::Scalar<dim, spacedim>> cached_views_scalar;
-  std::vector<FEFacetViews::Vector<dim, spacedim>> cached_views_vector;
-  FEFaceValuesBase<dim> *                          fe_face_values = nullptr;
-  FEFaceValuesBase<dim> *fe_face_values_neighbor                  = nullptr;
+  std::vector<FEInterfaceViews::Scalar<dim, spacedim>> cached_views_scalar;
+  std::vector<FEInterfaceViews::Vector<dim, spacedim>> cached_views_vector;
+  FEFaceValuesBase<dim> *                              fe_face_values = nullptr;
+  FEFaceValuesBase<dim> *fe_face_values_neighbor                      = nullptr;
 
   FEFaceValues<dim>    internal_fe_face_values;
   FESubfaceValues<dim> internal_fe_subface_values;
@@ -634,16 +648,14 @@ struct ScratchData
                                                update_gradients |
                                                update_quadrature_points |
                                                update_JxW_values,
-              const UpdateFlags facet_update_flags = update_values |
-                                                     update_gradients |
-                                                     update_quadrature_points |
-                                                     update_JxW_values |
-                                                     update_normal_vectors)
+              const UpdateFlags interface_update_flags =
+                update_values | update_gradients | update_quadrature_points |
+                update_JxW_values | update_normal_vectors)
     : fe_values(mapping, fe, QGauss<dim>(quadrature_degree), update_flags)
-    , fe_facet_values(mapping,
-                      fe,
-                      QGauss<dim - 1>(quadrature_degree),
-                      facet_update_flags)
+    , fe_interface_values(mapping,
+                          fe,
+                          QGauss<dim - 1>(quadrature_degree),
+                          interface_update_flags)
   {}
 
 
@@ -652,15 +664,16 @@ struct ScratchData
                 scratch_data.fe_values.get_fe(),
                 scratch_data.fe_values.get_quadrature(),
                 scratch_data.fe_values.get_update_flags())
-    , fe_facet_values(scratch_data.fe_values
-                        .get_mapping(), // TODO: implement for fe_facet_values
-                      scratch_data.fe_values.get_fe(),
-                      scratch_data.fe_facet_values.get_quadrature(),
-                      scratch_data.fe_facet_values.get_update_flags())
+    , fe_interface_values(
+        scratch_data.fe_values
+          .get_mapping(), // TODO: implement for fe_interface_values
+        scratch_data.fe_values.get_fe(),
+        scratch_data.fe_interface_values.get_quadrature(),
+        scratch_data.fe_interface_values.get_update_flags())
   {}
 
-  FEValues<dim>      fe_values;
-  FEFacetValues<dim> fe_facet_values;
+  FEValues<dim>          fe_values;
+  FEInterfaceValues<dim> fe_interface_values;
 };
 
 
