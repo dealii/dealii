@@ -25,7 +25,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/particles/particle_generator.h>
+#include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
@@ -43,7 +43,7 @@ test()
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
     std::vector<Point<dim>> particle_reference_locations(1, Point<dim>());
-    Particles::Generator::regular_reference_locations(
+    Particles::Generators::regular_reference_locations(
       tr, particle_reference_locations, particle_handler);
 
     deallog << "Particle number: " << particle_handler.n_global_particles()

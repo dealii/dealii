@@ -25,17 +25,19 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_P4EST
+
 namespace Particles
 {
   /**
    * A namespace that contains all classes that are related to the particle
    * generation.
    */
-  namespace Generator
+  namespace Generators
   {
     /**
      * A function that generates particles in every cell at specified @p particle_reference_locations.
-     * The total number of particles that is added to the @p partiche_handler object is
+     * The total number of particles that is added to the @p particle_handler object is
      * the number of locally owned cells of the @p triangulation times the number of
      * locations in @p particle_reference_locations. An optional @p mapping argument
      * can be used to map from @p particle_reference_locations to the real particle locations.
@@ -46,7 +48,7 @@ namespace Particles
      * Particles will be generated in every cell at these locations.
      *
      * @param particle_handler The particle handler that will take ownership
-     *  of the generated particles.
+     * of the generated particles.
      *
      * @param mapping An optional mapping object that is used to map reference
      * location in the unit cell to the real cells of the triangulation. If no
@@ -55,13 +57,16 @@ namespace Particles
     template <int dim, int spacedim = dim>
     void
     regular_reference_locations(
-      const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
-      const std::vector<Point<dim>> & particle_reference_locations,
-      ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping = MappingQ1<dim, spacedim>());
+      const Triangulation<dim, spacedim> &triangulation,
+      const std::vector<Point<dim>> &     particle_reference_locations,
+      ParticleHandler<dim, spacedim> &    particle_handler,
+      const Mapping<dim, spacedim> &      mapping =
+        StaticMappingQ1<dim, spacedim>::mapping);
 
-  } // namespace Generator
+  } // namespace Generators
 } // namespace Particles
+
+#endif // DEAL_II_WITH_P4EST
 
 DEAL_II_NAMESPACE_CLOSE
 

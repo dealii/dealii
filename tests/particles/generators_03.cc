@@ -16,7 +16,11 @@
 
 
 // check the particle generation using the
-// Particles::Generator::regular_reference_locations function.
+// Particles::Generator::regular_reference_locations function using a nonlinear
+// mapping in a hyper shell. The particles are generated at Gauss quadrature
+// points.
+
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -25,7 +29,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/particles/particle_generator.h>
+#include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
@@ -37,19 +41,17 @@ test()
   {
     parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
 
-    GridGenerator::hyper_cube(tr);
-    tr.refine_global(1);
-    MappingQ<dim, spacedim> mapping(1);
+    GridGenerator::hyper_shell(tr, Point<dim>(), 0.5, 1.0);
+
+    MappingQGeneric<dim, spacedim> mapping(4);
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    std::vector<Point<dim>> particle_reference_locations(1, Point<dim>());
+    std::vector<Point<dim>> particle_reference_locations =
+      QGauss<dim>(3).get_points();
 
-    for (unsigned int i = 0; i < dim; ++i)
-      particle_reference_locations[0](i) = 0.5;
-
-    Particles::Generator::regular_reference_locations(
-      tr, particle_reference_locations, particle_handler);
+    Particles::Generators::regular_reference_locations(
+      tr, particle_reference_locations, particle_handler, mapping);
 
     deallog << "Particle number: " << particle_handler.n_global_particles()
             << std::endl;
@@ -77,9 +79,6 @@ main(int argc, char *argv[])
 
   deallog.push("2d/2d");
   test<2, 2>();
-  deallog.pop();
-  deallog.push("2d/3d");
-  test<2, 3>();
   deallog.pop();
   deallog.push("3d/3d");
   test<3, 3>();
