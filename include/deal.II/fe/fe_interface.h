@@ -598,6 +598,62 @@ public:
     return cached_views_vector[vector.first_vector_component];
   }
 
+  /**
+   * Return the left or the right (if @p left is false) value on the interface for the shape
+   * function @p idx in the quadrature point @p q_point of component @p component.
+   */
+  double
+  choose(const bool         left,
+         const unsigned int interface_dof_index,
+         const unsigned int q_point,
+         const unsigned int component = 0) const
+  {
+    const unsigned int shape_fct =
+      interface_dof_index_to_fe_dof_index(interface_dof_index);
+    const unsigned int fe_idx =
+      interface_dof_index_to_fe_index(interface_dof_index);
+
+    if (left && fe_idx == 0)
+      return get_fe_values().shape_value_component(shape_fct,
+                                                   q_point,
+                                                   component);
+    if (!left && fe_idx == 1)
+      return get_fe_values_neighbor().shape_value_component(shape_fct,
+                                                            q_point,
+                                                            component);
+
+    return 0.0;
+  }
+
+  /**
+   * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function @p idx
+   * in the quadrature point @p q_point of component @p component.
+   */
+  double
+  jump(const unsigned int interface_dof_index,
+       const unsigned int q_point,
+       const unsigned int component = 0) const
+  {
+    const unsigned int shape_fct =
+      interface_dof_index_to_fe_dof_index(interface_dof_index);
+    const unsigned int fe_idx =
+      interface_dof_index_to_fe_index(interface_dof_index);
+
+    if (fe_idx == 0)
+      return get_fe_values().shape_value_component(shape_fct,
+                                                   q_point,
+                                                   component);
+    else
+      {
+        if (is_boundary_facet())
+          return 0.0;
+        else
+          return -get_fe_values_neighbor().shape_value_component(shape_fct,
+                                                                 q_point,
+                                                                 component);
+      }
+  }
+
 private:
   /**
    * update the internal data structures for the view objects.

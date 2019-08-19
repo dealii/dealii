@@ -471,9 +471,10 @@ namespace Step12
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_facet.scalar().choose(beta_n > 0, j, qpoint) // u-
-                * beta_n * fe_facet.scalar().jump(i, qpoint)    // (beta*n)[v]
-                * JxW[qpoint];                                  // dx
+                fe_facet.choose(beta_n > 0, j, qpoint) // u-
+                * beta_n                               // (beta*n)
+                * fe_facet.jump(i, qpoint)             // [v]
+                * JxW[qpoint];                         // dx
         }
     };
 
