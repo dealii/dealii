@@ -43,7 +43,7 @@
 // classes at all: they are passed to <code>DoFHandler</code> and
 // <code>FEValues</code> objects, and that is about it.
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_facet.h>
+#include <deal.II/fe/fe_interface.h>
 // We are going to use the simplest possible solver, called Richardson
 // iteration, that represents a simple defect correction. This, in combination
 // with a block SSOR preconditioner (defined in precondition_block.h), that
@@ -408,9 +408,9 @@ namespace Step12
                                const unsigned int &face_no,
                                ScratchData<dim> &  scratch_data,
                                CopyData &          copy_data) {
-      scratch_data.fe_facet_values.reinit(cell, face_no);
+      scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
-        scratch_data.fe_facet_values.get_fe_values();
+        scratch_data.fe_interface_values.get_fe_values();
 
       const auto &q_points = fe_face.get_quadrature_points();
 
@@ -448,15 +448,15 @@ namespace Step12
                            const unsigned int &nsf,
                            ScratchData<dim> &  scratch_data,
                            CopyData &          copy_data) {
-      FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
+      FEInterfaceValues<dim> &fe_facet = scratch_data.fe_interface_values;
       fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
       const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
 
       copy_data.face_data.emplace_back();
       CopyDataFace &copy_data_face = copy_data.face_data.back();
 
-      const unsigned int n_dofs        = fe_facet.n_facet_dofs();
-      copy_data_face.joint_dof_indices = fe_facet.get_facet_dof_indices();
+      const unsigned int n_dofs        = fe_facet.n_interface_dofs();
+      copy_data_face.joint_dof_indices = fe_facet.get_interface_dof_indices();
 
       copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
 
@@ -486,12 +486,16 @@ namespace Step12
 
       for (auto &cdf : c.face_data) // TODO: use constraints?
         {
-          const unsigned int dofs_per_cell = cdf.joint_dof_indices.size();
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int k = 0; k < dofs_per_cell; ++k)
-              system_matrix.add(cdf.joint_dof_indices[i],
-                                cdf.joint_dof_indices[k],
-                                cdf.cell_matrix(i, k));
+          constraints.distribute_local_to_global(cdf.cell_matrix,
+                                                 cdf.joint_dof_indices,
+                                                 system_matrix);
+          //          const unsigned int dofs_per_cell =
+          //          cdf.joint_dof_indices.size(); for (unsigned int i = 0; i <
+          //          dofs_per_cell; ++i)
+          //            for (unsigned int k = 0; k < dofs_per_cell; ++k)
+          //              system_matrix.add(cdf.joint_dof_indices[i],
+          //                                cdf.joint_dof_indices[k],
+          //                                cdf.cell_matrix(i, k));
         }
     };
 
