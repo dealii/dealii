@@ -362,7 +362,7 @@ namespace LineMinimization
     Assert(x1 != x2, ExcMessage("Point are the same"));
     const NumberType denom = (2. * g1 * x2 - 2. * g1 * x1 - 2. * f2 + 2. * f1);
     if (denom == 0)
-      return boost::none;
+      return {};
     else
       return (g1 * (x2 * x2 - x1 * x1) + 2. * (f1 - f2) * x1) / denom;
   }
@@ -382,13 +382,13 @@ namespace LineMinimization
     const NumberType beta1 = g1 + g2 - 3. * (f1 - f2) / (x1 - x2);
     const NumberType s     = beta1 * beta1 - g1 * g2;
     if (s < 0)
-      return boost::none;
+      return {};
 
     const NumberType beta2 = std::sqrt(s);
     const NumberType denom =
       x1 < x2 ? g2 - g1 + 2. * beta2 : g1 - g2 + 2. * beta2;
     if (denom == 0.)
-      return boost::none;
+      return {};
 
     return x1 < x2 ? x2 - (x2 - x1) * (g2 + beta2 - beta1) / denom :
                      x1 - (x1 - x2) * (g1 + beta2 - beta1) / denom;
@@ -422,7 +422,7 @@ namespace LineMinimization
     const NumberType denom =
       std::pow(x2_shift * x3_shift, 2) * (x2_shift - x3_shift);
     if (denom == 0.)
-      return boost::none;
+      return {};
 
     const NumberType A =
       (r1 * std::pow(x3_shift, 2) - r2 * std::pow(x2_shift, 2)) / denom;
@@ -433,7 +433,7 @@ namespace LineMinimization
     // now get the minimizer:
     const NumberType radical = B * B - A * C * 3;
     if (radical < 0)
-      return boost::none;
+      return {};
 
     return x1 + (-B + std::sqrt(radical)) / (A * 3);
   }
@@ -499,7 +499,7 @@ namespace LineMinimization
     std_cxx17::optional<NumberType> res =
       x_rec.size() > 0 ?
         cubic_fit_three_points(x1, f1, g1, x2, f2, x_rec[0], f_rec[0]) :
-        boost::none;
+        std_cxx17::optional<NumberType>{};
     if (res && *res >= bounds.first && *res <= bounds.second)
       return *res;
 
