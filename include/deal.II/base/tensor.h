@@ -45,6 +45,13 @@ template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
 class Vector;
+namespace Differentiation
+{
+  namespace SD
+  {
+    class Expression;
+  }
+} // namespace Differentiation
 #endif
 
 #ifndef DOXYGEN
@@ -1341,7 +1348,8 @@ namespace internal
               typename OtherNumber,
               typename std::enable_if<
                 !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
+                  typename ProductType<Number, OtherNumber>::type>::value &&
+                  !std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
                       division_operator(Tensor<rank, dim, Number> (&t)[dim],
@@ -1360,7 +1368,8 @@ namespace internal
               typename OtherNumber,
               typename std::enable_if<
                 std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
+                  typename ProductType<Number, OtherNumber>::type>::value ||
+                  std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
                       division_operator(dealii::Tensor<rank, dim, Number> (&t)[dim],
