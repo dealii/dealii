@@ -855,7 +855,8 @@ namespace DoFRenumbering
    * @pre for serial triangulation @p cell_order must have size
    * <code>dof_handler.get_triangulation().n_active_cells()</code>, whereas
    * in case of parallel triangulation its size should be
-   * parallel::Triangulation::n_locally_owned_active_cells(). Every active cell
+   * parallel::TriangulationBase::n_locally_owned_active_cells(). Every active
+   * cell
    * iterator of that triangulation needs to be present in @p cell_order exactly
    * once.
    */
@@ -883,8 +884,8 @@ namespace DoFRenumbering
    * vector therefore presents a (very particular) <i>permutation</i> of the
    * current DoF indices.
    * @param[out] inverse_renumbering The reverse of the permutation returned
-   * in the previous argument. In case of parallel::Triangulation the inverse
-   * is within locally owned DoFs.
+   * in the previous argument. In case of parallel::TriangulationBase the
+   * inverse is within locally owned DoFs.
    * @param[in] dof_handler The DoFHandler whose degrees of freedom are to be
    * renumbered.
    * @param[in] cell_order A vector that contains the order of the cells that
@@ -893,8 +894,8 @@ namespace DoFRenumbering
    * @pre for serial triangulation @p cell_order must have size
    * <code>dof_handler.get_triangulation().n_active_cells()</code>, whereas
    * in case of parallel triangulation its size should be
-   * parallel::Triangulation::n_locally_owned_active_cells(). Every active cell
-   * iterator of that triangulation needs to be present in @p
+   * parallel::TriangulationBase::n_locally_owned_active_cells(). Every active
+   * cell iterator of that triangulation needs to be present in @p
    * cell_order exactly once. @post For each @p i between zero and
    * <code>dof_handler.n_locally_owned_dofs()</code>, the condition
    * <code>renumbering[inverse_renumbering[i]] ==

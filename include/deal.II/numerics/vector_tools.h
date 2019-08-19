@@ -2580,7 +2580,7 @@ namespace VectorTools
    * VectorTools::integrate_difference() and you normally want to supply the
    * same value for @p norm as you used in VectorTools::integrate_difference().
    *
-   * If the given Triangulation is a parallel::Triangulation, entries
+   * If the given Triangulation is a parallel::TriangulationBase, entries
    * in @p cellwise_error that do not correspond to locally owned cells are
    * assumed to be 0.0 and a parallel reduction using MPI is done to compute
    * the global error.

@@ -44,13 +44,13 @@ namespace parallel
    * parallel::shared::Triangulation.
    */
   template <int dim, int spacedim = dim>
-  class Triangulation : public dealii::Triangulation<dim, spacedim>
+  class TriangulationBase : public dealii::Triangulation<dim, spacedim>
   {
   public:
     /**
      * Constructor.
      */
-    Triangulation(
+    TriangulationBase(
       MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
@@ -59,7 +59,7 @@ namespace parallel
     /**
      * Destructor.
      */
-    virtual ~Triangulation() override;
+    virtual ~TriangulationBase() override;
 
     /**
      * Return MPI communicator used by this triangulation.
@@ -238,6 +238,13 @@ namespace parallel
     void
     fill_level_ghost_owners();
   };
+
+  /**
+   *  Using directive for backwards-compatibility.
+   *  @deprecated Use TriangulationBase instead of Triangulation.
+   */
+  template <int dim, int spacedim = dim>
+  using Triangulation DEAL_II_DEPRECATED = TriangulationBase<dim, spacedim>;
 
 } // namespace parallel
 

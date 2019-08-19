@@ -183,7 +183,7 @@ namespace GridTools
 
         std::vector<BoundingBox<spacedim>> bbox_v(1, bbox);
         if (const auto tria_mpi =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &(*tria)))
           {
             covering_rtree = GridTools::build_global_description_tree(

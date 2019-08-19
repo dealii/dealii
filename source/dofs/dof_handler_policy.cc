@@ -5757,8 +5757,8 @@ namespace internal
 
         constexpr int dim      = DoFHandlerType::dimension;
         constexpr int spacedim = DoFHandlerType::space_dimension;
-        const parallel::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        const parallel::TriangulationBase<dim, spacedim> *tr =
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 

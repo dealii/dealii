@@ -1069,10 +1069,11 @@ namespace internal
           else
             {
               // a sequential triangulation. there is nothing we need to do here
-              Assert((dynamic_cast<
-                        const dealii::parallel::Triangulation<dim, spacedim> *>(
-                        &dof_handler.get_triangulation()) == nullptr),
-                     ExcInternalError());
+              Assert(
+                (dynamic_cast<
+                   const dealii::parallel::TriangulationBase<dim, spacedim> *>(
+                   &dof_handler.get_triangulation()) == nullptr),
+                ExcInternalError());
             }
         }
 

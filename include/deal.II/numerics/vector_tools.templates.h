@@ -1462,7 +1462,7 @@ namespace VectorTools
                                         project_to_boundary_first);
       else
         {
-          Assert((dynamic_cast<const parallel::Triangulation<dim> *>(
+          Assert((dynamic_cast<const parallel::TriangulationBase<dim> *>(
                     &(dof.get_triangulation())) == nullptr),
                  ExcNotImplemented());
           do_project(mapping,
@@ -1823,9 +1823,10 @@ namespace VectorTools
       }
     else
       {
-        Assert((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-                  &(dof.get_triangulation())) == nullptr),
-               ExcNotImplemented());
+        Assert(
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+             &(dof.get_triangulation())) == nullptr),
+          ExcNotImplemented());
         internal::do_project(mapping,
                              dof,
                              constraints,
@@ -1882,7 +1883,7 @@ namespace VectorTools
           const hp::QCollection<dim - 1> &q_boundary,
           const bool                      project_to_boundary_first)
   {
-    Assert((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &(dof.get_triangulation())) == nullptr),
            ExcNotImplemented());
 
@@ -8440,8 +8441,9 @@ namespace VectorTools
 
     MPI_Comm comm = MPI_COMM_SELF;
 #ifdef DEAL_II_WITH_MPI
-    if (const parallel::Triangulation<dim, spacedim> *ptria =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
+    if (const parallel::TriangulationBase<dim, spacedim> *ptria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria))
       comm = ptria->get_communicator();
 #endif
 
@@ -9071,8 +9073,8 @@ namespace VectorTools
 #ifdef DEAL_II_WITH_MPI
     // if this was a distributed DoFHandler, we need to do the reduction
     // over the entire domain
-    if (const parallel::Triangulation<dim, spacedim> *p_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *p_triangulation =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof.get_triangulation()))
       {
         // The type used to store the elements of the global vector may be a

@@ -727,7 +727,7 @@ namespace GridTools
    * distances between them, might make the function extremely faster.
    *
    * @note If a point is not found inside the mesh, or is lying inside an
-   * artificial cell of a parallel::Triangulation, an exception is thrown.
+   * artificial cell of a parallel::TriangulationBase, an exception is thrown.
    *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
@@ -814,9 +814,9 @@ namespace GridTools
    * @p local_points for each process, find the points lying on the locally
    * owned part of the mesh and compute the quadrature rules for them.
    * Distributed compute point locations is a function similar to
-   * GridTools::compute_point_locations but working for parallel::Triangulation
-   * objects and, unlike its serial version, also for a distributed
-   * triangulation (see parallel::distributed::Triangulation).
+   * GridTools::compute_point_locations but working for
+   * parallel::TriangulationBase objects and, unlike its serial version, also
+   * for a distributed triangulation (see parallel::distributed::Triangulation).
    *
    * @param[in] cache a GridTools::Cache object
    * @param[in] local_points the array of points owned by the current process.
@@ -850,7 +850,7 @@ namespace GridTools
    *
    * The function uses the triangulation's mpi communicator: for this reason it
    * throws an assert error if the Triangulation is not derived from
-   * parallel::Triangulation .
+   * parallel::TriangulationBase .
    *
    * In a serial execution the first three elements of the tuple are the same
    * as in GridTools::compute_point_locations .
@@ -3805,7 +3805,7 @@ namespace GridTools
 #    else
     constexpr int dim      = MeshType::dimension;
     constexpr int spacedim = MeshType::space_dimension;
-    auto tria = static_cast<const parallel::Triangulation<dim, spacedim> *>(
+    auto tria = static_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &mesh.get_triangulation());
     Assert(
       tria != nullptr,

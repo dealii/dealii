@@ -2127,7 +2127,7 @@ namespace parallel
       : // Do not check for distorted cells.
         // For multigrid, we need limit_level_difference_at_vertices
         // to make sure the transfer operators only need to consider two levels.
-      dealii::parallel::Triangulation<dim, spacedim>(
+      dealii::parallel::TriangulationBase<dim, spacedim>(
         mpi_communicator,
         (settings_ & construct_multigrid_hierarchy) ?
           static_cast<
@@ -2880,10 +2880,10 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::update_number_cache()
     {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
+      parallel::TriangulationBase<dim, spacedim>::update_number_cache();
 
       if (settings & construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
+        parallel::TriangulationBase<dim, spacedim>::fill_level_ghost_owners();
     }
 
 
@@ -4725,8 +4725,8 @@ namespace parallel
     Triangulation<dim, spacedim>::memory_consumption() const
     {
       std::size_t mem =
-        this->dealii::parallel::Triangulation<dim,
-                                              spacedim>::memory_consumption() +
+        this->dealii::parallel::TriangulationBase<dim, spacedim>::
+          memory_consumption() +
         MemoryConsumption::memory_consumption(triangulation_has_content) +
         MemoryConsumption::memory_consumption(connectivity) +
         MemoryConsumption::memory_consumption(parallel_forest) +
@@ -4767,8 +4767,8 @@ namespace parallel
     {
       try
         {
-          dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(
-            other_tria);
+          dealii::parallel::TriangulationBase<dim, spacedim>::
+            copy_triangulation(other_tria);
         }
       catch (
         const typename dealii::Triangulation<dim, spacedim>::DistortedCellList
@@ -4947,9 +4947,9 @@ namespace parallel
       const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
         smooth_grid,
       const Settings /*settings*/)
-      : dealii::parallel::Triangulation<1, spacedim>(mpi_communicator,
-                                                     smooth_grid,
-                                                     false)
+      : dealii::parallel::TriangulationBase<1, spacedim>(mpi_communicator,
+                                                         smooth_grid,
+                                                         false)
     {
       Assert(false, ExcNotImplemented());
     }

@@ -232,9 +232,9 @@ namespace DoFTools
     // and dofs on a cell owned by a different processor.
     constexpr int dim      = DoFHandlerType::dimension;
     constexpr int spacedim = DoFHandlerType::space_dimension;
-    if (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &dof_row.get_triangulation()) != nullptr ||
-        dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &dof_col.get_triangulation()) != nullptr)
       {
         Assert(&dof_row.get_triangulation() == &dof_col.get_triangulation(),

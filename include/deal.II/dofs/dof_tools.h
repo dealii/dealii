@@ -1311,7 +1311,7 @@ namespace DoFTools
 
   /**
    * Same as above but return the selected DoFs as IndexSet. In particular,
-   * for parallel::Triangulation objects this function should be preferred.
+   * for parallel::TriangulationBase objects this function should be preferred.
    */
   template <int dim, int spacedim>
   IndexSet

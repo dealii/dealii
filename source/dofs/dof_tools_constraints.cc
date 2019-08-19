@@ -2788,9 +2788,10 @@ namespace DoFTools
             MPI_Comm communicator = MPI_COMM_SELF;
             try
               {
-                const typename dealii::parallel::Triangulation<dim, spacedim>
+                const typename dealii::parallel::TriangulationBase<dim,
+                                                                   spacedim>
                   &tria = dynamic_cast<const typename dealii::parallel::
-                                         Triangulation<dim, spacedim> &>(
+                                         TriangulationBase<dim, spacedim> &>(
                     coarse_to_fine_grid_map.get_destination_grid()
                       .get_triangulation());
                 communicator          = tria.get_communicator();

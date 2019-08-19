@@ -273,8 +273,8 @@ MGTransferPrebuilt<VectorType>::build_matrices(
           // be manually distributed.
 
           // Retrieve communicator from triangulation if it is parallel
-          const parallel::Triangulation<dim, spacedim> *dist_tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          const parallel::TriangulationBase<dim, spacedim> *dist_tria =
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &(mg_dof.get_triangulation()));
 
           MPI_Comm communicator = dist_tria != nullptr ?

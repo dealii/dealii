@@ -431,7 +431,7 @@ namespace hp
     /**
      * Assign a hp::FECollection @p fe to this object.
      *
-     * In case a parallel::Triangulation is assigned to this object,
+     * In case a parallel::TriangulationBase is assigned to this object,
      * the active_fe_indices will be exchanged between processors so that
      * each one knows the indices on its own cells and all ghost cells.
      *
@@ -1595,8 +1595,8 @@ namespace hp
   std::vector<types::global_dof_index>
   DoFHandler<dim, spacedim>::compute_n_locally_owned_dofs_per_processor() const
   {
-    const parallel::Triangulation<dim, spacedim> *tr =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    const parallel::TriangulationBase<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()));
     if (tr != nullptr)
       return number_cache.get_n_locally_owned_dofs_per_processor(
@@ -1611,8 +1611,8 @@ namespace hp
   std::vector<IndexSet>
   DoFHandler<dim, spacedim>::compute_locally_owned_dofs_per_processor() const
   {
-    const parallel::Triangulation<dim, spacedim> *tr =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    const parallel::TriangulationBase<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()));
     if (tr != nullptr)
       return number_cache.get_locally_owned_dofs_per_processor(
@@ -1673,8 +1673,8 @@ namespace hp
     Assert(level < this->get_triangulation().n_global_levels(),
            ExcMessage("The given level index exceeds the number of levels "
                       "present in the triangulation"));
-    const parallel::Triangulation<dim, spacedim> *tr =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    const parallel::TriangulationBase<dim, spacedim> *tr =
+      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()));
     if (tr != nullptr)
       return mg_number_cache[level].get_locally_owned_dofs_per_processor(

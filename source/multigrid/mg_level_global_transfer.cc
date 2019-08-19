@@ -83,8 +83,8 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
 
   // now do a global reduction over all processors to see what operation
   // they can agree upon
-  if (const parallel::Triangulation<dim, spacedim> *ptria =
-        dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  if (const parallel::TriangulationBase<dim, spacedim> *ptria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()))
     perform_plain_copy = (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
                                               ptria->get_communicator()) == 1);
@@ -295,8 +295,8 @@ void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof)
 {
-  const parallel::Triangulation<dim, spacedim> *ptria =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  const parallel::TriangulationBase<dim, spacedim> *ptria =
+    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &mg_dof.get_triangulation());
   const MPI_Comm mpi_communicator =
     ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;

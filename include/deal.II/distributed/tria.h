@@ -154,7 +154,7 @@ namespace parallel
      * and this function needs to know about boundaries. In other words, it is
      * <i>not</i> enough to just set boundary indicators on newly created
      * faces only <i>after</i> calling
-     * <tt>distributed::parallel::Triangulation::execute_coarsening_and_refinement</tt>:
+     * <tt>distributed::parallel::TriangulationBase::execute_coarsening_and_refinement</tt>:
      * it actually has to happen while that function is still running.
      *
      * The way to do this is by writing a function that sets boundary
@@ -248,7 +248,8 @@ namespace parallel
      * @ingroup distributed
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
+    class Triangulation
+      : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
     public:
       /**
@@ -1199,7 +1200,7 @@ namespace parallel
       get_cell_weights() const;
 
       /**
-       * Override the implementation in parallel::Triangulation because
+       * Override the implementation in parallel::TriangulationBase because
        * we can ask p4est about ghost neighbors across periodic boundaries.
        *
        * Specifically, this function determines the neighboring subdomains that
@@ -1236,7 +1237,7 @@ namespace parallel
      */
     template <int spacedim>
     class Triangulation<1, spacedim>
-      : public dealii::parallel::Triangulation<1, spacedim>
+      : public dealii::parallel::TriangulationBase<1, spacedim>
     {
     public:
       /**
@@ -1410,7 +1411,8 @@ namespace parallel
      * p4est is not available.
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
+    class Triangulation
+      : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
     public:
       /**

@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
   /**
-   * Anytime a parallel::Triangulation is repartitioned, either upon request
+   * Anytime a parallel::TriangulationBase is repartitioned, either upon request
    * or by refinement/coarsening, cells will be distributed amongst all
    * subdomains to achieve an equally balanced workload. If the workload per
    * cell varies, which is in general the case for hp::DoFHandler objects, we
@@ -40,7 +40,7 @@ namespace parallel
    * a hp::DoFHandler. One can choose from predefined weighting
    * algorithms provided by this class or provide a custom one. The
    * chosen weighting function will be connected to the corresponding
-   * signal of the linked parallel::Triangulation via callback.
+   * signal of the linked parallel::TriangulationBase via callback.
    *
    * An object of this class needs to exist for every DoFHandler associated
    * with the Triangulation we work on to achieve satisfying work balancing
@@ -147,7 +147,7 @@ namespace parallel
      * We store both to make sure to always work on the correct combination of
      * both.
      */
-    SmartPointer<const parallel::Triangulation<dim, spacedim>, CellWeights>
+    SmartPointer<const parallel::TriangulationBase<dim, spacedim>, CellWeights>
       triangulation;
 
     /**

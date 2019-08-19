@@ -482,8 +482,8 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
          ExcDimensionMismatch(
            max_level, dof_handler.get_triangulation().n_global_levels() - 1));
 
-  const parallel::Triangulation<dim, spacedim> *p_tria =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  const parallel::TriangulationBase<dim, spacedim> *p_tria =
+    (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &dof_handler.get_triangulation()));
   MPI_Comm mpi_communicator =
     p_tria != nullptr ? p_tria->get_communicator() : MPI_COMM_SELF;
@@ -607,13 +607,14 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   // dst == defect level block vector. At first run this vector is not
   // initialized. Do this below:
   {
-    const parallel::Triangulation<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    const parallel::TriangulationBase<dim, spacedim> *tria =
+      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &(mg_dof[0]->get_triangulation())));
     for (unsigned int i = 1; i < n_blocks; ++i)
-      AssertThrow((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-                     &(mg_dof[0]->get_triangulation())) == tria),
-                  ExcMessage("The DoFHandler use different Triangulations!"));
+      AssertThrow(
+        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+           &(mg_dof[0]->get_triangulation())) == tria),
+        ExcMessage("The DoFHandler use different Triangulations!"));
 
     MGLevelObject<bool> do_reinit;
     do_reinit.resize(min_level, max_level);
