@@ -79,13 +79,13 @@ of course is going to change as the fluids move around.
 The second part of the equations is the description of the
 dynamics of the saturation. The saturation equation for the displacing fluid (water) is:
 @f{eqnarray*}
-  S_{t} + \nabla \cdot (F(S) \mathbf{u}) = \{q}_{w},
+  S_{t} + \nabla \cdot (F(S) \mathbf{u}) = q_{w},
   \\
-  S_{t} + F(S) \nabla \mathbf{u} + \mathbf{u} \cdot \nabla F(S) = S_{t} + F(S) * \q + \mathbf{u} \cdot \nabla F(S) = \{q}_{w}.
+  S_{t} + F(S) \nabla \mathbf{u} + \mathbf{u} \cdot \nabla F(S) = S_{t} + F(S) * q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
 @f}
-where $\{q}_{w}$ is the flow rate of the displacing fluid (water) and is related to the fractional flow F(S) through:
+where $q_{w}$ is the flow rate of the displacing fluid (water) and is related to the fractional flow F(S) through:
 @f[
-  \{q}_{w} = F(S) * \q,
+  q_{w} = F(S) * q,
   \\
   F(S)
   =
