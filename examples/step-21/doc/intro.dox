@@ -77,21 +77,33 @@ similar). However, we have not said anything yet about the saturation, which
 of course is going to change as the fluids move around.
 
 The second part of the equations is the description of the
-dynamics of the saturation. The saturation equation for the displacing fluid (water) is:
+dynamics of the saturation, i.e., how the relative concentration of the
+two fluids changes with time. The saturation equation for the displacing 
+fluid (water) is given by the following conservation law:
 @f{eqnarray*}
   S_{t} + \nabla \cdot (F(S) \mathbf{u}) = q_{w},
-  \\
-  S_{t} + F(S) \nabla \mathbf{u} + \mathbf{u} \cdot \nabla F(S) = S_{t} + F(S) * q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
 @f}
-where $q_{w}$ is the flow rate of the displacing fluid (water) and is related to the fractional flow F(S) through:
+which can be rewritten by using the product rule of the divergence operator
+in the previous equation:
+@f{eqnarray*}
+  S_{t} + F(S) \left[\nabla \cdot \mathbf{u}\right] 
+        + \mathbf{u} \cdot \left[ \nabla F(S)\right]
+  = S_{t} + F(S) q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
+@f}
+Here, $q=\nabla\cdot \mathbf{u}$ is the total influx introduced
+above, and $q_{w}$ is the flow rate of the displacing fluid (water).
+These two are related to the fractional flow $F(S)$ in the following way:
 @f[
-  q_{w} = F(S) * q,
-  \\
+  q_{w} = F(S) q,
+@f]
+where the fractional flow is often parameterized via the (heuristic) expression
+@f[
   F(S)
   =
   \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}.
 @f]
-Thus, we obtain the saturation equation in the following advected form:
+Putting it all together yields the saturation equation in the following,
+advected form:
 @f{eqnarray*}
   S_{t} + \mathbf{u} \cdot \nabla F(S) = 0,
 @f}
