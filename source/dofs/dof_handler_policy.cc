@@ -4836,7 +4836,7 @@ namespace internal
           // from elsewhere
           auto pack =
             [](const typename DoFHandlerType::active_cell_iterator &cell)
-            -> boost::optional<std::vector<types::global_dof_index>> {
+            -> std_cxx17::optional<std::vector<types::global_dof_index>> {
             Assert(cell->is_locally_owned(), ExcInternalError());
 
             // first see whether we need to do anything at all on this cell.
@@ -4887,7 +4887,8 @@ namespace internal
                    local_dof_indices.end());
                 Assert(is_complete, ExcInternalError());
 #    endif
-                return boost::optional<std::vector<types::global_dof_index>>();
+                return std_cxx17::optional<
+                  std::vector<types::global_dof_index>>();
               }
           };
 
