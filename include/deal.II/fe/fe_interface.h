@@ -49,8 +49,6 @@ namespace FEInterfaceViews
   class Scalar : public Base<dim, spacedim>
   {
   public:
-    // needed?   Scalar ();
-
     /**
      * This is the type returned for values.
      */
@@ -73,21 +71,26 @@ namespace FEInterfaceViews
     {}
 
     /**
-     * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function @p idx
-     * in the quadrature point @p q_point.
+     * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function
+     * @p interface_dof_index in the quadrature point @p q_point.
      */
     value_type
-    jump(const unsigned int idx, const unsigned int q_point) const
+    jump(const unsigned int interface_dof_index,
+         const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(
+          interface_dof_index);
+      const unsigned int fe_idx =
+        this->fe_interface->interface_dof_index_to_fe_index(
+          interface_dof_index);
 
-      if (shape_fct == idx)
+      if (fe_idx == 0)
         return this->fe_interface->get_fe_values().shape_value_component(
           shape_fct, q_point, component);
       else
         {
-          if (this->fe_interface->is_boundary_facet())
+          if (this->fe_interface->at_boundary())
             return 0.0;
           else
             return -this->fe_interface->get_fe_values_neighbor()
@@ -98,15 +101,19 @@ namespace FEInterfaceViews
     /**
      * Return the average value $\{u\}=\frac{1}{2}(u_1 + u_2)$ on the interface
      * for the shape
-     * function @p idx in the quadrature point @p q_point.
+     * function @p interface_dof_index in the quadrature point @p q_point.
      */
     value_type
-    average(const unsigned int idx, const unsigned int q_point) const
+    average(const unsigned int interface_dof_index,
+            const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(
+          interface_dof_index);
       const unsigned int fe_idx =
-        this->fe_interface->interface_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(
+          interface_dof_index);
+
       return 0.5 * this->fe_interface->get_fe_values(fe_idx)
                      .shape_value_component(shape_fct, q_point, component);
     }
@@ -114,38 +121,45 @@ namespace FEInterfaceViews
     /**
      * Return the average of the gradient $\{\nabla u\}$ on the interface for
      * the shape
-     * function @p idx in the quadrature point @p q_point.
+     * function @p interface_dof_index in the quadrature point @p q_point.
      */
     gradient_type
-    gradient_average(const unsigned int idx, const unsigned int q_point) const
+    gradient_average(const unsigned int interface_dof_index,
+                     const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(
+          interface_dof_index);
       const unsigned int fe_idx =
-        this->fe_interface->interface_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(
+          interface_dof_index);
 
       return 0.5 * this->fe_interface->get_fe_values(fe_idx)[extractor]
                      .gradient(shape_fct, q_point);
     }
 
     /**
-     * Return the left or the right (if @p left is false) value on the interface for the shape
-     * function @p idx in the quadrature point @p q_point.
+     * Return the current (if @p current_cell is true) or neighboring (if @p
+     * current_cell is false) value on the interface for the shape function @p
+     * interface_dof_index in the quadrature point @p q_point of component @p
+     * component.
      */
     value_type
-    choose(const bool         left,
-           const unsigned int idx,
+    choose(const bool         current_cell,
+           const unsigned int interface_dof_index,
            const unsigned int q_point) const
     {
       const unsigned int shape_fct =
-        this->fe_interface->interface_dof_index_to_fe_dof_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_dof_index(
+          interface_dof_index);
       const unsigned int fe_idx =
-        this->fe_interface->interface_dof_index_to_fe_index(idx);
+        this->fe_interface->interface_dof_index_to_fe_index(
+          interface_dof_index);
 
-      if (left && fe_idx == 0)
+      if (current_cell && fe_idx == 0)
         return this->fe_interface->get_fe_values().shape_value_component(
           shape_fct, q_point, component);
-      if (!left && fe_idx == 1)
+      if (!current_cell && fe_idx == 1)
         return this->fe_interface->get_fe_values_neighbor()
           .shape_value_component(shape_fct, q_point, component);
 
@@ -191,7 +205,7 @@ namespace FEInterfaceViews
                                                                     q_point);
       else
         {
-          if (this->fe_interface->is_boundary_facet())
+          if (this->fe_interface->at_boundary())
             {
               // we should not get here
               Assert(false, ExcInternalError());
@@ -293,7 +307,8 @@ public:
 
   /**
    * Construct the FeInterfaceValues with a single FiniteElement (same on both
-   * sides of the facet). The FeFaceValues objects will be initialized with the given @p mapping, @p quadrature, and @p update_flags.
+   * sides of the facet). The FeFaceValues objects will be initialized with
+   * the given @p mapping, @p quadrature, and @p update_flags.
    *
    */
   FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
@@ -314,8 +329,8 @@ public:
 
 
   /**
-   * Re-initialize this object to be used on a new facet given by two faces of
-   * two neighboring cells.
+   * Re-initialize this object to be used on a new interface given by two faces
+   * of two neighboring cells.
    *
    * The arguments including their order is identical to the @p face_worker arguments
    * in MeshWorker::mesh_loop.
@@ -397,7 +412,7 @@ public:
   }
 
   /**
-   * Return the normal vector of the facet in each quadrature point.
+   * Return the normal vector of the interface in each quadrature point.
    */
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const
@@ -434,21 +449,21 @@ public:
 
 
   /**
-   * Return the number of DoFs on the current facet. This is the sum of the
+   * Return the number of DoFs on the current interface. This is the sum of the
    * number of DoFs on the two adjacent cells.
    */
   unsigned
   n_interface_dofs() const
   {
-    return n_dofs_fe + (is_boundary_facet() ? 0 : n_dofs_fe_neighbor);
+    return n_dofs_fe + (at_boundary() ? 0 : n_dofs_fe_neighbor);
   }
 
   /**
-   * Return if the current facet, which is set by reinit(), is an internal face
-   * with two adjacent cells or a boundary face.
+   * Return if the current interface, which is set by reinit(), is an internal
+   * face with two adjacent cells or a boundary face.
    */
   bool
-  is_boundary_facet() const
+  at_boundary() const
   {
     return fe_face_values_neighbor == nullptr;
   }
@@ -479,7 +494,7 @@ public:
 
   /**
    * For a given interface dof index return whether it belongs to the cell (0)
-   * or the neighbor (1).
+   * or to the neighbor (1).
    */
   unsigned int
   interface_dof_index_to_fe_index(const unsigned int interface_dof_index) const
@@ -489,8 +504,8 @@ public:
   }
 
   /**
-   * Convert an FiniteElement index (0=cell, 1=neighbor) and dof index @p face_dof_index
-   * into a interface DoF index.
+   * Convert an FiniteElement index @p fe_index (0=cell, 1=neighbor) and dof
+   * index @p face_dof_index into an interface DoF index.
    *
    * The inverse of this operation is done with
    * interface_dof_index_to_fe_index() and interface_dof_idx_to_fe_dof_idx().
@@ -500,7 +515,7 @@ public:
                       const unsigned int face_dof_index) const
   {
     Assert(fe_index <= 1, ExcMessage("fe_index should be 0 or 1"));
-    if (is_boundary_facet())
+    if (at_boundary())
       Assert(fe_index == 0,
              ExcMessage("A boundary facet only has FE index 0."));
 
@@ -521,6 +536,12 @@ public:
 
   /**
    * Return the FEFaceValue object of the cell or the neighboring cell
+   *
+   * If @p cell_or_neighbor is 0, return the cell's, if it is 1, return the
+   * neighboring cell's FEFaceValue object.
+   *
+   * @note The argument @p cell_or_neighbor is returned by
+   * interface_dof_index_to_fe_index().
    */
   const FEFaceValuesBase<dim, spacedim> &
   get_fe_values(const unsigned int cell_or_neighbor) const
@@ -529,17 +550,22 @@ public:
     return (cell_or_neighbor == 0) ? get_fe_values() : get_fe_values_neighbor();
   }
 
+  /**
+   * Return the FEFaceValue object of the current cell
+   */
   const FEFaceValuesBase<dim, spacedim> &
   get_fe_values() const
   {
     return *fe_face_values;
   }
 
+  /**
+   * Return the FEFaceValue object of the current neighboring cell
+   */
   const FEFaceValuesBase<dim, spacedim> &
   get_fe_values_neighbor() const
   {
-    Assert(!is_boundary_facet(),
-           ExcMessage("Not possible for boundary Facet."));
+    Assert(!at_boundary(), ExcMessage("Not possible for boundary Facet."));
     return *fe_face_values_neighbor;
   }
 
@@ -553,7 +579,12 @@ public:
   }
 
   /**
-   * Return a view of scalar FE.
+   * Return a view of a given scalar FE given by the extractor @p scalar.
+   *
+   * The concept of views is explained in the documentation of
+   * the namespace FEValuesViews and in particular in the
+   * @ref vector_valued
+   * module.
    */
   const FEInterfaceViews::Scalar<dim, spacedim> &
   operator[](const FEValuesExtractors::Scalar &scalar) const
@@ -562,22 +593,6 @@ public:
            ExcMessage("Invalid FEValuesExtractors::Scalar!"));
 
     return cached_views_scalar[scalar.component];
-  }
-
-  /**
-   * Return *this[FEValuesExtractors::Scalar(0)] if this FE is scalar (has
-   * only a single component).
-   *
-   * Fail otherwise.
-   */
-  const FEInterfaceViews::Scalar<dim, spacedim> &
-  scalar() const
-  {
-    Assert(
-      fe_face_values->get_fe().n_components() == 1,
-      ExcMessage(
-        "FEInterfaceValues::scalar() is only valid if the FE has exactly one component!"));
-    return cached_views_scalar[0];
   }
 
   /**
@@ -599,11 +614,18 @@ public:
   }
 
   /**
-   * Return the left or the right (if @p left is false) value on the interface for the shape
-   * function @p idx in the quadrature point @p q_point of component @p component.
+   * Return the current (if @p current_cell is true) or neighboring (if @p
+   * current_cell is false) value on the interface for the shape function @p
+   * interface_dof_index in the quadrature point @p q_point of component @p
+   * component.
+   *
+   * @note This function is typically used to pick the upstream or downstream
+   * value based on a direction. This can be achieved by using
+   * <code>(direction * normal)>0</code> as the first argument of this
+   * function.
    */
   double
-  choose(const bool         left,
+  choose(const bool         current_cell,
          const unsigned int interface_dof_index,
          const unsigned int q_point,
          const unsigned int component = 0) const
@@ -613,11 +635,11 @@ public:
     const unsigned int fe_idx =
       interface_dof_index_to_fe_index(interface_dof_index);
 
-    if (left && fe_idx == 0)
+    if (current_cell && fe_idx == 0)
       return get_fe_values().shape_value_component(shape_fct,
                                                    q_point,
                                                    component);
-    if (!left && fe_idx == 1)
+    if (!current_cell && fe_idx == 1)
       return get_fe_values_neighbor().shape_value_component(shape_fct,
                                                             q_point,
                                                             component);
@@ -626,8 +648,9 @@ public:
   }
 
   /**
-   * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function @p idx
-   * in the quadrature point @p q_point of component @p component.
+   * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function
+   * @p interface_dof_index in the quadrature point @p q_point of component @p
+   * component.
    */
   double
   jump(const unsigned int interface_dof_index,
@@ -645,7 +668,7 @@ public:
                                                    component);
     else
       {
-        if (is_boundary_facet())
+        if (at_boundary())
           return 0.0;
         else
           return -get_fe_values_neighbor().shape_value_component(shape_fct,
@@ -656,7 +679,7 @@ public:
 
 private:
   /**
-   * update the internal data structures for the view objects.
+   * Update the internal data structures for the view objects.
    */
   void
   update_view_cache()
@@ -671,23 +694,66 @@ private:
     const unsigned int n_vec_views =
       (fe.n_components() < spacedim) ? 0 : (fe.n_components() - spacedim);
     cached_views_vector.clear();
+
     cached_views_vector.reserve(n_vec_views);
     for (unsigned int c = 0; c < n_vec_views; ++c)
       cached_views_vector.emplace_back(*this, c);
   }
 
+  /**
+   * The list of DoF indices for the current interface, filled in reinit().
+   */
   std::vector<types::global_dof_index> interface_dof_indices;
-  unsigned int                         n_dofs_fe;
-  unsigned int                         n_dofs_fe_neighbor;
 
+  /**
+   * The number of DoFs belonging to the current cell
+   */
+  unsigned int n_dofs_fe;
+
+  /**
+   * The number of DoFs belonging to the neighboring cell
+   */
+  unsigned int n_dofs_fe_neighbor;
+
+  /**
+   * Cache for the scalar views, filled in update_view_cache().
+   */
   std::vector<FEInterfaceViews::Scalar<dim, spacedim>> cached_views_scalar;
-  std::vector<FEInterfaceViews::Vector<dim, spacedim>> cached_views_vector;
-  FEFaceValuesBase<dim> *                              fe_face_values = nullptr;
-  FEFaceValuesBase<dim> *fe_face_values_neighbor                      = nullptr;
 
-  FEFaceValues<dim>    internal_fe_face_values;
+  /**
+   * Cache for the vector views, filled in update_view_cache().
+   */
+  std::vector<FEInterfaceViews::Vector<dim, spacedim>> cached_views_vector;
+
+  /**
+   * Pointer to internal_fe_face_values or internal_fe_subface_values,
+   * respectively.
+   */
+  FEFaceValuesBase<dim> *fe_face_values = nullptr;
+  /**
+   * Pointer to internal_fe_face_values_neighbor,
+   * internal_fe_subface_values_neighbor, or nullptr, respectively.
+   */
+  FEFaceValuesBase<dim> *fe_face_values_neighbor = nullptr;
+
+  /**
+   * The FEFaceValues object for the current cell.
+   */
+  FEFaceValues<dim> internal_fe_face_values;
+
+  /**
+   * The FEFaceValues object for the current cell if the cell is refined.
+   */
   FESubfaceValues<dim> internal_fe_subface_values;
-  FEFaceValues<dim>    internal_fe_face_values_neighbor;
+
+  /**
+   * The FEFaceValues object for the neighboring cell.
+   */
+  FEFaceValues<dim> internal_fe_face_values_neighbor;
+
+  /**
+   * The FEFaceValues object for the neighboring cell if the cell is refined.
+   */
   FESubfaceValues<dim> internal_fe_subface_values_neighbor;
 };
 
