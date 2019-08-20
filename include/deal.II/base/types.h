@@ -97,12 +97,14 @@ namespace types
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
-   * The type used for coarse-cell ids.
+   * The type used for coarse-cell ids. See the glossary
+   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    */
   using coarse_cell_id = unsigned long long int;
 #else
   /**
-   * The type used for coarse-cell ids.
+   * The type used for coarse-cell ids. See the glossary
+   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    */
   using coarse_cell_id = unsigned int;
 #endif
@@ -201,7 +203,8 @@ namespace numbers
     static_cast<types::global_dof_index>(-1);
 
   /**
-   * An invalid value for coarse-cell ids.
+   * An invalid value for coarse cell ids. See the glossary
+   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    */
   const types::coarse_cell_id invalid_coarse_cell_id =
     static_cast<types::coarse_cell_id>(-1);

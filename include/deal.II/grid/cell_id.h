@@ -39,10 +39,12 @@ class Triangulation;
 
 /**
  * A class to represent a unique ID for a cell in a Triangulation. It is
- * returned by <tt>cell->id()</tt> if <tt>cell</tt> is a cell iterator.
+ * returned by `cell->id()` (i.e., CellAccessor::id()) where
+ * `cell` is assumed to be a cell iterator.
  *
- * This class
- * stores the index of the coarse cell from which a cell is descendant,
+ * This class stores the index of the coarse cell from which a cell is
+ * descendant (or, more specifically, the
+ * entry on @ref GlossCoarseCellId "coarse cell IDs"),
  * together with information on how to reach the cell from that coarse cell
  * (i.e., which child index to take on each level of the triangulation when
  * moving from one cell to its children). The important point about this
