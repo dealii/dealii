@@ -38,8 +38,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
-  : FE_PolyTensor<PolynomialsBernardiRaugel<dim>, dim>(
-      p,
+  : FE_PolyTensor<dim>(
+      PolynomialsBernardiRaugel<dim>(p),
       FiniteElementData<dim>(get_dpo_vector(),
                              dim,
                              2,

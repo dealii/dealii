@@ -166,9 +166,9 @@ namespace internal
 
 
 
-template <class PolynomialType, int dim, int spacedim>
-FE_PolyTensor<PolynomialType, dim, spacedim>::FE_PolyTensor(
-  const unsigned int                degree,
+template <int dim, int spacedim>
+FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
+  const TensorPolynomialsBase<dim> &polynomials,
   const FiniteElementData<dim> &    fe_data,
   const std::vector<bool> &         restriction_is_additive_flags,
   const std::vector<ComponentMask> &nonzero_components)
@@ -176,7 +176,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::FE_PolyTensor(
                                  restriction_is_additive_flags,
                                  nonzero_components)
   , mapping_kind({MappingKind::mapping_none})
-  , poly_space(PolynomialType(degree))
+  , poly_space(polynomials.clone())
 {
   cached_point(0) = -1;
   // Set up the table converting
@@ -192,19 +192,28 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::FE_PolyTensor(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
+FE_PolyTensor<dim, spacedim>::FE_PolyTensor(const FE_PolyTensor &fe)
+  : FiniteElement<dim, spacedim>(fe)
+  , mapping_kind(fe.mapping_kind)
+  , poly_space(fe.poly_space->clone())
+  , inverse_node_matrix(fe.inverse_node_matrix)
+{}
+
+
+
+template <int dim, int spacedim>
 bool
-FE_PolyTensor<PolynomialType, dim, spacedim>::single_mapping_kind() const
+FE_PolyTensor<dim, spacedim>::single_mapping_kind() const
 {
   return mapping_kind.size() == 1;
 }
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 MappingKind
-FE_PolyTensor<PolynomialType, dim, spacedim>::get_mapping_kind(
-  const unsigned int i) const
+FE_PolyTensor<dim, spacedim>::get_mapping_kind(const unsigned int i) const
 {
   if (single_mapping_kind())
     return mapping_kind[0];
@@ -215,11 +224,10 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::get_mapping_kind(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 double
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value(
-  const unsigned int,
-  const Point<dim> &) const
+FE_PolyTensor<dim, spacedim>::shape_value(const unsigned int,
+                                          const Point<dim> &) const
 
 {
   Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
@@ -228,9 +236,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 double
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value_component(
+FE_PolyTensor<dim, spacedim>::shape_value_component(
   const unsigned int i,
   const Point<dim> & p,
   const unsigned int component) const
@@ -243,11 +251,11 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value_component(
   if (cached_point != p || cached_values.size() == 0)
     {
       cached_point = p;
-      cached_values.resize(poly_space.n());
+      cached_values.resize(poly_space->n());
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space.compute(
+      poly_space->compute(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
@@ -262,11 +270,10 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value_component(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 Tensor<1, dim>
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad(
-  const unsigned int,
-  const Point<dim> &) const
+FE_PolyTensor<dim, spacedim>::shape_grad(const unsigned int,
+                                         const Point<dim> &) const
 {
   Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<1, dim>();
@@ -274,9 +281,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 Tensor<1, dim>
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_component(
+FE_PolyTensor<dim, spacedim>::shape_grad_component(
   const unsigned int i,
   const Point<dim> & p,
   const unsigned int component) const
@@ -289,11 +296,11 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_component(
   if (cached_point != p || cached_grads.size() == 0)
     {
       cached_point = p;
-      cached_grads.resize(poly_space.n());
+      cached_grads.resize(poly_space->n());
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space.compute(
+      poly_space->compute(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
@@ -309,11 +316,10 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_component(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 Tensor<2, dim>
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad(
-  const unsigned int,
-  const Point<dim> &) const
+FE_PolyTensor<dim, spacedim>::shape_grad_grad(const unsigned int,
+                                              const Point<dim> &) const
 {
   Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<2, dim>();
@@ -321,9 +327,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 Tensor<2, dim>
-FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad_component(
+FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
   const unsigned int i,
   const Point<dim> & p,
   const unsigned int component) const
@@ -336,11 +342,11 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad_component(
   if (cached_point != p || cached_grad_grads.size() == 0)
     {
       cached_point = p;
-      cached_grad_grads.resize(poly_space.n());
+      cached_grad_grads.resize(poly_space->n());
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space.compute(
+      poly_space->compute(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
@@ -359,9 +365,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad_component(
 // Fill data of FEValues
 //---------------------------------------------------------------------------
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 void
-FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
+FE_PolyTensor<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
   const Quadrature<dim> &                                     quadrature,
@@ -934,9 +940,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 void
-FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
+FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const Quadrature<dim - 1> &                                 quadrature,
@@ -1559,9 +1565,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 void
-FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
+FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
@@ -2177,9 +2183,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_PolyTensor<PolynomialType, dim, spacedim>::requires_update_flags(
+FE_PolyTensor<dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;

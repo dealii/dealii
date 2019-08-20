@@ -33,8 +33,8 @@ DEAL_II_NAMESPACE_OPEN
 template <class PolynomialType, int dim, int spacedim>
 FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
                                                         MappingKind        map)
-  : FE_PolyTensor<PolynomialType, dim, spacedim>(
-      deg,
+  : FE_PolyTensor<dim, spacedim>(
+      PolynomialType(deg),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,
@@ -69,7 +69,7 @@ std::string
 FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_DGVector_" << this->poly_space.name() << "<" << dim << ">("
+  namebuf << "FE_DGVector_" << this->poly_space->name() << "<" << dim << ">("
           << this->degree - 1 << ")";
   return namebuf.str();
 }

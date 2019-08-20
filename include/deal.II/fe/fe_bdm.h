@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup fe
  */
 template <int dim>
-class FE_BDM : public FE_PolyTensor<PolynomialsBDM<dim>, dim>
+class FE_BDM : public FE_PolyTensor<dim>
 {
 public:
   /**

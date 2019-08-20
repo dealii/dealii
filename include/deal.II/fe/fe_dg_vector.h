@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2010
  */
 template <class PolynomialType, int dim, int spacedim = dim>
-class FE_DGVector : public FE_PolyTensor<PolynomialType, dim, spacedim>
+class FE_DGVector : public FE_PolyTensor<dim, spacedim>
 {
 public:
   /**

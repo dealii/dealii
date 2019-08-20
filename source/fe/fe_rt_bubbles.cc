@@ -37,16 +37,15 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>(
-      deg,
-      FiniteElementData<dim>(get_dpo_vector(deg),
-                             dim,
-                             deg + 1,
-                             FiniteElementData<dim>::Hdiv),
-      get_ria_vector(deg),
-      std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::compute_n_pols(
-                                   deg),
-                                 std::vector<bool>(dim, true)))
+  : FE_PolyTensor<dim>(PolynomialsRT_Bubbles<dim>(deg),
+                       FiniteElementData<dim>(get_dpo_vector(deg),
+                                              dim,
+                                              deg + 1,
+                                              FiniteElementData<dim>::Hdiv),
+                       get_ria_vector(deg),
+                       std::vector<ComponentMask>(
+                         PolynomialsRT_Bubbles<dim>::compute_n_pols(deg),
+                         std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   Assert(
