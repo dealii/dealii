@@ -4552,6 +4552,26 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    unsigned int
+    Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
+      const types::coarse_cell_id coarse_cell_id) const
+    {
+      return p4est_tree_to_coarse_cell_permutation[coarse_cell_id];
+    }
+
+
+
+    template <int dim, int spacedim>
+    types::coarse_cell_id
+    Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
+      const unsigned int coarse_cell_index) const
+    {
+      return coarse_cell_to_p4est_tree_permutation[coarse_cell_index];
+    }
+
+
+
+    template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::add_periodicity(
       const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
@@ -5045,6 +5065,27 @@ namespace parallel
       return std::vector<bool>();
     }
 
+
+
+    template <int spacedim>
+    unsigned int
+    Triangulation<1, spacedim>::coarse_cell_id_to_coarse_cell_index(
+      const types::coarse_cell_id) const
+    {
+      Assert(false, ExcNotImplemented());
+      return 0;
+    }
+
+
+
+    template <int spacedim>
+    types::coarse_cell_id
+    Triangulation<1, spacedim>::coarse_cell_index_to_coarse_cell_id(
+      const unsigned int) const
+    {
+      Assert(false, ExcNotImplemented());
+      return 0;
+    }
 
 
     template <int spacedim>

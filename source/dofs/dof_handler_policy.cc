@@ -4538,11 +4538,7 @@ namespace internal
         communicate_mg_ghost_cells(
           const typename parallel::distributed::Triangulation<dim, spacedim>
             &             tria,
-          DoFHandlerType &dof_handler,
-          const std::vector<dealii::types::global_dof_index>
-            &coarse_cell_to_p4est_tree_permutation,
-          const std::vector<dealii::types::global_dof_index>
-            &p4est_tree_to_coarse_cell_permutation)
+          DoFHandlerType &dof_handler)
         {
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners =
@@ -4565,7 +4561,7 @@ namespace internal
 
               find_marked_mg_ghost_cells_recursively<dim, spacedim>(
                 tria,
-                coarse_cell_to_p4est_tree_permutation[cell->index()],
+                cell->id().get_coarse_cell_id(),
                 cell,
                 p4est_coarse_cell,
                 neighbor_cell_list);
@@ -4634,11 +4630,14 @@ namespace internal
                    c < cell_data_transfer_buffer.tree_indices.size();
                    ++c)
                 {
+                  const auto temp =
+                    CellId(cell_data_transfer_buffer.tree_indices[c], 0, NULL)
+                      .to_cell(tria);
+
                   typename DoFHandlerType::level_cell_iterator cell(
                     &dof_handler.get_triangulation(),
                     0,
-                    p4est_tree_to_coarse_cell_permutation
-                      [cell_data_transfer_buffer.tree_indices[c]],
+                    temp->index(),
                     &dof_handler);
 
                   typename dealii::internal::p4est::types<dim>::quadrant
@@ -4703,12 +4702,12 @@ namespace internal
                    c < cell_data_transfer_buffer.tree_indices.size();
                    ++c, dofs += 1 + dofs[0])
                 {
+                  const auto temp =
+                    CellId(cell_data_transfer_buffer.tree_indices[c], 0, NULL)
+                      .to_cell(tria);
+
                   typename DoFHandlerType::level_cell_iterator cell(
-                    &tria,
-                    0,
-                    p4est_tree_to_coarse_cell_permutation
-                      [cell_data_transfer_buffer.tree_indices[c]],
-                    &dof_handler);
+                    &tria, 0, temp->index(), &dof_handler);
 
                   typename dealii::internal::p4est::types<dim>::quadrant
                     p4est_coarse_cell;
@@ -4750,9 +4749,7 @@ namespace internal
         void
         communicate_mg_ghost_cells(
           const typename parallel::distributed::Triangulation<1, spacedim> &,
-          DoFHandler<1, spacedim> &,
-          const std::vector<dealii::types::global_dof_index> &,
-          const std::vector<dealii::types::global_dof_index> &)
+          DoFHandler<1, spacedim> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4763,9 +4760,7 @@ namespace internal
         void
         communicate_mg_ghost_cells(
           const typename parallel::distributed::Triangulation<1, spacedim> &,
-          hp::DoFHandler<1, spacedim> &,
-          const std::vector<dealii::types::global_dof_index> &,
-          const std::vector<dealii::types::global_dof_index> &)
+          hp::DoFHandler<1, spacedim> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4794,9 +4789,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells(
           const DoFHandler<1, spacedim> &,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &,
-          const std::vector<dealii::types::global_dof_index> &,
-          const std::vector<dealii::types::global_dof_index> &)
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4807,9 +4800,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells(
           const hp::DoFHandler<1, spacedim> &,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &,
-          const std::vector<dealii::types::global_dof_index> &,
-          const std::vector<dealii::types::global_dof_index> &)
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4820,9 +4811,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells(
           const DoFHandlerType &dof_handler,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &,
-          const std::vector<dealii::types::global_dof_index> &,
-          const std::vector<dealii::types::global_dof_index> &)
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)vertices_with_ghost_neighbors;
@@ -5172,10 +5161,7 @@ namespace internal
           // as explained in the 'distributed' paper, this has to be
           // done twice
           communicate_dof_indices_on_marked_cells(
-            *dof_handler,
-            vertices_with_ghost_neighbors,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+            *dof_handler, vertices_with_ghost_neighbors);
 
           // in case of hp::DoFHandlers, we may have received valid
           // indices of degrees of freedom that are dominated by a fe
@@ -5190,10 +5176,7 @@ namespace internal
           //                    may still have invalid ones. thus, exchange
           //                    one more time.
           communicate_dof_indices_on_marked_cells(
-            *dof_handler,
-            vertices_with_ghost_neighbors,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+            *dof_handler, vertices_with_ghost_neighbors);
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
@@ -5400,11 +5383,7 @@ namespace internal
           // Phase 1. Request all marked cells from corresponding owners. If we
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
-          communicate_mg_ghost_cells(
-            *triangulation,
-            *dof_handler,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+          communicate_mg_ghost_cells(*triangulation, *dof_handler);
 
           // have a barrier so that sends from above and below this
           // place are not mixed up.
@@ -5424,11 +5403,7 @@ namespace internal
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
-          communicate_mg_ghost_cells(
-            *triangulation,
-            *dof_handler,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+          communicate_mg_ghost_cells(*triangulation, *dof_handler);
 
 #  ifdef DEBUG
           // make sure we have removed all flags:
@@ -5709,10 +5684,7 @@ namespace internal
               // as explained in the 'distributed' paper, this has to be
               // done twice
               communicate_dof_indices_on_marked_cells(
-                *dof_handler,
-                vertices_with_ghost_neighbors,
-                triangulation->coarse_cell_to_p4est_tree_permutation,
-                triangulation->p4est_tree_to_coarse_cell_permutation);
+                *dof_handler, vertices_with_ghost_neighbors);
 
               // in case of hp::DoFHandlers, we may have received valid
               // indices of degrees of freedom that are dominated by a fe
@@ -5723,10 +5695,7 @@ namespace internal
                 *dof_handler);
 
               communicate_dof_indices_on_marked_cells(
-                *dof_handler,
-                vertices_with_ghost_neighbors,
-                triangulation->coarse_cell_to_p4est_tree_permutation,
-                triangulation->p4est_tree_to_coarse_cell_permutation);
+                *dof_handler, vertices_with_ghost_neighbors);
 
               triangulation->load_user_flags(user_flags);
             }
