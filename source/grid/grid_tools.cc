@@ -173,8 +173,8 @@ namespace GridTools
     double global_volume = 0;
 
 #ifdef DEAL_II_WITH_MPI
-    if (const parallel::Triangulation<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &triangulation))
       global_volume =
         Utilities::MPI::sum(local_volume, p_tria->get_communicator());
@@ -3129,8 +3129,8 @@ namespace GridTools
     double global_min_diameter = 0;
 
 #ifdef DEAL_II_WITH_MPI
-    if (const parallel::Triangulation<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &triangulation))
       global_min_diameter =
         Utilities::MPI::min(min_diameter, p_tria->get_communicator());
@@ -3156,8 +3156,8 @@ namespace GridTools
     double global_max_diameter = 0;
 
 #ifdef DEAL_II_WITH_MPI
-    if (const parallel::Triangulation<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &triangulation))
       global_max_diameter =
         Utilities::MPI::max(max_diameter, p_tria->get_communicator());
@@ -5087,7 +5087,7 @@ namespace GridTools
 #else
     // Recovering the mpi communicator used to create the triangulation
     const auto &tria_mpi =
-      dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &cache.get_triangulation());
     // If the dynamic cast failed we can't recover the mpi communicator:
     // throwing an assertion error

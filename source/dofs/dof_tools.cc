@@ -1307,9 +1307,9 @@ namespace DoFTools
     // collect information for each subdomain index anyway, not just for the
     // used one.)
     const unsigned int n_subdomains =
-      (dynamic_cast<
-           const parallel::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> *>(
+      (dynamic_cast<const parallel::TriangulationBase<
+             DoFHandlerType::dimension,
+             DoFHandlerType::space_dimension> *>(
          &dof_handler.get_triangulation()) == nullptr ?
          [&dof_handler]() {
            unsigned int max_subdomain_id = 0;
@@ -1319,9 +1319,9 @@ namespace DoFTools
            return max_subdomain_id + 1;
          }() :
          Utilities::MPI::n_mpi_processes(
-           dynamic_cast<
-             const parallel::Triangulation<DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension> *>(
+           dynamic_cast<const parallel::TriangulationBase<
+             DoFHandlerType::dimension,
+             DoFHandlerType::space_dimension> *>(
              &dof_handler.get_triangulation())
              ->get_communicator()));
     Assert(n_subdomains > *std::max_element(subdomain_association.begin(),
@@ -1870,8 +1870,8 @@ namespace DoFTools
     const unsigned int dim      = DoFHandlerType::dimension;
     const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-    if (const parallel::Triangulation<dim, spacedim> *tria =
-          (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *tria =
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof_handler.get_triangulation())))
       {
         std::vector<types::global_dof_index> local_dof_count =
@@ -1955,9 +1955,9 @@ namespace DoFTools
 #ifdef DEAL_II_WITH_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
-        if (const parallel::Triangulation<DoFHandlerType::dimension,
-                                          DoFHandlerType::space_dimension>
-              *tria = (dynamic_cast<const parallel::Triangulation<
+        if (const parallel::TriangulationBase<DoFHandlerType::dimension,
+                                              DoFHandlerType::space_dimension>
+              *tria = (dynamic_cast<const parallel::TriangulationBase<
                          DoFHandlerType::dimension,
                          DoFHandlerType::space_dimension> *>(
                 &dof_handler.get_triangulation())))

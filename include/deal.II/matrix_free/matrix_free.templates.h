@@ -275,8 +275,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
         {
-          const parallel::Triangulation<dim> *dist_tria =
-            dynamic_cast<const parallel::Triangulation<dim> *>(
+          const parallel::TriangulationBase<dim> *dist_tria =
+            dynamic_cast<const parallel::TriangulationBase<dim> *>(
               &(dof_handler[0]->get_triangulation()));
           task_info.communicator = dist_tria != nullptr ?
                                      dist_tria->get_communicator() :
@@ -444,8 +444,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
         {
-          const parallel::Triangulation<dim> *dist_tria =
-            dynamic_cast<const parallel::Triangulation<dim> *>(
+          const parallel::TriangulationBase<dim> *dist_tria =
+            dynamic_cast<const parallel::TriangulationBase<dim> *>(
               &(dof_handler[0]->get_triangulation()));
           task_info.communicator = dist_tria != nullptr ?
                                      dist_tria->get_communicator() :
@@ -658,7 +658,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
                                                  end_cell = tria.end(0);
       // For serial Triangulations always take all cells
       const unsigned int subdomain_id =
-        (dynamic_cast<const parallel::Triangulation<dim> *>(
+        (dynamic_cast<const parallel::TriangulationBase<dim> *>(
            &dof_handler[0]->get_triangulation()) != nullptr) ?
           my_pid :
           numbers::invalid_subdomain_id;
@@ -730,7 +730,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
                                               end_cell = dof_handler[0]->end(0);
   // For serial Triangulations always take all cells
   const unsigned int subdomain_id =
-    (dynamic_cast<const parallel::Triangulation<dim> *>(
+    (dynamic_cast<const parallel::TriangulationBase<dim> *>(
        &dof_handler[0]->get_triangulation()) != nullptr) ?
       my_pid :
       numbers::invalid_subdomain_id;

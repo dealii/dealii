@@ -169,8 +169,8 @@ namespace internal
             }
         }
 
-      const dealii::parallel::Triangulation<dim, spacedim> *tria =
-        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+      const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
+        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()));
       AssertThrow(
         send_data_temp.size() == 0 || tria != nullptr,
@@ -856,8 +856,9 @@ namespace internal
                 }
 
           // step 2.7: Initialize the ghosted vector
-          const parallel::Triangulation<dim, dim> *ptria =
-            (dynamic_cast<const parallel::Triangulation<dim, dim> *>(&tria));
+          const parallel::TriangulationBase<dim, dim> *ptria =
+            (dynamic_cast<const parallel::TriangulationBase<dim, dim> *>(
+              &tria));
           const MPI_Comm communicator =
             ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
 

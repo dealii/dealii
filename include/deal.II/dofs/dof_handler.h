@@ -1586,8 +1586,8 @@ template <int dim, int spacedim>
 std::vector<types::global_dof_index>
 DoFHandler<dim, spacedim>::compute_n_locally_owned_dofs_per_processor() const
 {
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  const parallel::TriangulationBase<dim, spacedim> *tr =
+    (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &this->get_triangulation()));
   if (tr != nullptr)
     return number_cache.get_n_locally_owned_dofs_per_processor(
@@ -1602,8 +1602,8 @@ template <int dim, int spacedim>
 std::vector<IndexSet>
 DoFHandler<dim, spacedim>::compute_locally_owned_dofs_per_processor() const
 {
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  const parallel::TriangulationBase<dim, spacedim> *tr =
+    (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &this->get_triangulation()));
   if (tr != nullptr)
     return number_cache.get_locally_owned_dofs_per_processor(
@@ -1626,8 +1626,8 @@ DoFHandler<dim, spacedim>::compute_locally_owned_mg_dofs_per_processor(
     mg_number_cache.size() == this->get_triangulation().n_global_levels(),
     ExcMessage(
       "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+  const parallel::TriangulationBase<dim, spacedim> *tr =
+    (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
       &this->get_triangulation()));
   if (tr != nullptr)
     return mg_number_cache[level].get_locally_owned_dofs_per_processor(

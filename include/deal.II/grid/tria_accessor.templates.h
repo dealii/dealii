@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
   template <int, int>
-  class Triangulation;
+  class TriangulationBase;
 }
 #endif
 
@@ -3569,8 +3569,9 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
   if (is_artificial())
     return false;
 
-  const parallel::Triangulation<dim, spacedim> *pt =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(this->tria);
+  const parallel::TriangulationBase<dim, spacedim> *pt =
+    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+      this->tria);
 
   if (pt == nullptr)
     return true;
@@ -3589,8 +3590,9 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   return true;
 #else
 
-  const parallel::Triangulation<dim, spacedim> *pt =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(this->tria);
+  const parallel::TriangulationBase<dim, spacedim> *pt =
+    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+      this->tria);
 
   if (pt == nullptr)
     return true;
@@ -3614,8 +3616,9 @@ CellAccessor<dim, spacedim>::is_ghost() const
   return false;
 #else
 
-  const parallel::Triangulation<dim, spacedim> *pt =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(this->tria);
+  const parallel::TriangulationBase<dim, spacedim> *pt =
+    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+      this->tria);
 
   if (pt == nullptr)
     return false;
@@ -3637,8 +3640,9 @@ CellAccessor<dim, spacedim>::is_artificial() const
   return false;
 #else
 
-  const parallel::Triangulation<dim, spacedim> *pt =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(this->tria);
+  const parallel::TriangulationBase<dim, spacedim> *pt =
+    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+      this->tria);
 
   if (pt == nullptr)
     return false;

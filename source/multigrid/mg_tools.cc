@@ -1653,8 +1653,9 @@ namespace MGTools
     unsigned int global_min = min_level;
     // If necessary, communicate to find minimum
     // level for an active cell over all subdomains
-    if (const parallel::Triangulation<dim, spacedim> *tr =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
+    if (const parallel::TriangulationBase<dim, spacedim> *tr =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria))
       global_min = Utilities::MPI::min(min_level, tr->get_communicator());
 
     AssertIndexRange(global_min, tria.n_global_levels());
@@ -1673,8 +1674,9 @@ namespace MGTools
     // It is only necessary to calculate the imbalance
     // on a distributed mesh. The imbalance is always
     // 1.0 for the serial case.
-    if (const parallel::Triangulation<dim, spacedim> *tr =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
+    if (const parallel::TriangulationBase<dim, spacedim> *tr =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria))
       {
         const unsigned int n_proc =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());

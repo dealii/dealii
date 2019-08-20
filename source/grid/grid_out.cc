@@ -3283,8 +3283,8 @@ GridOut::write_mesh_per_processor_as_vtu(
   // if not, just create a .vtu file with no reference
   // to the processor number
   std::string new_file = filename_without_extension + ".vtu";
-  if (const parallel::Triangulation<dim, spacedim> *tr =
-        dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
+  if (const parallel::TriangulationBase<dim, spacedim> *tr =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(&tria))
     {
       new_file = filename_without_extension + ".proc" +
                  Utilities::int_to_string(tr->locally_owned_subdomain(), 4) +

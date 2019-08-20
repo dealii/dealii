@@ -42,9 +42,9 @@ namespace parallel
                      smooth_grid,
       const bool     allow_artificial_cells,
       const Settings settings)
-      : dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
-                                                       smooth_grid,
-                                                       false)
+      : dealii::parallel::TriangulationBase<dim, spacedim>(mpi_communicator,
+                                                           smooth_grid,
+                                                           false)
       , settings(settings)
       , allow_artificial_cells(allow_artificial_cells)
     {
@@ -392,7 +392,7 @@ namespace parallel
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 
-      dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(
+      dealii::parallel::TriangulationBase<dim, spacedim>::copy_triangulation(
         other_tria);
       partition();
       this->update_number_cache();
@@ -404,10 +404,10 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::update_number_cache()
     {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
+      parallel::TriangulationBase<dim, spacedim>::update_number_cache();
 
       if (settings & construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
+        parallel::TriangulationBase<dim, spacedim>::fill_level_ghost_owners();
     }
   } // namespace shared
 } // namespace parallel

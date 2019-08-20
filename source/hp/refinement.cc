@@ -133,8 +133,8 @@ namespace hp
               }
           }
 
-      if (const parallel::Triangulation<dim, spacedim> *parallel_tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+      if (const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &dof_handler.get_triangulation()))
         {
           max_smoothness_refine =

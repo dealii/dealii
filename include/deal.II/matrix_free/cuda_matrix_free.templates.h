@@ -544,7 +544,8 @@ namespace CUDAWrappers
   {
     const auto &triangulation = dof_handler.get_triangulation();
     if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim> *>(&triangulation))
+          dynamic_cast<const parallel::TriangulationBase<dim> *>(
+            &triangulation))
       internal_reinit(mapping,
                       dof_handler,
                       constraints,

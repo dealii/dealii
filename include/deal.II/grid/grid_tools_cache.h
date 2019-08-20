@@ -159,7 +159,7 @@ namespace GridTools
      * areas that cover all or parts of the local portion of a
      * parallel triangulation, and an unsigned int representing
      * the process or subdomain that owns these cells.
-     * Given a point on a parallel::Triangulation, this tree
+     * Given a point on a parallel::TriangulationBase, this tree
      * allows to identify one, or few candidate processes, for
      * which the point lies on a locally owned cell.
      *

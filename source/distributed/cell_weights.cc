@@ -28,7 +28,7 @@ namespace parallel
     const hp::DoFHandler<dim, spacedim> &dof_handler)
     : dof_handler(&dof_handler, typeid(*this).name())
   {
-    triangulation = (dynamic_cast<parallel::Triangulation<dim, spacedim> *>(
+    triangulation = (dynamic_cast<parallel::TriangulationBase<dim, spacedim> *>(
       const_cast<dealii::Triangulation<dim, spacedim> *>(
         &(this->dof_handler->get_triangulation()))));
 
@@ -49,7 +49,7 @@ namespace parallel
       Assert(
         triangulation != nullptr,
         ExcMessage(
-          "parallel::CellWeights requires a parallel::Triangulation object."));
+          "parallel::CellWeights requires a parallel::TriangulationBase object."));
   }
 
 

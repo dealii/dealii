@@ -195,7 +195,8 @@ namespace internal
       // boundaries as evenly as possible between the processors
       std::map<types::subdomain_id, FaceIdentifier>
         inner_faces_at_proc_boundary;
-      if (dynamic_cast<const parallel::Triangulation<dim> *>(&triangulation))
+      if (dynamic_cast<const parallel::TriangulationBase<dim> *>(
+            &triangulation))
         {
           const types::subdomain_id my_domain =
             triangulation.locally_owned_subdomain();
@@ -289,8 +290,8 @@ namespace internal
               // looking at the length of the lists of faces
 #  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
               MPI_Comm comm = MPI_COMM_SELF;
-              if (const parallel::Triangulation<dim> *ptria =
-                    dynamic_cast<const parallel::Triangulation<dim> *>(
+              if (const parallel::TriangulationBase<dim> *ptria =
+                    dynamic_cast<const parallel::TriangulationBase<dim> *>(
                       &triangulation))
                 comm = ptria->get_communicator();
 
