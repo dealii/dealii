@@ -19,6 +19,8 @@
 
 #ifndef DEAL_II_WITH_CXX17
 #  include <deal.II/base/std_cxx14/utility.h>
+#else
+#  include <tuple>
 #endif
 
 #include <cmath>
