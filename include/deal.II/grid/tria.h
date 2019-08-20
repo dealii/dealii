@@ -3483,6 +3483,34 @@ public:
     std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
   get_periodic_face_map() const;
 
+  /**
+   * Translate the unique id of a coarse cell to its index.
+   *
+   * @note For serial and shared triangulation both id and index are the same.
+   *       For distributed triangulations setting both might differ, since the
+   *       id might correspond to a global id and the index to a local id.
+   *
+   * @param coarse_cell_id Unique id of the coarse cell.
+   * @return Index of the coarse cell within the current triangulation.
+   */
+  virtual unsigned int
+  coarse_cell_id_to_coarse_cell_index(
+    const types::coarse_cell_id coarse_cell_id) const;
+
+
+  /**
+   * Translate the index of coarse cell to its unique id.
+   *
+   * @note: See the note of the method
+   * translate_coarse_cell_id_to_coarse_cell_index().
+   *
+   * @param coarse_cell_index Index of the coarse cell.
+   * @return Id of the coarse cell.
+   */
+  virtual types::coarse_cell_id
+  coarse_cell_index_to_coarse_cell_id(
+    const unsigned int coarse_cell_index) const;
+
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -4280,6 +4308,27 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // the triangulation
   signals.create();
 }
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
+Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
+  const types::coarse_cell_id coarse_cell_id) const
+{
+  return coarse_cell_id;
+}
+
+
+
+template <int dim, int spacedim>
+inline types::coarse_cell_id
+Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
+  const unsigned int coarse_cell_index) const
+{
+  return coarse_cell_index;
+}
+
 
 
 /* -------------- declaration of explicit specializations ------------- */
