@@ -39,8 +39,8 @@ FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
                              dim,
                              deg + 1,
                              FiniteElementData<dim>::L2),
-      std::vector<bool>(PolynomialType::compute_n_pols(deg), true),
-      std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
+      std::vector<bool>(PolynomialType::n_polynomials(deg), true),
+      std::vector<ComponentMask>(PolynomialType::n_polynomials(deg),
                                  ComponentMask(dim, true)))
 {
   this->mapping_kind                   = {map};
@@ -81,7 +81,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(
   const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim + 1);
-  dpo[dim] = PolynomialType::compute_n_pols(deg);
+  dpo[dim] = PolynomialType::n_polynomials(deg);
 
   return dpo;
 }

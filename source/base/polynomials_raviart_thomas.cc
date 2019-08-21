@@ -170,7 +170,7 @@ PolynomialsRaviartThomas<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsRaviartThomas<dim>::n_polynomials(unsigned int k)
+PolynomialsRaviartThomas<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1)
     return k + 1;

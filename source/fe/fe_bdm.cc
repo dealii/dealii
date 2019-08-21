@@ -45,7 +45,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
                              deg + 1,
                              FiniteElementData<dim>::Hdiv),
       get_ria_vector(deg),
-      std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
+      std::vector<ComponentMask>(PolynomialsBDM<dim>::n_polynomials(deg),
                                  std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -222,12 +222,12 @@ FE_BDM<dim>::get_dpo_vector(const unsigned int deg)
   // the element is face-based and we have as many degrees of freedom
   // on the faces as there are polynomials of degree up to
   // deg. Observe the odd convention of
-  // PolynomialSpace::compute_n_pols()!
+  // PolynomialSpace::n_polynomials()!
 
   std::vector<unsigned int> dpo(dim + 1, 0u);
   dpo[dim] =
-    (deg > 1 ? dim * PolynomialSpace<dim>::compute_n_pols(deg - 1) : 0u);
-  dpo[dim - 1] = PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
+    (deg > 1 ? dim * PolynomialSpace<dim>::n_polynomials(deg - 1) : 0u);
+  dpo[dim - 1] = PolynomialSpace<dim - 1>::n_polynomials(deg + 1);
 
   return dpo;
 }
@@ -244,9 +244,9 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
       return std::vector<bool>();
     }
 
-  const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
+  const unsigned int dofs_per_cell = PolynomialsBDM<dim>::n_polynomials(deg);
   const unsigned int dofs_per_face =
-    PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
+    PolynomialSpace<dim - 1>::n_polynomials(deg + 1);
 
   Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <= dofs_per_cell,
          ExcInternalError());

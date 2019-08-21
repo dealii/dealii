@@ -429,7 +429,7 @@ square for (unsigned int j=0;j<moment_weight.size();++j)
 
 template <int dim>
 unsigned int
-PolynomialsBDM<dim>::n_polynomials(unsigned int k)
+PolynomialsBDM<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1)
     return k + 1;

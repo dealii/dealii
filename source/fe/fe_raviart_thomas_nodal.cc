@@ -45,7 +45,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int deg)
                                               FiniteElementData<dim>::Hdiv),
                        get_ria_vector(deg),
                        std::vector<ComponentMask>(
-                         PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
+                         PolynomialsRaviartThomas<dim>::n_polynomials(deg),
                          std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -253,7 +253,7 @@ std::vector<bool>
 FE_RaviartThomasNodal<dim>::get_ria_vector(const unsigned int deg)
 {
   const unsigned int dofs_per_cell =
-    PolynomialsRaviartThomas<dim>::compute_n_pols(deg);
+    PolynomialsRaviartThomas<dim>::n_polynomials(deg);
   unsigned int dofs_per_face = deg + 1;
   for (unsigned int d = 2; d < dim; ++d)
     dofs_per_face *= deg + 1;

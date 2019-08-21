@@ -1486,7 +1486,7 @@ PolynomialsNedelec<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsNedelec<dim>::n_polynomials(unsigned int k)
+PolynomialsNedelec<dim>::n_polynomials(const unsigned int k)
 {
   switch (dim)
     {
