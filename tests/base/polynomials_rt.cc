@@ -46,7 +46,8 @@ plot(const PolynomialsRaviartThomas<dim> &poly)
 
       deallog << "RT" << poly.degree() << '<' << dim << '>' << '\t'
               << quadrature.point(k);
-      poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
+      poly.evaluate(
+        quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.n(); ++i)
         for (unsigned int d = 0; d < dim; ++d)
