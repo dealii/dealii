@@ -30,8 +30,9 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class provides a framework for the finite element polynomial
  * classes for use with finite element classes that are derived from
- * @p FE_Poly and @p FE_PolyTensor. An object of this type is stored
- * as a member variable in the finite element class.
+ * FE_PolyTensor. An object of this type (or rather of a type derived
+ * from this class) is stored as a member variable each object of
+ * type FE_PolyTensor.
  *
  * <h3>Deriving classes</h3>
  *
