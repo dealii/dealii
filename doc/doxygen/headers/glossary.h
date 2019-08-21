@@ -413,6 +413,67 @@
  *   consists of exactly the level-zero cells of a triangulation. (Whether
  *   they are active (i.e., have no children) or have been refined is not
  *   important for this definition.)
+ *
+ *   Most of the triangulation classes in deal.II store the entire coarse
+ *   mesh along with at least some of the refined cells. (Both the
+ *   dealii::Triangulation and parallel::shared::Triangulation classes
+ *   actually store <i>all</i> cells of the entire mesh, whereas some
+ *   other classes such as parallel::distributed::Triangulation only
+ *   store <i>some</i> of the @ref GlossActive "active cells" on
+ *   each process in a parallel computation.) In those cases,
+ *   one can query the triangulation for all coarse mesh
+ *   cells. Other triangulation classes (e.g.,
+ *   parallel::fullydistributed::Triangulation) only store a part
+ *   of the coarse mesh. See also
+ *   @ref GlossCoarseCellId "the concept of coarse cell ids"
+ *   for that case.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossCoarseCellId <b>Coarse cell ID</b></dt>
+ * <dd>
+ *   Most of the triangulation classes in deal.II, notably
+ *   dealii::Triangulation, parallel::shared::Triangulation, and
+ *   parallel::distributed::Triangulation, store the entire
+ *   @ref GlossCoarseMesh "coarse mesh"
+ *   of a triangulation on each process of a parallel computation. On the
+ *   other hand, this is not the case for other classes, notably for
+ *   parallel::fullydistributed::Triangulation, which is designed for cases
+ *   where even the coarse mesh is too large to be stored on each process
+ *   and needs to be partitioned.
+ *
+ *   In those cases, it is often necessary in algorithms to reference a coarse
+ *   mesh cell uniquely. Because the triangulation object on the current
+ *   process does not actually store the entire coarse mesh, one needs to have
+ *   a globally unique identifier for each coarse mesh cell that is independent
+ *   of the index within level zero of the triangulation stored locally. This
+ *   globally unique ID is called the "coarse cell ID". It can be accessed via
+ *   the function call
+ *   @code
+ *     triangulation.coarse_cell_index_to_coarse_cell_id (coarse_cell->index());
+ *   @endcode
+ *   where `triangulation` is the triangulation to which the iterator
+ *   `coarse_cell` pointing to a cell at level zero belongs. Here,
+ *   `coarse_cell->index()` returns the index of that cell within its
+ *   refinement level (see TriaAccessor::index()). This is a number
+ *   between zero and the number of coarse mesh cells stored on the
+ *   current process in a parallel computation; it uniquely identifies
+ *   a cell on that parallel process, but different parallel processes may
+ *   use that index for different cells located at different coordinates.
+ *
+ *   For those classes that store all coarse mesh cells on each process,
+ *   the Triangulation::coarse_cell_index_to_coarse_cell_id() simply
+ *   returns a permutation of the possible argument values. In the
+ *   simplest cases, such as for a sequential or a parallel shared
+ *   triangulation, the function will in fact simply return the
+ *   value of the argument. For others, such as
+ *   parallel::distributed::Triangulation, the ordering of
+ *   coarse cell IDs is not the same as the ordering of coarse
+ *   cell indices. Finally, for classes such as
+ *   parallel::fullydistributed::Triangulation, the function returns
+ *   the globally unique ID, which is from a larger set of possible
+ *   indices than the indices of the coarse cells actually stored on
+ *   the current process.
  * </dd>
  *
  *
