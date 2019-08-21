@@ -61,7 +61,7 @@ PolynomialsRaviartThomas<dim>::create_polynomials(const unsigned int k)
 
 template <int dim>
 void
-PolynomialsRaviartThomas<dim>::compute(
+PolynomialsRaviartThomas<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,

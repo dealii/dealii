@@ -255,7 +255,7 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space->compute(
+      poly_space->evaluate(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
@@ -300,7 +300,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space->compute(
+      poly_space->evaluate(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 
@@ -346,7 +346,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
 
       std::vector<Tensor<4, dim>> dummy1;
       std::vector<Tensor<5, dim>> dummy2;
-      poly_space->compute(
+      poly_space->evaluate(
         p, cached_values, cached_grads, cached_grad_grads, dummy1, dummy2);
     }
 

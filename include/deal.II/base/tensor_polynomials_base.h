@@ -37,8 +37,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Any derived class must provide the most basic properties for shape
  * functions evaluated on the reference cell. This includes, but is not
- * limited to, implementing the <tt>compute</tt>, <tt>name</tt>, and
- * <tt>clone</tt> member functions. These functions are necessary to store the
+ * limited to, implementing the evaluate(), name(), and
+ * clone() member functions. These functions are necessary to store the
  * most basic information of how the polynomials in the derived class evaluate
  * at a given point on the reference cell. More information on each function can
  * be found in the corresponding function's documentation.
@@ -97,12 +97,12 @@ public:
    * in a loop over all tensor product polynomials.
    */
   virtual void
-  compute(const Point<dim> &           unit_point,
-          std::vector<Tensor<1, dim>> &values,
-          std::vector<Tensor<2, dim>> &grads,
-          std::vector<Tensor<3, dim>> &grad_grads,
-          std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const = 0;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<Tensor<1, dim>> &values,
+           std::vector<Tensor<2, dim>> &grads,
+           std::vector<Tensor<3, dim>> &grad_grads,
+           std::vector<Tensor<4, dim>> &third_derivatives,
+           std::vector<Tensor<5, dim>> &fourth_derivatives) const = 0;
 
   /**
    * Return the number of polynomials.

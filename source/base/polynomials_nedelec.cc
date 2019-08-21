@@ -51,7 +51,7 @@ PolynomialsNedelec<dim>::create_polynomials(const unsigned int k)
 // polynomial at the given point.
 template <int dim>
 void
-PolynomialsNedelec<dim>::compute(
+PolynomialsNedelec<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
