@@ -500,6 +500,7 @@ namespace OpenCASCADE
 
     Handle(Geom_BSplineCurve) bspline = bspline_generator.Curve();
     TopoDS_Edge out_shape             = BRepBuilderAPI_MakeEdge(bspline);
+    out_shape.Closed(closed);
     return out_shape;
   }
 
