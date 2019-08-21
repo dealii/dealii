@@ -1,0 +1,5 @@
+New: MGConstrainedDoFs now allows the user to define constraints 
+on each multigrid level to be applied during prolongation in a 
+matrix-free transfer.
+<br>
+(Conrad Clevenger, 2019/09/13)
