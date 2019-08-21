@@ -58,8 +58,10 @@ test()
       std::string tria_1_out =
         "tria-1-" + std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) + ".svg";
       std::ofstream tria_1_out_stream(tria_1_out);
-      GridOut().write_svg(tria_0, tria_0_out_stream);
-      GridOut().write_svg(tria_1, tria_1_out_stream);
+      GridOut go;
+      go.set_flags (GridOutFlags::Svg(2, 4, true, GridOutFlags::Svg::white, 0, 0, GridOutFlags::Svg::level_number, false, true, true));
+      go.write_svg(tria_0, tria_0_out_stream);
+      go.write_svg(tria_1, tria_1_out_stream);
     }
 
   deallog << "tria 0 cells:" << std::endl;
