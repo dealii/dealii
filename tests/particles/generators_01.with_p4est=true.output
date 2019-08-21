@@ -1,0 +1,13 @@
+
+DEAL:2d/2d::Particle number: 1
+DEAL:2d/2d::Particle location: 0.00000 0.00000
+DEAL:2d/2d::Particle reference location: 0.00000 0.00000
+DEAL:2d/2d::OK
+DEAL:2d/3d::Particle number: 1
+DEAL:2d/3d::Particle location: 0.00000 0.00000 0.00000
+DEAL:2d/3d::Particle reference location: 0.00000 0.00000
+DEAL:2d/3d::OK
+DEAL:3d/3d::Particle number: 1
+DEAL:3d/3d::Particle location: 0.00000 0.00000 0.00000
+DEAL:3d/3d::Particle reference location: 0.00000 0.00000 0.00000
+DEAL:3d/3d::OK
