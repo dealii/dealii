@@ -338,7 +338,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
+  constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2);
 
   /**
@@ -363,7 +363,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  bool
+  constexpr bool
   value_is_zero(const Number &value);
 
   /**
@@ -939,7 +939,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  inline bool
+  constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return (value_1 == internal::NumberType<Number1>::value(value_2));
@@ -955,7 +955,7 @@ namespace numbers
 
 
   template <typename Number>
-  inline bool
+  constexpr bool
   value_is_zero(const Number &value)
   {
     return values_are_equal(value, 0.0);
