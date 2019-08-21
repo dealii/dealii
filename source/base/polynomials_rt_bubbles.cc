@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , raviart_thomas_space(k - 1)
   , monomials(k + 2)
 {
@@ -835,7 +835,7 @@ PolynomialsRT_Bubbles<dim>::compute(
 
 template <int dim>
 unsigned int
-PolynomialsRT_Bubbles<dim>::compute_n_pols(const unsigned int k)
+PolynomialsRT_Bubbles<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1 || dim == 2 || dim == 3)
     return dim * Utilities::fixed_power<dim>(k + 1);

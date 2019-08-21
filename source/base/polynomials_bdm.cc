@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
   , monomials((dim == 2) ? (1) : (k + 2))
   , p_values(polynomial_space.n())
@@ -429,7 +429,7 @@ square for (unsigned int j=0;j<moment_weight.size();++j)
 
 template <int dim>
 unsigned int
-PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
+PolynomialsBDM<dim>::n_polynomials(unsigned int k)
 {
   if (dim == 1)
     return k + 1;

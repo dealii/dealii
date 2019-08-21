@@ -214,7 +214,7 @@ public:
    * onedimensional polynomials, thus the degree plus one.
    */
   static unsigned int
-  compute_n_pols(const unsigned int n);
+  n_polynomials(const unsigned int n);
 
 protected:
   /**
@@ -271,7 +271,7 @@ template <int dim>
 template <class Pol>
 PolynomialSpace<dim>::PolynomialSpace(const std::vector<Pol> &pols)
   : polynomials(pols.begin(), pols.end())
-  , n_pols(compute_n_pols(polynomials.size()))
+  , n_pols(n_polynomials(polynomials.size()))
   , index_map(n_pols)
   , index_map_inverse(n_pols)
 {

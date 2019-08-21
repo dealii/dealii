@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 unsigned int
-PolynomialSpace<dim>::compute_n_pols(const unsigned int n)
+PolynomialSpace<dim>::n_polynomials(const unsigned int n)
 {
   unsigned int n_pols = n;
   for (unsigned int i = 1; i < dim; ++i)
@@ -36,7 +36,7 @@ PolynomialSpace<dim>::compute_n_pols(const unsigned int n)
 
 template <>
 unsigned int
-PolynomialSpace<0>::compute_n_pols(const unsigned int)
+PolynomialSpace<0>::n_polynomials(const unsigned int)
 {
   return 0;
 }
