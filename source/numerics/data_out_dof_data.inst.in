@@ -36,7 +36,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension,
+          typename VEC::value_type> &);
 
 
 
@@ -61,7 +62,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension,
+          typename VEC::value_type> &);
 
 
 
@@ -87,7 +89,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension,
+          typename VEC::value_type> &);
 #endif
   }
 

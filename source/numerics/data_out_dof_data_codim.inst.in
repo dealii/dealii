@@ -39,7 +39,8 @@ for (VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
       add_data_vector<VEC>(
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension,
+          typename VEC::value_type> &);
 
     template void
     DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
@@ -49,7 +50,8 @@ for (VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension,
+          typename VEC::value_type> &);
 #endif
   }
 

@@ -21,31 +21,31 @@ DEAL_II_NAMESPACE_OPEN
 
 // -------------------------- DataPostprocessor ---------------------------
 
-template <int dim>
+template <int dim, typename Number>
 void
-DataPostprocessor<dim>::evaluate_scalar_field(
-  const DataPostprocessorInputs::Scalar<dim> &,
-  std::vector<Vector<double>> &) const
+DataPostprocessor<dim, Number>::evaluate_scalar_field(
+  const DataPostprocessorInputs::Scalar<dim, Number> &,
+  std::vector<Vector<Number>> &) const
 {
   AssertThrow(false, ExcPureFunctionCalled());
 }
 
 
 
-template <int dim>
+template <int dim, typename Number>
 void
-DataPostprocessor<dim>::evaluate_vector_field(
-  const DataPostprocessorInputs::Vector<dim> &,
-  std::vector<Vector<double>> &) const
+DataPostprocessor<dim, Number>::evaluate_vector_field(
+  const DataPostprocessorInputs::Vector<dim, Number> &,
+  std::vector<Vector<Number>> &) const
 {
   AssertThrow(false, ExcPureFunctionCalled());
 }
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<DataComponentInterpretation::DataComponentInterpretation>
-DataPostprocessor<dim>::get_data_component_interpretation() const
+DataPostprocessor<dim, Number>::get_data_component_interpretation() const
 {
   // default implementation assumes that all
   // components are independent scalars
@@ -56,8 +56,8 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 
 // -------------------------- DataPostprocessorScalar -------------------------
 
-template <int dim>
-DataPostprocessorScalar<dim>::DataPostprocessorScalar(
+template <int dim, typename Number>
+DataPostprocessorScalar<dim, Number>::DataPostprocessorScalar(
   const std::string &name,
   const UpdateFlags  update_flags)
   : name(name)
@@ -66,27 +66,27 @@ DataPostprocessorScalar<dim>::DataPostprocessorScalar(
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<std::string>
-DataPostprocessorScalar<dim>::get_names() const
+DataPostprocessorScalar<dim, Number>::get_names() const
 {
   return std::vector<std::string>(1, name);
 }
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<DataComponentInterpretation::DataComponentInterpretation>
-DataPostprocessorScalar<dim>::get_data_component_interpretation() const
+DataPostprocessorScalar<dim, Number>::get_data_component_interpretation() const
 {
   return std::vector<DataComponentInterpretation::DataComponentInterpretation>(
     1, DataComponentInterpretation::component_is_scalar);
 }
 
 
-template <int dim>
+template <int dim, typename Number>
 UpdateFlags
-DataPostprocessorScalar<dim>::get_needed_update_flags() const
+DataPostprocessorScalar<dim, Number>::get_needed_update_flags() const
 {
   return update_flags;
 }
@@ -95,8 +95,8 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 
 // -------------------------- DataPostprocessorVector -------------------------
 
-template <int dim>
-DataPostprocessorVector<dim>::DataPostprocessorVector(
+template <int dim, typename Number>
+DataPostprocessorVector<dim, Number>::DataPostprocessorVector(
   const std::string &name,
   const UpdateFlags  update_flags)
   : name(name)
@@ -105,27 +105,27 @@ DataPostprocessorVector<dim>::DataPostprocessorVector(
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<std::string>
-DataPostprocessorVector<dim>::get_names() const
+DataPostprocessorVector<dim, Number>::get_names() const
 {
   return std::vector<std::string>(dim, name);
 }
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<DataComponentInterpretation::DataComponentInterpretation>
-DataPostprocessorVector<dim>::get_data_component_interpretation() const
+DataPostprocessorVector<dim, Number>::get_data_component_interpretation() const
 {
   return std::vector<DataComponentInterpretation::DataComponentInterpretation>(
     dim, DataComponentInterpretation::component_is_part_of_vector);
 }
 
 
-template <int dim>
+template <int dim, typename Number>
 UpdateFlags
-DataPostprocessorVector<dim>::get_needed_update_flags() const
+DataPostprocessorVector<dim, Number>::get_needed_update_flags() const
 {
   return update_flags;
 }
@@ -134,8 +134,8 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 
 // -------------------------- DataPostprocessorTensor -------------------------
 
-template <int dim>
-DataPostprocessorTensor<dim>::DataPostprocessorTensor(
+template <int dim, typename Number>
+DataPostprocessorTensor<dim, Number>::DataPostprocessorTensor(
   const std::string &name,
   const UpdateFlags  update_flags)
   : name(name)
@@ -144,9 +144,9 @@ DataPostprocessorTensor<dim>::DataPostprocessorTensor(
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<std::string>
-DataPostprocessorTensor<dim>::get_names() const
+DataPostprocessorTensor<dim, Number>::get_names() const
 {
   static_assert(dim <= 3,
                 "The following variable needs to be expanded for dim>3");
@@ -161,18 +161,18 @@ DataPostprocessorTensor<dim>::get_names() const
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::vector<DataComponentInterpretation::DataComponentInterpretation>
-DataPostprocessorTensor<dim>::get_data_component_interpretation() const
+DataPostprocessorTensor<dim, Number>::get_data_component_interpretation() const
 {
   return std::vector<DataComponentInterpretation::DataComponentInterpretation>(
     dim * dim, DataComponentInterpretation::component_is_scalar);
 }
 
 
-template <int dim>
+template <int dim, typename Number>
 UpdateFlags
-DataPostprocessorTensor<dim>::get_needed_update_flags() const
+DataPostprocessorTensor<dim, Number>::get_needed_update_flags() const
 {
   return update_flags;
 }

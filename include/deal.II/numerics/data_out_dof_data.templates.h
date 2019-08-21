@@ -382,8 +382,8 @@ namespace internal
     }
 
 
-    template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::DataEntryBase(
+    template <typename DoFHandlerType, typename Number>
+    DataEntryBase<DoFHandlerType, Number>::DataEntryBase(
       const DoFHandlerType *          dofs,
       const std::vector<std::string> &names_in,
       const std::vector<
@@ -419,10 +419,10 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::DataEntryBase(
+    template <typename DoFHandlerType, typename Number>
+    DataEntryBase<DoFHandlerType, Number>::DataEntryBase(
       const DoFHandlerType *dofs,
-      const DataPostprocessor<DoFHandlerType::space_dimension>
+      const DataPostprocessor<DoFHandlerType::space_dimension, Number>
         *data_postprocessor)
       : dof_handler(dofs,
                     typeid(
@@ -464,7 +464,8 @@ namespace internal
      * @author Wolfgang Bangerth, 2004
      */
     template <typename DoFHandlerType, typename VectorType>
-    class DataEntry : public DataEntryBase<DoFHandlerType>
+    class DataEntry
+      : public DataEntryBase<DoFHandlerType, typename VectorType::value_type>
     {
     public:
       /**
@@ -486,7 +487,8 @@ namespace internal
        */
       DataEntry(const DoFHandlerType *dofs,
                 const VectorType *    data,
-                const DataPostprocessor<DoFHandlerType::space_dimension>
+                const DataPostprocessor<DoFHandlerType::space_dimension,
+                                        typename VectorType::value_type>
                   *data_postprocessor);
 
       /**
@@ -610,9 +612,10 @@ namespace internal
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
         &data_component_interpretation)
-      : DataEntryBase<DoFHandlerType>(dofs,
-                                      names,
-                                      data_component_interpretation)
+      : DataEntryBase<DoFHandlerType, typename VectorType::value_type>(
+          dofs,
+          names,
+          data_component_interpretation)
       , vector(data)
     {}
 
@@ -622,9 +625,12 @@ namespace internal
     DataEntry<DoFHandlerType, VectorType>::DataEntry(
       const DoFHandlerType *dofs,
       const VectorType *    data,
-      const DataPostprocessor<DoFHandlerType::space_dimension>
+      const DataPostprocessor<DoFHandlerType::space_dimension,
+                              typename VectorType::value_type>
         *data_postprocessor)
-      : DataEntryBase<DoFHandlerType>(dofs, data_postprocessor)
+      : DataEntryBase<DoFHandlerType, typename VectorType::value_type>(
+          dofs,
+          data_postprocessor)
       , vector(data)
     {}
 
@@ -978,29 +984,40 @@ namespace internal
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::DataOut_DoFData()
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  DataOut_DoFData()
   : triangulation(nullptr, typeid(*this).name())
   , dofs(nullptr, typeid(*this).name())
 {}
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::~DataOut_DoFData()
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  ~DataOut_DoFData()
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class for clarity be explicit on which function is
   // called
-  DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear();
+  DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::clear();
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
-  const DoFHandlerType &d)
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  attach_dof_handler(const DoFHandlerType &d)
 {
   Assert(dof_data.size() == 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
@@ -1016,9 +1033,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   attach_triangulation(
     const Triangulation<DoFHandlerType::dimension,
                         DoFHandlerType::space_dimension> &tria)
@@ -1036,13 +1056,18 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
-  const DoFHandlerType &                                    dof_handler,
-  const VectorType &                                        vec,
-  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  add_data_vector(const DoFHandlerType &dof_handler,
+                  const VectorType &    vec,
+                  const DataPostprocessor<DoFHandlerType::space_dimension,
+                                          typename VectorType::value_type>
+                    &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
   // postprocessor. if we do, we know that we have type_dof_data, which makes
@@ -1077,10 +1102,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   add_data_vector_internal(
     const DoFHandlerType *          dof_handler,
     const VectorType &              data_vector,
@@ -1236,9 +1264,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   clear_data_vectors()
 {
   dof_data.erase(dof_data.begin(), dof_data.end());
@@ -1251,9 +1282,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   clear_input_data_references()
 {
   for (unsigned int i = 0; i < dof_data.size(); ++i)
@@ -1268,9 +1302,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear()
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::clear()
 {
   dof_data.erase(dof_data.begin(), dof_data.end());
   cell_data.erase(cell_data.begin(), cell_data.end());
@@ -1285,10 +1322,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear()
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 std::vector<std::string>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
-  const
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  get_dataset_names() const
 {
   std::vector<std::string> names;
   // collect the names of dof and cell data
@@ -1322,13 +1362,16 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 std::vector<
   std::tuple<unsigned int,
              unsigned int,
              std::string,
              DataComponentInterpretation::DataComponentInterpretation>>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   get_nonscalar_data_ranges() const
 {
   std::vector<
@@ -1441,20 +1484,28 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 const std::vector<dealii::DataOutBase::Patch<patch_dim, patch_space_dim>> &
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_patches() const
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
+  get_patches() const
 {
   return patches;
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 std::vector<
   std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension>>>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::get_fes()
+  const
 {
   const unsigned int dhdim      = DoFHandlerType::dimension;
   const unsigned int dhspacedim = DoFHandlerType::space_dimension;
@@ -1495,9 +1546,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <typename DoFHandlerType,
+          int patch_dim,
+          int patch_space_dim,
+          typename Number>
 std::size_t
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim, Number>::
   memory_consumption() const
 {
   return (DataOutInterface<patch_dim, patch_space_dim>::memory_consumption() +

@@ -227,7 +227,7 @@ namespace DataPostprocessorInputs
    *
    * @author Wolfgang Bangerth, 2016
    */
-  template <int spacedim>
+  template <int spacedim, typename Number = double>
   struct Scalar : public CommonInputs<spacedim>
   {
     /**
@@ -235,7 +235,7 @@ namespace DataPostprocessorInputs
      * points used to create graphical output from one cell, face, or other
      * object.
      */
-    std::vector<double> solution_values;
+    std::vector<Number> solution_values;
 
     /**
      * An array of gradients of the (scalar) solution at each of the evaluation
@@ -250,7 +250,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Tensor<1, spacedim>> solution_gradients;
+    std::vector<Tensor<1, spacedim, Number>> solution_gradients;
 
     /**
      * An array of second derivatives of the (scalar) solution at each of the
@@ -265,7 +265,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Tensor<2, spacedim>> solution_hessians;
+    std::vector<Tensor<2, spacedim, Number>> solution_hessians;
   };
 
 
@@ -283,7 +283,7 @@ namespace DataPostprocessorInputs
    *
    * @author Wolfgang Bangerth, 2016
    */
-  template <int spacedim>
+  template <int spacedim, typename Number = double>
   struct Vector : public CommonInputs<spacedim>
   {
     /**
@@ -295,7 +295,7 @@ namespace DataPostprocessorInputs
      * vector runs over the components of the finite element field for which
      * output will be generated.
      */
-    std::vector<dealii::Vector<double>> solution_values;
+    std::vector<dealii::Vector<Number>> solution_values;
 
     /**
      * An array of gradients of a vector-valued solution at each of the
@@ -314,7 +314,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<std::vector<Tensor<1, spacedim>>> solution_gradients;
+    std::vector<std::vector<Tensor<1, spacedim, Number>>> solution_gradients;
 
     /**
      * An array of second derivatives of a vector-valued solution at each of the
@@ -333,7 +333,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<std::vector<Tensor<2, spacedim>>> solution_hessians;
+    std::vector<std::vector<Tensor<2, spacedim, Number>>> solution_hessians;
   };
 
 } // namespace DataPostprocessorInputs
@@ -425,7 +425,7 @@ namespace DataPostprocessorInputs
  * @ingroup output
  * @author Tobias Leicht, 2007, Wolfgang Bangerth, 2016
  */
-template <int dim>
+template <int dim, typename Number = double>
 class DataPostprocessor : public Subscriptor
 {
 public:
@@ -456,8 +456,9 @@ public:
    * component.
    */
   virtual void
-  evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &input_data,
-                        std::vector<Vector<double>> &computed_quantities) const;
+  evaluate_scalar_field(
+    const DataPostprocessorInputs::Scalar<dim, Number> &input_data,
+    std::vector<Vector<Number>> &computed_quantities) const;
 
   /**
    * Same as the evaluate_scalar_field() function, but this
@@ -465,8 +466,9 @@ public:
    * i.e. the finite element in use has multiple vector components.
    */
   virtual void
-  evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
-                        std::vector<Vector<double>> &computed_quantities) const;
+  evaluate_vector_field(
+    const DataPostprocessorInputs::Vector<dim, Number> &input_data,
+    std::vector<Vector<Number>> &computed_quantities) const;
 
   /**
    * Return the vector of strings describing the names of the computed
@@ -535,8 +537,8 @@ public:
  * @ingroup output
  * @author Wolfgang Bangerth, 2011
  */
-template <int dim>
-class DataPostprocessorScalar : public DataPostprocessor<dim>
+template <int dim, typename Number = double>
+class DataPostprocessorScalar : public DataPostprocessor<dim, Number>
 {
 public:
   /**
@@ -774,8 +776,8 @@ private:
  * @ingroup output
  * @author Wolfgang Bangerth, 2011, 2017
  */
-template <int dim>
-class DataPostprocessorVector : public DataPostprocessor<dim>
+template <int dim, typename Number = double>
+class DataPostprocessorVector : public DataPostprocessor<dim, Number>
 {
 public:
   /**
@@ -1019,8 +1021,8 @@ private:
  * @ingroup output
  * @author Wolfgang Bangerth, 2017
  */
-template <int dim>
-class DataPostprocessorTensor : public DataPostprocessor<dim>
+template <int dim, typename Number = double>
+class DataPostprocessorTensor : public DataPostprocessor<dim, Number>
 {
 public:
   /**
