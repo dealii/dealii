@@ -147,7 +147,7 @@ namespace Algorithms
      * A flag used to decide how many stepsize iteration should be made.
      * Default is the original value of 21.
      *
-     * Enter zero here to turn of stepsize control.
+     * Enter zero here to turn off stepsize control.
      *
      * @note Controlled by <tt>Stepsize iterations</tt> in parameter file
      */
