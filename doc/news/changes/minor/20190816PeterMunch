@@ -1,0 +1,3 @@
+New: Enable internal::DoFHandlerImplementation::Policy::ParallelDistributed for 1D.
+<br>
+(Peter Munch, 2019/08/16)

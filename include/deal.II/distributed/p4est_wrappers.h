@@ -64,6 +64,20 @@ namespace internal
     template <int>
     struct types;
 
+    // these struct mimics p4est for 1D
+    template <>
+    struct types<1>
+    {
+      // id of a quadrant is an integeger
+      using quadrant = int;
+
+      // maximum number of children
+      static const int max_n_child_indices_bits = 27;
+
+      // number of bits the data type of id has
+      static const int n_bits = std::numeric_limits<quadrant>::digits;
+    };
+
     template <>
     struct types<2>
     {
