@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * An example is shown below
  * @code
- * HDF5::File data_file(filename, HDF5::File::Mode::create);
+ * HDF5::File data_file(filename, HDF5::File::FileAccessMode::create);
  * double double_attribute = 2.2;
  * data_file.set_attribute("double_attribute", double_attribute);
  * auto group = data_file.create_group("group");
