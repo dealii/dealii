@@ -33,24 +33,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class gives a unified framework for the implementation of
- * FiniteElement classes based on Tensor valued polynomial spaces like
- * PolynomialsBDM and PolynomialsRaviartThomas.
+ * This class provides a unified framework for the implementation of
+ * FiniteElement classes based on tensor-valued polynomial spaces like
+ * PolynomialsBDM and PolynomialsRaviartThomas. In this, it is the
+ * tensor-valued equivalent of the FE_Poly class.
  *
  * In essence, what this class requires is that a derived class describes
  * to it a (vector-valued) polynomial space in which every polynomial
- * has exactly @p dim vector components. The polynomial space is described
- * through the @p PolynomialType template argument, which needs to provide
- * a function of the following signature:
- * @code
- * void compute (const Point<dim>            &unit_point,
- *               std::vector<Tensor<1,dim> > &values,
- *               std::vector<Tensor<2,dim> > &grads,
- *               std::vector<Tensor<3,dim> > &grad_grads) const;
- * @endcode
- *
- * For more information on the template parameter <tt>spacedim</tt>, see the
- * documentation for the class Triangulation.
+ * has exactly @p dim vector components. The classes that provide such
+ * implementations are all derived from the TensorPolynomialsBase
+ * class, and an object of one of these derived types needs to be
+ * provided to the constructor of this class.
  *
  *
  * <h3>Deriving classes</h3>
@@ -58,13 +51,16 @@ DEAL_II_NAMESPACE_OPEN
  * This class is not a fully implemented FiniteElement class, but implements
  * some common features of vector valued elements based on vector valued
  * polynomial classes. What's missing here in particular is information on the
- * topological location of the node values, and derived classes need to provide
+ * topological location of the node values (i.e., whether a degree of freedom
+ * is logically at a vertex, edge, face, or the interior of a cell --
+ * information that determines the continuity properties of the associated
+ * shape functions across cell interfaces), and derived classes need to provide
  * this information.
  *
  * Similarly, in many cases, node functionals depend on the shape of the mesh
  * cell, since they evaluate normal or tangential components on the faces. In
  * order to allow for a set of transformations, the variable #mapping_kind has
- * been introduced. It should needs be set in the constructor of a derived
+ * been introduced. It needs be set in the constructor of a derived
  * class.
  *
  * Any derived class must decide on the polynomial space to use.  This
@@ -138,7 +134,7 @@ DEAL_II_NAMESPACE_OPEN
  * mappings, then @p mapping_kind may be a vector with the same number
  * of elements as there are shape functions.
  *
- * @see PolynomialsBDM, PolynomialsRaviartThomas
+ * @see TensorPolynomialsBase
  * @ingroup febase
  * @author Guido Kanschat
  * @date 2005

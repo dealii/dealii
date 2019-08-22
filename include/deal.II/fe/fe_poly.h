@@ -29,8 +29,10 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class gives a unified framework for the implementation of
- * FiniteElement classes based on polynomial spaces like the
- * TensorProductPolynomials or PolynomialSpace classes.
+ * FiniteElement classes based on scalar polynomial spaces like the
+ * TensorProductPolynomials or PolynomialSpace classes. This
+ * class has a corresponding class for tensor-valued finite
+ * elements in the FE_PolyTensor class.
  *
  * Every class that has the following public member variables and
  * functions can be used as template parameter @p PolynomialType.
