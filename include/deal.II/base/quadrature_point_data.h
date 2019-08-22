@@ -170,9 +170,10 @@ public:
   get_data(const CellIteratorType &cell) const;
 
   /**
-   * Returns an optional indicating whether @p cell contains an associated
-   * data or not. If data is available, dereferencing the optional
-   * reveals a vector of pointers to the underlying data at quadrature points.
+   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * associated data or not. If data is available, dereferencing the
+   * std_cxx17::optional reveals a vector of pointers to the underlying data
+   * at the quadrature points.
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
    * there is minimal overhead in returning a vector by value instead of by
@@ -189,9 +190,10 @@ public:
   try_get_data(const CellIteratorType &cell);
 
   /**
-   * Returns an optional indicating whether @p cell contains an associated
-   * data or not. If data is available, dereferencing the optional reveals
-   * a vector of constant pointers to the underlying data at quadrature points.
+   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * associated data or not. If data is available, dereferencing the
+   * std_cxx17::optional reveals a vector of constant pointers to the
+   * underlying data at the quadrature points.
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
    * there is minimal overhead in returning a vector by value instead of by
