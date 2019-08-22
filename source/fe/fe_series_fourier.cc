@@ -209,7 +209,8 @@ namespace FESeries
 
     for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)
       for (unsigned int j = 0; j < local_dof_values.size(); j++)
-        unrolled_coefficients[i] += matrix[i][j] * local_dof_values[j];
+        unrolled_coefficients[i] +=
+          matrix[i][j] * static_cast<double>(local_dof_values[j]);
 
     fourier_coefficients.fill(unrolled_coefficients.begin());
   }
