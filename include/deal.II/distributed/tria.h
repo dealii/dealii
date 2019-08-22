@@ -249,7 +249,7 @@ namespace parallel
      */
     template <int dim, int spacedim = dim>
     class Triangulation
-      : public dealii::parallel::TriangulationBase<dim, spacedim>
+      : public dealii::parallel::DistributedTriangulationBase<dim, spacedim>
     {
     public:
       /**
@@ -382,6 +382,12 @@ namespace parallel
        */
       virtual void
       clear() override;
+
+      /**
+       * Return if multilevel hierarchy is supported and has been constructed.
+       */
+      bool
+      is_multilevel_hierarchy_constructed() const override;
 
       /**
        * Implementation of the same function as in the base class.
@@ -1247,7 +1253,7 @@ namespace parallel
      */
     template <int spacedim>
     class Triangulation<1, spacedim>
-      : public dealii::parallel::TriangulationBase<1, spacedim>
+      : public dealii::parallel::DistributedTriangulationBase<1, spacedim>
     {
     public:
       /**
@@ -1334,6 +1340,9 @@ namespace parallel
        */
       void
       save(const std::string &filename) const;
+
+      bool
+      is_multilevel_hierarchy_constructed() const override;
 
       /**
        * This function is not implemented, but needs to be present for the

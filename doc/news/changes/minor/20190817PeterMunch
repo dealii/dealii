@@ -1,0 +1,4 @@
+New: Introduce new class parallel::DistributedTriangulationBase 
+between parallel::TriangulationBase and parallel::distributed::Triangulation.
+<br>
+(Peter Munch, 2019/08/17)
