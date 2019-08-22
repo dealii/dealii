@@ -62,7 +62,8 @@ public:
 
   /**
    * Return a string that uniquely identifies a finite element. This class
-   * returns <tt>FE_RaviartThomas<dim>(degree)</tt>, with @p dim and @p degree
+   * returns `FE_DGVector_` plus a piece of the name that is taken from what
+   * the polynomial object returns, plus `<dim>(degree)`, with @p dim and @p degree
    * replaced by appropriate values.
    */
   virtual std::string
