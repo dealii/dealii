@@ -1,0 +1,20 @@
+DEAL::Cycle 0
+DEAL::Number of active cells:       64
+DEAL::Number of degrees of freedom: 256
+DEAL:Richardson::Starting value 0.176777
+DEAL:Richardson::Convergence step 4 value 4.87502e-17
+DEAL::Writing solution to <solution-0.vtk>
+DEAL::Cycle 1
+DEAL::gradient_indicator l-infty: 0.160661
+DEAL::Number of active cells:       112
+DEAL::Number of degrees of freedom: 448
+DEAL:Richardson::Starting value 0.153093
+DEAL:Richardson::Convergence step 9 value 4.06889e-17
+DEAL::Writing solution to <solution-1.vtk>
+DEAL::Cycle 2
+DEAL::gradient_indicator l-infty: 0.0785475
+DEAL::Number of active cells:       214
+DEAL::Number of degrees of freedom: 856
+DEAL:Richardson::Starting value 0.149870
+DEAL:Richardson::Convergence step 16 value 1.41017e-14
+DEAL::Writing solution to <solution-2.vtk>
