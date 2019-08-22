@@ -148,7 +148,10 @@ class FE_PolyTensor : public FiniteElement<dim, spacedim>
 {
 public:
   /**
-   * Constructor.
+   * Constructor. This constructor does a deep copy of the polynomials
+   * object via the TensorPolynomialsBase::clone() function and stores
+   * a pointer to the copy. As a consequence, the calling site can
+   * simply pass a temporary object as the first argument.
    */
   FE_PolyTensor(const TensorPolynomialsBase<dim> &polynomials,
                 const FiniteElementData<dim> &    fe_data,
