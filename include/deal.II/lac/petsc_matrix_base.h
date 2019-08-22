@@ -840,13 +840,17 @@ namespace PETScWrappers
     residual(VectorBase &dst, const VectorBase &x, const VectorBase &b) const;
 
     /**
-     * Iterator starting at the first entry.
+     * Iterator starting at the first entry. This can only be called on a
+     * processor owning the entire matrix. In all other cases refer to the
+     * version of begin() taking a row number as an argument.
      */
     const_iterator
     begin() const;
 
     /**
-     * Final iterator.
+     * Final iterator. This can only be called on a processor owning the entire
+     * matrix. In all other cases refer to the version of end() taking a row
+     * number as an argument.
      */
     const_iterator
     end() const;
@@ -1494,13 +1498,29 @@ namespace PETScWrappers
   inline MatrixBase::const_iterator
   MatrixBase::begin() const
   {
-    return const_iterator(this, 0, 0);
+    Assert(
+      (in_local_range(0) && in_local_range(m() - 1)),
+      ExcMessage(
+        "begin() and end() can only be called on a processor owning the entire matrix. If this is a distributed matrix, use begin(row) and end(row) instead."));
+
+    // find the first non-empty row in order to make sure that the returned
+    // iterator points to something useful
+    size_type first_nonempty_row = 0;
+    while ((first_nonempty_row < m()) && (row_length(first_nonempty_row) == 0))
+      ++first_nonempty_row;
+
+    return const_iterator(this, first_nonempty_row, 0);
   }
 
 
   inline MatrixBase::const_iterator
   MatrixBase::end() const
   {
+    Assert(
+      (in_local_range(0) && in_local_range(m() - 1)),
+      ExcMessage(
+        "begin() and end() can only be called on a processor owning the entire matrix. If this is a distributed matrix, use begin(row) and end(row) instead."));
+
     return const_iterator(this, m(), 0);
   }
 
