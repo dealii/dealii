@@ -701,7 +701,7 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    std::unique_ptr<Number[], decltype(free) *> values;
+    std::unique_ptr<Number[], decltype(std::free) *> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
