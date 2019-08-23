@@ -1560,7 +1560,9 @@ namespace PETScWrappers
 
     // if there is no such line, then take the
     // end iterator of the matrix
-    return end();
+    // we don't allow calling end() directly for distributed matrices so we need
+    // to copy the code without the assertion.
+    return {this, m(), 0};
   }
 
 
