@@ -363,7 +363,7 @@ namespace parallel
        * mesh independent of the number of processors into which the
        * triangulation is partitioned.
        */
-      Triangulation(
+      explicit Triangulation(
         MPI_Comm mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                        smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
