@@ -58,7 +58,9 @@ public:
   DiagonalMatrix() = default;
 
   /**
-   * Constructor immediately initializing the object properly.
+   * Constructor initializing this object as a diagonal matrix of size `n x n`
+   * where `n` is the size of the vector, and with diagonal entries equal to the
+   * elements of @p vec.
    */
   explicit DiagonalMatrix(const VectorType &vec);
 
