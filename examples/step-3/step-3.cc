@@ -594,11 +594,12 @@ void Step3::output_results() const
   data_out.build_patches();
 
   // Now we have everything in place for the actual output. Just open a file
-  // and write the data into it, using GNUPLOT format (there are other
-  // functions which write their data in postscript, AVS, GMV, or some other
-  // format):
-  std::ofstream output("solution.gpl");
-  data_out.write_gnuplot(output);
+  // and write the data into it, using VTK format (there are many other
+  // functions in the DataOut class we are using here that can write the
+  // data in postscript, AVS, GMV, Gnuplot, or some other file
+  // formats):
+  std::ofstream output("solution.vtk");
+  data_out.write_vtk(output);
 }
 
 
