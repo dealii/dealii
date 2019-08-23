@@ -37,8 +37,6 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
 
-#include <deal.II/numerics/coarsening_strategies.h>
-
 #include <boost/serialization/array.hpp>
 
 #include <algorithm>
@@ -1228,6 +1226,40 @@ namespace internal
               cell->set_active_fe_index(coarsen.second);
             }
         }
+
+
+        /**
+         * Coarsening strategy for the CellDataTransfer object responsible for
+         * tranferring the active_fe_index of each cell on
+         * parallel::distributed::Triangulation objects that have been refined.
+         *
+         * A finite element index needs to be determined for the (not yet
+         * active) parent cell from its (still active) children.  Out of the set
+         * of elements previously assigned to the former children, we choose the
+         * one dominated by all children for the parent cell.
+         */
+        template <int dim, int spacedim>
+        static unsigned int
+        determine_fe_from_children(
+          const std::vector<unsigned int> &        children_fe_indices,
+          dealii::hp::FECollection<dim, spacedim> &fe_collection)
+        {
+          Assert(!children_fe_indices.empty(), ExcInternalError());
+
+          // convert vector to set
+          const std::set<unsigned int> children_fe_indices_set(
+            children_fe_indices.begin(), children_fe_indices.end());
+
+          const unsigned int dominated_fe_index =
+            fe_collection.find_dominated_fe_extended(children_fe_indices_set,
+                                                     /*codim=*/0);
+
+          Assert(dominated_fe_index != numbers::invalid_unsigned_int,
+                 typename dealii::hp::FECollection<
+                   dim>::ExcNoDominatedFiniteElementAmongstChildren());
+
+          return dominated_fe_index;
+        }
       };
     } // namespace DoFHandlerImplementation
   }   // namespace hp
@@ -2041,45 +2073,21 @@ namespace hp
         active_fe_index_transfer =
           std_cxx14::make_unique<ActiveFEIndexTransfer>();
 
-        // First, do what we would do in the sequential case.
-        dealii::internal::hp::DoFHandlerImplementation::Implementation::
-          collect_fe_indices_on_cells_to_be_refined(*this);
-
         // If we work on a p::d::Triangulation, we have to transfer all
         // active_fe_indices since ownership of cells may change. We will
         // use our p::d::CellDataTransfer member to achieve this. Further,
         // we prepare the values in such a way that they will correspond to
         // the active_fe_indices on the new mesh.
 
-        // Gather all current active_fe_indices.
-        get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
+        // Gather all current future_fe_indices.
+        active_fe_index_transfer->active_fe_indices.resize(
+          get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
 
-        // Overwrite active_fe_indices of cells that change by either
-        // h/p refinement/coarsening.
-        for (const auto &pair :
-             active_fe_index_transfer->persisting_cells_fe_index)
-          active_fe_index_transfer
-            ->active_fe_indices[pair.first->active_cell_index()] = pair.second;
-
-        for (const auto &pair :
-             active_fe_index_transfer->refined_cells_fe_index)
-          active_fe_index_transfer
-            ->active_fe_indices[pair.first->active_cell_index()] = pair.second;
-
-        for (const auto &pair :
-             active_fe_index_transfer->coarsened_cells_fe_index)
-          for (unsigned int child_index = 0;
-               child_index < pair.first->n_children();
-               ++child_index)
-            {
-              // Make sure that all children belong to the same subdomain.
-              Assert(pair.first->child(child_index)->is_locally_owned(),
-                     ExcInternalError());
-
-              active_fe_index_transfer
-                ->active_fe_indices[pair.first->child(child_index)
-                                      ->active_cell_index()] = pair.second;
-            }
+        for (const auto &cell : active_cell_iterators())
+          if (cell->is_locally_owned())
+            active_fe_index_transfer
+              ->active_fe_indices[cell->active_cell_index()] =
+              cell->future_fe_index();
 
         // Create transfer object and attach to it.
         const auto *distributed_tria = dynamic_cast<
@@ -2091,7 +2099,10 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &CoarseningStrategies::check_equality<unsigned int>);
+          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
+                      Implementation::determine_fe_from_children<dim, spacedim>,
+                    std::placeholders::_1,
+                    std::ref(fe_collection)));
 
         active_fe_index_transfer->cell_data_transfer
           ->prepare_for_coarsening_and_refinement(
@@ -2198,7 +2209,10 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &CoarseningStrategies::check_equality<unsigned int>);
+          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
+                      Implementation::determine_fe_from_children<dim, spacedim>,
+                    std::placeholders::_1,
+                    std::ref(fe_collection)));
 
         // If we work on a p::d::Triangulation, we have to transfer all
         // active fe indices since ownership of cells may change.
@@ -2271,7 +2285,10 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          &CoarseningStrategies::check_equality<unsigned int>);
+          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
+                      Implementation::determine_fe_from_children<dim, spacedim>,
+                    std::placeholders::_1,
+                    std::ref(fe_collection)));
 
         // Unpack active_fe_indices.
         active_fe_index_transfer->active_fe_indices.resize(
