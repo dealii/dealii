@@ -2123,20 +2123,20 @@ namespace parallel
       MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
-      const Settings settings_)
+      const Settings settings)
       : // Do not check for distorted cells.
         // For multigrid, we need limit_level_difference_at_vertices
         // to make sure the transfer operators only need to consider two levels.
       dealii::parallel::DistributedTriangulationBase<dim, spacedim>(
         mpi_communicator,
-        (settings_ & construct_multigrid_hierarchy) ?
+        (settings & construct_multigrid_hierarchy) ?
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
             smooth_grid |
             Triangulation<dim, spacedim>::limit_level_difference_at_vertices) :
           smooth_grid,
         false)
-      , settings(settings_)
+      , settings(settings)
       , triangulation_has_content(false)
       , connectivity(nullptr)
       , parallel_forest(nullptr)
