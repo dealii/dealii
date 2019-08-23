@@ -168,7 +168,13 @@
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/dir ../deal.II
     </pre>
-    We recommend compiling deal.II in parallel if your machine has more than one processor core. This can be done by providing the <code>--jobs</code> flag to <code>make</code> with a numerical argument. Here we compile with four <code>make</code> jobs:
+    We recommend compiling deal.II in parallel if your machine has
+    more than one processor core. This can be done by providing
+    the <code>--jobs=N</code> flag to <code>make</code> with a
+    numerical argument <code>N</code>. (The
+    argument <code>--jobs=N</code> is often abbreviated
+    as <code>-jN</code>.) Here we compile with four <code>make</code>
+    jobs:
     <pre>
   make --jobs=4 install
   make test
@@ -180,9 +186,10 @@
     </p>
 
     <p>
-        <b>Note:</b></p>
+        <b>Notes:</b></p>
     <ul>
-        <li> <code>/path/to/install/dir</code> is the directory which deal.II should be installed into. This can be a directory in your home directory (e.g., <code>~/bin/deal.II</code>) or a directory such as <code>/usr/local</code> if you have root privileges.
+        <li> The part "<code>/path/to/install/dir</code>" in the
+            command above needs to be replaced by the path to the directory which deal.II should be installed into. This can be a directory in your home directory (e.g., <code>~/bin/deal.II</code>) or a directory such as <code>/usr/local</code> if you have root privileges.
             Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks). 
         </li>
 
