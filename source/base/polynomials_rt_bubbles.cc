@@ -42,7 +42,7 @@ PolynomialsRT_Bubbles<dim>::PolynomialsRT_Bubbles(const unsigned int k)
 
 template <int dim>
 void
-PolynomialsRT_Bubbles<dim>::compute(
+PolynomialsRT_Bubbles<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
@@ -89,12 +89,12 @@ PolynomialsRT_Bubbles<dim>::compute(
     p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
 
     // This is the Raviart-Thomas part of the space
-    raviart_thomas_space.compute(unit_point,
-                                 p_values,
-                                 p_grads,
-                                 p_grad_grads,
-                                 p_third_derivatives,
-                                 p_fourth_derivatives);
+    raviart_thomas_space.evaluate(unit_point,
+                                  p_values,
+                                  p_grads,
+                                  p_grad_grads,
+                                  p_third_derivatives,
+                                  p_fourth_derivatives);
     for (unsigned int i = 0; i < p_values.size(); ++i)
       values[i] = p_values[i];
     for (unsigned int i = 0; i < p_grads.size(); ++i)

@@ -321,12 +321,12 @@ protected:
     if (update_flags & (update_values | update_gradients))
       for (unsigned int k = 0; k < n_q_points; ++k)
         {
-          poly_space->compute(quadrature.point(k),
-                              values,
-                              grads,
-                              grad_grads,
-                              third_derivatives,
-                              fourth_derivatives);
+          poly_space->evaluate(quadrature.point(k),
+                               values,
+                               grads,
+                               grad_grads,
+                               third_derivatives,
+                               fourth_derivatives);
 
           if (update_flags & update_values)
             {

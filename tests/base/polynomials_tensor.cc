@@ -39,7 +39,7 @@ check_point(const Point<dim> &x, const PolynomialType &p)
   std::vector<Tensor<4, dim>> thirds(0);
   std::vector<Tensor<5, dim>> fourths(0);
 
-  p.compute(x, values, gradients, seconds, thirds, fourths);
+  p.evaluate(x, values, gradients, seconds, thirds, fourths);
 
   deallog << "Point " << x << std::endl;
   for (unsigned int i = 0; i < n; ++i)
