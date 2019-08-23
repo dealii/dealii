@@ -52,9 +52,15 @@ public:
   using size_type  = typename VectorType::size_type;
 
   /**
-   * Constructor.
+   * Default constructor. The object needs still to be reinitialized to be
+   * usable.
    */
   DiagonalMatrix() = default;
+
+  /**
+   * Constructor immediately initializing the object properly.
+   */
+  explicit DiagonalMatrix(const VectorType &vec);
 
   /**
    * Initialize with a given vector by copying the content of the vector
@@ -214,6 +220,13 @@ private:
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN
+
+template <typename VectorType>
+DiagonalMatrix<VectorType>::DiagonalMatrix(const VectorType &vec)
+  : diagonal(vec)
+{}
+
+
 
 template <typename VectorType>
 void
