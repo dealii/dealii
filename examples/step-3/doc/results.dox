@@ -19,49 +19,35 @@ sometimes useful for debugging purposes, but often clutters up the
 screen display.
 
 Apart from the output shown above, the program generated the file
-<code>solution.gpl</code>, which is in GNUPLOT format. It can be
-viewed as follows: invoke GNUPLOT and enter the following sequence of
-commands at its prompt:
-@code
-examples/\step-3> gnuplot
+<code>solution.vtk</code>, which is in the VTK format that is widely
+used by many visualization programs today -- including the two
+heavy-weights <a href="https://www.llnl.gov/visit">Visit</a> and
+<a href="https://www.paraview.org">Paraview</a> that are the most
+commonly used programs for this purpose today.
 
-        G N U P L O T
-        Version 3.7 patchlevel 3
-        last modified Thu Dec 12 13:00:00 GMT 2002
-        System: Linux 2.6.11.4-21.10-default
-
-        Copyright(C) 1986 - 1993, 1998 - 2002
-        Thomas Williams, Colin Kelley and many others
-
-        Type `help` to access the on-line reference manual
-        The gnuplot FAQ is available from
-        http://www.gnuplot.info/gnuplot-faq.html
-
-        Send comments and requests for help to <info-gnuplot@dartmouth.edu>
-        Send bugs, suggestions and mods to <bug-gnuplot@dartmouth.edu>
-
-
-Terminal type set to 'x11'
-gnuplot> set style data lines
-gnuplot> splot "solution.gpl"
-@endcode
-This produces the picture of the solution below left. Alternatively,
-you can order GNUPLOT to do some hidden line removal by the command
-@code
-gnuplot> set hidden3d
-@endcode
-to get the result at the right:
-
+Using Visit, it is not very difficult to generate a picture of the
+solution like this:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-1.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-2.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-3.png" alt="Visualization of the solution of step-3">
     </td>
   </tr>
 </table>
+It shows both the solution and the mesh, elevated above the $x$-$y$ plane
+based on the value of the solution at each point. Of course the solution
+here is not particularly exciting, but that is a result of both what the
+Laplace equation represents and the right hand side $f(\mathbf x)=1$ we
+have chosen for this program: The Laplace equation describes (among many
+other uses) the vertical deformation of a membrane subject to an external
+(also vertical) force. In the current example, the membrane's borders
+are clamped to a square frame with no vertical variation; a constant
+force density will therefore intuitively lead to a membrane that
+simply bulges upward -- like the one shown above.
+
+Visit and Paraview both allow playing with various kinds of visualizations
+of the solution. Several video lectures show how to use these programs.
+@dealiiVideoLectureSeeAlso{11,32}
 
 
 
