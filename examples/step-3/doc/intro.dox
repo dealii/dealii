@@ -335,8 +335,13 @@ following tutorial programs.
 
 <h3> A note on types </h3>
 
-deal.II defines a number of integral %types via alias in namespace types. In
-particular, in this program you will see types::global_dof_index in a couple of
+deal.II defines a number of integral %types via alias in namespace dealii::types.
+(In the previous sentence, the word "integral" is used as the <i>adjective</i>
+that corresponds to the noun "integer". It shouldn't be confused with the
+<i>noun</i> "integral" that represents the area or volume under a curve
+or surface. The adjective "integral" is widely used in the C++ world in
+contexts such as "integral type", "integral constant", etc.)
+In particular, in this program you will see types::global_dof_index in a couple of
 places: an integer type that is used to denote the <i>global</i> index of a
 degree of freedom, i.e., the index of a particular degree of freedom within the
 DoFHandler object that is defined on top of a triangulation (as opposed to the
