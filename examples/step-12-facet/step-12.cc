@@ -46,7 +46,7 @@
 #include <deal.II/fe/fe_dgq.h>
 // This header is needed for FEInterfaceValues to compute integrals on
 // interfaces
-#include <deal.II/fe/fe_interface.h>
+#include <deal.II/fe/fe_interface_values.h>
 // We are going to use the simplest possible solver, called Richardson
 // iteration, that represents a simple defect correction. This, in combination
 // with a block SSOR preconditioner (defined in precondition_block.h), that
