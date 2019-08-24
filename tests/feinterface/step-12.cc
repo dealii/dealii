@@ -18,6 +18,8 @@
  * Timo Heister, Clemson University, 2019
  */
 
+// a version of step-12 using FEInterfaceValues
+
 
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on:
@@ -72,6 +74,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "../tests.h"
 
 namespace Step12
 {
@@ -560,7 +563,8 @@ namespace Step12
 int
 main()
 {
-  dealii::deallog.depth_console(10);
+  initlog();
+
   try
     {
       Step12::AdvectionProblem<2> dgmethod;
