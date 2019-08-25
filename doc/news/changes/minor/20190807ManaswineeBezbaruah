@@ -1,6 +1,0 @@
-Improved: Changes in grid_generator.h
-The original documentation of enclosed_hyper_cube said 'first two parameters' in the second line, which was a bit unclear. 
-I made that more specific. The coloring scheme was also unclear, especially with the use of bitwise OR as a verb.
-The moebius function had a pi outside of math mode, not a huge error.
-<br>
-(Manaswinee Bezbaruah, 2019/08/05)
