@@ -1445,10 +1445,11 @@ namespace Step33
     std::vector<types::global_dof_index> dof_indices_neighbor(dofs_per_cell);
 
     const UpdateFlags update_flags = update_values | update_gradients |
-                                     update_quadrature_points | update_JxW_values,
-                      face_update_flags = update_values | update_quadrature_points |
-                                          update_JxW_values |
-                                          update_normal_vectors,
+                                     update_quadrature_points |
+                                     update_JxW_values,
+                      face_update_flags =
+                        update_values | update_quadrature_points |
+                        update_JxW_values | update_normal_vectors,
                       neighbor_face_update_flags = update_values;
 
     FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
