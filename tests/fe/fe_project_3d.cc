@@ -362,9 +362,7 @@ test(const FiniteElement<dim> &fe,
                     n_x_v[0] = (-normal[1] * face_values[q_point][0] +
                                 normal[0] * face_values[q_point][1]);
                   else if (dim == 3)
-                    cross_product(*reinterpret_cast<Tensor<1, dim> *>(&n_x_v),
-                                  normal,
-                                  face_values[q_point]);
+                    n_x_v = cross_product_3d(normal, face_values[q_point]);
 
                   if (cell->at_boundary(face))
                     boundary_tangentials += face_JxW_values[q_point] * n_x_v;
@@ -374,11 +372,10 @@ test(const FiniteElement<dim> &fe,
                   // boundary curl curl traces
                   if (dim == 3)
                     {
-                      Tensor<1, dim> n_x_curl_u;
-                      cross_product(n_x_curl_u,
-                                    normal,
-                                    *reinterpret_cast<Tensor<1, dim> *>(
-                                      &face_curls[q_point]));
+                      Tensor<1, dim> n_x_curl_u =
+                        cross_product_3d(normal,
+                                         *reinterpret_cast<Tensor<1, dim> *>(
+                                           &face_curls[q_point]));
                       if (cell->at_boundary(face))
                         boundary_curl_curl_traces +=
                           face_JxW_values[q_point] * n_x_curl_u;

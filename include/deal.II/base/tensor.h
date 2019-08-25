@@ -2683,7 +2683,4 @@ linfty_norm(const Tensor<2, dim, adouble> &t)
 
 DEAL_II_NAMESPACE_CLOSE
 
-// include deprecated non-member functions operating on Tensor
-#include <deal.II/base/tensor_deprecated.h>
-
 #endif
