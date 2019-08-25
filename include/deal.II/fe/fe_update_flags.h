@@ -115,6 +115,9 @@ enum UpdateFlags
    * locations $\mathbf x_q$ on the real cell, you need to pass this
    * flag to the FEValues constructor to make sure you can later
    * access them.
+   *
+   * In the context of DataPostprocessor,
+   * DataPostprocessorInputs::CommonInputs::evaluation_points will be updated.
    */
   update_quadrature_points = 0x0020,
   //! Transformed quadrature weights
