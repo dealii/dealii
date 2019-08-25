@@ -739,6 +739,11 @@ namespace Utilities
     {
     public:
       /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithmProcess() = default;
+
+      /**
        * @return A vector of ranks this process wants to send a request to.
        *
        * @note This is the only method which has to be implemented since the
