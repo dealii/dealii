@@ -1,0 +1,18 @@
+
+DEAL::Cycle 0
+DEAL::Number of active cells:       64
+DEAL::Number of degrees of freedom: 256
+DEAL::Solver stopped within 4 - 17 iterations
+DEAL::Writing solution to <solution-0.vtk>
+DEAL::Cycle 1
+DEAL::gradient_indicator l-infty: 0.160661
+DEAL::Number of active cells:       112
+DEAL::Number of degrees of freedom: 448
+DEAL::Solver stopped within 4 - 17 iterations
+DEAL::Writing solution to <solution-1.vtk>
+DEAL::Cycle 2
+DEAL::gradient_indicator l-infty: 0.0785475
+DEAL::Number of active cells:       214
+DEAL::Number of degrees of freedom: 856
+DEAL::Solver stopped within 4 - 17 iterations
+DEAL::Writing solution to <solution-2.vtk>
