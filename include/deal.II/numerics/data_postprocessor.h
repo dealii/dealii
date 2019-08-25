@@ -502,10 +502,13 @@ public:
 
   /**
    * Return, which data has to be provided to compute the derived quantities.
-   * This has to be a combination of @p update_values, @p update_gradients and
-   * @p update_hessians. If the DataPostprocessor is to be used in combination
-   * with DataOutFaces, you may also ask for a update of normals via the @p
-   * update_normal_vectors flag.
+   * This has to be a combination of @p update_values, @p update_gradients,
+   * @p update_hessians and @p update_quadrature_points. Note that the flag
+   * @p update_quadrature_points updates
+   * DataPostprocessorInputs::CommonInputs::evaluation_points. If the
+   * DataPostprocessor is to be used in combination with DataOutFaces, you may
+   * also ask for a update of normals via the @p update_normal_vectors flag.
+   * The description of the flags can be found at dealii::UpdateFlags.
    */
   virtual UpdateFlags
   get_needed_update_flags() const = 0;
@@ -546,10 +549,13 @@ public:
    *
    * @param name The name by which the scalar variable computed by this class
    * should be made available in graphical output files.
-   * @param update_flags This has to be a combination of @p update_values, @p
-   * update_gradients and @p update_hessians. If the DataPostprocessor is to
-   * be used in combination with DataOutFaces, you may also ask for a update
-   * of normals via the @p update_normal_vectors flag.
+   * @param update_flags This has to be a combination of @p update_values,
+   * @p update_gradients, @p update_hessians and @p update_quadrature_points.
+   * Note that the flag @p update_quadrature_points updates
+   * DataPostprocessorInputs::CommonInputs::evaluation_points. If the
+   * DataPostprocessor is to be used in combination with DataOutFaces, you may
+   * also ask for a update of normals via the @p update_normal_vectors flag.
+   * The description of the flags can be found at dealii::UpdateFlags.
    */
   DataPostprocessorScalar(const std::string &name,
                           const UpdateFlags  update_flags);
@@ -785,10 +791,13 @@ public:
    *
    * @param name The name by which the vector variable computed by this class
    * should be made available in graphical output files.
-   * @param update_flags This has to be a combination of @p update_values, @p
-   * update_gradients and @p update_hessians. If the DataPostprocessor is to
-   * be used in combination with DataOutFaces, you may also ask for a update
-   * of normals via the @p update_normal_vectors flag.
+   * @param update_flags This has to be a combination of @p update_values,
+   * @p update_gradients, @p update_hessians and @p update_quadrature_points.
+   * Note that the flag @p update_quadrature_points updates
+   * DataPostprocessorInputs::CommonInputs::evaluation_points. If the
+   * DataPostprocessor is to be used in combination with DataOutFaces, you may
+   * also ask for a update of normals via the @p update_normal_vectors flag.
+   * The description of the flags can be found at dealii::UpdateFlags.
    */
   DataPostprocessorVector(const std::string &name,
                           const UpdateFlags  update_flags);
@@ -1030,10 +1039,13 @@ public:
    *
    * @param name The name by which the vector variable computed by this class
    * should be made available in graphical output files.
-   * @param update_flags This has to be a combination of @p update_values, @p
-   * update_gradients and @p update_hessians. If the DataPostprocessor is to
-   * be used in combination with DataOutFaces, you may also ask for a update
-   * of normals via the @p update_normal_vectors flag.
+   * @param update_flags This has to be a combination of @p update_values,
+   * @p update_gradients, @p update_hessians and @p update_quadrature_points.
+   * Note that the flag @p update_quadrature_points updates
+   * DataPostprocessorInputs::CommonInputs::evaluation_points. If the
+   * DataPostprocessor is to be used in combination with DataOutFaces, you may
+   * also ask for a update of normals via the @p update_normal_vectors flag.
+   * The description of the flags can be found at dealii::UpdateFlags.
    */
   DataPostprocessorTensor(const std::string &name,
                           const UpdateFlags  update_flags);
