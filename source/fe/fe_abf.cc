@@ -52,8 +52,8 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
                              dim,
                              deg + 2,
                              FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
-      std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
+      std::vector<bool>(PolynomialsABF<dim>::n_polynomials(deg), true),
+      std::vector<ComponentMask>(PolynomialsABF<dim>::n_polynomials(deg),
                                  std::vector<bool>(dim, true)))
   , rt_order(deg)
 {

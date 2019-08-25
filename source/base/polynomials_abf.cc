@@ -48,13 +48,13 @@ namespace
 
 template <int dim>
 PolynomialsABF<dim>::PolynomialsABF(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , polynomial_space(get_abf_polynomials<dim>(k))
 {
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
   // multiply by 'dim'
-  Assert(dim * polynomial_space.n() == compute_n_pols(k), ExcInternalError());
+  Assert(dim * polynomial_space.n() == n_polynomials(k), ExcInternalError());
 }
 
 
@@ -155,7 +155,7 @@ PolynomialsABF<dim>::evaluate(
 
 template <int dim>
 unsigned int
-PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
+PolynomialsABF<dim>::n_polynomials(const unsigned int k)
 {
   switch (dim)
     {

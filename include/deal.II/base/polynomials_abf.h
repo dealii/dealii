@@ -97,7 +97,7 @@ public:
    * FiniteElement classes.
    */
   static unsigned int
-  compute_n_pols(unsigned int degree);
+  n_polynomials(const unsigned int degree);
 
   /**
    * @copydoc TensorPolynomialsBase<dim>::clone()

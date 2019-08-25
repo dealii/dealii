@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsBernardiRaugel<dim>::PolynomialsBernardiRaugel(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k + 1, compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k + 1, n_polynomials(k))
   , polynomial_space_Q(create_polynomials_Q())
   , polynomial_space_bubble(create_polynomials_bubble())
 {}
@@ -236,7 +236,7 @@ PolynomialsBernardiRaugel<dim>::evaluate(
 
 template <int dim>
 unsigned int
-PolynomialsBernardiRaugel<dim>::compute_n_pols(const unsigned int k)
+PolynomialsBernardiRaugel<dim>::n_polynomials(const unsigned int k)
 {
   (void)k;
   Assert(k == 1, ExcNotImplemented());

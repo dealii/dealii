@@ -126,7 +126,7 @@ public:
    * required by the FiniteElement classes.
    */
   static unsigned int
-  compute_n_pols(const unsigned int k);
+  n_polynomials(const unsigned int k);
 
   /**
    * @copydoc TensorPolynomialsBase<dim>::clone()

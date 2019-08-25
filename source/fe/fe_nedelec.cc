@@ -75,8 +75,8 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
                              dim,
                              order + 1,
                              FiniteElementData<dim>::Hcurl),
-      std::vector<bool>(PolynomialsNedelec<dim>::compute_n_pols(order), true),
-      std::vector<ComponentMask>(PolynomialsNedelec<dim>::compute_n_pols(order),
+      std::vector<bool>(PolynomialsNedelec<dim>::n_polynomials(order), true),
+      std::vector<ComponentMask>(PolynomialsNedelec<dim>::n_polynomials(order),
                                  std::vector<bool>(dim, true)))
 {
 #ifdef DEBUG_NEDELEC
@@ -2003,7 +2003,7 @@ FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree, bool dg)
 
   if (dg)
     {
-      dpo[dim] = PolynomialsNedelec<dim>::compute_n_pols(degree);
+      dpo[dim] = PolynomialsNedelec<dim>::n_polynomials(degree);
     }
   else
     {

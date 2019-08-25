@@ -44,9 +44,8 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
                              dim,
                              2,
                              FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(PolynomialsBernardiRaugel<dim>::compute_n_pols(p),
-                        true),
-      std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::compute_n_pols(
+      std::vector<bool>(PolynomialsBernardiRaugel<dim>::n_polynomials(p), true),
+      std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::n_polynomials(
                                    p),
                                  std::vector<bool>(dim, true)))
 {

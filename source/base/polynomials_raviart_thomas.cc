@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, compute_n_pols(k))
+  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
   , polynomial_space(create_polynomials(k))
 {}
 
@@ -170,7 +170,7 @@ PolynomialsRaviartThomas<dim>::evaluate(
 
 template <int dim>
 unsigned int
-PolynomialsRaviartThomas<dim>::compute_n_pols(unsigned int k)
+PolynomialsRaviartThomas<dim>::n_polynomials(const unsigned int k)
 {
   if (dim == 1)
     return k + 1;
