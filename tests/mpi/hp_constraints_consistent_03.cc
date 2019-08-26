@@ -84,7 +84,7 @@ test(const unsigned int degree_center,
   for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        if (cell->id().to_string() == "0_0:") // center cell has ID 0
+        if (cell->id().to_string() == "1_0:")
           {
             // set different fe on center cell
             cell->set_active_fe_index(1);
@@ -100,7 +100,7 @@ test(const unsigned int degree_center,
             Assert(n_neighbors == 3, ExcInternalError());
 #endif
           }
-        else if (cell->id().to_string() == "1_0:")
+        else if (cell->id().to_string() == "0_0:")
           {
             // set different boundary id on leftmost cell
             for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
