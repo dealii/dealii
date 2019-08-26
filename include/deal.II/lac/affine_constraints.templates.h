@@ -1905,6 +1905,7 @@ namespace internal
     {
       Assert(shift == 0, ExcNotImplemented());
       std::vector<size_type> constrained_local_dofs_host;
+      constrained_local_dofs_host.reserve(cm.size());
 
       for (const auto global_index : cm)
         if (vec.in_local_range(global_index))
