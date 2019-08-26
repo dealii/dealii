@@ -81,23 +81,23 @@ test(const unsigned int degree_center,
   // prepare DoFHandler
   hp::DoFHandler<dim> dh(tria);
 
-  const auto &center = dh.begin_active();
-  if (center->is_locally_owned() &&
-      center->id().to_string() == "0_0:") // center cell has ID 0
-    {
-      center->set_active_fe_index(1);
+  for (const auto &cell : dh.active_cell_iterators())
+    if (cell->is_locally_owned() && cell->id().to_string() == "1_0:")
+      {
+        // set different fe on center cell
+        cell->set_active_fe_index(1);
 
 #ifdef DEBUG
-      // verify that our scenario is initialized correctly
-      // by checking the number of neighbors of the center cell
-      unsigned int n_neighbors = 0;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
-        if (static_cast<unsigned int>(center->neighbor_index(i)) !=
-            numbers::invalid_unsigned_int)
-          ++n_neighbors;
-      Assert(n_neighbors == 3, ExcInternalError());
+        // verify that our scenario is initialized correctly
+        // by checking the number of neighbors of the center cell
+        unsigned int n_neighbors = 0;
+        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+          if (static_cast<unsigned int>(cell->neighbor_index(i)) !=
+              numbers::invalid_unsigned_int)
+            ++n_neighbors;
+        Assert(n_neighbors == 3, ExcInternalError());
 #endif
-    }
+      }
 
   dh.distribute_dofs(fe_collection);
 
