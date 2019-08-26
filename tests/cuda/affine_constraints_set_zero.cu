@@ -48,30 +48,53 @@ test()
   local_active.set_size(2 * numproc);
   local_active.add_range(myid * numproc, (myid + 1) * numproc);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v;
-  v.reinit(local_active, complete_index_set(2 * numproc), MPI_COMM_WORLD);
-
-  const int n_blocks = 1 + v.size() / CUDAWrappers::block_size;
-  initialize_vector<<<n_blocks, CUDAWrappers::block_size>>>(v.get_values(),
-                                                            numproc,
-                                                            myid * numproc);
-  v.compress(VectorOperation::insert);
-
   AffineConstraints<double> cm;
-  cm.add_line(numproc * myid + 1);
+  cm.add_line(1);
+  cm.add_line(2);
   cm.close();
 
-  deallog << "vector before:" << std::endl;
-  v.print(deallog.get_file_stream());
-
-  deallog << std::endl;
   deallog << "CM:" << std::endl;
   cm.print(deallog.get_file_stream());
 
-  cm.set_zero(v);
+  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> ghosted;
+  {
+    ghosted.reinit(local_active,
+                   complete_index_set(2 * numproc),
+                   MPI_COMM_WORLD);
 
-  deallog << "vector after:" << std::endl;
-  v.print(deallog.get_file_stream());
+    const int n_blocks = 1 + ghosted.size() / CUDAWrappers::block_size;
+    initialize_vector<<<n_blocks, CUDAWrappers::block_size>>>(
+      ghosted.get_values(), numproc, myid * numproc);
+    ghosted.compress(VectorOperation::insert);
+
+    deallog << "ghosted vector before:" << std::endl;
+    ghosted.print(deallog.get_file_stream());
+
+    cm.set_zero(ghosted);
+
+    deallog << "ghosted vector after:" << std::endl;
+    ghosted.print(deallog.get_file_stream());
+  }
+
+  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> distributed;
+  {
+    distributed.reinit(local_active,
+                       complete_index_set(2 * numproc),
+                       MPI_COMM_WORLD);
+
+    const int n_blocks = 1 + distributed.size() / CUDAWrappers::block_size;
+    initialize_vector<<<n_blocks, CUDAWrappers::block_size>>>(
+      distributed.get_values(), numproc, myid * numproc);
+    distributed.compress(VectorOperation::insert);
+
+    deallog << "distributed vector before:" << std::endl;
+    distributed.print(deallog.get_file_stream());
+
+    cm.set_zero(distributed);
+
+    deallog << "distributed vector after:" << std::endl;
+    distributed.print(deallog.get_file_stream());
+  }
 
   deallog << "OK" << std::endl;
 }
