@@ -188,21 +188,21 @@ namespace LinearAlgebra
      * From the host, there are two methods to access the elements of the Vector
      * when using the CUDA memory space:
      * <ul>
-     * <li> use get_values()
-     * <code>
+     * <li> use get_values():
+     * @code
      * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
      * double* vector_dev = vector.get_values();
      * std::vector<double> vector_host(local_range.n_elements(), 1.);
      * Utilities::CUDA::copy_to_dev(vector_host, vector_dev);
-     * </code>
-     * <li> use import()
-     * <code>
+     * @endcode
+     * <li> use import():
+     * @code
      * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
      * ReadWriteVector<double> rw_vector(local_range);
      * for (auto & val : rw_vector)
      *   val = 1.;
      * vector.import(rw_vector, VectorOperations::insert);
-     * </code>
+     * @endcode
      * </ul>
      * The import method is a lot safer and will perform an MPI communication if
      * necessary. Since an MPI communication may be performed, import needs to
