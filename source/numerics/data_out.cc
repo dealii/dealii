@@ -161,26 +161,34 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
           if (postprocessor != nullptr)
             {
-              // we have to postprocess the data, so determine, which fields
+              // We have to postprocess the data, so determine, which fields
               // have to be updated
               const UpdateFlags update_flags =
                 postprocessor->get_needed_update_flags();
-              if (n_components == 1)
+
+              if ((n_components == 1) &&
+                  (this->dof_data[dataset]->is_complex_valued() == false))
                 {
-                  // at each point there is only one component of value,
-                  // gradient etc.
+                  // At each point there is only one component of value,
+                  // gradient etc. Based on the 'if' statement above, we
+                  // know that the solution is scalar and real-valued, so
+                  // we do not need to worry about getting any imaginary
+                  // components to the postprocessor, and we can safely
+                  // call the function that evaluates a scalar field
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_values);
+
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_gradients);
+
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians(
                       this_fe_patch_values,
@@ -188,6 +196,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                         real_part,
                       scratch_data.patch_values_scalar.solution_hessians);
 
+                  // Also fill some of the other fields postprocessors may
+                  // want to access.
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_scalar.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
@@ -200,6 +210,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   scratch_data.patch_values_scalar
                     .template set_cell<DoFHandlerType>(dh_cell);
 
+                  // Finally call the postprocessor's function that
+                  // deals with scalar inputs.
                   postprocessor->evaluate_scalar_field(
                     scratch_data.patch_values_scalar,
                     scratch_data.postprocessed_values[dataset]);
@@ -208,27 +220,46 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 {
                   scratch_data.resize_system_vectors(n_components);
 
-                  // at each point there is a vector valued function and its
-                  // derivative...
-                  if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_values);
-                  if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_gradients);
-                  if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_hessians);
+                  // At each point we now have to evaluate a vector valued
+                  // function and its derivatives. It may be that the solution
+                  // is scalar and complex-valued, but we treat this as a vector
+                  // field with two components.
 
+                  // At this point, we need to ask how we fill the fields that
+                  // we want to pass on to the postprocessor. If the field in
+                  // question is real-valued, we'll just extract the (only)
+                  // real component from the solution fields
+                  if (this->dof_data[dataset]->is_complex_valued() == false)
+                    {
+                      if (update_flags & update_values)
+                        this->dof_data[dataset]->get_function_values(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_values);
+
+                      if (update_flags & update_gradients)
+                        this->dof_data[dataset]->get_function_gradients(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_gradients);
+
+                      if (update_flags & update_hessians)
+                        this->dof_data[dataset]->get_function_hessians(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_hessians);
+                    }
+                  else
+                    {
+                      // The solution is complex-valued. We don't currently
+                      // know how to handle this.
+                      Assert(false, ExcNotImplemented());
+                    }
+
+                  // Now set other fields we may need
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_system.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
