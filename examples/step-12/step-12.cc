@@ -15,6 +15,7 @@
 
  *
  * Author: Guido Kanschat, Texas A&M University, 2009
+ *         Timo Heister, Clemson University, 2019
  */
 
 
@@ -43,6 +44,9 @@
 // classes at all: they are passed to <code>DoFHandler</code> and
 // <code>FEValues</code> objects, and that is about it.
 #include <deal.II/fe/fe_dgq.h>
+// This header is needed for FEInterfaceValues to compute integrals on
+// interfaces
+#include <deal.II/fe/fe_interface_values.h>
 // We are going to use the simplest possible solver, called Richardson
 // iteration, that represents a simple defect correction. This, in combination
 // with a block SSOR preconditioner (defined in precondition_block.h), that
@@ -53,20 +57,9 @@
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
 
-// Here come the new include files for using the MeshWorker framework. The first
-// contains the class MeshWorker::DoFInfo, which provides local integrators with
-// a mapping between local and global degrees of freedom. It stores the results
-// of local integrals as well in its base class MeshWorker::LocalResults.
-// In the second of these files, we find an object of type
-// MeshWorker::IntegrationInfo, which is mostly a wrapper around a group of
-// FEValues objects. The file <tt>meshworker/simple.h</tt> contains classes
-// assembling locally integrated data into a global system containing only a
-// single matrix. Finally, we will need the file that runs the loop over all
-// mesh cells and faces.
-#include <deal.II/meshworker/dof_info.h>
-#include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/simple.h>
-#include <deal.II/meshworker/loop.h>
+// Here come the new include files for using the mesh_loop from the MeshWorker
+// framework
+#include <deal.II/meshworker/mesh_loop.h>
 
 // Like in all programs, we finish this section by including the needed C++
 // headers and declaring we want to use objects in the dealii namespace without
@@ -159,7 +152,7 @@ namespace Step12
   private:
     void setup_system();
     void assemble_system();
-    void solve(Vector<double> &solution);
+    void solve();
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
@@ -173,6 +166,8 @@ namespace Step12
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
 
+    AffineConstraints<> constraints;
+
     // The next four members represent the linear system to be solved.
     // <code>system_matrix</code> and <code>right_hand_side</code> are generated
     // by <code>assemble_system()</code>, the <code>solution</code> is computed
@@ -183,36 +178,6 @@ namespace Step12
 
     Vector<double> solution;
     Vector<double> right_hand_side;
-
-    // Finally, we have to provide functions that assemble the cell, boundary,
-    // and inner face terms. Within the MeshWorker framework, the loop over all
-    // cells and much of the setup of operations will be done outside this
-    // class, so all we have to provide are these three operations. They will
-    // then work on intermediate objects for which first, we here define
-    // alias to the info objects handed to the local integration functions
-    // in order to make our life easier below.
-    using DoFInfo  = MeshWorker::DoFInfo<dim>;
-    using CellInfo = MeshWorker::IntegrationInfo<dim>;
-
-    // The following three functions are then the ones that get called inside
-    // the generic loop over all cells and faces. They are the ones doing the
-    // actual integration.
-    //
-    // In our code below, these functions do not access member variables of the
-    // current class, so we can mark them as <code>static</code> and simply pass
-    // pointers to these functions to the MeshWorker framework. If, however,
-    // these functions would want to access member variables (or needed
-    // additional arguments beyond the ones specified below), we could use the
-    // facilities of lambda functions to provide the
-    // MeshWorker framework with objects that act as if they had the required
-    // number and types of arguments, but have in fact other arguments already
-    // bound.
-    static void integrate_cell_term(DoFInfo &dinfo, CellInfo &info);
-    static void integrate_boundary_term(DoFInfo &dinfo, CellInfo &info);
-    static void integrate_face_term(DoFInfo & dinfo1,
-                                    DoFInfo & dinfo2,
-                                    CellInfo &info1,
-                                    CellInfo &info2);
   };
 
 
@@ -261,238 +226,181 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
-    // This is the magic object, which knows everything about the data
-    // structures and local integration.  This is the object doing the work in
-    // the function MeshWorker::loop(), which is implicitly called by
-    // MeshWorker::integration_loop() below. After the functions to which we
-    // provide pointers did the local integration, the
-    // MeshWorker::Assembler::SystemSimple object distributes these into the
-    // global sparse matrix and the right hand side vector.
-    MeshWorker::IntegrationInfoBox<dim> info_box;
+    typedef decltype(dof_handler.begin_active()) Iterator;
+    BoundaryValues<dim>                          boundary_function;
 
-    // First, we initialize the quadrature formulae and the update flags in the
-    // worker base class. For quadrature, we play safe and use a QGauss formula
-    // with number of points one higher than the polynomial degree used. Since
-    // the quadratures for cells, boundary and interior faces can be selected
-    // independently, we have to hand over this value three times.
+    auto cell_worker = [&](const Iterator &  cell,
+                           ScratchData<dim> &scratch_data,
+                           CopyData &        copy_data) {
+      const unsigned int n_dofs = scratch_data.fe_values.get_fe().dofs_per_cell;
+      copy_data.reinit(cell, n_dofs);
+      scratch_data.fe_values.reinit(cell);
+
+      const auto &q_points = scratch_data.fe_values.get_quadrature_points();
+
+      const FEValues<dim> &      fe_v = scratch_data.fe_values;
+      const std::vector<double> &JxW  = fe_v.get_JxW_values();
+
+      // We solve a homogeneous equation, thus no right hand side shows up in
+      // the cell term.  What's left is integrating the matrix entries.
+      for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
+        {
+          auto beta_q = beta(q_points[point]);
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            for (unsigned int j = 0; j < n_dofs; ++j)
+              {
+                copy_data.cell_matrix(i, j) +=
+                  -beta_q * fe_v.shape_grad(i, point) *
+                  fe_v.shape_value(j, point) * JxW[point];
+              }
+        }
+    };
+
+    /*
+        auto boundary_worker1 = [&](const Iterator &    cell,
+                                    const unsigned int &face_no,
+                                    ScratchData<dim> &  scratch_data,
+                                    CopyData &          copy_data) {
+          FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
+          fe_facet.reinit(cell, face_no);
+
+          const auto &q_points =
+       fe_facet.get_fe_values().get_quadrature_points();
+
+          const unsigned int         n_facet_dofs = fe_facet.n_facet_dofs();
+          const std::vector<double> &JxW =
+            fe_facet.get_fe_values().get_JxW_values();
+          const std::vector<Tensor<1, dim>> &normals =
+            fe_facet.get_fe_values().get_normal_vectors();
+
+          std::vector<double> g(q_points.size());
+          boundary_function.value_list(q_points, g);
+
+          for (unsigned int point = 0; point < q_points.size(); ++point)
+            {
+              const double beta_n = beta(q_points[point]) * normals[point];
+
+              if (beta_n > 0)
+                {
+                  for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO:
+       ugly! for (unsigned int j = 0; j < n_facet_dofs / 2; ++j)
+                      copy_data.cell_matrix(i, j) +=
+                        beta_n * fe_facet.scalar().jump(j, point) *
+                        fe_facet.scalar().choose(true, i, point) * JxW[point];
+                }
+              else if (0)
+                for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO:
+       ugly copy_data.cell_rhs(i) -= beta_n * g[point] *
+                                           fe_facet.scalar().jump(i, point) *
+                                           JxW[point];
+            }
+        };*/
+
+    auto boundary_worker = [&](const Iterator &    cell,
+                               const unsigned int &face_no,
+                               ScratchData<dim> &  scratch_data,
+                               CopyData &          copy_data) {
+      scratch_data.fe_interface_values.reinit(cell, face_no);
+      const FEFaceValuesBase<dim> &fe_face =
+        scratch_data.fe_interface_values.get_fe_values();
+
+      const auto &q_points = fe_face.get_quadrature_points();
+
+      const unsigned int n_facet_dofs = fe_face.get_fe().n_dofs_per_cell();
+      const std::vector<double> &        JxW     = fe_face.get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals = fe_face.get_normal_vectors();
+
+      std::vector<double> g(q_points.size());
+      boundary_function.value_list(q_points, g);
+
+      for (unsigned int point = 0; point < q_points.size(); ++point)
+        {
+          const double beta_n = beta(q_points[point]) * normals[point];
+
+          if (beta_n > 0)
+            {
+              for (unsigned int i = 0; i < n_facet_dofs; ++i)
+                for (unsigned int j = 0; j < n_facet_dofs; ++j)
+                  copy_data.cell_matrix(i, j) +=
+                    beta_n * fe_face.shape_value(j, point) *
+                    fe_face.shape_value(i, point) * JxW[point];
+            }
+          else
+            for (unsigned int i = 0; i < n_facet_dofs; ++i)
+              copy_data.cell_rhs(i) -=
+                beta_n * g[point] * fe_face.shape_value(i, point) * JxW[point];
+        }
+    };
+
+    auto face_worker = [&](const Iterator &    cell,
+                           const unsigned int &f,
+                           const unsigned int &sf,
+                           const Iterator &    ncell,
+                           const unsigned int &nf,
+                           const unsigned int &nsf,
+                           ScratchData<dim> &  scratch_data,
+                           CopyData &          copy_data) {
+      FEInterfaceValues<dim> &fe_facet = scratch_data.fe_interface_values;
+      fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
+      const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
+
+      copy_data.face_data.emplace_back();
+      CopyDataFace &copy_data_face = copy_data.face_data.back();
+
+      const unsigned int n_dofs        = fe_facet.n_interface_dofs();
+      copy_data_face.joint_dof_indices = fe_facet.get_interface_dof_indices();
+
+      copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
+
+      const std::vector<double> &        JxW = fe_facet.get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals =
+        fe_facet.get_normal_vectors();
+
+      // u- * (beta*n)[v]
+      for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
+        {
+          const double beta_n = beta(q_points[qpoint]) * normals[qpoint];
+          for (unsigned int i = 0; i < n_dofs; ++i)
+            for (unsigned int j = 0; j < n_dofs; ++j)
+              copy_data_face.cell_matrix(i, j) +=
+                fe_facet.choose(beta_n > 0, j, qpoint) // u^-
+                * beta_n                               // (beta*n)
+                * fe_facet.jump(i, qpoint)             // [v]
+                * JxW[qpoint];                         // dx
+        }
+    };
+
+    auto copier = [&](const CopyData &c) {
+      constraints.distribute_local_to_global(c.cell_matrix,
+                                             c.cell_rhs,
+                                             c.local_dof_indices,
+                                             system_matrix,
+                                             right_hand_side);
+
+      for (auto &cdf : c.face_data)
+        {
+          constraints.distribute_local_to_global(cdf.cell_matrix,
+                                                 cdf.joint_dof_indices,
+                                                 system_matrix);
+        }
+    };
+
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-    info_box.initialize_gauss_quadrature(n_gauss_points,
-                                         n_gauss_points,
-                                         n_gauss_points);
 
-    // These are the types of values we need for integrating our system. They
-    // are added to the flags used on cells, boundary and interior faces, as
-    // well as interior neighbor faces, which is forced by the four @p true
-    // values.
-    info_box.initialize_update_flags();
-    UpdateFlags update_flags =
-      update_quadrature_points | update_values | update_gradients;
-    info_box.add_update_flags(update_flags, true, true, true, true);
-
-    // After preparing all data in <tt>info_box</tt>, we initialize the FEValues
-    // objects in there.
-    info_box.initialize(fe, mapping);
-
-    // The object created so far helps us do the local integration on each cell
-    // and face. Now, we need an object which receives the integrated (local)
-    // data and forwards them to the assembler.
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
-
-    // Now, we have to create the assembler object and tell it, where to put the
-    // local data. These will be our system matrix and the right hand side.
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
-      assembler;
-    assembler.initialize(system_matrix, right_hand_side);
-
-    // Finally, the integration loop over all active cells (determined by the
-    // first argument, which is an active iterator).
-    //
-    // As noted in the discussion when declaring the local integration functions
-    // in the class declaration, the arguments expected by the assembling
-    // integrator class are not actually function pointers. Rather, they are
-    // objects that can be called like functions with a certain number of
-    // arguments. Consequently, we could also pass objects with appropriate
-    // operator() implementations here, or lambda functions if the local
-    // integrators were, for example, non-static member functions.
-    MeshWorker::loop<dim,
-                     dim,
-                     MeshWorker::DoFInfo<dim>,
-                     MeshWorker::IntegrationInfoBox<dim>>(
-      dof_handler.begin_active(),
-      dof_handler.end(),
-      dof_info,
-      info_box,
-      &AdvectionProblem<dim>::integrate_cell_term,
-      &AdvectionProblem<dim>::integrate_boundary_term,
-      &AdvectionProblem<dim>::integrate_face_term,
-      assembler);
+    ScratchData<dim> scratch_data(mapping, fe, n_gauss_points);
+    CopyData         copy_data;
+    MeshWorker::mesh_loop(dof_handler.begin_active(),
+                          dof_handler.end(),
+                          cell_worker,
+                          copier,
+                          scratch_data,
+                          copy_data,
+                          MeshWorker::assemble_own_cells |
+                            MeshWorker::assemble_boundary_faces |
+                            MeshWorker::assemble_own_interior_faces_once,
+                          boundary_worker,
+                          face_worker);
   }
-
-
-  // @sect4{The local integrators}
-
-  // These are the functions given to the MeshWorker::integration_loop() called
-  // just above. They compute the local contributions to the system matrix and
-  // right hand side on cells and faces.
-  template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo & dinfo,
-                                                  CellInfo &info)
-  {
-    // First, let us retrieve some of the objects used here from @p info. Note
-    // that these objects can handle much more complex structures, thus the
-    // access here looks more complicated than might seem necessary.
-    const FEValuesBase<dim> &  fe_values    = info.fe_values();
-    FullMatrix<double> &       local_matrix = dinfo.matrix(0).matrix;
-    const std::vector<double> &JxW          = fe_values.get_JxW_values();
-
-    // With these objects, we continue local integration like always. First, we
-    // loop over the quadrature points and compute the advection vector in the
-    // current point.
-    for (unsigned int point = 0; point < fe_values.n_quadrature_points; ++point)
-      {
-        const Tensor<1, dim> beta_at_q_point =
-          beta(fe_values.quadrature_point(point));
-
-        // We solve a homogeneous equation, thus no right hand side shows up in
-        // the cell term.  What's left is integrating the matrix entries.
-        for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
-          for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-            local_matrix(i, j) += -beta_at_q_point *                //
-                                  fe_values.shape_grad(i, point) *  //
-                                  fe_values.shape_value(j, point) * //
-                                  JxW[point];
-      }
-  }
-
-  // Now the same for the boundary terms. Note that now we use FEValuesBase, the
-  // base class for both FEFaceValues and FESubfaceValues, in order to get
-  // access to normal vectors.
-  template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo & dinfo,
-                                                      CellInfo &info)
-  {
-    const FEValuesBase<dim> &fe_face_values = info.fe_values();
-    FullMatrix<double> &     local_matrix   = dinfo.matrix(0).matrix;
-    Vector<double> &         local_vector   = dinfo.vector(0).block(0);
-
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1, dim>> &normals =
-      fe_face_values.get_normal_vectors();
-
-    std::vector<double> g(fe_face_values.n_quadrature_points);
-
-    static BoundaryValues<dim> boundary_function;
-    boundary_function.value_list(fe_face_values.get_quadrature_points(), g);
-
-    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points;
-         ++point)
-      {
-        const double beta_dot_n =
-          beta(fe_face_values.quadrature_point(point)) * normals[point];
-        if (beta_dot_n > 0)
-          for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-              local_matrix(i, j) += beta_dot_n *                           //
-                                    fe_face_values.shape_value(j, point) * //
-                                    fe_face_values.shape_value(i, point) * //
-                                    JxW[point];
-        else
-          for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-            local_vector(i) += -beta_dot_n *                          //
-                               g[point] *                             //
-                               fe_face_values.shape_value(i, point) * //
-                               JxW[point];
-      }
-  }
-
-  // Finally, the interior face terms. The difference here is that we receive
-  // two info objects, one for each cell adjacent to the face and we assemble
-  // four matrices, one for each cell and two for coupling back and forth.
-  template <int dim>
-  void AdvectionProblem<dim>::integrate_face_term(DoFInfo & dinfo1,
-                                                  DoFInfo & dinfo2,
-                                                  CellInfo &info1,
-                                                  CellInfo &info2)
-  {
-    // For quadrature points, weights, etc., we use the FEValuesBase object of
-    // the first argument.
-    const FEValuesBase<dim> &fe_face_values = info1.fe_values();
-    const unsigned int       dofs_per_cell  = fe_face_values.dofs_per_cell;
-
-    // For additional shape functions, we have to ask the neighbors
-    // FEValuesBase.
-    const FEValuesBase<dim> &fe_face_values_neighbor = info2.fe_values();
-    const unsigned int       neighbor_dofs_per_cell =
-      fe_face_values_neighbor.dofs_per_cell;
-
-    // Then we get references to the four local matrices. The letters u and v
-    // refer to trial and test functions, respectively. The %numbers indicate
-    // the cells provided by info1 and info2. By convention, the two matrices
-    // in each info object refer to the test functions on the respective cell.
-    // The first matrix contains the interior couplings of that cell, while the
-    // second contains the couplings between cells.
-    FullMatrix<double> &u1_v1_matrix = dinfo1.matrix(0, false).matrix;
-    FullMatrix<double> &u2_v1_matrix = dinfo1.matrix(0, true).matrix;
-    FullMatrix<double> &u1_v2_matrix = dinfo2.matrix(0, true).matrix;
-    FullMatrix<double> &u2_v2_matrix = dinfo2.matrix(0, false).matrix;
-
-    // Here, following the previous functions, we would have the local right
-    // hand side vectors. Fortunately, the interface terms only involve the
-    // solution and the right hand side does not receive any contributions.
-
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1, dim>> &normals =
-      fe_face_values.get_normal_vectors();
-
-    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points;
-         ++point)
-      {
-        const double beta_dot_n =
-          beta(fe_face_values.quadrature_point(point)) * normals[point];
-        if (beta_dot_n > 0)
-          {
-            // This term we've already seen:
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                u1_v1_matrix(i, j) += beta_dot_n *                           //
-                                      fe_face_values.shape_value(j, point) * //
-                                      fe_face_values.shape_value(i, point) * //
-                                      JxW[point];
-
-            // We additionally assemble the term $(\beta\cdot n u,\hat
-            // v)_{\partial \kappa_+}$,
-            for (unsigned int k = 0; k < neighbor_dofs_per_cell; ++k)
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                u1_v2_matrix(k, j) +=
-                  -beta_dot_n *                                   //
-                  fe_face_values.shape_value(j, point) *          //
-                  fe_face_values_neighbor.shape_value(k, point) * //
-                  JxW[point];
-          }
-        else
-          {
-            // This one we've already seen, too:
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              for (unsigned int l = 0; l < neighbor_dofs_per_cell; ++l)
-                u2_v1_matrix(i, l) +=
-                  beta_dot_n *                                    //
-                  fe_face_values_neighbor.shape_value(l, point) * //
-                  fe_face_values.shape_value(i, point) *          //
-                  JxW[point];
-
-            // And this is another new one: $(\beta\cdot n \hat u,\hat
-            // v)_{\partial \kappa_-}$:
-            for (unsigned int k = 0; k < neighbor_dofs_per_cell; ++k)
-              for (unsigned int l = 0; l < neighbor_dofs_per_cell; ++l)
-                u2_v2_matrix(k, l) +=
-                  -beta_dot_n *                                   //
-                  fe_face_values_neighbor.shape_value(l, point) * //
-                  fe_face_values_neighbor.shape_value(k, point) * //
-                  JxW[point];
-          }
-      }
-  }
-
 
   // @sect3{All the rest}
   //
@@ -506,7 +414,7 @@ namespace Step12
   // then a block Gauss-Seidel preconditioner (see the PreconditionBlockSOR
   // class with relaxation=1) does a much better job.
   template <int dim>
-  void AdvectionProblem<dim>::solve(Vector<double> &solution)
+  void AdvectionProblem<dim>::solve()
   {
     SolverControl      solver_control(1000, 1e-12);
     SolverRichardson<> solver(solver_control);
@@ -576,30 +484,17 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
-    // First write the grid in eps format.
-    {
-      const std::string filename = "grid-" + std::to_string(cycle) + ".eps";
-      deallog << "Writing grid to <" << filename << ">" << std::endl;
-      std::ofstream eps_output(filename);
+    const std::string filename = "solution-" + std::to_string(cycle) + ".vtk";
+    deallog << "Writing solution to <" << filename << ">" << std::endl;
+    std::ofstream output(filename);
 
-      GridOut grid_out;
-      grid_out.write_eps(triangulation, eps_output);
-    }
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "u");
 
-    // Then output the solution in gnuplot format.
-    {
-      const std::string filename = "sol-" + std::to_string(cycle) + ".gnuplot";
-      deallog << "Writing solution to <" << filename << ">" << std::endl;
-      std::ofstream gnuplot_output(filename);
+    data_out.build_patches();
 
-      DataOut<dim> data_out;
-      data_out.attach_dof_handler(dof_handler);
-      data_out.add_data_vector(solution, "u");
-
-      data_out.build_patches();
-
-      data_out.write_gnuplot(gnuplot_output);
-    }
+    data_out.write_vtk(output);
   }
 
 
@@ -614,12 +509,10 @@ namespace Step12
         if (cycle == 0)
           {
             GridGenerator::hyper_cube(triangulation);
-
             triangulation.refine_global(3);
           }
         else
           refine_grid();
-
 
         deallog << "Number of active cells:       "
                 << triangulation.n_active_cells() << std::endl;
@@ -630,7 +523,7 @@ namespace Step12
                 << std::endl;
 
         assemble_system();
-        solve(solution);
+        solve();
 
         output_results(cycle);
       }
@@ -642,10 +535,9 @@ namespace Step12
 // well, and need not be commented on.
 int main()
 {
+  dealii::deallog.depth_console(10);
   try
     {
-      dealii::deallog.depth_console(5);
-
       Step12::AdvectionProblem<2> dgmethod;
       dgmethod.run();
     }

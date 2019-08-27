@@ -1,27 +1,31 @@
+<br>
+
+<i> Note: A variant called step-12b of this tutorial exists, that uses
+MeshWorker and LocalIntegrators instead of assembling matrices using
+FEInterfaceValues as it is done in this tutorial.
+</i>
+
 <a name="Intro"></a>
-<h1>An example of the MeshWorker framework with an advection problem</h1>
+<h1>An example of an advection problem using the Discountinuous Galerkin method</h1>
 
 <h3>Overview</h3>
 
-This example is devoted to the MeshWorker framework and the <em>discontinuous
-Galerkin method</em>, or in short: DG method. It includes the following topics.
+This example is devoted to the <em>discontinuous
+Galerkin method</em>, or in short, the DG method. It includes the following topics.
 <ol>
   <li> Discretization of the linear advection equation with the DG method.
-  <li> Assembling of the system matrix using the MeshWorker::loop().
+  <li> Assembling of jump terms and other expressions on the interface between cells using FEInterfaceValues.
+  <li> Assembling of the system matrix using the MeshWorker::mesh_loop().
 </ol>
 
 The particular concern of this program are the loops of DG methods. These turn
 out to be especially complex, primarily because for the face terms, we have to
 distinguish the cases of boundary, regular interior faces and interior faces
-with hanging nodes, respectively. The MeshWorker framework implements the
-standard loop over all cells and faces in MeshWorker::loop() and takes care of
-distinguishing between all the different faces.
-
-There are two things left to do if you use MeshWorker: first, you need
-to write the local integrators for your problem. Second, you select
-classes from the MeshWorker namespace and combine them to achieve your
-goal.
-
+with hanging nodes, respectively. The MeshWorker::mesh_loop() handles the
+complexity on iterating over cells and faces and allows specifying "workers"
+for the different cell and face terms. The integration of face terms itself,
+including on faces with hanging nodes, is done using the FEInterfaceValues
+class.
 
 <h3>Problem</h3>
 
@@ -72,5 +76,5 @@ In order to implement this bilinear form, we need to compute the cell
 terms $\bigl(u_h,{\mathbf \beta}\cdot\nabla v_h\bigr)_T$, the internal fluxes
 $\bigl<u_h^-, \beta\cdot[v_h\mathbf n]\bigr>_{F}$, and the boundary terms $\bigl<u_h,
 v_h \beta\cdot \mathbf n]\bigr>_{\Gamma_+}$ and $\bigl<g, \beta\cdot\mathbf n
-v_h\bigr>_{\Gamma_-}$. The summation of all those is done by MeshWorker::integration_loop().
+v_h\bigr>_{\Gamma_-}$. The summation of all those is done by MeshWorker::mesh_loop().
 
