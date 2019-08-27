@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
+
+
+// This test crashed at some point: We have set and sent active_fe_indices based
+// on the refinement flags on the p::d::Triangulation object. However, p4est has
+// the last word on deciding which cells will be refined -- and p4est makes use
+// of it in the specific scenario provided as a test. A fix has been introduced
+// along with this test.
 
 
 #include <deal.II/base/function.h>
@@ -34,16 +41,14 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <iostream>
-#include <vector>
-
 #include "../tests.h"
 
 
 template <int dim>
 void
-transfer(std::ostream &out)
+test()
 {
+  // setup
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
@@ -55,32 +60,34 @@ transfer(std::ostream &out)
 
   hp::DoFHandler<dim> dgq_dof_handler(tria);
 
-  // randomly assign FE orders
+  // randomly assign fes
   for (const auto &cell : dgq_dof_handler.active_cell_iterators())
     if (cell->is_locally_owned())
       cell->set_active_fe_index(Testing::rand() % max_degree);
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
+  // prepare index sets
   IndexSet dgq_locally_owned_dofs = dgq_dof_handler.locally_owned_dofs();
   IndexSet dgq_locally_relevant_dofs;
-  dealii::DoFTools::extract_locally_relevant_dofs(dgq_dof_handler,
-                                                  dgq_locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs(dgq_dof_handler,
+                                          dgq_locally_relevant_dofs);
   IndexSet dgq_ghost_dofs = dgq_locally_relevant_dofs;
   dgq_ghost_dofs.subtract_set(dgq_locally_owned_dofs);
 
+  // prepare dof_values
   LinearAlgebra::distributed::Vector<double> dgq_solution;
   dgq_solution.reinit(dgq_locally_owned_dofs, dgq_ghost_dofs, MPI_COMM_WORLD);
-
   VectorTools::interpolate(dgq_dof_handler, ZeroFunction<dim>(), dgq_solution);
+  dgq_solution.update_ghost_values();
 
   parallel::distributed::SolutionTransfer<
     dim,
     LinearAlgebra::distributed::Vector<double>,
     hp::DoFHandler<dim>>
     dgq_soltrans(dgq_dof_handler);
+  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
 
-  LinearAlgebra::distributed::Vector<double> dgq_old_solution = dgq_solution;
-  dgq_old_solution.update_ghost_values();
+  // refine and transfer
   {
     unsigned int counter = 0;
     for (auto cell = tria.begin_active(); cell != tria.end(); ++cell, ++counter)
@@ -93,18 +100,17 @@ transfer(std::ostream &out)
         }
   }
 
-  tria.prepare_coarsening_and_refinement();
-  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
   tria.execute_coarsening_and_refinement();
-
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
+  // prepare index sets
   dgq_locally_owned_dofs = dgq_dof_handler.locally_owned_dofs();
-  dealii::DoFTools::extract_locally_relevant_dofs(dgq_dof_handler,
-                                                  dgq_locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs(dgq_dof_handler,
+                                          dgq_locally_relevant_dofs);
   dgq_ghost_dofs = dgq_locally_relevant_dofs;
   dgq_ghost_dofs.subtract_set(dgq_locally_owned_dofs);
 
+  // unpack dof_values
   dgq_solution.reinit(dgq_locally_owned_dofs, dgq_ghost_dofs, MPI_COMM_WORLD);
   dgq_soltrans.interpolate(dgq_solution);
 
@@ -119,9 +125,9 @@ main(int argc, char *argv[])
   MPILogInitAll                    log;
 
   deallog.push("2d");
-  transfer<2>(deallog.get_file_stream());
+  test<2>();
   deallog.pop();
   deallog.push("3d");
-  transfer<3>(deallog.get_file_stream());
+  test<3>();
   deallog.pop();
 }
