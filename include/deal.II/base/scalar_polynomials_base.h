@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_tensor_polynomials_base_h
-#define dealii_tensor_polynomials_base_h
+#ifndef dealii_scalar_polynomials_base_h
+#define dealii_scalar_polynomials_base_h
 
 
 #include <deal.II/base/config.h>
@@ -30,9 +30,9 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class provides a framework for the finite element polynomial
  * classes for use with finite element classes that are derived from
- * FE_PolyTensor. An object of this type (or rather of a type derived
- * from this class) is stored as a member variable in each object of
- * type FE_PolyTensor.
+ * FE_Poly. An object of this type (or rather of a type derived from
+ * this class) is stored as a member variable in each object of type
+ * FE_Poly.
  *
  * <h3>Deriving classes</h3>
  *
@@ -46,12 +46,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Some classes that derive from this class include
  * <ul>
- *   <li> <tt>PolynomialsABF</tt>
- *   <li> <tt>PolynomialsBDM</tt>
- *   <li> <tt>PolynomialsBernardiRaugel</tt>
- *   <li> <tt>PolynomialsNedelec</tt>
- *   <li> <tt>PolynomialsRaviartThomas</tt>
- *   <li> <tt>PolynomialsRT_Bubbles</tt>
+ *   <li> <tt>PolynomialsRannacherTurek</tt>
+ *   <li> <tt>PolynomialsP</tt>
+ *   <li> <tt>PolynomialSpace</tt>
+ *   <li> <tt>TensorProductPolynomials</tt>
+ *   <li> <tt>TensorProductPolynomialsConst</tt>
+ *   <li> <tt>TensorProductPolynomialsBubbles</tt>
  * </ul>
  *
  * @ingroup Polynomials
@@ -59,31 +59,31 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2019
  */
 template <int dim>
-class TensorPolynomialsBase
+class ScalarPolynomialsBase
 {
 public:
   /**
    * Constructor. This takes the degree of the space, @p deg from the finite element
    * class, and @p n, the number of polynomials for the space.
    */
-  TensorPolynomialsBase(const unsigned int deg,
+  ScalarPolynomialsBase(const unsigned int deg,
                         const unsigned int n_polynomials);
 
   /**
    * Move constructor.
    */
-  TensorPolynomialsBase(TensorPolynomialsBase<dim> &&) = default; // NOLINT
+  ScalarPolynomialsBase(ScalarPolynomialsBase<dim> &&) = default; // NOLINT
 
   /**
    * Copy constructor.
    */
-  TensorPolynomialsBase(const TensorPolynomialsBase<dim> &) = default;
+  ScalarPolynomialsBase(const ScalarPolynomialsBase<dim> &) = default;
 
   /**
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~TensorPolynomialsBase() = default;
+  virtual ~ScalarPolynomialsBase() = default;
 
   /**
    * Compute the value and the derivatives of the polynomials at
@@ -99,11 +99,11 @@ public:
    */
   virtual void
   evaluate(const Point<dim> &           unit_point,
-           std::vector<Tensor<1, dim>> &values,
-           std::vector<Tensor<2, dim>> &grads,
-           std::vector<Tensor<3, dim>> &grad_grads,
-           std::vector<Tensor<4, dim>> &third_derivatives,
-           std::vector<Tensor<5, dim>> &fourth_derivatives) const = 0;
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const = 0;
 
   /**
    * Return the number of polynomials.
@@ -125,11 +125,11 @@ public:
    * here in this base class and return an object of the same type as the
    * derived class.
    *
-   * Some places in the library, for example the constructors of FE_PolyTensor,
+   * Some places in the library, for example the constructors of FE_Poly,
    * need to make copies of polynomial spaces without knowing their exact type.
    * They do so through this function.
    */
-  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const = 0;
 
   /**
@@ -154,7 +154,7 @@ private:
 
 template <int dim>
 inline unsigned int
-TensorPolynomialsBase<dim>::n() const
+ScalarPolynomialsBase<dim>::n() const
 {
   return n_pols;
 }
@@ -163,7 +163,7 @@ TensorPolynomialsBase<dim>::n() const
 
 template <int dim>
 inline unsigned int
-TensorPolynomialsBase<dim>::degree() const
+ScalarPolynomialsBase<dim>::degree() const
 {
   return polynomial_degree;
 }
