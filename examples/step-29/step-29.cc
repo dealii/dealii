@@ -333,9 +333,15 @@ namespace Step29
            ExcDimensionMismatch(computed_quantities.size(),
                                 inputs.solution_values.size()));
 
-    // The computation itself is straightforward: We iterate over each entry
-    // in the output vector and compute $|u|$ from the corresponding values of
-    // $v$ and $w$:
+    // The computation itself is straightforward: We iterate over each
+    // entry in the output vector and compute $|u|$ from the
+    // corresponding values of $v$ and $w$. We do this by creating a
+    // complex number $u$ and then calling `std::abs()` on the
+    // result. (One may be tempted to call `std::norm()`, but in a
+    // historical quirk, the C++ committee decided that `std::norm()`
+    // should return the <i>square</i> of the absolute value --
+    // thereby not satisfying the properties mathematicians require of
+    // something called a "norm".)
     for (unsigned int i = 0; i < computed_quantities.size(); i++)
       {
         Assert(computed_quantities[i].size() == 1,
@@ -343,9 +349,10 @@ namespace Step29
         Assert(inputs.solution_values[i].size() == 2,
                ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
 
-        computed_quantities[i](0) = std::sqrt(
-          inputs.solution_values[i](0) * inputs.solution_values[i](0) +
-          inputs.solution_values[i](1) * inputs.solution_values[i](1));
+        const std::complex<double> u(inputs.solution_values[i](0),
+                                     inputs.solution_values[i](1));
+
+        computed_quantities[i](0) = std::abs(u);
       }
   }
 
