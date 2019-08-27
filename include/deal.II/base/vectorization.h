@@ -104,8 +104,8 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
  * respectively (this corresponds to the SSE/SSE2 data sets) when compiling
  * deal.II on 64-bit operating systems. On Intel Sandy Bridge processors and
  * newer or AMD Bulldozer processors and newer, four doubles or eight floats
- * are used when deal.II is configured using gcc with --with-cpu=native
- * or --with-cpu=corei7-avx. On compilations with AVX-512 support (e.g.,
+ * are used when deal.II is configured using gcc with \--with-cpu=native
+ * or \--with-cpu=corei7-avx. On compilations with AVX-512 support (e.g.,
  * Intel Skylake Server from 2017), eight doubles or sixteen floats are used.
  *
  * This behavior of this class is made similar to the basic data types double

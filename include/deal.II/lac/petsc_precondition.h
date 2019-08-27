@@ -669,7 +669,7 @@ namespace PETScWrappers
   /**
    * A class that implements the interface to use the BoomerAMG algebraic
    * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
-   * configured with HYPRE (e.g. with --download-hypre=1).
+   * configured with HYPRE (e.g. with \--download-hypre=1).
    *
    * The preconditioner does support parallel distributed computations. See
    * step-40 for an example.
@@ -791,7 +791,7 @@ namespace PETScWrappers
   /**
    * A class that implements the interface to use the ParaSails sparse
    * approximate inverse preconditioner from the HYPRE suite. Note that PETSc
-   * has to be configured with HYPRE (e.g. with --download-hypre=1).
+   * has to be configured with HYPRE (e.g. with \--download-hypre=1).
    *
    * ParaSails uses least-squares minimization to compute a sparse approximate
    * inverse. The sparsity pattern used is the pattern of a power of a
