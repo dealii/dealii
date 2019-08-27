@@ -61,7 +61,10 @@ namespace
                   const unsigned int               dofs_per_cell)
   {
     for (const auto &values : dof_values)
-      AssertDimension(values.size(), dofs_per_cell);
+      {
+        AssertDimension(values.size(), dofs_per_cell);
+        (void)values;
+      }
 
     const std::size_t bytes_per_entry = sizeof(value_type) * dofs_per_cell;
 
