@@ -229,7 +229,8 @@ namespace Utilities
     FunctionType function,
     FunctionArgs &&... arguments)
     : function(function)
-    , arguments(std::make_tuple(std::move(arguments)...)){};
+    , arguments(std::make_tuple(std::move(arguments)...))
+  {}
 
 
 
@@ -238,14 +239,16 @@ namespace Utilities
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function,
                                                         TupleType && arguments)
     : function(function)
-    , arguments(std::move(arguments)){};
+    , arguments(std::move(arguments))
+  {}
 
 
 
   template <typename ReturnType, class... FunctionArgs>
   template <class FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function)
-    : function(function){};
+    : function(function)
+  {}
 
 
 
@@ -296,7 +299,7 @@ namespace Utilities
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);
-  };
+  }
 
 
 
