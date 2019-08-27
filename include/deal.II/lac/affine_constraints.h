@@ -54,6 +54,27 @@ namespace internals
   class GlobalRowsFromLocal;
 }
 
+namespace internal
+{
+  namespace AffineConstraintsImplementation
+  {
+    template <class VectorType>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 VectorType &                                vec);
+
+    template <class T>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 dealii::Vector<T> &                         vec);
+
+    template <class T>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 dealii::BlockVector<T> &                    vec);
+  } // namespace AffineConstraintsImplementation
+} // namespace internal
+
 
 template <typename number>
 class AffineConstraints;
@@ -1673,6 +1694,20 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
   Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity  = value;
+}
+
+template <typename number>
+template <class VectorType>
+inline void
+AffineConstraints<number>::set_zero(VectorType &vec) const
+{
+  // since lines is a private member, we cannot pass it to the functions
+  // above. therefore, copy the content which is cheap
+  std::vector<size_type> constrained_lines(lines.size());
+  for (unsigned int i = 0; i < lines.size(); ++i)
+    constrained_lines[i] = lines[i].index;
+  internal::AffineConstraintsImplementation::set_zero_all(constrained_lines,
+                                                          vec);
 }
 
 template <typename number>

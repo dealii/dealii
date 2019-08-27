@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/smartpointer.h>
@@ -27,6 +28,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/vector_memory.h>
@@ -1029,6 +1031,12 @@ public:
                    const double       max_eigenvalue      = 1);
 
     /**
+     *  Copy assignment operator.
+     */
+    AdditionalData &
+    operator=(const AdditionalData &other_data);
+
+    /**
      * This determines the degree of the Chebyshev polynomial. The degree of
      * the polynomial gives the number of matrix-vector products to be
      * performed for one application of the vmult() operation. Degree one
@@ -1074,6 +1082,12 @@ public:
      * ignored.
      */
     double max_eigenvalue;
+
+    /**
+     * Constraints to be used for the operator given. This variable is used to
+     * zero out the correct entries when creating an initial guess.
+     */
+    AffineConstraints<double> constraints;
 
     /**
      * Stores the preconditioner object that the Chebyshev is wrapped around.
@@ -1947,19 +1961,21 @@ namespace internal
     }
 
     // selection for diagonal matrix around parallel deal.II vector
-    template <typename Number, typename MemorySpace>
+    template <typename Number>
     inline void
     vector_updates(
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace> &rhs,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
       const DiagonalMatrix<
-        LinearAlgebra::distributed::Vector<Number, MemorySpace>> &jacobi,
-      const unsigned int                                       iteration_index,
-      const double                                             factor1,
-      const double                                             factor2,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &solution_old,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &temp_vector1,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &solution)
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>> &jacobi,
+      const unsigned int iteration_index,
+      const double       factor1,
+      const double       factor2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &solution_old,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &temp_vector1,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
     {
       VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
@@ -2047,10 +2063,11 @@ namespace internal
       vector.add(-mean_value);
     }
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number>
     void
     set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector)
+      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -2067,6 +2084,54 @@ namespace internal
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
     }
+
+
+#  ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <typename Number>
+    __global__ void
+    set_initial_guess_kernel(const types::global_dof_index offset,
+                             const unsigned int            local_size,
+                             Number *                      values)
+
+    {
+      const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
+      if (index < local_size)
+        values[index] = (index + offset) % 11;
+    }
+
+    template <typename Number>
+    void
+    set_initial_guess(
+      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+        &vector)
+    {
+      // Choose a high-frequency mode consisting of numbers between 0 and 1
+      // that is cheap to compute (cheaper than random numbers) but avoids
+      // obviously re-occurring numbers in multi-component systems by choosing
+      // a period of 11.
+      // Make initial guess robust with respect to number of processors
+      // by operating on the global index.
+      types::global_dof_index first_local_range = 0;
+      if (!vector.locally_owned_elements().is_empty())
+        first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
+
+      const auto n_local_elements = vector.local_size();
+      const int  n_blocks =
+        1 + (n_local_elements - 1) / CUDAWrappers::block_size;
+      set_initial_guess_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
+        first_local_range, n_local_elements, vector.get_values());
+
+#    ifdef DEBUG
+      // Check that the kernel was launched correctly
+      AssertCuda(cudaGetLastError());
+      // Check that there was no problem during the execution of the kernel
+      AssertCuda(cudaDeviceSynchronize());
+#    endif
+
+      const Number mean_value = vector.mean_value();
+      vector.add(-mean_value);
+    }
+#  endif // DEAL_II_COMPILER_CUDA_AWARE
 
     struct EigenvalueTracker
     {
@@ -2097,6 +2162,26 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   , eig_cg_residual(eig_cg_residual)
   , max_eigenvalue(max_eigenvalue)
 {}
+
+
+
+template <typename MatrixType, class VectorType, typename PreconditionerType>
+inline typename PreconditionChebyshev<MatrixType,
+                                      VectorType,
+                                      PreconditionerType>::AdditionalData &
+                  PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
+  AdditionalData::operator=(const AdditionalData &other_data)
+{
+  degree              = other_data.degree;
+  smoothing_range     = other_data.smoothing_range;
+  eig_cg_n_iterations = other_data.eig_cg_n_iterations;
+  eig_cg_residual     = other_data.eig_cg_residual;
+  max_eigenvalue      = other_data.max_eigenvalue;
+  preconditioner      = other_data.preconditioner;
+  constraints.copy_from(other_data.constraints);
+
+  return *this;
+}
 
 
 
@@ -2191,6 +2276,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       // one entry is different to trigger high frequencies
       internal::PreconditionChebyshevImplementation::set_initial_guess(
         temp_vector1);
+      data.constraints.set_zero(temp_vector1);
 
       try
         {
