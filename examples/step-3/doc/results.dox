@@ -8,7 +8,7 @@ DEAL:cg::Starting value 0.121094
 DEAL:cg::Convergence step 48 value 5.33692e-13
 @endcode
 
-The first three lines is what we wrote to <code>cout</code>. The last
+The first two lines is what we wrote to <code>cout</code>. The last
 two lines were generated without our intervention by the CG
 solver. The first two lines state the residual at the start of the
 iteration, while the last line tells us that the solver needed 47
