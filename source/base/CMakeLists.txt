@@ -75,6 +75,7 @@ SET(_unity_include_src
   quadrature.cc
   quadrature_lib.cc
   quadrature_selector.cc
+  scalar_polynomials_base.cc
   subscriptor.cc
   table_handler.cc
   tensor_function.cc
