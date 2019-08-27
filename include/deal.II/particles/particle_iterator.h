@@ -107,7 +107,7 @@ namespace Particles
     operator++(int);
 
     /**
-     * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator moves
+     * Prefix <tt>\--</tt> operator: <tt>\--iterator</tt>. This operator moves
      * the iterator to the previous element and returns a reference to
      * <tt>*this</tt>.
      */
@@ -115,7 +115,7 @@ namespace Particles
     operator--();
 
     /**
-     * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
+     * Postfix <tt>\--</tt> operator: <tt>iterator\--</tt>. This operator moves
      * the iterator to the previous element, but returns an iterator to the
      * element previously pointed to.
      */

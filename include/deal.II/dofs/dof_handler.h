@@ -107,7 +107,7 @@ namespace internal
  * triangulation data. These iterators are built on top of those of the
  * Triangulation class, but offer the additional information on degrees of
  * freedom functionality compared to pure triangulation iterators. The order
- * in which dof iterators are presented by the <tt>++</tt> and <tt>--</tt>
+ * in which dof iterators are presented by the <tt>++</tt> and <tt>\--</tt>
  * operators is the same as that for the corresponding iterators traversing
  * the triangulation on which this DoFHandler is constructed.
  *

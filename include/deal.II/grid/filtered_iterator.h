@@ -341,7 +341,7 @@ namespace IteratorFilters
  * filter (called a <em>predicate</em>, following the notation of the C++
  * standard library). Once initialized with a predicate and a value for the
  * iterator, a filtered iterator hops to the next or previous element that
- * satisfies the predicate if operators ++ or -- are invoked. Intermediate
+ * satisfies the predicate if operators ++ or \-- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
  * objects without the need to explicitly write down the condition they have
