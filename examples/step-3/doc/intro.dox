@@ -144,8 +144,9 @@ Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
 takes to make that happen:
 
-- The objects for $A,U,F$ are of type SparseMatrix and Vector, and we will see
-  in the program below what classes are used to solve linear systems.
+- The object for $A$ is of type SparseMatrix while those for $U$ and $F$ are of
+  type Vector. We will see in the program below what classes are used to solve
+  linear systems.
 - We need a way to form the integrals. In the finite element method, this is
   most commonly done using quadrature, i.e. the integrals are replaced by a
   weighted sum over a set of points on each cell. That is, we first split the
