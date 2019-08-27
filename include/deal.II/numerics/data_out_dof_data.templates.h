@@ -1348,89 +1348,105 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     for (unsigned int i = 0; i < (*d)->n_output_variables;)
       // see what kind of data we have here. note that for the purpose of the
       // current function all we care about is vector data
-      if ((*d)->data_component_interpretation[i] ==
-          DataComponentInterpretation::component_is_part_of_vector)
+      switch ((*d)->data_component_interpretation[i])
         {
-          // ensure that there is a continuous number of next space_dim
-          // components that all deal with vectors
-          Assert(i + patch_space_dim <= (*d)->n_output_variables,
-                 Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
-                   i, (*d)->names[i]));
-          for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
-            Assert(
-              (*d)->data_component_interpretation[i + dd] ==
-                DataComponentInterpretation::component_is_part_of_vector,
-              Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
-                i, (*d)->names[i]));
+          case DataComponentInterpretation::component_is_scalar:
+            {
+              // just move one component forward by one, or two if the component
+              // happens to be complex-valued
+              ++i;
+              output_component += ((*d)->is_complex_valued() ? 2 : 1);
 
-          // all seems alright, so figure out whether there is a common name to
-          // these components. if not, leave the name empty and let the output
-          // format writer decide what to do here
-          std::string name = (*d)->names[i];
-          for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
-            if (name != (*d)->names[i + dd])
-              {
-                name = "";
-                break;
-              }
+              break;
+            }
 
-          // finally add a corresponding range
-          ranges.emplace_back(std::forward_as_tuple(
-            output_component,
-            output_component + patch_space_dim - 1,
-            name,
-            DataComponentInterpretation::component_is_part_of_vector));
+          case DataComponentInterpretation::component_is_part_of_vector:
+            {
+              // ensure that there is a continuous number of next space_dim
+              // components that all deal with vectors
+              Assert(
+                i + patch_space_dim <= (*d)->n_output_variables,
+                Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
+                  i, (*d)->names[i]));
+              for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
+                Assert(
+                  (*d)->data_component_interpretation[i + dd] ==
+                    DataComponentInterpretation::component_is_part_of_vector,
+                  Exceptions::DataOutImplementation::
+                    ExcInvalidVectorDeclaration(i, (*d)->names[i]));
 
-          // increase the 'component' counter by the appropriate amount, same
-          // for 'i', since we have already dealt with all these components
-          output_component += patch_space_dim;
-          i += patch_space_dim;
-        }
-      else if ((*d)->data_component_interpretation[i] ==
-               DataComponentInterpretation::component_is_part_of_tensor)
-        {
-          const unsigned int size = patch_space_dim * patch_space_dim;
-          // ensure that there is a continuous number of next
-          // space_dim*space_dim components that all deal with tensors
-          Assert(i + size <= (*d)->n_output_variables,
-                 Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
-                   i, (*d)->names[i]));
-          for (unsigned int dd = 1; dd < size; ++dd)
-            Assert(
-              (*d)->data_component_interpretation[i + dd] ==
-                DataComponentInterpretation::component_is_part_of_tensor,
-              Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
-                i, (*d)->names[i]));
+              // all seems alright, so figure out whether there is a common name
+              // to these components. if not, leave the name empty and let the
+              // output format writer decide what to do here
+              std::string name = (*d)->names[i];
+              for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
+                if (name != (*d)->names[i + dd])
+                  {
+                    name = "";
+                    break;
+                  }
 
-          // all seems alright, so figure out whether there is a common name to
-          // these components. if not, leave the name empty and let the output
-          // format writer decide what to do here
-          std::string name = (*d)->names[i];
-          for (unsigned int dd = 1; dd < size; ++dd)
-            if (name != (*d)->names[i + dd])
-              {
-                name = "";
-                break;
-              }
+              // finally add a corresponding range
+              ranges.emplace_back(std::forward_as_tuple(
+                output_component,
+                output_component + patch_space_dim - 1,
+                name,
+                DataComponentInterpretation::component_is_part_of_vector));
 
-          // finally add a corresponding range
-          ranges.emplace_back(std::forward_as_tuple(
-            output_component,
-            output_component + size - 1,
-            name,
-            DataComponentInterpretation::component_is_part_of_tensor));
+              // increase the 'component' counter by the appropriate amount,
+              // same for 'i', since we have already dealt with all these
+              // components
+              output_component += patch_space_dim;
+              i += patch_space_dim;
 
-          // increase the 'component' counter by the appropriate amount, same
-          // for 'i', since we have already dealt with all these components
-          output_component += size;
-          i += size;
-        }
-      else
-        {
-          // just move one component forward by one, or two if the vector
-          // happens to be complex-valued
-          ++i;
-          output_component += ((*d)->is_complex_valued() ? 2 : 1);
+              break;
+            }
+
+          case DataComponentInterpretation::component_is_part_of_tensor:
+            {
+              const unsigned int size = patch_space_dim * patch_space_dim;
+              // ensure that there is a continuous number of next
+              // space_dim*space_dim components that all deal with tensors
+              Assert(
+                i + size <= (*d)->n_output_variables,
+                Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
+                  i, (*d)->names[i]));
+              for (unsigned int dd = 1; dd < size; ++dd)
+                Assert(
+                  (*d)->data_component_interpretation[i + dd] ==
+                    DataComponentInterpretation::component_is_part_of_tensor,
+                  Exceptions::DataOutImplementation::
+                    ExcInvalidTensorDeclaration(i, (*d)->names[i]));
+
+              // all seems alright, so figure out whether there is a common name
+              // to these components. if not, leave the name empty and let the
+              // output format writer decide what to do here
+              std::string name = (*d)->names[i];
+              for (unsigned int dd = 1; dd < size; ++dd)
+                if (name != (*d)->names[i + dd])
+                  {
+                    name = "";
+                    break;
+                  }
+
+              // finally add a corresponding range
+              ranges.emplace_back(std::forward_as_tuple(
+                output_component,
+                output_component + size - 1,
+                name,
+                DataComponentInterpretation::component_is_part_of_tensor));
+
+              // increase the 'component' counter by the appropriate amount,
+              // same for 'i', since we have already dealt with all these
+              // components
+              output_component += size;
+              i += size;
+
+              break;
+            }
+
+          default:
+            Assert(false, ExcNotImplemented());
         }
 
   // note that we do not have to traverse the list of cell data here because
