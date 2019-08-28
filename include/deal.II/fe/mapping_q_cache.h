@@ -117,6 +117,8 @@ private:
   boost::signals2::connection clear_signal;
 };
 
+/*@}*/
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

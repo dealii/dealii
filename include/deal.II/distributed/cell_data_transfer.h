@@ -223,7 +223,7 @@ namespace parallel
       /**
        * @copydoc CellDataTransfer::CellDataTransfer
        *
-       * @copydoc Use the above constructor instead.
+       * @deprecated Use the above constructor instead.
        */
       DEAL_II_DEPRECATED
       CellDataTransfer(const parallel::distributed::Triangulation<dim, spacedim>
