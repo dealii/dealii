@@ -332,17 +332,30 @@ the nice detail of the boundary fitted mesh if we refine two more times:
 
 <h3> Possible extensions </h3>
 
-<h4> Modify a mesh </h4>
+<h4> Assigning different boundary ids </h4>
 
-Similar to the operations in step-1, iterate over a mesh and change boundary
-indicators.
+It is often useful to assign different boundary ids to a mesh that is
+generated in one form or another as described in this tutorial to apply
+different boundary conditions.
+
+For example, you might want to apply a different boundary condition for the
+right boundary of the first grid in this program. To do this, iterate over the
+cells and their faces and identify the correct faces (for example using
+cell->center() or cell->get_boundary_id()). You can then use
+cell->set_boundary_id() to set the boundary id to something different. You can
+take a look back at step-1 how iteration over the meshes is done there.
 
 <h4> Extracting a boundary mesh </h4>
 
-To compute on surfaces on manifolds, you can use the function
-GridTools::extract_boundary_mesh() to extract the surface elements of a
-mesh. For example, using the function on a 3d mesh (a Triangulation<3,3>),
-this will return a Triangulation<2,3> that you can use in step-38 for example.
+Computations on manifolds, like they are done in step-38, require a surface
+mesh embedded into a higher dimensional space. While some can be constructed
+using the GridGenerator namespace or loaded from a file, it is sometimes
+useful to extract a surface mesh from a volume mesh.
+
+Use the function GridTools::extract_boundary_mesh() to extract the surface
+elements of a mesh. Using the function on a 3d mesh (a Triangulation<3,3>, for
+example from grid_4()), this will return a Triangulation<2,3> that you can use
+in step-38.  Also try extracting the boundary mesh of a Triangulation<2,2>.
 
 
 <!--
