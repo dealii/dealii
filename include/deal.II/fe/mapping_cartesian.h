@@ -31,22 +31,38 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class providing a mapping from the reference cell to cells that are
- * axiparallel.
+ * axiparallel, i.e., that have the shape of rectangles (in 2d) or
+ * boxes (in 3d) with edges parallel to the coordinate directions. The
+ * class therefore provides functionality that is equivalent to what,
+ * for example, MappingQ would provide for such cells. However, knowledge
+ * of the shape of cells allows this class to be substantially more
+ * efficient.
  *
- * This class maps the unit cell to a grid cell with surfaces parallel to the
- * coordinate lines/planes. It is specifically developed for Cartesian meshes.
- * In other words, the mapping is meant for cells for which the mapping from
+ * Specifically, the mapping is meant for cells for which the mapping from
  * the reference to the real cell is a scaling along the coordinate
  * directions: The transformation from reference coordinates $\hat {\mathbf
  * x}$ to real coordinates $\mathbf x$ on each cell is of the form
  * @f{align*}{
- * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 \\ 0 & h_y
- * \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix}
+ *     h_x & 0 \\
+ *     0 & h_y
+ *   \end{pmatrix}
+ *   \hat{\mathbf x}
+ *   + {\mathbf v}_0
  * @f}
  * in 2d, and
  * @f{align*}{
- * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 & 0 \\ 0 & h_y & 0
- * \\ 0 & 0 & h_z \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix}
+ *     h_x & 0 & 0 \\
+ *     0 & h_y & 0 \\
+ *     0 & 0 & h_z
+ *   \end{pmatrix}
+ *   \hat{\mathbf x}
+ *   + {\mathbf v}_0
  * @f}
  * in 3d, where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$
  * are the extents of the cell along the axes.
