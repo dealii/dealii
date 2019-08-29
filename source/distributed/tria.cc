@@ -4598,8 +4598,6 @@ namespace parallel
       it           = periodicity_vector.begin();
       periodic_end = periodicity_vector.end();
 
-      const auto begin_cell = this->begin();
-
       for (; it < periodic_end; ++it)
         {
           const cell_iterator first_cell  = it->cell[0];
@@ -4609,11 +4607,9 @@ namespace parallel
 
           // respective cells of the matching faces in p4est
           const unsigned int tree_left =
-            coarse_cell_to_p4est_tree_permutation[first_cell->index() -
-                                                  begin_cell->index()];
+            coarse_cell_to_p4est_tree_permutation[first_cell->index()];
           const unsigned int tree_right =
-            coarse_cell_to_p4est_tree_permutation[second_cell->index() -
-                                                  begin_cell->index()];
+            coarse_cell_to_p4est_tree_permutation[second_cell->index()];
 
           // p4est wants to know which corner the first corner on
           // the face with the lower id is mapped to on the face with
