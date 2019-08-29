@@ -128,8 +128,8 @@ class Triangulation;
  * In order to facilitate these principles, the concept of waking up and
  * letting sleep a time step object was developed. Assume we have a time
  * stepping scheme which needs to look ahead one time step and needs the data
- * of the last two time steps, the following pseudocode described what the
- * centeral loop function of this class will do when we move from timestep @p
+ * of the last two time steps, the following pseudocode describes what the
+ * central loop function of this class will do when we move from timestep @p
  * n-1 to timestep @p n:
  * @verbatim
  *   wake up timestep n+1 with signal 1
@@ -151,8 +151,8 @@ class Triangulation;
  *
  * In the example above, possible actions might be: timestep <tt>n+1</tt>
  * rebuilds the computational grid (there is a specialized class which can do
- * this for you); timestep @p n builds matrices sets solution vectors to the
- * right size, maybe using an initial guess; then it does the computations;
+ * this for you); timestep @p n builds matrices and sets solution vectors to
+ * the right size, maybe using an initial guess; then it does the computations;
  * then it deletes the matrices since they are not needed by subsequent
  * timesteps; timestep @p n-1 deletes those data vectors which are only needed
  * by one timestep ahead; timestep @p n-2 deletes the remaining vectors and
@@ -163,7 +163,7 @@ class Triangulation;
  * the following sequence of events:
  * @verbatim
  *   wake up with signal 1
- *   wake up signal 0
+ *   wake up with signal 0
  *   do computation
  *   sleep with signal 0
  *   sleep with signal 1
@@ -176,7 +176,7 @@ class Triangulation;
  * look-behind (i.e. the maximum signal number to the @p sleep function) can
  * be chosen separately. For example, it is usually only needed to look one
  * time step behind when computing error estimation (in some cases, it may
- * vene be possible to not look ahead or back at all, in which case only
+ * even be possible to not look ahead or back at all, in which case only
  * signals zero will be sent), while one needs a look back of at least one for
  * a timestepping method.
  *
@@ -212,7 +212,7 @@ class Triangulation;
  *     write_statistics ();
  *
  *     end_sweep ();
- *   };
+ *   }
  *
  *
  *
@@ -221,9 +221,9 @@ class Triangulation;
  *   {
  *     for (unsigned int sweep=0; sweep<number_of_sweeps; ++sweep)
  *       timestep_manager.run_sweep (sweep);
- *   };
+ *   }
  * @endcode
- * Here, @p timestep_manager is an object of type TimeDependent_Wave(), which
+ * Here, @p timestep_manager is an object of type TimeDependent_Wave<dim>, which
  * is a class derived from TimeDependent. @p start_sweep, @p
  * solve_primal_problem, @p solve_dual_problem, @p postprocess and @p
  * end_sweep are functions inherited from this class. They all do a loop over
@@ -242,11 +242,11 @@ class Triangulation;
  *       {
  *         timesteps[step]->set_timestep_no (step);
  *         timesteps[step]->set_sweep_no (sweep_no);
- *       };
+ *       }
  *
  *     for (unsigned int step=0; step<timesteps.size(); ++step)
  *       timesteps[step]->start_sweep ();
- *   };
+ *   }
  *
  *
  *   void
@@ -258,7 +258,7 @@ class Triangulation;
  *                        std::placeholders::_1),
  *              timestepping_data_primal,
  *              forward);
- *   };
+ *   }
  * @endcode
  * The latter function shows rather clear how most of the loops are invoked
  * (@p solve_primal_problem, @p solve_dual_problem, @p postprocess, @p
@@ -294,8 +294,8 @@ class Triangulation;
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * @endcode
- * TimeStepBase_Wave::refine_grid is a function taking an argument, unlike all
- * the other functions used above within the loops. However, in this special
+ * TimeStepBase_Wave<dim>::refine_grid is a function taking an argument, unlike
+ * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
  * was started, so we fixed it and made a function object which to the outside
  * world does not take parameters.
@@ -345,7 +345,7 @@ class Triangulation;
  *              look_back<=timestepping_data.look_back;
  *              ++look_back)
  *           timesteps[step-look_back]->sleep(look_back);
- *       };
+ *       }
  *
  *     // make the last few timesteps sleep
  *     for (int step=n_timesteps;
@@ -355,7 +355,7 @@ class Triangulation;
  *            look_back<=timestepping_data.look_back;
  *            ++look_back)
  *         timesteps[step-look_back]->sleep(look_back);
- *   };
+ *   }
  * @endcode
  *
  *
@@ -408,7 +408,7 @@ public:
      * scheme), this value will be one.
      *
      * The value of this number determines, how many time steps after having
-     * done computations on a tim level the time step manager will call the @p
+     * done computations on a time level the time step manager will call the @p
      * sleep function for each time step.
      */
     const unsigned int look_back;
@@ -473,7 +473,7 @@ public:
    *
    * This mechanism usually will result in a set-up loop like this
    * @code
-   * for (i=0; i<N; ++i)
+   * for (int i=0; i<N; ++i)
    *   manager.add_timestep(new MyTimeStep());
    * @endcode
    */
@@ -583,7 +583,7 @@ public:
   start_sweep(const unsigned int sweep_no);
 
   /**
-   * Analogon to the above function, calling @p end_sweep of each time step
+   * Analogous to the above function, calling @p end_sweep of each time step
    * object. The same applies with respect to the @p virtualness of this
    * function as for the previous one.
    *
@@ -702,7 +702,7 @@ public:
   TimeStepBase(const TimeStepBase &) = delete;
 
   /**
-   * The copy assignment operator is dleetd to avoid shallow copies winth
+   * The copy assignment operator is deleted to avoid shallow copies with
    * unexpected behavior.
    */
   TimeStepBase &
@@ -757,7 +757,7 @@ public:
   start_sweep();
 
   /**
-   * This is the analogon to the above function, but it is called at the end
+   * This is the analogous to the above function, but it is called at the end
    * of a sweep. You will usually want to do clean-ups in this function, such
    * as deleting temporary files and the like.
    */
@@ -929,7 +929,7 @@ private:
    * Set the number this time step has in the list of timesteps. This function
    * is called by the time step management object at the beginning of each
    * sweep, to update information which may have changed due to addition or
-   * deleltion of time levels.
+   * deletion of time levels.
    */
   void
   set_timestep_no(const unsigned int step_no);
@@ -1398,7 +1398,7 @@ public:
    * memory and may therefore be externalized.
    *
    * By default, if the user specified so in the flags for this object, the
-   * triangulation is deleted and the refinement history saved such that the
+   * triangulation is deleted and the refinement history is saved such that the
    * respective @p wake_up function can rebuild it. You should therefore call
    * this function from your overloaded version, preferably at the end so that
    * your function can use the triangulation as long as you need it.
