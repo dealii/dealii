@@ -3503,7 +3503,7 @@ public:
    * Translate the index of coarse cell to its unique id. See the glossary
    * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    *
-   * @note: See the note of the method
+   * @note See the note of the method
    * coarse_cell_id_to_coarse_cell_index().
    *
    * @param coarse_cell_index Index of the coarse cell.
