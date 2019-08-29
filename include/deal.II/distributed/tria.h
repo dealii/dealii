@@ -318,8 +318,7 @@ namespace parallel
         /**
          * This flags needs to be set to use the geometric multigrid
          * functionality. This option requires additional computation and
-         * communication. Note: geometric multigrid is still a work in
-         * progress.
+         * communication.
          */
         construct_multigrid_hierarchy = 0x2,
         /**
