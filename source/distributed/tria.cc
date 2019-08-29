@@ -4592,26 +4592,18 @@ namespace parallel
       Assert(this->n_levels() == 1,
              ExcMessage("The triangulation is refined!"));
 
-      using FaceVector =
-        std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>;
-      typename FaceVector::const_iterator it, periodic_end;
-      it           = periodicity_vector.begin();
-      periodic_end = periodicity_vector.end();
-
-      for (; it < periodic_end; ++it)
+      for (const auto &face_pair : periodicity_vector)
         {
-          const cell_iterator first_cell  = it->cell[0];
-          const cell_iterator second_cell = it->cell[1];
-          const unsigned int  face_left   = it->face_idx[0];
-          const unsigned int  face_right  = it->face_idx[1];
+          const cell_iterator first_cell  = face_pair.cell[0];
+          const cell_iterator second_cell = face_pair.cell[1];
+          const unsigned int  face_left   = face_pair.face_idx[0];
+          const unsigned int  face_right  = face_pair.face_idx[1];
 
           // respective cells of the matching faces in p4est
           const unsigned int tree_left =
-            coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
-                                                                first_cell)];
+            coarse_cell_to_p4est_tree_permutation[first_cell->index()];
           const unsigned int tree_right =
-            coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
-                                                                second_cell)];
+            coarse_cell_to_p4est_tree_permutation[second_cell->index()];
 
           // p4est wants to know which corner the first corner on
           // the face with the lower id is mapped to on the face with
@@ -4622,7 +4614,7 @@ namespace parallel
 
           unsigned int p4est_orientation = 0;
           if (dim == 2)
-            p4est_orientation = it->orientation[1];
+            p4est_orientation = face_pair.orientation[1];
           else
             {
               const unsigned int  face_idx_list[] = {face_left, face_right};
@@ -4666,26 +4658,26 @@ namespace parallel
               Assert(first_dealii_idx_on_face != numbers::invalid_unsigned_int,
                      ExcInternalError());
               // Now map dealii_idx_on_face according to the orientation
-              const unsigned int left_to_right[8][4] = {{0, 2, 1, 3},
-                                                        {0, 1, 2, 3},
-                                                        {3, 1, 2, 0},
-                                                        {3, 2, 1, 0},
-                                                        {2, 3, 0, 1},
-                                                        {1, 3, 0, 2},
-                                                        {1, 0, 3, 2},
-                                                        {2, 0, 3, 1}};
-              const unsigned int right_to_left[8][4] = {{0, 2, 1, 3},
-                                                        {0, 1, 2, 3},
-                                                        {3, 1, 2, 0},
-                                                        {3, 2, 1, 0},
-                                                        {2, 3, 0, 1},
-                                                        {2, 0, 3, 1},
-                                                        {1, 0, 3, 2},
-                                                        {1, 3, 0, 2}};
-              const unsigned int second_dealii_idx_on_face =
-                lower_idx == 0 ? left_to_right[it->orientation.to_ulong()]
+              constexpr unsigned int left_to_right[8][4] = {{0, 2, 1, 3},
+                                                            {0, 1, 2, 3},
+                                                            {3, 1, 2, 0},
+                                                            {3, 2, 1, 0},
+                                                            {2, 3, 0, 1},
+                                                            {1, 3, 0, 2},
+                                                            {1, 0, 3, 2},
+                                                            {2, 0, 3, 1}};
+              constexpr unsigned int right_to_left[8][4] = {{0, 2, 1, 3},
+                                                            {0, 1, 2, 3},
+                                                            {3, 1, 2, 0},
+                                                            {3, 2, 1, 0},
+                                                            {2, 3, 0, 1},
+                                                            {2, 0, 3, 1},
+                                                            {1, 0, 3, 2},
+                                                            {1, 3, 0, 2}};
+              const unsigned int     second_dealii_idx_on_face =
+                lower_idx == 0 ? left_to_right[face_pair.orientation.to_ulong()]
                                               [first_dealii_idx_on_face] :
-                                 right_to_left[it->orientation.to_ulong()]
+                                 right_to_left[face_pair.orientation.to_ulong()]
                                               [first_dealii_idx_on_face];
               const unsigned int second_dealii_idx_on_cell =
                 GeometryInfo<dim>::face_to_cell_vertices(
