@@ -17,6 +17,7 @@
 #define dealii_fe_interface_values_h
 
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -24,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
  * FEInterfaceValues is a data structure to access and assemble Finite Element
  * data on interfaces between two cells of a mesh.
  *
- * Basically, it provides a way to access average and jump terms used in
+ * It provides a way to access average and jump terms used in
  * Discontinuous Galerkin methods on faces between two neighboring cells. In
  * the literature these are called "inner interfaces" or "facets".
  *
@@ -37,6 +38,9 @@ DEAL_II_NAMESPACE_OPEN
  * The class is made to be used inside MeshWorker::mesh_loop. It is intended
  * to be a low level replacement for MeshWorker and LocalIntegrators and a
  * higher level abstraction compared to assembling face terms manually.
+ *
+ *
+ * @author Timo Heister, 2019.
  */
 template <int dim, int spacedim = dim>
 class FEInterfaceValues
@@ -60,12 +64,21 @@ public:
                     const Quadrature<dim - 1> &         quadrature,
                     const UpdateFlags                   update_flags);
 
+  /**
+   * Construct the FEInterfaceValues with a single FiniteElement and
+   * a Q1 Mapping.
+   *
+   * See the constructor above.
+   */
+  FEInterfaceValues(const FiniteElement<dim, spacedim> &fe,
+                    const Quadrature<dim - 1> &         quadrature,
+                    const UpdateFlags                   update_flags);
 
   /**
    * Re-initialize this object to be used on a new interface given by two faces
    * of two neighboring cells.
    *
-   * The arguments including their order is identical to the @p face_worker arguments
+   * The arguments (including their order) is identical to the @p face_worker arguments
    * in MeshWorker::mesh_loop.
    *
    * Use numbers::invalid_unsigned_int for @p sub_face_no or @p
@@ -111,7 +124,7 @@ public:
   get_quadrature() const;
 
   /**
-   * Return a reference to the quadrature object in use.
+   * Return a reference to the quadrature points.
    */
   const std::vector<Point<spacedim>> &
   get_quadrature_points() const;
@@ -122,7 +135,6 @@ public:
   const UpdateFlags
   get_update_flags() const;
 
-
   /**
    * Return the number of DoFs on the current interface. This is the sum of the
    * number of DoFs on the two adjacent cells.
@@ -131,7 +143,7 @@ public:
   n_interface_dofs() const;
 
   /**
-   * Return if the current interface, which is set by reinit(), is an internal
+   * Return if the current interface is an internal
    * face with two adjacent cells or a boundary face.
    */
   bool
@@ -170,10 +182,10 @@ public:
                       const unsigned int face_dof_index) const;
 
   /**
-   * Return the FEFaceValue object of the cell or the neighboring cell
+   * Return the FEFaceValues object of the cell or the neighboring cell
    *
-   * If @p cell_or_neighbor is 0, return the cell's, if it is 1, return the
-   * neighboring cell's FEFaceValue object.
+   * If @p cell_or_neighbor is 0, return the cell FEFaceValues object , if it is 1, return the
+   * neighboring cell FEFaceValues object.
    *
    * @note The argument @p cell_or_neighbor is returned by
    * interface_dof_index_to_fe_index().
@@ -200,8 +212,8 @@ public:
   normal(const unsigned int q_point_index) const;
 
   /**
-   * Return the current (if @p current_cell is true) or neighboring (if @p
-   * current_cell is false) value on the interface for the shape function @p
+   * Return the current value (if @p current_cell is true) or the neighboring value
+   * (if @p current_cell is false) on the interface for the shape function @p
    * interface_dof_index in the quadrature point @p q_point of component @p
    * component.
    *
@@ -217,9 +229,10 @@ public:
          const unsigned int component = 0) const;
 
   /**
-   * Return the jump $[u]=u_1 - u_2$ on the interface for the shape function
-   * @p interface_dof_index in the quadrature point @p q_point of component @p
-   * component.
+   * Return the jump $[u]=u_{\text{cell}} - u_{\text{neighbor}}$ on the
+   * interface
+   * for the shape function @p interface_dof_index in the quadrature point
+   * @p q_point of component @p component.
    */
   double
   jump(const unsigned int interface_dof_index,
@@ -312,6 +325,36 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   , internal_fe_subface_values(mapping, fe, quadrature, update_flags)
   , internal_fe_face_values_neighbor(mapping, fe, quadrature, update_flags)
   , internal_fe_subface_values_neighbor(mapping, fe, quadrature, update_flags)
+  , fe_face_values(nullptr)
+  , fe_face_values_neighbor(nullptr)
+{
+  n_dofs_fe          = fe.n_dofs_per_cell();
+  n_dofs_fe_neighbor = fe.n_dofs_per_cell();
+}
+
+
+
+template <int dim, int spacedim>
+FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
+  const FiniteElement<dim, spacedim> &fe,
+  const Quadrature<dim - 1> &         quadrature,
+  const UpdateFlags                   update_flags)
+  : internal_fe_face_values(StaticMappingQ1<dim, spacedim>::mapping,
+                            fe,
+                            quadrature,
+                            update_flags)
+  , internal_fe_subface_values(StaticMappingQ1<dim, spacedim>::mapping,
+                               fe,
+                               quadrature,
+                               update_flags)
+  , internal_fe_face_values_neighbor(StaticMappingQ1<dim, spacedim>::mapping,
+                                     fe,
+                                     quadrature,
+                                     update_flags)
+  , internal_fe_subface_values_neighbor(StaticMappingQ1<dim, spacedim>::mapping,
+                                        fe,
+                                        quadrature,
+                                        update_flags)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
 {
