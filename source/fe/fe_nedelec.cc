@@ -502,8 +502,7 @@ template <>
 void
 FE_Nedelec<1>::initialize_restriction()
 {
-  // there is only one refinement case in 1d,
-  // which is the isotropic one
+  // there is only one refinement case in 1d, which is the isotropic one
   for (unsigned int i = 0; i < GeometryInfo<1>::max_children_per_cell; ++i)
     this->restriction[0][i].reinit(0, 0);
 }
@@ -511,1485 +510,1458 @@ FE_Nedelec<1>::initialize_restriction()
 
 
 // Restriction operator
-template <int dim>
+template <>
 void
-FE_Nedelec<dim>::initialize_restriction()
+FE_Nedelec<2>::initialize_restriction()
 {
-  // This function does the same as the
-  // function interpolate further below.
-  // But since the functions, which we
-  // interpolate here, are discontinuous
-  // we have to use more quadrature
-  // points as in interpolate.
-  const QGauss<1>              edge_quadrature(2 * this->degree);
-  const std::vector<Point<1>> &edge_quadrature_points =
-    edge_quadrature.get_points();
+  // This function does the same as the function interpolate further below.
+  // But since the functions, which we interpolate here, are discontinuous
+  // we have to use more quadrature points as in interpolate.
+  const QGauss<1>    edge_quadrature(2 * this->degree);
+  const auto &       edge_quadrature_points   = edge_quadrature.get_points();
   const unsigned int n_edge_quadrature_points = edge_quadrature.size();
-  const unsigned int index = RefinementCase<dim>::isotropic_refinement - 1;
+  const unsigned int index = RefinementCase<2>::isotropic_refinement - 1;
 
-  switch (dim)
+  // First interpolate the shape functions of the child cells
+  // to the lowest order shape functions of the parent cell.
+  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+    for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+         ++q_point)
+      {
+        const double weight = 2.0 * edge_quadrature.weight(q_point);
+
+        if (edge_quadrature_points[q_point](0) < 0.5)
+          {
+            Point<2> quadrature_point(0.0,
+                                      2.0 * edge_quadrature_points[q_point](0));
+
+            this->restriction[index][0](0, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 1);
+            quadrature_point(0) = 1.0;
+            this->restriction[index][1](this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 1);
+            quadrature_point(0) = quadrature_point(1);
+            quadrature_point(1) = 0.0;
+            this->restriction[index][0](2 * this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 0);
+            quadrature_point(1) = 1.0;
+            this->restriction[index][2](3 * this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 0);
+          }
+
+        else
+          {
+            Point<2> quadrature_point(0.0,
+                                      2.0 * edge_quadrature_points[q_point](0) -
+                                        1.0);
+
+            this->restriction[index][2](0, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 1);
+            quadrature_point(0) = 1.0;
+            this->restriction[index][3](this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 1);
+            quadrature_point(0) = quadrature_point(1);
+            quadrature_point(1) = 0.0;
+            this->restriction[index][1](2 * this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 0);
+            quadrature_point(1) = 1.0;
+            this->restriction[index][3](3 * this->degree, dof) +=
+              weight * this->shape_value_component(dof, quadrature_point, 0);
+          }
+      }
+
+  // Then project the shape functions of the child cells to the higher
+  // order shape functions of the parent cell.
+  if (this->degree > 1)
     {
-      case 2:
-        {
-          // First interpolate the shape
-          // functions of the child cells
-          // to the lowest order shape
-          // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      const unsigned int deg = this->degree - 1;
+      const auto &       legendre_polynomials =
+        Polynomials::Legendre::generate_complete_basis(deg);
+      FullMatrix<double> system_matrix_inv(deg, deg);
+
+      {
+        FullMatrix<double> assembling_matrix(deg, n_edge_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+             ++q_point)
+          {
+            const double weight = std::sqrt(edge_quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < deg; ++i)
+              assembling_matrix(i, q_point) =
+                weight * legendre_polynomials[i + 1].value(
+                           edge_quadrature_points[q_point](0));
+          }
+
+        FullMatrix<double> system_matrix(deg, deg);
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      FullMatrix<double> solution(this->degree - 1, 4);
+      FullMatrix<double> system_rhs(this->degree - 1, 4);
+      Vector<double>     tmp(4);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+        for (unsigned int i = 0; i < 2; ++i)
+          {
+            system_rhs = 0.0;
+
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
-                const double weight = 2.0 * edge_quadrature.weight(q_point);
+                const double   weight = edge_quadrature.weight(q_point);
+                const Point<2> quadrature_point_0(
+                  i, edge_quadrature_points[q_point](0));
+                const Point<2> quadrature_point_1(
+                  edge_quadrature_points[q_point](0), i);
 
                 if (edge_quadrature_points[q_point](0) < 0.5)
                   {
-                    Point<dim> quadrature_point(
-                      0.0, 2.0 * edge_quadrature_points[q_point](0));
+                    Point<2> quadrature_point_2(
+                      i, 2.0 * edge_quadrature_points[q_point](0));
 
-                    this->restriction[index][0](0, dof) +=
+                    tmp(0) =
                       weight *
-                      this->shape_value_component(dof, quadrature_point, 1);
-                    quadrature_point(0) = 1.0;
-                    this->restriction[index][1](this->degree, dof) +=
+                      (2.0 * this->shape_value_component(dof,
+                                                         quadrature_point_2,
+                                                         1) -
+                       this->restriction[index][i](i * this->degree, dof) *
+                         this->shape_value_component(i * this->degree,
+                                                     quadrature_point_0,
+                                                     1));
+                    tmp(1) =
+                      -1.0 * weight *
+                      this->restriction[index][i + 2](i * this->degree, dof) *
+                      this->shape_value_component(i * this->degree,
+                                                  quadrature_point_0,
+                                                  1);
+                    quadrature_point_2 =
+                      Point<2>(2.0 * edge_quadrature_points[q_point](0), i);
+                    tmp(2) =
                       weight *
-                      this->shape_value_component(dof, quadrature_point, 1);
-                    quadrature_point(0) = quadrature_point(1);
-                    quadrature_point(1) = 0.0;
-                    this->restriction[index][0](2 * this->degree, dof) +=
+                      (2.0 * this->shape_value_component(dof,
+                                                         quadrature_point_2,
+                                                         0) -
+                       this->restriction[index][2 * i]((i + 2) * this->degree,
+                                                       dof) *
+                         this->shape_value_component((i + 2) * this->degree,
+                                                     quadrature_point_1,
+                                                     0));
+                    tmp(3) = -1.0 * weight *
+                             this->restriction[index][2 * i + 1]((i + 2) *
+                                                                   this->degree,
+                                                                 dof) *
+                             this->shape_value_component((i + 2) * this->degree,
+                                                         quadrature_point_1,
+                                                         0);
+                  }
+                else
+                  {
+                    tmp(0) =
+                      -1.0 * weight *
+                      this->restriction[index][i](i * this->degree, dof) *
+                      this->shape_value_component(i * this->degree,
+                                                  quadrature_point_0,
+                                                  1);
+
+                    Point<2> quadrature_point_2(
+                      i, 2.0 * edge_quadrature_points[q_point](0) - 1.0);
+
+                    tmp(1) =
                       weight *
-                      this->shape_value_component(dof, quadrature_point, 0);
-                    quadrature_point(1) = 1.0;
-                    this->restriction[index][2](3 * this->degree, dof) +=
+                      (2.0 * this->shape_value_component(dof,
+                                                         quadrature_point_2,
+                                                         1) -
+                       this->restriction[index][i + 2](i * this->degree, dof) *
+                         this->shape_value_component(i * this->degree,
+                                                     quadrature_point_0,
+                                                     1));
+                    tmp(2) =
+                      -1.0 * weight *
+                      this->restriction[index][2 * i]((i + 2) * this->degree,
+                                                      dof) *
+                      this->shape_value_component((i + 2) * this->degree,
+                                                  quadrature_point_1,
+                                                  0);
+                    quadrature_point_2 =
+                      Point<2>(2.0 * edge_quadrature_points[q_point](0) - 1.0,
+                               i);
+                    tmp(3) =
                       weight *
-                      this->shape_value_component(dof, quadrature_point, 0);
+                      (2.0 * this->shape_value_component(dof,
+                                                         quadrature_point_2,
+                                                         0) -
+                       this->restriction[index][2 * i + 1]((i + 2) *
+                                                             this->degree,
+                                                           dof) *
+                         this->shape_value_component((i + 2) * this->degree,
+                                                     quadrature_point_1,
+                                                     0));
+                  }
+
+                for (unsigned int j = 0; j < this->degree - 1; ++j)
+                  {
+                    const double L_j = legendre_polynomials[j + 1].value(
+                      edge_quadrature_points[q_point](0));
+
+                    for (unsigned int k = 0; k < tmp.size(); ++k)
+                      system_rhs(j, k) += tmp(k) * L_j;
+                  }
+              }
+
+            system_matrix_inv.mmult(solution, system_rhs);
+
+            for (unsigned int j = 0; j < this->degree - 1; ++j)
+              for (unsigned int k = 0; k < 2; ++k)
+                {
+                  if (std::abs(solution(j, k)) > 1e-14)
+                    this->restriction[index][i + 2 * k](i * this->degree + j +
+                                                          1,
+                                                        dof) = solution(j, k);
+
+                  if (std::abs(solution(j, k + 2)) > 1e-14)
+                    this->restriction[index][2 * i + k](
+                      (i + 2) * this->degree + j + 1, dof) = solution(j, k + 2);
+                }
+          }
+
+      const QGauss<2> quadrature(2 * this->degree);
+      const auto &    quadrature_points = quadrature.get_points();
+      const auto &    lobatto_polynomials =
+        Polynomials::Lobatto::generate_complete_basis(this->degree);
+      const unsigned int n_boundary_dofs =
+        GeometryInfo<2>::faces_per_cell * this->degree;
+      const unsigned int n_quadrature_points = quadrature.size();
+
+      {
+        FullMatrix<double> assembling_matrix((this->degree - 1) * this->degree,
+                                             n_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point)
+          {
+            const double weight = std::sqrt(quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < this->degree; ++i)
+              {
+                const double L_i = weight * legendre_polynomials[i].value(
+                                              quadrature_points[q_point](0));
+
+                for (unsigned int j = 0; j < this->degree - 1; ++j)
+                  assembling_matrix(i * (this->degree - 1) + j, q_point) =
+                    L_i * lobatto_polynomials[j + 2].value(
+                            quadrature_points[q_point](1));
+              }
+          }
+
+        FullMatrix<double> system_matrix(assembling_matrix.m(),
+                                         assembling_matrix.m());
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      solution.reinit(system_matrix_inv.m(), 8);
+      system_rhs.reinit(system_matrix_inv.m(), 8);
+      tmp.reinit(8);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+        {
+          system_rhs = 0.0;
+
+          for (unsigned int q_point = 0; q_point < n_quadrature_points;
+               ++q_point)
+            {
+              tmp = 0.0;
+
+              if (quadrature_points[q_point](0) < 0.5)
+                {
+                  if (quadrature_points[q_point](1) < 0.5)
+                    {
+                      const Point<2> quadrature_point(
+                        2.0 * quadrature_points[q_point](0),
+                        2.0 * quadrature_points[q_point](1));
+
+                      tmp(0) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(1) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                    }
+
+                  else
+                    {
+                      const Point<2> quadrature_point(
+                        2.0 * quadrature_points[q_point](0),
+                        2.0 * quadrature_points[q_point](1) - 1.0);
+
+                      tmp(4) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(5) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                    }
+                }
+
+              else if (quadrature_points[q_point](1) < 0.5)
+                {
+                  const Point<2> quadrature_point(
+                    2.0 * quadrature_points[q_point](0) - 1.0,
+                    2.0 * quadrature_points[q_point](1));
+
+                  tmp(2) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 0);
+                  tmp(3) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 1);
+                }
+
+              else
+                {
+                  const Point<2> quadrature_point(
+                    2.0 * quadrature_points[q_point](0) - 1.0,
+                    2.0 * quadrature_points[q_point](1) - 1.0);
+
+                  tmp(6) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 0);
+                  tmp(7) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 1);
+                }
+
+              for (unsigned int i = 0; i < 2; ++i)
+                for (unsigned int j = 0; j < this->degree; ++j)
+                  {
+                    tmp(2 * i) -=
+                      this->restriction[index][i](j + 2 * this->degree, dof) *
+                      this->shape_value_component(j + 2 * this->degree,
+                                                  quadrature_points[q_point],
+                                                  0);
+                    tmp(2 * i + 1) -=
+                      this->restriction[index][i](i * this->degree + j, dof) *
+                      this->shape_value_component(i * this->degree + j,
+                                                  quadrature_points[q_point],
+                                                  1);
+                    tmp(2 * (i + 2)) -=
+                      this->restriction[index][i + 2](j + 3 * this->degree,
+                                                      dof) *
+                      this->shape_value_component(j + 3 * this->degree,
+                                                  quadrature_points[q_point],
+                                                  0);
+                    tmp(2 * i + 5) -=
+                      this->restriction[index][i + 2](i * this->degree + j,
+                                                      dof) *
+                      this->shape_value_component(i * this->degree + j,
+                                                  quadrature_points[q_point],
+                                                  1);
+                  }
+
+              tmp *= quadrature.weight(q_point);
+
+              for (unsigned int i = 0; i < this->degree; ++i)
+                {
+                  const double L_i_0 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](0));
+                  const double L_i_1 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](1));
+
+                  for (unsigned int j = 0; j < this->degree - 1; ++j)
+                    {
+                      const double l_j_0 =
+                        L_i_0 * lobatto_polynomials[j + 2].value(
+                                  quadrature_points[q_point](1));
+                      const double l_j_1 =
+                        L_i_1 * lobatto_polynomials[j + 2].value(
+                                  quadrature_points[q_point](0));
+
+                      for (unsigned int k = 0; k < 4; ++k)
+                        {
+                          system_rhs(i * (this->degree - 1) + j, 2 * k) +=
+                            tmp(2 * k) * l_j_0;
+                          system_rhs(i * (this->degree - 1) + j, 2 * k + 1) +=
+                            tmp(2 * k + 1) * l_j_1;
+                        }
+                    }
+                }
+            }
+
+          system_matrix_inv.mmult(solution, system_rhs);
+
+          for (unsigned int i = 0; i < this->degree; ++i)
+            for (unsigned int j = 0; j < this->degree - 1; ++j)
+              for (unsigned int k = 0; k < 4; ++k)
+                {
+                  if (std::abs(solution(i * (this->degree - 1) + j, 2 * k)) >
+                      1e-14)
+                    this->restriction[index][k](i * (this->degree - 1) + j +
+                                                  n_boundary_dofs,
+                                                dof) =
+                      solution(i * (this->degree - 1) + j, 2 * k);
+
+                  if (std::abs(solution(i * (this->degree - 1) + j,
+                                        2 * k + 1)) > 1e-14)
+                    this->restriction[index][k](
+                      i + (this->degree - 1 + j) * this->degree +
+                        n_boundary_dofs,
+                      dof) = solution(i * (this->degree - 1) + j, 2 * k + 1);
+                }
+        }
+    }
+}
+
+// Restriction operator
+template <>
+void
+FE_Nedelec<3>::initialize_restriction()
+{
+  // This function does the same as the function interpolate further below.
+  // But since the functions, which we interpolate here, are discontinuous
+  // we have to use more quadrature points as in interpolate.
+  const QGauss<1>    edge_quadrature(2 * this->degree);
+  const auto &       edge_quadrature_points   = edge_quadrature.get_points();
+  const unsigned int n_edge_quadrature_points = edge_quadrature.size();
+  const unsigned int index = RefinementCase<3>::isotropic_refinement - 1;
+
+  // First interpolate the shape functions of the child cells
+  // to the lowest order shape functions of the parent cell.
+  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+    for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+         ++q_point)
+      {
+        const double weight = 2.0 * edge_quadrature.weight(q_point);
+
+        if (edge_quadrature_points[q_point](0) < 0.5)
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              {
+                Point<3> quadrature_point(
+                  i, 2.0 * edge_quadrature_points[q_point](0), j);
+
+                this->restriction[index][i + 4 * j]((i + 4 * j) * this->degree,
+                                                    dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 1);
+                quadrature_point =
+                  Point<3>(2.0 * edge_quadrature_points[q_point](0), i, j);
+                this->restriction[index][2 * (i + 2 * j)]((i + 4 * j + 2) *
+                                                            this->degree,
+                                                          dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 0);
+                quadrature_point =
+                  Point<3>(i, j, 2.0 * edge_quadrature_points[q_point](0));
+                this->restriction[index][i + 2 * j]((i + 2 * (j + 4)) *
+                                                      this->degree,
+                                                    dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 2);
+              }
+
+        else
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              {
+                Point<3> quadrature_point(
+                  i, 2.0 * edge_quadrature_points[q_point](0) - 1.0, j);
+
+                this->restriction[index][i + 4 * j + 2]((i + 4 * j) *
+                                                          this->degree,
+                                                        dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 1);
+                quadrature_point =
+                  Point<3>(2.0 * edge_quadrature_points[q_point](0) - 1.0,
+                           i,
+                           j);
+                this->restriction[index][2 * (i + 2 * j) + 1]((i + 4 * j + 2) *
+                                                                this->degree,
+                                                              dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 0);
+                quadrature_point =
+                  Point<3>(i,
+                           j,
+                           2.0 * edge_quadrature_points[q_point](0) - 1.0);
+                this->restriction[index][i + 2 * (j + 2)]((i + 2 * (j + 4)) *
+                                                            this->degree,
+                                                          dof) +=
+                  weight *
+                  this->shape_value_component(dof, quadrature_point, 2);
+              }
+      }
+
+  // Then project the shape functions of the child cells to the higher
+  // order shape functions of the parent cell.
+  if (this->degree > 1)
+    {
+      const unsigned int deg = this->degree - 1;
+      const auto &       legendre_polynomials =
+        Polynomials::Legendre::generate_complete_basis(deg);
+      FullMatrix<double> system_matrix_inv(deg, deg);
+
+      {
+        FullMatrix<double> assembling_matrix(deg, n_edge_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+             ++q_point)
+          {
+            const double weight = std::sqrt(edge_quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < deg; ++i)
+              assembling_matrix(i, q_point) =
+                weight * legendre_polynomials[i + 1].value(
+                           edge_quadrature_points[q_point](0));
+          }
+
+        FullMatrix<double> system_matrix(deg, deg);
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      FullMatrix<double> solution(deg, 6);
+      FullMatrix<double> system_rhs(deg, 6);
+      Vector<double>     tmp(6);
+
+      for (unsigned int i = 0; i < 2; ++i)
+        for (unsigned int j = 0; j < 2; ++j)
+          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+            {
+              system_rhs = 0.0;
+
+              for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+                   ++q_point)
+                {
+                  const double   weight = edge_quadrature.weight(q_point);
+                  const Point<3> quadrature_point_0(
+                    i, edge_quadrature_points[q_point](0), j);
+                  const Point<3> quadrature_point_1(
+                    edge_quadrature_points[q_point](0), i, j);
+                  const Point<3> quadrature_point_2(
+                    i, j, edge_quadrature_points[q_point](0));
+
+                  if (edge_quadrature_points[q_point](0) < 0.5)
+                    {
+                      Point<3> quadrature_point_3(
+                        i, 2.0 * edge_quadrature_points[q_point](0), j);
+
+                      tmp(0) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           1) -
+                         this->restriction[index][i + 4 * j]((i + 4 * j) *
+                                                               this->degree,
+                                                             dof) *
+                           this->shape_value_component((i + 4 * j) *
+                                                         this->degree,
+                                                       quadrature_point_0,
+                                                       1));
+                      tmp(1) =
+                        -1.0 * weight *
+                        this->restriction[index][i + 4 * j + 2]((i + 4 * j) *
+                                                                  this->degree,
+                                                                dof) *
+                        this->shape_value_component((i + 4 * j) * this->degree,
+                                                    quadrature_point_0,
+                                                    1);
+                      quadrature_point_3 =
+                        Point<3>(2.0 * edge_quadrature_points[q_point](0),
+                                 i,
+                                 j);
+                      tmp(2) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           0) -
+                         this->restriction[index][2 * (i + 2 * j)](
+                           (i + 4 * j + 2) * this->degree, dof) *
+                           this->shape_value_component((i + 4 * j + 2) *
+                                                         this->degree,
+                                                       quadrature_point_1,
+                                                       0));
+                      tmp(3) = -1.0 * weight *
+                               this->restriction[index][2 * (i + 2 * j) + 1](
+                                 (i + 4 * j + 2) * this->degree, dof) *
+                               this->shape_value_component((i + 4 * j + 2) *
+                                                             this->degree,
+                                                           quadrature_point_1,
+                                                           0);
+                      quadrature_point_3 =
+                        Point<3>(i,
+                                 j,
+                                 2.0 * edge_quadrature_points[q_point](0));
+                      tmp(4) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           2) -
+                         this->restriction[index][i + 2 * j]((i + 2 * (j + 4)) *
+                                                               this->degree,
+                                                             dof) *
+                           this->shape_value_component((i + 2 * (j + 4)) *
+                                                         this->degree,
+                                                       quadrature_point_2,
+                                                       2));
+                      tmp(5) = -1.0 * weight *
+                               this->restriction[index][i + 2 * (j + 2)](
+                                 (i + 2 * (j + 4)) * this->degree, dof) *
+                               this->shape_value_component((i + 2 * (j + 4)) *
+                                                             this->degree,
+                                                           quadrature_point_2,
+                                                           2);
+                    }
+
+                  else
+                    {
+                      tmp(0) =
+                        -1.0 * weight *
+                        this->restriction[index][i + 4 * j]((i + 4 * j) *
+                                                              this->degree,
+                                                            dof) *
+                        this->shape_value_component((i + 4 * j) * this->degree,
+                                                    quadrature_point_0,
+                                                    1);
+
+                      Point<3> quadrature_point_3(
+                        i, 2.0 * edge_quadrature_points[q_point](0) - 1.0, j);
+
+                      tmp(1) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           1) -
+                         this->restriction[index][i + 4 * j + 2]((i + 4 * j) *
+                                                                   this->degree,
+                                                                 dof) *
+                           this->shape_value_component((i + 4 * j) *
+                                                         this->degree,
+                                                       quadrature_point_0,
+                                                       1));
+                      tmp(2) = -1.0 * weight *
+                               this->restriction[index][2 * (i + 2 * j)](
+                                 (i + 4 * j + 2) * this->degree, dof) *
+                               this->shape_value_component((i + 4 * j + 2) *
+                                                             this->degree,
+                                                           quadrature_point_1,
+                                                           0);
+                      quadrature_point_3 =
+                        Point<3>(2.0 * edge_quadrature_points[q_point](0) - 1.0,
+                                 i,
+                                 j);
+                      tmp(3) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           0) -
+                         this->restriction[index][2 * (i + 2 * j) + 1](
+                           (i + 4 * j + 2) * this->degree, dof) *
+                           this->shape_value_component((i + 4 * j + 2) *
+                                                         this->degree,
+                                                       quadrature_point_1,
+                                                       0));
+                      tmp(4) = -1.0 * weight *
+                               this->restriction[index][i + 2 * j](
+                                 (i + 2 * (j + 4)) * this->degree, dof) *
+                               this->shape_value_component((i + 2 * (j + 4)) *
+                                                             this->degree,
+                                                           quadrature_point_2,
+                                                           2);
+                      quadrature_point_3 = Point<3>(
+                        i, j, 2.0 * edge_quadrature_points[q_point](0) - 1.0);
+                      tmp(5) =
+                        weight *
+                        (2.0 * this->shape_value_component(dof,
+                                                           quadrature_point_3,
+                                                           2) -
+                         this->restriction[index][i + 2 * (j + 2)](
+                           (i + 2 * (j + 4)) * this->degree, dof) *
+                           this->shape_value_component((i + 2 * (j + 4)) *
+                                                         this->degree,
+                                                       quadrature_point_2,
+                                                       2));
+                    }
+
+                  for (unsigned int k = 0; k < deg; ++k)
+                    {
+                      const double L_k = legendre_polynomials[k + 1].value(
+                        edge_quadrature_points[q_point](0));
+
+                      for (unsigned int l = 0; l < tmp.size(); ++l)
+                        system_rhs(k, l) += tmp(l) * L_k;
+                    }
+                }
+
+              system_matrix_inv.mmult(solution, system_rhs);
+
+              for (unsigned int k = 0; k < 2; ++k)
+                for (unsigned int l = 0; l < deg; ++l)
+                  {
+                    if (std::abs(solution(l, k)) > 1e-14)
+                      this->restriction[index][i + 2 * (2 * j + k)](
+                        (i + 4 * j) * this->degree + l + 1, dof) =
+                        solution(l, k);
+
+                    if (std::abs(solution(l, k + 2)) > 1e-14)
+                      this->restriction[index][2 * (i + 2 * j) + k](
+                        (i + 4 * j + 2) * this->degree + l + 1, dof) =
+                        solution(l, k + 2);
+
+                    if (std::abs(solution(l, k + 4)) > 1e-14)
+                      this->restriction[index][i + 2 * (j + 2 * k)](
+                        (i + 2 * (j + 4)) * this->degree + l + 1, dof) =
+                        solution(l, k + 4);
+                  }
+            }
+
+      const QGauss<2> face_quadrature(2 * this->degree);
+      const auto &    face_quadrature_points = face_quadrature.get_points();
+      const auto &    lobatto_polynomials =
+        Polynomials::Lobatto::generate_complete_basis(this->degree);
+      const unsigned int n_edge_dofs =
+        GeometryInfo<3>::lines_per_cell * this->degree;
+      const unsigned int n_face_quadrature_points = face_quadrature.size();
+
+      {
+        FullMatrix<double> assembling_matrix(deg * this->degree,
+                                             n_face_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_face_quadrature_points;
+             ++q_point)
+          {
+            const double weight = std::sqrt(face_quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i <= deg; ++i)
+              {
+                const double L_i =
+                  weight * legendre_polynomials[i].value(
+                             face_quadrature_points[q_point](0));
+
+                for (unsigned int j = 0; j < deg; ++j)
+                  assembling_matrix(i * deg + j, q_point) =
+                    L_i * lobatto_polynomials[j + 2].value(
+                            face_quadrature_points[q_point](1));
+              }
+          }
+
+        FullMatrix<double> system_matrix(assembling_matrix.m(),
+                                         assembling_matrix.m());
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      solution.reinit(system_matrix_inv.m(), 24);
+      system_rhs.reinit(system_matrix_inv.m(), 24);
+      tmp.reinit(24);
+
+      for (unsigned int i = 0; i < 2; ++i)
+        for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+          {
+            system_rhs = 0.0;
+
+            for (unsigned int q_point = 0; q_point < n_face_quadrature_points;
+                 ++q_point)
+              {
+                tmp = 0.0;
+
+                if (face_quadrature_points[q_point](0) < 0.5)
+                  {
+                    if (face_quadrature_points[q_point](1) < 0.5)
+                      {
+                        Point<3> quadrature_point_0(
+                          i,
+                          2.0 * face_quadrature_points[q_point](0),
+                          2.0 * face_quadrature_points[q_point](1));
+
+                        tmp(0) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            1);
+                        tmp(1) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            2);
+                        quadrature_point_0 =
+                          Point<3>(2.0 * face_quadrature_points[q_point](0),
+                                   i,
+                                   2.0 * face_quadrature_points[q_point](1));
+                        tmp(8) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            2);
+                        tmp(9) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            0);
+                        quadrature_point_0 =
+                          Point<3>(2.0 * face_quadrature_points[q_point](0),
+                                   2.0 * face_quadrature_points[q_point](1),
+                                   i);
+                        tmp(16) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            0);
+                        tmp(17) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            1);
+                      }
+
+                    else
+                      {
+                        Point<3> quadrature_point_0(
+                          i,
+                          2.0 * face_quadrature_points[q_point](0),
+                          2.0 * face_quadrature_points[q_point](1) - 1.0);
+
+                        tmp(2) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            1);
+                        tmp(3) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            2);
+                        quadrature_point_0 =
+                          Point<3>(2.0 * face_quadrature_points[q_point](0),
+                                   i,
+                                   2.0 * face_quadrature_points[q_point](1) -
+                                     1.0);
+                        tmp(10) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            2);
+                        tmp(11) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            0);
+                        quadrature_point_0 =
+                          Point<3>(2.0 * face_quadrature_points[q_point](0),
+                                   2.0 * face_quadrature_points[q_point](1) -
+                                     1.0,
+                                   i);
+                        tmp(18) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            0);
+                        tmp(19) +=
+                          2.0 * this->shape_value_component(dof,
+                                                            quadrature_point_0,
+                                                            1);
+                      }
+                  }
+
+                else if (face_quadrature_points[q_point](1) < 0.5)
+                  {
+                    Point<3> quadrature_point_0(
+                      i,
+                      2.0 * face_quadrature_points[q_point](0) - 1.0,
+                      2.0 * face_quadrature_points[q_point](1));
+
+                    tmp(4) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 1);
+                    tmp(5) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 2);
+                    quadrature_point_0 =
+                      Point<3>(2.0 * face_quadrature_points[q_point](0) - 1.0,
+                               i,
+                               2.0 * face_quadrature_points[q_point](1));
+                    tmp(12) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 2);
+                    tmp(13) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 0);
+                    quadrature_point_0 =
+                      Point<3>(2.0 * face_quadrature_points[q_point](0) - 1.0,
+                               2.0 * face_quadrature_points[q_point](1),
+                               i);
+                    tmp(20) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 0);
+                    tmp(21) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 1);
                   }
 
                 else
                   {
-                    Point<dim> quadrature_point(
-                      0.0, 2.0 * edge_quadrature_points[q_point](0) - 1.0);
+                    Point<3> quadrature_point_0(
+                      i,
+                      2.0 * face_quadrature_points[q_point](0) - 1.0,
+                      2.0 * face_quadrature_points[q_point](1) - 1.0);
 
-                    this->restriction[index][2](0, dof) +=
-                      weight *
-                      this->shape_value_component(dof, quadrature_point, 1);
-                    quadrature_point(0) = 1.0;
-                    this->restriction[index][3](this->degree, dof) +=
-                      weight *
-                      this->shape_value_component(dof, quadrature_point, 1);
-                    quadrature_point(0) = quadrature_point(1);
-                    quadrature_point(1) = 0.0;
-                    this->restriction[index][1](2 * this->degree, dof) +=
-                      weight *
-                      this->shape_value_component(dof, quadrature_point, 0);
-                    quadrature_point(1) = 1.0;
-                    this->restriction[index][3](3 * this->degree, dof) +=
-                      weight *
-                      this->shape_value_component(dof, quadrature_point, 0);
-                  }
-              }
-
-          // Then project the shape functions
-          // of the child cells to the higher
-          // order shape functions of the
-          // parent cell.
-          if (this->degree > 1)
-            {
-              const unsigned int deg = this->degree - 1;
-              const std::vector<Polynomials::Polynomial<double>>
-                &legendre_polynomials =
-                  Polynomials::Legendre::generate_complete_basis(deg);
-              FullMatrix<double> system_matrix_inv(deg, deg);
-
-              {
-                FullMatrix<double> assembling_matrix(deg,
-                                                     n_edge_quadrature_points);
-
-                for (unsigned int q_point = 0;
-                     q_point < n_edge_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight =
-                      std::sqrt(edge_quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i < deg; ++i)
-                      assembling_matrix(i, q_point) =
-                        weight * legendre_polynomials[i + 1].value(
-                                   edge_quadrature_points[q_point](0));
+                    tmp(6) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 1);
+                    tmp(7) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 2);
+                    quadrature_point_0 =
+                      Point<3>(2.0 * face_quadrature_points[q_point](0) - 1.0,
+                               i,
+                               2.0 * face_quadrature_points[q_point](1) - 1.0);
+                    tmp(14) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 2);
+                    tmp(15) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 0);
+                    quadrature_point_0 =
+                      Point<3>(2.0 * face_quadrature_points[q_point](0) - 1.0,
+                               2.0 * face_quadrature_points[q_point](1) - 1.0,
+                               i);
+                    tmp(22) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 0);
+                    tmp(23) +=
+                      2.0 *
+                      this->shape_value_component(dof, quadrature_point_0, 1);
                   }
 
-                FullMatrix<double> system_matrix(deg, deg);
+                const Point<3> quadrature_point_0(
+                  i,
+                  face_quadrature_points[q_point](0),
+                  face_quadrature_points[q_point](1));
+                const Point<3> quadrature_point_1(
+                  face_quadrature_points[q_point](0),
+                  i,
+                  face_quadrature_points[q_point](1));
+                const Point<3> quadrature_point_2(
+                  face_quadrature_points[q_point](0),
+                  face_quadrature_points[q_point](1),
+                  i);
 
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              FullMatrix<double> solution(this->degree - 1, 4);
-              FullMatrix<double> system_rhs(this->degree - 1, 4);
-              Vector<double>     tmp(4);
-
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
-                for (unsigned int i = 0; i < 2; ++i)
-                  {
-                    system_rhs = 0.0;
-
-                    for (unsigned int q_point = 0;
-                         q_point < n_edge_quadrature_points;
-                         ++q_point)
+                for (unsigned int j = 0; j < 2; ++j)
+                  for (unsigned int k = 0; k < 2; ++k)
+                    for (unsigned int l = 0; l <= deg; ++l)
                       {
-                        const double weight = edge_quadrature.weight(q_point);
-                        const Point<dim> quadrature_point_0(
-                          i, edge_quadrature_points[q_point](0));
-                        const Point<dim> quadrature_point_1(
-                          edge_quadrature_points[q_point](0), i);
-
-                        if (edge_quadrature_points[q_point](0) < 0.5)
-                          {
-                            Point<dim> quadrature_point_2(
-                              i, 2.0 * edge_quadrature_points[q_point](0));
-
-                            tmp(0) =
-                              weight *
-                              (2.0 * this->shape_value_component(
-                                       dof, quadrature_point_2, 1) -
-                               this->restriction[index][i](i * this->degree,
-                                                           dof) *
-                                 this->shape_value_component(i * this->degree,
-                                                             quadrature_point_0,
-                                                             1));
-                            tmp(1) =
-                              -1.0 * weight *
-                              this->restriction[index][i + 2](i * this->degree,
-                                                              dof) *
-                              this->shape_value_component(i * this->degree,
-                                                          quadrature_point_0,
-                                                          1);
-                            quadrature_point_2 = Point<dim>(
-                              2.0 * edge_quadrature_points[q_point](0), i);
-                            tmp(2) =
-                              weight *
-                              (2.0 * this->shape_value_component(
-                                       dof, quadrature_point_2, 0) -
-                               this->restriction[index][2 * i]((i + 2) *
-                                                                 this->degree,
-                                                               dof) *
-                                 this->shape_value_component((i + 2) *
-                                                               this->degree,
-                                                             quadrature_point_1,
-                                                             0));
-                            tmp(3) =
-                              -1.0 * weight *
-                              this->restriction[index][2 * i + 1](
-                                (i + 2) * this->degree, dof) *
-                              this->shape_value_component(
-                                (i + 2) * this->degree, quadrature_point_1, 0);
-                          }
-
-                        else
-                          {
-                            tmp(0) =
-                              -1.0 * weight *
-                              this->restriction[index][i](i * this->degree,
-                                                          dof) *
-                              this->shape_value_component(i * this->degree,
-                                                          quadrature_point_0,
-                                                          1);
-
-                            Point<dim> quadrature_point_2(
-                              i,
-                              2.0 * edge_quadrature_points[q_point](0) - 1.0);
-
-                            tmp(1) =
-                              weight *
-                              (2.0 * this->shape_value_component(
-                                       dof, quadrature_point_2, 1) -
-                               this->restriction[index][i + 2](i * this->degree,
-                                                               dof) *
-                                 this->shape_value_component(i * this->degree,
-                                                             quadrature_point_0,
-                                                             1));
-                            tmp(2) =
-                              -1.0 * weight *
-                              this->restriction[index][2 * i]((i + 2) *
-                                                                this->degree,
-                                                              dof) *
-                              this->shape_value_component(
-                                (i + 2) * this->degree, quadrature_point_1, 0);
-                            quadrature_point_2 = Point<dim>(
-                              2.0 * edge_quadrature_points[q_point](0) - 1.0,
-                              i);
-                            tmp(3) =
-                              weight *
-                              (2.0 * this->shape_value_component(
-                                       dof, quadrature_point_2, 0) -
-                               this->restriction[index][2 * i + 1](
-                                 (i + 2) * this->degree, dof) *
-                                 this->shape_value_component((i + 2) *
-                                                               this->degree,
-                                                             quadrature_point_1,
-                                                             0));
-                          }
-
-                        for (unsigned int j = 0; j < this->degree - 1; ++j)
-                          {
-                            const double L_j =
-                              legendre_polynomials[j + 1].value(
-                                edge_quadrature_points[q_point](0));
-
-                            for (unsigned int k = 0; k < tmp.size(); ++k)
-                              system_rhs(j, k) += tmp(k) * L_j;
-                          }
+                        tmp(2 * (j + 2 * k)) -=
+                          this->restriction[index][i + 2 * (2 * j + k)](
+                            (i + 4 * j) * this->degree + l, dof) *
+                          this->shape_value_component((i + 4 * j) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_0,
+                                                      1);
+                        tmp(2 * (j + 2 * k) + 1) -=
+                          this->restriction[index][i + 2 * (2 * j + k)](
+                            (i + 2 * (k + 4)) * this->degree + l, dof) *
+                          this->shape_value_component((i + 2 * (k + 4)) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_0,
+                                                      2);
+                        tmp(2 * (j + 2 * (k + 2))) -=
+                          this->restriction[index][2 * (i + 2 * j) + k](
+                            (2 * (i + 4) + k) * this->degree + l, dof) *
+                          this->shape_value_component((2 * (i + 4) + k) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_1,
+                                                      2);
+                        tmp(2 * (j + 2 * k) + 9) -=
+                          this->restriction[index][2 * (i + 2 * j) + k](
+                            (i + 4 * j + 2) * this->degree + l, dof) *
+                          this->shape_value_component((i + 4 * j + 2) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_1,
+                                                      0);
+                        tmp(2 * (j + 2 * (k + 4))) -=
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (4 * i + j + 2) * this->degree + l, dof) *
+                          this->shape_value_component((4 * i + j + 2) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_2,
+                                                      0);
+                        tmp(2 * (j + 2 * k) + 17) -=
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (4 * i + k) * this->degree + l, dof) *
+                          this->shape_value_component((4 * i + k) *
+                                                          this->degree +
+                                                        l,
+                                                      quadrature_point_2,
+                                                      1);
                       }
 
-                    system_matrix_inv.mmult(solution, system_rhs);
+                tmp *= face_quadrature.weight(q_point);
 
-                    for (unsigned int j = 0; j < this->degree - 1; ++j)
-                      for (unsigned int k = 0; k < 2; ++k)
-                        {
-                          if (std::abs(solution(j, k)) > 1e-14)
-                            this->restriction[index][i + 2 * k](
-                              i * this->degree + j + 1, dof) = solution(j, k);
-
-                          if (std::abs(solution(j, k + 2)) > 1e-14)
-                            this->restriction[index][2 * i + k](
-                              (i + 2) * this->degree + j + 1, dof) =
-                              solution(j, k + 2);
-                        }
-                  }
-
-              const QGauss<dim>              quadrature(2 * this->degree);
-              const std::vector<Point<dim>> &quadrature_points =
-                quadrature.get_points();
-              const std::vector<Polynomials::Polynomial<double>>
-                &lobatto_polynomials =
-                  Polynomials::Lobatto::generate_complete_basis(this->degree);
-              const unsigned int n_boundary_dofs =
-                GeometryInfo<dim>::faces_per_cell * this->degree;
-              const unsigned int n_quadrature_points = quadrature.size();
-
-              {
-                FullMatrix<double> assembling_matrix((this->degree - 1) *
-                                                       this->degree,
-                                                     n_quadrature_points);
-
-                for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                     ++q_point)
+                for (unsigned int j = 0; j <= deg; ++j)
                   {
-                    const double weight = std::sqrt(quadrature.weight(q_point));
+                    const double L_j_0 = legendre_polynomials[j].value(
+                      face_quadrature_points[q_point](0));
+                    const double L_j_1 = legendre_polynomials[j].value(
+                      face_quadrature_points[q_point](1));
 
-                    for (unsigned int i = 0; i < this->degree; ++i)
+                    for (unsigned int k = 0; k < deg; ++k)
                       {
-                        const double L_i =
-                          weight * legendre_polynomials[i].value(
-                                     quadrature_points[q_point](0));
+                        const double l_k_0 =
+                          L_j_0 * lobatto_polynomials[k + 2].value(
+                                    face_quadrature_points[q_point](1));
+                        const double l_k_1 =
+                          L_j_1 * lobatto_polynomials[k + 2].value(
+                                    face_quadrature_points[q_point](0));
 
-                        for (unsigned int j = 0; j < this->degree - 1; ++j)
-                          assembling_matrix(i * (this->degree - 1) + j,
-                                            q_point) =
-                            L_i * lobatto_polynomials[j + 2].value(
-                                    quadrature_points[q_point](1));
+                        for (unsigned int l = 0; l < 4; ++l)
+                          {
+                            system_rhs(j * deg + k, 2 * l) +=
+                              tmp(2 * l) * l_k_0;
+                            system_rhs(j * deg + k, 2 * l + 1) +=
+                              tmp(2 * l + 1) * l_k_1;
+                            system_rhs(j * deg + k, 2 * (l + 4)) +=
+                              tmp(2 * (l + 4)) * l_k_1;
+                            system_rhs(j * deg + k, 2 * l + 9) +=
+                              tmp(2 * l + 9) * l_k_0;
+                            system_rhs(j * deg + k, 2 * (l + 8)) +=
+                              tmp(2 * (l + 8)) * l_k_0;
+                            system_rhs(j * deg + k, 2 * l + 17) +=
+                              tmp(2 * l + 17) * l_k_1;
+                          }
                       }
                   }
-
-                FullMatrix<double> system_matrix(assembling_matrix.m(),
-                                                 assembling_matrix.m());
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
-                system_matrix_inv.invert(system_matrix);
               }
 
-              solution.reinit(system_matrix_inv.m(), 8);
-              system_rhs.reinit(system_matrix_inv.m(), 8);
-              tmp.reinit(8);
+            system_matrix_inv.mmult(solution, system_rhs);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
-                {
-                  system_rhs = 0.0;
-
-                  for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = 0; k < 2; ++k)
+                for (unsigned int l = 0; l <= deg; ++l)
+                  for (unsigned int m = 0; m < deg; ++m)
                     {
-                      tmp = 0.0;
+                      if (std::abs(solution(l * deg + m, 2 * (j + 2 * k))) >
+                          1e-14)
+                        this->restriction[index][i + 2 * (2 * j + k)](
+                          (2 * i * this->degree + l) * deg + m + n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * k));
 
-                      if (quadrature_points[q_point](0) < 0.5)
+                      if (std::abs(solution(l * deg + m, 2 * (j + 2 * k) + 1)) >
+                          1e-14)
+                        this->restriction[index][i + 2 * (2 * j + k)](
+                          ((2 * i + 1) * deg + m) * this->degree + l +
+                            n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * k) + 1);
+
+                      if (std::abs(solution(l * deg + m,
+                                            2 * (j + 2 * (k + 2)))) > 1e-14)
+                        this->restriction[index][2 * (i + 2 * j) + k](
+                          (2 * (i + 2) * this->degree + l) * deg + m +
+                            n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * (k + 2)));
+
+                      if (std::abs(solution(l * deg + m, 2 * (j + 2 * k) + 9)) >
+                          1e-14)
+                        this->restriction[index][2 * (i + 2 * j) + k](
+                          ((2 * i + 5) * deg + m) * this->degree + l +
+                            n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * k) + 9);
+
+                      if (std::abs(solution(l * deg + m,
+                                            2 * (j + 2 * (k + 4)))) > 1e-14)
+                        this->restriction[index][2 * (2 * i + j) + k](
+                          (2 * (i + 4) * this->degree + l) * deg + m +
+                            n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * (k + 4)));
+
+                      if (std::abs(solution(l * deg + m,
+                                            2 * (j + 2 * k) + 17)) > 1e-14)
+                        this->restriction[index][2 * (2 * i + j) + k](
+                          ((2 * i + 9) * deg + m) * this->degree + l +
+                            n_edge_dofs,
+                          dof) = solution(l * deg + m, 2 * (j + 2 * k) + 17);
+                    }
+          }
+
+      const QGauss<3>    quadrature(2 * this->degree);
+      const auto &       quadrature_points = quadrature.get_points();
+      const unsigned int n_boundary_dofs =
+        2 * GeometryInfo<3>::faces_per_cell * deg * this->degree + n_edge_dofs;
+      const unsigned int n_quadrature_points = quadrature.size();
+
+      {
+        FullMatrix<double> assembling_matrix(deg * deg * this->degree,
+                                             n_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point)
+          {
+            const double weight = std::sqrt(quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i <= deg; ++i)
+              {
+                const double L_i = weight * legendre_polynomials[i].value(
+                                              quadrature_points[q_point](0));
+
+                for (unsigned int j = 0; j < deg; ++j)
+                  {
+                    const double l_j = L_i * lobatto_polynomials[j + 2].value(
+                                               quadrature_points[q_point](1));
+
+                    for (unsigned int k = 0; k < deg; ++k)
+                      assembling_matrix((i * deg + j) * deg + k, q_point) =
+                        l_j * lobatto_polynomials[k + 2].value(
+                                quadrature_points[q_point](2));
+                  }
+              }
+          }
+
+        FullMatrix<double> system_matrix(assembling_matrix.m(),
+                                         assembling_matrix.m());
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      solution.reinit(system_matrix_inv.m(), 24);
+      system_rhs.reinit(system_matrix_inv.m(), 24);
+      tmp.reinit(24);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+        {
+          system_rhs = 0.0;
+
+          for (unsigned int q_point = 0; q_point < n_quadrature_points;
+               ++q_point)
+            {
+              tmp = 0.0;
+
+              if (quadrature_points[q_point](0) < 0.5)
+                {
+                  if (quadrature_points[q_point](1) < 0.5)
+                    {
+                      if (quadrature_points[q_point](2) < 0.5)
                         {
-                          if (quadrature_points[q_point](1) < 0.5)
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0),
-                                2.0 * quadrature_points[q_point](1));
+                          const Point<3> quadrature_point(
+                            2.0 * quadrature_points[q_point](0),
+                            2.0 * quadrature_points[q_point](1),
+                            2.0 * quadrature_points[q_point](2));
 
-                              tmp(0) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 0);
-                              tmp(1) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 1);
-                            }
-
-                          else
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0),
-                                2.0 * quadrature_points[q_point](1) - 1.0);
-
-                              tmp(4) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 0);
-                              tmp(5) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 1);
-                            }
-                        }
-
-                      else if (quadrature_points[q_point](1) < 0.5)
-                        {
-                          const Point<dim> quadrature_point(
-                            2.0 * quadrature_points[q_point](0) - 1.0,
-                            2.0 * quadrature_points[q_point](1));
-
+                          tmp(0) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              0);
+                          tmp(1) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              1);
                           tmp(2) +=
                             2.0 * this->shape_value_component(dof,
                                                               quadrature_point,
-                                                              0);
+                                                              2);
+                        }
+
+                      else
+                        {
+                          const Point<3> quadrature_point(
+                            2.0 * quadrature_points[q_point](0),
+                            2.0 * quadrature_points[q_point](1),
+                            2.0 * quadrature_points[q_point](2) - 1.0);
+
                           tmp(3) +=
                             2.0 * this->shape_value_component(dof,
                                                               quadrature_point,
-                                                              1);
-                        }
-
-                      else
-                        {
-                          const Point<dim> quadrature_point(
-                            2.0 * quadrature_points[q_point](0) - 1.0,
-                            2.0 * quadrature_points[q_point](1) - 1.0);
-
-                          tmp(6) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
                                                               0);
-                          tmp(7) +=
+                          tmp(4) +=
                             2.0 * this->shape_value_component(dof,
                                                               quadrature_point,
                                                               1);
-                        }
-
-                      for (unsigned int i = 0; i < 2; ++i)
-                        for (unsigned int j = 0; j < this->degree; ++j)
-                          {
-                            tmp(2 * i) -=
-                              this->restriction[index][i](j + 2 * this->degree,
-                                                          dof) *
-                              this->shape_value_component(
-                                j + 2 * this->degree,
-                                quadrature_points[q_point],
-                                0);
-                            tmp(2 * i + 1) -=
-                              this->restriction[index][i](i * this->degree + j,
-                                                          dof) *
-                              this->shape_value_component(
-                                i * this->degree + j,
-                                quadrature_points[q_point],
-                                1);
-                            tmp(2 * (i + 2)) -= this->restriction[index][i + 2](
-                                                  j + 3 * this->degree, dof) *
-                                                this->shape_value_component(
-                                                  j + 3 * this->degree,
-                                                  quadrature_points[q_point],
-                                                  0);
-                            tmp(2 * i + 5) -= this->restriction[index][i + 2](
-                                                i * this->degree + j, dof) *
-                                              this->shape_value_component(
-                                                i * this->degree + j,
-                                                quadrature_points[q_point],
-                                                1);
-                          }
-
-                      tmp *= quadrature.weight(q_point);
-
-                      for (unsigned int i = 0; i < this->degree; ++i)
-                        {
-                          const double L_i_0 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](0));
-                          const double L_i_1 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](1));
-
-                          for (unsigned int j = 0; j < this->degree - 1; ++j)
-                            {
-                              const double l_j_0 =
-                                L_i_0 * lobatto_polynomials[j + 2].value(
-                                          quadrature_points[q_point](1));
-                              const double l_j_1 =
-                                L_i_1 * lobatto_polynomials[j + 2].value(
-                                          quadrature_points[q_point](0));
-
-                              for (unsigned int k = 0; k < 4; ++k)
-                                {
-                                  system_rhs(i * (this->degree - 1) + j,
-                                             2 * k) += tmp(2 * k) * l_j_0;
-                                  system_rhs(i * (this->degree - 1) + j,
-                                             2 * k + 1) +=
-                                    tmp(2 * k + 1) * l_j_1;
-                                }
-                            }
+                          tmp(5) +=
+                            2.0 * this->shape_value_component(dof,
+                                                              quadrature_point,
+                                                              2);
                         }
                     }
 
-                  system_matrix_inv.mmult(solution, system_rhs);
+                  else if (quadrature_points[q_point](2) < 0.5)
+                    {
+                      const Point<3> quadrature_point(
+                        2.0 * quadrature_points[q_point](0),
+                        2.0 * quadrature_points[q_point](1) - 1.0,
+                        2.0 * quadrature_points[q_point](2));
 
-                  for (unsigned int i = 0; i < this->degree; ++i)
-                    for (unsigned int j = 0; j < this->degree - 1; ++j)
-                      for (unsigned int k = 0; k < 4; ++k)
-                        {
-                          if (std::abs(solution(i * (this->degree - 1) + j,
-                                                2 * k)) > 1e-14)
-                            this->restriction[index][k](i * (this->degree - 1) +
-                                                          j + n_boundary_dofs,
-                                                        dof) =
-                              solution(i * (this->degree - 1) + j, 2 * k);
+                      tmp(6) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(7) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                      tmp(8) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 2);
+                    }
 
-                          if (std::abs(solution(i * (this->degree - 1) + j,
-                                                2 * k + 1)) > 1e-14)
-                            this->restriction[index][k](
-                              i + (this->degree - 1 + j) * this->degree +
-                                n_boundary_dofs,
-                              dof) =
-                              solution(i * (this->degree - 1) + j, 2 * k + 1);
-                        }
+                  else
+                    {
+                      const Point<3> quadrature_point(
+                        2.0 * quadrature_points[q_point](0),
+                        2.0 * quadrature_points[q_point](1) - 1.0,
+                        2.0 * quadrature_points[q_point](2) - 1.0);
+
+                      tmp(9) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(10) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                      tmp(11) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 2);
+                    }
                 }
-            }
 
-          break;
-        }
+              else if (quadrature_points[q_point](1) < 0.5)
+                {
+                  if (quadrature_points[q_point](2) < 0.5)
+                    {
+                      const Point<3> quadrature_point(
+                        2.0 * quadrature_points[q_point](0) - 1.0,
+                        2.0 * quadrature_points[q_point](1),
+                        2.0 * quadrature_points[q_point](2));
 
-      case 3:
-        {
-          // First interpolate the shape
-          // functions of the child cells
-          // to the lowest order shape
-          // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
-            for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
-                 ++q_point)
-              {
-                const double weight = 2.0 * edge_quadrature.weight(q_point);
+                      tmp(12) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(13) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                      tmp(14) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 2);
+                    }
 
-                if (edge_quadrature_points[q_point](0) < 0.5)
-                  for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      {
-                        Point<dim> quadrature_point(
-                          i, 2.0 * edge_quadrature_points[q_point](0), j);
+                  else
+                    {
+                      const Point<3> quadrature_point(
+                        2.0 * quadrature_points[q_point](0) - 1.0,
+                        2.0 * quadrature_points[q_point](1),
+                        2.0 * quadrature_points[q_point](2) - 1.0);
 
-                        this->restriction[index][i + 4 * j]((i + 4 * j) *
-                                                              this->degree,
-                                                            dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 1);
-                        quadrature_point =
-                          Point<dim>(2.0 * edge_quadrature_points[q_point](0),
-                                     i,
-                                     j);
-                        this->restriction[index][2 * (i + 2 * j)](
-                          (i + 4 * j + 2) * this->degree, dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 0);
-                        quadrature_point =
-                          Point<dim>(i,
-                                     j,
-                                     2.0 * edge_quadrature_points[q_point](0));
-                        this->restriction[index][i + 2 * j]((i + 2 * (j + 4)) *
-                                                              this->degree,
-                                                            dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 2);
-                      }
+                      tmp(15) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 0);
+                      tmp(16) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 1);
+                      tmp(17) +=
+                        2.0 *
+                        this->shape_value_component(dof, quadrature_point, 2);
+                    }
+                }
 
-                else
-                  for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      {
-                        Point<dim> quadrature_point(
-                          i, 2.0 * edge_quadrature_points[q_point](0) - 1.0, j);
+              else if (quadrature_points[q_point](2) < 0.5)
+                {
+                  const Point<3> quadrature_point(
+                    2.0 * quadrature_points[q_point](0) - 1.0,
+                    2.0 * quadrature_points[q_point](1) - 1.0,
+                    2.0 * quadrature_points[q_point](2));
 
-                        this->restriction[index][i + 4 * j + 2]((i + 4 * j) *
-                                                                  this->degree,
-                                                                dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 1);
-                        quadrature_point = Point<dim>(
-                          2.0 * edge_quadrature_points[q_point](0) - 1.0, i, j);
-                        this->restriction[index][2 * (i + 2 * j) + 1](
-                          (i + 4 * j + 2) * this->degree, dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 0);
-                        quadrature_point = Point<dim>(
-                          i, j, 2.0 * edge_quadrature_points[q_point](0) - 1.0);
-                        this->restriction[index][i + 2 * (j + 2)](
-                          (i + 2 * (j + 4)) * this->degree, dof) +=
-                          weight *
-                          this->shape_value_component(dof, quadrature_point, 2);
-                      }
-              }
+                  tmp(18) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 0);
+                  tmp(19) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 1);
+                  tmp(20) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 2);
+                }
 
-          // Then project the shape functions
-          // of the child cells to the higher
-          // order shape functions of the
-          // parent cell.
-          if (this->degree > 1)
-            {
-              const unsigned int deg = this->degree - 1;
-              const std::vector<Polynomials::Polynomial<double>>
-                &legendre_polynomials =
-                  Polynomials::Legendre::generate_complete_basis(deg);
-              FullMatrix<double> system_matrix_inv(deg, deg);
+              else
+                {
+                  const Point<3> quadrature_point(
+                    2.0 * quadrature_points[q_point](0) - 1.0,
+                    2.0 * quadrature_points[q_point](1) - 1.0,
+                    2.0 * quadrature_points[q_point](2) - 1.0);
 
-              {
-                FullMatrix<double> assembling_matrix(deg,
-                                                     n_edge_quadrature_points);
-
-                for (unsigned int q_point = 0;
-                     q_point < n_edge_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight =
-                      std::sqrt(edge_quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i < deg; ++i)
-                      assembling_matrix(i, q_point) =
-                        weight * legendre_polynomials[i + 1].value(
-                                   edge_quadrature_points[q_point](0));
-                  }
-
-                FullMatrix<double> system_matrix(deg, deg);
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              FullMatrix<double> solution(deg, 6);
-              FullMatrix<double> system_rhs(deg, 6);
-              Vector<double>     tmp(6);
+                  tmp(21) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 0);
+                  tmp(22) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 1);
+                  tmp(23) +=
+                    2.0 * this->shape_value_component(dof, quadrature_point, 2);
+                }
 
               for (unsigned int i = 0; i < 2; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
-                  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+                  for (unsigned int k = 0; k < 2; ++k)
+                    for (unsigned int l = 0; l <= deg; ++l)
+                      {
+                        tmp(3 * (i + 2 * (j + 2 * k))) -=
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (4 * i + j + 2) * this->degree + l, dof) *
+                          this->shape_value_component(
+                            (4 * i + j + 2) * this->degree + l,
+                            quadrature_points[q_point],
+                            0);
+                        tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (4 * i + k) * this->degree + l, dof) *
+                          this->shape_value_component(
+                            (4 * i + k) * this->degree + l,
+                            quadrature_points[q_point],
+                            1);
+                        tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (2 * (j + 4) + k) * this->degree + l, dof) *
+                          this->shape_value_component(
+                            (2 * (j + 4) + k) * this->degree + l,
+                            quadrature_points[q_point],
+                            2);
+
+                        for (unsigned int m = 0; m < deg; ++m)
+                          {
+                            tmp(3 * (i + 2 * (j + 2 * k))) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                ((2 * j + 5) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                ((2 * j + 5) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                0);
+                            tmp(3 * (i + 2 * (j + 2 * k))) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                (2 * (i + 4) * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                (2 * (i + 4) * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                0);
+                            tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                (2 * k * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                (2 * k * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                1);
+                            tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                ((2 * i + 9) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                ((2 * i + 9) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                1);
+                            tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                ((2 * k + 1) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                ((2 * k + 1) * deg + m) * this->degree + l +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                2);
+                            tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
+                              this->restriction[index][2 * (2 * i + j) + k](
+                                (2 * (j + 2) * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                dof) *
+                              this->shape_value_component(
+                                (2 * (j + 2) * this->degree + l) * deg + m +
+                                  n_edge_dofs,
+                                quadrature_points[q_point],
+                                2);
+                          }
+                      }
+
+              tmp *= quadrature.weight(q_point);
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                {
+                  const double L_i_0 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](0));
+                  const double L_i_1 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](1));
+                  const double L_i_2 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](2));
+
+                  for (unsigned int j = 0; j < deg; ++j)
                     {
-                      system_rhs = 0.0;
+                      const double l_j_0 =
+                        L_i_0 * lobatto_polynomials[j + 2].value(
+                                  quadrature_points[q_point](1));
+                      const double l_j_1 =
+                        L_i_1 * lobatto_polynomials[j + 2].value(
+                                  quadrature_points[q_point](0));
+                      const double l_j_2 =
+                        L_i_2 * lobatto_polynomials[j + 2].value(
+                                  quadrature_points[q_point](0));
 
-                      for (unsigned int q_point = 0;
-                           q_point < n_edge_quadrature_points;
-                           ++q_point)
+                      for (unsigned int k = 0; k < deg; ++k)
                         {
-                          const double weight = edge_quadrature.weight(q_point);
-                          const Point<dim> quadrature_point_0(
-                            i, edge_quadrature_points[q_point](0), j);
-                          const Point<dim> quadrature_point_1(
-                            edge_quadrature_points[q_point](0), i, j);
-                          const Point<dim> quadrature_point_2(
-                            i, j, edge_quadrature_points[q_point](0));
-
-                          if (edge_quadrature_points[q_point](0) < 0.5)
-                            {
-                              Point<dim> quadrature_point_3(
-                                i, 2.0 * edge_quadrature_points[q_point](0), j);
-
-                              tmp(0) =
-                                weight * (2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_3, 1) -
-                                          this->restriction[index][i + 4 * j](
-                                            (i + 4 * j) * this->degree, dof) *
-                                            this->shape_value_component(
-                                              (i + 4 * j) * this->degree,
-                                              quadrature_point_0,
-                                              1));
-                              tmp(1) =
-                                -1.0 * weight *
-                                this->restriction[index][i + 4 * j + 2](
-                                  (i + 4 * j) * this->degree, dof) *
-                                this->shape_value_component((i + 4 * j) *
-                                                              this->degree,
-                                                            quadrature_point_0,
-                                                            1);
-                              quadrature_point_3 = Point<dim>(
-                                2.0 * edge_quadrature_points[q_point](0), i, j);
-                              tmp(2) =
-                                weight *
-                                (2.0 * this->shape_value_component(
-                                         dof, quadrature_point_3, 0) -
-                                 this->restriction[index][2 * (i + 2 * j)](
-                                   (i + 4 * j + 2) * this->degree, dof) *
-                                   this->shape_value_component(
-                                     (i + 4 * j + 2) * this->degree,
-                                     quadrature_point_1,
-                                     0));
-                              tmp(3) =
-                                -1.0 * weight *
-                                this->restriction[index][2 * (i + 2 * j) + 1](
-                                  (i + 4 * j + 2) * this->degree, dof) *
-                                this->shape_value_component((i + 4 * j + 2) *
-                                                              this->degree,
-                                                            quadrature_point_1,
-                                                            0);
-                              quadrature_point_3 = Point<dim>(
-                                i, j, 2.0 * edge_quadrature_points[q_point](0));
-                              tmp(4) =
-                                weight *
-                                (2.0 * this->shape_value_component(
-                                         dof, quadrature_point_3, 2) -
-                                 this->restriction[index][i + 2 * j](
-                                   (i + 2 * (j + 4)) * this->degree, dof) *
-                                   this->shape_value_component(
-                                     (i + 2 * (j + 4)) * this->degree,
-                                     quadrature_point_2,
-                                     2));
-                              tmp(5) =
-                                -1.0 * weight *
-                                this->restriction[index][i + 2 * (j + 2)](
-                                  (i + 2 * (j + 4)) * this->degree, dof) *
-                                this->shape_value_component((i + 2 * (j + 4)) *
-                                                              this->degree,
-                                                            quadrature_point_2,
-                                                            2);
-                            }
-
-                          else
-                            {
-                              tmp(0) =
-                                -1.0 * weight *
-                                this->restriction[index][i + 4 * j](
-                                  (i + 4 * j) * this->degree, dof) *
-                                this->shape_value_component((i + 4 * j) *
-                                                              this->degree,
-                                                            quadrature_point_0,
-                                                            1);
-
-                              Point<dim> quadrature_point_3(
-                                i,
-                                2.0 * edge_quadrature_points[q_point](0) - 1.0,
-                                j);
-
-                              tmp(1) = weight *
-                                       (2.0 * this->shape_value_component(
-                                                dof, quadrature_point_3, 1) -
-                                        this->restriction[index][i + 4 * j + 2](
-                                          (i + 4 * j) * this->degree, dof) *
-                                          this->shape_value_component(
-                                            (i + 4 * j) * this->degree,
-                                            quadrature_point_0,
-                                            1));
-                              tmp(2) =
-                                -1.0 * weight *
-                                this->restriction[index][2 * (i + 2 * j)](
-                                  (i + 4 * j + 2) * this->degree, dof) *
-                                this->shape_value_component((i + 4 * j + 2) *
-                                                              this->degree,
-                                                            quadrature_point_1,
-                                                            0);
-                              quadrature_point_3 = Point<dim>(
-                                2.0 * edge_quadrature_points[q_point](0) - 1.0,
-                                i,
-                                j);
-                              tmp(3) =
-                                weight *
-                                (2.0 * this->shape_value_component(
-                                         dof, quadrature_point_3, 0) -
-                                 this->restriction[index][2 * (i + 2 * j) + 1](
-                                   (i + 4 * j + 2) * this->degree, dof) *
-                                   this->shape_value_component(
-                                     (i + 4 * j + 2) * this->degree,
-                                     quadrature_point_1,
-                                     0));
-                              tmp(4) =
-                                -1.0 * weight *
-                                this->restriction[index][i + 2 * j](
-                                  (i + 2 * (j + 4)) * this->degree, dof) *
-                                this->shape_value_component((i + 2 * (j + 4)) *
-                                                              this->degree,
-                                                            quadrature_point_2,
-                                                            2);
-                              quadrature_point_3 = Point<dim>(
-                                i,
-                                j,
-                                2.0 * edge_quadrature_points[q_point](0) - 1.0);
-                              tmp(5) =
-                                weight *
-                                (2.0 * this->shape_value_component(
-                                         dof, quadrature_point_3, 2) -
-                                 this->restriction[index][i + 2 * (j + 2)](
-                                   (i + 2 * (j + 4)) * this->degree, dof) *
-                                   this->shape_value_component(
-                                     (i + 2 * (j + 4)) * this->degree,
-                                     quadrature_point_2,
-                                     2));
-                            }
-
-                          for (unsigned int k = 0; k < deg; ++k)
-                            {
-                              const double L_k =
-                                legendre_polynomials[k + 1].value(
-                                  edge_quadrature_points[q_point](0));
-
-                              for (unsigned int l = 0; l < tmp.size(); ++l)
-                                system_rhs(k, l) += tmp(l) * L_k;
-                            }
-                        }
-
-                      system_matrix_inv.mmult(solution, system_rhs);
-
-                      for (unsigned int k = 0; k < 2; ++k)
-                        for (unsigned int l = 0; l < deg; ++l)
-                          {
-                            if (std::abs(solution(l, k)) > 1e-14)
-                              this->restriction[index][i + 2 * (2 * j + k)](
-                                (i + 4 * j) * this->degree + l + 1, dof) =
-                                solution(l, k);
-
-                            if (std::abs(solution(l, k + 2)) > 1e-14)
-                              this->restriction[index][2 * (i + 2 * j) + k](
-                                (i + 4 * j + 2) * this->degree + l + 1, dof) =
-                                solution(l, k + 2);
-
-                            if (std::abs(solution(l, k + 4)) > 1e-14)
-                              this->restriction[index][i + 2 * (j + 2 * k)](
-                                (i + 2 * (j + 4)) * this->degree + l + 1, dof) =
-                                solution(l, k + 4);
-                          }
-                    }
-
-              const QGauss<2>              face_quadrature(2 * this->degree);
-              const std::vector<Point<2>> &face_quadrature_points =
-                face_quadrature.get_points();
-              const std::vector<Polynomials::Polynomial<double>>
-                &lobatto_polynomials =
-                  Polynomials::Lobatto::generate_complete_basis(this->degree);
-              const unsigned int n_edge_dofs =
-                GeometryInfo<dim>::lines_per_cell * this->degree;
-              const unsigned int n_face_quadrature_points =
-                face_quadrature.size();
-
-              {
-                FullMatrix<double> assembling_matrix(deg * this->degree,
-                                                     n_face_quadrature_points);
-
-                for (unsigned int q_point = 0;
-                     q_point < n_face_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight =
-                      std::sqrt(face_quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i <= deg; ++i)
-                      {
-                        const double L_i =
-                          weight * legendre_polynomials[i].value(
-                                     face_quadrature_points[q_point](0));
-
-                        for (unsigned int j = 0; j < deg; ++j)
-                          assembling_matrix(i * deg + j, q_point) =
-                            L_i * lobatto_polynomials[j + 2].value(
-                                    face_quadrature_points[q_point](1));
-                      }
-                  }
-
-                FullMatrix<double> system_matrix(assembling_matrix.m(),
-                                                 assembling_matrix.m());
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              solution.reinit(system_matrix_inv.m(), 24);
-              system_rhs.reinit(system_matrix_inv.m(), 24);
-              tmp.reinit(24);
-
-              for (unsigned int i = 0; i < 2; ++i)
-                for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
-                  {
-                    system_rhs = 0.0;
-
-                    for (unsigned int q_point = 0;
-                         q_point < n_face_quadrature_points;
-                         ++q_point)
-                      {
-                        tmp = 0.0;
-
-                        if (face_quadrature_points[q_point](0) < 0.5)
-                          {
-                            if (face_quadrature_points[q_point](1) < 0.5)
-                              {
-                                Point<dim> quadrature_point_0(
-                                  i,
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  2.0 * face_quadrature_points[q_point](1));
-
-                                tmp(0) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 1);
-                                tmp(1) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 2);
-                                quadrature_point_0 = Point<dim>(
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  i,
-                                  2.0 * face_quadrature_points[q_point](1));
-                                tmp(8) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 2);
-                                tmp(9) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 0);
-                                quadrature_point_0 = Point<dim>(
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  2.0 * face_quadrature_points[q_point](1),
-                                  i);
-                                tmp(16) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 0);
-                                tmp(17) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 1);
-                              }
-
-                            else
-                              {
-                                Point<dim> quadrature_point_0(
-                                  i,
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  2.0 * face_quadrature_points[q_point](1) -
-                                    1.0);
-
-                                tmp(2) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 1);
-                                tmp(3) += 2.0 * this->shape_value_component(
-                                                  dof, quadrature_point_0, 2);
-                                quadrature_point_0 = Point<dim>(
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  i,
-                                  2.0 * face_quadrature_points[q_point](1) -
-                                    1.0);
-                                tmp(10) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 2);
-                                tmp(11) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 0);
-                                quadrature_point_0 = Point<dim>(
-                                  2.0 * face_quadrature_points[q_point](0),
-                                  2.0 * face_quadrature_points[q_point](1) -
-                                    1.0,
-                                  i);
-                                tmp(18) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 0);
-                                tmp(19) += 2.0 * this->shape_value_component(
-                                                   dof, quadrature_point_0, 1);
-                              }
-                          }
-
-                        else if (face_quadrature_points[q_point](1) < 0.5)
-                          {
-                            Point<dim> quadrature_point_0(
-                              i,
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              2.0 * face_quadrature_points[q_point](1));
-
-                            tmp(4) += 2.0 * this->shape_value_component(
-                                              dof, quadrature_point_0, 1);
-                            tmp(5) += 2.0 * this->shape_value_component(
-                                              dof, quadrature_point_0, 2);
-                            quadrature_point_0 = Point<dim>(
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              i,
-                              2.0 * face_quadrature_points[q_point](1));
-                            tmp(12) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 2);
-                            tmp(13) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 0);
-                            quadrature_point_0 = Point<dim>(
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              2.0 * face_quadrature_points[q_point](1),
-                              i);
-                            tmp(20) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 0);
-                            tmp(21) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 1);
-                          }
-
-                        else
-                          {
-                            Point<dim> quadrature_point_0(
-                              i,
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              2.0 * face_quadrature_points[q_point](1) - 1.0);
-
-                            tmp(6) += 2.0 * this->shape_value_component(
-                                              dof, quadrature_point_0, 1);
-                            tmp(7) += 2.0 * this->shape_value_component(
-                                              dof, quadrature_point_0, 2);
-                            quadrature_point_0 = Point<dim>(
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              i,
-                              2.0 * face_quadrature_points[q_point](1) - 1.0);
-                            tmp(14) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 2);
-                            tmp(15) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 0);
-                            quadrature_point_0 = Point<dim>(
-                              2.0 * face_quadrature_points[q_point](0) - 1.0,
-                              2.0 * face_quadrature_points[q_point](1) - 1.0,
-                              i);
-                            tmp(22) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 0);
-                            tmp(23) += 2.0 * this->shape_value_component(
-                                               dof, quadrature_point_0, 1);
-                          }
-
-                        const Point<dim> quadrature_point_0(
-                          i,
-                          face_quadrature_points[q_point](0),
-                          face_quadrature_points[q_point](1));
-                        const Point<dim> quadrature_point_1(
-                          face_quadrature_points[q_point](0),
-                          i,
-                          face_quadrature_points[q_point](1));
-                        const Point<dim> quadrature_point_2(
-                          face_quadrature_points[q_point](0),
-                          face_quadrature_points[q_point](1),
-                          i);
-
-                        for (unsigned int j = 0; j < 2; ++j)
-                          for (unsigned int k = 0; k < 2; ++k)
-                            for (unsigned int l = 0; l <= deg; ++l)
-                              {
-                                tmp(2 * (j + 2 * k)) -=
-                                  this->restriction[index][i + 2 * (2 * j + k)](
-                                    (i + 4 * j) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (i + 4 * j) * this->degree + l,
-                                    quadrature_point_0,
-                                    1);
-                                tmp(2 * (j + 2 * k) + 1) -=
-                                  this->restriction[index][i + 2 * (2 * j + k)](
-                                    (i + 2 * (k + 4)) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (i + 2 * (k + 4)) * this->degree + l,
-                                    quadrature_point_0,
-                                    2);
-                                tmp(2 * (j + 2 * (k + 2))) -=
-                                  this->restriction[index][2 * (i + 2 * j) + k](
-                                    (2 * (i + 4) + k) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (2 * (i + 4) + k) * this->degree + l,
-                                    quadrature_point_1,
-                                    2);
-                                tmp(2 * (j + 2 * k) + 9) -=
-                                  this->restriction[index][2 * (i + 2 * j) + k](
-                                    (i + 4 * j + 2) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (i + 4 * j + 2) * this->degree + l,
-                                    quadrature_point_1,
-                                    0);
-                                tmp(2 * (j + 2 * (k + 4))) -=
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (4 * i + j + 2) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (4 * i + j + 2) * this->degree + l,
-                                    quadrature_point_2,
-                                    0);
-                                tmp(2 * (j + 2 * k) + 17) -=
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (4 * i + k) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (4 * i + k) * this->degree + l,
-                                    quadrature_point_2,
-                                    1);
-                              }
-
-                        tmp *= face_quadrature.weight(q_point);
-
-                        for (unsigned int j = 0; j <= deg; ++j)
-                          {
-                            const double L_j_0 = legendre_polynomials[j].value(
-                              face_quadrature_points[q_point](0));
-                            const double L_j_1 = legendre_polynomials[j].value(
-                              face_quadrature_points[q_point](1));
-
-                            for (unsigned int k = 0; k < deg; ++k)
-                              {
-                                const double l_k_0 =
-                                  L_j_0 * lobatto_polynomials[k + 2].value(
-                                            face_quadrature_points[q_point](1));
-                                const double l_k_1 =
-                                  L_j_1 * lobatto_polynomials[k + 2].value(
-                                            face_quadrature_points[q_point](0));
-
-                                for (unsigned int l = 0; l < 4; ++l)
-                                  {
-                                    system_rhs(j * deg + k, 2 * l) +=
-                                      tmp(2 * l) * l_k_0;
-                                    system_rhs(j * deg + k, 2 * l + 1) +=
-                                      tmp(2 * l + 1) * l_k_1;
-                                    system_rhs(j * deg + k, 2 * (l + 4)) +=
-                                      tmp(2 * (l + 4)) * l_k_1;
-                                    system_rhs(j * deg + k, 2 * l + 9) +=
-                                      tmp(2 * l + 9) * l_k_0;
-                                    system_rhs(j * deg + k, 2 * (l + 8)) +=
-                                      tmp(2 * (l + 8)) * l_k_0;
-                                    system_rhs(j * deg + k, 2 * l + 17) +=
-                                      tmp(2 * l + 17) * l_k_1;
-                                  }
-                              }
-                          }
-                      }
-
-                    system_matrix_inv.mmult(solution, system_rhs);
-
-                    for (unsigned int j = 0; j < 2; ++j)
-                      for (unsigned int k = 0; k < 2; ++k)
-                        for (unsigned int l = 0; l <= deg; ++l)
-                          for (unsigned int m = 0; m < deg; ++m)
-                            {
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * k))) > 1e-14)
-                                this->restriction[index][i + 2 * (2 * j + k)](
-                                  (2 * i * this->degree + l) * deg + m +
-                                    n_edge_dofs,
-                                  dof) = solution(l * deg + m, 2 * (j + 2 * k));
-
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * k) + 1)) >
-                                  1e-14)
-                                this->restriction[index][i + 2 * (2 * j + k)](
-                                  ((2 * i + 1) * deg + m) * this->degree + l +
-                                    n_edge_dofs,
-                                  dof) =
-                                  solution(l * deg + m, 2 * (j + 2 * k) + 1);
-
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * (k + 2)))) >
-                                  1e-14)
-                                this->restriction[index][2 * (i + 2 * j) + k](
-                                  (2 * (i + 2) * this->degree + l) * deg + m +
-                                    n_edge_dofs,
-                                  dof) =
-                                  solution(l * deg + m, 2 * (j + 2 * (k + 2)));
-
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * k) + 9)) >
-                                  1e-14)
-                                this->restriction[index][2 * (i + 2 * j) + k](
-                                  ((2 * i + 5) * deg + m) * this->degree + l +
-                                    n_edge_dofs,
-                                  dof) =
-                                  solution(l * deg + m, 2 * (j + 2 * k) + 9);
-
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * (k + 4)))) >
-                                  1e-14)
-                                this->restriction[index][2 * (2 * i + j) + k](
-                                  (2 * (i + 4) * this->degree + l) * deg + m +
-                                    n_edge_dofs,
-                                  dof) =
-                                  solution(l * deg + m, 2 * (j + 2 * (k + 4)));
-
-                              if (std::abs(solution(l * deg + m,
-                                                    2 * (j + 2 * k) + 17)) >
-                                  1e-14)
-                                this->restriction[index][2 * (2 * i + j) + k](
-                                  ((2 * i + 9) * deg + m) * this->degree + l +
-                                    n_edge_dofs,
-                                  dof) =
-                                  solution(l * deg + m, 2 * (j + 2 * k) + 17);
-                            }
-                  }
-
-              const QGauss<dim>              quadrature(2 * this->degree);
-              const std::vector<Point<dim>> &quadrature_points =
-                quadrature.get_points();
-              const unsigned int n_boundary_dofs =
-                2 * GeometryInfo<dim>::faces_per_cell * deg * this->degree +
-                n_edge_dofs;
-              const unsigned int n_quadrature_points = quadrature.size();
-
-              {
-                FullMatrix<double> assembling_matrix(deg * deg * this->degree,
-                                                     n_quadrature_points);
-
-                for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight = std::sqrt(quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i <= deg; ++i)
-                      {
-                        const double L_i =
-                          weight * legendre_polynomials[i].value(
-                                     quadrature_points[q_point](0));
-
-                        for (unsigned int j = 0; j < deg; ++j)
-                          {
-                            const double l_j =
-                              L_i * lobatto_polynomials[j + 2].value(
+                          const double l_k_0 =
+                            l_j_0 * lobatto_polynomials[k + 2].value(
+                                      quadrature_points[q_point](2));
+                          const double l_k_1 =
+                            l_j_1 * lobatto_polynomials[k + 2].value(
+                                      quadrature_points[q_point](2));
+                          const double l_k_2 =
+                            l_j_2 * lobatto_polynomials[k + 2].value(
                                       quadrature_points[q_point](1));
 
-                            for (unsigned int k = 0; k < deg; ++k)
-                              assembling_matrix((i * deg + j) * deg + k,
-                                                q_point) =
-                                l_j * lobatto_polynomials[k + 2].value(
-                                        quadrature_points[q_point](2));
-                          }
-                      }
-                  }
-
-                FullMatrix<double> system_matrix(assembling_matrix.m(),
-                                                 assembling_matrix.m());
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              solution.reinit(system_matrix_inv.m(), 24);
-              system_rhs.reinit(system_matrix_inv.m(), 24);
-              tmp.reinit(24);
-
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
-                {
-                  system_rhs = 0.0;
-
-                  for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
-                    {
-                      tmp = 0.0;
-
-                      if (quadrature_points[q_point](0) < 0.5)
-                        {
-                          if (quadrature_points[q_point](1) < 0.5)
+                          for (unsigned int l = 0; l < 8; ++l)
                             {
-                              if (quadrature_points[q_point](2) < 0.5)
-                                {
-                                  const Point<dim> quadrature_point(
-                                    2.0 * quadrature_points[q_point](0),
-                                    2.0 * quadrature_points[q_point](1),
-                                    2.0 * quadrature_points[q_point](2));
-
-                                  tmp(0) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 0);
-                                  tmp(1) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 1);
-                                  tmp(2) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 2);
-                                }
-
-                              else
-                                {
-                                  const Point<dim> quadrature_point(
-                                    2.0 * quadrature_points[q_point](0),
-                                    2.0 * quadrature_points[q_point](1),
-                                    2.0 * quadrature_points[q_point](2) - 1.0);
-
-                                  tmp(3) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 0);
-                                  tmp(4) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 1);
-                                  tmp(5) += 2.0 * this->shape_value_component(
-                                                    dof, quadrature_point, 2);
-                                }
-                            }
-
-                          else if (quadrature_points[q_point](2) < 0.5)
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0),
-                                2.0 * quadrature_points[q_point](1) - 1.0,
-                                2.0 * quadrature_points[q_point](2));
-
-                              tmp(6) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 0);
-                              tmp(7) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 1);
-                              tmp(8) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 2);
-                            }
-
-                          else
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0),
-                                2.0 * quadrature_points[q_point](1) - 1.0,
-                                2.0 * quadrature_points[q_point](2) - 1.0);
-
-                              tmp(9) += 2.0 * this->shape_value_component(
-                                                dof, quadrature_point, 0);
-                              tmp(10) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 1);
-                              tmp(11) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 2);
-                            }
-                        }
-
-                      else if (quadrature_points[q_point](1) < 0.5)
-                        {
-                          if (quadrature_points[q_point](2) < 0.5)
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0) - 1.0,
-                                2.0 * quadrature_points[q_point](1),
-                                2.0 * quadrature_points[q_point](2));
-
-                              tmp(12) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 0);
-                              tmp(13) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 1);
-                              tmp(14) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 2);
-                            }
-
-                          else
-                            {
-                              const Point<dim> quadrature_point(
-                                2.0 * quadrature_points[q_point](0) - 1.0,
-                                2.0 * quadrature_points[q_point](1),
-                                2.0 * quadrature_points[q_point](2) - 1.0);
-
-                              tmp(15) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 0);
-                              tmp(16) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 1);
-                              tmp(17) += 2.0 * this->shape_value_component(
-                                                 dof, quadrature_point, 2);
-                            }
-                        }
-
-                      else if (quadrature_points[q_point](2) < 0.5)
-                        {
-                          const Point<dim> quadrature_point(
-                            2.0 * quadrature_points[q_point](0) - 1.0,
-                            2.0 * quadrature_points[q_point](1) - 1.0,
-                            2.0 * quadrature_points[q_point](2));
-
-                          tmp(18) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              0);
-                          tmp(19) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              1);
-                          tmp(20) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              2);
-                        }
-
-                      else
-                        {
-                          const Point<dim> quadrature_point(
-                            2.0 * quadrature_points[q_point](0) - 1.0,
-                            2.0 * quadrature_points[q_point](1) - 1.0,
-                            2.0 * quadrature_points[q_point](2) - 1.0);
-
-                          tmp(21) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              0);
-                          tmp(22) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              1);
-                          tmp(23) +=
-                            2.0 * this->shape_value_component(dof,
-                                                              quadrature_point,
-                                                              2);
-                        }
-
-                      for (unsigned int i = 0; i < 2; ++i)
-                        for (unsigned int j = 0; j < 2; ++j)
-                          for (unsigned int k = 0; k < 2; ++k)
-                            for (unsigned int l = 0; l <= deg; ++l)
-                              {
-                                tmp(3 * (i + 2 * (j + 2 * k))) -=
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (4 * i + j + 2) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (4 * i + j + 2) * this->degree + l,
-                                    quadrature_points[q_point],
-                                    0);
-                                tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (4 * i + k) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (4 * i + k) * this->degree + l,
-                                    quadrature_points[q_point],
-                                    1);
-                                tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (2 * (j + 4) + k) * this->degree + l, dof) *
-                                  this->shape_value_component(
-                                    (2 * (j + 4) + k) * this->degree + l,
-                                    quadrature_points[q_point],
-                                    2);
-
-                                for (unsigned int m = 0; m < deg; ++m)
-                                  {
-                                    tmp(3 * (i + 2 * (j + 2 * k))) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        ((2 * j + 5) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        ((2 * j + 5) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        0);
-                                    tmp(3 * (i + 2 * (j + 2 * k))) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        (2 * (i + 4) * this->degree + l) * deg +
-                                          m + n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        (2 * (i + 4) * this->degree + l) * deg +
-                                          m + n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        0);
-                                    tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        (2 * k * this->degree + l) * deg + m +
-                                          n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        (2 * k * this->degree + l) * deg + m +
-                                          n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        1);
-                                    tmp(3 * (i + 2 * (j + 2 * k)) + 1) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        ((2 * i + 9) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        ((2 * i + 9) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        1);
-                                    tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        ((2 * k + 1) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        ((2 * k + 1) * deg + m) * this->degree +
-                                          l + n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        2);
-                                    tmp(3 * (i + 2 * (j + 2 * k)) + 2) -=
-                                      this->restriction[index][2 * (2 * i + j) +
-                                                               k](
-                                        (2 * (j + 2) * this->degree + l) * deg +
-                                          m + n_edge_dofs,
-                                        dof) *
-                                      this->shape_value_component(
-                                        (2 * (j + 2) * this->degree + l) * deg +
-                                          m + n_edge_dofs,
-                                        quadrature_points[q_point],
-                                        2);
-                                  }
-                              }
-
-                      tmp *= quadrature.weight(q_point);
-
-                      for (unsigned int i = 0; i <= deg; ++i)
-                        {
-                          const double L_i_0 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](0));
-                          const double L_i_1 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](1));
-                          const double L_i_2 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](2));
-
-                          for (unsigned int j = 0; j < deg; ++j)
-                            {
-                              const double l_j_0 =
-                                L_i_0 * lobatto_polynomials[j + 2].value(
-                                          quadrature_points[q_point](1));
-                              const double l_j_1 =
-                                L_i_1 * lobatto_polynomials[j + 2].value(
-                                          quadrature_points[q_point](0));
-                              const double l_j_2 =
-                                L_i_2 * lobatto_polynomials[j + 2].value(
-                                          quadrature_points[q_point](0));
-
-                              for (unsigned int k = 0; k < deg; ++k)
-                                {
-                                  const double l_k_0 =
-                                    l_j_0 * lobatto_polynomials[k + 2].value(
-                                              quadrature_points[q_point](2));
-                                  const double l_k_1 =
-                                    l_j_1 * lobatto_polynomials[k + 2].value(
-                                              quadrature_points[q_point](2));
-                                  const double l_k_2 =
-                                    l_j_2 * lobatto_polynomials[k + 2].value(
-                                              quadrature_points[q_point](1));
-
-                                  for (unsigned int l = 0; l < 8; ++l)
-                                    {
-                                      system_rhs((i * deg + j) * deg + k,
-                                                 3 * l) += tmp(3 * l) * l_k_0;
-                                      system_rhs((i * deg + j) * deg + k,
-                                                 3 * l + 1) +=
-                                        tmp(3 * l + 1) * l_k_1;
-                                      system_rhs((i * deg + j) * deg + k,
-                                                 3 * l + 2) +=
-                                        tmp(3 * l + 2) * l_k_2;
-                                    }
-                                }
+                              system_rhs((i * deg + j) * deg + k, 3 * l) +=
+                                tmp(3 * l) * l_k_0;
+                              system_rhs((i * deg + j) * deg + k, 3 * l + 1) +=
+                                tmp(3 * l + 1) * l_k_1;
+                              system_rhs((i * deg + j) * deg + k, 3 * l + 2) +=
+                                tmp(3 * l + 2) * l_k_2;
                             }
                         }
                     }
-
-                  system_matrix_inv.mmult(solution, system_rhs);
-
-                  for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      for (unsigned int k = 0; k < 2; ++k)
-                        for (unsigned int l = 0; l <= deg; ++l)
-                          for (unsigned int m = 0; m < deg; ++m)
-                            for (unsigned int n = 0; n < deg; ++n)
-                              {
-                                if (std::abs(
-                                      solution((l * deg + m) * deg + n,
-                                               3 * (i + 2 * (j + 2 * k)))) >
-                                    1e-14)
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (l * deg + m) * deg + n + n_boundary_dofs,
-                                    dof) = solution((l * deg + m) * deg + n,
-                                                    3 * (i + 2 * (j + 2 * k)));
-
-                                if (std::abs(
-                                      solution((l * deg + m) * deg + n,
-                                               3 * (i + 2 * (j + 2 * k)) + 1)) >
-                                    1e-14)
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    (l + (m + deg) * this->degree) * deg + n +
-                                      n_boundary_dofs,
-                                    dof) =
-                                    solution((l * deg + m) * deg + n,
-                                             3 * (i + 2 * (j + 2 * k)) + 1);
-
-                                if (std::abs(
-                                      solution((l * deg + m) * deg + n,
-                                               3 * (i + 2 * (j + 2 * k)) + 2)) >
-                                    1e-14)
-                                  this->restriction[index][2 * (2 * i + j) + k](
-                                    l +
-                                      ((m + 2 * deg) * deg + n) * this->degree +
-                                      n_boundary_dofs,
-                                    dof) =
-                                    solution((l * deg + m) * deg + n,
-                                             3 * (i + 2 * (j + 2 * k)) + 2);
-                              }
                 }
             }
 
-          break;
-        }
+          system_matrix_inv.mmult(solution, system_rhs);
 
-      default:
-        Assert(false, ExcNotImplemented());
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = 0; k < 2; ++k)
+                for (unsigned int l = 0; l <= deg; ++l)
+                  for (unsigned int m = 0; m < deg; ++m)
+                    for (unsigned int n = 0; n < deg; ++n)
+                      {
+                        if (std::abs(solution((l * deg + m) * deg + n,
+                                              3 * (i + 2 * (j + 2 * k)))) >
+                            1e-14)
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (l * deg + m) * deg + n + n_boundary_dofs, dof) =
+                            solution((l * deg + m) * deg + n,
+                                     3 * (i + 2 * (j + 2 * k)));
+
+                        if (std::abs(solution((l * deg + m) * deg + n,
+                                              3 * (i + 2 * (j + 2 * k)) + 1)) >
+                            1e-14)
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            (l + (m + deg) * this->degree) * deg + n +
+                              n_boundary_dofs,
+                            dof) = solution((l * deg + m) * deg + n,
+                                            3 * (i + 2 * (j + 2 * k)) + 1);
+
+                        if (std::abs(solution((l * deg + m) * deg + n,
+                                              3 * (i + 2 * (j + 2 * k)) + 2)) >
+                            1e-14)
+                          this->restriction[index][2 * (2 * i + j) + k](
+                            l + ((m + 2 * deg) * deg + n) * this->degree +
+                              n_boundary_dofs,
+                            dof) = solution((l * deg + m) * deg + n,
+                                            3 * (i + 2 * (j + 2 * k)) + 2);
+                      }
+        }
     }
 }
 
@@ -2495,6 +2467,7 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
 
 
 
+// This function is implemented using three separate template specializations.
 template <>
 void
 FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
@@ -2506,450 +2479,406 @@ FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
 
 
 
-// In this function we compute the
-// subface interpolation matrix.
-// This is done by a projection-
-// based interpolation. Therefore
-// we first interpolate the
-// shape functions of the higher
-// order element on the lowest
-// order edge shape functions.
-// Then the remaining part of
-// the interpolated shape
-// functions is projected on the
-// higher order edge shape
-// functions, the face shape
-// functions and the interior
-// shape functions (if they all
-// exist).
-template <int dim>
+// In this function we compute the subface interpolation matrix. This is done
+// by a projection-based interpolation. Therefore, we first interpolate the
+// shape functions of the higher order element on the lowest order edge shape
+// functions. Then the remaining part of the interpolated shape functions is
+// projected on the higher order edge shape functions, the face shape functions
+// and the interior shape functions (if they all exist).
+template <>
 void
-FE_Nedelec<dim>::get_subface_interpolation_matrix(
-  const FiniteElement<dim> &source,
-  const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix) const
+FE_Nedelec<2>::get_subface_interpolation_matrix(
+  const FiniteElement<2> &source,
+  const unsigned int      subface,
+  FullMatrix<double> &    interpolation_matrix) const
 {
-  // this is only implemented, if the
-  // source FE is also a
-  // Nedelec element
+  // this is only implemented, if the source FE is also a Nedelec element
   AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
-                (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+                (dynamic_cast<const FE_Nedelec<2> *>(&source) != nullptr),
+              typename FiniteElement<2>::ExcInterpolationNotImplemented());
+  AssertDimension(interpolation_matrix.m(), source.dofs_per_face);
+  AssertDimension(interpolation_matrix.n(), this->dofs_per_face);
 
-  // ok, source is a Nedelec element, so
-  // we will be able to do the work
-  const FE_Nedelec<dim> &source_fe =
-    dynamic_cast<const FE_Nedelec<dim> &>(source);
+  // ok, source is a Nedelec element, so we will be able to do the work
+  const auto &source_fe = dynamic_cast<const FE_Nedelec<2> &>(source);
 
-  // Make sure, that the element,
-  // for which the DoFs should be
-  // constrained is the one with
-  // the higher polynomial degree.
-  // Actually the procedure will work
-  // also if this assertion is not
-  // satisfied. But the matrices
-  // produced in that case might
-  // lead to problems in the
-  // hp procedures, which use this
-  // method.
+  // Make sure, that the element, for which the DoFs should be constrained
+  // is the one with the higher polynomial degree. Actually the procedure
+  // will work also if this assertion is not satisfied. But the matrices
+  // produced in that case might lead to problems in the hp procedures,
+  // which use this method.
   Assert(this->dofs_per_face <= source_fe.dofs_per_face,
-         (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
+         (typename FiniteElement<2>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0.0;
-  // Perform projection-based interpolation
-  // as usual.
-  const QGauss<1>              edge_quadrature(source_fe.degree);
-  const std::vector<Point<1>> &edge_quadrature_points =
-    edge_quadrature.get_points();
+  // Perform projection-based interpolation as usual.
+  const QGauss<1>    edge_quadrature(source_fe.degree);
+  const auto &       edge_quadrature_points   = edge_quadrature.get_points();
   const unsigned int n_edge_quadrature_points = edge_quadrature.size();
 
-  switch (dim)
+  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+    for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+         ++q_point)
+      {
+        const Point<2> quadrature_point(
+          0.0, 0.5 * (edge_quadrature_points[q_point](0) + subface));
+
+        interpolation_matrix(0, dof) +=
+          0.5 * edge_quadrature.weight(q_point) *
+          this->shape_value_component(dof, quadrature_point, 1);
+      }
+
+  if (source_fe.degree > 1)
     {
-      case 2:
+      const auto &legendre_polynomials =
+        Polynomials::Legendre::generate_complete_basis(source_fe.degree - 1);
+      FullMatrix<double> system_matrix_inv(source_fe.degree - 1,
+                                           source_fe.degree - 1);
+
+      {
+        FullMatrix<double> assembling_matrix(source_fe.degree - 1,
+                                             n_edge_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+             ++q_point)
+          {
+            const double weight = std::sqrt(edge_quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
+              assembling_matrix(i, q_point) =
+                weight * legendre_polynomials[i + 1].value(
+                           edge_quadrature_points[q_point](0));
+          }
+
+        FullMatrix<double> system_matrix(source_fe.degree - 1,
+                                         source_fe.degree - 1);
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      Vector<double> solution(source_fe.degree - 1);
+      Vector<double> system_rhs(source_fe.degree - 1);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
         {
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
-            for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
-                 ++q_point)
-              {
-                const Point<dim> quadrature_point(
-                  0.0, 0.5 * (edge_quadrature_points[q_point](0) + subface));
+          system_rhs = 0.0;
 
-                interpolation_matrix(0, dof) +=
-                  0.5 * edge_quadrature.weight(q_point) *
-                  this->shape_value_component(dof, quadrature_point, 1);
-              }
-
-          if (source_fe.degree > 1)
+          for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+               ++q_point)
             {
-              const std::vector<Polynomials::Polynomial<double>>
-                &legendre_polynomials =
-                  Polynomials::Legendre::generate_complete_basis(
-                    source_fe.degree - 1);
-              FullMatrix<double> system_matrix_inv(source_fe.degree - 1,
-                                                   source_fe.degree - 1);
+              const Point<2> quadrature_point_0(
+                0.0, 0.5 * (edge_quadrature_points[q_point](0) + subface));
+              const Point<2> quadrature_point_1(
+                0.0, edge_quadrature_points[q_point](0));
+              const double tmp =
+                edge_quadrature.weight(q_point) *
+                (0.5 * this->shape_value_component(dof, quadrature_point_0, 1) -
+                 interpolation_matrix(0, dof) *
+                   source_fe.shape_value_component(0, quadrature_point_1, 1));
 
-              {
-                FullMatrix<double> assembling_matrix(source_fe.degree - 1,
-                                                     n_edge_quadrature_points);
+              for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
+                system_rhs(i) += tmp * legendre_polynomials[i + 1].value(
+                                         edge_quadrature_points[q_point](0));
+            }
 
-                for (unsigned int q_point = 0;
-                     q_point < n_edge_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight =
-                      std::sqrt(edge_quadrature.weight(q_point));
+          system_matrix_inv.vmult(solution, system_rhs);
 
-                    for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
-                      assembling_matrix(i, q_point) =
-                        weight * legendre_polynomials[i + 1].value(
-                                   edge_quadrature_points[q_point](0));
-                  }
+          for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
+            if (std::abs(solution(i)) > 1e-14)
+              interpolation_matrix(i + 1, dof) = solution(i);
+        }
+    }
+}
 
-                FullMatrix<double> system_matrix(source_fe.degree - 1,
-                                                 source_fe.degree - 1);
+// In this function we compute the subface interpolation matrix. This is done
+// by a projection-based interpolation. Therefore, we first interpolate the
+// shape functions of the higher order element on the lowest order edge shape
+// functions. Then the remaining part of the interpolated shape functions is
+// projected on the higher order edge shape functions, the face shape functions
+// and the interior shape functions (if they all exist).
+template <>
+void
+FE_Nedelec<3>::get_subface_interpolation_matrix(
+  const FiniteElement<3> &source,
+  const unsigned int      subface,
+  FullMatrix<double> &    interpolation_matrix) const
+{
+  // this is only implemented, if the source FE is also a Nedelec element
+  AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
+                (dynamic_cast<const FE_Nedelec<3> *>(&source) != nullptr),
+              typename FiniteElement<3>::ExcInterpolationNotImplemented());
+  AssertDimension(interpolation_matrix.m(), source.dofs_per_face);
+  AssertDimension(interpolation_matrix.n(), this->dofs_per_face);
 
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.invert(system_matrix);
-              }
+  // ok, source is a Nedelec element, so we will be able to do the work
+  const auto &source_fe = dynamic_cast<const FE_Nedelec<3> &>(source);
 
-              Vector<double> solution(source_fe.degree - 1);
-              Vector<double> system_rhs(source_fe.degree - 1);
+  // Make sure, that the element, for which the DoFs should be constrained
+  // is the one with the higher polynomial degree. Actually the procedure
+  // will work also if this assertion is not satisfied. But the matrices
+  // produced in that case might lead to problems in the hp procedures,
+  // which use this method.
+  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
+         (typename FiniteElement<3>::ExcInterpolationNotImplemented()));
+  interpolation_matrix = 0.0;
+  // Perform projection-based interpolation as usual.
+  const QGauss<1>    edge_quadrature(source_fe.degree);
+  const auto &       edge_quadrature_points   = edge_quadrature.get_points();
+  const unsigned int n_edge_quadrature_points = edge_quadrature.size();
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+  constexpr double shifts[4][2] = {{0.0, 0.0},
+                                   {1.0, 0.0},
+                                   {0.0, 1.0},
+                                   {1.0, 1.0}};
+
+  for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+    for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+         ++q_point)
+      {
+        const double weight = 0.5 * edge_quadrature.weight(q_point);
+
+        for (unsigned int i = 0; i < 2; ++i)
+          {
+            Point<3> quadrature_point(
+              0.5 * (i + shifts[subface][0]),
+              0.5 * (edge_quadrature_points[q_point](0) + shifts[subface][1]),
+              0.0);
+
+            interpolation_matrix(i * source_fe.degree, dof) +=
+              weight * this->shape_value_component(
+                         this->face_to_cell_index(dof, 4), quadrature_point, 1);
+            quadrature_point =
+              Point<3>(0.5 * (edge_quadrature_points[q_point](0) +
+                              shifts[subface][0]),
+                       0.5 * (i + shifts[subface][1]),
+                       0.0);
+            interpolation_matrix((i + 2) * source_fe.degree, dof) +=
+              weight * this->shape_value_component(
+                         this->face_to_cell_index(dof, 4), quadrature_point, 0);
+          }
+      }
+
+  if (source_fe.degree > 1)
+    {
+      const auto &legendre_polynomials =
+        Polynomials::Legendre::generate_complete_basis(source_fe.degree - 1);
+      FullMatrix<double> system_matrix_inv(source_fe.degree - 1,
+                                           source_fe.degree - 1);
+
+      {
+        FullMatrix<double> assembling_matrix(source_fe.degree - 1,
+                                             n_edge_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+             ++q_point)
+          {
+            const double weight = std::sqrt(edge_quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
+              assembling_matrix(i, q_point) =
+                weight * legendre_polynomials[i + 1].value(
+                           edge_quadrature_points[q_point](0));
+          }
+
+        FullMatrix<double> system_matrix(source_fe.degree - 1,
+                                         source_fe.degree - 1);
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      FullMatrix<double> solution(source_fe.degree - 1,
+                                  GeometryInfo<3>::lines_per_face);
+      FullMatrix<double> system_rhs(source_fe.degree - 1,
+                                    GeometryInfo<3>::lines_per_face);
+      Vector<double>     tmp(GeometryInfo<3>::lines_per_face);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+        {
+          system_rhs = 0.0;
+
+          for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
+               ++q_point)
+            {
+              const double weight = edge_quadrature.weight(q_point);
+
+              for (unsigned int i = 0; i < 2; ++i)
                 {
-                  system_rhs = 0.0;
+                  Point<3> quadrature_point_0(
+                    0.5 * (i + shifts[subface][0]),
+                    0.5 *
+                      (edge_quadrature_points[q_point](0) + shifts[subface][1]),
+                    0.0);
+                  Point<3> quadrature_point_1(
+                    i, edge_quadrature_points[q_point](0), 0.0);
 
-                  for (unsigned int q_point = 0;
-                       q_point < n_edge_quadrature_points;
-                       ++q_point)
-                    {
-                      const Point<dim> quadrature_point_0(
-                        0.0,
-                        0.5 * (edge_quadrature_points[q_point](0) + subface));
-                      const Point<dim> quadrature_point_1(
-                        0.0, edge_quadrature_points[q_point](0));
-                      const double tmp =
-                        edge_quadrature.weight(q_point) *
-                        (0.5 * this->shape_value_component(dof,
-                                                           quadrature_point_0,
-                                                           1) -
-                         interpolation_matrix(0, dof) *
-                           source_fe.shape_value_component(0,
-                                                           quadrature_point_1,
-                                                           1));
+                  tmp(i) =
+                    weight * (0.5 * this->shape_value_component(
+                                      this->face_to_cell_index(dof, 4),
+                                      quadrature_point_0,
+                                      1) -
+                              interpolation_matrix(i * source_fe.degree, dof) *
+                                source_fe.shape_value_component(
+                                  i * source_fe.degree, quadrature_point_1, 1));
+                  quadrature_point_0 =
+                    Point<3>(0.5 * (edge_quadrature_points[q_point](0) +
+                                    shifts[subface][0]),
+                             0.5 * (i + shifts[subface][1]),
+                             0.0);
+                  quadrature_point_1 =
+                    Point<3>(edge_quadrature_points[q_point](0), i, 0.0);
+                  tmp(i + 2) =
+                    weight *
+                    (0.5 *
+                       this->shape_value_component(this->face_to_cell_index(dof,
+                                                                            4),
+                                                   quadrature_point_0,
+                                                   0) -
+                     interpolation_matrix((i + 2) * source_fe.degree, dof) *
+                       source_fe.shape_value_component(
+                         (i + 2) * source_fe.degree, quadrature_point_1, 0));
+                }
 
-                      for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
-                        system_rhs(i) +=
-                          tmp * legendre_polynomials[i + 1].value(
-                                  edge_quadrature_points[q_point](0));
-                    }
+              for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
+                {
+                  const double L_i = legendre_polynomials[i + 1].value(
+                    edge_quadrature_points[q_point](0));
 
-                  system_matrix_inv.vmult(solution, system_rhs);
-
-                  for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
-                    if (std::abs(solution(i)) > 1e-14)
-                      interpolation_matrix(i + 1, dof) = solution(i);
+                  for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face;
+                       ++j)
+                    system_rhs(i, j) += tmp(j) * L_i;
                 }
             }
 
-          break;
+          system_matrix_inv.mmult(solution, system_rhs);
+
+          for (unsigned int i = 0; i < GeometryInfo<3>::lines_per_face; ++i)
+            for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+              if (std::abs(solution(j, i)) > 1e-14)
+                interpolation_matrix(i * source_fe.degree + j + 1, dof) =
+                  solution(j, i);
         }
 
-      case 3:
-        {
-          const double shifts[4][2] = {{0.0, 0.0},
-                                       {1.0, 0.0},
-                                       {0.0, 1.0},
-                                       {1.0, 1.0}};
+      const QGauss<2> quadrature(source_fe.degree);
+      const auto &    quadrature_points = quadrature.get_points();
+      const auto &    lobatto_polynomials =
+        Polynomials::Lobatto::generate_complete_basis(source_fe.degree);
+      const unsigned int n_boundary_dofs =
+        GeometryInfo<3>::lines_per_face * source_fe.degree;
+      const unsigned int n_quadrature_points = quadrature.size();
 
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
-            for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
-                 ++q_point)
+      {
+        FullMatrix<double> assembling_matrix(source_fe.degree *
+                                               (source_fe.degree - 1),
+                                             n_quadrature_points);
+
+        for (unsigned int q_point = 0; q_point < n_quadrature_points; ++q_point)
+          {
+            const double weight = std::sqrt(quadrature.weight(q_point));
+
+            for (unsigned int i = 0; i < source_fe.degree; ++i)
               {
-                const double weight = 0.5 * edge_quadrature.weight(q_point);
+                const double L_i = weight * legendre_polynomials[i].value(
+                                              quadrature_points[q_point](0));
 
-                for (unsigned int i = 0; i < 2; ++i)
-                  {
-                    Point<dim> quadrature_point(
-                      0.5 * (i + shifts[subface][0]),
-                      0.5 * (edge_quadrature_points[q_point](0) +
-                             shifts[subface][1]),
-                      0.0);
-
-                    interpolation_matrix(i * source_fe.degree, dof) +=
-                      weight *
-                      this->shape_value_component(
-                        this->face_to_cell_index(dof, 4), quadrature_point, 1);
-                    quadrature_point =
-                      Point<dim>(0.5 * (edge_quadrature_points[q_point](0) +
-                                        shifts[subface][0]),
-                                 0.5 * (i + shifts[subface][1]),
-                                 0.0);
-                    interpolation_matrix((i + 2) * source_fe.degree, dof) +=
-                      weight *
-                      this->shape_value_component(
-                        this->face_to_cell_index(dof, 4), quadrature_point, 0);
-                  }
-              }
-
-          if (source_fe.degree > 1)
-            {
-              const std::vector<Polynomials::Polynomial<double>>
-                &legendre_polynomials =
-                  Polynomials::Legendre::generate_complete_basis(
-                    source_fe.degree - 1);
-              FullMatrix<double> system_matrix_inv(source_fe.degree - 1,
-                                                   source_fe.degree - 1);
-
-              {
-                FullMatrix<double> assembling_matrix(source_fe.degree - 1,
-                                                     n_edge_quadrature_points);
-
-                for (unsigned int q_point = 0;
-                     q_point < n_edge_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight =
-                      std::sqrt(edge_quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
-                      assembling_matrix(i, q_point) =
-                        weight * legendre_polynomials[i + 1].value(
-                                   edge_quadrature_points[q_point](0));
-                  }
-
-                FullMatrix<double> system_matrix(source_fe.degree - 1,
-                                                 source_fe.degree - 1);
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              FullMatrix<double> solution(source_fe.degree - 1,
-                                          GeometryInfo<dim>::lines_per_face);
-              FullMatrix<double> system_rhs(source_fe.degree - 1,
-                                            GeometryInfo<dim>::lines_per_face);
-              Vector<double>     tmp(GeometryInfo<dim>::lines_per_face);
-
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
-                {
-                  system_rhs = 0.0;
-
-                  for (unsigned int q_point = 0;
-                       q_point < n_edge_quadrature_points;
-                       ++q_point)
-                    {
-                      const double weight = edge_quadrature.weight(q_point);
-
-                      for (unsigned int i = 0; i < 2; ++i)
-                        {
-                          Point<dim> quadrature_point_0(
-                            0.5 * (i + shifts[subface][0]),
-                            0.5 * (edge_quadrature_points[q_point](0) +
-                                   shifts[subface][1]),
-                            0.0);
-                          Point<dim> quadrature_point_1(
-                            i, edge_quadrature_points[q_point](0), 0.0);
-
-                          tmp(i) =
-                            weight *
-                            (0.5 * this->shape_value_component(
-                                     this->face_to_cell_index(dof, 4),
-                                     quadrature_point_0,
-                                     1) -
-                             interpolation_matrix(i * source_fe.degree, dof) *
-                               source_fe.shape_value_component(
-                                 i * source_fe.degree, quadrature_point_1, 1));
-                          quadrature_point_0 =
-                            Point<dim>(0.5 *
-                                         (edge_quadrature_points[q_point](0) +
-                                          shifts[subface][0]),
-                                       0.5 * (i + shifts[subface][1]),
-                                       0.0);
-                          quadrature_point_1 =
-                            Point<dim>(edge_quadrature_points[q_point](0),
-                                       i,
-                                       0.0);
-                          tmp(i + 2) =
-                            weight *
-                            (0.5 * this->shape_value_component(
-                                     this->face_to_cell_index(dof, 4),
-                                     quadrature_point_0,
-                                     0) -
-                             interpolation_matrix((i + 2) * source_fe.degree,
-                                                  dof) *
-                               source_fe.shape_value_component(
-                                 (i + 2) * source_fe.degree,
-                                 quadrature_point_1,
-                                 0));
-                        }
-
-                      for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
-                        {
-                          const double L_i = legendre_polynomials[i + 1].value(
-                            edge_quadrature_points[q_point](0));
-
-                          for (unsigned int j = 0;
-                               j < GeometryInfo<dim>::lines_per_face;
-                               ++j)
-                            system_rhs(i, j) += tmp(j) * L_i;
-                        }
-                    }
-
-                  system_matrix_inv.mmult(solution, system_rhs);
-
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::lines_per_face;
-                       ++i)
-                    for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
-                      if (std::abs(solution(j, i)) > 1e-14)
-                        interpolation_matrix(i * source_fe.degree + j + 1,
-                                             dof) = solution(j, i);
-                }
-
-              const QGauss<2>              quadrature(source_fe.degree);
-              const std::vector<Point<2>> &quadrature_points =
-                quadrature.get_points();
-              const std::vector<Polynomials::Polynomial<double>>
-                &lobatto_polynomials =
-                  Polynomials::Lobatto::generate_complete_basis(
-                    source_fe.degree);
-              const unsigned int n_boundary_dofs =
-                GeometryInfo<dim>::lines_per_face * source_fe.degree;
-              const unsigned int n_quadrature_points = quadrature.size();
-
-              {
-                FullMatrix<double> assembling_matrix(source_fe.degree *
-                                                       (source_fe.degree - 1),
-                                                     n_quadrature_points);
-
-                for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                     ++q_point)
-                  {
-                    const double weight = std::sqrt(quadrature.weight(q_point));
-
-                    for (unsigned int i = 0; i < source_fe.degree; ++i)
-                      {
-                        const double L_i =
-                          weight * legendre_polynomials[i].value(
-                                     quadrature_points[q_point](0));
-
-                        for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
-                          assembling_matrix(i * (source_fe.degree - 1) + j,
-                                            q_point) =
-                            L_i * lobatto_polynomials[j + 2].value(
-                                    quadrature_points[q_point](1));
-                      }
-                  }
-
-                FullMatrix<double> system_matrix(assembling_matrix.m(),
-                                                 assembling_matrix.m());
-
-                assembling_matrix.mTmult(system_matrix, assembling_matrix);
-                system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
-                system_matrix_inv.invert(system_matrix);
-              }
-
-              solution.reinit(system_matrix_inv.m(), 2);
-              system_rhs.reinit(system_matrix_inv.m(), 2);
-              tmp.reinit(2);
-
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
-                {
-                  system_rhs = 0.0;
-
-                  for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
-                    {
-                      Point<dim> quadrature_point(
-                        0.5 *
-                          (quadrature_points[q_point](0) + shifts[subface][0]),
-                        0.5 *
-                          (quadrature_points[q_point](1) + shifts[subface][1]),
-                        0.0);
-                      tmp(0) = 0.5 * this->shape_value_component(
-                                       this->face_to_cell_index(dof, 4),
-                                       quadrature_point,
-                                       0);
-                      tmp(1) = 0.5 * this->shape_value_component(
-                                       this->face_to_cell_index(dof, 4),
-                                       quadrature_point,
-                                       1);
-                      quadrature_point =
-                        Point<dim>(quadrature_points[q_point](0),
-                                   quadrature_points[q_point](1),
-                                   0.0);
-
-                      for (unsigned int i = 0; i < 2; ++i)
-                        for (unsigned int j = 0; j < source_fe.degree; ++j)
-                          {
-                            tmp(0) -= interpolation_matrix(
-                                        (i + 2) * source_fe.degree + j, dof) *
-                                      source_fe.shape_value_component(
-                                        (i + 2) * source_fe.degree + j,
-                                        quadrature_point,
-                                        0);
-                            tmp(1) -=
-                              interpolation_matrix(i * source_fe.degree + j,
-                                                   dof) *
-                              source_fe.shape_value_component(
-                                i * source_fe.degree + j, quadrature_point, 1);
-                          }
-
-                      tmp *= quadrature.weight(q_point);
-
-                      for (unsigned int i = 0; i < source_fe.degree; ++i)
-                        {
-                          const double L_i_0 = legendre_polynomials[i].value(
-                            quadrature_points[q_point](0));
-                          const double L_i_1 = legendre_polynomials[i].value(
+                for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+                  assembling_matrix(i * (source_fe.degree - 1) + j, q_point) =
+                    L_i * lobatto_polynomials[j + 2].value(
                             quadrature_points[q_point](1));
+              }
+          }
 
-                          for (unsigned int j = 0; j < source_fe.degree - 1;
-                               ++j)
-                            {
-                              system_rhs(i * (source_fe.degree - 1) + j, 0) +=
-                                tmp(0) * L_i_0 *
-                                lobatto_polynomials[j + 2].value(
-                                  quadrature_points[q_point](1));
-                              system_rhs(i * (source_fe.degree - 1) + j, 1) +=
-                                tmp(1) * L_i_1 *
-                                lobatto_polynomials[j + 2].value(
-                                  quadrature_points[q_point](0));
-                            }
-                        }
+        FullMatrix<double> system_matrix(assembling_matrix.m(),
+                                         assembling_matrix.m());
+
+        assembling_matrix.mTmult(system_matrix, assembling_matrix);
+        system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
+        system_matrix_inv.invert(system_matrix);
+      }
+
+      solution.reinit(system_matrix_inv.m(), 2);
+      system_rhs.reinit(system_matrix_inv.m(), 2);
+      tmp.reinit(2);
+
+      for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+        {
+          system_rhs = 0.0;
+
+          for (unsigned int q_point = 0; q_point < n_quadrature_points;
+               ++q_point)
+            {
+              Point<3> quadrature_point(
+                0.5 * (quadrature_points[q_point](0) + shifts[subface][0]),
+                0.5 * (quadrature_points[q_point](1) + shifts[subface][1]),
+                0.0);
+              tmp(0) =
+                0.5 * this->shape_value_component(
+                        this->face_to_cell_index(dof, 4), quadrature_point, 0);
+              tmp(1) =
+                0.5 * this->shape_value_component(
+                        this->face_to_cell_index(dof, 4), quadrature_point, 1);
+              quadrature_point = Point<3>(quadrature_points[q_point](0),
+                                          quadrature_points[q_point](1),
+                                          0.0);
+
+              for (unsigned int i = 0; i < 2; ++i)
+                for (unsigned int j = 0; j < source_fe.degree; ++j)
+                  {
+                    tmp(0) -=
+                      interpolation_matrix((i + 2) * source_fe.degree + j,
+                                           dof) *
+                      source_fe.shape_value_component(
+                        (i + 2) * source_fe.degree + j, quadrature_point, 0);
+                    tmp(1) -=
+                      interpolation_matrix(i * source_fe.degree + j, dof) *
+                      source_fe.shape_value_component(i * source_fe.degree + j,
+                                                      quadrature_point,
+                                                      1);
+                  }
+
+              tmp *= quadrature.weight(q_point);
+
+              for (unsigned int i = 0; i < source_fe.degree; ++i)
+                {
+                  const double L_i_0 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](0));
+                  const double L_i_1 = legendre_polynomials[i].value(
+                    quadrature_points[q_point](1));
+
+                  for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+                    {
+                      system_rhs(i * (source_fe.degree - 1) + j, 0) +=
+                        tmp(0) * L_i_0 *
+                        lobatto_polynomials[j + 2].value(
+                          quadrature_points[q_point](1));
+                      system_rhs(i * (source_fe.degree - 1) + j, 1) +=
+                        tmp(1) * L_i_1 *
+                        lobatto_polynomials[j + 2].value(
+                          quadrature_points[q_point](0));
                     }
-
-                  system_matrix_inv.mmult(solution, system_rhs);
-
-                  for (unsigned int i = 0; i < source_fe.degree; ++i)
-                    for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
-                      {
-                        if (std::abs(solution(i * (source_fe.degree - 1) + j,
-                                              0)) > 1e-14)
-                          interpolation_matrix(i * (source_fe.degree - 1) + j +
-                                                 n_boundary_dofs,
-                                               dof) =
-                            solution(i * (source_fe.degree - 1) + j, 0);
-
-                        if (std::abs(solution(i * (source_fe.degree - 1) + j,
-                                              1)) > 1e-14)
-                          interpolation_matrix(
-                            i + (j + source_fe.degree - 1) * source_fe.degree +
-                              n_boundary_dofs,
-                            dof) = solution(i * (source_fe.degree - 1) + j, 1);
-                      }
                 }
             }
 
-          break;
-        }
+          system_matrix_inv.mmult(solution, system_rhs);
 
-      default:
-        Assert(false, ExcNotImplemented());
+          for (unsigned int i = 0; i < source_fe.degree; ++i)
+            for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+              {
+                if (std::abs(solution(i * (source_fe.degree - 1) + j, 0)) >
+                    1e-14)
+                  interpolation_matrix(i * (source_fe.degree - 1) + j +
+                                         n_boundary_dofs,
+                                       dof) =
+                    solution(i * (source_fe.degree - 1) + j, 0);
+
+                if (std::abs(solution(i * (source_fe.degree - 1) + j, 1)) >
+                    1e-14)
+                  interpolation_matrix(
+                    i + (j + source_fe.degree - 1) * source_fe.degree +
+                      n_boundary_dofs,
+                    dof) = solution(i * (source_fe.degree - 1) + j, 1);
+              }
+        }
     }
 }
 

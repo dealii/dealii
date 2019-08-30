@@ -294,8 +294,8 @@ MappingCartesian<dim, spacedim>::compute_fill(
         {
           case 1:
             {
-              static const Point<dim> normals[GeometryInfo<1>::faces_per_cell] =
-                {Point<dim>(-1.), Point<dim>(1.)};
+              constexpr Point<1> normals[GeometryInfo<1>::faces_per_cell] =
+                {Point<1>(-1.), Point<1>(1.)};
               std::fill(normal_vectors.begin(),
                         normal_vectors.end(),
                         normals[face_no]);
@@ -304,11 +304,11 @@ MappingCartesian<dim, spacedim>::compute_fill(
 
           case 2:
             {
-              static const Point<dim> normals[GeometryInfo<2>::faces_per_cell] =
-                {Point<dim>(-1, 0),
-                 Point<dim>(1, 0),
-                 Point<dim>(0, -1),
-                 Point<dim>(0, 1)};
+              constexpr Point<2> normals[GeometryInfo<2>::faces_per_cell] =
+                {Point<2>(-1, 0),
+                 Point<2>(1, 0),
+                 Point<2>(0, -1),
+                 Point<2>(0, 1)};
               std::fill(normal_vectors.begin(),
                         normal_vectors.end(),
                         normals[face_no]);
@@ -317,13 +317,13 @@ MappingCartesian<dim, spacedim>::compute_fill(
 
           case 3:
             {
-              static const Point<dim> normals[GeometryInfo<3>::faces_per_cell] =
-                {Point<dim>(-1, 0, 0),
-                 Point<dim>(1, 0, 0),
-                 Point<dim>(0, -1, 0),
-                 Point<dim>(0, 1, 0),
-                 Point<dim>(0, 0, -1),
-                 Point<dim>(0, 0, 1)};
+              constexpr Point<3> normals[GeometryInfo<3>::faces_per_cell] =
+                {Point<3>(-1, 0, 0),
+                 Point<3>(1, 0, 0),
+                 Point<3>(0, -1, 0),
+                 Point<3>(0, 1, 0),
+                 Point<3>(0, 0, -1),
+                 Point<3>(0, 0, 1)};
               std::fill(normal_vectors.begin(),
                         normal_vectors.end(),
                         normals[face_no]);

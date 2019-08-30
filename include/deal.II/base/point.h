@@ -116,14 +116,13 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV
-  Point();
+  DEAL_II_CUDA_HOST_DEV constexpr Point();
 
   /**
    * Convert a tensor to a point.
    */
-  explicit DEAL_II_CUDA_HOST_DEV
-  Point(const Tensor<1, dim, Number> &);
+  explicit DEAL_II_CUDA_HOST_DEV constexpr Point(
+    const Tensor<1, dim, Number> &);
 
   /**
    * Constructor for one dimensional points. This function is only implemented
@@ -133,8 +132,7 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  explicit DEAL_II_CUDA_HOST_DEV
-  Point(const Number x);
+  explicit DEAL_II_CUDA_HOST_DEV constexpr Point(const Number x);
 
   /**
    * Constructor for two dimensional points. This function is only implemented
@@ -145,8 +143,7 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV
-  Point(const Number x, const Number y);
+  DEAL_II_CUDA_HOST_DEV constexpr Point(const Number x, const Number y);
 
   /**
    * Constructor for three dimensional points. This function is only
@@ -157,8 +154,9 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV
-  Point(const Number x, const Number y, const Number z);
+  DEAL_II_CUDA_HOST_DEV constexpr Point(const Number x,
+                                        const Number y,
+                                        const Number z);
 
   /**
    * Convert a boost::geometry::point to a dealii::Point.
@@ -176,24 +174,24 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  static DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                               unit_vector(const unsigned int i);
+  static DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR Point<dim, Number>
+                                                 unit_vector(const unsigned int i);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number
-                        operator()(const unsigned int index) const;
+  DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR Number
+                                          operator()(const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number &
-                        operator()(const unsigned int index);
+  DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR Number &
+                                          operator()(const unsigned int index);
 
   /**
    * Assignment operator from Tensor<1, dim, Number> with different underlying
@@ -201,8 +199,8 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Point<dim, Number> &
-  operator=(const Tensor<1, dim, OtherNumber> &p);
+  DEAL_II_CONSTEXPR Point<dim, Number> &
+                    operator=(const Tensor<1, dim, OtherNumber> &p);
 
   /**
    * @name Addition and subtraction of points.
@@ -344,14 +342,14 @@ public:
 // At least clang-3.7 requires us to have a user-defined constructor
 // and we can't use 'Point<dim,Number>::Point () = default' here.
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point() // NOLINT
 {}
 
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Tensor<1, dim, Number> &t)
   : Tensor<1, dim, Number>(t)
 {}
@@ -359,77 +357,46 @@ Point<dim, Number>::Point(const Tensor<1, dim, Number> &t)
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x)
+  : Tensor<1, dim, Number>{{x}}
 {
-#  ifndef __CUDA_ARCH__
-  Assert(dim == 1,
-         ExcMessage(
-           "You can only initialize Point<1> objects using the constructor "
-           "that takes only one argument. Point<dim> objects with dim!=1 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
-
-  // we can only get here if we pass the assertion. use the switch anyway so
-  // as to avoid compiler warnings about uninitialized elements or writing
-  // beyond the end of the 'values' array
-  switch (dim)
-    {
-      case 1:
-        this->values[0] = x;
-        break;
-
-      default:;
-    }
+  static_assert(
+    dim == 1,
+    "You can only initialize Point<1> objects using the constructor "
+    "that takes only one argument. Point<dim> objects with dim!=1 "
+    "require initialization with the constructor that takes 'dim' "
+    "arguments.");
 }
 
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y)
+  : Tensor<1, dim, Number>{{x, y}}
 {
-#  ifndef __CUDA_ARCH__
-  Assert(dim == 2,
-         ExcMessage(
-           "You can only initialize Point<2> objects using the constructor "
-           "that takes two arguments. Point<dim> objects with dim!=2 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
-
-  // we can only get here if we pass the assertion. use the indirection anyway
-  // so as to avoid compiler warnings about uninitialized elements or writing
-  // beyond the end of the 'values' array
-  constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
-  this->values[0]                = x;
-  this->values[y_index]          = y;
+  static_assert(
+    dim == 2,
+    "You can only initialize Point<2> objects using the constructor "
+    "that takes two arguments. Point<dim> objects with dim!=2 "
+    "require initialization with the constructor that takes 'dim' "
+    "arguments.");
 }
 
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Number x, const Number y, const Number z)
+  : Tensor<1, dim, Number>{{x, y, z}}
 {
-#  ifndef __CUDA_ARCH__
-  Assert(dim == 3,
-         ExcMessage(
-           "You can only initialize Point<3> objects using the constructor "
-           "that takes three arguments. Point<dim> objects with dim!=3 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
-
-  // we can only get here if we pass the assertion. use the indirection anyway
-  // so as to avoid compiler warnings about uninitialized elements or writing
-  // beyond the end of the 'values' array
-  constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
-  constexpr unsigned int z_index = (dim < 3) ? 0 : 2;
-  this->values[0]                = x;
-  this->values[y_index]          = y;
-  this->values[z_index]          = z;
+  static_assert(
+    dim == 3,
+    "You can only initialize Point<3> objects using the constructor "
+    "that takes three arguments. Point<dim> objects with dim!=3 "
+    "require initialization with the constructor that takes 'dim' "
+    "arguments.");
 }
 
 
@@ -457,8 +424,8 @@ inline Point<dim, Number>::Point(
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                             Point<dim, Number>::unit_vector(unsigned int i)
+inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim, Number>
+                                               Point<dim, Number>::unit_vector(unsigned int i)
 {
   Point<dim, Number> p;
   p[i] = 1.;
@@ -467,7 +434,7 @@ inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Number
+inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Number
 Point<dim, Number>::operator()(const unsigned int index) const
 {
 #  ifndef __CUDA_ARCH__
@@ -479,7 +446,7 @@ Point<dim, Number>::operator()(const unsigned int index) const
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Number &
+inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Number &
 Point<dim, Number>::operator()(const unsigned int index)
 {
 #  ifndef __CUDA_ARCH__
@@ -492,7 +459,7 @@ Point<dim, Number>::operator()(const unsigned int index)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE Point<dim, Number> &
+inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE Point<dim, Number> &
 Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p)
 {
   Tensor<1, dim, Number>::operator=(p);

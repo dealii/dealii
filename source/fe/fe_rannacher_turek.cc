@@ -90,19 +90,25 @@ void
 FE_RannacherTurek<dim>::initialize_support_points()
 {
   Assert(dim == 2, ExcNotImplemented());
-  dealii::QGauss<dim - 1> face_quadrature(this->n_face_support_points);
+}
+
+template <>
+void
+FE_RannacherTurek<2>::initialize_support_points()
+{
+  dealii::QGauss<1> face_quadrature(this->n_face_support_points);
   this->weights = face_quadrature.get_weights();
   this->generalized_support_points.resize(4 * face_quadrature.size());
   for (unsigned int q = 0; q < face_quadrature.size(); ++q)
     {
       this->generalized_support_points[0 * face_quadrature.size() + q] =
-        dealii::Point<dim>(0, 1 - face_quadrature.point(q)(0));
+        dealii::Point<2>(0, 1 - face_quadrature.point(q)(0));
       this->generalized_support_points[1 * face_quadrature.size() + q] =
-        dealii::Point<dim>(1, 1 - face_quadrature.point(q)(0));
+        dealii::Point<2>(1, 1 - face_quadrature.point(q)(0));
       this->generalized_support_points[2 * face_quadrature.size() + q] =
-        dealii::Point<dim>(face_quadrature.point(q)(0), 0);
+        dealii::Point<2>(face_quadrature.point(q)(0), 0);
       this->generalized_support_points[3 * face_quadrature.size() + q] =
-        dealii::Point<dim>(face_quadrature.point(q)(0), 1);
+        dealii::Point<2>(face_quadrature.point(q)(0), 1);
     }
 }
 
