@@ -50,9 +50,9 @@ namespace Algorithms
   {
     param.enter_subsection("Newton");
     ReductionControl::declare_parameters(param);
-    param.declare_entry("Assemble threshold", "0.", Patterns::Double());
-    param.declare_entry("Stepsize iterations", "21", Patterns::Integer());
-    param.declare_entry("Debug level", "0", Patterns::Integer());
+    param.declare_entry("Assemble threshold", "0.", Patterns::Double(0.));
+    param.declare_entry("Stepsize iterations", "21", Patterns::Integer(0));
+    param.declare_entry("Debug level", "0", Patterns::Integer(0));
     param.declare_entry("Debug vectors", "false", Patterns::Bool());
     param.leave_subsection();
   }
@@ -65,6 +65,7 @@ namespace Algorithms
     control.parse_parameters(param);
     assemble_threshold    = param.get_double("Assemble threshold");
     n_stepsize_iterations = param.get_integer("Stepsize iterations");
+    debug                 = param.get_integer("Debug level");
     debug_vectors         = param.get_bool("Debug vectors");
     param.leave_subsection();
   }
