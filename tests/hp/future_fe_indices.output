@@ -1,12 +1,12 @@
 
 DEAL:1D::cell:0_1:0, future_fe:1
-DEAL:1D::cell:0_1:1, future_fe:2
+DEAL:1D::cell:0_1:1, future_fe:0
 DEAL:2D::cell:0_1:0, future_fe:1
-DEAL:2D::cell:0_1:1, future_fe:2
+DEAL:2D::cell:0_1:1, future_fe:0
 DEAL:2D::cell:0_1:2, future_fe:0
 DEAL:2D::cell:0_1:3, future_fe:0
 DEAL:3D::cell:0_1:0, future_fe:1
-DEAL:3D::cell:0_1:1, future_fe:2
+DEAL:3D::cell:0_1:1, future_fe:0
 DEAL:3D::cell:0_1:2, future_fe:0
 DEAL:3D::cell:0_1:3, future_fe:0
 DEAL:3D::cell:0_1:4, future_fe:0

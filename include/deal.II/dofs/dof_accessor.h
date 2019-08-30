@@ -1947,6 +1947,28 @@ public:
    */
 
   /**
+   * Return the finite element that will be assigned to this cell next time the
+   * triangulation gets refined and coarsened. If no future finite element has
+   * been specified for this cell via the set_future_fe_index() function, the
+   * active one will remain unchanged, in which case the active finite element
+   * will be returned.
+   *
+   * For non-hp DoF handlers, this is of course always the same element,
+   * independent of the cell we are presently on, but for hp DoF handlers, this
+   * may change from cell to cell.
+   *
+   * @note Since degrees of freedom only exist on active cells for
+   * hp::DoFHandler (i.e., there is currently no implementation of multilevel
+   * hp::DoFHandler objects), it does not make sense to query the finite
+   * element on non-active cells since they do not have finite element spaces
+   * associated with them without having any degrees of freedom. Consequently,
+   * this function will produce an exception when called on non-active cells.
+   */
+  const FiniteElement<DoFHandlerType::dimension,
+                      DoFHandlerType::space_dimension> &
+  get_future_fe() const;
+
+  /**
    * Return the fe_index of the finite element that will be assigned to this
    * cell next time the triangulation gets refined and coarsened. If no future
    * finite element has been specified for this cell via the
