@@ -1904,17 +1904,15 @@ namespace internal
       size_type                                                      shift = 0)
     {
       Assert(shift == 0, ExcNotImplemented());
-      const int              n_constraints = cm.size();
-      std::vector<size_type> constrained_local_dofs_host(n_constraints);
+      std::vector<size_type> constrained_local_dofs_host;
+      constrained_local_dofs_host.reserve(cm.size());
 
-      std::transform(cm.begin(),
-                     cm.end(),
-                     constrained_local_dofs_host.begin(),
-                     [&vec](const size_type global_index) {
-                       return vec.get_partitioner()->global_to_local(
-                         global_index);
-                     });
+      for (const auto global_index : cm)
+        if (vec.in_local_range(global_index))
+          constrained_local_dofs_host.push_back(
+            vec.get_partitioner()->global_to_local(global_index));
 
+      const int  n_constraints = constrained_local_dofs_host.size();
       size_type *constrained_local_dofs_device;
       Utilities::CUDA::malloc(constrained_local_dofs_device, n_constraints);
       Utilities::CUDA::copy_to_dev(constrained_local_dofs_host,
@@ -1922,7 +1920,7 @@ namespace internal
 
       const int n_blocks = 1 + (n_constraints - 1) / CUDAWrappers::block_size;
       set_zero_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
-        constrained_local_dofs_device, cm.size(), vec.get_values());
+        constrained_local_dofs_device, n_constraints, vec.get_values());
 #  ifdef DEBUG
       // Check that the kernel was launched correctly
       AssertCuda(cudaGetLastError());
