@@ -4785,6 +4785,19 @@ FEFaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
+template <template <int, int> class DoFHandlerType, bool lda>
+void
+FEFaceValues<dim, spacedim>::reinit(
+  const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>, lda>> &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &             face)
+{
+  const auto face_n = cell->face_iterator_to_index(face);
+  reinit(cell, face_n);
+}
+
+
+
+template <int dim, int spacedim>
 void
 FEFaceValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -4802,6 +4815,18 @@ FEFaceValues<dim, spacedim>::reinit(
   // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit(face_no);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEFaceValues<dim, spacedim>::reinit(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face)
+{
+  const auto face_n = cell->face_iterator_to_index(face);
+  reinit(cell, face_n);
 }
 
 
@@ -4981,6 +5006,21 @@ FESubfaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
+template <template <int, int> class DoFHandlerType, bool lda>
+void
+FESubfaceValues<dim, spacedim>::reinit(
+  const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>, lda>> &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &             face,
+  const typename Triangulation<dim, spacedim>::face_iterator &subface)
+{
+  reinit(cell,
+         cell->face_iterator_to_index(face),
+         face->child_iterator_to_index(subface));
+}
+
+
+
+template <int dim, int spacedim>
 void
 FESubfaceValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -5001,6 +5041,20 @@ FESubfaceValues<dim, spacedim>::reinit(
   // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit(face_no, subface_no);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FESubfaceValues<dim, spacedim>::reinit(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face,
+  const typename Triangulation<dim, spacedim>::face_iterator &subface)
+{
+  reinit(cell,
+         cell->face_iterator_to_index(face),
+         face->child_iterator_to_index(subface));
 }
 
 
