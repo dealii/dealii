@@ -58,7 +58,7 @@ namespace Algorithms
   {
     param.enter_subsection("ThetaTimestepping");
     TimestepControl::declare_parameters(param);
-    param.declare_entry("Theta", ".5", Patterns::Double());
+    param.declare_entry("Theta", ".5", Patterns::Double(0., 1.));
     param.declare_entry("Adaptive", "false", Patterns::Bool());
     param.leave_subsection();
   }
