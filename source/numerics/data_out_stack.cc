@@ -337,51 +337,16 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
 
       // first fill in the vertices of the patch
 
-      // Patches are organized such
-      // that the parameter direction
-      // is the last
-      // coordinate. Thus, vertices
-      // are two copies of the space
-      // patch, one at parameter-step
-      // and one at parameter.
-      switch (dim)
+      // Patches are organized such that the parameter direction is the last
+      // coordinate. Thus, vertices are two copies of the space patch, one at
+      // parameter-step and one at parameter.
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         {
-          case 1:
-            patch->vertices[0] =
-              Point<dim + 1>(cell->vertex(0)(0), parameter - parameter_step);
-            patch->vertices[1] =
-              Point<dim + 1>(cell->vertex(1)(0), parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(0)(0), parameter);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(1)(0), parameter);
-            break;
-
-          case 2:
-            patch->vertices[0] = Point<dim + 1>(cell->vertex(0)(0),
-                                                cell->vertex(0)(1),
-                                                parameter - parameter_step);
-            patch->vertices[1] = Point<dim + 1>(cell->vertex(1)(0),
-                                                cell->vertex(1)(1),
-                                                parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(2)(0),
-                                                cell->vertex(2)(1),
-                                                parameter - parameter_step);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(3)(0),
-                                                cell->vertex(3)(1),
-                                                parameter - parameter_step);
-            patch->vertices[4] =
-              Point<dim + 1>(cell->vertex(0)(0), cell->vertex(0)(1), parameter);
-            patch->vertices[5] =
-              Point<dim + 1>(cell->vertex(1)(0), cell->vertex(1)(1), parameter);
-            patch->vertices[6] =
-              Point<dim + 1>(cell->vertex(2)(0), cell->vertex(2)(1), parameter);
-            patch->vertices[7] =
-              Point<dim + 1>(cell->vertex(3)(0), cell->vertex(3)(1), parameter);
-            break;
-
-          default:
-            Assert(false, ExcNotImplemented());
+          patch->vertices[i] =
+            cell->vertex(i).extend(parameter - parameter_step);
+          patch->vertices[GeometryInfo<dim>::vertices_per_cell + i] =
+            cell->vertex(i).extend(parameter);
         }
-
 
       // now fill in the data values.
       // note that the required order is

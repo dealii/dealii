@@ -88,31 +88,11 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   // Not implemented for higher dimensions
   Assert(dim <= 3, ExcNotImplemented());
 
-  Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
+  const Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
 
   const unsigned int unit_normal_direction =
     GeometryInfo<dim>::unit_normal_direction[face_no];
-
-  if (dim == 2)
-    {
-      if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1)};
-      else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0)};
-    }
-  else if (dim == 3)
-    {
-      if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1), unit_cell_pt(2)};
-      else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(2)};
-      else if (unit_normal_direction == 2)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(1)};
-    }
-
-  // We should never get here
-  Assert(false, ExcInternalError());
-  return {};
+  return unit_cell_pt.project(unit_normal_direction);
 }
 
 /* ---------------------------- InternalDataBase --------------------------- */

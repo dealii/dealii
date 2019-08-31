@@ -48,6 +48,9 @@ namespace internal
 
       static constexpr std::array<int, 2> unit_normal_orientation{{-1, 1}};
 
+      static constexpr std::array<Point<1>, 2> unit_normal_vector{
+        {Point<1>{-1}, Point<1>{1}}};
+
       static constexpr std::array<unsigned int, 2> opposite_face{{1, 0}};
 
       static constexpr std::array<unsigned int, 2> dx_to_deal{{0, 1}};
@@ -66,6 +69,9 @@ namespace internal
 
       static constexpr std::array<int, 4> unit_normal_orientation{
         {-1, 1, -1, 1}};
+
+      static constexpr std::array<Point<2>, 4> unit_normal_vector{
+        {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}};
 
       static constexpr std::array<unsigned int, 4> opposite_face{{1, 0, 3, 2}};
 
@@ -86,6 +92,9 @@ namespace internal
 
       static constexpr std::array<int, 6> unit_normal_orientation{
         {-1, 1, -1, 1, -1, 1}};
+
+      static constexpr std::array<Point<3>, 6> unit_normal_vector{
+        {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}}};
 
       static constexpr std::array<unsigned int, 6> opposite_face{
         {1, 0, 3, 2, 5, 4}};
@@ -130,6 +139,16 @@ namespace internal
 
       static constexpr std::array<int, 8> unit_normal_orientation{
         {-1, 1, -1, 1, -1, 1, -1, 1}};
+
+      static constexpr std::array<Point<4>, 8> unit_normal_vector{
+        {{-1, 0, 0, 0},
+         {1, 0, 0, 0},
+         {0, -1, 0, 0},
+         {0, 1, 0, 0},
+         {0, 0, -1, 0},
+         {0, 0, 1, 0},
+         {0, 0, 0, -1},
+         {0, 0, 0, 1}}};
 
       static constexpr std::array<unsigned int, 8> opposite_face{
         {1, 0, 3, 2, 5, 4, 7, 6}};
@@ -2261,6 +2280,19 @@ struct GeometryInfo
    */
   static constexpr std::array<int, faces_per_cell> unit_normal_orientation =
     internal::GeometryInfoHelper::Initializers<dim>::unit_normal_orientation;
+
+  /**
+   * Unit normal vector (Point<dim>) of a face of the reference cell.
+   *
+   * Note that this is only the <em>standard orientation</em> of faces. At
+   * least in 3d, actual faces of cells in a triangulation can also have the
+   * opposite orientation, depending on a flag that one can query from the
+   * cell it belongs to. For more information, see the
+   * @ref GlossFaceOrientation "glossary"
+   * entry on face orientation.
+   */
+  static constexpr std::array<Point<dim>, faces_per_cell> unit_normal_vector =
+    internal::GeometryInfoHelper::Initializers<dim>::unit_normal_vector;
 
   /**
    * List of numbers which denotes which face is opposite to a given face. Its

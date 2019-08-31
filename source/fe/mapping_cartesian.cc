@@ -279,60 +279,15 @@ MappingCartesian<dim, spacedim>::compute_fill(
     }
 
 
-  // compute normal vectors. since
-  // cells are aligned to coordinate
-  // axes, they are simply vectors
-  // with exactly one entry equal to
-  // 1 or -1. Furthermore, all
-  // normals on a face have the same
-  // value
+  // compute normal vectors. since cells are aligned to coordinate
+  // axes, they are simply vectors with exactly one entry equal to
+  // 1 or -1. Furthermore, all normals on a face have the same value
   if (update_flags & update_normal_vectors)
     {
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
-
-      switch (dim)
-        {
-          case 1:
-            {
-              constexpr Point<1> normals[GeometryInfo<1>::faces_per_cell] =
-                {Point<1>(-1.), Point<1>(1.)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          case 2:
-            {
-              constexpr Point<2> normals[GeometryInfo<2>::faces_per_cell] =
-                {Point<2>(-1, 0),
-                 Point<2>(1, 0),
-                 Point<2>(0, -1),
-                 Point<2>(0, 1)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          case 3:
-            {
-              constexpr Point<3> normals[GeometryInfo<3>::faces_per_cell] =
-                {Point<3>(-1, 0, 0),
-                 Point<3>(1, 0, 0),
-                 Point<3>(0, -1, 0),
-                 Point<3>(0, 1, 0),
-                 Point<3>(0, 0, -1),
-                 Point<3>(0, 0, 1)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
+      std::fill(normal_vectors.begin(),
+                normal_vectors.end(),
+                GeometryInfo<dim>::unit_normal_vector[face_no]);
     }
 }
 

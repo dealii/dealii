@@ -1415,83 +1415,72 @@ namespace GridGenerator
                  "points in this coordinate direction."));
       }
 
-
-    // then generate the necessary
-    // points
+    // then generate the necessary points
     std::vector<Point<dim>> points;
     switch (dim)
       {
         case 1:
           {
-            double x = 0;
-            for (unsigned int i = 0;; ++i)
+            auto point = p1;
+            points.push_back(point);
+            for (auto step : step_sizes[0])
               {
-                points.push_back(Point<dim>(p1[0] + x));
-
-                // form partial sums. in
-                // the last run through
-                // avoid accessing
-                // non-existent values
-                // and exit early instead
-                if (i == step_sizes[0].size())
-                  break;
-
-                x += step_sizes[0][i];
+                point[0] += step;
+                points.push_back(point);
               }
             break;
           }
 
         case 2:
           {
-            double y = 0;
+            auto point_1 = p1;
             for (unsigned int j = 0;; ++j)
               {
-                double x = 0;
+                auto point_0 = point_1;
                 for (unsigned int i = 0;; ++i)
                   {
-                    points.push_back(Point<dim>(p1[0] + x, p1[1] + y));
+                    points.push_back(point_0);
                     if (i == step_sizes[0].size())
                       break;
 
-                    x += step_sizes[0][i];
+                    point_0[0] += step_sizes[0][i];
                   }
 
                 if (j == step_sizes[1].size())
                   break;
 
-                y += step_sizes[1][j];
+                point_1[1] += step_sizes[1][j];
               }
             break;
           }
         case 3:
           {
-            double z = 0;
+            auto point_2 = p1;
             for (unsigned int k = 0;; ++k)
               {
-                double y = 0;
+                auto point_1 = point_2;
                 for (unsigned int j = 0;; ++j)
                   {
-                    double x = 0;
+                    auto point_0 = point_1;
                     for (unsigned int i = 0;; ++i)
                       {
-                        points.push_back(
-                          Point<dim>(p1[0] + x, p1[1] + y, p1[2] + z));
+                        points.push_back(point_0);
                         if (i == step_sizes[0].size())
                           break;
 
-                        x += step_sizes[0][i];
+                        point_0[0] += step_sizes[0][i];
                       }
 
                     if (j == step_sizes[1].size())
                       break;
 
-                    y += step_sizes[1][j];
+                    point_1[1] += step_sizes[1][j];
                   }
 
                 if (k == step_sizes[2].size())
                   break;
 
-                z += step_sizes[2][k];
+                point_2[2] += step_sizes[2][k];
               }
             break;
           }

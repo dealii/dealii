@@ -159,6 +159,20 @@ public:
                                         const Number z);
 
   /**
+   * Constructor for four dimensional points. This function is only
+   * implemented for <tt>dim==4</tt> since the usage is considered unsafe for
+   * points with <tt>dim!=4</tt> as it would leave some components of the
+   * point coordinates uninitialized (if dim>4) or would not use some
+   * arguments (if dim<4).
+   *
+   * @note This function can also be used in CUDA device code.
+   */
+  DEAL_II_CUDA_HOST_DEV constexpr Point(const Number x,
+                                        const Number y,
+                                        const Number z,
+                                        const Number w);
+
+  /**
    * Convert a boost::geometry::point to a dealii::Point.
    */
   template <std::size_t dummy_dim,
@@ -201,6 +215,20 @@ public:
   template <typename OtherNumber>
   DEAL_II_CONSTEXPR Point<dim, Number> &
                     operator=(const Tensor<1, dim, OtherNumber> &p);
+
+  /**
+   * Converts the Point<dim> to a Point<dim + 1> object by appending a
+   * coordinate value as the last coordinate
+   */
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim + 1, Number>
+                                          extend(const Number extension) const;
+
+  /**
+   * Projects a point into a dim - 1 space by removing one of the coordinate
+   * values.
+   */
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim - 1, Number>
+                                          project(const unsigned int coord_axis) const;
 
   /**
    * @name Addition and subtraction of points.
@@ -402,6 +430,24 @@ Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 
 
 template <int dim, typename Number>
+constexpr DEAL_II_CUDA_HOST_DEV
+Point<dim, Number>::Point(const Number x,
+                          const Number y,
+                          const Number z,
+                          const Number w)
+  : Tensor<1, dim, Number>{{x, y, z, w}}
+{
+  static_assert(
+    dim == 4,
+    "You can only initialize Point<4> objects using the constructor "
+    "that takes three arguments. Point<dim> objects with dim!=4 "
+    "require initialization with the constructor that takes 'dim' "
+    "arguments.");
+}
+
+
+
+template <int dim, typename Number>
 template <
   std::size_t dummy_dim,
   typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
@@ -464,6 +510,33 @@ Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p)
 {
   Tensor<1, dim, Number>::operator=(p);
   return *this;
+}
+
+
+
+template <int dim, typename Number>
+inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim + 1, Number>
+                                               Point<dim, Number>::extend(const Number extension) const
+{
+  Point<dim + 1, Number> result;
+  for (unsigned int i = 0; i < dim; ++i)
+    result[i] = this->values[i];
+  result[dim] = extension;
+  return result;
+}
+
+
+
+template <int dim, typename Number>
+inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim - 1, Number>
+                                               Point<dim, Number>::project(const unsigned int coord_axis) const
+{
+  Point<dim - 1, Number> result;
+  for (unsigned int i = 0; i < coord_axis - 1; ++i)
+    result[i] = this->values[i];
+  for (unsigned int i = coord_axis; i < dim; ++i)
+    result[i - 1] = this->values[i];
+  return result;
 }
 
 

@@ -54,6 +54,10 @@ constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_direction;
 
 template <int dim>
+constexpr std::array<Point<dim>, GeometryInfo<dim>::faces_per_cell>
+  GeometryInfo<dim>::unit_normal_vector;
+
+template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
   GeometryInfo<dim>::dx_to_deal;
 
