@@ -3974,6 +3974,7 @@ inline const FiniteElement<DoFHandlerType::dimension,
                            DoFHandlerType::space_dimension> &
 DoFCellAccessor<DoFHandlerType, level_dof_access>::get_fe() const
 {
+  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   Assert(
     (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension> *>(
@@ -3982,7 +3983,6 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_fe() const
     ExcMessage("In hp::DoFHandler objects, finite elements are only associated "
                "with active cells. Consequently, you can not ask for the "
                "active finite element on cells with children."));
-  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
   return this->dof_handler->get_fe(active_fe_index());
 }
@@ -4044,6 +4044,26 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_active_fe_index(
 
   dealii::internal::DoFCellAccessorImplementation::Implementation::
     set_active_fe_index(*this, i);
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline const FiniteElement<DoFHandlerType::dimension,
+                           DoFHandlerType::space_dimension> &
+DoFCellAccessor<DoFHandlerType, level_dof_access>::get_future_fe() const
+{
+  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->has_children() == false),
+    ExcMessage("In hp::DoFHandler objects, finite elements are only associated "
+               "with active cells. Consequently, you can not ask for the "
+               "future finite element on cells with children."));
+
+  return this->dof_handler->get_fe(future_fe_index());
 }
 
 
