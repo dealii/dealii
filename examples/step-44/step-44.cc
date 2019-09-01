@@ -1450,11 +1450,7 @@ namespace Step44
   template <int dim>
   void Solid<dim>::make_grid()
   {
-    GridGenerator::hyper_rectangle(
-      triangulation,
-      (dim == 3 ? Point<dim>(0.0, 0.0, 0.0) : Point<dim>(0.0, 0.0)),
-      (dim == 3 ? Point<dim>(1.0, 1.0, 1.0) : Point<dim>(1.0, 1.0)),
-      true);
+    GridGenerator::hyper_cube(triangulation, 0., 1., true);
     GridTools::scale(parameters.scale, triangulation);
     triangulation.refine_global(std::max(1U, parameters.global_refinement));
 

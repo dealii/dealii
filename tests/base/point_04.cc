@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test for Point::operator()
+// test for Point::operator() and the constructor from boost::geometry
 
 #include <deal.II/base/point.h>
 

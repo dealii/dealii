@@ -1308,12 +1308,10 @@ namespace Step28
     const unsigned int assemblies_x = 2, assemblies_y = 2, assemblies_z = 1;
 
     const Point<dim> bottom_left = Point<dim>();
-    const Point<dim> upper_right =
-      (dim == 2 ? Point<dim>(assemblies_x * rods_per_assembly_x * pin_pitch_x,
-                             assemblies_y * rods_per_assembly_y * pin_pitch_y) :
-                  Point<dim>(assemblies_x * rods_per_assembly_x * pin_pitch_x,
-                             assemblies_y * rods_per_assembly_y * pin_pitch_y,
-                             assemblies_z * assembly_height));
+    const Point<dim> upper_right = dim_independent_point<dim>(
+      assemblies_x * rods_per_assembly_x * pin_pitch_x,
+      assemblies_y * rods_per_assembly_y * pin_pitch_y,
+      assemblies_z * assembly_height);
 
     std::vector<unsigned int> n_subdivisions;
     n_subdivisions.push_back(assemblies_x * rods_per_assembly_x);

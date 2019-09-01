@@ -4152,7 +4152,6 @@ namespace internal
                                 u1 = mapping->transform_real_to_unit_cell(cell,
                                                                           v1);
 
-                              const Point<spacedim> center;
                               for (unsigned int i = 0; i < n_points; ++i)
                                 line_points.push_back(
                                   mapping->transform_unit_to_real_cell(
@@ -4228,6 +4227,7 @@ namespace internal
       {}
     };
 
+    using LineList = std::list<LineEntry>;
 
     void
     write_eps(const dealii::Triangulation<1> &,
@@ -4270,6 +4270,169 @@ namespace internal
     }
 
 
+    template <int dim, int spacedim>
+    LineList
+    get_lines(const dealii::Triangulation<dim, spacedim> &,
+              const Mapping<dim, spacedim> *,
+              const GridOutFlags::Eps<2> &,
+              const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcInternalError());
+    }
+
+    // make up a list of lines by which we will construct the triangulation
+    //
+    // this part unfortunately is a bit dimension dependent, so we have to
+    // treat every dimension different. however, by directly producing
+    // the lines to be printed, i.e. their 2d images, we can later do the
+    // actual output dimension independent again
+    template <int spacedim>
+    LineList
+    get_lines(const dealii::Triangulation<2, spacedim> &tria,
+              const Mapping<2, spacedim> *              mapping,
+              const GridOutFlags::Eps<2> &              eps_flags_2,
+              const GridOutFlags::Eps<3> &)
+    {
+      LineList line_list;
+      for (const auto &cell : tria.active_cell_iterators())
+        for (unsigned int line_no = 0;
+             line_no < GeometryInfo<2>::lines_per_cell;
+             ++line_no)
+          {
+            const auto line = cell->line(line_no);
+
+            // first treat all interior lines and make up a list of them. if
+            // curved lines shall not be supported (i.e. no mapping is
+            // provided), then also treat all other lines
+            if (!line->has_children() &&
+                (mapping == nullptr || !line->at_boundary()))
+              line_list.emplace_back(line->vertex(0),
+                                     line->vertex(1),
+                                     line->user_flag_set(),
+                                     cell->level());
+          }
+
+      const unsigned int n_points = eps_flags_2.n_boundary_face_points;
+
+      // next if we are to treat curved boundaries specially, then add lines
+      // to the list consisting of pieces of the boundary lines
+      if (mapping != nullptr)
+        {
+          // to do so, first generate a sequence of
+          // points on a face and project them onto the
+          // faces of a unit cell
+          std::vector<Point<1>> boundary_points(n_points);
+
+          for (unsigned int i = 0; i < n_points; ++i)
+            boundary_points[i](0) = 1. * (i + 1) / (n_points + 1);
+
+          Quadrature<1> quadrature(boundary_points);
+          Quadrature<2> q_projector(
+            QProjector<2>::project_to_all_faces(quadrature));
+
+          // next loop over all boundary faces and
+          // generate the info from them
+          for (const auto &cell : tria.active_cell_iterators())
+            for (unsigned int face_no = 0;
+                 face_no < GeometryInfo<2>::faces_per_cell;
+                 ++face_no)
+              {
+                const auto face = cell->face(face_no);
+                if (face->at_boundary())
+                  {
+                    Point<2> p0 = face->vertex(0);
+
+                    // loop over all pieces of the line and generate line-lets
+                    const unsigned int offset = face_no * n_points;
+                    for (unsigned int i = 0; i < n_points; ++i)
+                      {
+                        const Point<2> p1 =
+                          mapping->transform_unit_to_real_cell(
+                            cell, q_projector.point(offset + i));
+
+                        line_list.emplace_back(p0,
+                                               p1,
+                                               face->user_flag_set(),
+                                               cell->level());
+                        p0 = p1;
+                      }
+
+                    // generate last piece
+                    const Point<2> p1 = face->vertex(1);
+                    line_list.emplace_back(p0,
+                                           p1,
+                                           face->user_flag_set(),
+                                           cell->level());
+                  }
+              }
+        }
+      return line_list;
+    }
+
+    template <int spacedim>
+    LineList
+    get_lines(const dealii::Triangulation<3, spacedim> &tria,
+              const Mapping<3, spacedim> *              mapping,
+              const GridOutFlags::Eps<2> &,
+              const GridOutFlags::Eps<3> &eps_flags_3)
+
+    {
+      // curved boundary output presently not supported
+      Assert(mapping == nullptr, ExcNotImplemented());
+
+      // loop over all lines and compute their projection on the plane
+      // perpendicular to the direction of sight
+
+      // direction of view equals the unit vector of the position of the
+      // spectator to the origin.
+
+      // we chose here the viewpoint as in gnuplot as default.
+      //
+      // TODO:[WB] Fix a potential problem with viewing angles in 3d Eps
+      // GridOut
+      // note: the following might be wrong if one of the base vectors below
+      // is in direction of the viewer, but I am too tired at present to fix
+      // this
+      constexpr double pi         = numbers::PI;
+      const double     z_angle    = eps_flags_3.azimut_angle;
+      const double     turn_angle = eps_flags_3.turn_angle;
+      const Point<3>   view_direction(-std::sin(z_angle * 2. * pi / 360.) *
+                                      std::sin(turn_angle * 2. * pi / 360.),
+                                    +std::sin(z_angle * 2. * pi / 360.) *
+                                      std::cos(turn_angle * 2. * pi / 360.),
+                                    -std::cos(z_angle * 2. * pi / 360.));
+
+      // decide about the two unit vectors in this plane. we chose the first
+      // one to be the projection of the z-axis to this plane
+      const Tensor<1, 3> vector1 =
+        Point<3>(0, 0, 1) -
+        ((Point<3>(0, 0, 1) * view_direction) * view_direction);
+      const Tensor<1, 3> unit_vector1 = vector1 / vector1.norm();
+
+      // now the third vector is fixed. we chose the projection of a more or
+      // less arbitrary vector to the plane perpendicular to the first one
+      const Tensor<1, 3> vector2 =
+        (Point<3>(1, 0, 0) -
+         ((Point<3>(1, 0, 0) * view_direction) * view_direction) -
+         ((Point<3>(1, 0, 0) * unit_vector1) * unit_vector1));
+      const Tensor<1, 3> unit_vector2 = vector2 / vector2.norm();
+
+      LineList line_list;
+      for (const auto &cell : tria.active_cell_iterators())
+        for (unsigned int line_no = 0;
+             line_no < GeometryInfo<3>::lines_per_cell;
+             ++line_no)
+          {
+            const auto line = cell->line(line_no);
+            line_list.emplace_back(Point<2>{line->vertex(0) * unit_vector2,
+                                            line->vertex(0) * unit_vector1},
+                                   Point<2>{line->vertex(1) * unit_vector2,
+                                            line->vertex(1) * unit_vector1},
+                                   line->user_flag_set(),
+                                   cell->level());
+          }
+      return line_list;
+    }
 
     template <int dim, int spacedim>
     void
@@ -4279,8 +4442,6 @@ namespace internal
               const GridOutFlags::Eps<2> &                eps_flags_2,
               const GridOutFlags::Eps<3> &                eps_flags_3)
     {
-      using LineList = std::list<LineEntry>;
-
       // We should never get here in 1D since this function is overloaded for
       // all dim == 1 cases.
       Assert(dim == 2 || dim == 3, ExcInternalError());
@@ -4294,239 +4455,8 @@ namespace internal
           static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3);
 
       AssertThrow(out, ExcIO());
-      const unsigned int n_points = eps_flags_base.n_boundary_face_points;
 
-      // make up a list of lines by which
-      // we will construct the triangulation
-      //
-      // this part unfortunately is a bit
-      // dimension dependent, so we have to
-      // treat every dimension different.
-      // however, by directly producing
-      // the lines to be printed, i.e. their
-      // 2d images, we can later do the
-      // actual output dimension independent
-      // again
-      LineList line_list;
-
-      switch (dim)
-        {
-          case 1:
-            {
-              Assert(false, ExcInternalError());
-              break;
-            }
-
-          case 2:
-            {
-              for (typename dealii::Triangulation<dim, spacedim>::
-                     active_cell_iterator cell = tria.begin_active();
-                   cell != tria.end();
-                   ++cell)
-                for (unsigned int line_no = 0;
-                     line_no < GeometryInfo<dim>::lines_per_cell;
-                     ++line_no)
-                  {
-                    typename dealii::Triangulation<dim, spacedim>::line_iterator
-                      line = cell->line(line_no);
-
-                    // first treat all
-                    // interior lines and
-                    // make up a list of
-                    // them. if curved
-                    // lines shall not be
-                    // supported (i.e. no
-                    // mapping is
-                    // provided), then also
-                    // treat all other
-                    // lines
-                    if (!line->has_children() &&
-                        (mapping == nullptr || !line->at_boundary()))
-                      // one would expect
-                      // make_pair(line->vertex(0),
-                      //           line->vertex(1))
-                      // here, but that is
-                      // not dimension
-                      // independent, since
-                      // vertex(i) is
-                      // Point<dim>, but we
-                      // want a Point<2>.
-                      // in fact, whenever
-                      // we're here, the
-                      // vertex is a
-                      // Point<dim>, but
-                      // the compiler does
-                      // not know
-                      // this. hopefully,
-                      // the compiler will
-                      // optimize away this
-                      // little kludge
-                      line_list.emplace_back(
-                        Point<2>(line->vertex(0)(0), line->vertex(0)(1)),
-                        Point<2>(line->vertex(1)(0), line->vertex(1)(1)),
-                        line->user_flag_set(),
-                        cell->level());
-                  }
-
-              // next if we are to treat
-              // curved boundaries
-              // specially, then add lines
-              // to the list consisting of
-              // pieces of the boundary
-              // lines
-              if (mapping != nullptr)
-                {
-                  // to do so, first
-                  // generate a sequence of
-                  // points on a face and
-                  // project them onto the
-                  // faces of a unit cell
-                  std::vector<Point<dim - 1>> boundary_points(n_points);
-
-                  for (unsigned int i = 0; i < n_points; ++i)
-                    boundary_points[i](0) = 1. * (i + 1) / (n_points + 1);
-
-                  Quadrature<dim - 1> quadrature(boundary_points);
-                  Quadrature<dim>     q_projector(
-                    QProjector<dim>::project_to_all_faces(quadrature));
-
-                  // next loop over all
-                  // boundary faces and
-                  // generate the info from
-                  // them
-                  for (typename dealii::Triangulation<dim, spacedim>::
-                         active_cell_iterator cell = tria.begin_active();
-                       cell != tria.end();
-                       ++cell)
-                    for (unsigned int face_no = 0;
-                         face_no < GeometryInfo<dim>::faces_per_cell;
-                         ++face_no)
-                      {
-                        const typename dealii::Triangulation<dim, spacedim>::
-                          face_iterator face = cell->face(face_no);
-
-                        if (face->at_boundary())
-                          {
-                            Point<dim> p0_dim(face->vertex(0));
-                            Point<2>   p0(p0_dim(0), p0_dim(1));
-
-                            // loop over
-                            // all pieces
-                            // of the line
-                            // and generate
-                            // line-lets
-                            const unsigned int offset = face_no * n_points;
-                            for (unsigned int i = 0; i < n_points; ++i)
-                              {
-                                const Point<dim> p1_dim(
-                                  mapping->transform_unit_to_real_cell(
-                                    cell, q_projector.point(offset + i)));
-                                const Point<2> p1(p1_dim(0), p1_dim(1));
-
-                                line_list.emplace_back(p0,
-                                                       p1,
-                                                       face->user_flag_set(),
-                                                       cell->level());
-                                p0 = p1;
-                              }
-
-                            // generate last piece
-                            const Point<dim> p1_dim(face->vertex(1));
-                            const Point<2>   p1(p1_dim(0), p1_dim(1));
-                            line_list.emplace_back(p0,
-                                                   p1,
-                                                   face->user_flag_set(),
-                                                   cell->level());
-                          }
-                      }
-                }
-
-              break;
-            }
-
-          case 3:
-            {
-              // curved boundary output
-              // presently not supported
-              Assert(mapping == nullptr, ExcNotImplemented());
-
-              typename dealii::Triangulation<dim,
-                                             spacedim>::active_cell_iterator
-                cell = tria.begin_active(),
-                endc = tria.end();
-
-              // loop over all lines and compute their
-              // projection on the plane perpendicular
-              // to the direction of sight
-
-              // direction of view equals the unit
-              // vector of the position of the
-              // spectator to the origin.
-              //
-              // we chose here the viewpoint as in
-              // gnuplot as default.
-              //
-              // TODO:[WB] Fix a potential problem with viewing angles in 3d Eps
-              // GridOut
-              // note: the following might be wrong
-              // if one of the base vectors below
-              // is in direction of the viewer, but
-              // I am too tired at present to fix
-              // this
-              const double     pi         = numbers::PI;
-              const double     z_angle    = eps_flags_3.azimut_angle;
-              const double     turn_angle = eps_flags_3.turn_angle;
-              const Point<dim> view_direction(
-                -std::sin(z_angle * 2. * pi / 360.) *
-                  std::sin(turn_angle * 2. * pi / 360.),
-                +std::sin(z_angle * 2. * pi / 360.) *
-                  std::cos(turn_angle * 2. * pi / 360.),
-                -std::cos(z_angle * 2. * pi / 360.));
-
-              // decide about the two unit vectors
-              // in this plane. we chose the first one
-              // to be the projection of the z-axis
-              // to this plane
-              const Tensor<1, dim> vector1 =
-                Point<dim>(0, 0, 1) -
-                ((Point<dim>(0, 0, 1) * view_direction) * view_direction);
-              const Tensor<1, dim> unit_vector1 = vector1 / vector1.norm();
-
-              // now the third vector is fixed. we
-              // chose the projection of a more or
-              // less arbitrary vector to the plane
-              // perpendicular to the first one
-              const Tensor<1, dim> vector2 =
-                (Point<dim>(1, 0, 0) -
-                 ((Point<dim>(1, 0, 0) * view_direction) * view_direction) -
-                 ((Point<dim>(1, 0, 0) * unit_vector1) * unit_vector1));
-              const Tensor<1, dim> unit_vector2 = vector2 / vector2.norm();
-
-
-              for (; cell != endc; ++cell)
-                for (unsigned int line_no = 0;
-                     line_no < GeometryInfo<dim>::lines_per_cell;
-                     ++line_no)
-                  {
-                    typename dealii::Triangulation<dim, spacedim>::line_iterator
-                      line = cell->line(line_no);
-                    line_list.emplace_back(
-                      Point<2>(line->vertex(0) * unit_vector2,
-                               line->vertex(0) * unit_vector1),
-                      Point<2>(line->vertex(1) * unit_vector2,
-                               line->vertex(1) * unit_vector1),
-                      line->user_flag_set(),
-                      cell->level());
-                  }
-
-              break;
-            }
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
-
-
+      LineList line_list = get_lines(tria, mapping, eps_flags_2, eps_flags_3);
 
       // find out minimum and maximum x and
       // y coordinates to compute offsets
@@ -4669,10 +4599,7 @@ namespace internal
         {
           out << "(Helvetica) findfont 140 scalefont setfont" << '\n';
 
-          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-            cell = tria.begin_active(),
-            endc = tria.end();
-          for (; cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             {
               out << (cell->center()(0) - offset(0)) * scale << ' '
                   << (cell->center()(1) - offset(1)) * scale << " m" << '\n'

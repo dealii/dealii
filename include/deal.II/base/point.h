@@ -531,10 +531,12 @@ template <int dim, typename Number>
 inline DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV Point<dim - 1, Number>
                                                Point<dim, Number>::project(const unsigned int coord_axis) const
 {
+  AssertIndexRange(coord_axis, dim);
+  Assert(dim > 1, ExcMessage("Projecting a Point<dim> works only for dim > 1"));
   Point<dim - 1, Number> result;
-  for (unsigned int i = 0; i < coord_axis - 1; ++i)
+  for (unsigned int i = 0; i < coord_axis; ++i)
     result[i] = this->values[i];
-  for (unsigned int i = coord_axis; i < dim; ++i)
+  for (unsigned int i = coord_axis + 1; i < dim; ++i)
     result[i - 1] = this->values[i];
   return result;
 }
@@ -678,6 +680,25 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
 
 /*--------------------------- Global functions: Point -----------------------*/
 
+/**
+ * Function that generates a <tt>Point<dim><\tt> object from a list of
+ * coordinates. The difference between this function and the constructors of
+ * <tt>Point<dim><\tt> is that the constructors require exactly dim number of
+ * arguments, but this function allows having more arguments than dim. For
+ * example, the line
+ * @code
+ *   Point<dim> point = dimension_independent_point<dim>(1., 2.5, 0.2);
+ * @endcode
+ * can create <code>Point<1>(1.)<\code>, <code>Point<2>(1., 2.5)<\code>, or
+ * <code>Point<3>(1., 2.5, 0.2) depending on the values of <tt>dim<\tt>.
+ * If the number of arguments provided to this function is less than
+ * <tt>dim<\tt>, those arguments are padded with zero.
+ */
+template <int dim>
+constexpr Point<dim>
+dim_independent_point(const double x = 0.,
+                      const double y = 0.,
+                      const double z = 0.);
 
 /**
  * Global operator scaling a point vector by a scalar.
@@ -688,7 +709,7 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  * @relatesalso EnableIfScalar
  */
 template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_CUDA_HOST_DEV
+constexpr DEAL_II_CUDA_HOST_DEV
   Point<dim,
         typename ProductType<Number,
                              typename EnableIfScalar<OtherNumber>::type>::type>
@@ -733,6 +754,27 @@ operator>>(std::istream &in, Point<dim, Number> &p)
 
 
 #ifndef DOXYGEN
+
+template <>
+constexpr Point<1>
+dim_independent_point<1>(const double x, const double, const double)
+{
+  return Point<1>{x};
+}
+
+template <>
+constexpr Point<2>
+dim_independent_point<2>(const double x, const double y, const double)
+{
+  return {x, y};
+}
+
+template <>
+constexpr Point<3>
+dim_independent_point<3>(const double x, const double y, const double z)
+{
+  return {x, y, z};
+}
 
 /**
  * Output operator for points of dimension 1. This is implemented specialized
