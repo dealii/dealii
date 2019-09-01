@@ -996,7 +996,8 @@ namespace Step22
   // rectangle four times in the first coordinate direction. To limit the
   // scope of the variables involved in the creation of the mesh to the range
   // where we actually need them, we put the entire block between a pair of
-  // braces:
+  // braces. In order to allow both 2d and 3d coordinates, we make use of the
+  // combination of std::make_pair and std::get functions:
   template <int dim>
   void StokesProblem<dim>::run()
   {
@@ -1004,13 +1005,15 @@ namespace Step22
       std::vector<unsigned int> subdivisions(dim, 1);
       subdivisions[0] = 4;
 
-      const Point<dim> bottom_left = (dim == 2 ?                //
-                                        Point<dim>(-2, -1) :    // 2d case
-                                        Point<dim>(-2, 0, -1)); // 3d case
+      const auto bottom_left_2d_or_3d =
+        std::make_pair(Point<2>(-2, -1),     // 2d case
+                       Point<3>(-2, 0, -1)); // 3d case
+      const Point<dim> bottom_left = std::get<dim - 2>(bottom_left_2d_or_3d);
 
-      const Point<dim> top_right = (dim == 2 ?              //
-                                      Point<dim>(2, 0) :    // 2d case
-                                      Point<dim>(2, 1, 0)); // 3d case
+      const auto top_right_2d_or_3d =
+        std::make_pair(Point<2>(2, 0),     // 2d case
+                       Point<3>(2, 1, 0)); // 3d case
+      const Point<dim> top_right = std::get<dim - 2>(top_right_2d_or_3d);
 
       GridGenerator::subdivided_hyper_rectangle(triangulation,
                                                 subdivisions,

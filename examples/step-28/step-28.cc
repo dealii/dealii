@@ -1307,11 +1307,18 @@ namespace Step28
 
     const unsigned int assemblies_x = 2, assemblies_y = 2, assemblies_z = 1;
 
+    // The location of the upper right point should be constructed in two
+    // separate way depending on whether it is in 2D or 3D. We make use of
+    // std::make_pair and std::get to allow dimension-dependent construction
+    // within a dimension-independent code while ensuring type-safety.
     const Point<dim> bottom_left = Point<dim>();
-    const Point<dim> upper_right = dim_independent_point<dim>(
-      assemblies_x * rods_per_assembly_x * pin_pitch_x,
-      assemblies_y * rods_per_assembly_y * pin_pitch_y,
-      assemblies_z * assembly_height);
+    const auto       upper_right_2d_or_3d =
+      std::make_pair(Point<2>(assemblies_x * rods_per_assembly_x * pin_pitch_x,
+                              assemblies_y * rods_per_assembly_y * pin_pitch_y),
+                     Point<3>(assemblies_x * rods_per_assembly_x * pin_pitch_x,
+                              assemblies_y * rods_per_assembly_y * pin_pitch_y,
+                              assemblies_z * assembly_height));
+    const Point<dim> upper_right = std::get<dim - 2>(upper_right_2d_or_3d);
 
     std::vector<unsigned int> n_subdivisions;
     n_subdivisions.push_back(assemblies_x * rods_per_assembly_x);

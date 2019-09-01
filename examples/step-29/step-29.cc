@@ -433,13 +433,15 @@ namespace Step29
     // point in the program where things are slightly different in 2D and 3D.
     // Even though this tutorial only deals with the 2D case, the necessary
     // additions to make this program functional in 3D are so minimal that we
-    // opt for including them:
-    const Point<dim> transducer =
-      (dim == 2) ? Point<dim>(0.5, 0.0) : Point<dim>(0.5, 0.5, 0.0);
-    const Point<dim> focal_point = (dim == 2) ?
-                                     Point<dim>(0.5, focal_distance) :
-                                     Point<dim>(0.5, 0.5, focal_distance);
-
+    // opt for including them. We use std::pair to assign either a Point<2> or
+    // Point<3> to Point<dim>.
+    const auto transducer_2d_or_3d =
+      std::make_pair(Point<2>(0.5, 0.0), Point<3>(0.5, 0.5, 0.0));
+    const Point<dim> transducer = std::get<dim - 2>(transducer_2d_or_3d);
+    const auto       focal_point_2d_or_3d =
+      std::make_pair(Point<2>(0.5, focal_distance),
+                     Point<3>(0.5, 0.5, focal_distance));
+    const Point<dim> focal_point = std::get<dim - 2>(focal_point_2d_or_3d);
 
     // As initial coarse grid we take a simple unit square with 5 subdivisions
     // in each direction. The number of subdivisions is chosen so that the
