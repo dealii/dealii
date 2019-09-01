@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  *
- * Authors: Thomas Clevenger, Clemson University
- *          Timo Heister, University of Utah
+ * Authors: Thomas C. Clevenger, Clemson University
+ *          Timo Heister, Clemson University and University of Utah
  */
 
 // @sect3{Include files}
