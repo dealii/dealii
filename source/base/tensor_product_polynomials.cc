@@ -241,7 +241,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
 
 template <int dim, typename PolynomialType>
 void
-TensorProductPolynomials<dim, PolynomialType>::compute(
+TensorProductPolynomials<dim, PolynomialType>::evaluate(
   const Point<dim> &           p,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,

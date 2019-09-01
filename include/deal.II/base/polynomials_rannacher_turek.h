@@ -18,6 +18,7 @@
 #define dealii_polynomials_rannacher_turek_h
 
 #include <deal.II/base/point.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>
 
 #include <vector>
@@ -38,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2015
  */
 template <int dim>
-class PolynomialsRannacherTurek
+class PolynomialsRannacherTurek : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -85,12 +86,24 @@ public:
    * zero. A size of zero means that we are not computing the vector entries.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<double> &        values,
-          std::vector<Tensor<1, dim>> &grads,
-          std::vector<Tensor<2, dim>> &grad_grads,
-          std::vector<Tensor<3, dim>> &third_derivatives,
-          std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
+
+  /**
+   * Return the name of the space, which is <tt>RannacherTurek</tt>.
+   */
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
 };
 
 
@@ -201,6 +214,15 @@ PolynomialsRannacherTurek<dim>::compute_derivative(const unsigned int i,
 {
   return internal::PolynomialsRannacherTurekImplementation::compute_derivative<
     order>(i, p);
+}
+
+
+
+template <int dim>
+inline std::string
+PolynomialsRannacherTurek<dim>::name() const
+{
+  return "RannacherTurek";
 }
 
 

@@ -42,7 +42,7 @@ check_poly(const Point<dim> &     x,
   std::vector<Tensor<3, dim>> third1(n), third2(n);
   std::vector<Tensor<4, dim>> fourth1(n), fourth2(n);
 
-  p.compute(x, values1, gradients1, second1, third1, fourth1);
+  p.evaluate(x, values1, gradients1, second1, third1, fourth1);
   q.compute(x, values2, gradients2, second2, third2, fourth2);
 
   for (unsigned int k = 0; k < n; ++k)

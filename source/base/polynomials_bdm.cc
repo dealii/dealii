@@ -98,12 +98,12 @@ PolynomialsBDM<dim>::evaluate(
     // will have first all polynomials
     // in the x-component, then y and
     // z.
-    polynomial_space.compute(unit_point,
-                             p_values,
-                             p_grads,
-                             p_grad_grads,
-                             p_third_derivatives,
-                             p_fourth_derivatives);
+    polynomial_space.evaluate(unit_point,
+                              p_values,
+                              p_grads,
+                              p_grad_grads,
+                              p_third_derivatives,
+                              p_fourth_derivatives);
 
     std::fill(values.begin(), values.end(), Tensor<1, dim>());
     for (unsigned int i = 0; i < p_values.size(); ++i)

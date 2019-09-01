@@ -86,7 +86,7 @@ TensorProductPolynomialsConst<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-TensorProductPolynomialsConst<dim>::compute(
+TensorProductPolynomialsConst<dim>::evaluate(
   const Point<dim> &           p,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -141,7 +141,7 @@ TensorProductPolynomialsConst<dim>::compute(
       do_4th_derivatives = true;
     }
 
-  this->TensorProductPolynomials<dim>::compute(
+  this->TensorProductPolynomials<dim>::evaluate(
     p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
   // for dgq node: values =1, grads=0, grads_grads=0, third_derivatives=0,

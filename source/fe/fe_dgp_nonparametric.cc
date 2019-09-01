@@ -332,12 +332,12 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_values(
   if (fe_internal.update_each & (update_values | update_gradients))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
-        polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values,
-                                 grads,
-                                 grad_grads,
-                                 empty_vector_of_3rd_order_tensors,
-                                 empty_vector_of_4th_order_tensors);
+        polynomial_space.evaluate(mapping_data.quadrature_points[i],
+                                  values,
+                                  grads,
+                                  grad_grads,
+                                  empty_vector_of_3rd_order_tensors,
+                                  empty_vector_of_4th_order_tensors);
 
         if (fe_internal.update_each & update_values)
           for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
@@ -388,12 +388,12 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_face_values(
   if (fe_internal.update_each & (update_values | update_gradients))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
-        polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values,
-                                 grads,
-                                 grad_grads,
-                                 empty_vector_of_3rd_order_tensors,
-                                 empty_vector_of_4th_order_tensors);
+        polynomial_space.evaluate(mapping_data.quadrature_points[i],
+                                  values,
+                                  grads,
+                                  grad_grads,
+                                  empty_vector_of_3rd_order_tensors,
+                                  empty_vector_of_4th_order_tensors);
 
         if (fe_internal.update_each & update_values)
           for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
@@ -445,12 +445,12 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_subface_values(
   if (fe_internal.update_each & (update_values | update_gradients))
     for (unsigned int i = 0; i < n_q_points; ++i)
       {
-        polynomial_space.compute(mapping_data.quadrature_points[i],
-                                 values,
-                                 grads,
-                                 grad_grads,
-                                 empty_vector_of_3rd_order_tensors,
-                                 empty_vector_of_4th_order_tensors);
+        polynomial_space.evaluate(mapping_data.quadrature_points[i],
+                                  values,
+                                  grads,
+                                  grad_grads,
+                                  empty_vector_of_3rd_order_tensors,
+                                  empty_vector_of_4th_order_tensors);
 
         if (fe_internal.update_each & update_values)
           for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
