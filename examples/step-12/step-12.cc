@@ -34,6 +34,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -57,7 +58,7 @@
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
 
-// Here come the new include files for using the mesh_loop from the MeshWorker
+// Finally, the new include file for using the mesh_loop from the MeshWorker
 // framework
 #include <deal.II/meshworker/mesh_loop.h>
 
@@ -131,17 +132,91 @@ namespace Step12
   }
 
 
+  // @sect3{The ScratchData and CopyData classes}
+  //
+  // The following objects are the scratch and copy objects we use in the call
+  // to MeshWorker::mesh_loop. The new object is the FEInterfaceValues object,
+  // that works similar to FEValues or FEFacesValues, except that it acts on
+  // an interface between two cells and allows us to assemble the interface
+  // terms in our weak form.
+
+  template <int dim>
+  struct ScratchData
+  {
+    ScratchData(const Mapping<dim> &      mapping,
+                const FiniteElement<dim> &fe,
+                const unsigned int        quadrature_degree,
+                const UpdateFlags         update_flags = update_values |
+                                                 update_gradients |
+                                                 update_quadrature_points |
+                                                 update_JxW_values,
+                const UpdateFlags interface_update_flags =
+                  update_values | update_gradients | update_quadrature_points |
+                  update_JxW_values | update_normal_vectors)
+      : fe_values(mapping, fe, QGauss<dim>(quadrature_degree), update_flags)
+      , fe_interface_values(mapping,
+                            fe,
+                            QGauss<dim - 1>(quadrature_degree),
+                            interface_update_flags)
+    {}
+
+
+    ScratchData(const ScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_mapping(),
+                  scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  scratch_data.fe_values.get_update_flags())
+      , fe_interface_values(
+          scratch_data.fe_values
+            .get_mapping(), // TODO: implement for fe_interface_values
+          scratch_data.fe_values.get_fe(),
+          scratch_data.fe_interface_values.get_quadrature(),
+          scratch_data.fe_interface_values.get_update_flags())
+    {}
+
+    FEValues<dim>          fe_values;
+    FEInterfaceValues<dim> fe_interface_values;
+  };
+
+
+
+  struct CopyDataFace
+  {
+    FullMatrix<double>                   cell_matrix;
+    std::vector<types::global_dof_index> joint_dof_indices;
+  };
+
+
+
+  struct CopyData
+  {
+    FullMatrix<double>                   cell_matrix;
+    Vector<double>                       cell_rhs;
+    std::vector<types::global_dof_index> local_dof_indices;
+    std::vector<CopyDataFace>            face_data;
+
+    template <class Iterator>
+    void reinit(const Iterator &cell, unsigned int dofs_per_cell)
+    {
+      cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
+      cell_rhs.reinit(dofs_per_cell);
+
+      local_dof_indices.resize(dofs_per_cell);
+      cell->get_dof_indices(local_dof_indices);
+    }
+  };
+
+
   // @sect3{The AdvectionProblem class}
   //
   // After this preparations, we proceed with the main class of this program,
-  // called AdvectionProblem. It is basically the main class of step-6. We do
-  // not have an AffineConstraints object, because there are no hanging node
-  // constraints in DG discretizations.
-
+  // called AdvectionProblem. While we would not need an AffineConstraints
+  // object, because there are no hanging node constraints in DG
+  // discretizations, we use an empty object here as this allows us to use its
+  // copy_local_to_global functionality.
+  //
   // Major differences will only come up in the implementation of the assemble
-  // functions, since here, we not only need to cover the flux integrals over
-  // faces, we also use the MeshWorker interface to simplify the loops
-  // involved.
+  // function.
   template <int dim>
   class AdvectionProblem
   {
@@ -159,10 +234,7 @@ namespace Step12
     Triangulation<dim>   triangulation;
     const MappingQ1<dim> mapping;
 
-    // Furthermore we want to use DG elements of degree 1 (but this is only
-    // specified in the constructor). If you want to use a DG method of a
-    // different degree the whole program stays the same, only replace 1 in
-    // the constructor by the desired polynomial degree.
+    // Furthermore we want to use DG elements.
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
 
@@ -218,17 +290,19 @@ namespace Step12
 
   // @sect4{The assemble_system function}
 
-  // Here we see the major difference to assembling by hand. Instead of writing
-  // loops over cells and faces, we leave all this to the MeshWorker framework.
-  // In order to do so, we just have to define local integration functions and
-  // use one of the classes in namespace MeshWorker::Assembler to build the
-  // global system.
+  // Here we see the major difference to assembling by hand. Instead of
+  // writing loops over cells and faces, the logic is contained in the call to
+  // MeshWorker::mesh_loop() and we only need to specify what should happen on
+  // each cell, each boundary face, and each interior face. These three tasks
+  // are handled by the lambda functions inside the function below.
+
   template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
     typedef decltype(dof_handler.begin_active()) Iterator;
     BoundaryValues<dim>                          boundary_function;
 
+    // This is the function that will be executed for each cell.
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
@@ -250,52 +324,17 @@ namespace Step12
             for (unsigned int j = 0; j < n_dofs; ++j)
               {
                 copy_data.cell_matrix(i, j) +=
-                  -beta_q * fe_v.shape_grad(i, point) *
-                  fe_v.shape_value(j, point) * JxW[point];
+                  -beta_q                      // -\beta
+                  * fe_v.shape_grad(i, point)  // \nabla \phi_i
+                  * fe_v.shape_value(j, point) // \phi_j
+                  * JxW[point];                // dx
               }
         }
     };
 
-    /*
-        auto boundary_worker1 = [&](const Iterator &    cell,
-                                    const unsigned int &face_no,
-                                    ScratchData<dim> &  scratch_data,
-                                    CopyData &          copy_data) {
-          FEFacetValues<dim> &fe_facet = scratch_data.fe_facet_values;
-          fe_facet.reinit(cell, face_no);
-
-          const auto &q_points =
-       fe_facet.get_fe_values().get_quadrature_points();
-
-          const unsigned int         n_facet_dofs = fe_facet.n_facet_dofs();
-          const std::vector<double> &JxW =
-            fe_facet.get_fe_values().get_JxW_values();
-          const std::vector<Tensor<1, dim>> &normals =
-            fe_facet.get_fe_values().get_normal_vectors();
-
-          std::vector<double> g(q_points.size());
-          boundary_function.value_list(q_points, g);
-
-          for (unsigned int point = 0; point < q_points.size(); ++point)
-            {
-              const double beta_n = beta(q_points[point]) * normals[point];
-
-              if (beta_n > 0)
-                {
-                  for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO:
-       ugly! for (unsigned int j = 0; j < n_facet_dofs / 2; ++j)
-                      copy_data.cell_matrix(i, j) +=
-                        beta_n * fe_facet.scalar().jump(j, point) *
-                        fe_facet.scalar().choose(true, i, point) * JxW[point];
-                }
-              else if (0)
-                for (unsigned int i = 0; i < n_facet_dofs / 2; ++i) // TODO:
-       ugly copy_data.cell_rhs(i) -= beta_n * g[point] *
-                                           fe_facet.scalar().jump(i, point) *
-                                           JxW[point];
-            }
-        };*/
-
+    // This is the function called for boundary faces and consists of a normal
+    // integration using FeFaceValues. New is the logic to decide if the term
+    // goes into the system matrix (outflow) or the right-hand side (inflow).
     auto boundary_worker = [&](const Iterator &    cell,
                                const unsigned int &face_no,
                                ScratchData<dim> &  scratch_data,
@@ -322,16 +361,23 @@ namespace Step12
               for (unsigned int i = 0; i < n_facet_dofs; ++i)
                 for (unsigned int j = 0; j < n_facet_dofs; ++j)
                   copy_data.cell_matrix(i, j) +=
-                    beta_n * fe_face.shape_value(j, point) *
-                    fe_face.shape_value(i, point) * JxW[point];
+                    fe_face.shape_value(i, point)   // \phi_i
+                    * fe_face.shape_value(j, point) // \phi_j
+                    * beta_n                        // \beta . n
+                    * JxW[point];                   // dx
             }
           else
             for (unsigned int i = 0; i < n_facet_dofs; ++i)
-              copy_data.cell_rhs(i) -=
-                beta_n * g[point] * fe_face.shape_value(i, point) * JxW[point];
+              copy_data.cell_rhs(i) += -fe_face.shape_value(i, point) // \phi_i
+                                       * g[point]                     // g
+                                       * beta_n      // \beta . n
+                                       * JxW[point]; // dx
         }
     };
 
+    // This is the function called on interior faces. The arguments specify
+    // cells, face and subface indices (for adaptive refinement). We just pass
+    // them along to the reinit() function of FEInterfaceValues.
     auto face_worker = [&](const Iterator &    cell,
                            const unsigned int &f,
                            const unsigned int &sf,
@@ -342,7 +388,7 @@ namespace Step12
                            CopyData &          copy_data) {
       FEInterfaceValues<dim> &fe_facet = scratch_data.fe_interface_values;
       fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
-      const auto &q_points = fe_facet.get_fe_values().get_quadrature_points();
+      const auto &q_points = fe_facet.get_quadrature_points();
 
       copy_data.face_data.emplace_back();
       CopyDataFace &copy_data_face = copy_data.face_data.back();
@@ -356,20 +402,21 @@ namespace Step12
       const std::vector<Tensor<1, dim>> &normals =
         fe_facet.get_normal_vectors();
 
-      // u- * (beta*n)[v]
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
           const double beta_n = beta(q_points[qpoint]) * normals[qpoint];
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_facet.choose(beta_n > 0, j, qpoint) // u^-
-                * beta_n                               // (beta*n)
-                * fe_facet.jump(i, qpoint)             // [v]
-                * JxW[qpoint];                         // dx
+                fe_facet.jump(i, qpoint)                        // [\phi_i]
+                * fe_facet.shape_value((beta_n > 0), j, qpoint) // phi_j^{UP}
+                * beta_n                                        // (\beta . n)
+                * JxW[qpoint];                                  // dx
         }
     };
 
+    // This lambda function will handle copying the data from the cell and
+    // face assembly into the global matrix and right-hand side:
     auto copier = [&](const CopyData &c) {
       constraints.distribute_local_to_global(c.cell_matrix,
                                              c.cell_rhs,
@@ -389,6 +436,10 @@ namespace Step12
 
     ScratchData<dim> scratch_data(mapping, fe, n_gauss_points);
     CopyData         copy_data;
+
+    // Here, we finally handle the assembly. We pass in ScratchData and
+    // CopyData objects, the lambda functions from above, an specify that we
+    // want to assemble interior faces once.
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,
@@ -427,6 +478,9 @@ namespace Step12
 
     // After these preparations we are ready to start the linear solver.
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
+
+    std::cout << "  Solver converged in " << solver_control.last_step()
+              << " iterations." << std::endl;
   }
 
 
@@ -479,13 +533,14 @@ namespace Step12
   }
 
 
-  // The output of this program consists of eps-files of the adaptively refined
-  // grids and the numerical solutions given in gnuplot format.
+  // The output of this program consists of a vtk file of the adaptively
+  // refined grids and the numerical solutions. Finally, we also compute the
+  // L-infinity norm of the solution using VectorTools::integrate_difference.
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     const std::string filename = "solution-" + std::to_string(cycle) + ".vtk";
-    deallog << "Writing solution to <" << filename << ">" << std::endl;
+    std::cout << "  Writing solution to <" << filename << ">" << std::endl;
     std::ofstream output(filename);
 
     DataOut<dim> data_out;
@@ -495,6 +550,21 @@ namespace Step12
     data_out.build_patches();
 
     data_out.write_vtk(output);
+
+    {
+      Vector<float> values(triangulation.n_active_cells());
+      VectorTools::integrate_difference(dof_handler,
+                                        solution,
+                                        ZeroFunction<dim>(),
+                                        values,
+                                        QGauss<dim>(fe.degree + 1),
+                                        VectorTools::Linfty_norm);
+      const double l_infty =
+        VectorTools::compute_global_error(triangulation,
+                                          values,
+                                          VectorTools::Linfty_norm);
+      std::cout << "  L-infinity norm: " << l_infty << std::endl;
+    }
   }
 
 
@@ -504,7 +574,7 @@ namespace Step12
   {
     for (unsigned int cycle = 0; cycle < 6; ++cycle)
       {
-        deallog << "Cycle " << cycle << std::endl;
+        std::cout << "Cycle " << cycle << std::endl;
 
         if (cycle == 0)
           {
@@ -514,13 +584,13 @@ namespace Step12
         else
           refine_grid();
 
-        deallog << "Number of active cells:       "
-                << triangulation.n_active_cells() << std::endl;
+        std::cout << "  Number of active cells:       "
+                  << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-                << std::endl;
+        std::cout << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+                  << std::endl;
 
         assemble_system();
         solve();
@@ -535,7 +605,6 @@ namespace Step12
 // well, and need not be commented on.
 int main()
 {
-  dealii::deallog.depth_console(10);
   try
     {
       Step12::AdvectionProblem<2> dgmethod;
