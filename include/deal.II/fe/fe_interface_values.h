@@ -223,10 +223,10 @@ public:
    * function.
    */
   double
-  choose(const bool         current_cell,
-         const unsigned int interface_dof_index,
-         const unsigned int q_point,
-         const unsigned int component = 0) const;
+  shape_value(const bool         current_cell,
+              const unsigned int interface_dof_index,
+              const unsigned int q_point,
+              const unsigned int component = 0) const;
 
   /**
    * Return the jump $[u]=u_{\text{cell}} - u_{\text{neighbor}}$ on the
@@ -238,6 +238,17 @@ public:
   jump(const unsigned int interface_dof_index,
        const unsigned int q_point,
        const unsigned int component = 0) const;
+
+  /**
+   * Return the average $\{u\}=frac{1}{2}u_{\text{cell}} +
+   * \frac{1}{2}u_{\text{neighbor}}$ on the interface
+   * for the shape function @p interface_dof_index in the quadrature point
+   * @p q_point of component @p component.
+   */
+  double
+  average(const unsigned int interface_dof_index,
+          const unsigned int q_point,
+          const unsigned int component = 0) const;
 
 private:
   /**
@@ -596,10 +607,11 @@ FEInterfaceValues<dim, spacedim>::normal(const unsigned int q_point_index) const
 
 template <int dim, int spacedim>
 double
-FEInterfaceValues<dim, spacedim>::choose(const bool         current_cell,
-                                         const unsigned int interface_dof_index,
-                                         const unsigned int q_point,
-                                         const unsigned int component) const
+FEInterfaceValues<dim, spacedim>::shape_value(
+  const bool         current_cell,
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
 {
   const unsigned int shape_fct =
     interface_dof_index_to_fe_dof_index(interface_dof_index);
@@ -642,6 +654,33 @@ FEInterfaceValues<dim, spacedim>::jump(const unsigned int interface_dof_index,
     }
 }
 
+
+
+template <int dim, int spacedim>
+double
+FEInterfaceValues<dim, spacedim>::average(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const unsigned int shape_fct =
+    interface_dof_index_to_fe_dof_index(interface_dof_index);
+  const unsigned int fe_idx =
+    interface_dof_index_to_fe_index(interface_dof_index);
+
+  if (fe_idx == 0)
+    return 0.5 *
+           get_fe_values().shape_value_component(shape_fct, q_point, component);
+  else
+    {
+      if (at_boundary())
+        return 0.0;
+      else
+        return 0.5 * get_fe_values_neighbor().shape_value_component(shape_fct,
+                                                                    q_point,
+                                                                    component);
+    }
+}
 
 
 #endif // DOXYGEN
