@@ -1,0 +1,3 @@
+Improved: Point<dim> has constexpr constructors and methods.
+<br>
+(Reza Rastak, 2018/08/31)
