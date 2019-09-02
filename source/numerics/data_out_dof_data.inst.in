@@ -39,6 +39,24 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
           DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
 
 
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_dimension>::
+      add_mg_data_vector<VEC>(const DH<deal_II_dimension, deal_II_dimension> &,
+                              const MGLevelObject<VEC> &,
+                              const std::string &);
+
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_dimension>::
+      add_mg_data_vector<VEC>(
+        const DH<deal_II_dimension, deal_II_dimension> &,
+        const MGLevelObject<VEC> &,
+        const std::vector<std::string> &,
+        const std::vector<
+          DataComponentInterpretation::DataComponentInterpretation> &);
+
+
 
     // stuff needed for face data
 
