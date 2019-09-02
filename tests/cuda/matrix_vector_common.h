@@ -198,7 +198,7 @@ main()
   {
     deallog.push("2d");
     test<2, 1>();
-    // test<2, 2>();
+    test<2, 2>();
     test<2, 3>();
     deallog.pop();
     deallog.push("3d");
