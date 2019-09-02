@@ -341,7 +341,7 @@ namespace Step12
                                CopyData &          copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
-        scratch_data.fe_interface_values.get_fe_values();
+        scratch_data.fe_interface_values.get_fe_face_values(0);
 
       const auto &q_points = fe_face.get_quadrature_points();
 
@@ -386,21 +386,20 @@ namespace Step12
                            const unsigned int &nsf,
                            ScratchData<dim> &  scratch_data,
                            CopyData &          copy_data) {
-      FEInterfaceValues<dim> &fe_facet = scratch_data.fe_interface_values;
-      fe_facet.reinit(cell, f, sf, ncell, nf, nsf);
-      const auto &q_points = fe_facet.get_quadrature_points();
+      FEInterfaceValues<dim> &fe_iv = scratch_data.fe_interface_values;
+      fe_iv.reinit(cell, f, sf, ncell, nf, nsf);
+      const auto &q_points = fe_iv.get_quadrature_points();
 
       copy_data.face_data.emplace_back();
       CopyDataFace &copy_data_face = copy_data.face_data.back();
 
-      const unsigned int n_dofs        = fe_facet.n_interface_dofs();
-      copy_data_face.joint_dof_indices = fe_facet.get_interface_dof_indices();
+      const unsigned int n_dofs        = fe_iv.n_current_interface_dofs();
+      copy_data_face.joint_dof_indices = fe_iv.get_interface_dof_indices();
 
       copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
 
-      const std::vector<double> &        JxW = fe_facet.get_JxW_values();
-      const std::vector<Tensor<1, dim>> &normals =
-        fe_facet.get_normal_vectors();
+      const std::vector<double> &        JxW     = fe_iv.get_JxW_values();
+      const std::vector<Tensor<1, dim>> &normals = fe_iv.get_normal_vectors();
 
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
@@ -408,10 +407,10 @@ namespace Step12
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_facet.jump(i, qpoint)                        // [\phi_i]
-                * fe_facet.shape_value((beta_n > 0), j, qpoint) // phi_j^{UP}
-                * beta_n                                        // (\beta . n)
-                * JxW[qpoint];                                  // dx
+                fe_iv.jump(i, qpoint)                        // [\phi_i]
+                * fe_iv.shape_value((beta_n > 0), j, qpoint) // phi_j^{UP}
+                * beta_n                                     // (\beta . n)
+                * JxW[qpoint];                               // dx
         }
     };
 

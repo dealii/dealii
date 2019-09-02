@@ -1,51 +1,44 @@
 <h1>Results</h1>
 
 
-The output of this program consist of the console output, the eps
-files including the grids, and the solutions given in gnuplot format.
+The output of this program consist of the console output and
+solutions in vtk format:
 @code
-DEAL::Cycle 0
-DEAL::Number of active cells:       64
-DEAL::Number of degrees of freedom: 256
-DEAL:Richardson::Starting value 0.176777
-DEAL:Richardson::Convergence step 4 value 3.33123e-17
-DEAL::Writing grid to <grid-0.eps>
-DEAL::Writing solution to <sol-0.gnuplot>
-DEAL::Cycle 1
-DEAL::Number of active cells:       112
-DEAL::Number of degrees of freedom: 448
-DEAL:Richardson::Starting value 0.153093
-DEAL:Richardson::Convergence step 9 value 3.74479e-17
-DEAL::Writing grid to <grid-1.eps>
-DEAL::Writing solution to <sol-1.gnuplot>
-DEAL::Cycle 2
-DEAL::Number of active cells:       214
-DEAL::Number of degrees of freedom: 856
-DEAL:Richardson::Starting value 0.149870
-DEAL:Richardson::Convergence step 16 value 1.41017e-14
-DEAL::Writing grid to <grid-2.eps>
-DEAL::Writing solution to <sol-2.gnuplot>
-DEAL::Cycle 3
-DEAL::Number of active cells:       415
-DEAL::Number of degrees of freedom: 1660
-DEAL:Richardson::Starting value 0.149053
-DEAL:Richardson::Convergence step 26 value 4.92424e-15
-DEAL::Writing grid to <grid-3.eps>
-DEAL::Writing solution to <sol-3.gnuplot>
-DEAL::Cycle 4
-DEAL::Number of active cells:       796
-DEAL::Number of degrees of freedom: 3184
-DEAL:Richardson::Starting value 0.148848
-DEAL:Richardson::Convergence step 44 value 5.80787e-14
-DEAL::Writing grid to <grid-4.eps>
-DEAL::Writing solution to <sol-4.gnuplot>
-DEAL::Cycle 5
-DEAL::Number of active cells:       1561
-DEAL::Number of degrees of freedom: 6244
-DEAL:Richardson::Starting value 0.131369
-DEAL:Richardson::Convergence step 81 value 2.39812e-13
-DEAL::Writing grid to <grid-5.eps>
-DEAL::Writing solution to <sol-5.gnuplot>
+Cycle 0
+  Number of active cells:       64
+  Number of degrees of freedom: 256
+  Solver converged in 4 iterations.
+  Writing solution to <solution-0.vtk>
+  L-infinity norm: 1.09057
+Cycle 1
+  Number of active cells:       112
+  Number of degrees of freedom: 448
+  Solver converged in 9 iterations.
+  Writing solution to <solution-1.vtk>
+  L-infinity norm: 1.10402
+Cycle 2
+  Number of active cells:       214
+  Number of degrees of freedom: 856
+  Solver converged in 16 iterations.
+  Writing solution to <solution-2.vtk>
+  L-infinity norm: 1.09813
+Cycle 3
+  Number of active cells:       415
+  Number of degrees of freedom: 1660
+  Solver converged in 26 iterations.
+  Writing solution to <solution-3.vtk>
+  L-infinity norm: 1.09579
+Cycle 4
+  Number of active cells:       796
+  Number of degrees of freedom: 3184
+  Solver converged in 44 iterations.
+  Writing solution to <solution-4.vtk>
+  L-infinity norm: 1.09612
+Cycle 5
+  Number of active cells:       1561
+  Number of degrees of freedom: 6244
+  Solver converged in 81 iterations.
+  Writing solution to <solution-5.vtk>
 @endcode
 
 We show the solutions on the initial mesh, the mesh after two
@@ -54,17 +47,6 @@ and after five adaptive refinement steps.
 <img src="https://www.dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
 <img src="https://www.dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
 <img src="https://www.dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
-
-
-Then we show the final grid (after 5 refinement steps) and the solution again,
-this time with a nicer 3d rendering (obtained using the DataOutBase::write_vtk
-function and the VTK-based VisIt visualization program) that better shows the
-sharpness of the jump on the refined mesh and the over- and undershoots of the
-solution along the interface:
-
-<img src="https://www.dealii.org/images/steps/developer/step-12.grid-5.png" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-12.3d-solution.png" alt="">
-
 
 And finally we show a plot of a 3d computation.
 
