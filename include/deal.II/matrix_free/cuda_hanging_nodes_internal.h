@@ -177,11 +177,6 @@ namespace CUDAWrappers
       , fe_degree(fe_degree)
       , dof_handler(dof_handler)
     {
-      AssertThrow(
-        (dim == 3) || ((fe_degree % 2) == 1),
-        ExcMessage(
-          "This function is not implemented when dim = 2 and fe_degree is even."));
-
       // Set up line-to-cell mapping for edge constraints (only if dim = 3)
       setup_line_to_cell();
 
@@ -787,6 +782,7 @@ namespace CUDAWrappers
           ((direction == 1) && ((constraint_mask & internal::constr_type_x) ?
                                   (x_idx == 0) :
                                   (x_idx == fe_degree)));
+        __syncthreads();
         if (constrained_face && constrained_dof)
           {
             const bool type = constraint_mask & this_type;
@@ -901,6 +897,7 @@ namespace CUDAWrappers
            ((constraint_mask & face2) && on_face2) ||
            ((constraint_mask & edge) && on_face1 && on_face2));
 
+        __syncthreads();
         if (constrained_face && constrained_dof)
           {
             const bool type = constraint_mask & this_type;
