@@ -936,15 +936,6 @@ public:
   equ(const value_type a, const BlockVector2 &V);
 
   /**
-   * U=a*V+b*W. Replacing by sum.
-   */
-  void
-  equ(const value_type       a,
-      const BlockVectorBase &V,
-      const value_type       b,
-      const BlockVectorBase &W);
-
-  /**
    * Update the ghost values by calling <code>update_ghost_values</code> for
    * each block.
    */
@@ -1944,29 +1935,6 @@ BlockVectorBase<VectorType>::scale(const BlockVector2 &v)
          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i].scale(v.block(i));
-}
-
-
-
-template <class VectorType>
-void
-BlockVectorBase<VectorType>::equ(const value_type                   a,
-                                 const BlockVectorBase<VectorType> &v,
-                                 const value_type                   b,
-                                 const BlockVectorBase<VectorType> &w)
-{
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-
-  for (size_type i = 0; i < n_blocks(); ++i)
-    {
-      components[i].equ(a, v.components[i], b, w.components[i]);
-    }
 }
 
 

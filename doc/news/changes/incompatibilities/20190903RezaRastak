@@ -1,0 +1,3 @@
+Removed: BlockVectorBase::equ(a, U, b, V) is removed.
+<br>
+(Reza Rastak, 2019/09/03)
