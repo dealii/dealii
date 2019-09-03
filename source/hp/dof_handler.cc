@@ -1587,6 +1587,8 @@ namespace hp
     const Triangulation<dim, spacedim> &   tria,
     const hp::FECollection<dim, spacedim> &fe)
   {
+    clear();
+
     if (this->tria != &tria)
       {
         for (auto &connection : tria_listeners)
