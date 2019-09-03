@@ -132,13 +132,6 @@ public:
            std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
-   * Return the degree of the BDM space, which is one less than the highest
-   * polynomial degree.
-   */
-  unsigned int
-  degree() const;
-
-  /**
    * Return the name of the space, which is <tt>BDM</tt>.
    */
   std::string
@@ -201,14 +194,6 @@ private:
    */
   mutable std::vector<Tensor<4, dim>> p_fourth_derivatives;
 };
-
-
-template <int dim>
-inline unsigned int
-PolynomialsBDM<dim>::degree() const
-{
-  return polynomial_space.degree() - 1;
-}
 
 
 template <int dim>

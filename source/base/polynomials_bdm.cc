@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
+  : TensorPolynomialsBase<dim>(k + 1, n_polynomials(k))
   , polynomial_space(Polynomials::Legendre::generate_complete_basis(k))
   , monomials((dim == 2) ? (1) : (k + 2))
   , p_values(polynomial_space.n())
@@ -193,7 +193,8 @@ PolynomialsBDM<dim>::evaluate(
               // p(t) = t^(i+1)
               monomials[i + 1].value(unit_point(d), monovali[d]);
               // q(t) = t^(k-i)
-              monomials[degree() - i].value(unit_point(d), monovalk[d]);
+              monomials[this->degree() - 1 - i].value(unit_point(d),
+                                                      monovalk[d]);
             }
           if (values.size() != 0)
             {
