@@ -258,10 +258,10 @@ namespace CUDAWrappers
     // Use the read-only data cache.
     values[idx] = __ldg(&src[src_idx]);
 
+    __syncthreads();
+
     internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
                                                            values);
-
-    __syncthreads();
   }
 
 
