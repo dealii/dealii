@@ -131,14 +131,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::renumber_dofs(
 template <int dim, typename Number, typename VectorizedArrayType>
 const DoFHandler<dim> &
 MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
-  const unsigned int dof_index) const
+  const unsigned int dof_handler_index) const
 {
-  AssertIndexRange(dof_index, n_components());
+  AssertIndexRange(dof_handler_index, n_components());
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
     {
       AssertDimension(dof_handlers.dof_handler.size(),
                       dof_handlers.n_dof_handlers);
-      return *dof_handlers.dof_handler[dof_index];
+      return *dof_handlers.dof_handler[dof_handler_index];
     }
   else
     {
@@ -156,11 +156,11 @@ typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
   const unsigned int macro_cell_number,
   const unsigned int vector_number,
-  const unsigned int dof_index) const
+  const unsigned int dof_handler_index) const
 {
   const unsigned int vectorization_length =
     VectorizedArrayType::n_array_elements;
-  AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
+  AssertIndexRange(dof_handler_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
 
@@ -169,7 +169,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
     {
       AssertDimension(dof_handlers.dof_handler.size(),
                       dof_handlers.n_dof_handlers);
-      dofh = dof_handlers.dof_handler[dof_index];
+      dofh = dof_handlers.dof_handler[dof_handler_index];
     }
   else
     {
@@ -193,17 +193,18 @@ typename hp::DoFHandler<dim>::active_cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int macro_cell_number,
   const unsigned int vector_number,
-  const unsigned int dof_index) const
+  const unsigned int dof_handler_index) const
 {
   constexpr unsigned int vectorization_length =
     VectorizedArrayType::n_array_elements;
-  AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
+  AssertIndexRange(dof_handler_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
 
   Assert(dof_handlers.active_dof_handler == DoFHandlers::hp,
          ExcNotImplemented());
-  const hp::DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[dof_index];
+  const hp::DoFHandler<dim> *dofh =
+    dof_handlers.hp_dof_handler[dof_handler_index];
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[macro_cell_number * vectorization_length + vector_number];
   return typename hp::DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),

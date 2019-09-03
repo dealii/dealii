@@ -1307,7 +1307,7 @@ public:
   typename DoFHandler<dim>::cell_iterator
   get_cell_iterator(const unsigned int macro_cell_number,
                     const unsigned int vector_number,
-                    const unsigned int fe_component = 0) const;
+                    const unsigned int dof_handler_index = 0) const;
 
   /**
    * This returns the cell iterator in deal.II speak to a given cell in the
@@ -1392,7 +1392,7 @@ public:
    * given hp index.
    */
   unsigned int
-  get_dofs_per_face(const unsigned int fe_component       = 0,
+  get_dofs_per_face(const unsigned int dof_handler_index  = 0,
                     const unsigned int hp_active_fe_index = 0) const;
 
   /**
