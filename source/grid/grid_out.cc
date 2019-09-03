@@ -4151,8 +4151,6 @@ namespace internal
                                                                           v0),
                                 u1 = mapping->transform_real_to_unit_cell(cell,
                                                                           v1);
-
-                              const Point<spacedim> center;
                               for (unsigned int i = 0; i < n_points; ++i)
                                 line_points.push_back(
                                   mapping->transform_unit_to_real_cell(
