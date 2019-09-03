@@ -471,20 +471,15 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       //////////////////      
       if(keyword == "FIELD")
       {
-        std::cout<<std::endl<<"Processing FIELD_DATA...."<<std::endl;
-        unsigned int no_fields;
-        /*char word[10];                                     //FieldData in the Field Section
-        in>>word;
-        */
-       in>>keyword;
+        unsigned int n_fields;
+        in >> keyword;
         AssertThrow(
           keyword == "FieldData",
           ExcMessage("While reading VTK file, missing keyword FieldData"));
         
-        //if (strcmp(word,"FieldData")==0)
-          in>>no_fields;
+        in >> n_fields;
         
-        for(unsigned int i = 0;i < no_fields;i++)
+        for(unsigned int i = 0;i < n_fields;++i)
         {
           std::string section_name;
           std::string data_type;
@@ -512,7 +507,6 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           this->field_data[section_name]=temp_data;
         }
       }
-      std::cout<<std::endl<<"Processing FIELD section complete."<<std::endl;
 
       //////////////////
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
