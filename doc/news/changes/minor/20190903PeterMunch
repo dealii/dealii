@@ -1,0 +1,3 @@
+New: Enable global refinement and coarsengin for parallel::fullydistributed::Triangulation. 
+<br>
+(Peter Munch, 2019/08/03)
