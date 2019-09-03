@@ -30,10 +30,12 @@ DEAL_II_NAMESPACE_OPEN
  * the literature these are called "inner interfaces" or "facets".
  *
  * Internally, this class provides an abstraction for two FEFaceValues
- * objects. The class introduces a new "interface dof index" that walks over
+ * objects (or FESubfaceValues when using adaptive refinement). The class
+ * introduces a new "interface dof index" that walks over
  * the union of the dof indices of the two FEFaceValues objects. Helper
  * functions allow translating between the new "interface dof index" and the
- * corresponding "fe index" and "dof index" of the FE.
+ * corresponding "fe index" (0 for the first cell, 1 for the second cell)
+ * and "dof index" of the FE.
  *
  * The class is made to be used inside MeshWorker::mesh_loop. It is intended
  * to be a low level replacement for MeshWorker and LocalIntegrators and a
@@ -50,9 +52,7 @@ public:
    * Construct an FEInterfaceValues from existing FEFaceValues objects.
    */
   FEInterfaceValues(const FEFaceValues<dim> &   fe,
-                    const FESubfaceValues<dim> &fe_sub,
-                    const FEFaceValues<dim> &   fe_neighbor,
-                    const FESubfaceValues<dim> &fe_sub_neighbor);
+                    const FESubfaceValues<dim> &fe_sub);
 
   /**
    * Construct the FEInterfaceValues with a single FiniteElement (same on both
@@ -171,7 +171,7 @@ public:
 
   /**
    * Convert a FiniteElement index @p fe_index (0=cell, 1=neighbor) and dof
-   * index @p face_dof_index into an interface DoF index.
+   * index @p fe_dof_index into an interface DoF index.
    *
    * The inverse of this operation is done with
    * interface_dof_index_to_fe_index() and
@@ -179,7 +179,7 @@ public:
    */
   unsigned int
   interface_dof_index(const unsigned int fe_index,
-                      const unsigned int face_dof_index) const;
+                      const unsigned int fe_dof_index) const;
 
   /**
    * Return the FEFaceValues object of the cell or the neighboring cell
@@ -310,18 +310,17 @@ private:
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const FEFaceValues<dim> &   fe,
-  const FESubfaceValues<dim> &fe_sub,
-  const FEFaceValues<dim> &   fe_neighbor,
-  const FESubfaceValues<dim> &fe_sub_neighbor)
+  const FESubfaceValues<dim> &fe_sub)
   : internal_fe_face_values(fe)
   , internal_fe_subface_values(fe_sub)
-  , internal_fe_face_values_neighbor(fe_neighbor)
-  , internal_fe_subface_values_neighbor(fe_sub_neighbor)
+  , internal_fe_face_values_neighbor(fe)
+  , internal_fe_subface_values_neighbor(fe_sub)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
 {
-  n_dofs_fe          = fe.get_fe().n_dofs_per_cell();
-  n_dofs_fe_neighbor = fe_neighbor.get_fe().n_dofs_per_cell();
+  n_dofs_fe = internal_fe_face_values.get_fe().n_dofs_per_cell();
+  n_dofs_fe_neighbor =
+    internal_fe_face_values_neighbor.get_fe().n_dofs_per_cell();
 }
 
 
@@ -542,7 +541,7 @@ template <int dim, int spacedim>
 unsigned int
 FEInterfaceValues<dim, spacedim>::interface_dof_index(
   const unsigned int fe_index,
-  const unsigned int face_dof_index) const
+  const unsigned int fe_dof_index) const
 {
   Assert(fe_index <= 1, ExcMessage("fe_index should be 0 or 1"));
   if (at_boundary())
@@ -550,14 +549,14 @@ FEInterfaceValues<dim, spacedim>::interface_dof_index(
 
   if (fe_index == 0)
     {
-      Assert(face_dof_index < n_dofs_fe, ExcMessage("invalid face_dof_idx"));
-      return face_dof_index;
+      Assert(fe_dof_index < n_dofs_fe, ExcMessage("invalid fe_dof_index"));
+      return fe_dof_index;
     }
   else if (fe_index == 1)
     {
-      Assert(face_dof_index < n_dofs_fe_neighbor,
-             ExcMessage("invalid face_dof_idx"));
-      return face_dof_index + n_dofs_fe;
+      Assert(fe_dof_index < n_dofs_fe_neighbor,
+             ExcMessage("invalid fe_dof_index"));
+      return fe_dof_index + n_dofs_fe;
     }
 
   // return something invalid:
