@@ -294,12 +294,12 @@ namespace internal
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           {
             test_values[k].resize(poly.n());
-            poly.compute(quadrature.point(k),
-                         test_values[k],
-                         dummy1,
-                         dummy2,
-                         dummy3,
-                         dummy4);
+            poly.evaluate(quadrature.point(k),
+                          test_values[k],
+                          dummy1,
+                          dummy2,
+                          dummy3,
+                          dummy4);
             for (unsigned int i = 0; i < poly.n(); ++i)
               {
                 test_values[k][i] *= quadrature.weight(k);

@@ -296,7 +296,7 @@ namespace internal
             data.shape_fourth_derivatives.size() != 0)
           for (unsigned int point = 0; point < n_points; ++point)
             {
-              tensor_pols.compute(
+              tensor_pols.evaluate(
                 unit_points[point], values, grads, grad2, grad3, grad4);
 
               if (data.shape_values.size() != 0)

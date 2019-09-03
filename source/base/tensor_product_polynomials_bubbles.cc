@@ -215,7 +215,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
 
 template <int dim>
 void
-TensorProductPolynomialsBubbles<dim>::compute(
+TensorProductPolynomialsBubbles<dim>::evaluate(
   const Point<dim> &           p,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -273,7 +273,7 @@ TensorProductPolynomialsBubbles<dim>::compute(
       do_4th_derivatives = true;
     }
 
-  this->TensorProductPolynomials<dim>::compute(
+  this->TensorProductPolynomials<dim>::evaluate(
     p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
   for (unsigned int i = this->n_tensor_pols;

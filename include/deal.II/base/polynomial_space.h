@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/tensor.h>
 
@@ -95,7 +96,7 @@ DEAL_II_NAMESPACE_OPEN
  * 2005
  */
 template <int dim>
-class PolynomialSpace
+class PolynomialSpace : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -142,12 +143,12 @@ public:
    * compute_grad_grad() functions, see below, in a loop over all polynomials.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<double> &        values,
-          std::vector<Tensor<1, dim>> &grads,
-          std::vector<Tensor<2, dim>> &grad_grads,
-          std::vector<Tensor<3, dim>> &third_derivatives,
-          std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
   /**
    * Compute the value of the <tt>i</tt>th polynomial at unit point
@@ -194,27 +195,20 @@ public:
    * given, then the result of this function is <i>N</i> in 1d,
    * <i>N(N+1)/2</i> in 2d, and <i>N(N+1)(N+2)/6</i> in 3d.
    */
-  unsigned int
-  n() const;
-
-  /**
-   * Degree of the space. This is by definition the number of polynomials
-   * given to the constructor, NOT the maximal degree of a polynomial in this
-   * vector. The latter value is never checked and therefore left to the
-   * application.
-   */
-  unsigned int
-  degree() const;
-
-  /**
-   * Static function used in the constructor to compute the number of
-   * polynomials.
-   *
-   * @warning The argument `n` is not the maximal degree, but the number of
-   * onedimensional polynomials, thus the degree plus one.
-   */
   static unsigned int
   n_polynomials(const unsigned int n);
+
+  /**
+   * Return the name of the space, which is <tt>PolynomialSpace</tt>.
+   */
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
 
 protected:
   /**
@@ -233,11 +227,6 @@ private:
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
   const std::vector<Polynomials::Polynomial<double>> polynomials;
-
-  /**
-   * Store the precomputed value which the <tt>n()</tt> function returns.
-   */
-  const unsigned int n_pols;
 
   /**
    * Index map for reordering the polynomials.
@@ -270,16 +259,16 @@ PolynomialSpace<3>::compute_index(const unsigned int n) const;
 template <int dim>
 template <class Pol>
 PolynomialSpace<dim>::PolynomialSpace(const std::vector<Pol> &pols)
-  : polynomials(pols.begin(), pols.end())
-  , n_pols(n_polynomials(polynomials.size()))
-  , index_map(n_pols)
-  , index_map_inverse(n_pols)
+  : ScalarPolynomialsBase<dim>(pols.size(), n_polynomials(pols.size()))
+  , polynomials(pols.begin(), pols.end())
+  , index_map(n_polynomials(pols.size()))
+  , index_map_inverse(n_polynomials(pols.size()))
 {
   // per default set this index map
   // to identity. This map can be
   // changed by the user through the
   // set_numbering function
-  for (unsigned int i = 0; i < n_pols; ++i)
+  for (unsigned int i = 0; i < this->n(); ++i)
     {
       index_map[i]         = i;
       index_map_inverse[i] = i;
@@ -287,20 +276,12 @@ PolynomialSpace<dim>::PolynomialSpace(const std::vector<Pol> &pols)
 }
 
 
-template <int dim>
-inline unsigned int
-PolynomialSpace<dim>::n() const
-{
-  return n_pols;
-}
-
-
 
 template <int dim>
-inline unsigned int
-PolynomialSpace<dim>::degree() const
+inline std::string
+PolynomialSpace<dim>::name() const
 {
-  return polynomials.size();
+  return "PolynomialSpace";
 }
 
 
@@ -309,7 +290,7 @@ template <class StreamType>
 void
 PolynomialSpace<dim>::output_indices(StreamType &out) const
 {
-  for (unsigned int i = 0; i < n_pols; ++i)
+  for (unsigned int i = 0; i < this->n(); ++i)
     {
       const std::array<unsigned int, dim> ix = compute_index(i);
       out << i << "\t";

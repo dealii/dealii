@@ -40,12 +40,12 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  *  static const unsigned int dimension;
  *
- *  void compute (const Point<dim>            &unit_point,
- *                std::vector<double>         &values,
- *                std::vector<Tensor<1,dim> > &grads,
- *                std::vector<Tensor<2,dim> > &grad_grads,
- *                std::vector<Tensor<3,dim> > &third_derivatives,
- *                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+ *  void evaluate (const Point<dim>            &unit_point,
+ *                 std::vector<double>         &values,
+ *                 std::vector<Tensor<1,dim> > &grads,
+ *                 std::vector<Tensor<2,dim> > &grad_grads,
+ *                 std::vector<Tensor<3,dim> > &third_derivatives,
+ *                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
  *
  *  double compute_value (const unsigned int i,
  *                        const Point<dim> &p) const;
@@ -303,12 +303,12 @@ protected:
                         update_3rd_derivatives))
       for (unsigned int i = 0; i < n_q_points; ++i)
         {
-          poly_space.compute(quadrature.point(i),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space.evaluate(quadrature.point(i),
+                              values,
+                              grads,
+                              grad_grads,
+                              third_derivatives,
+                              fourth_derivatives);
 
           // the values of shape functions at quadrature points don't change.
           // consequently, write these values right into the output array if
