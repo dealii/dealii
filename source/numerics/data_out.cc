@@ -218,7 +218,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 }
               else
                 {
-                  scratch_data.resize_system_vectors(n_components);
+                  scratch_data.resize_system_vectors(
+                    n_components *
+                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1));
 
                   // At each point we now have to evaluate a vector valued
                   // function and its derivatives. It may be that the solution
@@ -255,8 +257,181 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   else
                     {
                       // The solution is complex-valued. We don't currently
-                      // know how to handle this.
-                      Assert(false, ExcNotImplemented());
+                      // know how to handle this in the most general case,
+                      // but we can deal with it as long as there is only a
+                      // scalar solution since then we can just collate the two
+                      // components of the scalar solution into one vector field
+                      if (n_components == 1)
+                        {
+                          // First get the real component of the scalar solution
+                          // and copy the data into the
+                          // scratch_data.patch_values_system output fields
+                          if (update_flags & update_values)
+                            {
+                              this->dof_data[dataset]->get_function_values(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_values);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_values[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_values[i];
+                                }
+                            }
+
+                          if (update_flags & update_gradients)
+                            {
+                              this->dof_data[dataset]->get_function_gradients(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_gradients);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_gradients.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_gradients[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_gradients[i];
+                                }
+                            }
+
+                          if (update_flags & update_hessians)
+                            {
+                              this->dof_data[dataset]->get_function_hessians(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_hessians);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_hessians[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_hessians[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_hessians[i];
+                                }
+                            }
+
+                          // Now we also have to get the imaginary
+                          // component of the scalar solution
+                          // and copy the data into the
+                          // scratch_data.patch_values_system output fields
+                          // that follow the real one
+                          if (update_flags & update_values)
+                            {
+                              this->dof_data[dataset]->get_function_values(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_values);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_values[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_values[i];
+                                }
+                            }
+
+                          if (update_flags & update_gradients)
+                            {
+                              this->dof_data[dataset]->get_function_gradients(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_gradients);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_gradients.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_gradients[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_gradients[i];
+                                }
+                            }
+
+                          if (update_flags & update_hessians)
+                            {
+                              this->dof_data[dataset]->get_function_hessians(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_hessians);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_hessians[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_hessians[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_hessians[i];
+                                }
+                            }
+                        }
+                      else
+                        {
+                          // This is the vector-valued, complex-valued case.
+                          Assert(false, ExcNotImplemented());
+                        }
                     }
 
                   // Now set other fields we may need
