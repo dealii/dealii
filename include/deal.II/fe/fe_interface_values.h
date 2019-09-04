@@ -25,22 +25,25 @@ DEAL_II_NAMESPACE_OPEN
  * FEInterfaceValues is a data structure to access and assemble Finite Element
  * data on interfaces between two cells of a mesh.
  *
- * It provides a way to access average and jump terms used in
- * Discontinuous Galerkin methods on faces between two neighboring cells. In
- * the literature these are called "inner interfaces" or "facets".
+ * It provides a way to access averages, jump terms, and similar operations used
+ * in Discontinuous Galerkin methods on a face between two neighboring cells.
+ * This allows the computation of typical mesh-dependent linear or bilinear
+ * forms in a similar way as FEValues does for cells and FEFaceValues does for
+ * faces. In
+ * the literature, the faces between neighboring cells are called "inner
+ * interfaces" or "facets".
  *
  * Internally, this class provides an abstraction for two FEFaceValues
  * objects (or FESubfaceValues when using adaptive refinement). The class
  * introduces a new "interface dof index" that walks over
  * the union of the dof indices of the two FEFaceValues objects. Helper
  * functions allow translating between the new "interface dof index" and the
- * corresponding "fe index" (0 for the first cell, 1 for the second cell)
- * and "dof index" of the FE.
+ * corresponding "cell index" (0 for the first cell, 1 for the second cell)
+ * and "dof index" within that cell.
  *
  * The class is made to be used inside MeshWorker::mesh_loop. It is intended
  * to be a low level replacement for MeshWorker and LocalIntegrators and a
  * higher level abstraction compared to assembling face terms manually.
- *
  *
  * @author Timo Heister, 2019.
  */
@@ -50,9 +53,14 @@ class FEInterfaceValues
 public:
   /**
    * Construct an FEInterfaceValues from existing FEFaceValues objects.
+   *
+   * The arguments to this functions are used to construct the internal
+   * FEFaceValues and FESubfaceValues objects for the two cells of the
+   * interface. As the arguments are copied, there are no requirements
+   * on the lifetime of the arguments.
    */
-  FEInterfaceValues(const FEFaceValues<dim> &   fe,
-                    const FESubfaceValues<dim> &fe_sub);
+  FEInterfaceValues(const FEFaceValues<dim> &   fe_face_values,
+                    const FESubfaceValues<dim> &fe_subface_values);
 
   /**
    * Construct the FEInterfaceValues with a single FiniteElement (same on both
@@ -82,28 +90,42 @@ public:
    * in MeshWorker::mesh_loop.
    *
    * Use numbers::invalid_unsigned_int for @p sub_face_no or @p
-   * sub_face_no_neighbor to indicate that no subface is in use.
+   * sub_face_no_neighbor to indicate that you want to work on the entire face,
+   * not a sub-face.
    */
-  template <class Iterator>
+  template <class CellIteratorType>
   void
-  reinit(const Iterator &    cell,
-         const unsigned int &face_no,
-         const unsigned int &sub_face_no,
-         const Iterator &    cell_neighbor,
-         const unsigned int &face_no_neighbor,
-         const unsigned int &sub_face_no_neighbor);
+  reinit(const CellIteratorType &cell,
+         const unsigned int &    face_no,
+         const unsigned int &    sub_face_no,
+         const CellIteratorType &cell_neighbor,
+         const unsigned int &    face_no_neighbor,
+         const unsigned int &    sub_face_no_neighbor);
 
   /**
    * Re-initialize this object to be used on a interface given by a single face
-   * of a cell. This is useful to use FEInterfaceValues to work on boundaries of
-   * the domain.
+   * @p face_no of the cell @p cell. This is useful to use FEInterfaceValues
+   * on boundaries of the domain.
    *
-   * As a consequence, queries like jump() will assume a value of zero for the
-   * values on the "other" side.
+   * As a consequence, members like jump() will assume a value of zero for the
+   * values on the "other" side. Note that no sub_face_number is needed as a
+   * boundary face can not neighbor a finer cell.
+   *
+   * After calling this function at_boundary() will return true.
    */
-  template <class Iterator>
+  template <class CellIteratorType>
   void
-  reinit(const Iterator &cell, const unsigned int &face_no);
+  reinit(const CellIteratorType &cell, const unsigned int &face_no);
+
+  /**
+   * Return a reference to the FEFaceValues or FESubfaceValues object
+   * of the specified cell of the interface.
+   *
+   * The @p cell_index is either 0 or 1 and corresponds to the cell index
+   * returned by interface_dof_to_cell_and_dof_index().
+   */
+  const FEFaceValuesBase<dim, spacedim> &
+  get_fe_face_values(const unsigned int cell_index) const;
 
   /**
    * Return the vector of JxW values for each quadrature point.
@@ -113,6 +135,10 @@ public:
 
   /**
    * Return the normal vector of the interface in each quadrature point.
+   *
+   * The return value is identical to get_fe_face_values(0).get_normal_vectors()
+   * and therefore, are outside normal vectors from the perspective of the
+   * first cell of this interface.
    */
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const;
@@ -143,8 +169,10 @@ public:
   n_interface_dofs() const;
 
   /**
-   * Return if the current interface is an internal
-   * face with two adjacent cells or a boundary face.
+   * Return if the current interface is a boundary face or an internal
+   * face with two adjacent cells.
+   *
+   * See the corresponding reinit() functions for details.
    */
   bool
   at_boundary() const;
@@ -156,66 +184,48 @@ public:
   get_interface_dof_indices() const;
 
   /**
-   * Translate a local "interface dof index" to a local "dof index" of the
-   * underlying FEFaceValues.
+   * Convert a cell index @p cell_index (0 or 1) and dof
+   * index @p fe_dof_index into an interface dof index.
+   *
+   * This is the inverse operation to interface_dof_to_cell_and_dof_index().
    */
   unsigned int
-  interface_dof_index_to_fe_dof_index(unsigned int interface_dof_index) const;
+  cell_and_dof_to_interface_dof_index(const unsigned int cell_index,
+                                      const unsigned int fe_dof_index) const;
 
   /**
-   * For a given "interface dof index" return whether it belongs to the cell (0)
-   * or to the neighbor (1).
-   */
-  unsigned int
-  interface_dof_index_to_fe_index(const unsigned int interface_dof_index) const;
-
-  /**
-   * Convert a FiniteElement index @p fe_index (0=cell, 1=neighbor) and dof
-   * index @p fe_dof_index into an interface DoF index.
+   * Convert an interface dof index into the corresponding cell index
+   * and dof index of that cell returned as a pair.
    *
-   * The inverse of this operation is done with
-   * interface_dof_index_to_fe_index() and
-   * interface_dof_index_to_fe_dof_index().
+   * This is the inverse operation to cell_and_dof_to_interface_dof_index().
    */
-  unsigned int
-  interface_dof_index(const unsigned int fe_index,
-                      const unsigned int fe_dof_index) const;
+  std::pair<unsigned int, unsigned int>
+  interface_dof_to_cell_and_dof_index(
+    const unsigned int interface_dof_index) const;
 
-  /**
-   * Return the FEFaceValues object of the cell or the neighboring cell
-   *
-   * If @p cell_or_neighbor is 0, return the cell FEFaceValues object , if it is 1, return the
-   * neighboring cell FEFaceValues object.
-   *
-   * @note The argument @p cell_or_neighbor is returned by
-   * interface_dof_index_to_fe_index().
-   */
-  const FEFaceValuesBase<dim, spacedim> &
-  get_fe_values(const unsigned int cell_or_neighbor) const;
-
-  /**
-   * Return the FEFaceValue object of the current cell
-   */
-  const FEFaceValuesBase<dim, spacedim> &
-  get_fe_values() const;
-
-  /**
-   * Return the FEFaceValue object of the current neighboring cell
-   */
-  const FEFaceValuesBase<dim, spacedim> &
-  get_fe_values_neighbor() const;
 
   /**
    * Return the normal in a given quadrature point.
+   *
+   * The normal points in outwards direction as seen from the first cell of
+   * this interface.
    */
   Tensor<1, spacedim>
   normal(const unsigned int q_point_index) const;
 
   /**
-   * Return the current value (if @p current_cell is true) or the neighboring value
-   * (if @p current_cell is false) on the interface for the shape function @p
-   * interface_dof_index in the quadrature point @p q_point of component @p
-   * component.
+   * Return component @p component of the value of the shape function
+   * with interface dof index @p interface_dof_index in
+   * quadrature point @p q_point.
+   *
+   * The argument @p use_upstream_value selects between the upstream value and
+   * the downstream value as defined by the direction of the normal vector
+   * in this quadrature point. If @p use_upstream_value is true, the shape
+   * functions from the first cell of the interface is used.
+   *
+   * In other words, this function returns the limit of the value of the shape
+   * function in the given quadrature point when approaching it from one of the
+   * two cells of the interface.
    *
    * @note This function is typically used to pick the upstream or downstream
    * value based on a direction. This can be achieved by using
@@ -223,15 +233,15 @@ public:
    * function.
    */
   double
-  shape_value(const bool         current_cell,
+  shape_value(const bool         use_upstream_value,
               const unsigned int interface_dof_index,
               const unsigned int q_point,
               const unsigned int component = 0) const;
 
   /**
-   * Return the jump $[u]=u_{\text{cell}} - u_{\text{neighbor}}$ on the
+   * Return the jump $[u]=u_{\text{cell1}} - u_{\text{cell2}}$ on the
    * interface
-   * for the shape function @p interface_dof_index in the quadrature point
+   * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
    */
   double
@@ -242,7 +252,7 @@ public:
   /**
    * Return the average $\{u\}=frac{1}{2}u_{\text{cell}} +
    * \frac{1}{2}u_{\text{neighbor}}$ on the interface
-   * for the shape function @p interface_dof_index in the quadrature point
+   * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
    */
   double
@@ -255,28 +265,6 @@ private:
    * The list of DoF indices for the current interface, filled in reinit().
    */
   std::vector<types::global_dof_index> interface_dof_indices;
-
-  /**
-   * The number of DoFs belonging to the current cell
-   */
-  unsigned int n_dofs_fe;
-
-  /**
-   * The number of DoFs belonging to the neighboring cell
-   */
-  unsigned int n_dofs_fe_neighbor;
-
-  /**
-   * Pointer to internal_fe_face_values or internal_fe_subface_values,
-   * respectively.
-   */
-  FEFaceValuesBase<dim> *fe_face_values = nullptr;
-
-  /**
-   * Pointer to internal_fe_face_values_neighbor,
-   * internal_fe_subface_values_neighbor, or nullptr, respectively.
-   */
-  FEFaceValuesBase<dim> *fe_face_values_neighbor = nullptr;
 
   /**
    * The FEFaceValues object for the current cell.
@@ -297,6 +285,19 @@ private:
    * The FEFaceValues object for the neighboring cell if the cell is refined.
    */
   FESubfaceValues<dim> internal_fe_subface_values_neighbor;
+
+  /**
+   * Pointer to internal_fe_face_values or internal_fe_subface_values,
+   * respectively as determined in reinit().
+   */
+  FEFaceValuesBase<dim> *fe_face_values = nullptr;
+
+  /**
+   * Pointer to internal_fe_face_values_neighbor,
+   * internal_fe_subface_values_neighbor, or nullptr, respectively
+   * as determined in reinit().
+   */
+  FEFaceValuesBase<dim> *fe_face_values_neighbor = nullptr;
 };
 
 
@@ -309,19 +310,15 @@ private:
 
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
-  const FEFaceValues<dim> &   fe,
-  const FESubfaceValues<dim> &fe_sub)
-  : internal_fe_face_values(fe)
-  , internal_fe_subface_values(fe_sub)
-  , internal_fe_face_values_neighbor(fe)
-  , internal_fe_subface_values_neighbor(fe_sub)
+  const FEFaceValues<dim> &   fe_face_values,
+  const FESubfaceValues<dim> &fe_subface_values)
+  : internal_fe_face_values(fe_face_values)
+  , internal_fe_subface_values(fe_subface_values)
+  , internal_fe_face_values_neighbor(fe_face_values)
+  , internal_fe_subface_values_neighbor(fe_subface_values)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
-{
-  n_dofs_fe = internal_fe_face_values.get_fe().n_dofs_per_cell();
-  n_dofs_fe_neighbor =
-    internal_fe_face_values_neighbor.get_fe().n_dofs_per_cell();
-}
+{}
 
 
 
@@ -337,10 +334,7 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   , internal_fe_subface_values_neighbor(mapping, fe, quadrature, update_flags)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
-{
-  n_dofs_fe          = fe.n_dofs_per_cell();
-  n_dofs_fe_neighbor = fe.n_dofs_per_cell();
-}
+{}
 
 
 
@@ -367,23 +361,20 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
                                         update_flags)
   , fe_face_values(nullptr)
   , fe_face_values_neighbor(nullptr)
-{
-  n_dofs_fe          = fe.n_dofs_per_cell();
-  n_dofs_fe_neighbor = fe.n_dofs_per_cell();
-}
+{}
 
 
 
 template <int dim, int spacedim>
-template <class Iterator>
+template <class CellIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
-  const Iterator &    cell,
-  const unsigned int &face_no,
-  const unsigned int &sub_face_no,
-  const Iterator &    cell_neighbor,
-  const unsigned int &face_no_neighbor,
-  const unsigned int &sub_face_no_neighbor)
+  const CellIteratorType &cell,
+  const unsigned int &    face_no,
+  const unsigned int &    sub_face_no,
+  const CellIteratorType &cell_neighbor,
+  const unsigned int &    face_no_neighbor,
+  const unsigned int &    sub_face_no_neighbor)
 {
   if (sub_face_no == numbers::invalid_unsigned_int)
     {
@@ -409,13 +400,14 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
 
   // Fill the DoF indices:
-  std::vector<types::global_dof_index> v(n_dofs_fe);
+  std::vector<types::global_dof_index> v(
+    fe_face_values->get_fe().n_dofs_per_cell);
   cell->get_dof_indices(v);
-  std::vector<types::global_dof_index> v2(n_dofs_fe_neighbor);
+  std::vector<types::global_dof_index> v2(
+    fe_face_values_neighbor->get_fe().n_dofs_per_cell);
   cell_neighbor->get_dof_indices(v2);
 
-  interface_dof_indices.clear();
-  interface_dof_indices.insert(interface_dof_indices.end(), v.begin(), v.end());
+  interface_dof_indices = std::move(v);
   interface_dof_indices.insert(interface_dof_indices.end(),
                                v2.begin(),
                                v2.end());
@@ -424,16 +416,16 @@ FEInterfaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
-template <class Iterator>
+template <class CellIteratorType>
 void
-FEInterfaceValues<dim, spacedim>::reinit(const Iterator &    cell,
-                                         const unsigned int &face_no)
+FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
+                                         const unsigned int &    face_no)
 {
   internal_fe_face_values.reinit(cell, face_no);
   fe_face_values          = &internal_fe_face_values;
   fe_face_values_neighbor = nullptr;
 
-  interface_dof_indices.resize(n_dofs_fe);
+  interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell);
   cell->get_dof_indices(interface_dof_indices);
 }
 
@@ -443,7 +435,7 @@ template <int dim, int spacedim>
 const std::vector<double> &
 FEInterfaceValues<dim, spacedim>::get_JxW_values() const
 {
-  return internal_fe_face_values.get_JxW_values();
+  return fe_face_values->get_JxW_values();
 }
 
 
@@ -452,7 +444,7 @@ template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
 FEInterfaceValues<dim, spacedim>::get_normal_vectors() const
 {
-  return internal_fe_face_values.get_normal_vectors();
+  return fe_face_values->get_normal_vectors();
 }
 
 
@@ -461,7 +453,7 @@ template <int dim, int spacedim>
 const Quadrature<dim - 1> &
 FEInterfaceValues<dim, spacedim>::get_quadrature() const
 {
-  return internal_fe_face_values.get_quadrature();
+  return fe_face_values->get_quadrature();
 }
 
 
@@ -470,7 +462,7 @@ template <int dim, int spacedim>
 const std::vector<Point<spacedim>> &
 FEInterfaceValues<dim, spacedim>::get_quadrature_points() const
 {
-  return internal_fe_face_values.get_quadrature_points();
+  return fe_face_values->get_quadrature_points();
 }
 
 
@@ -479,7 +471,7 @@ template <int dim, int spacedim>
 const UpdateFlags
 FEInterfaceValues<dim, spacedim>::get_update_flags() const
 {
-  return internal_fe_face_values.get_update_flags();
+  return fe_face_values->get_update_flags();
 }
 
 
@@ -488,7 +480,7 @@ template <int dim, int spacedim>
 unsigned
 FEInterfaceValues<dim, spacedim>::n_interface_dofs() const
 {
-  return n_dofs_fe + (at_boundary() ? 0 : n_dofs_fe_neighbor);
+  return interface_dof_indices.size();
 }
 
 
@@ -506,55 +498,46 @@ template <int dim, int spacedim>
 std::vector<types::global_dof_index>
 FEInterfaceValues<dim, spacedim>::get_interface_dof_indices() const
 {
-  Assert(interface_dof_indices.size() == n_interface_dofs(),
-         ExcInternalError());
   return interface_dof_indices;
 }
 
 
 
 template <int dim, int spacedim>
-unsigned int
-FEInterfaceValues<dim, spacedim>::interface_dof_index_to_fe_dof_index(
-  unsigned int interface_dof_index) const
-{
-  AssertIndexRange(interface_dof_index, n_interface_dofs());
-  return (interface_dof_index >= n_dofs_fe) ?
-           (interface_dof_index - n_dofs_fe) :
-           interface_dof_index;
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FEInterfaceValues<dim, spacedim>::interface_dof_index_to_fe_index(
+std::pair<unsigned int, unsigned int>
+FEInterfaceValues<dim, spacedim>::interface_dof_to_cell_and_dof_index(
   const unsigned int interface_dof_index) const
 {
   AssertIndexRange(interface_dof_index, n_interface_dofs());
-  return (interface_dof_index < n_dofs_fe) ? 0 : 1;
+  const unsigned int n_dofs_fe  = fe_face_values->get_fe().n_dofs_per_cell;
+  const unsigned int cell_index = (interface_dof_index < n_dofs_fe) ? 0 : 1;
+  const unsigned int dof_index =
+    (cell_index == 1) ? (interface_dof_index - n_dofs_fe) : interface_dof_index;
+  return std::make_pair(cell_index, dof_index);
 }
 
 
 
 template <int dim, int spacedim>
 unsigned int
-FEInterfaceValues<dim, spacedim>::interface_dof_index(
-  const unsigned int fe_index,
+FEInterfaceValues<dim, spacedim>::cell_and_dof_to_interface_dof_index(
+  const unsigned int cell_index,
   const unsigned int fe_dof_index) const
 {
-  Assert(fe_index <= 1, ExcMessage("fe_index should be 0 or 1"));
+  Assert(cell_index <= 1, ExcMessage("cell_index should be 0 or 1"));
   if (at_boundary())
-    Assert(fe_index == 0, ExcMessage("A boundary facet only has FE index 0."));
+    Assert(cell_index == 0,
+           ExcMessage("A boundary facet only has cell index 0."));
 
-  if (fe_index == 0)
+  const unsigned int n_dofs_fe = fe_face_values->get_fe().n_dofs_per_cell;
+  if (cell_index == 0)
     {
       Assert(fe_dof_index < n_dofs_fe, ExcMessage("invalid fe_dof_index"));
       return fe_dof_index;
     }
-  else if (fe_index == 1)
+  else if (cell_index == 1)
     {
-      Assert(fe_dof_index < n_dofs_fe_neighbor,
+      Assert(fe_dof_index < fe_face_values_neighbor->get_fe().n_dofs_per_cell,
              ExcMessage("invalid fe_dof_index"));
       return fe_dof_index + n_dofs_fe;
     }
@@ -567,30 +550,16 @@ FEInterfaceValues<dim, spacedim>::interface_dof_index(
 
 template <int dim, int spacedim>
 const FEFaceValuesBase<dim, spacedim> &
-FEInterfaceValues<dim, spacedim>::get_fe_values(
-  const unsigned int cell_or_neighbor) const
+FEInterfaceValues<dim, spacedim>::get_fe_face_values(
+  const unsigned int cell_index) const
 {
-  AssertIndexRange(cell_or_neighbor, 2);
-  return (cell_or_neighbor == 0) ? get_fe_values() : get_fe_values_neighbor();
-}
+  AssertIndexRange(cell_index, 2);
+  Assert(
+    cell_index == 0 || !at_boundary(),
+    ExcMessage(
+      "You are on a boundary, so you can only ask for the first FEFaceValues object."));
 
-
-
-template <int dim, int spacedim>
-const FEFaceValuesBase<dim, spacedim> &
-FEInterfaceValues<dim, spacedim>::get_fe_values() const
-{
-  return *fe_face_values;
-}
-
-
-
-template <int dim, int spacedim>
-const FEFaceValuesBase<dim, spacedim> &
-FEInterfaceValues<dim, spacedim>::get_fe_values_neighbor() const
-{
-  Assert(!at_boundary(), ExcMessage("Not possible for boundary Facet."));
-  return *fe_face_values_neighbor;
+  return (cell_index == 0) ? *fe_face_values : *fe_face_values_neighbor;
 }
 
 
@@ -612,17 +581,17 @@ FEInterfaceValues<dim, spacedim>::shape_value(
   const unsigned int q_point,
   const unsigned int component) const
 {
-  const unsigned int shape_fct =
-    interface_dof_index_to_fe_dof_index(interface_dof_index);
-  const unsigned int fe_idx =
-    interface_dof_index_to_fe_index(interface_dof_index);
+  const auto cell_and_dof_idx =
+    interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (current_cell && fe_idx == 0)
-    return get_fe_values().shape_value_component(shape_fct, q_point, component);
-  if (!current_cell && fe_idx == 1)
-    return get_fe_values_neighbor().shape_value_component(shape_fct,
-                                                          q_point,
-                                                          component);
+  if (current_cell && cell_and_dof_idx.second == 0)
+    return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.first,
+                                                       q_point,
+                                                       component);
+  if (!current_cell && cell_and_dof_idx.second == 1)
+    return get_fe_face_values(1).shape_value_component(cell_and_dof_idx.first,
+                                                       q_point,
+                                                       component);
 
   return 0.0;
 }
@@ -635,21 +604,20 @@ FEInterfaceValues<dim, spacedim>::jump(const unsigned int interface_dof_index,
                                        const unsigned int q_point,
                                        const unsigned int component) const
 {
-  const unsigned int shape_fct =
-    interface_dof_index_to_fe_dof_index(interface_dof_index);
-  const unsigned int fe_idx =
-    interface_dof_index_to_fe_index(interface_dof_index);
+  const auto cell_and_dof_idx =
+    interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (fe_idx == 0)
-    return get_fe_values().shape_value_component(shape_fct, q_point, component);
+  if (cell_and_dof_idx.first == 0)
+    return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.second,
+                                                       q_point,
+                                                       component);
   else
     {
       if (at_boundary())
         return 0.0;
       else
-        return -get_fe_values_neighbor().shape_value_component(shape_fct,
-                                                               q_point,
-                                                               component);
+        return -get_fe_face_values(1).shape_value_component(
+          cell_and_dof_idx.second, q_point, component);
     }
 }
 
@@ -662,22 +630,19 @@ FEInterfaceValues<dim, spacedim>::average(
   const unsigned int q_point,
   const unsigned int component) const
 {
-  const unsigned int shape_fct =
-    interface_dof_index_to_fe_dof_index(interface_dof_index);
-  const unsigned int fe_idx =
-    interface_dof_index_to_fe_index(interface_dof_index);
+  const auto cell_and_dof_idx =
+    interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (fe_idx == 0)
-    return 0.5 *
-           get_fe_values().shape_value_component(shape_fct, q_point, component);
+  if (cell_and_dof_idx.first == 0)
+    return 0.5 * get_fe_face_values(0).shape_value_component(
+                   cell_and_dof_idx.second, q_point, component);
   else
     {
       if (at_boundary())
         return 0.0;
       else
-        return 0.5 * get_fe_values_neighbor().shape_value_component(shape_fct,
-                                                                    q_point,
-                                                                    component);
+        return 0.5 * get_fe_face_values(1).shape_value_component(
+                       cell_and_dof_idx.second, q_point, component);
     }
 }
 
