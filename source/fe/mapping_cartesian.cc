@@ -289,50 +289,9 @@ MappingCartesian<dim, spacedim>::compute_fill(
   if (update_flags & update_normal_vectors)
     {
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
-
-      switch (dim)
-        {
-          case 1:
-            {
-              static const Point<dim> normals[GeometryInfo<1>::faces_per_cell] =
-                {Point<dim>(-1.), Point<dim>(1.)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          case 2:
-            {
-              static const Point<dim> normals[GeometryInfo<2>::faces_per_cell] =
-                {Point<dim>(-1, 0),
-                 Point<dim>(1, 0),
-                 Point<dim>(0, -1),
-                 Point<dim>(0, 1)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          case 3:
-            {
-              static const Point<dim> normals[GeometryInfo<3>::faces_per_cell] =
-                {Point<dim>(-1, 0, 0),
-                 Point<dim>(1, 0, 0),
-                 Point<dim>(0, -1, 0),
-                 Point<dim>(0, 1, 0),
-                 Point<dim>(0, 0, -1),
-                 Point<dim>(0, 0, 1)};
-              std::fill(normal_vectors.begin(),
-                        normal_vectors.end(),
-                        normals[face_no]);
-              break;
-            }
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
+      std::fill(normal_vectors.begin(),
+                normal_vectors.end(),
+                Point<dim>{GeometryInfo<dim>::unit_normal_vector[face_no]});
     }
 }
 
