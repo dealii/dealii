@@ -53,18 +53,15 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
   for (auto v : indices)
     {
       deallog << "  index " << idx << " global_dof_index:" << v << ":\n";
-      deallog << "    fe_dof_index: "
-              << fiv.interface_dof_index_to_fe_dof_index(idx) << "\n";
-      deallog << "    fe_index: " << fiv.interface_dof_index_to_fe_index(idx)
+      const auto pair = fiv.interface_dof_to_cell_and_dof_index(idx);
+      deallog << "    cell_index: " << pair.first << "\n";
+      deallog << "    fe_index: " << pair.second << "\n";
+      deallog << "    convert back: "
+              << fiv.cell_and_dof_to_interface_dof_index(pair.first,
+                                                         pair.second)
               << "\n";
-      deallog
-        << "    convert back: "
-        << fiv.interface_dof_index(fiv.interface_dof_index_to_fe_index(idx),
-                                   fiv.interface_dof_index_to_fe_dof_index(idx))
-        << "\n";
-      Assert(idx == fiv.interface_dof_index(
-                      fiv.interface_dof_index_to_fe_index(idx),
-                      fiv.interface_dof_index_to_fe_dof_index(idx)),
+      Assert(idx ==
+               fiv.cell_and_dof_to_interface_dof_index(pair.first, pair.second),
              ExcInternalError());
 
       ++idx;
@@ -137,9 +134,9 @@ test()
                    cell->neighbor_of_neighbor(f),
                    numbers::invalid_unsigned_int);
 
-        Assert(&fiv.get_fe_values(0) == &fiv.get_fe_values(),
+        Assert(fiv.get_fe_face_values(0).get_cell() == cell,
                ExcInternalError());
-        Assert(&fiv.get_fe_values(1) == &fiv.get_fe_values_neighbor(),
+        Assert(fiv.get_fe_face_values(1).get_cell() == cell->neighbor(f),
                ExcInternalError());
         Assert(fiv.n_interface_dofs() == 2 * fe.n_dofs_per_cell(),
                ExcInternalError());
@@ -165,7 +162,7 @@ test()
   {
     ++cell;
     fiv.reinit(cell, 1);
-    Assert(&fiv.get_fe_values(0) == &fiv.get_fe_values(), ExcInternalError());
+    Assert(fiv.get_fe_face_values(0).get_cell() == cell, ExcInternalError());
     Assert(fiv.n_interface_dofs() == fe.n_dofs_per_cell(), ExcInternalError());
     Assert(fiv.at_boundary(), ExcInternalError());
     inspect_fiv(fiv);

@@ -129,6 +129,9 @@ public:
 
   /**
    * Return the vector of JxW values for each quadrature point.
+   *
+   * @note This call requires a prior call to reinit() and having
+   * the @p update_JxW_values flag set in the constructor.
    */
   const std::vector<double> &
   get_JxW_values() const;
@@ -139,6 +142,9 @@ public:
    * The return value is identical to get_fe_face_values(0).get_normal_vectors()
    * and therefore, are outside normal vectors from the perspective of the
    * first cell of this interface.
+   *
+   * @note This call requires a prior call to reinit() and having
+   * the @p update_normal_vectors flag set in the constructor.
    */
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const;
@@ -150,7 +156,10 @@ public:
   get_quadrature() const;
 
   /**
-   * Return a reference to the quadrature points.
+   * Return a reference to the quadrature points in real space.
+   *
+   * @note This call requires a prior call to reinit() and having
+   * the @p update_quadrature_points flag set in the constructor.
    */
   const std::vector<Point<spacedim>> &
   get_quadrature_points() const;
@@ -401,10 +410,10 @@ FEInterfaceValues<dim, spacedim>::reinit(
 
   // Fill the DoF indices:
   std::vector<types::global_dof_index> v(
-    fe_face_values->get_fe().n_dofs_per_cell);
+    fe_face_values->get_fe().n_dofs_per_cell());
   cell->get_dof_indices(v);
   std::vector<types::global_dof_index> v2(
-    fe_face_values_neighbor->get_fe().n_dofs_per_cell);
+    fe_face_values_neighbor->get_fe().n_dofs_per_cell());
   cell_neighbor->get_dof_indices(v2);
 
   interface_dof_indices = std::move(v);
@@ -425,7 +434,7 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
   fe_face_values          = &internal_fe_face_values;
   fe_face_values_neighbor = nullptr;
 
-  interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell);
+  interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
   cell->get_dof_indices(interface_dof_indices);
 }
 
@@ -435,6 +444,8 @@ template <int dim, int spacedim>
 const std::vector<double> &
 FEInterfaceValues<dim, spacedim>::get_JxW_values() const
 {
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
   return fe_face_values->get_JxW_values();
 }
 
@@ -444,6 +455,8 @@ template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
 FEInterfaceValues<dim, spacedim>::get_normal_vectors() const
 {
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
   return fe_face_values->get_normal_vectors();
 }
 
@@ -453,7 +466,7 @@ template <int dim, int spacedim>
 const Quadrature<dim - 1> &
 FEInterfaceValues<dim, spacedim>::get_quadrature() const
 {
-  return fe_face_values->get_quadrature();
+  return internal_fe_face_values.get_quadrature();
 }
 
 
@@ -462,6 +475,8 @@ template <int dim, int spacedim>
 const std::vector<Point<spacedim>> &
 FEInterfaceValues<dim, spacedim>::get_quadrature_points() const
 {
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
   return fe_face_values->get_quadrature_points();
 }
 
@@ -471,7 +486,7 @@ template <int dim, int spacedim>
 const UpdateFlags
 FEInterfaceValues<dim, spacedim>::get_update_flags() const
 {
-  return fe_face_values->get_update_flags();
+  return internal_fe_face_values.get_update_flags();
 }
 
 
@@ -509,7 +524,7 @@ FEInterfaceValues<dim, spacedim>::interface_dof_to_cell_and_dof_index(
   const unsigned int interface_dof_index) const
 {
   AssertIndexRange(interface_dof_index, n_interface_dofs());
-  const unsigned int n_dofs_fe  = fe_face_values->get_fe().n_dofs_per_cell;
+  const unsigned int n_dofs_fe  = fe_face_values->get_fe().n_dofs_per_cell();
   const unsigned int cell_index = (interface_dof_index < n_dofs_fe) ? 0 : 1;
   const unsigned int dof_index =
     (cell_index == 1) ? (interface_dof_index - n_dofs_fe) : interface_dof_index;
@@ -529,7 +544,7 @@ FEInterfaceValues<dim, spacedim>::cell_and_dof_to_interface_dof_index(
     Assert(cell_index == 0,
            ExcMessage("A boundary facet only has cell index 0."));
 
-  const unsigned int n_dofs_fe = fe_face_values->get_fe().n_dofs_per_cell;
+  const unsigned int n_dofs_fe = fe_face_values->get_fe().n_dofs_per_cell();
   if (cell_index == 0)
     {
       Assert(fe_dof_index < n_dofs_fe, ExcMessage("invalid fe_dof_index"));
@@ -537,7 +552,7 @@ FEInterfaceValues<dim, spacedim>::cell_and_dof_to_interface_dof_index(
     }
   else if (cell_index == 1)
     {
-      Assert(fe_dof_index < fe_face_values_neighbor->get_fe().n_dofs_per_cell,
+      Assert(fe_dof_index < fe_face_values_neighbor->get_fe().n_dofs_per_cell(),
              ExcMessage("invalid fe_dof_index"));
       return fe_dof_index + n_dofs_fe;
     }
@@ -584,12 +599,12 @@ FEInterfaceValues<dim, spacedim>::shape_value(
   const auto cell_and_dof_idx =
     interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (current_cell && cell_and_dof_idx.second == 0)
-    return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.first,
+  if (current_cell && cell_and_dof_idx.first == 0)
+    return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.second,
                                                        q_point,
                                                        component);
-  if (!current_cell && cell_and_dof_idx.second == 1)
-    return get_fe_face_values(1).shape_value_component(cell_and_dof_idx.first,
+  if (!current_cell && cell_and_dof_idx.first == 1)
+    return get_fe_face_values(1).shape_value_component(cell_and_dof_idx.second,
                                                        q_point,
                                                        component);
 

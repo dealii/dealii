@@ -303,7 +303,7 @@ namespace Step12
                                CopyData &          copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
-        scratch_data.fe_interface_values.get_fe_values();
+        scratch_data.fe_interface_values.get_fe_face_values(0);
 
       const auto &q_points = fe_face.get_quadrature_points();
 

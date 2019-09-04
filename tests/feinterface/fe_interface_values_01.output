@@ -6,36 +6,36 @@ at_boundary(): 0
 n_interface_dofs(): 8
 interface_dof_indices: 0 1 2 3 4 5 6 7 
   index 0 global_dof_index:0:
-    fe_dof_index: 0
+    cell_index: 0
     fe_index: 0
     convert back: 0
   index 1 global_dof_index:1:
-    fe_dof_index: 1
-    fe_index: 0
+    cell_index: 0
+    fe_index: 1
     convert back: 1
   index 2 global_dof_index:2:
-    fe_dof_index: 2
-    fe_index: 0
+    cell_index: 0
+    fe_index: 2
     convert back: 2
   index 3 global_dof_index:3:
-    fe_dof_index: 3
-    fe_index: 0
+    cell_index: 0
+    fe_index: 3
     convert back: 3
   index 4 global_dof_index:4:
-    fe_dof_index: 0
-    fe_index: 1
+    cell_index: 1
+    fe_index: 0
     convert back: 4
   index 5 global_dof_index:5:
-    fe_dof_index: 1
+    cell_index: 1
     fe_index: 1
     convert back: 5
   index 6 global_dof_index:6:
-    fe_dof_index: 2
-    fe_index: 1
+    cell_index: 1
+    fe_index: 2
     convert back: 6
   index 7 global_dof_index:7:
-    fe_dof_index: 3
-    fe_index: 1
+    cell_index: 1
+    fe_index: 3
     convert back: 7
 
 
@@ -44,20 +44,20 @@ at_boundary(): 1
 n_interface_dofs(): 4
 interface_dof_indices: 4 5 6 7 
   index 0 global_dof_index:4:
-    fe_dof_index: 0
+    cell_index: 0
     fe_index: 0
     convert back: 0
   index 1 global_dof_index:5:
-    fe_dof_index: 1
-    fe_index: 0
+    cell_index: 0
+    fe_index: 1
     convert back: 1
   index 2 global_dof_index:6:
-    fe_dof_index: 2
-    fe_index: 0
+    cell_index: 0
+    fe_index: 2
     convert back: 2
   index 3 global_dof_index:7:
-    fe_dof_index: 3
-    fe_index: 0
+    cell_index: 0
+    fe_index: 3
     convert back: 3
 
 
