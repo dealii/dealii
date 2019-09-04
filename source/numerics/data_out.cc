@@ -277,6 +277,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.postprocessed_values[dataset]);
                 }
 
+              // Now we need to copy the result of the postprocessor to
+              // the Patch object where it can then be further processes
+              // by the functions in DataOutBase
               for (unsigned int q = 0; q < n_q_points; ++q)
                 for (unsigned int component = 0;
                      component < this->dof_data[dataset]->n_output_variables;
@@ -351,9 +354,17 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 }
             }
 
-          // increment the counter for the actual data record
+          // Increment the counter for the actual data record. We need to
+          // move it forward a number of positions equal to the number
+          // of components of this data set; if the input consisted
+          // of a complex-valued quantity and if it is not further
+          // processed by a postprocessor, then we need two output
+          // slots for each input variable.
           offset += this->dof_data[dataset]->n_output_variables *
-                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
+                    (this->dof_data[dataset]->is_complex_valued() &&
+                         (this->dof_data[dataset]->postprocessor == nullptr) ?
+                       2 :
+                       1);
         }
 
       // then do the cell data. only compute the number of a cell if needed;
@@ -565,13 +576,24 @@ DataOut<dim, DoFHandlerType>::build_patches(
   this->patches.clear();
   this->patches.resize(all_cells.size());
 
-  // now create a default object for the WorkStream object to work with
+  // Now create a default object for the WorkStream object to work with. The
+  // first step is to count how many output data sets there will be. This is,
+  // in principle, just the number of components of each data set, but we
+  // need to allocate two entries per component if there are
+  // complex-valued input data (unless we use a postprocessor on this
+  // output -- all postprocessor outputs are real-valued)
   unsigned int n_datasets = 0;
   for (unsigned int i = 0; i < this->cell_data.size(); ++i)
-    n_datasets += (this->cell_data[i]->is_complex_valued() ? 2 : 1);
+    n_datasets += (this->cell_data[i]->is_complex_valued() &&
+                       (this->cell_data[i]->postprocessor == nullptr) ?
+                     2 :
+                     1);
   for (unsigned int i = 0; i < this->dof_data.size(); ++i)
     n_datasets += (this->dof_data[i]->n_output_variables *
-                   (this->dof_data[i]->is_complex_valued() ? 2 : 1));
+                   (this->dof_data[i]->is_complex_valued() &&
+                        (this->dof_data[i]->postprocessor == nullptr) ?
+                      2 :
+                      1));
 
   std::vector<unsigned int> n_postprocessor_outputs(this->dof_data.size());
   for (unsigned int dataset = 0; dataset < this->dof_data.size(); ++dataset)
