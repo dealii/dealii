@@ -254,65 +254,69 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.postprocessed_values[dataset][q](component);
             }
           else
-            // use the given data vector directly, without a postprocessor.
-            // again, we treat single component functions separately for
-            // efficiency reasons.
-            if (n_components == 1)
             {
-              // first output the real part of the solution vector
-              this->dof_data[dataset]->get_function_values(
-                this_fe_patch_values,
-                internal::DataOutImplementation::ComponentExtractor::real_part,
-                scratch_data.patch_values_scalar.solution_values);
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                patch.data(offset, q) =
-                  scratch_data.patch_values_scalar.solution_values[q];
-
-              // and if there is one, also output the imaginary part
-              if (this->dof_data[dataset]->is_complex_valued() == true)
+              // use the given data vector directly, without a postprocessor.
+              // again, we treat single component functions separately for
+              // efficiency reasons.
+              if (n_components == 1)
                 {
+                  // first output the real part of the solution vector
                   this->dof_data[dataset]->get_function_values(
                     this_fe_patch_values,
                     internal::DataOutImplementation::ComponentExtractor::
-                      imaginary_part,
+                      real_part,
                     scratch_data.patch_values_scalar.solution_values);
                   for (unsigned int q = 0; q < n_q_points; ++q)
-                    patch.data(offset + 1, q) =
+                    patch.data(offset, q) =
                       scratch_data.patch_values_scalar.solution_values[q];
+
+                  // and if there is one, also output the imaginary part
+                  if (this->dof_data[dataset]->is_complex_valued() == true)
+                    {
+                      this->dof_data[dataset]->get_function_values(
+                        this_fe_patch_values,
+                        internal::DataOutImplementation::ComponentExtractor::
+                          imaginary_part,
+                        scratch_data.patch_values_scalar.solution_values);
+                      for (unsigned int q = 0; q < n_q_points; ++q)
+                        patch.data(offset + 1, q) =
+                          scratch_data.patch_values_scalar.solution_values[q];
+                    }
                 }
-            }
-          else
-            {
-              scratch_data.resize_system_vectors(n_components);
-
-              // same as above: first the real part
-              const unsigned int stride =
-                (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
-              this->dof_data[dataset]->get_function_values(
-                this_fe_patch_values,
-                internal::DataOutImplementation::ComponentExtractor::real_part,
-                scratch_data.patch_values_system.solution_values);
-              for (unsigned int component = 0; component < n_components;
-                   ++component)
-                for (unsigned int q = 0; q < n_q_points; ++q)
-                  patch.data(offset + component * stride, q) =
-                    scratch_data.patch_values_system.solution_values[q](
-                      component);
-
-              // and if there is one, also output the imaginary part
-              if (this->dof_data[dataset]->is_complex_valued() == true)
+              else
                 {
+                  scratch_data.resize_system_vectors(n_components);
+
+                  // same as above: first the real part
+                  const unsigned int stride =
+                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
                   this->dof_data[dataset]->get_function_values(
                     this_fe_patch_values,
                     internal::DataOutImplementation::ComponentExtractor::
-                      imaginary_part,
+                      real_part,
                     scratch_data.patch_values_system.solution_values);
                   for (unsigned int component = 0; component < n_components;
                        ++component)
                     for (unsigned int q = 0; q < n_q_points; ++q)
-                      patch.data(offset + component * stride + 1, q) =
+                      patch.data(offset + component * stride, q) =
                         scratch_data.patch_values_system.solution_values[q](
                           component);
+
+                  // and if there is one, also output the imaginary part
+                  if (this->dof_data[dataset]->is_complex_valued() == true)
+                    {
+                      this->dof_data[dataset]->get_function_values(
+                        this_fe_patch_values,
+                        internal::DataOutImplementation::ComponentExtractor::
+                          imaginary_part,
+                        scratch_data.patch_values_system.solution_values);
+                      for (unsigned int component = 0; component < n_components;
+                           ++component)
+                        for (unsigned int q = 0; q < n_q_points; ++q)
+                          patch.data(offset + component * stride + 1, q) =
+                            scratch_data.patch_values_system.solution_values[q](
+                              component);
+                    }
                 }
             }
 
