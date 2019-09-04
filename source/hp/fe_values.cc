@@ -19,90 +19,85 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace internal
+namespace hp
 {
-  namespace hp
+  // -------------------------- FEValuesBase -------------------------
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>
+      &mapping_collection,
+    const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
+      &                                   fe_collection,
+    const dealii::hp::QCollection<q_dim> &q_collection,
+    const UpdateFlags                     update_flags)
+    : fe_collection(&fe_collection)
+    , mapping_collection(&mapping_collection)
+    , q_collection(q_collection)
+    , fe_values_table(fe_collection.size(),
+                      mapping_collection.size(),
+                      q_collection.size())
+    , present_fe_values_index(numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int)
+    , update_flags(update_flags)
+  {}
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
+      &                                   fe_collection,
+    const dealii::hp::QCollection<q_dim> &q_collection,
+    const UpdateFlags                     update_flags)
+    : fe_collection(&fe_collection)
+    , mapping_collection(
+        &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
+          mapping_collection)
+    , q_collection(q_collection)
+    , fe_values_table(fe_collection.size(), 1, q_collection.size())
+    , present_fe_values_index(numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int)
+    , update_flags(update_flags)
+  {}
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesType &
+  FEValuesBase<dim, q_dim, FEValuesType>::select_fe_values(
+    const unsigned int fe_index,
+    const unsigned int mapping_index,
+    const unsigned int q_index)
   {
-    // -------------------------- FEValuesBase -------------------------
-
-    template <int dim, int q_dim, class FEValuesType>
-    FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
-      const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>
-        &mapping_collection,
-      const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-        &                                   fe_collection,
-      const dealii::hp::QCollection<q_dim> &q_collection,
-      const UpdateFlags                     update_flags)
-      : fe_collection(&fe_collection)
-      , mapping_collection(&mapping_collection)
-      , q_collection(q_collection)
-      , fe_values_table(fe_collection.size(),
-                        mapping_collection.size(),
-                        q_collection.size())
-      , present_fe_values_index(numbers::invalid_unsigned_int,
-                                numbers::invalid_unsigned_int,
-                                numbers::invalid_unsigned_int)
-      , update_flags(update_flags)
-    {}
+    Assert(fe_index < fe_collection->size(),
+           ExcIndexRange(fe_index, 0, fe_collection->size()));
+    Assert(mapping_index < mapping_collection->size(),
+           ExcIndexRange(mapping_index, 0, mapping_collection->size()));
+    Assert(q_index < q_collection.size(),
+           ExcIndexRange(q_index, 0, q_collection.size()));
 
 
-    template <int dim, int q_dim, class FEValuesType>
-    FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
-      const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-        &                                   fe_collection,
-      const dealii::hp::QCollection<q_dim> &q_collection,
-      const UpdateFlags                     update_flags)
-      : fe_collection(&fe_collection)
-      , mapping_collection(
-          &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
-            mapping_collection)
-      , q_collection(q_collection)
-      , fe_values_table(fe_collection.size(), 1, q_collection.size())
-      , present_fe_values_index(numbers::invalid_unsigned_int,
-                                numbers::invalid_unsigned_int,
-                                numbers::invalid_unsigned_int)
-      , update_flags(update_flags)
-    {}
+    // set the triple of indices
+    // that we want to work with
+    present_fe_values_index = TableIndices<3>(fe_index, mapping_index, q_index);
 
+    // first check whether we
+    // already have an object for
+    // this particular combination
+    // of indices
+    if (fe_values_table(present_fe_values_index).get() == nullptr)
+      fe_values_table(present_fe_values_index) =
+        std::make_shared<FEValuesType>((*mapping_collection)[mapping_index],
+                                       (*fe_collection)[fe_index],
+                                       q_collection[q_index],
+                                       update_flags);
 
-
-    template <int dim, int q_dim, class FEValuesType>
-    FEValuesType &
-    FEValuesBase<dim, q_dim, FEValuesType>::select_fe_values(
-      const unsigned int fe_index,
-      const unsigned int mapping_index,
-      const unsigned int q_index)
-    {
-      Assert(fe_index < fe_collection->size(),
-             ExcIndexRange(fe_index, 0, fe_collection->size()));
-      Assert(mapping_index < mapping_collection->size(),
-             ExcIndexRange(mapping_index, 0, mapping_collection->size()));
-      Assert(q_index < q_collection.size(),
-             ExcIndexRange(q_index, 0, q_collection.size()));
-
-
-      // set the triple of indices
-      // that we want to work with
-      present_fe_values_index =
-        TableIndices<3>(fe_index, mapping_index, q_index);
-
-      // first check whether we
-      // already have an object for
-      // this particular combination
-      // of indices
-      if (fe_values_table(present_fe_values_index).get() == nullptr)
-        fe_values_table(present_fe_values_index) =
-          std::make_shared<FEValuesType>((*mapping_collection)[mapping_index],
-                                         (*fe_collection)[fe_index],
-                                         q_collection[q_index],
-                                         update_flags);
-
-      // now there definitely is one!
-      return *fe_values_table(present_fe_values_index);
-    }
-  } // namespace hp
-} // namespace internal
-
+    // now there definitely is one!
+    return *fe_values_table(present_fe_values_index);
+  }
+} // namespace hp
 
 
 namespace hp
@@ -116,11 +111,10 @@ namespace hp
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim> &                q_collection,
     const UpdateFlags                           update_flags)
-    : internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
-        mapping,
-        fe_collection,
-        q_collection,
-        update_flags)
+    : hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(mapping,
+                                                                  fe_collection,
+                                                                  q_collection,
+                                                                  update_flags)
   {}
 
 
@@ -129,10 +123,9 @@ namespace hp
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim> &           q_collection,
     const UpdateFlags                      update_flags)
-    : internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(
-        fe_collection,
-        q_collection,
-        update_flags)
+    : hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(fe_collection,
+                                                                  q_collection,
+                                                                  update_flags)
   {}
 
 
@@ -237,12 +230,11 @@ namespace hp
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim - 1> &            q_collection,
     const UpdateFlags                           update_flags)
-    : internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
-          mapping,
-          fe_collection,
-          q_collection,
-          update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+        mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -251,11 +243,10 @@ namespace hp
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim - 1> &       q_collection,
     const UpdateFlags                      update_flags)
-    : internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
-          fe_collection,
-          q_collection,
-          update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -362,12 +353,11 @@ namespace hp
     const hp::FECollection<dim, spacedim> &     fe_collection,
     const hp::QCollection<dim - 1> &            q_collection,
     const UpdateFlags                           update_flags)
-    : internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
-          mapping,
-          fe_collection,
-          q_collection,
-          update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
+        mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
@@ -376,11 +366,10 @@ namespace hp
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim - 1> &       q_collection,
     const UpdateFlags                      update_flags)
-    : internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
-          fe_collection,
-          q_collection,
-          update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>(
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
 
 
