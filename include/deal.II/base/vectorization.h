@@ -4132,6 +4132,27 @@ namespace std
 
 
   /**
+   * Variant of above function that takes an integer as second argument.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, int width>
+  inline ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &x, const int p)
+  {
+    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
+    for (unsigned int i = 0;
+         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+         ++i)
+      values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<Number, width> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
    * Compute the absolute value (modulus) of a vectorized data field. The
    * result is returned as vectorized array in the form <tt>{abs(x[0]),
    * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
