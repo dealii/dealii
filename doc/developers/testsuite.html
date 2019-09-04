@@ -540,22 +540,6 @@ category/test.mpirun=N.output
       files for different numbers of MPI processes.
     </p>
 
-
-    <a name="binary"></a>
-    <h3>Tests with binary output</h3>
-    <p>
-      If a test produces binary output add <code>binary</code> to the
-      output file to indicate this:
-<pre>
-category/test.binary.output
-</pre>
-      The testsuite ensures that a diff tool suitable for comparing binary
-      output files is used instead of the default diff tool, which (as in
-      the case of <code>numdiff</code>) might be unable to compare binary
-      files.
-    </p>
-
-
     <a name="variants"></a>
     <h3>Tests with multiple comparison files</h3>
     <p>
