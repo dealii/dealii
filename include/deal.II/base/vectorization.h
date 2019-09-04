@@ -3968,7 +3968,7 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
 /**
  * TODO
  */
-enum SIMDComparison : int
+enum class SIMDComparison : int
 {
   equal                 = _CMP_EQ_OQ,
   not_equal             = _CMP_NEQ_OQ,
@@ -3990,26 +3990,25 @@ compare_and_apply_mask(const Number &left,
                        const Number &false_value)
 {
   bool mask;
-
   switch (predicate)
     {
       case SIMDComparison::equal:
-        mask = left == right;
+        mask = (left == right);
         break;
       case SIMDComparison::not_equal:
-        mask = left != right;
+        mask = (left != right);
         break;
       case SIMDComparison::less_than:
-        mask = left < right;
+        mask = (left < right);
         break;
       case SIMDComparison::less_than_or_equal:
-        mask = left <= right;
+        mask = (left <= right);
         break;
       case SIMDComparison::greater_than:
-        mask = left > right;
+        mask = (left > right);
         break;
       case SIMDComparison::greater_than_or_equal:
-        mask = left >= right;
+        mask = (left >= right);
         break;
     }
 
@@ -4027,31 +4026,12 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
                        const VectorizedArray<Number, 1> &true_value,
                        const VectorizedArray<Number, 1> &false_value)
 {
-  bool mask;
-
-  switch (predicate)
-    {
-      case SIMDComparison::equal:
-        mask = left.data == right.data;
-        break;
-      case SIMDComparison::not_equal:
-        mask = left.data != right.data;
-        break;
-      case SIMDComparison::less_than:
-        mask = left.data < right.data;
-        break;
-      case SIMDComparison::less_than_or_equal:
-        mask = left.data <= right.data;
-        break;
-      case SIMDComparison::greater_than:
-        mask = left.data > right.data;
-        break;
-      case SIMDComparison::greater_than_or_equal:
-        mask = left.data >= right.data;
-        break;
-    }
-
-  return mask ? true_value.data : false_value.data;
+  VectorizedArray<Number, 1> result;
+  result.data = compare_and_apply_mask<predicate, Number>(left.data,
+                                                          right.data,
+                                                          true_value.data,
+                                                          false_value.data);
+  return result;
 }
 
 //@}
@@ -4059,33 +4039,33 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
 #ifndef DOXYGEN
 #  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 16>
 compare_and_apply_mask(const VectorizedArray<float, 16> &left,
                        const VectorizedArray<float, 16> &right,
                        const VectorizedArray<float, 16> &true_values,
                        const VectorizedArray<float, 16> &false_values)
 {
-  const auto mask = _mm512_cmp_ps(left.data, right.data, predicate);
+  const __mmask16 mask =
+    _mm512_cmp_ps(left.data, right.data, static_cast<int>(predicate));
   VectorizedArray<float, 16> result;
-  result.data = _mm512_or_ps(_mm512_and_ps(mask, true_values.data),
-                             _mm512_andnot_ps(mask, false_values.data));
+  result.data = _mm512_mask_mov_ps(false_values.data, mask, true_values.data);
   return result;
 }
 
 
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<double, 8>
 compare_and_apply_mask(const VectorizedArray<double, 8> &left,
                        const VectorizedArray<double, 8> &right,
                        const VectorizedArray<double, 8> &true_values,
                        const VectorizedArray<double, 8> &false_values)
 {
-  const auto mask = _mm512_cmp_pd(left.data, right.data, predicate);
+  const __mmask16 mask =
+    _mm512_cmp_pd(left.data, right.data, static_cast<int>(predicate));
   VectorizedArray<double, 8> result;
-  result.data = _mm256_or_ps(_mm512_and_ps(mask, true_values.data),
-                             _mm512_andnot_ps(mask, false_values.data));
+  result.data = _mm512_mask_mov_pd(false_values.data, mask, true_values.data);
   return result;
 }
 
@@ -4093,14 +4073,15 @@ compare_and_apply_mask(const VectorizedArray<double, 8> &left,
 
 #  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 8>
 compare_and_apply_mask(const VectorizedArray<float, 8> &left,
                        const VectorizedArray<float, 8> &right,
                        const VectorizedArray<float, 8> &true_values,
                        const VectorizedArray<float, 8> &false_values)
 {
-  const auto mask = _mm256_cmp_ps(left.data, right.data, predicate);
+  const auto mask =
+    _mm256_cmp_ps(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<float, 8> result;
   result.data = _mm256_or_ps(_mm256_and_ps(mask, true_values.data),
@@ -4109,14 +4090,15 @@ compare_and_apply_mask(const VectorizedArray<float, 8> &left,
 }
 
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<double, 4>
 compare_and_apply_mask(const VectorizedArray<double, 4> &left,
                        const VectorizedArray<double, 4> &right,
                        const VectorizedArray<double, 4> &true_values,
                        const VectorizedArray<double, 4> &false_values)
 {
-  const auto mask = _mm256_cmp_pd(left.data, right.data, predicate);
+  const auto mask =
+    _mm256_cmp_pd(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<double, 4> result;
   result.data = _mm256_or_ps(_mm256_and_ps(mask, true_values.data),
@@ -4128,34 +4110,78 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
 
 #  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>
 compare_and_apply_mask(const VectorizedArray<float, 4> &left,
                        const VectorizedArray<float, 4> &right,
                        const VectorizedArray<float, 4> &true_values,
                        const VectorizedArray<float, 4> &false_values)
 {
-  const auto mask = _mm_cmp_ps(left.data, right.data, predicate);
+  __m128 mask;
+  switch (predicate)
+    {
+      case SIMDComparison::equal:
+        mask = _mm_cmpeq_ps(left.data, right.data);
+        break;
+      case SIMDComparison::not_equal:
+        mask = _mm_cmpneq_ps(left.data, right.data);
+        break;
+      case SIMDComparison::less_than:
+        mask = _mm_cmplt_ps(left.data, right.data);
+        break;
+      case SIMDComparison::less_than_or_equal:
+        mask = _mm_cmple_ps(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than:
+        mask = _mm_cmpgt_ps(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than_or_equal:
+        mask = _mm_cmpge_ps(left.data, right.data);
+        break;
+    }
 
   VectorizedArray<float, 4> result;
   result.data = _mm_or_ps(_mm_and_ps(mask, true_values.data),
                           _mm_andnot_ps(mask, false_values.data));
+
   return result;
 }
 
 
-template <int predicate>
+template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<double, 2>
 compare_and_apply_mask(const VectorizedArray<double, 2> &left,
                        const VectorizedArray<double, 2> &right,
                        const VectorizedArray<double, 2> &true_values,
                        const VectorizedArray<double, 2> &false_values)
 {
-  const auto mask = _mm_cmp_pd(left.data, right.data, predicate);
+  __m128d mask;
+  switch (predicate)
+    {
+      case SIMDComparison::equal:
+        mask = _mm_cmpeq_pd(left.data, right.data);
+        break;
+      case SIMDComparison::not_equal:
+        mask = _mm_cmpneq_pd(left.data, right.data);
+        break;
+      case SIMDComparison::less_than:
+        mask = _mm_cmplt_pd(left.data, right.data);
+        break;
+      case SIMDComparison::less_than_or_equal:
+        mask = _mm_cmple_pd(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than:
+        mask = _mm_cmpgt_pd(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than_or_equal:
+        mask = _mm_cmpge_pd(left.data, right.data);
+        break;
+    }
 
   VectorizedArray<double, 2> result;
   result.data = _mm_or_ps(_mm_and_ps(mask, true_values.data),
                           _mm_andnot_ps(mask, false_values.data));
+
   return result;
 }
 
