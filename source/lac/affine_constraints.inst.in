@@ -345,3 +345,16 @@ for (T : DEAL_II_VEC_TEMPLATES)
     template void dealii::AffineConstraints<double>::distribute<T<float>>(
       T<float> &) const;
   }
+
+
+for (T : VECTOR_TYPES)
+  {
+    namespace internal
+    {
+      namespace AffineConstraintsImplementation
+      {
+        template void
+        set_zero_all(const std::vector<types::global_dof_index> &, T &vec);
+      \}
+    \}
+  }
