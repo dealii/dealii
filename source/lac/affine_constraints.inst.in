@@ -288,12 +288,6 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void
     AffineConstraints<S>::distribute<LinearAlgebra::distributed::T<S>>(
       LinearAlgebra::distributed::T<S> &) const;
-
-    template void AffineConstraints<S>::set_zero<T<S>>(T<S> &) const;
-
-    template void
-    AffineConstraints<S>::set_zero<LinearAlgebra::distributed::T<S>>(
-      LinearAlgebra::distributed::T<S> &) const;
   }
 
 for (S : COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
@@ -302,13 +296,6 @@ for (S : COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
       const;
 
     template void AffineConstraints<S::value_type>::distribute<
-      LinearAlgebra::distributed::T<S>>(LinearAlgebra::distributed::T<S> &)
-      const;
-
-    template void AffineConstraints<S::value_type>::set_zero<T<S>>(T<S> &)
-      const;
-
-    template void AffineConstraints<S::value_type>::set_zero<
       LinearAlgebra::distributed::T<S>>(LinearAlgebra::distributed::T<S> &)
       const;
   }
@@ -329,8 +316,6 @@ for (S : COMPLEX_SCALARS)
 for (V : EXTERNAL_PARALLEL_VECTORS)
   {
     template void AffineConstraints<V::value_type>::distribute<V>(V &) const;
-
-    template void AffineConstraints<V::value_type>::set_zero<V>(V &) const;
   }
 
 
