@@ -1904,6 +1904,7 @@ namespace internal
       size_type                                                      shift = 0)
     {
       Assert(shift == 0, ExcNotImplemented());
+      (void)shift;
       std::vector<size_type> constrained_local_dofs_host;
       constrained_local_dofs_host.reserve(cm.size());
 
@@ -1992,20 +1993,6 @@ namespace internal
     }
   } // namespace AffineConstraintsImplementation
 } // namespace internal
-
-template <typename number>
-template <class VectorType>
-void
-AffineConstraints<number>::set_zero(VectorType &vec) const
-{
-  // since lines is a private member, we cannot pass it to the functions
-  // above. therefore, copy the content which is cheap
-  std::vector<size_type> constrained_lines(lines.size());
-  for (unsigned int i = 0; i < lines.size(); ++i)
-    constrained_lines[i] = lines[i].index;
-  internal::AffineConstraintsImplementation::set_zero_all(constrained_lines,
-                                                          vec);
-}
 
 template <typename number>
 template <typename VectorType>

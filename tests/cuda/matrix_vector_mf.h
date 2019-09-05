@@ -161,7 +161,7 @@ template <int dim,
           typename Number,
           typename VectorType = LinearAlgebra::CUDAWrappers::Vector<Number>,
           int n_q_points_1d   = fe_degree + 1>
-class MatrixFreeTest
+class MatrixFreeTest : public Subscriptor
 {
 public:
   MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in,
@@ -169,7 +169,18 @@ public:
                  const bool constant_coeff = true);
 
   void
-  vmult(VectorType &dst, const VectorType &src);
+  vmult(VectorType &dst, const VectorType &src) const;
+
+  Number
+  el(const unsigned int row, const unsigned int col) const;
+
+  types::global_dof_index
+  m() const
+  {
+    return internal_m;
+  }
+
+  types::global_dof_index internal_m;
 
 private:
   const CUDAWrappers::MatrixFree<dim, Number> &data;
@@ -200,7 +211,20 @@ MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::
     }
 }
 
-
+template <int dim,
+          int fe_degree,
+          typename Number,
+          typename VectorType,
+          int n_q_points_1d>
+Number
+MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::el(
+  const unsigned int row,
+  const unsigned int col) const
+{
+  (void)col;
+  Assert(false, ExcNotImplemented());
+  return 0.;
+}
 
 template <int dim,
           int fe_degree,
@@ -210,7 +234,7 @@ template <int dim,
 void
 MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::vmult(
   VectorType &      dst,
-  const VectorType &src)
+  const VectorType &src) const
 {
   dst = static_cast<Number>(0.);
   HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d> helmholtz_operator(
