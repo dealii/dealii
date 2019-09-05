@@ -4121,7 +4121,7 @@ compare_and_apply_mask(const VectorizedArray<float, 16> &left,
                        const VectorizedArray<float, 16> &false_values)
 {
   const __mmask16 mask =
-    _mm512_cmp_ps(left.data, right.data, static_cast<int>(predicate));
+    _mm512_cmp_ps_mask(left.data, right.data, static_cast<int>(predicate));
   VectorizedArray<float, 16> result;
   result.data = _mm512_mask_mov_ps(false_values.data, mask, true_values.data);
   return result;
@@ -4137,7 +4137,7 @@ compare_and_apply_mask(const VectorizedArray<double, 8> &left,
                        const VectorizedArray<double, 8> &false_values)
 {
   const __mmask16 mask =
-    _mm512_cmp_pd(left.data, right.data, static_cast<int>(predicate));
+    _mm512_cmp_pd_mask(left.data, right.data, static_cast<int>(predicate));
   VectorizedArray<double, 8> result;
   result.data = _mm512_mask_mov_pd(false_values.data, mask, true_values.data);
   return result;
@@ -4175,8 +4175,8 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
     _mm256_cmp_pd(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<double, 4> result;
-  result.data = _mm256_or_ps(_mm256_and_ps(mask, true_values.data),
-                             _mm256_andnot_ps(mask, false_values.data));
+  result.data = _mm256_or_pd(_mm256_and_pd(mask, true_values.data),
+                             _mm256_andnot_pd(mask, false_values.data));
   return result;
 }
 
@@ -4253,8 +4253,8 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
     }
 
   VectorizedArray<double, 2> result;
-  result.data = _mm_or_ps(_mm_and_ps(mask, true_values.data),
-                          _mm_andnot_ps(mask, false_values.data));
+  result.data = _mm_or_pd(_mm_and_pd(mask, true_values.data),
+                          _mm_andnot_pd(mask, false_values.data));
 
   return result;
 }
