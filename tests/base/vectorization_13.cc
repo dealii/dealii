@@ -41,6 +41,12 @@ do_test(const VectorizedArrayType                      array,
   for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
+
+  exponentiated_array = std::pow(array, -number_int);
+
+  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+    deallog << exponentiated_array[i] << " ";
+  deallog << std::endl;
 }
 
 
