@@ -3966,21 +3966,94 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
 
 
 /**
- * TODO
+ * enum class encoding binary operations for a component-wise comparison of
+ * VectorizedArray data types.
+ *
+ * @note In case of SIMD vecorization (sse, avx, av512) we select the
+ * corresponding ordered, non-signalling (<code>OQ</code>) variants.
  */
 enum class SIMDComparison : int
 {
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
   equal                 = _CMP_EQ_OQ,
   not_equal             = _CMP_NEQ_OQ,
   less_than             = _CMP_LT_OQ,
   less_than_or_equal    = _CMP_LE_OQ,
   greater_than          = _CMP_GT_OQ,
   greater_than_or_equal = _CMP_GE_OQ
+#else
+  equal,
+  not_equal,
+  less_than,
+  less_than_or_equal,
+  greater_than,
+  greater_than_or_equal
+#endif
 };
 
 
 /**
- * TODO
+ * Computes the vectorized equivalent of the following ternary operation:
+ * @code
+ *   (left OP right) ? true_value : false_value
+ * @endcode
+ * where <code>OP</code> is a binary operator (such as <code>=</code>,
+ * <code>!=</code>, <code><</code>, <code><=</code>, <code>></code>, and
+ * <code>>=</code>).
+ *
+ * Such a computational idiom is useful as an alternative to branching
+ * whenever the control flow itself would depend on (computed) data. For
+ * example, in case of a scalar data type the statement
+ * <code>(left < right) ? true_value : false_value</code>
+ * could have been also implementd using an <code>if</code>-statement:
+ * @code
+ * if (left < right)
+ *     result = true_value;
+ * else
+ *     result = false_value;
+ * @endcode
+ * This, however, is fundamentally impossible in case of vectorization
+ * because different decisions will be necessary on different vector entries
+ * (lanes) and
+ * the first variant (based on a ternary operator) has to be used instead:
+ * @code
+ *   result = compare_and_apply_mask<SIMDComparison::less_than>
+ *     (left, right, true_value, false_value);
+ * @endcode
+ * Some more illustrative examples (that are less efficient than the
+ * dedicated <code>std::max</code> and <code>std::abs</code> overloads):
+ * @code
+ *   VectorizedArray<double> left;
+ *   VectorizedArray<double> right;
+ *
+ *   // std::max
+ *   const auto maximum = compare_and_apply_mask<SIMDComparison::greater_than>
+ *     (left, right, left, right);
+ *
+ *   // std::abs
+ *   const auto absolute = compare_and_apply_mask<SIMDComparison::less_than>
+ *     (left, VectorizedArray<double>(0.), -left, left);
+ * @endcode
+ *
+ * More precisely, this function first computes a (boolean) mask that is
+ * the result of a binary operator <code>OP</code> applied to all elements
+ * of the VectorizedArray arguments @p left and @p right. The mask is then
+ * used to either select the corresponding component of @p true_value (if
+ * the binary operation equates to true), or @p false_value. The binary
+ * operator is encoded via the SIMDComparison template argument
+ * @p predicate.
+ *
+ * In order to ease with generic programming approaches, the function
+ * provides overloads for all VectorizedArray<Number> variants as well as
+ * generic POD types such as double and float.
+ *
+ * @note For this function to work the binary operation has to be encoded
+ * via a SIMDComparison template argument @p predicate. Depending on it
+ * appropriate low-level machine instructions are generated replacing the
+ * call to compare_and_apply_mask. This also explains why @p predicate is a
+ * compile-time constant template parameter and not a constant function
+ * argument. In order to be able to emit the correct low-level instruction,
+ * the compiler has to know the comparison at compile time.
  */
 template <SIMDComparison predicate, typename Number>
 DEAL_II_ALWAYS_INLINE inline Number
@@ -4017,7 +4090,8 @@ compare_and_apply_mask(const Number &left,
 
 
 /**
- * TODO
+ * Specialization of above function for the non-vectorized
+ * VectorizedArray<Number, 1> variant.
  */
 template <SIMDComparison predicate, typename Number>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, 1>
