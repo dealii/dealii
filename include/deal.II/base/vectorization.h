@@ -4140,14 +4140,13 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   pow(const ::dealii::VectorizedArray<Number, width> &x, const int p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
-         ++i)
-      values[i] = std::pow(x[i], p);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
-    return out;
+    if (p == 0)
+      return ::dealii::VectorizedArray<Number, width>(1.);
+    else if (p < 0)
+      return ::dealii::VectorizedArray<Number, width>(1.) / pow(x, -p);
+    else
+      return ((p % 2 == 1) ? x : ::dealii::VectorizedArray<Number, width>(1.)) *
+             pow(x * x, p / 2);
   }
 
 
