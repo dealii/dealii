@@ -1032,9 +1032,10 @@ namespace Utilities
   inline T
   fixed_power(const T x)
   {
-    static_assert(
+    Assert(
       !std::is_integral<T>::value || (N >= 0),
-      "The non-type template parameter N must be a non-negative integer for integral type T");
+      ExcMessage(
+        "The non-type template parameter N must be a non-negative integer for integral type T"));
 
     if (N == 0)
       return T(1.);
