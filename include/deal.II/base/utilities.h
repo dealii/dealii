@@ -1030,27 +1030,21 @@ namespace Utilities
 {
   template <int N, typename T>
   inline T
-  fixed_power(const T n)
+  fixed_power(const T x)
   {
-    Assert(N >= 0, ExcNotImplemented());
-    switch (N)
-      {
-        case 0:
-          return dealii::internal::NumberType<T>::value(1);
-        case 1:
-          return n;
-        case 2:
-          return n * n;
-        case 3:
-          return n * n * n;
-        case 4:
-          return n * n * n * n;
-        default:
-          T result = n;
-          for (int d = 1; d < N; ++d)
-            result *= n;
-          return result;
-      }
+    Assert(
+      !std::is_integral<T>::value || (N >= 0),
+      ExcMessage(
+        "The non-type template parameter N must be a non-negative integer for integral type T"));
+
+    if (N == 0)
+      return T(1.);
+    else if (N < 0)
+      return T(1.) / fixed_power<-N>(x);
+    else
+      // Use exponentiation by squaring:
+      return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
+                             fixed_power<N / 2>(x * x));
   }
 
 
