@@ -291,10 +291,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * C++ deal.II simulation with MPI HDF5:
  * @code
- * hdf5::File data_file("simulation.hdf5",
- *                      MPI_COMM_WORLD,
- *                      HDF5::FileAccessMode::Mode::open);
- * hdf5::Group data = data_file.open_group("data");
+ * HDF5::File data_file("simulation.hdf5",
+ *                      HDF5::File::FileAccessMode::open,
+ *                      MPI_COMM_WORLD);
+ * HDF5::Group data = data_file.open_group("data");
  *
  * auto nb_frequency_points = data.get_attribute<int>("nb_frequency_points");
  * auto rho = data.get_attribute<double>("rho");
