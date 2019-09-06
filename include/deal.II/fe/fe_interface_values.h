@@ -252,6 +252,9 @@ public:
    * interface
    * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $[u]=u_{\text{cell1}}$.
    */
   double
   jump(const unsigned int interface_dof_index,
@@ -259,10 +262,13 @@ public:
        const unsigned int component = 0) const;
 
   /**
-   * Return the average $\{u\}=frac{1}{2}u_{\text{cell}} +
-   * \frac{1}{2}u_{\text{neighbor}}$ on the interface
+   * Return the average $\{u\}=frac{1}{2}u_{\text{cell1}} +
+   * \frac{1}{2}u_{\text{cell2}}$ on the interface
    * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\{u\}=u_{\text{cell1}}$.
    */
   double
   average(const unsigned int interface_dof_index,
@@ -591,7 +597,7 @@ FEInterfaceValues<dim, spacedim>::normal(const unsigned int q_point_index) const
 template <int dim, int spacedim>
 double
 FEInterfaceValues<dim, spacedim>::shape_value(
-  const bool         current_cell,
+  const bool         use_upstream_value,
   const unsigned int interface_dof_index,
   const unsigned int q_point,
   const unsigned int component) const
@@ -599,11 +605,11 @@ FEInterfaceValues<dim, spacedim>::shape_value(
   const auto cell_and_dof_idx =
     interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (current_cell && cell_and_dof_idx.first == 0)
+  if (use_upstream_value && cell_and_dof_idx.first == 0)
     return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.second,
                                                        q_point,
                                                        component);
-  if (!current_cell && cell_and_dof_idx.first == 1)
+  if (!use_upstream_value && cell_and_dof_idx.first == 1)
     return get_fe_face_values(1).shape_value_component(cell_and_dof_idx.second,
                                                        q_point,
                                                        component);
@@ -622,18 +628,11 @@ FEInterfaceValues<dim, spacedim>::jump(const unsigned int interface_dof_index,
   const auto cell_and_dof_idx =
     interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (cell_and_dof_idx.first == 0)
-    return get_fe_face_values(0).shape_value_component(cell_and_dof_idx.second,
-                                                       q_point,
-                                                       component);
-  else
-    {
-      if (at_boundary())
-        return 0.0;
-      else
-        return -get_fe_face_values(1).shape_value_component(
-          cell_and_dof_idx.second, q_point, component);
-    }
+  const double factor = (cell_and_dof_idx.first == 0) ? 1.0 : -1.0;
+
+  return factor *
+         get_fe_face_values(cell_and_dof_idx.first)
+           .shape_value_component(cell_and_dof_idx.second, q_point, component);
 }
 
 
@@ -648,17 +647,10 @@ FEInterfaceValues<dim, spacedim>::average(
   const auto cell_and_dof_idx =
     interface_dof_to_cell_and_dof_index(interface_dof_index);
 
-  if (cell_and_dof_idx.first == 0)
-    return 0.5 * get_fe_face_values(0).shape_value_component(
-                   cell_and_dof_idx.second, q_point, component);
-  else
-    {
-      if (at_boundary())
-        return 0.0;
-      else
-        return 0.5 * get_fe_face_values(1).shape_value_component(
-                       cell_and_dof_idx.second, q_point, component);
-    }
+  const double factor = (at_boundary()) ? 1.0 : 0.5;
+  return factor *
+         get_fe_face_values(cell_and_dof_idx.first)
+           .shape_value_component(cell_and_dof_idx.second, q_point, component);
 }
 
 
