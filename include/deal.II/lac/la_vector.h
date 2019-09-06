@@ -161,6 +161,15 @@ namespace LinearAlgebra
            const bool omit_zeroing_entries = false) override;
 
     /**
+     * Returns `false` as this is a serial vector.
+     *
+     * This functionality only needs to be called if using MPI based vectors and
+     * exists in other objects for compatibility.
+     */
+    bool
+    has_ghost_elements() const;
+
+    /**
      * Copies the data of the input vector @p in_vector.
      */
     Vector<Number> &
@@ -507,6 +516,21 @@ namespace LinearAlgebra
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::Vector<Number>> : std::true_type
 {};
+
+#ifndef DOXYGEN
+/*----------------------- Inline functions ----------------------------------*/
+
+namespace LinearAlgebra
+{
+  template <typename Number>
+  inline bool
+  Vector<Number>::has_ghost_elements() const
+  {
+    return false;
+  }
+} // namespace LinearAlgebra
+
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
