@@ -555,13 +555,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::is_supported(
     return false;
 
   // then check of the base element is supported
-  if (dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
-                     *>(fe_ptr) != nullptr)
+  if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
     return true;
-  if (dynamic_cast<const FE_Poly<
-        TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
-        dim,
-        spacedim> *>(fe_ptr) != nullptr)
+  if (dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr) != nullptr)
     return true;
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(fe_ptr) != nullptr)
     return true;

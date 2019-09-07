@@ -60,7 +60,7 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
-  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(
           internal::FE_DGQ::get_QGaussLobatto_points(degree))),
@@ -93,7 +93,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ(
   const std::vector<Polynomials::Polynomial<double>> &polynomials)
-  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       TensorProductPolynomials<dim>(polynomials),
       FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
                              1,
@@ -303,11 +303,14 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       // cell and evaluate the
       // shape functions there
       const Point<dim> p = this->unit_support_points[j];
+      auto *const      polynomial_space_p =
+        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+      Assert(polynomial_space_p != nullptr, ExcInternalError());
       for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-        cell_interpolation(j, i) = this->poly_space.compute_value(i, p);
+        cell_interpolation(j, i) = polynomial_space_p->compute_value(i, p);
 
       for (unsigned int i = 0; i < source_fe.dofs_per_cell; ++i)
-        source_interpolation(j, i) = source_fe.poly_space.compute_value(i, p);
+        source_interpolation(j, i) = polynomial_space_p->compute_value(i, p);
     }
 
   // then compute the
@@ -832,8 +835,11 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   bool                equidistant = true;
   std::vector<double> points(this->degree + 1);
 
+  auto *const polynomial_space_p =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+  Assert(polynomial_space_p != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
+    polynomial_space_p->get_numbering_inverse();
   for (unsigned int j = 0; j <= this->degree; j++)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
@@ -945,9 +951,12 @@ std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
-  std::vector<Point<1>>     qpoints(this->degree + 1);
+  std::vector<Point<1>> qpoints(this->degree + 1);
+  auto *const           polynomial_space_p =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+  Assert(polynomial_space_p != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
+    polynomial_space_p->get_numbering_inverse();
   for (unsigned int i = 0; i <= this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);

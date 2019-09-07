@@ -120,7 +120,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the order @p order derivative of the <tt>i</tt>th tensor product
@@ -151,7 +151,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -166,7 +166,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the number of tensor product polynomials plus the bubble

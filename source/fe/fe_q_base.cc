@@ -180,12 +180,14 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
 
     // use that the element evaluates to 1 at index 0 and along the line at
     // zero
+    TensorProductPolynomials<dim> *poly_space_derived_ptr =
+      dynamic_cast<TensorProductPolynomials<dim> *>(fe.poly_space.get());
     const std::vector<unsigned int> &index_map_inverse =
-      fe.poly_space.get_numbering_inverse();
+      poly_space_derived_ptr->get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
       FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
-             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             fe.poly_space->compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
            ExcInternalError());
 
@@ -195,7 +197,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
           Point<dim> p;
           p[0] = constraint_points[i](0);
           fe.interface_constraints(i, face_index_map[j]) =
-            fe.poly_space.compute_value(index_map_inverse[j], p);
+            fe.poly_space->compute_value(index_map_inverse[j], p);
 
           // if the value is small up to round-off, then simply set it to zero
           // to avoid unwanted fill-in of the constraint matrices (which would
@@ -315,12 +317,14 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
 
     // use that the element evaluates to 1 at index 0 and along the line at
     // zero
+    TensorProductPolynomials<dim> *poly_space_derived_ptr =
+      dynamic_cast<TensorProductPolynomials<dim> *>(fe.poly_space.get());
     const std::vector<unsigned int> &index_map_inverse =
-      fe.poly_space.get_numbering_inverse();
+      poly_space_derived_ptr->get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
       FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
-             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             fe.poly_space->compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
            ExcInternalError());
 
@@ -385,8 +389,8 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
               indices[1] * (q_deg + 1) + indices[0];
 
             fe.interface_constraints(i, face_index_map[j]) =
-              fe.poly_space.compute_value(index_map_inverse[new_index],
-                                          constraint_point);
+              fe.poly_space->compute_value(index_map_inverse[new_index],
+                                           constraint_point);
 
             // if the value is small up to round-off, then simply set it to
             // zero to avoid unwanted fill-in of the constraint matrices
@@ -407,7 +411,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::FE_Q_Base(
   const PolynomialType &        poly_space,
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &     restriction_is_additive_flags)
-  : FE_Poly<PolynomialType, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       poly_space,
       fe_data,
       restriction_is_additive_flags,
@@ -445,7 +449,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
       FETools::hierarchic_to_lexicographic_numbering<dim>(q_degree);
     for (unsigned int i = q_dofs_per_cell; i < this->dofs_per_cell; ++i)
       renumber.push_back(i);
-    this->poly_space.set_numbering(renumber);
+    TensorProductPolynomials<dim> *poly_space_derived_ptr =
+      dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+    poly_space_derived_ptr->set_numbering(renumber);
   }
 
   // Finally fill in support points on cell and face and initialize
@@ -502,12 +508,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
 
           // FE_Q element evaluates to 1 in unit support point and to zero in
           // all other points by construction
-          Assert(std::abs(this->poly_space.compute_value(j, p) - 1.) < 1e-13,
+          Assert(std::abs(this->poly_space->compute_value(j, p) - 1.) < 1e-13,
                  ExcInternalError());
 
           for (unsigned int i = 0; i < source_q_dofs_per_cell; ++i)
             interpolation_matrix(j, i) =
-              source_fe->poly_space.compute_value(i, p);
+              source_fe->poly_space->compute_value(i, p);
         }
 
       // for FE_Q_DG0, add one last row of identity
@@ -748,10 +754,15 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
+      TensorProductPolynomials<dim> *poly_space_derived_ptr =
+        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr->get_numbering_inverse();
+      TensorProductPolynomials<dim> *poly_space_derived_ptr_other =
+        dynamic_cast<TensorProductPolynomials<dim> *>(
+          fe_q_other->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse_other =
-        fe_q_other->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr_other->get_numbering_inverse();
 
       for (unsigned int i = 0; i < p - 1; ++i)
         for (unsigned int j = 0; j < q - 1; ++j)
@@ -810,10 +821,15 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
+      TensorProductPolynomials<dim> *poly_space_derived_ptr =
+        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr->get_numbering_inverse();
+      TensorProductPolynomials<dim> *poly_space_derived_ptr_other =
+        dynamic_cast<TensorProductPolynomials<dim> *>(
+          fe_q_other->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse_other =
-        fe_q_other->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr_other->get_numbering_inverse();
 
       for (unsigned int i1 = 0; i1 < p - 1; ++i1)
         for (unsigned int i2 = 0; i2 < p - 1; ++i2)
@@ -870,8 +886,10 @@ void
 FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_support_points(
   const std::vector<Point<1>> &points)
 {
+  TensorProductPolynomials<dim> *poly_space_derived_ptr =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   const std::vector<unsigned int> &index_map_inverse =
-    this->poly_space.get_numbering_inverse();
+    poly_space_derived_ptr->get_numbering_inverse();
 
   // We can compute the support points by computing the tensor
   // product of the 1d set of points. We could do this by hand, but it's
@@ -1175,7 +1193,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
       // current numbering gives the identity operation
       for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
         {
-          Assert(std::fabs(1. - this->poly_space.compute_value(
+          Assert(std::fabs(1. - this->poly_space->compute_value(
                                   i, this->unit_support_points[i])) < eps,
                  ExcInternalError("The Lagrange polynomial does not evaluate "
                                   "to one or zero in a nodal point. "
@@ -1185,7 +1203,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                                   "prevents the sum to be one."));
           for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
             if (j != i)
-              Assert(std::fabs(this->poly_space.compute_value(
+              Assert(std::fabs(this->poly_space->compute_value(
                        i, this->unit_support_points[j])) < eps,
                      ExcInternalError(
                        "The Lagrange polynomial does not evaluate "
@@ -1204,8 +1222,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
       const unsigned int            dofs1d = q_degree + 1;
       std::vector<Table<2, double>> subcell_evaluations(
         dim, Table<2, double>(dofs1d, dofs1d));
+
+      TensorProductPolynomials<dim> *poly_space_derived_ptr =
+        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr->get_numbering_inverse();
 
       // helper value: step size how to walk through diagonal and how many
       // points we have left apart from the first dimension
@@ -1238,7 +1259,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                 Point<dim> point;
                 point[0] = p_cell[d];
                 const double cell_value =
-                  this->poly_space.compute_value(index_map_inverse[i], point);
+                  this->poly_space->compute_value(index_map_inverse[i], point);
 
                 // cut off values that are too small. note that we have here
                 // Lagrange interpolation functions, so they should be zero at
@@ -1280,7 +1301,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                   subcell_evaluations[d](j_indices[d - 1], i_indices[d - 1]);
 
               // innermost sum where we actually compute. the same as
-              // prolongate(j,i) = this->poly_space.compute_value (i, p_cell)
+              // prolongate(j,i) = this->poly_space->compute_value (i, p_cell)
               for (unsigned int jj = 0; jj < dofs1d; ++jj)
                 {
                   const unsigned int j_ind = index_map_inverse[j + jj];
@@ -1379,9 +1400,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
       // assumption that whenever a row makes a non-zero contribution to the
       // mother's residual, the correct value is interpolated.
 
-      const double                     eps = 1e-15 * q_degree * dim;
+      const double eps = 1e-15 * q_degree * dim;
+
+      TensorProductPolynomials<dim> *poly_space_derived_ptr =
+        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        poly_space_derived_ptr->get_numbering_inverse();
 
       const unsigned int          dofs1d = q_degree + 1;
       std::vector<Tensor<1, dim>> evaluations1d(dofs1d);
@@ -1411,8 +1435,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
                     Point<dim> point;
                     point[0] = p_subcell[d];
                     evaluations1d[j][d] =
-                      this->poly_space.compute_value(index_map_inverse[j],
-                                                     point);
+                      this->poly_space->compute_value(index_map_inverse[j],
+                                                      point);
                   }
               unsigned int j_indices[dim];
               internal::FE_Q_Base::zero_indices<dim>(j_indices);

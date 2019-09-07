@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 template <class PolynomialType,
           int dim      = PolynomialType::dimension,
           int spacedim = dim>
-class FE_Q_Base : public FE_Poly<PolynomialType, dim, spacedim>
+class FE_Q_Base : public FE_Poly<dim, spacedim>
 {
 public:
   /**

@@ -147,7 +147,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
@@ -180,7 +180,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -195,7 +195,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the name of the space, which is <tt>TensorProductPolynomials</tt>.
@@ -340,7 +340,7 @@ public:
    * tensor polynomials all at once and in a much more efficient way.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
@@ -373,7 +373,7 @@ public:
    * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -388,7 +388,7 @@ public:
    * all tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the name of the space, which is <tt>AnisotropicPolynomials</tt>.

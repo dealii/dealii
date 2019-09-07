@@ -130,7 +130,7 @@ namespace internal
 
 template <int dim>
 FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
-  : FE_Poly<PolynomialsP<dim>, dim>(
+  : FE_Poly<dim>(
       PolynomialsP<dim>(degree),
       FiniteElementData<dim>(get_dpo_vector(degree),
                              1,
@@ -143,8 +143,8 @@ FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
         FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
         std::vector<bool>(1, true)))
 {
-  Assert(this->poly_space.n() == this->dofs_per_cell, ExcInternalError());
-  Assert(this->poly_space.degree() == this->degree, ExcInternalError());
+  Assert(this->poly_space->n() == this->dofs_per_cell, ExcInternalError());
+  Assert(this->poly_space->degree() == this->degree, ExcInternalError());
 
   // DG doesn't have constraints, so
   // leave them empty
@@ -233,9 +233,13 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
           source_fe_matrix(k, j) = source_fe.shape_value(j, unit_points[k]);
 
       FullMatrix<double> this_matrix(this->dofs_per_cell, this->dofs_per_cell);
+      auto *const        polynomial_space_p =
+        dynamic_cast<PolynomialsP<dim> *>(this->poly_space.get());
+      Assert(polynomial_space_p != nullptr, ExcInternalError());
       for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
         for (unsigned int k = 0; k < unit_points.size(); ++k)
-          this_matrix(k, j) = this->poly_space.compute_value(j, unit_points[k]);
+          this_matrix(k, j) =
+            polynomial_space_p->compute_value(j, unit_points[k]);
 
       this_matrix.gauss_jordan();
 
@@ -454,8 +458,11 @@ FE_DGPMonomial<2>::has_support_on_face(const unsigned int shape_index,
     support_on_face = true;
   else
     {
+      auto *const polynomial_space_p =
+        dynamic_cast<PolynomialsP<2> *>(this->poly_space.get());
+      Assert(polynomial_space_p != nullptr, ExcInternalError());
       const std::array<unsigned int, 2> degrees =
-        this->poly_space.directional_degrees(shape_index);
+        polynomial_space_p->directional_degrees(shape_index);
 
       if ((face_index == 0 && degrees[1] == 0) ||
           (face_index == 3 && degrees[0] == 0))
@@ -476,8 +483,11 @@ FE_DGPMonomial<3>::has_support_on_face(const unsigned int shape_index,
     support_on_face = true;
   else
     {
+      auto *const polynomial_space_p =
+        dynamic_cast<PolynomialsP<3> *>(this->poly_space.get());
+      Assert(polynomial_space_p != nullptr, ExcInternalError());
       const std::array<unsigned int, 3> degrees =
-        this->poly_space.directional_degrees(shape_index);
+        polynomial_space_p->directional_degrees(shape_index);
 
       if ((face_index == 0 && degrees[1] == 0) ||
           (face_index == 2 && degrees[2] == 0) ||

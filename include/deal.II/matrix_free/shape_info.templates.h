@@ -136,20 +136,11 @@ namespace internal
         Assert(fe->n_components() == 1,
                ExcMessage("Expected a scalar element"));
 
-        const FE_Poly<TensorProductPolynomials<dim>, dim, dim> *fe_poly =
-          dynamic_cast<
-            const FE_Poly<TensorProductPolynomials<dim>, dim, dim> *>(fe);
+        const FE_Poly<dim, dim> *fe_poly =
+          dynamic_cast<const FE_Poly<dim, dim> *>(fe);
 
-        const FE_Poly<
-          TensorProductPolynomials<dim,
-                                   Polynomials::PiecewisePolynomial<double>>,
-          dim,
-          dim> *fe_poly_piece =
-          dynamic_cast<const FE_Poly<
-            TensorProductPolynomials<dim,
-                                     Polynomials::PiecewisePolynomial<double>>,
-            dim,
-            dim> *>(fe);
+        const FE_Poly<dim, dim> *fe_poly_piece =
+          dynamic_cast<const FE_Poly<dim, dim> *>(fe);
 
         const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim> *>(fe);
 

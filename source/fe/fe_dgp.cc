@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
-  : FE_Poly<PolynomialSpace<dim>, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       PolynomialSpace<dim>(
         Polynomials::Legendre::generate_complete_basis(degree)),
       FiniteElementData<dim>(get_dpo_vector(degree),

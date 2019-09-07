@@ -58,7 +58,7 @@ public:
    * Value of basis function @p i at @p p.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * <tt>order</tt>-th of basis function @p i at @p p.
@@ -73,13 +73,13 @@ public:
    * Gradient of basis function @p i at @p p.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Gradient of gradient of basis function @p i at @p p.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute values and derivatives of all basis functions at @p unit_point.

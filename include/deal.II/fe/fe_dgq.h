@@ -109,7 +109,7 @@ class Quadrature;
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
 template <int dim, int spacedim = dim>
-class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
+class FE_DGQ : public FE_Poly<dim, spacedim>
 {
 public:
   /**

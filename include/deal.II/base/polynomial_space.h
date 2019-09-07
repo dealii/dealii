@@ -157,7 +157,7 @@ public:
    * Consider using evaluate() instead.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
@@ -178,7 +178,7 @@ public:
    * Consider using evaluate() instead.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
@@ -187,7 +187,7 @@ public:
    * Consider using evaluate() instead.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the number of polynomials spanning the space represented by this
