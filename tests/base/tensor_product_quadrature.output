@@ -1,0 +1,36 @@
+
+DEAL::dim = 2
+DEAL::Constructor taking 1D Quadratures
+DEAL::points
+DEAL::0.200000 0.200000, 0.800000 0.200000, 0.200000 0.800000, 0.800000 0.800000, 
+DEAL::weights
+DEAL::0.0100000, 0.0900000, 0.0900000, 0.810000, 
+DEAL::base quadrature 0
+DEAL::points
+DEAL::0.200000, 0.800000, 
+DEAL::weights
+DEAL::0.100000, 0.900000, 
+DEAL::base quadrature 1
+DEAL::points
+DEAL::0.200000, 0.800000, 
+DEAL::weights
+DEAL::0.100000, 0.900000, 
+DEAL::
+DEAL::Constructor taking 1D and SubQuadrature
+DEAL::points
+DEAL::0.400000 0.200000, 0.600000 0.200000, 0.400000 0.800000, 0.600000 0.800000, 
+DEAL::weights
+DEAL::0.0300000, 0.0700000, 0.270000, 0.630000, 
+DEAL::base quadrature 0
+DEAL::points
+DEAL::0.400000, 0.600000, 
+DEAL::weights
+DEAL::0.300000, 0.700000, 
+DEAL::base quadrature 1
+DEAL::points
+DEAL::0.200000, 0.800000, 
+DEAL::weights
+DEAL::0.100000, 0.900000, 
+DEAL::
+DEAL::Constructor taking n_points
+DEAL::OK

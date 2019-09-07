@@ -36,7 +36,7 @@ template <>
 QGauss<0>::QGauss(const unsigned int)
   : // there are n_q^dim == 1
     // points
-  Quadrature<0>(1)
+  TensorProductQuadrature<0>(1)
 {
   // the single quadrature point gets unit
   // weight
@@ -49,7 +49,7 @@ template <>
 QGaussLobatto<0>::QGaussLobatto(const unsigned int)
   : // there are n_q^dim == 1
     // points
-  Quadrature<0>(1)
+  TensorProductQuadrature<0>(1)
 {
   // the single quadrature point gets unit
   // weight
@@ -60,7 +60,7 @@ QGaussLobatto<0>::QGaussLobatto(const unsigned int)
 
 template <>
 QGauss<1>::QGauss(const unsigned int n)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
 {
   if (n == 0)
     return;
@@ -139,7 +139,7 @@ namespace internal
 
 template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
 {
   Assert(n >= 2, ExcNotImplemented());
 
@@ -162,7 +162,7 @@ QGaussLobatto<1>::QGaussLobatto(const unsigned int n)
 
 template <>
 QMidpoint<1>::QMidpoint()
-  : Quadrature<1>(1)
+  : TensorProductQuadrature<1>(1)
 {
   this->quadrature_points[0] = Point<1>(0.5);
   this->weights[0]           = 1.0;
@@ -172,7 +172,7 @@ QMidpoint<1>::QMidpoint()
 
 template <>
 QTrapez<1>::QTrapez()
-  : Quadrature<1>(2)
+  : TensorProductQuadrature<1>(2)
 {
   static const double xpts[] = {0.0, 1.0};
   static const double wts[]  = {0.5, 0.5};
@@ -188,7 +188,7 @@ QTrapez<1>::QTrapez()
 
 template <>
 QSimpson<1>::QSimpson()
-  : Quadrature<1>(3)
+  : TensorProductQuadrature<1>(3)
 {
   static const double xpts[] = {0.0, 0.5, 1.0};
   static const double wts[]  = {1. / 6., 2. / 3., 1. / 6.};
@@ -204,7 +204,7 @@ QSimpson<1>::QSimpson()
 
 template <>
 QMilne<1>::QMilne()
-  : Quadrature<1>(5)
+  : TensorProductQuadrature<1>(5)
 {
   static const double xpts[] = {0.0, .25, .5, .75, 1.0};
   static const double wts[]  = {
@@ -221,7 +221,7 @@ QMilne<1>::QMilne()
 
 template <>
 QWeddle<1>::QWeddle()
-  : Quadrature<1>(7)
+  : TensorProductQuadrature<1>(7)
 {
   static const double xpts[] = {
     0.0, 1. / 6., 1. / 3., .5, 2. / 3., 5. / 6., 1.0};
@@ -243,7 +243,7 @@ QWeddle<1>::QWeddle()
 
 template <>
 QGaussLog<1>::QGaussLog(const unsigned int n, const bool revert)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
 {
   std::vector<double> p = get_quadrature_points(n);
   std::vector<double> w = get_quadrature_weights(n);
@@ -529,7 +529,7 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
                           const Point<1>     origin,
                           const double       alpha,
                           const bool         factor_out_singularity)
-  : Quadrature<1>(
+  : TensorProductQuadrature<1>(
       ((origin[0] == 0) || (origin[0] == 1)) ? (alpha == 1 ? n : 2 * n) : 4 * n)
   , fraction(((origin[0] == 0) || (origin[0] == 1.)) ? 1. : origin[0])
 {
@@ -790,8 +790,6 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad)
     {
       this->weights[i]           = quad.weight(permutation[i]);
       this->quadrature_points[i] = quad.point(permutation[i]);
-      if (permutation[i] != i)
-        this->is_tensor_product_flag = false;
     }
 }
 
@@ -809,48 +807,48 @@ QSorted<dim>::compare_weights(const unsigned int a, const unsigned int b) const
 
 template <int dim>
 QGauss<dim>::QGauss(const unsigned int n)
-  : Quadrature<dim>(QGauss<dim - 1>(n), QGauss<1>(n))
+  : TensorProductQuadrature<dim>(QGauss<dim - 1>(n), QGauss<1>(n))
 {}
 
 
 
 template <int dim>
 QGaussLobatto<dim>::QGaussLobatto(const unsigned int n)
-  : Quadrature<dim>(QGaussLobatto<dim - 1>(n), QGaussLobatto<1>(n))
+  : TensorProductQuadrature<dim>(QGaussLobatto<dim - 1>(n), QGaussLobatto<1>(n))
 {}
 
 
 
 template <int dim>
 QMidpoint<dim>::QMidpoint()
-  : Quadrature<dim>(QMidpoint<dim - 1>(), QMidpoint<1>())
+  : TensorProductQuadrature<dim>(QMidpoint<dim - 1>(), QMidpoint<1>())
 {}
 
 
 
 template <int dim>
 QTrapez<dim>::QTrapez()
-  : Quadrature<dim>(QTrapez<dim - 1>(), QTrapez<1>())
+  : TensorProductQuadrature<dim>(QTrapez<dim - 1>(), QTrapez<1>())
 {}
 
 
 
 template <int dim>
 QSimpson<dim>::QSimpson()
-  : Quadrature<dim>(QSimpson<dim - 1>(), QSimpson<1>())
+  : TensorProductQuadrature<dim>(QSimpson<dim - 1>(), QSimpson<1>())
 {}
 
 
 
 template <int dim>
 QMilne<dim>::QMilne()
-  : Quadrature<dim>(QMilne<dim - 1>(), QMilne<1>())
+  : TensorProductQuadrature<dim>(QMilne<dim - 1>(), QMilne<1>())
 {}
 
 
 template <int dim>
 QWeddle<dim>::QWeddle()
-  : Quadrature<dim>(QWeddle<dim - 1>(), QWeddle<1>())
+  : TensorProductQuadrature<dim>(QWeddle<dim - 1>(), QWeddle<1>())
 {}
 
 template <int dim>
@@ -859,7 +857,7 @@ QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
   : // We need the explicit implementation if dim == 1. If dim > 1 we use the
     // former implementation and apply a tensorial product to obtain the higher
     // dimensions.
-  Quadrature<dim>(
+  TensorProductQuadrature<dim>(
     dim == 2 ?
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1]))) :
@@ -867,14 +865,14 @@ QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
       QAnisotropic<dim>(QTelles<1>(base_quad, Point<1>(singularity[0])),
                         QTelles<1>(base_quad, Point<1>(singularity[1])),
                         QTelles<1>(base_quad, Point<1>(singularity[2]))) :
-      Quadrature<dim>())
+      TensorProductQuadrature<dim>())
 {}
 
 template <int dim>
 QTelles<dim>::QTelles(const unsigned int n, const Point<dim> &singularity)
   : // In this case we map the standard Gauss Legendre formula using the given
     // singularity point coordinates.
-  Quadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
+  TensorProductQuadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
 {}
 
 
@@ -882,7 +880,7 @@ QTelles<dim>::QTelles(const unsigned int n, const Point<dim> &singularity)
 template <>
 QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
   : // We explicitly implement the Telles' variable change if dim == 1.
-  Quadrature<1>(base_quad)
+  TensorProductQuadrature<1>(base_quad)
 {
   // We define all the constants to be used in the implementation of
   // Telles' rule
@@ -1001,7 +999,7 @@ namespace internal
 
 template <>
 QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
 {
   Assert(n > 0, ExcMessage("Need at least one point for the quadrature rule"));
   std::vector<double> p = internal::QGaussChebyshev::get_quadrature_points(n);
@@ -1017,7 +1015,7 @@ QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
 
 template <int dim>
 QGaussChebyshev<dim>::QGaussChebyshev(const unsigned int n)
-  : Quadrature<dim>(QGaussChebyshev<1>(n))
+  : TensorProductQuadrature<dim>(QGaussChebyshev<1>(n))
 {}
 
 
@@ -1097,7 +1095,7 @@ namespace internal
 
 template <>
 QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n, EndPoint ep)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
   , ep(ep)
 {
   Assert(n > 0, ExcMessage("Need at least one point for quadrature rules"));
@@ -1117,7 +1115,7 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n, EndPoint ep)
 template <int dim>
 QGaussRadauChebyshev<dim>::QGaussRadauChebyshev(const unsigned int n,
                                                 EndPoint           ep)
-  : Quadrature<dim>(QGaussRadauChebyshev<1>(
+  : TensorProductQuadrature<dim>(QGaussRadauChebyshev<1>(
       n,
       static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)))
   , ep(ep)
@@ -1169,7 +1167,7 @@ namespace internal
 
 template <>
 QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
-  : Quadrature<1>(n)
+  : TensorProductQuadrature<1>(n)
 {
   Assert(n > 1,
          ExcMessage(
@@ -1189,7 +1187,7 @@ QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
 
 template <int dim>
 QGaussLobattoChebyshev<dim>::QGaussLobattoChebyshev(const unsigned int n)
-  : Quadrature<dim>(QGaussLobattoChebyshev<1>(n))
+  : TensorProductQuadrature<dim>(QGaussLobattoChebyshev<1>(n))
 {}
 
 

@@ -728,7 +728,7 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
   // now also fill the various fields with their correct values
   compute_shape_function_values(ref_q_points);
 
-  tensor_product_quadrature = q.is_tensor_product();
+  tensor_product_quadrature = is_tensor_product(q);
 
   // use of MatrixFree only for higher order elements
   if (polynomial_degree < 2)
@@ -740,8 +740,10 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
       // in all directions
       if (tensor_product_quadrature)
         {
+          const TensorProductQuadrature<dim> &tensor_quadrature =
+            dynamic_cast<const TensorProductQuadrature<dim> &>(q);
           const std::array<Quadrature<1>, dim> quad_array =
-            q.get_tensor_basis();
+            tensor_quadrature.get_tensor_basis();
           for (unsigned int i = 1; i < dim && tensor_product_quadrature; ++i)
             {
               if (quad_array[i - 1].size() != quad_array[i].size())
@@ -773,8 +775,11 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
 
           if (tensor_product_quadrature)
             {
+              const TensorProductQuadrature<dim> &tensor_quadrature =
+                dynamic_cast<const TensorProductQuadrature<dim> &>(q);
+
               const FE_Q<dim> fe(polynomial_degree);
-              shape_info.reinit(q.get_tensor_basis()[0], fe);
+              shape_info.reinit(tensor_quadrature.get_tensor_basis()[0], fe);
 
               const unsigned int n_shape_values = fe.n_dofs_per_cell();
               const unsigned int max_size =
@@ -805,7 +810,10 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize_face(
     {
       const unsigned int  facedim = dim > 1 ? dim - 1 : 1;
       const FE_Q<facedim> fe(polynomial_degree);
-      shape_info.reinit(q.get_tensor_basis()[0], fe);
+
+      const TensorProductQuadrature<dim> &tensor_quadrature =
+        dynamic_cast<const TensorProductQuadrature<dim> &>(q);
+      shape_info.reinit(tensor_quadrature.get_tensor_basis()[0], fe);
 
       const unsigned int n_shape_values = fe.n_dofs_per_cell();
       const unsigned int n_q_points     = q.size();

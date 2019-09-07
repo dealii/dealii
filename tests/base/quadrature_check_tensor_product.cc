@@ -39,10 +39,13 @@ check_tensor_product(const std::vector<Quadrature<1>> &quadratures,
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
       const Quadrature<1> &quadrature = quadratures[i];
-      if (quadrature.is_tensor_product())
+      if (is_tensor_product(quadrature))
         {
           deallog << "1D " << quadrature_names[i];
-          const auto &q_basis = quadrature.get_tensor_basis();
+          const TensorProductQuadrature<1> &tensor_product_quadrature =
+            dynamic_cast<const TensorProductQuadrature<1> &>(quadrature);
+
+          const auto &q_basis = tensor_product_quadrature.get_tensor_basis();
           AssertThrow(q_basis.size() == 1, ExcInternalError());
           const auto &q_points  = quadrature.get_points();
           const auto &q_weights = quadrature.get_weights();
@@ -72,10 +75,13 @@ check_tensor_product(const std::vector<Quadrature<2>> &quadratures,
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
       const Quadrature<2> &quadrature = quadratures[i];
-      if (quadrature.is_tensor_product())
+      if (is_tensor_product(quadrature))
         {
           deallog << "2D " << quadrature_names[i];
-          const auto &q_basis = quadrature.get_tensor_basis();
+          const TensorProductQuadrature<2> &tensor_product_quadrature =
+            dynamic_cast<const TensorProductQuadrature<2> &>(quadrature);
+
+          const auto &q_basis = tensor_product_quadrature.get_tensor_basis();
           AssertThrow(q_basis.size() == 2, ExcInternalError());
           const auto &q_points  = quadrature.get_points();
           const auto &q_weights = quadrature.get_weights();
@@ -110,10 +116,13 @@ check_tensor_product(const std::vector<Quadrature<3>> &quadratures,
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
       const Quadrature<3> &quadrature = quadratures[i];
-      if (quadrature.is_tensor_product())
+      if (is_tensor_product(quadrature))
         {
           deallog << "3D " << quadrature_names[i];
-          const auto &q_basis = quadrature.get_tensor_basis();
+          const TensorProductQuadrature<3> &tensor_product_quadrature =
+            dynamic_cast<const TensorProductQuadrature<3> &>(quadrature);
+
+          const auto &q_basis = tensor_product_quadrature.get_tensor_basis();
           AssertThrow(q_basis.size() == 3, ExcInternalError());
           const auto &q_points  = quadrature.get_points();
           const auto &q_weights = quadrature.get_weights();

@@ -241,18 +241,116 @@ public:
   void
   serialize(Archive &ar, const unsigned int version);
 
+protected:
   /**
-   * This function returns true if the quadrature object is a tensor product
-   * of one-dimensional formulas and the quadrature points are sorted
-   * lexicographically.
+   * List of quadrature points. To be filled by the constructors of derived
+   * classes.
    */
-  bool
-  is_tensor_product() const;
+  std::vector<Point<dim>> quadrature_points;
 
   /**
-   * In case the quadrature formula is a tensor product, this function
-   * returns the @p dim one-dimensional basis objects.
-   * Otherwise, calling this function is not allowed.
+   * List of weights of the quadrature points.  To be filled by the
+   * constructors of derived classes.
+   */
+  std::vector<double> weights;
+};
+
+
+/**
+ * This function returns true if the incoming Quadrature<dim> is of type
+ * TensorProductQuadrature<dim>.
+ */
+template <int dim>
+bool
+is_tensor_product(const Quadrature<dim> &quadrature);
+
+
+/**
+ * This class represents a Quadrature<dim> which is the tensor product of a
+ * dim 1-dimensional quadratures. The main feature of this class is that it is
+ * possible to extract the base quadratures using the get_tensor_basis()
+ * function. Being able to access these base quadratures allows for
+ * optimizations which otherwise wouldn't be possible.
+ */
+template <int dim>
+class TensorProductQuadrature : public Quadrature<dim>
+{
+public:
+  /**
+   * Alias for a quadrature that acts on an object of one dimension
+   * less. Note that a SubTensorProductQuadrature is an SubQuadrature.
+   *
+   * Since a 1-dimensional quadrature can be considered a tensor product we
+   * let the SubTensorProductQuadrature for dim=2 to be an ordinary quadrature.
+   */
+  using SubTensorProductQuadrature =
+    typename std::conditional<(1 < dim),
+                              TensorProductQuadrature<dim - 1>,
+                              Quadrature<0>>::type;
+  /**
+   * Constructor.
+   *
+   * This constructor is marked as explicit to avoid involuntary accidents
+   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
+   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
+   * meant.
+   */
+  explicit TensorProductQuadrature(const unsigned int n_quadrature_points = 0);
+
+  /**
+   * Build this quadrature formula as the tensor product of a formula in a
+   * dimension one less than the present and a formula in one dimension.
+   * This constructor assumes (and tests) that constant functions are integrated
+   * exactly, i.e. the sum of the quadrature weights is one.
+   *
+   * <tt>SubQuadrature<dim>::type</tt> expands to <tt>Quadrature<dim-1></tt>.
+   */
+  TensorProductQuadrature(const SubTensorProductQuadrature &,
+                          const Quadrature<1> &);
+
+  /**
+   * Build this quadrature formula as the <tt>dim</tt>-fold tensor product of
+   * a formula in one dimension.
+   *
+   * Assuming that the points in the one-dimensional rule are in ascending
+   * order, the points of the resulting rule are ordered lexicographically
+   * with <i>x</i> running fastest.
+   *
+   * In order to avoid a conflict with the copy constructor in 1d, we let the
+   * argument be a 0d quadrature formula for dim==1, and a 1d quadrature
+   * formula for all other space dimensions.
+   *
+   * This constructor does not require that constant functions are integrated
+   * exactly. Therefore, it is appropriate if the one-dimensional formula
+   * is defined with respect to a weighting function.
+   */
+  explicit TensorProductQuadrature(const Quadrature<1> &quadrature_1d);
+
+  /**
+   * Copy constructor.
+   */
+  TensorProductQuadrature(const TensorProductQuadrature<dim> &q);
+
+  /**
+   * Move constructor. Construct a new quadrature object by transferring the
+   * internal data of another quadrature object.
+   */
+  TensorProductQuadrature(TensorProductQuadrature<dim> &&) noexcept = default;
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~TensorProductQuadrature() override = default;
+
+  /**
+   * Move assignment operator. Moves all data from another quadrature object
+   * to this object.
+   */
+  TensorProductQuadrature &
+  operator=(TensorProductQuadrature<dim> &&) = default; // NOLINT
+
+  /**
+   * Returns the @p dim one-dimensional basis objects.
    *
    * For @p dim equal to one, we can not return the std::array as a const
    * reference and have to return it by value. In this case, the array
@@ -278,29 +376,7 @@ public:
 
 protected:
   /**
-   * List of quadrature points. To be filled by the constructors of derived
-   * classes.
-   */
-  std::vector<Point<dim>> quadrature_points;
-
-  /**
-   * List of weights of the quadrature points.  To be filled by the
-   * constructors of derived classes.
-   */
-  std::vector<double> weights;
-
-  /**
-   * Indicates if this object represents quadrature formula that is a tensor
-   * product of one-dimensional formulas.
-   * This flag is set if dim==1 or the constructors taking a Quadrature<1>
-   * (and possibly a Quadrature<dim-1> object) is called. This implies
-   * that the quadrature points are sorted lexicographically.
-   */
-  bool is_tensor_product_flag;
-
-  /**
-   * Stores the one-dimensional tensor basis objects in case this object
-   * can be represented by a tensor product.
+   * Stores the one-dimensional tensor basis objects.
    */
   std::unique_ptr<std::array<Quadrature<1>, dim>> tensor_basis;
 };
@@ -317,7 +393,7 @@ protected:
  * @author Guido Kanschat, 2005
  */
 template <int dim>
-class QAnisotropic : public Quadrature<dim>
+class QAnisotropic : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -366,7 +442,7 @@ public:
  * @author Wolfgang Bangerth 1999
  */
 template <int dim>
-class QIterated : public Quadrature<dim>
+class QIterated : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -440,9 +516,11 @@ Quadrature<dim>::get_weights() const
 
 template <int dim>
 inline bool
-Quadrature<dim>::is_tensor_product() const
+is_tensor_product(const Quadrature<dim> &quadrature)
 {
-  return is_tensor_product_flag;
+  const TensorProductQuadrature<dim> *tensor_product_quadrature =
+    dynamic_cast<const TensorProductQuadrature<dim> *>(&quadrature);
+  return tensor_product_quadrature != nullptr;
 }
 
 

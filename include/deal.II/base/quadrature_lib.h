@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2001
  */
 template <int dim>
-class QGauss : public Quadrature<dim>
+class QGauss : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -73,7 +73,7 @@ public:
  * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
 template <int dim>
-class QGaussLobatto : public Quadrature<dim>
+class QGaussLobatto : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -90,7 +90,7 @@ public:
  * for linear polynomials.
  */
 template <int dim>
-class QMidpoint : public Quadrature<dim>
+class QMidpoint : public TensorProductQuadrature<dim>
 {
 public:
   QMidpoint();
@@ -102,7 +102,7 @@ public:
  * points is exact for polynomials of degree 3.
  */
 template <int dim>
-class QSimpson : public Quadrature<dim>
+class QSimpson : public TensorProductQuadrature<dim>
 {
 public:
   QSimpson();
@@ -123,7 +123,7 @@ public:
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class QTrapez : public Quadrature<dim>
+class QTrapez : public TensorProductQuadrature<dim>
 {
 public:
   QTrapez();
@@ -138,7 +138,7 @@ public:
  * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
-class QMilne : public Quadrature<dim>
+class QMilne : public TensorProductQuadrature<dim>
 {
 public:
   QMilne();
@@ -152,7 +152,7 @@ public:
  * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
-class QWeddle : public Quadrature<dim>
+class QWeddle : public TensorProductQuadrature<dim>
 {
 public:
   QWeddle();
@@ -174,7 +174,7 @@ public:
  * The weights and functions have been tabulated up to order 12.
  */
 template <int dim>
-class QGaussLog : public Quadrature<dim>
+class QGaussLog : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -235,7 +235,7 @@ private:
  * The weights and functions have been tabulated up to order 12.
  */
 template <int dim>
-class QGaussLogR : public Quadrature<dim>
+class QGaussLogR : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -464,7 +464,7 @@ private:
  * @author Nicola Giuliani, Luca Heltai 2015
  */
 template <int dim>
-class QTelles : public Quadrature<dim>
+class QTelles : public TensorProductQuadrature<dim>
 {
 public:
   /**
@@ -496,7 +496,7 @@ public:
  * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
-class QGaussChebyshev : public Quadrature<dim>
+class QGaussChebyshev : public TensorProductQuadrature<dim>
 {
 public:
   /// Generate a formula with <tt>n</tt> quadrature points
@@ -521,7 +521,7 @@ public:
  * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
-class QGaussRadauChebyshev : public Quadrature<dim>
+class QGaussRadauChebyshev : public TensorProductQuadrature<dim>
 {
 public:
   /* EndPoint is used to specify which of the two endpoints of the unit interval
@@ -568,7 +568,7 @@ private:
  * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
-class QGaussLobattoChebyshev : public Quadrature<dim>
+class QGaussLobattoChebyshev : public TensorProductQuadrature<dim>
 {
 public:
   /// Generate a formula with <tt>n</tt> quadrature points
