@@ -15,7 +15,7 @@
 
 
 
-// validate algorithms that will flag cells for p adaptivity
+// validate algorithms that will flag cells for p-adaptivity
 
 
 #include <deal.II/base/geometry_info.h>
@@ -101,7 +101,7 @@ test()
     validate(tria, dh);
   }
 
-  deallog << "full p adaptivity" << std::endl;
+  deallog << "full p-adaptivity" << std::endl;
   {
     Triangulation<dim>  tria;
     hp::DoFHandler<dim> dh;
@@ -117,7 +117,7 @@ test()
   // Ultimately, the first quarter of all cells will be flagged for
   // p refinement, and the last quarter for p coarsening.
 
-  deallog << "p adaptivity from flags" << std::endl;
+  deallog << "p-adaptivity from flags" << std::endl;
   {
     Triangulation<dim>  tria;
     hp::DoFHandler<dim> dh;
@@ -134,29 +134,54 @@ test()
     validate(tria, dh);
   }
 
-  deallog << "p adaptivity from threshold" << std::endl;
+  deallog << "p-adaptivity from absolute threshold" << std::endl;
   {
     Triangulation<dim>  tria;
     hp::DoFHandler<dim> dh;
     setup(tria, dh, fes);
 
     unsigned int   n_active = tria.n_active_cells();
-    Vector<double> smoothness_indicators(n_active);
+    Vector<double> indicators(n_active);
     for (unsigned int i = 0; i < n_active; ++i)
       {
         if (i < .25 * n_active)
-          smoothness_indicators[i] = 2.;
+          indicators[i] = 2.;
         else if (i < .75 * n_active)
-          smoothness_indicators[i] = 1.;
+          indicators[i] = 1.;
         else
-          smoothness_indicators[i] = 0.;
+          indicators[i] = 0.;
       }
-    hp::Refinement::p_adaptivity_from_threshold(dh, smoothness_indicators);
+    hp::Refinement::p_adaptivity_from_absolute_threshold(dh,
+                                                         indicators,
+                                                         1 + 1e-4,
+                                                         1 - 1e-4);
 
     validate(tria, dh);
   }
 
-  deallog << "p adaptivity from regularity" << std::endl;
+  deallog << "p-adaptivity from relative threshold" << std::endl;
+  {
+    Triangulation<dim>  tria;
+    hp::DoFHandler<dim> dh;
+    setup(tria, dh, fes);
+
+    unsigned int   n_active = tria.n_active_cells();
+    Vector<double> indicators(n_active);
+    for (unsigned int i = 0; i < n_active; ++i)
+      {
+        if (i < .25 * n_active)
+          indicators[i] = 2.;
+        else if (i < .75 * n_active)
+          indicators[i] = 1.;
+        else
+          indicators[i] = 0.;
+      }
+    hp::Refinement::p_adaptivity_from_relative_threshold(dh, indicators);
+
+    validate(tria, dh);
+  }
+
+  deallog << "p-adaptivity from regularity" << std::endl;
   {
     Triangulation<dim>  tria;
     hp::DoFHandler<dim> dh;
@@ -178,35 +203,34 @@ test()
     validate(tria, dh);
   }
 
-  deallog << "p adaptivity from prediction" << std::endl;
+  deallog << "p-adaptivity from reference" << std::endl;
   {
     Triangulation<dim>  tria;
     hp::DoFHandler<dim> dh;
     setup(tria, dh, fes);
 
     unsigned int   n_active = tria.n_active_cells();
-    Vector<double> predicted_errors(n_active), error_estimates(n_active);
+    Vector<double> references(n_active), criteria(n_active);
     for (unsigned int i = 0; i < n_active; ++i)
       {
         if (i < .25 * n_active)
           {
-            predicted_errors[i] = 1. + 1e-4;
-            error_estimates[i]  = 1.;
+            references[i] = 1. + 1e-4;
+            criteria[i]   = 1.;
           }
         else if (i < .75 * n_active)
           {
-            predicted_errors[i] = 1.;
-            error_estimates[i]  = 1.;
+            references[i] = 1.;
+            criteria[i]   = 1.;
           }
         else
           {
-            predicted_errors[i] = 1. + 1e-4;
-            error_estimates[i]  = 1.;
+            references[i] = 1. - 1e-4;
+            criteria[i]   = 1.;
           }
       }
-    hp::Refinement::p_adaptivity_from_prediction(dh,
-                                                 error_estimates,
-                                                 predicted_errors);
+    hp::Refinement::p_adaptivity_from_reference(
+      dh, criteria, references, std::less<double>(), std::greater<double>());
 
     validate(tria, dh);
   }

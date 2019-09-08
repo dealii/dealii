@@ -19,9 +19,13 @@
 
 #include <deal.II/base/config.h>
 
-#include <vector>
+#include <deal.II/base/template_constraints.h>
+
+#include <functional>
+
 
 DEAL_II_NAMESPACE_OPEN
+
 
 // forward declarations
 #ifndef DOXYGEN
@@ -34,6 +38,7 @@ namespace hp
   class DoFHandler;
 }
 #endif
+
 
 namespace hp
 {
@@ -95,21 +100,21 @@ namespace hp
    * @code
    * // step 1: flag cells for refinement or coarsening
    * Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-   * KellyErrorEstimator<dim>::estimate (hp_dof_handler,
-   *                                     QGauss<dim-1> (quadrature_points),
-   *                                     typename FunctionMap<dim>::type(),
-   *                                     solution,
-   *                                     estimated_error_per_cell);
-   * GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-   *                                                    estimated_error_per_cell,
-   *                                                    top_fraction,
-   *                                                    bottom_fraction);
+   * KellyErrorEstimator<dim>::estimate(hp_dof_handler,
+   *                                    QGauss<dim-1> (quadrature_points),
+   *                                    typename FunctionMap<dim>::type(),
+   *                                    solution,
+   *                                    estimated_error_per_cell);
+   * GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
+   *                                                   estimated_error_per_cell,
+   *                                                   top_fraction,
+   *                                                   bottom_fraction);
    *
    * // step 2: set future finite element indices on flagged cells
-   * hp::Refinement::full_p_adaptivity (hp_dof_handler);
+   * hp::Refinement::full_p_adaptivity(hp_dof_handler);
    *
    * // step 3: decide whether h- or p-adaptive methods will be supplied
-   * hp::Refinement::force_p_over_h (hp_dof_handler);
+   * hp::Refinement::force_p_over_h(hp_dof_handler);
    *
    * // step 4: prepare solutions to be transferred
    * ...
@@ -122,6 +127,20 @@ namespace hp
    */
   namespace Refinement
   {
+    /**
+     * An alias that defines the characteristics of a function that can be used
+     * as a comparison criterion for deciding whether to perform h- or
+     * p-adaptation.
+     *
+     * Such functions take two numbers as arguments: The first one corresponds
+     * to the provided criterion, while the other one conforms to the reference.
+     * The result of the comparision will be returned as a boolean.
+     */
+    template <typename Number>
+    using ComparisonFunction =
+      std::function<bool(const typename identity<Number>::type &,
+                         const typename identity<Number>::type &)>;
+
     /**
      * @name Setting p-adaptivity flags
      * @{
@@ -140,10 +159,10 @@ namespace hp
     full_p_adaptivity(const hp::DoFHandler<dim, spacedim> &dof_handler);
 
     /**
-     * Adapt the finite element on cells that have been specifically flagged for
-     * p-adaptation via the parameter @p p_flags. Future finite elements will
-     * only be assigned if cells have been flagged for refinement and coarsening
-     * beforehand.
+     * Adapt which finite element to use on cells that have been specifically
+     * flagged for p-adaptation via the parameter @p p_flags. Future finite
+     * elements will only be assigned if cells have been flagged for refinement
+     * and coarsening beforehand.
      *
      * Each entry of the parameter @p p_flags needs to correspond to an active
      * cell.
@@ -158,25 +177,24 @@ namespace hp
                             const std::vector<bool> &            p_flags);
 
     /**
-     * Adapt the finite element on cells whose smoothness indicators meet a
-     * certain threshold.
+     * Adapt which finite element to use on cells whose criteria meet a certain
+     * absolute threshold.
      *
-     * The threshold will be chosen for refined and coarsened cells
-     * individually. For each class of cells, we determine the maximal and
-     * minimal values of the smoothness indicators and determine the threshold
-     * by linear interpolation between these limits. Parameters
-     * @p p_refine_fraction and @p p_refine_coarsen are used as interpolation
-     * factors, where `0` corresponds to the minimal and `1` to the maximal
-     * value. By default, mean values are considered as thresholds.
+     * For p-refinement and p-coarsening, two separate thresholds need to
+     * provided via parameters @p p_refine_threshold and @p p_coarsen_threshold.
      *
-     * We consider a cell for p-refinement if it is flagged for refinement and
-     * its smoothness indicator is larger than the corresponding threshold. The
-     * same applies for p-coarsening, but the cell's indicator must be lower
-     * than the threshold.
+     * We consider a cell for p-adaptivity if it is currently flagged for
+     * refinement or coarsening and its criterion successfully compares to the
+     * corresponding threshold. Let us be more specific on the default case: We
+     * consider a cell for p-refinement if it is flagged for refinement and its
+     * criterion is larger than the corresponding threshold. The same applies
+     * for p-coarsening, but the cell's criterion must be lower than the
+     * threshold. However, different compare function objects can be supplied
+     * via the parameters @p compare_refine and @p compare_coarsen to impose
+     * different decision strategies.
      *
-     * Each entry of the parameter @p smoothness_indicators needs to correspond
-     * to an active cell. Parameters @p p_refine_fraction and
-     * @p p_coarsen_fraction need to be in the interval $[0,1]$.
+     * Each entry of the parameter @p criteria needs to correspond to an active
+     * cell.
      *
      * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
      *   may change refine and coarsen flags, which will ultimately change the
@@ -184,14 +202,56 @@ namespace hp
      */
     template <int dim, typename Number, int spacedim>
     void
-    p_adaptivity_from_threshold(
+    p_adaptivity_from_absolute_threshold(
       const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               smoothness_indicators,
-      const double                         p_refine_fraction  = 0.5,
-      const double                         p_coarsen_fraction = 0.5);
+      const Vector<Number> &               criteria,
+      const Number                         p_refine_threshold,
+      const Number                         p_coarsen_threshold,
+      const ComparisonFunction<Number> &compare_refine = std::greater<Number>(),
+      const ComparisonFunction<Number> &compare_coarsen = std::less<Number>());
 
     /**
-     * Adapt the finite element on cells based on the regularity of the
+     * Adapt which finite element to use on cells whose criteria meet a certain
+     * threshold relative to the overall range of criterion values.
+     *
+     * The threshold will be determined for refined and coarsened cells
+     * separately based on the currently set refinement markers. For each class
+     * of cells, we determine the maximal and minimal values of all criteria and
+     * determine the threshold by linear interpolation between these limits.
+     * Parameters @p p_refine_fraction and @p p_refine_coarsen are used as
+     * interpolation factors, where `0` corresponds to the minimal and `1` to
+     * the maximal value. By default, mean values are considered as thresholds.
+     *
+     * We consider a cell for p-adaptivity if it is currently flagged for
+     * refinement or coarsening and its criterion successfully compares to the
+     * corresponding threshold. Let us be more specific on the default case: We
+     * consider a cell for p-refinement if it is flagged for refinement and its
+     * criterion is larger than the corresponding threshold. The same applies
+     * for p-coarsening, but the cell's criterion must be lower than the
+     * threshold. However, different compare function objects can be supplied
+     * via the parameters @p compare_refine and @p compare_coarsen to impose
+     * different decision strategies.
+     *
+     * Each entry of the parameter @p criteria needs to correspond to an active
+     * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
+     * in the interval $[0,1]$.
+     *
+     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
+     *   may change refine and coarsen flags, which will ultimately change the
+     *   results of this function.
+     */
+    template <int dim, typename Number, int spacedim>
+    void
+    p_adaptivity_from_relative_threshold(
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &               criteria,
+      const double                         p_refine_fraction  = 0.5,
+      const double                         p_coarsen_fraction = 0.5,
+      const ComparisonFunction<Number> &compare_refine = std::greater<Number>(),
+      const ComparisonFunction<Number> &compare_coarsen = std::less<Number>());
+
+    /**
+     * Adapt which finite element to use on cells based on the regularity of the
      * (unknown) analytical solution.
      *
      * With an approximation of the local Sobolev regularity index $k_K$,
@@ -211,17 +271,17 @@ namespace hp
      *
      * For more theoretical details see
      * @code{.bib}
-     * @article{Houston2005,
-     *  author    = {Houston, Paul and S{\"u}li, Endre},
-     *  title     = {A note on the design of hp-adaptive finite element
-     *               methods for elliptic partial differential equations},
-     *  journal   = {{Computer Methods in Applied Mechanics and Engineering}},
-     *  volume    = {194},
-     *  number    = {2},
-     *  pages     = {229--243},
+     * @article{Ainsworth1998,
+     *  author    = {Ainsworth, Mark and Senior, Bill},
+     *  title     = {An adaptive refinement strategy for hp-finite element
+     *               computations},
+     *  journal   = {{Applied Numerical Mathematics}},
+     *  volume    = {26},
+     *  number    = {1--2},
+     *  pages     = {165--178},
      *  publisher = {Elsevier},
-     *  year      = {2005},
-     *  doi       = {10.1016/j.cma.2004.04.009}
+     *  year      = {1998},
+     *  doi       = {10.1016/S0168-9274(97)00083-4}
      * }
      * @endcode
      *
@@ -236,39 +296,19 @@ namespace hp
       const Vector<Number> &               sobolev_indices);
 
     /**
-     * Adapt the finite element on cells based on their refinement history
-     * or rather the predicted change of their error estimates.
+     * Adapt which finite element to use on each cell based on how its criterion
+     * relates to a reference.
      *
-     * If a cell is flagged for adaptation, we will perform p-adaptation once
-     * the associated error indicators $\eta_{K}$ on cell $K$ satisfy
-     * $\eta_{K} < \eta_{K,\text{pred}}$, where the subscript $\text{pred}$
-     * denotes the predicted error. This corresponds to our assumption of
-     * smoothness being correct, else h-adaptation is supplied.
+     * We consider a cell for p-adaptivity if it is currently flagged for
+     * refinement or coarsening and its criterion successfully compares to the
+     * corresponding reference. Other than functions
+     * p_adaptivity_from_absolute_threshold() and
+     * p_adaptivity_from_relative_threshold(), compare function objects have to
+     * be provided explicitly via the parameters @p compare_refine and
+     * @p compare_coarsen.
      *
-     * For the very first adaptation step, the user needs to decide whether h-
-     * or p-adaptation is supposed to happen. An h-step will be applied with
-     * $\eta_{K,\text{pred}} = 0$, whereas $\eta_{K,\text{pred}} = \infty$
-     * ensures a p-step. The latter may be realised with
-     * `std::numeric_limits::max()`.
-     *
-     * Each entry of the parameter @p error_indicators and @p predicted_errors
-     * needs to correspond to an active cell.
-     *
-     * For more theoretical details see
-     * @code{.bib}
-     * @article{Melenk2001,
-     *  author    = {Melenk, Jens Markus and Wohlmuth, Barbara I.},
-     *  title     = {{On residual-based a posteriori error estimation
-     *                in hp-FEM}},
-     *  journal   = {{Advances in Computational Mathematics}},
-     *  volume    = {15},
-     *  number    = {1},
-     *  pages     = {311--331},
-     *  publisher = {Springer US},
-     *  year      = {2001},
-     *  doi       = {10.1023/A:1014268310921}
-     * }
-     * @endcode
+     * Each entry of the parameters @p criteria and @p references needs to
+     * correspond to an active cell.
      *
      * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
      *   may change refine and coarsen flags, which will ultimately change the
@@ -276,11 +316,12 @@ namespace hp
      */
     template <int dim, typename Number, int spacedim>
     void
-    p_adaptivity_from_prediction(
+    p_adaptivity_from_reference(
       const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               error_indicators,
-      const Vector<Number> &               predicted_errors);
-
+      const Vector<Number> &               criteria,
+      const Vector<Number> &               references,
+      const ComparisonFunction<Number> &   compare_refine,
+      const ComparisonFunction<Number> &   compare_coarsen);
     /**
      * @}
      */
@@ -319,21 +360,18 @@ namespace hp
      * confident to say that the error will not change by sole interpolation on
      * the larger finite element space.
      *
-     * Further, the function assumes that the local error on a cell
-     * that will be refined, will lead to errors on the $2^{dim}$
-     * children that are all equal, whereas local errors on siblings
-     * will be summed up on the parent cell in case of
-     * coarsening. This assumption is often not satisfied in practice:
-     * For example, if a cell is at a corner singularity, then the one
-     * child cell that ends up closest to the singularity will inherit
-     * the majority of the remaining error -- but this function can
-     * not know where the singularity will be, and consequently
-     * assumes equal distribution.
+     * Further, the function assumes that the local error on a cell that will be
+     * refined, will lead to errors on the $2^{dim}$ children that are all
+     * equal, whereas local errors on siblings will be summed up on the parent
+     * cell in case of coarsening. This assumption is often not satisfied in
+     * practice: For example, if a cell is at a corner singularity, then the one
+     * child cell that ends up closest to the singularity will inherit the
+     * majority of the remaining error -- but this function can not know where
+     * the singularity will be, and consequently assumes equal distribution.
      *
-     * When transferring the predicted error to the coarsened mesh,
-     * make sure to configure your CellDataTransfer object with
-     * CoarseningStrategies::sum() as a coarsening
-     * strategy.
+     * When transferring the predicted error to the coarsened mesh, make sure to
+     * configure your CellDataTransfer object with CoarseningStrategies::sum()
+     * as a coarsening strategy.
      *
      * For p-adaptation, the local error is expected to converge exponentially
      * with the polynomial degree of the assigned finite element. Each increase
@@ -365,6 +403,66 @@ namespace hp
      *            (\gamma_\text{h} \, 0.5^{p_{K_c}})
      *            \quad \forall K_c \text{ children of } K$
      * </table>
+     *
+     * With these predicted error estimates, we are capable of adapting the
+     * finite element on cells based on their refinement history or rather the
+     * predicted change of their error estimates.
+     *
+     * If a cell is flagged for adaptation, we want to perform p-adaptation once
+     * the associated error indicators $\eta_{K}$ on cell $K$ satisfy
+     * $\eta_{K} < \eta_{K,\text{pred}}$, where the subscript $\text{pred}$
+     * denotes the predicted error. This corresponds to our assumption of
+     * smoothness being correct, else h-adaptation is applied. We achieve this
+     * with the function hp::Refinement::p_adaptivity_from_criteria() and a
+     * function object `std::less<Number>()` for both comparator parameters.
+     *
+     * For the very first adaptation step, the user needs to decide whether h-
+     * or p-adaptation is supposed to happen. An h-step will be applied with
+     * $\eta_{K,\text{pred}} = 0$, whereas $\eta_{K,\text{pred}} = \infty$
+     * ensures a p-step. The latter may be realised with
+     * `std::numeric_limits::infinity()`.
+     *
+     * The following code snippet demonstrates how to impose hp-adaptivity based
+     * on refinement history in an application:
+     * @code
+     * // [initialisation...]
+     * Vector<float> predicted_error_per_cell(triangulation.n_active_cells());
+     * for(unsigned int i = 0; i < triangulation.n_active_cells(); ++i)
+     *   predicted_error_per_cell[i] = std::numeric_limits<float>::max();
+     *
+     * // [during each refinement step...]
+     * // set h-adaptivity flags
+     * Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+     * KellyErrorEstimator::estimate(...);
+     * GridRefinemet::refine_and_coarsen_fixed_fraction(...);
+     *
+     * // set p-adaptivity flags
+     * hp::Refinement::p_adaptivity_from_reference(
+     *   hp_dof_handler,
+     *   estimated_error_per_cell,
+     *   predicted_error_per_cell,
+     *   std::less<float>(),
+     *   std::less<float>());
+     * hp::Refinement::{choose|force}_p_over_h(...);
+     *
+     * // predict error for the subsequent adaptation
+     * triangulation.prepare_coarsening_and_refinement();
+     * hp::Refinement::predict_error(
+     *   hp_dof_handler,
+     *   estimated_error_per_cell,
+     *   predicted_error_per_cell);
+     *
+     * // perform adaptation
+     * CellDataTransfer<dim, spacedim, Vector<float>>
+     *   cell_data_transfer(triangulation);
+     * cell_data_transfer.prepare_for_coarsening_and_refinement();
+     *
+     * triangulation.execute_coarsening_and_refinement();
+     *
+     * Vector<float> transferred_errors(triangulation.n_active_cells());
+     * cell_data_transfer.unpack(predicted_error_per_cell, transferred_errors);
+     * predicted_error_per_cell = std::move(transferred_errors);
+     * @endcode
      *
      * For more theoretical details see
      * @code{.bib}

@@ -383,10 +383,10 @@ namespace Step27
     parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
       triangulation, estimated_error_per_cell, 0.3, 0.03);
 
-    hp::Refinement::p_adaptivity_from_threshold(dof_handler,
-                                                smoothness_indicators,
-                                                0.5,
-                                                0.);
+    hp::Refinement::p_adaptivity_from_relative_threshold(dof_handler,
+                                                         smoothness_indicators,
+                                                         0.5,
+                                                         0.);
     hp::Refinement::choose_p_over_h(dof_handler);
 
     triangulation.execute_coarsening_and_refinement();
