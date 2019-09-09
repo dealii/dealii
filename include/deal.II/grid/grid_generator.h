@@ -1712,7 +1712,8 @@ namespace GridGenerator
    * existing triangulation. A prototypical case is a 2d domain with
    * rectangular holes. This can be achieved by first meshing the entire
    * domain and then using this function to get rid of the cells that are
-   * located at the holes. Likewise, you could create the mesh that
+   * located at the holes. A demonstration of this particular use case is part
+   * of step-27. Likewise, you could create the mesh that
    * GridGenerator::hyper_L() produces by starting with a
    * GridGenerator::hyper_cube(), refining it once, and then calling the
    * current function with a single cell in the second argument.
