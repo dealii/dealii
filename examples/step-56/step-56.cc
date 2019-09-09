@@ -750,7 +750,7 @@ namespace Step56
       }
 
     // This iterator goes over all cells (not just active)
-    for (const auto &cell : velocity_dof_handler.active_cell_iterators())
+    for (const auto &cell : velocity_dof_handler.cell_iterators())
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
