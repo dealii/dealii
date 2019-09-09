@@ -471,10 +471,10 @@ protected:
 
 
   /**
-   * The polynomial space. Its type is given by the template parameter
-   * PolynomialType.
+   * A copy of the object passed to the constructor that describes the
+   * polynomial space.
    */
-  std::unique_ptr<TensorPolynomialsBase<dim>> poly_space;
+  const std::unique_ptr<const TensorPolynomialsBase<dim>> poly_space;
 
   /**
    * The inverse of the matrix <i>a<sub>ij</sub></i> of node values
