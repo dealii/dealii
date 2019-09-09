@@ -58,17 +58,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #  ifndef DOXYGEN
-namespace internal
-{
-  namespace DoFHandlerImplementation
-  {
-    namespace Policy
-    {
-      template <typename>
-      class ParallelDistributed;
-    }
-  } // namespace DoFHandlerImplementation
-} // namespace internal
 
 namespace FETools
 {
@@ -1233,12 +1222,6 @@ namespace parallel
       virtual types::coarse_cell_id
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
-
-
-
-      template <typename>
-      friend class dealii::internal::DoFHandlerImplementation::Policy::
-        ParallelDistributed;
 
       template <int, int, class>
       friend class dealii::FETools::internal::ExtrapolateImplementation;
