@@ -22,6 +22,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -1730,6 +1731,1420 @@ namespace internal
         }
     }
   };
+
+
+
+  // internal helper function for reading data; base version of different types
+  template <typename VectorizedArrayType, typename Number2>
+  void
+  do_vectorized_read(const Number2 *src_ptr, VectorizedArrayType &dst)
+  {
+    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      dst[v] = src_ptr[v];
+  }
+
+
+
+  // internal helper function for reading data; specialized version where we
+  // can use a dedicated load function
+  template <typename Number, unsigned int width>
+  void
+  do_vectorized_read(const Number *src_ptr, VectorizedArray<Number, width> &dst)
+  {
+    dst.load(src_ptr);
+  }
+
+
+
+  // internal helper function for reading data; base version of different types
+  template <typename VectorizedArrayType, typename Number2>
+  void
+  do_vectorized_gather(const Number2 *      src_ptr,
+                       const unsigned int * indices,
+                       VectorizedArrayType &dst)
+  {
+    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      dst[v] = src_ptr[indices[v]];
+  }
+
+
+
+  // internal helper function for reading data; specialized version where we
+  // can use a dedicated gather function
+  template <typename Number, unsigned int width>
+  void
+  do_vectorized_gather(const Number *                  src_ptr,
+                       const unsigned int *            indices,
+                       VectorizedArray<Number, width> &dst)
+  {
+    dst.gather(src_ptr, indices);
+  }
+
+
+
+  // internal helper function for reading data; base version of different types
+  template <typename VectorizedArrayType, typename Number2>
+  void
+  do_vectorized_add(const VectorizedArrayType src, Number2 *dst_ptr)
+  {
+    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      dst_ptr[v] += src[v];
+  }
+
+
+
+  // internal helper function for reading data; specialized version where we
+  // can use a dedicated load function
+  template <typename Number, unsigned int width>
+  void
+  do_vectorized_add(const VectorizedArray<Number, width> src, Number *dst_ptr)
+  {
+    VectorizedArray<Number, width> tmp;
+    tmp.load(dst_ptr);
+    (tmp + src).store(dst_ptr);
+  }
+
+
+
+  // internal helper function for reading data; base version of different types
+  template <typename VectorizedArrayType, typename Number2>
+  void
+  do_vectorized_scatter_add(const VectorizedArrayType src,
+                            const unsigned int *      indices,
+                            Number2 *                 dst_ptr)
+  {
+    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      dst_ptr[indices[v]] += src[v];
+  }
+
+
+
+  // internal helper function for reading data; specialized version where we
+  // can use a dedicated gather function
+  template <typename Number, unsigned int width>
+  void
+  do_vectorized_scatter_add(const VectorizedArray<Number, width> src,
+                            const unsigned int *                 indices,
+                            Number *                             dst_ptr)
+  {
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+    for (unsigned int v = 0; v < width; ++v)
+      dst_ptr[indices[v]] += src[v];
+#else
+    VectorizedArray<Number, width> tmp;
+    tmp.gather(dst_ptr, indices);
+    (tmp + src).scatter(indices, dst_ptr);
+#endif
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType,
+            typename Number2 = Number>
+  struct FEFaceEvaluationSelector
+  {
+    static void
+    evaluate(const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
+             const VectorizedArrayType *   values_array,
+             VectorizedArrayType *         values_quad,
+             VectorizedArrayType *         gradients_quad,
+             VectorizedArrayType *         scratch_data,
+             const bool                    evaluate_values,
+             const bool                    evaluate_gradients,
+             const unsigned int            face_no,
+             const unsigned int            subface_index,
+             const unsigned int            face_orientation,
+             const Table<2, unsigned int> &orientation_map)
+    {
+      constexpr unsigned int static_dofs_per_face =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
+                         numbers::invalid_unsigned_int;
+      const unsigned int dofs_per_face =
+        fe_degree > -1 ? static_dofs_per_face :
+                         Utilities::pow(data.fe_degree + 1, dim - 1);
+
+      // we allocate small amounts of data on the stack to signal the compiler
+      // that this temporary data is only needed for the calculations but the
+      // final results can be discarded and need not be written back to
+      // memory. For large sizes or when the dofs per face is not a compile-time
+      // constant, however, we want to go to the heap in the `scratch_data`
+      // variable to not risk a stack overflow.
+      constexpr unsigned int stack_array_size_threshold = 100;
+
+      VectorizedArrayType
+                           temp_data[static_dofs_per_face < stack_array_size_threshold ?
+                    n_components * 2 * static_dofs_per_face :
+                    1];
+      VectorizedArrayType *temp1;
+      if (static_dofs_per_face < stack_array_size_threshold)
+        temp1 = &temp_data[0];
+      else
+        temp1 = scratch_data;
+
+      FEFaceNormalEvaluationImpl<dim,
+                                 fe_degree,
+                                 n_components,
+                                 VectorizedArrayType>::
+        template interpolate<true, false>(
+          data, values_array, temp1, evaluate_gradients, face_no);
+
+      const unsigned int n_q_points_1d_actual =
+        fe_degree > -1 ? n_q_points_1d : 0;
+      if (fe_degree > -1 &&
+          subface_index >= GeometryInfo<dim>::max_children_per_cell &&
+          data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+        FEFaceEvaluationImpl<
+          true,
+          dim,
+          fe_degree,
+          n_q_points_1d_actual,
+          n_components,
+          VectorizedArrayType>::evaluate_in_face(data,
+                                                 temp1,
+                                                 values_quad,
+                                                 gradients_quad,
+                                                 scratch_data + 2 *
+                                                                  n_components *
+                                                                  dofs_per_face,
+                                                 evaluate_values,
+                                                 evaluate_gradients,
+                                                 subface_index);
+      else
+        FEFaceEvaluationImpl<
+          false,
+          dim,
+          fe_degree,
+          n_q_points_1d_actual,
+          n_components,
+          VectorizedArrayType>::evaluate_in_face(data,
+                                                 temp1,
+                                                 values_quad,
+                                                 gradients_quad,
+                                                 scratch_data + 2 *
+                                                                  n_components *
+                                                                  dofs_per_face,
+                                                 evaluate_values,
+                                                 evaluate_gradients,
+                                                 subface_index);
+
+      if (face_orientation)
+        adjust_for_face_orientation(face_orientation,
+                                    orientation_map,
+                                    false,
+                                    evaluate_values,
+                                    evaluate_gradients,
+                                    data.n_q_points_face,
+                                    scratch_data,
+                                    values_quad,
+                                    gradients_quad);
+    }
+
+    static void
+    integrate(const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
+              VectorizedArrayType *         values_array,
+              VectorizedArrayType *         values_quad,
+              VectorizedArrayType *         gradients_quad,
+              VectorizedArrayType *         scratch_data,
+              const bool                    integrate_values,
+              const bool                    integrate_gradients,
+              const unsigned int            face_no,
+              const unsigned int            subface_index,
+              const unsigned int            face_orientation,
+              const Table<2, unsigned int> &orientation_map)
+    {
+      if (face_orientation)
+        adjust_for_face_orientation(face_orientation,
+                                    orientation_map,
+                                    true,
+                                    integrate_values,
+                                    integrate_gradients,
+                                    data.n_q_points_face,
+                                    scratch_data,
+                                    values_quad,
+                                    gradients_quad);
+
+      constexpr unsigned int static_dofs_per_face =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
+                         numbers::invalid_unsigned_int;
+      const unsigned int dofs_per_face =
+        fe_degree > -1 ? static_dofs_per_face :
+                         Utilities::pow(data.fe_degree + 1, dim - 1);
+
+      constexpr unsigned int stack_array_size_threshold = 100;
+
+      VectorizedArrayType
+                           temp_data[static_dofs_per_face < stack_array_size_threshold ?
+                    n_components * 2 * static_dofs_per_face :
+                    1];
+      VectorizedArrayType *temp1;
+      if (static_dofs_per_face < stack_array_size_threshold)
+        temp1 = &temp_data[0];
+      else
+        temp1 = scratch_data;
+
+      const unsigned int n_q_points_1d_actual =
+        fe_degree > -1 ? n_q_points_1d : 0;
+      if (fe_degree > -1 &&
+          subface_index >= GeometryInfo<dim - 1>::max_children_per_cell &&
+          data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+        FEFaceEvaluationImpl<
+          true,
+          dim,
+          fe_degree,
+          n_q_points_1d_actual,
+          n_components,
+          VectorizedArrayType>::integrate_in_face(data,
+                                                  temp1,
+                                                  values_quad,
+                                                  gradients_quad,
+                                                  scratch_data +
+                                                    2 * n_components *
+                                                      dofs_per_face,
+                                                  integrate_values,
+                                                  integrate_gradients,
+                                                  subface_index);
+      else
+        FEFaceEvaluationImpl<
+          false,
+          dim,
+          fe_degree,
+          n_q_points_1d_actual,
+          n_components,
+          VectorizedArrayType>::integrate_in_face(data,
+                                                  temp1,
+                                                  values_quad,
+                                                  gradients_quad,
+                                                  scratch_data +
+                                                    2 * n_components *
+                                                      dofs_per_face,
+                                                  integrate_values,
+                                                  integrate_gradients,
+                                                  subface_index);
+
+      FEFaceNormalEvaluationImpl<dim,
+                                 fe_degree,
+                                 n_components,
+                                 VectorizedArrayType>::
+        template interpolate<false, false>(
+          data, temp1, values_array, integrate_gradients, face_no);
+    }
+
+    static bool
+    gather_evaluate(
+      const Number2 *                                            src_ptr,
+      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
+      const MatrixFreeFunctions::DoFInfo &                       dof_info,
+      VectorizedArrayType *                                      values_quad,
+      VectorizedArrayType *                                      gradients_quad,
+      VectorizedArrayType *                                      scratch_data,
+      const bool         evaluate_values,
+      const bool         evaluate_gradients,
+      const unsigned int active_fe_index,
+      const unsigned int first_selected_component,
+      const unsigned int cell,
+      const unsigned int face_no,
+      const unsigned int subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+      const unsigned int                                 face_orientation,
+      const Table<2, unsigned int> &                     orientation_map)
+    {
+      const unsigned int side = face_no % 2;
+
+      constexpr unsigned int static_dofs_per_component =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim) :
+                         numbers::invalid_unsigned_int;
+      constexpr unsigned int static_dofs_per_face =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
+                         numbers::invalid_unsigned_int;
+      const unsigned int dofs_per_face =
+        fe_degree > -1 ? static_dofs_per_face :
+                         Utilities::pow(data.fe_degree + 1, dim - 1);
+
+      constexpr unsigned int stack_array_size_threshold = 100;
+
+      VectorizedArrayType
+        temp_data[static_dofs_per_face < stack_array_size_threshold ?
+                    n_components * 2 * dofs_per_face :
+                    1];
+      VectorizedArrayType *__restrict temp1;
+      if (static_dofs_per_face < stack_array_size_threshold)
+        temp1 = &temp_data[0];
+      else
+        temp1 = scratch_data;
+
+      // case 1: contiguous and interleaved indices
+      if (((evaluate_gradients == false &&
+            data.nodal_at_cell_boundaries == true) ||
+           (data.element_type ==
+              MatrixFreeFunctions::tensor_symmetric_hermite &&
+            fe_degree > 1)) &&
+          dof_info.index_storage_variants[dof_access_index][cell] ==
+            MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+              interleaved_contiguous)
+        {
+          AssertDimension(
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
+            VectorizedArrayType::n_array_elements);
+          const unsigned int dof_index =
+            dof_info.dof_indices_contiguous
+              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info.component_dof_indices_offset[active_fe_index]
+                                                 [first_selected_component] *
+              VectorizedArrayType::n_array_elements;
+
+          if (fe_degree > 1 && evaluate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 1 + side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 = index_array[2 * i];
+                  const unsigned int ind2 = index_array[2 * i + 1];
+                  AssertIndexRange(ind1, data.dofs_per_component_on_cell);
+                  AssertIndexRange(ind2, data.dofs_per_component_on_cell);
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      do_vectorized_read(
+                        src_ptr + dof_index +
+                          (ind1 + comp * static_dofs_per_component) *
+                            VectorizedArrayType::n_array_elements,
+                        temp1[i + 2 * comp * dofs_per_face]);
+                      do_vectorized_read(
+                        src_ptr + dof_index +
+                          (ind2 + comp * static_dofs_per_component) *
+                            VectorizedArrayType::n_array_elements,
+                        temp1[dofs_per_face + i + 2 * comp * dofs_per_face]);
+                      temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
+                        grad_weight *
+                        (temp1[i + 2 * comp * dofs_per_face] -
+                         temp1[i + dofs_per_face + 2 * comp * dofs_per_face]);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind = index_array[i];
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    do_vectorized_read(
+                      src_ptr + dof_index +
+                        (ind + comp * static_dofs_per_component) *
+                          VectorizedArrayType::n_array_elements,
+                      temp1[i + 2 * comp * dofs_per_face]);
+                }
+            }
+        }
+
+      // case 2: contiguous and interleaved indices with fixed stride
+      else if (((evaluate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_strided)
+        {
+          AssertDimension(
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
+            VectorizedArrayType::n_array_elements);
+          const unsigned int *indices =
+            &dof_info.dof_indices_contiguous
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+          if (fe_degree > 1 && evaluate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 1 + side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 =
+                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                  const unsigned int ind2 =
+                    index_array[2 * i + 1] *
+                    VectorizedArrayType::n_array_elements;
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      do_vectorized_gather(
+                        src_ptr + ind1 +
+                          comp * static_dofs_per_component *
+                            VectorizedArrayType::n_array_elements +
+                          dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component] *
+                            VectorizedArrayType::n_array_elements,
+                        indices,
+                        temp1[i + 2 * comp * dofs_per_face]);
+                      VectorizedArrayType grad;
+                      do_vectorized_gather(
+                        src_ptr + ind2 +
+                          comp * static_dofs_per_component *
+                            VectorizedArrayType::n_array_elements +
+                          dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component] *
+                            VectorizedArrayType::n_array_elements,
+                        indices,
+                        grad);
+                      temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
+                        grad_weight *
+                        (temp1[i + 2 * comp * dofs_per_face] - grad);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind =
+                    index_array[i] * VectorizedArrayType::n_array_elements;
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    do_vectorized_gather(
+                      src_ptr + ind +
+                        comp * static_dofs_per_component *
+                          VectorizedArrayType::n_array_elements +
+                        dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component] *
+                          VectorizedArrayType::n_array_elements,
+                      indices,
+                      temp1[i + 2 * comp * dofs_per_face]);
+                }
+            }
+        }
+
+      // case 3: contiguous and interleaved indices with mixed stride
+      else if (((evaluate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_mixed_strides)
+        {
+          const unsigned int *strides =
+            &dof_info.dof_indices_interleave_strides
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+          unsigned int indices[VectorizedArrayType::n_array_elements];
+          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
+               ++v)
+            indices[v] =
+              dof_info.dof_indices_contiguous
+                [dof_access_index]
+                [cell * VectorizedArrayType::n_array_elements + v] +
+              dof_info.component_dof_indices_offset[active_fe_index]
+                                                   [first_selected_component] *
+                strides[v];
+          const unsigned int nvec =
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
+
+          if (fe_degree > 1 && evaluate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 1 + side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              if (nvec == VectorizedArrayType::n_array_elements)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  for (unsigned int i = 0; i < dofs_per_face; ++i)
+                    {
+                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind1[v] =
+                          indices[v] + (comp * static_dofs_per_component +
+                                        index_array[2 * i]) *
+                                         strides[v];
+                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind2[v] =
+                          indices[v] + (comp * static_dofs_per_component +
+                                        index_array[2 * i + 1]) *
+                                         strides[v];
+                      do_vectorized_gather(src_ptr,
+                                           ind1,
+                                           temp1[i + 2 * comp * dofs_per_face]);
+                      VectorizedArrayType grad;
+                      do_vectorized_gather(src_ptr, ind2, grad);
+                      temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
+                        grad_weight *
+                        (temp1[i + 2 * comp * dofs_per_face] - grad);
+                    }
+              else
+                {
+                  for (unsigned int i = 0; i < n_components * 2 * dofs_per_face;
+                       ++i)
+                    temp1[i] = VectorizedArrayType();
+                  for (unsigned int v = 0; v < nvec; ++v)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      for (unsigned int i = 0; i < dofs_per_face; ++i)
+                        {
+                          const unsigned int ind1 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[2 * i]) *
+                                           strides[v];
+                          const unsigned int ind2 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[2 * i + 1]) *
+                                           strides[v];
+                          temp1[i + 2 * comp * dofs_per_face][v] =
+                            src_ptr[ind1];
+                          const Number grad = src_ptr[ind2];
+                          temp1[i + dofs_per_face +
+                                2 * comp * dofs_per_face][v] =
+                            grad_weight[0] *
+                            (temp1[i + 2 * comp * dofs_per_face][v] - grad);
+                        }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              if (nvec == VectorizedArrayType::n_array_elements)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  for (unsigned int i = 0; i < dofs_per_face; ++i)
+                    {
+                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind[v] =
+                          indices[v] +
+                          (comp * static_dofs_per_component + index_array[i]) *
+                            strides[v];
+                      do_vectorized_gather(src_ptr,
+                                           ind,
+                                           temp1[i + 2 * comp * dofs_per_face]);
+                    }
+              else
+                {
+                  for (unsigned int i = 0; i < n_components * dofs_per_face;
+                       ++i)
+                    temp1[i] = VectorizedArrayType();
+                  for (unsigned int v = 0; v < nvec; ++v)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      for (unsigned int i = 0; i < dofs_per_face; ++i)
+                        {
+                          const unsigned int ind1 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[i]) *
+                                           strides[v];
+                          temp1[i + 2 * comp * dofs_per_face][v] =
+                            src_ptr[ind1];
+                        }
+                }
+            }
+        }
+
+      // case 4: contiguous indices without interleaving
+      else if (((evaluate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   contiguous &&
+               dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
+                 VectorizedArrayType::n_array_elements)
+        {
+          const unsigned int *indices =
+            &dof_info.dof_indices_contiguous
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+          if (evaluate_gradients == true &&
+              data.element_type ==
+                MatrixFreeFunctions::tensor_symmetric_hermite)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 1 + side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 = index_array[2 * i];
+                  const unsigned int ind2 = index_array[2 * i + 1];
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      do_vectorized_gather(
+                        src_ptr + ind1 + comp * static_dofs_per_component +
+                          dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component],
+                        indices,
+                        temp1[i + 2 * comp * dofs_per_face]);
+                      VectorizedArrayType grad;
+                      do_vectorized_gather(
+                        src_ptr + ind2 + comp * static_dofs_per_component +
+                          dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component],
+                        indices,
+                        grad);
+                      temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
+                        grad_weight *
+                        (temp1[i + 2 * comp * dofs_per_face] - grad);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  {
+                    const unsigned int ind = index_array[i];
+                    do_vectorized_gather(
+                      src_ptr + ind + comp * static_dofs_per_component +
+                        dof_info.component_dof_indices_offset
+                          [active_fe_index][first_selected_component],
+                      indices,
+                      temp1[i + comp * 2 * dofs_per_face]);
+                  }
+            }
+        }
+
+      // case 5: default vector access
+      else
+        {
+          return false;
+        }
+
+      if (fe_degree > -1 &&
+          subface_index >= GeometryInfo<dim>::max_children_per_cell &&
+          data.element_type <= MatrixFreeFunctions::tensor_symmetric)
+        FEFaceEvaluationImpl<
+          true,
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          n_components,
+          VectorizedArrayType>::evaluate_in_face(data,
+                                                 temp1,
+                                                 values_quad,
+                                                 gradients_quad,
+                                                 scratch_data + 2 *
+                                                                  n_components *
+                                                                  dofs_per_face,
+                                                 evaluate_values,
+                                                 evaluate_gradients,
+                                                 subface_index);
+      else
+        FEFaceEvaluationImpl<
+          false,
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          n_components,
+          VectorizedArrayType>::evaluate_in_face(data,
+                                                 temp1,
+                                                 values_quad,
+                                                 gradients_quad,
+                                                 scratch_data + 2 *
+                                                                  n_components *
+                                                                  dofs_per_face,
+                                                 evaluate_values,
+                                                 evaluate_gradients,
+                                                 subface_index);
+
+      if (face_orientation)
+        adjust_for_face_orientation(face_orientation,
+                                    orientation_map,
+                                    false,
+                                    evaluate_values,
+                                    evaluate_gradients,
+                                    data.n_q_points_face,
+                                    scratch_data,
+                                    values_quad,
+                                    gradients_quad);
+
+      return true;
+    }
+
+    static bool
+    integrate_scatter(
+      Number2 *                                                  dst_ptr,
+      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
+      const MatrixFreeFunctions::DoFInfo &                       dof_info,
+      VectorizedArrayType *                                      values_array,
+      VectorizedArrayType *                                      values_quad,
+      VectorizedArrayType *                                      gradients_quad,
+      VectorizedArrayType *                                      scratch_data,
+      const bool         integrate_values,
+      const bool         integrate_gradients,
+      const unsigned int active_fe_index,
+      const unsigned int first_selected_component,
+      const unsigned int cell,
+      const unsigned int face_no,
+      const unsigned int subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
+      const unsigned int                                 face_orientation,
+      const Table<2, unsigned int> &                     orientation_map)
+    {
+      if (face_orientation)
+        adjust_for_face_orientation(face_orientation,
+                                    orientation_map,
+                                    true,
+                                    integrate_values,
+                                    integrate_gradients,
+                                    data.n_q_points_face,
+                                    scratch_data,
+                                    values_quad,
+                                    gradients_quad);
+
+      const unsigned int     side = face_no % 2;
+      constexpr unsigned int static_dofs_per_component =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim) :
+                         numbers::invalid_unsigned_int;
+      const unsigned int dofs_per_face =
+        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
+                         Utilities::pow(data.fe_degree + 1, dim - 1);
+
+      constexpr unsigned int stack_array_size_threshold = 100;
+
+      VectorizedArrayType temp_data[dofs_per_face < stack_array_size_threshold ?
+                                      n_components * 2 * dofs_per_face :
+                                      1];
+      VectorizedArrayType *__restrict temp1;
+      if (dofs_per_face < stack_array_size_threshold)
+        temp1 = &temp_data[0];
+      else
+        temp1 = scratch_data;
+
+      if (fe_degree > -1 &&
+          subface_index >= GeometryInfo<dim>::max_children_per_cell &&
+          data.element_type <= internal::MatrixFreeFunctions::tensor_symmetric)
+        internal::FEFaceEvaluationImpl<
+          true,
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          n_components,
+          VectorizedArrayType>::integrate_in_face(data,
+                                                  temp1,
+                                                  values_quad,
+                                                  gradients_quad,
+                                                  scratch_data +
+                                                    2 * n_components *
+                                                      dofs_per_face,
+                                                  integrate_values,
+                                                  integrate_gradients,
+                                                  subface_index);
+      else
+        internal::FEFaceEvaluationImpl<
+          false,
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          n_components,
+          VectorizedArrayType>::integrate_in_face(data,
+                                                  temp1,
+                                                  values_quad,
+                                                  gradients_quad,
+                                                  scratch_data +
+                                                    2 * n_components *
+                                                      dofs_per_face,
+                                                  integrate_values,
+                                                  integrate_gradients,
+                                                  subface_index);
+
+      // case 1: contiguous and interleaved indices
+      if (((integrate_gradients == false &&
+            data.nodal_at_cell_boundaries == true) ||
+           (data.element_type ==
+              internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
+            fe_degree > 1)) &&
+          dof_info.index_storage_variants[dof_access_index][cell] ==
+            internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+              interleaved_contiguous)
+        {
+          AssertDimension(
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
+            VectorizedArrayType::n_array_elements);
+          const unsigned int dof_index =
+            dof_info.dof_indices_contiguous
+              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info.component_dof_indices_offset[active_fe_index]
+                                                 [first_selected_component] *
+              VectorizedArrayType::n_array_elements;
+
+          if (fe_degree > 1 && integrate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 2 - side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 = index_array[2 * i];
+                  const unsigned int ind2 = index_array[2 * i + 1];
+                  AssertIndexRange(ind1, data.dofs_per_component_on_cell);
+                  AssertIndexRange(ind2, data.dofs_per_component_on_cell);
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      VectorizedArrayType val =
+                        temp1[i + 2 * comp * dofs_per_face] -
+                        grad_weight *
+                          temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      VectorizedArrayType grad =
+                        grad_weight *
+                        temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      do_vectorized_add(
+                        val,
+                        dst_ptr + dof_index +
+                          (ind1 + comp * static_dofs_per_component) *
+                            VectorizedArrayType::n_array_elements);
+                      do_vectorized_add(
+                        grad,
+                        dst_ptr + dof_index +
+                          (ind2 + comp * static_dofs_per_component) *
+                            VectorizedArrayType::n_array_elements);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind = index_array[i];
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    do_vectorized_add(
+                      temp1[i + 2 * comp * dofs_per_face],
+                      dst_ptr + dof_index +
+                        (ind + comp * static_dofs_per_component) *
+                          VectorizedArrayType::n_array_elements);
+                }
+            }
+        }
+
+      // case 2: contiguous and interleaved indices with fixed stride
+      else if (((integrate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_strided)
+        {
+          AssertDimension(
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
+            VectorizedArrayType::n_array_elements);
+          const unsigned int *indices =
+            &dof_info.dof_indices_contiguous
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+          if (fe_degree > 1 && integrate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 2 - side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 =
+                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                  const unsigned int ind2 =
+                    index_array[2 * i + 1] *
+                    VectorizedArrayType::n_array_elements;
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      VectorizedArrayType val =
+                        temp1[i + 2 * comp * dofs_per_face] -
+                        grad_weight *
+                          temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      VectorizedArrayType grad =
+                        grad_weight *
+                        temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      do_vectorized_scatter_add(
+                        val,
+                        indices,
+                        dst_ptr + ind1 +
+                          comp * static_dofs_per_component *
+                            VectorizedArrayType::n_array_elements +
+                          dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component] *
+                            VectorizedArrayType::n_array_elements);
+                      do_vectorized_scatter_add(
+                        grad,
+                        indices,
+                        dst_ptr + ind2 +
+                          comp * static_dofs_per_component *
+                            VectorizedArrayType::n_array_elements +
+                          dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component] *
+                            VectorizedArrayType::n_array_elements);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind =
+                    index_array[i] * VectorizedArrayType::n_array_elements;
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    do_vectorized_scatter_add(
+                      temp1[i + 2 * comp * dofs_per_face],
+                      indices,
+                      dst_ptr + ind +
+                        comp * static_dofs_per_component *
+                          VectorizedArrayType::n_array_elements +
+                        dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component] *
+                          VectorizedArrayType::n_array_elements);
+                }
+            }
+        }
+
+      // case 3: contiguous and interleaved indices with mixed stride
+      else if (((integrate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_mixed_strides)
+        {
+          const unsigned int *strides =
+            &dof_info.dof_indices_interleave_strides
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+          unsigned int indices[VectorizedArrayType::n_array_elements];
+          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
+               ++v)
+            indices[v] =
+              dof_info.dof_indices_contiguous
+                [dof_access_index]
+                [cell * VectorizedArrayType::n_array_elements + v] +
+              dof_info.component_dof_indices_offset[active_fe_index]
+                                                   [first_selected_component] *
+                strides[v];
+          const unsigned int nvec =
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
+
+          if (fe_degree > 1 && integrate_gradients == true)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 2 - side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              if (nvec == VectorizedArrayType::n_array_elements)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  for (unsigned int i = 0; i < dofs_per_face; ++i)
+                    {
+                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind1[v] =
+                          indices[v] + (comp * static_dofs_per_component +
+                                        index_array[2 * i]) *
+                                         strides[v];
+                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind2[v] =
+                          indices[v] + (comp * static_dofs_per_component +
+                                        index_array[2 * i + 1]) *
+                                         strides[v];
+                      VectorizedArrayType val =
+                        temp1[i + 2 * comp * dofs_per_face] -
+                        grad_weight *
+                          temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      VectorizedArrayType grad =
+                        grad_weight *
+                        temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      do_vectorized_scatter_add(val, ind1, dst_ptr);
+                      do_vectorized_scatter_add(grad, ind2, dst_ptr);
+                    }
+              else
+                {
+                  for (unsigned int v = 0; v < nvec; ++v)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      for (unsigned int i = 0; i < dofs_per_face; ++i)
+                        {
+                          const unsigned int ind1 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[2 * i]) *
+                                           strides[v];
+                          const unsigned int ind2 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[2 * i + 1]) *
+                                           strides[v];
+                          Number val =
+                            temp1[i + 2 * comp * dofs_per_face][v] -
+                            grad_weight[0] * temp1[i + dofs_per_face +
+                                                   2 * comp * dofs_per_face][v];
+                          Number grad =
+                            grad_weight[0] * temp1[i + dofs_per_face +
+                                                   2 * comp * dofs_per_face][v];
+                          dst_ptr[ind1] += val;
+                          dst_ptr[ind2] += grad;
+                        }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              if (nvec == VectorizedArrayType::n_array_elements)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  for (unsigned int i = 0; i < dofs_per_face; ++i)
+                    {
+                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      DEAL_II_OPENMP_SIMD_PRAGMA
+                      for (unsigned int v = 0;
+                           v < VectorizedArrayType::n_array_elements;
+                           ++v)
+                        ind[v] =
+                          indices[v] +
+                          (comp * static_dofs_per_component + index_array[i]) *
+                            strides[v];
+                      do_vectorized_scatter_add(
+                        temp1[i + 2 * comp * dofs_per_face], ind, dst_ptr);
+                    }
+              else
+                {
+                  for (unsigned int v = 0; v < nvec; ++v)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      for (unsigned int i = 0; i < dofs_per_face; ++i)
+                        {
+                          const unsigned int ind1 =
+                            indices[v] + (comp * static_dofs_per_component +
+                                          index_array[i]) *
+                                           strides[v];
+                          dst_ptr[ind1] +=
+                            temp1[i + 2 * comp * dofs_per_face][v];
+                        }
+                }
+            }
+        }
+
+      // case 4: contiguous indices without interleaving
+      else if (((integrate_gradients == false &&
+                 data.nodal_at_cell_boundaries == true) ||
+                (data.element_type ==
+                   internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
+                 fe_degree > 1)) &&
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   contiguous &&
+               dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
+                 VectorizedArrayType::n_array_elements)
+        {
+          const unsigned int *indices =
+            &dof_info.dof_indices_contiguous
+               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+
+          if (integrate_gradients == true &&
+              data.element_type ==
+                internal::MatrixFreeFunctions::tensor_symmetric_hermite)
+            {
+              // we know that the gradient weights for the Hermite case on the
+              // right (side==1) are the negative from the value at the left
+              // (side==0), so we only read out one of them.
+              const VectorizedArrayType grad_weight =
+                data.shape_data_on_face[0][fe_degree + 2 - side];
+              AssertDimension(data.face_to_cell_index_hermite.size(1),
+                              2 * dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_hermite(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind1 = index_array[2 * i];
+                  const unsigned int ind2 = index_array[2 * i + 1];
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    {
+                      VectorizedArrayType val =
+                        temp1[i + 2 * comp * dofs_per_face] -
+                        grad_weight *
+                          temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      VectorizedArrayType grad =
+                        grad_weight *
+                        temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
+                      do_vectorized_scatter_add(
+                        val,
+                        indices,
+                        dst_ptr + comp * static_dofs_per_component + ind1 +
+                          dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component]);
+                      do_vectorized_scatter_add(
+                        grad,
+                        indices,
+                        dst_ptr + comp * static_dofs_per_component + ind2 +
+                          dof_info.component_dof_indices_offset
+                            [active_fe_index][first_selected_component]);
+                    }
+                }
+            }
+          else
+            {
+              AssertDimension(data.face_to_cell_index_nodal.size(1),
+                              dofs_per_face);
+              const unsigned int *index_array =
+                &data.face_to_cell_index_nodal(face_no, 0);
+              for (unsigned int i = 0; i < dofs_per_face; ++i)
+                {
+                  const unsigned int ind = index_array[i];
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    do_vectorized_scatter_add(
+                      temp1[i + 2 * comp * dofs_per_face],
+                      indices,
+                      dst_ptr + comp * static_dofs_per_component + ind +
+                        dof_info.component_dof_indices_offset
+                          [active_fe_index][first_selected_component]);
+                }
+            }
+        }
+
+      // case 5: default vector access, must be handled separately, just do
+      // the face-normal interpolation
+      else
+        {
+          FEFaceNormalEvaluationImpl<dim,
+                                     fe_degree,
+                                     n_components,
+                                     VectorizedArrayType>::
+            template interpolate<false, false>(
+              data, temp1, values_array, integrate_gradients, face_no);
+          return false;
+        }
+
+      return true;
+    }
+
+    static void
+    adjust_for_face_orientation(const unsigned int            face_orientation,
+                                const Table<2, unsigned int> &orientation_map,
+                                const bool                    integrate,
+                                const bool                    values,
+                                const bool                    gradients,
+                                const unsigned int            n_q_points,
+                                VectorizedArrayType *         tmp_values,
+                                VectorizedArrayType *         values_quad,
+                                VectorizedArrayType *         gradients_quad)
+    {
+      Assert(face_orientation, ExcInternalError());
+      const unsigned int *orientation = &orientation_map[face_orientation][0];
+      for (unsigned int c = 0; c < n_components; ++c)
+        {
+          if (values == true)
+            {
+              if (integrate)
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  tmp_values[q] = values_quad[c * n_q_points + orientation[q]];
+              else
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  tmp_values[orientation[q]] = values_quad[c * n_q_points + q];
+              for (unsigned int q = 0; q < n_q_points; ++q)
+                values_quad[c * n_q_points + q] = tmp_values[q];
+            }
+          if (gradients == true)
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                if (integrate)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
+                    tmp_values[q] = gradients_quad[(c * dim + d) * n_q_points +
+                                                   orientation[q]];
+                else
+                  for (unsigned int q = 0; q < n_q_points; ++q)
+                    tmp_values[orientation[q]] =
+                      gradients_quad[(c * dim + d) * n_q_points + q];
+                for (unsigned int q = 0; q < n_q_points; ++q)
+                  gradients_quad[(c * dim + d) * n_q_points + q] =
+                    tmp_values[q];
+              }
+        }
+    }
+  };
+
+
+
+  template <int dim, int fe_degree, int n_components, typename Number>
+  struct CellwiseInverseMassMatrixImpl
+  {
+    static void
+    apply(const AlignedVector<Number> &inverse_shape,
+          const AlignedVector<Number> &inverse_coefficients,
+          const unsigned int           n_desired_components,
+          const Number *               in_array,
+          Number *                     out_array)
+    {
+      constexpr unsigned int dofs_per_component =
+        Utilities::pow(fe_degree + 1, dim);
+      Assert(inverse_coefficients.size() > 0 &&
+               inverse_coefficients.size() % dofs_per_component == 0,
+             ExcMessage(
+               "Expected diagonal to be a multiple of scalar dof per cells"));
+      if (inverse_coefficients.size() != dofs_per_component)
+        AssertDimension(n_desired_components * dofs_per_component,
+                        inverse_coefficients.size());
+
+      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+
+      internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
+                                       dim,
+                                       fe_degree + 1,
+                                       fe_degree + 1,
+                                       Number>
+        evaluator(AlignedVector<Number>(),
+                  AlignedVector<Number>(),
+                  inverse_shape);
+
+      const unsigned int shift_coefficient =
+        inverse_coefficients.size() > dofs_per_component ? dofs_per_component :
+                                                           0;
+      const Number *inv_coefficient = inverse_coefficients.data();
+      for (unsigned int d = 0; d < n_desired_components; ++d)
+        {
+          const Number *in  = in_array + d * dofs_per_component;
+          Number *      out = out_array + d * dofs_per_component;
+          // Need to select 'apply' method with hessian slot because values
+          // assume symmetries that do not exist in the inverse shapes
+          evaluator.template hessians<0, false, false>(in, out);
+          if (dim > 1)
+            {
+              evaluator.template hessians<1, false, false>(out, out);
+
+              if (dim == 3)
+                {
+                  evaluator.template hessians<2, false, false>(out, out);
+                  for (unsigned int q = 0; q < dofs_per_component; ++q)
+                    out[q] *= inv_coefficient[q];
+                  evaluator.template hessians<2, true, false>(out, out);
+                }
+              else if (dim == 2)
+                for (unsigned int q = 0; q < dofs_per_component; ++q)
+                  out[q] *= inv_coefficient[q];
+
+              evaluator.template hessians<1, true, false>(out, out);
+            }
+          else
+            {
+              for (unsigned int q = 0; q < dofs_per_component; ++q)
+                out[q] *= inv_coefficient[q];
+            }
+          evaluator.template hessians<0, true, false>(out, out);
+
+          inv_coefficient += shift_coefficient;
+        }
+    }
+
+    static void
+    transform_from_q_points_to_basis(const AlignedVector<Number> &inverse_shape,
+                                     const unsigned int n_desired_components,
+                                     const Number *     in_array,
+                                     Number *           out_array)
+    {
+      constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
+      internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
+                                       dim,
+                                       fe_degree + 1,
+                                       fe_degree + 1,
+                                       Number>
+        evaluator(AlignedVector<Number>(),
+                  AlignedVector<Number>(),
+                  inverse_shape);
+
+      for (unsigned int d = 0; d < n_desired_components; ++d)
+        {
+          const Number *in  = in_array + d * dofs_per_cell;
+          Number *      out = out_array + d * dofs_per_cell;
+
+          if (dim == 3)
+            {
+              evaluator.template hessians<2, true, false>(in, out);
+              evaluator.template hessians<1, true, false>(out, out);
+              evaluator.template hessians<0, true, false>(out, out);
+            }
+          if (dim == 2)
+            {
+              evaluator.template hessians<1, true, false>(in, out);
+              evaluator.template hessians<0, true, false>(out, out);
+            }
+          if (dim == 1)
+            evaluator.template hessians<0, true, false>(in, out);
+        }
+    }
+  };
+
 } // end of namespace internal
 
 
