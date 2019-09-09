@@ -665,11 +665,12 @@ public:
   DeclException0(ExcGmshNoCellInformation);
   
   /**
-   * 
+   * Return a map containing field data. The format of the returned map is as follows: 
+   * - std::string stores the name of the field data (identifier) as specified in the external mesh
+   * - std::map<int, double > stores cell_id and value for the given identifier
    */
-  std::map< std::string, std::map<int,double> > get_field_data()
-  {
-      
+  std::map< std::string, std::map<int,double> > get_field_data() const
+  {      
       return this->field_data;
   }
 
@@ -677,8 +678,8 @@ protected:
     
   /**
   * Data member that stores cell data. The format is as follows:
-  * std::string stores identified
-  * std::map<int, double> stores cell_id and value for the given identifier.
+  * - std::string stores the name of the field data (identifier) as specified in the external mesh
+  * - std::map<int, double> stores cell_id and value for the given identifier
   */
   std::map< std::string, std::map<int,double> > field_data;
   
