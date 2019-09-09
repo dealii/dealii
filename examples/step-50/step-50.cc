@@ -18,7 +18,7 @@
  */
 
 
-// @note: This a work in progress example of parallel geometric
+// @note This is a work in progress example of parallel geometric
 // multigrid. Some parts are still in heavy development.
 
 // This program is a parallel version of step-16 with a slightly different
