@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Daniel Arndt, 2015
  */
 template <int dim>
-class TensorProductPolynomialsBubbles
+class TensorProductPolynomialsBubbles : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -105,7 +105,7 @@ public:
            std::vector<Tensor<1, dim>> &grads,
            std::vector<Tensor<2, dim>> &grad_grads,
            std::vector<Tensor<3, dim>> &third_derivatives,
-           std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -177,6 +177,18 @@ public:
   unsigned int
   n() const;
 
+  /**
+   * Return the name of the space, which is <tt>AnisotropicPolynomials</tt>.
+   */
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
+
 private:
   /**
    * The TensorProductPolynomials object
@@ -205,7 +217,9 @@ template <int dim>
 template <class Pol>
 inline TensorProductPolynomialsBubbles<dim>::TensorProductPolynomialsBubbles(
   const std::vector<Pol> &pols)
-  : tensor_polys(pols)
+  : ScalarPolynomialsBase<dim>(1,
+                               Utilities::fixed_power<dim>(pols.size()) + dim)
+  , tensor_polys(pols)
   , index_map(tensor_polys.n() +
               ((tensor_polys.polynomials.size() <= 2) ? 1 : dim))
   , index_map_inverse(tensor_polys.n() +
@@ -255,6 +269,14 @@ TensorProductPolynomialsBubbles<dim>::get_numbering_inverse() const
 
 
 template <int dim>
+inline std::string
+TensorProductPolynomialsBubbles<dim>::name() const
+{
+  return "TensorProductPolynomialsBubbles";
+}
+
+
+template <int dim>
 template <int order>
 Tensor<order, dim>
 TensorProductPolynomialsBubbles<dim>::compute_derivative(
@@ -264,7 +286,6 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
-  (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions

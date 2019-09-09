@@ -137,7 +137,7 @@ PolynomialsBernardiRaugel<dim>::evaluate(
     }
 
   // set indices for the anisotropic polynomials to find
-  // them after polynomial_space_bubble.compute is called
+  // them after polynomial_space_bubble.evaluate is called
   std::vector<int> aniso_indices;
   if (dim == 2)
     {
@@ -156,18 +156,18 @@ PolynomialsBernardiRaugel<dim>::evaluate(
       aniso_indices.push_back(17);
     }
 
-  polynomial_space_bubble.compute(unit_point,
-                                  bubble_values,
-                                  bubble_grads,
-                                  bubble_grad_grads,
-                                  bubble_third_derivatives,
-                                  bubble_fourth_derivatives);
-  polynomial_space_Q.compute(unit_point,
-                             Q_values,
-                             Q_grads,
-                             Q_grad_grads,
-                             Q_third_derivatives,
-                             Q_fourth_derivatives);
+  polynomial_space_bubble.evaluate(unit_point,
+                                   bubble_values,
+                                   bubble_grads,
+                                   bubble_grad_grads,
+                                   bubble_third_derivatives,
+                                   bubble_fourth_derivatives);
+  polynomial_space_Q.evaluate(unit_point,
+                              Q_values,
+                              Q_grads,
+                              Q_grad_grads,
+                              Q_third_derivatives,
+                              Q_fourth_derivatives);
 
   // first dim*vertices_per_cell functions are Q_1^2 functions
   for (unsigned int i = 0; i < dim * GeometryInfo<dim>::vertices_per_cell; ++i)

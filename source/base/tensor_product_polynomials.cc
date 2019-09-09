@@ -15,6 +15,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <boost/container/small_vector.hpp>
@@ -98,7 +99,7 @@ TensorProductPolynomials<dim, PolynomialType>::output_indices(
   std::ostream &out) const
 {
   unsigned int ix[dim];
-  for (unsigned int i = 0; i < n_tensor_pols; ++i)
+  for (unsigned int i = 0; i < this->n(); ++i)
     {
       compute_index(i, ix);
       out << i << "\t";
@@ -250,26 +251,23 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   Assert(dim <= 3, ExcNotImplemented());
-  Assert(values.size() == n_tensor_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
-  Assert(grads.size() == n_tensor_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
-  Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
-  Assert(third_derivatives.size() == n_tensor_pols ||
-           third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
-  Assert(fourth_derivatives.size() == n_tensor_pols ||
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch2(values.size(), this->n(), 0));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch2(grads.size(), this->n(), 0));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
+  Assert(fourth_derivatives.size() == this->n() ||
            fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_tensor_pols, 0));
+         ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
-  const bool update_values     = (values.size() == n_tensor_pols),
-             update_grads      = (grads.size() == n_tensor_pols),
-             update_grad_grads = (grad_grads.size() == n_tensor_pols),
-             update_3rd_derivatives =
-               (third_derivatives.size() == n_tensor_pols),
-             update_4th_derivatives =
-               (fourth_derivatives.size() == n_tensor_pols);
+  const bool update_values          = (values.size() == this->n()),
+             update_grads           = (grads.size() == this->n()),
+             update_grad_grads      = (grad_grads.size() == this->n()),
+             update_3rd_derivatives = (third_derivatives.size() == this->n()),
+             update_4th_derivatives = (fourth_derivatives.size() == this->n());
 
   // check how many values/derivatives we have to compute
   unsigned int n_values_and_derivatives = 0;
@@ -405,14 +403,24 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
 
 
 
+template <int dim, typename PolynomialType>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+TensorProductPolynomials<dim, PolynomialType>::clone() const
+{
+  return std_cxx14::make_unique<TensorProductPolynomials<dim, PolynomialType>>(
+    *this);
+}
+
+
+
 /* ------------------- AnisotropicPolynomials -------------- */
 
 
 template <int dim>
 AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   const std::vector<std::vector<Polynomials::Polynomial<double>>> &pols)
-  : polynomials(pols)
-  , n_tensor_pols(get_n_tensor_pols(pols))
+  : ScalarPolynomialsBase<dim>(1, get_n_tensor_pols(pols))
+  , polynomials(pols)
 {
   Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d = 0; d < dim; ++d)
@@ -531,7 +539,7 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-AnisotropicPolynomials<dim>::compute(
+AnisotropicPolynomials<dim>::evaluate(
   const Point<dim> &           p,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -539,26 +547,23 @@ AnisotropicPolynomials<dim>::compute(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_tensor_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
-  Assert(grads.size() == n_tensor_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
-  Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
-  Assert(third_derivatives.size() == n_tensor_pols ||
-           third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
-  Assert(fourth_derivatives.size() == n_tensor_pols ||
+  Assert(values.size() == this->n() || values.size() == 0,
+         ExcDimensionMismatch2(values.size(), this->n(), 0));
+  Assert(grads.size() == this->n() || grads.size() == 0,
+         ExcDimensionMismatch2(grads.size(), this->n(), 0));
+  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+         ExcDimensionMismatch2(grad_grads.size(), this->n(), 0));
+  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+         ExcDimensionMismatch2(third_derivatives.size(), this->n(), 0));
+  Assert(fourth_derivatives.size() == this->n() ||
            fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_tensor_pols, 0));
+         ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
-  const bool update_values     = (values.size() == n_tensor_pols),
-             update_grads      = (grads.size() == n_tensor_pols),
-             update_grad_grads = (grad_grads.size() == n_tensor_pols),
-             update_3rd_derivatives =
-               (third_derivatives.size() == n_tensor_pols),
-             update_4th_derivatives =
-               (fourth_derivatives.size() == n_tensor_pols);
+  const bool update_values          = (values.size() == this->n()),
+             update_grads           = (grads.size() == this->n()),
+             update_grad_grads      = (grad_grads.size() == this->n()),
+             update_3rd_derivatives = (third_derivatives.size() == this->n()),
+             update_4th_derivatives = (fourth_derivatives.size() == this->n());
 
   // check how many
   // values/derivatives we have to
@@ -590,7 +595,7 @@ AnisotropicPolynomials<dim>::compute(
         }
     }
 
-  for (unsigned int i = 0; i < n_tensor_pols; ++i)
+  for (unsigned int i = 0; i < this->n(); ++i)
     {
       // first get the
       // one-dimensional indices of
@@ -679,15 +684,6 @@ AnisotropicPolynomials<dim>::compute(
 }
 
 
-
-template <int dim>
-unsigned int
-AnisotropicPolynomials<dim>::n() const
-{
-  return n_tensor_pols;
-}
-
-
 template <int dim>
 unsigned int
 AnisotropicPolynomials<dim>::get_n_tensor_pols(
@@ -697,6 +693,14 @@ AnisotropicPolynomials<dim>::get_n_tensor_pols(
   for (unsigned int d = 0; d < dim; ++d)
     y *= pols[d].size();
   return y;
+}
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+AnisotropicPolynomials<dim>::clone() const
+{
+  return std_cxx14::make_unique<AnisotropicPolynomials<dim>>(*this);
 }
 
 

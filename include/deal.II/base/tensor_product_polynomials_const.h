@@ -80,7 +80,7 @@ public:
            std::vector<Tensor<1, dim>> &grads,
            std::vector<Tensor<2, dim>> &grad_grads,
            std::vector<Tensor<3, dim>> &third_derivatives,
-           std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -167,8 +167,8 @@ inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
   : TensorProductPolynomials<dim>(pols)
 {
   // append index for renumbering
-  this->index_map.push_back(this->n_tensor_pols);
-  this->index_map_inverse.push_back(this->n_tensor_pols);
+  this->index_map.push_back(TensorProductPolynomials<dim>::n());
+  this->index_map_inverse.push_back(TensorProductPolynomials<dim>::n());
 }
 
 
@@ -177,7 +177,7 @@ template <int dim>
 inline unsigned int
 TensorProductPolynomialsConst<dim>::n() const
 {
-  return this->n_tensor_pols + 1;
+  return TensorProductPolynomials<dim>::n() + 1;
 }
 
 
@@ -196,7 +196,7 @@ TensorProductPolynomialsConst<dim>::compute_derivative(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  const unsigned int max_indices = this->n_tensor_pols;
+  const unsigned int max_indices = TensorProductPolynomials<dim>::n();
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions

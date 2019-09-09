@@ -29,7 +29,7 @@ double
 TensorProductPolynomialsConst<dim>::compute_value(const unsigned int i,
                                                   const Point<dim> & p) const
 {
-  const unsigned int max_indices = this->n_tensor_pols;
+  const unsigned int max_indices = TensorProductPolynomials<dim>::n();
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
@@ -57,7 +57,7 @@ Tensor<1, dim>
 TensorProductPolynomialsConst<dim>::compute_grad(const unsigned int i,
                                                  const Point<dim> & p) const
 {
-  const unsigned int max_indices = this->n_tensor_pols;
+  const unsigned int max_indices = TensorProductPolynomials<dim>::n();
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
@@ -73,7 +73,7 @@ Tensor<2, dim>
 TensorProductPolynomialsConst<dim>::compute_grad_grad(const unsigned int i,
                                                       const Point<dim> &p) const
 {
-  const unsigned int max_indices = this->n_tensor_pols;
+  const unsigned int max_indices = TensorProductPolynomials<dim>::n();
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
@@ -94,21 +94,30 @@ TensorProductPolynomialsConst<dim>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n_tensor_pols + 1 || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), this->n_tensor_pols + 1, 0));
-  Assert(grads.size() == this->n_tensor_pols + 1 || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), this->n_tensor_pols + 1, 0));
-  Assert(grad_grads.size() == this->n_tensor_pols + 1 || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), this->n_tensor_pols + 1, 0));
-  Assert(third_derivatives.size() == this->n_tensor_pols + 1 ||
+  Assert(values.size() == TensorProductPolynomials<dim>::n() + 1 ||
+           values.size() == 0,
+         ExcDimensionMismatch2(values.size(),
+                               TensorProductPolynomials<dim>::n() + 1,
+                               0));
+  Assert(grads.size() == TensorProductPolynomials<dim>::n() + 1 ||
+           grads.size() == 0,
+         ExcDimensionMismatch2(grads.size(),
+                               TensorProductPolynomials<dim>::n() + 1,
+                               0));
+  Assert(grad_grads.size() == TensorProductPolynomials<dim>::n() + 1 ||
+           grad_grads.size() == 0,
+         ExcDimensionMismatch2(grad_grads.size(),
+                               TensorProductPolynomials<dim>::n() + 1,
+                               0));
+  Assert(third_derivatives.size() == TensorProductPolynomials<dim>::n() + 1 ||
            third_derivatives.size() == 0,
          ExcDimensionMismatch2(third_derivatives.size(),
-                               this->n_tensor_pols + 1,
+                               TensorProductPolynomials<dim>::n() + 1,
                                0));
-  Assert(fourth_derivatives.size() == this->n_tensor_pols + 1 ||
+  Assert(fourth_derivatives.size() == TensorProductPolynomials<dim>::n() + 1 ||
            fourth_derivatives.size() == 0,
          ExcDimensionMismatch2(fourth_derivatives.size(),
-                               this->n_tensor_pols + 1,
+                               TensorProductPolynomials<dim>::n() + 1,
                                0));
 
   // remove slot for const value, go into the base class compute method and
@@ -132,12 +141,12 @@ TensorProductPolynomialsConst<dim>::evaluate(
     }
   if (third_derivatives.empty() == false)
     {
-      third_derivatives.resize(this->n_tensor_pols);
+      third_derivatives.resize(TensorProductPolynomials<dim>::n());
       do_3rd_derivatives = true;
     }
   if (fourth_derivatives.empty() == false)
     {
-      fourth_derivatives.resize(this->n_tensor_pols);
+      fourth_derivatives.resize(TensorProductPolynomials<dim>::n());
       do_4th_derivatives = true;
     }
 

@@ -95,12 +95,12 @@ PolynomialsNedelec<dim>::evaluate(
     {
       case 1:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
@@ -121,12 +121,12 @@ PolynomialsNedelec<dim>::evaluate(
 
       case 2:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Declare the values, derivatives and
           // second derivatives vectors of
@@ -144,12 +144,12 @@ PolynomialsNedelec<dim>::evaluate(
           std::vector<Tensor<2, dim>> p_grad_grads(
             (grad_grads.size() == 0) ? 0 : n_basis);
 
-          polynomial_space.compute(p,
-                                   p_values,
-                                   p_grads,
-                                   p_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p,
+                                    p_values,
+                                    p_grads,
+                                    p_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
@@ -307,12 +307,12 @@ PolynomialsNedelec<dim>::evaluate(
 
       case 3:
         {
-          polynomial_space.compute(unit_point,
-                                   unit_point_values,
-                                   unit_point_grads,
-                                   unit_point_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(unit_point,
+                                    unit_point_values,
+                                    unit_point_grads,
+                                    unit_point_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Declare the values, derivatives
           // and second derivatives vectors of
@@ -335,21 +335,21 @@ PolynomialsNedelec<dim>::evaluate(
           p1(0) = unit_point(1);
           p1(1) = unit_point(2);
           p1(2) = unit_point(0);
-          polynomial_space.compute(p1,
-                                   p1_values,
-                                   p1_grads,
-                                   p1_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p1,
+                                    p1_values,
+                                    p1_grads,
+                                    p1_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
           p2(0) = unit_point(2);
           p2(1) = unit_point(0);
           p2(2) = unit_point(1);
-          polynomial_space.compute(p2,
-                                   p2_values,
-                                   p2_grads,
-                                   p2_grad_grads,
-                                   empty_vector_of_3rd_order_tensors,
-                                   empty_vector_of_4th_order_tensors);
+          polynomial_space.evaluate(p2,
+                                    p2_values,
+                                    p2_grads,
+                                    p2_grad_grads,
+                                    empty_vector_of_3rd_order_tensors,
+                                    empty_vector_of_4th_order_tensors);
 
           // Assign the correct values to the
           // corresponding shape functions.
