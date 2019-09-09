@@ -145,7 +145,7 @@ for which either the matrix $A$ or matrix $B$ has a nonzero entry at position
 $(i,j)$). If all coefficients
 fulfill the following conditions:
 @f{align*}
-  a_{ii} &> 0, & b_{ii} &\leq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
+  a_{ii} &> 0, & b_{ii} &\geq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
   &
   \forall j &\in S_i,
 @f}
