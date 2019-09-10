@@ -35,7 +35,7 @@ test_grid(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   BlockInfo bi;
   bi.initialize(mgdof, false, false);
   bi.initialize_local(mgdof);

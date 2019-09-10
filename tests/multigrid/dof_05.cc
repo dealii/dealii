@@ -46,7 +46,7 @@ check()
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   deallog << dim << "D OK" << std::endl;
 }
 

@@ -55,7 +55,7 @@ test()
   // setup DoFs
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   AffineConstraints<double> constraints;
   VectorTools::interpolate_boundary_values(dof,
                                            0,

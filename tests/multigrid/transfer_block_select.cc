@@ -85,7 +85,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   DoFHandler<dim>  mgdof(tr);
   DoFHandler<dim> &dof = mgdof;
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
   vector<types::global_dof_index> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);

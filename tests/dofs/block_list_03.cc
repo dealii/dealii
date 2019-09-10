@@ -24,7 +24,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
 
   const unsigned int level = tr.n_levels() - 1;
 

@@ -100,7 +100,7 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   MGTransferPrebuilt<Vector<double>> transfer;
   transfer.build_matrices(mgdof);

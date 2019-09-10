@@ -416,7 +416,7 @@ namespace Step37
     mg_constraints.clear_elements();
 
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;

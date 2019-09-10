@@ -66,7 +66,7 @@ check(const unsigned int fe_degree)
 
       DoFHandler<dim> mgdof(tr);
       mgdof.distribute_dofs(fe);
-      mgdof.distribute_mg_dofs(fe);
+      mgdof.distribute_mg_dofs();
 
       // build reference
       MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>>

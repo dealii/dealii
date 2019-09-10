@@ -86,7 +86,7 @@ test()
   Assert(dofh.has_active_dofs() == true, ExcInternalError());
   Assert(dofh.has_level_dofs() == false, ExcInternalError());
 
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
   Assert(dofh.has_active_dofs() == true, ExcInternalError());
   Assert(dofh.has_level_dofs() == true, ExcInternalError());

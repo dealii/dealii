@@ -75,7 +75,7 @@ test(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   dof.initialize_local_block_info();
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     DoFRenumbering::component_wise(dof, level);

@@ -61,7 +61,7 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);

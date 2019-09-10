@@ -109,11 +109,11 @@ check(const unsigned int fe_degree)
 
       DoFHandler<dim> mgdof_1(tr);
       mgdof_1.distribute_dofs(fe_1);
-      mgdof_1.distribute_mg_dofs(fe_1);
+      mgdof_1.distribute_mg_dofs();
 
       DoFHandler<dim> mgdof_2(tr);
       mgdof_2.distribute_dofs(fe_2);
-      mgdof_2.distribute_mg_dofs(fe_2);
+      mgdof_2.distribute_mg_dofs();
 
       const std::vector<const DoFHandler<dim> *> mgdof_ptr{&mgdof_1, &mgdof_2};
 

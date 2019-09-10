@@ -172,13 +172,13 @@ check()
 
   FESystem<dim> e1(FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e1);
-  mgdof.distribute_mg_dofs(e1);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof, false);
   mgdof.clear();
 
   FESystem<dim> e2(FE_DGP<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e2);
-  mgdof.distribute_mg_dofs(e2);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof, true);
   mgdof.clear();
 }

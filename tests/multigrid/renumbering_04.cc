@@ -52,7 +52,7 @@ check(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
-  dh.distribute_mg_dofs(fe);
+  dh.distribute_mg_dofs();
 
   deallog << "** before:" << std::endl;
   {

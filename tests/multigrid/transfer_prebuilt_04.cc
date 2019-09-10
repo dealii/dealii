@@ -63,7 +63,7 @@ check()
 
       DoFHandler<dim> mgdof(tr);
       mgdof.distribute_dofs(fe);
-      mgdof.distribute_mg_dofs(fe);
+      mgdof.distribute_mg_dofs();
 
       MGConstrainedDoFs                                   mg_constrained_dofs;
       Functions::ZeroFunction<dim>                        zero_function;

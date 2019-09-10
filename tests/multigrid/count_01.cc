@@ -64,7 +64,7 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   std::vector<std::vector<types::global_dof_index>> count(tr.n_levels());
   MGTools::count_dofs_per_component(mgdof, count, false);

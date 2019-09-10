@@ -141,7 +141,7 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
   MGConstrainedDoFs mg_constrained_dofs_ref;
   {
@@ -154,7 +154,7 @@ check_fe(FiniteElement<dim> &fe)
 
     DoFHandler<dim> dofhref(tr);
     dofhref.distribute_dofs(fe);
-    dofhref.distribute_mg_dofs(fe);
+    dofhref.distribute_mg_dofs();
 
     // std::map<std::string,std::vector<types::global_dof_index> > dofmap;
     std::map<std::string, std::vector<types::global_dof_index>> mgdofmap;

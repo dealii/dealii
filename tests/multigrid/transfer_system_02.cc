@@ -98,7 +98,7 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   DoFRenumbering::component_wise(mg_dof_handler);
   for (unsigned int level = 0; level < tr.n_levels(); ++level)

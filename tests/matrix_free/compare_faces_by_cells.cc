@@ -337,7 +337,7 @@ test()
   FE_DGQ<dim>     fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl;
 
   MappingQGeneric<dim>                                   mapping(fe_degree + 1);

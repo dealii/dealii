@@ -493,7 +493,7 @@ namespace Step56
     pressure_mass_matrix.clear();
 
     // The main DoFHandler only needs active DoFs, so we are not calling
-    // distribute_mg_dofs() here
+    // distribute_mg_dofs();
     dof_handler.distribute_dofs(fe);
 
     // This block structure separates the dim velocity components from

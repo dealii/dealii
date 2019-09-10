@@ -129,7 +129,7 @@ check_block(const FiniteElement<dim> &fe)
   DoFHandler<dim>  mgdof(tr);
   DoFHandler<dim> &dof = mgdof;
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   // Make sure all orderings are the
   // same
