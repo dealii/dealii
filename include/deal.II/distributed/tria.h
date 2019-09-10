@@ -323,7 +323,7 @@ namespace parallel
       /**
        * Constructor.
        *
-       * @param mpi_communicator denotes the MPI communicator to be used for
+       * @param mpi_communicator The MPI communicator to be used for
        * the triangulation.
        *
        * @param smooth_grid Degree and kind of mesh smoothing to be applied to
