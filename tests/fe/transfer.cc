@@ -54,7 +54,7 @@ print_matrix(Triangulation<dim> &      tr,
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
-  dof.distribute_mg_dofs(finel);
+  dof.distribute_mg_dofs();
 
   MGTransferPrebuilt<Vector<double>> transfer;
   transfer.build_matrices(dof);

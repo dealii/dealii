@@ -68,7 +68,7 @@ test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
 
   ScratchData scratch;

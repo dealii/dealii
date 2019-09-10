@@ -77,9 +77,9 @@ test()
   FE_Q<dim>       fe2(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe1);
-  dof_handler.distribute_mg_dofs(fe1);
+  dof_handler.distribute_mg_dofs();
   dof_handler.distribute_dofs(fe2);
-  dof_handler.distribute_mg_dofs(fe2);
+  dof_handler.distribute_mg_dofs();
   deallog << "OK" << std::endl;
 }
 

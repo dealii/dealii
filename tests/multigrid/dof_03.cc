@@ -54,7 +54,7 @@ check()
 
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     deallog << "check " << dim << " level  distribute " << dof.has_active_dofs()
             << ' ' << dof.has_level_dofs() << std::endl;
 

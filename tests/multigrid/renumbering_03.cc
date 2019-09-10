@@ -59,7 +59,7 @@ check()
 
   DoFHandler<dim> mg_dof_handler(tria);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   for (unsigned int level = 0; level < tria.n_levels(); ++level)
     {
       const types::global_dof_index   n_dofs = mg_dof_handler.n_dofs(level);

@@ -271,9 +271,9 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   mg_dof_handler_renumbered.distribute_dofs(fe);
-  mg_dof_handler_renumbered.distribute_mg_dofs(fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs();
 
   const unsigned int nlevels = triangulation.n_levels();
 

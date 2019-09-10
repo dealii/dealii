@@ -102,7 +102,7 @@ check()
     DoFHandler<dim> dof(tr);
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     check_renumbering(dof);
   }
 
@@ -111,7 +111,7 @@ check()
     DoFHandler<dim> dof(tr);
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     check_renumbering(dof);
   }
 }

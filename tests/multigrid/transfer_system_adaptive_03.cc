@@ -138,7 +138,7 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
   for (unsigned int l = 0; l < tr.n_levels(); ++l)

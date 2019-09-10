@@ -70,7 +70,7 @@ test()
 
   FE_Q<dim> fe(1);
   dof_handler.distribute_dofs(fe);
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
 
 
   // Print dofs before reordering

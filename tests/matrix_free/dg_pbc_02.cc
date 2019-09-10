@@ -82,7 +82,7 @@ test()
   FE_DGQ<dim>     fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   AffineConstraints<double> constraints;
   constraints.close();
 

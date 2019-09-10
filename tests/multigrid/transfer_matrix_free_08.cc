@@ -67,7 +67,7 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   // build matrix-free transfer
   MGTransferMatrixFree<dim, Number> transfer;

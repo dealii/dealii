@@ -72,7 +72,7 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   std::vector<std::set<types::global_dof_index>> boundary_indices(
     tr.n_levels());

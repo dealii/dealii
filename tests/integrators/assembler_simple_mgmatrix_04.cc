@@ -194,7 +194,7 @@ test(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   dof.initialize_local_block_info();
   mg::SparseMatrixCollection<double> mg;
   mg.resize(0, tr.n_levels() - 1);

@@ -27,7 +27,7 @@ test_block_list(const parallel::distributed::Triangulation<dim> &tr,
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
 
   for (unsigned int level = 0; level < tr.n_global_levels(); ++level)
     {

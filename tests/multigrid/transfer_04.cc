@@ -122,7 +122,7 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
   typedef TrilinosWrappers::MPI::Vector vector_t;
 
   MGConstrainedDoFs mg_constrained_dofs;

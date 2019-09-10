@@ -72,7 +72,7 @@ test()
   deallog << "Number of cells: " << tria.n_global_active_cells() << std::endl
           << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
   deallog << "Number of DoFs per level: ";
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     deallog << dof_handler.n_dofs(level) << " ";

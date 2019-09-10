@@ -99,7 +99,7 @@ test()
 
   static const FE_DGP<dim> fe(0);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
   {
     for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)

@@ -215,7 +215,7 @@ test(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
-  dofs.distribute_mg_dofs(fe);
+  dofs.distribute_mg_dofs();
   deallog << "DoFHandler " << dofs.n_dofs() << " levels";
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);

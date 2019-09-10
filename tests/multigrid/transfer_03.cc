@@ -193,11 +193,11 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   DoFHandler<dim> mgdof_renumbered(tr);
   mgdof_renumbered.distribute_dofs(fe);
-  mgdof_renumbered.distribute_mg_dofs(fe);
+  mgdof_renumbered.distribute_mg_dofs();
 
   std::vector<unsigned int> block_component(4, 0);
   block_component[2] = 1;
