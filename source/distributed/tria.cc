@@ -2209,8 +2209,8 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
-      this->update_number_cache();
       this->update_periodic_face_map();
+      this->update_number_cache();
     }
 
 
@@ -2853,12 +2853,11 @@ namespace parallel
             }
         }
 
+      this->update_periodic_face_map();
       this->update_number_cache();
 
       // signal that de-serialization is finished
       this->signals.post_distributed_load();
-
-      this->update_periodic_face_map();
     }
 
 
@@ -4056,9 +4055,8 @@ namespace parallel
         }
 #  endif
 
-      this->update_number_cache();
-
       this->update_periodic_face_map();
+      this->update_number_cache();
 
       // signal that refinement is finished
       this->signals.post_distributed_refinement();
@@ -4158,10 +4156,10 @@ namespace parallel
                                          previous_global_first_quadrant.data());
         }
 
+      this->update_periodic_face_map();
+
       // update how many cells, edges, etc, we store locally
       this->update_number_cache();
-
-      this->update_periodic_face_map();
 
       // signal that repartitioning is finished
       this->signals.post_distributed_repartition();
@@ -4843,8 +4841,8 @@ namespace parallel
           Assert(false, ExcInternalError());
         }
 
-      this->update_number_cache();
       this->update_periodic_face_map();
+      this->update_number_cache();
     }
 
 
