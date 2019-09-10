@@ -114,10 +114,16 @@ class FE_Nedelec : public FE_PolyTensor<dim>
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec element of given @p order.
-   * The maximal polynomial degree of the shape functions is
-   * <code>order+1</code> (in each variable; the total polynomial degree
-   * may be higher).
+   * Constructor for the Nedelec element of given @p order. The maximal
+   * polynomial degree of the shape functions is `order+1` (in each variable;
+   * the total polynomial degree may be higher). If `order = 0`, the element is
+   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * element has degrees of freedom on the edges, faces and volume. For example
+   * the 3D version of FE_Nedelec has 12 degrees of freedom for `order = 0`
+   * and 54 for `degree = 1`. It is important to have enough quadrature points
+   * in order to perform the quadrature with sufficient accuracy.
+   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * quadrature formula, where `order` is the order of FE_Nedelec.
    */
   FE_Nedelec(const unsigned int order);
 
