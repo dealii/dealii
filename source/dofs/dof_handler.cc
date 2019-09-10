@@ -1293,7 +1293,7 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+  if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*tria) == nullptr)
     block_info_object.initialize(*this, true, false);
 }
