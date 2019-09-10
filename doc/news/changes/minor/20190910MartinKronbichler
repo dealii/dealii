@@ -1,0 +1,9 @@
+New: There is a new variant of MatrixFree::cell_loop() which takes two
+std::function objects with ranges on the locally owned degrees of freedom, one
+with work to be scheduled before the cell operation first touches some
+unknowns, and one after the cell operation last touches them. The goal of
+these functions is to bring vector operations close to the time when the
+vector entries are accessed by the cell operation which increases the cache
+hit rate of modern processors (temporal locality).
+<br>
+(Martin Kronbichler, 2019/09/10)
