@@ -336,6 +336,10 @@ namespace internal
     void
     TaskInfo::loop(MFWorkerInterface &funct) const
     {
+      if (scheme == none)
+        funct.cell_loop_pre_range(
+          partition_row_index[partition_row_index.size() - 2]);
+
       funct.vector_update_ghosts_start();
 
 #ifdef DEAL_II_WITH_THREADS
@@ -584,10 +588,11 @@ namespace internal
                    i < partition_row_index[part + 1];
                    ++i)
                 {
+                  funct.cell_loop_pre_range(i);
+                  funct.zero_dst_vector_range(i);
                   AssertIndexRange(i + 1, cell_partition_data.size());
                   if (cell_partition_data[i + 1] > cell_partition_data[i])
                     {
-                      funct.zero_dst_vector_range(i);
                       funct.cell(std::make_pair(cell_partition_data[i],
                                                 cell_partition_data[i + 1]));
                     }
@@ -603,6 +608,7 @@ namespace internal
                           std::make_pair(boundary_partition_data[i],
                                          boundary_partition_data[i + 1]));
                     }
+                  funct.cell_loop_post_range(i);
                 }
 
               if (part == 1)
@@ -610,6 +616,9 @@ namespace internal
             }
         }
       funct.vector_compress_finish();
+      if (scheme == none)
+        funct.cell_loop_post_range(
+          partition_row_index[partition_row_index.size() - 2]);
     }
 
 

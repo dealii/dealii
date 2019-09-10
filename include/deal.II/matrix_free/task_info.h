@@ -67,6 +67,12 @@ namespace internal
     virtual void
     zero_dst_vector_range(const unsigned int range_index) = 0;
 
+    virtual void
+    cell_loop_pre_range(const unsigned int range_index) = 0;
+
+    virtual void
+    cell_loop_post_range(const unsigned int range_index) = 0;
+
     /// Runs the cell work specified by MatrixFree::loop or
     /// MatrixFree::cell_loop
     virtual void
