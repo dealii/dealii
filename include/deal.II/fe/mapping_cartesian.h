@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/qprojector.h>
+
 #include <deal.II/fe/mapping.h>
 
 #include <cmath>
@@ -255,24 +257,77 @@ private:
    * @}
    */
 
-
-
   /**
-   * Do the computation for the <tt>fill_*</tt> functions.
+   * Update the cell_extents field of the incoming InternalData object with the
+   * size of the incoming cell.
    */
   void
-  compute_fill(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-               const unsigned int               face_no,
-               const unsigned int               sub_no,
-               const CellSimilarity::Similarity cell_similarity,
-               const InternalData &             data,
-               std::vector<Point<dim>> &        quadrature_points,
-               std::vector<Tensor<1, dim>> &    normal_vectors) const;
+  update_cell_extents(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const InternalData &                                        data) const;
 
   /**
-   * Value to indicate that a given face or subface number is invalid.
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_values.
    */
-  static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
+  void
+  maybe_update_cell_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_face_values.
+   */
+  void
+  maybe_update_face_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_subface_values.
+   */
+  void
+  maybe_update_subface_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          sub_no,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Transform quadrature points in InternalData to real space by scaling unit
+   * coordinates with cell_extends in each direction.
+   *
+   * Called from the various maybe_update_*_quadrature_points functions.
+   */
+  void
+  transform_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const InternalData &                                        data,
+    const typename QProjector<dim>::DataSetDescriptor &         offset,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the normal vectors if the UpdateFlags of the incoming InternalData
+   * object say that they should be updated.
+   */
+  void
+  maybe_update_normal_vectors(
+    const unsigned int           face_no,
+    const InternalData &         data,
+    std::vector<Tensor<1, dim>> &normal_vectors) const;
 };
 
 /*@}*/
