@@ -17,9 +17,7 @@
 # doxygen documentation. For more information see
 # https://en.wikipedia.org/wiki/Canonical_link_element
 #
-# This script is invoked by CMake. To add the canonical link to the webpages of
-# the deal.ii repository you can use the script
-# contrib/utilities/set_canonical_webpages.py
+# This script is invoked by CMake.
 
 use strict;
 use warnings;
