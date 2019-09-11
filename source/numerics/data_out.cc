@@ -161,26 +161,34 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
           if (postprocessor != nullptr)
             {
-              // we have to postprocess the data, so determine, which fields
+              // We have to postprocess the data, so determine, which fields
               // have to be updated
               const UpdateFlags update_flags =
                 postprocessor->get_needed_update_flags();
-              if (n_components == 1)
+
+              if ((n_components == 1) &&
+                  (this->dof_data[dataset]->is_complex_valued() == false))
                 {
-                  // at each point there is only one component of value,
-                  // gradient etc.
+                  // At each point there is only one component of value,
+                  // gradient etc. Based on the 'if' statement above, we
+                  // know that the solution is scalar and real-valued, so
+                  // we do not need to worry about getting any imaginary
+                  // components to the postprocessor, and we can safely
+                  // call the function that evaluates a scalar field
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_values);
+
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_gradients);
+
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians(
                       this_fe_patch_values,
@@ -188,6 +196,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                         real_part,
                       scratch_data.patch_values_scalar.solution_hessians);
 
+                  // Also fill some of the other fields postprocessors may
+                  // want to access.
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_scalar.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
@@ -200,35 +210,231 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   scratch_data.patch_values_scalar
                     .template set_cell<DoFHandlerType>(dh_cell);
 
+                  // Finally call the postprocessor's function that
+                  // deals with scalar inputs.
                   postprocessor->evaluate_scalar_field(
                     scratch_data.patch_values_scalar,
                     scratch_data.postprocessed_values[dataset]);
                 }
               else
                 {
-                  scratch_data.resize_system_vectors(n_components);
+                  scratch_data.resize_system_vectors(
+                    n_components *
+                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1));
 
-                  // at each point there is a vector valued function and its
-                  // derivative...
-                  if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_values);
-                  if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_gradients);
-                  if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians(
-                      this_fe_patch_values,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        real_part,
-                      scratch_data.patch_values_system.solution_hessians);
+                  // At each point we now have to evaluate a vector valued
+                  // function and its derivatives. It may be that the solution
+                  // is scalar and complex-valued, but we treat this as a vector
+                  // field with two components.
 
+                  // At this point, we need to ask how we fill the fields that
+                  // we want to pass on to the postprocessor. If the field in
+                  // question is real-valued, we'll just extract the (only)
+                  // real component from the solution fields
+                  if (this->dof_data[dataset]->is_complex_valued() == false)
+                    {
+                      if (update_flags & update_values)
+                        this->dof_data[dataset]->get_function_values(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_values);
+
+                      if (update_flags & update_gradients)
+                        this->dof_data[dataset]->get_function_gradients(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_gradients);
+
+                      if (update_flags & update_hessians)
+                        this->dof_data[dataset]->get_function_hessians(
+                          this_fe_patch_values,
+                          internal::DataOutImplementation::ComponentExtractor::
+                            real_part,
+                          scratch_data.patch_values_system.solution_hessians);
+                    }
+                  else
+                    {
+                      // The solution is complex-valued. We don't currently
+                      // know how to handle this in the most general case,
+                      // but we can deal with it as long as there is only a
+                      // scalar solution since then we can just collate the two
+                      // components of the scalar solution into one vector field
+                      if (n_components == 1)
+                        {
+                          // First get the real component of the scalar solution
+                          // and copy the data into the
+                          // scratch_data.patch_values_system output fields
+                          if (update_flags & update_values)
+                            {
+                              this->dof_data[dataset]->get_function_values(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_values);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_values[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_values[i];
+                                }
+                            }
+
+                          if (update_flags & update_gradients)
+                            {
+                              this->dof_data[dataset]->get_function_gradients(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_gradients);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_gradients.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_gradients[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_gradients[i];
+                                }
+                            }
+
+                          if (update_flags & update_hessians)
+                            {
+                              this->dof_data[dataset]->get_function_hessians(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::real_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_hessians);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_hessians[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_hessians[i][0] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_hessians[i];
+                                }
+                            }
+
+                          // Now we also have to get the imaginary
+                          // component of the scalar solution
+                          // and copy the data into the
+                          // scratch_data.patch_values_system output fields
+                          // that follow the real one
+                          if (update_flags & update_values)
+                            {
+                              this->dof_data[dataset]->get_function_values(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_values);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_values[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_values[i];
+                                }
+                            }
+
+                          if (update_flags & update_gradients)
+                            {
+                              this->dof_data[dataset]->get_function_gradients(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_gradients);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_gradients.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_values[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_gradients[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_gradients[i];
+                                }
+                            }
+
+                          if (update_flags & update_hessians)
+                            {
+                              this->dof_data[dataset]->get_function_hessians(
+                                this_fe_patch_values,
+                                internal::DataOutImplementation::
+                                  ComponentExtractor::imaginary_part,
+                                scratch_data.patch_values_scalar
+                                  .solution_hessians);
+
+                              for (unsigned int i = 0;
+                                   i < scratch_data.patch_values_scalar
+                                         .solution_values.size();
+                                   ++i)
+                                {
+                                  AssertDimension(
+                                    scratch_data.patch_values_system
+                                      .solution_hessians[i]
+                                      .size(),
+                                    2);
+                                  scratch_data.patch_values_system
+                                    .solution_hessians[i][1] =
+                                    scratch_data.patch_values_scalar
+                                      .solution_hessians[i];
+                                }
+                            }
+                        }
+                      else
+                        {
+                          // This is the vector-valued, complex-valued case.
+                          Assert(false, ExcNotImplemented());
+                        }
+                    }
+
+                  // Now set other fields we may need
                   if (update_flags & update_quadrature_points)
                     scratch_data.patch_values_system.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
@@ -246,6 +452,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.postprocessed_values[dataset]);
                 }
 
+              // Now we need to copy the result of the postprocessor to
+              // the Patch object where it can then be further processes
+              // by the functions in DataOutBase
               for (unsigned int q = 0; q < n_q_points; ++q)
                 for (unsigned int component = 0;
                      component < this->dof_data[dataset]->n_output_variables;
@@ -320,9 +529,17 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 }
             }
 
-          // increment the counter for the actual data record
+          // Increment the counter for the actual data record. We need to
+          // move it forward a number of positions equal to the number
+          // of components of this data set; if the input consisted
+          // of a complex-valued quantity and if it is not further
+          // processed by a postprocessor, then we need two output
+          // slots for each input variable.
           offset += this->dof_data[dataset]->n_output_variables *
-                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
+                    (this->dof_data[dataset]->is_complex_valued() &&
+                         (this->dof_data[dataset]->postprocessor == nullptr) ?
+                       2 :
+                       1);
         }
 
       // then do the cell data. only compute the number of a cell if needed;
@@ -534,13 +751,24 @@ DataOut<dim, DoFHandlerType>::build_patches(
   this->patches.clear();
   this->patches.resize(all_cells.size());
 
-  // now create a default object for the WorkStream object to work with
+  // Now create a default object for the WorkStream object to work with. The
+  // first step is to count how many output data sets there will be. This is,
+  // in principle, just the number of components of each data set, but we
+  // need to allocate two entries per component if there are
+  // complex-valued input data (unless we use a postprocessor on this
+  // output -- all postprocessor outputs are real-valued)
   unsigned int n_datasets = 0;
   for (unsigned int i = 0; i < this->cell_data.size(); ++i)
-    n_datasets += (this->cell_data[i]->is_complex_valued() ? 2 : 1);
+    n_datasets += (this->cell_data[i]->is_complex_valued() &&
+                       (this->cell_data[i]->postprocessor == nullptr) ?
+                     2 :
+                     1);
   for (unsigned int i = 0; i < this->dof_data.size(); ++i)
     n_datasets += (this->dof_data[i]->n_output_variables *
-                   (this->dof_data[i]->is_complex_valued() ? 2 : 1));
+                   (this->dof_data[i]->is_complex_valued() &&
+                        (this->dof_data[i]->postprocessor == nullptr) ?
+                      2 :
+                      1));
 
   std::vector<unsigned int> n_postprocessor_outputs(this->dof_data.size());
   for (unsigned int dataset = 0; dataset < this->dof_data.size(); ++dataset)

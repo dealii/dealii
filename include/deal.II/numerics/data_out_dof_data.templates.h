@@ -1291,24 +1291,31 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   const
 {
   std::vector<std::string> names;
-  // collect the names of dof and cell data
-  using data_iterator = typename std::vector<std::shared_ptr<
-    internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>::
-    const_iterator;
 
-  for (data_iterator d = dof_data.begin(); d != dof_data.end(); ++d)
+  // Loop over all DoF-data datasets and push the names. If the
+  // vector underlying a data set is complex-valued, then
+  // expand it into its real and imaginary part. Note, however,
+  // that what comes back from a postprocess is *always*
+  // real-valued, regardless of what goes in, so we don't
+  // have this to do this name expansion for data sets that
+  // have a postprocessor.
+  for (auto d = dof_data.begin(); d != dof_data.end(); ++d)
     for (unsigned int i = 0; i < (*d)->names.size(); ++i)
-      if ((*d)->is_complex_valued() == false)
+      if ((*d)->is_complex_valued() == false ||
+          ((*d)->postprocessor != nullptr))
         names.push_back((*d)->names[i]);
       else
         {
           names.push_back((*d)->names[i] + "_re");
           names.push_back((*d)->names[i] + "_im");
         }
-  for (data_iterator d = cell_data.begin(); d != cell_data.end(); ++d)
+
+  // Do the same as above for cell-type data
+  for (auto d = cell_data.begin(); d != cell_data.end(); ++d)
     {
       Assert((*d)->names.size() == 1, ExcInternalError());
-      if ((*d)->is_complex_valued() == false)
+      if (((*d)->is_complex_valued() == false) ||
+          ((*d)->postprocessor != nullptr))
         names.push_back((*d)->names[0]);
       else
         {
@@ -1352,10 +1359,14 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
         {
           case DataComponentInterpretation::component_is_scalar:
             {
-              // just move one component forward by one, or two if the component
-              // happens to be complex-valued
+              // Just move one component forward by one (or two if the component
+              // happens to be complex-valued and we don't use a postprocessor
+              // -- postprocessors always return real-valued things)
               ++i;
-              output_component += ((*d)->is_complex_valued() ? 2 : 1);
+              output_component +=
+                ((*d)->is_complex_valued() && ((*d)->postprocessor == nullptr) ?
+                   2 :
+                   1);
 
               break;
             }
