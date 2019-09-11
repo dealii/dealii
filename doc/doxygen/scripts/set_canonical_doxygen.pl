@@ -41,6 +41,7 @@ for my $filename (@html) {
      if ($filename eq "./header.html")
      {
 	  # there is no relevant content in the header
+	  next;
      }
 
      open(my $file_handle, "+<:encoding(UTF-8)", $filename)
