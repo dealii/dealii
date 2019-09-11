@@ -77,9 +77,18 @@ public:
                 "FE_NedelecSZ is only implemented for dim==spacedim!");
 
   /**
-   * Constructor for an element of given @p degree.
+   * Constructor for the NedelecSZ element of given @p order. The maximal
+   * polynomial degree of the shape functions is `order+1` (in each variable;
+   * the total polynomial degree may be higher). If `order = 0`, the element is
+   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * element has degrees of freedom on the edges, faces and volume. For example
+   * the 3D version of FE_NedelecSZ has 12 degrees of freedom for `order = 0`
+   * and 54 for `degree = 1`. It is important to have enough quadrature points
+   * in order to perform the quadrature with sufficient accuracy.
+   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * quadrature formula, where `order` is the order of FE_NedelecSZ.
    */
-  FE_NedelecSZ(const unsigned int degree);
+  FE_NedelecSZ(const unsigned int order);
 
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;

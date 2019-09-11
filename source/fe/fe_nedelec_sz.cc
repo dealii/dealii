@@ -21,14 +21,14 @@ DEAL_II_NAMESPACE_OPEN
 
 // Constructor:
 template <int dim, int spacedim>
-FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
+FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int order)
   : FiniteElement<dim, dim>(
-      FiniteElementData<dim>(get_dpo_vector(degree),
+      FiniteElementData<dim>(get_dpo_vector(order),
                              dim,
-                             degree + 1,
+                             order + 1,
                              FiniteElementData<dim>::Hcurl),
-      std::vector<bool>(compute_num_dofs(degree), true),
-      std::vector<ComponentMask>(compute_num_dofs(degree),
+      std::vector<bool>(compute_num_dofs(order), true),
+      std::vector<ComponentMask>(compute_num_dofs(order),
                                  std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -43,7 +43,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
     }
 
   // Generate the 1-D polynomial basis.
-  create_polynomials(degree);
+  create_polynomials(order);
 }
 
 
