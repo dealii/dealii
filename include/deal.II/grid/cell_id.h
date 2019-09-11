@@ -157,6 +157,12 @@ public:
   operator<(const CellId &other) const;
 
   /**
+   * Determine if this cell id is the direct parent of the input cell id.
+   */
+  bool
+  is_parent_of(const CellId &other) const;
+
+  /**
    * Boost serialization function
    */
   template <class Archive>
@@ -313,6 +319,24 @@ CellId::operator<(const CellId &other) const
 
   if (n_child_indices == other.n_child_indices)
     return false;
+  return true; // other.id is longer
+}
+
+
+
+inline bool
+CellId::is_parent_of(const CellId &other) const
+{
+  if (this->coarse_cell_id != other.coarse_cell_id)
+    return false;
+
+  if (n_child_indices + 1 != other.n_child_indices)
+    return false;
+
+  for (unsigned int idx = 0; idx < n_child_indices; ++idx)
+    if (child_indices[idx] != other.child_indices[idx])
+      return false;
+
   return true; // other.id is longer
 }
 
