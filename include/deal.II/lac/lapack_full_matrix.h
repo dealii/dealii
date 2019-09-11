@@ -863,6 +863,20 @@ public:
   singular_value(const size_type i) const;
 
   /**
+   * Retrieves #svd_u matrix after compute_svd() or compute_inverse_svd() was
+   * called.
+   */
+  inline const LAPACKFullMatrix<number> &
+  get_svd_u() const;
+
+  /**
+   * Retrieves #svd_vt matrix after compute_svd() or compute_inverse_svd() was
+   * called.
+   */
+  inline const LAPACKFullMatrix<number>&
+  get_svd_vt() const;
+
+  /**
    * Print the matrix and allow formatting of entries.
    *
    * The parameters allow for a flexible setting of the output format:
@@ -1171,6 +1185,28 @@ LAPACKFullMatrix<number>::singular_value(const size_type i) const
   AssertIndexRange(i, wr.size());
 
   return wr[i];
+}
+
+
+template <typename number>
+inline const LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::get_svd_u() const
+{
+  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+         LAPACKSupport::ExcState(state));
+
+  return *svd_u;
+}
+
+
+template <typename number>
+inline const LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::get_svd_vt() const
+{
+  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
+         LAPACKSupport::ExcState(state));
+
+  return *svd_vt;
 }
 
 
