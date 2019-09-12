@@ -873,14 +873,14 @@ public:
   singular_value(const size_type i) const;
 
   /**
-   * Retrieves #svd_u matrix after compute_svd() or compute_inverse_svd() was
+   * Retrieve the matrix #svd_u after compute_svd() or compute_inverse_svd() was
    * called.
    */
   inline const LAPACKFullMatrix<number> &
   get_svd_u() const;
 
   /**
-   * Retrieves #svd_vt matrix after compute_svd() or compute_inverse_svd() was
+   * Retrieve the matrix #svd_vt after compute_svd() or compute_inverse_svd() was
    * called.
    */
   inline const LAPACKFullMatrix<number>&
