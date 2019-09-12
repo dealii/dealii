@@ -342,8 +342,11 @@ namespace Step27
     // Loss of precision with a factor of 1e-12 with Trilinos
     LA::SolverCG cg(solver_control);
 
-    LA::MPI::PreconditionAMG preconditioner;
-    preconditioner.initialize(system_matrix);
+    LA::MPI::PreconditionAMG                 preconditioner;
+    LA::MPI::PreconditionAMG::AdditionalData data;
+    data.elliptic              = true;
+    data.higher_order_elements = true;
+    preconditioner.initialize(system_matrix, data);
 
     check_solver_within_range(cg.solve(system_matrix,
                                        completely_distributed_solution,
