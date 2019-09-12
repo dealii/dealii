@@ -815,7 +815,17 @@ public:
    *
    * Requires that the #state is LAPACKSupport::matrix, fills the data members
    * #wr, #svd_u, and #svd_vt, and leaves the object in the #state
-   * LAPACKSupport::svd.
+   * LAPACKSupport::svd. 
+   * 
+   * The singular value decomposition factorizes the provided matrix (A) into 
+   * three parts U, sigma and the transpose of V (V^T), such that A = U sigma 
+   * V^T. Sigma is a MxN matrix which contains the singular values of A on 
+   * the diagonal while all the other elements are zero. U is a MxM orthogonal 
+   * matrix containing the left singular vectors corresponding to the singular
+   * values of A. V is a NxN orthonal matrix containing the right singular 
+   * vectors corresponding the the singular values of A.
+   *  
+   * Note that the variable #svd_vt contains the tranposed of V.  
    */
   void
   compute_svd();
