@@ -329,7 +329,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                               for (unsigned int i = 0;
                                    i < scratch_data.patch_values_scalar
-                                         .solution_values.size();
+                                         .solution_hessians.size();
                                    ++i)
                                 {
                                   AssertDimension(
@@ -412,7 +412,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                               for (unsigned int i = 0;
                                    i < scratch_data.patch_values_scalar
-                                         .solution_values.size();
+                                         .solution_hessians.size();
                                    ++i)
                                 {
                                   AssertDimension(
