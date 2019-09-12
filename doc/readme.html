@@ -255,9 +255,13 @@
 
     <pre>
       cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+      make documentation
+      make install
     </pre>
 
     <p>
+        As usual, you can pass <code>-jN</code> to <code>make</code>
+        in order to use more than one processor.
         For this to succeed, you will need <a href="http://www.perl.org/" target="_top">Perl 5.x</a>,
         <a href="http://www.doxygen.org/" target="_top">doxygen</a> and <code>dot</code> (which is part of the <a href="http://www.graphviz.org" target="_top">GraphViz</a> package) to be installed.
     </p>
@@ -268,13 +272,6 @@
 
     <p> Finally, the default for locally installed documentation is to render formulas as images. You can force formulas to be displayed via the MathJax system by adding <code>-DDEAL_II_DOXYGEN_USE_MATHJAX=ON</code> to the CMake call above. These formulas
         are then rendered natively by the browser. With <code>-DDEAL_II_DOXYGEN_USE_ONLINE_MATHJAX=OFF</code> CMake will try to find a local installation of MathJax scripts, otherwise the online version of the scripts will be used in the documentation.
-    </p>
-
-    <p>
-        Upon calling <code>make</code> and <code>make install</code>, this will install both this readme, other installation instructions, as well as the
-        <a href="doxygen/deal.II/index.html" target="_top">manual that documents
-      all functions and classes</a> as well as the <a href="doxygen/deal.II/Tutorial.html" target="_top"> tutorial
-      of well-documented example programs</a> (the "steps").
     </p>
 
     <p>
