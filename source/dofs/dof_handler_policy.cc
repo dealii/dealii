@@ -5152,16 +5152,29 @@ namespace internal
             //* 3. communicate local dofcount and shift ids to make
             // them unique
             dealii::types::global_dof_index my_shift = 0;
-            const int                       ierr =
-              MPI_Exscan(DEAL_II_MPI_CONST_CAST(
-                           &level_number_cache.n_locally_owned_dofs),
-                         &my_shift,
-                         1,
-                         DEAL_II_DOF_INDEX_MPI_TYPE,
-                         MPI_SUM,
-                         triangulation->get_communicator());
+            int ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(
+                                    &level_number_cache.n_locally_owned_dofs),
+                                  &my_shift,
+                                  1,
+                                  DEAL_II_DOF_INDEX_MPI_TYPE,
+                                  MPI_SUM,
+                                  triangulation->get_communicator());
             AssertThrowMPI(ierr);
 
+            // The last processor knows about the total number of dofs, so we
+            // can use a cheaper broadcast rather than an MPI_Allreduce via
+            // MPI::sum().
+            level_number_cache.n_global_dofs =
+              my_shift + level_number_cache.n_locally_owned_dofs;
+            ierr = MPI_Bcast(&level_number_cache.n_global_dofs,
+                             1,
+                             DEAL_II_DOF_INDEX_MPI_TYPE,
+                             Utilities::MPI::n_mpi_processes(
+                               triangulation->get_communicator()) -
+                               1,
+                             triangulation->get_communicator());
+
+            // shift indices
             for (types::global_dof_index &index : renumbering)
               if (index != numbers::invalid_dof_index)
                 index += my_shift;
@@ -5179,10 +5192,6 @@ namespace internal
                 renumbering, IndexSet(0), *dof_handler, level, false);
 
             // now a little bit of housekeeping
-            level_number_cache.n_global_dofs =
-              Utilities::MPI::sum(level_number_cache.n_locally_owned_dofs,
-                                  triangulation->get_communicator());
-
             level_number_cache.locally_owned_dofs =
               IndexSet(level_number_cache.n_global_dofs);
             level_number_cache.locally_owned_dofs.add_range(
