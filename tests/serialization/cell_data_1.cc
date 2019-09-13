@@ -22,26 +22,6 @@
 
 #include "serialization.h"
 
-namespace dealii
-{
-  template <int structdim>
-  bool
-  operator==(const CellData<structdim> &t1, const CellData<structdim> &t2)
-  {
-    for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell;
-         i++)
-      if (t1.vertices[i] != t2.vertices[i])
-        return false;
-
-    if (t1.material_id != t2.material_id)
-      return false;
-    if (t1.boundary_id != t2.boundary_id)
-      return false;
-    if (t1.manifold_id != t2.manifold_id)
-      return false;
-    return true;
-  }
-} // namespace dealii
 
 template <int structdim>
 void

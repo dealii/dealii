@@ -43,6 +43,40 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+template <int structdim>
+CellData<structdim>::CellData()
+  : material_id(0)
+  , manifold_id(numbers::flat_manifold_id)
+{
+  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+    vertices[i] = numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim>
+bool
+CellData<structdim>::operator==(const CellData<structdim> &other) const
+{
+  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; i++)
+    if (vertices[i] != other.vertices[i])
+      return false;
+
+  if (material_id != other.material_id)
+    return false;
+
+  if (boundary_id != other.boundary_id)
+    return false;
+
+  if (manifold_id != other.manifold_id)
+    return false;
+
+  return true;
+}
+
+
+
 bool
 SubCellData::check_consistency(const unsigned int dim) const
 {
