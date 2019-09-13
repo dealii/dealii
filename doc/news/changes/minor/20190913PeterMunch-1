@@ -1,0 +1,4 @@
+New: Add Boost serialization function to dealii::fullydistributed::CellData and
+dealii::fullydistributed::ConstructionData.
+<br>
+(Peter Munch, 2019/09/13)
