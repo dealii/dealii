@@ -191,6 +191,13 @@ struct CellData
    * - manifold id to numbers::flat_manifold_id
    */
   CellData();
+
+  /**
+   * Boost serialization function
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int version);
 };
 
 
@@ -4121,6 +4128,17 @@ inline CellData<structdim>::CellData()
 
   // And the manifold to be invalid
   manifold_id = numbers::flat_manifold_id;
+}
+
+template <int structdim>
+template <class Archive>
+void
+CellData<structdim>::serialize(Archive &ar, const unsigned int /*version*/)
+{
+  ar &vertices;
+  ar &material_id;
+  ar &boundary_id;
+  ar &manifold_id;
 }
 
 
