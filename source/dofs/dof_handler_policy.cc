@@ -34,16 +34,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/device/back_inserter.hpp>
-#  include <boost/iostreams/filter/gzip.hpp>
-#  include <boost/iostreams/filtering_stream.hpp>
-#  include <boost/iostreams/stream.hpp>
-#  include <boost/serialization/array.hpp>
-#endif
-
 #include <algorithm>
 #include <memory>
 #include <numeric>
@@ -4217,152 +4207,6 @@ namespace internal
 
       namespace
       {
-        /**
-         * A structure that allows the transfer of DoF indices from one
-         * processor to another. It corresponds to a packed buffer that stores a
-         * list of cells (in the form of a list of coarse mesh index -- i.e.,
-         * the tree_index of the cell, and a corresponding list of quadrants
-         * within these trees), and a long array of DoF indices.
-         *
-         * The list of DoF indices stores first the number of indices for the
-         * first cell (=tree index and quadrant), then the indices for that
-         * cell, then the number of indices of the second cell, then the actual
-         * indices of the second cell, etc.
-         *
-         * The DoF indices array may or may not be used by algorithms using this
-         * class.
-         */
-        template <int dim>
-        struct CellDataTransferBuffer
-        {
-          std::vector<unsigned int> tree_indices;
-          std::vector<typename dealii::internal::p4est::types<dim>::quadrant>
-                                                       quadrants;
-          std::vector<dealii::types::global_dof_index> dof_numbers_and_indices;
-
-
-          /**
-           * Write the data of this object to a stream for the purpose of
-           * serialization.
-           */
-          template <class Archive>
-          void
-          save(Archive &ar, const unsigned int /*version*/) const
-          {
-            // we would like to directly serialize the 'quadrants' vector,
-            // but the element type is internal to p4est and does not
-            // know how to serialize itself. consequently, first copy it over
-            // to an array of bytes, and then serialize that
-            std::vector<char> quadrants_as_chars(sizeof(quadrants[0]) *
-                                                 quadrants.size());
-            if (quadrants_as_chars.size() > 0)
-              {
-                Assert(quadrants.data() != nullptr, ExcInternalError());
-                std::memcpy(quadrants_as_chars.data(),
-                            quadrants.data(),
-                            quadrants_as_chars.size());
-              }
-
-            // now serialize everything
-            ar &quadrants_as_chars &tree_indices &dof_numbers_and_indices;
-          }
-
-          /**
-           * Read the data of this object from a stream for the purpose of
-           * serialization. Throw away the previous content.
-           */
-          template <class Archive>
-          void
-          load(Archive &ar, const unsigned int /*version*/)
-          {
-            // undo the copying trick from the 'save' function
-            std::vector<char> quadrants_as_chars;
-            ar &quadrants_as_chars &tree_indices &dof_numbers_and_indices;
-
-            if (quadrants_as_chars.size() > 0)
-              {
-                quadrants.resize(quadrants_as_chars.size() /
-                                 sizeof(quadrants[0]));
-                std::memcpy(quadrants.data(),
-                            quadrants_as_chars.data(),
-                            quadrants_as_chars.size());
-              }
-            else
-              quadrants.clear();
-          }
-
-          BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-
-          /**
-           * Pack the data that corresponds to this object into a buffer in
-           * the form of a vector of chars and return it.
-           */
-          std::vector<char>
-          pack_data() const
-          {
-            // set up a buffer and then use it as the target of a compressing
-            // stream into which we serialize the current object
-            std::vector<char> buffer;
-            {
-#  ifdef DEAL_II_WITH_ZLIB
-              boost::iostreams::filtering_ostream out;
-              out.push(
-                boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                  boost::iostreams::gzip::best_compression)));
-              out.push(boost::iostreams::back_inserter(buffer));
-
-              boost::archive::binary_oarchive archive(out);
-
-              archive << *this;
-              out.flush();
-#  else
-              std::ostringstream              out;
-              boost::archive::binary_oarchive archive(out);
-              archive << *this;
-              const std::string &s = out.str();
-              buffer.reserve(s.size());
-              buffer.assign(s.begin(), s.end());
-#  endif
-            }
-
-            return buffer;
-          }
-
-
-          /**
-           * Given a buffer in the form of an array of chars, unpack it and
-           * restore the current object to the state that it was when
-           * it was packed into said buffer by the pack_data() function.
-           */
-          void
-          unpack_data(const std::vector<char> &buffer)
-          {
-            std::string decompressed_buffer;
-
-            // first decompress the buffer
-            {
-#  ifdef DEAL_II_WITH_ZLIB
-              boost::iostreams::filtering_ostream decompressing_stream;
-              decompressing_stream.push(boost::iostreams::gzip_decompressor());
-              decompressing_stream.push(
-                boost::iostreams::back_inserter(decompressed_buffer));
-              decompressing_stream.write(buffer.data(), buffer.size());
-#  else
-              decompressed_buffer.assign(buffer.begin(), buffer.end());
-#  endif
-            }
-
-            // then restore the object from the buffer
-            std::istringstream              in(decompressed_buffer);
-            boost::archive::binary_iarchive archive(in);
-
-            archive >> *this;
-          }
-        };
-
-
-
         template <int dim, int spacedim>
         void
         get_mg_dofindices_recursively(
@@ -4372,8 +4216,8 @@ namespace internal
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant
-            &                          quadrant,
-          CellDataTransferBuffer<dim> &cell_data_transfer_buffer)
+            &                                           quadrant,
+          std::vector<dealii::types::global_dof_index> &dof_numbers_and_indices)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
@@ -4382,17 +4226,15 @@ namespace internal
                        tria.locally_owned_subdomain(),
                      ExcInternalError());
 
-
               std::vector<dealii::types::global_dof_index> local_dof_indices(
                 dealii_cell->get_fe().dofs_per_cell);
               dealii_cell->get_mg_dof_indices(local_dof_indices);
 
-              cell_data_transfer_buffer.dof_numbers_and_indices.push_back(
+              dof_numbers_and_indices.push_back(
                 dealii_cell->get_fe().dofs_per_cell);
-              cell_data_transfer_buffer.dof_numbers_and_indices.insert(
-                cell_data_transfer_buffer.dof_numbers_and_indices.end(),
-                local_dof_indices.begin(),
-                local_dof_indices.end());
+              dof_numbers_and_indices.insert(dof_numbers_and_indices.end(),
+                                             local_dof_indices.begin(),
+                                             local_dof_indices.end());
               return; // we are done
             }
 
@@ -4413,8 +4255,9 @@ namespace internal
               p4est_child[c],
               dealii_cell->child(c),
               quadrant,
-              cell_data_transfer_buffer);
+              dof_numbers_and_indices);
         }
+
 
 
         template <int dim, int spacedim>
@@ -4427,7 +4270,10 @@ namespace internal
             &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant
             &p4est_cell,
-          std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
+          std::map<dealii::types::subdomain_id,
+                   std::vector<std::pair<
+                     unsigned int,
+                     typename dealii::internal::p4est::types<dim>::quadrant>>>
             &neighbor_cell_list)
         {
           // recurse...
@@ -4455,11 +4301,10 @@ namespace internal
                 tria.locally_owned_subdomain())
             {
               neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .tree_indices.push_back(tree_index);
-              neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .quadrants.push_back(p4est_cell);
+                .emplace_back(tree_index, p4est_cell);
             }
         }
+
 
 
         template <int dim, int spacedim>
@@ -4540,15 +4385,16 @@ namespace internal
             &             tria,
           DoFHandlerType &dof_handler)
         {
+          using QuadrantBufferType = std::vector<
+            std::pair<unsigned int,
+                      typename dealii::internal::p4est::types<dim>::quadrant>>;
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners =
             tria.level_ghost_owners();
-          using cellmap_t =
-            std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>;
-          cellmap_t neighbor_cell_list;
+          std::map<dealii::types::subdomain_id, QuadrantBufferType>
+            neighbor_cell_list;
           for (const auto level_ghost_owner : level_ghost_owners)
-            neighbor_cell_list.insert(
-              std::make_pair(level_ghost_owner, CellDataTransferBuffer<dim>()));
+            neighbor_cell_list[level_ghost_owner] = {};
 
           for (typename DoFHandlerType::level_cell_iterator cell =
                  dof_handler.begin(0);
@@ -4570,38 +4416,34 @@ namespace internal
                  ExcInternalError());
 
           //* send our requests:
-          std::vector<std::vector<char>> sendbuffers(level_ghost_owners.size());
-          std::vector<MPI_Request>       requests(level_ghost_owners.size());
+          std::vector<MPI_Request> requests(level_ghost_owners.size());
+          {
+            unsigned int idx = 0;
+            for (const auto &it : neighbor_cell_list)
+              {
+                // send the data about the relevant cells
+                const int ierr =
+                  MPI_Isend(it.second.data(),
+                            it.second.size() * sizeof(it.second[0]),
+                            MPI_BYTE,
+                            it.first,
+                            10101,
+                            tria.get_communicator(),
+                            &requests[idx]);
+                AssertThrowMPI(ierr);
+                ++idx;
+              }
+          }
 
-          unsigned int idx = 0;
-          for (typename cellmap_t::iterator it = neighbor_cell_list.begin();
-               it != neighbor_cell_list.end();
-               ++it, ++idx)
-            {
-              // pack all the data into the buffer for this recipient
-              // and send it. keep data around till we can make sure
-              // that the packet has been received
-              sendbuffers[idx] = it->second.pack_data();
-              const int ierr   = MPI_Isend(sendbuffers[idx].data(),
-                                         sendbuffers[idx].size(),
-                                         MPI_BYTE,
-                                         it->first,
-                                         10101,
-                                         tria.get_communicator(),
-                                         &requests[idx]);
-              AssertThrowMPI(ierr);
-            }
-
-          //* receive requests and reply
-          std::vector<std::vector<char>> reply_buffers(
+          //* receive requests and reply with the ghost indices
+          std::vector<QuadrantBufferType> quadrant_data_to_send(
             level_ghost_owners.size());
+          std::vector<std::vector<types::global_dof_index>>
+                                   send_dof_numbers_and_indices(level_ghost_owners.size());
           std::vector<MPI_Request> reply_requests(level_ghost_owners.size());
 
           for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
             {
-              std::vector<char>           receive;
-              CellDataTransferBuffer<dim> cell_data_transfer_buffer;
-
               MPI_Status status;
               int        len;
               int        ierr = MPI_Probe(MPI_ANY_SOURCE,
@@ -4611,10 +4453,13 @@ namespace internal
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
-              receive.resize(len);
+              Assert(len % sizeof(quadrant_data_to_send[idx][0]) == 0,
+                     ExcInternalError());
+              const unsigned int n_cells =
+                len / sizeof(quadrant_data_to_send[idx][0]);
+              quadrant_data_to_send[idx].resize(n_cells);
 
-              char *ptr = receive.data();
-              ierr      = MPI_Recv(ptr,
+              ierr = MPI_Recv(quadrant_data_to_send[idx].data(),
                               len,
                               MPI_BYTE,
                               status.MPI_SOURCE,
@@ -4623,15 +4468,12 @@ namespace internal
                               &status);
               AssertThrowMPI(ierr);
 
-              cell_data_transfer_buffer.unpack_data(receive);
-
               // store the dof indices for each cell
-              for (unsigned int c = 0;
-                   c < cell_data_transfer_buffer.tree_indices.size();
+              for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells);
                    ++c)
                 {
                   const auto temp =
-                    CellId(cell_data_transfer_buffer.tree_indices[c], 0, NULL)
+                    CellId(quadrant_data_to_send[idx][c].first, 0, NULL)
                       .to_cell(tria);
 
                   typename DoFHandlerType::level_cell_iterator cell(
@@ -4648,15 +4490,14 @@ namespace internal
                     tria,
                     p4est_coarse_cell,
                     cell,
-                    cell_data_transfer_buffer.quadrants[c],
-                    cell_data_transfer_buffer);
+                    quadrant_data_to_send[idx][c].second,
+                    send_dof_numbers_and_indices[idx]);
                 }
 
               // send reply
-              reply_buffers[idx] = cell_data_transfer_buffer.pack_data();
-              ierr               = MPI_Isend(reply_buffers[idx].data(),
-                               reply_buffers[idx].size(),
-                               MPI_BYTE,
+              ierr = MPI_Isend(send_dof_numbers_and_indices[idx].data(),
+                               send_dof_numbers_and_indices[idx].size(),
+                               DEAL_II_DOF_INDEX_MPI_TYPE,
                                status.MPI_SOURCE,
                                10102,
                                tria.get_communicator(),
@@ -4667,9 +4508,6 @@ namespace internal
           //* finally receive the replies
           for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
             {
-              std::vector<char>           receive;
-              CellDataTransferBuffer<dim> cell_data_transfer_buffer;
-
               MPI_Status status;
               int        len;
               int        ierr = MPI_Probe(MPI_ANY_SOURCE,
@@ -4677,34 +4515,31 @@ namespace internal
                                    tria.get_communicator(),
                                    &status);
               AssertThrowMPI(ierr);
-              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+              ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
+              const QuadrantBufferType &quadrants =
+                neighbor_cell_list[status.MPI_SOURCE];
               AssertThrowMPI(ierr);
-              receive.resize(len);
+              Assert((len > 0 && !quadrants.empty()) ||
+                       (len == 0 && quadrants.empty()),
+                     ExcInternalError());
+              std::vector<types::global_dof_index>
+                receive_dof_numbers_and_indices(len);
 
-              char *ptr = receive.data();
-              ierr      = MPI_Recv(ptr,
+              ierr = MPI_Recv(receive_dof_numbers_and_indices.data(),
                               len,
-                              MPI_BYTE,
+                              DEAL_II_DOF_INDEX_MPI_TYPE,
                               status.MPI_SOURCE,
                               status.MPI_TAG,
                               tria.get_communicator(),
                               &status);
               AssertThrowMPI(ierr);
 
-              cell_data_transfer_buffer.unpack_data(receive);
-              if (cell_data_transfer_buffer.tree_indices.size() == 0)
-                continue;
-
               // set the dof indices for each cell
               dealii::types::global_dof_index *dofs =
-                cell_data_transfer_buffer.dof_numbers_and_indices.data();
-              for (unsigned int c = 0;
-                   c < cell_data_transfer_buffer.tree_indices.size();
-                   ++c, dofs += 1 + dofs[0])
+                receive_dof_numbers_and_indices.data();
+              for (const auto &it : quadrants)
                 {
-                  const auto temp =
-                    CellId(cell_data_transfer_buffer.tree_indices[c], 0, NULL)
-                      .to_cell(tria);
+                  const auto temp = CellId(it.first, 0, NULL).to_cell(tria);
 
                   typename DoFHandlerType::level_cell_iterator cell(
                     &tria, 0, temp->index(), &dof_handler);
@@ -4717,12 +4552,12 @@ namespace internal
                          ExcInternalError());
 
                   set_mg_dofindices_recursively<dim, spacedim>(
-                    tria,
-                    p4est_coarse_cell,
-                    cell,
-                    cell_data_transfer_buffer.quadrants[c],
-                    dofs + 1);
+                    tria, p4est_coarse_cell, cell, it.second, dofs + 1);
+                  dofs += 1 + dofs[0];
                 }
+              Assert(dofs == receive_dof_numbers_and_indices.data() +
+                               receive_dof_numbers_and_indices.size(),
+                     ExcInternalError());
             }
 
           // complete all sends, so that we can safely destroy the
@@ -4817,7 +4652,7 @@ namespace internal
           (void)vertices_with_ghost_neighbors;
           Assert(false, ExcNotImplemented());
 #  else
-          const unsigned int dim = DoFHandlerType::dimension;
+          const unsigned int dim      = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
 
           // define functions that pack data on cells that are ghost cells
