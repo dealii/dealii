@@ -64,6 +64,45 @@ namespace parallel
         const bool         construct_multilevel_hierarchy = false,
         const unsigned int my_rank_in = numbers::invalid_unsigned_int);
 
+
+      /**
+       * Construct a parallel::fullydistributed::ConstructionData. In contrast
+       * to the function above, this function is also responsible for creating
+       * a serial triangulation and for its partitioning (by calling the
+       * provided std::functions). Internally only selected processes (every
+       * n-th/each root of a group of size group_size) create a serial
+       * triangulation and the ConstructionData for all processes in its group,
+       * which is communicated.
+       *
+       * @note A reasonable group size is the size of a NUMA domain or the
+       * size of a compute node.
+       *
+       * @param serial_grid_generator A function, which creates a serial triangulation.
+       * @param serial_grid_partitioner A function, which can partition a serial
+       *        triangulation, i.e., sets the sudomain_ids of the active cells.
+       *        The function takes as the first argument a serial triangulation,
+       *        as the second argument the MPI communicator, and as the third
+       *        argument the group size.
+       * @param comm MPI communicator
+       * @param group_size The size of each group.
+       * @param construct_multilevel_hierarchy Construct multigrid levels.
+       * @return ConstructionData to be used to setup
+       *         parallel::fullydistributed::Triangulation.
+       *
+       * @author Peter Munch, 2019
+       */
+      template <int dim, int spacedim = dim>
+      ConstructionData<dim, spacedim>
+      create_construction_data_from_triangulation_in_groups(
+        std::function<void(dealii::Triangulation<dim, spacedim> &)>
+                                                serial_grid_generator,
+        std::function<void(dealii::Triangulation<dim, spacedim> &,
+                           const MPI_Comm,
+                           const unsigned int)> serial_grid_partitioner,
+        const MPI_Comm                          comm,
+        const int                               group_size = 1,
+        const bool construct_multilevel_hierarchy          = false);
+
     } // namespace Utilities
   }   // namespace fullydistributed
 } // namespace parallel

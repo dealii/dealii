@@ -1,0 +1,5 @@
+New: Allow to create parallel::fullydistributed::ConstructionData
+by groups, in which only one process actually creates 
+ConstructionDatas and distributes them within the group.
+<br>
+(Peter Munch, 2019/09/13)
