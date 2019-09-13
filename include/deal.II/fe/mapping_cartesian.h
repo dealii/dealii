@@ -328,6 +328,18 @@ private:
     const unsigned int           face_no,
     const InternalData &         data,
     std::vector<Tensor<1, dim>> &normal_vectors) const;
+
+  /**
+   * Since the Jacobian is constant for this mapping all derivatives of the
+   * Jacobian are identically zero. Fill these quantities with zeros if the
+   * corresponding update flags say that they should be updated.
+   */
+  void
+  maybe_update_jacobian_derivatives(
+    const InternalData &             data,
+    const CellSimilarity::Similarity cell_similarity,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 };
 
 /*@}*/

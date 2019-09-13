@@ -316,6 +316,58 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
 
 
 template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
+  const InternalData &             data,
+  const CellSimilarity::Similarity cell_similarity,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  if (cell_similarity != CellSimilarity::translation)
+    {
+      if (data.update_each & update_jacobian_grads)
+        for (unsigned int i = 0; i < output_data.jacobian_grads.size(); ++i)
+          output_data.jacobian_grads[i] = DerivativeForm<2, dim, spacedim>();
+
+      if (data.update_each & update_jacobian_pushed_forward_grads)
+        for (unsigned int i = 0;
+             i < output_data.jacobian_pushed_forward_grads.size();
+             ++i)
+          output_data.jacobian_pushed_forward_grads[i] = Tensor<3, spacedim>();
+
+      if (data.update_each & update_jacobian_2nd_derivatives)
+        for (unsigned int i = 0;
+             i < output_data.jacobian_2nd_derivatives.size();
+             ++i)
+          output_data.jacobian_2nd_derivatives[i] =
+            DerivativeForm<3, dim, spacedim>();
+
+      if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
+        for (unsigned int i = 0;
+             i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
+             ++i)
+          output_data.jacobian_pushed_forward_2nd_derivatives[i] =
+            Tensor<4, spacedim>();
+
+      if (data.update_each & update_jacobian_3rd_derivatives)
+        for (unsigned int i = 0;
+             i < output_data.jacobian_3rd_derivatives.size();
+             ++i)
+          output_data.jacobian_3rd_derivatives[i] =
+            DerivativeForm<4, dim, spacedim>();
+
+      if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
+        for (unsigned int i = 0;
+             i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
+             ++i)
+          output_data.jacobian_pushed_forward_3rd_derivatives[i] =
+            Tensor<5, spacedim>();
+    }
+}
+
+
+
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -361,51 +413,8 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
           for (unsigned int j = 0; j < dim; ++j)
             output_data.jacobians[i][j][j] = data.cell_extents[j];
         }
-  // "compute" the derivative of the Jacobian at the quadrature
-  // points, which are all zero of course
-  if (data.update_each & update_jacobian_grads)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.jacobian_grads.size(); ++i)
-        output_data.jacobian_grads[i] = DerivativeForm<2, dim, spacedim>();
 
-  if (data.update_each & update_jacobian_pushed_forward_grads)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0;
-           i < output_data.jacobian_pushed_forward_grads.size();
-           ++i)
-        output_data.jacobian_pushed_forward_grads[i] = Tensor<3, spacedim>();
-
-  // "compute" the hessian of the Jacobian at the quadrature points,
-  // which are all also zero of course
-  if (data.update_each & update_jacobian_2nd_derivatives)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.jacobian_2nd_derivatives.size();
-           ++i)
-        output_data.jacobian_2nd_derivatives[i] =
-          DerivativeForm<3, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0;
-           i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
-           ++i)
-        output_data.jacobian_pushed_forward_2nd_derivatives[i] =
-          Tensor<4, spacedim>();
-
-  if (data.update_each & update_jacobian_3rd_derivatives)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.jacobian_3rd_derivatives.size();
-           ++i)
-        output_data.jacobian_3rd_derivatives[i] =
-          DerivativeForm<4, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0;
-           i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
-           ++i)
-        output_data.jacobian_pushed_forward_3rd_derivatives[i] =
-          Tensor<5, spacedim>();
+  maybe_update_jacobian_derivatives(data, cell_similarity, output_data);
 
   // "compute" inverse Jacobian at the quadrature points, which are
   // all the same
@@ -481,41 +490,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
           output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
-  if (data.update_each & update_jacobian_grads)
-    for (unsigned int i = 0; i < output_data.jacobian_grads.size(); ++i)
-      output_data.jacobian_grads[i] = DerivativeForm<2, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_grads)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_grads.size();
-         ++i)
-      output_data.jacobian_pushed_forward_grads[i] = Tensor<3, spacedim>();
-
-  if (data.update_each & update_jacobian_2nd_derivatives)
-    for (unsigned int i = 0; i < output_data.jacobian_2nd_derivatives.size();
-         ++i)
-      output_data.jacobian_2nd_derivatives[i] =
-        DerivativeForm<3, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
-         ++i)
-      output_data.jacobian_pushed_forward_2nd_derivatives[i] =
-        Tensor<4, spacedim>();
-
-  if (data.update_each & update_jacobian_3rd_derivatives)
-    for (unsigned int i = 0; i < output_data.jacobian_3rd_derivatives.size();
-         ++i)
-      output_data.jacobian_3rd_derivatives[i] =
-        DerivativeForm<4, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
-         ++i)
-      output_data.jacobian_pushed_forward_3rd_derivatives[i] =
-        Tensor<5, spacedim>();
+  maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
 
   if (data.update_each & update_inverse_jacobians)
     for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
@@ -593,41 +568,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
           output_data.jacobians[i][d][d] = data.cell_extents[d];
       }
 
-  if (data.update_each & update_jacobian_grads)
-    for (unsigned int i = 0; i < output_data.jacobian_grads.size(); ++i)
-      output_data.jacobian_grads[i] = DerivativeForm<2, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_grads)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_grads.size();
-         ++i)
-      output_data.jacobian_pushed_forward_grads[i] = Tensor<3, spacedim>();
-
-  if (data.update_each & update_jacobian_2nd_derivatives)
-    for (unsigned int i = 0; i < output_data.jacobian_2nd_derivatives.size();
-         ++i)
-      output_data.jacobian_2nd_derivatives[i] =
-        DerivativeForm<3, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_2nd_derivatives.size();
-         ++i)
-      output_data.jacobian_pushed_forward_2nd_derivatives[i] =
-        Tensor<4, spacedim>();
-
-  if (data.update_each & update_jacobian_3rd_derivatives)
-    for (unsigned int i = 0; i < output_data.jacobian_3rd_derivatives.size();
-         ++i)
-      output_data.jacobian_3rd_derivatives[i] =
-        DerivativeForm<4, dim, spacedim>();
-
-  if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
-    for (unsigned int i = 0;
-         i < output_data.jacobian_pushed_forward_3rd_derivatives.size();
-         ++i)
-      output_data.jacobian_pushed_forward_3rd_derivatives[i] =
-        Tensor<5, spacedim>();
+  maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
 
   if (data.update_each & update_inverse_jacobians)
     for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
