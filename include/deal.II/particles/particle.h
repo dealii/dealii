@@ -88,10 +88,50 @@ namespace Particles
   } // namespace internal
 
   /**
-   * Base class of particles - represents a particle with position,
-   * an ID number and a variable number of properties. This class
-   * can be extended to include data related to a particle by the property
-   * manager.
+   * A class that represents a particle in a domain that is meshed by
+   * a triangulation of some kind. The data this class stores is the
+   * position of the particle in the overall space, the position of
+   * the particle in the reference coordinate system of the cell it is
+   * currently in, an ID number that is unique among all particles,
+   * and a variable number of "properties".
+   *
+   * The "properties" attached to each object of this class are
+   * stored by a PropertyPool object. These properties are
+   * stored as an array of `double` variables that can be accessed
+   * via an ArrayView object. For example, if one wanted to equip
+   * each particle with a "temperature" and "chemical composition"
+   * property that is advected along with the particle (and may change
+   * from time step to time step based on some differential equation,
+   * for example), then one would allocate two properties per particle
+   * in the PropertyPool object.
+   *
+   * In practice, however, one often wants to associate properties
+   * with particles that are not just independent numbers as in the
+   * situation above. An example would be if one wanted to track the
+   * stress or strain that a particle is subjected to -- a tensor-valued
+   * quantity. In these cases, one would <i>interpret</i> these scalar
+   * properties as the <i>components of the stress or strain</i>. In
+   * other words, one would first tell the PropertyPool to allocate
+   * as many properties per particle as there are components in the
+   * tensor one wants to track, and then write small conversion functions that
+   * take the ArrayView of scalar properties returned by the
+   * get_properties() function and convert it to a tensor of the
+   * appropriate type. This can then be evaluated and evolved in each
+   * time step. A second conversion function would convert back from a
+   * tensor to an ArrayView object to store the updated data back in the
+   * particle via the set_properties() function.
+   *
+   * There are of course cases where the properties one cares about are
+   * not real (or, in computers, floating point) numbers but rather
+   * categorical: For example, one may want to mark some particles
+   * as "red", "blue", or "green". The property might then either be
+   * represented as an integer, or as an element of an `enum`. In these
+   * cases, one would need to come up with a way to <i>represent</i>
+   * these sorts of categorical fields in terms of floating point
+   * numbers. For example, one could map "red" to the floating point number
+   * 1.0, "blue" to 2.0, and "green" to 3.0. The conversion functions
+   * to translate between these two representations should then not be very
+   * difficult to write either.
    *
    * @ingroup Particle
    * @author Rene Gassmoeller, 2017
