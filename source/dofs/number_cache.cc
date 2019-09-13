@@ -153,7 +153,7 @@ namespace internal
                 boost::iostreams::filtering_ostream out;
                 out.push(boost::iostreams::gzip_compressor(
                   boost::iostreams::gzip_params(
-                    boost::iostreams::gzip::best_compression)));
+                    boost::iostreams::gzip::best_speed)));
                 out.push(boost::iostreams::back_inserter(my_data));
 
                 boost::archive::binary_oarchive archive(out);
