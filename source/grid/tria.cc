@@ -49,8 +49,9 @@ CellData<structdim>::CellData()
   : material_id(0)
   , manifold_id(numbers::flat_manifold_id)
 {
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
-    vertices[i] = numbers::invalid_unsigned_int;
+  std::fill(std::begin(vertices),
+            std::end(vertices),
+            numbers::invalid_unsigned_int);
 }
 
 
