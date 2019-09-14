@@ -3892,7 +3892,7 @@ namespace GridTools
         // pack all the data into the buffer for this recipient and send it.
         // keep data around till we can make sure that the packet has been
         // received
-        sendbuffers[idx] = Utilities::pack(data);
+        sendbuffers[idx] = Utilities::pack(data, /*enable_compression*/ false);
         const int ierr   = MPI_Isend(sendbuffers[idx].data(),
                                    sendbuffers[idx].size(),
                                    MPI_BYTE,
@@ -3928,7 +3928,8 @@ namespace GridTools
         AssertThrowMPI(ierr);
 
         auto cellinfo =
-          Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(receive);
+          Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(
+            receive, /*enable_compression*/ false);
 
         DataType *data = cellinfo.data.data();
         for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
