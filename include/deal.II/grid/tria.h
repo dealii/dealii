@@ -193,6 +193,12 @@ struct CellData
   CellData();
 
   /**
+   * Comparison operator.
+   */
+  bool
+  operator==(const CellData<structdim> &other) const;
+
+  /**
    * Boost serialization function
    */
   template <class Archive>
@@ -4117,18 +4123,6 @@ private:
 
 #ifndef DOXYGEN
 
-
-template <int structdim>
-inline CellData<structdim>::CellData()
-{
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
-    vertices[i] = numbers::invalid_unsigned_int;
-
-  material_id = 0;
-
-  // And the manifold to be invalid
-  manifold_id = numbers::flat_manifold_id;
-}
 
 template <int structdim>
 template <class Archive>
