@@ -649,7 +649,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       deallog.push("nothread");
       do_test<dim, fe_degree, fe_degree + 1, Number>(dof, false);
@@ -674,5 +674,4 @@ main(int argc, char **argv)
   test<2, 1, double>();
   test<2, 2, float>();
   test<3, 1, double>();
-  test<3, 1, float>();
 }
