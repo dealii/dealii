@@ -79,6 +79,7 @@ TimestepControl::parse_parameters(ParameterHandler &param)
     strategy_val = uniform;
   else if (strategy == std::string("doubling"))
     strategy_val = doubling;
+  restart();
 }
 
 
