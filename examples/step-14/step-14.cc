@@ -1132,10 +1132,6 @@ namespace Step14
       class BoundaryValues : public Function<dim>
       {
       public:
-        BoundaryValues()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
@@ -1144,10 +1140,6 @@ namespace Step14
       class RightHandSide : public Function<dim>
       {
       public:
-        RightHandSide()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
