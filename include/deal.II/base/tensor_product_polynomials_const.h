@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Timo Heister, 2012
  */
 template <int dim>
-class TensorProductPolynomialsConst : public TensorProductPolynomials<dim>
+class TensorProductPolynomialsConst
 {
 public:
   /**
@@ -61,6 +61,32 @@ public:
    */
   template <class Pol>
   TensorProductPolynomialsConst(const std::vector<Pol> &pols);
+
+  /**
+   * Print the list of <tt>tensor_polys</tt> indices to <tt>out</tt>.
+   */
+  void
+  output_indices(std::ostream &out) const;
+
+  /**
+   * Set the ordering of the polynomials. Requires
+   * <tt>renumber.size()==tensor_polys.n()</tt>.  Stores a copy of
+   * <tt>renumber</tt>.
+   */
+  void
+  set_numbering(const std::vector<unsigned int> &renumber);
+
+  /**
+   * Give read access to the renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering() const;
+
+  /**
+   * Give read access to the inverse renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering_inverse() const;
 
   /**
    * Compute the value and the first and second derivatives of each tensor
@@ -151,6 +177,22 @@ public:
    */
   unsigned int
   n() const;
+
+private:
+  /**
+   * The TensorProductPolynomials object
+   */
+  TensorProductPolynomials<dim> tensor_polys;
+
+  /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map;
+
+  /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map_inverse;
 };
 
 /** @} */
@@ -164,12 +206,10 @@ template <int dim>
 template <class Pol>
 inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
   const std::vector<Pol> &pols)
-  : TensorProductPolynomials<dim>(pols)
-{
-  // append index for renumbering
-  this->index_map.push_back(TensorProductPolynomials<dim>::n());
-  this->index_map_inverse.push_back(TensorProductPolynomials<dim>::n());
-}
+  : tensor_polys(pols)
+  , index_map(tensor_polys.n() + 1)
+  , index_map_inverse(tensor_polys.n() + 1)
+{}
 
 
 
@@ -177,7 +217,24 @@ template <int dim>
 inline unsigned int
 TensorProductPolynomialsConst<dim>::n() const
 {
-  return TensorProductPolynomials<dim>::n() + 1;
+  return tensor_polys.n() + 1;
+}
+
+
+
+template <int dim>
+inline const std::vector<unsigned int> &
+TensorProductPolynomialsConst<dim>::get_numbering() const
+{
+  return index_map;
+}
+
+
+template <int dim>
+inline const std::vector<unsigned int> &
+TensorProductPolynomialsConst<dim>::get_numbering_inverse() const
+{
+  return index_map_inverse;
 }
 
 
@@ -196,13 +253,12 @@ TensorProductPolynomialsConst<dim>::compute_derivative(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  const unsigned int max_indices = TensorProductPolynomials<dim>::n();
+  const unsigned int max_indices = tensor_polys.n();
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_indices)
-    return this
-      ->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
+    return tensor_polys.template compute_derivative<order>(i, p);
   else
     // this is for the constant function
     return Tensor<order, dim>();
