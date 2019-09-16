@@ -995,16 +995,15 @@ namespace Utilities
           std::vector<T1> buffer_recv;
           // get size of of incoming message
           int  number_amount;
-          auto ierr = MPI_Get_count(&status,
-                                    internal::mpi_type_id(buffer_recv.data()),
-                                    &number_amount);
+          auto ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
           AssertThrowMPI(ierr);
 
           // allocate memory for incoming message
-          buffer_recv.resize(number_amount);
+          Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+          buffer_recv.resize(number_amount / sizeof(T1));
           ierr = MPI_Recv(buffer_recv.data(),
                           number_amount,
-                          internal::mpi_type_id(buffer_recv.data()),
+                          MPI_BYTE,
                           other_rank,
                           tag_request,
                           this->comm,
@@ -1023,8 +1022,8 @@ namespace Utilities
 
           // start to send answer back
           ierr = MPI_Isend(request_buffer.data(),
-                           request_buffer.size(),
-                           internal::mpi_type_id(request_buffer.data()),
+                           request_buffer.size() * sizeof(T2),
+                           MPI_BYTE,
                            other_rank,
                            tag_delivery,
                            this->comm,
@@ -1064,8 +1063,8 @@ namespace Utilities
 
             // start to send data
             auto ierr = MPI_Isend(send_buffer.data(),
-                                  send_buffer.size(),
-                                  internal::mpi_type_id(send_buffer.data()),
+                                  send_buffer.size() * sizeof(T1),
+                                  MPI_BYTE,
                                   rank,
                                   tag_request,
                                   this->comm,
@@ -1076,8 +1075,8 @@ namespace Utilities
             auto &recv_buffer = recv_buffers[index];
             this->process.prepare_recv_buffer(rank, recv_buffer);
             ierr = MPI_Irecv(recv_buffer.data(),
-                             recv_buffer.size(),
-                             internal::mpi_type_id(recv_buffer.data()),
+                             recv_buffer.size() * sizeof(T2),
+                             MPI_BYTE,
                              rank,
                              tag_delivery,
                              this->comm,
@@ -1149,12 +1148,10 @@ namespace Utilities
       using T2 = int;
 
       virtual void
-      process_request(const unsigned int     other_rank,
-                      const std::vector<T1> &buffer_recv,
-                      std::vector<T2> &      request_buffer) override
+      process_request(const unsigned int other_rank,
+                      const std::vector<T1> &,
+                      std::vector<T2> &) override
       {
-        (void)buffer_recv;
-        (void)request_buffer;
         this->sources.push_back(other_rank);
       }
 
@@ -1237,16 +1234,15 @@ namespace Utilities
 
       // get size of incoming message
       int  number_amount;
-      auto ierr = MPI_Get_count(&status,
-                                internal::mpi_type_id(buffer_recv.data()),
-                                &number_amount);
+      auto ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
       AssertThrowMPI(ierr);
 
       // allocate memory for incoming message
-      buffer_recv.resize(number_amount);
+      Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+      buffer_recv.resize(number_amount / sizeof(T1));
       ierr = MPI_Recv(buffer_recv.data(),
                       number_amount,
-                      internal::mpi_type_id(buffer_recv.data()),
+                      MPI_BYTE,
                       other_rank,
                       tag_request,
                       this->comm,
@@ -1259,8 +1255,8 @@ namespace Utilities
 
       // start to send answer back
       ierr = MPI_Isend(request_buffer.data(),
-                       request_buffer.size(),
-                       MPI_UNSIGNED,
+                       request_buffer.size() * sizeof(T2),
+                       MPI_BYTE,
                        other_rank,
                        tag_delivery,
                        this->comm,
@@ -1320,8 +1316,8 @@ namespace Utilities
 
           // start to send data
           auto ierr = MPI_Isend(send_buffer.data(),
-                                send_buffer.size(),
-                                internal::mpi_type_id(send_buffer.data()),
+                                send_buffer.size() * sizeof(T1),
+                                MPI_BYTE,
                                 rank,
                                 tag_request,
                                 this->comm,
@@ -1332,8 +1328,8 @@ namespace Utilities
           auto &recv_buffer = recv_buffers[i];
           this->process.prepare_recv_buffer(rank, recv_buffer);
           ierr = MPI_Irecv(recv_buffer.data(),
-                           recv_buffer.size(),
-                           MPI_UNSIGNED,
+                           recv_buffer.size() * sizeof(T2),
+                           MPI_BYTE,
                            rank,
                            tag_delivery,
                            this->comm,
@@ -1424,14 +1420,16 @@ namespace Utilities
       // dictionary, the index set is statically repartitioned among the
       // processes again and extended with information with the actual owner
       // of that the index.
-      internal::ComputeIndexOwner::ConsensusAlgorithmProcess process(
+      internal::ComputeIndexOwner::ConsensusAlgorithmPayload process(
         owned_indices, indices_to_look_up, comm, owning_ranks);
 
       // Step 2: read dictionary
       // Communicate with the process who owns the index in the static
-      // partition (i.e. in the partition). This process returns the actual
+      // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
-      ConsensusAlgorithmSelector<types::global_dof_index, unsigned int>
+      ConsensusAlgorithmSelector<
+        std::pair<types::global_dof_index, types::global_dof_index>,
+        unsigned int>
         consensus_algorithm(process, comm);
       consensus_algorithm.run();
 

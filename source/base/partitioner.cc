@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/partitioner.templates.h>
 
@@ -192,215 +193,154 @@ namespace Utilities
           return;
         }
 
-      std::vector<types::global_dof_index> first_index(n_procs + 1);
+      types::global_dof_index my_size = local_size();
       // Allow non-zero start index for the vector. send this data to all
       // processors
-      first_index[0] = local_range_data.first;
-      int ierr       = MPI_Bcast(
-        first_index.data(), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0, communicator);
-      AssertThrowMPI(ierr);
+      if (my_pid == 0)
+        my_size += local_range_data.first;
 
-      // Get the end-of-local_range for all processors
-      ierr = MPI_Allgather(&local_range_data.second,
-                           1,
-                           DEAL_II_DOF_INDEX_MPI_TYPE,
-                           &first_index[1],
-                           1,
-                           DEAL_II_DOF_INDEX_MPI_TYPE,
-                           communicator);
-      AssertThrowMPI(ierr);
-      first_index[n_procs] = global_size;
-
-      // fix case when there are some processors without any locally owned
-      // indices: then there might be a zero in some entries. The reason
-      // is that local_range_data will contain [0,0) and second index is
-      // incorrect inside the Allgather'ed first_index. Below we fix this
-      // by ensuring that the start point is always the end index of the
-      // processor immediately before.
-      if (global_size > 0)
+      types::global_dof_index my_shift = 0;
+      {
+        const int ierr = MPI_Exscan(&my_size,
+                                    &my_shift,
+                                    1,
+                                    DEAL_II_DOF_INDEX_MPI_TYPE,
+                                    MPI_SUM,
+                                    communicator);
+        AssertThrowMPI(ierr);
+      }
+      if (my_shift != local_range_data.first)
         {
-          for (unsigned int i = 1; i < n_procs; ++i)
-            if (first_index[i] == 0)
-              first_index[i] = first_index[i - 1];
-
-          // correct if our processor has a wrong local range
-          if (first_index[my_pid] != local_range_data.first)
-            {
-              Assert(local_range_data.first == local_range_data.second,
-                     ExcInternalError());
-              local_range_data.first = local_range_data.second =
-                first_index[my_pid];
-            }
+          const types::global_dof_index old_local_size = local_size();
+          local_range_data.first                       = my_shift;
+          local_range_data.second = my_shift + old_local_size;
         }
 
-      unsigned int n_ghost_targets = 0;
+      std::vector<unsigned int> owning_ranks_of_ghosts(
+        ghost_indices_data.n_elements());
+
+      // set up dictionary
+      internal::ComputeIndexOwner::ConsensusAlgorithmPayload process(
+        locally_owned_range_data,
+        ghost_indices_data,
+        communicator,
+        owning_ranks_of_ghosts,
+        /* track origins of ghosts*/ true);
+
+      // read dictionary by communicating with the process who owns the index
+      // in the static partition (i.e. in the dictionary). This process
+      // returns the actual owner of the index.
+      ConsensusAlgorithmSelector<
+        std::pair<types::global_dof_index, types::global_dof_index>,
+        unsigned int>
+        consensus_algorithm(process, communicator);
+      consensus_algorithm.run();
+
       {
-        const auto index_owner =
-          Utilities::MPI::compute_index_owner(this->locally_owned_range_data,
-                                              this->ghost_indices_data,
-                                              this->communicator);
+        ghost_targets_data = {};
 
-        ghost_targets_data.clear();
-
-        if (index_owner.size() > 0)
+        if (owning_ranks_of_ghosts.size() > 0)
           {
-            ghost_targets_data.emplace_back(index_owner[0], 0);
-            for (auto i : index_owner)
+            ghost_targets_data.emplace_back(owning_ranks_of_ghosts[0], 0);
+            for (auto i : owning_ranks_of_ghosts)
               {
                 Assert(i >= ghost_targets_data.back().first,
                        ExcInternalError(
-                         "Expect result of compute_index_owner to be sorted"));
+                         "Expect result of ConsensusAlgorithmProcess to be "
+                         "sorted"));
                 if (i == ghost_targets_data.back().first)
                   ghost_targets_data.back().second++;
                 else
                   ghost_targets_data.emplace_back(i, 1);
               }
           }
-
-        n_ghost_targets = ghost_targets_data.size();
-      }
-      // find the processes that want to import to me
-      {
-        std::vector<int> send_buffer(n_procs, 0);
-        std::vector<int> receive_buffer(n_procs, 0);
-        for (unsigned int i = 0; i < n_ghost_targets; i++)
-          send_buffer[ghost_targets_data[i].first] =
-            ghost_targets_data[i].second;
-
-        const int ierr = MPI_Alltoall(send_buffer.data(),
-                                      1,
-                                      MPI_INT,
-                                      receive_buffer.data(),
-                                      1,
-                                      MPI_INT,
-                                      communicator);
-        AssertThrowMPI(ierr);
-
-        // allocate memory for import data
-        std::vector<std::pair<unsigned int, unsigned int>> import_targets_temp;
-        n_import_indices_data = 0;
-        for (unsigned int i = 0; i < n_procs; i++)
-          if (receive_buffer[i] > 0)
-            {
-              n_import_indices_data += receive_buffer[i];
-              import_targets_temp.emplace_back(i, receive_buffer[i]);
-            }
-        // copy, don't move, to get deterministic memory usage.
-        import_targets_data = import_targets_temp;
       }
 
-      // now that we know how many indices each process will receive from
-      // ghosts, send and receive indices for import data. non-blocking receives
-      // and blocking sends
-      {
-        std::vector<types::global_dof_index> expanded_import_indices(
-          n_import_indices_data);
-        unsigned int             current_index_start = 0;
-        std::vector<MPI_Request> import_requests(import_targets_data.size() +
-                                                 n_ghost_targets);
-        for (unsigned int i = 0; i < import_targets_data.size(); i++)
-          {
-            const int ierr =
-              MPI_Irecv(&expanded_import_indices[current_index_start],
-                        import_targets_data[i].second,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        import_targets_data[i].first,
-                        import_targets_data[i].first,
-                        communicator,
-                        &import_requests[i]);
-            AssertThrowMPI(ierr);
-            current_index_start += import_targets_data[i].second;
-          }
-        AssertDimension(current_index_start, n_import_indices_data);
+      // find how much the individual processes that want import from me
+      std::map<unsigned int, IndexSet> import_data = process.get_requesters();
 
-        // use non-blocking send for ghost indices stored in
-        // expanded_ghost_indices
-        std::vector<types::global_dof_index> expanded_ghost_indices;
-        if (n_ghost_indices_data > 0)
-          ghost_indices_data.fill_index_vector(expanded_ghost_indices);
-
-        current_index_start = 0;
-        for (unsigned int i = 0; i < n_ghost_targets; i++)
+      // count import requests and setup the compressed indices
+      n_import_indices_data = 0;
+      import_targets_data   = {};
+      import_targets_data.reserve(import_data.size());
+      import_indices_chunks_by_rank_data = {};
+      import_indices_chunks_by_rank_data.reserve(import_data.size());
+      import_indices_chunks_by_rank_data.resize(1);
+      for (const auto &i : import_data)
+        if (i.second.n_elements() > 0)
           {
-            const int ierr =
-              MPI_Isend(&expanded_ghost_indices[current_index_start],
-                        ghost_targets_data[i].second,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        ghost_targets_data[i].first,
-                        my_pid,
-                        communicator,
-                        &import_requests[import_targets_data.size() + i]);
-            AssertThrowMPI(ierr);
-            current_index_start += ghost_targets_data[i].second;
-          }
-        AssertDimension(current_index_start, n_ghost_indices_data);
-
-        // wait for all import from other processes to be done
-        if (import_requests.size() > 0)
-          {
-            const int ierr = MPI_Waitall(import_requests.size(),
-                                         import_requests.data(),
-                                         MPI_STATUSES_IGNORE);
-            AssertThrowMPI(ierr);
+            import_targets_data.emplace_back(i.first, i.second.n_elements());
+            n_import_indices_data += i.second.n_elements();
+            import_indices_chunks_by_rank_data.push_back(
+              import_indices_chunks_by_rank_data.back() +
+              i.second.n_intervals());
           }
 
-        // transform import indices to local index space and compress
-        // contiguous indices in form of ranges
+      // transform import indices to local index space
+      import_indices_data = {};
+      import_indices_data.reserve(import_indices_chunks_by_rank_data.back());
+      for (const auto &i : import_data)
         {
-          import_indices_chunks_by_rank_data.resize(import_targets_data.size() +
-                                                    1);
-          import_indices_chunks_by_rank_data[0] = 0;
-          // a vector which stores import indices as ranges [a_i,b_i)
-          std::vector<std::pair<unsigned int, unsigned int>>
-                       compressed_import_indices;
-          unsigned int shift = 0;
-          for (unsigned int p = 0; p < import_targets_data.size(); ++p)
-            {
-              types::global_dof_index last_index =
-                numbers::invalid_dof_index - 1;
-              for (unsigned int ii = 0; ii < import_targets_data[p].second;
-                   ++ii)
-                {
-                  // index in expanded_import_indices for a pair (p,ii):
-                  const unsigned int i = shift + ii;
-                  Assert(expanded_import_indices[i] >= local_range_data.first &&
-                           expanded_import_indices[i] < local_range_data.second,
-                         ExcIndexRange(expanded_import_indices[i],
-                                       local_range_data.first,
-                                       local_range_data.second));
-                  // local index starting from the beginning of locally owned
-                  // DoFs:
-                  types::global_dof_index new_index =
-                    (expanded_import_indices[i] - local_range_data.first);
-                  Assert(new_index < numbers::invalid_unsigned_int,
-                         ExcNotImplemented());
-                  if (new_index == last_index + 1)
-                    // if contiguous, increment the end of last range:
-                    compressed_import_indices.back().second++;
-                  else
-                    // otherwise start a new range:
-                    compressed_import_indices.emplace_back(new_index,
-                                                           new_index + 1);
-                  last_index = new_index;
-                }
-              shift += import_targets_data[p].second;
-              import_indices_chunks_by_rank_data[p + 1] =
-                compressed_import_indices.size();
-            }
-          import_indices_data = compressed_import_indices;
-
-          // sanity check
-#  ifdef DEBUG
-          const types::global_dof_index n_local_dofs =
-            local_range_data.second - local_range_data.first;
-          for (const auto &range : import_indices_data)
-            {
-              AssertIndexRange(range.first, n_local_dofs);
-              AssertIndexRange(range.second - 1, n_local_dofs);
-            }
-#  endif
+          Assert((i.second & locally_owned_range_data) == i.second,
+                 ExcInternalError("Requested indices must be in local range"));
+          for (auto interval = i.second.begin_intervals();
+               interval != i.second.end_intervals();
+               ++interval)
+            import_indices_data.emplace_back(*interval->begin() -
+                                               local_range_data.first,
+                                             interval->last() + 1 -
+                                               local_range_data.first);
         }
-      }
+
+#  ifdef DEBUG
+
+      // simple check: the number of processors to which we want to send
+      // ghosts and the processors to which ghosts reference should be the
+      // same
+      AssertDimension(
+        Utilities::MPI::sum(import_targets_data.size(), communicator),
+        Utilities::MPI::sum(ghost_targets_data.size(), communicator));
+
+      // simple check: the number of indices to exchange should match from the
+      // ghost indices side and the import indices side
+      AssertDimension(Utilities::MPI::sum(n_import_indices_data, communicator),
+                      Utilities::MPI::sum(n_ghost_indices_data, communicator));
+
+      // expensive check that the communication channel is sane -> do a ghost
+      // exchange step and see whether the ghost indices sent to us by other
+      // processes (ghost_indices) are the same as we hold locally
+      // (ghost_indices_ref).
+      std::vector<types::global_dof_index> ghost_indices_ref;
+      ghost_indices_data.fill_index_vector(ghost_indices_ref);
+      AssertDimension(ghost_indices_ref.size(), n_ghost_indices());
+      std::vector<types::global_dof_index> indices_to_send(n_import_indices());
+      std::vector<types::global_dof_index> ghost_indices(n_ghost_indices());
+      std::vector<types::global_dof_index> my_indices;
+      locally_owned_range_data.fill_index_vector(my_indices);
+      std::vector<MPI_Request> requests;
+      n_ghost_indices_in_larger_set = n_ghost_indices_data;
+      export_to_ghosted_array_start(127,
+                                    ArrayView<const types::global_dof_index>(
+                                      my_indices.data(), my_indices.size()),
+                                    make_array_view(indices_to_send),
+                                    make_array_view(ghost_indices),
+                                    requests);
+      export_to_ghosted_array_finish(make_array_view(ghost_indices), requests);
+      int       flag = 0;
+      const int ierr = MPI_Testall(requests.size(),
+                                   requests.data(),
+                                   &flag,
+                                   MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+      Assert(flag == 1,
+             ExcMessage(
+               "MPI found unfinished requests. Check communication setup"));
+
+      for (unsigned int i = 0; i < ghost_indices.size(); ++i)
+        AssertDimension(ghost_indices[i], ghost_indices_ref[i]);
+
+#  endif
+
 #endif // #ifdef DEAL_II_WITH_MPI
 
       if (larger_ghost_index_set.size() == 0)
@@ -533,7 +473,7 @@ namespace Utilities
       return memory;
     }
 
-  } // end of namespace MPI
+  } // namespace MPI
 
 } // end of namespace Utilities
 
