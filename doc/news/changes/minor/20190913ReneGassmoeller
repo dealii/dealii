@@ -1,0 +1,4 @@
+Added: Add a new particle generation function that can generate particles at
+random positions controlled by a probability density function.
+<br>
+(Rene Gassmoeller, 2019/09/13)
