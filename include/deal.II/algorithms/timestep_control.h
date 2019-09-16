@@ -98,29 +98,29 @@ namespace Algorithms
     parse_parameters(ParameterHandler &param);
 
     /**
-     * The left end of the time interval.
+     * Return the left end of the time interval.
      */
     double
     start() const;
     /**
-     * The right end of the time interval. The control mechanism ensures that
-     * the final time step ends at this point.
+     * Return the right end of the time interval. The control mechanism
+     * ensures that the final time step ends at this point.
      */
     double
     final() const;
     /**
-     * The tolerance value controlling the time steps.
+     * Return the tolerance value controlling the time steps.
      */
     double
     tolerance() const;
     /**
-     * The size of the current time step.
+     * Return the size of the current time step.
      */
     double
     step() const;
 
     /**
-     * The current time.
+     * Return the current time.
      */
     double
     now() const;
@@ -184,28 +184,68 @@ namespace Algorithms
      */
     void
     file_name_format(const char *);
+    /**
+     * Return the output name template.
+     */
     const char *
     file_name_format();
 
   private:
-    double   start_val;
-    double   final_val;
-    double   tolerance_val;
+    /**
+     * The beginning of the time interval.
+     */
+    double start_val;
+    /**
+     *The end of the time interval.
+     */
+    double final_val;
+    /**
+     * The tolerance value controlling the time steps.
+     */
+    double tolerance_val;
+    /**
+     * Time-stepping strategy.
+     */
     Strategy strategy_val;
-    double   start_step_val;
-    double   max_step_val;
-    double   min_step_val;
+    /**
+     * The size of the first step.
+     */
+    double start_step_val;
+    /**
+     * The maximum step size.
+     */
+    double max_step_val;
+    /**
+     * The minimum step size.
+     */
+    double min_step_val;
     /**
      * The size of the current time step. This may differ from @p step_val, if
-     * we aimed at @p final_val.
+     * we aim at @p final_val.
      */
     double current_step_val;
+    /**
+     * The size of the current time step determined by the strategy. This may
+     * differ from @p current_step_val, if we aim at @p final_val.
+     */
     double step_val;
-
+    /**
+     * The current time.
+     */
     double now_val;
+    /**
+     * Determines the approximate time interval between generated outputs.
+     * If negative, output will be generated at all time steps.
+     */
     double print_step;
+    /**
+     * If current time exceeds this value, it is time to generate the output.
+     */
     double next_print_val;
 
+    /**
+     * Output file name template.
+     */
     char format[30];
   };
 
