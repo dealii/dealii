@@ -968,7 +968,7 @@ namespace internal
          * For parallel::shared::Triangulation objects,
          * this information is distributed on both ghost and artificial cells.
          *
-         * In case a parallel::distributed::Triangulation is used,
+         * In case a parallel::DistributedTriangulationBase is used,
          * indices are communicated only to ghost cells.
          */
         template <int dim, int spacedim>
@@ -1014,11 +1014,12 @@ namespace internal
                     cell->index(),
                     active_fe_indices[cell->active_cell_index()]);
             }
-          else if (const dealii::parallel::distributed::Triangulation<dim,
-                                                                      spacedim>
-                     *tr = dynamic_cast<const dealii::parallel::distributed::
-                                          Triangulation<dim, spacedim> *>(
-                       &dof_handler.get_triangulation()))
+          else if (const dealii::parallel::
+                     DistributedTriangulationBase<dim, spacedim> *tr =
+                       dynamic_cast<
+                         const dealii::parallel::
+                           DistributedTriangulationBase<dim, spacedim> *>(
+                         &dof_handler.get_triangulation()))
             {
               // For completely distributed meshes, use the function that is
               // able to move data from locally owned cells on one processor to
@@ -1217,7 +1218,7 @@ namespace internal
 
         /**
          * Coarsening strategy for the CellDataTransfer object responsible for
-         * tranferring the active_fe_index of each cell on
+         * transferring the active_fe_index of each cell on
          * parallel::distributed::Triangulation objects that have been refined.
          *
          * A finite element index needs to be determined for the (not yet
@@ -1716,7 +1717,7 @@ namespace hp
     // decide whether we need a sequential or a parallel shared/distributed
     // policy and attach corresponding callback functions dealing with the
     // transfer of active_fe_indices
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+    if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
                        *>(&this->get_triangulation()))
       {
         policy = std_cxx14::make_unique<
@@ -2024,8 +2025,18 @@ namespace hp
   DoFHandler<dim, spacedim>::pre_distributed_active_fe_index_transfer()
   {
 #ifndef DEAL_II_WITH_P4EST
-    Assert(false, ExcInternalError());
+    Assert(false,
+           ExcMessage(
+             "You are attempting to use a functionality that is only available "
+             "if deal.II was configured to use p4est, but cmake did not find a "
+             "valid p4est library."));
 #else
+    // the implementation below requires a p:d:T currently
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &this->get_triangulation()) != nullptr),
+           ExcNotImplemented());
+
     // Finite elements need to be assigned to each cell by calling
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
@@ -2107,8 +2118,18 @@ namespace hp
   DoFHandler<dim, spacedim>::post_distributed_active_fe_index_transfer()
   {
 #ifndef DEAL_II_WITH_P4EST
-    Assert(false, ExcInternalError());
+    Assert(false,
+           ExcMessage(
+             "You are attempting to use a functionality that is only available "
+             "if deal.II was configured to use p4est, but cmake did not find a "
+             "valid p4est library."));
 #else
+    // the implementation below requires a p:d:T currently
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &this->get_triangulation()) != nullptr),
+           ExcNotImplemented());
+
     // Finite elements need to be assigned to each cell by calling
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
@@ -2147,11 +2168,11 @@ namespace hp
              "if deal.II was configured to use p4est, but cmake did not find a "
              "valid p4est library."));
 #else
-    Assert(
-      (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                      *>(&this->get_triangulation()) != nullptr),
-      ExcMessage(
-        "This functionality requires a parallel::distributed::Triangulation object."));
+    // the implementation below requires a p:d:T currently
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &this->get_triangulation()) != nullptr),
+           ExcNotImplemented());
 
     // Finite elements need to be assigned to each cell by calling
     // distribute_dofs() first to make this functionality available.
@@ -2204,6 +2225,12 @@ namespace hp
              "if deal.II was configured to use p4est, but cmake did not find a "
              "valid p4est library."));
 #else
+    // the implementation below requires a p:d:T currently
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &this->get_triangulation()) != nullptr),
+           ExcNotImplemented());
+
     if (fe_collection.size() > 0)
       {
         Assert(active_fe_index_transfer != nullptr, ExcInternalError());
@@ -2227,11 +2254,11 @@ namespace hp
              "if deal.II was configured to use p4est, but cmake did not find a "
              "valid p4est library."));
 #else
-    Assert(
-      (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                      *>(&this->get_triangulation()) != nullptr),
-      ExcMessage(
-        "This functionality requires a parallel::distributed::Triangulation object."));
+    // the implementation below requires a p:d:T currently
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &this->get_triangulation()) != nullptr),
+           ExcNotImplemented());
 
     // Finite elements need to be assigned to each cell by calling
     // distribute_dofs() first to make this functionality available.
