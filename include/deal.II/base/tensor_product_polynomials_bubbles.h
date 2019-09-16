@@ -285,8 +285,8 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
 {
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
-  const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
-  Assert(i < max_q_indices + n_bubbles, ExcInternalError());
+  Assert(i < max_q_indices + /* n_bubbles= */ ((q_degree <= 1) ? 1 : dim),
+         ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
