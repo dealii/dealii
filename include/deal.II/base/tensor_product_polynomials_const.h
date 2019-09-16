@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Timo Heister, 2012
  */
 template <int dim>
-class TensorProductPolynomialsConst
+class TensorProductPolynomialsConst : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -178,6 +178,19 @@ public:
   unsigned int
   n() const;
 
+  /**
+   * Return the name of the space, which is
+   * <tt>TensorProductPolynomialsConst</tt>.
+   */
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
+
 private:
   /**
    * The TensorProductPolynomials object
@@ -206,7 +219,8 @@ template <int dim>
 template <class Pol>
 inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
   const std::vector<Pol> &pols)
-  : tensor_polys(pols)
+  : ScalarPolynomialsBase<dim>(1, Utilities::fixed_power<dim>(pols.size()) + 1)
+  , tensor_polys(pols)
   , index_map(tensor_polys.n() + 1)
   , index_map_inverse(tensor_polys.n() + 1)
 {}

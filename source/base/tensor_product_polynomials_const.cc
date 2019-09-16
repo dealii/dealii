@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -194,6 +195,15 @@ TensorProductPolynomialsConst<dim>::evaluate(
     third_derivatives.emplace_back();
   if (do_4th_derivatives)
     fourth_derivatives.emplace_back();
+}
+
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+TensorProductPolynomialsConst<dim>::clone() const
+{
+  return std_cxx14::make_unique<TensorProductPolynomialsConst<dim>>(*this);
 }
 
 
