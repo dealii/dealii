@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials_bubbles.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,7 +71,6 @@ TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
-  (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
@@ -110,7 +110,6 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
-  (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
@@ -158,7 +157,6 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
-  (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
@@ -266,8 +264,7 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
 {
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
-  (void)max_q_indices;
-  const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);
+  const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   Assert(values.size() == max_q_indices + n_bubbles || values.size() == 0,
          ExcDimensionMismatch2(values.size(), max_q_indices + n_bubbles, 0));
   Assert(grads.size() == max_q_indices + n_bubbles || grads.size() == 0,
@@ -330,6 +327,15 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
       if (do_4th_derivatives)
         fourth_derivatives.push_back(compute_derivative<4>(i, p));
     }
+}
+
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+TensorProductPolynomialsBubbles<dim>::clone() const
+{
+  return std_cxx14::make_unique<TensorProductPolynomialsBubbles<dim>>(*this);
 }
 
 

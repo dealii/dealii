@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
@@ -65,7 +66,7 @@ class TensorProductPolynomialsBubbles;
  * 2003
  */
 template <int dim, typename PolynomialType = Polynomials::Polynomial<double>>
-class TensorProductPolynomials
+class TensorProductPolynomials : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -126,7 +127,7 @@ public:
            std::vector<Tensor<1, dim>> &grads,
            std::vector<Tensor<2, dim>> &grad_grads,
            std::vector<Tensor<3, dim>> &third_derivatives,
-           std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -192,23 +193,22 @@ public:
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
 
   /**
-   * Return the number of tensor product polynomials. For <i>n</i> 1d
-   * polynomials this is <i>n<sup>dim</sup></i>.
+   * Return the name of the space, which is <tt>TensorProductPolynomials</tt>.
    */
-  unsigned int
-  n() const;
+  std::string
+  name() const override;
 
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
 
 protected:
   /**
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
   std::vector<PolynomialType> polynomials;
-
-  /**
-   * Number of tensor product polynomials. See n().
-   */
-  unsigned int n_tensor_pols;
 
   /**
    * Index map for reordering the polynomials.
@@ -268,7 +268,7 @@ protected:
  * @author Wolfgang Bangerth 2003
  */
 template <int dim>
-class AnisotropicPolynomials
+class AnisotropicPolynomials : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -282,6 +282,9 @@ public:
    * Since we want to build <i>anisotropic</i> polynomials, the @p dim
    * sets of polynomials passed in as arguments may of course be
    * different, and may also vary in number.
+   *
+   * The number of tensor product polynomials is <tt>Nx*Ny*Nz</tt>, or with
+   * terms dropped if the number of space dimensions is less than 3.
    */
   AnisotropicPolynomials(
     const std::vector<std::vector<Polynomials::Polynomial<double>>>
@@ -292,7 +295,7 @@ public:
    * product polynomial at <tt>unit_point</tt>.
    *
    * The size of the vectors must either be equal <tt>0</tt> or equal
-   * <tt>n_tensor_pols</tt>.  In the first case, the function will not compute
+   * <tt>this->n()</tt>.  In the first case, the function will not compute
    * these values.
    *
    * If you need values or derivatives of all tensor product polynomials then
@@ -301,12 +304,12 @@ public:
    * in a loop over all tensor product polynomials.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<double> &        values,
-          std::vector<Tensor<1, dim>> &grads,
-          std::vector<Tensor<2, dim>> &grad_grads,
-          std::vector<Tensor<3, dim>> &third_derivatives,
-          std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -317,7 +320,7 @@ public:
    * polynomials is not efficient, because then each point value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>values.size()==n_tensor_pols</tt> to get the point values of all
+   * with <tt>values.size()==this->n()</tt> to get the point values of all
    * tensor polynomials all at once and in a much more efficient way.
    */
   double
@@ -350,7 +353,7 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>grads.size()==n_tensor_pols</tt> to get the point value of all
+   * with <tt>grads.size()==this->n()</tt> to get the point value of all
    * tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
@@ -365,30 +368,29 @@ public:
    * polynomials is not efficient, because then each derivative value of the
    * underlying (one-dimensional) polynomials is (unnecessarily) computed
    * several times.  Instead use the <tt>compute</tt> function, see above,
-   * with <tt>grad_grads.size()==n_tensor_pols</tt> to get the point value of
+   * with <tt>grad_grads.size()==this->n()</tt> to get the point value of
    * all tensor polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
 
   /**
-   * Return the number of tensor product polynomials. It is the product of
-   * the number of polynomials in each coordinate direction.
+   * Return the name of the space, which is <tt>AnisotropicPolynomials</tt>.
    */
-  unsigned int
-  n() const;
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
 
 private:
   /**
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
   const std::vector<std::vector<Polynomials::Polynomial<double>>> polynomials;
-
-  /**
-   * Number of tensor product polynomials. This is <tt>Nx*Ny*Nz</tt>, or with
-   * terms dropped if the number of space dimensions is less than 3.
-   */
-  const unsigned int n_tensor_pols;
 
   /**
    * Each tensor product polynomial @þ{i} is a product of one-dimensional
@@ -400,7 +402,7 @@ private:
   compute_index(const unsigned int i, unsigned int (&indices)[dim]) const;
 
   /**
-   * Given the input to the constructor, compute <tt>n_tensor_pols</tt>.
+   * Given the input to the constructor, compute <tt>n_pols</tt>.
    */
   static unsigned int
   get_n_tensor_pols(
@@ -419,32 +421,19 @@ template <int dim, typename PolynomialType>
 template <class Pol>
 inline TensorProductPolynomials<dim, PolynomialType>::TensorProductPolynomials(
   const std::vector<Pol> &pols)
-  : polynomials(pols.begin(), pols.end())
-  , n_tensor_pols(Utilities::fixed_power<dim>(pols.size()))
-  , index_map(n_tensor_pols)
-  , index_map_inverse(n_tensor_pols)
+  : ScalarPolynomialsBase<dim>(1, Utilities::fixed_power<dim>(pols.size()))
+  , polynomials(pols.begin(), pols.end())
+  , index_map(this->n())
+  , index_map_inverse(this->n())
 {
   // per default set this index map to identity. This map can be changed by
   // the user through the set_numbering() function
-  for (unsigned int i = 0; i < n_tensor_pols; ++i)
+  for (unsigned int i = 0; i < this->n(); ++i)
     {
       index_map[i]         = i;
       index_map_inverse[i] = i;
     }
 }
-
-
-
-template <int dim, typename PolynomialType>
-inline unsigned int
-TensorProductPolynomials<dim, PolynomialType>::n() const
-{
-  if (dim == 0)
-    return numbers::invalid_unsigned_int;
-  else
-    return n_tensor_pols;
-}
-
 
 
 template <int dim, typename PolynomialType>
@@ -461,6 +450,15 @@ TensorProductPolynomials<dim, PolynomialType>::get_numbering_inverse() const
 {
   return index_map_inverse;
 }
+
+
+template <int dim, typename PolynomialType>
+inline std::string
+TensorProductPolynomials<dim, PolynomialType>::name() const
+{
+  return "TensorProductPolynomials";
+}
+
 
 template <int dim, typename PolynomialType>
 template <int order>
@@ -707,6 +705,14 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
           return derivative;
         }
     }
+}
+
+
+template <int dim>
+inline std::string
+AnisotropicPolynomials<dim>::name() const
+{
+  return "AnisotropicPolynomials";
 }
 
 
