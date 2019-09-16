@@ -24,22 +24,60 @@ DEAL_II_NAMESPACE_OPEN
 /* ------------------- TensorProductPolynomialsBubbles -------------- */
 
 
+
+template <int dim>
+void
+TensorProductPolynomialsBubbles<dim>::output_indices(std::ostream &out) const
+{
+  unsigned int ix[dim];
+  for (unsigned int i = 0; i < tensor_polys.n(); ++i)
+    {
+      tensor_polys.compute_index(i, ix);
+      out << i << "\t";
+      for (unsigned int d = 0; d < dim; ++d)
+        out << ix[d] << " ";
+      out << std::endl;
+    }
+}
+
+
+
+template <int dim>
+void
+TensorProductPolynomialsBubbles<dim>::set_numbering(
+  const std::vector<unsigned int> &renumber)
+{
+  Assert(renumber.size() == index_map.size(),
+         ExcDimensionMismatch(renumber.size(), index_map.size()));
+
+  index_map = renumber;
+  for (unsigned int i = 0; i < index_map.size(); ++i)
+    index_map_inverse[index_map[i]] = i;
+
+  std::vector<unsigned int> renumber_base;
+  for (unsigned int i = 0; i < tensor_polys.n(); ++i)
+    renumber_base.push_back(renumber[i]);
+
+  tensor_polys.set_numbering(renumber_base);
+}
+
+
 template <int dim>
 double
 TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
                                                     const Point<dim> & p) const
 {
-  const unsigned int q_degree      = this->polynomials.size() - 1;
-  const unsigned int max_q_indices = this->n_tensor_pols;
+  const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
+  const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
-    return this->TensorProductPolynomials<dim>::compute_value(i, p);
+    return tensor_polys.compute_value(i, p);
 
-  const unsigned int comp = i - this->n_tensor_pols;
+  const unsigned int comp = i - tensor_polys.n();
 
   // compute \prod_{i=1}^d 4*(1-x_i^2)(p)
   double value = 1.;
@@ -63,22 +101,23 @@ TensorProductPolynomialsBubbles<0>::compute_value(const unsigned int,
 }
 
 
+
 template <int dim>
 Tensor<1, dim>
 TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
                                                    const Point<dim> & p) const
 {
-  const unsigned int q_degree      = this->polynomials.size() - 1;
-  const unsigned int max_q_indices = this->n_tensor_pols;
+  const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
+  const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
-    return this->TensorProductPolynomials<dim>::compute_grad(i, p);
+    return tensor_polys.compute_grad(i, p);
 
-  const unsigned int comp = i - this->n_tensor_pols;
+  const unsigned int comp = i - tensor_polys.n();
   Tensor<1, dim>     grad;
 
   for (unsigned int d = 0; d < dim; ++d)
@@ -116,17 +155,17 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  const unsigned int q_degree      = this->polynomials.size() - 1;
-  const unsigned int max_q_indices = this->n_tensor_pols;
+  const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
+  const unsigned int max_q_indices = tensor_polys.n();
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
   Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
-    return this->TensorProductPolynomials<dim>::compute_grad_grad(i, p);
+    return tensor_polys.compute_grad_grad(i, p);
 
-  const unsigned int comp = i - this->n_tensor_pols;
+  const unsigned int comp = i - tensor_polys.n();
 
   double v[dim + 1][3];
   {
@@ -213,6 +252,8 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
   return grad_grad;
 }
 
+
+
 template <int dim>
 void
 TensorProductPolynomialsBubbles<dim>::evaluate(
@@ -223,8 +264,8 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  const unsigned int q_degree      = this->polynomials.size() - 1;
-  const unsigned int max_q_indices = this->n_tensor_pols;
+  const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
+  const unsigned int max_q_indices = tensor_polys.n();
   (void)max_q_indices;
   const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);
   Assert(values.size() == max_q_indices + n_bubbles || values.size() == 0,
@@ -249,36 +290,34 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
   bool do_3rd_derivatives = false, do_4th_derivatives = false;
   if (values.empty() == false)
     {
-      values.resize(this->n_tensor_pols);
+      values.resize(tensor_polys.n());
       do_values = true;
     }
   if (grads.empty() == false)
     {
-      grads.resize(this->n_tensor_pols);
+      grads.resize(tensor_polys.n());
       do_grads = true;
     }
   if (grad_grads.empty() == false)
     {
-      grad_grads.resize(this->n_tensor_pols);
+      grad_grads.resize(tensor_polys.n());
       do_grad_grads = true;
     }
   if (third_derivatives.empty() == false)
     {
-      third_derivatives.resize(this->n_tensor_pols);
+      third_derivatives.resize(tensor_polys.n());
       do_3rd_derivatives = true;
     }
   if (fourth_derivatives.empty() == false)
     {
-      fourth_derivatives.resize(this->n_tensor_pols);
+      fourth_derivatives.resize(tensor_polys.n());
       do_4th_derivatives = true;
     }
 
-  this->TensorProductPolynomials<dim>::evaluate(
+  tensor_polys.evaluate(
     p, values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
-  for (unsigned int i = this->n_tensor_pols;
-       i < this->n_tensor_pols + n_bubbles;
-       ++i)
+  for (unsigned int i = tensor_polys.n(); i < tensor_polys.n() + n_bubbles; ++i)
     {
       if (do_values)
         values.push_back(compute_value(i, p));

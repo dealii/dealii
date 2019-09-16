@@ -29,6 +29,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <int dim>
+class TensorProductPolynomialsBubbles;
+
 /**
  * @addtogroup Polynomials
  * @{
@@ -227,6 +230,12 @@ protected:
   void
   compute_index(const unsigned int i,
                 unsigned int (&indices)[(dim > 0 ? dim : 1)]) const;
+
+  /**
+   * TensorProductPolynomialsBubbles has a TensorProductPolynomials class
+   * so we declare it as a friend class.
+   */
+  friend class TensorProductPolynomialsBubbles<dim>;
 };
 
 
