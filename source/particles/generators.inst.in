@@ -30,6 +30,27 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
+        template Particle<deal_II_dimension, deal_II_space_dimension>
+        random_particle_in_cell(
+          const typename Triangulation<
+            deal_II_dimension,
+            deal_II_space_dimension>::active_cell_iterator &cell,
+          const types::particle_index                       id,
+          std::mt19937 &random_number_generator,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
+        template void
+        probabilistic_locations<deal_II_dimension, deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension>
+            &                                      triangulation,
+          const Function<deal_II_space_dimension> &probability_density_function,
+          const bool                               random_cell_selection,
+          const types::particle_index              n_particles_to_create,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const unsigned int random_number_seed);
       \}
     \}
 #endif
