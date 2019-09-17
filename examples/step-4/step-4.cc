@@ -102,11 +102,11 @@ private:
 // Function, which declares the common interface which all functions have to
 // follow. In particular, concrete classes have to overload the
 // <code>value</code> function, which takes a point in dim-dimensional space
-// as parameters and shall return the value at that point as a
+// as parameters and returns the value at that point as a
 // <code>double</code> variable.
 //
 // The <code>value</code> function takes a second argument, which we have here
-// named <code>component</code>: This is only meant for vector valued
+// named <code>component</code>: This is only meant for vector-valued
 // functions, where you may want to access a certain component of the vector
 // at the point <code>p</code>. However, our functions are scalar, so we need
 // not worry about this parameter and we will not use it in the implementation
@@ -119,25 +119,15 @@ private:
 //
 // Function objects are used in lots of places in the library (for example, in
 // step-2 we used a Functions::ZeroFunction instance as an argument to
-// VectorTools::interpolate_boundary_values) and this is the first step where
-// we define a new class that inherits from Function. Since we only ever call
-// Function::value, we could get away with just a plain function (and this is
-// what is done in step-5), but since this is a tutorial we inherit from
+// VectorTools::interpolate_boundary_values) and this is the first tutorial
+// where we define a new class that inherits from Function. Since we only ever
+// call Function::value(), we could get away with just a plain function (and
+// this is what is done in step-5), but since this is a tutorial we inherit from
 // Function for the sake of example.
-//
-// Unfortunately, we have to explicitly provide a default constructor for this
-// class (even though we do not need the constructor to do anything unusual)
-// to satisfy a strict reading of the C++ language standard. Some compilers
-// (like GCC from version 4.3 onwards) do not require this, but we provide the
-// default constructor so that all supported compilers are happy.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide()
-    : Function<dim>()
-  {}
-
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
@@ -148,17 +138,37 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues()
-    : Function<dim>()
-  {}
-
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
 
-
-
-// For this example, we choose as right hand side the function
+// If you are not familiar with what the keywords `virtual` and `override` in
+// the function declarations above mean, you will probably want to take a look
+// at your favorite C++ book or an online tutorial such as
+// http://www.cplusplus.com/doc/tutorial/polymorphism/ . In essence, what is
+// happening here is that Function<dim> is an "abstract" base class that
+// declares a certain "interface" -- a set of functions one can call on
+// objects of this kind. But it does not actually *implement* these functions:
+// it just says "this is how Function objects look like", but what kind of
+// function it actually is, is left to derived classes that implement
+// the `value()` function.
+//
+// Deriving one class from another is often called an "is-a" relationship
+// function. Here, the `RightHandSide` class "is a" Function class
+// because it implements the interface described by the Function base class.
+// (The actual implementation of the `value()` function is in the code block
+// below.) The `virtual` keyword then means "Yes, the
+// function here is one that can be overridden by derived classes",
+// and the `override` keyword means "Yes, this is in fact a function we know
+// has been declared as part of the base class". The `override` keyword is not
+// strictly necessary, but is an insurance against typos: If we get the name
+// of the function or the type of one argument wrong, the compiler will warn
+// us by stating "You say that this function overrides one in a base class,
+// but I don't actually know any such function with this name and these
+// arguments."
+//
+// But back to the concrete case here:
+// For this tutorial, we choose as right hand side the function
 // $4(x^4+y^4)$ in 2D, or $4(x^4+y^4+z^4)$ in 3D. We could write this
 // distinction using an if-statement on the space dimension, but here is a
 // simple way that also allows us to use the same function in 1D (or in 4D, if
