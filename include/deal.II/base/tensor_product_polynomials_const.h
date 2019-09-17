@@ -252,6 +252,13 @@ TensorProductPolynomialsConst<dim>::get_numbering_inverse() const
 }
 
 
+template <int dim>
+inline std::string
+TensorProductPolynomialsConst<dim>::name() const
+{
+  return "TensorProductPolynomialsConst";
+}
+
 
 template <>
 inline unsigned int
@@ -259,6 +266,7 @@ TensorProductPolynomialsConst<0>::n() const
 {
   return numbers::invalid_unsigned_int;
 }
+
 
 template <int dim>
 template <int order>
