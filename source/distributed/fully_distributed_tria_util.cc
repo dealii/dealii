@@ -156,7 +156,7 @@ namespace parallel
         // (also taking into account periodicity)
         auto add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells =
           [](TriaIterator<CellAccessor<dim, spacedim>> &cell,
-             std::set<unsigned int> &vertices_owned_by_locally_owned_cells) {
+             std::vector<bool> &vertices_owned_by_locally_owned_cells) {
             // add vertices belonging to a periodic neighbor
             for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
               if (cell->has_periodic_neighbor(f))
@@ -168,18 +168,18 @@ namespace parallel
                        v < GeometryInfo<dim>::vertices_per_face;
                        ++v)
                     {
-                      vertices_owned_by_locally_owned_cells.insert(
-                        face_t->vertex_index(v));
-                      vertices_owned_by_locally_owned_cells.insert(
-                        face_n->vertex_index(v));
+                      vertices_owned_by_locally_owned_cells
+                        [face_t->vertex_index(v)] = true;
+                      vertices_owned_by_locally_owned_cells
+                        [face_n->vertex_index(v)] = true;
                     }
                 }
 
             // add local vertices
             for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                  ++v)
-              vertices_owned_by_locally_owned_cells.insert(
-                cell->vertex_index(v));
+              vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
+                true;
           };
 
         // check if multilevel hierarchy should be constructed
@@ -194,7 +194,8 @@ namespace parallel
               fullydistributed::Settings::default_setting;
 
             // 1) collect vertices of active locally owned cells
-            std::set<unsigned int> vertices_owned_by_locally_owned_cells;
+            std::vector<bool> vertices_owned_by_locally_owned_cells(
+              tria.n_vertices());
             for (auto cell : tria.cell_iterators())
               if (cell->active() && cell->subdomain_id() == my_rank)
                 add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
@@ -208,9 +209,8 @@ namespace parallel
                 for (unsigned int v = 0;
                      v < GeometryInfo<dim>::vertices_per_cell;
                      ++v)
-                  if (vertices_owned_by_locally_owned_cells.find(
-                        cell->vertex_index(v)) !=
-                      vertices_owned_by_locally_owned_cells.end())
+                  if (vertices_owned_by_locally_owned_cells[cell->vertex_index(
+                        v)])
                     return true;
                 return false;
               };
@@ -336,7 +336,8 @@ namespace parallel
               {
                 // collect vertices connected to a (on any level) locally owned
                 // cell
-                std::set<unsigned int> vertices_owned_by_locally_owned_cells;
+                std::vector<bool> vertices_owned_by_locally_owned_cells(
+                  tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
                       (cell->active() && cell->subdomain_id() == my_rank))
@@ -351,9 +352,8 @@ namespace parallel
                     for (unsigned int v = 0;
                          v < GeometryInfo<dim>::vertices_per_cell;
                          ++v)
-                      if (vertices_owned_by_locally_owned_cells.find(
-                            cell->vertex_index(v)) !=
-                          vertices_owned_by_locally_owned_cells.end())
+                      if (vertices_owned_by_locally_owned_cells
+                            [cell->vertex_index(v)])
                         return true;
                     return false;
                   };
@@ -424,7 +424,8 @@ namespace parallel
                  ++level)
               {
                 // collect local vertices on level
-                std::set<unsigned int> vertices_owned_by_locally_owned_cells;
+                std::vector<bool> vertices_owned_by_locally_owned_cells(
+                  tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
                       (cell->active() && cell->subdomain_id() == my_rank))
@@ -437,9 +438,8 @@ namespace parallel
                     for (unsigned int v = 0;
                          v < GeometryInfo<dim>::vertices_per_cell;
                          ++v)
-                      if (vertices_owned_by_locally_owned_cells.find(
-                            cell->vertex_index(v)) !=
-                          vertices_owned_by_locally_owned_cells.end())
+                      if (vertices_owned_by_locally_owned_cells
+                            [cell->vertex_index(v)])
                         return true;
                     return false;
                   };
