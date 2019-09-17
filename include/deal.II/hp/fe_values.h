@@ -241,12 +241,6 @@ namespace hp
 
     /**
      * Constructor. Initialize this object with the given parameters.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the DoFHandler::get_fe() function.
      */
     FEValues(
       const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
@@ -259,12 +253,6 @@ namespace hp
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the DoFHandler::get_fe() function.
      */
     FEValues(const hp::FECollection<dim, spacedim> &fe_collection,
              const hp::QCollection<dim> &           q_collection,
@@ -377,12 +365,6 @@ namespace hp
   public:
     /**
      * Constructor. Initialize this object with the given parameters.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
      */
     FEFaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
                  const hp::FECollection<dim, spacedim> &     fe_collection,
@@ -394,12 +376,6 @@ namespace hp
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
      */
     FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                  const hp::QCollection<dim - 1> &       q_collection,
@@ -497,12 +473,6 @@ namespace hp
   public:
     /**
      * Constructor. Initialize this object with the given parameters.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
      */
     FESubfaceValues(
       const hp::MappingCollection<dim, spacedim> &mapping_collection,
@@ -515,12 +485,6 @@ namespace hp
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
-     *
-     * The finite element collection parameter is actually ignored, but is in
-     * the signature of this function to make it compatible with the signature
-     * of the respective constructor of the usual FEValues object, with the
-     * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
      */
     FESubfaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                     const hp::QCollection<dim - 1> &       q_collection,
