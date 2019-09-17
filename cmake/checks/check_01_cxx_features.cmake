@@ -733,12 +733,14 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
+  #define Assert(x,y) if (!(x)) throw y;
   void bar()
   {}
 
   constexpr int
   foo(const int n)
   {
+    Assert(n>0, \"hello\");
     if(!(n >= 0))
       bar();
     return n;
