@@ -157,7 +157,7 @@ namespace Particles
 
 
 
-    template <int dim, int spacedim = dim>
+    template <int dim, int spacedim>
     Particle<dim, spacedim>
     random_particle_in_cell(
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
