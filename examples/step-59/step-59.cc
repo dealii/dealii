@@ -98,10 +98,6 @@ namespace Step59
   class Solution : public Function<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int = 0) const override final
     {
@@ -135,10 +131,6 @@ namespace Step59
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int = 0) const override final
     {

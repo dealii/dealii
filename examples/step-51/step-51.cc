@@ -83,7 +83,7 @@
 
 
 
-// We start by putting the class into its own namespace.
+// We start by putting all of our classes into their own namespace.
 namespace Step51
 {
   using namespace dealii;
@@ -130,10 +130,6 @@ namespace Step51
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int /*component*/ = 0) const override
     {
@@ -243,10 +239,6 @@ namespace Step51
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int /*component*/ = 0) const override
     {
