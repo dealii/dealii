@@ -86,11 +86,11 @@ class BlockIndices;
  *     void reinit(const CellIt& c);
  *
  *     template <class CellIt, class FaceIt>
- *     void reinit(const CellIt& c, const FaceIt& f, unsigned int n);
+ *     void reinit(const CellIt& c, const FaceIt& f, const unsigned int n);
  *
  *     template <class CellIt, class FaceIt>
- *     void reinit(const CellIt& c, const FaceIt& f, unsigned int n,
- *     unsigned int s);
+ *     void reinit(const CellIt& c, const FaceIt& f, const unsigned int n,
+ *                 const unsigned int s);
  *
  *   friend template class DoFInfoBox<int dim, DOFINFO>;
  * };
@@ -183,28 +183,40 @@ namespace MeshWorker
   /**
    * The class providing the scrapbook to fill with results of local
    * integration. Depending on the task the mesh worker loop is performing,
-   * local results can be of different types. They have in common that they
-   * are the result of local integration over a cell or face. Their actual
-   * type is determined by the Assembler using them. It is also the assembler
-   * setting the arrays of local results to the sizes needed. Here is a list
-   * of the provided data types and the assemblers using them:
+   * local results can be of different types: They can be scalars, vectors
+   * of size equal to the number of degrees of freedom used in the integrals,
+   * or square matrices of that same size. All of these have in common that they
+   * are the result of local integration over a cell or face. Which kind of
+   * object is the result of an operation is determined by the Assembler using
+   * them. It is also the assembler that determines <i>how many</i> of each
+   * kind of object are produced (for example, an assembler may create
+   * both the local contributions to a mass and a stiffness matrix), and for
+   * setting the arrays of local results to the sizes needed.
+   *
+   * The interface of this class allows accessing all of this information
+   * via the following functions:
    *
    * <ol>
-   * <li> n_values() numbers accessed with value(), and stored in the data
-   * member #J.
+   * <li> Scalars: n_values() returns the number of scalars stored by
+   * an object of this class, and they are accessed via the value() function.
    *
-   * <li> n_vectors() vectors of the length of dofs on this cell, accessed by
-   * vector(), and stored in #R.
-   * <li> n_matrices() matrices of dimension dofs per cell in each direction,
+   * <li> Vectors: n_vectors() returns the number of vectors stored by
+   * an object of this class (each vector has length equal to the number of
+   * degrees of freedom on this cell on which the integration happens).
+   * The vectors are accessed by the vector() function.
+   *
+   * <li> Matrices: n_matrices() returns the number of matrices stored,
+   * each of which is a square matrix of dimension equal to the number of
+   * degrees of freedom per cell. The matrices are
    * accessed by matrix() with second argument <tt>false</tt>. These are
-   * stored in #M1, and they are the matrices coupling degrees of freedom in
-   * the same cell. For fluxes across faces, there is an additional set #M2 of
-   * matrices of the same size, but the dimension of the matrices being
+   * matrices coupling degrees of freedom in
+   * the same cell. For fluxes across faces, there is an additional set of
+   * matrices of the same size, with the dimension of these matrices being
    * according to the degrees of freedom on both cells. These are accessed
    * with matrix(), using the second argument <tt>true</tt>.
    * </ol>
    *
-   * The local matrices initialized by reinit() of the @p info object and then
+   * The local matrices are initialized by reinit() of the @p info object and then
    * assembled into the global system by Assembler classes.
    *
    * @ingroup MeshWorker
@@ -215,16 +227,15 @@ namespace MeshWorker
   {
   public:
     /**
-     * The number of scalar values.
+     * The number of scalar values stored by the current object.
      *
      * This number is set to a nonzero value by Assembler::CellsAndFaces
-     *
      */
     unsigned int
     n_values() const;
 
     /**
-     * The number of vectors.
+     * The number of vectors stored by the current object.
      *
      * This number is set to a nonzero value by Assembler::ResidualSimple and
      * Assembler::ResidualLocalBlocksToGlobalBlocks.
@@ -233,7 +244,7 @@ namespace MeshWorker
     n_vectors() const;
 
     /**
-     * The number of matrices.
+     * The number of matrices stored by the current object.
      */
     unsigned int
     n_matrices() const;
@@ -251,44 +262,46 @@ namespace MeshWorker
     n_quadrature_values() const;
 
     /**
-     * Access scalar value at index @p i.
+     * Read-write access to the `i`th scalar stored by this class.
      */
     number &
-    value(unsigned int i);
+    value(const unsigned int i);
 
     /**
-     * Read scalar value at index @p i.
+     * Read access to the `i`th scalar stored by this class.
      */
     number
-    value(unsigned int i) const;
+    value(const unsigned int i) const;
 
     /**
-     * Access vector at index @p i.
+     * Read-write access to the `i`th vector stored by this class
      */
     BlockVector<number> &
-    vector(unsigned int i);
+    vector(const unsigned int i);
 
     /**
-     * Read vector at index @p i.
+     * Read-write access to the `i`th vector stored by this class
      */
     const BlockVector<number> &
-    vector(unsigned int i) const;
+    vector(const unsigned int i) const;
 
     /**
-     * Access matrix at index @p i. For results on internal faces, a true
-     * value for @p external refers to the flux between cells, while false
-     * refers to entries coupling inside the cell.
+     * Read-write access to the `i`th matrix stored by this class.
+     *
+     * For an explanation of the second argument, see the documentation
+     * of the current class itself.
      */
     MatrixBlock<FullMatrix<number>> &
-    matrix(unsigned int i, bool external = false);
+    matrix(const unsigned int i, const bool external = false);
 
     /**
-     * Read matrix at index @p i. For results on internal faces, a true value
-     * for @p external refers to the flux between cells, while false refers to
-     * entries coupling inside the cell.
+     * Read access to the `i`th matrix stored by this class.
+     *
+     * For an explanation of the second argument, see the documentation
+     * of the current class itself.
      */
     const MatrixBlock<FullMatrix<number>> &
-    matrix(unsigned int i, bool external = false) const;
+    matrix(const unsigned int i, const bool external = false) const;
 
     /**
      * Access to the vector #quadrature_data of data in quadrature points,
@@ -302,13 +315,13 @@ namespace MeshWorker
      * Access the <i>i</i>th value at quadrature point <i>k</i>
      */
     number &
-    quadrature_value(unsigned int k, unsigned int i);
+    quadrature_value(const unsigned int k, const unsigned int i);
 
     /**
      * Read the <i>i</i>th value at quadrature point <i>k</i>
      */
     number
-    quadrature_value(unsigned int k, unsigned int i) const;
+    quadrature_value(const unsigned int k, const unsigned int i) const;
 
     /**
      * Initialize the vector with scalar values.
@@ -334,7 +347,7 @@ namespace MeshWorker
      * @note This function is usually only called by the assembler.
      */
     void
-    initialize_matrices(unsigned int n, bool both);
+    initialize_matrices(const unsigned int n, bool both);
 
     /**
      * Allocate a local matrix for each of the global ones in @p matrices.
@@ -365,7 +378,7 @@ namespace MeshWorker
      * quadrature points.
      */
     void
-    initialize_quadrature(unsigned int np, unsigned int nv);
+    initialize_quadrature(const unsigned int np, const unsigned int nv);
 
     /**
      * Reinitialize matrices for new cell. Does not resize any of the data
@@ -421,7 +434,7 @@ namespace MeshWorker
 
   template <typename number>
   inline void
-  LocalResults<number>::initialize_numbers(unsigned int n)
+  LocalResults<number>::initialize_numbers(const unsigned int n)
   {
     J.resize(n);
   }
@@ -511,7 +524,8 @@ namespace MeshWorker
 
   template <typename number>
   inline void
-  LocalResults<number>::initialize_quadrature(unsigned int np, unsigned int nv)
+  LocalResults<number>::initialize_quadrature(const unsigned int np,
+                                              const unsigned int nv)
   {
     quadrature_data.reinit(np, nv);
   }
@@ -559,7 +573,7 @@ namespace MeshWorker
 
   template <typename number>
   inline number &
-  LocalResults<number>::value(unsigned int i)
+  LocalResults<number>::value(const unsigned int i)
   {
     AssertIndexRange(i, J.size());
     return J[i];
@@ -568,7 +582,7 @@ namespace MeshWorker
 
   template <typename number>
   inline BlockVector<number> &
-  LocalResults<number>::vector(unsigned int i)
+  LocalResults<number>::vector(const unsigned int i)
   {
     AssertIndexRange(i, R.size());
     return R[i];
@@ -577,7 +591,7 @@ namespace MeshWorker
 
   template <typename number>
   inline MatrixBlock<FullMatrix<number>> &
-  LocalResults<number>::matrix(unsigned int i, bool external)
+  LocalResults<number>::matrix(const unsigned int i, const bool external)
   {
     if (external)
       {
@@ -591,7 +605,8 @@ namespace MeshWorker
 
   template <typename number>
   inline number &
-  LocalResults<number>::quadrature_value(unsigned int k, unsigned int i)
+  LocalResults<number>::quadrature_value(const unsigned int k,
+                                         const unsigned int i)
   {
     return quadrature_data(k, i);
   }
@@ -607,7 +622,7 @@ namespace MeshWorker
 
   template <typename number>
   inline number
-  LocalResults<number>::value(unsigned int i) const
+  LocalResults<number>::value(const unsigned int i) const
   {
     AssertIndexRange(i, J.size());
     return J[i];
@@ -616,7 +631,7 @@ namespace MeshWorker
 
   template <typename number>
   inline const BlockVector<number> &
-  LocalResults<number>::vector(unsigned int i) const
+  LocalResults<number>::vector(const unsigned int i) const
   {
     AssertIndexRange(i, R.size());
     return R[i];
@@ -625,7 +640,7 @@ namespace MeshWorker
 
   template <typename number>
   inline const MatrixBlock<FullMatrix<number>> &
-  LocalResults<number>::matrix(unsigned int i, bool external) const
+  LocalResults<number>::matrix(const unsigned int i, const bool external) const
   {
     if (external)
       {
@@ -639,7 +654,8 @@ namespace MeshWorker
 
   template <typename number>
   inline number
-  LocalResults<number>::quadrature_value(unsigned int k, unsigned int i) const
+  LocalResults<number>::quadrature_value(const unsigned int k,
+                                         const unsigned int i) const
   {
     return quadrature_data(k, i);
   }
