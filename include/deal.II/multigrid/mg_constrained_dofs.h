@@ -104,6 +104,24 @@ public:
     const ComponentMask &               component_mask = ComponentMask());
 
   /**
+   * Add user defined constraints to be used on level @p level.
+   *
+   * The user can call this function multiple times and any new,
+   * conflicting constraints will overwrite the previous constraints
+   * for that DoF.
+   *
+   * Before the transfer, the user defined constraints will be distributed
+   * to the source vector, and then any DoF index set using
+   * make_zero_boundary_constraints() will be overwritten with
+   * value zero.
+   *
+   * @note This is currently only implemented for MGTransferMatrixFree.
+   */
+  void
+  add_user_constraints(const unsigned int               level,
+                       const AffineConstraints<double> &constraints_on_level);
+
+  /**
    * Fill the internal data structures with information
    * about no normal flux boundary dofs.
    *
@@ -196,6 +214,16 @@ public:
   const AffineConstraints<double> &
   get_level_constraint_matrix(const unsigned int level) const;
 
+  /**
+   * Return the user defined constraint matrix for a given level. These
+   * constraints are set using the function add_user_constraints() and
+   * should not contain constraints for DoF indices set in
+   * make_zero_boundary_constraints() as they will be overwritten during
+   * the transfer.
+   */
+  const AffineConstraints<double> &
+  get_user_constraint_matrix(const unsigned int level) const;
+
 private:
   /**
    * The indices of boundary dofs for each level.
@@ -213,6 +241,11 @@ private:
    * periodic boundary conditions for each level .
    */
   std::vector<AffineConstraints<double>> level_constraints;
+
+  /**
+   * Constraint matrices defined by user.
+   */
+  std::vector<AffineConstraints<double>> user_constraints;
 };
 
 
@@ -223,12 +256,14 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
   boundary_indices.clear();
   refinement_edge_indices.clear();
   level_constraints.clear();
+  user_constraints.clear();
 
   const unsigned int nlevels = dof.get_triangulation().n_global_levels();
 
   // At this point level_constraint and refinement_edge_indices are empty.
-  level_constraints.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
+  level_constraints.resize(nlevels);
+  user_constraints.resize(nlevels);
   for (unsigned int l = 0; l < nlevels; ++l)
     {
       IndexSet relevant_dofs;
@@ -400,10 +435,30 @@ MGConstrainedDoFs::make_no_normal_flux_constraints(
 
 
 inline void
+MGConstrainedDoFs::add_user_constraints(
+  const unsigned int               level,
+  const AffineConstraints<double> &constraints_on_level)
+{
+  AssertIndexRange(level, user_constraints.size());
+
+  // Get the relevant DoFs from level_constraints if
+  // the user constraint matrix has not been initialized
+  if (user_constraints[level].get_local_lines().size() == 0)
+    user_constraints[level].reinit(level_constraints[level].get_local_lines());
+
+  user_constraints[level].merge(
+    constraints_on_level,
+    AffineConstraints<double>::MergeConflictBehavior::right_object_wins);
+  user_constraints[level].close();
+}
+
+
+inline void
 MGConstrainedDoFs::clear()
 {
   boundary_indices.clear();
   refinement_edge_indices.clear();
+  user_constraints.clear();
 }
 
 
@@ -483,6 +538,15 @@ inline const AffineConstraints<double> &
 MGConstrainedDoFs::get_level_constraint_matrix(const unsigned int level) const
 {
   return get_level_constraints(level);
+}
+
+
+
+inline const AffineConstraints<double> &
+MGConstrainedDoFs::get_user_constraint_matrix(const unsigned int level) const
+{
+  AssertIndexRange(level, user_constraints.size());
+  return user_constraints[level];
 }
 
 

@@ -329,6 +329,10 @@ for (T : DEAL_II_VEC_TEMPLATES)
       T<float> &) const;
     template void dealii::AffineConstraints<double>::distribute<T<float>>(
       T<float> &) const;
+
+    template void dealii::AffineConstraints<double>::distribute<
+      LinearAlgebra::distributed::T<float>>(
+      LinearAlgebra::distributed::T<float> &) const;
   }
 
 

@@ -355,6 +355,30 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
     Utilities::fixed_power<dim>(n_child_dofs_1d);
   constexpr unsigned int three_to_dim = Utilities::pow(3, dim);
 
+  // If we have user defined MG constraints, we must create
+  // a non-const, ghosted version of the source vector to distribute
+  // constraints.
+  const LinearAlgebra::distributed::Vector<Number> *to_use = &src;
+  LinearAlgebra::distributed::Vector<Number>        new_src;
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+          .get_local_lines()
+          .size() > 0)
+    {
+      LinearAlgebra::distributed::Vector<Number> copy_src(src);
+
+      // Distribute any user defined constraints
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+        .distribute(copy_src);
+
+      // Re-initialize new ghosted vector with correct constraints
+      new_src.reinit(copy_src);
+      new_src = copy_src;
+      new_src.update_ghost_values();
+
+      to_use = &new_src;
+    }
+
   for (unsigned int cell = 0; cell < n_owned_level_cells[to_level - 1];
        cell += vec_size)
     {
@@ -382,7 +406,7 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
               for (unsigned int k = 0; k < (dim > 2 ? degree_size : 1); ++k)
                 for (unsigned int j = 0; j < (dim > 1 ? degree_size : 1); ++j)
                   for (unsigned int i = 0; i < degree_size; ++i, ++m)
-                    evaluation_data[m][v] = src.local_element(
+                    evaluation_data[m][v] = to_use->local_element(
                       indices[c * n_scalar_cell_dofs +
                               k * n_child_dofs_1d * n_child_dofs_1d +
                               j * n_child_dofs_1d + i]);
