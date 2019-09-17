@@ -178,7 +178,8 @@ public:
   n() const;
 
   /**
-   * Return the name of the space, which is <tt>AnisotropicPolynomials</tt>.
+   * Return the name of the space, which is
+   * <tt>TensorProductPolynomialsBubbles</tt>.
    */
   std::string
   name() const override;

@@ -30,8 +30,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations for friends
+// TODO: We may be able to modify these classes so they aren't
+// required to be friends
 template <int dim>
 class TensorProductPolynomialsBubbles;
+template <int dim>
+class TensorProductPolynomialsConst;
 
 /**
  * @addtogroup Polynomials
@@ -236,6 +241,12 @@ protected:
    * so we declare it as a friend class.
    */
   friend class TensorProductPolynomialsBubbles<dim>;
+
+  /**
+   * TensorProductPolynomialsConst has a TensorProductPolynomials class
+   * so we declare it as a friend class.
+   */
+  friend class TensorProductPolynomialsConst<dim>;
 };
 
 
