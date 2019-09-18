@@ -1,0 +1,21 @@
+
+DEAL:uniform::Current time = 0.00000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.123000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.246000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.369000, step size = 0.123000, Generate output = yes
+DEAL:uniform::Current time = 0.492000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.615000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.738000, step size = 0.123000, Generate output = yes
+DEAL:uniform::Current time = 0.861000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 0.984000, step size = 0.123000, Generate output = yes
+DEAL:uniform::Current time = 1.10700, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 1.23000, step size = 0.123000, Generate output = no
+DEAL:uniform::Current time = 1.35300, step size = 0.123000, Generate output = yes
+DEAL:uniform::Current time = 1.50000, step size = 0.147000, Generate output = yes
+DEAL:doubling::Current time = 0.00000, step size = 0.123000, Generate output = yes
+DEAL:doubling::Current time = 0.123000, step size = 0.123000, Generate output = yes
+DEAL:doubling::Current time = 0.369000, step size = 0.246000, Generate output = yes
+DEAL:doubling::Current time = 0.861000, step size = 0.492000, Generate output = yes
+DEAL:doubling::Current time = 1.84500, step size = 0.984000, Generate output = yes
+DEAL:doubling::Current time = 2.53000, step size = 0.685000, Generate output = yes
+DEAL::OK
