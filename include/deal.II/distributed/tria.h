@@ -1194,16 +1194,6 @@ namespace parallel
       get_cell_weights() const;
 
       /**
-       * Override the implementation in parallel::TriangulationBase because
-       * we can ask p4est about ghost neighbors across periodic boundaries.
-       *
-       * Specifically, this function determines the neighboring subdomains that
-       * are adjacent to each vertex.
-       */
-      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-      compute_vertices_with_ghost_neighbors() const override;
-
-      /**
        * This method returns a bit vector of length tria.n_vertices()
        * indicating the locally active vertices on a level, i.e., the vertices
        * touched by the locally owned level cells for use in geometric
@@ -1367,13 +1357,6 @@ namespace parallel
        * dummy settings object
        */
       Settings settings;
-
-      /**
-       * Like above, this method, which is only implemented for dim = 2 or 3,
-       * needs a stub because it is used in dof_handler_policy.cc
-       */
-      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-      compute_vertices_with_ghost_neighbors() const override;
 
       /**
        * Like above, this method, which is only implemented for dim = 2 or 3,

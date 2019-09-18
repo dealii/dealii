@@ -327,13 +327,6 @@ namespace parallel
       virtual std::size_t
       memory_consumption() const override;
 
-      /**
-       * This function determines the neighboring subdomains that are adjacent
-       * to each vertex.
-       */
-      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-      compute_vertices_with_ghost_neighbors() const override;
-
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 

@@ -4194,7 +4194,8 @@ namespace parallel
       // Here, it is sufficient to collect all vertices that are located
       // at that boundary.
       const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-        vertices_with_ghost_neighbors = compute_vertices_with_ghost_neighbors();
+        vertices_with_ghost_neighbors =
+          this->compute_vertices_with_ghost_neighbors();
 
       // now collect cells and their vertices
       // for the interested neighbors
@@ -4466,19 +4467,6 @@ namespace parallel
       const
     {
       return coarse_cell_to_p4est_tree_permutation;
-    }
-
-
-
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    Triangulation<dim, spacedim>::compute_vertices_with_ghost_neighbors() const
-    {
-      Assert(dim > 1, ExcNotImplemented());
-
-      return dealii::internal::p4est::compute_vertices_with_ghost_neighbors<
-        dim,
-        spacedim>(*this, this->parallel_forest, this->parallel_ghost);
     }
 
 
@@ -5031,16 +5019,6 @@ namespace parallel
     {
       static std::vector<types::global_dof_index> a;
       return a;
-    }
-
-
-
-    template <int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    Triangulation<1, spacedim>::compute_vertices_with_ghost_neighbors() const
-    {
-      Assert(false, ExcNotImplemented());
-      return std::map<unsigned int, std::set<dealii::types::subdomain_id>>();
     }
 
 
