@@ -79,6 +79,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS)
         setup_transfer<deal_II_dimension>(
           const dealii::DoFHandler<deal_II_dimension> &,
           const MGConstrainedDoFs *,
+          const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+            &,
           ElementInfo<S> &,
           std::vector<std::vector<unsigned int>> &,
           std::vector<std::vector<std::pair<unsigned int, unsigned int>>> &,
@@ -86,7 +88,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS)
           std::vector<std::vector<std::vector<unsigned short>>> &,
           std::vector<std::vector<S>> &,
           std::vector<Table<2, unsigned int>> &,
-          MGLevelObject<LinearAlgebra::distributed::Vector<S>> &);
+          MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>> &);
       \}
     \}
   }

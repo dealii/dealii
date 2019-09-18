@@ -89,9 +89,24 @@ public:
 
   /**
    * Actually build the information for the prolongation for each level.
+   *
+   * The optional second argument of external partitioners allows the user to
+   * suggest vector partitioning on the levels. In case the partitioners
+   * are found to contain all ghost unknowns that are visited through the
+   * transfer, the given partitioners are chosen. This ensures compatibility
+   * of vectors during prolongate and restrict with external partitioners as
+   * given by the user, which in turn saves some copy operations. However, in
+   * case there are unknowns missing -- and this is typically the case at some
+   * point during h-coarsening since processors will need to drop out and
+   * thus children's unknowns on some processor will be needed as ghosts to a
+   * parent cell on another processor -- the provided external partitioners are
+   * ignored and internal variants are used instead.
    */
   void
-  build(const DoFHandler<dim, dim> &mg_dof);
+  build(const DoFHandler<dim, dim> &mg_dof,
+        const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &external_partitioners =
+            std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>());
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -244,6 +259,15 @@ private:
    * index), and the indices on the cell (inner index).
    */
   std::vector<std::vector<std::vector<unsigned short>>> dirichlet_indices;
+
+  /**
+   * A vector that holds shared pointers to the partitioners of the
+   * transfer. These partitioners might be shared with what was passed in from
+   * the outside through build() or be shared with the level vectors inherited
+   * from MGLevelGlobalTransfer.
+   */
+  MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    vector_partitioners;
 
   /**
    * Perform the prolongation operation.

@@ -300,15 +300,39 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
                 ghosted_global_vector,
                 ghosted_level_vector);
 
-  fill_internal(mg_dof,
-                mg_constrained_dofs,
-                mpi_communicator,
-                true,
-                this->solution_copy_indices,
-                this->solution_copy_indices_global_mine,
-                this->solution_copy_indices_level_mine,
-                solution_ghosted_global_vector,
-                solution_ghosted_level_vector);
+  // in case we have hanging nodes which imply different ownership of
+  // global and level dof indices, we must also fill the solution indices
+  // which contain additional indices, otherwise they can re-use the
+  // indices of the standard transfer.
+  int have_refinement_edge_dofs = 0;
+  if (mg_constrained_dofs != nullptr)
+    for (unsigned int level = 0;
+         level < mg_dof.get_triangulation().n_global_levels();
+         ++level)
+      if (mg_constrained_dofs->get_refinement_edge_indices(level).n_elements() >
+          0)
+        {
+          have_refinement_edge_dofs = 1;
+          break;
+        }
+  if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator) == 1)
+    fill_internal(mg_dof,
+                  mg_constrained_dofs,
+                  mpi_communicator,
+                  true,
+                  this->solution_copy_indices,
+                  this->solution_copy_indices_global_mine,
+                  this->solution_copy_indices_level_mine,
+                  solution_ghosted_global_vector,
+                  solution_ghosted_level_vector);
+  else
+    {
+      this->solution_copy_indices             = this->copy_indices;
+      this->solution_copy_indices_global_mine = this->copy_indices_global_mine;
+      this->solution_copy_indices_level_mine  = this->copy_indices_level_mine;
+      solution_ghosted_global_vector          = ghosted_global_vector;
+      solution_ghosted_level_vector           = ghosted_level_vector;
+    }
 
   bool my_perform_renumbered_plain_copy =
     (this->copy_indices.back().n_cols() ==
