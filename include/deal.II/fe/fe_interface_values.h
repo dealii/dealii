@@ -83,15 +83,33 @@ public:
    *
    * The arguments (including their order) are identical to the @p face_worker arguments
    * in MeshWorker::mesh_loop().
+   *
+   * @param[in] cell An iterator to the first cell adjacent to the interface.
+   * @param[in] face_no An integer identifying which face of the first cell the
+   *   interface is on.
+   * @param[in] sub_face_no An integer identifying the subface (child) of the
+   *   face identified by the previous two arguments the interface corresponds
+   *   to. If equal to numbers::invalid_unsigned_int, then the interface is
+   *   considered to be the entire face.
+   * @param[in] cell_neighbor An iterator to the second cell adjacent to
+   *   the interface. The type of this iterator does not have to equal that
+   *   of `cell`, but must be convertible to it. This allows using an
+   *   active cell iterator for `cell`, and `cell->neighbor(f)` for
+   *   `cell_neighbor`, since the return type of `cell->neighbor(f)` is
+   *   simply a cell iterator (not necessarily an active cell iterator).
+   * @param[in] face_no_neighbor Like `face_no`, just for the neighboring
+   *   cell.
+   * @param[in] sub_face_no_neighbor Like `sub_face_no`, just for the
+   *   neighboring cell.
    */
   template <class CellIteratorType>
   void
-  reinit(const CellIteratorType &cell,
-         const unsigned int &    face_no,
-         const unsigned int &    sub_face_no,
-         const CellIteratorType &cell_neighbor,
-         const unsigned int &    face_no_neighbor,
-         const unsigned int &    sub_face_no_neighbor);
+  reinit(const CellIteratorType &                         cell,
+         const unsigned int &                             face_no,
+         const unsigned int &                             sub_face_no,
+         const typename identity<CellIteratorType>::type &cell_neighbor,
+         const unsigned int &                             face_no_neighbor,
+         const unsigned int &                             sub_face_no_neighbor);
 
   /**
    * Re-initialize this object to be used on an interface given by a single face
@@ -394,12 +412,12 @@ template <int dim, int spacedim>
 template <class CellIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
-  const CellIteratorType &cell,
-  const unsigned int &    face_no,
-  const unsigned int &    sub_face_no,
-  const CellIteratorType &cell_neighbor,
-  const unsigned int &    face_no_neighbor,
-  const unsigned int &    sub_face_no_neighbor)
+  const CellIteratorType &                         cell,
+  const unsigned int &                             face_no,
+  const unsigned int &                             sub_face_no,
+  const typename identity<CellIteratorType>::type &cell_neighbor,
+  const unsigned int &                             face_no_neighbor,
+  const unsigned int &                             sub_face_no_neighbor)
 {
   if (sub_face_no == numbers::invalid_unsigned_int)
     {
