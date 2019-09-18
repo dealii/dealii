@@ -180,17 +180,6 @@ namespace internal
 #ifdef DEAL_II_WITH_MPI
       if (tria)
         {
-          // TODO: Searching the owner for every single DoF becomes quite
-          // inefficient. Please fix this, Timo.
-          // The list of neighbors is symmetric (our neighbors have us as a
-          // neighbor), so we can use it to send and to know how many messages
-          // we will get.
-          std::vector<std::vector<IndexSet>>
-            locally_owned_mg_dofs_per_processor;
-          for (unsigned int l = 0; l < tria->n_global_levels(); ++l)
-            locally_owned_mg_dofs_per_processor.push_back(
-              mg_dof.compute_locally_owned_mg_dofs_per_processor(l));
-
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
           std::map<int, std::vector<DoFPair>> send_data;
