@@ -94,7 +94,7 @@ TimestepControl::advance()
   // first step.
   if (now_val != start())
     {
-      if (strategy_val == doubling && 2 * s <= tolerance_val)
+      if (strategy_val == doubling)
         s *= 2;
       if (s > max_step_val)
         s = max_step_val;
@@ -113,8 +113,7 @@ TimestepControl::advance()
   // shot over the final time, adjust
   // it so we hit the final time
   // exactly.
-  double s1 = .01 * s;
-  if (h > final_val - s1)
+  if (h > final_val - tolerance_val)
     {
       current_step_val = final_val - now_val;
       h                = final_val;

@@ -45,7 +45,8 @@ namespace Algorithms
    * <li> If the resulting time exceeds the final time of the interval, the
    * step size is reduced in order to meet this time.
    * <li> If the resulting time is below the final time by just a fraction of
-   * the step size, the step size is increased in order to meet this time.
+   * the step size, the step size is increased in order to meet this time. The
+   * fraction of time must be smaller than tolerance().
    * <li> The resulting step size is used from the current time.
    * </ol>
    *
@@ -56,19 +57,17 @@ namespace Algorithms
   {
   public:
     /**
-     * The time stepping strategies. These are controlled by the value of
-     * tolerance() and start_step().
+     * The time stepping strategies.
      */
     enum Strategy
     {
       /**
-       * Choose a uniform time step size. The step size is determined by
-       * start_step(), tolerance() is ignored.
+       * Choose a uniform time step size.
        */
       uniform,
       /**
        * Start with the time step size given by start_step() and double it in
-       * every step. tolerance() is ignored.
+       * every step.
        *
        * This strategy is intended for pseudo-timestepping schemes computing a
        * stationary limit.
@@ -114,7 +113,8 @@ namespace Algorithms
     double
     final() const;
     /**
-     * Return the tolerance value controlling the time steps.
+     * Return the tolerance value controlling the time steps. In the final time
+     * step, the step size can be increased (at most) by this tolerance amount.
      */
     double
     tolerance() const;
@@ -210,7 +210,8 @@ namespace Algorithms
     double final_val;
 
     /**
-     * The tolerance value controlling the time steps.
+     * The tolerance value controlling how much the time step size can be
+     * increased in the last time step.
      */
     double tolerance_val;
 
