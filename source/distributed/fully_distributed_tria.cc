@@ -484,13 +484,12 @@ namespace parallel
     Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
       const types::coarse_cell_id coarse_cell_id) const
     {
-      const auto coarse_cell_index =
-        std::lower_bound(coarse_cell_id_to_coarse_cell_index_vector.begin(),
-                         coarse_cell_id_to_coarse_cell_index_vector.end(),
-                         coarse_cell_id,
-                         [](const auto &pair, const auto &val) {
-                           return pair.first < val;
-                         });
+      const auto coarse_cell_index = std::lower_bound(
+        coarse_cell_id_to_coarse_cell_index_vector.begin(),
+        coarse_cell_id_to_coarse_cell_index_vector.end(),
+        coarse_cell_id,
+        [](const std::pair<types::coarse_cell_id, unsigned int> &pair,
+           const types::coarse_cell_id &val) { return pair.first < val; });
       Assert(coarse_cell_index !=
                coarse_cell_id_to_coarse_cell_index_vector.cend(),
              ExcMessage("Coarse cell index not found!"));
