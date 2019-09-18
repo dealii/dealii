@@ -1,0 +1,5 @@
+New: Added a GridGenerator::generate_from_name_and_arguments() that leverages the MutableBind class
+to parse two strings, and generate a grid from them interpreting one as a GridGenerator function
+name to call, and the other as a tuple of arguments to pass to the function.
+<br>
+(Luca Heltai, 2019/08/27)

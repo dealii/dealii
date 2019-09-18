@@ -1328,6 +1328,49 @@ namespace GridGenerator
                const double         R,
                const double         r);
 
+  /**
+   * Call one of the other GridGenerator functions, parsing the name of the
+   * function to call from the string @p grid_generator_function_name, and
+   * the arguments to the function from the string
+   * @p grid_generator_function_arguments.
+   *
+   * The string that supplies the arguments is passed to the function
+   * Patterns::Tools::Convert<TupleTyple>::to_value(), where `TupleType` here is
+   * a tuple containing **all** the arguments of the GridGenerator function,
+   * including all optional arguments.
+   *
+   * An example usage of this function is given by:
+   * @code
+   * GridGenerator::generate_from_name_and_arguments(
+   *   tria,
+   *   "hyper_ball",
+   *   "0.0, 0.0 : 1 : false");
+   * @endcode
+   * Here, the colon separates the function arguments, and the comma separates
+   * the coordinates of a Point<2> argument.
+   *
+   * According to the arity of the `TupleType`, the arguments of the function
+   * may be separated by different separators (see the documentation of
+   * Patterns::Tuple for the details of how the conversion is
+   * performed). If a wrong format is used, an exception is thrown, and the
+   * expected format is output as an error message.
+   *
+   * All GridGenerator functions are supported. If you find some that are
+   * missing, please open an issue on GitHub.
+   *
+   * @param tria                              The triangulation to be worked on
+   * @param grid_generator_function_name      The name of the function to call
+   * @param grid_generator_function_arguments The arguments of the function, in
+   * the format of a tuple-convertible string
+   *
+   * @author Luca Heltai, 2019.
+   */
+  template <int dim, int spacedim>
+  void
+  generate_from_name_and_arguments(
+    Triangulation<dim, spacedim> &tria,
+    const std::string &           grid_generator_function_name,
+    const std::string &           grid_generator_function_arguments);
   ///@}
 
   /**

@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_unity_include_src
   cell_id.cc
   grid_generator.cc
+  grid_generator_from_name.cc
   grid_in.cc
   grid_out.cc
   grid_refinement.cc
@@ -51,6 +52,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 SET(_inst
   cell_id.inst.in
   grid_generator.inst.in
+  grid_generator_from_name.inst.in
   grid_in.inst.in
   grid_out.inst.in
   grid_refinement.inst.in
