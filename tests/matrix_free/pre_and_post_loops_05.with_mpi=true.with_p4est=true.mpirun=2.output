@@ -1,0 +1,10 @@
+
+DEAL::Testing FE_Q<2>(3)
+DEAL::Error in 1x merged operation: 0.00
+DEAL::Error in 2x merged operation: 0.00
+DEAL::Testing FE_Q<2>(3)
+DEAL::Error in 1x merged operation: 0.00
+DEAL::Error in 2x merged operation: 0.00
+DEAL::Testing FE_Q<3>(2)
+DEAL::Error in 1x merged operation: 0.00
+DEAL::Error in 2x merged operation: 0.00
