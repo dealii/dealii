@@ -1,0 +1,79 @@
+
+DEAL:0:2d::n_levels:                  1
+DEAL:0:2d::n_cells:                   55
+DEAL:0:2d::n_active_cells:            55
+DEAL:0:2d::
+DEAL:0:2d::n_dofs:                             833
+DEAL:0:2d::n_locally_owned_dofs:               189
+DEAL:0:2d::
+DEAL:0:3d::n_levels:                  1
+DEAL:0:3d::n_cells:                   1001
+DEAL:0:3d::n_active_cells:            1001
+DEAL:0:3d::
+DEAL:0:3d::n_dofs:                             31841
+DEAL:0:3d::n_locally_owned_dofs:               6945
+DEAL:0:3d::
+
+DEAL:1:2d::n_levels:                  1
+DEAL:1:2d::n_cells:                   69
+DEAL:1:2d::n_active_cells:            69
+DEAL:1:2d::
+DEAL:1:2d::n_dofs:                             833
+DEAL:1:2d::n_locally_owned_dofs:               156
+DEAL:1:2d::
+DEAL:1:3d::n_levels:                  1
+DEAL:1:3d::n_cells:                   1171
+DEAL:1:3d::n_active_cells:            1171
+DEAL:1:3d::
+DEAL:1:3d::n_dofs:                             31841
+DEAL:1:3d::n_locally_owned_dofs:               6352
+DEAL:1:3d::
+
+
+DEAL:2:2d::n_levels:                  1
+DEAL:2:2d::n_cells:                   60
+DEAL:2:2d::n_active_cells:            60
+DEAL:2:2d::
+DEAL:2:2d::n_dofs:                             833
+DEAL:2:2d::n_locally_owned_dofs:               168
+DEAL:2:2d::
+DEAL:2:3d::n_levels:                  1
+DEAL:2:3d::n_cells:                   1093
+DEAL:2:3d::n_active_cells:            1093
+DEAL:2:3d::
+DEAL:2:3d::n_dofs:                             31841
+DEAL:2:3d::n_locally_owned_dofs:               6248
+DEAL:2:3d::
+
+
+DEAL:3:2d::n_levels:                  1
+DEAL:3:2d::n_cells:                   64
+DEAL:3:2d::n_active_cells:            64
+DEAL:3:2d::
+DEAL:3:2d::n_dofs:                             833
+DEAL:3:2d::n_locally_owned_dofs:               152
+DEAL:3:2d::
+DEAL:3:3d::n_levels:                  1
+DEAL:3:3d::n_cells:                   1044
+DEAL:3:3d::n_active_cells:            1044
+DEAL:3:3d::
+DEAL:3:3d::n_dofs:                             31841
+DEAL:3:3d::n_locally_owned_dofs:               6280
+DEAL:3:3d::
+
+
+DEAL:4:2d::n_levels:                  1
+DEAL:4:2d::n_cells:                   50
+DEAL:4:2d::n_active_cells:            50
+DEAL:4:2d::
+DEAL:4:2d::n_dofs:                             833
+DEAL:4:2d::n_locally_owned_dofs:               168
+DEAL:4:2d::
+DEAL:4:3d::n_levels:                  1
+DEAL:4:3d::n_cells:                   1005
+DEAL:4:3d::n_active_cells:            1005
+DEAL:4:3d::
+DEAL:4:3d::n_dofs:                             31841
+DEAL:4:3d::n_locally_owned_dofs:               6016
+DEAL:4:3d::
+

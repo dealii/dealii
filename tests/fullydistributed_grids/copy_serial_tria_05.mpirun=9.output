@@ -3,21 +3,21 @@ DEAL:0:1d::n_levels:                  1
 DEAL:0:1d::n_cells:                   1
 DEAL:0:1d::n_active_cells:            1
 DEAL:0:1d::
-DEAL:0:1d::n_dofs:                             0
+DEAL:0:1d::n_dofs:                             5
 DEAL:0:1d::n_locally_owned_dofs:               0
 DEAL:0:1d::
 DEAL:0:2d::n_levels:                  1
 DEAL:0:2d::n_cells:                   1
 DEAL:0:2d::n_active_cells:            1
 DEAL:0:2d::
-DEAL:0:2d::n_dofs:                             0
+DEAL:0:2d::n_dofs:                             25
 DEAL:0:2d::n_locally_owned_dofs:               0
 DEAL:0:2d::
 DEAL:0:3d::n_levels:                  1
 DEAL:0:3d::n_cells:                   1
 DEAL:0:3d::n_active_cells:            1
 DEAL:0:3d::
-DEAL:0:3d::n_dofs:                             0
+DEAL:0:3d::n_dofs:                             125
 DEAL:0:3d::n_locally_owned_dofs:               0
 DEAL:0:3d::
 
@@ -25,14 +25,14 @@ DEAL:1:1d::n_levels:                  1
 DEAL:1:1d::n_cells:                   1
 DEAL:1:1d::n_active_cells:            1
 DEAL:1:1d::
-DEAL:1:1d::n_dofs:                             0
+DEAL:1:1d::n_dofs:                             5
 DEAL:1:1d::n_locally_owned_dofs:               0
 DEAL:1:1d::
 DEAL:1:2d::n_levels:                  1
 DEAL:1:2d::n_cells:                   1
 DEAL:1:2d::n_active_cells:            1
 DEAL:1:2d::
-DEAL:1:2d::n_dofs:                             0
+DEAL:1:2d::n_dofs:                             25
 DEAL:1:2d::n_locally_owned_dofs:               0
 DEAL:1:2d::
 DEAL:1:3d::n_levels:                  2
@@ -48,7 +48,7 @@ DEAL:2:1d::n_levels:                  1
 DEAL:2:1d::n_cells:                   1
 DEAL:2:1d::n_active_cells:            1
 DEAL:2:1d::
-DEAL:2:1d::n_dofs:                             0
+DEAL:2:1d::n_dofs:                             5
 DEAL:2:1d::n_locally_owned_dofs:               0
 DEAL:2:1d::
 DEAL:2:2d::n_levels:                  2
@@ -62,7 +62,7 @@ DEAL:2:3d::n_levels:                  1
 DEAL:2:3d::n_cells:                   1
 DEAL:2:3d::n_active_cells:            1
 DEAL:2:3d::
-DEAL:2:3d::n_dofs:                             0
+DEAL:2:3d::n_dofs:                             125
 DEAL:2:3d::n_locally_owned_dofs:               0
 DEAL:2:3d::
 
@@ -71,21 +71,21 @@ DEAL:3:1d::n_levels:                  1
 DEAL:3:1d::n_cells:                   1
 DEAL:3:1d::n_active_cells:            1
 DEAL:3:1d::
-DEAL:3:1d::n_dofs:                             0
+DEAL:3:1d::n_dofs:                             5
 DEAL:3:1d::n_locally_owned_dofs:               0
 DEAL:3:1d::
 DEAL:3:2d::n_levels:                  1
 DEAL:3:2d::n_cells:                   1
 DEAL:3:2d::n_active_cells:            1
 DEAL:3:2d::
-DEAL:3:2d::n_dofs:                             0
+DEAL:3:2d::n_dofs:                             25
 DEAL:3:2d::n_locally_owned_dofs:               0
 DEAL:3:2d::
 DEAL:3:3d::n_levels:                  1
 DEAL:3:3d::n_cells:                   1
 DEAL:3:3d::n_active_cells:            1
 DEAL:3:3d::
-DEAL:3:3d::n_dofs:                             0
+DEAL:3:3d::n_dofs:                             125
 DEAL:3:3d::n_locally_owned_dofs:               0
 DEAL:3:3d::
 
@@ -101,14 +101,14 @@ DEAL:4:2d::n_levels:                  1
 DEAL:4:2d::n_cells:                   1
 DEAL:4:2d::n_active_cells:            1
 DEAL:4:2d::
-DEAL:4:2d::n_dofs:                             0
+DEAL:4:2d::n_dofs:                             25
 DEAL:4:2d::n_locally_owned_dofs:               0
 DEAL:4:2d::
 DEAL:4:3d::n_levels:                  1
 DEAL:4:3d::n_cells:                   1
 DEAL:4:3d::n_active_cells:            1
 DEAL:4:3d::
-DEAL:4:3d::n_dofs:                             0
+DEAL:4:3d::n_dofs:                             125
 DEAL:4:3d::n_locally_owned_dofs:               0
 DEAL:4:3d::
 
@@ -117,21 +117,21 @@ DEAL:5:1d::n_levels:                  1
 DEAL:5:1d::n_cells:                   1
 DEAL:5:1d::n_active_cells:            1
 DEAL:5:1d::
-DEAL:5:1d::n_dofs:                             0
+DEAL:5:1d::n_dofs:                             5
 DEAL:5:1d::n_locally_owned_dofs:               0
 DEAL:5:1d::
 DEAL:5:2d::n_levels:                  1
 DEAL:5:2d::n_cells:                   1
 DEAL:5:2d::n_active_cells:            1
 DEAL:5:2d::
-DEAL:5:2d::n_dofs:                             0
+DEAL:5:2d::n_dofs:                             25
 DEAL:5:2d::n_locally_owned_dofs:               0
 DEAL:5:2d::
 DEAL:5:3d::n_levels:                  1
 DEAL:5:3d::n_cells:                   1
 DEAL:5:3d::n_active_cells:            1
 DEAL:5:3d::
-DEAL:5:3d::n_dofs:                             0
+DEAL:5:3d::n_dofs:                             125
 DEAL:5:3d::n_locally_owned_dofs:               0
 DEAL:5:3d::
 
@@ -140,21 +140,21 @@ DEAL:6:1d::n_levels:                  1
 DEAL:6:1d::n_cells:                   1
 DEAL:6:1d::n_active_cells:            1
 DEAL:6:1d::
-DEAL:6:1d::n_dofs:                             0
+DEAL:6:1d::n_dofs:                             5
 DEAL:6:1d::n_locally_owned_dofs:               0
 DEAL:6:1d::
 DEAL:6:2d::n_levels:                  1
 DEAL:6:2d::n_cells:                   1
 DEAL:6:2d::n_active_cells:            1
 DEAL:6:2d::
-DEAL:6:2d::n_dofs:                             0
+DEAL:6:2d::n_dofs:                             25
 DEAL:6:2d::n_locally_owned_dofs:               0
 DEAL:6:2d::
 DEAL:6:3d::n_levels:                  1
 DEAL:6:3d::n_cells:                   1
 DEAL:6:3d::n_active_cells:            1
 DEAL:6:3d::
-DEAL:6:3d::n_dofs:                             0
+DEAL:6:3d::n_dofs:                             125
 DEAL:6:3d::n_locally_owned_dofs:               0
 DEAL:6:3d::
 
@@ -163,21 +163,21 @@ DEAL:7:1d::n_levels:                  1
 DEAL:7:1d::n_cells:                   1
 DEAL:7:1d::n_active_cells:            1
 DEAL:7:1d::
-DEAL:7:1d::n_dofs:                             0
+DEAL:7:1d::n_dofs:                             5
 DEAL:7:1d::n_locally_owned_dofs:               0
 DEAL:7:1d::
 DEAL:7:2d::n_levels:                  1
 DEAL:7:2d::n_cells:                   1
 DEAL:7:2d::n_active_cells:            1
 DEAL:7:2d::
-DEAL:7:2d::n_dofs:                             0
+DEAL:7:2d::n_dofs:                             25
 DEAL:7:2d::n_locally_owned_dofs:               0
 DEAL:7:2d::
 DEAL:7:3d::n_levels:                  1
 DEAL:7:3d::n_cells:                   1
 DEAL:7:3d::n_active_cells:            1
 DEAL:7:3d::
-DEAL:7:3d::n_dofs:                             0
+DEAL:7:3d::n_dofs:                             125
 DEAL:7:3d::n_locally_owned_dofs:               0
 DEAL:7:3d::
 
@@ -186,21 +186,21 @@ DEAL:8:1d::n_levels:                  1
 DEAL:8:1d::n_cells:                   1
 DEAL:8:1d::n_active_cells:            1
 DEAL:8:1d::
-DEAL:8:1d::n_dofs:                             0
+DEAL:8:1d::n_dofs:                             5
 DEAL:8:1d::n_locally_owned_dofs:               0
 DEAL:8:1d::
 DEAL:8:2d::n_levels:                  1
 DEAL:8:2d::n_cells:                   1
 DEAL:8:2d::n_active_cells:            1
 DEAL:8:2d::
-DEAL:8:2d::n_dofs:                             0
+DEAL:8:2d::n_dofs:                             25
 DEAL:8:2d::n_locally_owned_dofs:               0
 DEAL:8:2d::
 DEAL:8:3d::n_levels:                  1
 DEAL:8:3d::n_cells:                   1
 DEAL:8:3d::n_active_cells:            1
 DEAL:8:3d::
-DEAL:8:3d::n_dofs:                             0
+DEAL:8:3d::n_dofs:                             125
 DEAL:8:3d::n_locally_owned_dofs:               0
 DEAL:8:3d::
 

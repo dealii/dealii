@@ -107,7 +107,7 @@ main(int argc, char *argv[])
 
   {
     deallog.push("2d");
-    const int n_refinements  = 4;
+    const int n_refinements  = 3;
     const int n_subdivisions = 8;
     test<2>(n_refinements, n_subdivisions, comm);
     deallog.pop();

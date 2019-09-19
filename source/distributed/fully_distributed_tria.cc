@@ -289,10 +289,10 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::update_number_cache()
     {
+      parallel::Triangulation<dim, spacedim>::update_number_cache();
+
       if (settings & construct_multigrid_hierarchy)
         parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
-
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
     }
 
 
@@ -511,8 +511,8 @@ namespace parallel
 
       const auto coarse_cell_id =
         coarse_cell_index_to_coarse_cell_id_vector[coarse_cell_index];
-      Assert(coarse_cell_id != numbers::invalid_coarse_cell_id,
-             ExcMessage("You are trying to access a dummy cell!"));
+      AssertThrow(coarse_cell_id != numbers::invalid_coarse_cell_id,
+                  ExcMessage("You are trying to access a dummy cell!"));
       return coarse_cell_id;
     }
 

@@ -338,23 +338,29 @@ namespace parallel
               {
                 // collect vertices connected to a (on any level) locally owned
                 // cell
-                std::vector<bool> vertices_owned_by_locally_owned_cells(
-                  tria.n_vertices());
+                std::vector<bool>
+                  vertices_owned_by_locally_owned_cells_on_level(
+                    tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
                       (cell->active() && cell->subdomain_id() == my_rank))
                     add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
-                      cell, vertices_owned_by_locally_owned_cells);
+                      cell, vertices_owned_by_locally_owned_cells_on_level);
+
+                for (auto cell : tria.active_cell_iterators())
+                  if (cell->subdomain_id() == my_rank)
+                    add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
+                      cell, vertices_owned_by_locally_owned_cells_on_level);
 
                 // helper function to determine if cell is locally relevant
                 // (i.e. a cell which is connected to a vertex via a locally
                 // owned cell)
-                auto is_locally_relevant =
+                auto is_locally_relevant_on_level =
                   [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
                     for (unsigned int v = 0;
                          v < GeometryInfo<dim>::vertices_per_cell;
                          ++v)
-                      if (vertices_owned_by_locally_owned_cells
+                      if (vertices_owned_by_locally_owned_cells_on_level
                             [cell->vertex_index(v)])
                         return true;
                     return false;
@@ -362,7 +368,7 @@ namespace parallel
 
                 // mark all locally relevant cells
                 for (auto cell : tria.cell_iterators_on_level(level))
-                  if (is_locally_relevant(cell))
+                  if (is_locally_relevant_on_level(cell))
                     set_user_flag_reverse(cell);
               }
 
@@ -421,26 +427,50 @@ namespace parallel
             construction_data.cell_infos.resize(
               tria.get_triangulation().n_global_levels());
 
+            // collect local vertices on active level
+            std::vector<bool> vertices_owned_by_locally_owned_active_cells(
+              tria.n_vertices());
+            for (auto cell : tria.active_cell_iterators())
+              if (cell->subdomain_id() == my_rank)
+                add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
+                  cell, vertices_owned_by_locally_owned_active_cells);
+
+            // helper function to determine if cell is locally relevant
+            // on active level
+            auto is_locally_relevant_on_active_level =
+              [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
+                if (cell->active())
+                  for (unsigned int v = 0;
+                       v < GeometryInfo<dim>::vertices_per_cell;
+                       ++v)
+                    if (vertices_owned_by_locally_owned_active_cells
+                          [cell->vertex_index(v)])
+                      return true;
+                return false;
+              };
+
             for (unsigned int level = 0;
                  level < tria.get_triangulation().n_global_levels();
                  ++level)
               {
                 // collect local vertices on level
-                std::vector<bool> vertices_owned_by_locally_owned_cells(
-                  tria.n_vertices());
+                std::vector<bool>
+                  vertices_owned_by_locally_owned_cells_on_level(
+                    tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
                       (cell->active() && cell->subdomain_id() == my_rank))
                     add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
-                      cell, vertices_owned_by_locally_owned_cells);
+                      cell, vertices_owned_by_locally_owned_cells_on_level);
 
                 // helper function to determine if cell is locally relevant
-                auto is_locally_relevant =
+                // on level
+                auto is_locally_relevant_on_level =
                   [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
                     for (unsigned int v = 0;
                          v < GeometryInfo<dim>::vertices_per_cell;
                          ++v)
-                      if (vertices_owned_by_locally_owned_cells
+                      if (vertices_owned_by_locally_owned_cells_on_level
                             [cell->vertex_index(v)])
                         return true;
                     return false;
@@ -496,13 +526,18 @@ namespace parallel
                     cell_info.level_subdomain_id =
                       numbers::artificial_subdomain_id;
 
-                    if (is_locally_relevant(cell))
+                    if (is_locally_relevant_on_active_level(cell))
                       {
                         cell_info.level_subdomain_id =
                           cell->level_subdomain_id();
-                        if (cell->active())
-                          cell_info.subdomain_id = cell->subdomain_id();
+                        cell_info.subdomain_id = cell->subdomain_id();
                       }
+                    else if (is_locally_relevant_on_level(cell))
+                      {
+                        cell_info.level_subdomain_id =
+                          cell->level_subdomain_id();
+                      }
+                    // else: cell is locally relevant but an artificial cell
 
                     level_cell_infos.emplace_back(cell_info);
                   }

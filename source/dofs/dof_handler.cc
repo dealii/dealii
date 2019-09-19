@@ -855,7 +855,7 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
                                ParallelShared<DoFHandler<dim, spacedim>>>(
         *this);
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
              &tria) == nullptr)
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
@@ -907,8 +907,8 @@ DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &t,
                                ParallelShared<DoFHandler<dim, spacedim>>>(
         *this);
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(&t) !=
-           nullptr)
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+             &t) != nullptr)
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
                                ParallelDistributed<DoFHandler<dim, spacedim>>>(
@@ -1251,8 +1251,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-        &*tria) == nullptr)
+  if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
+                     *>(&*tria) == nullptr)
     block_info_object.initialize(*this, false, true);
 }
 
@@ -1353,7 +1353,7 @@ DoFHandler<dim, spacedim>::renumber_dofs(
              ExcMessage("Incorrect size of the input array."));
     }
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
              &*tria) != nullptr)
     {
       AssertDimension(new_numbers.size(), n_locally_owned_dofs());
