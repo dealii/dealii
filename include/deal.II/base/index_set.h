@@ -1693,6 +1693,11 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
 
       tmp_ranges.emplace_back(begin_index, end_index);
       p = q;
+
+      // if the starting index of the next go-around of the for loop is less
+      // than the end index of the one just identified, then we will have at
+      // least one pair of ranges that are not sorted, and consequently the
+      // whole collection of ranges is not sorted.
       if (p != end && *p < end_index)
         ranges_are_sorted = false;
     }
