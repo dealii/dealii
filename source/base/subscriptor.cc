@@ -74,7 +74,12 @@ Subscriptor::check_no_subscribers() const noexcept
   // just display a message and continue the program.
   if (counter != 0)
     {
+#  if __cpp_lib_uncaught_exceptions >= 201411
+      // std::uncaught_exception() is deprecated in c++17
+      if (std::uncaught_exceptions() == 0)
+#  else
       if (std::uncaught_exception() == false)
+#  endif
         {
           std::string infostring;
           for (const auto &map_entry : counter_map)

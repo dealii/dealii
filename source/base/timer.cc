@@ -383,7 +383,12 @@ TimerOutput::~TimerOutput()
   // avoid communicating with other processes if there is an uncaught
   // exception
 #ifdef DEAL_II_WITH_MPI
-  if (std::uncaught_exception() && mpi_communicator != MPI_COMM_SELF)
+#  if __cpp_lib_uncaught_exceptions >= 201411
+  // std::uncaught_exception() is deprecated in c++17
+  if (std::uncaught_exceptions() > 0 && mpi_communicator != MPI_COMM_SELF)
+#  else
+  if (std::uncaught_exception() == true && mpi_communicator != MPI_COMM_SELF)
+#  endif
     {
       std::cerr << "---------------------------------------------------------"
                 << std::endl
