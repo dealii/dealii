@@ -190,12 +190,12 @@ namespace Algorithms
      * Set the output name template.
      */
     void
-    file_name_format(const char *);
+    file_name_format(const std::string &format);
 
     /**
      * Return the output name template.
      */
-    const char *
+    const std::string &
     file_name_format();
 
   private:
@@ -265,7 +265,7 @@ namespace Algorithms
     /**
      * Output file name template.
      */
-    char format[30];
+    std::string format;
   };
 
 
@@ -360,13 +360,13 @@ namespace Algorithms
 
 
   inline void
-  TimestepControl::file_name_format(const char *fmt)
+  TimestepControl::file_name_format(const std::string &fmt)
   {
-    strcpy(format, fmt);
+    format = fmt;
   }
 
 
-  inline const char *
+  inline const std::string &
   TimestepControl::file_name_format()
   {
     return format;

@@ -39,9 +39,9 @@ TimestepControl::TimestepControl(double start,
   , step_val(start_step)
   , print_step(print_step)
   , next_print_val(print_step > 0. ? start_val + print_step : start_val - 1.)
+  , format("T.%06.3f")
 {
   now_val = start_val;
-  strcpy(format, "T.%06.3f");
 
   // avoid compiler warning
   (void)min_step_val;
