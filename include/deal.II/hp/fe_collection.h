@@ -834,7 +834,8 @@ namespace hp
     // loop over all of the given arguments and add the finite elements to
     // this collection. Inlining the definition of fe_pointers causes internal
     // compiler errors on GCC 7.1.1 so we define it separately:
-    const auto fe_pointers = {&fes...};
+    const auto fe_pointers = {
+      (static_cast<const FiniteElement<dim, spacedim> *>(&fes))...};
     for (const auto p : fe_pointers)
       push_back(*p);
   }

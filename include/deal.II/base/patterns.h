@@ -1439,7 +1439,7 @@ namespace Patterns
                   "are derived from PatternBase");
     static_assert(sizeof...(ps) > 0,
                   "The number of PatternTypes must be greater than zero!");
-    auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
+    const auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
     for (const auto p : pattern_pointers)
       patterns.push_back(p->clone());
   }

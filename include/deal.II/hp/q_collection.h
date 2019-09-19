@@ -156,7 +156,8 @@ namespace hp
     // loop over all of the given arguments and add the quadrature objects to
     // this collection. Inlining the definition of q_pointers causes internal
     // compiler errors on GCC 7.1.1 so we define it separately:
-    const auto q_pointers = {&quadrature_objects...};
+    const auto q_pointers = {
+      (static_cast<const Quadrature<dim> *>(&quadrature_objects))...};
     for (const auto p : q_pointers)
       push_back(*p);
   }
