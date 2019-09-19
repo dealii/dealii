@@ -90,7 +90,7 @@ namespace GridGenerator
                                      arguments,
                                      tria);
             }
-          catch (Patterns::Tools::ExcNoMatch)
+          catch (Patterns::Tools::ExcNoMatch &)
             {
               parse_and_create<dim,
                                dim,
