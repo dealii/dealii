@@ -1,0 +1,7 @@
+Changed: The type of the argument of the
+Algorithms::TimeStepControl::file_name_format() function that takes a
+string has been changed from `char *` to `std::string`. Similarly, the
+returned type of the function of same name that doesn't take an
+argument has undergone the same kind of change.
+<br>
+(Wolfgang Bangerth, 2019/09/18)
