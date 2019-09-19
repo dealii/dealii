@@ -28,8 +28,8 @@ for (deal_II_dimension : DIMENSIONS)
             const dealii::Triangulation<deal_II_dimension, deal_II_dimension>
               &                tria,
             const MPI_Comm     comm,
-            const bool         construct_multilevel_hierarchy = false,
-            const unsigned int my_rank_in = numbers::invalid_unsigned_int);
+            const bool         construct_multilevel_hierarchy,
+            const unsigned int my_rank_in);
         \}
       \}
     \}
