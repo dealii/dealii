@@ -343,6 +343,15 @@ namespace internal
     {}
 
 
+
+    inline std::size_t
+    DoFIndicesOnFaces<1>::memory_consumption() const
+    {
+      return 0;
+    }
+
+
+
     template <class Archive>
     void
     DoFIndicesOnFaces<2>::serialize(Archive &ar, const unsigned int)
@@ -351,11 +360,29 @@ namespace internal
     }
 
 
+
+    inline std::size_t
+    DoFIndicesOnFaces<2>::memory_consumption() const
+    {
+      return MemoryConsumption::memory_consumption(lines);
+    }
+
+
+
     template <class Archive>
     void
     DoFIndicesOnFaces<3>::serialize(Archive &ar, const unsigned int)
     {
       ar &lines &quads;
+    }
+
+
+
+    inline std::size_t
+    DoFIndicesOnFaces<3>::memory_consumption() const
+    {
+      return (MemoryConsumption::memory_consumption(lines) +
+              MemoryConsumption::memory_consumption(quads));
     }
 
     template <int structdim>
