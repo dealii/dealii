@@ -56,27 +56,6 @@ namespace Algorithms
   {
   public:
     /**
-     * The time stepping strategies. These are controlled by the value of
-     * tolerance() and start_step().
-     */
-    enum Strategy
-    {
-      /**
-       * Choose a uniform time step size. The step size is determined by
-       * start_step(), tolerance() is ignored.
-       */
-      uniform,
-      /**
-       * Start with the time step size given by start_step() and double it in
-       * every step. tolerance() is ignored.
-       *
-       * This strategy is intended for pseudo-timestepping schemes computing a
-       * stationary limit.
-       */
-      doubling
-    };
-
-    /**
      * Constructor setting default values
      */
     TimestepControl(double start      = 0.,
@@ -152,10 +131,6 @@ namespace Algorithms
      */
     void
     tolerance(double);
-    /**
-     * Set strategy.
-     */
-    void strategy(Strategy);
 
     /**
      * Set size of the first step. This may be overwritten by the time
@@ -213,11 +188,6 @@ namespace Algorithms
      * The tolerance value controlling the time steps.
      */
     double tolerance_val;
-
-    /**
-     * Time-stepping strategy.
-     */
-    Strategy strategy_val;
 
     /**
      * The size of the first step.
@@ -322,13 +292,6 @@ namespace Algorithms
   TimestepControl::tolerance(double t)
   {
     tolerance_val = t;
-  }
-
-
-  inline void
-  TimestepControl::strategy(Strategy t)
-  {
-    strategy_val = t;
   }
 
 
