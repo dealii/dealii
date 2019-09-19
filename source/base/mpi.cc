@@ -780,7 +780,12 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       if (job_supports_mpi() == true)
         {
-          if (std::uncaught_exception())
+#  if __cpp_lib_uncaught_exceptions >= 201411
+          // std::uncaught_exception() is deprecated in c++17
+          if (std::uncaught_exceptions() > 0)
+#  else
+          if (std::uncaught_exception() == true)
+#  endif
             {
               std::cerr
                 << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
