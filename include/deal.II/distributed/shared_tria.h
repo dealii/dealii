@@ -56,7 +56,8 @@ namespace parallel
      * "owns" a subset of cells. The use of this class is demonstrated in
      * step-18.
      *
-     * Different from the parallel::distributed::Triangulation, this implies
+     * Different from the parallel::distributed::Triangulation and
+     * parallel::fullydistributed::Triangulation classes, this implies
      * that the entire mesh is stored on each processor. While this is clearly
      * a memory bottleneck that limits the use of this class to a few dozen
      * or hundreds of MPI processes, the partitioning of the mesh can be used
