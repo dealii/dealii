@@ -1636,12 +1636,49 @@ IndexSet::add_index(const size_type index)
 
 
 
+inline void
+IndexSet::add_range(const size_type begin, const size_type end)
+{
+  Assert((begin < index_space_size) ||
+           ((begin == index_space_size) && (end == index_space_size)),
+         ExcIndexRangeType<size_type>(begin, 0, index_space_size));
+  Assert(end <= index_space_size,
+         ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
+  Assert(begin <= end, ExcIndexRangeType<size_type>(begin, 0, end));
+
+  if (begin != end)
+    {
+      const Range new_range(begin, end);
+
+      // the new index might be larger than the last index present in the
+      // ranges. Then we can skip the binary search
+      if (ranges.size() == 0 || begin > ranges.back().end)
+        ranges.push_back(new_range);
+      else
+        ranges.insert(Utilities::lower_bound(ranges.begin(),
+                                             ranges.end(),
+                                             new_range),
+                      new_range);
+      is_compressed = false;
+    }
+}
+
+
+
 template <typename ForwardIterator>
 inline void
 IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
 {
-  // insert each element of the range. if some of them happen to be
-  // consecutive, merge them to a range
+  if (begin == end)
+    return;
+
+  // identify ranges in the given iterator range by checking whether some
+  // indices happen to be consecutive. to avoid quadratic complexity when
+  // calling add_range many times (as add_range() going into the middle of an
+  // already existing range must shift entries around), we first collect a
+  // vector of ranges.
+  std::vector<std::pair<size_type, size_type>> tmp_ranges;
+  bool                                         ranges_are_sorted = true;
   for (ForwardIterator p = begin; p != end;)
     {
       const size_type begin_index = *p;
@@ -1654,9 +1691,39 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
           ++q;
         }
 
-      add_range(begin_index, end_index);
+      tmp_ranges.emplace_back(begin_index, end_index);
       p = q;
+
+      // if the starting index of the next go-around of the for loop is less
+      // than the end index of the one just identified, then we will have at
+      // least one pair of ranges that are not sorted, and consequently the
+      // whole collection of ranges is not sorted.
+      if (p != end && *p < end_index)
+        ranges_are_sorted = false;
     }
+
+  if (!ranges_are_sorted)
+    std::sort(tmp_ranges.begin(), tmp_ranges.end());
+
+  // if we have many ranges, we first construct a temporary index set (where
+  // we add ranges in a consecutive way, so fast), otherwise, we work with
+  // add_range(). the number 9 is chosen heuristically given the fact that
+  // there are typically up to 8 independent ranges when adding the degrees of
+  // freedom on a 3D cell or 9 when adding degrees of freedom of faces. if
+  // doing cell-by-cell additions, we want to avoid repeated calls to
+  // IndexSet::compress() which gets called upon merging two index sets, so we
+  // want to be in the other branch then.
+  if (tmp_ranges.size() > 9)
+    {
+      IndexSet tmp_set(size());
+      tmp_set.ranges.reserve(tmp_ranges.size());
+      for (const auto &i : tmp_ranges)
+        tmp_set.add_range(i.first, i.second);
+      this->add_indices(tmp_set);
+    }
+  else
+    for (const auto &i : tmp_ranges)
+      add_range(i.first, i.second);
 }
 
 

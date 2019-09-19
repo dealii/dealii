@@ -1,0 +1,6 @@
+Improved: IndexSet::add_indices() could previously have quadratic complexity
+in the number of ranges if many ranges were added. This is now fixed. Note,
+however, that calling IndexSet::add_indices() many times still is of quadratic
+complexity.
+<br>
+(Martin Kronbichler, 2019/09/19)

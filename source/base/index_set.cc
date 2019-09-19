@@ -95,35 +95,6 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
 
 
 void
-IndexSet::add_range(const size_type begin, const size_type end)
-{
-  Assert((begin < index_space_size) ||
-           ((begin == index_space_size) && (end == index_space_size)),
-         ExcIndexRangeType<size_type>(begin, 0, index_space_size));
-  Assert(end <= index_space_size,
-         ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
-  Assert(begin <= end, ExcIndexRangeType<size_type>(begin, 0, end));
-
-  if (begin != end)
-    {
-      const Range new_range(begin, end);
-
-      // the new index might be larger than the last index present in the
-      // ranges. Then we can skip the binary search
-      if (ranges.size() == 0 || begin > ranges.back().end)
-        ranges.push_back(new_range);
-      else
-        ranges.insert(Utilities::lower_bound(ranges.begin(),
-                                             ranges.end(),
-                                             new_range),
-                      new_range);
-      is_compressed = false;
-    }
-}
-
-
-
-void
 IndexSet::do_compress() const
 {
   // we will, in the following, modify mutable variables. this can only
