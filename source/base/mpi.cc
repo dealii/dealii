@@ -642,7 +642,7 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
           // we need to figure out how many MPI processes there are on the
           // current node, as well as how many CPU cores we have. for the
-          // first task, check what get_hostname() returns and then to an
+          // first task, check what get_hostname() returns and then do an
           // allgather so each processor gets the answer
           //
           // in calculating the length of the string, don't forget the
