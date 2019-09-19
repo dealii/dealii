@@ -3566,17 +3566,10 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
 #ifndef DEAL_II_WITH_MPI
   return true;
 #else
-  if (is_artificial())
-    return false;
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return true;
-  else
-    return (this->subdomain_id() == pt->locally_owned_subdomain());
+  return (this->tria->locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id ||
+          this->subdomain_id() == this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3590,14 +3583,9 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   return true;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return true;
-  else
-    return (this->level_subdomain_id() == pt->locally_owned_subdomain());
+  return (this->tria->locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id ||
+          this->level_subdomain_id() == this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3609,21 +3597,17 @@ CellAccessor<dim, spacedim>::is_ghost() const
 {
   Assert(this->active(),
          ExcMessage("is_ghost() can only be called on active cells!"));
-  if (is_artificial() || this->has_children())
+  if (this->has_children())
     return false;
 
 #ifndef DEAL_II_WITH_MPI
   return false;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return false;
-  else
-    return (this->subdomain_id() != pt->locally_owned_subdomain());
+  return (this->tria->locally_owned_subdomain() !=
+            numbers::invalid_subdomain_id &&
+          this->subdomain_id() != this->tria->locally_owned_subdomain() &&
+          this->subdomain_id() != numbers::artificial_subdomain_id);
 
 #endif
 }
@@ -3640,14 +3624,9 @@ CellAccessor<dim, spacedim>::is_artificial() const
   return false;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return false;
-  else
-    return this->subdomain_id() == numbers::artificial_subdomain_id;
+  return (this->tria->locally_owned_subdomain() !=
+            numbers::invalid_subdomain_id &&
+          this->subdomain_id() == numbers::artificial_subdomain_id);
 
 #endif
 }
