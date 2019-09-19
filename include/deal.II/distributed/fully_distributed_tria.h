@@ -86,6 +86,13 @@ namespace parallel
       CellData() = default;
 
       /**
+       * Boost serialization function
+       */
+      template <class Archive>
+      void
+      serialize(Archive &ar, const unsigned int /*version*/);
+
+      /**
        * Unique CellID of the cell.
        */
       CellId::binary_type id;
@@ -118,7 +125,8 @@ namespace parallel
        *
        * @note Only used for 3D.
        */
-      std::array<types::material_id, GeometryInfo<dim>::quads_per_cell>
+      std::array<types::material_id,
+                 dim == 1 ? 1 : GeometryInfo<3>::quads_per_cell>
         manifold_quad_ids;
 
       /**
@@ -139,6 +147,13 @@ namespace parallel
     template <int dim, int spacedim>
     struct ConstructionData
     {
+      /**
+       * Boost serialization function
+       */
+      template <class Archive>
+      void
+      serialize(Archive &ar, const unsigned int /*version*/);
+
       /**
        * Cells of the locally-relevant coarse-grid triangulation.
        */
@@ -384,6 +399,42 @@ namespace parallel
       bool
         currently_processing_prepare_coarsening_and_refinement_for_internal_usage;
     };
+
+
+#ifndef DOXYGEN
+
+    template <int dim>
+    template <class Archive>
+    void
+    CellData<dim>::serialize(Archive &ar, const unsigned int /*version*/)
+    {
+      ar &id;
+      ar &subdomain_id;
+      ar &level_subdomain_id;
+      ar &manifold_id;
+      if (dim >= 2)
+        ar &manifold_line_ids;
+      if (dim >= 3)
+        ar &manifold_quad_ids;
+      ar &boundary_ids;
+    }
+
+
+    template <int dim, int spacedim>
+    template <class Archive>
+    void
+    ConstructionData<dim, spacedim>::serialize(Archive &ar,
+                                               const unsigned int /*version*/)
+    {
+      ar &coarse_cells;
+      ar &coarse_cell_vertices;
+      ar &coarse_cell_index_to_coarse_cell_id;
+      ar &cell_infos;
+      ar &settings;
+    }
+
+
+#endif
 
   } // namespace fullydistributed
 } // namespace parallel

@@ -72,4 +72,55 @@ print_statistics(const DoFHandler<dim, spacedim> &dof_handler,
   deallog << std::endl;
 }
 
+namespace dealii
+{
+  namespace parallel
+  {
+    namespace fullydistributed
+    {
+      template <int dim>
+      bool
+      operator==(const CellData<dim> &t1, const CellData<dim> &t2)
+      {
+        if (t1.id != t2.id)
+          return false;
+        if (t1.subdomain_id != t2.subdomain_id)
+          return false;
+        if (t1.level_subdomain_id != t2.level_subdomain_id)
+          return false;
+        if (t1.manifold_id != t2.manifold_id)
+          return false;
+        if (dim >= 2 && t1.manifold_line_ids != t2.manifold_line_ids)
+          return false;
+        if (dim >= 3 && t1.manifold_quad_ids != t2.manifold_quad_ids)
+          return false;
+        if (t1.boundary_ids != t2.boundary_ids)
+          return false;
+
+        return true;
+      }
+
+      template <int dim, int spacedim>
+      bool
+      operator==(const ConstructionData<dim, spacedim> &t1,
+                 const ConstructionData<dim, spacedim> &t2)
+      {
+        if (t1.coarse_cells != t2.coarse_cells)
+          return false;
+        if (t1.coarse_cell_vertices != t2.coarse_cell_vertices)
+          return false;
+        if (t1.coarse_cell_index_to_coarse_cell_id !=
+            t2.coarse_cell_index_to_coarse_cell_id)
+          return false;
+        if (t1.cell_infos != t2.cell_infos)
+          return false;
+        if (t1.settings != t2.settings)
+          return false;
+
+        return true;
+      }
+    } // namespace fullydistributed
+  }   // namespace parallel
+} // namespace dealii
+
 #endif
