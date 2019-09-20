@@ -1138,6 +1138,9 @@ namespace internal
       static ArrayElementType value;
     };
 
+    template <typename Type>
+    Type Uninitialized<Type>::value;
+
     template <typename ArrayElementType>
     DEAL_II_CONSTEXPR inline ArrayElementType &
     subscript(ArrayElementType *,
