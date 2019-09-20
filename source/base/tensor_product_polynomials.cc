@@ -164,7 +164,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  unsigned int indices[(dim > 0) ? dim : 1];
+  unsigned int indices[dim];
   compute_index(i, indices);
 
   // compute values and
@@ -191,6 +191,17 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
     }
 
   return grad;
+}
+
+
+
+template <>
+Tensor<1, 0>
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad(
+  const unsigned int,
+  const Point<0> &) const
+{
+  return Tensor<1, 0>();
 }
 
 
@@ -236,6 +247,17 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
       }
 
   return grad_grad;
+}
+
+
+
+template <>
+Tensor<2, 0>
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad_grad(
+  const unsigned int,
+  const Point<0> &) const
+{
+  return Tensor<2, 0>();
 }
 
 
