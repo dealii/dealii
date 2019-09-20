@@ -119,7 +119,36 @@ executable.
   then functions.
   <br>
   Exceptions shall be declared at the end of the public section
-  before the non-public sections start.</li>
+  before the non-public sections start.
+  <br>
+  We do not use the C++11-style class member initialization for member variables
+  that are neither <code>static const</code> nor <code>static constexpr</code>;
+  i.e., instead of
+@code
+  class Foo
+  {
+    int a = 42;
+    int *b = nullptr;
+  };
+@endcode
+  write
+@code
+  class Foo
+  {
+    Foo();
+
+    int a;
+    int *b;
+  };
+
+
+
+  inline Foo::Foo()
+  : a(42)
+  , b(nullptr)
+  {}
+@endcode
+  </li>
 
 <li> If a function has both input and output parameters, usually the
   input parameters shall precede the output parameters, unless there
