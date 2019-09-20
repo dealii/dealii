@@ -123,7 +123,7 @@ namespace parallel
        *
        * @note Only used for 2D and 3D.
        */
-      std::array<types::material_id, GeometryInfo<dim>::lines_per_cell>
+      std::array<types::manifold_id, GeometryInfo<dim>::lines_per_cell>
         manifold_line_ids;
 
       /**
@@ -131,7 +131,7 @@ namespace parallel
        *
        * @note Only used for 3D.
        */
-      std::array<types::material_id,
+      std::array<types::manifold_id,
                  dim == 1 ? 1 : GeometryInfo<3>::quads_per_cell>
         manifold_quad_ids;
 
