@@ -328,7 +328,7 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      *
-     * @note: The @p trilinos_vec is not allowed to have ghost entries.
+     * @note The @p trilinos_vec is not allowed to have ghost entries.
      */
     void
     import(const TrilinosWrappers::MPI::Vector &trilinos_vec,

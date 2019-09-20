@@ -742,7 +742,7 @@ namespace VectorTools
    * yourself by calling the @p AffineConstraints::distribute function of your
    * hanging node constraints object.
    *
-   * @note: This function works with parallel::distributed::Triangulation, but
+   * @note This function works with parallel::distributed::Triangulation, but
    * only if the parallel partitioning is the same for both meshes (see the
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
    * flag).

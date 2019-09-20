@@ -582,7 +582,7 @@ public:
    * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only
    * have same value for all components.
    *
-   * @note: we copy the underlying component value data from @p f from its
+   * @note We copy the underlying component value data from @p f from its
    * beginning. So the number of components of @p f cannot be less than the
    * calling object.
    */

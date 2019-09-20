@@ -144,7 +144,7 @@ namespace parallel
      * ghost cell adjacent to the cells of the local processor. In other
      * words, this is the set of subdomain_id() for all ghost cells.
      *
-     * @note: If @p i is contained in the list of processor @p j, then @p j
+     * @note If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
     const std::set<types::subdomain_id> &
@@ -156,7 +156,7 @@ namespace parallel
      * other words, this is the set of level_subdomain_id() for all level
      * ghost cells.
      *
-     * @note: If @p i is contained in the list of processor @p j, then @p j
+     * @note If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
     const std::set<types::subdomain_id> &
