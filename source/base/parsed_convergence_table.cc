@@ -48,10 +48,10 @@ namespace
     for (unsigned int i = 0; i < component_names.size(); ++i)
       {
         if (unique_component_names[j] != component_names[i])
-          masks.emplace_back(ComponentMask(bools[j++]));
+          masks.emplace_back(bools[j++]);
         bools[j][i] = true;
       }
-    masks.emplace_back(ComponentMask(bools[j++]));
+    masks.emplace_back(bools[j++]);
     AssertDimension(j, unique_component_names.size());
     return masks;
   }

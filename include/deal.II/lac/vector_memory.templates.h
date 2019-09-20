@@ -132,8 +132,7 @@ GrowingVectorMemory<VectorType>::alloc()
     }
 
   // no free vector found, so let's just allocate a new one
-  get_pool().data->emplace_back(
-    entry_type(true, std_cxx14::make_unique<VectorType>()));
+  get_pool().data->emplace_back(true, std_cxx14::make_unique<VectorType>());
 
   return get_pool().data->back().second.get();
 }
