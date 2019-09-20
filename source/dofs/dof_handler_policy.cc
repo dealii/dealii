@@ -3476,7 +3476,7 @@ namespace internal
                 numbers::invalid_subdomain_id, *dof_handler, level);
 
             // then add a complete, sequential index set
-            number_caches.emplace_back(NumberCache(n_level_dofs));
+            number_caches.emplace_back(n_level_dofs);
           }
 
         const_cast<dealii::Triangulation<DoFHandlerType::dimension,
