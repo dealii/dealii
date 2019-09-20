@@ -65,7 +65,7 @@ public:
   /**
    * Constructor setting the counter to zero.
    */
-  Subscriptor();
+  Subscriptor() = default;
 
   /**
    * Copy-constructor.
@@ -208,7 +208,7 @@ private:
    * template.
    *
    */
-  mutable std::atomic<unsigned int> counter;
+  mutable std::atomic<unsigned int> counter{0};
 
   /**
    * In this map, we count subscriptions for each different identification
@@ -238,7 +238,7 @@ private:
    * neither available in the destructor, nor in the constructor, we obtain it
    * in between and store it here.
    */
-  mutable const std::type_info *object_info;
+  mutable const std::type_info *object_info{nullptr};
 
   /**
    * Check that there are no objects subscribing to this object. If this check
@@ -265,16 +265,7 @@ private:
 
 //---------------------------------------------------------------------------
 
-inline Subscriptor::Subscriptor()
-  : counter(0)
-  , object_info(nullptr)
-{}
-
-
-
 inline Subscriptor::Subscriptor(const Subscriptor &)
-  : counter(0)
-  , object_info(nullptr)
 {}
 
 
