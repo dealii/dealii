@@ -410,7 +410,8 @@ private:
    * <tt>i</tt>.
    */
   void
-  compute_index(const unsigned int i, unsigned int (&indices)[dim]) const;
+  compute_index(const unsigned int i,
+                unsigned int (&indices)[(dim > 0 ? dim : 1)]) const;
 
   /**
    * Given the input to the constructor, compute <tt>n_pols</tt>.
