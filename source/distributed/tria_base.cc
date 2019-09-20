@@ -56,7 +56,6 @@ namespace parallel
            ExcMessage("You compiled deal.II without MPI support, for "
                       "which parallel::TriangulationBase is not available."));
 #endif
-    number_cache.n_locally_owned_active_cells.resize(n_subdomains);
   }
 
 
@@ -99,8 +98,6 @@ namespace parallel
       MemoryConsumption::memory_consumption(mpi_communicator) +
       MemoryConsumption::memory_consumption(my_subdomain) +
       MemoryConsumption::memory_consumption(
-        number_cache.n_locally_owned_active_cells) +
-      MemoryConsumption::memory_consumption(
         number_cache.n_global_active_cells) +
       MemoryConsumption::memory_consumption(number_cache.n_global_levels);
     return mem;
@@ -117,7 +114,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   TriangulationBase<dim, spacedim>::NumberCache::NumberCache()
-    : n_global_active_cells(0)
+    : n_locally_owned_active_cells(0)
     , n_global_levels(0)
   {}
 
@@ -125,7 +122,7 @@ namespace parallel
   unsigned int
   TriangulationBase<dim, spacedim>::n_locally_owned_active_cells() const
   {
-    return number_cache.n_locally_owned_active_cells[my_subdomain];
+    return number_cache.n_locally_owned_active_cells;
   }
 
   template <int dim, int spacedim>
@@ -143,11 +140,32 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  const std::vector<unsigned int> &
-  TriangulationBase<dim, spacedim>::n_locally_owned_active_cells_per_processor()
-    const
+  std::vector<unsigned int>
+  TriangulationBase<dim, spacedim>::
+    compute_n_locally_owned_active_cells_per_processor() const
   {
-    return number_cache.n_locally_owned_active_cells;
+    ;
+#ifdef DEAL_II_WITH_MPI
+    std::vector<unsigned int> n_locally_owned_active_cells_per_processor(
+      Utilities::MPI::n_mpi_processes(this->mpi_communicator), 0);
+
+    if (this->n_levels() > 0)
+      {
+        const int ierr =
+          MPI_Allgather(&number_cache.n_locally_owned_active_cells,
+                        1,
+                        MPI_UNSIGNED,
+                        n_locally_owned_active_cells_per_processor.data(),
+                        1,
+                        MPI_UNSIGNED,
+                        this->mpi_communicator);
+        AssertThrowMPI(ierr);
+      }
+
+    return n_locally_owned_active_cells_per_processor;
+#else
+    return {number_cache.n_locally_owned_active_cells};
+#endif
   }
 
   template <int dim, int spacedim>
@@ -162,16 +180,9 @@ namespace parallel
   void
   TriangulationBase<dim, spacedim>::update_number_cache()
   {
-    Assert(number_cache.n_locally_owned_active_cells.size() ==
-             Utilities::MPI::n_mpi_processes(this->mpi_communicator),
-           ExcInternalError());
-
-    std::fill(number_cache.n_locally_owned_active_cells.begin(),
-              number_cache.n_locally_owned_active_cells.end(),
-              0);
-
     number_cache.ghost_owners.clear();
     number_cache.level_ghost_owners.clear();
+    number_cache.n_locally_owned_active_cells = 0;
 
     if (this->n_levels() == 0)
       {
@@ -206,25 +217,11 @@ namespace parallel
            cell != this->end();
            ++cell)
         if (cell->subdomain_id() == my_subdomain)
-          ++number_cache.n_locally_owned_active_cells[my_subdomain];
-
-    unsigned int send_value =
-      number_cache.n_locally_owned_active_cells[my_subdomain];
-    const int ierr =
-      MPI_Allgather(&send_value,
-                    1,
-                    MPI_UNSIGNED,
-                    number_cache.n_locally_owned_active_cells.data(),
-                    1,
-                    MPI_UNSIGNED,
-                    this->mpi_communicator);
-    AssertThrowMPI(ierr);
+          ++number_cache.n_locally_owned_active_cells;
 
     number_cache.n_global_active_cells =
-      std::accumulate(number_cache.n_locally_owned_active_cells.begin(),
-                      number_cache.n_locally_owned_active_cells.end(),
-                      /* ensure sum is computed with correct data type:*/
-                      static_cast<types::global_dof_index>(0));
+      Utilities::MPI::sum(number_cache.n_locally_owned_active_cells,
+                          this->mpi_communicator);
     number_cache.n_global_levels =
       Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
   }

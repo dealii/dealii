@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,10 +79,11 @@ namespace parallel
      * that contribute to this triangulation. The element of this vector
      * indexed by locally_owned_subdomain() equals the result of
      * n_locally_owned_active_cells().
+     *
+     * @note This function involves global communication!
      */
-    const std::vector<unsigned int> &
-    n_locally_owned_active_cells_per_processor() const;
-
+    std::vector<unsigned int>
+    compute_n_locally_owned_active_cells_per_processor() const;
 
     /**
      * Return the number of active cells in the triangulation that are locally
@@ -195,10 +196,9 @@ namespace parallel
     struct NumberCache
     {
       /**
-       * This vector stores the number of locally owned active cells per MPI
-       * rank.
+       * Number of locally owned active cells of this MPI rank.
        */
-      std::vector<unsigned int> n_locally_owned_active_cells;
+      unsigned int n_locally_owned_active_cells;
       /**
        * The total number of active cells (sum of @p
        * n_locally_owned_active_cells).
