@@ -204,6 +204,9 @@ struct CellData
   template <class Archive>
   void
   serialize(Archive &ar, const unsigned int version);
+
+  static_assert(structdim > 0,
+                "The class CellData can only be used for structdim>0.");
 };
 
 
