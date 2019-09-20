@@ -48,6 +48,11 @@ namespace Utilities
           static const unsigned int tag_setup = 11;
 
           /**
+           * The minimum grain size for the ranges.
+           */
+          static const unsigned int range_minimum_grain_size = 4096;
+
+          /**
            * A vector with as many entries as there are dofs in the dictionary
            * of the current process, and each entry containing the rank of the
            * owner of that dof in the IndexSet `owned_indices`. This is
@@ -71,8 +76,8 @@ namespace Utilities
 
           /**
            * The local range of the global index space that is represented in
-           * the dictionary, computed from `dofs_per_process` and the current
-           * MPI rank.
+           * the dictionary, computed from `dofs_per_process`, the current
+           * MPI rank, and range_minimum_grain_size.
            */
           std::pair<types::global_dof_index, types::global_dof_index>
             local_range;
@@ -96,6 +101,13 @@ namespace Utilities
           unsigned int n_dict_procs_in_owned_indices;
 
           /**
+           * A stride to distribute the work more evenly over MPI ranks in
+           * case the grain size forces us to have fewer ranges than we have
+           * processors.
+           */
+          unsigned int stride_small_size;
+
+          /**
            * Set up the dictionary by computing the partitioning from the
            * global size and sending the rank information on locally owned
            * ranges to the owner of the dictionary part.
@@ -103,89 +115,92 @@ namespace Utilities
           void
           reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
           {
+            // 1) set up the partition
             this->partition(owned_indices, comm);
 
 #ifdef DEAL_II_WITH_MPI
             unsigned int my_rank = this_mpi_process(comm);
 
-            types::global_dof_index              dic_local_received = 0;
-            std::map<unsigned int, unsigned int> relevant_procs_map;
+            types::global_dof_index dic_local_received = 0;
+            std::map<unsigned int,
+                     std::vector<std::pair<types::global_dof_index,
+                                           types::global_dof_index>>>
+              buffers;
 
             // 2) collect relevant processes and process local dict entries
-            {
-              std::vector<unsigned int> relevant_procs;
-              for (auto i : owned_indices)
-                {
-                  unsigned int other_rank = this->dof_to_dict_rank(i);
-                  if (other_rank == my_rank)
-                    {
-                      actually_owning_ranks[i - local_range.first] = my_rank;
-                      dic_local_received++;
-                      if (actually_owning_rank_list.empty())
-                        actually_owning_rank_list.push_back(my_rank);
-                    }
-                  else if (relevant_procs.empty() ||
-                           relevant_procs.back() != other_rank)
-                    relevant_procs.push_back(other_rank);
-                }
-
+            for (auto interval = owned_indices.begin_intervals();
+                 interval != owned_indices.end_intervals();
+                 interval++)
               {
-                unsigned int c = 0;
-                for (auto i : relevant_procs)
-                  relevant_procs_map[i] = c++;
-              }
-            }
+                // Due to the granularity of the dictionary, the interval
+                // might be split into several ranges of processor owner
+                // ranks. Here, we process the interval by breaking into
+                // smaller pieces in terms of the dictionary number.
+                std::pair<types::global_dof_index, types::global_dof_index>
+                                   index_range(*interval->begin(), interval->last() + 1);
+                const unsigned int owner_last =
+                  dof_to_dict_rank(interval->last());
+                unsigned int owner_first = numbers::invalid_unsigned_int;
+                while (owner_first != owner_last)
+                  {
+                    owner_first = dof_to_dict_rank(index_range.first);
 
-            n_dict_procs_in_owned_indices = relevant_procs_map.size();
-            std::vector<std::vector<
-              std::pair<types::global_dof_index, types::global_dof_index>>>
-                                     buffers(n_dict_procs_in_owned_indices);
-            std::vector<MPI_Request> request(n_dict_procs_in_owned_indices);
+                    // this explicitly picks up the formula of
+                    // dof_to_dict_rank, so the two places must be in sync
+                    types::global_dof_index next_index =
+                      std::min((index_range.first / dofs_per_process + 1) *
+                                 dofs_per_process,
+                               index_range.second);
+
+                    Assert(next_index > index_range.first, ExcInternalError());
+
+#  ifdef DEBUG
+                    // make sure that the owner is the same on the current
+                    // interval
+                    for (types::global_dof_index i = index_range.first + 1;
+                         i < next_index;
+                         ++i)
+                      AssertDimension(owner_first, dof_to_dict_rank(i));
+#  endif
+
+                    // add the interval, either to the local range or into a
+                    // buffer to be sent to another processor
+                    if (owner_first == my_rank)
+                      {
+                        std::fill(actually_owning_ranks.data() +
+                                    index_range.first - local_range.first,
+                                  actually_owning_ranks.data() + next_index -
+                                    local_range.first,
+                                  my_rank);
+                        dic_local_received += next_index - index_range.first;
+                        if (actually_owning_rank_list.empty())
+                          actually_owning_rank_list.push_back(my_rank);
+                      }
+                    else
+                      buffers[owner_first].emplace_back(index_range.first,
+                                                        next_index);
+
+                    index_range.first = next_index;
+                  }
+              }
+
+            n_dict_procs_in_owned_indices = buffers.size();
+            std::vector<MPI_Request> request;
+            request.reserve(n_dict_procs_in_owned_indices);
 
             // 3) send messages with local dofs to the right dict process
-            {
-              std::vector<std::vector<types::global_dof_index>> temp(
-                n_dict_procs_in_owned_indices);
-
-              // collect dofs of each dict process
-              for (auto i : owned_indices)
-                {
-                  unsigned int other_rank = this->dof_to_dict_rank(i);
-                  if (other_rank != my_rank)
-                    temp[relevant_procs_map[other_rank]].push_back(i);
-                }
-
-              // send dofs to each process
-              for (auto rank_pair : relevant_procs_map)
-                {
-                  const int rank  = rank_pair.first;
-                  const int index = rank_pair.second;
-
-                  // create index set and compress data to be sent
-                  auto &   indices_i = temp[index];
-                  IndexSet is(this->size);
-                  is.add_indices(indices_i.begin(), indices_i.end());
-                  is.compress();
-
-                  // translate index set to a list of pairs
-                  auto &buffer = buffers[index];
-                  for (auto interval = is.begin_intervals();
-                       interval != is.end_intervals();
-                       interval++)
-                    buffer.emplace_back(*interval->begin(),
-                                        interval->last() + 1);
-
-                  // send data
-                  const auto ierr = MPI_Isend(buffer.data(),
-                                              buffer.size() * 2,
-                                              DEAL_II_DOF_INDEX_MPI_TYPE,
-                                              rank,
-                                              tag_setup,
-                                              comm,
-                                              &request[index]);
-                  AssertThrowMPI(ierr);
-                }
-            }
+            for (const auto &rank_pair : buffers)
+              {
+                request.push_back(MPI_Request());
+                const auto ierr = MPI_Isend(rank_pair.second.data(),
+                                            rank_pair.second.size() * 2,
+                                            DEAL_II_DOF_INDEX_MPI_TYPE,
+                                            rank_pair.first,
+                                            tag_setup,
+                                            comm,
+                                            &request.back());
+                AssertThrowMPI(ierr);
+              }
 
             // 4) receive messages until all dofs in dict are processed
             while (this->local_size != dic_local_received)
@@ -221,14 +236,29 @@ namespace Utilities
 
                 // process message: loop over all intervals
                 for (auto interval : buffer)
-                  for (types::global_dof_index i = interval.first;
-                       i < interval.second;
-                       i++)
-                    {
-                      this->actually_owning_ranks[i - this->local_range.first] =
-                        other_rank;
-                      dic_local_received++;
-                    }
+                  {
+#  ifdef DEBUG
+                    for (types::global_dof_index i = interval.first;
+                         i < interval.second;
+                         i++)
+                      Assert(actually_owning_ranks[i - local_range.first] ==
+                               numbers::invalid_unsigned_int,
+                             ExcInternalError());
+                    Assert(interval.first >= local_range.first &&
+                             interval.first < local_range.second,
+                           ExcInternalError());
+                    Assert(interval.second > local_range.first &&
+                             interval.second <= local_range.second,
+                           ExcInternalError());
+#  endif
+
+                    std::fill(actually_owning_ranks.data() + interval.first -
+                                local_range.first,
+                              actually_owning_ranks.data() + interval.second -
+                                local_range.first,
+                              other_rank);
+                    dic_local_received += interval.second - interval.first;
+                  }
               }
 
             std::sort(actually_owning_rank_list.begin(),
@@ -251,12 +281,26 @@ namespace Utilities
 
           /**
            * Translate a global dof index to the MPI rank in the dictionary
-           * using `dofs_per_process`.
+           * using `dofs_per_process`. We multiply by `stride_small_size` to
+           * ensure a balance over the MPI ranks due to the grain size.
            */
           unsigned int
           dof_to_dict_rank(const types::global_dof_index i)
           {
-            return i / dofs_per_process;
+            // note: this formula is also explicitly used in reinit()
+            return (i / dofs_per_process) * stride_small_size;
+          }
+
+          /**
+           * Given an MPI rank id of an arbitrary processor, return the index
+           * offset where the local range of that processor begins.
+           */
+          types::global_dof_index
+          get_index_offset(const unsigned int rank)
+          {
+            return std::min(dofs_per_process * ((rank + stride_small_size - 1) /
+                                                stride_small_size),
+                            size);
           }
 
           /**
@@ -295,14 +339,23 @@ namespace Utilities
             const unsigned int n_procs = n_mpi_processes(comm);
             const unsigned int my_rank = this_mpi_process(comm);
 
-            size              = owned_indices.size();
-            dofs_per_process  = (size + n_procs - 1) / n_procs;
-            local_range.first = std::min(dofs_per_process * my_rank, size);
-            local_range.second =
-              std::min(dofs_per_process * (my_rank + 1), size);
+            size             = owned_indices.size();
+            dofs_per_process = (size + n_procs - 1) / n_procs;
+            if (dofs_per_process < range_minimum_grain_size)
+              {
+                dofs_per_process  = range_minimum_grain_size;
+                stride_small_size = dofs_per_process * n_procs / size;
+              }
+            else
+              stride_small_size = 1;
+            local_range.first  = get_index_offset(my_rank);
+            local_range.second = get_index_offset(my_rank + 1);
+
             local_size = local_range.second - local_range.first;
 
-            actually_owning_ranks.resize(local_size);
+            actually_owning_ranks = {};
+            actually_owning_ranks.resize(local_size,
+                                         numbers::invalid_unsigned_int);
 #else
             (void)owned_indices;
             (void)comm;
@@ -596,8 +649,7 @@ namespace Utilities
                     for (const auto &j : requesters[i])
                       {
                         const types::global_dof_index index_offset =
-                          static_cast<types::global_dof_index>(my_rank) *
-                          dict.dofs_per_process;
+                          dict.get_index_offset(my_rank);
                         IndexSet &my_index_set = requested_indices[j.first];
                         my_index_set.set_size(owned_indices.size());
                         for (const auto &interval : j.second)
@@ -662,8 +714,7 @@ namespace Utilities
                 // unpack the message and translate the dictionary-local
                 // indices coming via MPI to the global index range
                 const types::global_dof_index index_offset =
-                  static_cast<types::global_dof_index>(status.MPI_SOURCE) *
-                  dict.dofs_per_process;
+                  dict.get_index_offset(status.MPI_SOURCE);
                 unsigned int offset = 0;
                 while (offset < buffer.size())
                   {
