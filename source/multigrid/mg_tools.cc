@@ -1320,13 +1320,14 @@ namespace MGTools
     local_dofs.reserve(DoFTools::max_dofs_per_face(dof));
     std::fill(local_dofs.begin(), local_dofs.end(), numbers::invalid_dof_index);
 
+    std::vector<std::vector<types::global_dof_index>> dofs_by_level(
+      dof.get_triangulation().n_levels());
+
     // First, deal with the simpler case when we have to identify all boundary
     // dofs
     if (component_mask.n_selected_components(n_components) == n_components)
       {
-        typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(),
-                                                          endc = dof.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof.cell_iterators())
           {
             if (dof.get_triangulation().locally_owned_subdomain() !=
                   numbers::invalid_subdomain_id &&
@@ -1348,8 +1349,9 @@ namespace MGTools
                   if (boundary_ids.find(bi) != boundary_ids.end())
                     {
                       face->get_mg_dof_indices(level, local_dofs);
-                      boundary_indices[level].add_indices(local_dofs.begin(),
-                                                          local_dofs.end());
+                      dofs_by_level[level].insert(dofs_by_level[level].end(),
+                                                  local_dofs.begin(),
+                                                  local_dofs.end());
                     }
                 }
           }
@@ -1360,9 +1362,7 @@ namespace MGTools
                ExcMessage(
                  "It's probably worthwhile to select at least one component."));
 
-        typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(),
-                                                          endc = dof.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof.cell_iterators())
           if (dof.get_triangulation().locally_owned_subdomain() ==
                 numbers::invalid_subdomain_id ||
               cell->level_subdomain_id() != numbers::artificial_subdomain_id)
@@ -1439,14 +1439,24 @@ namespace MGTools
                             Assert(component != numbers::invalid_unsigned_int,
                                    ExcInternalError());
                             if (component_mask[component] == true)
-                              boundary_indices[level].add_index(local_dofs[i]);
+                              dofs_by_level[level].push_back(local_dofs[i]);
                           }
                       }
                     else
-                      boundary_indices[level].add_indices(local_dofs.begin(),
-                                                          local_dofs.end());
+                      dofs_by_level[level].insert(dofs_by_level[level].end(),
+                                                  local_dofs.begin(),
+                                                  local_dofs.end());
                   }
               }
+      }
+    for (unsigned int level = 0; level < dof.get_triangulation().n_levels();
+         ++level)
+      {
+        std::sort(dofs_by_level[level].begin(), dofs_by_level[level].end());
+        boundary_indices[level].add_indices(
+          dofs_by_level[level].begin(),
+          std::unique(dofs_by_level[level].begin(),
+                      dofs_by_level[level].end()));
       }
   }
 

@@ -1,0 +1,3 @@
+Improved: MGTools::make_boundary_list() has been made faster.
+<br>
+(Martin Kronbichler, 2019/09/19)
