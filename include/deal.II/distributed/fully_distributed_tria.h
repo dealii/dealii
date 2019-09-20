@@ -93,6 +93,12 @@ namespace parallel
       serialize(Archive &ar, const unsigned int /*version*/);
 
       /**
+       * Comparison operator.
+       */
+      bool
+      operator==(const CellData<dim> &other) const;
+
+      /**
        * Unique CellID of the cell.
        */
       CellId::binary_type id;
@@ -153,6 +159,12 @@ namespace parallel
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int /*version*/);
+
+      /**
+       * Comparison operator.
+       */
+      bool
+      operator==(const ConstructionData<dim, spacedim> &other) const;
 
       /**
        * Cells of the locally-relevant coarse-grid triangulation.
@@ -433,6 +445,51 @@ namespace parallel
       ar &settings;
     }
 
+
+
+    template <int dim>
+    bool
+    CellData<dim>::operator==(const CellData<dim> &other) const
+    {
+      if (this->id != other.id)
+        return false;
+      if (this->subdomain_id != other.subdomain_id)
+        return false;
+      if (this->level_subdomain_id != other.level_subdomain_id)
+        return false;
+      if (this->manifold_id != other.manifold_id)
+        return false;
+      if (dim >= 2 && this->manifold_line_ids != other.manifold_line_ids)
+        return false;
+      if (dim >= 3 && this->manifold_quad_ids != other.manifold_quad_ids)
+        return false;
+      if (this->boundary_ids != other.boundary_ids)
+        return false;
+
+      return true;
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool
+    ConstructionData<dim, spacedim>::
+    operator==(const ConstructionData<dim, spacedim> &other) const
+    {
+      if (this->coarse_cells != other.coarse_cells)
+        return false;
+      if (this->coarse_cell_vertices != other.coarse_cell_vertices)
+        return false;
+      if (this->coarse_cell_index_to_coarse_cell_id !=
+          other.coarse_cell_index_to_coarse_cell_id)
+        return false;
+      if (this->cell_infos != other.cell_infos)
+        return false;
+      if (this->settings != other.settings)
+        return false;
+
+      return true;
+    }
 
 #endif
 
