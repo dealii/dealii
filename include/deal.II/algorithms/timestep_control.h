@@ -161,18 +161,6 @@ namespace Algorithms
     bool
     print();
 
-    /**
-     * Set the output name template.
-     */
-    void
-    file_name_format(const std::string &format);
-
-    /**
-     * Return the output name template.
-     */
-    const std::string &
-    file_name_format();
-
   private:
     /**
      * The beginning of the time interval.
@@ -231,11 +219,6 @@ namespace Algorithms
      * If current time exceeds this value, it is time to generate the output.
      */
     double next_print_val;
-
-    /**
-     * Output file name template.
-     */
-    std::string format;
   };
 
 
@@ -321,19 +304,6 @@ namespace Algorithms
       next_print_val = now_val - 1.;
   }
 
-
-  inline void
-  TimestepControl::file_name_format(const std::string &fmt)
-  {
-    format = fmt;
-  }
-
-
-  inline const std::string &
-  TimestepControl::file_name_format()
-  {
-    return format;
-  }
 } // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
