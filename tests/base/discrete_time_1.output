@@ -1,0 +1,27 @@
+
+DEAL:Start to end::Start time = 0.00000
+DEAL:Start to end::End time = 1.50000
+DEAL:Start to end::Current time = 0.00000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.123000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.246000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.369000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.492000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.615000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.738000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.861000, next step size = 0.123000
+DEAL:Start to end::Current time = 0.984000, next step size = 0.123000
+DEAL:Start to end::Current time = 1.10700, next step size = 0.123000
+DEAL:Start to end::Current time = 1.23000, next step size = 0.123000
+DEAL:Start to end::Current time = 1.35300, next step size = 0.123000
+DEAL:Start to end::Current time = 1.47600, next step size = 0.0240000
+DEAL:Start to end::Current time = 1.50000, next step size = 0.00000
+DEAL:Start to end::Restarted
+DEAL:Start to end::Current time = 0.00000, next step size = 0.123000
+DEAL:Start to end::OK
+DEAL:Adjust time step size::Current time = 0.400000, next step size = 0.150000
+DEAL:Adjust time step size::Current time = 0.550000, next step size = 0.150000
+DEAL:Adjust time step size::Current time = 0.910000, next step size = 0.360000
+DEAL:Adjust time step size::Current time = 1.27000, next step size = 0.360000
+DEAL:Adjust time step size::Current time = 1.88000, next step size = 0.220000
+DEAL:Adjust time step size::Current time = 2.10000, next step size = 0.00000
+DEAL:Adjust time step size::OK
