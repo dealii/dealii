@@ -379,11 +379,12 @@ namespace Step40
         pcout << "   Number of active cells:       "
               << triangulation.n_global_active_cells() << std::endl
               << "      ";
+        const auto n_locally_owned_active_cells_per_processor =
+          triangulation.compute_n_locally_owned_active_cells_per_processor();
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << triangulation.n_locally_owned_active_cells_per_processor()[i]
-                << '+';
+          pcout << n_locally_owned_active_cells_per_processor[i] << '+';
         pcout << std::endl;
 
         pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()

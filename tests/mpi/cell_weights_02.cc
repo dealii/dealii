@@ -59,10 +59,12 @@ test()
     std::bind(&cell_weight<dim>, std::placeholders::_1, std::placeholders::_2));
   tr.refine_global(1);
 
+  const auto n_locally_owned_active_cells_per_processor =
+    tr.compute_n_locally_owned_active_cells_per_processor();
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int p = 0; p < numproc; ++p)
       deallog << "processor " << p << ": "
-              << tr.n_locally_owned_active_cells_per_processor()[p]
+              << n_locally_owned_active_cells_per_processor[p]
               << " locally owned active cells" << std::endl;
 }
 
