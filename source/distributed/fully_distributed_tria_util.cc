@@ -23,6 +23,8 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/grid/grid_tools.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace parallel
@@ -512,6 +514,106 @@ namespace parallel
 
         return construction_data;
       }
+
+
+
+      template <int dim, int spacedim>
+      ConstructionData<dim, spacedim>
+      create_construction_data_from_triangulation_in_groups(
+        std::function<void(dealii::Triangulation<dim, spacedim> &)>
+                                                serial_grid_generator,
+        std::function<void(dealii::Triangulation<dim, spacedim> &,
+                           const MPI_Comm,
+                           const unsigned int)> serial_grid_partitioner,
+        const MPI_Comm                          comm,
+        const int                               group_size,
+        const bool                              construct_multilevel_hierarchy)
+      {
+#ifndef DEAL_II_WITH_MPI
+        (void)serial_grid_generator;
+        (void)serial_grid_partitioner;
+        (void)comm;
+        (void)group_size;
+        (void)construct_multilevel_hierarchy;
+
+        return ConstructionData<dim, spacedim>();
+#else
+        const unsigned int my_rank =
+          dealii::Utilities::MPI::this_mpi_process(comm);
+        const unsigned int group_root = (my_rank / group_size) * group_size;
+
+        // check if process is root of the group
+        if (my_rank == group_root)
+          {
+            // Step 1: create serial triangulation
+            dealii::Triangulation<dim, spacedim> tria(
+              construct_multilevel_hierarchy ?
+                dealii::Triangulation<dim, spacedim>::none :
+                dealii::Triangulation<dim, spacedim>::
+                  limit_level_difference_at_vertices);
+            serial_grid_generator(tria);
+
+            // Step 2: partition active cells and ...
+            serial_grid_partitioner(tria, comm, group_size);
+
+            // ... cells on the levels if multigrid is required
+            if (construct_multilevel_hierarchy)
+              GridTools::partition_multigrid_levels(tria);
+
+            const unsigned int end_group =
+              std::min(group_root + group_size,
+                       dealii::Utilities::MPI::n_mpi_processes(comm));
+
+            // 3) create ConstructionData for the other processes in group
+            for (unsigned int other_rank = group_root + 1;
+                 other_rank < end_group;
+                 other_rank++)
+              {
+                // 3a) create construction data for other ranks
+                const auto construction_data =
+                  create_construction_data_from_triangulation(
+                    tria, comm, construct_multilevel_hierarchy, other_rank);
+                // 3b) pack
+                std::vector<char> buffer;
+                dealii::Utilities::pack(construction_data, buffer, false);
+
+                // 3c) send ConstructionData
+                const auto ierr = MPI_Send(
+                  buffer.data(), buffer.size(), MPI_CHAR, other_rank, 0, comm);
+                AssertThrowMPI(ierr);
+              }
+
+            // 4) create ConstructionData for this process (root of group)
+            return create_construction_data_from_triangulation(
+              tria, comm, construct_multilevel_hierarchy, my_rank);
+          }
+        else
+          {
+            // 3a) recv packed ConstructionData from group-root process
+            //     (counter-part of 3c of root process)
+            MPI_Status status;
+            auto       ierr = MPI_Probe(group_root, 0, comm, &status);
+            AssertThrowMPI(ierr);
+            int len;
+            MPI_Get_count(&status, MPI_CHAR, &len);
+            std::vector<char> buf(len);
+            ierr =
+              MPI_Recv(buf.data(), len, MPI_CHAR, group_root, 0, comm, &status);
+            AssertThrowMPI(ierr);
+
+            // 3b) unpack ConstructionData (counter-part of 3b of root process)
+            auto construction_data = dealii::Utilities::template unpack<
+              ConstructionData<dim, spacedim>>(buf, false);
+
+            // WARNING: serialization cannot handle the MPI communicator
+            // which is the reason why we have to set it here explicitly
+            construction_data.comm = comm;
+
+            return construction_data;
+          }
+#endif
+      }
+
     } // namespace Utilities
   }   // namespace fullydistributed
 } // namespace parallel
