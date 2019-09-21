@@ -364,21 +364,19 @@ namespace parallel
   {
     // 1) collect for each vertex on periodic faces all vertices it coincides
     //    with
-    std::map<unsigned int, std::set<unsigned int>>
-      vertex_to_coinciding_vertices;
-    {
-      // 1a) collect nodes coinciding due to periodicity
-      std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex;
+    std::map<unsigned int, std::vector<unsigned int>> coinciding_vertex_groups;
+    std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
 
+    {
       static const int lookup_table_2d[2][2] =
-        //               flip:
+        //           flip:
         {
           {0, 1}, // false
           {1, 0}  // true
         };
 
       static const int lookup_table_3d[2][2][2][4] =
-        //                           orientation flip  rotation
+        //                   orientation flip  rotation
         {{{
             {0, 2, 1, 3}, // false       false false
             {2, 3, 0, 1}  // false       false true
@@ -397,7 +395,7 @@ namespace parallel
           }}};
 
       // loop over all periodic face pairs
-      for (auto pair : this->get_periodic_face_map())
+      for (const auto &pair : this->get_periodic_face_map())
         {
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
@@ -434,62 +432,46 @@ namespace parallel
               const auto   vertex_a = face_a->vertex_index(i);
               const auto   vertex_b = face_b->vertex_index(j);
               unsigned int temp     = std::min(vertex_a, vertex_b);
-              {
-                auto it = vertex_to_coinciding_vertex.find(vertex_a);
-                if (it != vertex_to_coinciding_vertex.end())
-                  temp = std::min(temp, it->second);
-              }
-              {
-                auto it = vertex_to_coinciding_vertex.find(vertex_b);
-                if (it != vertex_to_coinciding_vertex.end())
-                  temp = std::min(temp, it->second);
-              }
-              vertex_to_coinciding_vertex[vertex_a] = temp;
-              vertex_to_coinciding_vertex[vertex_b] = temp;
+
+              auto it_a = vertex_to_coinciding_vertex_group.find(vertex_a);
+              if (it_a != vertex_to_coinciding_vertex_group.end())
+                temp = std::min(temp, it_a->second);
+
+              auto it_b = vertex_to_coinciding_vertex_group.find(vertex_b);
+              if (it_b != vertex_to_coinciding_vertex_group.end())
+                temp = std::min(temp, it_b->second);
+
+              if (it_a != vertex_to_coinciding_vertex_group.end())
+                it_a->second = temp;
+              else
+                vertex_to_coinciding_vertex_group[vertex_a] = temp;
+
+              if (it_b != vertex_to_coinciding_vertex_group.end())
+                it_b->second = temp;
+              else
+                vertex_to_coinciding_vertex_group[vertex_b] = temp;
             }
         }
 
       // 1b) compress map: let vertices point to the coinciding vertex with
       //     the smallest index
-      for (auto &p : vertex_to_coinciding_vertex)
+      for (auto &p : vertex_to_coinciding_vertex_group)
         {
           if (p.first == p.second)
             continue;
           unsigned int temp = p.second;
-          while (temp != vertex_to_coinciding_vertex[temp])
-            temp = vertex_to_coinciding_vertex[temp];
+          while (temp != vertex_to_coinciding_vertex_group[temp])
+            temp = vertex_to_coinciding_vertex_group[temp];
           p.second = temp;
         }
 
-#ifdef DEBUG
-      // check if map is actually compressed
-      for (auto p : vertex_to_coinciding_vertex)
-        {
-          if (p.first == p.second)
-            continue;
-          auto pp = vertex_to_coinciding_vertex.find(p.second);
-          if (pp->first == pp->second)
-            continue;
-          AssertThrow(false, ExcMessage("Map has to be compressed!"));
-        }
-#endif
-
       // 1c) create a map: smallest index of coinciding index -> all
       // coinciding indices
-      std::map<unsigned int, std::set<unsigned int>>
-        smallest_coinciding_vertex_to_coinciding_vertices;
-      for (auto p : vertex_to_coinciding_vertex)
-        smallest_coinciding_vertex_to_coinciding_vertices[p.second] =
-          std::set<unsigned int>();
+      for (auto p : vertex_to_coinciding_vertex_group)
+        coinciding_vertex_groups[p.second] = {};
 
-      for (auto p : vertex_to_coinciding_vertex)
-        smallest_coinciding_vertex_to_coinciding_vertices[p.second].insert(
-          p.first);
-
-      // 1d) create a map: vertex -> all coinciding indices
-      for (auto &s : smallest_coinciding_vertex_to_coinciding_vertices)
-        for (auto &ss : s.second)
-          vertex_to_coinciding_vertices[ss] = s.second;
+      for (auto p : vertex_to_coinciding_vertex_group)
+        coinciding_vertex_groups[p.second].push_back(p.first);
     }
 
     // 2) collect vertices belonging to local cells
@@ -518,10 +500,12 @@ namespace parallel
                 result[cell->vertex_index(v)].insert(owner);
 
               // mark also nodes coinciding due to periodicity
-              auto coinciding_vertices =
-                vertex_to_coinciding_vertices.find(cell->vertex_index(v));
-              if (coinciding_vertices != vertex_to_coinciding_vertices.end())
-                for (auto coinciding_vertex : coinciding_vertices->second)
+              auto coinciding_vertex_group =
+                vertex_to_coinciding_vertex_group.find(cell->vertex_index(v));
+              if (coinciding_vertex_group !=
+                  vertex_to_coinciding_vertex_group.end())
+                for (auto coinciding_vertex :
+                     coinciding_vertex_groups[coinciding_vertex_group->second])
                   if (vertex_of_own_cell[coinciding_vertex])
                     result[coinciding_vertex].insert(owner);
             }
