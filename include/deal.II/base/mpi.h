@@ -869,12 +869,13 @@ namespace Utilities
      * This class implements ConsensusAlgorithm, using only point-to-point
      * communications and a single IBarrier.
      *
-     * @note This class closely follows the paper Hoefner et. al. "Scalable
-     *       Communication Protocols for Dynamic Sparse Data Exchange".
-     *       Since the algorithm shown there is not considering payloads, the
-     *       algorithm has been  modified here in such a way that synchronous
-     *       sends (Issend) have been replaced by equivalent Isend/Irecv, where
-     *       Irecv receives the answer to a request (with payload).
+     * @note This class closely follows the paper Hoefler, Siebert, Lumsdaine
+     *       "Scalable Communication Protocols for Dynamic Sparse Data
+     *       Exchange". Since the algorithm shown there is not considering
+     *       payloads, the algorithm has been modified here in such a way that
+     *       synchronous sends (Issend) have been replaced by equivalent
+     *       Isend/Irecv, where Irecv receives the answer to a request (with
+     *       payload).
      *
      * @tparam T1 the type of the elements of the vector to sent
      * @tparam T2 the type of the elements of the vector to received
