@@ -4720,11 +4720,14 @@ namespace internal
             [](const typename DoFHandlerType::active_cell_iterator &cell,
                const std::vector<types::global_dof_index> &received_dof_indices)
             -> void {
-            // this function should only be called on ghost cells, and
+            // this function should only be called on ghost cells; however, it
+            // might happen at periodic boundaries that not locally-relevant
+            // cells might have been sent: simply ignore these
+            if (!cell->is_ghost())
+              return;
+
             // on top of that, only on cells that have not been
             // completed -- which we indicate via the user flag.
-            // check both
-            Assert(cell->is_ghost(), ExcInternalError());
             Assert(cell->user_flag_set(), ExcInternalError());
 
             // if we just got an incomplete array of DoF indices, then we must
