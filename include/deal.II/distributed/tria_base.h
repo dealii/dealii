@@ -246,10 +246,48 @@ namespace parallel
   template <int dim, int spacedim = dim>
   using Triangulation DEAL_II_DEPRECATED = TriangulationBase<dim, spacedim>;
 
+
+
   /**
-   * A base class for distributed triangulations. It can be used to test
-   * (via <tt>dynamic_cast</tt>) whether a particular triangulation object
-   * is able to distribute meshes between processes.
+   * A base class for distributed triangulations, i.e., triangulations that
+   * do not store all cells on all processors. This implies that not
+   * every detail of a triangulation may be known on each processor.
+   * In particular, you have to expect that triangulations of classes
+   * derived from this one only store some of the active cells (namely,
+   * the @ref GlossLocallyOwnedCell "locally owned cells"), along
+   * with @ref GlossGhostCell "ghost cells" and possibly
+   * @ref GlossArtificialCell "artificial cells". In contrast to the classes
+   * derived from parallel::TriangulationBase, it is certain that the
+   * classes derived from the current class will not store the entire
+   * triangulation as long as it has a large enough number of cells. (The
+   * difference to parallel::TriangulationBase is that the
+   * parallel::shared::Triangulation is derived from
+   * parallel::TriangulationBase, but not from the current class.) The
+   * distinction is not large in practice: Everything that is difficult for
+   * parallel distributed triangulation is generally also difficult for any
+   * other kind of parallel triangulation classes; however, this intermediate
+   * base class allows to further differentiate between the different kinds of
+   * classes providing parallel mesh functionality.
+   *
+   * This class can, then, be used to test whether a
+   * pointer or reference to a triangulation object refers to any kind of
+   * parallel triangulation, or whether the triangulation is in fact
+   * parallel distributed. In other words, one could write a function like
+   * this:
+   * @code
+   *   template <int dim, int spacedim>
+   *   bool
+   *   is_parallel_distributed(const dealii::Triangulation<dim,spacedim> &tria)
+   *   {
+   *     if(dynamic_cast<const
+   *                     parallel::DistributedTriangulationBase<dim,spacedim>*>
+   *                    (&tria)
+   *        != nullptr)
+   *       return true;
+   *     else
+   *       return false;
+   *   }
+   * @endcode
    */
   template <int dim, int spacedim = dim>
   class DistributedTriangulationBase
