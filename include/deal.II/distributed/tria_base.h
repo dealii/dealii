@@ -40,8 +40,37 @@ namespace parallel
 {
   /**
    * This class describes the interface for all triangulation classes that
-   * work in parallel, namely parallel::distributed::Triangulation and
+   * work in parallel, namely parallel::distributed::Triangulation,
+   * parallel::fullydistributed::Triangulation, and
    * parallel::shared::Triangulation.
+   *
+   * It is, consequently, a class that can be used to test whether a
+   * pointer of reference to a triangulation object refers to a
+   * sequential triangulation, or whether the triangulation is in fact
+   * parallel. In other words, one could write a function like this:
+   * @code
+   *   template <int dim, int spacedim>
+   *   bool is_parallel (const dealii::Triangulation<dim,spacedim> &tria)
+   *   {
+   *     if (dynamic_cast<const parallel::TriangulationBase<dim,spacedim>*>
+   *                     (&tria)
+   *         != nullptr)
+   *       return true;
+   *     else
+   *       return false;
+   *   }
+   * @endcode
+   *
+   * All parallel triangulations share certain traits, such as the fact that
+   * they communicate via @ref GlossMPICommunicator "MPI communicators" or
+   * that they have
+   * @ref GlossLocallyOwnedCell "locally owned",
+   * @ref GlossGhostCell "ghost", and possibly
+   * @ref GlossArtificialCell "artificial cells". This class provides
+   * a number of member functions that allows querying some information
+   * about the triangulation that is independent of how exactly a
+   * parallel triangulation is implemented (i.e., which of the various
+   * classes derived from the current one it actually is).
    */
   template <int dim, int spacedim = dim>
   class TriangulationBase : public dealii::Triangulation<dim, spacedim>
