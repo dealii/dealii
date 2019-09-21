@@ -170,11 +170,7 @@ namespace internal
     TriaObjectsHex::reserve_space(const unsigned int new_hexes)
     {
       const unsigned int new_size =
-        new_hexes + std::count_if(used.begin(),
-                                  used.end(),
-                                  std::bind(std::equal_to<bool>(),
-                                            std::placeholders::_1,
-                                            true));
+        new_hexes + std::count(used.begin(), used.end(), true);
 
       // see above...
       if (new_size > cells.size())

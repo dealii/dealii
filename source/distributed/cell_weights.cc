@@ -40,10 +40,11 @@ namespace parallel
         // Add callback function to the cell_weight signal and store its
         // connection.
         tria_listener = triangulation->signals.cell_weight.connect(
-          std::bind(&CellWeights<dim, spacedim>::weight_callback,
-                    std::ref(*this),
-                    std::placeholders::_1,
-                    std::placeholders::_2));
+          [this](
+            const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
+            const typename Triangulation<dim, spacedim>::CellStatus status) {
+            return this->weight_callback(cell_, status);
+          });
       }
     else
       Assert(

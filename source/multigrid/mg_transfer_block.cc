@@ -544,9 +544,9 @@ MGTransferBlockSelect<number>::build_matrices(
       const types::global_dof_index n_active_dofs =
         std::count_if(temp_copy_indices.begin(),
                       temp_copy_indices.end(),
-                      std::bind(std::not_equal_to<types::global_dof_index>(),
-                                std::placeholders::_1,
-                                numbers::invalid_dof_index));
+                      [](const types::global_dof_index index) {
+                        return index != numbers::invalid_dof_index;
+                      });
       copy_indices[selected_block][level].resize(n_active_dofs);
       types::global_dof_index counter = 0;
       for (types::global_dof_index i = 0; i < temp_copy_indices.size(); ++i)
@@ -623,12 +623,12 @@ MGTransferBlock<number>::build_matrices(const DoFHandler<dim, spacedim> &dof,
       for (unsigned int block = 0; block < n_blocks; ++block)
         if (selected[block])
           {
-            const types::global_dof_index n_active_dofs = std::count_if(
-              temp_copy_indices[block].begin(),
-              temp_copy_indices[block].end(),
-              std::bind(std::not_equal_to<types::global_dof_index>(),
-                        std::placeholders::_1,
-                        numbers::invalid_dof_index));
+            const types::global_dof_index n_active_dofs =
+              std::count_if(temp_copy_indices[block].begin(),
+                            temp_copy_indices[block].end(),
+                            [](const types::global_dof_index index) {
+                              return index != numbers::invalid_dof_index;
+                            });
             copy_indices[block][level].resize(n_active_dofs);
             types::global_dof_index counter = 0;
             for (types::global_dof_index i = 0;

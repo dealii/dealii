@@ -812,15 +812,19 @@ DataOut<dim, DoFHandlerType>::build_patches(
     WorkStream::run(
       all_cells.data(),
       all_cells.data() + all_cells.size(),
-      std::bind(&DataOut<dim, DoFHandlerType>::build_one_patch,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                /* no std::placeholders::_3, since this function doesn't
-                   actually need a copy data object -- it just writes everything
-                   right into the output array */
-                n_subdivisions,
-                curved_cell_region),
+      [this, n_subdivisions, curved_cell_region](
+        const std::pair<cell_iterator, unsigned int> *cell_and_index,
+        internal::DataOutImplementation::ParallelData<
+          DoFHandlerType::dimension,
+          DoFHandlerType::space_dimension> &scratch_data,
+        // this function doesn't actually need a copy data object -- it just
+        // writes everything right into the output array
+        int) {
+        this->build_one_patch(cell_and_index,
+                              scratch_data,
+                              n_subdivisions,
+                              curved_cell_region);
+      },
       // no copy-local-to-global function needed here
       std::function<void(const int)>(),
       thread_data,

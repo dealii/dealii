@@ -156,11 +156,11 @@ namespace parallel
       Assert(tria != nullptr, ExcInternalError());
 
       handle = tria->register_data_attach(
-        std::bind(
-          &SolutionTransfer<dim, VectorType, DoFHandlerType>::pack_callback,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2),
+        [this](
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            cell_iterator &cell_,
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            CellStatus status) { return this->pack_callback(cell_, status); },
         /*returns_variable_size_data=*/DoFHandlerType::is_hp_dof_handler);
     }
 
@@ -262,14 +262,15 @@ namespace parallel
 
       tria->notify_ready_to_unpack(
         handle,
-        std::bind(
-          &SolutionTransfer<dim, VectorType, DoFHandlerType>::unpack_callback,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3,
-          std::ref(all_out)));
-
+        [this, &all_out](
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            cell_iterator &cell_,
+          const typename Triangulation<dim, DoFHandlerType::space_dimension>::
+            CellStatus status,
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &data_range) {
+          this->unpack_callback(cell_, status, data_range, all_out);
+        });
 
       for (typename std::vector<VectorType *>::iterator it = all_out.begin();
            it != all_out.end();

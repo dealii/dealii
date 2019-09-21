@@ -96,7 +96,7 @@ PointValueHistory<dim>::PointValueHistory(
   indep_names = std::vector<std::string>();
 
   tria_listener = dof_handler.get_triangulation().signals.any_change.connect(
-    std::bind(&PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
+    [this]() { this->tria_change_listener(); });
 }
 
 
@@ -128,8 +128,7 @@ PointValueHistory<dim>::PointValueHistory(
     {
       tria_listener =
         dof_handler->get_triangulation().signals.any_change.connect(
-          std::bind(&PointValueHistory<dim>::tria_change_listener,
-                    std::ref(*this)));
+          [this]() { this->tria_change_listener(); });
     }
 }
 
@@ -162,8 +161,7 @@ PointValueHistory<dim>::operator=(const PointValueHistory &point_value_history)
     {
       tria_listener =
         dof_handler->get_triangulation().signals.any_change.connect(
-          std::bind(&PointValueHistory<dim>::tria_change_listener,
-                    std::ref(*this)));
+          [this]() { this->tria_change_listener(); });
     }
 
   return *this;
