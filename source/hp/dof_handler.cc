@@ -1731,13 +1731,11 @@ namespace hp
   {
     // connect functions to signals of the underlying triangulation
     tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
-      std::bind(&DoFHandler<dim, spacedim>::pre_refinement_action,
-                std::ref(*this))));
+      [this]() { this->pre_refinement_action(); }));
     tria_listeners.push_back(this->tria->signals.post_refinement.connect(
-      std::bind(&DoFHandler<dim, spacedim>::post_refinement_action,
-                std::ref(*this))));
-    tria_listeners.push_back(this->tria->signals.create.connect(std::bind(
-      &DoFHandler<dim, spacedim>::post_refinement_action, std::ref(*this))));
+      [this]() { this->post_refinement_action(); }));
+    tria_listeners.push_back(this->tria->signals.create.connect(
+      [this]() { this->post_refinement_action(); }));
 
     // decide whether we need a sequential or a parallel shared/distributed
     // policy and attach corresponding callback functions dealing with the
@@ -1751,39 +1749,30 @@ namespace hp
 
         // repartitioning signals
         tria_listeners.push_back(
+          this->tria->signals.pre_distributed_repartition.connect([this]() {
+            internal::hp::DoFHandlerImplementation::Implementation::
+              ensure_absence_of_future_fe_indices<dim, spacedim>(*this);
+          }));
+        tria_listeners.push_back(
           this->tria->signals.pre_distributed_repartition.connect(
-            std::bind(&internal::hp::DoFHandlerImplementation::Implementation::
-                        ensure_absence_of_future_fe_indices<dim, spacedim>,
-                      std::ref(*this))));
+            [this]() { this->pre_distributed_active_fe_index_transfer(); }));
         tria_listeners.push_back(
-          this->tria->signals.pre_distributed_repartition.connect(std::bind(
-            &DoFHandler<dim,
-                        spacedim>::pre_distributed_active_fe_index_transfer,
-            std::ref(*this))));
-        tria_listeners.push_back(
-          this->tria->signals.post_distributed_repartition.connect(std::bind(
-            &DoFHandler<dim,
-                        spacedim>::post_distributed_active_fe_index_transfer,
-            std::ref(*this))));
+          this->tria->signals.post_distributed_repartition.connect(
+            [this] { this->post_distributed_active_fe_index_transfer(); }));
 
         // refinement signals
         tria_listeners.push_back(
-          this->tria->signals.pre_distributed_refinement.connect(std::bind(
-            &DoFHandler<dim,
-                        spacedim>::pre_distributed_active_fe_index_transfer,
-            std::ref(*this))));
+          this->tria->signals.pre_distributed_refinement.connect(
+            [this]() { this->pre_distributed_active_fe_index_transfer(); }));
         tria_listeners.push_back(
-          this->tria->signals.post_distributed_refinement.connect(std::bind(
-            &DoFHandler<dim,
-                        spacedim>::post_distributed_active_fe_index_transfer,
-            std::ref(*this))));
+          this->tria->signals.post_distributed_refinement.connect(
+            [this]() { this->post_distributed_active_fe_index_transfer(); }));
 
         // serialization signals
         tria_listeners.push_back(
-          this->tria->signals.post_distributed_save.connect(
-            std::bind(&DoFHandler<dim, spacedim>::
-                        post_distributed_serialization_of_active_fe_indices,
-                      std::ref(*this))));
+          this->tria->signals.post_distributed_save.connect([this]() {
+            this->post_distributed_serialization_of_active_fe_indices();
+          }));
       }
     else if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
                             *>(&this->get_triangulation()) != nullptr)
@@ -1794,18 +1783,17 @@ namespace hp
             *this);
 
         // partitioning signals
-        tria_listeners.push_back(this->tria->signals.pre_partition.connect(
-          std::bind(&internal::hp::DoFHandlerImplementation::Implementation::
-                      ensure_absence_of_future_fe_indices<dim, spacedim>,
-                    std::ref(*this))));
+        tria_listeners.push_back(
+          this->tria->signals.pre_partition.connect([this]() {
+            internal::hp::DoFHandlerImplementation::Implementation::
+              ensure_absence_of_future_fe_indices(*this);
+          }));
 
         // refinement signals
         tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
-          std::bind(&DoFHandler<dim, spacedim>::pre_active_fe_index_transfer,
-                    std::ref(*this))));
+          [this] { this->pre_active_fe_index_transfer(); }));
         tria_listeners.push_back(this->tria->signals.post_refinement.connect(
-          std::bind(&DoFHandler<dim, spacedim>::post_active_fe_index_transfer,
-                    std::ref(*this))));
+          [this] { this->post_active_fe_index_transfer(); }));
       }
     else
       {
@@ -1816,11 +1804,9 @@ namespace hp
 
         // refinement signals
         tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
-          std::bind(&DoFHandler<dim, spacedim>::pre_active_fe_index_transfer,
-                    std::ref(*this))));
+          [this] { this->pre_active_fe_index_transfer(); }));
         tria_listeners.push_back(this->tria->signals.post_refinement.connect(
-          std::bind(&DoFHandler<dim, spacedim>::post_active_fe_index_transfer,
-                    std::ref(*this))));
+          [this] { this->post_active_fe_index_transfer(); }));
       }
   }
 
@@ -2099,10 +2085,11 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
-                      Implementation::determine_fe_from_children<dim, spacedim>,
-                    std::placeholders::_1,
-                    std::ref(fe_collection)));
+          [this](const std::vector<unsigned int> &children_fe_indices) {
+            return dealii::internal::hp::DoFHandlerImplementation::
+              Implementation::determine_fe_from_children<dim, spacedim>(
+                children_fe_indices, fe_collection);
+          });
 
         active_fe_index_transfer->cell_data_transfer
           ->prepare_for_coarsening_and_refinement(
@@ -2209,10 +2196,11 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
-                      Implementation::determine_fe_from_children<dim, spacedim>,
-                    std::placeholders::_1,
-                    std::ref(fe_collection)));
+          [this](const std::vector<unsigned int> &children_fe_indices) {
+            return dealii::internal::hp::DoFHandlerImplementation::
+              Implementation::determine_fe_from_children<dim, spacedim>(
+                children_fe_indices, fe_collection);
+          });
 
         // If we work on a p::d::Triangulation, we have to transfer all
         // active fe indices since ownership of cells may change.
@@ -2285,10 +2273,11 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          std::bind(&dealii::internal::hp::DoFHandlerImplementation::
-                      Implementation::determine_fe_from_children<dim, spacedim>,
-                    std::placeholders::_1,
-                    std::ref(fe_collection)));
+          [this](const std::vector<unsigned int> &children_fe_indices) {
+            return dealii::internal::hp::DoFHandlerImplementation::
+              Implementation::determine_fe_from_children<dim, spacedim>(
+                children_fe_indices, fe_collection);
+          });
 
         // Unpack active_fe_indices.
         active_fe_index_transfer->active_fe_indices.resize(
