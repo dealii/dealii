@@ -369,34 +369,79 @@ namespace parallel
     {
       // 1a) collect nodes coinciding due to periodicity
       std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex;
-      for (auto &cell : this->active_cell_iterators())
-        if (cell->is_locally_owned() || cell->is_ghost())
-          for (auto i = 0u; i < GeometryInfo<dim>::faces_per_cell; ++i)
-            if (cell->has_periodic_neighbor(i) &&
-                cell->periodic_neighbor(i)->active())
+      for (auto pair : this->get_periodic_face_map())
+        {
+          auto face_a = pair.first.first->face(pair.first.second);
+          auto face_b = pair.second.first.first->face(pair.second.first.second);
+
+          auto mask = pair.second.second;
+
+          static const int lookup_table_2d[2][2] =
+            //               flip:
+            {
+              {0, 1}, // false
+              {1, 0}  // true
+            };
+
+          static const int lookup_table_3d[2][2][2][4] =
+            //                           orientation flip  rotation
+            {{{
+                {0, 2, 1, 3}, // false       false false
+                {2, 3, 0, 1}  // false       false true
+              },
               {
-                auto face_t = cell->face(i);
-                auto face_n = cell->periodic_neighbor(i)->face(
-                  cell->periodic_neighbor_face_no(i));
-                for (auto j = 0u; j < GeometryInfo<dim>::vertices_per_face; ++j)
-                  {
-                    auto         v_t  = face_t->vertex_index(j);
-                    auto         v_n  = face_n->vertex_index(j);
-                    unsigned int temp = std::min(v_t, v_n);
-                    {
-                      auto it = vertex_to_coinciding_vertex.find(v_t);
-                      if (it != vertex_to_coinciding_vertex.end())
-                        temp = std::min(temp, it->second);
-                    }
-                    {
-                      auto it = vertex_to_coinciding_vertex.find(v_n);
-                      if (it != vertex_to_coinciding_vertex.end())
-                        temp = std::min(temp, it->second);
-                    }
-                    vertex_to_coinciding_vertex[v_t] = temp;
-                    vertex_to_coinciding_vertex[v_n] = temp;
-                  }
+                {3, 1, 2, 0}, // false       true  false
+                {1, 0, 3, 2}  // false       true  true
+              }},
+             {{
+                {0, 1, 2, 3}, // true        false false
+                {1, 3, 0, 2}  // true        false true
+              },
+              {
+                {3, 2, 1, 0}, // true        true  false
+                {2, 0, 3, 1}  // true        true  true
+              }}};
+
+          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
+               ++i)
+            {
+              bool face_orientation = mask[0];
+              bool face_flip        = mask[1];
+              bool face_rotation    = mask[2];
+
+
+              // Lookup the index for the second face
+              unsigned int j = 0;
+              switch (dim)
+                {
+                  case 2:
+                    j = lookup_table_2d[face_flip][i];
+                    break;
+                  case 3:
+                    j = lookup_table_3d[face_orientation][face_flip]
+                                       [face_rotation][i];
+                    break;
+                  default:
+                    AssertThrow(false, ExcNotImplemented());
+                }
+
+              auto         v_t  = face_a->vertex_index(i);
+              auto         v_n  = face_b->vertex_index(j);
+              unsigned int temp = std::min(v_t, v_n);
+              {
+                auto it = vertex_to_coinciding_vertex.find(v_t);
+                if (it != vertex_to_coinciding_vertex.end())
+                  temp = std::min(temp, it->second);
               }
+              {
+                auto it = vertex_to_coinciding_vertex.find(v_n);
+                if (it != vertex_to_coinciding_vertex.end())
+                  temp = std::min(temp, it->second);
+              }
+              vertex_to_coinciding_vertex[v_t] = temp;
+              vertex_to_coinciding_vertex[v_n] = temp;
+            }
+        }
 
       // 1b) compress map: let vertices point to the coinciding vertex with
       //     the smallest index
@@ -445,7 +490,7 @@ namespace parallel
     std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);
     for (const auto &cell : this->active_cell_iterators())
       if (cell->is_locally_owned())
-        for (auto v = 0u; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           vertex_of_own_cell[cell->vertex_index(v)] = true;
 
     // 3) for for each vertex belonging to a locally owned cell all ghost
