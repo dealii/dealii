@@ -35,6 +35,7 @@ ScalarPolynomialsBase<dim>::ScalarPolynomialsBase(
 
 
 
+template class ScalarPolynomialsBase<0>;
 template class ScalarPolynomialsBase<1>;
 template class ScalarPolynomialsBase<2>;
 template class ScalarPolynomialsBase<3>;
