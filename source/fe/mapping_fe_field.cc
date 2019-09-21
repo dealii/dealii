@@ -838,7 +838,8 @@ namespace internal
 
         if (update_flags & update_volume_elements)
           {
-            AssertDimension(data.covariant.size(), data.volume_elements.size());
+            AssertDimension(data.contravariant.size(),
+                            data.volume_elements.size());
             if (cell_similarity != CellSimilarity::translation)
               for (unsigned int point = 0; point < data.contravariant.size();
                    ++point)
