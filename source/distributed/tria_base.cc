@@ -369,51 +369,56 @@ namespace parallel
     {
       // 1a) collect nodes coinciding due to periodicity
       std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex;
+
+      static const int lookup_table_2d[2][2] =
+        //               flip:
+        {
+          {0, 1}, // false
+          {1, 0}  // true
+        };
+
+      static const int lookup_table_3d[2][2][2][4] =
+        //                           orientation flip  rotation
+        {{{
+            {0, 2, 1, 3}, // false       false false
+            {2, 3, 0, 1}  // false       false true
+          },
+          {
+            {3, 1, 2, 0}, // false       true  false
+            {1, 0, 3, 2}  // false       true  true
+          }},
+         {{
+            {0, 1, 2, 3}, // true        false false
+            {1, 3, 0, 2}  // true        false true
+          },
+          {
+            {3, 2, 1, 0}, // true        true  false
+            {2, 0, 3, 1}  // true        true  true
+          }}};
+
+      // loop over all periodic face pairs
       for (auto pair : this->get_periodic_face_map())
         {
-          auto face_a = pair.first.first->face(pair.first.second);
-          auto face_b = pair.second.first.first->face(pair.second.first.second);
+          const auto face_a = pair.first.first->face(pair.first.second);
+          const auto face_b =
+            pair.second.first.first->face(pair.second.first.second);
+          const auto mask = pair.second.second;
 
-          auto mask = pair.second.second;
-
-          static const int lookup_table_2d[2][2] =
-            //               flip:
-            {
-              {0, 1}, // false
-              {1, 0}  // true
-            };
-
-          static const int lookup_table_3d[2][2][2][4] =
-            //                           orientation flip  rotation
-            {{{
-                {0, 2, 1, 3}, // false       false false
-                {2, 3, 0, 1}  // false       false true
-              },
-              {
-                {3, 1, 2, 0}, // false       true  false
-                {1, 0, 3, 2}  // false       true  true
-              }},
-             {{
-                {0, 1, 2, 3}, // true        false false
-                {1, 3, 0, 2}  // true        false true
-              },
-              {
-                {3, 2, 1, 0}, // true        true  false
-                {2, 0, 3, 1}  // true        true  true
-              }}};
-
+          // loop over all vertices on face
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
                ++i)
             {
-              bool face_orientation = mask[0];
-              bool face_flip        = mask[1];
-              bool face_rotation    = mask[2];
+              const bool face_orientation = mask[0];
+              const bool face_flip        = mask[1];
+              const bool face_rotation    = mask[2];
 
-
-              // Lookup the index for the second face
+              // find the right local vertex index for the second face
               unsigned int j = 0;
               switch (dim)
                 {
+                  case 1:
+                    j = i;
+                    break;
                   case 2:
                     j = lookup_table_2d[face_flip][i];
                     break;
@@ -425,21 +430,22 @@ namespace parallel
                     AssertThrow(false, ExcNotImplemented());
                 }
 
-              auto         v_t  = face_a->vertex_index(i);
-              auto         v_n  = face_b->vertex_index(j);
-              unsigned int temp = std::min(v_t, v_n);
+              // get vertex indices and store in map
+              const auto   vertex_a = face_a->vertex_index(i);
+              const auto   vertex_b = face_b->vertex_index(j);
+              unsigned int temp     = std::min(vertex_a, vertex_b);
               {
-                auto it = vertex_to_coinciding_vertex.find(v_t);
+                auto it = vertex_to_coinciding_vertex.find(vertex_a);
                 if (it != vertex_to_coinciding_vertex.end())
                   temp = std::min(temp, it->second);
               }
               {
-                auto it = vertex_to_coinciding_vertex.find(v_n);
+                auto it = vertex_to_coinciding_vertex.find(vertex_b);
                 if (it != vertex_to_coinciding_vertex.end())
                   temp = std::min(temp, it->second);
               }
-              vertex_to_coinciding_vertex[v_t] = temp;
-              vertex_to_coinciding_vertex[v_n] = temp;
+              vertex_to_coinciding_vertex[vertex_a] = temp;
+              vertex_to_coinciding_vertex[vertex_b] = temp;
             }
         }
 
@@ -493,15 +499,15 @@ namespace parallel
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           vertex_of_own_cell[cell->vertex_index(v)] = true;
 
-    // 3) for for each vertex belonging to a locally owned cell all ghost
+    // 3) for each vertex belonging to a locally owned cell all ghost
     //    neighbors (including the periodic own)
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>> result;
+    std::map<unsigned int, std::set<types::subdomain_id>> result;
 
     // loop over all active ghost cells
     for (const auto &cell : this->active_cell_iterators())
       if (cell->is_ghost())
         {
-          const auto owner = cell->subdomain_id();
+          const types::subdomain_id owner = cell->subdomain_id();
 
           // loop over all its vertices
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
