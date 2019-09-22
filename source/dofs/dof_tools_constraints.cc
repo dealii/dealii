@@ -2819,9 +2819,7 @@ namespace DoFTools
 #endif
           }
 
-        WorkStream::run(
-          coarse_grid.begin_active(),
-          coarse_grid.end(),
+        auto worker =
           [coarse_component,
            &coarse_grid,
            &coarse_to_fine_grid_map,
@@ -2836,7 +2834,9 @@ namespace DoFTools
                                                        coarse_grid.get_fe(),
                                                        coarse_to_fine_grid_map,
                                                        parameter_dofs);
-          },
+          };
+
+        auto copier =
           [coarse_component,
            &coarse_grid,
            &weight_mapping,
@@ -2848,9 +2848,14 @@ namespace DoFTools
                                                     weight_mapping,
                                                     is_called_in_parallel,
                                                     weights);
-          },
-          scratch,
-          copy_data);
+          };
+
+        WorkStream::run(coarse_grid.begin_active(),
+                        coarse_grid.end(),
+                        worker,
+                        copier,
+                        scratch,
+                        copy_data);
 
 #ifdef DEAL_II_WITH_MPI
         for (std::size_t i = 0;

@@ -807,36 +807,37 @@ DataOut<dim, DoFHandlerType>::build_patches(
                 update_flags,
                 cell_to_patch_index_map);
 
+  auto worker = [this, n_subdivisions, curved_cell_region](
+                  const std::pair<cell_iterator, unsigned int> *cell_and_index,
+                  internal::DataOutImplementation::ParallelData<
+                    DoFHandlerType::dimension,
+                    DoFHandlerType::space_dimension> &scratch_data,
+                  // this function doesn't actually need a copy data object --
+                  // it just writes everything right into the output array
+                  int) {
+    this->build_one_patch(cell_and_index,
+                          scratch_data,
+                          n_subdivisions,
+                          curved_cell_region);
+  };
+
   // now build the patches in parallel
   if (all_cells.size() > 0)
-    WorkStream::run(
-      all_cells.data(),
-      all_cells.data() + all_cells.size(),
-      [this, n_subdivisions, curved_cell_region](
-        const std::pair<cell_iterator, unsigned int> *cell_and_index,
-        internal::DataOutImplementation::ParallelData<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> &scratch_data,
-        // this function doesn't actually need a copy data object -- it just
-        // writes everything right into the output array
-        int) {
-        this->build_one_patch(cell_and_index,
-                              scratch_data,
-                              n_subdivisions,
-                              curved_cell_region);
-      },
-      // no copy-local-to-global function needed here
-      std::function<void(const int)>(),
-      thread_data,
-      /* dummy CopyData object = */ 0,
-      // experimenting shows that we can make things run a bit
-      // faster if we increase the number of cells we work on
-      // per item (i.e., WorkStream's chunk_size argument,
-      // about 10% improvement) and the items in flight at any
-      // given time (another 5% on the testcase discussed in
-      // @ref workstream_paper, on 32 cores) and if
-      8 * MultithreadInfo::n_threads(),
-      64);
+    WorkStream::run(all_cells.data(),
+                    all_cells.data() + all_cells.size(),
+                    worker,
+                    // no copy-local-to-global function needed here
+                    std::function<void(const int)>(),
+                    thread_data,
+                    /* dummy CopyData object = */ 0,
+                    // experimenting shows that we can make things run a bit
+                    // faster if we increase the number of cells we work on
+                    // per item (i.e., WorkStream's chunk_size argument,
+                    // about 10% improvement) and the items in flight at any
+                    // given time (another 5% on the testcase discussed in
+                    // @ref workstream_paper, on 32 cores) and if
+                    8 * MultithreadInfo::n_threads(),
+                    64);
 }
 
 
