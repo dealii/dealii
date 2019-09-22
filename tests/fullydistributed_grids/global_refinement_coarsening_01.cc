@@ -90,15 +90,26 @@ test(const int /*n_refinements*/, const int /*n_subdivisions*/, MPI_Comm comm)
   grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_0", true, true);
 
   // perform global refinement (4x)
-  tria_pft.refine_global(4);
+  tria_pft.refine_global(1);
   grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_1", true, true);
+  tria_pft.refine_global(1);
+  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_2", true, true);
+  tria_pft.refine_global(1);
+  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_3", true, true);
 
   // perform global coarsening (1x)
   for (auto cell : tria_pft.active_cell_iterators())
     cell->set_coarsen_flag();
   tria_pft.execute_coarsening_and_refinement();
-
-  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_2", true, true);
+  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_4", true, true);
+  for (auto cell : tria_pft.active_cell_iterators())
+    cell->set_coarsen_flag();
+  tria_pft.execute_coarsening_and_refinement();
+  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_5", true, true);
+  for (auto cell : tria_pft.active_cell_iterators())
+    cell->set_coarsen_flag();
+  tria_pft.execute_coarsening_and_refinement();
+  grid_out.write_mesh_per_processor_as_vtu(tria_pft, "tria_pft_6", true, true);
 }
 
 int

@@ -16,6 +16,9 @@
 
 #include <deal.II/base/memory_consumption.h>
 
+#include <deal.II/grid/grid_tools.h>
+//#include <deal.II/base/std_cxx17/optional.h>
+
 #include <deal.II/distributed/fully_distributed_tria.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -30,6 +33,15 @@ namespace GridGenerator
              const double                  right,
              const bool                    colorize);
 } // namespace GridGenerator
+
+// namespace GridTools
+//{
+// template<typename DataType , typename MeshType >
+// void exchange_cell_data_to_ghosts	(	const MeshType & 	mesh,
+// const std::function< std_cxx17::optional< DataType >(const typename
+// MeshType::active_cell_iterator &)> & 	pack, const std::function< void(const
+// typename MeshType::active_cell_iterator &, const DataType &)> & 	unpack )	;
+//}
 
 namespace parallel
 {
@@ -301,60 +313,49 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
-      // function to get all vertices of locally relevant cells
-      auto add_vertices_of_cell_to_vertices_owned_by_loclly_owned_cells =
-        [](TriaIterator<CellAccessor<dim, spacedim>> &cell,
-           std::vector<bool> &vertices_owned_by_loclly_owned_cells) {
-          // add vertices belonging to a periodic neighbor
-          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; i++)
-            if (cell->has_periodic_neighbor(i))
-              {
-                const auto face_t = cell->face(i);
-                const auto face_n = cell->periodic_neighbor(i)->face(
-                  cell->periodic_neighbor_face_no(i));
-                for (unsigned int j = 0;
-                     j < GeometryInfo<dim>::vertices_per_face;
-                     j++)
-                  {
-                    vertices_owned_by_loclly_owned_cells[face_t->vertex_index(
-                      j)] = true;
-                    vertices_owned_by_loclly_owned_cells[face_n->vertex_index(
-                      j)] = true;
-                  }
-              }
-
-          // add local vertices
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
-            vertices_owned_by_loclly_owned_cells[cell->vertex_index(v)] = true;
-        };
-
-      // 1) preparation: only refine locally-relevant cells
+      // 1) preparation
       {
-        std::vector<bool> vertices_owned_by_loclly_owned_cells(
-          this->n_vertices());
+        // reset the coarsening/refinement flags of non-local cells
         for (auto cell : this->cell_iterators())
-          if (cell->active() && cell->is_locally_owned())
-            add_vertices_of_cell_to_vertices_owned_by_loclly_owned_cells(
-              cell, vertices_owned_by_loclly_owned_cells);
-
-        auto is_locally_relevant = [&](auto &cell) {
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
-            if (vertices_owned_by_loclly_owned_cells[cell->vertex_index(v)])
-              return true;
-          return false;
-        };
-
-        for (auto cell : this->cell_iterators())
-          if (cell->active() && !is_locally_relevant(cell))
+          if (cell->active() && !cell->is_locally_owned())
             {
               cell->clear_refine_flag();
-              // Note: cell->clear_coarsen_flag(); is not allowed here, since
-              // it would lead to the circumstance that ghost cells are
-              // not refined
+              cell->clear_coarsen_flag();
+
+              if (cell->level() > 0)
+                cell->set_coarsen_flag();
             }
+
+        // update refinement/coarsening flags of non-local cells via
+        // ghost-cell exchange
+        GridTools::exchange_cell_data_to_ghosts<unsigned int>(
+          *this,
+          [](const auto &cell) {
+            return ((cell->refine_flag_set() ==
+                     RefinementCase<dim>::isotropic_refinement)
+                    << 1) |
+                   cell->coarsen_flag_set();
+          },
+          [](const auto &cell, const unsigned int pair) {
+            if (pair & 2)
+              {
+                cell->clear_coarsen_flag();
+                cell->set_refine_flag();
+              }
+            else if (pair & 1)
+              {
+                if (cell->refine_flag_set() !=
+                    RefinementCase<dim>::isotropic_refinement)
+                  if (cell->level() > 0)
+                    cell->set_coarsen_flag();
+              }
+          });
       }
+
+      // 1b) store current active cells
+      std::set<typename CellId::binary_type> active_cells;
+      for (auto cell : this->active_cell_iterators())
+        active_cells.insert(cell->id().template to_binary<dim>());
 
       // 2) execute actual coarsening and/or refinement
       currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
@@ -363,12 +364,67 @@ namespace parallel
       currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
         false;
 
-      // 3) clean-up: update artificial cells
+      // 3a) post-processing:
+      for (auto cell : this->active_cell_iterators())
+        if (cell->level() > 0 &&
+            (active_cells.find(
+               cell->parent()->id().template to_binary<dim>()) !=
+             active_cells.end()))
+          {
+            // cell has been refined
+            cell->set_subdomain_id(cell->parent()->level_subdomain_id());
+            cell->set_level_subdomain_id(cell->parent()->level_subdomain_id());
+          }
+        else if (active_cells.find(cell->id().template to_binary<dim>()) !=
+                 active_cells.end())
+          {
+            // nothing has happened with this cell: nothing to do (?)
+            cell->set_subdomain_id(cell->level_subdomain_id());
+          }
+        else
+          {
+            // cell has become active, since it children have been coarsened
+            // make level_subdomain_id to subdomain_id
+            cell->set_subdomain_id(cell->level_subdomain_id());
+          }
+
+      // 3b) update artificial cells (keep only one ghost layer)
       {
+        // collect vertices belonging to active local cells
+        auto add_vertices_of_cell_to_vertices_owned_by_loclly_owned_cells =
+          [](TriaIterator<CellAccessor<dim, spacedim>> &cell,
+             std::vector<bool> &vertices_owned_by_loclly_owned_cells) {
+            // add vertices belonging to a periodic neighbor
+            for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; i++)
+              if (cell->has_periodic_neighbor(i))
+                {
+                  const auto face_t = cell->face(i);
+                  const auto face_n = cell->periodic_neighbor(i)->face(
+                    cell->periodic_neighbor_face_no(i));
+                  for (unsigned int j = 0;
+                       j < GeometryInfo<dim>::vertices_per_face;
+                       j++)
+                    {
+                      vertices_owned_by_loclly_owned_cells[face_t->vertex_index(
+                        j)] = true;
+                      vertices_owned_by_loclly_owned_cells[face_n->vertex_index(
+                        j)] = true;
+                    }
+                }
+
+            // add local vertices
+            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+                 v++)
+              vertices_owned_by_loclly_owned_cells[cell->vertex_index(v)] =
+                true;
+          };
+
         std::vector<bool> vertices_owned_by_loclly_owned_cells(
           this->n_vertices());
         for (auto cell : this->cell_iterators())
-          if (cell->active() && cell->is_locally_owned())
+          if (cell->active() &&
+              (cell->is_locally_owned() ||
+               cell->level_subdomain_id() == this->locally_owned_subdomain()))
             add_vertices_of_cell_to_vertices_owned_by_loclly_owned_cells(
               cell, vertices_owned_by_loclly_owned_cells);
 
@@ -380,15 +436,15 @@ namespace parallel
           return false;
         };
 
+        // mark all active cells which are not connected via a vertex to
+        // an active local cells as artificial
         for (auto cell : this->cell_iterators())
           if (cell->active() && !is_locally_relevant(cell))
-            {
-              cell->set_subdomain_id(numbers::artificial_subdomain_id);
-              cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
-            }
-          else if (cell->active())
-            cell->set_level_subdomain_id(cell->parent()->level_subdomain_id());
+            cell->set_subdomain_id(numbers::artificial_subdomain_id);
       }
+
+      // 3c) update cache
+      update_number_cache();
     }
 
 
