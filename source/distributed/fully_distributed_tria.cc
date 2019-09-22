@@ -322,6 +322,7 @@ namespace parallel
               cell->clear_refine_flag();
               cell->clear_coarsen_flag();
 
+              // start assumption:
               if (cell->level() > 0)
                 cell->set_coarsen_flag();
             }
@@ -330,24 +331,24 @@ namespace parallel
         // ghost-cell exchange
         GridTools::exchange_cell_data_to_ghosts<unsigned int>(
           *this,
-          [](const auto &cell) {
-            return ((cell->refine_flag_set() ==
-                     RefinementCase<dim>::isotropic_refinement)
-                    << 1) |
-                   cell->coarsen_flag_set();
+          [](const TriaIterator<CellAccessor<dim, spacedim>> &cell) {
+            if (cell->refine_flag_set())
+              {
+                Assert(cell->refine_flag_set() ==
+                         RefinementPossibilities<dim>::isotropic_refinement,
+                       ExcMessage(
+                         "This class does not support anisotropic refinement"));
+                return true;
+              }
+            else
+              return false;
           },
-          [](const auto &cell, const unsigned int pair) {
-            if (pair & 2)
+          [](const TriaIterator<CellAccessor<dim, spacedim>> &cell,
+             const unsigned int                               refinement_flag) {
+            if (refinement_flag == true)
               {
                 cell->clear_coarsen_flag();
                 cell->set_refine_flag();
-              }
-            else if (pair & 1)
-              {
-                if (cell->refine_flag_set() !=
-                    RefinementCase<dim>::isotropic_refinement)
-                  if (cell->level() > 0)
-                    cell->set_coarsen_flag();
               }
           });
       }
@@ -445,7 +446,7 @@ namespace parallel
 
       // 3c) update cache
       update_number_cache();
-    }
+    } // namespace fullydistributed
 
 
 
