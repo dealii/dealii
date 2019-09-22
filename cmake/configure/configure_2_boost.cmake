@@ -63,15 +63,19 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
   ELSE()
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
   ENDIF()
+  LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
 
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <memory>
+    #include <boost/config.hpp>
 
     int main()
     {
+    #ifndef BOOST_NO_AUTO_PTR
       int *i = new int;
       std::auto_ptr<int> x(i);
+    #endif
       return 0;
     }
     "
@@ -100,9 +104,9 @@ MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
     ENDIF()
   ENDIF()
 
-  FEATURE_BOOST_CONFIGURE_COMMON()
-
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+
+  FEATURE_BOOST_CONFIGURE_COMMON()
 
   IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     #
