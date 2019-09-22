@@ -1225,9 +1225,11 @@ namespace WorkStream
               parallel::internal::parallel_for(
                 colored_iterators[color].begin(),
                 colored_iterators[color].end(),
-                std::bind(&WorkerAndCopier::operator(),
-                          std::ref(worker_and_copier),
-                          std::placeholders::_1),
+                [&worker_and_copier](
+                  const tbb::blocked_range<
+                    typename std::vector<Iterator>::const_iterator> &range) {
+                  worker_and_copier(range);
+                },
                 chunk_size);
             }
       }
@@ -1283,12 +1285,14 @@ namespace WorkStream
     // forward to the other function
     run(begin,
         end,
-        std::bind(worker,
-                  std::ref(main_object),
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
-        std::bind(copier, std::ref(main_object), std::placeholders::_1),
+        [&main_object, worker](const Iterator &iterator,
+                               ScratchData &   scratch_data,
+                               CopyData &      copy_data) {
+          (main_object.*worker)(iterator, scratch_data, copy_data);
+        },
+        [&main_object, copier](const CopyData &copy_data) {
+          (main_object.*copier)(copy_data);
+        },
         sample_scratch_data,
         sample_copy_data,
         queue_length,
@@ -1314,12 +1318,14 @@ namespace WorkStream
     // forward to the other function
     run(begin,
         end,
-        std::bind(worker,
-                  std::ref(main_object),
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
-        std::bind(copier, std::ref(main_object), std::placeholders::_1),
+        [&main_object, worker](const Iterator &iterator,
+                               ScratchData &   scratch_data,
+                               CopyData &      copy_data) {
+          (main_object.*worker)(iterator, scratch_data, copy_data);
+        },
+        [&main_object, copier](const CopyData &copy_data) {
+          (main_object.*copier)(copy_data);
+        },
         sample_scratch_data,
         sample_copy_data,
         queue_length,

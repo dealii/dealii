@@ -698,36 +698,49 @@ namespace MeshWorker
       f_face_worker;
 
     if (cell_worker != nullptr)
-      f_cell_worker = std::bind(cell_worker,
-                                std::ref(main_class),
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3);
+      f_cell_worker = [&main_class,
+                       cell_worker](const CellIteratorType &cell_iterator,
+                                    ScratchData &           scratch_data,
+                                    CopyData &              copy_data) {
+        (main_class.*cell_worker)(cell_iterator, scratch_data, copy_data);
+      };
 
     if (boundary_worker != nullptr)
-      f_boundary_worker = std::bind(boundary_worker,
-                                    std::ref(main_class),
-                                    std::placeholders::_1,
-                                    std::placeholders::_2,
-                                    std::placeholders::_3,
-                                    std::placeholders::_4);
+      f_boundary_worker =
+        [&main_class, boundary_worker](const CellIteratorType &cell_iterator,
+                                       const unsigned int      face_no,
+                                       ScratchData &           scratch_data,
+                                       CopyData &              copy_data) {
+          (main_class.*
+           boundary_worker)(cell_iterator, face_no, scratch_data, copy_data);
+        };
 
     if (face_worker != nullptr)
-      f_face_worker = std::bind(face_worker,
-                                std::ref(main_class),
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3,
-                                std::placeholders::_4,
-                                std::placeholders::_5,
-                                std::placeholders::_6,
-                                std::placeholders::_7,
-                                std::placeholders::_8);
+      f_face_worker = [&main_class,
+                       face_worker](const CellIteratorType &cell_iterator_1,
+                                    const unsigned int      face_index_1,
+                                    const unsigned int      subface_index_1,
+                                    const CellIteratorType &cell_iterator_2,
+                                    const unsigned int      face_index_2,
+                                    const unsigned int      subface_index_2,
+                                    ScratchData &           scratch_data,
+                                    CopyData &              copy_data) {
+        (main_class.*face_worker)(cell_iterator_1,
+                                  face_index_1,
+                                  subface_index_1,
+                                  cell_iterator_2,
+                                  face_index_2,
+                                  subface_index_2,
+                                  scratch_data,
+                                  copy_data);
+      };
 
     mesh_loop(begin,
               end,
               f_cell_worker,
-              std::bind(copier, main_class, std::placeholders::_1),
+              [&main_class, copier](const CopyData &copy_data) {
+                (main_class.*copier)(copy_data);
+              },
               sample_scratch_data,
               sample_copy_data,
               flags,

@@ -463,13 +463,13 @@ namespace parallel
     ff(begin, end);
 #  endif
 #else
-    internal::parallel_for(
-      begin,
-      end,
-      std::bind(&internal::apply_to_subranges<RangeType, Function>,
-                std::placeholders::_1,
-                std::cref(f)),
-      grainsize);
+    internal::parallel_for(begin,
+                           end,
+                           [&f](const tbb::blocked_range<RangeType> &range) {
+                             internal::apply_to_subranges<RangeType, Function>(
+                               range, f);
+                           },
+                           grainsize);
 #endif
   }
 

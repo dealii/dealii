@@ -2267,10 +2267,10 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       internal::PreconditionChebyshevImplementation::EigenvalueTracker
                            eigenvalue_tracker;
       SolverCG<VectorType> solver(control);
-      solver.connect_eigenvalues_slot(std::bind(
-        &internal::PreconditionChebyshevImplementation::EigenvalueTracker::slot,
-        &eigenvalue_tracker,
-        std::placeholders::_1));
+      solver.connect_eigenvalues_slot(
+        [&eigenvalue_tracker](const std::vector<double> &eigenvalues) {
+          eigenvalue_tracker.slot(eigenvalues);
+        });
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies

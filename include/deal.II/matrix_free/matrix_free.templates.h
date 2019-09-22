@@ -1872,14 +1872,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::make_connectivity_graph_faces(
   tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
                                 unsigned int>
     map;
-  parallel::apply_to_subranges(0,
-                               cell_level_index.size(),
-                               std::bind(&internal::fill_index_subrange,
-                                         std::placeholders::_1,
-                                         std::placeholders::_2,
-                                         std::cref(cell_level_index),
-                                         std::ref(map)),
-                               50);
+  parallel::apply_to_subranges(
+    0,
+    cell_level_index.size(),
+    [this, &map](const unsigned int begin, const unsigned int end) {
+      internal::fill_index_subrange(begin, end, cell_level_index, map);
+    },
+    50);
 
   // step 2: Make a list for all blocks with other blocks that write to the
   // cell (due to the faces that are associated to it)
@@ -1892,13 +1891,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::make_connectivity_graph_faces(
   parallel::apply_to_subranges(
     0,
     task_info.n_active_cells,
-    std::bind(&internal::fill_connectivity_subrange<dim>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::cref(tria),
-              std::cref(cell_level_index),
-              std::cref(map),
-              std::ref(connectivity_direct)),
+    [this, &tria, &map, &connectivity_direct](const unsigned int begin,
+                                              const unsigned int end) {
+      internal::fill_connectivity_subrange<dim>(
+        begin, end, tria, cell_level_index, map, connectivity_direct);
+    },
     20);
   connectivity_direct.symmetrize();
 
@@ -1907,11 +1904,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::make_connectivity_graph_faces(
   parallel::apply_to_subranges(
     0,
     task_info.n_active_cells,
-    std::bind(&internal::fill_connectivity_indirect_subrange,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::cref(connectivity_direct),
-              std::ref(connectivity)),
+    [&connectivity_direct, &connectivity](const unsigned int begin,
+                                          const unsigned int end) {
+      internal::fill_connectivity_indirect_subrange(begin,
+                                                    end,
+                                                    connectivity_direct,
+                                                    connectivity);
+    },
     20);
 #endif
 }
