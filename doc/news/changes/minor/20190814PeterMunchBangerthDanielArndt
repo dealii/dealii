@@ -1,3 +1,4 @@
-New: Add an iterator over all faces of a cell(accessor).
+New: Add CellAccessor::face_iterators(), which returns an iterator range over
+the faces of a cell.
 <br>
 (Peter Munch, Wolfgang Bangerth, Daniel Arndt, 2019/08/14)
