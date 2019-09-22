@@ -75,10 +75,12 @@ namespace internal
        * caches, saving one global vector access for the case where this is
        * applied rather than `vector = 0.;`.
        *
-       * Size of the chunk is set to 64 kByte which generally fits to current
-       * caches.
+       * We set the granularity to 64 - that is a number sufficiently large
+       * to minimize loop peel overhead within the work (and compatible with
+       * vectorization lengths of up to 16) and small enough to not waste on
+       * the size of the individual chunks.
        */
-      static const unsigned int chunk_size_zero_vector = 8192;
+      static const unsigned int chunk_size_zero_vector = 64;
 
       /**
        * Default empty constructor.
@@ -600,7 +602,33 @@ namespace internal
       /**
        * Stores the actual ranges in the vector to be cleared.
        */
-      std::vector<unsigned int> vector_zero_range_list;
+      std::vector<std::pair<unsigned int, unsigned int>> vector_zero_range_list;
+
+      /**
+       * Stores an integer to each partition in TaskInfo that indicates when
+       * to schedule operations that will be done before any access to vector
+       * entries.
+       */
+      std::vector<unsigned int> cell_loop_pre_list_index;
+
+      /**
+       * Stores the actual ranges of the operation before any access to vector
+       * entries.
+       */
+      std::vector<std::pair<unsigned int, unsigned int>> cell_loop_pre_list;
+
+      /**
+       * Stores an integer to each partition in TaskInfo that indicates when
+       * to schedule operations that will be done after all access to vector
+       * entries.
+       */
+      std::vector<unsigned int> cell_loop_post_list_index;
+
+      /**
+       * Stores the actual ranges of the operation after all access to vector
+       * entries.
+       */
+      std::vector<std::pair<unsigned int, unsigned int>> cell_loop_post_list;
     };
 
 
