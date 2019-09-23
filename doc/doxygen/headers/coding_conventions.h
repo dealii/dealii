@@ -63,11 +63,11 @@ executable.
 <ol>
 <li> %Functions which return the number of something (number of cells,
   degrees of freedom, etc) should start with <code>n_*</code>. Example:
-  SparsityPattern::n_nonzero_entries().</li>
+  SparsityPatternBase::n_nonzero_elements().</li>
 
 <li> %Functions which set a bit or flag should start with <code>set_*</code>;
   functions which clear bits or flags should be named <code>clear_*</code>.
-  Example: CellIterator::set_refine_flag().</li>
+  Example: CellAccessor::set_refine_flag().</li>
 
 <li> Traditional logical operators should be used instead of their English
   equivalents (i.e., use <code>&&</code>, <code>||</code>, and <code>!</code>
@@ -119,7 +119,36 @@ executable.
   then functions.
   <br>
   Exceptions shall be declared at the end of the public section
-  before the non-public sections start.</li>
+  before the non-public sections start.
+  <br>
+  We do not use the C++11-style class member initialization for member variables
+  that are neither <code>static const</code> nor <code>static constexpr</code>;
+  i.e., instead of
+@code
+  class Foo
+  {
+    int a = 42;
+    int *b = nullptr;
+  };
+@endcode
+  write
+@code
+  class Foo
+  {
+    Foo();
+
+    int a;
+    int *b;
+  };
+
+
+
+  inline Foo::Foo()
+  : a(42)
+  , b(nullptr)
+  {}
+@endcode
+  </li>
 
 <li> If a function has both input and output parameters, usually the
   input parameters shall precede the output parameters, unless there
@@ -219,7 +248,7 @@ DOXYGEN ... #endif</code> to prevent Doxygen from picking them up.</li>
 expand_instantiations (built from
 <code>cmake/scripts/expand_instantiations.cc</code>) and the parameters are
 defined dynamically through cmake depending on your configuration (see
-<code>share/deal.II/template-arguments</code> in your build directory).
+<code>cmake/config/template-arguments.in</code> in your build directory).
 It is those <code>.inst</code> files that are eventually included from the
 corresponding <code>.cc</code> files. </p>
 
@@ -246,8 +275,8 @@ we list here:
   consider a trivial implementation of vector addition:
   @code
     Vector &
-    operator += (Vector       &lhs,
-                 const Vector &rhs)
+    operator+=(Vector       &lhs,
+               const Vector &rhs)
     {
       for (unsigned int i=0; i<lhs.size(); ++i)
         lhs(i) += rhs(i);
@@ -268,11 +297,11 @@ we list here:
   implementation will do exactly this:
   @code
     Vector &
-    operator += (Vector       &lhs,
-                 const Vector &rhs)
+    operator+=(Vector       &lhs,
+               const Vector &rhs)
     {
       Assert (lhs.size() == rhs.size(),
-              ExcDimensionMismatch (lhs.size(), rhs.size());
+              ExcDimensionMismatch(lhs.size(), rhs.size());
       for (unsigned int i=0; i<lhs.size(); ++i)
         lhs(i) += rhs(i);
       return lhs;
@@ -312,7 +341,7 @@ we list here:
   a vector would expect the norm to be positive. You can write this as
   follows:
   @code
-    double norm (const Vector &v)
+    double norm(const Vector &v)
     {
       double s = 0;
       for (unsigned int i=0; i<v.size(); ++i)
@@ -347,8 +376,8 @@ we list here:
             { ... }
           else
             {
-                // we have a cell whose neighbor must
-                // be at the boundary if we got here
+              // we have a cell whose neighbor must
+              // be at the boundary if we got here
             }
         }
   @endcode
@@ -431,8 +460,8 @@ we list here:
       ... // something lengthy and complicated
       for (const auto &cell = dof_handler.active_cell_iterators())
         {
-          <b>const</b> Point<dim> cell_center = (cell->vertex(0) +
-                                                 cell->vertex(1)) / 2;
+          const Point<dim> cell_center = (cell->vertex(0) +
+                                          cell->vertex(1)) / 2;
           ...
         }
       ...
@@ -460,7 +489,7 @@ we list here:
   @code
      template <int dim>
      typename Triangulation<dim>::cell_iterator
-     CellAccessor<dim>::child (const unsigned int child_no)
+     CellAccessor<dim>::child(const unsigned int child_no)
      {
        ...
        return something;
