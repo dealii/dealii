@@ -61,7 +61,7 @@ namespace CUDAWrappers
    * this class.
    *
    * This class implements a loop over all cells (cell_loop()). This loop is
-   * scheduled in such a way that cells that cells that share degrees of freedom
+   * scheduled in such a way that cells that share degrees of freedom
    * are not worked on simultaneously, which implies that it is possible to
    * write to vectors in parallel without having to explicitly synchronize
    * access to these vectors and matrices. This class does not implement any
@@ -98,6 +98,9 @@ namespace CUDAWrappers
      */
     struct AdditionalData
     {
+      /**
+       * Constructor.
+       */
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
@@ -142,15 +145,52 @@ namespace CUDAWrappers
      */
     struct Data
     {
-      point_type *             q_points;
+      /**
+       * Pointer to the quadrature points.
+       */
+      point_type *q_points;
+
+      /**
+       * Map the position in the local vector to the position in the global
+       * vector.
+       */
       types::global_dof_index *local_to_global;
-      Number *                 inv_jacobian;
-      Number *                 JxW;
-      unsigned int             n_cells;
-      unsigned int             padding_length;
-      unsigned int             row_start;
-      unsigned int *           constraint_mask;
-      bool                     use_coloring;
+
+      /**
+       * Pointer to the inverse Jacobian.
+       */
+      Number *inv_jacobian;
+
+      /**
+       * Pointer to the Jacobian times the weights.
+       */
+      Number *JxW;
+
+      /**
+       * Number of cells.
+       */
+      unsigned int n_cells;
+
+      /**
+       * Length of the padding.
+       */
+      unsigned int padding_length;
+
+      /**
+       * Row start (including padding).
+       */
+      unsigned int row_start;
+
+      /**
+       * Mask deciding where constraints are set on a given cell.
+       */
+      unsigned int *constraint_mask;
+
+      /**
+       * If true, use graph coloring has been used and we can simply add into
+       * the destingation vector. Otherwise, use atomic operations.
+       */
+      bool use_coloring;
     };
 
     /**
@@ -453,15 +493,19 @@ namespace CUDAWrappers
     std::vector<Number *> inv_jacobian;
 
     /**
-     * Vector of pointer to the Jacobian time the weights associated to the
+     * Vector of pointer to the Jacobian times the weights associated to the
      * cells of each color.
      */
     std::vector<Number *> JxW;
 
-    // Pointer to the constrained degrees of freedom.
+    /**
+     * Pointer to the constrained degrees of freedom.
+     */
     types::global_dof_index *constrained_dofs;
 
-    // Mask deciding where constraints are set on a given cell.
+    /**
+     *  Mask deciding where constraints are set on a given cell.
+     */
     std::vector<unsigned int *> constraint_mask;
 
     /**
@@ -482,12 +526,32 @@ namespace CUDAWrappers
      */
     std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
-    // Parallelization parameters
+    /**
+     * Cells per block (determined by the function cells_per_block_shmem() ).
+     */
     unsigned int cells_per_block;
-    dim3         constraint_grid_dim;
-    dim3         constraint_block_dim;
 
-    unsigned int              padding_length;
+    /**
+     * Grid dimensions used to launch the CUDA kernels
+     * in *_constrained_values-operations.
+     */
+    dim3 constraint_grid_dim;
+
+    /**
+     * Block dimensions used to launch the CUDA kernels
+     * in *_constrained_values-operations.
+     */
+    dim3 constraint_block_dim;
+
+    /**
+     * Length of the padding (closest power of two larger than or equal to
+     * the number of thread).
+     */
+    unsigned int padding_length;
+
+    /**
+     * Row start of each color.
+     */
     std::vector<unsigned int> row_start;
 
     friend class internal::ReinitHelper<dim, Number>;
