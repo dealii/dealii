@@ -1014,64 +1014,15 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    constexpr unsigned int dofs_per_component =
-      Utilities::pow(fe_degree + 1, dim);
-    Assert(inverse_coefficients.size() > 0 &&
-             inverse_coefficients.size() % dofs_per_component == 0,
-           ExcMessage(
-             "Expected diagonal to be a multiple of scalar dof per cells"));
-    if (inverse_coefficients.size() != dofs_per_component)
-      AssertDimension(n_actual_components * dofs_per_component,
-                      inverse_coefficients.size());
-
-    Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
-
-    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
-                                     dim,
-                                     fe_degree + 1,
-                                     fe_degree + 1,
-                                     VectorizedArrayType>
-      evaluator(inverse_shape, inverse_shape, inverse_shape);
-
-    const unsigned int shift_coefficient =
-      inverse_coefficients.size() > dofs_per_component ? dofs_per_component : 0;
-    const VectorizedArrayType *inv_coefficient = inverse_coefficients.data();
-    VectorizedArrayType        temp_data_field[dofs_per_component];
-    for (unsigned int d = 0; d < n_actual_components; ++d)
-      {
-        const VectorizedArrayType *in  = in_array + d * dofs_per_component;
-        VectorizedArrayType *      out = out_array + d * dofs_per_component;
-        // Need to select 'apply' method with hessian slot because values
-        // assume symmetries that do not exist in the inverse shapes
-        evaluator.template hessians<0, false, false>(in, temp_data_field);
-        if (dim > 1)
-          {
-            evaluator.template hessians<1, false, false>(temp_data_field, out);
-
-            if (dim == 3)
-              {
-                evaluator.template hessians<2, false, false>(out,
-                                                             temp_data_field);
-                for (unsigned int q = 0; q < dofs_per_component; ++q)
-                  temp_data_field[q] *= inv_coefficient[q];
-                evaluator.template hessians<2, true, false>(temp_data_field,
-                                                            out);
-              }
-            else if (dim == 2)
-              for (unsigned int q = 0; q < dofs_per_component; ++q)
-                out[q] *= inv_coefficient[q];
-
-            evaluator.template hessians<1, true, false>(out, temp_data_field);
-          }
-        else
-          {
-            for (unsigned int q = 0; q < dofs_per_component; ++q)
-              temp_data_field[q] *= inv_coefficient[q];
-          }
-        evaluator.template hessians<0, true, false>(temp_data_field, out);
-
-        inv_coefficient += shift_coefficient;
-      }
+    internal::CellwiseInverseMassMatrixImpl<
+      dim,
+      fe_degree,
+      n_components,
+      VectorizedArrayType>::apply(inverse_shape,
+                                  inverse_coefficients,
+                                  n_actual_components,
+                                  in_array,
+                                  out_array);
   }
 
 
@@ -1091,35 +1042,14 @@ namespace MatrixFreeOperators
                                      const VectorizedArrayType *in_array,
                                      VectorizedArrayType *      out_array) const
   {
-    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
-                                     dim,
-                                     fe_degree + 1,
-                                     fe_degree + 1,
-                                     VectorizedArrayType>
-      evaluator(AlignedVector<VectorizedArrayType>(),
-                AlignedVector<VectorizedArrayType>(),
-                inverse_shape);
-
-    for (unsigned int d = 0; d < n_actual_components; ++d)
-      {
-        const VectorizedArrayType *in  = in_array + d * dofs_per_cell;
-        VectorizedArrayType *      out = out_array + d * dofs_per_cell;
-
-        if (dim == 3)
-          {
-            evaluator.template hessians<2, true, false>(in, out);
-            evaluator.template hessians<1, true, false>(out, out);
-            evaluator.template hessians<0, true, false>(out, out);
-          }
-        if (dim == 2)
-          {
-            evaluator.template hessians<1, true, false>(in, out);
-            evaluator.template hessians<0, true, false>(out, out);
-          }
-        if (dim == 1)
-          evaluator.template hessians<0, true, false>(in, out);
-      }
+    internal::CellwiseInverseMassMatrixImpl<dim,
+                                            fe_degree,
+                                            n_components,
+                                            VectorizedArrayType>::
+      transform_from_q_points_to_basis(inverse_shape,
+                                       n_actual_components,
+                                       in_array,
+                                       out_array);
   }
 
 
