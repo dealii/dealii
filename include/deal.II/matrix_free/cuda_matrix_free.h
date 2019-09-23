@@ -102,10 +102,12 @@ namespace CUDAWrappers
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
                                                  update_JxW_values,
-        const bool use_coloring = false)
+        const bool use_coloring = false,
+        const bool n_colors     = 1)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
+        , n_colors(n_colors)
       {}
 
       /**
