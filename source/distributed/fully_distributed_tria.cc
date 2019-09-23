@@ -327,9 +327,16 @@ namespace parallel
                 cell->set_coarsen_flag();
             }
 
+        currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
+          true;
+        this->prepare_coarsening_and_refinement();
+        currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
+          false;
+
+
         // update refinement/coarsening flags of non-local cells via
         // ghost-cell exchange
-        GridTools::exchange_cell_data_to_ghosts<unsigned int>(
+        GridTools::exchange_cell_data_to_ghosts<std::pair<bool, bool>>(
           *this,
           [](const TriaIterator<CellAccessor<dim, spacedim>> &cell) {
             if (cell->refine_flag_set())
@@ -338,18 +345,22 @@ namespace parallel
                          RefinementPossibilities<dim>::isotropic_refinement,
                        ExcMessage(
                          "This class does not support anisotropic refinement"));
-                return true;
+                return std::pair<bool, bool>(true, false);
               }
+            else if (!cell->coarsen_flag_set())
+              return std::pair<bool, bool>(false, true);
             else
-              return false;
+              return std::pair<bool, bool>(false, false);
           },
           [](const TriaIterator<CellAccessor<dim, spacedim>> &cell,
-             const unsigned int                               refinement_flag) {
-            if (refinement_flag == true)
+             const std::pair<bool, bool>                      refinement_flag) {
+            if (refinement_flag.first == true)
               {
                 cell->clear_coarsen_flag();
                 cell->set_refine_flag();
               }
+            else if (refinement_flag.second == true)
+              cell->clear_coarsen_flag();
           });
       }
 
