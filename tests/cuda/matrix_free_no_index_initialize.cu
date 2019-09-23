@@ -49,25 +49,20 @@ public:
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
       fe_eval(cell, gpu_data, shared_data);
 
-    const unsigned int tid =
-      (threadIdx.x % n_q_points_1d) +
-      (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
-      (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
-
     // set to unit vector
-    fe_eval.submit_dof_value(1., tid);
+    fe_eval.submit_dof_value(1.);
     __syncthreads();
     fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
 
 #ifndef __APPLE__
     // values should evaluate to one, derivatives to zero
-    assert(fe_eval.get_value(tid) == 1.);
+    assert(fe_eval.get_value() == 1.);
     for (unsigned int e = 0; e < dim; ++e)
-      assert(fe_eval.get_gradient(tid)[e] == 0.);
+      assert(fe_eval.get_gradient()[e] == 0.);
 
     fe_eval.integrate(/*integrate_values = */ true,
                       /*integrate_gradients=*/true);
-    assert(fe_eval.get_dof_value(tid) == 1.);
+    assert(fe_eval.get_dof_value() == 1.);
 #endif
   }
 
