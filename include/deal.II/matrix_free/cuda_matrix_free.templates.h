@@ -26,6 +26,7 @@
 
 #  include <deal.II/dofs/dof_tools.h>
 
+#  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
 #  include <deal.II/grid/filtered_iterator.h>
@@ -51,6 +52,10 @@ namespace CUDAWrappers
       global_shape_values[(max_elem_degree + 1) * (max_elem_degree + 1)];
     __constant__ double
       global_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
+
+    // for collocation methods
+    __constant__ double
+      global_co_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
 
     template <typename Number>
     using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
@@ -835,6 +840,13 @@ namespace CUDAWrappers
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d * sizeof(Number);
 
+    FE_DGQArbitraryNodes<1> fe_quad_co(quad);
+    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
+      shape_info_co(quad, fe_quad_co);
+
+    unsigned int size_co_shape_values =
+      n_q_points_1d * n_q_points_1d * sizeof(Number);
+
     cudaError_t cuda_error = cudaMemcpyToSymbol(internal::global_shape_values,
                                                 shape_info.shape_values.data(),
                                                 size_shape_values,
@@ -847,6 +859,13 @@ namespace CUDAWrappers
         cuda_error = cudaMemcpyToSymbol(internal::global_shape_gradients,
                                         shape_info.shape_gradients.data(),
                                         size_shape_values,
+                                        0,
+                                        cudaMemcpyHostToDevice);
+        AssertCuda(cuda_error);
+
+        cuda_error = cudaMemcpyToSymbol(internal::global_co_shape_gradients,
+                                        shape_info_co.shape_gradients.data(),
+                                        size_co_shape_values,
                                         0,
                                         cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
