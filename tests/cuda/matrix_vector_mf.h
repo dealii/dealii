@@ -37,8 +37,7 @@ public:
 
   __device__ void operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-      *                fe_eval,
-    const unsigned int q_point) const;
+      *fe_eval) const;
 
 private:
   Number coef;
@@ -48,12 +47,11 @@ private:
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 __device__ void HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::
-                operator()(
-  CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
-  const unsigned int                                                    q) const
+                operator()(CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
+             *fe_eval) const
 {
-  fe_eval->submit_value(coef * fe_eval->get_value(q), q);
-  fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
+  fe_eval->submit_value(coef * fe_eval->get_value());
+  fe_eval->submit_gradient(fe_eval->get_gradient());
 }
 
 
@@ -101,7 +99,7 @@ operator()(const unsigned int                                          cell,
     cell, gpu_data, shared_data);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(true, true);
-  fe_eval.apply_quad_point_operations(
+  fe_eval.apply_for_each_quad_point(
     HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(coef[pos]));
   fe_eval.integrate(true, true);
   fe_eval.distribute_local_to_global(dst);
