@@ -107,7 +107,7 @@ namespace GridGenerator
    * @image html simplex_2d.png
    * @image html simplex_3d.png
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
+   * @param tria The triangulation to be created. It needs to be empty upon
    * calling this function.
    *
    * @param vertices The dim+1 corners of the simplex.
@@ -232,7 +232,7 @@ namespace GridGenerator
    * @note For an example of the use of this function see the step-28 tutorial
    * program.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
+   * @param tria The triangulation to be created. It needs to be empty upon
    * calling this function.
    *
    * @param repetitions A vector of @p dim positive values denoting the number
@@ -314,7 +314,7 @@ namespace GridGenerator
    * the first @p dim coordinate directions embedded into the @p spacedim
    * dimensional space with the remaining entries set to zero.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
+   * @param tria The triangulation to be created. It needs to be empty upon
    * calling this function.
    *
    * @param holes Positive number of holes in each of the dim directions.
@@ -363,9 +363,11 @@ namespace GridGenerator
    * boundary faces are assigned such that the lower one in the x-direction is
    * 0, and the upper one is 1 (see
    * @ref GlossColorization "the glossary entry on colorization").
-   * The
-   * indicators for the surfaces in the y-direction are 2 and 3, and the ones
-   * for the z-direction are 5 and 6. The hole boundary has indicator 4.
+   * The indicators for the surfaces in the y-direction are 2 and 3, and the
+   * ones for the z-direction are 5 and 6. The hole boundary has indicator 4.
+   *
+   * @param tria the triangulation to be created. It needs to be empty upon
+   * calling this function.
    *
    * @author Denis Davydov, 2018
    */
@@ -433,7 +435,7 @@ namespace GridGenerator
    *
    * @image html channel_with_cylinder_2d_manifolds.png
    *
-   * @param tria Triangulation to create. Must be empty upon calling this
+   * @param tria Triangulation to be created. Must be empty upon calling this
    * function.
    *
    * @param shell_region_width Width of the layer of shells around the cylinder.
@@ -508,14 +510,20 @@ namespace GridGenerator
                const bool                          colorize = false);
 
   /**
-   * A parallelogram. The first corner point is the origin. The @p dim
-   * adjacent points are the ones given in the second argument and the fourth
-   * point will be the sum of these two vectors.  Colorizing is done in the
-   * same way as in hyper_rectangle().
+   * A parallelogram. The first corner point is the origin. The next @p dim
+   * vertices are the ones given in the second argument and the last vertex
+   * will be the sum of the two vectors connecting the origin to those
+   * points. Colorizing is done in the same way as in hyper_rectangle().
    *
    * @note This function is implemented in 2d only.
    *
-   * @note The triangulation passed as argument needs to be empty when calling this function.
+   * @param tria The triangulation to be created. It needs to be empty upon
+   * calling this function.
+   *
+   * @param corners Second and third vertices of the parallelogram.
+   *
+   * @param colorize Assign different boundary ids if true. (see @ref
+   * GlossColorization "the glossary entry on colorization").
    */
   template <int dim>
   void
@@ -581,7 +589,7 @@ namespace GridGenerator
   /**
    * A subdivided parallelepiped.
    *
-   * @param tria The Triangulation to create. It needs to be empty upon
+   * @param tria The triangulation to be created. It needs to be empty upon
    * calling this function.
    *
    * @param origin First corner of the parallelepiped.
