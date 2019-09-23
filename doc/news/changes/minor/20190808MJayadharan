@@ -1,3 +1,7 @@
-Debug: Fixed two functions in GridTools::Cache class (in source/grid/grid_tools_cache.cc), namely get_used_vertices_rtree() and get_cell_bounding_boxes_rtree where the update flag were not cleared. Fixed that by adding a line to both functions at the end of if loop checking the flag.
+Fixed: Fixed two functions in GridTools::Cache class, namely
+GridTools::Cache::get_used_vertices_rtree() and
+GridTools::Cache::get_cell_bounding_boxes_rtree() where the update flags were
+not cleared. Fixed that by adding a line to both functions at the end of the if
+clause checking the flag.
 <br>
 (Manu Jayadharan, 2019/08/08)

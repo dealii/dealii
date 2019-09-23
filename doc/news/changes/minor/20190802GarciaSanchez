@@ -1,4 +1,4 @@
-Improved: The function make_periodicity_constraints() can now be
+Improved: DoFTools::make_periodicity_constraints() can now be
 used with std::complex<double> numbers.
 <br>
 (Daniel Garcia-Sanchez, 2019/08/02)
