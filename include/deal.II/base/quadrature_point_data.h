@@ -939,11 +939,11 @@ namespace parallel
       data_storage  = &data_storage_;
 
       handle = triangulation->register_data_attach(
-        std::bind(
-          &ContinuousQuadratureDataTransfer<dim, DataType>::pack_function,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2),
+        [this](
+          const typename parallel::distributed::Triangulation<
+            dim>::cell_iterator &cell,
+          const typename parallel::distributed::Triangulation<dim>::CellStatus
+            status) { return this->pack_function(cell, status); },
         /*returns_variable_size_data=*/true);
     }
 
@@ -955,12 +955,13 @@ namespace parallel
     {
       triangulation->notify_ready_to_unpack(
         handle,
-        std::bind(
-          &ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function,
-          this,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3));
+        [this](
+          const typename parallel::distributed::Triangulation<
+            dim>::cell_iterator &cell,
+          const typename parallel::distributed::Triangulation<dim>::CellStatus
+            status,
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &data_range) { this->unpack_function(cell, status, data_range); });
 
       // invalidate the pointers
       data_storage  = nullptr;

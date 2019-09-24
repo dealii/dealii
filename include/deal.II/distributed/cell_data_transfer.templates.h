@@ -143,10 +143,12 @@ namespace parallel
       Assert(tria != nullptr, ExcInternalError());
 
       handle = tria->register_data_attach(
-        std::bind(&CellDataTransfer<dim, spacedim, VectorType>::pack_callback,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2),
+        [this](const typename parallel::distributed::
+                 Triangulation<dim, spacedim>::cell_iterator &cell,
+               const typename parallel::distributed::
+                 Triangulation<dim, spacedim>::CellStatus status) {
+          return this->pack_callback(cell, status);
+        },
         /*returns_variable_size_data=*/transfer_variable_size_data);
     }
 
@@ -215,12 +217,15 @@ namespace parallel
 
       tria->notify_ready_to_unpack(
         handle,
-        std::bind(&CellDataTransfer<dim, spacedim, VectorType>::unpack_callback,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::ref(all_out)));
+        [this, &all_out](
+          const typename parallel::distributed::Triangulation<dim, spacedim>::
+            cell_iterator &cell,
+          const typename parallel::distributed::Triangulation<dim, spacedim>::
+            CellStatus status,
+          const boost::iterator_range<std::vector<char>::const_iterator>
+            &data_range) {
+          this->unpack_callback(cell, status, data_range, all_out);
+        });
 
       dealii::internal::parallel::distributed::CellDataTransferImplementation::
         post_unpack_action(all_out);

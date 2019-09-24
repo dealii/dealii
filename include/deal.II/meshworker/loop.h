@@ -471,17 +471,19 @@ namespace MeshWorker
     WorkStream::run(
       begin,
       end,
-      std::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
-                std::placeholders::_1,
-                std::placeholders::_3,
-                std::placeholders::_2,
-                cell_worker,
-                boundary_worker,
-                face_worker,
-                lctrl),
-      std::bind(&dealii::internal::assemble<dim, DOFINFO, ASSEMBLER>,
-                std::placeholders::_1,
-                &assembler),
+      [&cell_worker, &boundary_worker, &face_worker, &lctrl](
+        ITERATOR cell, INFOBOX &info, DoFInfoBox<dim, DOFINFO> &dof_info) {
+        cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>(cell,
+                                                               dof_info,
+                                                               info,
+                                                               cell_worker,
+                                                               boundary_worker,
+                                                               face_worker,
+                                                               lctrl);
+      },
+      [&assembler](const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo) {
+        dealii::internal::assemble<dim, DOFINFO, ASSEMBLER>(dinfo, &assembler);
+      },
       info,
       dof_info);
   }
@@ -516,22 +518,28 @@ namespace MeshWorker
                        IntegrationInfo<dim, spacedim> &)>
       face_worker;
     if (integrator.use_cell)
-      cell_worker = std::bind(&LocalIntegrator<dim, spacedim>::cell,
-                              &integrator,
-                              std::placeholders::_1,
-                              std::placeholders::_2);
+      cell_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+                      IntegrationInfo<dim, spacedim> &integration_info) {
+          integrator.cell(dof_info, integration_info);
+        };
     if (integrator.use_boundary)
-      boundary_worker = std::bind(&LocalIntegrator<dim, spacedim>::boundary,
-                                  &integrator,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2);
+      boundary_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+                      IntegrationInfo<dim, spacedim> &integration_info) {
+          integrator.boundary(dof_info, integration_info);
+        };
     if (integrator.use_face)
-      face_worker = std::bind(&LocalIntegrator<dim, spacedim>::face,
-                              &integrator,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3,
-                              std::placeholders::_4);
+      face_worker =
+        [&integrator](DoFInfo<dim, spacedim> &        dof_info_1,
+                      DoFInfo<dim, spacedim> &        dof_info_2,
+                      IntegrationInfo<dim, spacedim> &integration_info_1,
+                      IntegrationInfo<dim, spacedim> &integration_info_2) {
+          integrator.face(dof_info_1,
+                          dof_info_2,
+                          integration_info_1,
+                          integration_info_2);
+        };
 
     loop<dim, spacedim>(begin,
                         end,

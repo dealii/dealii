@@ -523,10 +523,11 @@ inline SolverBase<VectorType>::SolverBase(
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect(std::bind(&SolverControl::check,
-                    std::ref(solver_control),
-                    std::placeholders::_1,
-                    std::placeholders::_2));
+  connect([&solver_control](const unsigned int iteration,
+                            const double       check_value,
+                            const VectorType &) {
+    return solver_control.check(iteration, check_value);
+  });
 }
 
 
@@ -540,10 +541,11 @@ inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect(std::bind(&SolverControl::check,
-                    std::ref(solver_control),
-                    std::placeholders::_1,
-                    std::placeholders::_2));
+  connect([&solver_control](const unsigned int iteration,
+                            const double       check_value,
+                            const VectorType &) {
+    return solver_control.check(iteration, check_value);
+  });
 }
 
 

@@ -1571,12 +1571,13 @@ namespace internal
         n_rows / internal::bucket_size_threading + 1);
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
-                                   std::bind(&internal::compute_row_lengths,
-                                             std::placeholders::_1,
-                                             std::placeholders::_2,
-                                             std::cref(*this),
-                                             std::ref(mutexes),
-                                             std::ref(row_lengths)),
+                                   [this,
+                                    &mutexes,
+                                    &row_lengths](const unsigned int begin,
+                                                  const unsigned int end) {
+                                     internal::compute_row_lengths(
+                                       begin, end, *this, mutexes, row_lengths);
+                                   },
                                    20);
 
       // disregard dofs that only sit on a single cell because they cannot
@@ -1591,16 +1592,15 @@ namespace internal
       SparsityPattern connectivity_dof(n_rows,
                                        task_info.n_active_cells,
                                        row_lengths);
-      parallel::apply_to_subranges(0,
-                                   task_info.n_active_cells,
-                                   std::bind(&internal::fill_connectivity_dofs,
-                                             std::placeholders::_1,
-                                             std::placeholders::_2,
-                                             std::cref(*this),
-                                             std::cref(row_lengths),
-                                             std::ref(mutexes),
-                                             std::ref(connectivity_dof)),
-                                   20);
+      parallel::apply_to_subranges(
+        0,
+        task_info.n_active_cells,
+        [this, &row_lengths, &mutexes, &connectivity_dof](
+          const unsigned int begin, const unsigned int end) {
+          internal::fill_connectivity_dofs(
+            begin, end, *this, row_lengths, mutexes, connectivity_dof);
+        },
+        20);
       connectivity_dof.compress();
 
 
@@ -1612,16 +1612,19 @@ namespace internal
       // create a connectivity list between cells. The connectivity graph
       // should apply the renumbering, i.e., the entry for cell j is the entry
       // for cell renumbering[j] in the original ordering.
-      parallel::apply_to_subranges(0,
-                                   task_info.n_active_cells,
-                                   std::bind(&internal::fill_connectivity,
-                                             std::placeholders::_1,
-                                             std::placeholders::_2,
-                                             std::cref(*this),
-                                             std::cref(reverse_numbering),
-                                             std::cref(connectivity_dof),
-                                             std::ref(connectivity)),
-                                   20);
+      parallel::apply_to_subranges(
+        0,
+        task_info.n_active_cells,
+        [this, &reverse_numbering, &connectivity_dof, &connectivity](
+          const unsigned int begin, const unsigned int end) {
+          internal::fill_connectivity(begin,
+                                      end,
+                                      *this,
+                                      reverse_numbering,
+                                      connectivity_dof,
+                                      connectivity);
+        },
+        20);
     }
 
 

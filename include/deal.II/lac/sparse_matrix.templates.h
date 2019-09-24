@@ -212,11 +212,11 @@ SparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      std::bind(
-        &internal::SparseMatrixImplementation::template zero_subrange<number>,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        val.get()),
+      [this](const size_type begin, const size_type end) {
+        internal::SparseMatrixImplementation::zero_subrange(begin,
+                                                            end,
+                                                            val.get());
+      },
       grain_size);
   else if (matrix_size > 0)
     {
@@ -778,16 +778,17 @@ SparseMatrix<number>::vmult(OutVector &dst, const InVector &src) const
   parallel::apply_to_subranges(
     0U,
     m(),
-    std::bind(&internal::SparseMatrixImplementation::
-                vmult_on_subrange<number, InVector, OutVector>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(src),
-              std::ref(dst),
-              false),
+    [this, &src, &dst](const size_type begin_row, const size_type end_row) {
+      internal::SparseMatrixImplementation::vmult_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        src,
+        dst,
+        false);
+    },
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
@@ -835,16 +836,17 @@ SparseMatrix<number>::vmult_add(OutVector &dst, const InVector &src) const
   parallel::apply_to_subranges(
     0U,
     m(),
-    std::bind(&internal::SparseMatrixImplementation::
-                vmult_on_subrange<number, InVector, OutVector>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(src),
-              std::ref(dst),
-              true),
+    [this, &src, &dst](const size_type begin_row, const size_type end_row) {
+      internal::SparseMatrixImplementation::vmult_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        src,
+        dst,
+        true);
+    },
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
@@ -922,14 +924,15 @@ SparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::
-                matrix_norm_sqr_on_subrange<number, Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(v)),
+    [this, &v](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::matrix_norm_sqr_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        v);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
@@ -989,15 +992,16 @@ SparseMatrix<number>::matrix_scalar_product(const Vector<somenumber> &u,
   Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   return parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::
-                matrix_scalar_product_on_subrange<number, Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(u),
-              std::cref(v)),
+    [this, &u, &v](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::
+        matrix_scalar_product_on_subrange(begin_row,
+                                          end_row,
+                                          val.get(),
+                                          cols->rowstart.get(),
+                                          cols->colnums.get(),
+                                          u,
+                                          v);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
@@ -1337,18 +1341,17 @@ SparseMatrix<number>::residual(Vector<somenumber> &      dst,
   Assert(&u != &dst, ExcSourceEqualsDestination());
 
   return std::sqrt(parallel::accumulate_from_subranges<somenumber>(
-    std::bind(&internal::SparseMatrixImplementation::residual_sqr_on_subrange<
-                number,
-                Vector<somenumber>,
-                Vector<somenumber>>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              val.get(),
-              cols->rowstart.get(),
-              cols->colnums.get(),
-              std::cref(u),
-              std::cref(b),
-              std::ref(dst)),
+    [this, &u, &b, &dst](const size_type begin_row, const size_type end_row) {
+      return internal::SparseMatrixImplementation::residual_sqr_on_subrange(
+        begin_row,
+        end_row,
+        val.get(),
+        cols->rowstart.get(),
+        cols->colnums.get(),
+        u,
+        b,
+        dst);
+    },
     0,
     m(),
     internal::SparseMatrixImplementation::minimum_parallel_grain_size));

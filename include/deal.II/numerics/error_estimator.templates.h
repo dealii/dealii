@@ -1307,15 +1307,21 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     dof_handler.begin_active(),
     static_cast<typename DoFHandlerType::active_cell_iterator>(
       dof_handler.end()),
-    std::bind(&internal::estimate_one_cell<InputVector, DoFHandlerType>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3,
-              std::ref(solutions),
-              strategy),
-    std::bind(&internal::copy_local_to_global<DoFHandlerType>,
-              std::placeholders::_1,
-              std::ref(face_integrals)),
+    [&solutions, strategy](
+      const typename DoFHandlerType::active_cell_iterator &cell,
+      internal::ParallelData<DoFHandlerType, typename InputVector::value_type>
+        &parallel_data,
+      std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
+        &local_face_integrals) {
+      internal::estimate_one_cell(
+        cell, parallel_data, local_face_integrals, solutions, strategy);
+    },
+    [&face_integrals](
+      const std::map<typename DoFHandlerType::face_iterator,
+                     std::vector<double>> &local_face_integrals) {
+      internal::copy_local_to_global<DoFHandlerType>(local_face_integrals,
+                                                     face_integrals);
+    },
     parallel_data,
     sample_local_face_integrals);
 
