@@ -43,33 +43,6 @@ namespace internal
 
     template std::size_t
     DoFIndicesOnFacesOrEdges<3>::memory_consumption() const;
-
-
-    // ---------------------- DoFFaces ----------------------------
-
-    std::size_t
-    DoFIndicesOnFaces<1>::memory_consumption() const
-    {
-      return 0;
-    }
-
-
-
-    std::size_t
-    DoFIndicesOnFaces<2>::memory_consumption() const
-    {
-      return MemoryConsumption::memory_consumption(lines);
-    }
-
-
-
-    std::size_t
-    DoFIndicesOnFaces<3>::memory_consumption() const
-    {
-      return (MemoryConsumption::memory_consumption(lines) +
-              MemoryConsumption::memory_consumption(quads));
-    }
-
   } // namespace hp
 } // namespace internal
 

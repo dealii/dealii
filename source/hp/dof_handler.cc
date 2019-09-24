@@ -1498,38 +1498,6 @@ namespace hp
 
 
 
-  template <>
-  types::global_dof_index
-  DoFHandler<2, 3>::n_boundary_dofs() const
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  template <>
-  template <typename number>
-  types::global_dof_index
-  DoFHandler<2, 3>::n_boundary_dofs(
-    const std::map<types::boundary_id, const Function<3, number> *> &) const
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  template <>
-  types::global_dof_index
-  DoFHandler<2, 3>::n_boundary_dofs(const std::set<types::boundary_id> &) const
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
   template <int dim, int spacedim>
   std::size_t
   DoFHandler<dim, spacedim>::memory_consumption() const

@@ -1405,6 +1405,38 @@ namespace hp
     // then just hand everything over to the other function that does the work
     return n_boundary_dofs(boundary_ids_only);
   }
+
+
+
+  template <>
+  inline types::global_dof_index
+  DoFHandler<2, 3>::n_boundary_dofs() const
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+
+
+  template <>
+  template <typename number>
+  inline types::global_dof_index
+  DoFHandler<2, 3>::n_boundary_dofs(
+    const std::map<types::boundary_id, const Function<3, number> *> &) const
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+
+
+  template <>
+  inline types::global_dof_index
+  DoFHandler<2, 3>::n_boundary_dofs(const std::set<types::boundary_id> &) const
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
 }
 
 
