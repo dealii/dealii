@@ -2289,10 +2289,14 @@ namespace GridTools
       Assert(pairs1.size() == pairs2.size(),
              ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
-           ExcMessage("No new periodic face pairs have been found. "
-                      "Are you sure that you've selected the correct boundary "
-                      "id's and that the coarsest level mesh is colorized?"));
+    Assert(
+      (pairs1.size() > 0 ||
+       (dynamic_cast<
+          const parallel::fullydistributed::Triangulation<dim, space_dim> *>(
+          &pairs1.begin()->first->get_triangulation()) != nullptr)),
+      ExcMessage("No new periodic face pairs have been found. "
+                 "Are you sure that you've selected the correct boundary "
+                 "id's and that the coarsest level mesh is colorized?"));
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(

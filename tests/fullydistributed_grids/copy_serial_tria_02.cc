@@ -80,14 +80,14 @@ main(int argc, char *argv[])
 
   {
     deallog.push("1d");
-    const int n_refinements  = 8;
+    const int n_refinements  = 6;
     const int n_subdivisions = 8;
     test<1>(n_refinements, n_subdivisions, comm);
     deallog.pop();
   }
   {
     deallog.push("2d");
-    const int n_refinements  = 4;
+    const int n_refinements  = 3;
     const int n_subdivisions = 8;
     test<2>(n_refinements, n_subdivisions, comm);
     deallog.pop();

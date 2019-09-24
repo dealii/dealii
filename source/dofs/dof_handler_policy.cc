@@ -4405,9 +4405,22 @@ namespace internal
                 p4est_coarse_cell;
               internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
+              types::coarse_cell_id coarse_cell_id = 0;
+              try
+                {
+                  coarse_cell_id = cell->id().get_coarse_cell_id();
+                }
+              catch (...)
+                {
+                  // In the case of parallel::fullydistributed::Triangulation,
+                  // a dummy cell throws an exception which is caught here.
+                  // We ignore this cell here.
+                  continue;
+                };
+
               find_marked_mg_ghost_cells_recursively<dim, spacedim>(
                 tria,
-                cell->id().get_coarse_cell_id(),
+                coarse_cell_id,
                 cell,
                 p4est_coarse_cell,
                 neighbor_cell_list);
@@ -4620,28 +4633,6 @@ namespace internal
          *   all ghost cells. In phase 2, this is only true if we
          *   did not receive a complete set of DoF indices in phase 1.
          */
-        template <int spacedim>
-        void
-        communicate_dof_indices_on_marked_cells(
-          const DoFHandler<1, spacedim> &,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
-        {
-          Assert(false, ExcNotImplemented());
-        }
-
-
-
-        template <int spacedim>
-        void
-        communicate_dof_indices_on_marked_cells(
-          const hp::DoFHandler<1, spacedim> &,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
-        {
-          Assert(false, ExcNotImplemented());
-        }
-
-
-
         template <class DoFHandlerType>
         void
         communicate_dof_indices_on_marked_cells(

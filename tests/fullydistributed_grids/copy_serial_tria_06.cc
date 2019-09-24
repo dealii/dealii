@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Create a serial triangulation with periodic face in x-direction and copy it.
+// Create a serial triangulation, copy it, and create a partitioner
+// by matrixfree.
 
 #include <deal.II/base/mpi.h>
 
@@ -23,12 +24,14 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/matrix_free/matrix_free.h>
 
 #include "./tests.h"
 
@@ -36,37 +39,11 @@ using namespace dealii;
 
 template <int dim>
 void
-test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
+test(int n_refinements, MPI_Comm comm)
 {
-  const double left  = 0;
-  const double right = 1;
-
-  auto add_periodicy = [&](dealii::Triangulation<dim> &tria) {
-    std::vector<
-      GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
-         periodic_faces;
-    auto cell = tria.begin();
-    auto endc = tria.end();
-    for (; cell != endc; ++cell)
-      for (unsigned int face_number = 0;
-           face_number < GeometryInfo<dim>::faces_per_cell;
-           ++face_number)
-        if (std::fabs(cell->face(face_number)->center()(0) - left) < 1e-12)
-          cell->face(face_number)->set_all_boundary_ids(1);
-        else if (std::fabs(cell->face(face_number)->center()(0) - right) <
-                 1e-12)
-          cell->face(face_number)->set_all_boundary_ids(2);
-
-    GridTools::collect_periodic_faces(tria, 1, 2, 0, periodic_faces);
-
-    tria.add_periodicity(periodic_faces);
-  };
-
   // create serial triangulation
   Triangulation<dim> basetria;
-  GridGenerator::subdivided_hyper_cube(basetria, n_subdivisions);
-  // new: add periodicy on serial mesh
-  add_periodicy(basetria);
+  GridGenerator::hyper_cube(basetria);
   basetria.refine_global(n_refinements);
 
   GridTools::partition_triangulation_zorder(
@@ -82,17 +59,48 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
 
-  // new: add periodicy on fullydistributed mesh (!!!)
-  add_periodicy(tria_pft);
+  unsigned int degree = 2;
 
   // test triangulation
-  FE_Q<dim>       fe(2);
+  FE_DGQ<dim>     fe(degree);
   DoFHandler<dim> dof_handler(tria_pft);
   dof_handler.distribute_dofs(fe);
 
-  // print statistics
-  print_statistics(tria_pft);
-  print_statistics(dof_handler);
+  // test 1: print the indices of the dofs of each active cell
+  {
+    std::vector<types::global_dof_index> dofs(Utilities::pow(degree + 1, dim));
+    for (auto cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned() || cell->is_ghost())
+        {
+          cell->get_dof_indices(dofs);
+
+          deallog << std::setw(4) << cell->subdomain_id() << " : ";
+          for (const auto dof : dofs)
+            deallog << std::setw(4) << dof << " ";
+          deallog << std::endl;
+        }
+  }
+
+  // test 2: let matrixfree setup all partitioners
+  {
+    typename dealii::MatrixFree<dim, double>::AdditionalData additional_data;
+    additional_data.mapping_update_flags =
+      update_gradients | update_JxW_values | update_quadrature_points;
+    additional_data.mapping_update_flags_inner_faces =
+      update_gradients | update_JxW_values;
+    additional_data.mapping_update_flags_boundary_faces =
+      update_gradients | update_JxW_values | update_quadrature_points;
+    additional_data.hold_all_faces_to_owned_cells = true;
+    additional_data.mapping_update_flags_faces_by_cells =
+      update_gradients | update_JxW_values | update_quadrature_points;
+
+    MappingQGeneric<dim>      mapping(1);
+    QGauss<1>                 quad(degree + 1);
+    AffineConstraints<double> constraint;
+
+    MatrixFree<dim, double> matrix_free;
+    matrix_free.reinit(mapping, dof_handler, constraint, quad, additional_data);
+  }
 }
 
 int
@@ -101,29 +109,12 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
-  const MPI_Comm comm = MPI_COMM_WORLD;
-
-  {
-    deallog.push("1d");
-    const int n_refinements  = 4;
-    const int n_subdivisions = 8;
-    test<1>(n_refinements, n_subdivisions, comm);
-    deallog.pop();
-  }
+  const int      n_refinements = 3;
+  const MPI_Comm comm          = MPI_COMM_WORLD;
 
   {
     deallog.push("2d");
-    const int n_refinements  = 3;
-    const int n_subdivisions = 8;
-    test<2>(n_refinements, n_subdivisions, comm);
-    deallog.pop();
-  }
-
-  {
-    deallog.push("2d");
-    const int n_refinements  = 3;
-    const int n_subdivisions = 4;
-    test<3>(n_refinements, n_subdivisions, comm);
+    test<2>(n_refinements, comm);
     deallog.pop();
   }
 }
