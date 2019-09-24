@@ -77,7 +77,8 @@ test(const unsigned int degree)
   FEValues<dim, spacedim> fe_values(map_fe,
                                     fe_sys,
                                     quadrature_formula,
-                                    update_values | update_JxW_values);
+                                    update_values | update_JxW_values |
+                                      update_volume_elements);
 
   typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
                                                              dof_sys
