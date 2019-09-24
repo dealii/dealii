@@ -24,6 +24,11 @@ namespace parallel
 {
   namespace fullydistributed
   {
+    /**
+     * A namespace for fully distributed triangulation utility functions.
+     *
+     * @ingroup fullydistributed
+     */
     namespace Utilities
     {
       /**
