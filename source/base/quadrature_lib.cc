@@ -774,10 +774,9 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad)
 
   std::sort(permutation.begin(),
             permutation.end(),
-            std::bind(&QSorted<dim>::compare_weights,
-                      std::ref(*this),
-                      std::placeholders::_1,
-                      std::placeholders::_2));
+            [this](const unsigned int x, const unsigned int y) {
+              return this->compare_weights(x, y);
+            });
 
   // At this point, the variable is_tensor_product_flag is set
   // to the respective value of the given Quadrature in the base

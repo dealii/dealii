@@ -396,19 +396,21 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
     n_datasets, Utilities::fixed_power<dimension - 1>(n_subdivisions + 1));
 
   // now build the patches in parallel
-  WorkStream::run(all_faces.data(),
-                  all_faces.data() + all_faces.size(),
-                  std::bind(&DataOutFaces<dim, DoFHandlerType>::build_one_patch,
-                            this,
-                            std::placeholders::_1,
-                            std::placeholders::_2,
-                            std::placeholders::_3),
-                  std::bind(&internal::DataOutFacesImplementation::
-                              append_patch_to_list<dim, space_dimension>,
-                            std::placeholders::_1,
-                            std::ref(this->patches)),
-                  thread_data,
-                  sample_patch);
+  WorkStream::run(
+    all_faces.data(),
+    all_faces.data() + all_faces.size(),
+    [this](const FaceDescriptor *cell_and_face,
+           internal::DataOutFacesImplementation::ParallelData<dimension,
+                                                              dimension> &data,
+           DataOutBase::Patch<dimension - 1, space_dimension> &patch) {
+      this->build_one_patch(cell_and_face, data, patch);
+    },
+    [this](const DataOutBase::Patch<dim - 1, space_dimension> &patch) {
+      internal::DataOutFacesImplementation::
+        append_patch_to_list<dim, space_dimension>(patch, this->patches);
+    },
+    thread_data,
+    sample_patch);
 }
 
 

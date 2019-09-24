@@ -169,33 +169,33 @@ TimeDependent::delete_timestep(const unsigned int position)
 void
 TimeDependent::solve_primal_problem()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_primal_problem,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
-          timestepping_data_primal,
-          forward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_primal_problem(); },
+    [](TimeStepBase *const time_step) { time_step->solve_primal_problem(); },
+    timestepping_data_primal,
+    forward);
 }
 
 
 void
 TimeDependent::solve_dual_problem()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_dual_problem,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
-          timestepping_data_dual,
-          backward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_dual_problem(); },
+    [](TimeStepBase *const time_step) { time_step->init_for_dual_problem(); },
+    timestepping_data_dual,
+    backward);
 }
 
 
 void
 TimeDependent::postprocess()
 {
-  do_loop(std::bind(&TimeStepBase::init_for_postprocessing,
-                    std::placeholders::_1),
-          std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
-          timestepping_data_postprocess,
-          forward);
+  do_loop(
+    [](TimeStepBase *const time_step) { time_step->init_for_postprocessing(); },
+    [](TimeStepBase *const time_step) { time_step->postprocess_timestep(); },
+    timestepping_data_postprocess,
+    forward);
 }
 
 
@@ -227,13 +227,13 @@ TimeDependent::start_sweep(const unsigned int s)
 void
 TimeDependent::end_sweep()
 {
-  void (TimeDependent::*p)(const unsigned int, const unsigned int) =
-    &TimeDependent::end_sweep;
-  parallel::apply_to_subranges(
-    0U,
-    timesteps.size(),
-    std::bind(p, this, std::placeholders::_1, std::placeholders::_2),
-    1);
+  parallel::apply_to_subranges(0U,
+                               timesteps.size(),
+                               [this](const unsigned int begin,
+                                      const unsigned int end) {
+                                 this->end_sweep(begin, end);
+                               },
+                               1);
 }
 
 

@@ -3155,11 +3155,9 @@ GridIn<dim, spacedim>::skip_empty_lines(std::istream &in)
       // consists only of spaces, and
       // if not put the whole thing
       // back and return
-      if (std::find_if(line.begin(),
-                       line.end(),
-                       std::bind(std::not_equal_to<char>(),
-                                 std::placeholders::_1,
-                                 ' ')) != line.end())
+      if (std::find_if(line.begin(), line.end(), [](const char c) {
+            return c != ' ';
+          }) != line.end())
         {
           in.putback('\n');
           for (int i = line.length() - 1; i >= 0; --i)

@@ -2819,23 +2819,41 @@ namespace DoFTools
 #endif
           }
 
+        auto worker =
+          [coarse_component,
+           &coarse_grid,
+           &coarse_to_fine_grid_map,
+           &parameter_dofs](const typename dealii::DoFHandler<dim, spacedim>::
+                              active_cell_iterator &            cell,
+                            const Assembler::Scratch &          scratch_data,
+                            Assembler::CopyData<dim, spacedim> &copy_data) {
+            compute_intergrid_weights_3<dim, spacedim>(cell,
+                                                       scratch_data,
+                                                       copy_data,
+                                                       coarse_component,
+                                                       coarse_grid.get_fe(),
+                                                       coarse_to_fine_grid_map,
+                                                       parameter_dofs);
+          };
+
+        auto copier =
+          [coarse_component,
+           &coarse_grid,
+           &weight_mapping,
+           is_called_in_parallel,
+           &weights](const Assembler::CopyData<dim, spacedim> &copy_data) {
+            copy_intergrid_weights_3<dim, spacedim>(copy_data,
+                                                    coarse_component,
+                                                    coarse_grid.get_fe(),
+                                                    weight_mapping,
+                                                    is_called_in_parallel,
+                                                    weights);
+          };
+
         WorkStream::run(coarse_grid.begin_active(),
                         coarse_grid.end(),
-                        std::bind(&compute_intergrid_weights_3<dim, spacedim>,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2,
-                                  std::placeholders::_3,
-                                  coarse_component,
-                                  std::cref(coarse_grid.get_fe()),
-                                  std::cref(coarse_to_fine_grid_map),
-                                  std::cref(parameter_dofs)),
-                        std::bind(&copy_intergrid_weights_3<dim, spacedim>,
-                                  std::placeholders::_1,
-                                  coarse_component,
-                                  std::cref(coarse_grid.get_fe()),
-                                  std::cref(weight_mapping),
-                                  is_called_in_parallel,
-                                  std::ref(weights)),
+                        worker,
+                        copier,
                         scratch,
                         copy_data);
 
@@ -3308,9 +3326,9 @@ namespace DoFTools
     const types::global_dof_index n_global_parm_dofs =
       std::count_if(weight_mapping.begin(),
                     weight_mapping.end(),
-                    std::bind(std::not_equal_to<types::global_dof_index>(),
-                              std::placeholders::_1,
-                              numbers::invalid_dof_index));
+                    [](const types::global_dof_index dof) {
+                      return dof != numbers::invalid_dof_index;
+                    });
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping(

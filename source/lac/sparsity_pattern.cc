@@ -352,9 +352,7 @@ SparsityPattern::compress()
   const std::size_t nonzero_elements =
     std::count_if(&colnums[rowstart[0]],
                   &colnums[rowstart[rows]],
-                  std::bind(std::not_equal_to<size_type>(),
-                            std::placeholders::_1,
-                            invalid_entry));
+                  [](const size_type col) { return col != invalid_entry; });
   // now allocate the respective memory
   std::unique_ptr<size_type[]> new_colnums(new size_type[nonzero_elements]);
 

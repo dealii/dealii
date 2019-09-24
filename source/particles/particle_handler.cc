@@ -654,14 +654,17 @@ namespace Particles
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
             neighbor_permutation[i] = i;
 
+          const auto cell_centers =
+            vertex_to_cell_centers[closest_vertex_index];
           std::sort(neighbor_permutation.begin(),
                     neighbor_permutation.end(),
-                    std::bind(&compare_particle_association<spacedim>,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::cref(vertex_to_particle),
-                              std::cref(
-                                vertex_to_cell_centers[closest_vertex_index])));
+                    [&vertex_to_particle, &cell_centers](const unsigned int a,
+                                                         const unsigned int b) {
+                      return compare_particle_association(a,
+                                                          b,
+                                                          vertex_to_particle,
+                                                          cell_centers);
+                    });
 
           // Search all of the cells adjacent to the closest vertex of the
           // previous cell Most likely we will find the particle in them.
@@ -1078,14 +1081,13 @@ namespace Particles
 
     if (global_max_particles_per_cell > 0)
       {
-        const std::function<std::vector<char>(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus)>
-          callback_function =
-            std::bind(&ParticleHandler<dim, spacedim>::store_particles,
-                      std::cref(*this),
-                      std::placeholders::_1,
-                      std::placeholders::_2);
+        const auto callback_function =
+          [this](const typename Triangulation<dim, spacedim>::cell_iterator
+                   &cell_iterator,
+                 const typename Triangulation<dim, spacedim>::CellStatus
+                   cell_status) {
+            return this->store_particles(cell_iterator, cell_status);
+          };
 
         handle = non_const_triangulation->register_data_attach(
           callback_function, /*returns_variable_size_data=*/true);
@@ -1114,14 +1116,13 @@ namespace Particles
     // data correctly. Only do this if something was actually stored.
     if (serialization && (global_max_particles_per_cell > 0))
       {
-        const std::function<std::vector<char>(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus)>
-          callback_function =
-            std::bind(&ParticleHandler<dim, spacedim>::store_particles,
-                      std::cref(*this),
-                      std::placeholders::_1,
-                      std::placeholders::_2);
+        const auto callback_function =
+          [this](const typename Triangulation<dim, spacedim>::cell_iterator
+                   &cell_iterator,
+                 const typename Triangulation<dim, spacedim>::CellStatus
+                   cell_status) {
+            return this->store_particles(cell_iterator, cell_status);
+          };
 
         handle = non_const_triangulation->register_data_attach(
           callback_function, /*returns_variable_size_data=*/true);
@@ -1130,16 +1131,15 @@ namespace Particles
     // Check if something was stored and load it
     if (handle != numbers::invalid_unsigned_int)
       {
-        const std::function<void(
-          const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const typename Triangulation<dim, spacedim>::CellStatus,
-          const boost::iterator_range<std::vector<char>::const_iterator> &)>
-          callback_function =
-            std::bind(&ParticleHandler<dim, spacedim>::load_particles,
-                      std::ref(*this),
-                      std::placeholders::_1,
-                      std::placeholders::_2,
-                      std::placeholders::_3);
+        const auto callback_function =
+          [this](
+            const typename Triangulation<dim, spacedim>::cell_iterator
+              &cell_iterator,
+            const typename Triangulation<dim, spacedim>::CellStatus cell_status,
+            const boost::iterator_range<std::vector<char>::const_iterator>
+              &range_iterator) {
+            this->load_particles(cell_iterator, cell_status, range_iterator);
+          };
 
         non_const_triangulation->notify_ready_to_unpack(handle,
                                                         callback_function);

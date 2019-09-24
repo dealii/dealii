@@ -4303,13 +4303,11 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
           // triangulations
           invalidate_present_cell();
           tria_listener_refinement =
-            cell->get_triangulation().signals.any_change.connect(std::bind(
-              &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-              std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+            cell->get_triangulation().signals.any_change.connect(
+              [this]() { this->invalidate_present_cell(); });
           tria_listener_mesh_transform =
-            cell->get_triangulation().signals.mesh_movement.connect(std::bind(
-              &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-              std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+            cell->get_triangulation().signals.mesh_movement.connect(
+              [this]() { this->invalidate_present_cell(); });
         }
     }
   else
@@ -4318,13 +4316,11 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
       // at least subscribe to the triangulation to get notified of
       // changes
       tria_listener_refinement =
-        cell->get_triangulation().signals.post_refinement.connect(std::bind(
-          &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-          std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+        cell->get_triangulation().signals.post_refinement.connect(
+          [this]() { this->invalidate_present_cell(); });
       tria_listener_mesh_transform =
-        cell->get_triangulation().signals.mesh_movement.connect(std::bind(
-          &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-          std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+        cell->get_triangulation().signals.mesh_movement.connect(
+          [this]() { this->invalidate_present_cell(); });
     }
 }
 

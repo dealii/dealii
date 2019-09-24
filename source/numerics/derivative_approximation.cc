@@ -1002,19 +1002,17 @@ namespace DerivativeApproximation
       WorkStream::run(
         begin,
         end,
-        static_cast<std::function<void(SynchronousIterators<Iterators> const &,
-                                       Assembler::Scratch const &,
-                                       Assembler::CopyData &)>>(
-          std::bind(&approximate<DerivativeDescription,
-                                 dim,
-                                 DoFHandlerType,
-                                 InputVector,
-                                 spacedim>,
-                    std::placeholders::_1,
-                    std::cref(mapping),
-                    std::cref(dof_handler),
-                    std::cref(solution),
-                    component)),
+        [&mapping, &dof_handler, &solution, component](
+          SynchronousIterators<Iterators> const &cell,
+          Assembler::Scratch const &,
+          Assembler::CopyData &) {
+          approximate<DerivativeDescription,
+                      dim,
+                      DoFHandlerType,
+                      InputVector,
+                      spacedim>(
+            cell, mapping, dof_handler, solution, component);
+        },
         std::function<void(internal::Assembler::CopyData const &)>(),
         internal::Assembler::Scratch(),
         internal::Assembler::CopyData());

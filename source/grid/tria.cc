@@ -4737,10 +4737,10 @@ namespace internal
 
             // count number of used cells
             // on the next higher level
-            const unsigned int used_cells = std::count_if(
-              triangulation.levels[level + 1]->cells.used.begin(),
-              triangulation.levels[level + 1]->cells.used.end(),
-              std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+            const unsigned int used_cells =
+              std::count(triangulation.levels[level + 1]->cells.used.begin(),
+                         triangulation.levels[level + 1]->cells.used.end(),
+                         true);
 
             // reserve space for the used_cells cells already existing
             // on the next higher level as well as for the
@@ -4760,11 +4760,9 @@ namespace internal
 
         // add to needed vertices how many
         // vertices are already in use
-        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
-                                         triangulation.vertices_used.end(),
-                                         std::bind(std::equal_to<bool>(),
-                                                   std::placeholders::_1,
-                                                   true));
+        needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                      triangulation.vertices_used.end(),
+                                      true);
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5046,10 +5044,10 @@ namespace internal
 
 
             // count number of used cells on the next higher level
-            const unsigned int used_cells = std::count_if(
-              triangulation.levels[level + 1]->cells.used.begin(),
-              triangulation.levels[level + 1]->cells.used.end(),
-              std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+            const unsigned int used_cells =
+              std::count(triangulation.levels[level + 1]->cells.used.begin(),
+                         triangulation.levels[level + 1]->cells.used.end(),
+                         true);
 
 
             // reserve space for the used_cells cells already existing
@@ -5085,11 +5083,9 @@ namespace internal
         triangulation.faces->lines.reserve_space(n_lines_in_pairs, 0);
 
         // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
-                                         triangulation.vertices_used.end(),
-                                         std::bind(std::equal_to<bool>(),
-                                                   std::placeholders::_1,
-                                                   true));
+        needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                      triangulation.vertices_used.end(),
+                                      true);
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -5452,10 +5448,10 @@ namespace internal
 
 
             // count number of used cells on the next higher level
-            const unsigned int used_cells = std::count_if(
-              triangulation.levels[level + 1]->cells.used.begin(),
-              triangulation.levels[level + 1]->cells.used.end(),
-              std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+            const unsigned int used_cells =
+              std::count(triangulation.levels[level + 1]->cells.used.begin(),
+                         triangulation.levels[level + 1]->cells.used.end(),
+                         true);
 
 
             // reserve space for the used_cells cells already existing
@@ -5539,11 +5535,9 @@ namespace internal
 
 
         // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count_if(triangulation.vertices_used.begin(),
-                                         triangulation.vertices_used.end(),
-                                         std::bind(std::equal_to<bool>(),
-                                                   std::placeholders::_1,
-                                                   true));
+        needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                      triangulation.vertices_used.end(),
+                                      true);
         // if we need more vertices: create them, if not: leave the
         // array as is, since shrinking is not really possible because
         // some of the vertices at the end may be in use
@@ -13184,11 +13178,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_used_vertices() const
 {
-  return std::count_if(vertices_used.begin(),
-                       vertices_used.end(),
-                       std::bind(std::equal_to<bool>(),
-                                 std::placeholders::_1,
-                                 true));
+  return std::count(vertices_used.begin(), vertices_used.end(), true);
 }
 
 
