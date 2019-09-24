@@ -434,15 +434,6 @@ namespace GridTools
   namespace
   {
     void
-    append_face_data(const CellData<0> & /*face_data*/,
-                     SubCellData & /*subcell_data*/)
-    {
-      Assert(false, ExcInternalError());
-    }
-
-
-
-    void
     append_face_data(const CellData<1> &face_data, SubCellData &subcell_data)
     {
       subcell_data.boundary_lines.push_back(face_data);
@@ -491,6 +482,76 @@ namespace GridTools
         return false;
       }
     };
+
+
+    /**
+     * get_coarse_mesh_description() needs to store face data for dim>1, but
+     * we can not have this code in the function, as this requires either an
+     * instantiation of CellData<dim-1>, or constexpr if. We use a class with
+     * specialization instead for now.
+     *
+     * Data on faces is added with insert_face_data() and then retrieved with
+     * get().
+     */
+    template <int dim>
+    class FaceDataHelper
+    {
+    public:
+      /**
+       * Store the data about the given face @p face.
+       */
+      template <class FaceIteratorType>
+      void
+      insert_face_data(const FaceIteratorType &face)
+      {
+        CellData<dim - 1> face_cell_data;
+        for (unsigned int vertex_n = 0;
+             vertex_n < GeometryInfo<dim>::vertices_per_face;
+             ++vertex_n)
+          face_cell_data.vertices[vertex_n] = face->vertex_index(vertex_n);
+        face_cell_data.boundary_id = face->boundary_id();
+        face_cell_data.manifold_id = face->manifold_id();
+
+        face_data.insert(face_cell_data);
+      }
+
+      /**
+       * Return  the @p subcell_data with the stored information.
+       */
+      SubCellData
+      get()
+      {
+        SubCellData subcell_data;
+
+        for (const CellData<dim - 1> &face_cell_data : face_data)
+          append_face_data(face_cell_data, subcell_data);
+        return subcell_data;
+      }
+
+
+    private:
+      std::set<CellData<dim - 1>, CellDataComparator<dim - 1>> face_data;
+    };
+
+
+    // Do nothing for dim=1:
+    template <>
+    class FaceDataHelper<1>
+    {
+    public:
+      template <class FaceIteratorType>
+      void
+      insert_face_data(const FaceIteratorType &)
+      {}
+
+      SubCellData
+      get()
+      {
+        return SubCellData{};
+      }
+    };
+
+
   } // namespace
 
 
@@ -505,7 +566,6 @@ namespace GridTools
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
-    SubCellData                  subcell_data;
 
     unsigned int max_level_0_vertex_n = 0;
     for (const auto &cell : tria.cell_iterators_on_level(0))
@@ -515,8 +575,10 @@ namespace GridTools
         max_level_0_vertex_n =
           std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
     vertices.resize(max_level_0_vertex_n + 1);
-    std::set<CellData<dim - 1>, CellDataComparator<dim - 1>> face_data;
+
+    FaceDataHelper<dim>                          face_data;
     std::set<CellData<1>, CellDataComparator<1>> line_data; // only used in 3D
+
     for (const auto &cell : tria.cell_iterators_on_level(0))
       {
         // Save cell data
@@ -537,24 +599,12 @@ namespace GridTools
         cells.push_back(cell_data);
 
         // Save face data
-        if (dim != 1)
+        if (dim > 1)
           {
             for (unsigned int face_n = 0;
                  face_n < GeometryInfo<dim>::faces_per_cell;
                  ++face_n)
-              {
-                const auto        face = cell->face(face_n);
-                CellData<dim - 1> face_cell_data;
-                for (unsigned int vertex_n = 0;
-                     vertex_n < GeometryInfo<dim>::vertices_per_face;
-                     ++vertex_n)
-                  face_cell_data.vertices[vertex_n] =
-                    face->vertex_index(vertex_n);
-                face_cell_data.boundary_id = face->boundary_id();
-                face_cell_data.manifold_id = face->manifold_id();
-
-                face_data.insert(face_cell_data);
-              }
+              face_data.insert_face_data(cell->face(face_n));
           }
         // Save line data
         if (dim == 3)
@@ -577,6 +627,7 @@ namespace GridTools
               }
           }
       }
+
       // Double-check that there are no unused vertices:
 #ifdef DEBUG
     {
@@ -593,11 +644,12 @@ namespace GridTools
     }
 #endif
 
-    for (const CellData<dim - 1> &face_cell_data : face_data)
-      append_face_data(face_cell_data, subcell_data);
+    SubCellData subcell_data = face_data.get();
+
     if (dim == 3)
       for (const CellData<1> &face_line_data : line_data)
         subcell_data.boundary_lines.push_back(face_line_data);
+
     return std::tuple<std::vector<Point<spacedim>>,
                       std::vector<CellData<dim>>,
                       SubCellData>(std::move(vertices),
