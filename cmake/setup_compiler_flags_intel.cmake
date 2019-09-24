@@ -96,6 +96,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #            references; however, it's the only useful way to do
 #            so if you need an invalid value for a reference)
 #   -w383   value copied to temporary, reference to temporary used
+#   -w854   const variable requires an initializer (defect 253 in http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html)
 #   -w981   operands are evaluated in unspecified order
 #   -w1418  external function definition with no prior declaration
 #           (happens in boost)
@@ -121,6 +122,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd193")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd279")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd383")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd854")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
