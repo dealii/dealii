@@ -547,7 +547,7 @@ namespace GridTools
       SubCellData
       get()
       {
-        return SubCellData{};
+        return SubCellData();
       }
     };
 
