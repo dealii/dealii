@@ -13,6 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+
+// Like mapping_fe_field_01, but add an update flag that led to an
+// assertion that checked the size of the wrong field and consequently
+// accidentally aborted an otherwise perfectly valid program
+
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -77,7 +82,8 @@ test(const unsigned int degree)
   FEValues<dim, spacedim> fe_values(map_fe,
                                     fe_sys,
                                     quadrature_formula,
-                                    update_values | update_JxW_values);
+                                    update_values | update_JxW_values |
+                                      update_volume_elements);
 
   typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
                                                              dof_sys
