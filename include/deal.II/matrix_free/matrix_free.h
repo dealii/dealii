@@ -1456,6 +1456,15 @@ public:
                     const unsigned int dof_handler_index = 0) const;
 
   /**
+   * This returns the level and index for the cell that would be
+   * returned by get_cell_iterator() for the same arguments @p
+   * macro_cell_number and @p vector_number.
+   */
+  std::pair<int, int>
+  get_cell_level_and_index(const unsigned int macro_cell_number,
+                           const unsigned int vector_number) const;
+
+  /**
    * This returns the cell iterator in deal.II speak to a given cell in the
    * renumbering of this structure. This function returns an exception in case
    * the structure was not constructed based on an hp::DoFHandler.
