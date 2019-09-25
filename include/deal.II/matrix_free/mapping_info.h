@@ -386,6 +386,11 @@ namespace internal
         face_data_by_cells;
 
       /**
+       * The pointer to the underlying Mapping object.
+       */
+      SmartPointer<const Mapping<dim>> mapping;
+
+      /**
        * Computes the information in the given cells, called within
        * initialize.
        */
