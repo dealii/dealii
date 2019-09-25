@@ -3567,6 +3567,10 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
   return true;
 #else
 
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition checks whether we have a serial
+  // triangulation, in which case all cells are locally owned. The second
+  // condition compares the subdomain id in the parallel case.
   return (this->tria->locally_owned_subdomain() ==
             numbers::invalid_subdomain_id ||
           this->subdomain_id() == this->tria->locally_owned_subdomain());
@@ -3583,6 +3587,10 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   return true;
 #else
 
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition checks whether we have a serial
+  // triangulation, in which case all cells are locally owned. The second
+  // condition compares the subdomain id in the parallel case.
   return (this->tria->locally_owned_subdomain() ==
             numbers::invalid_subdomain_id ||
           this->level_subdomain_id() == this->tria->locally_owned_subdomain());
@@ -3604,6 +3612,11 @@ CellAccessor<dim, spacedim>::is_ghost() const
   return false;
 #else
 
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition rules out that case as all cells to a
+  // serial triangulation are locally owned and none is ghosted. The second
+  // and third conditions check whether the cell's subdomain is not the
+  // locally owned one and not artificial.
   return (this->tria->locally_owned_subdomain() !=
             numbers::invalid_subdomain_id &&
           this->subdomain_id() != this->tria->locally_owned_subdomain() &&
@@ -3624,6 +3637,9 @@ CellAccessor<dim, spacedim>::is_artificial() const
   return false;
 #else
 
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition rules out that case as all cells to a
+  // serial triangulation are locally owned and none is artificial.
   return (this->tria->locally_owned_subdomain() !=
             numbers::invalid_subdomain_id &&
           this->subdomain_id() == numbers::artificial_subdomain_id);
