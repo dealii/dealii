@@ -272,43 +272,16 @@ namespace internal
       // FE_DGQArbitraryNodes underflow.
       if (n_q_points_1d < 200)
         {
-          const unsigned int stride = (n_q_points_1d + 1) / 2;
-          shape_gradients_collocation_eo.resize(n_q_points_1d * stride);
-          shape_hessians_collocation_eo.resize(n_q_points_1d * stride);
+          shape_gradients_collocation.resize(n_q_points_1d * n_q_points_1d);
+          shape_hessians_collocation.resize(n_q_points_1d * n_q_points_1d);
           FE_DGQArbitraryNodes<1> fe(quad.get_points());
-          for (unsigned int i = 0; i < n_q_points_1d / 2; ++i)
-            for (unsigned int q = 0; q < stride; ++q)
+          for (unsigned int i = 0; i < n_q_points_1d; ++i)
+            for (unsigned int q = 0; q < n_q_points_1d; ++q)
               {
-                shape_gradients_collocation_eo[i * stride + q] =
-                  0.5 *
-                  (fe.shape_grad(i, quad.get_points()[q])[0] +
-                   fe.shape_grad(i,
-                                 quad.get_points()[n_q_points_1d - 1 - q])[0]);
-                shape_gradients_collocation_eo[(n_q_points_1d - 1 - i) *
-                                                 stride +
-                                               q] =
-                  0.5 *
-                  (fe.shape_grad(i, quad.get_points()[q])[0] -
-                   fe.shape_grad(i,
-                                 quad.get_points()[n_q_points_1d - 1 - q])[0]);
-                shape_hessians_collocation_eo[i * stride + q] =
-                  0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] +
-                         fe.shape_grad_grad(
-                           i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
-                shape_hessians_collocation_eo[(n_q_points_1d - 1 - i) * stride +
-                                              q] =
-                  0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] -
-                         fe.shape_grad_grad(
-                           i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
-              }
-          if (n_q_points_1d % 2 == 1)
-            for (unsigned int q = 0; q < stride; ++q)
-              {
-                shape_gradients_collocation_eo[n_q_points_1d / 2 * stride + q] =
-                  fe.shape_grad(n_q_points_1d / 2, quad.get_points()[q])[0];
-                shape_hessians_collocation_eo[n_q_points_1d / 2 * stride + q] =
-                  fe.shape_grad_grad(n_q_points_1d / 2,
-                                     quad.get_points()[q])[0][0];
+                shape_gradients_collocation[i * n_q_points_1d + q] =
+                  fe.shape_grad(i, quad.get_points()[q])[0];
+                shape_hessians_collocation[i * n_q_points_1d + q] =
+                  fe.shape_grad_grad(i, quad.get_points()[q])[0][0];
               }
         }
 
@@ -483,46 +456,51 @@ namespace internal
               zero_tol_hessian)
             return false;
 
-      const unsigned int stride = (n_q_points_1d + 1) / 2;
-      shape_values_eo.resize((fe_degree + 1) * stride);
-      shape_gradients_eo.resize((fe_degree + 1) * stride);
-      shape_hessians_eo.resize((fe_degree + 1) * stride);
-      for (unsigned int i = 0; i < (fe_degree + 1) / 2; ++i)
-        for (unsigned int q = 0; q < stride; ++q)
-          {
-            shape_values_eo[i * stride + q] =
-              0.5 * (shape_values[i * n_q_points_1d + q] +
-                     shape_values[i * n_q_points_1d + n_q_points_1d - 1 - q]);
-            shape_values_eo[(fe_degree - i) * stride + q] =
-              0.5 * (shape_values[i * n_q_points_1d + q] -
-                     shape_values[i * n_q_points_1d + n_q_points_1d - 1 - q]);
+      auto convert_to_eo = [](const AlignedVector<Number> &array,
+                              const unsigned               n_points_dst,
+                              const unsigned               n_points_src) {
+        const unsigned int    stride = (n_points_dst + 1) / 2;
+        AlignedVector<Number> array_eo(n_points_src * stride);
+        for (unsigned int i = 0; i < n_points_src / 2; ++i)
+          for (unsigned int q = 0; q < stride; ++q)
+            {
+              array_eo[i * stride + q] =
+                0.5 * (array[i * n_points_dst + q] +
+                       array[i * n_points_dst + n_points_dst - 1 - q]);
+              array_eo[(n_points_src - 1 - i) * stride + q] =
+                0.5 * (array[i * n_points_dst + q] -
+                       array[i * n_points_dst + n_points_dst - 1 - q]);
+            }
+        if ((n_points_src - 1) % 2 == 0)
+          for (unsigned int q = 0; q < stride; ++q)
+            {
+              array_eo[(n_points_src - 1) / 2 * stride + q] =
+                array[((n_points_src - 1) / 2) * n_points_dst + q];
+            }
 
-            shape_gradients_eo[i * stride + q] =
-              0.5 *
-              (shape_gradients[i * n_q_points_1d + q] +
-               shape_gradients[i * n_q_points_1d + n_q_points_1d - 1 - q]);
-            shape_gradients_eo[(fe_degree - i) * stride + q] =
-              0.5 *
-              (shape_gradients[i * n_q_points_1d + q] -
-               shape_gradients[i * n_q_points_1d + n_q_points_1d - 1 - q]);
+        return array_eo;
+      };
 
-            shape_hessians_eo[i * stride + q] =
-              0.5 * (shape_hessians[i * n_q_points_1d + q] +
-                     shape_hessians[i * n_q_points_1d + n_q_points_1d - 1 - q]);
-            shape_hessians_eo[(fe_degree - i) * stride + q] =
-              0.5 * (shape_hessians[i * n_q_points_1d + q] -
-                     shape_hessians[i * n_q_points_1d + n_q_points_1d - 1 - q]);
-          }
-      if (fe_degree % 2 == 0)
-        for (unsigned int q = 0; q < stride; ++q)
-          {
-            shape_values_eo[fe_degree / 2 * stride + q] =
-              shape_values[(fe_degree / 2) * n_q_points_1d + q];
-            shape_gradients_eo[fe_degree / 2 * stride + q] =
-              shape_gradients[(fe_degree / 2) * n_q_points_1d + q];
-            shape_hessians_eo[fe_degree / 2 * stride + q] =
-              shape_hessians[(fe_degree / 2) * n_q_points_1d + q];
-          }
+      shape_values_eo =
+        convert_to_eo(shape_values, n_q_points_1d, fe_degree + 1);
+      shape_gradients_eo =
+        convert_to_eo(shape_gradients, n_q_points_1d, fe_degree + 1);
+      shape_hessians_eo =
+        convert_to_eo(shape_hessians, n_q_points_1d, fe_degree + 1);
+
+      // FE_DGQArbitraryNodes underflow (see also above where
+      // shape_gradients_collocation and shape_hessians_collocation is set up).
+      if (n_q_points_1d < 200)
+        {
+          shape_gradients_collocation_eo =
+            convert_to_eo(shape_gradients_collocation,
+                          n_q_points_1d,
+                          n_q_points_1d);
+          shape_hessians_collocation_eo =
+            convert_to_eo(shape_hessians_collocation,
+                          n_q_points_1d,
+                          n_q_points_1d);
+        }
 
       return true;
     }
@@ -568,6 +546,10 @@ namespace internal
       memory += MemoryConsumption::memory_consumption(shape_values);
       memory += MemoryConsumption::memory_consumption(shape_gradients);
       memory += MemoryConsumption::memory_consumption(shape_hessians);
+      memory +=
+        MemoryConsumption::memory_consumption(shape_gradients_collocation);
+      memory +=
+        MemoryConsumption::memory_consumption(shape_hessians_collocation);
       memory += MemoryConsumption::memory_consumption(shape_values_eo);
       memory += MemoryConsumption::memory_consumption(shape_gradients_eo);
       memory += MemoryConsumption::memory_consumption(shape_hessians_eo);
