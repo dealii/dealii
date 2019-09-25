@@ -1,0 +1,4 @@
+Improved: Evaluate/integrate the gradients in CUDAWrappers::EvaluatorTensorProduct
+with collocation method if both values and gradients are requested.
+<br>
+(Peter Munch, 2019/09/24)
