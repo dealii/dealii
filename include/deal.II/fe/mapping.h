@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/derivative_form.h>
 
 #include <deal.II/fe/fe_update_flags.h>

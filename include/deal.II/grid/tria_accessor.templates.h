@@ -22,8 +22,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <deal.II/distributed/tria_base.h>
-
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_faces.h>
@@ -34,15 +32,6 @@
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
-
-// Forward declaration
-#ifndef DOXYGEN
-namespace parallel
-{
-  template <int, int>
-  class TriangulationBase;
-}
-#endif
 
 
 /*--------------------- Functions: TriaAccessorBase -------------------------*/
