@@ -75,6 +75,17 @@ class TensorProductMatrixSymmetricSumBase
 {
 public:
   /**
+   * Type of matrix entries. This alias is analogous to <tt>value_type</tt>
+   * in the standard library containers.
+   */
+  using value_type = Number;
+
+  /**
+   * Compile-time array lengths given by the template parameter size.
+   */
+  static constexpr int static_size = size;
+
+  /**
    * Return the number of rows of the tensor product matrix
    * resulting from the Kronecker product of 1D matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
