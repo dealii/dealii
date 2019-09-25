@@ -20,6 +20,8 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 
@@ -195,8 +197,8 @@ namespace internal
       // boundaries as evenly as possible between the processors
       std::map<types::subdomain_id, FaceIdentifier>
         inner_faces_at_proc_boundary;
-      if (dynamic_cast<const parallel::TriangulationBase<dim> *>(
-            &triangulation))
+      if (triangulation.locally_owned_subdomain() !=
+          numbers::invalid_subdomain_id)
         {
           const types::subdomain_id my_domain =
             triangulation.locally_owned_subdomain();

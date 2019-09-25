@@ -22,8 +22,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <deal.II/distributed/tria_base.h>
-
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_faces.h>
@@ -34,15 +32,6 @@
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
-
-// Forward declaration
-#ifndef DOXYGEN
-namespace parallel
-{
-  template <int, int>
-  class TriangulationBase;
-}
-#endif
 
 
 /*--------------------- Functions: TriaAccessorBase -------------------------*/
@@ -3566,17 +3555,14 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
 #ifndef DEAL_II_WITH_MPI
   return true;
 #else
-  if (is_artificial())
-    return false;
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return true;
-  else
-    return (this->subdomain_id() == pt->locally_owned_subdomain());
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition checks whether we have a serial
+  // triangulation, in which case all cells are locally owned. The second
+  // condition compares the subdomain id in the parallel case.
+  return (this->tria->locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id ||
+          this->subdomain_id() == this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3590,14 +3576,13 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   return true;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return true;
-  else
-    return (this->level_subdomain_id() == pt->locally_owned_subdomain());
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition checks whether we have a serial
+  // triangulation, in which case all cells are locally owned. The second
+  // condition compares the subdomain id in the parallel case.
+  return (this->tria->locally_owned_subdomain() ==
+            numbers::invalid_subdomain_id ||
+          this->level_subdomain_id() == this->tria->locally_owned_subdomain());
 
 #endif
 }
@@ -3609,21 +3594,22 @@ CellAccessor<dim, spacedim>::is_ghost() const
 {
   Assert(this->active(),
          ExcMessage("is_ghost() can only be called on active cells!"));
-  if (is_artificial() || this->has_children())
+  if (this->has_children())
     return false;
 
 #ifndef DEAL_II_WITH_MPI
   return false;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return false;
-  else
-    return (this->subdomain_id() != pt->locally_owned_subdomain());
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition rules out that case as all cells to a
+  // serial triangulation are locally owned and none is ghosted. The second
+  // and third conditions check whether the cell's subdomain is not the
+  // locally owned one and not artificial.
+  return (this->tria->locally_owned_subdomain() !=
+            numbers::invalid_subdomain_id &&
+          this->subdomain_id() != this->tria->locally_owned_subdomain() &&
+          this->subdomain_id() != numbers::artificial_subdomain_id);
 
 #endif
 }
@@ -3640,14 +3626,12 @@ CellAccessor<dim, spacedim>::is_artificial() const
   return false;
 #else
 
-  const parallel::TriangulationBase<dim, spacedim> *pt =
-    dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      this->tria);
-
-  if (pt == nullptr)
-    return false;
-  else
-    return this->subdomain_id() == numbers::artificial_subdomain_id;
+  // Serial triangulations report invalid_subdomain_id as their locally owned
+  // subdomain, so the first condition rules out that case as all cells to a
+  // serial triangulation are locally owned and none is artificial.
+  return (this->tria->locally_owned_subdomain() !=
+            numbers::invalid_subdomain_id &&
+          this->subdomain_id() == numbers::artificial_subdomain_id);
 
 #endif
 }
