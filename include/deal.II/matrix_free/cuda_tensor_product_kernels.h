@@ -90,7 +90,7 @@ namespace CUDAWrappers
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       __device__ void
-      values(Number shape_values[], const Number *in, Number *out) const;
+      values(const Number *in, Number *out) const;
 
       /**
        * Evaluate the gradient of a finite element function at the quadrature
@@ -98,7 +98,15 @@ namespace CUDAWrappers
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       __device__ void
-      gradients(Number shape_gradients[], const Number *in, Number *out) const;
+      gradients(const Number *in, Number *out) const;
+
+      /**
+       * Evaluate the gradient of a finite element function at the quadrature
+       * points for a given @p direction.
+       */
+      template <int direction, bool dof_to_quad, bool add, bool in_place>
+      __device__ void
+      co_gradients(const Number *in, Number *out) const;
 
       /**
        * Helper function for values() and gradients().
@@ -106,6 +114,30 @@ namespace CUDAWrappers
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       __device__ void
       apply(Number shape_data[], const Number *in, Number *out) const;
+    };
+
+
+
+    /**
+     * Internal evaluator for 1d-3d shape function using the tensor product form
+     * of the basis functions.
+     *
+     * @ingroup CUDAWrappers
+     */
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    struct FEEvaluationImp
+    {
+      static constexpr unsigned int dofs_per_cell =
+        Utilities::pow(fe_degree + 1, dim);
+      static constexpr unsigned int n_q_points =
+        Utilities::pow(n_q_points_1d, dim);
+
+      __device__
+      FEEvaluationImp();
 
       /**
        * Evaluate the finite element function at the quadrature points.
@@ -147,6 +179,9 @@ namespace CUDAWrappers
        */
       __device__ void
       integrate_value_and_gradient(Number *u, Number *grad_u[dim]);
+
+      EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d, Number>
+        eval;
     };
 
 
@@ -162,6 +197,18 @@ namespace CUDAWrappers
 
 
 
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    __device__
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      FEEvaluationImp()
+    {}
+
+
+
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
     __device__ void
@@ -169,11 +216,11 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::values(Number        shape_values[],
-                                           const Number *in,
-                                           Number *      out) const
+                           Number>::values(const Number *in, Number *out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(shape_values, in, out);
+      apply<direction, dof_to_quad, add, in_place>(global_shape_values,
+                                                   in,
+                                                   out);
     }
 
 
@@ -185,11 +232,12 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::gradients(Number        shape_gradients[],
-                                              const Number *in,
+                           Number>::gradients(const Number *in,
                                               Number *      out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(shape_gradients, in, out);
+      apply<direction, dof_to_quad, add, in_place>(global_shape_gradients,
+                                                   in,
+                                                   out);
     }
 
 
@@ -201,7 +249,24 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::apply(Number        shape_data[],
+                           Number>::co_gradients(const Number *in,
+                                                 Number *      out) const
+    {
+      apply<direction, dof_to_quad, add, in_place>(global_co_shape_gradients,
+                                                   in,
+                                                   out);
+    }
+
+
+
+    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <int direction, bool dof_to_quad, bool add, bool in_place>
+    __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::apply(Number *      shape_data,
                                           const Number *in,
                                           Number *      out) const
     {
@@ -244,37 +309,38 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     inline __device__ void
-    EvaluatorTensorProduct<evaluate_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::value_at_quad_pts(Number *u)
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      value_at_quad_pts(Number *u)
     {
       switch (dim)
         {
           case 1:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              eval.template values<1, true, false, true>(u, u);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              eval.template values<1, true, false, true>(u, u);
               __syncthreads();
-              values<2, true, false, true>(global_shape_values, u, u);
+              eval.template values<2, true, false, true>(u, u);
 
               break;
             }
@@ -288,37 +354,38 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     inline __device__ void
-    EvaluatorTensorProduct<evaluate_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate_value(Number *u)
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      integrate_value(Number *u)
     {
       switch (dim)
         {
           case 1:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              eval.template values<1, false, false, true>(u, u);
 
               break;
             }
           case 3:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              eval.template values<1, false, false, true>(u, u);
               __syncthreads();
-              values<2, false, false, true>(global_shape_values, u, u);
+              eval.template values<2, false, false, true>(u, u);
 
               break;
             }
@@ -332,74 +399,55 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     inline __device__ void
-    EvaluatorTensorProduct<evaluate_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::gradient_at_quad_pts(const Number *const u,
-                                                         Number *grad_u[dim])
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      gradient_at_quad_pts(const Number *const u, Number *grad_u[dim])
     {
       switch (dim)
         {
           case 1:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[1]);
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template values<0, true, false, false>(u, grad_u[1]);
 
               __syncthreads();
 
-              values<1, true, false, true>(global_shape_values,
-                                           grad_u[0],
-                                           grad_u[0]);
-              gradients<1, true, false, true>(global_shape_gradients,
-                                              grad_u[1],
-                                              grad_u[1]);
+              eval.template values<1, true, false, true>(grad_u[0], grad_u[0]);
+              eval.template gradients<1, true, false, true>(grad_u[1],
+                                                            grad_u[1]);
 
               break;
             }
           case 3:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[1]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[2]);
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template values<0, true, false, false>(u, grad_u[1]);
+              eval.template values<0, true, false, false>(u, grad_u[2]);
 
               __syncthreads();
 
-              values<1, true, false, true>(global_shape_values,
-                                           grad_u[0],
-                                           grad_u[0]);
-              gradients<1, true, false, true>(global_shape_gradients,
-                                              grad_u[1],
-                                              grad_u[1]);
-              values<1, true, false, true>(global_shape_values,
-                                           grad_u[2],
-                                           grad_u[2]);
+              eval.template values<1, true, false, true>(grad_u[0], grad_u[0]);
+              eval.template gradients<1, true, false, true>(grad_u[1],
+                                                            grad_u[1]);
+              eval.template values<1, true, false, true>(grad_u[2], grad_u[2]);
 
               __syncthreads();
 
-              values<2, true, false, true>(global_shape_values,
-                                           grad_u[0],
-                                           grad_u[0]);
-              values<2, true, false, true>(global_shape_values,
-                                           grad_u[1],
-                                           grad_u[1]);
-              gradients<2, true, false, true>(global_shape_gradients,
-                                              grad_u[2],
-                                              grad_u[2]);
+              eval.template values<2, true, false, true>(grad_u[0], grad_u[0]);
+              eval.template values<2, true, false, true>(grad_u[1], grad_u[1]);
+              eval.template gradients<2, true, false, true>(grad_u[2],
+                                                            grad_u[2]);
 
               break;
             }
@@ -413,63 +461,50 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     inline __device__ void
-    EvaluatorTensorProduct<
-      evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>::value_and_gradient_at_quad_pts(Number *const u,
-                                              Number *      grad_u[dim])
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      value_and_gradient_at_quad_pts(Number *const u, Number *grad_u[dim])
     {
       switch (dim)
         {
           case 1:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
+              eval.template co_gradients<0, true, false, false>(u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              eval.template values<1, true, false, true>(u, u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              gradients<1, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[1]);
+              eval.template co_gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template co_gradients<1, true, false, false>(u, grad_u[1]);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              eval.template values<0, true, false, true>(u, u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              eval.template values<1, true, false, true>(u, u);
               __syncthreads();
-              values<2, true, false, true>(global_shape_values, u, u);
+              eval.template values<2, true, false, true>(u, u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              gradients<1, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[1]);
-              gradients<2, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[2]);
+              eval.template co_gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template co_gradients<1, true, false, false>(u, grad_u[1]);
+              eval.template co_gradients<2, true, false, false>(u, grad_u[2]);
 
               break;
             }
@@ -483,78 +518,59 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     template <bool add>
     inline __device__ void
-    EvaluatorTensorProduct<evaluate_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate_gradient(Number *u,
-                                                       Number *grad_u[dim])
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      integrate_gradient(Number *u, Number *grad_u[dim])
     {
       switch (dim)
         {
           case 1:
             {
-              gradients<0, false, add, false>(global_shape_gradients,
-                                              grad_u[dim],
-                                              u);
+              eval.template gradients<0, false, add, false>(grad_u[dim], u);
 
               break;
             }
           case 2:
             {
-              gradients<0, false, false, true>(global_shape_gradients,
-                                               grad_u[0],
-                                               grad_u[0]);
-              values<0, false, false, true>(global_shape_values,
-                                            grad_u[1],
-                                            grad_u[1]);
+              eval.template gradients<0, false, false, true>(grad_u[0],
+                                                             grad_u[0]);
+              eval.template values<0, false, false, true>(grad_u[1], grad_u[1]);
 
               __syncthreads();
 
-              values<1, false, add, false>(global_shape_values, grad_u[0], u);
+              eval.template values<1, false, add, false>(grad_u[0], u);
               __syncthreads();
-              gradients<1, false, true, false>(global_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              eval.template gradients<1, false, true, false>(grad_u[1], u);
 
               break;
             }
           case 3:
             {
-              gradients<0, false, false, true>(global_shape_gradients,
-                                               grad_u[0],
-                                               grad_u[0]);
-              values<0, false, false, true>(global_shape_values,
-                                            grad_u[1],
-                                            grad_u[1]);
-              values<0, false, false, true>(global_shape_values,
-                                            grad_u[2],
-                                            grad_u[2]);
+              eval.template gradients<0, false, false, true>(grad_u[0],
+                                                             grad_u[0]);
+              eval.template values<0, false, false, true>(grad_u[1], grad_u[1]);
+              eval.template values<0, false, false, true>(grad_u[2], grad_u[2]);
 
               __syncthreads();
 
-              values<1, false, false, true>(global_shape_values,
-                                            grad_u[0],
-                                            grad_u[0]);
-              gradients<1, false, false, true>(global_shape_gradients,
-                                               grad_u[1],
-                                               grad_u[1]);
-              values<1, false, false, true>(global_shape_values,
-                                            grad_u[2],
-                                            grad_u[2]);
+              eval.template values<1, false, false, true>(grad_u[0], grad_u[0]);
+              eval.template gradients<1, false, false, true>(grad_u[1],
+                                                             grad_u[1]);
+              eval.template values<1, false, false, true>(grad_u[2], grad_u[2]);
 
               __syncthreads();
 
-              values<2, false, add, false>(global_shape_values, grad_u[0], u);
+              eval.template values<2, false, add, false>(grad_u[0], u);
               __syncthreads();
-              values<2, false, true, false>(global_shape_values, grad_u[1], u);
+              eval.template values<2, false, true, false>(grad_u[1], u);
               __syncthreads();
-              gradients<2, false, true, false>(global_shape_gradients,
-                                               grad_u[2],
-                                               u);
+              eval.template gradients<2, false, true, false>(grad_u[2], u);
 
               break;
             }
@@ -568,67 +584,54 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     inline __device__ void
-    EvaluatorTensorProduct<evaluate_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate_value_and_gradient(Number *u,
-                                                                 Number
-                                                                   *grad_u[dim])
+    FEEvaluationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      integrate_value_and_gradient(Number *u, Number *grad_u[dim])
     {
       switch (dim)
         {
           case 1:
             {
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              eval.template co_gradients<0, false, true, false>(grad_u[0], u);
               __syncthreads();
 
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              gradients<1, false, true, false>(global_co_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              eval.template co_gradients<1, false, true, false>(grad_u[1], u);
               __syncthreads();
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              eval.template co_gradients<0, false, true, false>(grad_u[0], u);
               __syncthreads();
 
-              values<1, false, false, true>(global_shape_values, u, u);
+              eval.template values<1, false, false, true>(u, u);
               __syncthreads();
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
               __syncthreads();
 
               break;
             }
           case 3:
             {
-              gradients<2, false, true, false>(global_co_shape_gradients,
-                                               grad_u[2],
-                                               u);
+              eval.template co_gradients<2, false, true, false>(grad_u[2], u);
               __syncthreads();
-              gradients<1, false, true, false>(global_co_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              eval.template co_gradients<1, false, true, false>(grad_u[1], u);
               __syncthreads();
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              eval.template co_gradients<0, false, true, false>(grad_u[0], u);
               __syncthreads();
 
-              values<2, false, false, true>(global_shape_values, u, u);
+              eval.template values<2, false, false, true>(u, u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              eval.template values<1, false, false, true>(u, u);
               __syncthreads();
-              values<0, false, false, true>(global_shape_values, u, u);
+              eval.template values<0, false, false, true>(u, u);
               __syncthreads();
 
               break;

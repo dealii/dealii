@@ -374,29 +374,20 @@ namespace CUDAWrappers
   {
     // First evaluate the gradients because it requires values that will be
     // changed if evaluate_val is true
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
+    internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
+                              dim,
+                              fe_degree,
+                              n_q_points_1d,
+                              Number>
       evaluator_tensor_product;
     if (evaluate_val == true && evaluate_grad == true)
-      {
-        evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
-                                                                gradients);
-        __syncthreads();
-      }
+      evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
+                                                              gradients);
     else if (evaluate_grad == true)
-      {
-        evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
-        __syncthreads();
-      }
+      evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
     else if (evaluate_val == true)
-      {
-        evaluator_tensor_product.value_at_quad_pts(values);
-        __syncthreads();
-      }
+      evaluator_tensor_product.value_at_quad_pts(values);
+    __syncthreads();
   }
 
 
@@ -411,28 +402,19 @@ namespace CUDAWrappers
     const bool integrate_val,
     const bool integrate_grad)
   {
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
+    internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
+                              dim,
+                              fe_degree,
+                              n_q_points_1d,
+                              Number>
       evaluator_tensor_product;
     if (integrate_val == true && integrate_grad == true)
-      {
-        evaluator_tensor_product.integrate_value_and_gradient(values,
-                                                              gradients);
-      }
+      evaluator_tensor_product.integrate_value_and_gradient(values, gradients);
     else if (integrate_val == true)
-      {
-        evaluator_tensor_product.integrate_value(values);
-        __syncthreads();
-      }
+      evaluator_tensor_product.integrate_value(values);
     else if (integrate_grad == true)
-      {
-        evaluator_tensor_product.integrate_gradient<false>(values, gradients);
-        __syncthreads();
-      }
+      evaluator_tensor_product.integrate_gradient<false>(values, gradients);
+    __syncthreads();
   }
 
 
