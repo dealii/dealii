@@ -356,6 +356,7 @@ namespace internal
        */
       dealii::Table<2, unsigned int> face_to_cell_index_hermite;
 
+    private:
       /**
        * Check whether we have symmetries in the shape values. In that case,
        * also fill the shape_???_eo fields.
@@ -370,7 +371,7 @@ namespace internal
        * that save some operations in the evaluation.
        */
       bool
-      check_1d_shapes_collocation();
+      check_1d_shapes_collocation() const;
     };
 
 

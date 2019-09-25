@@ -531,7 +531,7 @@ namespace internal
 
     template <typename Number>
     bool
-    ShapeInfo<Number>::check_1d_shapes_collocation()
+    ShapeInfo<Number>::check_1d_shapes_collocation() const
     {
       if (dofs_per_component_on_cell != n_q_points)
         return false;
