@@ -76,11 +76,6 @@ namespace CUDAWrappers
                                   n_q_points_1d,
                                   Number>
     {
-      static constexpr unsigned int dofs_per_cell =
-        Utilities::pow(fe_degree + 1, dim);
-      static constexpr unsigned int n_q_points =
-        Utilities::pow(n_q_points_1d, dim);
-
       __device__
       EvaluatorTensorProduct();
 
@@ -101,8 +96,8 @@ namespace CUDAWrappers
       gradients(const Number *in, Number *out) const;
 
       /**
-       * Evaluate the gradient of a finite element function at the quadrature
-       * points for a given @p direction.
+       * Evaluate the gradient of a finite element function at the nodes for a
+       * given @p direction.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       __device__ void
@@ -179,6 +174,43 @@ namespace CUDAWrappers
        */
       __device__ void
       integrate_value_and_gradient(Number *u, Number *grad_u[dim]);
+
+      EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d, Number>
+        eval;
+    };
+
+
+
+    /**
+     * Internal evaluator for 1d-3d shape function using the tensor product form
+     * of the basis functions.
+     *
+     * @ingroup CUDAWrappers
+     */
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    struct FEEvaluationCollocationImp
+    {
+      __device__
+      FEEvaluationCollocationImp();
+
+      /**
+       * Evaluate the gradients of the finite element function at the quadrature
+       * points.
+       */
+      __device__ void
+      gradient_at_quad_pts(const Number *const u, Number *grad_u[dim]);
+
+      /**
+       * Helper function for integrate(). Integrate the gradients of the finite
+       * element function.
+       */
+      template <bool add>
+      __device__ void
+      integrate_gradient(Number *u, Number *grad_u[dim]);
 
       EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d, Number>
         eval;
@@ -633,6 +665,106 @@ namespace CUDAWrappers
               __syncthreads();
               eval.template values<0, false, false, true>(u, u);
               __syncthreads();
+
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__
+              // function.
+            }
+        }
+    }
+
+
+
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    __device__
+    FEEvaluationCollocationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      FEEvaluationCollocationImp()
+    {}
+
+
+
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    inline __device__ void
+    FEEvaluationCollocationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      gradient_at_quad_pts(const Number *const u, Number *grad_u[dim])
+    {
+      switch (dim)
+        {
+          case 1:
+            {
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
+
+              break;
+            }
+          case 2:
+            {
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template gradients<1, true, false, false>(u, grad_u[1]);
+
+              break;
+            }
+          case 3:
+            {
+              eval.template gradients<0, true, false, false>(u, grad_u[0]);
+              eval.template gradients<1, true, false, false>(u, grad_u[1]);
+              eval.template gradients<2, true, false, false>(u, grad_u[2]);
+
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__
+              // function.
+            }
+        }
+    }
+
+
+
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
+    template <bool add>
+    inline __device__ void
+    FEEvaluationCollocationImp<variant, dim, fe_degree, n_q_points_1d, Number>::
+      integrate_gradient(Number *u, Number *grad_u[dim])
+    {
+      switch (dim)
+        {
+          case 1:
+            {
+              eval.template gradients<0, false, add, false>(grad_u[dim], u);
+
+              break;
+            }
+          case 2:
+            {
+              eval.template gradients<0, false, add, false>(grad_u[0], u);
+              __syncthreads();
+              eval.template gradients<1, false, true, false>(grad_u[1], u);
+
+              break;
+            }
+          case 3:
+            {
+              eval.template gradients<0, false, add, false>(grad_u[0], u);
+              __syncthreads();
+              eval.template gradients<1, false, true, false>(grad_u[1], u);
+              __syncthreads();
+              eval.template gradients<3, false, true, false>(grad_u[2], u);
 
               break;
             }

@@ -372,22 +372,40 @@ namespace CUDAWrappers
     const bool evaluate_val,
     const bool evaluate_grad)
   {
-    // First evaluate the gradients because it requires values that will be
-    // changed if evaluate_val is true
-    internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
-                              dim,
-                              fe_degree,
-                              n_q_points_1d,
-                              Number>
-      evaluator_tensor_product;
-    if (evaluate_val == true && evaluate_grad == true)
-      evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
-                                                              gradients);
-    else if (evaluate_grad == true)
-      evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
-    else if (evaluate_val == true)
-      evaluator_tensor_product.value_at_quad_pts(values);
-    __syncthreads();
+    if (internal::global_co_shape_gradients[0] != 0.0)
+      {
+        internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
+                                  dim,
+                                  fe_degree,
+                                  n_q_points_1d,
+                                  Number>
+          eval;
+
+        if (evaluate_val == true && evaluate_grad == true)
+          eval.value_and_gradient_at_quad_pts(values, gradients);
+        else if (evaluate_grad == true)
+          eval.gradient_at_quad_pts(values, gradients);
+        else if (evaluate_val == true)
+          eval.value_at_quad_pts(values);
+
+        __syncthreads();
+      }
+    else
+      {
+        if (evaluate_grad == true)
+          {
+            internal::FEEvaluationCollocationImp<
+              internal::EvaluatorVariant::evaluate_general,
+              dim,
+              fe_degree,
+              n_q_points_1d,
+              Number>
+              eval;
+
+            eval.gradient_at_quad_pts(values, gradients);
+            __syncthreads();
+          }
+      }
   }
 
 
@@ -402,19 +420,43 @@ namespace CUDAWrappers
     const bool integrate_val,
     const bool integrate_grad)
   {
-    internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
-                              dim,
-                              fe_degree,
-                              n_q_points_1d,
-                              Number>
-      evaluator_tensor_product;
-    if (integrate_val == true && integrate_grad == true)
-      evaluator_tensor_product.integrate_value_and_gradient(values, gradients);
-    else if (integrate_val == true)
-      evaluator_tensor_product.integrate_value(values);
-    else if (integrate_grad == true)
-      evaluator_tensor_product.integrate_gradient<false>(values, gradients);
-    __syncthreads();
+    if (internal::global_co_shape_gradients[0] != 0.0)
+      {
+        internal::FEEvaluationImp<internal::EvaluatorVariant::evaluate_general,
+                                  dim,
+                                  fe_degree,
+                                  n_q_points_1d,
+                                  Number>
+          eval;
+        if (integrate_val == true && integrate_grad == true)
+          eval.integrate_value_and_gradient(values, gradients);
+        else if (integrate_val == true)
+          eval.integrate_value(values);
+        else if (integrate_grad == true)
+          eval.integrate_gradient<false>(values, gradients);
+        __syncthreads();
+      }
+    else
+      {
+        internal::FEEvaluationCollocationImp<
+          internal::EvaluatorVariant::evaluate_general,
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          Number>
+          eval;
+
+        if (integrate_val == true && integrate_grad == true)
+          {
+            eval.integrate_gradient<true>(values, gradients);
+            __syncthreads();
+          }
+        else if (integrate_grad == true)
+          {
+            eval.integrate_gradient<false>(values, gradients);
+            __syncthreads();
+          }
+      }
   }
 
 

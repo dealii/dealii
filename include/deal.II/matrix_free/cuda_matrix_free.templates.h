@@ -844,8 +844,7 @@ namespace CUDAWrappers
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
       shape_info_co(quad, fe_quad_co);
 
-    unsigned int size_co_shape_values =
-      n_q_points_1d * n_q_points_1d * sizeof(Number);
+    unsigned int size_co_shape_values = n_dofs_1d * n_dofs_1d * sizeof(Number);
 
     cudaError_t cuda_error = cudaMemcpyToSymbol(internal::global_shape_values,
                                                 shape_info.shape_values.data(),
@@ -863,12 +862,28 @@ namespace CUDAWrappers
                                         cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
 
-        cuda_error = cudaMemcpyToSymbol(internal::global_co_shape_gradients,
-                                        shape_info_co.shape_gradients.data(),
-                                        size_co_shape_values,
-                                        0,
-                                        cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        if (shape_info.element_type !=
+            ::dealii::internal::MatrixFreeFunctions::ElementType::
+              tensor_symmetric_collocation)
+          {
+            cuda_error =
+              cudaMemcpyToSymbol(internal::global_co_shape_gradients,
+                                 shape_info_co.shape_gradients.data(),
+                                 size_co_shape_values,
+                                 0,
+                                 cudaMemcpyHostToDevice);
+            AssertCuda(cuda_error);
+          }
+        else
+          {
+            std::vector<Number> temp(n_dofs_1d * n_dofs_1d, 0);
+            cuda_error = cudaMemcpyToSymbol(internal::global_co_shape_gradients,
+                                            temp.data(),
+                                            size_co_shape_values,
+                                            0,
+                                            cudaMemcpyHostToDevice);
+            AssertCuda(cuda_error);
+          }
       }
 
     // Setup the number of cells per CUDA thread block
