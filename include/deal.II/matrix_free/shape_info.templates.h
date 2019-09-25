@@ -75,6 +75,7 @@ namespace internal
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
+      this->quadrature             = quad;
       const FiniteElement<dim> *fe = &fe_in.base_element(base_element_number);
 
       Assert(fe->n_components() == 1,
