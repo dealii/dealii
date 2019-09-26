@@ -518,23 +518,21 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                     {
                       const unsigned int old_index =
                         pointerstruct->second.active_fe_index;
+                      const FullMatrix<double> &interpolation_matrix =
+                        interpolation_hp(active_fe_index, old_index);
                       // The interpolation matrix might be empty when using
                       // FE_Nothing.
-                      if (interpolation_hp(active_fe_index, old_index).empty())
+                      if (interpolation_matrix.empty())
                         tmp.reinit(dofs_per_cell, false);
                       else
                         {
                           tmp.reinit(dofs_per_cell, true);
                           const unsigned int old_index =
                             pointerstruct->second.active_fe_index;
-                          AssertDimension(
-                            (*valuesptr)[j].size(),
-                            interpolation_hp(active_fe_index, old_index).n());
-                          AssertDimension(
-                            tmp.size(),
-                            interpolation_hp(active_fe_index, old_index).m());
-                          interpolation_hp(active_fe_index, old_index)
-                            .vmult(tmp, (*valuesptr)[j]);
+                          AssertDimension((*valuesptr)[j].size(),
+                                          interpolation_matrix.n());
+                          AssertDimension(tmp.size(), interpolation_matrix.m());
+                          interpolation_matrix.vmult(tmp, (*valuesptr)[j]);
                         }
                       data = &tmp;
                     }
