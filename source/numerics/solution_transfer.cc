@@ -456,9 +456,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   internal::extract_interpolation_matrices(*dof_handler, interpolation_hp);
   Vector<typename VectorType::value_type> tmp, tmp2;
 
-  typename DoFHandlerType::cell_iterator cell = dof_handler->begin(),
-                                         endc = dof_handler->end();
-  for (; cell != endc; ++cell)
+  for (const auto &cell : dof_handler->cell_iterators())
     {
       pointerstruct =
         cell_map.find(std::make_pair(cell->level(), cell->index()));
@@ -479,11 +477,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
               const unsigned int old_fe_index =
                 pointerstruct->second.active_fe_index;
 
-              // get the values of
-              // each of the input
-              // data vectors on this
-              // cell and prolong it
-              // to its children
+              // get the values of each of the input data vectors on this cell
+              // and prolong it to its children
               unsigned int in_size = indexptr->size();
               for (unsigned int j = 0; j < size; ++j)
                 {
@@ -499,8 +494,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                 }
             }
           else if (valuesptr)
-            // the children of this cell were
-            // deleted
+            // the children of this cell were deleted
             {
               Assert(!cell->has_children(), ExcInternalError());
               Assert(indexptr == nullptr, ExcInternalError());
@@ -511,36 +505,37 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
               // indices
               cell->get_dof_indices(dofs);
 
-              // distribute the
-              // stored data to the
-              // new vectors
+              // distribute the stored data to the new vectors
               for (unsigned int j = 0; j < size; ++j)
                 {
-                  // make sure that the size of
-                  // the stored indices is the
-                  // same as
-                  // dofs_per_cell. this is
-                  // kind of a test if we use
-                  // the same fe in the hp
-                  // case. to really do that
-                  // test we would have to
-                  // store the fe_index of all
-                  // cells
+                  // make sure that the size of the stored indices is the same
+                  // as dofs_per_cell. this is kind of a test if we use the same
+                  // fe in the hp case. to really do that test we would have to
+                  // store the fe_index of all cells
                   const Vector<typename VectorType::value_type> *data = nullptr;
                   const unsigned int active_fe_index = cell->active_fe_index();
                   if (active_fe_index != pointerstruct->second.active_fe_index)
                     {
                       const unsigned int old_index =
                         pointerstruct->second.active_fe_index;
-                      tmp.reinit(dofs_per_cell, true);
-                      AssertDimension(
-                        (*valuesptr)[j].size(),
-                        interpolation_hp(active_fe_index, old_index).n());
-                      AssertDimension(
-                        tmp.size(),
-                        interpolation_hp(active_fe_index, old_index).m());
-                      interpolation_hp(active_fe_index, old_index)
-                        .vmult(tmp, (*valuesptr)[j]);
+                      // The interpolation matrix might be empty when using
+                      // FE_Nothing.
+                      if (interpolation_hp(active_fe_index, old_index).empty())
+                        tmp.reinit(dofs_per_cell, false);
+                      else
+                        {
+                          tmp.reinit(dofs_per_cell, true);
+                          const unsigned int old_index =
+                            pointerstruct->second.active_fe_index;
+                          AssertDimension(
+                            (*valuesptr)[j].size(),
+                            interpolation_hp(active_fe_index, old_index).n());
+                          AssertDimension(
+                            tmp.size(),
+                            interpolation_hp(active_fe_index, old_index).m());
+                          interpolation_hp(active_fe_index, old_index)
+                            .vmult(tmp, (*valuesptr)[j]);
+                        }
                       data = &tmp;
                     }
                   else
