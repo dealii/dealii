@@ -2575,7 +2575,9 @@ namespace GridTools
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*dimension</code> and boundary indicator @p b_id
    * and, similarly, a 'right' boundary consisting of all face with local face
-   * index <code>2*dimension+1</code> and boundary indicator @p b_id.
+   * index <code>2*dimension+1</code> and boundary indicator @p b_id. Faces
+   * with coordinates only differing in the @p direction component are
+   * identified.
    *
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.

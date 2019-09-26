@@ -1218,7 +1218,8 @@ namespace DoFTools
    *
    * This function tries to match all faces belonging to the first boundary
    * with faces belonging to the second boundary with the help of
-   * orthogonal_equality().
+   * orthogonal_equality(). More precisely, faces with coordinates only
+   * differing in the @p direction component are identified.
    *
    * If this matching is successful it constrains all DoFs associated with the
    * 'first' boundary to the respective DoFs of the 'second' boundary
@@ -1256,7 +1257,8 @@ namespace DoFTools
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*dimension</code> and boundary indicator @p b_id
    * and, similarly, a 'right' boundary consisting of all face with local face
-   * index <code>2*dimension+1</code> and boundary indicator @p b_id.
+   * index <code>2*dimension+1</code> and boundary indicator @p b_id. Faces with
+   * coordinates only differing in the @p direction component are identified.
    *
    * @note This version of make_periodicity_constraints  will not work on
    * meshes with cells not in
