@@ -95,7 +95,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       const DH<deal_II_dimension> &,
       const types::boundary_id,
       const types::boundary_id,
-      const int,
+      const unsigned int,
       AffineConstraints<double> &,
       const ComponentMask &);
 
@@ -104,7 +104,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
       const DH<deal_II_dimension> &,
       const types::boundary_id,
       const types::boundary_id,
-      const int,
+      const unsigned int,
       AffineConstraints<std::complex<double>> &,
       const ComponentMask &);
 #endif
@@ -112,7 +112,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_periodicity_constraints(
       const DH<deal_II_dimension> &,
       const types::boundary_id,
-      const int,
+      const unsigned int,
       AffineConstraints<double> &,
       const ComponentMask &);
 
@@ -120,7 +120,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_periodicity_constraints(
       const DH<deal_II_dimension> &,
       const types::boundary_id,
-      const int,
+      const unsigned int,
       AffineConstraints<std::complex<double>> &,
       const ComponentMask &);
 #endif
