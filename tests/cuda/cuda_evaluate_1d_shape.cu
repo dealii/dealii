@@ -45,9 +45,11 @@ evaluate_tensor_product(double *dst, double *src)
     evaluator;
 
   if (type == 0)
-    evaluator.template values<0, dof_to_quad, add, false>(src, dst);
+    evaluator.template values<0, dof_to_quad, add, false>(
+      CUDAWrappers::internal::global_shape_values, src, dst);
   if (type == 1)
-    evaluator.template gradients<0, dof_to_quad, add, false>(src, dst);
+    evaluator.template gradients<0, dof_to_quad, add, false>(
+      CUDAWrappers::internal::global_shape_values, src, dst);
 }
 
 template <int M, int N, int type, bool add>
