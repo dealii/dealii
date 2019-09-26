@@ -189,6 +189,24 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+std::pair<int, int>
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
+  const unsigned int macro_cell_number,
+  const unsigned int vector_number) const
+{
+  const unsigned int vectorization_length =
+    VectorizedArrayType::n_array_elements;
+  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
+  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+
+  std::pair<int, int> level_index_pair =
+    cell_level_index[macro_cell_number * vectorization_length + vector_number];
+  return level_index_pair;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 typename hp::DoFHandler<dim>::active_cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int macro_cell_number,
