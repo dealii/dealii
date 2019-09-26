@@ -173,6 +173,18 @@ namespace internal
       AlignedVector<Number> shape_hessians;
 
       /**
+       * Stores the shape gradients of the shape function space associated to
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>).
+       */
+      AlignedVector<Number> shape_gradients_collocation;
+
+      /**
+       * Stores the shape hessians of the shape function space associated to
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>).
+       */
+      AlignedVector<Number> shape_hessians_collocation;
+
+      /**
        * Stores the shape values in a different format, namely the so-called
        * even-odd scheme where the symmetries in shape_values are used for
        * faster evaluation.
@@ -195,15 +207,17 @@ namespace internal
 
       /**
        * Stores the shape gradients of the shape function space associated to
-       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
-       * faster evaluation only the even-odd format is necessary.
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). This
+       * array provides an alternative representation of the
+       * shape_gradients_collocation field in the even-odd format.
        */
       AlignedVector<Number> shape_gradients_collocation_eo;
 
       /**
        * Stores the shape hessians of the shape function space associated to
-       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
-       * faster evaluation only the even-odd format is necessary.
+       * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). This
+       * array provides an alternative representation of the
+       * shape_hessians_collocation field in the even-odd format.
        */
       AlignedVector<Number> shape_hessians_collocation_eo;
 
