@@ -488,7 +488,7 @@ namespace Step63
   class AdvectionProblem
   {
   public:
-    AdvectionProblem(Settings settings);
+    AdvectionProblem(const Settings &settings);
     void run();
 
   private:
@@ -548,7 +548,7 @@ namespace Step63
 
 
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem(Settings settings)
+  AdvectionProblem<dim>::AdvectionProblem(const Settings &settings)
     : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
     , dof_handler(triangulation)
     , fe(settings.fe_degree)

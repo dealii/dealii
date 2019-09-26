@@ -152,13 +152,15 @@ namespace LinearAlgebra
         }
 
         static void
-        import(const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
-               ::dealii::VectorOperation::values operation,
-               std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-                               communication_pattern,
-               const IndexSet &locally_owned_elem,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+        import(
+          const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
+          ::dealii::VectorOperation::values                       operation,
+          const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+            &             communication_pattern,
+          const IndexSet &locally_owned_elem,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::Host>
+            &data)
         {
           Assert(
             (operation == ::dealii::VectorOperation::add) ||

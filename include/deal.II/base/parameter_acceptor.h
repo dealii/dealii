@@ -603,7 +603,7 @@ public:
    * are passed to the SourceClass constructor.
    */
   template <typename... Args>
-  ParameterAcceptorProxy(const std::string section_name, Args... args);
+  ParameterAcceptorProxy(const std::string &section_name, Args... args);
 
   /**
    * Overloads the ParameterAcceptor::declare_parameters function, by calling
@@ -641,7 +641,7 @@ ParameterAcceptor::add_parameter(const std::string &          entry,
 template <class SourceClass>
 template <typename... Args>
 ParameterAcceptorProxy<SourceClass>::ParameterAcceptorProxy(
-  const std::string section_name,
+  const std::string &section_name,
   Args... args)
   : SourceClass(args...)
   , ParameterAcceptor(section_name)

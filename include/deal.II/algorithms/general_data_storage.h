@@ -351,7 +351,7 @@ template <class Stream>
 void
 GeneralDataStorage::print_info(Stream &os)
 {
-  for (auto it : any_data)
+  for (const auto &it : any_data)
     {
       os << it.first << '\t' << '\t'
          << boost::core::demangle(it.second.type().name()) << std::endl;
