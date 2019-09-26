@@ -101,9 +101,15 @@ Manifold<dim, spacedim>::get_new_point(
         weight = w / (weights[permutation[i]] + w);
 
       if (std::abs(weight) > 1e-14)
-        p = get_intermediate_point(p,
-                                   surrounding_points[permutation[i]],
-                                   1.0 - weight);
+        {
+          p = get_intermediate_point(p,
+                                     surrounding_points[permutation[i]],
+                                     1.0 - weight);
+        }
+      else
+        {
+          p = surrounding_points[permutation[i]];
+        }
       w += weights[permutation[i]];
     }
 
