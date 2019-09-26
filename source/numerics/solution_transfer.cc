@@ -527,8 +527,6 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                       else
                         {
                           tmp.reinit(dofs_per_cell, true);
-                          const unsigned int old_index =
-                            pointerstruct->second.active_fe_index;
                           AssertDimension((*valuesptr)[j].size(),
                                           interpolation_matrix.n());
                           AssertDimension(tmp.size(), interpolation_matrix.m());
