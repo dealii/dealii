@@ -46,15 +46,19 @@ evaluate_tensor_product(double *dst, double *src)
 
   if (type == 0)
     {
-      evaluator.template values<0, dof_to_quad, false, false>(src, src);
+      evaluator.template values<0, dof_to_quad, false, false>(
+        CUDAWrappers::internal::global_shape_values, src, src);
       __syncthreads();
-      evaluator.template values<1, dof_to_quad, add, false>(src, dst);
+      evaluator.template values<1, dof_to_quad, add, false>(
+        CUDAWrappers::internal::global_shape_values, src, dst);
     }
   if (type == 1)
     {
-      evaluator.template gradients<0, dof_to_quad, false, false>(src, src);
+      evaluator.template gradients<0, dof_to_quad, false, false>(
+        CUDAWrappers::internal::global_shape_values, src, src);
       __syncthreads();
-      evaluator.template gradients<1, dof_to_quad, add, false>(src, dst);
+      evaluator.template gradients<1, dof_to_quad, add, false>(
+        CUDAWrappers::internal::global_shape_values, src, dst);
     }
 }
 
