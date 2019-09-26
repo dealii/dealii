@@ -75,8 +75,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ref GlossPrimitive "not a primitive element"; (ii) the shape functions
  * are defined so that certain integrals over the faces are either zero
  * or one, rather than the common case of certain point values being
- * either zero or one. (There is, however, the FE_RaviartThomasNodal
- * element that uses point values.)
+ * either zero or one.
  *
  * We follow the commonly used -- though confusing -- definition of the "degree"
  * of N&eacute;d&eacute;lec elements. Specifically, the "degree" of the element
