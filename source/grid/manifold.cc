@@ -95,7 +95,7 @@ Manifold<dim, spacedim>::get_new_point(
   for (unsigned int i = 1; i < n_points; ++i)
     {
       double weight = 0.0;
-      if ((weights[permutation[i]] + w) < tol)
+      if (std::abs(weights[permutation[i]] + w) < tol)
         weight = 0.0;
       else
         weight = w / (weights[permutation[i]] + w);
