@@ -2494,7 +2494,7 @@ namespace DoFTools
   make_periodicity_constraints(const DoFHandlerType &             dof_handler,
                                const types::boundary_id           b_id1,
                                const types::boundary_id           b_id2,
-                               const int                          direction,
+                               const unsigned int                 direction,
                                dealii::AffineConstraints<number> &constraints,
                                const ComponentMask &component_mask)
   {
@@ -2526,7 +2526,7 @@ namespace DoFTools
   void
   make_periodicity_constraints(const DoFHandlerType &     dof_handler,
                                const types::boundary_id   b_id,
-                               const int                  direction,
+                               const unsigned int         direction,
                                AffineConstraints<number> &constraints,
                                const ComponentMask &      component_mask)
   {
