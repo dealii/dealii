@@ -394,6 +394,9 @@ namespace parallel
       // loop over all periodic face pairs
       for (const auto &pair : this->get_periodic_face_map())
         {
+          if (pair.first.first->level() != pair.second.first.first->level())
+            continue;
+
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
