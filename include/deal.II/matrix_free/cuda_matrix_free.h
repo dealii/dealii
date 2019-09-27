@@ -562,10 +562,16 @@ namespace CUDAWrappers
 
 
   // TODO find a better place to put these things
-  // Structure to pass the shared memory into a general user function.
+
+  /**
+   * Structure to pass the shared memory into a general user function.
+   */
   template <int dim, typename Number>
   struct SharedData
   {
+    /**
+     * Constructor.
+     */
     __device__
     SharedData(Number *vd, Number *gq[dim])
       : values(vd)
@@ -574,7 +580,16 @@ namespace CUDAWrappers
         gradients[d] = gq[d];
     }
 
+    /**
+     * Shared memory for dof and quad values.
+     */
     Number *values;
+
+    /**
+     * Shared memory for computed gradients in reference coordinate system.
+     * The gradient in each direction is saved in a struct-of-array
+     * format, i.e. first, all gradients in the x-direction come...
+     */
     Number *gradients[dim];
   };
 
