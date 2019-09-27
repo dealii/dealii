@@ -120,7 +120,9 @@ namespace Step64
   // The class `HelmholtzOperatorQuad` implements the evaluation of
   // the Helmholtz operator at each quadrature point. It uses a
   // similar mechanism as the MatrixFree framework introduced in
-  // step-37. As before, the functions of this class need to run on
+  // step-37. In contrast to there, the actual quadrature point
+  // index is treated implicitly by converting the current thread
+  // index. As before, the functions of this class need to run on
   // the device, so need to be marked as `__device__` for the
   // compiler.
   template <int dim, int fe_degree>
@@ -132,8 +134,7 @@ namespace Step64
     {}
 
     __device__ void
-    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-               const unsigned int                          q) const;
+    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const;
 
   private:
     double coef;
@@ -149,11 +150,10 @@ namespace Step64
   // here:
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
-                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-             const unsigned int                          q) const
+                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
   {
-    fe_eval->submit_value(coef * fe_eval->get_value(q), q);
-    fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
+    fe_eval->submit_value(coef * fe_eval->get_value());
+    fe_eval->submit_gradient(fe_eval->get_gradient());
   }
 
 
@@ -209,7 +209,7 @@ namespace Step64
       fe_eval(cell, gpu_data, shared_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(true, true);
-    fe_eval.apply_quad_point_operations(
+    fe_eval.apply_for_each_quad_point(
       HelmholtzOperatorQuad<dim, fe_degree>(coef[pos]));
     fe_eval.integrate(true, true);
     fe_eval.distribute_local_to_global(dst);
