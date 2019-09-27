@@ -1278,17 +1278,14 @@ namespace Patterns
 
 
     // check the different possibilities
-    for (std::vector<std::string>::const_iterator test_string =
-           split_names.begin();
-         test_string != split_names.end();
-         ++test_string)
+    for (const auto &test_string : split_names)
       {
         bool string_found = false;
 
         tmp = sequence;
         while (tmp.find('|') != std::string::npos)
           {
-            if (*test_string == std::string(tmp, 0, tmp.find('|')))
+            if (test_string == std::string(tmp, 0, tmp.find('|')))
               {
                 // string found, quit
                 // loop. don't change
@@ -1302,7 +1299,7 @@ namespace Patterns
           }
         // check last choice, not finished by |
         if (!string_found)
-          if (*test_string == tmp)
+          if (test_string == tmp)
             string_found = true;
 
         if (!string_found)

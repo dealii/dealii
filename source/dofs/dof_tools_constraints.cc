@@ -289,11 +289,8 @@ namespace DoFTools
 
         // finally copy the list into the mask
         std::fill(master_dof_mask.begin(), master_dof_mask.end(), false);
-        for (std::vector<types::global_dof_index>::const_iterator i =
-               master_dof_list.begin();
-             i != master_dof_list.end();
-             ++i)
-          master_dof_mask[*i] = true;
+        for (const auto dof : master_dof_list)
+          master_dof_mask[dof] = true;
       }
 
 
