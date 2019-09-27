@@ -98,16 +98,18 @@ namespace internal
       for (unsigned int level = 0; level < n_levels; ++level)
         {
           std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
-          copy_indices[level].clear();
+
+          // for the most common case where copy_indices are locally owned
+          // both globally and on the level, we want to skip collecting pairs
+          // and later sorting them. instead, we insert these indices into a
+          // plain vector
+          std::vector<types::global_dof_index> unrolled_copy_indices;
+
           copy_indices_level_mine[level].clear();
           copy_indices_global_mine[level].clear();
 
-          typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-            level_cell = mg_dof.begin_active(level);
-          const typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-            level_end = mg_dof.end_active(level);
-
-          for (; level_cell != level_end; ++level_cell)
+          for (const auto &level_cell :
+               mg_dof.active_cell_iterators_on_level(level))
             {
               if (mg_dof.get_triangulation().locally_owned_subdomain() !=
                     numbers::invalid_subdomain_id &&
@@ -116,6 +118,10 @@ namespace internal
                    level_cell->subdomain_id() ==
                      numbers::artificial_subdomain_id))
                 continue;
+
+              unrolled_copy_indices.resize(
+                mg_dof.locally_owned_dofs().n_elements(),
+                numbers::invalid_dof_index);
 
               // get the dof numbers of this cell for the global and the
               // level-wise numbering
@@ -131,41 +137,79 @@ namespace internal
                         level, level_dof_indices[i]))
                     continue;
 
-                  types::global_dof_index global_idx =
-                    globally_relevant.index_within_set(global_dof_indices[i]);
-                  // skip if we did this global dof already (on this or a
-                  // coarser level)
-                  if (dof_touched[global_idx])
-                    continue;
+                  // First check whether we own any of the active dof index
+                  // and the level one. This check involves locally owned
+                  // indices which often consist only of a single range, so
+                  // they are cheap to look up.
                   bool global_mine = mg_dof.locally_owned_dofs().is_element(
                     global_dof_indices[i]);
                   bool level_mine =
                     mg_dof.locally_owned_mg_dofs(level).is_element(
                       level_dof_indices[i]);
 
-
                   if (global_mine && level_mine)
                     {
-                      copy_indices[level].emplace_back(global_dof_indices[i],
-                                                       level_dof_indices[i]);
-                    }
-                  else if (global_mine)
-                    {
-                      copy_indices_global_mine[level].emplace_back(
-                        global_dof_indices[i], level_dof_indices[i]);
-
-                      // send this to the owner of the level_dof:
-                      send_data_temp.emplace_back(level,
-                                                  global_dof_indices[i],
-                                                  level_dof_indices[i]);
+                      // we own both the active dof index and the level one ->
+                      // set them into the vector, indexed by the local index
+                      // range of the active dof
+                      unrolled_copy_indices[mg_dof.locally_owned_dofs()
+                                              .index_within_set(
+                                                global_dof_indices[i])] =
+                        level_dof_indices[i];
                     }
                   else
                     {
-                      // somebody will send those to me
-                    }
+                      // get the relevant dofs index - this might be more
+                      // expensive to look up than the active indices, so we
+                      // only do it for the local-remote case within this loop
+                      const unsigned int relevant_idx =
+                        globally_relevant.index_within_set(
+                          global_dof_indices[i]);
 
-                  dof_touched[global_idx] = true;
+                      // skip if we did this global dof already (on this or a
+                      // coarser level)
+                      if (dof_touched[relevant_idx])
+                        continue;
+
+                      if (global_mine)
+                        {
+                          copy_indices_global_mine[level].emplace_back(
+                            global_dof_indices[i], level_dof_indices[i]);
+
+                          // send this to the owner of the level_dof:
+                          send_data_temp.emplace_back(level,
+                                                      global_dof_indices[i],
+                                                      level_dof_indices[i]);
+                        }
+                      else
+                        {
+                          // somebody will send those to me
+                        }
+
+                      dof_touched[relevant_idx] = true;
+                    }
                 }
+            }
+
+          // we now translate the plain vector for the copy_indices field into
+          // the expected format of a pair of indices
+          if (!unrolled_copy_indices.empty())
+            {
+              copy_indices[level].clear();
+
+              // reserve the full length in case we did not hit global-mine
+              // indices, so we expect all indices to come into copy_indices
+              if (copy_indices_global_mine[level].empty())
+                copy_indices[level].reserve(unrolled_copy_indices.size());
+
+              // locally_owned_dofs().nth_index_in_set(i) in this query is
+              // usually cheap to look up as there are few ranges in
+              // mg_dof.locally_owned_dofs()
+              for (unsigned int i = 0; i < unrolled_copy_indices.size(); ++i)
+                if (unrolled_copy_indices[i] != numbers::invalid_dof_index)
+                  copy_indices[level].emplace_back(
+                    mg_dof.locally_owned_dofs().nth_index_in_set(i),
+                    unrolled_copy_indices[i]);
             }
         }
 
@@ -353,13 +397,12 @@ namespace internal
         }
 #endif
 
-      // Sort the indices. This will produce more reliable debug output for
-      // regression tests and likely won't hurt performance even in release
-      // mode.
+      // Sort the indices, except the copy_indices which already are
+      // sorted. This will produce more reliable debug output for regression
+      // tests and won't hurt performance even in release mode because the
+      // non-owned indices are a small subset of all unknowns.
       std::less<std::pair<types::global_dof_index, types::global_dof_index>>
         compare;
-      for (auto &level_indices : copy_indices)
-        std::sort(level_indices.begin(), level_indices.end(), compare);
       for (auto &level_indices : copy_indices_level_mine)
         std::sort(level_indices.begin(), level_indices.end(), compare);
       for (auto &level_indices : copy_indices_global_mine)
