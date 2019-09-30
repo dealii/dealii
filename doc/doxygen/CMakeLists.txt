@@ -284,8 +284,9 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
     || ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doxygen.log ${CMAKE_BINARY_DIR}/doxygen.err
-  COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py
+  COMMAND ${PERL_EXECUTABLE}
+  ARGS
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.pl
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
