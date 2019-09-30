@@ -236,6 +236,9 @@ namespace Step64
           const LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
             &src) const;
 
+    void initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const;
+
   private:
     CUDAWrappers::MatrixFree<dim, double>       mf_data;
     LinearAlgebra::CUDAWrappers::Vector<double> coef;
@@ -301,6 +304,15 @@ namespace Step64
       coef.get_values());
     mf_data.cell_loop(helmholtz_operator, src, dst);
     mf_data.copy_constrained_values(src, dst);
+  }
+
+
+
+  template <int dim, int fe_degree>
+  void HelmholtzOperator<dim, fe_degree>::initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const
+  {
+    mf_data.initialize_dof_vector(vec);
   }
 
 
@@ -401,8 +413,8 @@ namespace Step64
     ghost_solution_host.reinit(locally_owned_dofs,
                                locally_relevant_dofs,
                                mpi_communicator);
-    solution_dev.reinit(locally_owned_dofs, mpi_communicator);
-    system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
+    system_matrix_dev->initialize_dof_vector(solution_dev);
+    system_rhs_dev.reinit(solution_dev);
   }
 
 

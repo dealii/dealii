@@ -1027,24 +1027,44 @@ namespace CUDAWrappers
     const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
     LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
   {
-    // Create the ghosted source and the ghosted destination
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> ghosted_src(
-      partitioner);
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> ghosted_dst(
-      ghosted_src);
-    ghosted_src = src;
+    // in case we have compatible partitioners, we can simply use the provided
+    // vectors
+    if (src.get_partitioner().get() == partitioner.get() &&
+        dst.get_partitioner().get() == partitioner.get())
+      {
+        src.update_ghost_values();
 
-    // Execute the loop on the cells
-    for (unsigned int i = 0; i < n_colors; ++i)
-      internal::apply_kernel_shmem<dim, Number, Functor>
-        <<<grid_dim[i], block_dim[i]>>>(func,
-                                        get_data(i),
-                                        ghosted_src.get_values(),
-                                        ghosted_dst.get_values());
+        // Execute the loop on the cells
+        for (unsigned int i = 0; i < n_colors; ++i)
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func,
+                                            get_data(i),
+                                            src.get_values(),
+                                            dst.get_values());
+        dst.compress(VectorOperation::add);
+        src.zero_out_ghosts();
+      }
+    else
+      {
+        // Create the ghosted source and the ghosted destination
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+          ghosted_src(partitioner);
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+          ghosted_dst(ghosted_src);
+        ghosted_src = src;
 
-    // Add the ghosted values
-    ghosted_dst.compress(VectorOperation::add);
-    dst = ghosted_dst;
+        // Execute the loop on the cells
+        for (unsigned int i = 0; i < n_colors; ++i)
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func,
+                                            get_data(i),
+                                            ghosted_src.get_values(),
+                                            ghosted_dst.get_values());
+
+        // Add the ghosted values
+        ghosted_dst.compress(VectorOperation::add);
+        dst = ghosted_dst;
+      }
   }
 
 
