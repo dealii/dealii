@@ -23,6 +23,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_idr.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
@@ -66,4 +67,5 @@ main()
   test<SolverGMRES<Vector<double>>>();
   test<SolverCG<Vector<double>>>();
   test<SolverFGMRES<Vector<double>>>();
+  test<SolverIDR<Vector<double>>>();
 }
