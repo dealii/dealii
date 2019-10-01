@@ -513,18 +513,30 @@ namespace Utilities
                    "vector_operation argument was passed to "
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
-#      ifdef DEAL_II_WITH_CXX17
-          if constexpr (std::is_trivial<Number>::value)
-#      else
-          if (std::is_trivial<Number>::value)
-#      endif
-            std::memset(ghost_array.data(),
-                        0,
-                        sizeof(Number) * ghost_array.size());
+
+#      if (defined(DEAL_II_COMPILER_CUDA_AWARE))
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            {
+              cudaMemset(ghost_array.data(),
+                         0,
+                         sizeof(Number) * ghost_array.size());
+            }
           else
-            std::fill(ghost_array.data(),
-                      ghost_array.data() + ghost_array.size(),
-                      0);
+#      endif
+            {
+#      ifdef DEAL_II_WITH_CXX17
+              if constexpr (std::is_trivial<Number>::value)
+#      else
+            if (std::is_trivial<Number>::value)
+#      endif
+                std::memset(ghost_array.data(),
+                            0,
+                            sizeof(Number) * ghost_array.size());
+              else
+                std::fill(ghost_array.data(),
+                          ghost_array.data() + ghost_array.size(),
+                          0);
+            }
           return;
         }
 #    endif
