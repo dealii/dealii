@@ -811,6 +811,7 @@ namespace CUDAWrappers
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
     this->use_coloring           = additional_data.use_coloring;
+    this->use_ghost_coloring     = additional_data.use_ghost_coloring;
 
     // TODO: only free if we actually need arrays of different length
     free();
@@ -887,7 +888,41 @@ namespace CUDAWrappers
 
     if (begin != end)
       {
-        if (additional_data.use_coloring)
+        if(additional_data.use_ghost_coloring)
+          {
+            graph.resize(3, std::vector<CellFilter>());
+            
+            std::vector<bool> ghost_vertices(dof_handler.get_triangulation ().n_vertices (), false);
+            
+            for(const auto cell : dof_handler.get_triangulation ().active_cell_iterators ())
+              if(cell->is_ghost())
+                for(unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+                  ghost_vertices[cell->vertex_index (i)] = true;
+              
+            std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<dealii::DoFCellAccessor<dealii::DoFHandler<dim, dim>, false>>>> inner_cells;
+              
+            for (auto cell = begin; cell != end; ++cell)
+            {
+              bool flag = false;
+                
+              for(unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+                if(cell->vertex_index (i))
+                    flag = true;
+              
+              if(flag)
+                graph[1].emplace_back(cell);
+              else
+                inner_cells.emplace_back(cell);
+            }
+            
+            for(unsigned i = 0; i < inner_cells.size(); i++)
+                if(i < inner_cells.size() / 2)
+                  graph[0].emplace_back(inner_cells[i]);
+                else
+                  graph[2].emplace_back(inner_cells[i]);
+              
+          }
+        else if (additional_data.use_coloring)
           {
             const auto fun = [&](const CellFilter &filter) {
               return internal::get_conflict_indices<dim, Number>(filter,
@@ -1032,17 +1067,44 @@ namespace CUDAWrappers
     if (src.get_partitioner().get() == partitioner.get() &&
         dst.get_partitioner().get() == partitioner.get())
       {
-        src.update_ghost_values();
 
         // Execute the loop on the cells
-        for (unsigned int i = 0; i < n_colors; ++i)
+        if(use_ghost_coloring)
+        {
+          src.update_ghost_values_start(0);
           internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
+            <<<grid_dim[0], block_dim[0]>>>(func,
+                                            get_data(0),
                                             src.get_values(),
                                             dst.get_values());
-        dst.compress(VectorOperation::add);
-        src.zero_out_ghosts();
+          src.update_ghost_values_finish();
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[1], block_dim[1]>>>(func,
+                                            get_data(1),
+                                            src.get_values(),
+                                            dst.get_values());
+          dst.compress_start(0, VectorOperation::add);
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[2], block_dim[2]>>>(func,
+                                            get_data(2),
+                                            src.get_values(),
+                                            dst.get_values());
+          dst.compress_finish(VectorOperation::add);
+        }
+        else
+        {
+          src.update_ghost_values();
+          for (unsigned int i = 0; i < n_colors; ++i)
+            internal::apply_kernel_shmem<dim, Number, Functor>
+              <<<grid_dim[i], block_dim[i]>>>(func,
+                                              get_data(i),
+                                              src.get_values(),
+                                              dst.get_values());
+          dst.compress(VectorOperation::add);
+        }
+        
+        
+        //src.zero_out_ghosts();
       }
     else
       {

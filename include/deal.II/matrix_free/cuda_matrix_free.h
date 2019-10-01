@@ -106,10 +106,12 @@ namespace CUDAWrappers
         const UpdateFlags           mapping_update_flags   = update_gradients |
                                                  update_JxW_values,
         const bool use_coloring = false,
+        const bool use_ghost_coloring = false,
         const bool n_colors     = 1)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
+        , use_ghost_coloring(use_ghost_coloring)
         , n_colors(n_colors)
       {}
 
@@ -139,6 +141,8 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
+      
+      bool use_ghost_coloring;
     };
 
     /**
@@ -440,6 +444,8 @@ namespace CUDAWrappers
      * newer architectures.
      */
     bool use_coloring;
+    
+    bool use_ghost_coloring;
 
     /**
      * Total number of degrees of freedom.
