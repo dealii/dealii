@@ -914,30 +914,32 @@ namespace LinearAlgebra
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
     defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          Assert(
-            (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
-            ExcMessage(
-              "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
-          if (import_data.values_dev == nullptr)
-            import_data.values_dev.reset(
-              Utilities::CUDA::allocate_device_data<Number>(
-                partitioner->n_import_indices()));
-#  else
-#    ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
-          static_assert(
-            std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
-            "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
-#    endif
-          if (import_data.values == nullptr)
+          if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
             {
-              Number *new_val;
-              Utilities::System::posix_memalign(
-                reinterpret_cast<void **>(&new_val),
-                64,
-                sizeof(Number) * partitioner->n_import_indices());
-              import_data.values.reset(new_val);
+              if (import_data.values_dev == nullptr)
+                import_data.values_dev.reset(
+                  Utilities::CUDA::allocate_device_data<Number>(
+                    partitioner->n_import_indices()));
             }
+          else
 #  endif
+            {
+#  if !defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+              static_assert(
+                std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
+                "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
+#  endif
+              if (import_data.values == nullptr)
+                {
+                  Number *new_val;
+                  Utilities::System::posix_memalign(
+                    reinterpret_cast<void **>(&new_val),
+                    64,
+                    sizeof(Number) * partitioner->n_import_indices());
+                  import_data.values.reset(new_val);
+                }
+            }
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
