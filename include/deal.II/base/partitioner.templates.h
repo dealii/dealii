@@ -126,6 +126,7 @@ namespace Utilities
                   import_indices_plain_dev[i].first.get(),
                   locally_owned_array.data(),
                   chunk_size);
+              cudaDeviceSynchronize();
             }
           else
 #    endif
@@ -400,6 +401,11 @@ namespace Utilities
             ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
                        "The number of ghost entries times the size of 'Number' "
                        "exceeds this value. This is not supported."));
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+      defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            cudaDeviceSynchronize();
+#    endif
           const int ierr =
             MPI_Isend(ghost_array_ptr,
                       ghost_targets_data[i].second * sizeof(Number),
