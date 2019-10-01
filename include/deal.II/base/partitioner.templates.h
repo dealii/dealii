@@ -687,17 +687,9 @@ namespace Utilities
             {
               for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
+                  // We can't easily assert here, so we just move the pointer
+                  // matching the host code.
                   const auto chunk_size = import_indices_plain.second;
-                  const int n_blocks =
-                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                      ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::
-                    set_permutated<<<n_blocks,
-                                     dealii::CUDAWrappers::block_size>>>(
-                      import_indices_plain.first.get(),
-                      locally_owned_array.data(),
-                      read_position,
-                      chunk_size);
                   read_position += chunk_size;
                 }
             }
