@@ -513,18 +513,30 @@ namespace Utilities
                    "vector_operation argument was passed to "
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
-#      ifdef DEAL_II_WITH_CXX17
-          if constexpr (std::is_trivial<Number>::value)
-#      else
-          if (std::is_trivial<Number>::value)
-#      endif
-            std::memset(ghost_array.data(),
-                        0,
-                        sizeof(Number) * ghost_array.size());
+
+#      if defined(DEAL_II_COMPILER_CUDA_AWARE)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            {
+              cudaMemset(ghost_array.data(),
+                         0,
+                         sizeof(Number) * ghost_array.size());
+            }
           else
-            std::fill(ghost_array.data(),
-                      ghost_array.data() + ghost_array.size(),
-                      0);
+#      endif
+            {
+#      ifdef DEAL_II_WITH_CXX17
+              if constexpr (std::is_trivial<Number>::value)
+#      else
+            if (std::is_trivial<Number>::value)
+#      endif
+                std::memset(ghost_array.data(),
+                            0,
+                            sizeof(Number) * ghost_array.size());
+              else
+                std::fill(ghost_array.data(),
+                          ghost_array.data() + ghost_array.size(),
+                          0);
+            }
           return;
         }
 #    endif
@@ -675,17 +687,9 @@ namespace Utilities
             {
               for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
+                  // We can't easily assert here, so we just move the pointer
+                  // matching the host code.
                   const auto chunk_size = import_indices_plain.second;
-                  const int n_blocks =
-                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                      ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::
-                    set_permutated<<<n_blocks,
-                                     dealii::CUDAWrappers::block_size>>>(
-                      import_indices_plain.first.get(),
-                      locally_owned_array.data(),
-                      read_position,
-                      chunk_size);
                   read_position += chunk_size;
                 }
             }
