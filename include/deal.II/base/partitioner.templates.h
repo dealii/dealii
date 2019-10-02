@@ -514,7 +514,7 @@ namespace Utilities
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
 
-#      if (defined(DEAL_II_COMPILER_CUDA_AWARE))
+#      if defined(DEAL_II_COMPILER_CUDA_AWARE)
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               cudaMemset(ghost_array.data(),
