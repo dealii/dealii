@@ -113,12 +113,16 @@ namespace parallel
      *                     locally_relevant_dofs,
      *                     mpi_communicator);
      * old_solution = solution;
+     *
+     * // Initialize SolutionTransfer object
+     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * soltrans.prepare_for_coarsening_and_refinement(old_solution);
      * ...
      * // Refine grid
      * // Recreate locally_owned_dofs and locally_relevant_dofs index sets
      * ...
      * solution.reinit(locally_owned_dofs, mpi_communicator);
-     * soltrans.refine_interpolate(old_solution, solution);
+     * soltrans.interpolate(solution);
      * @endcode
      *
      * <h3>Use for Serialization</h3>
