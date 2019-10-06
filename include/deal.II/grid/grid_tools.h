@@ -710,12 +710,12 @@ namespace GridTools
    * contains the first point of @p points.
    *
    * @return A tuple containing the following information:
-   *  - Cells, is a vector of a vector cells of the all cells
-   *   containing at least one of the @p points .
-   *  - A vector qpoints of vector of points, containing in @p qpoints[i]
+   *  - @p Cells : a vector of all the cells containing at least one of
+   *   the @p points .
+   *  - @p qpoints : A vector of vector of points. @p qpoints[i] contains
    *   the reference positions of all points that fall within the cell @p cells[i] .
-   *  - A vector indices of vector of integers, containing the mapping between
-   *   local numbering in qpoints, and global index in points
+   *  - @p indices : A vector of vector of integers, containing the mapping between
+   *   local numbering in @p qpoints , and global index in @p points .
    *
    * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
    * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
