@@ -240,7 +240,6 @@ SKIP_FUNCTION_MACROS   = YES
 GENERATE_TAGFILE       = deal.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
-PERL_PATH              = /usr/bin/perl
 
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
