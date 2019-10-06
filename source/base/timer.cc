@@ -16,7 +16,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 

@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>

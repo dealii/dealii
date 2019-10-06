@@ -15,7 +15,6 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/grid_refinement.h>

@@ -16,7 +16,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/scalar_polynomials_base.h>
-#include <deal.II/base/thread_management.h>
 
 #include <iomanip>
 #include <iostream>
