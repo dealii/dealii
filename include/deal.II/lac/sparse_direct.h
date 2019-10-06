@@ -21,7 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>

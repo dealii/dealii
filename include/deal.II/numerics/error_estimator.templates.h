@@ -20,7 +20,6 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/distributed/tria.h>

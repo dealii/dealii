@@ -15,7 +15,6 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <algorithm>
 #include <iostream>

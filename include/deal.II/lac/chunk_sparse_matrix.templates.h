@@ -19,7 +19,6 @@
 
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/chunk_sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>

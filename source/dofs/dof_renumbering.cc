@@ -15,7 +15,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 

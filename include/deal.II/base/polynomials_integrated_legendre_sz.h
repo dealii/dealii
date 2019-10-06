@@ -21,7 +21,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/thread_management.h>
 
 
 DEAL_II_NAMESPACE_OPEN

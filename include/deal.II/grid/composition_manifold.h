@@ -26,7 +26,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
