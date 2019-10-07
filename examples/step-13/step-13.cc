@@ -788,7 +788,7 @@ namespace Step13
       // function</a> that wraps the function call including the individual
       // arguments with fixed values. The fixed values are passed into the
       // lambda function using the capture list
-      // ([...]). All the other arguments the wrapped function requires and are
+      // (`[...]`). All the other arguments the wrapped function requires and are
       // part of the outer function signature are specified as regular function
       // parameters in the lambda function.
       //
