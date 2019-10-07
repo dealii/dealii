@@ -170,18 +170,20 @@ namespace parallel
      *   ... create the coarse mesh ...
      *
      *   coarse_grid.signals.post_refinement.connect(
-     *     std::bind (&set_boundary_ids<dim>, std::ref(coarse_grid)));
+     *     [&coarse_grid](){
+     *       set_boundary_ids<dim>(coarse_grid);
+     *     });
      * }
      * @endcode
      *
-     * What the call to <code>std::bind</code> does is to produce an
-     * object that can be called like a function with no arguments. It does so
-     * by taking the address of a function that does, in fact, take an
-     * argument but permanently fix this one argument to a reference to the
-     * coarse grid triangulation. After each refinement step, the
+     * The object passed as argument to <code>connect</code> is an object
+     * that can be called like a function with no arguments. It does so by
+     * wrapping a function that does, in fact, take an argument but this one
+     * argument is stored as a reference to the coarse grid triangulation when
+     * the lambda function is created. After each refinement step, the
      * triangulation will then call the object so created which will in turn
-     * call <code>set_boundary_ids<dim></code> with the reference to the
-     * coarse grid as argument.
+     * call <code>set_boundary_ids<dim></code> with the reference to the coarse
+     * grid as argument.
      *
      * This approach can be generalized. In the example above, we have used a
      * global function that will be called. However, sometimes it is necessary
@@ -210,17 +212,17 @@ namespace parallel
      *   ... create the coarse mesh ...
      *
      *   coarse_grid.signals.post_refinement.connect(
-     *     std::bind (&MyGeometry<dim>::set_boundary_ids,
-     *                std::cref(*this),
-     *                std::ref(coarse_grid)));
+     *     [this, &coarse_grid]()
+     *     {
+     *       this->set_boundary_ids(coarse_grid);
+     *     });
      * }
      * @endcode
-     * Here, like any other member function, <code>set_boundary_ids</code>
-     * implicitly takes a pointer or reference to the object it belongs to as
-     * first argument. <code>std::bind</code> again creates an object that can
+     * The lambda function above again is an object that can
      * be called like a global function with no arguments, and this object in
-     * turn calls <code>set_boundary_ids</code> with a pointer to the current
-     * object and a reference to the triangulation to work on. Note that
+     * turn calls the current object's member function
+     * <code>set_boundary_ids</code> with a reference to the triangulation to
+     * work on. Note that
      * because the <code>create_coarse_mesh</code> function is declared as
      * <code>const</code>, it is necessary that the
      * <code>set_boundary_ids</code> function is also declared

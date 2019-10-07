@@ -649,10 +649,10 @@ protected:
  *
  * The class gains additional expressive power because the argument it takes
  * does not have to be a pointer to an actual function. Rather, it is a
- * function object, i.e., it can also be the result of call to std::bind (or
- * boost::bind) or some other object that can be called with a single
- * argument. For example, if you need a Function object that returns the norm
- * of a point, you could write it like so:
+ * function object, i.e., it can also be the result of a lambda function or some
+ * other object that can be called with a single argument. For
+ * example, if you need a Function object that returns the norm of a point, you
+ * could write it like so:
  * @code
  * template <int dim, typename RangeNumberType>
  * class Norm : public Function<dim, RangeNumberType>
@@ -702,7 +702,7 @@ protected:
  * or we could write it like so:
  * @code
  * ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_distance_object(
- *   std::bind(&Point<dim>::distance, q, std::placeholders::_1));
+ *   [&q](const Point<dim> &p){return q.distance(p);});
  * @endcode
  * The savings in work to write this are apparent.
  *

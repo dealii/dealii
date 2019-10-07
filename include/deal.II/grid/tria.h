@@ -1118,8 +1118,10 @@ namespace internal
  *       // triangulation that we want to be informed about mesh refinement
  *       previous_cell = current_cell;
  *       previous_cell->get_triangulation().signals.post_refinement.connect(
- *         std::bind (&FEValues<dim>::invalidate_previous_cell,
- *                    std::ref (*this)));
+ *         [this]()
+ *         {
+ *           this->invalidate_previous_cell();
+ *         });
  *     }
  *   else
  *    previous_cell = current_cell;

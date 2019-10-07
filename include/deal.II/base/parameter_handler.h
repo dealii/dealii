@@ -346,7 +346,7 @@ class MultipleParameterLoop;
  * add_action() function.) Of course, in C++ one doesn't usually pass
  * around the address of a function, but an action can be a function-like
  * object (taking a string as argument) that results from calling
- * @p std::bind, or more conveniently, it can be a
+ * such as a
  * <a href="http://en.cppreference.com/w/cpp/language/lambda">lambda
  * function</a> that has the form
  * @code
