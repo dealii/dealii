@@ -737,22 +737,22 @@ namespace Step13
       Threads::Task<> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
-      WorkStream::run(dof_handler.begin_active(),
-                      dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
-                      AssemblyScratchData(*fe, *quadrature),
-                      AssemblyCopyData());
+      WorkStream::run(
+        dof_handler.begin_active(),
+        dof_handler.end(),
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               AssemblyScratchData &scratch_data,
+               AssemblyCopyData &   copy_data) {
+          this->local_assemble_matrix(cell, scratch_data, copy_data);
+        },
+        [this, &linear_system](const AssemblyCopyData &copy_data) {
+          this->copy_local_to_global(copy_data, linear_system);
+        },
+        AssemblyScratchData(*fe, *quadrature),
+        AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
-      // The syntax above using <code>std::bind</code> requires
+      // The syntax above using lambda functions requires
       // some explanation. There are multiple version of
       // WorkStream::run that expect different arguments. In step-9,
       // we used one version that took a pair of iterators, a pair of
@@ -783,58 +783,15 @@ namespace Step13
       // function that just takes function objects -- objects that
       // have an <code>operator()</code> and that consequently can be
       // called like functions, whatever they really represent. The
-      // typical way to generate such function objects is using
-      // <code>std::bind</code> (or, if the compiler is too old, a
-      // replacement for it, which we generically call
-      // <code>std::bind</code>) which takes a pointer to a
-      // (member) function and then <i>binds</i> individual arguments
-      // to fixed values. For example, you can create a function that
-      // takes an iterator, a scratch object and a copy object by
-      // taking the address of a member function and binding the
-      // (implicit) argument to the object on which it is to work to
-      // <code>*this</code>. This is what we do in the first call
-      // above. In the second call, we need to create a function
-      // object that takes a copy object, and we do so by taking the
-      // address of a member function that takes an implicit pointer
-      // to <code>*this</code>, a reference to a copy object, and a
-      // reference to a linear system, and binding the first and third
-      // of these, leaving something that has only one open argument
-      // that can then be filled by WorkStream::run().
+      // typical way to generate such function objects is using a
+      // <a href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
+      // function</a> that wraps the function call including the individual
+      // arguments with fixed values. The fixed values are passed into the
+      // lambda function using the capture list
+      // ([...]). All the other arguments the wrapped function requires and are
+      // part of the outer function signature are specified as regular function
+      // parameters in the lambda function.
       //
-      // There remains the question of what the
-      // <code>std::placeholders::_1</code>, <code>std::placeholders::_2</code>,
-      // etc., mean. (These arguments are called <i>placeholders</i>.) The idea
-      // of using <code>std::bind</code> in the first of the two cases above is
-      // that it produces an object that can be called with three arguments. But
-      // how are the three arguments the function object is being called with
-      // going to be distributed to the four arguments
-      // <code>local_assemble_matrix()</code> (including the implicit
-      // <code>this</code> pointer)? As specified, the first argument
-      // given to the function object will become the first argument
-      // given to <code>local_assemble_matrix()</code>, the second the
-      // second, etc. This is trivial here, but allows for interesting
-      // games in other circumstances. Consider, for example, having a
-      // function <code>void f(double x, double y)</code>. Then,
-      // creating a variable <code>p</code> of type
-      // <code>std::function@<void f(double,double)@></code> and
-      // initializing <code>p=std::bind(&f, std::placeholders::_2,
-      // std::placeholders::_1)</code> then calling <code>p(1,2)</code> will
-      // result in calling <code>f(2,1)</code>.
-      //
-      // @note An alternative to using <code>std::bind</code> is to use C++'s
-      // version of <a
-      // href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
-      // functions</a>. In essence, a lambda function is a function without a
-      // name that is defined right at the one place where it is going to be
-      // used -- i.e., where we pass the third and fourth argument to
-      // WorkStream::run. The functions one would define in these locations
-      // would take 3 and 1 arguments, respectively, and all they do is call
-      // <code>Solver::local_assemble_matrix</code> and
-      // <code>Solver::copy_local_to_global</code> with the required number of
-      // arguments, utilizing what the lambda function has gotten as arguments
-      // itself. We won't show the syntax this would require since it is no
-      // less confusing than the one used above.
-
       // At this point, we have assembled the matrix and condensed
       // it. The right hand side may or may not have been completely
       // assembled, but we would like to condense the right hand side

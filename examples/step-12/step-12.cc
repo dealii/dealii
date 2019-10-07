@@ -203,7 +203,7 @@ namespace Step12
     // pointers to these functions to the MeshWorker framework. If, however,
     // these functions would want to access member variables (or needed
     // additional arguments beyond the ones specified below), we could use the
-    // facilities of boost::bind (or std::bind, respectively) to provide the
+    // facilities of lambda functions to provide the
     // MeshWorker framework with objects that act as if they had the required
     // number and types of arguments, but have in fact other arguments already
     // bound.
@@ -312,7 +312,7 @@ namespace Step12
     // integrator class are not actually function pointers. Rather, they are
     // objects that can be called like functions with a certain number of
     // arguments. Consequently, we could also pass objects with appropriate
-    // operator() implementations here, or the result of std::bind if the local
+    // operator() implementations here, or lambda functions if the local
     // integrators were, for example, non-static member functions.
     MeshWorker::loop<dim,
                      dim,

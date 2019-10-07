@@ -691,9 +691,9 @@ namespace Step27
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
           FESeries::process_coefficients<dim>(
             fourier_coefficients,
-            std::bind(&LaplaceProblem<dim>::predicate,
-                      this,
-                      std::placeholders::_1),
+            [this](const TableIndices<dim> &indices) {
+              return this->predicate(indices);
+            },
             VectorTools::Linfty_norm);
 
         Assert(res.first.size() == res.second.size(), ExcInternalError());

@@ -237,8 +237,7 @@ void grid_4()
 // the address of a function that takes a point and returns a point, an object
 // that has an <code>operator()</code> like the code below, or for example, a
 // <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can
-// get via <code>std::bind</code> in more complex cases. Here we have a simple
-// transformation and use the simplest method: a lambda function.
+// get as a lambda function. Here we choose the latter option.
 void grid_5()
 {
   Triangulation<2>          triangulation;

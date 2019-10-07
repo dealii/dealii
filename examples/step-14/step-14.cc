@@ -522,19 +522,19 @@ namespace Step14
       Threads::Task<> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
-      WorkStream::run(dof_handler.begin_active(),
-                      dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
-                      AssemblyScratchData(*fe, *quadrature),
-                      AssemblyCopyData());
+      WorkStream::run(
+        dof_handler.begin_active(),
+        dof_handler.end(),
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               AssemblyScratchData &scratch_data,
+               AssemblyCopyData &   copy_data) {
+          this->local_assemble_matrix(cell, scratch_data, copy_data);
+        },
+        [this, &linear_system](const AssemblyCopyData &copy_data) {
+          this->copy_local_to_global(copy_data, linear_system);
+        },
+        AssemblyScratchData(*fe, *quadrature),
+        AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
       std::map<types::global_dof_index, double> boundary_value_map;
@@ -2193,13 +2193,14 @@ namespace Step14
       WorkStream::run(
         DualSolver<dim>::dof_handler.begin_active(),
         DualSolver<dim>::dof_handler.end(),
-        std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::ref(error_indicators),
-                  std::ref(face_integrals)),
+        [this,
+         &error_indicators,
+         &face_integrals](const active_cell_iterator & cell,
+                          WeightedResidualScratchData &scratch_data,
+                          WeightedResidualCopyData &   copy_data) {
+          this->estimate_on_one_cell(
+            cell, scratch_data, copy_data, error_indicators, face_integrals);
+        },
         std::function<void(const WeightedResidualCopyData &)>(),
         WeightedResidualScratchData(*DualSolver<dim>::fe,
                                     *DualSolver<dim>::quadrature,
