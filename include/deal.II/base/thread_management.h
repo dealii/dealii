@@ -21,6 +21,7 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/multithread_info.h>
+#  include <deal.II/base/std_cxx17/tuple.h>
 #  include <deal.II/base/template_constraints.h>
 
 #  include <condition_variable>
@@ -1096,8 +1097,9 @@ namespace Threads
   inline Thread<RT>
   new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_thread(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
+    return new_thread(
+      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
   }
 
 
@@ -1753,8 +1755,9 @@ namespace Threads
   inline Task<RT>
   new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_task(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
+    return new_task(
+      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
   }
 
 
