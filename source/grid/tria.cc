@@ -3166,8 +3166,11 @@ namespace internal
                             ExcInconsistentLineInfoOfLine(line_vertices.first,
                                                           line_vertices.second,
                                                           "boundary ids"));
-
-                line->set_boundary_id_internal(subcell_line.boundary_id);
+                // do not use the boundary id provided in subcell_line
+                // if it is an internal one
+                if (subcell_line.boundary_id !=
+                    numbers::internal_face_boundary_id)
+                  line->set_boundary_id_internal(subcell_line.boundary_id);
               }
             // Set manifold id if given
             AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
@@ -3317,8 +3320,11 @@ namespace internal
                                                           line[2]->index(),
                                                           line[3]->index(),
                                                           "boundary ids"));
-
-                quad->set_boundary_id_internal(subcell_quad.boundary_id);
+                // do not use the boundary id provided in subcell_quad
+                // if it is an invalid or internal one
+                if (subcell_quad.boundary_id !=
+                    numbers::internal_face_boundary_id)
+                  quad->set_boundary_id_internal(subcell_quad.boundary_id);
               }
             // Set manifold id if given
             if (quad->manifold_id() != numbers::flat_manifold_id)
