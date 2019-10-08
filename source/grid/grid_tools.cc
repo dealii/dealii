@@ -52,6 +52,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -413,6 +414,79 @@ namespace GridTools
     return (t34 + t64 + t95 + t125 + t156 + t181 + t207 + t228) / 12.;
   }
 
+
+  template <int dim>
+  Vector<double>
+  compute_aspect_ratio_of_cells(const Triangulation<dim> &triangulation,
+                                const Mapping<dim> &      mapping,
+                                const Quadrature<dim> &   quadrature)
+  {
+    FE_Nothing<dim> fe;
+    FEValues<dim>   fe_values(mapping, fe, quadrature, update_jacobians);
+
+    Vector<double> aspect_ratio_vector(triangulation.n_active_cells());
+
+    // loop over cells of processor
+    for (const auto &cell : triangulation.active_cell_iterators())
+      {
+        if (cell->is_locally_owned())
+          {
+            double aspect_ratio_cell = 0.0;
+
+            fe_values.reinit(cell);
+
+            // loop over quadrature points
+            for (unsigned int q = 0; q < quadrature.size(); ++q)
+              {
+                Tensor<2, dim, double> jacobian =
+                  Tensor<2, dim, double>(fe_values.jacobian(q));
+
+                LAPACKFullMatrix<double> J = LAPACKFullMatrix<double>(dim);
+                for (unsigned int i = 0; i < dim; i++)
+                  for (unsigned int j = 0; j < dim; j++)
+                    J(i, j) = jacobian[i][j];
+
+                // We intentionally do not want to throw an exception in case of
+                // inverted elements since this is not the task of this
+                // function. Instead, inf is written into the vector in case of
+                // inverted elements.
+                if (determinant(jacobian) <= 0)
+                  {
+                    aspect_ratio_cell = std::numeric_limits<double>::infinity();
+                  }
+                else
+                  {
+                    J.compute_svd();
+
+                    double const max_sv = J.singular_value(0);
+                    double const min_sv = J.singular_value(dim - 1);
+                    double const ar     = max_sv / min_sv;
+
+                    aspect_ratio_cell = std::max(aspect_ratio_cell, ar);
+                  }
+              }
+
+            // fill vector
+            aspect_ratio_vector(cell->active_cell_index()) = aspect_ratio_cell;
+          }
+      }
+
+    return aspect_ratio_vector;
+  }
+
+  template <int dim>
+  double
+  compute_maximum_aspect_ratio(const Triangulation<dim> &triangulation,
+                               const Mapping<dim> &      mapping,
+                               const Quadrature<dim> &   quadrature)
+  {
+    Vector<double> aspect_ratio_vector =
+      compute_aspect_ratio_of_cells(triangulation, mapping, quadrature);
+
+    return VectorTools::compute_global_error(triangulation,
+                                             aspect_ratio_vector,
+                                             VectorTools::Linfty_norm);
+  }
 
 
   template <int dim, int spacedim>
