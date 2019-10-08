@@ -217,6 +217,16 @@ public:
   }
 
   /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
+  }
+
+  /**
    * Access operator (only valid with component 0 in the base class without
    * specialization).
    */
@@ -685,6 +695,16 @@ public:
   }
 
   /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
+  }
+
+  /**
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1115,6 +1135,16 @@ public:
   {
     data = _mm512_set1_ps(x);
     return *this;
+  }
+
+  /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
   }
 
   /**
@@ -1602,6 +1632,16 @@ public:
   }
 
   /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
+  }
+
+  /**
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2001,6 +2041,16 @@ public:
   {
     data = _mm256_set1_ps(x);
     return *this;
+  }
+
+  /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
   }
 
   /**
@@ -2416,6 +2466,16 @@ public:
   }
 
   /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2786,6 +2846,16 @@ public:
   {
     data = _mm_set1_ps(x);
     return *this;
+  }
+
+  /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
   }
 
   /**
@@ -3170,6 +3240,16 @@ public:
   }
 
   /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
+  }
+
+  /**
    * Access operator. The component must be either 0 or 1.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3399,6 +3479,16 @@ public:
   {
     data = vec_splats(x);
     return *this;
+  }
+
+  /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return n_array_elements;
   }
 
   /**
