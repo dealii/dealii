@@ -36,6 +36,10 @@ test()
   for (unsigned int i = 0; i < n_vectors; ++i)
     c[i] = Number(i);
 
+  AssertDimension(n_vectors, a.size());
+  AssertDimension(a.size(), sizeof(a) / sizeof(Number));
+  AssertDimension(VectorizedArray<Number>::size(), sizeof(a) / sizeof(Number));
+
   deallog << "Addition: ";
   VectorizedArray<Number> d = a + b;
   for (unsigned int i = 0; i < n_vectors; ++i)
