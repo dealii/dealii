@@ -756,7 +756,7 @@ namespace Step13
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
-      // The syntax above using lambda functions requires
+      // The syntax above requires
       // some explanation. There are multiple version of
       // WorkStream::run that expect different arguments. In step-9,
       // we used one version that took a pair of iterators, a pair of
@@ -790,11 +790,15 @@ namespace Step13
       // typical way to generate such function objects is using a
       // <a href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
       // function</a> that wraps the function call including the individual
-      // arguments with fixed values. The fixed values are passed into the
-      // lambda function using the capture list
-      // (`[...]`). All the other arguments the wrapped function requires and are
-      // part of the outer function signature are specified as regular function
-      // parameters in the lambda function.
+      // arguments with fixed values. All the arguments that are part of the
+      // outer function signature are specified as regular function arguments in
+      // the lambda function. The fixed values are passed into the lambda
+      // function using the capture list (`[...]`). It is possible to use a
+      // capture default or to list all the variables that are to be bound to
+      // the lambda explicitly. For the sake of clarity we decided to to omit
+      // the capture default here, but that capture list could equally well be
+      // `[&]` meaning that all used variables are copied into the lambda by
+      // reference.
       //
       // At this point, we have assembled the matrix and condensed
       // it. The right hand side may or may not have been completely
