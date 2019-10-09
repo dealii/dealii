@@ -1,0 +1,4 @@
+
+DEAL::L2_norm:
+DEAL::computed: 2.68836e-16 expected: 0.00000 difference: 2.68836e-16
+DEAL::OK
