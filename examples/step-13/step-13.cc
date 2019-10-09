@@ -737,19 +737,23 @@ namespace Step13
       Threads::Task<> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
-      WorkStream::run(
-        dof_handler.begin_active(),
-        dof_handler.end(),
+      auto worker =
         [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
                AssemblyScratchData &scratch_data,
                AssemblyCopyData &   copy_data) {
           this->local_assemble_matrix(cell, scratch_data, copy_data);
-        },
-        [this, &linear_system](const AssemblyCopyData &copy_data) {
-          this->copy_local_to_global(copy_data, linear_system);
-        },
-        AssemblyScratchData(*fe, *quadrature),
-        AssemblyCopyData());
+        };
+
+      auto copier = [this, &linear_system](const AssemblyCopyData &copy_data) {
+        this->copy_local_to_global(copy_data, linear_system);
+      };
+
+      WorkStream::run(dof_handler.begin_active(),
+                      dof_handler.end(),
+                      worker,
+                      copier,
+                      AssemblyScratchData(*fe, *quadrature),
+                      AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
       // The syntax above using lambda functions requires

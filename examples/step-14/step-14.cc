@@ -522,19 +522,23 @@ namespace Step14
       Threads::Task<> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
-      WorkStream::run(
-        dof_handler.begin_active(),
-        dof_handler.end(),
+      auto worker =
         [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
                AssemblyScratchData &scratch_data,
                AssemblyCopyData &   copy_data) {
           this->local_assemble_matrix(cell, scratch_data, copy_data);
-        },
-        [this, &linear_system](const AssemblyCopyData &copy_data) {
-          this->copy_local_to_global(copy_data, linear_system);
-        },
-        AssemblyScratchData(*fe, *quadrature),
-        AssemblyCopyData());
+        };
+
+      auto copier = [this, &linear_system](const AssemblyCopyData &copy_data) {
+        this->copy_local_to_global(copy_data, linear_system);
+      };
+
+      WorkStream::run(dof_handler.begin_active(),
+                      dof_handler.end(),
+                      worker,
+                      copier,
+                      AssemblyScratchData(*fe, *quadrature),
+                      AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
       std::map<types::global_dof_index, double> boundary_value_map;
@@ -2188,20 +2192,24 @@ namespace Step14
              ++face_no)
           face_integrals[cell->face(face_no)] = -1e20;
 
+      auto worker = [this,
+                     &error_indicators,
+                     &face_integrals](const active_cell_iterator & cell,
+                                      WeightedResidualScratchData &scratch_data,
+                                      WeightedResidualCopyData &   copy_data) {
+        this->estimate_on_one_cell(
+          cell, scratch_data, copy_data, error_indicators, face_integrals);
+      };
+
+      auto copier = std::function<void(const WeightedResidualCopyData &)>();
+
       // Then hand it all off to WorkStream::run() to compute the
       // estimators for all cells in parallel:
       WorkStream::run(
         DualSolver<dim>::dof_handler.begin_active(),
         DualSolver<dim>::dof_handler.end(),
-        [this,
-         &error_indicators,
-         &face_integrals](const active_cell_iterator & cell,
-                          WeightedResidualScratchData &scratch_data,
-                          WeightedResidualCopyData &   copy_data) {
-          this->estimate_on_one_cell(
-            cell, scratch_data, copy_data, error_indicators, face_integrals);
-        },
-        std::function<void(const WeightedResidualCopyData &)>(),
+        worker,
+        copier,
         WeightedResidualScratchData(*DualSolver<dim>::fe,
                                     *DualSolver<dim>::quadrature,
                                     *DualSolver<dim>::face_quadrature,

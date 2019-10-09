@@ -2144,25 +2144,30 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 stokes_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(), stokes_dof_handler.end()),
+    auto worker =
       [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
              Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
              Assembly::CopyData::StokesPreconditioner<dim> &       data) {
         this->local_assemble_stokes_preconditioner(cell, scratch, data);
-      },
+      };
+
+    auto copier =
       [this](const Assembly::CopyData::StokesPreconditioner<dim> &data) {
         this->copy_local_to_global_stokes_preconditioner(data);
-      },
-      Assembly::Scratch::StokesPreconditioner<dim>(stokes_fe,
-                                                   quadrature_formula,
-                                                   mapping,
-                                                   update_JxW_values |
-                                                     update_values |
-                                                     update_gradients),
-      Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
+      };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::StokesPreconditioner<dim>(
+                      stokes_fe,
+                      quadrature_formula,
+                      mapping,
+                      update_JxW_values | update_values | update_gradients),
+                    Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
 
     stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
@@ -2711,28 +2716,31 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.end()),
-      [this, global_T_range, maximal_velocity, global_entropy_variation](
-        const typename DoFHandler<dim>::active_cell_iterator &cell,
-        Assembly::Scratch::TemperatureRHS<dim> &              scratch,
-        Assembly::CopyData::TemperatureRHS<dim> &             data) {
+    auto worker =
+      [=](const typename DoFHandler<dim>::active_cell_iterator &cell,
+          Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+          Assembly::CopyData::TemperatureRHS<dim> &             data) {
         this->local_assemble_temperature_rhs(global_T_range,
                                              maximal_velocity,
                                              global_entropy_variation,
                                              cell,
                                              scratch,
                                              data);
-      },
-      [this](const Assembly::CopyData::TemperatureRHS<dim> &data) {
-        this->copy_local_to_global_temperature_rhs(data);
-      },
-      Assembly::Scratch::TemperatureRHS<dim>(
-        temperature_fe, stokes_fe, mapping, quadrature_formula),
-      Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
+      };
+
+    auto copier = [=](const Assembly::CopyData::TemperatureRHS<dim> &data) {
+      this->copy_local_to_global_temperature_rhs(data);
+    };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::TemperatureRHS<dim>(
+                      temperature_fe, stokes_fe, mapping, quadrature_formula),
+                    Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
 
     temperature_rhs.compress(VectorOperation::add);
   }
