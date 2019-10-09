@@ -3170,7 +3170,7 @@ namespace internal
                 // if it is an internal one
                 if (subcell_line.boundary_id !=
                     numbers::internal_face_boundary_id)
-                  line->set_boundary_id_internal(subcell_line.boundary_id);
+                  line->set_boundary_id(subcell_line.boundary_id);
               }
             // Set manifold id if given
             AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
