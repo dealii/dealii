@@ -3324,7 +3324,7 @@ namespace internal
                 // if it is an invalid or internal one
                 if (subcell_quad.boundary_id !=
                     numbers::internal_face_boundary_id)
-                  quad->set_boundary_id_internal(subcell_quad.boundary_id);
+                  quad->set_boundary_id(subcell_quad.boundary_id);
               }
             // Set manifold id if given
             if (quad->manifold_id() != numbers::flat_manifold_id)
