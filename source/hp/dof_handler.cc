@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <functional>
 #include <set>
+#include <unordered_set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1431,9 +1432,11 @@ namespace hp
   {
     Assert(fe_collection.size() > 0, ExcNoFESelected());
 
-    std::set<types::global_dof_index>    boundary_dofs;
-    std::vector<types::global_dof_index> dofs_on_face;
+    std::unordered_set<types::global_dof_index> boundary_dofs;
+    std::vector<types::global_dof_index>        dofs_on_face;
     dofs_on_face.reserve(this->get_fe_collection().max_dofs_per_face());
+
+    const IndexSet &owned_dofs = locally_owned_dofs();
 
     // loop over all faces to check whether they are at a
     // boundary. note that we need not take special care of single
@@ -1444,17 +1447,26 @@ namespace hp
       cell = this->begin_active(),
       endc = this->end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->at_boundary(f))
-          {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
-            dofs_on_face.resize(dofs_per_face);
+      if (cell->is_locally_owned() && cell->at_boundary())
+        {
+          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            if (cell->at_boundary(f))
+              {
+                const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+                dofs_on_face.resize(dofs_per_face);
 
-            cell->face(f)->get_dof_indices(dofs_on_face,
-                                           cell->active_fe_index());
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              boundary_dofs.insert(dofs_on_face[i]);
-          }
+                cell->face(f)->get_dof_indices(dofs_on_face,
+                                               cell->active_fe_index());
+                for (unsigned int i = 0; i < dofs_per_face; ++i)
+                  {
+                    const unsigned int global_idof_index = dofs_on_face[i];
+                    if (owned_dofs.is_element(global_idof_index))
+                      {
+                        boundary_dofs.insert(global_idof_index);
+                      }
+                  }
+              }
+        }
     return boundary_dofs.size();
   }
 
@@ -1472,27 +1484,38 @@ namespace hp
 
     // same as above, but with additional checks for set of boundary
     // indicators
-    std::set<types::global_dof_index>    boundary_dofs;
-    std::vector<types::global_dof_index> dofs_on_face;
+    std::unordered_set<types::global_dof_index> boundary_dofs;
+    std::vector<types::global_dof_index>        dofs_on_face;
     dofs_on_face.reserve(this->get_fe_collection().max_dofs_per_face());
+
+    const IndexSet &owned_dofs = locally_owned_dofs();
 
     typename HpDoFHandler<dim, spacedim>::active_cell_iterator
       cell = this->begin_active(),
       endc = this->end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->at_boundary(f) &&
-            (boundary_ids.find(cell->face(f)->boundary_id()) !=
-             boundary_ids.end()))
-          {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
-            dofs_on_face.resize(dofs_per_face);
+      if (cell->is_locally_owned() && cell->at_boundary())
+        {
+          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            if (cell->at_boundary(f) &&
+                (boundary_ids.find(cell->face(f)->boundary_id()) !=
+                 boundary_ids.end()))
+              {
+                const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+                dofs_on_face.resize(dofs_per_face);
 
-            cell->face(f)->get_dof_indices(dofs_on_face,
-                                           cell->active_fe_index());
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              boundary_dofs.insert(dofs_on_face[i]);
-          }
+                cell->face(f)->get_dof_indices(dofs_on_face,
+                                               cell->active_fe_index());
+                for (unsigned int i = 0; i < dofs_per_face; ++i)
+                  {
+                    const unsigned int global_idof_index = dofs_on_face[i];
+                    if (owned_dofs.is_element(global_idof_index))
+                      {
+                        boundary_dofs.insert(global_idof_index);
+                      }
+                  }
+              }
+        }
     return boundary_dofs.size();
   }
 

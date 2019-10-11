@@ -778,7 +778,8 @@ namespace hp
     n_dofs(const unsigned int level) const;
 
     /**
-     * Return the number of degrees of freedom located on the boundary.
+     * Return the number of locally owned degrees of freedom located on the
+     * boundary.
      */
     types::global_dof_index
     n_boundary_dofs() const;
@@ -800,8 +801,9 @@ namespace hp
         &boundary_ids) const;
 
     /**
-     * Return the number of degrees of freedom located on those parts of the
-     * boundary which have a boundary indicator listed in the given set. The
+     * Return the number of locally owned degrees of freedom located on those
+     * parts of the boundary which have a boundary indicator listed in the given
+     * set.
      */
     types::global_dof_index
     n_boundary_dofs(const std::set<types::boundary_id> &boundary_ids) const;
