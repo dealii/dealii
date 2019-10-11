@@ -1,5 +1,0 @@
-New: The class VectorizedArray now provides a member function
-VectorizedArray::size() to return the number of array elements, in analogy to
-the STL containers.
-<br>
-(Martin Kronbichler, 2019/10/08)

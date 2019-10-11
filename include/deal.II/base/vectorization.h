@@ -85,6 +85,149 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
 
 
 /**
+ * An iterator for VectorizedArray.
+ *
+ * @author Peter Munch, 2019
+ */
+template <typename T>
+class VectorizedArrayIterator
+{
+public:
+  /**
+   * Constructor.
+   *
+   * @param data The actual VectorizedArray.
+   * @param lane A pointer to the current lane.
+   */
+  VectorizedArrayIterator(T &data, unsigned int lane)
+    : data(data)
+    , lane(lane)
+  {}
+
+  /**
+   * Compare for inequality.
+   */
+  bool
+  operator!=(const VectorizedArrayIterator<T> &other) const
+  {
+    return this->lane != other.lane;
+  }
+
+  /**
+   * Dereferencing operator (const version): returns the value of the current
+   * lane.
+   */
+  const typename T::value_type &operator*() const
+  {
+    return data[lane];
+  }
+
+
+  /**
+   * Dereferencing operator (non-@p const version): returns the value of the
+   * current lane.
+   */
+  template <typename U = T>
+  typename std::enable_if<!std::is_same<U, const U>::value,
+                          typename T::value_type>::type &
+  operator*()
+  {
+    return data[lane];
+  }
+
+  /**
+   * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
+   * the iterator to the next lane and returns a reference to
+   * <tt>*this</tt>.
+   */
+  VectorizedArrayIterator<T> &
+  operator++()
+  {
+    lane++;
+    return *this;
+  }
+
+private:
+  /**
+   * Reference to the actual VectorizedArray.
+   */
+  T &data;
+
+  /**
+   * Pointer to the current lane.
+   */
+  unsigned int lane;
+};
+
+
+
+/**
+ * A base class for the VectorizedArray specialization, containing common
+ * functionalities.
+ *
+ * @tparam Type of the actual vectorized array. We are using CRTP to prevent
+ * the usage of the virtual keyword.
+ *
+ * @author Peter Munch, 2019
+ */
+template <typename T>
+class VectorizedArrayBase
+{
+public:
+  /**
+   * Return the number of elements in the array stored in the variable
+   * n_array_elements of VectorizedArray.
+   */
+  static constexpr unsigned int
+  size()
+  {
+    return T::n_array_elements;
+  }
+
+  /**
+   * @return An iterator pointing to the beginning of the underlying data.
+   */
+  VectorizedArrayIterator<T>
+  begin()
+  {
+    return VectorizedArrayIterator<T>(static_cast<T &>(*this), 0);
+  }
+
+  /**
+   * @return An iterator pointing to the end of the underlying data.
+   */
+  VectorizedArrayIterator<T>
+  end()
+  {
+    return VectorizedArrayIterator<T>(static_cast<T &>(*this),
+                                      T::n_array_elements);
+  }
+
+  /**
+   * @return An iterator pointing to the beginning of the underlying data (const
+   * version).
+   */
+  VectorizedArrayIterator<const T>
+  begin() const
+  {
+    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
+  }
+
+  /**
+   * @return An iterator pointing to the end of the underlying data (const
+   * version).
+   */
+  VectorizedArrayIterator<const T>
+  end() const
+  {
+    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this),
+                                            T::n_array_elements);
+  }
+};
+
+
+
+/**
  * This generic class defines a unified interface to a vectorized data type.
  * For general template arguments, this class simply corresponds to the
  * template argument. For example, VectorizedArray<long double> is nothing
@@ -171,6 +314,7 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
  */
 template <typename Number, int width>
 class VectorizedArray
+  : public VectorizedArrayBase<VectorizedArray<Number, width>>
 {
 public:
   /**
@@ -214,16 +358,6 @@ public:
   {
     data = scalar;
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -657,6 +791,7 @@ vectorized_transpose_and_store(const bool                            add_into,
  */
 template <>
 class VectorizedArray<double, 8>
+  : public VectorizedArrayBase<VectorizedArray<double, 8>>
 {
 public:
   /**
@@ -692,16 +827,6 @@ public:
   {
     data = _mm512_set1_pd(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -1100,6 +1225,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 16>
+  : public VectorizedArrayBase<VectorizedArray<float, 16>>
 {
 public:
   /**
@@ -1135,16 +1261,6 @@ public:
   {
     data = _mm512_set1_ps(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -1594,6 +1710,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<double, 4>
+  : public VectorizedArrayBase<VectorizedArray<double, 4>>
 {
 public:
   /**
@@ -1629,16 +1746,6 @@ public:
   {
     data = _mm256_set1_pd(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -2006,6 +2113,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 8>
+  : public VectorizedArrayBase<VectorizedArray<float, 8>>
 {
 public:
   /**
@@ -2041,16 +2149,6 @@ public:
   {
     data = _mm256_set1_ps(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -2439,6 +2537,7 @@ vectorized_transpose_and_store(const bool                       add_into,
  */
 template <>
 class VectorizedArray<double, 2>
+  : public VectorizedArrayBase<VectorizedArray<double, 2>>
 {
 public:
   /**
@@ -2463,16 +2562,6 @@ public:
   VectorizedArray(const double scalar)
   {
     this->operator=(scalar);
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -2810,6 +2899,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 4>
+  : public VectorizedArrayBase<VectorizedArray<float, 4>>
 {
 public:
   /**
@@ -2846,16 +2936,6 @@ public:
   {
     data = _mm_set1_ps(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -3202,6 +3282,7 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 template <>
 class VectorizedArray<double, 2>
+  : public VectorizedArrayBase<VectorizedArray<double, 2>>
 {
 public:
   /**
@@ -3237,16 +3318,6 @@ public:
   {
     data = vec_splats(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
@@ -3444,6 +3515,7 @@ private:
 
 template <>
 class VectorizedArray<float, 4>
+  : public VectorizedArrayBase<VectorizedArray<float, 4>>
 {
 public:
   /**
@@ -3479,16 +3551,6 @@ public:
   {
     data = vec_splats(x);
     return *this;
-  }
-
-  /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements.
-   */
-  static constexpr unsigned int
-  size()
-  {
-    return n_array_elements;
   }
 
   /**
