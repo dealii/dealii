@@ -764,8 +764,9 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
             break;
         }
     }
-    
-    control().check(iparam[2], 0.);
+
+  // Set number of used iterations in SolverControl
+  control().check(iparam[2], 0.);
 
   if (info < 0)
     {
