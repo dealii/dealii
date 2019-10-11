@@ -764,6 +764,8 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
             break;
         }
     }
+    
+    control().check(iparam[2], 0.);
 
   if (info < 0)
     {
