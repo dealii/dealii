@@ -865,7 +865,33 @@ namespace GridOutFlags
    * @ingroup output
    */
   struct Vtk : public DataOutBase::VtkFlags
-  {};
+  {
+    /**
+     * Default constructor.
+     */
+    Vtk(const bool output_cells    = true,
+        const bool output_faces    = true,
+        const bool output_co_faces = true)
+      : output_cells(output_cells)
+      , output_faces(output_faces)
+      , output_co_faces(output_co_faces)
+    {}
+
+    /**
+     * Output cells.
+     */
+    bool output_cells;
+
+    /**
+     * Output faces.
+     */
+    bool output_faces;
+
+    /**
+     * Output co-faces/edges.
+     */
+    bool output_co_faces;
+  };
 
 
   /**
