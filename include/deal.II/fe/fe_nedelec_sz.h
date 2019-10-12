@@ -34,7 +34,8 @@ DEAL_II_NAMESPACE_OPEN
  * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the
  * PhD thesis of S. Zaglmayr, <b>High Order Finite Element Methods for
  * Electromagnetic Field Computation</b>, Johannes Kepler Universit&auml;t Linz,
- * 2006.
+ * 2006. It its used in the same context as described at the top of the
+ * description for the FE_Nedelec class.
  *
  * This element overcomes the sign conflict issues present in
  * traditional N&eacute;d&eacute;lec elements that arise from the edge
