@@ -2105,7 +2105,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * (<code>index_4==0</code>) the invocation of this function is this function
  * is
  * @code
- *   contract<0, 2, 1, 0>(t1, t2);
+ *   double_contract<0, 2, 1, 0>(t1, t2);
  * @endcode
  *
  * @note The position of the index is counted from 0, i.e.,
