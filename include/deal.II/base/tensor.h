@@ -2030,8 +2030,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *
  * If for example the first index (<code>index_1==0</code>) of a tensor
  * <code>t1</code> shall be contracted with the third index
- * (<code>index_2==2</code>) of a tensor <code>t2</code>, the invocation of
- * this function is
+ * (<code>index_2==2</code>) of a tensor <code>t2</code>, this function should
+ * be invoked as
  * @code
  *   contract<0, 2>(t1, t2);
  * @endcode
@@ -2102,8 +2102,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * If for example the first index (<code>index_1==0</code>) shall be
  * contracted with the third index (<code>index_2==2</code>), and the second
  * index (<code>index_3==1</code>) with the first index
- * (<code>index_4==0</code>) the invocation of this function is this function
- * is
+ * (<code>index_4==0</code>) of a tensor <code>t2</code>, this function should
+ * be invoked as
  * @code
  *   double_contract<0, 2, 1, 0>(t1, t2);
  * @endcode
