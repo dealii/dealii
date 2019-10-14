@@ -254,14 +254,15 @@ public:
  * This behavior of this class is made similar to the basic data types double
  * and float. The definition of a vectorized array does not initialize the
  * data field but rather leaves it undefined, as is the case for double and
- * float. However, when calling something like VectorizedArray<double> a =
- * VectorizedArray<double>(), it sets all numbers in this field to zero. In
- * other words, this class is a plain old data (POD) type which has an
- * equivalent C representation and can e.g. be safely copied with std::memcpy.
- * This POD layout is also necessary for ensuring correct alignment of data
- * with address boundaries when collected in a vector (i.e., when the first
- * element in a vector is properly aligned, all subsequent elements will be
- * correctly aligned, too).
+ * float. However, when calling something like `VectorizedArray<double> a =
+ * VectorizedArray<double>()` or `VectorizedArray<double> a = 0.`, it sets all
+ * numbers in this field to zero. This class is of standard layout type
+ * according to the C++11 standard, which means that there is an equivalent C
+ * representation and the class can e.g. be safely copied with std::memcpy.
+ * The standard layout is also necessary for ensuring correct alignment of
+ * data with address boundaries when collected in a vector (i.e., when the
+ * first element in a vector is properly aligned, all subsequent elements will
+ * be correctly aligned, too).
  *
  * Note that for proper functioning of this class, certain data alignment
  * rules must be respected. This is because the computer expects the starting
@@ -269,13 +270,12 @@ public:
  * (usually, the address of the vectorized array should be a multiple of the
  * length of the array in bytes). Otherwise, a segmentation fault or a severe
  * loss of performance might occur. When creating a single data field on the
- * stack like <tt>VectorizedArray<double> a = VectorizedArray<double>()</tt>,
- * the compiler will take care of data alignment automatically. However, when
- * allocating a long vector of VectorizedArray<double> data, one needs to
- * respect these rules. Use the class AlignedVector or data containers based
- * on AlignedVector (such as Table) for this purpose. It is a class very
- * similar to std::vector otherwise but always makes sure that data is
- * correctly aligned.
+ * stack like `VectorizedArray<double> a = 5.;`, the compiler will take care
+ * of data alignment automatically. However, when allocating a long vector of
+ * VectorizedArray<double> data, one needs to respect these rules. Use the
+ * class AlignedVector or data containers based on AlignedVector (such as
+ * Table) for this purpose. It is a class very similar to std::vector
+ * otherwise but always makes sure that data is correctly aligned.
  *
  * The user can explicitly control the width of a particular instruction set
  * architecture (ISA) extension by specifying the number of lanes via the second
@@ -331,9 +331,6 @@ public:
 
   static_assert(width == n_array_elements,
                 "You specified an illegal width that is not supported.");
-
-  // POD means that there should be no user-defined constructors, destructors
-  // and copy functions (the standard is somewhat relaxed in C++2011, though).
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -546,7 +543,8 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it is
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
    * declared public.
    */
   Number data;
@@ -1007,8 +1005,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m512d data;
 
@@ -1441,8 +1440,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m512 data;
 
@@ -1921,8 +1921,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m256d data;
 
@@ -2324,8 +2325,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m256 data;
 
@@ -2733,8 +2735,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m128d data;
 
@@ -3096,8 +3099,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __m128 data;
 
@@ -3436,8 +3440,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __vector double data;
 
@@ -3669,8 +3674,9 @@ public:
   }
 
   /**
-   * Actual data field. Since this class represents a POD data type, it
-   * remains public.
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
    */
   __vector float data;
 
