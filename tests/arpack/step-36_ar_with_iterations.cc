@@ -316,7 +316,7 @@ namespace Step36
     assemble_system();
 
     const std::pair<unsigned int, double> res = solve();
-    
+
     deallog << res.first << " iterations used" << std::endl;
 
     std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
