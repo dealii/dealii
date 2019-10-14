@@ -15,8 +15,8 @@
 
 
 // Test integrate_difference for complex-valued vectors. This test is
-// like integrate_difference_01, using a real-valued function but
-// using complex data types
+// like integrate_difference_01_complex_04, but compares the interpolated
+// solution to the exact solution.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -41,8 +41,7 @@
 using namespace dealii;
 
 
-// x+y(+z), x^2+y^2 (, z+xy)
-// div = 1+2y (+1)
+// x+y(+z), x^2+y^2 (, z+xy) times (1+i)/sqrt(2)
 template <int dim>
 class Ref : public Function<dim, std::complex<double>>
 {
@@ -55,11 +54,14 @@ public:
   value(const Point<dim> &p, const unsigned int c) const
   {
     if (c == 0)
-      return p[0] + p[1] + ((dim == 3) ? p[2] : 0.0);
+      return (p[0] + p[1] + ((dim == 3) ? p[2] : 0.0)) *
+             std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
     if (c == 1)
-      return p[0] * p[0] + p[1] * p[1];
+      return (p[0] * p[0] + p[1] * p[1]) *
+             std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
     if (c == 2)
-      return p[2] + p[0] * p[1];
+      return (p[2] + p[0] * p[1]) *
+             std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
     else
       return numbers::signaling_nan<double>();
   }
@@ -84,12 +86,7 @@ test(VectorTools::NormType norm, double value)
 
   Vector<double> cellwise_errors(tria.n_active_cells());
   VectorTools::integrate_difference(
-    dofh,
-    solution,
-    Functions::ZeroFunction<dim, std::complex<double>>(dim),
-    cellwise_errors,
-    QGauss<dim>(5),
-    norm);
+    dofh, solution, Ref<dim>(), cellwise_errors, QGauss<dim>(5), norm);
 
   const double error = cellwise_errors.l2_norm();
 
@@ -103,15 +100,9 @@ template <int dim>
 void
 test()
 {
-  deallog << "Hdiv_seminorm:" << std::endl;
-  // sqrt(\int (div f)^2 = sqrt(\int (1+2y)^2)
-  test<dim>(VectorTools::Hdiv_seminorm, std::sqrt(13.0 / 3.0));
   deallog << "L2_norm:" << std::endl;
   // sqrt(\int_\Omega f^2) = sqrt(\int (x+y)^2+(x^2+y^2)^2)
-  test<dim>(VectorTools::L2_norm, std::sqrt(161.0 / 90.0));
-  deallog << "H1_seminorm:" << std::endl;
-  // sqrt( sum | d/dxi f |_0^2 ) = sqrt( sum \int   )
-  test<dim>(VectorTools::H1_seminorm, std::sqrt(14.0 / 3.0));
+  test<dim>(VectorTools::L2_norm, 0.);
 
   deallog << "OK" << std::endl;
 }

@@ -110,11 +110,11 @@ namespace nedelec_singularity
 
 
   template <int dim>
-  class ExactSolution : public Function<dim>
+  class ExactSolution : public Function<dim, std::complex<double>>
   {
   public:
     ExactSolution();
-    virtual double
+    virtual std::complex<double>
     value(const Point<dim> &p, const unsigned int component) const override;
   };
 
@@ -122,13 +122,13 @@ namespace nedelec_singularity
 
   template <int dim>
   ExactSolution<dim>::ExactSolution()
-    : Function<dim>(dim)
+    : Function<dim, std::complex<double>>(dim)
   {}
 
 
 
   template <int dim>
-  double
+  std::complex<double>
   ExactSolution<dim>::value(const Point<dim> & p,
                             const unsigned int component) const
   {
