@@ -7544,6 +7544,83 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
 }
 
 
+template <int dim, int spacedim>
+std::string
+DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
+  const std::string &directory,
+  const std::string &filename_without_extension,
+  const unsigned int counter,
+  const unsigned int n_digits_for_counter,
+  const MPI_Comm &   mpi_communicator,
+  const unsigned int n_groups) const
+{
+  const unsigned int rank = Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_ranks =
+    Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int n_files_written =
+    (n_groups == 0 || n_groups > n_ranks) ? n_ranks : n_groups;
+
+  const unsigned int n_digits =
+    static_cast<int>(std::ceil(std::log10(std::fabs(n_files_written))));
+
+  const unsigned int color = rank % n_files_written;
+  const std::string  filename =
+    directory + filename_without_extension + "_" +
+    Utilities::int_to_string(counter, n_digits_for_counter) + "." +
+    Utilities::int_to_string(color, n_digits) + ".vtu";
+
+  if (n_groups == 0 || n_groups > n_ranks)
+    {
+      // every processor writes one file
+      std::ofstream output(filename.c_str());
+      this->write_vtu(output);
+    }
+  else if (n_groups == 1)
+    {
+      // write only a single data file in parallel
+      this->write_vtu_in_parallel(filename.c_str(), mpi_communicator);
+    }
+  else
+    {
+#ifdef DEAL_II_WITH_MPI
+      // write n_groups data files
+      MPI_Comm comm_group;
+      int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
+      AssertThrowMPI(ierr);
+      this->write_vtu_in_parallel(filename.c_str(), comm_group);
+      ierr = MPI_Comm_free(&comm_group);
+      AssertThrowMPI(ierr);
+#else
+      AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));
+#endif
+    }
+
+  // write pvtu record
+  const std::string filename_master =
+    filename_without_extension + "_" +
+    Utilities::int_to_string(counter, n_digits_for_counter) + ".pvtu";
+
+  if (rank == 0)
+    {
+      std::vector<std::string> filename_vector;
+      for (unsigned int i = 0; i < n_files_written; ++i)
+        {
+          const std::string filename =
+            filename_without_extension + "_" +
+            Utilities::int_to_string(counter, n_digits_for_counter) + "." +
+            Utilities::int_to_string(i, n_digits) + ".vtu";
+
+          filename_vector.emplace_back(filename);
+        }
+
+      std::ofstream master_output((directory + filename_master).c_str());
+      this->write_pvtu_record(master_output, filename_vector);
+    }
+
+  return filename_master;
+}
+
+
 
 template <int dim, int spacedim>
 void
