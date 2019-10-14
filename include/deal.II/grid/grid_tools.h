@@ -231,6 +231,55 @@ namespace GridTools
   cell_measure(const T &, ...);
 
   /**
+   * Computes an aspect ratio measure for all locally-owned active cells and
+   * fills a vector with one entry per cell, given a @p triangulation and
+   * @p mapping. The size of the vector that is returned equals the number of
+   * active cells. The vector contains zero for non locally-owned cells. The
+   * aspect ratio of a cell is defined as the ratio of the maximum to minimum
+   * singular value of the Jacobian, taking the maximum over all quadrature
+   * points of a quadrature rule specified via @p quadrature. For example, for
+   * the special case of rectangular elements in 2d with dimensions $a$ and $b$
+   * ($a \geq b$), this function returns the usual aspect ratio definition
+   * $a/b$. The above definition using singular values is a generalization to
+   * arbitrarily deformed elements. This function is intended to be used for
+   * $d=2,3$ space dimensions, but it can also be used for $d=1$ returning a
+   * value of 1.
+   *
+   * @note Inverted elements do not throw an exception. Instead, a value of inf
+   * is written into the vector in case of inverted elements.
+   *
+   * @note Make sure to use enough quadrature points for a precise calculation
+   * of the aspect ratio in case of deformed elements.
+   *
+   * @note In parallel computations the return value will have the length
+   * n_active_cells but the aspect ratio is only computed for the cells that
+   * are locally owned and placed at index CellAccessor::active_cell_index(),
+   * respectively. All other values are set to 0.
+   *
+   * @author Niklas Fehn, Martin Kronbichler, 2019
+   */
+  template <int dim>
+  Vector<double>
+  compute_aspect_ratio_of_cells(const Triangulation<dim> &triangulation,
+                                const Mapping<dim> &      mapping,
+                                const Quadrature<dim> &   quadrature);
+
+  /**
+   * Computes the maximum aspect ratio by taking the maximum over all cells.
+   *
+   * @note When running in parallel with a Triangulation that supports MPI,
+   * this is a collective call and the return value is the maximum over all
+   * processors.
+   *
+   * @author Niklas Fehn, Martin Kronbichler, 2019
+   */
+  template <int dim>
+  double
+  compute_maximum_aspect_ratio(const Triangulation<dim> &triangulation,
+                               const Mapping<dim> &      mapping,
+                               const Quadrature<dim> &   quadrature);
+
+  /**
    * Compute the smallest box containing the entire triangulation.
    *
    * If the input triangulation is a `parallel::distributed::Triangulation`,
