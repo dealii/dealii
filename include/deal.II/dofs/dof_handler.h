@@ -954,15 +954,17 @@ public:
   n_dofs(const unsigned int level) const;
 
   /**
-   * Return the number of degrees of freedom located on the boundary.
+   * Return the number of locally owned degrees of freedom located on the
+   * boundary.
    */
   types::global_dof_index
   n_boundary_dofs() const;
 
   /**
-   * Return the number of degrees of freedom located on those parts of the
-   * boundary which have a boundary indicator listed in the given set. The
-   * reason that a @p map rather than a @p set is used is the same as
+   * Return the number of locally owned degrees of freedom located on those
+   * parts of the boundary which have a boundary indicator listed in the given
+   * set.
+   * The reason that a @p map rather than a @p set is used is the same as
    * described in the documentation of that variant of
    * DoFTools::make_boundary_sparsity_pattern() that takes a map.
    *
