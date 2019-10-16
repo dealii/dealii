@@ -3166,8 +3166,10 @@ namespace internal
                             ExcInconsistentLineInfoOfLine(line_vertices.first,
                                                           line_vertices.second,
                                                           "boundary ids"));
-                // do not use the boundary id provided in subcell_line
-                // if it is an internal one
+                // If the boundary id provided in subcell_line
+                // is anything other than the default
+                // (internal_face_boundary_id), then set it in the new
+                // triangulation.
                 if (subcell_line.boundary_id !=
                     numbers::internal_face_boundary_id)
                   line->set_boundary_id(subcell_line.boundary_id);
@@ -3320,8 +3322,10 @@ namespace internal
                                                           line[2]->index(),
                                                           line[3]->index(),
                                                           "boundary ids"));
-                // do not use the boundary id provided in subcell_quad
-                // if it is an invalid or internal one
+                // If the boundary id provided in subcell_line
+                // is anything other than the default
+                // (internal_face_boundary_id), then set it in the new
+                // triangulation.
                 if (subcell_quad.boundary_id !=
                     numbers::internal_face_boundary_id)
                   quad->set_boundary_id(subcell_quad.boundary_id);
