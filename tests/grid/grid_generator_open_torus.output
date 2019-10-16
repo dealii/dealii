@@ -1,0 +1,4 @@
+
+DEAL::N_active_cells_full = 45
+DEAL::N_active_cells_open = 15
+DEAL::| AR_full - AR_open | = 0.000000e+00
