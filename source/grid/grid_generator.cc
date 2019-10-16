@@ -592,7 +592,8 @@ namespace GridGenerator
   void torus<2, 3>(Triangulation<2, 3> &tria,
                    const double         R,
                    const double         r,
-                   const unsigned int)
+                   const unsigned int,
+                   const double)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
@@ -734,7 +735,8 @@ namespace GridGenerator
   void torus<3, 3>(Triangulation<3, 3> &tria,
                    const double         R,
                    const double         r,
-                   const unsigned int   n_cells_toroidal)
+                   const unsigned int   n_cells_toroidal,
+                   const double         phi)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
@@ -743,11 +745,16 @@ namespace GridGenerator
     Assert(n_cells_toroidal > 2,
            ExcMessage("Number of cells in toroidal direction has "
                       "to be at least 3."));
+    AssertThrow(phi > 0.0 && phi < 2.0 * numbers::PI + 1.0e-15,
+                ExcMessage("Invalid angle phi specified."));
 
     // the first 8 vertices are in the x-y-plane
-    Point<3> const        p = Point<3>(R, 0.0, 0.0);
-    double const          a = 1. / (1 + std::sqrt(2.0));
-    std::vector<Point<3>> vertices(8 * n_cells_toroidal);
+    Point<3> const p                = Point<3>(R, 0.0, 0.0);
+    double const   a                = 1. / (1 + std::sqrt(2.0));
+    unsigned int   additional_layer = 0; // torus is closed (angle of 2*pi)
+    if (phi < 2.0 * numbers::PI - 1.0e-15)
+      additional_layer = 1; // indicates "open" torus with angle < 2*pi
+    std::vector<Point<3>> vertices(8 * (n_cells_toroidal + additional_layer));
     vertices[0] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0)),
     vertices[1] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0)),
     vertices[2] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0) * a),
@@ -759,8 +766,8 @@ namespace GridGenerator
 
     // create remaining vertices by rotating around negative y-axis (the
     // direction is to ensure positive cell measures)
-    double phi_cell = 2.0 * numbers::PI / n_cells_toroidal;
-    for (unsigned int c = 1; c < n_cells_toroidal; ++c)
+    double const phi_cell = phi / n_cells_toroidal;
+    for (unsigned int c = 1; c < n_cells_toroidal + additional_layer; ++c)
       {
         for (unsigned int v = 0; v < 8; ++v)
           {
@@ -777,13 +784,15 @@ namespace GridGenerator
       {
         for (unsigned int j = 0; j < 2; ++j)
           {
-            unsigned int offset = (8 * (c + j)) % (8 * n_cells_toroidal);
+            unsigned int offset =
+              (8 * (c + j)) % (8 * (n_cells_toroidal + additional_layer));
+
             // cell 0 in x-y-plane
             cells[5 * c].vertices[0 + j * 4] = offset + 0;
             cells[5 * c].vertices[1 + j * 4] = offset + 1;
             cells[5 * c].vertices[2 + j * 4] = offset + 2;
             cells[5 * c].vertices[3 + j * 4] = offset + 3;
-            // cell 1 in x-y-plane
+            // cell 1 in x-y-plane (cell on torus centerline)
             cells[5 * c + 1].vertices[0 + j * 4] = offset + 2;
             cells[5 * c + 1].vertices[1 + j * 4] = offset + 3;
             cells[5 * c + 1].vertices[2 + j * 4] = offset + 4;
@@ -805,8 +814,9 @@ namespace GridGenerator
             cells[5 * c + 4].vertices[3 + j * 4] = offset + 7;
           }
 
-        cells[5 * c].material_id     = 0;
-        cells[5 * c + 1].material_id = 0;
+        cells[5 * c].material_id = 0;
+        // cell on torus centerline
+        cells[5 * c + 1].material_id = 1;
         cells[5 * c + 2].material_id = 0;
         cells[5 * c + 3].material_id = 0;
         cells[5 * c + 4].material_id = 0;
@@ -819,14 +829,26 @@ namespace GridGenerator
 
     for (auto &cell : tria.cell_iterators())
       {
-        bool cell_at_boundary = false;
+        // identify faces on torus surface and set manifold to 1
         for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
-          if (cell->at_boundary(f))
-            cell_at_boundary = true;
-        if (cell_at_boundary == false)
-          cell->set_all_manifold_ids(2);
+          {
+            // faces 4 and 5 are those with normal vector aligned with torus
+            // centerline
+            if (cell->face(f)->at_boundary() && f != 4 && f != 5)
+              {
+                cell->face(f)->set_all_manifold_ids(1);
+              }
+          }
+
+        // set manifold id to 2 for those cells that are on the torus centerline
+        if (cell->material_id() == 1)
+          {
+            cell->set_all_manifold_ids(2);
+            // reset to 0
+            cell->set_material_id(0);
+          }
       }
-    tria.set_all_manifold_ids_on_boundary(1);
+
     tria.set_manifold(1, TorusManifold<3>(R, r));
     tria.set_manifold(2,
                       CylindricalManifold<3>(Tensor<1, 3>({0., 1., 0.}),
