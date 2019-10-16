@@ -615,24 +615,27 @@ namespace VectorTools
 
     for (; h != endh; ++h, ++l)
       {
-        h->get_dof_values(data_1, cell_data_1);
-        transfer.vmult(cell_data_2, cell_data_1);
-
-        l->get_dof_indices(local_dof_indices);
-
-        // distribute cell vector
-        for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
+        if (h->is_locally_owned())
           {
-            ::dealii::internal::ElementAccess<OutVector>::add(
-              cell_data_2(j), local_dof_indices[j], data_2);
+            h->get_dof_values(data_1, cell_data_1);
+            transfer.vmult(cell_data_2, cell_data_1);
 
-            // count, how often we have
-            // added to this dof
-            Assert(
-              touch_count[local_dof_indices[j]] <
-                std::numeric_limits<decltype(touch_count)::value_type>::max(),
-              ExcInternalError());
-            ++touch_count[local_dof_indices[j]];
+            l->get_dof_indices(local_dof_indices);
+
+            // distribute cell vector
+            for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
+              {
+                ::dealii::internal::ElementAccess<OutVector>::add(
+                  cell_data_2(j), local_dof_indices[j], data_2);
+
+                // count, how often we have
+                // added to this dof
+                Assert(touch_count[local_dof_indices[j]] <
+                         std::numeric_limits<decltype(
+                           touch_count)::value_type>::max(),
+                       ExcInternalError());
+                ++touch_count[local_dof_indices[j]];
+              }
           }
       }
 
