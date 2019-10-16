@@ -58,6 +58,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
   : Subscriptor()
   , indices_are_initialized(false)
   , mapping_is_initialized(false)
+  , level_mg_handler(numbers::invalid_unsigned_int)
 {}
 
 
@@ -249,6 +250,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
   task_info                 = v.task_info;
   indices_are_initialized   = v.indices_are_initialized;
   mapping_is_initialized    = v.mapping_is_initialized;
+  level_mg_handler          = v.level_mg_handler;
 }
 
 
@@ -265,6 +267,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
+  // Store the level of the mesh to be worked on.
+  this->level_mg_handler = additional_data.level_mg_handler;
+
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
   {
@@ -425,6 +430,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
+  // Store the level of the mesh to be worked on.
+  this->level_mg_handler = additional_data.level_mg_handler;
+
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
   {

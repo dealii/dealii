@@ -1602,6 +1602,12 @@ public:
   mapping_initialized() const;
 
   /**
+   * Return the level of the mesh to be worked on.
+   */
+  unsigned int
+  get_level_mg_handler() const;
+
+  /**
    * Return an approximation of the memory consumption of this class in
    * bytes.
    */
@@ -1928,6 +1934,11 @@ private:
    */
   mutable std::list<std::pair<bool, AlignedVector<Number>>>
     scratch_pad_non_threadsafe;
+
+  /**
+   * Stored the level of the mesh to be worked on.
+   */
+  unsigned int level_mg_handler;
 };
 
 
@@ -2478,6 +2489,14 @@ inline bool
 MatrixFree<dim, Number, VectorizedArrayType>::mapping_initialized() const
 {
   return mapping_is_initialized;
+}
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+inline unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_level_mg_handler() const
+{
+  return level_mg_handler;
 }
 
 
