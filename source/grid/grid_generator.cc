@@ -827,7 +827,7 @@ namespace GridGenerator
           cell->set_all_manifold_ids(2);
       }
     tria.set_all_manifold_ids_on_boundary(1);
-    tria.set_manifold(1, TorusManifold<3>(2, 0.5));
+    tria.set_manifold(1, TorusManifold<3>(R, r));
     tria.set_manifold(2,
                       CylindricalManifold<3>(Tensor<1, 3>({0., 1., 0.}),
                                              Point<3>()));
