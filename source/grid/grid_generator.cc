@@ -749,12 +749,17 @@ namespace GridGenerator
                 ExcMessage("Invalid angle phi specified."));
 
     // the first 8 vertices are in the x-y-plane
-    Point<3> const p                = Point<3>(R, 0.0, 0.0);
-    double const   a                = 1. / (1 + std::sqrt(2.0));
-    unsigned int   additional_layer = 0; // torus is closed (angle of 2*pi)
-    if (phi < 2.0 * numbers::PI - 1.0e-15)
-      additional_layer = 1; // indicates "open" torus with angle < 2*pi
-    std::vector<Point<3>> vertices(8 * (n_cells_toroidal + additional_layer));
+    Point<3> const p = Point<3>(R, 0.0, 0.0);
+    double const   a = 1. / (1 + std::sqrt(2.0));
+    // A value of 1 indicates "open" torus with angle < 2*pi, which
+    // means that we need an additional layer of vertices
+    const unsigned int additional_layer =
+      (phi < 2.0 * numbers::PI - 1.0e-15) ?
+        1 :
+        0; // torus is closed (angle of 2*pi)
+    const unsigned int n_point_layers_toroidal =
+      n_cells_toroidal + additional_layer;
+    std::vector<Point<3>> vertices(8 * n_point_layers_toroidal);
     vertices[0] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0)),
     vertices[1] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0)),
     vertices[2] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0) * a),
@@ -767,7 +772,7 @@ namespace GridGenerator
     // create remaining vertices by rotating around negative y-axis (the
     // direction is to ensure positive cell measures)
     double const phi_cell = phi / n_cells_toroidal;
-    for (unsigned int c = 1; c < n_cells_toroidal + additional_layer; ++c)
+    for (unsigned int c = 1; c < n_point_layers_toroidal; ++c)
       {
         for (unsigned int v = 0; v < 8; ++v)
           {
@@ -784,8 +789,8 @@ namespace GridGenerator
       {
         for (unsigned int j = 0; j < 2; ++j)
           {
-            unsigned int offset =
-              (8 * (c + j)) % (8 * (n_cells_toroidal + additional_layer));
+            const unsigned int offset =
+              (8 * (c + j)) % (8 * n_point_layers_toroidal);
 
             // cell 0 in x-y-plane
             cells[5 * c].vertices[0 + j * 4] = offset + 0;
@@ -815,7 +820,7 @@ namespace GridGenerator
           }
 
         cells[5 * c].material_id = 0;
-        // cell on torus centerline
+        // mark cell on torus centerline
         cells[5 * c + 1].material_id = 1;
         cells[5 * c + 2].material_id = 0;
         cells[5 * c + 3].material_id = 0;
