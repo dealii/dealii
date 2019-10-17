@@ -280,7 +280,7 @@ test(const unsigned int n_ref = 0)
         mg_additional_data;
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, LevelNumberType>::AdditionalData::partition_color;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level = level;
       mg_additional_data.mapping_update_flags =
         update_values | update_gradients | update_JxW_values |
         update_quadrature_points;

@@ -135,7 +135,7 @@ test()
               .cell_vectorization_category[cell->index()] = cell->material_id();
           }
 
-      mg_additional_data[level].level_mg_handler = level;
+      mg_additional_data[level].mg_level = level;
     }
 
   std::vector<std::shared_ptr<MatrixFree<dim, float>>> mg_mf_data(max_level +

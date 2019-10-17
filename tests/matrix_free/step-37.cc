@@ -218,7 +218,7 @@ namespace Step37
     typename MatrixFree<dim, number>::AdditionalData additional_data;
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::partition_color;
-    additional_data.level_mg_handler = level;
+    additional_data.mg_level = level;
     additional_data.mapping_update_flags =
       (update_gradients | update_JxW_values | update_quadrature_points);
     data.reinit(dof_handler,

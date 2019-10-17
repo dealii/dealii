@@ -70,7 +70,7 @@ public:
     typename MatrixFree<dim, number>::AdditionalData addit_data;
     addit_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::none;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level = level;
 
     // extract the constraints due to Dirichlet boundary conditions
     AffineConstraints<double>                           constraints;

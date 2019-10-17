@@ -58,7 +58,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
   : Subscriptor()
   , indices_are_initialized(false)
   , mapping_is_initialized(false)
-  , level_mg_handler(numbers::invalid_unsigned_int)
+  , mg_level(numbers::invalid_unsigned_int)
 {}
 
 
@@ -250,7 +250,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
   task_info                 = v.task_info;
   indices_are_initialized   = v.indices_are_initialized;
   mapping_is_initialized    = v.mapping_is_initialized;
-  level_mg_handler          = v.level_mg_handler;
+  mg_level                  = v.mg_level;
 }
 
 
@@ -268,7 +268,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
     &additional_data)
 {
   // Store the level of the mesh to be worked on.
-  this->level_mg_handler = additional_data.level_mg_handler;
+  this->mg_level = additional_data.mg_level;
 
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
@@ -431,7 +431,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
     &additional_data)
 {
   // Store the level of the mesh to be worked on.
-  this->level_mg_handler = additional_data.level_mg_handler;
+  this->mg_level = additional_data.mg_level;
 
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
@@ -658,7 +658,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 {
   cell_level_index.clear();
   dof_handlers.active_dof_handler = DoFHandlers::usual;
-  dof_handlers.level              = additional_data.level_mg_handler;
+  dof_handlers.level              = additional_data.mg_level;
   dof_handlers.n_dof_handlers     = dof_handler.size();
   dof_handlers.dof_handler.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
@@ -676,7 +676,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 
   const Triangulation<dim> &tria =
     dof_handlers.dof_handler[0]->get_triangulation();
-  const unsigned int level = additional_data.level_mg_handler;
+  const unsigned int level = additional_data.mg_level;
   if (level == numbers::invalid_unsigned_int)
     {
       if (n_mpi_procs == 1)
@@ -727,7 +727,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 {
   cell_level_index.clear();
   dof_handlers.active_dof_handler = DoFHandlers::hp;
-  dof_handlers.level              = additional_data.level_mg_handler;
+  dof_handlers.level              = additional_data.mg_level;
   Assert(dof_handlers.level == numbers::invalid_unsigned_int,
          ExcNotImplemented());
   dof_handlers.n_dof_handlers = dof_handler.size();
@@ -1039,19 +1039,18 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     for (unsigned int no = 0; no < n_fe; ++no)
       {
         if (do_face_integrals &&
-            additional_data.level_mg_handler != numbers::invalid_unsigned_int)
+            additional_data.mg_level != numbers::invalid_unsigned_int)
           {
             // in case of adaptivity, go through the cells on the next finer
             // level and check whether we need to get read access to some of
             // those entries for the mg flux matrices
             const DoFHandler<dim> &dof_handler = *dof_handlers.dof_handler[no];
             std::vector<types::global_dof_index> dof_indices;
-            if (additional_data.level_mg_handler + 1 <
+            if (additional_data.mg_level + 1 <
                 dof_handler.get_triangulation().n_global_levels())
               for (typename DoFHandler<dim>::cell_iterator cell =
-                     dof_handler.begin(additional_data.level_mg_handler + 1);
-                   cell !=
-                   dof_handler.end(additional_data.level_mg_handler + 1);
+                     dof_handler.begin(additional_data.mg_level + 1);
+                   cell != dof_handler.end(additional_data.mg_level + 1);
                    ++cell)
                 if (cell->level_subdomain_id() == task_info.my_pid)
                   for (unsigned int f = 0;

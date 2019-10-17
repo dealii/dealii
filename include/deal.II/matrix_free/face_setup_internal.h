@@ -171,7 +171,7 @@ namespace internal
       std::vector<std::pair<unsigned int, unsigned int>> &cell_levels)
     {
       use_active_cells =
-        additional_data.level_mg_handler == numbers::invalid_unsigned_int;
+        additional_data.mg_level == numbers::invalid_unsigned_int;
 
 #  ifdef DEBUG
       // safety check
@@ -582,7 +582,7 @@ namespace internal
               // inside the domain in case of multigrid separately
               else if ((dcell->at_boundary(f) == false ||
                         dcell->has_periodic_neighbor(f)) &&
-                       additional_data.level_mg_handler !=
+                       additional_data.mg_level !=
                          numbers::invalid_unsigned_int &&
                        dcell->neighbor_or_periodic_neighbor(f)->level() <
                          dcell->level())

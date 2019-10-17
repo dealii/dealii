@@ -338,7 +338,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       std::vector<AffineConstraints<double>> level_constraints(dof.size());
       std::vector<const AffineConstraints<double> *> level_constraints_ptrs(
