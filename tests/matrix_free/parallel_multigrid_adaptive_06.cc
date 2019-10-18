@@ -311,7 +311,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;

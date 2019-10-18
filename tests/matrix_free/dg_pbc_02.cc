@@ -97,7 +97,7 @@ test()
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     {
       MatrixFree<dim> mf_data;
-      data.level_mg_handler = level;
+      data.mg_level = level;
       mf_data.reinit(dof, constraints, quad, data);
       std::vector<unsigned int> n_inner_faces(2 * dim),
         n_inner_other_faces(2 * dim), n_boundary_faces(2 * dim);

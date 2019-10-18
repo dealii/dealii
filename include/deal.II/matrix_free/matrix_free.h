@@ -166,10 +166,10 @@ public:
    * local time stepping where one would like to control which elements
    * together form a batch of cells. The array `cell_vectorization_categories`
    * is accessed by the number given by cell->active_cell_index() when working
-   * on the active cells with `level_mg_handler` set to `-1` and by
-   * cell->index() for the level cells. By default, the different categories
-   * in `cell_vectorization_category` can be mixed and the algorithm is
-   * allowed to merge lower category numbers with the next higher categories
+   * on the active cells with `mg_level` set to `numbers::invalid_unsigned_int`
+   * and by cell->index() for the level cells. By default, the different
+   * categories in `cell_vectorization_category` can be mixed and the algorithm
+   * is allowed to merge lower category numbers with the next higher categories
    * if it is necessary inside the algorithm, in order to avoid partially
    * filled SIMD lanes as much as possible. This gives a better utilization of
    * the vectorization but might need special treatment, in particular for
@@ -218,7 +218,7 @@ public:
       const UpdateFlags  mapping_update_flags_boundary_faces = update_default,
       const UpdateFlags  mapping_update_flags_inner_faces    = update_default,
       const UpdateFlags  mapping_update_flags_faces_by_cells = update_default,
-      const unsigned int level_mg_handler    = numbers::invalid_unsigned_int,
+      const unsigned int mg_level            = numbers::invalid_unsigned_int,
       const bool         store_plain_indices = true,
       const bool         initialize_indices  = true,
       const bool         initialize_mapping  = true,
@@ -231,7 +231,8 @@ public:
       , mapping_update_flags_boundary_faces(mapping_update_flags_boundary_faces)
       , mapping_update_flags_inner_faces(mapping_update_flags_inner_faces)
       , mapping_update_flags_faces_by_cells(mapping_update_flags_faces_by_cells)
-      , level_mg_handler(level_mg_handler)
+      , mg_level(mg_level)
+      , level_mg_handler(this->mg_level)
       , store_plain_indices(store_plain_indices)
       , initialize_indices(initialize_indices)
       , initialize_mapping(initialize_mapping)
@@ -381,7 +382,14 @@ public:
      * to work on a level, its dofs must be distributed by using
      * <code>dof_handler.distribute_mg_dofs(fe);</code>.
      */
-    unsigned int level_mg_handler;
+    unsigned int mg_level;
+
+    /**
+     * Alias for mg_level
+     *
+     * @deprecated Use mg_level instead.
+     */
+    DEAL_II_DEPRECATED unsigned int &level_mg_handler;
 
     /**
      * Controls whether to allow reading from vectors without resolving
@@ -442,7 +450,7 @@ public:
      * control which elements together form a batch of cells.
      *
      * This array is accessed by the number given by cell->active_cell_index()
-     * when working on the active cells with @p level_mg_handler set to -1 and
+     * when working on the active cells with @p mg_level set to numbers::invalid_unsigned_int and
      * by cell->index() for the level cells.
      *
      * @note This field is empty upon construction of AdditionalData. It is
@@ -1602,10 +1610,11 @@ public:
   mapping_initialized() const;
 
   /**
-   * Return the level of the mesh to be worked on.
+   * Return the level of the mesh to be worked on. Returns
+   * numbers::invalid_unsigned_int if working on active cells.
    */
   unsigned int
-  get_level_mg_handler() const;
+  get_mg_level() const;
 
   /**
    * Return an approximation of the memory consumption of this class in
@@ -1938,7 +1947,7 @@ private:
   /**
    * Stored the level of the mesh to be worked on.
    */
-  unsigned int level_mg_handler;
+  unsigned int mg_level;
 };
 
 
@@ -2494,9 +2503,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::mapping_initialized() const
 
 template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
-MatrixFree<dim, Number, VectorizedArrayType>::get_level_mg_handler() const
+MatrixFree<dim, Number, VectorizedArrayType>::get_mg_level() const
 {
-  return level_mg_handler;
+  return mg_level;
 }
 
 
@@ -2644,7 +2653,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handlers, additional_data.level_mg_handler);
+      dof_handlers, additional_data.mg_level);
 
   std::vector<hp::QCollection<1>> quad_hp;
   quad_hp.emplace_back(quad);
@@ -2678,7 +2687,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
   std::vector<IndexSet> locally_owned_sets =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handlers, additional_data.level_mg_handler);
+      dof_handlers, additional_data.mg_level);
 
   std::vector<hp::QCollection<1>> quad_hp;
   quad_hp.emplace_back(quad);
@@ -2705,7 +2714,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handler, additional_data.level_mg_handler);
+      dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<1>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);
@@ -2731,7 +2740,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handler, additional_data.level_mg_handler);
+      dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<1>> quad_hp;
   quad_hp.emplace_back(quad);
   internal_reinit(StaticMappingQ1<dim>::mapping,
@@ -2757,7 +2766,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handler, additional_data.level_mg_handler);
+      dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<1>> quad_hp;
   quad_hp.emplace_back(quad);
   internal_reinit(mapping,
@@ -2783,7 +2792,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFreeImplementation::extract_locally_owned_index_sets(
-      dof_handler, additional_data.level_mg_handler);
+      dof_handler, additional_data.mg_level);
   std::vector<hp::QCollection<1>> quad_hp;
   for (unsigned int q = 0; q < quad.size(); ++q)
     quad_hp.emplace_back(quad[q]);

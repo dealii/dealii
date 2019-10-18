@@ -109,7 +109,7 @@ test()
         mg_constraints[level].add_line(*bc_it);
       mg_constraints[level].close();
       typename MatrixFree<dim>::AdditionalData data;
-      data.level_mg_handler = level;
+      data.mg_level = level;
       mg_matrices[level].reinit(
         mapping, dof, mg_constraints[level], quad, data);
 

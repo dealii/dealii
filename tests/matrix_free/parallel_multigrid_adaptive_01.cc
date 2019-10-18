@@ -75,7 +75,7 @@ public:
     addit_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level         = level;
     AffineConstraints<double> constraints;
     if (level == numbers::invalid_unsigned_int)
       {

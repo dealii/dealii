@@ -1041,7 +1041,7 @@ namespace Step59
           (update_gradients | update_JxW_values);
         additional_data.mapping_update_flags_boundary_faces =
           (update_gradients | update_JxW_values);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         const auto mg_mf_storage_level =
           std::make_shared<MatrixFree<dim, float>>();
         mg_mf_storage_level->reinit(dof_handler,
