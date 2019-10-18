@@ -3031,6 +3031,56 @@ public:
                     const std::vector<std::string> &piece_names) const;
 
   /**
+   * This function combines DataOutInterface::write_vtu(), or
+   * DataOutInterface::write_vtu_in_parallel(), with
+   * DataOutInterface::write_pvtu_record(). It automatically constructs
+   * the filename of the generated output files and writes a pvtu file.
+   * A specified @p directory and a @p filename_without_extension
+   * form the first part of the filename. The filename is then extended with
+   * a @p counter labeling the current timestep/iteration/etc., the processor ID,
+   * and finally the .vtu/.pvtu ending. Since the number of timesteps to be
+   * written depends on the application, the number of digits to be reserved in
+   * the filename can be specified as parameter @p n_digits_for_counter, and the number
+   * is not padded with leading zeros if this parameter is left at its default
+   * value numbers::invalid_unsigned_int. If more than one file identifier
+   * is needed (e.g. time step number and iteration counter of solver), the
+   * last identifier is used as @p counter, while all other identifiers have to be
+   * added to @p filename_without_extension when calling this function. In a
+   * parallel setting, several files are typically written per time step. The
+   * number of files written in parallel depends on the number of MPI processes
+   * (see parameter @p mpi_communicator with default value MPI_COMM_WORLD), and a
+   * specified number of @p n_groups with default value 0. The background is that
+   * VTU file output supports grouping files from several CPUs into a given
+   * number of files using MPI I/O when writing on a parallel filesystem. The
+   * default value of @p n_groups is 0, meaning that every MPI rank will write one
+   * file. A value of 1 will generate one big file containing the solution over
+   * the whole domain, while a larger value will create @p n_groups files (but not
+   * more than there are MPI ranks). Note that only one processor needs to
+   * generate the .pvtu file, where processor zero is chosen to take over this
+   * job.
+   *
+   * The return value is the filename of the master file for the pvtu record.
+   *
+   * @note The code simply combines the strings @p directory and
+   * @p filename_without_extension, i.e., the user has to make sure that
+   * @p directory contains a trailing character, e.g. "/", that separates the
+   * directory from the filename.
+   *
+   * @note Use an empty string "" for the first argument if output is to be
+   * written in the current working directory.
+   *
+   * @author Niklas Fehn, Martin Kronbichler, 2019
+   */
+  std::string
+  write_vtu_with_pvtu_record(
+    const std::string &directory,
+    const std::string &filename_without_extension,
+    const unsigned int counter,
+    const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
+    const MPI_Comm &   mpi_communicator     = MPI_COMM_WORLD,
+    const unsigned int n_groups             = 0) const;
+
+  /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
    * format. See DataOutBase::write_svg.
    */
