@@ -438,13 +438,8 @@ namespace GridTools
             // loop over quadrature points
             for (unsigned int q = 0; q < quadrature.size(); ++q)
               {
-                Tensor<2, dim, double> jacobian =
+                const Tensor<2, dim, double> jacobian =
                   Tensor<2, dim, double>(fe_values.jacobian(q));
-
-                LAPACKFullMatrix<double> J = LAPACKFullMatrix<double>(dim);
-                for (unsigned int i = 0; i < dim; i++)
-                  for (unsigned int j = 0; j < dim; j++)
-                    J(i, j) = jacobian[i][j];
 
                 // We intentionally do not want to throw an exception in case of
                 // inverted elements since this is not the task of this
@@ -456,12 +451,22 @@ namespace GridTools
                   }
                 else
                   {
+                    LAPACKFullMatrix<double> J = LAPACKFullMatrix<double>(dim);
+                    for (unsigned int i = 0; i < dim; i++)
+                      for (unsigned int j = 0; j < dim; j++)
+                        J(i, j) = jacobian[i][j];
+
                     J.compute_svd();
 
                     double const max_sv = J.singular_value(0);
                     double const min_sv = J.singular_value(dim - 1);
                     double const ar     = max_sv / min_sv;
 
+                    // Take the max between the previous and the current
+                    // aspect ratio value; if we had previously encountered
+                    // an inverted cell, we will have placed an infinity
+                    // in the aspect_ratio_cell variable, and that value
+                    // will survive this max operation.
                     aspect_ratio_cell = std::max(aspect_ratio_cell, ar);
                   }
               }
@@ -473,6 +478,8 @@ namespace GridTools
 
     return aspect_ratio_vector;
   }
+
+
 
   template <int dim>
   double
@@ -487,6 +494,7 @@ namespace GridTools
                                              aspect_ratio_vector,
                                              VectorTools::Linfty_norm);
   }
+
 
 
   template <int dim, int spacedim>
