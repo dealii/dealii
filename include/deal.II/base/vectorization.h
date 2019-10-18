@@ -259,6 +259,7 @@ public:
  * numbers in this field to zero. This class is of standard layout type
  * according to the C++11 standard, which means that there is an equivalent C
  * representation and the class can e.g. be safely copied with std::memcpy.
+ * (See also https://en.cppreference.com/w/cpp/named_req/StandardLayoutType.)
  * The standard layout is also necessary for ensuring correct alignment of
  * data with address boundaries when collected in a vector (i.e., when the
  * first element in a vector is properly aligned, all subsequent elements will
