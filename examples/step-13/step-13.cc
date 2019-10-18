@@ -795,7 +795,7 @@ namespace Step13
       // the lambda function. The fixed values are passed into the lambda
       // function using the capture list (`[...]`). It is possible to use a
       // capture default or to list all the variables that are to be bound to
-      // the lambda explicitly. For the sake of clarity we decided to to omit
+      // the lambda explicitly. For the sake of clarity we decided to omit
       // the capture default here, but that capture list could equally well be
       // `[&]` meaning that all used variables are copied into the lambda by
       // reference.
