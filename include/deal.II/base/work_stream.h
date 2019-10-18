@@ -929,8 +929,16 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
-   * a more efficient algorithm is used internally.
+   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * a more efficient algorithm is used internally. It is important, however,
+   * to recognize that the empty function object created above is *not*
+   * the same as a lambda function with an empty body,
+   * `[](const CopyData &) {}` -- from the perspective of this function,
+   * there is no way to recognize whether a lambda function provided as
+   * a copier does something or does not do something in its body,
+   * and so it needs to be copied. On the other hand, a default-constructed
+   * `std::function` object *can* be recognized, and is then used to select
+   * a more efficient algorithm.
    */
   template <typename Worker,
             typename Copier,
@@ -982,8 +990,16 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
-   * a more efficient algorithm is used internally.
+   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * a more efficient algorithm is used internally. It is important, however,
+   * to recognize that the empty function object created above is *not*
+   * the same as a lambda function with an empty body,
+   * `[](const CopyData &) {}` -- from the perspective of this function,
+   * there is no way to recognize whether a lambda function provided as
+   * a copier does something or does not do something in its body,
+   * and so it needs to be copied. On the other hand, a default-constructed
+   * `std::function` object *can* be recognized, and is then used to select
+   * a more efficient algorithm.
    */
   template <typename Worker,
             typename Copier,
@@ -1276,8 +1292,16 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
-   * a more efficient algorithm is used internally.
+   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * a more efficient algorithm is used internally. It is important, however,
+   * to recognize that the empty function object created above is *not*
+   * the same as a lambda function with an empty body,
+   * `[](const CopyData &) {}` -- from the perspective of this function,
+   * there is no way to recognize whether a lambda function provided as
+   * a copier does something or does not do something in its body,
+   * and so it needs to be copied. On the other hand, a default-constructed
+   * `std::function` object *can* be recognized, and is then used to select
+   * a more efficient algorithm.
    */
   template <typename MainClass,
             typename Iterator,
