@@ -466,20 +466,13 @@ namespace Utilities
   unsigned int
   needed_digits(const unsigned int max_number)
   {
-    if (max_number < 10)
+    if (max_number > 0)
+      return static_cast<int>(
+        std::ceil(std::log10(std::fabs(max_number + 0.1))));
+    else
       return 1;
-    if (max_number < 100)
-      return 2;
-    if (max_number < 1000)
-      return 3;
-    if (max_number < 10000)
-      return 4;
-    if (max_number < 100000)
-      return 5;
-    if (max_number < 1000000)
-      return 6;
-    AssertThrow(false, ExcInvalidNumber(max_number));
-    return 0;
+
+    return 1;
   }
 
 
