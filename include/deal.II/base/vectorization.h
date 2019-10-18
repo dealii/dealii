@@ -99,7 +99,7 @@ public:
    * @param data The actual VectorizedArray.
    * @param lane A pointer to the current lane.
    */
-  VectorizedArrayIterator(T &data, unsigned int lane)
+  VectorizedArrayIterator(T &data, const unsigned int lane)
     : data(data)
     , lane(lane)
   {}
@@ -162,11 +162,13 @@ private:
 
 
 /**
- * A base class for the VectorizedArray specialization, containing common
- * functionalities.
+ * A base class for the various VectorizedArray template specializations,
+ * containing common functionalities.
  *
- * @tparam Type of the actual vectorized array. We are using CRTP to prevent
- * the usage of the virtual keyword.
+ * @tparam T Type of the actual vectorized array. We are using the
+ *   Couriously Recurring Template Pattern (see
+ *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in this
+ *   class to avoid having to resort to `virtual` member functions.
  *
  * @author Peter Munch, 2019
  */
@@ -194,6 +196,16 @@ public:
   }
 
   /**
+   * @return An iterator pointing to the beginning of the underlying data (`const`
+   * version).
+   */
+  VectorizedArrayIterator<const T>
+  begin() const
+  {
+    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
+  }
+
+  /**
    * @return An iterator pointing to the end of the underlying data.
    */
   VectorizedArrayIterator<T>
@@ -204,17 +216,7 @@ public:
   }
 
   /**
-   * @return An iterator pointing to the beginning of the underlying data (const
-   * version).
-   */
-  VectorizedArrayIterator<const T>
-  begin() const
-  {
-    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
-  }
-
-  /**
-   * @return An iterator pointing to the end of the underlying data (const
+   * @return An iterator pointing to the end of the underlying data (`const`
    * version).
    */
   VectorizedArrayIterator<const T>
