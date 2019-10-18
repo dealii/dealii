@@ -208,6 +208,59 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
+  const unsigned int face_batch_number,
+  const unsigned int vector_number,
+  const bool         interior,
+  const unsigned int fe_component) const
+{
+  AssertIndexRange(fe_component, dof_handlers.n_dof_handlers);
+  if (interior)
+    {
+      AssertIndexRange(face_batch_number, n_ghost_inner_face_batches());
+    }
+  else
+    {
+      AssertIndexRange(face_batch_number, n_inner_face_batches());
+    }
+
+  AssertIndexRange(vector_number,
+                   n_active_entries_per_face_batch(face_batch_number));
+
+  const DoFHandler<dim> *dofh = nullptr;
+  if (dof_handlers.active_dof_handler == DoFHandlers::usual)
+    {
+      AssertDimension(dof_handlers.dof_handler.size(),
+                      dof_handlers.n_dof_handlers);
+      dofh = dof_handlers.dof_handler[fe_component];
+    }
+  else
+    {
+      Assert(false,
+             ExcMessage("Cannot return DoFHandler<dim>::cell_iterator "
+                        "for underlying DoFHandler!"));
+    }
+
+  const internal::MatrixFreeFunctions::FaceToCellTopology<
+    VectorizedArrayType::n_array_elements>
+    face2cell_info = get_face_info(face_batch_number);
+
+  const unsigned int cell_index =
+    interior ? face2cell_info.cells_interior[vector_number] :
+               face2cell_info.cells_exterior[vector_number];
+
+  std::pair<unsigned int, unsigned int> index = cell_level_index[cell_index];
+
+  return {typename DoFHandler<dim>::cell_iterator(
+            &dofh->get_triangulation(), index.first, index.second, dofh),
+          interior ? face2cell_info.interior_face_no :
+                     face2cell_info.exterior_face_no};
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 typename hp::DoFHandler<dim>::active_cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int macro_cell_number,

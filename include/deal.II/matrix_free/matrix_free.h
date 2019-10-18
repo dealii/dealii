@@ -1473,6 +1473,24 @@ public:
                            const unsigned int vector_number) const;
 
   /**
+   * Return the cell iterator in deal.II speak to a interior/exterior cell of
+   * given face  in the renumbering of this structure. The second element
+   * of the pair is the face number so that the face iterator can be accessed:
+   * pair.first()->face(pair.second() );
+   *
+   * Note that the face iterators in deal.II go through cells differently to
+   * what the face/boundary loop of this class does. This is because several
+   * faces are worked on together (vectorization), and since faces with neighbor
+   * cells on different MPI processors need to be accessed at a certain time
+   * when accessing remote data and overlapping communication with computation.
+   */
+  std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>
+  get_face_iterator(const unsigned int face_batch_number,
+                    const unsigned int vector_number,
+                    const bool         interior     = true,
+                    const unsigned int fe_component = 0) const;
+
+  /**
    * This returns the cell iterator in deal.II speak to a given cell in the
    * renumbering of this structure. This function returns an exception in case
    * the structure was not constructed based on an hp::DoFHandler.
