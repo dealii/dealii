@@ -275,9 +275,9 @@ namespace GridGenerator
         parse_and_create<3, 3, unsigned int, unsigned int, double, double>(
           moebius, arguments, tria);
       else if (name == "torus")
-        parse_and_create<3, 3, double, double, unsigned int>(torus,
-                                                             arguments,
-                                                             tria);
+        parse_and_create<3, 3, double, double, unsigned int, double>(torus,
+                                                                     arguments,
+                                                                     tria);
       else
         {
           return false;
@@ -296,9 +296,9 @@ namespace GridGenerator
                      Triangulation<2, 3> &tria)
     {
       if (name == "torus")
-        parse_and_create<2, 3, double, double, unsigned int>(torus,
-                                                             arguments,
-                                                             tria);
+        parse_and_create<2, 3, double, double, unsigned int, double>(torus,
+                                                                     arguments,
+                                                                     tria);
       else
         {
           return false;

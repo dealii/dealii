@@ -1188,6 +1188,13 @@ namespace GridGenerator
    * @param n_cells_toroidal Optional argument to set the number of cell
    * layers in toroidal direction. The default is 6 cell layers.
    *
+   * @param phi Optional argument to generate an open torus with angle
+   * $0 < \varphi <= 2 \pi$. The default value is $2 \pi$,
+   * in which case a closed torus is generated. If the torus is open,
+   * the torus is cut at two planes perpendicular to the torus centerline.
+   * The center of these two planes are located at $(x_1, y_1, z_1) = (R, 0, 0)$
+   * and $(x_2, y_2, z_2) = (R \cos(\varphi), 0, R \sin(\varphi))$.
+   *
    * @note Implemented for Triangulation<2,3> and Triangulation<3,3>.
    */
   template <int dim, int spacedim>
@@ -1195,7 +1202,8 @@ namespace GridGenerator
   torus(Triangulation<dim, spacedim> &tria,
         const double                  R,
         const double                  r,
-        const unsigned int            n_cells_toroidal = 6);
+        const unsigned int            n_cells_toroidal = 6,
+        const double                  phi              = 2.0 * numbers::PI);
 
   /**
    * This function produces a square in the <i>xy</i>-plane with a cylindrical
