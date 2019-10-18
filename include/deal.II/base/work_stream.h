@@ -152,11 +152,6 @@ namespace WorkStream
 
   namespace internal
   {
-    // TODO: The following classes all use std::shared_ptr, but the
-    //  correct pointer class would actually be std::unique_ptr. make this
-    //  replacement whenever we have a class that provides these semantics
-    //  and that is available also as a fall-back whenever via boost or similar
-
     /**
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the second
@@ -193,7 +188,7 @@ namespace WorkStream
            */
           struct ScratchDataObject
           {
-            std::shared_ptr<ScratchData> scratch_data;
+            std::unique_ptr<ScratchData> scratch_data;
             bool                         currently_in_use;
 
             /**
@@ -208,20 +203,7 @@ namespace WorkStream
               , currently_in_use(in_use)
             {}
 
-            // TODO: when we push back an object to the list of scratch objects,
-            // in
-            //  Worker::operator(), we first create an object and then copy
-            //  it to the end of this list. this involves having two objects
-            //      of the current type having pointers to it, each with their
-            //      own currently_in_use flag. there is probably little harm in
-            //      this because the original one goes out of scope right away
-            //      again, but it's certainly awkward. one way to avoid this
-            //      would be to use unique_ptr but we'd need to figure out a way
-            //      to use it in non-C++11 mode
-            ScratchDataObject(const ScratchDataObject &o)
-              : scratch_data(o.scratch_data)
-              , currently_in_use(o.currently_in_use)
-            {}
+            ScratchDataObject(ScratchDataObject &&o) noexcept = default;
           };
 
 
@@ -274,7 +256,7 @@ namespace WorkStream
            *
            * The pointers to scratch objects stored in each of these lists
            * must be so that they are deleted on all threads when the thread
-           * local object is destroyed. This is achieved by using shared_ptr.
+           * local object is destroyed. This is achieved by using unique_ptr.
            *
            * Note that when a worker needs to create a scratch object, it
            * allocates it using sample_scratch_data to copy from. This has the
@@ -432,7 +414,7 @@ namespace WorkStream
          *
          * The pointers to scratch objects stored in each of these lists must
          * be so that they are deleted on all threads when the thread local
-         * object is destroyed. This is achieved by using shared_ptr.
+         * object is destroyed. This is achieved by using unique_ptr.
          *
          * Note that when a worker needs to create a scratch object, it
          * allocates it using sample_scratch_data to copy from. This has the
@@ -536,7 +518,7 @@ namespace WorkStream
 
                 typename ItemType::ScratchDataList::value_type
                   new_scratch_object(scratch_data, true);
-                scratch_data_list.push_back(new_scratch_object);
+                scratch_data_list.push_back(std::move(new_scratch_object));
               }
           }
 
@@ -701,8 +683,8 @@ namespace WorkStream
       template <typename Iterator, typename ScratchData, typename CopyData>
       struct ScratchAndCopyDataObjects
       {
-        std::shared_ptr<ScratchData> scratch_data;
-        std::shared_ptr<CopyData>    copy_data;
+        std::unique_ptr<ScratchData> scratch_data;
+        std::unique_ptr<CopyData>    copy_data;
         bool                         currently_in_use;
 
         /**
