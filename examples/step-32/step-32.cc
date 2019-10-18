@@ -2728,7 +2728,7 @@ namespace Step32
                                              data);
       };
 
-    auto copier = [=](const Assembly::CopyData::TemperatureRHS<dim> &data) {
+    auto copier = [this](const Assembly::CopyData::TemperatureRHS<dim> &data) {
       this->copy_local_to_global_temperature_rhs(data);
     };
 

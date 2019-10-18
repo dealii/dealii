@@ -2201,7 +2201,8 @@ namespace Step14
           cell, scratch_data, copy_data, error_indicators, face_integrals);
       };
 
-      auto copier = std::function<void(const WeightedResidualCopyData &)>();
+      auto do_nothing_copier =
+        std::function<void(const WeightedResidualCopyData &)>();
 
       // Then hand it all off to WorkStream::run() to compute the
       // estimators for all cells in parallel:
@@ -2209,7 +2210,7 @@ namespace Step14
         DualSolver<dim>::dof_handler.begin_active(),
         DualSolver<dim>::dof_handler.end(),
         worker,
-        copier,
+        do_nothing_copier,
         WeightedResidualScratchData(*DualSolver<dim>::fe,
                                     *DualSolver<dim>::quadrature,
                                     *DualSolver<dim>::face_quadrature,

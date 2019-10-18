@@ -797,7 +797,7 @@ namespace Step13
       // capture default or to list all the variables that are to be bound to
       // the lambda explicitly. For the sake of clarity we decided to omit
       // the capture default here, but that capture list could equally well be
-      // `[&]` meaning that all used variables are copied into the lambda by
+      // `[&]`, meaning that all used variables are copied into the lambda by
       // reference.
       //
       // At this point, we have assembled the matrix and condensed
