@@ -174,9 +174,25 @@ namespace Utilities
   /**
    * Determine how many digits are needed to represent numbers at most as
    * large as the given number.
+   *
+   * @author Niklas Fehn, 2019
    */
   unsigned int
   needed_digits(const unsigned int max_number);
+
+  /**
+   * This function allows to cut off a floating point number @p number
+   * after @p n_digits of accuracy, i.e., after @p n_digits decimal places
+   * in scientific floating point notation. When interpreted as rounding
+   * operation, this function reduces the absolute value of a floating point
+   * number and always rounds towards zero, since decimal places are simply
+   * cut off.
+   *
+   * @author Niklas Fehn, 2019
+   */
+  template <typename Number>
+  Number
+  truncate_to_n_digits(const Number number, const unsigned int n_digits);
 
   /**
    * Given a string, convert it to an integer. Throw an assertion if that is

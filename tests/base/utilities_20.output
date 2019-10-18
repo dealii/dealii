@@ -1,0 +1,21 @@
+
+DEAL::
+DEAL::number = 1.234568e+05
+DEAL::number_1digit = 1.000000e+05
+DEAL::number_2digit = 1.200000e+05
+DEAL::number_3digit = 1.230000e+05
+DEAL::
+DEAL::number = 1.000000e+00
+DEAL::number_1digit = 9.000000e-01
+DEAL::number_2digit = 9.900000e-01
+DEAL::number_3digit = 9.990000e-01
+DEAL::
+DEAL::number = 0.000000e+00
+DEAL::number_1digit = 0.000000e+00
+DEAL::number_2digit = 0.000000e+00
+DEAL::number_3digit = 0.000000e+00
+DEAL::
+DEAL::number = -9.876543e-06
+DEAL::number_1digit = -9.000000e-06
+DEAL::number_2digit = -9.800000e-06
+DEAL::number_3digit = -9.870000e-06
