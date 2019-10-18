@@ -469,8 +469,6 @@ namespace Utilities
     if (max_number > 0)
       return static_cast<int>(
         std::ceil(std::log10(std::fabs(max_number + 0.1))));
-    else
-      return 1;
 
     return 1;
   }
