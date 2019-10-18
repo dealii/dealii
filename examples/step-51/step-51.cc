@@ -1035,7 +1035,7 @@ namespace Step51
                unsigned int &                                        data) {
           this->postprocess_one_cell(cell, scratch, data);
         },
-        [](const unsigned int &) {},
+        std::function<void(const unsigned int &)>(),
         scratch,
         0U);
     }
