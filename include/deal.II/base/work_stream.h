@@ -927,6 +927,10 @@ namespace WorkStream
    * copies of the <tt>ScratchData</tt> object and
    * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
    * are generated.
+   *
+   * @note In case the copier does not do anything, pass
+   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
+   * a more efficient algorithm is used internally.
    */
   template <typename Worker,
             typename Copier,
@@ -976,6 +980,10 @@ namespace WorkStream
    * copies of the <tt>ScratchData</tt> object and
    * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
    * are generated.
+   *
+   * @note In case the copier does not do anything, pass
+   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
+   * a more efficient algorithm is used internally.
    */
   template <typename Worker,
             typename Copier,
@@ -1266,6 +1274,10 @@ namespace WorkStream
    * copies of the <tt>ScratchData</tt> object and
    * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
    * are generated.
+   *
+   * @note In case the copier does not do anything, pass
+   * <code>std::function<void(const CopyData&)>()</code> as @p copier to make sure
+   * a more efficient algorithm is used internally.
    */
   template <typename MainClass,
             typename Iterator,
