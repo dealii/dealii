@@ -7560,8 +7560,11 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   const unsigned int n_files_written =
     (n_groups == 0 || n_groups > n_ranks) ? n_ranks : n_groups;
 
+  Assert(n_files_written >= 1, ExcInternalError());
+  // the "-1" is needed since we use C++ style counting starting with 0, so
+  // writing 10 files means the filename runs from 0 to 9
   const unsigned int n_digits =
-    static_cast<int>(std::ceil(std::log10(std::fabs(n_files_written))));
+    Utilities::needed_digits(std::max(0, int(n_files_written) - 1));
 
   const unsigned int color = rank % n_files_written;
   const std::string  filename =
