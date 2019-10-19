@@ -192,13 +192,13 @@ namespace Utilities
             for (const auto &rank_pair : buffers)
               {
                 request.push_back(MPI_Request());
-                const auto ierr = MPI_Isend(rank_pair.second.data(),
-                                            rank_pair.second.size() * 2,
-                                            DEAL_II_DOF_INDEX_MPI_TYPE,
-                                            rank_pair.first,
-                                            tag_setup,
-                                            comm,
-                                            &request.back());
+                const int ierr = MPI_Isend(rank_pair.second.data(),
+                                           rank_pair.second.size() * 2,
+                                           DEAL_II_DOF_INDEX_MPI_TYPE,
+                                           rank_pair.first,
+                                           tag_setup,
+                                           comm,
+                                           &request.back());
                 AssertThrowMPI(ierr);
               }
 
@@ -270,9 +270,14 @@ namespace Utilities
                      ExcInternalError());
 
             // 5) make sure that all messages have been sent
-            const auto ierr =
-              MPI_Waitall(request.size(), request.data(), MPI_STATUSES_IGNORE);
-            AssertThrowMPI(ierr);
+            if (request.size() > 0)
+              {
+                const int ierr = MPI_Waitall(request.size(),
+                                             request.data(),
+                                             MPI_STATUSES_IGNORE);
+                AssertThrowMPI(ierr);
+              }
+
 #else
             (void)owned_indices;
             (void)comm;
@@ -743,9 +748,13 @@ namespace Utilities
               }
 
             if (send_requests.size() > 0)
-              MPI_Waitall(send_requests.size(),
-                          send_requests.data(),
-                          MPI_STATUSES_IGNORE);
+              {
+                const auto ierr = MPI_Waitall(send_requests.size(),
+                                              send_requests.data(),
+                                              MPI_STATUSES_IGNORE);
+                AssertThrowMPI(ierr);
+              }
+
 
 #  ifdef DEBUG
             for (const auto &it : requested_indices)
