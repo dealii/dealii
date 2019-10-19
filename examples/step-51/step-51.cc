@@ -1027,16 +1027,17 @@ namespace Step51
       PostProcessScratchData scratch(
         fe_u_post, fe_local, quadrature_formula, local_flags, flags);
 
-      WorkStream::run(dof_handler_u_post.begin_active(),
-                      dof_handler_u_post.end(),
-                      std::bind(&HDG<dim>::postprocess_one_cell,
-                                std::ref(*this),
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::function<void(const unsigned int &)>(),
-                      scratch,
-                      0U);
+      WorkStream::run(
+        dof_handler_u_post.begin_active(),
+        dof_handler_u_post.end(),
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               PostProcessScratchData &                              scratch,
+               unsigned int &                                        data) {
+          this->postprocess_one_cell(cell, scratch, data);
+        },
+        std::function<void(const unsigned int &)>(),
+        scratch,
+        0U);
     }
 
     Vector<float> difference_per_cell(triangulation.n_active_cells());

@@ -2106,19 +2106,17 @@ namespace Step32
   // specific signatures: three arguments in the first and one
   // argument in the latter case (see the documentation of the
   // WorkStream::run function for the meaning of these arguments).
-  // Note how we use the construct <code>std::bind</code> to
+  // Note how we use a lambda functions to
   // create a function object that satisfies this requirement. It uses
-  // placeholders <code>std::placeholders::_1, std::placeholders::_2,
-  // std::placeholders::_3</code> for the local assembly function that specify
-  // cell, scratch data, and copy data, as well as the placeholder
-  // <code>std::placeholders::_1</code> for the copy function that expects the
-  // data to be written into the global matrix (for placeholder
-  // arguments, also see the discussion in step-13's
-  // <code>assemble_linear_system()</code> function). On the other
+  // function arguments for the local assembly function that specify
+  // cell, scratch data, and copy data, as well as function argument
+  // for the copy function that expects the
+  // data to be written into the global matrix (also see the discussion in
+  // step-13's <code>assemble_linear_system()</code> function). On the other
   // hand, the implicit zeroth argument of member functions (namely
   // the <code>this</code> pointer of the object on which that member
   // function is to operate on) is <i>bound</i> to the
-  // <code>this</code> pointer of the current function. The
+  // <code>this</code> pointer of the current function and is captured. The
   // WorkStream::run function, as a consequence, does not need to know
   // anything about the object these functions work on.
   //
@@ -2146,27 +2144,30 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 stokes_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(), stokes_dof_handler.end()),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::local_assemble_stokes_preconditioner,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_stokes_preconditioner,
-        this,
-        std::placeholders::_1),
-      Assembly::Scratch::StokesPreconditioner<dim>(stokes_fe,
-                                                   quadrature_formula,
-                                                   mapping,
-                                                   update_JxW_values |
-                                                     update_values |
-                                                     update_gradients),
-      Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
+    auto worker =
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
+             Assembly::CopyData::StokesPreconditioner<dim> &       data) {
+        this->local_assemble_stokes_preconditioner(cell, scratch, data);
+      };
+
+    auto copier =
+      [this](const Assembly::CopyData::StokesPreconditioner<dim> &data) {
+        this->copy_local_to_global_stokes_preconditioner(data);
+      };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               stokes_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::StokesPreconditioner<dim>(
+                      stokes_fe,
+                      quadrature_formula,
+                      mapping,
+                      update_JxW_values | update_values | update_gradients),
+                    Assembly::CopyData::StokesPreconditioner<dim>(stokes_fe));
 
     stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
@@ -2339,14 +2340,14 @@ namespace Step32
       CellFilter(IteratorFilters::LocallyOwnedCell(),
                  stokes_dof_handler.begin_active()),
       CellFilter(IteratorFilters::LocallyOwnedCell(), stokes_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_stokes_system,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(&BoussinesqFlowProblem<dim>::copy_local_to_global_stokes_system,
-                this,
-                std::placeholders::_1),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::StokesSystem<dim> &                scratch,
+             Assembly::CopyData::StokesSystem<dim> &               data) {
+        this->local_assemble_stokes_system(cell, scratch, data);
+      },
+      [this](const Assembly::CopyData::StokesSystem<dim> &data) {
+        this->copy_local_to_global_stokes_system(data);
+      },
       Assembly::Scratch::StokesSystem<dim>(
         stokes_fe,
         mapping,
@@ -2453,15 +2454,14 @@ namespace Step32
                  temperature_dof_handler.begin_active()),
       CellFilter(IteratorFilters::LocallyOwnedCell(),
                  temperature_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_temperature_matrix,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_temperature_matrix,
-        this,
-        std::placeholders::_1),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             Assembly::Scratch::TemperatureMatrix<dim> &           scratch,
+             Assembly::CopyData::TemperatureMatrix<dim> &          data) {
+        this->local_assemble_temperature_matrix(cell, scratch, data);
+      },
+      [this](const Assembly::CopyData::TemperatureMatrix<dim> &data) {
+        this->copy_local_to_global_temperature_matrix(data);
+      },
       Assembly::Scratch::TemperatureMatrix<dim>(temperature_fe,
                                                 mapping,
                                                 quadrature_formula),
@@ -2716,26 +2716,31 @@ namespace Step32
     using CellFilter =
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
-    WorkStream::run(
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.begin_active()),
-      CellFilter(IteratorFilters::LocallyOwnedCell(),
-                 temperature_dof_handler.end()),
-      std::bind(&BoussinesqFlowProblem<dim>::local_assemble_temperature_rhs,
-                this,
-                global_T_range,
-                maximal_velocity,
-                global_entropy_variation,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
-      std::bind(
-        &BoussinesqFlowProblem<dim>::copy_local_to_global_temperature_rhs,
-        this,
-        std::placeholders::_1),
-      Assembly::Scratch::TemperatureRHS<dim>(
-        temperature_fe, stokes_fe, mapping, quadrature_formula),
-      Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
+    auto worker =
+      [=](const typename DoFHandler<dim>::active_cell_iterator &cell,
+          Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+          Assembly::CopyData::TemperatureRHS<dim> &             data) {
+        this->local_assemble_temperature_rhs(global_T_range,
+                                             maximal_velocity,
+                                             global_entropy_variation,
+                                             cell,
+                                             scratch,
+                                             data);
+      };
+
+    auto copier = [this](const Assembly::CopyData::TemperatureRHS<dim> &data) {
+      this->copy_local_to_global_temperature_rhs(data);
+    };
+
+    WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.begin_active()),
+                    CellFilter(IteratorFilters::LocallyOwnedCell(),
+                               temperature_dof_handler.end()),
+                    worker,
+                    copier,
+                    Assembly::Scratch::TemperatureRHS<dim>(
+                      temperature_fe, stokes_fe, mapping, quadrature_formula),
+                    Assembly::CopyData::TemperatureRHS<dim>(temperature_fe));
 
     temperature_rhs.compress(VectorOperation::add);
   }

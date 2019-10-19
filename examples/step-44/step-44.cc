@@ -2049,17 +2049,16 @@ namespace Step44
     // call to WorkStream because assemble_system_tangent_one_cell
     // is a constant function and copy_local_to_global_K is
     // non-constant.
-    WorkStream::run(dof_handler.active_cell_iterators(),
-                    std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
-                              this,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3),
-                    std::bind(&Solid<dim>::copy_local_to_global_K,
-                              this,
-                              std::placeholders::_1),
-                    scratch_data,
-                    per_task_data);
+    WorkStream::run(
+      dof_handler.active_cell_iterators(),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             ScratchData_K &                                       scratch,
+             PerTaskData_K &                                       data) {
+        this->assemble_system_tangent_one_cell(cell, scratch, data);
+      },
+      [this](const PerTaskData_K &data) { this->copy_local_to_global_K(data); },
+      scratch_data,
+      per_task_data);
 
     timer.leave_subsection();
   }
@@ -2234,17 +2233,18 @@ namespace Step44
     PerTaskData_RHS per_task_data(dofs_per_cell);
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
-    WorkStream::run(dof_handler.active_cell_iterators(),
-                    std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
-                              this,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3),
-                    std::bind(&Solid<dim>::copy_local_to_global_rhs,
-                              this,
-                              std::placeholders::_1),
-                    scratch_data,
-                    per_task_data);
+    WorkStream::run(
+      dof_handler.active_cell_iterators(),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             ScratchData_RHS &                                     scratch,
+             PerTaskData_RHS &                                     data) {
+        this->assemble_system_rhs_one_cell(cell, scratch, data);
+      },
+      [this](const PerTaskData_RHS &data) {
+        this->copy_local_to_global_rhs(data);
+      },
+      scratch_data,
+      per_task_data);
 
     timer.leave_subsection();
   }

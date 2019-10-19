@@ -955,7 +955,7 @@ namespace Step9
     WorkStream::run(dof_handler.begin_active(),
                     dof_handler.end(),
                     &GradientEstimation::template estimate_cell<dim>,
-                    [](const EstimateCopyData &) {},
+                    std::function<void(const EstimateCopyData &)>(),
                     EstimateScratchData<dim>(dof_handler.get_fe(),
                                              solution,
                                              error_per_cell),
