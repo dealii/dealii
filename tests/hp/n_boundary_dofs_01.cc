@@ -38,9 +38,9 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(3);
 
-  FE_Q<dim>           fe(2);
-  hp::FECollection    fe_coll(fe);
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  FE_Q<dim>             fe(2);
+  hp::FECollection<dim> fe_coll(fe);
+  hp::DoFHandler<dim>   dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe_coll);
 
