@@ -618,7 +618,7 @@ namespace Utilities
           get_requesters()
           {
             Assert(track_index_requests,
-                   ExcMessage("Must enable index range tracking in"
+                   ExcMessage("Must enable index range tracking in "
                               "constructor of ConsensusAlgorithmProcess"));
 
             std::map<unsigned int, dealii::IndexSet> requested_indices;
