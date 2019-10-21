@@ -117,7 +117,16 @@ public:
   CellId();
 
   /**
-   * Return a human readable string representation of this CellId.
+   * Return a human-readable string representation of this CellId.
+   *
+   * The string returned by this function consists of only ASCII characters
+   * and will look, for example, like this: `"0_3:006"`. It *can* be
+   * interpreted by humans as saying "This cell originates from the zeroth
+   * coarse mesh cell, lives on refinement level 3, and the path from the
+   * coarse mesh cell to its children and grand children is given by 006".
+   * But it is not *meant* to be interpreted in any meaningful way: It's just
+   * a way of representing the internal state of the current object using
+   * only ASCII characters in the printable range.
    */
   std::string
   to_string() const;
