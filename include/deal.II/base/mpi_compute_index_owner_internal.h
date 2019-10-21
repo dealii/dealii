@@ -759,6 +759,11 @@ namespace Utilities
               }
 #  endif
 
+            // This barrier is important to make sure that two successive calls
+            // to this functions do not overlap and we confuse messages. See the
+            // discussion in https://github.com/dealii/dealii/issues/8929
+            MPI_Barrier(comm);
+
 #endif // DEAL_II_WITH_MPI
 
             return requested_indices;
