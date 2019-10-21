@@ -244,34 +244,43 @@ namespace Utilities
       // Send myid to every process in `destinations` vector...
       std::vector<MPI_Request> send_requests(destinations.size());
       for (const auto &el : destinations)
-        MPI_Isend(&myid,
-                  1,
-                  MPI_UNSIGNED,
-                  el,
-                  32766,
-                  mpi_comm,
-                  send_requests.data() + (&el - destinations.data()));
+        {
+          const int ierr =
+            MPI_Isend(&myid,
+                      1,
+                      MPI_UNSIGNED,
+                      el,
+                      32766,
+                      mpi_comm,
+                      send_requests.data() + (&el - destinations.data()));
+          AssertThrowMPI(ierr);
+        }
 
-      // if no one to receive from, return an empty vector
-      if (n_recv_from == 0)
-        return std::vector<unsigned int>();
 
-      // ...otherwise receive `n_recv_from` times from the processes
+      // Receive `n_recv_from` times from the processes
       // who communicate with this one. Store the obtained id's
       // in the resulting vector
       std::vector<unsigned int> origins(n_recv_from);
       for (auto &el : origins)
-        MPI_Recv(&el,
-                 1,
-                 MPI_UNSIGNED,
-                 MPI_ANY_SOURCE,
-                 32766,
-                 mpi_comm,
-                 MPI_STATUS_IGNORE);
+        {
+          const int ierr = MPI_Recv(&el,
+                                    1,
+                                    MPI_UNSIGNED,
+                                    MPI_ANY_SOURCE,
+                                    32766,
+                                    mpi_comm,
+                                    MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+        }
 
-      MPI_Waitall(destinations.size(),
-                  send_requests.data(),
-                  MPI_STATUSES_IGNORE);
+
+      {
+        const int ierr = MPI_Waitall(destinations.size(),
+                                     send_requests.data(),
+                                     MPI_STATUSES_IGNORE);
+        AssertThrowMPI(ierr);
+      }
+
       return origins;
 #  else
       // let all processors communicate the maximal number of destinations
