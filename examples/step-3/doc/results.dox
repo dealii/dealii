@@ -68,27 +68,29 @@ suggestions:
   </li>
 
   <li>
-  Change the boundary condition: The code uses the <code>ZeroFunction</code>
+  Change the boundary condition: The code uses the Functions::ZeroFunction
   function to generate zero boundary conditions. However, you may want to try
-  non-zero constant boundary values using <code>ConstantFunction&lt;2&gt;
-  (1)</code> instead of <code>ZeroFunction&lt;2&gt; ()</code> to have unit
-  Dirichlet boundary values. More exotic functions are described in the
-  documentation of the <code>Functions</code> namespace, and you may pick one
-  to describe your particular boundary values.
+  non-zero constant boundary values using
+  <code>ConstantFunction&lt;2&gt;(1)</code> instead of
+  <code>ZeroFunction&lt;2&gt;()</code> to have unit Dirichlet boundary
+  values. More exotic functions are described in the documentation of the
+  Functions namespace, and you may pick one to describe your particular boundary
+  values.
   </li>
 
   <li> Modify the type of boundary condition: Presently, what happens
   is that we use Dirichlet boundary values all around, since the
   default is that all boundary parts have boundary indicator zero, and
   then we tell the
-  <code>VectorTools::interpolate_boundary_values</code> function to
+  VectorTools::interpolate_boundary_values() function to
   interpolate boundary values to zero on all boundary components with
   indicator zero.  <p> We can change this behavior if we assign parts
   of the boundary different indicators. For example, try this
-  immediately after calling <code>GridGenerator::hyper_cube</code>:
+  immediately after calling GridGenerator::hyper_cube():
   @code
   triangulation.begin_active()->face(0)->set_boundary_id(1);
   @endcode
+
   What this does is it first asks the triangulation to
   return an iterator that points to the first active cell. Of course,
   this being the coarse mesh for the triangulation of a square, the
@@ -100,7 +102,7 @@ suggestions:
   parents, i.e. even on the finest mesh, the faces on one side of the
   square have boundary indicator 1. Later, when we get to
   interpolating boundary conditions, the
-  <code>interpolate_boundary_values</code> will only produce boundary
+  VectorTools::interpolate_boundary_values() call will only produce boundary
   values for those faces that have zero boundary indicator, and leave
   those faces alone that have a different boundary indicator. What
   this then does is to impose Dirichlet boundary conditions on the
@@ -120,18 +122,14 @@ suggestions:
   @code
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-        for (unsigned int face_number = 0;
-             face_number < GeometryInfo<2>::faces_per_cell;
-             ++face_number)
-          if ((std::fabs(cell->face(face_number)->center()(1) - (-1.0)) <
-               1e-12) ||
-              (std::fabs(cell->face(face_number)->center()(1) - (1.0)) < 1e-12))
-            cell->face(face_number)->set_boundary_id(1);
+        for (auto &face : cell->face_iterators())
+          if ((std::fabs(face->center()(1) - (-1.0)) < 1e-12) ||
+              (std::fabs(face->center()(1) - (1.0)) < 1e-12))
+            face->set_boundary_id(1);
     }
-    @code
-    Although this code is significantly longer than before, it is
-    useful for complex geometries, as it does not require knowledge
-    of face labels.
+  @endcode
+  Although this code is significantly longer than before, it is useful for
+  complex geometries, as it does not require knowledge of face labels.
 
   <li>
   A slight variation of the last point would be to set different boundary
@@ -139,10 +137,10 @@ suggestions:
   boundary indicator one. In practice, what you have to do is to add a second
   call to <code>interpolate_boundary_values</code> for boundary indicator one:
   @code
-  VectorTools::interpolate_boundary_values (dof_handler,
-					    1,
-					    ConstantFunction<2>(1.),
-					    boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+					   1,
+					   ConstantFunction<2>(1.),
+					   boundary_values);
   @endcode
   If you have this call immediately after the first one to this function, then
   it will interpolate boundary values on faces with boundary indicator 1 to the
@@ -162,8 +160,8 @@ suggestions:
   following code to the <code>LaplaceProblem::output_results</code> function:
   @code
     std::cout << "Solution at (1/3,1/3): "
-              << VectorTools::point_value (dof_handler, solution,
-                                           Point<2>(1./3, 1./3))
+              << VectorTools::point_value(dof_handler, solution,
+                                          Point<2>(1./3, 1./3))
               << std::endl;
   @endcode
   For 1 through 9 global refinement steps, we then get the following sequence
