@@ -941,12 +941,12 @@ namespace Utilities
       /**
        * Buffers for sending answers to requests.
        */
-      std::vector<std::vector<T2>> request_buffers;
+      std::vector<std::unique_ptr<std::vector<T2>>> request_buffers;
 
       /**
        * Requests for sending answers to requests.
        */
-      std::vector<std::shared_ptr<MPI_Request>> request_requests;
+      std::vector<std::unique_ptr<MPI_Request>> request_requests;
 
       // request for barrier
       MPI_Request barrier_request;
