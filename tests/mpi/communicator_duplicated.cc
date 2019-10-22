@@ -35,12 +35,14 @@ test(const MPI_Comm comm)
 
   if (my_rank == 1)
     {
-      int value[3] = {1, 2, 3};
-      int dest     = 0;
+      int         value[3] = {1, 2, 3};
+      int         dest     = 0;
+      MPI_Request requests[3];
 
-      MPI_Send(&value[0], 1, MPI_UNSIGNED, dest, tag, comm);
-      MPI_Send(&value[1], 1, MPI_UNSIGNED, dest, tag, comm2);
-      MPI_Send(&value[2], 1, MPI_UNSIGNED, dest, tag, *pcomm3);
+      MPI_Isend(&value[0], 1, MPI_UNSIGNED, dest, tag, comm, &requests[0]);
+      MPI_Isend(&value[1], 1, MPI_UNSIGNED, dest, tag, comm2, &requests[1]);
+      MPI_Isend(&value[2], 1, MPI_UNSIGNED, dest, tag, *pcomm3, &requests[2]);
+      MPI_Waitall(3, requests, MPI_STATUSES_IGNORE);
     }
 
   if (my_rank == 0)
