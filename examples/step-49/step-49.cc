@@ -55,8 +55,8 @@ using namespace dealii;
 // - The number of boundary faces that use each boundary indicator, so that
 //   it can be compared with what we expect.
 //
-// Finally, the function outputs the mesh in encapsulated postscript (EPS)
-// format that can easily be visualized in the same way as was done in step-1.
+// Finally, the function outputs the mesh in VTU format that can easily be
+// visualized in Paraview or VisIt.
 template <int dim>
 void print_mesh_info(const Triangulation<dim> &triangulation,
                      const std::string &       filename)
@@ -72,7 +72,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // we then increment it):
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
-    for (auto &cell : triangulation.active_cell_iterators())
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
@@ -95,7 +95,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // file:
   std::ofstream out(filename);
   GridOut       grid_out;
-  grid_out.write_eps(triangulation, out);
+  grid_out.write_vtu(triangulation, out);
   std::cout << " written to " << filename << std::endl << std::endl;
 }
 
@@ -116,7 +116,7 @@ void grid_1()
   std::ifstream f("example.msh");
   gridin.read_msh(f);
 
-  print_mesh_info(triangulation, "grid-1.eps");
+  print_mesh_info(triangulation, "grid-1.vtu");
 }
 
 
@@ -142,7 +142,7 @@ void grid_2()
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations(tria1, tria2, triangulation);
 
-  print_mesh_info(triangulation, "grid-2.eps");
+  print_mesh_info(triangulation, "grid-2.vtu");
 }
 
 
@@ -191,7 +191,7 @@ void grid_3()
   // section</a> for a fully worked example where we <em>do</em> attach a
   // Manifold object).
   triangulation.refine_global(2);
-  print_mesh_info(triangulation, "grid-3.eps");
+  print_mesh_info(triangulation, "grid-3.vtu");
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on
@@ -221,7 +221,7 @@ void grid_4()
   GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, 0.25, 1.0);
 
   GridGenerator::extrude_triangulation(triangulation, 3, 2.0, out);
-  print_mesh_info(out, "grid-4.eps");
+  print_mesh_info(out, "grid-4.vtu");
 }
 
 
@@ -254,7 +254,7 @@ void grid_5()
       return {in[0], in[1] + std::sin(in[0] / 5.0 * numbers::PI)};
     },
     triangulation);
-  print_mesh_info(triangulation, "grid-5.eps");
+  print_mesh_info(triangulation, "grid-5.vtu");
 }
 
 
@@ -294,7 +294,7 @@ void grid_6()
                                             Point<2>(1.0, 1.0));
 
   GridTools::transform(Grid6Func(), triangulation);
-  print_mesh_info(triangulation, "grid-6.eps");
+  print_mesh_info(triangulation, "grid-6.vtu");
 }
 
 
@@ -317,14 +317,14 @@ void grid_7()
                                             Point<2>(1.0, 1.0));
 
   GridTools::distort_random(0.3, triangulation, true);
-  print_mesh_info(triangulation, "grid-7.eps");
+  print_mesh_info(triangulation, "grid-7.vtu");
 }
 
 
 // @sect3{The main function}
 
-// Finally, the main function. There isn't much to do here, only to call the
-// subfunctions.
+// Finally, the main function. There isn't much to do here, only to call all the
+// various functions we wrote above.
 int main()
 {
   try
