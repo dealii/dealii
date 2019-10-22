@@ -625,32 +625,15 @@ namespace VectorTools
             // distribute cell vector
             for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
               {
-                ::dealii::internal::ElementAccess<OutVector>::add(
-                  cell_data_2(j), local_dof_indices[j], data_2);
+                if (touch_count[local_dof_indices[j]] == 0)
+                  {
+                    ::dealii::internal::ElementAccess<OutVector>::set(
+                      cell_data_2(j), local_dof_indices[j], data_2);
 
-                // count, how often we have
-                // added to this dof
-                Assert(touch_count[local_dof_indices[j]] <
-                         std::numeric_limits<decltype(
-                           touch_count)::value_type>::max(),
-                       ExcInternalError());
-                ++touch_count[local_dof_indices[j]];
+                    ++touch_count[local_dof_indices[j]];
+                  }
               }
           }
-      }
-
-    // compute the mean value of the
-    // sum which we have placed in each
-    // entry of the output vector
-    for (unsigned int i = 0; i < dof_2.n_dofs(); ++i)
-      {
-        Assert(touch_count[i] != 0, ExcInternalError());
-        using value_type = typename OutVector::value_type;
-        const value_type val =
-          ::dealii::internal::ElementAccess<OutVector>::get(data_2, i);
-
-        ::dealii::internal::ElementAccess<OutVector>::set(
-          val / static_cast<value_type>(touch_count[i]), i, data_2);
       }
   }
 
