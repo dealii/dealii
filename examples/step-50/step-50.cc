@@ -681,13 +681,15 @@ namespace Step50
   // on the global level and an DoFHandler object computes the
   // matrices corresponding to these transfer operators.
   //
-  // The second part of the following lines deals with the coarse grid
-  // solver. Since our coarse grid is very coarse indeed, we decide
-  // for a direct solver (a Householder decomposition of the coarsest
-  // level matrix), even if its implementation is not particularly
-  // sophisticated. If our coarse mesh had many more cells than the
-  // five we have here, something better suited would obviously be
-  // necessary here.
+  // The second part of the following lines deals with the coarse grid solver.
+  // We use MGCoarseGridIterativeSolver which provides a wrapper for a deal.II
+  // iterative solver with a given matrix and preconditioner; in this particular
+  // case we use SolverCG. Since our coarse grid is very coarse indeed, we could
+  // have decided to use the direct solver MGCoarseGridHouseholder (a
+  // Householder decomposition of the coarsest level matrix), even if its
+  // implementation is not particularly sophisticated. If our coarse mesh had
+  // many more cells than the five we have here, something better than
+  // MGCoarseGridHouseholder would obviously be necessary here.
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
