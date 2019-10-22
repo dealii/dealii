@@ -218,7 +218,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
   AssertIndexRange(fe_component, dof_handlers.n_dof_handlers);
   if (interior)
     {
-      AssertIndexRange(face_batch_number, n_ghost_inner_face_batches());
+      AssertIndexRange(face_batch_number,
+                       n_inner_face_batches() + n_boundary_face_batches());
     }
   else
     {
