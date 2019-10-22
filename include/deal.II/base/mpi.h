@@ -191,10 +191,25 @@ namespace Utilities
      * can interact without interfering with each other.
      *
      * When no longer needed, the communicator created here needs to be
-     * destroyed using <code>MPI_Comm_free</code>.
+     * destroyed using free_communicator().
+     *
+     * This function is equivalent to calling
+     * <code>MPI_Comm_dup(mpi_communicator, &return_value);</code>.
      */
     MPI_Comm
     duplicate_communicator(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Free the given
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator that was duplicated using duplicate_communicator().
+     *
+     * The argument is passed by reference and will be invalidated and set to
+     * the MPI null handle. This function is equivalent to calling
+     * <code>MPI_Comm_free(&mpi_communicator);</code>.
+     */
+    void
+    free_communicator(MPI_Comm &mpi_communicator);
 
     /**
      * If @p comm is an intracommunicator, this function returns a new
