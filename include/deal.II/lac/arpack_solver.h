@@ -483,6 +483,21 @@ inline ArpackSolver::AdditionalData::AdditionalData(
         ExcMessage(
           "'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
+  // Check for possible options for asymmetric problems
+  else
+    {
+      Assert(
+        eigenvalue_of_interest != algebraically_largest,
+        ExcMessage(
+          "'largest algebraic part' can only be used for symmetric problems!"));
+      Assert(
+        eigenvalue_of_interest != algebraically_smallest,
+        ExcMessage(
+          "'smallest algebraic part' can only be used for symmetric problems!"));
+      Assert(eigenvalue_of_interest != both_ends,
+             ExcMessage(
+               "'both ends' can only be used for symmetric problems!"));
+    }
 }
 
 
@@ -764,6 +779,9 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
             break;
         }
     }
+
+  // Set number of used iterations in SolverControl
+  control().check(iparam[2], 0.);
 
   if (info < 0)
     {
