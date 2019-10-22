@@ -230,7 +230,7 @@ namespace Utilities
        * Create a duplicate of the given @p communicator.
        */
       explicit DuplicatedCommunicator(const MPI_Comm &communicator)
-        : comm (duplicate_communicator(communicator))
+        : comm(duplicate_communicator(communicator))
       {}
 
       /**
@@ -257,12 +257,13 @@ namespace Utilities
       /**
        * Do not allow assignment of this class.
        */
-      DuplicatedCommunicator& operator=(const DuplicatedCommunicator &) = delete;
+      DuplicatedCommunicator &
+      operator=(const DuplicatedCommunicator &) = delete;
 
     private:
-	/**
-	 * The communicator of course.
-	 */
+      /**
+       * The communicator of course.
+       */
       MPI_Comm comm;
     };
 

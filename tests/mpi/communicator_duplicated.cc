@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,8 @@
 #include "../tests.h"
 
 
-void test(const MPI_Comm comm)
+void
+test(const MPI_Comm comm)
 {
   int tag = 12345;
 
@@ -32,29 +33,14 @@ void test(const MPI_Comm comm)
   MPI_Comm comm2 = Utilities::MPI::duplicate_communicator(comm);
   Utilities::MPI::DuplicatedCommunicator pcomm3(comm);
 
-  if (my_rank==1)
+  if (my_rank == 1)
     {
-      int value[3]={1,2,3};
-      int dest = 0;
-      
-      MPI_Send(&value[0],
-	       1,
-	       MPI_UNSIGNED,
-	       dest,
-	       tag,
-	       comm);
-      MPI_Send(&value[1],
-	       1,
-	       MPI_UNSIGNED,
-	       dest,
-	       tag,
-	       comm2);
-      MPI_Send(&value[2],
-	       1,
-	       MPI_UNSIGNED,
-	       dest,
-	       tag,
-	       *pcomm3);
+      int value[3] = {1, 2, 3};
+      int dest     = 0;
+
+      MPI_Send(&value[0], 1, MPI_UNSIGNED, dest, tag, comm);
+      MPI_Send(&value[1], 1, MPI_UNSIGNED, dest, tag, comm2);
+      MPI_Send(&value[2], 1, MPI_UNSIGNED, dest, tag, *pcomm3);
     }
 
   if (my_rank == 0)
@@ -64,12 +50,10 @@ void test(const MPI_Comm comm)
 
       // receive in reverse order, if duplication of communicators worked,
       // these won't be mixed up!
-      MPI_Recv(&value[2], 1, MPI_UNSIGNED,
-	       src, tag, *pcomm3, MPI_STATUS_IGNORE);
-      MPI_Recv(&value[1], 1, MPI_UNSIGNED,
-	       src, tag, comm2, MPI_STATUS_IGNORE);
-      MPI_Recv(&value[0], 1, MPI_UNSIGNED,
-	       src, tag, comm, MPI_STATUS_IGNORE);
+      MPI_Recv(
+        &value[2], 1, MPI_UNSIGNED, src, tag, *pcomm3, MPI_STATUS_IGNORE);
+      MPI_Recv(&value[1], 1, MPI_UNSIGNED, src, tag, comm2, MPI_STATUS_IGNORE);
+      MPI_Recv(&value[0], 1, MPI_UNSIGNED, src, tag, comm, MPI_STATUS_IGNORE);
 
       deallog << value[0] << " " << value[1] << " " << value[2] << std::endl;
     }
