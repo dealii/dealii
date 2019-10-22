@@ -639,10 +639,11 @@ namespace VectorTools
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
-   * @p data_1 is executed from the FE space represented by @p dof_1 to the
-   * vector @p data_2 on FE space @p dof_2. The interpolation on each cell is
-   * represented by the matrix @p transfer. Curved boundaries are neglected so
-   * far.
+   * @p data_1 (which is assumed to be ghosted, see @ref GlossGhostedVector)
+   * is executed from the FE space represented by @p dof_1
+   * to the vector @p data_2 (which must be non-ghosted) on FE space @p dof_2.
+   * The interpolation on each cell is represented by the matrix @p transfer.
+   * Curved boundaries are neglected so far.
    *
    * Note that you may have to call <tt>hanging_nodes.distribute(data_2)</tt>
    * with the hanging nodes from space @p dof_2 afterwards, to make the result
