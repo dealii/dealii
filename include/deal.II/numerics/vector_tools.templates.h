@@ -635,12 +635,12 @@ namespace VectorTools
 
                 // Count cells that share each dof.
                 ::dealii::internal::ElementAccess<OutVector>::add(
-                  1, local_dof_indices[j], touch_count);
+                  static_cast<number>(1), local_dof_indices[j], touch_count);
               }
           }
       }
 
-    // Collect information from other parallel processes.
+    // Collect information over all the parallel processes.
     data_2.compress(VectorOperation::add);
     touch_count.compress(VectorOperation::add);
 
@@ -648,10 +648,16 @@ namespace VectorTools
     // each entry of the output vector only at locally owned elements.
     for (const auto &i : data_2.locally_owned_elements())
       {
-        Assert(touch_count[i] != 0, ExcInternalError());
+        const number touch_count_i =
+          ::dealii::internal::ElementAccess<OutVector>::get(touch_count, i);
 
-        ::dealii::internal::ElementAccess<OutVector>::set(
-          data_2[i] / touch_count[i], i, data_2);
+        Assert(touch_count_i != static_cast<number>(0), ExcInternalError());
+
+        const number value =
+          ::dealii::internal::ElementAccess<OutVector>::get(data_2, i) /
+          touch_count_i;
+
+        ::dealii::internal::ElementAccess<OutVector>::set(value, i, data_2);
       }
 
     // Compress data_2 to set the proper values on all the processors.
