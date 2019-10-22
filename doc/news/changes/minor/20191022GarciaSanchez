@@ -1,0 +1,5 @@
+Changed: Fix coarse solver documentation in step-50 which uses for the coarse
+solver MGCoarseGridIterativeSolver, not MGCoarseGridHouseholder. Add discussion
+about when it would be appropriated to use MGCoarseGridHouseholder.
+<br>
+(Daniel Garcia-Sanchez, 2019/10/22)
