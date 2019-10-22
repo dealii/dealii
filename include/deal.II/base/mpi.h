@@ -212,6 +212,61 @@ namespace Utilities
     free_communicator(MPI_Comm &mpi_communicator);
 
     /**
+     * Helper class to automatically duplicate and free an MPI
+     * @ref GlossMPICommunicator "communicator".
+     *
+     * This class duplicates the communicator given in the constructor
+     * using duplicate_communicator() and frees it automatically when
+     * this object gets destroyed by calling free_communicator(). You
+     * can access the wrapped communicator using operator*.
+     *
+     * This class exists to easily allow duplicating communicators without
+     * having to worry when and how to free it after usage.
+     */
+    class DuplicatedCommunicator
+    {
+    public:
+      /**
+       * Create a duplicate of the given @p communicator.
+       */
+      explicit DuplicatedCommunicator(const MPI_Comm &communicator)
+        : comm (duplicate_communicator(communicator))
+      {}
+
+      /**
+       * The destructor will free the communicator automatically.
+       */
+      ~DuplicatedCommunicator()
+      {
+        free_communicator(comm);
+      }
+
+      /**
+       * Access the stored communicator.
+       */
+      const MPI_Comm &operator*() const
+      {
+        return comm;
+      }
+
+      /**
+       * Do not allow making copies.
+       */
+      DuplicatedCommunicator(const DuplicatedCommunicator &) = delete;
+
+      /**
+       * Do not allow assignment of this class.
+       */
+      DuplicatedCommunicator& operator=(const DuplicatedCommunicator &) = delete;
+
+    private:
+	/**
+	 * The communicator of course.
+	 */
+      MPI_Comm comm;
+    };
+
+    /**
      * If @p comm is an intracommunicator, this function returns a new
      * communicator @p newcomm with communication group defined by the
      * @p group argument. The function is only collective over the group of
