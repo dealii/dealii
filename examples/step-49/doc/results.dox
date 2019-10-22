@@ -341,9 +341,11 @@ different boundary conditions.
 For example, you might want to apply a different boundary condition for the
 right boundary of the first grid in this program. To do this, iterate over the
 cells and their faces and identify the correct faces (for example using
-cell->center() or cell->get_boundary_id()). You can then use
-cell->set_boundary_id() to set the boundary id to something different. You can
-take a look back at step-1 how iteration over the meshes is done there.
+`cell->center()` to query the coordinates of the center of a cell as we
+do in step-1, or using `cell->face(f)->get_boundary_id()` to query the current
+boundary indicator of the $f$th face of the cell). You can then use
+cell->face(f)->set_boundary_id() to set the boundary id to something different.
+You can take a look back at step-1 how iteration over the meshes is done there.
 
 <h4> Extracting a boundary mesh </h4>
 
