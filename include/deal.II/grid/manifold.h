@@ -163,6 +163,8 @@ namespace Manifolds
                                  const bool with_interpolation = false);
 } // namespace Manifolds
 
+
+
 /**
  * Manifolds are used to describe the geometry of boundaries of domains as
  * well as the geometry of the interior. Manifold objects are therefore
@@ -172,7 +174,9 @@ namespace Manifolds
  *
  * Manifolds are best understood by using the language of differential
  * geometry, but their common uses can be easily described simply through
- * examples.
+ * examples. An exhaustive discussion of how, where, and why this class
+ * is used is provided in the
+ * @ref GlossGeometryPaper "geometry paper".
  *
  *
  * <h3>Common use case: Creating a new vertex</h3>
