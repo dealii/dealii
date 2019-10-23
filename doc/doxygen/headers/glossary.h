@@ -1033,6 +1033,31 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor geometry_paper <b>geometry paper</b></dt>
+ * <dd>The "geometry paper" is a paper by L. Heltai, W. Bangerth, M. Kronbichler,
+ * and A. Mola, titled
+ * "Using exact geometry information in finite element computations", that
+ * describes how deal.II describes the geometry of domains. In particular,
+ * it discusses the algorithmic foundations on which the Manifold class
+ * is based, and what kind of information it needs to provide for mesh
+ * refinement, the computation of normal vectors, and the many other places
+ * where geometry enters into finite element computations.
+ *
+ * The paper is currently available on arXiv at https://arxiv.org/abs/1910.09824 .
+ * The full reference for this paper is as follows:
+ * @code{.bib}
+@misc{heltai2019using,
+    title={Using exact geometry information in finite element computations},
+    author={Luca Heltai and Wolfgang Bangerth and Martin Kronbichler and Andrea Mola},
+    year={2019},
+    eprint={1910.09824},
+    archivePrefix={arXiv},
+    primaryClass={math.NA}
+}
+ * @endcode
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossGhostCell <b>Ghost cells</b></dt>
  * <dd>
  * If a mesh is distributed across multiple MPI processes using the
@@ -1132,6 +1157,7 @@
  * overview of where the different kinds of vectors are typically
  * used.
  * </dd>
+ *
  *
  * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
  * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
