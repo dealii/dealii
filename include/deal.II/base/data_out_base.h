@@ -3031,10 +3031,23 @@ public:
                     const std::vector<std::string> &piece_names) const;
 
   /**
-   * This function combines DataOutInterface::write_vtu(), or
-   * DataOutInterface::write_vtu_in_parallel(), with
-   * DataOutInterface::write_pvtu_record(). It automatically constructs
-   * the filename of the generated output files and writes a pvtu file.
+   * This function writes several .vtu files and a .pvtu record in parallel
+   * and constructs the filenames automatically. It is a combination of
+   * DataOutInterface::write_vtu() or
+   * DataOutInterface::write_vtu_in_parallel(), and
+   * DataOutInterface::write_pvtu_record().
+   *
+   * For example, running
+   * <code> write_vtu_with_pvtu_record("output/","solution", 3, 4, comm, 2)
+   * </code> on 10 processes generates the files
+   * @code
+   * output/solution_0003.0.vtu
+   * output/solution_0003.1.vtu
+   * output/solution_0003.pvtu
+   * @endcode
+   * where the .0.vtu file contains the output of the first half of the proceses
+   * grouped together.
+   *
    * A specified @p directory and a @p filename_without_extension
    * form the first part of the filename. The filename is then extended with
    * a @p counter labeling the current timestep/iteration/etc., the processor ID,
@@ -3045,7 +3058,9 @@ public:
    * value numbers::invalid_unsigned_int. If more than one file identifier
    * is needed (e.g. time step number and iteration counter of solver), the
    * last identifier is used as @p counter, while all other identifiers have to be
-   * added to @p filename_without_extension when calling this function. In a
+   * added to @p filename_without_extension when calling this function.
+   *
+   * In a
    * parallel setting, several files are typically written per time step. The
    * number of files written in parallel depends on the number of MPI processes
    * (see parameter @p mpi_communicator with default value MPI_COMM_WORLD), and a
@@ -3055,7 +3070,9 @@ public:
    * default value of @p n_groups is 0, meaning that every MPI rank will write one
    * file. A value of 1 will generate one big file containing the solution over
    * the whole domain, while a larger value will create @p n_groups files (but not
-   * more than there are MPI ranks). Note that only one processor needs to
+   * more than there are MPI ranks).
+   *
+   * Note that only one processor needs to
    * generate the .pvtu file, where processor zero is chosen to take over this
    * job.
    *
