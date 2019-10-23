@@ -106,6 +106,7 @@ namespace Utilities
     void
     free_communicator(MPI_Comm &mpi_communicator)
     {
+      // MPI_Comm_free will set the argument to MPI_COMM_NULL automatically.
       const int ierr = MPI_Comm_free(&mpi_communicator);
       AssertThrowMPI(ierr);
     }

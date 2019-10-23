@@ -234,6 +234,11 @@ namespace Utilities
       {}
 
       /**
+       * Do not allow making copies.
+       */
+      DuplicatedCommunicator(const DuplicatedCommunicator &) = delete;
+
+      /**
        * The destructor will free the communicator automatically.
        */
       ~DuplicatedCommunicator()
@@ -249,10 +254,6 @@ namespace Utilities
         return comm;
       }
 
-      /**
-       * Do not allow making copies.
-       */
-      DuplicatedCommunicator(const DuplicatedCommunicator &) = delete;
 
       /**
        * Do not allow assignment of this class.
