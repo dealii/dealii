@@ -103,6 +103,16 @@ namespace Utilities
 
 
 
+    void
+    free_communicator(MPI_Comm &mpi_communicator)
+    {
+      // MPI_Comm_free will set the argument to MPI_COMM_NULL automatically.
+      const int ierr = MPI_Comm_free(&mpi_communicator);
+      AssertThrowMPI(ierr);
+    }
+
+
+
     int
     create_group(const MPI_Comm & comm,
                  const MPI_Group &group,
@@ -521,6 +531,7 @@ namespace Utilities
     }
 
 
+
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm & /*comm*/,
                                   const IndexSet::size_type &local_size)
@@ -529,11 +540,18 @@ namespace Utilities
     }
 
 
+
     MPI_Comm
     duplicate_communicator(const MPI_Comm &mpi_communicator)
     {
       return mpi_communicator;
     }
+
+
+
+    void
+    free_communicator(MPI_Comm & /*mpi_communicator*/)
+    {}
 
 
 

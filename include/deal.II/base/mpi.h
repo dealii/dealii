@@ -191,10 +191,82 @@ namespace Utilities
      * can interact without interfering with each other.
      *
      * When no longer needed, the communicator created here needs to be
-     * destroyed using <code>MPI_Comm_free</code>.
+     * destroyed using free_communicator().
+     *
+     * This function is equivalent to calling
+     * <code>MPI_Comm_dup(mpi_communicator, &return_value);</code>.
      */
     MPI_Comm
     duplicate_communicator(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Free the given
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator that was duplicated using duplicate_communicator().
+     *
+     * The argument is passed by reference and will be invalidated and set to
+     * the MPI null handle. This function is equivalent to calling
+     * <code>MPI_Comm_free(&mpi_communicator);</code>.
+     */
+    void
+    free_communicator(MPI_Comm &mpi_communicator);
+
+    /**
+     * Helper class to automatically duplicate and free an MPI
+     * @ref GlossMPICommunicator "communicator".
+     *
+     * This class duplicates the communicator given in the constructor
+     * using duplicate_communicator() and frees it automatically when
+     * this object gets destroyed by calling free_communicator(). You
+     * can access the wrapped communicator using operator*.
+     *
+     * This class exists to easily allow duplicating communicators without
+     * having to worry when and how to free it after usage.
+     */
+    class DuplicatedCommunicator
+    {
+    public:
+      /**
+       * Create a duplicate of the given @p communicator.
+       */
+      explicit DuplicatedCommunicator(const MPI_Comm &communicator)
+        : comm(duplicate_communicator(communicator))
+      {}
+
+      /**
+       * Do not allow making copies.
+       */
+      DuplicatedCommunicator(const DuplicatedCommunicator &) = delete;
+
+      /**
+       * The destructor will free the communicator automatically.
+       */
+      ~DuplicatedCommunicator()
+      {
+        free_communicator(comm);
+      }
+
+      /**
+       * Access the stored communicator.
+       */
+      const MPI_Comm &operator*() const
+      {
+        return comm;
+      }
+
+
+      /**
+       * Do not allow assignment of this class.
+       */
+      DuplicatedCommunicator &
+      operator=(const DuplicatedCommunicator &) = delete;
+
+    private:
+      /**
+       * The communicator of course.
+       */
+      MPI_Comm comm;
+    };
 
     /**
      * If @p comm is an intracommunicator, this function returns a new
