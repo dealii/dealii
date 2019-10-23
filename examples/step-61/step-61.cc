@@ -65,7 +65,7 @@
 // program into its own namespace:
 namespace Step61
 {
-    using namespace dealii;
+  using namespace dealii;
 
   // @sect3{The WGDarcyEquation class template}
 
@@ -97,7 +97,7 @@ namespace Step61
 
     FESystem<dim>   fe;
     DoFHandler<dim> dof_handler;
-      
+
     FE_DGRaviartThomas<dim> fe_dgrt;
     DoFHandler<dim>         dof_handler_dgrt;
 
@@ -108,8 +108,8 @@ namespace Step61
 
     Vector<double> solution;
     Vector<double> system_rhs;
-      
-    Vector<double>   darcy_velocity;
+
+    Vector<double> darcy_velocity;
   };
 
 
@@ -260,10 +260,11 @@ namespace Step61
   template <int dim>
   WGDarcyEquation<dim>::WGDarcyEquation(const unsigned int degree)
     : fe(FE_DGQ<dim>(degree), 1, FE_FaceQ<dim>(degree), 1)
-    , dof_handler(triangulation),
-    
-    fe_dgrt(0),
-    dof_handler_dgrt (triangulation)
+    , dof_handler(triangulation)
+    ,
+
+    fe_dgrt(0)
+    , dof_handler_dgrt(triangulation)
 
   {}
 
@@ -302,15 +303,15 @@ namespace Step61
   void WGDarcyEquation<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler_dgrt.distribute_dofs (fe_dgrt);
+    dof_handler_dgrt.distribute_dofs(fe_dgrt);
 
     std::cout << "   Number of pressure degrees of freedom: "
               << dof_handler.n_dofs() << std::endl;
 
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
-      
-    darcy_velocity.reinit (dof_handler_dgrt.n_dofs());
+
+    darcy_velocity.reinit(dof_handler_dgrt.n_dofs());
 
     {
       constraints.clear();
@@ -695,18 +696,22 @@ namespace Step61
                                         update_values | update_normal_vectors |
                                           update_quadrature_points |
                                           update_JxW_values);
-      
-    FEValues<dim> fe_values_dgrt (fe_dgrt, quadrature_formula,
-                                  update_values   | update_gradients |
-                                  update_quadrature_points | update_JxW_values);
-      
-    FEFaceValues<dim> fe_face_values_dgrt (fe_dgrt, face_quadrature_formula,
-                                           update_values   | update_normal_vectors |
-                                           update_quadrature_points |
-                                           update_JxW_values);
 
-    const unsigned int dofs_per_cell    = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
+    FEValues<dim> fe_values_dgrt(fe_dgrt,
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    FEFaceValues<dim> fe_face_values_dgrt(fe_dgrt,
+                                          face_quadrature_formula,
+                                          update_values |
+                                            update_normal_vectors |
+                                            update_quadrature_points |
+                                            update_JxW_values);
+
+    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell_rt   = fe_rt.dofs_per_cell;
     const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
 
     const unsigned int n_q_points    = fe_values.get_quadrature().size();
@@ -718,7 +723,8 @@ namespace Step61
 
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    std::vector<types::global_dof_index> local_dof_indices_dgrt(dofs_per_cell_dgrt);
+    std::vector<types::global_dof_index> local_dof_indices_dgrt(
+      dofs_per_cell_dgrt);
 
     FullMatrix<double> cell_matrix_M(dofs_per_cell_rt, dofs_per_cell_rt);
     FullMatrix<double> cell_matrix_G(dofs_per_cell_rt, dofs_per_cell);
@@ -761,10 +767,9 @@ namespace Step61
     // The numerical velocity is the product of beta and the basis functions of
     // the Raviart-Thomas space.
     typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end(),
-    cell_dgrt = dof_handler_dgrt.begin_active();
-    for (; cell!=endc; ++cell,++cell_dgrt)
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end(), cell_dgrt = dof_handler_dgrt.begin_active();
+    for (; cell != endc; ++cell, ++cell_dgrt)
       {
         fe_values.reinit(cell);
         fe_values_dgrt.reinit(cell_dgrt);
@@ -861,13 +866,13 @@ namespace Step61
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_velocity(k) +=
                 -(cell_solution(i) * cell_matrix_C(i, j) * cell_matrix_D(k, j));
-          
+
         // We compute Darcy velocity.
         // This is same as cell_velocity but used to graph Darcy velocity.
         cell_dgrt->get_dof_indices(local_dof_indices_dgrt);
-        for (unsigned int k = 0; k<dofs_per_cell_dgrt;++k)
-          for (unsigned int j = 0; j<dofs_per_cell_dgrt; ++j)
-            for (unsigned int i = 0; i<dofs_per_cell;++i)
+        for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
+          for (unsigned int j = 0; j < dofs_per_cell_dgrt; ++j)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               darcy_velocity(local_dof_indices_dgrt[k]) +=
                 -(cell_solution(i) * cell_matrix_C(i, j) * cell_matrix_D(k, j));
 
@@ -988,19 +993,20 @@ namespace Step61
     }
     // Output Darcy velocity vectors.
     {
-      std::vector<std::string> solution_names (dim, "velocity");
+      std::vector<std::string> solution_names(dim, "velocity");
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation
-       (dim, DataComponentInterpretation::component_is_part_of_vector);
-          
+        data_component_interpretation(
+          dim, DataComponentInterpretation::component_is_part_of_vector);
+
       DataOut<dim> data_out_dgrt;
-      data_out_dgrt.attach_dof_handler (dof_handler_dgrt);
-      data_out_dgrt.add_data_vector (darcy_velocity, solution_names,
-                                     DataOut<dim>::type_dof_data,
-                                     data_component_interpretation);
-      data_out_dgrt.build_patches (fe_dgrt.degree);
-      std::ofstream dgrt_output ("Darcy_velocity.vtk");
-      data_out_dgrt.write_vtk (dgrt_output);
+      data_out_dgrt.attach_dof_handler(dof_handler_dgrt);
+      data_out_dgrt.add_data_vector(darcy_velocity,
+                                    solution_names,
+                                    DataOut<dim>::type_dof_data,
+                                    data_component_interpretation);
+      data_out_dgrt.build_patches(fe_dgrt.degree);
+      std::ofstream dgrt_output("Darcy_velocity.vtk");
+      data_out_dgrt.write_vtk(dgrt_output);
     }
   }
 
