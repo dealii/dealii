@@ -1,0 +1,4 @@
+Improved: Make the output of cells, faces and co-faces optional in
+GridOut::write_vtk.
+<br>
+(Peter Munch, Niklas Fehn, 2019/10/11)
