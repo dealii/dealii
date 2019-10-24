@@ -210,13 +210,10 @@ namespace Step12
   // @sect3{The AdvectionProblem class}
   //
   // After this preparations, we proceed with the main class of this program,
-  // called AdvectionProblem. While we would not need an AffineConstraints
-  // object, because there are no hanging node constraints in DG
-  // discretizations, we use an empty object here as this allows us to use its
-  // `copy_local_to_global` functionality.
+  // called AdvectionProblem.
   //
-  // Major differences will only come up in the implementation of the assemble
-  // function.
+  // This should all be pretty familiar to you. Interesting details will only
+  // come up in the implementation of the assemble function.
   template <int dim>
   class AdvectionProblem
   {
@@ -415,8 +412,15 @@ namespace Step12
         }
     };
 
-    // This lambda function will handle copying the data from the cell and
-    // face assembly into the global matrix and right-hand side:
+    // The following lambda function will handle copying the data from the
+    // cell and face assembly into the global matrix and right-hand side.
+    //
+    // While we would not need an AffineConstraints object, because there are
+    // no hanging node constraints in DG discretizations, we use an empty
+    // object here as this allows us to use its `copy_local_to_global`
+    // functionality.
+    AffineConstraints<double> constraints;
+
     auto copier = [&](const CopyData &c) {
       constraints.distribute_local_to_global(c.cell_matrix,
                                              c.cell_rhs,
