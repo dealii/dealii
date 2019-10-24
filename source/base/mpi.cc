@@ -892,9 +892,10 @@ namespace Utilities
     template <typename T1, typename T2>
     ConsensusAlgorithm<T1, T2>::ConsensusAlgorithm(
       ConsensusAlgorithmProcess<T1, T2> &process,
-      const MPI_Comm &                   comm)
+      const MPI_Comm &                   communicator)
       : process(process)
-      , comm(comm)
+      , comm_dup(communicator)
+      , comm(*comm_dup)
       , my_rank(this_mpi_process(comm))
       , n_procs(n_mpi_processes(comm))
     {}
