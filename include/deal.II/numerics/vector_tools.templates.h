@@ -602,54 +602,71 @@ namespace VectorTools
     Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
     Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
-    std::vector<short unsigned int> touch_count(
-      dof_2.n_dofs(), 0); // TODO: check on datatype... kinda strange (UK)
+    // Reset output vector.
+    data_2 = static_cast<number>(0);
+
+    // Store how many cells share each dof (unghosted).
+    OutVector touch_count;
+    touch_count.reinit(data_2);
+
     std::vector<types::global_dof_index> local_dof_indices(
       dof_2.get_fe().dofs_per_cell);
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator h =
+    typename DoFHandler<dim, spacedim>::active_cell_iterator cell_1 =
       dof_1.begin_active();
-    typename DoFHandler<dim, spacedim>::active_cell_iterator l =
+    typename DoFHandler<dim, spacedim>::active_cell_iterator cell_2 =
       dof_2.begin_active();
-    const typename DoFHandler<dim, spacedim>::cell_iterator endh = dof_1.end();
+    const typename DoFHandler<dim, spacedim>::cell_iterator end_1 = dof_1.end();
 
-    for (; h != endh; ++h, ++l)
+    for (; cell_1 != end_1; ++cell_1, ++cell_2)
       {
-        h->get_dof_values(data_1, cell_data_1);
-        transfer.vmult(cell_data_2, cell_data_1);
-
-        l->get_dof_indices(local_dof_indices);
-
-        // distribute cell vector
-        for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
+        if (cell_1->is_locally_owned())
           {
-            ::dealii::internal::ElementAccess<OutVector>::add(
-              cell_data_2(j), local_dof_indices[j], data_2);
+            Assert(cell_2->is_locally_owned(), ExcInternalError());
 
-            // count, how often we have
-            // added to this dof
-            Assert(
-              touch_count[local_dof_indices[j]] <
-                std::numeric_limits<decltype(touch_count)::value_type>::max(),
-              ExcInternalError());
-            ++touch_count[local_dof_indices[j]];
+            // Perform dof interpolation.
+            cell_1->get_dof_values(data_1, cell_data_1);
+            transfer.vmult(cell_data_2, cell_data_1);
+
+            cell_2->get_dof_indices(local_dof_indices);
+
+            // Distribute cell vector.
+            for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
+              {
+                ::dealii::internal::ElementAccess<OutVector>::add(
+                  cell_data_2(j), local_dof_indices[j], data_2);
+
+                // Count cells that share each dof.
+                ::dealii::internal::ElementAccess<OutVector>::add(
+                  static_cast<number>(1), local_dof_indices[j], touch_count);
+              }
           }
       }
 
-    // compute the mean value of the
-    // sum which we have placed in each
-    // entry of the output vector
-    for (unsigned int i = 0; i < dof_2.n_dofs(); ++i)
-      {
-        Assert(touch_count[i] != 0, ExcInternalError());
-        using value_type = typename OutVector::value_type;
-        const value_type val =
-          ::dealii::internal::ElementAccess<OutVector>::get(data_2, i);
+    // Collect information over all the parallel processes.
+    data_2.compress(VectorOperation::add);
+    touch_count.compress(VectorOperation::add);
 
-        ::dealii::internal::ElementAccess<OutVector>::set(
-          val / static_cast<value_type>(touch_count[i]), i, data_2);
+    // Compute the mean value of the sum which has been placed in
+    // each entry of the output vector only at locally owned elements.
+    for (const auto &i : data_2.locally_owned_elements())
+      {
+        const number touch_count_i =
+          ::dealii::internal::ElementAccess<OutVector>::get(touch_count, i);
+
+        Assert(touch_count_i != static_cast<number>(0), ExcInternalError());
+
+        const number value =
+          ::dealii::internal::ElementAccess<OutVector>::get(data_2, i) /
+          touch_count_i;
+
+        ::dealii::internal::ElementAccess<OutVector>::set(value, i, data_2);
       }
+
+    // Compress data_2 to set the proper values on all the parallel processes.
+    data_2.compress(VectorOperation::insert);
   }
+
 
 
   template <int dim,
