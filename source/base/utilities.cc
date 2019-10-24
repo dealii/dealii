@@ -475,6 +475,34 @@ namespace Utilities
 
 
 
+  template <typename Number>
+  Number
+  truncate_to_n_digits(const Number number, const unsigned int n_digits)
+  {
+    AssertThrow(n_digits >= 1, ExcMessage("invalid parameter."));
+
+    if (!(std::fabs(number) > std::numeric_limits<Number>::min()))
+      return number;
+
+    const int order =
+      static_cast<int>(std::floor(std::log10(std::fabs(number))));
+
+    const int shift = -order + static_cast<int>(n_digits) - 1;
+
+    Assert(shift <= static_cast<int>(std::floor(
+                      std::log10(std::numeric_limits<Number>::max()))),
+           ExcMessage(
+             "Overflow. Use a smaller value for n_digits and/or make sure "
+             "that the absolute value of 'number' does not become too small."));
+
+    const Number factor = std::pow(10.0, static_cast<Number>(shift));
+
+    const Number number_cutoff = std::trunc(number * factor) / factor;
+
+    return number_cutoff;
+  }
+
+
   int
   string_to_int(const std::string &s_)
   {
@@ -1218,6 +1246,11 @@ namespace Utilities
   to_string<double>(double, unsigned int);
   template std::string
   to_string<long double>(long double, unsigned int);
+
+  template double
+  truncate_to_n_digits(const double, const unsigned int);
+  template float
+  truncate_to_n_digits(const float, const unsigned int);
 
   template std::vector<std::array<std::uint64_t, 1>>
   inverse_Hilbert_space_filling_curve<1, double>(
