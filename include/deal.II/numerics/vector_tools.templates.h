@@ -602,6 +602,9 @@ namespace VectorTools
     Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
     Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
+    // Reset output vector.
+    data_2 = static_cast<number>(0);
+
     // Store how many cells share each dof (unghosted).
     OutVector touch_count;
     touch_count.reinit(data_2);
@@ -660,9 +663,10 @@ namespace VectorTools
         ::dealii::internal::ElementAccess<OutVector>::set(value, i, data_2);
       }
 
-    // Compress data_2 to set the proper values on all the processors.
+    // Compress data_2 to set the proper values on all the parallel processes.
     data_2.compress(VectorOperation::insert);
   }
+
 
 
   template <int dim,
