@@ -354,23 +354,23 @@ namespace Step12
 
       for (unsigned int point = 0; point < q_points.size(); ++point)
         {
-          const double beta_n = beta(q_points[point]) * normals[point];
+          const double beta_dot_n = beta(q_points[point]) * normals[point];
 
-          if (beta_n > 0)
+          if (beta_dot_n > 0)
             {
               for (unsigned int i = 0; i < n_facet_dofs; ++i)
                 for (unsigned int j = 0; j < n_facet_dofs; ++j)
                   copy_data.cell_matrix(i, j) +=
                     fe_face.shape_value(i, point)   // \phi_i
                     * fe_face.shape_value(j, point) // \phi_j
-                    * beta_n                        // \beta . n
+                    * beta_dot_n                    // \beta . n
                     * JxW[point];                   // dx
             }
           else
             for (unsigned int i = 0; i < n_facet_dofs; ++i)
               copy_data.cell_rhs(i) += -fe_face.shape_value(i, point) // \phi_i
                                        * g[point]                     // g
-                                       * beta_n      // \beta . n
+                                       * beta_dot_n  // \beta . n
                                        * JxW[point]; // dx
         }
     };
@@ -403,14 +403,15 @@ namespace Step12
 
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
-          const double beta_n = beta(q_points[qpoint]) * normals[qpoint];
+          const double beta_dot_n = beta(q_points[qpoint]) * normals[qpoint];
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_iv.jump(i, qpoint)                        // [\phi_i]
-                * fe_iv.shape_value((beta_n > 0), j, qpoint) // phi_j^{upwind}
-                * beta_n                                     // (\beta . n)
-                * JxW[qpoint];                               // dx
+                fe_iv.jump(i, qpoint) // [\phi_i]
+                *
+                fe_iv.shape_value((beta_dot_n > 0), j, qpoint) // phi_j^{upwind}
+                * beta_dot_n                                   // (\beta . n)
+                * JxW[qpoint];                                 // dx
         }
     };
 
