@@ -259,6 +259,13 @@ public:
   ~FunctionParser() override;
 
   /**
+   * Copy operator. Objects of this type can not be copied, and
+   * consequently this operator is deleted.
+   */
+  FunctionParser &
+  operator=(const FunctionParser &) = delete;
+
+  /**
    * Type for the constant map. Used by the initialize() method.
    */
   using ConstMap = std::map<std::string, double>;
