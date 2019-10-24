@@ -299,8 +299,8 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
-    using ActiveCellIterator = typename DoFHandler<dim>::active_cell_iyerator;
-    const BoundaryValues<dim>                          boundary_function;
+    using Iterator = typename DoFHandler<dim>::active_cell_iterator;
+    const BoundaryValues<dim> boundary_function;
 
     // This is the function that will be executed for each cell.
     auto cell_worker = [&](const Iterator &  cell,
