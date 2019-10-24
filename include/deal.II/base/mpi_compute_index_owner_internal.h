@@ -115,11 +115,17 @@ namespace Utilities
           void
           reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
           {
+            // We are using MPI_Probe with MPI_ANY_SOURCE, making this
+            // function call unsafe when executed twice in a row because
+            // packages can be mixed up. Avoid this by duplicating the
+            // communicator.
+            DuplicatedCommunicator comm_dup(comm);
+
             // 1) set up the partition
-            this->partition(owned_indices, comm);
+            this->partition(owned_indices, *comm_dup);
 
 #ifdef DEAL_II_WITH_MPI
-            unsigned int my_rank = this_mpi_process(comm);
+            unsigned int my_rank = this_mpi_process(*comm_dup);
 
             types::global_dof_index dic_local_received = 0;
             std::map<unsigned int,
@@ -197,7 +203,7 @@ namespace Utilities
                                             DEAL_II_DOF_INDEX_MPI_TYPE,
                                             rank_pair.first,
                                             tag_setup,
-                                            comm,
+                                            *comm_dup,
                                             &request.back());
                 AssertThrowMPI(ierr);
               }
@@ -207,7 +213,8 @@ namespace Utilities
               {
                 // wait for an incoming message
                 MPI_Status status;
-                auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_setup, comm, &status);
+                auto       ierr =
+                  MPI_Probe(MPI_ANY_SOURCE, tag_setup, *comm_dup, &status);
                 AssertThrowMPI(ierr);
 
                 // retrieve size of incoming message
@@ -230,7 +237,7 @@ namespace Utilities
                                 DEAL_II_DOF_INDEX_MPI_TYPE,
                                 other_rank,
                                 tag_setup,
-                                comm,
+                                *comm_dup,
                                 &status);
                 AssertThrowMPI(ierr);
 
@@ -625,6 +632,13 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
+            // We are using MPI_Probe with MPI_ANY_SOURCE, making this
+            // function call unsafe when executed twice in a row because
+            // packages can be mixed up. Avoid this by duplicating the
+            // communicator. See the discussion in
+            // https://github.com/dealii/dealii/issues/8929
+            DuplicatedCommunicator comm_dup(comm);
+
             // reserve enough slots for the requests ahead; depending on
             // whether the owning rank is one of the requesters or not, we
             // might have one less requests to execute, so fill the requests
@@ -677,7 +691,7 @@ namespace Utilities
                                 MPI_UNSIGNED,
                                 dict.actually_owning_rank_list[i],
                                 1021,
-                                comm,
+                                *comm_dup,
                                 &send_requests.back());
                     AssertThrowMPI(ierr);
                   }
@@ -690,7 +704,7 @@ namespace Utilities
                 // wait for an incoming message
                 MPI_Status   status;
                 unsigned int ierr =
-                  MPI_Probe(MPI_ANY_SOURCE, 1021, comm, &status);
+                  MPI_Probe(MPI_ANY_SOURCE, 1021, *comm_dup, &status);
                 AssertThrowMPI(ierr);
 
                 // retrieve size of incoming message
@@ -707,7 +721,7 @@ namespace Utilities
                                 MPI_UNSIGNED,
                                 status.MPI_SOURCE,
                                 1021,
-                                comm,
+                                *comm_dup,
                                 &status);
                 AssertThrowMPI(ierr);
 
@@ -758,11 +772,6 @@ namespace Utilities
                          "MPI rank should be locally owned here!"));
               }
 #  endif
-
-            // This barrier is important to make sure that two successive calls
-            // to this functions do not overlap and we confuse messages. See the
-            // discussion in https://github.com/dealii/dealii/issues/8929
-            MPI_Barrier(comm);
 
 #endif // DEAL_II_WITH_MPI
 
