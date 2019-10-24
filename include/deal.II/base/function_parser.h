@@ -247,6 +247,12 @@ public:
                  const double h = 1e-8);
 
   /**
+   * Copy constructor. Objects of this type can not be copied, and
+   * consequently this constructor is deleted.
+   */
+  FunctionParser(const FunctionParser &) = delete;
+
+  /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
    * for each component of the function).
    */
