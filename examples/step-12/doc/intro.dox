@@ -91,8 +91,14 @@ The summation of all those is done by MeshWorker::mesh_loop().
 
 <h3>The test problem</h3>
 
-Wee solve the advection equation on
+We solve the advection equation on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
 representing a circular counterclockwise flow field, and $g=1$
 on ${\bf x}\in\Gamma_-^1 := [0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
 \Gamma_-\setminus \Gamma_-^1$.
+
+We solve on a sequence of meshes by refining the mesh adaptively by estimating
+the norm of the gradient on each cell. After solving on each mesh, we output
+the solution in vtk format and compute the $L^\infty$ norm of the solution. As
+the exact solution is either 0 or 1, we can measure the magnitude of the
+overshoot of the numerical solution with this.
