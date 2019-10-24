@@ -892,7 +892,8 @@ namespace WorkStream
    *
    * This function that can be used for worker and copier objects that are
    * either pointers to non-member functions or objects that allow to be
-   * called with an operator(), for example objects created by std::bind.
+   * called with an operator(), for example objects created by lambda functions
+   * or std::bind.
    *
    * The two data types <tt>ScratchData</tt> and <tt>CopyData</tt> need to
    * have a working copy constructor. <tt>ScratchData</tt> is only used in the
@@ -945,8 +946,11 @@ namespace WorkStream
    *
    * This function that can be used for worker and copier objects that are
    * either pointers to non-member functions or objects that allow to be
-   * called with an operator(), for example objects created by std::bind. If
-   * the copier is an empty function, it is ignored in the pipeline.
+   * called with an operator(), for example lambda functions
+   * or objects created by std::bind. If the copier is an empty function, it is
+   * ignored in the pipeline. (However, a lambda function with an empty body is
+   * *not* equivalent to an empty `std::function` object and will, consequently,
+   * not be ignored.
    *
    * The argument passed as @p end must be convertible to the same type as @p
    * begin, but doesn't have to be of the same type itself. This allows to

@@ -749,7 +749,8 @@ public:
   /**
    * This is the second variant to run the loop over all cells, now providing
    * a function pointer to a member function of class `CLASS`. This method
-   * obviates the need to call std::bind to bind the class into the given
+   * obviates the need to define a lambda function or to call std::bind to bind
+   * the class into the given
    * function in case the local function needs to access data in the class
    * (i.e., it is a non-static member function).
    *
@@ -1062,7 +1063,8 @@ public:
    * member functions of class @p CLASS with the signature <code>operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
    * std::pair<unsigned int,unsigned int>&)const</code>. This method obviates
-   * the need to call std::bind to bind the class into the given
+   * the need to define a lambda function or to call std::bind to bind
+   * the class into the given
    * function in case the local function needs to access data in the class
    * (i.e., it is a non-static member function).
    *

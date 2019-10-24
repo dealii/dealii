@@ -387,11 +387,11 @@ namespace IteratorFilters
  * @endcode
  * then
  * @code
- *   std::bind (&level_equal_to<active_cell_iterator>, std::placeholders::_1, 3)
+ *   [](const BIterator& c){ return level_equal_to<active_cell_iterator>(c, 3);}
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
- * this second argument is bound to a fixed value using the @p std::bind
+ * this second argument is taken considered fixed when creating the lambda
  * function).
  *
  * Finally, classes can be predicates. The following class is one:

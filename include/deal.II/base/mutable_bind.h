@@ -54,7 +54,7 @@ namespace Utilities
    * The arguments are copied to the tuple, with their reference and const
    * attributes removed. Only copy constructible objects are allowed as
    * function arguments. If you need to keep some references around, you may
-   * wrap your function into a std::bind object:
+   * wrap your function into a lambda function:
    *
    * @code
    *  void
@@ -67,10 +67,11 @@ namespace Utilities
    *  const Point<2> p(1, 2);
    *
    *  Utilities::MutableBind<void, double, unsigned int> exp = {
-   *    std::bind(example_function,
-   *              std::cref(p),
-   *              std::placeholders::_1,
-   *              std::placeholders::_2),
+   *    [&p](const double &d,
+   *         const unsigned int i)
+   *    {
+   *      example_function(p, d, i);
+   *    },
    *    {}};
    *
    *  exp.parse_arguments("3.0 : 4");
