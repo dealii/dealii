@@ -237,6 +237,8 @@ namespace Utilities
         }
 
 #  if DEAL_II_MPI_VERSION_GTE(2, 2)
+      DuplicatedCommunicator comm(mpi_comm);
+
       // Calculate the number of messages to send to each process
       std::vector<unsigned int> dest_vector(n_procs);
       for (const auto &el : destinations)
@@ -247,7 +249,7 @@ namespace Utilities
       // results over all processes
       unsigned int n_recv_from;
       const int    ierr = MPI_Reduce_scatter_block(
-        dest_vector.data(), &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
+        dest_vector.data(), &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, *comm);
 
       AssertThrowMPI(ierr);
 
@@ -261,7 +263,7 @@ namespace Utilities
                       MPI_UNSIGNED,
                       el,
                       32766,
-                      mpi_comm,
+                      *comm,
                       send_requests.data() + (&el - destinations.data()));
           AssertThrowMPI(ierr);
         }
@@ -278,7 +280,7 @@ namespace Utilities
                                     MPI_UNSIGNED,
                                     MPI_ANY_SOURCE,
                                     32766,
-                                    mpi_comm,
+                                    *comm,
                                     MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
