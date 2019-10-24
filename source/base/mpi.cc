@@ -853,7 +853,7 @@ namespace Utilities
                                                        const std::vector<T1> &,
                                                        std::vector<T2> &)
     {
-      // noting to do
+      // nothing to do
     }
 
 
@@ -863,7 +863,7 @@ namespace Utilities
     ConsensusAlgorithmProcess<T1, T2>::pack_recv_buffer(const int,
                                                         std::vector<T1> &)
     {
-      // noting to do
+      // nothing to do
     }
 
 
@@ -873,7 +873,7 @@ namespace Utilities
     ConsensusAlgorithmProcess<T1, T2>::prepare_recv_buffer(const int,
                                                            std::vector<T2> &)
     {
-      // noting to do
+      // nothing to do
     }
 
 
@@ -884,7 +884,7 @@ namespace Utilities
       const int,
       const std::vector<T2> &)
     {
-      // noting to do
+      // nothing to do
     }
 
 
