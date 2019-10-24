@@ -253,6 +253,12 @@ public:
   FunctionParser(const FunctionParser &) = delete;
 
   /**
+   * Move constructor. Objects of this type can not be moved, and
+   * consequently this constructor is deleted.
+   */
+  FunctionParser(FunctionParser &&) = delete;
+
+  /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
    * for each component of the function).
    */
@@ -264,6 +270,13 @@ public:
    */
   FunctionParser &
   operator=(const FunctionParser &) = delete;
+
+  /**
+   * Move operator. Objects of this type can not be moved, and
+   * consequently this operator is deleted.
+   */
+  FunctionParser &
+  operator=(FunctionParser &&) = delete;
 
   /**
    * Type for the constant map. Used by the initialize() method.
