@@ -46,7 +46,7 @@
 // <code>FEValues</code> objects, and that is about it.
 #include <deal.II/fe/fe_dgq.h>
 // This header is needed for FEInterfaceValues to compute integrals on
-// interfaces
+// interfaces:
 #include <deal.II/fe/fe_interface_values.h>
 // We are going to use the simplest possible solver, called Richardson
 // iteration, that represents a simple defect correction. This, in combination
@@ -135,7 +135,7 @@ namespace Step12
   // @sect3{The ScratchData and CopyData classes}
   //
   // The following objects are the scratch and copy objects we use in the call
-  // to MeshWorker::mesh_loop. The new object is the FEInterfaceValues object,
+  // to MeshWorker::mesh_loop(). The new object is the FEInterfaceValues object,
   // that works similar to FEValues or FEFacesValues, except that it acts on
   // an interface between two cells and allows us to assemble the interface
   // terms in our weak form.
@@ -213,7 +213,7 @@ namespace Step12
   // called AdvectionProblem. While we would not need an AffineConstraints
   // object, because there are no hanging node constraints in DG
   // discretizations, we use an empty object here as this allows us to use its
-  // copy_local_to_global functionality.
+  // `copy_local_to_global` functionality.
   //
   // Major differences will only come up in the implementation of the assemble
   // function.
@@ -299,8 +299,8 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
-    typedef decltype(dof_handler.begin_active()) Iterator;
-    BoundaryValues<dim>                          boundary_function;
+    using ActiveCellIterator = typename DoFHandler<dim>::active_cell_iyerator;
+    const BoundaryValues<dim>                          boundary_function;
 
     // This is the function that will be executed for each cell.
     auto cell_worker = [&](const Iterator &  cell,
@@ -333,7 +333,7 @@ namespace Step12
     };
 
     // This is the function called for boundary faces and consists of a normal
-    // integration using FeFaceValues. New is the logic to decide if the term
+    // integration using FEFaceValues. New is the logic to decide if the term
     // goes into the system matrix (outflow) or the right-hand side (inflow).
     auto boundary_worker = [&](const Iterator &    cell,
                                const unsigned int &face_no,
@@ -408,7 +408,7 @@ namespace Step12
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
                 fe_iv.jump(i, qpoint)                        // [\phi_i]
-                * fe_iv.shape_value((beta_n > 0), j, qpoint) // phi_j^{UP}
+                * fe_iv.shape_value((beta_n > 0), j, qpoint) // phi_j^{upwind}
                 * beta_n                                     // (\beta . n)
                 * JxW[qpoint];                               // dx
         }
@@ -534,7 +534,7 @@ namespace Step12
 
   // The output of this program consists of a vtk file of the adaptively
   // refined grids and the numerical solutions. Finally, we also compute the
-  // L-infinity norm of the solution using VectorTools::integrate_difference.
+  // L-infinity norm of the solution using VectorTools::integrate_difference().
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {

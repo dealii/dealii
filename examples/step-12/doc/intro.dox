@@ -1,8 +1,8 @@
 <br>
 
-<i> Note: A variant called step-12b of this tutorial exists, that uses
+<i> Note: A variant called step-12b of this tutorial exists, using
 MeshWorker and LocalIntegrators instead of assembling matrices using
-FEInterfaceValues as it is done in this tutorial.
+FEInterfaceValues as is done in this tutorial.
 </i>
 
 <a name="Intro"></a>
@@ -64,7 +64,7 @@ all internal and external faces and as such there are three cases:
 <li> outer boundary on the outflow:
   $\int_{\Gamma_+} v_h u_h \beta \cdot n$
 <li> inner faces (integral from two sides turns into jump, we use the upwind velocity):
-  $\int_F [v_h] u_h^{\text{UP}} \beta \cdot n$
+  $\int_F [v_h] u_h^{\text{upwind}} \beta \cdot n$
 </ol>
 
 Here, the jump is defined as $[v] = v^+ - v^-$, where the superscripts refer
@@ -83,7 +83,7 @@ and $\mathbb F_h^i$ is the set of all active interior faces. This formulation
 is known as the upwind discontinuous Galerkin method.
 
 In order to implement this bilinear form, we need to compute the cell terms
-(first sum) using a normal cell integration, the interface terms (second sum) using
+(first sum) using the usual way to achieve integration on a cell, the interface terms (second sum) using
 FEInterfaceValues, and the boundary terms (the other two terms).
 The summation of all those is done by MeshWorker::mesh_loop().
 
