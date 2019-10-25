@@ -869,12 +869,14 @@ namespace GridOutFlags
     /**
      * Default constructor.
      */
-    Vtk(const bool output_cells    = true,
-        const bool output_faces    = true,
-        const bool output_co_faces = true)
+    Vtk(const bool output_cells         = true,
+        const bool output_faces         = true,
+        const bool output_edges         = true,
+        const bool output_only_relevant = true)
       : output_cells(output_cells)
       , output_faces(output_faces)
-      , output_co_faces(output_co_faces)
+      , output_edges(output_edges)
+      , output_only_relevant(output_only_relevant)
     {}
 
     /**
@@ -890,7 +892,13 @@ namespace GridOutFlags
     /**
      * Output co-faces/edges.
      */
-    bool output_co_faces;
+    bool output_edges;
+
+    /**
+     * Output only faces/co-faces that differ from the default settings
+     * (e.g boundary_id).
+     */
+    bool output_only_relevant;
   };
 
 

@@ -2951,13 +2951,11 @@ namespace
     return v;
   }
 
-
   /**
-   * Return all lines of a face in three dimension that have a non-standard
-   * boundary indicator (!=0), or a non-flat manifold indicator.
+   * Return all boundary lines of non-internal faces in three dimension.
    */
   std::vector<typename Triangulation<3, 3>::active_line_iterator>
-  relevant_co_faces(const Triangulation<3, 3> &tria)
+  get_boundary_edge_iterators(const Triangulation<3, 3> &tria)
   {
     std::vector<typename Triangulation<3, 3>::active_line_iterator> res;
 
@@ -2965,10 +2963,52 @@ namespace
     tria.save_user_flags_line(flags);
     const_cast<Triangulation<3, 3> &>(tria).clear_user_flags_line();
 
-    for (auto face = tria.begin_active_face(); face != tria.end_face(); ++face)
+    for (auto face : tria.active_face_iterators())
       for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
         {
-          auto line = face->line(l);
+          const auto line = face->line(l);
+          if (line->user_flag_set() || line->has_children())
+            continue;
+          else
+            line->set_user_flag();
+          if (line->at_boundary())
+            res.emplace_back(line);
+        }
+    const_cast<Triangulation<3, 3> &>(tria).load_user_flags_line(flags);
+    return res;
+  }
+
+
+
+  /**
+   * Same as above, for 1 and 2 dimensional grids. Does nothing.
+   */
+  template <int dim, int spacedim>
+  std::vector<typename Triangulation<dim, spacedim>::active_line_iterator>
+  get_boundary_edge_iterators(const Triangulation<dim, spacedim> &)
+  {
+    return {};
+  }
+
+
+
+  /**
+   * Return all lines of a face in three dimension that have a non-standard
+   * boundary indicator (!=0), or a non-flat manifold indicator.
+   */
+  std::vector<typename Triangulation<3, 3>::active_line_iterator>
+  get_relevant_edge_iterators(const Triangulation<3, 3> &tria)
+  {
+    std::vector<typename Triangulation<3, 3>::active_line_iterator> res;
+
+    std::vector<bool> flags;
+    tria.save_user_flags_line(flags);
+    const_cast<Triangulation<3, 3> &>(tria).clear_user_flags_line();
+
+    for (auto face : tria.active_face_iterators())
+      for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
+        {
+          const auto line = face->line(l);
           if (line->user_flag_set() || line->has_children())
             continue;
           else
@@ -2988,9 +3028,30 @@ namespace
    */
   template <int dim, int spacedim>
   std::vector<typename Triangulation<dim, spacedim>::active_line_iterator>
-  relevant_co_faces(const Triangulation<dim, spacedim> &)
+  get_relevant_edge_iterators(const Triangulation<dim, spacedim> &)
   {
     return {};
+  }
+
+
+
+  /**
+   * Return all boundary faces of a triangulation.
+   */
+  template <int dim, int spacedim>
+  std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
+  get_boundary_face_iterators(const Triangulation<dim, spacedim> &tria)
+  {
+    std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
+      res;
+    if (dim == 1)
+      return res;
+    for (auto face : tria.active_face_iterators())
+      {
+        if (face->boundary_id() != numbers::invalid_boundary_id)
+          res.push_back(face);
+      }
+    return res;
   }
 
 
@@ -3001,13 +3062,13 @@ namespace
    */
   template <int dim, int spacedim>
   std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
-  relevant_faces(const Triangulation<dim, spacedim> &tria)
+  get_relevant_face_iterators(const Triangulation<dim, spacedim> &tria)
   {
     std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
       res;
     if (dim == 1)
       return res;
-    for (auto face = tria.begin_active_face(); face != tria.end_face(); ++face)
+    for (auto face : tria.active_face_iterators())
       {
         if (face->manifold_id() != numbers::flat_manifold_id ||
             (face->boundary_id() != 0 &&
@@ -3047,19 +3108,23 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
       out << '\n';
     }
 
-  const auto faces    = relevant_faces(tria);
-  const auto co_faces = relevant_co_faces(tria);
+  const auto faces = vtk_flags.output_only_relevant ?
+                       get_relevant_face_iterators(tria) :
+                       get_boundary_face_iterators(tria);
+  const auto edges = vtk_flags.output_only_relevant ?
+                       get_relevant_edge_iterators(tria) :
+                       get_boundary_edge_iterators(tria);
 
   AssertThrow(
-    vtk_flags.output_cells || (dim > 2 && vtk_flags.output_faces) ||
-      (dim > 3 && vtk_flags.output_co_faces),
+    vtk_flags.output_cells || (dim >= 2 && vtk_flags.output_faces) ||
+      (dim >= 3 && vtk_flags.output_edges),
     ExcMessage(
-      "At least one of the flags (output_cells, output_faces, output_co_faces) has to be enabled!"));
+      "At least one of the flags (output_cells, output_faces, output_edges) has to be enabled!"));
 
   // Write cells preamble
   const int n_cells = (vtk_flags.output_cells ? tria.n_active_cells() : 0) +
                       (vtk_flags.output_faces ? faces.size() : 0) +
-                      (vtk_flags.output_co_faces ? co_faces.size() : 0);
+                      (vtk_flags.output_edges ? edges.size() : 0);
 
   // VTK now expects a number telling the total storage requirement to read all
   // cell connectivity information. The connectivity information is read cell by
@@ -3074,8 +3139,8 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     (vtk_flags.output_faces ?
        faces.size() * (GeometryInfo<dim>::vertices_per_face + 1) :
        0) +
-    (vtk_flags.output_co_faces ? co_faces.size() * (3) :
-                                 0); // only in 3d, otherwise it is always zero.
+    (vtk_flags.output_edges ? edges.size() * (3) :
+                              0); // only in 3d, otherwise it is always zero.
 
   AssertThrow(cells_size > 0, ExcMessage("No cells given to be output!"));
 
@@ -3117,12 +3182,12 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
           }
         out << '\n';
       }
-  if (vtk_flags.output_co_faces)
-    for (const auto &co_face : co_faces)
+  if (vtk_flags.output_edges)
+    for (const auto &edge : edges)
       {
         out << 2;
         for (unsigned int i = 0; i < 2; ++i)
-          out << ' ' << co_face->vertex_index(i);
+          out << ' ' << edge->vertex_index(i);
         out << '\n';
       }
 
@@ -3144,9 +3209,9 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         }
       out << '\n';
     }
-  if (vtk_flags.output_co_faces)
+  if (vtk_flags.output_edges)
     {
-      for (unsigned int i = 0; i < co_faces.size(); ++i)
+      for (unsigned int i = 0; i < edges.size(); ++i)
         {
           out << co_face_type << ' ';
         }
@@ -3176,12 +3241,12 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         }
       out << '\n';
     }
-  if (vtk_flags.output_co_faces)
+  if (vtk_flags.output_edges)
     {
-      for (const auto &co_face : co_faces)
+      for (const auto &edge : edges)
         {
           out << static_cast<std::make_signed<types::boundary_id>::type>(
-                   co_face->boundary_id())
+                   edge->boundary_id())
               << ' ';
         }
     }
@@ -3210,12 +3275,12 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         }
       out << '\n';
     }
-  if (vtk_flags.output_co_faces)
+  if (vtk_flags.output_edges)
     {
-      for (const auto &co_face : co_faces)
+      for (const auto &edge : edges)
         {
           out << static_cast<std::make_signed<types::boundary_id>::type>(
-                   co_face->manifold_id())
+                   edge->manifold_id())
               << ' ';
         }
       out << '\n';
