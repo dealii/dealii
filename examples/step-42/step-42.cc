@@ -2046,31 +2046,9 @@ namespace Step42
     // output files. We then do the same again for the competitor of
     // Paraview, the Visit visualization program, by creating a matching
     // <code>.visit</code> file.
-    const std::string filename =
-      (output_dir + filename_base + "-" +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
-
-    std::ofstream output_vtu((filename + ".vtu"));
-    data_out.write_vtu(output_vtu);
+    data_out.write_vtu_with_pvtu_record(
+      output_dir, filename_base, 0, 1, mpi_communicator);
     pcout << output_dir + filename_base << ".pvtu" << std::endl;
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back(filename_base + "-" +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream pvtu_master_output(
-          (output_dir + filename_base + ".pvtu"));
-        data_out.write_pvtu_record(pvtu_master_output, filenames);
-
-        std::ofstream visit_master_output(
-          (output_dir + filename_base + ".visit"));
-        DataOutBase::write_visit_record(visit_master_output, filenames);
-      }
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;

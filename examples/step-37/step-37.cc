@@ -1128,29 +1128,11 @@ namespace Step37
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
-      ".vtu");
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
-
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output(master_name);
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution-", cycle, 3, MPI_COMM_WORLD);
 
     time_details << "Time write output          (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << "s\n";

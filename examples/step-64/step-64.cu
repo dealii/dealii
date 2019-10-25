@@ -544,29 +544,11 @@ namespace Step64
     data_out.add_data_vector(ghost_solution_host, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(mpi_communicator)) +
-      ".vtu");
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
-
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output(master_name);
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution-", cycle, 2, mpi_communicator);
 
     Vector<float> cellwise_norm(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,

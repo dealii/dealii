@@ -3243,41 +3243,9 @@ namespace Step32
     data_out.add_data_vector(locally_relevant_joint_solution, postprocessor);
     data_out.build_patches();
 
-    static int        out_index = 0;
-    const std::string filename =
-      ("solution-" + Utilities::int_to_string(out_index, 5) + "." +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4) +
-       ".vtu");
-    std::ofstream output(filename);
-    data_out.write_vtu(output);
-
-
-    // At this point, all processors have written their own files to disk. We
-    // could visualize them individually in Visit or Paraview, but in reality
-    // we of course want to visualize the whole set of files at once. To this
-    // end, we create a master file in each of the formats understood by Visit
-    // (<code>.visit</code>) and Paraview (<code>.pvtu</code>) on the zeroth
-    // processor that describes how the individual files are defining the
-    // global data set.
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back(std::string("solution-") +
-                              Utilities::int_to_string(out_index, 5) + "." +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(out_index, 5) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-
-        const std::string visit_master_filename =
-          ("solution-" + Utilities::int_to_string(out_index, 5) + ".visit");
-        std::ofstream visit_master(visit_master_filename);
-        DataOutBase::write_visit_record(visit_master, filenames);
-      }
+    static int out_index = 0;
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution-", out_index, 5, MPI_COMM_WORLD);
 
     out_index++;
   }

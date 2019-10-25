@@ -739,27 +739,8 @@ namespace Step45
     data_out.add_data_vector(subdomain, "subdomain");
     data_out.build_patches(mapping, degree + 1);
 
-    std::ofstream output(
-      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + "." +
-      Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2) +
-      ".vtu");
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back(std::string("solution-") +
-                              Utilities::int_to_string(refinement_cycle, 2) +
-                              "." + Utilities::int_to_string(i, 2) + ".vtu");
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(refinement_cycle, 2) +
-           ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution-", refinement_cycle, 2, MPI_COMM_WORLD);
   }
 
 
