@@ -1966,19 +1966,19 @@ namespace DoFTools
 
           // We have to be careful to treat so called "identity
           // constraints" special. These are constraints of the form
-          // x1 == factor * x_2. In this case, if the constraint
-          // x2 == 1./factor * x1 already exists we are in trouble.
+          // x1 == constraint_factor * x_2. In this case, if the constraint
+          // x2 == 1./constraint_factor * x1 already exists we are in trouble.
           //
           // Consequently, we have to check that we have indeed such an
           // "identity constraint". We do this by looping over all entries
           // of the row of the transformation matrix and check whether we
           // find exactly one nonzero entry. If this is the case, set
           // "is_identity_constrained" to true and record the corresponding
-          // index and factor.
+          // index and constraint_factor.
 
           bool         is_identity_constrained = false;
           unsigned int target                  = numbers::invalid_unsigned_int;
-          double       factor                  = 1.;
+          double       constraint_factor       = 1.;
 
           constexpr double eps = 1.e-13;
           for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
@@ -1996,7 +1996,7 @@ namespace DoFTools
                     }
                   is_identity_constrained = true;
                   target                  = jj;
-                  factor                  = entry;
+                  constraint_factor       = entry;
                 }
             }
 
@@ -2052,11 +2052,11 @@ namespace DoFTools
                !affine_constraints.is_constrained(dof_right)))
             {
               std::swap(dof_left, dof_right);
-              factor = 1. / factor;
+              constraint_factor = 1. / constraint_factor;
             }
 
           // Next, we try to enter the constraint
-          //   dof_left = factor * dof_right;
+          //   dof_left = constraint_factor * dof_right;
 
           // If both degrees of freedom are constrained, there is nothing we
           // can do. Simply continue with the next dof.
@@ -2068,8 +2068,8 @@ namespace DoFTools
           // constraint does not create a constraint cycle. Thus, check for
           // a dependency cycle:
 
-          bool   constraints_are_cyclic = true;
-          number cycle_factor           = factor;
+          bool   constraints_are_cyclic  = true;
+          number cycle_constraint_factor = constraint_factor;
 
           for (auto test_dof = dof_right; test_dof != dof_left;)
             {
@@ -2084,7 +2084,7 @@ namespace DoFTools
               if (constraint_entries.size() == 1)
                 {
                   test_dof = constraint_entries[0].first;
-                  cycle_factor *= constraint_entries[0].second;
+                  cycle_constraint_factor *= constraint_entries[0].second;
                 }
               else
                 {
@@ -2094,23 +2094,26 @@ namespace DoFTools
             }
 
           // In case of a dependency cycle we, either
-          //  - do nothing if cycle_factor == 1. In this case all degrees
+          //  - do nothing if cycle_constraint_factor == 1. In this case all
+          //  degrees
           //    of freedom are already periodically constrained,
           //  - otherwise, force all dofs to zero (by setting dof_left to
           //    zero). The reasoning behind this is the fact that
-          //    cycle_factor != 1 occurs in situations such as
+          //    cycle_constraint_factor != 1 occurs in situations such as
           //    x1 == x2 and x2 == -1. * x1. This system is only solved by
           //    x_1 = x_2 = 0.
 
           if (constraints_are_cyclic)
             {
-              if (std::abs(cycle_factor - 1.) > eps)
+              if (std::abs(cycle_constraint_factor - 1.) > eps)
                 affine_constraints.add_line(dof_left);
             }
           else
             {
               affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left, dof_right, factor);
+              affine_constraints.add_entry(dof_left,
+                                           dof_right,
+                                           constraint_factor);
             }
         } /* for dofs_per_face */
     }
