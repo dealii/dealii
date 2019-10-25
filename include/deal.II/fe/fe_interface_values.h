@@ -307,6 +307,47 @@ public:
           const unsigned int q_point,
           const unsigned int component = 0) const;
 
+  /**
+   * Return the average of the gradient $\{\nabla u \} = \frac{1}{2}\nabla
+   * u_{\text{cell0}} + \frac{1}{2} \nabla u_{\text{cell1}}$ on the interface
+   * for the shape function @p interface_dof_index at the quadrature point @p
+   * q_point of component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\{\nabla u\}=\nabla u_{\text{cell0}}$.
+   */
+  Tensor<1, dim>
+  average_gradient(const unsigned int interface_dof_index,
+                   const unsigned int q_point,
+                   const unsigned int component = 0) const;
+
+  /**
+   * Return the average of the Hessian $\{\nabla^2 u \} = \frac{1}{2}\nabla^2
+   * u_{\text{cell0}} + \frac{1}{2} \nabla^2 u_{\text{cell1}}$ on the interface
+   * for the shape function @p interface_dof_index at the quadrature point @p
+   * q_point of component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $\{\nabla^2 u\}=\nabla^2 u_{\text{cell0}}$.
+   */
+  Tensor<2, dim>
+  average_hessian(const unsigned int interface_dof_index,
+                  const unsigned int q_point,
+                  const unsigned int component = 0) const;
+
+  /**
+   * Return the jump if the gradient $[\nabla u]=\nabla u_{\text{cell0}} -
+   * \nabla u_{\text{cell1}}$ on the interface for the shape function @p
+   * interface_dof_index at the quadrature point @p q_point of component @p
+   * component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $[\nabla u]=\nabla u_{\text{cell0}}$.
+   */
+  Tensor<1, dim>
+  jump_gradient(const unsigned int interface_dof_index,
+                const unsigned int q_point,
+                const unsigned int component = 0) const;
 
   /**
    * @}
@@ -638,14 +679,14 @@ FEInterfaceValues<dim, spacedim>::shape_value(
   const unsigned int q_point,
   const unsigned int component) const
 {
-  const auto dofpair = dofmap[interface_dof_index];
+  const auto dof_pair = dofmap[interface_dof_index];
 
-  if (here_or_there && dofpair[0] != numbers::invalid_unsigned_int)
-    return get_fe_face_values(0).shape_value_component(dofpair[0],
+  if (here_or_there && dof_pair[0] != numbers::invalid_unsigned_int)
+    return get_fe_face_values(0).shape_value_component(dof_pair[0],
                                                        q_point,
                                                        component);
-  if (!here_or_there && dofpair[1] != numbers::invalid_unsigned_int)
-    return get_fe_face_values(1).shape_value_component(dofpair[1],
+  if (!here_or_there && dof_pair[1] != numbers::invalid_unsigned_int)
+    return get_fe_face_values(1).shape_value_component(dof_pair[1],
                                                        q_point,
                                                        component);
 
@@ -660,16 +701,16 @@ FEInterfaceValues<dim, spacedim>::jump(const unsigned int interface_dof_index,
                                        const unsigned int q_point,
                                        const unsigned int component) const
 {
-  const auto dofpair = dofmap[interface_dof_index];
+  const auto dof_pair = dofmap[interface_dof_index];
 
   double value = 0.0;
 
-  if (dofpair[0] != numbers::invalid_unsigned_int)
-    value += get_fe_face_values(0).shape_value_component(dofpair[0],
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += get_fe_face_values(0).shape_value_component(dof_pair[0],
                                                          q_point,
                                                          component);
-  if (dofpair[1] != numbers::invalid_unsigned_int)
-    value -= get_fe_face_values(1).shape_value_component(dofpair[1],
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value -= get_fe_face_values(1).shape_value_component(dof_pair[1],
                                                          q_point,
                                                          component);
   return value;
@@ -684,26 +725,117 @@ FEInterfaceValues<dim, spacedim>::average(
   const unsigned int q_point,
   const unsigned int component) const
 {
-  const auto dofpair = dofmap[interface_dof_index];
+  const auto dof_pair = dofmap[interface_dof_index];
 
   if (at_boundary())
-    return 1.0 * get_fe_face_values(0).shape_value_component(dofpair[0],
+    return 1.0 * get_fe_face_values(0).shape_value_component(dof_pair[0],
                                                              q_point,
                                                              component);
 
   double value = 0.0;
 
-  if (dofpair[0] != numbers::invalid_unsigned_int)
-    value += 0.5 * get_fe_face_values(0).shape_value_component(dofpair[0],
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(0).shape_value_component(dof_pair[0],
                                                                q_point,
                                                                component);
-  if (dofpair[1] != numbers::invalid_unsigned_int)
-    value += 0.5 * get_fe_face_values(1).shape_value_component(dofpair[1],
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(1).shape_value_component(dof_pair[1],
                                                                q_point,
                                                                component);
 
   return value;
 }
+
+
+
+template <int dim, int spacedim>
+Tensor<1, dim>
+FEInterfaceValues<dim, spacedim>::average_gradient(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  if (at_boundary())
+    return get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                      q_point,
+                                                      component);
+
+  Tensor<1, dim> value;
+
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                              q_point,
+                                                              component);
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(1).shape_grad_component(dof_pair[1],
+                                                              q_point,
+                                                              component);
+
+  return value;
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<2, dim>
+FEInterfaceValues<dim, spacedim>::average_hessian(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  if (at_boundary())
+    return get_fe_face_values(0).shape_hessian_component(dof_pair[0],
+                                                         q_point,
+                                                         component);
+
+  Tensor<2, dim> value;
+
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(0).shape_hessian_component(dof_pair[0],
+                                                                 q_point,
+                                                                 component);
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value += 0.5 * get_fe_face_values(1).shape_hessian_component(dof_pair[1],
+                                                                 q_point,
+                                                                 component);
+
+  return value;
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<1, dim>
+FEInterfaceValues<dim, spacedim>::jump_gradient(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  if (at_boundary())
+    return get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                      q_point,
+                                                      component);
+
+  Tensor<1, dim> value;
+
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += 1.0 * get_fe_face_values(0).shape_grad_component(dof_pair[0],
+                                                              q_point,
+                                                              component);
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value += -1.0 * get_fe_face_values(1).shape_grad_component(dof_pair[1],
+                                                               q_point,
+                                                               component);
+
+  return value;
+}
+
 
 #endif // DOXYGEN
 
