@@ -1,0 +1,693 @@
+
+DEAL:2d::Active level (with max_level=2):
+DEAL:2d::cell:      0_2:00
+DEAL:2d::cell:      0_2:01
+DEAL:2d::cell:      0_2:02
+DEAL:2d::cell:      0_2:03
+DEAL:2d::cell:      0_2:10
+DEAL:2d::cell:      0_2:11
+DEAL:2d::cell:      0_2:12
+DEAL:2d::cell:      0_2:13
+DEAL:2d::cell:      0_2:20
+DEAL:2d::cell:      0_2:21
+DEAL:2d::cell:      0_2:22
+DEAL:2d::cell:      0_2:23
+DEAL:2d::cell:      0_2:30
+DEAL:2d::cell:      0_2:31
+DEAL:2d::cell:      0_2:32
+DEAL:2d::cell:      0_2:33
+DEAL:2d::face:      0_2:00 0_2:01
+DEAL:2d::face:      0_2:00 0_2:02
+DEAL:2d::face:      0_2:01 0_2:03
+DEAL:2d::face:      0_2:01 0_2:10
+DEAL:2d::face:      0_2:02 0_2:03
+DEAL:2d::face:      0_2:02 0_2:20
+DEAL:2d::face:      0_2:03 0_2:12
+DEAL:2d::face:      0_2:03 0_2:21
+DEAL:2d::face:      0_2:10 0_2:11
+DEAL:2d::face:      0_2:10 0_2:12
+DEAL:2d::face:      0_2:11 0_2:13
+DEAL:2d::face:      0_2:12 0_2:13
+DEAL:2d::face:      0_2:12 0_2:30
+DEAL:2d::face:      0_2:13 0_2:31
+DEAL:2d::face:      0_2:20 0_2:21
+DEAL:2d::face:      0_2:20 0_2:22
+DEAL:2d::face:      0_2:21 0_2:23
+DEAL:2d::face:      0_2:21 0_2:30
+DEAL:2d::face:      0_2:22 0_2:23
+DEAL:2d::face:      0_2:23 0_2:32
+DEAL:2d::face:      0_2:30 0_2:31
+DEAL:2d::face:      0_2:30 0_2:32
+DEAL:2d::face:      0_2:31 0_2:33
+DEAL:2d::face:      0_2:32 0_2:33
+DEAL:2d::boundary:  0_2:00
+DEAL:2d::boundary:  0_2:01
+DEAL:2d::boundary:  0_2:02
+DEAL:2d::boundary:  0_2:10
+DEAL:2d::boundary:  0_2:11
+DEAL:2d::boundary:  0_2:13
+DEAL:2d::boundary:  0_2:20
+DEAL:2d::boundary:  0_2:22
+DEAL:2d::boundary:  0_2:23
+DEAL:2d::boundary:  0_2:31
+DEAL:2d::boundary:  0_2:32
+DEAL:2d::boundary:  0_2:33
+DEAL:2d::
+DEAL:2d::Multigrid level 0:
+DEAL:2d::cell:      0_0:
+DEAL:2d::boundary:  0_0:
+DEAL:2d::
+DEAL:2d::Multigrid level 1:
+DEAL:2d::cell:      0_1:0
+DEAL:2d::cell:      0_1:1
+DEAL:2d::cell:      0_1:2
+DEAL:2d::cell:      0_1:3
+DEAL:2d::face:      0_1:0 0_1:1
+DEAL:2d::face:      0_1:0 0_1:2
+DEAL:2d::face:      0_1:1 0_1:3
+DEAL:2d::face:      0_1:2 0_1:3
+DEAL:2d::boundary:  0_1:0
+DEAL:2d::boundary:  0_1:1
+DEAL:2d::boundary:  0_1:2
+DEAL:2d::boundary:  0_1:3
+DEAL:2d::
+DEAL:2d::Multigrid level 2:
+DEAL:2d::cell:      0_2:00
+DEAL:2d::cell:      0_2:01
+DEAL:2d::cell:      0_2:02
+DEAL:2d::cell:      0_2:03
+DEAL:2d::cell:      0_2:10
+DEAL:2d::cell:      0_2:11
+DEAL:2d::cell:      0_2:12
+DEAL:2d::cell:      0_2:13
+DEAL:2d::cell:      0_2:20
+DEAL:2d::cell:      0_2:21
+DEAL:2d::cell:      0_2:22
+DEAL:2d::cell:      0_2:23
+DEAL:2d::cell:      0_2:30
+DEAL:2d::cell:      0_2:31
+DEAL:2d::cell:      0_2:32
+DEAL:2d::cell:      0_2:33
+DEAL:2d::face:      0_2:00 0_2:01
+DEAL:2d::face:      0_2:00 0_2:02
+DEAL:2d::face:      0_2:01 0_2:03
+DEAL:2d::face:      0_2:01 0_2:10
+DEAL:2d::face:      0_2:02 0_2:03
+DEAL:2d::face:      0_2:02 0_2:20
+DEAL:2d::face:      0_2:03 0_2:12
+DEAL:2d::face:      0_2:03 0_2:21
+DEAL:2d::face:      0_2:10 0_2:11
+DEAL:2d::face:      0_2:10 0_2:12
+DEAL:2d::face:      0_2:11 0_2:13
+DEAL:2d::face:      0_2:12 0_2:13
+DEAL:2d::face:      0_2:12 0_2:30
+DEAL:2d::face:      0_2:13 0_2:31
+DEAL:2d::face:      0_2:20 0_2:21
+DEAL:2d::face:      0_2:20 0_2:22
+DEAL:2d::face:      0_2:21 0_2:23
+DEAL:2d::face:      0_2:21 0_2:30
+DEAL:2d::face:      0_2:22 0_2:23
+DEAL:2d::face:      0_2:23 0_2:32
+DEAL:2d::face:      0_2:30 0_2:31
+DEAL:2d::face:      0_2:30 0_2:32
+DEAL:2d::face:      0_2:31 0_2:33
+DEAL:2d::face:      0_2:32 0_2:33
+DEAL:2d::boundary:  0_2:00
+DEAL:2d::boundary:  0_2:01
+DEAL:2d::boundary:  0_2:02
+DEAL:2d::boundary:  0_2:10
+DEAL:2d::boundary:  0_2:11
+DEAL:2d::boundary:  0_2:13
+DEAL:2d::boundary:  0_2:20
+DEAL:2d::boundary:  0_2:22
+DEAL:2d::boundary:  0_2:23
+DEAL:2d::boundary:  0_2:31
+DEAL:2d::boundary:  0_2:32
+DEAL:2d::boundary:  0_2:33
+DEAL:2d::
+DEAL:3d::Active level (with max_level=2):
+DEAL:3d::cell:      0_2:00
+DEAL:3d::cell:      0_2:01
+DEAL:3d::cell:      0_2:02
+DEAL:3d::cell:      0_2:03
+DEAL:3d::cell:      0_2:04
+DEAL:3d::cell:      0_2:05
+DEAL:3d::cell:      0_2:06
+DEAL:3d::cell:      0_2:07
+DEAL:3d::cell:      0_2:10
+DEAL:3d::cell:      0_2:11
+DEAL:3d::cell:      0_2:12
+DEAL:3d::cell:      0_2:13
+DEAL:3d::cell:      0_2:14
+DEAL:3d::cell:      0_2:15
+DEAL:3d::cell:      0_2:16
+DEAL:3d::cell:      0_2:17
+DEAL:3d::cell:      0_2:20
+DEAL:3d::cell:      0_2:21
+DEAL:3d::cell:      0_2:22
+DEAL:3d::cell:      0_2:23
+DEAL:3d::cell:      0_2:24
+DEAL:3d::cell:      0_2:25
+DEAL:3d::cell:      0_2:26
+DEAL:3d::cell:      0_2:27
+DEAL:3d::cell:      0_2:30
+DEAL:3d::cell:      0_2:31
+DEAL:3d::cell:      0_2:32
+DEAL:3d::cell:      0_2:33
+DEAL:3d::cell:      0_2:34
+DEAL:3d::cell:      0_2:35
+DEAL:3d::cell:      0_2:36
+DEAL:3d::cell:      0_2:37
+DEAL:3d::cell:      0_2:40
+DEAL:3d::cell:      0_2:41
+DEAL:3d::cell:      0_2:42
+DEAL:3d::cell:      0_2:43
+DEAL:3d::cell:      0_2:44
+DEAL:3d::cell:      0_2:45
+DEAL:3d::cell:      0_2:46
+DEAL:3d::cell:      0_2:47
+DEAL:3d::cell:      0_2:50
+DEAL:3d::cell:      0_2:51
+DEAL:3d::cell:      0_2:52
+DEAL:3d::cell:      0_2:53
+DEAL:3d::cell:      0_2:54
+DEAL:3d::cell:      0_2:55
+DEAL:3d::cell:      0_2:56
+DEAL:3d::cell:      0_2:57
+DEAL:3d::cell:      0_2:60
+DEAL:3d::cell:      0_2:61
+DEAL:3d::cell:      0_2:62
+DEAL:3d::cell:      0_2:63
+DEAL:3d::cell:      0_2:64
+DEAL:3d::cell:      0_2:65
+DEAL:3d::cell:      0_2:66
+DEAL:3d::cell:      0_2:67
+DEAL:3d::cell:      0_2:70
+DEAL:3d::cell:      0_2:71
+DEAL:3d::cell:      0_2:72
+DEAL:3d::cell:      0_2:73
+DEAL:3d::cell:      0_2:74
+DEAL:3d::cell:      0_2:75
+DEAL:3d::cell:      0_2:76
+DEAL:3d::cell:      0_2:77
+DEAL:3d::face:      0_2:00 0_2:01
+DEAL:3d::face:      0_2:00 0_2:02
+DEAL:3d::face:      0_2:00 0_2:04
+DEAL:3d::face:      0_2:01 0_2:03
+DEAL:3d::face:      0_2:01 0_2:05
+DEAL:3d::face:      0_2:01 0_2:10
+DEAL:3d::face:      0_2:02 0_2:03
+DEAL:3d::face:      0_2:02 0_2:06
+DEAL:3d::face:      0_2:02 0_2:20
+DEAL:3d::face:      0_2:03 0_2:07
+DEAL:3d::face:      0_2:03 0_2:12
+DEAL:3d::face:      0_2:03 0_2:21
+DEAL:3d::face:      0_2:04 0_2:05
+DEAL:3d::face:      0_2:04 0_2:06
+DEAL:3d::face:      0_2:04 0_2:40
+DEAL:3d::face:      0_2:05 0_2:07
+DEAL:3d::face:      0_2:05 0_2:14
+DEAL:3d::face:      0_2:05 0_2:41
+DEAL:3d::face:      0_2:06 0_2:07
+DEAL:3d::face:      0_2:06 0_2:24
+DEAL:3d::face:      0_2:06 0_2:42
+DEAL:3d::face:      0_2:07 0_2:16
+DEAL:3d::face:      0_2:07 0_2:25
+DEAL:3d::face:      0_2:07 0_2:43
+DEAL:3d::face:      0_2:10 0_2:11
+DEAL:3d::face:      0_2:10 0_2:12
+DEAL:3d::face:      0_2:10 0_2:14
+DEAL:3d::face:      0_2:11 0_2:13
+DEAL:3d::face:      0_2:11 0_2:15
+DEAL:3d::face:      0_2:12 0_2:13
+DEAL:3d::face:      0_2:12 0_2:16
+DEAL:3d::face:      0_2:12 0_2:30
+DEAL:3d::face:      0_2:13 0_2:17
+DEAL:3d::face:      0_2:13 0_2:31
+DEAL:3d::face:      0_2:14 0_2:15
+DEAL:3d::face:      0_2:14 0_2:16
+DEAL:3d::face:      0_2:14 0_2:50
+DEAL:3d::face:      0_2:15 0_2:17
+DEAL:3d::face:      0_2:15 0_2:51
+DEAL:3d::face:      0_2:16 0_2:17
+DEAL:3d::face:      0_2:16 0_2:34
+DEAL:3d::face:      0_2:16 0_2:52
+DEAL:3d::face:      0_2:17 0_2:35
+DEAL:3d::face:      0_2:17 0_2:53
+DEAL:3d::face:      0_2:20 0_2:21
+DEAL:3d::face:      0_2:20 0_2:22
+DEAL:3d::face:      0_2:20 0_2:24
+DEAL:3d::face:      0_2:21 0_2:23
+DEAL:3d::face:      0_2:21 0_2:25
+DEAL:3d::face:      0_2:21 0_2:30
+DEAL:3d::face:      0_2:22 0_2:23
+DEAL:3d::face:      0_2:22 0_2:26
+DEAL:3d::face:      0_2:23 0_2:27
+DEAL:3d::face:      0_2:23 0_2:32
+DEAL:3d::face:      0_2:24 0_2:25
+DEAL:3d::face:      0_2:24 0_2:26
+DEAL:3d::face:      0_2:24 0_2:60
+DEAL:3d::face:      0_2:25 0_2:27
+DEAL:3d::face:      0_2:25 0_2:34
+DEAL:3d::face:      0_2:25 0_2:61
+DEAL:3d::face:      0_2:26 0_2:27
+DEAL:3d::face:      0_2:26 0_2:62
+DEAL:3d::face:      0_2:27 0_2:36
+DEAL:3d::face:      0_2:27 0_2:63
+DEAL:3d::face:      0_2:30 0_2:31
+DEAL:3d::face:      0_2:30 0_2:32
+DEAL:3d::face:      0_2:30 0_2:34
+DEAL:3d::face:      0_2:31 0_2:33
+DEAL:3d::face:      0_2:31 0_2:35
+DEAL:3d::face:      0_2:32 0_2:33
+DEAL:3d::face:      0_2:32 0_2:36
+DEAL:3d::face:      0_2:33 0_2:37
+DEAL:3d::face:      0_2:34 0_2:35
+DEAL:3d::face:      0_2:34 0_2:36
+DEAL:3d::face:      0_2:34 0_2:70
+DEAL:3d::face:      0_2:35 0_2:37
+DEAL:3d::face:      0_2:35 0_2:71
+DEAL:3d::face:      0_2:36 0_2:37
+DEAL:3d::face:      0_2:36 0_2:72
+DEAL:3d::face:      0_2:37 0_2:73
+DEAL:3d::face:      0_2:40 0_2:41
+DEAL:3d::face:      0_2:40 0_2:42
+DEAL:3d::face:      0_2:40 0_2:44
+DEAL:3d::face:      0_2:41 0_2:43
+DEAL:3d::face:      0_2:41 0_2:45
+DEAL:3d::face:      0_2:41 0_2:50
+DEAL:3d::face:      0_2:42 0_2:43
+DEAL:3d::face:      0_2:42 0_2:46
+DEAL:3d::face:      0_2:42 0_2:60
+DEAL:3d::face:      0_2:43 0_2:47
+DEAL:3d::face:      0_2:43 0_2:52
+DEAL:3d::face:      0_2:43 0_2:61
+DEAL:3d::face:      0_2:44 0_2:45
+DEAL:3d::face:      0_2:44 0_2:46
+DEAL:3d::face:      0_2:45 0_2:47
+DEAL:3d::face:      0_2:45 0_2:54
+DEAL:3d::face:      0_2:46 0_2:47
+DEAL:3d::face:      0_2:46 0_2:64
+DEAL:3d::face:      0_2:47 0_2:56
+DEAL:3d::face:      0_2:47 0_2:65
+DEAL:3d::face:      0_2:50 0_2:51
+DEAL:3d::face:      0_2:50 0_2:52
+DEAL:3d::face:      0_2:50 0_2:54
+DEAL:3d::face:      0_2:51 0_2:53
+DEAL:3d::face:      0_2:51 0_2:55
+DEAL:3d::face:      0_2:52 0_2:53
+DEAL:3d::face:      0_2:52 0_2:56
+DEAL:3d::face:      0_2:52 0_2:70
+DEAL:3d::face:      0_2:53 0_2:57
+DEAL:3d::face:      0_2:53 0_2:71
+DEAL:3d::face:      0_2:54 0_2:55
+DEAL:3d::face:      0_2:54 0_2:56
+DEAL:3d::face:      0_2:55 0_2:57
+DEAL:3d::face:      0_2:56 0_2:57
+DEAL:3d::face:      0_2:56 0_2:74
+DEAL:3d::face:      0_2:57 0_2:75
+DEAL:3d::face:      0_2:60 0_2:61
+DEAL:3d::face:      0_2:60 0_2:62
+DEAL:3d::face:      0_2:60 0_2:64
+DEAL:3d::face:      0_2:61 0_2:63
+DEAL:3d::face:      0_2:61 0_2:65
+DEAL:3d::face:      0_2:61 0_2:70
+DEAL:3d::face:      0_2:62 0_2:63
+DEAL:3d::face:      0_2:62 0_2:66
+DEAL:3d::face:      0_2:63 0_2:67
+DEAL:3d::face:      0_2:63 0_2:72
+DEAL:3d::face:      0_2:64 0_2:65
+DEAL:3d::face:      0_2:64 0_2:66
+DEAL:3d::face:      0_2:65 0_2:67
+DEAL:3d::face:      0_2:65 0_2:74
+DEAL:3d::face:      0_2:66 0_2:67
+DEAL:3d::face:      0_2:67 0_2:76
+DEAL:3d::face:      0_2:70 0_2:71
+DEAL:3d::face:      0_2:70 0_2:72
+DEAL:3d::face:      0_2:70 0_2:74
+DEAL:3d::face:      0_2:71 0_2:73
+DEAL:3d::face:      0_2:71 0_2:75
+DEAL:3d::face:      0_2:72 0_2:73
+DEAL:3d::face:      0_2:72 0_2:76
+DEAL:3d::face:      0_2:73 0_2:77
+DEAL:3d::face:      0_2:74 0_2:75
+DEAL:3d::face:      0_2:74 0_2:76
+DEAL:3d::face:      0_2:75 0_2:77
+DEAL:3d::face:      0_2:76 0_2:77
+DEAL:3d::boundary:  0_2:00
+DEAL:3d::boundary:  0_2:01
+DEAL:3d::boundary:  0_2:02
+DEAL:3d::boundary:  0_2:03
+DEAL:3d::boundary:  0_2:04
+DEAL:3d::boundary:  0_2:05
+DEAL:3d::boundary:  0_2:06
+DEAL:3d::boundary:  0_2:10
+DEAL:3d::boundary:  0_2:11
+DEAL:3d::boundary:  0_2:12
+DEAL:3d::boundary:  0_2:13
+DEAL:3d::boundary:  0_2:14
+DEAL:3d::boundary:  0_2:15
+DEAL:3d::boundary:  0_2:17
+DEAL:3d::boundary:  0_2:20
+DEAL:3d::boundary:  0_2:21
+DEAL:3d::boundary:  0_2:22
+DEAL:3d::boundary:  0_2:23
+DEAL:3d::boundary:  0_2:24
+DEAL:3d::boundary:  0_2:26
+DEAL:3d::boundary:  0_2:27
+DEAL:3d::boundary:  0_2:30
+DEAL:3d::boundary:  0_2:31
+DEAL:3d::boundary:  0_2:32
+DEAL:3d::boundary:  0_2:33
+DEAL:3d::boundary:  0_2:35
+DEAL:3d::boundary:  0_2:36
+DEAL:3d::boundary:  0_2:37
+DEAL:3d::boundary:  0_2:40
+DEAL:3d::boundary:  0_2:41
+DEAL:3d::boundary:  0_2:42
+DEAL:3d::boundary:  0_2:44
+DEAL:3d::boundary:  0_2:45
+DEAL:3d::boundary:  0_2:46
+DEAL:3d::boundary:  0_2:47
+DEAL:3d::boundary:  0_2:50
+DEAL:3d::boundary:  0_2:51
+DEAL:3d::boundary:  0_2:53
+DEAL:3d::boundary:  0_2:54
+DEAL:3d::boundary:  0_2:55
+DEAL:3d::boundary:  0_2:56
+DEAL:3d::boundary:  0_2:57
+DEAL:3d::boundary:  0_2:60
+DEAL:3d::boundary:  0_2:62
+DEAL:3d::boundary:  0_2:63
+DEAL:3d::boundary:  0_2:64
+DEAL:3d::boundary:  0_2:65
+DEAL:3d::boundary:  0_2:66
+DEAL:3d::boundary:  0_2:67
+DEAL:3d::boundary:  0_2:71
+DEAL:3d::boundary:  0_2:72
+DEAL:3d::boundary:  0_2:73
+DEAL:3d::boundary:  0_2:74
+DEAL:3d::boundary:  0_2:75
+DEAL:3d::boundary:  0_2:76
+DEAL:3d::boundary:  0_2:77
+DEAL:3d::
+DEAL:3d::Multigrid level 0:
+DEAL:3d::cell:      0_0:
+DEAL:3d::boundary:  0_0:
+DEAL:3d::
+DEAL:3d::Multigrid level 1:
+DEAL:3d::cell:      0_1:0
+DEAL:3d::cell:      0_1:1
+DEAL:3d::cell:      0_1:2
+DEAL:3d::cell:      0_1:3
+DEAL:3d::cell:      0_1:4
+DEAL:3d::cell:      0_1:5
+DEAL:3d::cell:      0_1:6
+DEAL:3d::cell:      0_1:7
+DEAL:3d::face:      0_1:0 0_1:1
+DEAL:3d::face:      0_1:0 0_1:2
+DEAL:3d::face:      0_1:0 0_1:4
+DEAL:3d::face:      0_1:1 0_1:3
+DEAL:3d::face:      0_1:1 0_1:5
+DEAL:3d::face:      0_1:2 0_1:3
+DEAL:3d::face:      0_1:2 0_1:6
+DEAL:3d::face:      0_1:3 0_1:7
+DEAL:3d::face:      0_1:4 0_1:5
+DEAL:3d::face:      0_1:4 0_1:6
+DEAL:3d::face:      0_1:5 0_1:7
+DEAL:3d::face:      0_1:6 0_1:7
+DEAL:3d::boundary:  0_1:0
+DEAL:3d::boundary:  0_1:1
+DEAL:3d::boundary:  0_1:2
+DEAL:3d::boundary:  0_1:3
+DEAL:3d::boundary:  0_1:4
+DEAL:3d::boundary:  0_1:5
+DEAL:3d::boundary:  0_1:6
+DEAL:3d::boundary:  0_1:7
+DEAL:3d::
+DEAL:3d::Multigrid level 2:
+DEAL:3d::cell:      0_2:00
+DEAL:3d::cell:      0_2:01
+DEAL:3d::cell:      0_2:02
+DEAL:3d::cell:      0_2:03
+DEAL:3d::cell:      0_2:04
+DEAL:3d::cell:      0_2:05
+DEAL:3d::cell:      0_2:06
+DEAL:3d::cell:      0_2:07
+DEAL:3d::cell:      0_2:10
+DEAL:3d::cell:      0_2:11
+DEAL:3d::cell:      0_2:12
+DEAL:3d::cell:      0_2:13
+DEAL:3d::cell:      0_2:14
+DEAL:3d::cell:      0_2:15
+DEAL:3d::cell:      0_2:16
+DEAL:3d::cell:      0_2:17
+DEAL:3d::cell:      0_2:20
+DEAL:3d::cell:      0_2:21
+DEAL:3d::cell:      0_2:22
+DEAL:3d::cell:      0_2:23
+DEAL:3d::cell:      0_2:24
+DEAL:3d::cell:      0_2:25
+DEAL:3d::cell:      0_2:26
+DEAL:3d::cell:      0_2:27
+DEAL:3d::cell:      0_2:30
+DEAL:3d::cell:      0_2:31
+DEAL:3d::cell:      0_2:32
+DEAL:3d::cell:      0_2:33
+DEAL:3d::cell:      0_2:34
+DEAL:3d::cell:      0_2:35
+DEAL:3d::cell:      0_2:36
+DEAL:3d::cell:      0_2:37
+DEAL:3d::cell:      0_2:40
+DEAL:3d::cell:      0_2:41
+DEAL:3d::cell:      0_2:42
+DEAL:3d::cell:      0_2:43
+DEAL:3d::cell:      0_2:44
+DEAL:3d::cell:      0_2:45
+DEAL:3d::cell:      0_2:46
+DEAL:3d::cell:      0_2:47
+DEAL:3d::cell:      0_2:50
+DEAL:3d::cell:      0_2:51
+DEAL:3d::cell:      0_2:52
+DEAL:3d::cell:      0_2:53
+DEAL:3d::cell:      0_2:54
+DEAL:3d::cell:      0_2:55
+DEAL:3d::cell:      0_2:56
+DEAL:3d::cell:      0_2:57
+DEAL:3d::cell:      0_2:60
+DEAL:3d::cell:      0_2:61
+DEAL:3d::cell:      0_2:62
+DEAL:3d::cell:      0_2:63
+DEAL:3d::cell:      0_2:64
+DEAL:3d::cell:      0_2:65
+DEAL:3d::cell:      0_2:66
+DEAL:3d::cell:      0_2:67
+DEAL:3d::cell:      0_2:70
+DEAL:3d::cell:      0_2:71
+DEAL:3d::cell:      0_2:72
+DEAL:3d::cell:      0_2:73
+DEAL:3d::cell:      0_2:74
+DEAL:3d::cell:      0_2:75
+DEAL:3d::cell:      0_2:76
+DEAL:3d::cell:      0_2:77
+DEAL:3d::face:      0_2:00 0_2:01
+DEAL:3d::face:      0_2:00 0_2:02
+DEAL:3d::face:      0_2:00 0_2:04
+DEAL:3d::face:      0_2:01 0_2:03
+DEAL:3d::face:      0_2:01 0_2:05
+DEAL:3d::face:      0_2:01 0_2:10
+DEAL:3d::face:      0_2:02 0_2:03
+DEAL:3d::face:      0_2:02 0_2:06
+DEAL:3d::face:      0_2:02 0_2:20
+DEAL:3d::face:      0_2:03 0_2:07
+DEAL:3d::face:      0_2:03 0_2:12
+DEAL:3d::face:      0_2:03 0_2:21
+DEAL:3d::face:      0_2:04 0_2:05
+DEAL:3d::face:      0_2:04 0_2:06
+DEAL:3d::face:      0_2:04 0_2:40
+DEAL:3d::face:      0_2:05 0_2:07
+DEAL:3d::face:      0_2:05 0_2:14
+DEAL:3d::face:      0_2:05 0_2:41
+DEAL:3d::face:      0_2:06 0_2:07
+DEAL:3d::face:      0_2:06 0_2:24
+DEAL:3d::face:      0_2:06 0_2:42
+DEAL:3d::face:      0_2:07 0_2:16
+DEAL:3d::face:      0_2:07 0_2:25
+DEAL:3d::face:      0_2:07 0_2:43
+DEAL:3d::face:      0_2:10 0_2:11
+DEAL:3d::face:      0_2:10 0_2:12
+DEAL:3d::face:      0_2:10 0_2:14
+DEAL:3d::face:      0_2:11 0_2:13
+DEAL:3d::face:      0_2:11 0_2:15
+DEAL:3d::face:      0_2:12 0_2:13
+DEAL:3d::face:      0_2:12 0_2:16
+DEAL:3d::face:      0_2:12 0_2:30
+DEAL:3d::face:      0_2:13 0_2:17
+DEAL:3d::face:      0_2:13 0_2:31
+DEAL:3d::face:      0_2:14 0_2:15
+DEAL:3d::face:      0_2:14 0_2:16
+DEAL:3d::face:      0_2:14 0_2:50
+DEAL:3d::face:      0_2:15 0_2:17
+DEAL:3d::face:      0_2:15 0_2:51
+DEAL:3d::face:      0_2:16 0_2:17
+DEAL:3d::face:      0_2:16 0_2:34
+DEAL:3d::face:      0_2:16 0_2:52
+DEAL:3d::face:      0_2:17 0_2:35
+DEAL:3d::face:      0_2:17 0_2:53
+DEAL:3d::face:      0_2:20 0_2:21
+DEAL:3d::face:      0_2:20 0_2:22
+DEAL:3d::face:      0_2:20 0_2:24
+DEAL:3d::face:      0_2:21 0_2:23
+DEAL:3d::face:      0_2:21 0_2:25
+DEAL:3d::face:      0_2:21 0_2:30
+DEAL:3d::face:      0_2:22 0_2:23
+DEAL:3d::face:      0_2:22 0_2:26
+DEAL:3d::face:      0_2:23 0_2:27
+DEAL:3d::face:      0_2:23 0_2:32
+DEAL:3d::face:      0_2:24 0_2:25
+DEAL:3d::face:      0_2:24 0_2:26
+DEAL:3d::face:      0_2:24 0_2:60
+DEAL:3d::face:      0_2:25 0_2:27
+DEAL:3d::face:      0_2:25 0_2:34
+DEAL:3d::face:      0_2:25 0_2:61
+DEAL:3d::face:      0_2:26 0_2:27
+DEAL:3d::face:      0_2:26 0_2:62
+DEAL:3d::face:      0_2:27 0_2:36
+DEAL:3d::face:      0_2:27 0_2:63
+DEAL:3d::face:      0_2:30 0_2:31
+DEAL:3d::face:      0_2:30 0_2:32
+DEAL:3d::face:      0_2:30 0_2:34
+DEAL:3d::face:      0_2:31 0_2:33
+DEAL:3d::face:      0_2:31 0_2:35
+DEAL:3d::face:      0_2:32 0_2:33
+DEAL:3d::face:      0_2:32 0_2:36
+DEAL:3d::face:      0_2:33 0_2:37
+DEAL:3d::face:      0_2:34 0_2:35
+DEAL:3d::face:      0_2:34 0_2:36
+DEAL:3d::face:      0_2:34 0_2:70
+DEAL:3d::face:      0_2:35 0_2:37
+DEAL:3d::face:      0_2:35 0_2:71
+DEAL:3d::face:      0_2:36 0_2:37
+DEAL:3d::face:      0_2:36 0_2:72
+DEAL:3d::face:      0_2:37 0_2:73
+DEAL:3d::face:      0_2:40 0_2:41
+DEAL:3d::face:      0_2:40 0_2:42
+DEAL:3d::face:      0_2:40 0_2:44
+DEAL:3d::face:      0_2:41 0_2:43
+DEAL:3d::face:      0_2:41 0_2:45
+DEAL:3d::face:      0_2:41 0_2:50
+DEAL:3d::face:      0_2:42 0_2:43
+DEAL:3d::face:      0_2:42 0_2:46
+DEAL:3d::face:      0_2:42 0_2:60
+DEAL:3d::face:      0_2:43 0_2:47
+DEAL:3d::face:      0_2:43 0_2:52
+DEAL:3d::face:      0_2:43 0_2:61
+DEAL:3d::face:      0_2:44 0_2:45
+DEAL:3d::face:      0_2:44 0_2:46
+DEAL:3d::face:      0_2:45 0_2:47
+DEAL:3d::face:      0_2:45 0_2:54
+DEAL:3d::face:      0_2:46 0_2:47
+DEAL:3d::face:      0_2:46 0_2:64
+DEAL:3d::face:      0_2:47 0_2:56
+DEAL:3d::face:      0_2:47 0_2:65
+DEAL:3d::face:      0_2:50 0_2:51
+DEAL:3d::face:      0_2:50 0_2:52
+DEAL:3d::face:      0_2:50 0_2:54
+DEAL:3d::face:      0_2:51 0_2:53
+DEAL:3d::face:      0_2:51 0_2:55
+DEAL:3d::face:      0_2:52 0_2:53
+DEAL:3d::face:      0_2:52 0_2:56
+DEAL:3d::face:      0_2:52 0_2:70
+DEAL:3d::face:      0_2:53 0_2:57
+DEAL:3d::face:      0_2:53 0_2:71
+DEAL:3d::face:      0_2:54 0_2:55
+DEAL:3d::face:      0_2:54 0_2:56
+DEAL:3d::face:      0_2:55 0_2:57
+DEAL:3d::face:      0_2:56 0_2:57
+DEAL:3d::face:      0_2:56 0_2:74
+DEAL:3d::face:      0_2:57 0_2:75
+DEAL:3d::face:      0_2:60 0_2:61
+DEAL:3d::face:      0_2:60 0_2:62
+DEAL:3d::face:      0_2:60 0_2:64
+DEAL:3d::face:      0_2:61 0_2:63
+DEAL:3d::face:      0_2:61 0_2:65
+DEAL:3d::face:      0_2:61 0_2:70
+DEAL:3d::face:      0_2:62 0_2:63
+DEAL:3d::face:      0_2:62 0_2:66
+DEAL:3d::face:      0_2:63 0_2:67
+DEAL:3d::face:      0_2:63 0_2:72
+DEAL:3d::face:      0_2:64 0_2:65
+DEAL:3d::face:      0_2:64 0_2:66
+DEAL:3d::face:      0_2:65 0_2:67
+DEAL:3d::face:      0_2:65 0_2:74
+DEAL:3d::face:      0_2:66 0_2:67
+DEAL:3d::face:      0_2:67 0_2:76
+DEAL:3d::face:      0_2:70 0_2:71
+DEAL:3d::face:      0_2:70 0_2:72
+DEAL:3d::face:      0_2:70 0_2:74
+DEAL:3d::face:      0_2:71 0_2:73
+DEAL:3d::face:      0_2:71 0_2:75
+DEAL:3d::face:      0_2:72 0_2:73
+DEAL:3d::face:      0_2:72 0_2:76
+DEAL:3d::face:      0_2:73 0_2:77
+DEAL:3d::face:      0_2:74 0_2:75
+DEAL:3d::face:      0_2:74 0_2:76
+DEAL:3d::face:      0_2:75 0_2:77
+DEAL:3d::face:      0_2:76 0_2:77
+DEAL:3d::boundary:  0_2:00
+DEAL:3d::boundary:  0_2:01
+DEAL:3d::boundary:  0_2:02
+DEAL:3d::boundary:  0_2:03
+DEAL:3d::boundary:  0_2:04
+DEAL:3d::boundary:  0_2:05
+DEAL:3d::boundary:  0_2:06
+DEAL:3d::boundary:  0_2:10
+DEAL:3d::boundary:  0_2:11
+DEAL:3d::boundary:  0_2:12
+DEAL:3d::boundary:  0_2:13
+DEAL:3d::boundary:  0_2:14
+DEAL:3d::boundary:  0_2:15
+DEAL:3d::boundary:  0_2:17
+DEAL:3d::boundary:  0_2:20
+DEAL:3d::boundary:  0_2:21
+DEAL:3d::boundary:  0_2:22
+DEAL:3d::boundary:  0_2:23
+DEAL:3d::boundary:  0_2:24
+DEAL:3d::boundary:  0_2:26
+DEAL:3d::boundary:  0_2:27
+DEAL:3d::boundary:  0_2:30
+DEAL:3d::boundary:  0_2:31
+DEAL:3d::boundary:  0_2:32
+DEAL:3d::boundary:  0_2:33
+DEAL:3d::boundary:  0_2:35
+DEAL:3d::boundary:  0_2:36
+DEAL:3d::boundary:  0_2:37
+DEAL:3d::boundary:  0_2:40
+DEAL:3d::boundary:  0_2:41
+DEAL:3d::boundary:  0_2:42
+DEAL:3d::boundary:  0_2:44
+DEAL:3d::boundary:  0_2:45
+DEAL:3d::boundary:  0_2:46
+DEAL:3d::boundary:  0_2:47
+DEAL:3d::boundary:  0_2:50
+DEAL:3d::boundary:  0_2:51
+DEAL:3d::boundary:  0_2:53
+DEAL:3d::boundary:  0_2:54
+DEAL:3d::boundary:  0_2:55
+DEAL:3d::boundary:  0_2:56
+DEAL:3d::boundary:  0_2:57
+DEAL:3d::boundary:  0_2:60
+DEAL:3d::boundary:  0_2:62
+DEAL:3d::boundary:  0_2:63
+DEAL:3d::boundary:  0_2:64
+DEAL:3d::boundary:  0_2:65
+DEAL:3d::boundary:  0_2:66
+DEAL:3d::boundary:  0_2:67
+DEAL:3d::boundary:  0_2:71
+DEAL:3d::boundary:  0_2:72
+DEAL:3d::boundary:  0_2:73
+DEAL:3d::boundary:  0_2:74
+DEAL:3d::boundary:  0_2:75
+DEAL:3d::boundary:  0_2:76
+DEAL:3d::boundary:  0_2:77
+DEAL:3d::
