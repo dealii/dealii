@@ -243,6 +243,31 @@ public:
     {}
 
     /**
+     * Copy constructor.
+     */
+    AdditionalData(const AdditionalData &other)
+      : tasks_parallel_scheme(other.tasks_parallel_scheme)
+      , tasks_block_size(other.tasks_block_size)
+      , mapping_update_flags(other.mapping_update_flags)
+      , mapping_update_flags_boundary_faces(
+          other.mapping_update_flags_boundary_faces)
+      , mapping_update_flags_inner_faces(other.mapping_update_flags_inner_faces)
+      , mapping_update_flags_faces_by_cells(
+          other.mapping_update_flags_faces_by_cells)
+      , mg_level(other.mg_level)
+      , level_mg_handler(this->mg_level)
+      , store_plain_indices(other.store_plain_indices)
+      , initialize_indices(other.initialize_indices)
+      , initialize_mapping(other.initialize_mapping)
+      , overlap_communication_computation(
+          other.overlap_communication_computation)
+      , hold_all_faces_to_owned_cells(other.hold_all_faces_to_owned_cells)
+      , cell_vectorization_category(other.cell_vectorization_category)
+      , cell_vectorization_categories_strict(
+          other.cell_vectorization_categories_strict)
+    {}
+
+    /**
      * Set the scheme for task parallelism. There are four options available.
      * If set to @p none, the operator application is done in serial without
      * shared memory parallelism. If this class is used together with MPI and
