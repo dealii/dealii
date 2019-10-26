@@ -1064,14 +1064,14 @@ namespace Utilities
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign(memptr, alignment, size);
 
-      AssertThrow(ierr == 0, ExcOutOfMemory());
-      AssertThrow(*memptr != nullptr, ExcOutOfMemory());
+      AssertThrow(ierr == 0, ExcOutOfMemory(size));
+      AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
       // Windows does not appear to have posix_memalign. just use the
       // regular malloc in that case
       *memptr = malloc(size);
       (void)alignment;
-      AssertThrow(*memptr != 0, ExcOutOfMemory());
+      AssertThrow(*memptr != 0, ExcOutOfMemory(size));
 #endif
     }
 

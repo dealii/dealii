@@ -690,14 +690,18 @@ namespace StandardExceptions
   /**
    * Trying to allocate a new object failed due to lack of free memory.
    */
-  DeclExceptionMsg(ExcOutOfMemory,
-                   "Your program tried to allocate some memory but this "
-                   "allocation failed. Typically, this either means that "
-                   "you simply do not have enough memory in your system, "
-                   "or that you are (erroneously) trying to allocate "
-                   "a chunk of memory that is simply beyond all reasonable "
-                   "size, for example because the size of the object has "
-                   "been computed incorrectly.");
+  DeclException1(ExcOutOfMemory,
+                 std::size_t,
+                 "Your program tried to allocate some memory but this "
+                 "allocation failed. Typically, this either means that "
+                 "you simply do not have enough memory in your system, "
+                 "or that you are (erroneously) trying to allocate "
+                 "a chunk of memory that is simply beyond all reasonable "
+                 "size, for example because the size of the object has "
+                 "been computed incorrectly."
+                 "\n\n"
+                 "In the current case, the request was for "
+                   << arg1 << " bytes.");
 
   /**
    * A memory handler reached a point where all allocated objects should have
