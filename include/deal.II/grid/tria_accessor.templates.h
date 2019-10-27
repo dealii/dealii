@@ -3157,6 +3157,22 @@ namespace internal
 
 
 template <int dim, int spacedim>
+inline TriaIterator<CellAccessor<dim, spacedim>>
+CellAccessor<dim, spacedim>::child(const unsigned int i) const
+{
+  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
+                                              this->present_level + 1,
+                                              this->child_index(i));
+
+  Assert((q.state() == IteratorState::past_the_end) || q->used(),
+         ExcInternalError());
+
+  return q;
+}
+
+
+
+template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {
@@ -3512,22 +3528,6 @@ CellAccessor<dim, spacedim>::neighbor(const unsigned int i) const
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
                                               neighbor_level(i),
                                               neighbor_index(i));
-
-  Assert((q.state() == IteratorState::past_the_end) || q->used(),
-         ExcInternalError());
-
-  return q;
-}
-
-
-
-template <int dim, int spacedim>
-inline TriaIterator<CellAccessor<dim, spacedim>>
-CellAccessor<dim, spacedim>::child(const unsigned int i) const
-{
-  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
-                                              this->present_level + 1,
-                                              this->child_index(i));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
          ExcInternalError());
