@@ -3759,8 +3759,8 @@ public:
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given face
-   * on given cell of type "iterator into a Triangulation object", and the
-   * given finite element. Since iterators into triangulation alone only
+   * on a given cell of type "iterator into a Triangulation object", and the
+   * given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
@@ -3879,8 +3879,8 @@ public:
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given
-   * subface on given cell of type "iterator into a Triangulation object", and
-   * the given finite element. Since iterators into triangulation alone only
+   * subface on a given cell of type "iterator into a Triangulation object", and
+   * the given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
