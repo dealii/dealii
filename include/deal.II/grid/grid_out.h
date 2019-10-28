@@ -772,12 +772,12 @@ namespace GridOutFlags
      */
     float cell_font_scaling;
     /**
-     * Write level number into each cell. Defaults to true.
+     * Write level number into each cell. Defaults to false.
      */
     bool label_level_number;
 
     /**
-     * Write cell index into each cell. Defaults to true.
+     * Write cell index into each cell. Defaults to false.
      */
     bool label_cell_index;
 
