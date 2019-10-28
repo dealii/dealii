@@ -26,7 +26,7 @@ $cmake_source_dir=$ARGV[1];
 
 print
 "/**
-  * \@page $step_underscore The $step tutorial program
+\@page $step_underscore The $step tutorial program
 ";
 
 open BF, "$cmake_source_dir/examples/$step/doc/builds-on"
@@ -98,5 +98,5 @@ print
 "<a name=\"PlainProg\"></a>
 <h1> The plain program</h1>
 \@include \"$step.$file_extension\"
- */
+*/
 ";
