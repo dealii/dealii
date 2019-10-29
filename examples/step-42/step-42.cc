@@ -623,7 +623,8 @@ namespace Step42
     void solve_newton();
     void refine_grid();
     void move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const;
-    void output_results(const std::string &filename_base);
+    void output_results(const unsigned int current_refinement_cycle);
+
     void output_contact_force() const;
 
     // As far as member variables are concerned, we start with ones that we use
@@ -1972,7 +1973,7 @@ namespace Step42
   // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
   void PlasticityContactProblem<dim>::output_results(
-    const std::string &filename_base)
+    const unsigned int current_refinement_cycle)
   {
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
@@ -2046,9 +2047,9 @@ namespace Step42
     // output files. We then do the same again for the competitor of
     // Paraview, the Visit visualization program, by creating a matching
     // <code>.visit</code> file.
-    data_out.write_vtu_with_pvtu_record(
-      output_dir, filename_base, 0, 1, mpi_communicator);
-    pcout << output_dir + filename_base << ".pvtu" << std::endl;
+    const std::string master_name = data_out.write_vtu_with_pvtu_record(
+      output_dir, "solution", current_refinement_cycle, 2, mpi_communicator);
+    pcout << master_name << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;
@@ -2162,8 +2163,7 @@ namespace Step42
 
         solve_newton();
 
-        output_results(std::string("solution-") +
-                       Utilities::int_to_string(current_refinement_cycle, 2));
+        output_results(current_refinement_cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();
