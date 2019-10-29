@@ -2293,7 +2293,7 @@ namespace GridTools
       (pairs1.size() > 0 ||
        (dynamic_cast<
           const parallel::fullydistributed::Triangulation<dim, space_dim> *>(
-          &pairs1.begin()->first->get_triangulation()) != nullptr)),
+          &mesh.begin()->get_triangulation()) != nullptr)),
       ExcMessage("No new periodic face pairs have been found. "
                  "Are you sure that you've selected the correct boundary "
                  "id's and that the coarsest level mesh is colorized?"));

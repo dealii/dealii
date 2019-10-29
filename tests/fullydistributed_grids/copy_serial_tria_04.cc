@@ -56,8 +56,25 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
         else if (std::fabs(cell->face(face_number)->center()(0) - right) <
                  1e-12)
           cell->face(face_number)->set_all_boundary_ids(2);
+        else if (dim >= 2 &&
+                 std::fabs(cell->face(face_number)->center()(1) - left) < 1e-12)
+          cell->face(face_number)->set_all_boundary_ids(3);
+        else if (dim >= 2 && std::fabs(cell->face(face_number)->center()(1) -
+                                       right) < 1e-12)
+          cell->face(face_number)->set_all_boundary_ids(4);
+        else if (dim >= 3 &&
+                 std::fabs(cell->face(face_number)->center()(2) - left) < 1e-12)
+          cell->face(face_number)->set_all_boundary_ids(5);
+        else if (dim >= 3 && std::fabs(cell->face(face_number)->center()(2) -
+                                       right) < 1e-12)
+          cell->face(face_number)->set_all_boundary_ids(6);
 
-    GridTools::collect_periodic_faces(tria, 1, 2, 0, periodic_faces);
+    if (dim >= 1)
+      GridTools::collect_periodic_faces(tria, 1, 2, 0, periodic_faces);
+    if (dim >= 2)
+      GridTools::collect_periodic_faces(tria, 3, 4, 1, periodic_faces);
+    if (dim >= 3)
+      GridTools::collect_periodic_faces(tria, 5, 6, 2, periodic_faces);
 
     tria.add_periodicity(periodic_faces);
   };
@@ -120,7 +137,7 @@ main(int argc, char *argv[])
   }
 
   {
-    deallog.push("2d");
+    deallog.push("3d");
     const int n_refinements  = 3;
     const int n_subdivisions = 4;
     test<3>(n_refinements, n_subdivisions, comm);

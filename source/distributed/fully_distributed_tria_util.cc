@@ -154,34 +154,34 @@ namespace parallel
         // store the communicator
         construction_data.comm = comm;
 
+
+        std::map<unsigned int, std::vector<unsigned int>>
+                                             coinciding_vertex_groups;
+        std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
+
+        GridTools::collect_coinciding_vertices(
+          tria, coinciding_vertex_groups, vertex_to_coinciding_vertex_group);
+
         // helper function, which collects all vertices belonging to a cell
         // (also taking into account periodicity)
         auto add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells =
-          [](TriaIterator<CellAccessor<dim, spacedim>> &cell,
-             std::vector<bool> &vertices_owned_by_locally_owned_cells) {
-            // add vertices belonging to a periodic neighbor
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-              if (cell->has_periodic_neighbor(f))
-                {
-                  auto face_t = cell->face(f);
-                  auto face_n = cell->periodic_neighbor(f)->face(
-                    cell->periodic_neighbor_face_no(f));
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_face;
-                       ++v)
-                    {
-                      vertices_owned_by_locally_owned_cells
-                        [face_t->vertex_index(v)] = true;
-                      vertices_owned_by_locally_owned_cells
-                        [face_n->vertex_index(v)] = true;
-                    }
-                }
-
+          [coinciding_vertex_groups, vertex_to_coinciding_vertex_group](
+            TriaIterator<CellAccessor<dim, spacedim>> &cell,
+            std::vector<bool> &vertices_owned_by_locally_owned_cells) {
             // add local vertices
             for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                  ++v)
-              vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
-                true;
+              {
+                vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
+                  true;
+                const auto coinciding_vertex_group =
+                  vertex_to_coinciding_vertex_group.find(cell->vertex_index(v));
+                if (coinciding_vertex_group !=
+                    vertex_to_coinciding_vertex_group.end())
+                  for (const auto &co_vertex : coinciding_vertex_groups.at(
+                         coinciding_vertex_group->second))
+                    vertices_owned_by_locally_owned_cells[co_vertex] = true;
+              }
           };
 
         // check if multilevel hierarchy should be constructed
