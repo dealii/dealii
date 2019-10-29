@@ -3758,9 +3758,21 @@ public:
          const unsigned int                                     face_no);
 
   /**
+   * Reinitialize the gradients, Jacobi determinants, etc for face @p face
+   * and cell @p cell.
+   *
+   * @note @p face must be one of @p cell's face iterators.
+   */
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void
+  reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>,
+                                            level_dof_access>> &     cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face);
+
+  /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given face
-   * on given cell of type "iterator into a Triangulation object", and the
-   * given finite element. Since iterators into triangulation alone only
+   * on a given cell of type "iterator into a Triangulation object", and the
+   * given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
@@ -3773,6 +3785,25 @@ public:
   void
   reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
          const unsigned int                                          face_no);
+
+  /*
+   * Reinitialize the gradients, Jacobi determinants, etc for the given face
+   * on a given cell of type "iterator into a Triangulation object", and the
+   * given finite element. Since iterators into a triangulation alone only
+   * convey information about the geometry of a cell, but not about degrees of
+   * freedom possibly associated with this cell, you will not be able to call
+   * some functions of this class if they need information about degrees of
+   * freedom. These functions are, above all, the
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
+   *
+   * @note @p face must be one of @p cell's face iterators.
+   */
+  void
+  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face);
 
   /**
    * Return a reference to this very object.
@@ -3878,9 +3909,20 @@ public:
          const unsigned int                                     subface_no);
 
   /**
+   * Alternative reinitialization function that takes, as arguments, iterators
+   * to the face and subface instead of their numbers.
+   */
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void
+  reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>,
+                                            level_dof_access>> &     cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face,
+         const typename Triangulation<dim, spacedim>::face_iterator &subface);
+
+  /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given
-   * subface on given cell of type "iterator into a Triangulation object", and
-   * the given finite element. Since iterators into triangulation alone only
+   * subface on a given cell of type "iterator into a Triangulation object", and
+   * the given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
@@ -3894,6 +3936,30 @@ public:
   reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
          const unsigned int                                          face_no,
          const unsigned int subface_no);
+
+  /**
+   * Reinitialize the gradients, Jacobi determinants, etc for the given
+   * subface on a given cell of type "iterator into a Triangulation object", and
+   * the given finite element. Since iterators into a triangulation alone only
+   * convey information about the geometry of a cell, but not about degrees of
+   * freedom possibly associated with this cell, you will not be able to call
+   * some functions of this class if they need information about degrees of
+   * freedom. These functions are, above all, the
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
+   *
+   * This does the same thing as the previous function but takes iterators
+   * instead of numbers as arguments.
+   *
+   * @note @p face and @p subface must correspond to a face (and a subface of
+   * that face) of @p cell.
+   */
+  void
+  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face,
+         const typename Triangulation<dim, spacedim>::face_iterator &subface);
 
   /**
    * Return a reference to this very object.

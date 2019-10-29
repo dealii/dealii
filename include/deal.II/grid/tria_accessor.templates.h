@@ -1511,6 +1511,23 @@ TriaAccessor<structdim, dim, spacedim>::child(const unsigned int i) const
 
 
 template <int structdim, int dim, int spacedim>
+inline unsigned int
+TriaAccessor<structdim, dim, spacedim>::child_iterator_to_index(
+  const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &child) const
+{
+  const auto n_children = this->n_children();
+  for (unsigned int child_n = 0; child_n < n_children; ++child_n)
+    if (this->child(child_n) == child)
+      return child_n;
+
+  Assert(false,
+         ExcMessage("The given child is not a child of the current object."));
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 inline TriaIterator<TriaAccessor<structdim, dim, spacedim>>
 TriaAccessor<structdim, dim, spacedim>::isotropic_child(
   const unsigned int i) const
@@ -2591,6 +2608,16 @@ TriaAccessor<0, dim, spacedim>::max_refinement_depth()
 
 
 template <int dim, int spacedim>
+inline unsigned int
+TriaAccessor<0, dim, spacedim>::child_iterator_to_index(
+  const TriaIterator<TriaAccessor<0, dim, spacedim>> &)
+{
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<0, dim, spacedim>>
 TriaAccessor<0, dim, spacedim>::child(const unsigned int)
 {
@@ -3004,6 +3031,17 @@ TriaAccessor<0, 1, spacedim>::max_refinement_depth()
 }
 
 
+
+template <int spacedim>
+inline unsigned int
+TriaAccessor<0, 1, spacedim>::child_iterator_to_index(
+  const TriaIterator<TriaAccessor<0, 1, spacedim>> &)
+{
+  return numbers::invalid_unsigned_int;
+}
+
+
+
 template <int spacedim>
 inline TriaIterator<TriaAccessor<0, 1, spacedim>>
 TriaAccessor<0, 1, spacedim>::child(const unsigned int)
@@ -3157,10 +3195,43 @@ namespace internal
 
 
 template <int dim, int spacedim>
+inline TriaIterator<CellAccessor<dim, spacedim>>
+CellAccessor<dim, spacedim>::child(const unsigned int i) const
+{
+  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
+                                              this->present_level + 1,
+                                              this->child_index(i));
+
+  Assert((q.state() == IteratorState::past_the_end) || q->used(),
+         ExcInternalError());
+
+  return q;
+}
+
+
+
+template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {
   return dealii::internal::CellAccessorImplementation::get_face(*this, i);
+}
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
+CellAccessor<dim, spacedim>::face_iterator_to_index(
+  const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const
+{
+  for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
+       ++face_n)
+    if (this->face(face_n) == face)
+      return face_n;
+
+  Assert(false,
+         ExcMessage("The given face is not a face of the current cell."));
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -3512,22 +3583,6 @@ CellAccessor<dim, spacedim>::neighbor(const unsigned int i) const
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
                                               neighbor_level(i),
                                               neighbor_index(i));
-
-  Assert((q.state() == IteratorState::past_the_end) || q->used(),
-         ExcInternalError());
-
-  return q;
-}
-
-
-
-template <int dim, int spacedim>
-inline TriaIterator<CellAccessor<dim, spacedim>>
-CellAccessor<dim, spacedim>::child(const unsigned int i) const
-{
-  TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
-                                              this->present_level + 1,
-                                              this->child_index(i));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
          ExcInternalError());

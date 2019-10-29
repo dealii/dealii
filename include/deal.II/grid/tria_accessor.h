@@ -983,6 +983,14 @@ public:
   child(const unsigned int i) const;
 
   /**
+   * Return the child number of @p child on the current cell. This is the
+   * inverse function of TriaAccessor::child().
+   */
+  unsigned int
+  child_iterator_to_index(
+    const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &child) const;
+
+  /**
    * Return an iterator to that object that is identical to the ith child for
    * isotropic refinement. If the current object is refined isotropically,
    * then the returned object is the ith child. If the current object is
@@ -2045,6 +2053,12 @@ public:
   max_refinement_depth();
 
   /**
+   * @brief Return an invalid unsigned integer.
+   */
+  static unsigned int
+  child_iterator_to_index(const TriaIterator<TriaAccessor<0, dim, spacedim>> &);
+
+  /**
    * @brief Return an invalid object.
    */
   static TriaIterator<TriaAccessor<0, dim, spacedim>>
@@ -2498,6 +2512,12 @@ public:
   max_refinement_depth();
 
   /**
+   * @brief Return an invalid unsigned integer.
+   */
+  static unsigned int
+  child_iterator_to_index(const TriaIterator<TriaAccessor<0, 1, spacedim>> &);
+
+  /**
    * @brief Return an invalid object
    */
   static TriaIterator<TriaAccessor<0, 1, spacedim>>
@@ -2735,6 +2755,13 @@ public:
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
   face(const unsigned int i) const;
 
+  /**
+   * Return the face number of @p face on the current cell. This is the
+   * inverse function of TriaAccessor::face().
+   */
+  unsigned int
+  face_iterator_to_index(
+    const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const;
 
   /**
    * Return an array of iterators to all faces of this cell.
