@@ -1288,6 +1288,13 @@ namespace Step18
           std::pair<double, std::string>(present_time, pvtu_master_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
+
+        std::ofstream visit_output("solution.visit");
+        static std::vector<std::pair<double, std::vector<std::string>>>
+          times_and_pieces;
+        times_and_pieces.emplace_back(
+          present_time, std::vector<std::string>(1, pvtu_master_filename));
+        DataOutBase::write_visit_record(visit_output, times_and_pieces);
       }
   }
 
