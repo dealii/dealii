@@ -501,7 +501,7 @@ namespace Step48
     data_out.build_patches();
 
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", timestep_number, 3, MPI_COMM_WORLD);
+      "./", "solution", timestep_number, 3, MPI_COMM_WORLD);
   }
 
 

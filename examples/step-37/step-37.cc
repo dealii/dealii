@@ -1132,7 +1132,7 @@ namespace Step37
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", cycle, 3, MPI_COMM_WORLD);
+      "./", "solution", cycle, 3, MPI_COMM_WORLD);
 
     time_details << "Time write output          (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << "s\n";

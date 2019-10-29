@@ -576,7 +576,7 @@ namespace Step40
     // in parallel with the help of MPI-IO. Additionally a PVTU record is
     // generated, which groups the written VTU files.
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", cycle, 2, mpi_communicator, 8);
+      "./", "solution", cycle, 2, mpi_communicator, 8);
   }
 
 

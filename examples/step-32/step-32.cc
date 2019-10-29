@@ -3245,7 +3245,7 @@ namespace Step32
 
     static int out_index = 0;
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", out_index, 5, MPI_COMM_WORLD);
+      "./", "solution", out_index, 5, MPI_COMM_WORLD);
 
     out_index++;
   }

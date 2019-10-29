@@ -1273,7 +1273,7 @@ namespace Step18
 
     // Let us open a file and write the data we have generated into it:
     const auto pvtu_master_filename = data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", timestep_no, 4, mpi_communicator);
+      "./", "solution", timestep_no, 4, mpi_communicator);
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:

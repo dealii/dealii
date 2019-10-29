@@ -548,7 +548,7 @@ namespace Step64
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", cycle, 2, mpi_communicator);
+      "./", "solution", cycle, 2, mpi_communicator);
 
     Vector<float> cellwise_norm(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,

@@ -740,7 +740,7 @@ namespace Step45
     data_out.build_patches(mapping, degree + 1);
 
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution-", refinement_cycle, 2, MPI_COMM_WORLD);
+      "./", "solution", refinement_cycle, 2, MPI_COMM_WORLD);
   }
 
 
