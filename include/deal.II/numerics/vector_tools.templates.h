@@ -5629,7 +5629,6 @@ namespace VectorTools
       const FiniteElement<dim> &     fe = cell->get_fe();
       const std::vector<Point<dim>> &quadrature_points =
         fe_face_values.get_quadrature_points();
-      const unsigned int degree = fe.degree - 1;
 
       std::vector<Vector<number>> values(fe_face_values.n_quadrature_points,
                                          Vector<number>(fe.n_components()));
@@ -5669,6 +5668,7 @@ namespace VectorTools
           base_indices.second = (first_vector_component - fe_index_old) /
                                 fe.base_element(i).n_components();
         }
+      const unsigned int degree = fe.base_element(base_indices.first).degree - 1;
 
       switch (dim)
         {
@@ -6016,10 +6016,12 @@ namespace VectorTools
                     }
                 }
 
-              // Solve lienar system:
-              face_matrix_inv.invert(face_matrix);
-              face_matrix_inv.vmult(face_solution, face_rhs);
-
+              // Solve linear system:
+              if(associated_face_dofs > 0)
+	      {
+		face_matrix_inv.invert(face_matrix);
+		face_matrix_inv.vmult(face_solution, face_rhs);
+	      }
 
               // Store computed DoFs:
               for (unsigned int associated_face_dof = 0;
