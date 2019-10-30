@@ -5366,9 +5366,6 @@ namespace VectorTools
 
       // Initialize the required objects.
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
-      // Store degree as fe.degree-1
-      // For nedelec elements FE_Nedelec<dim> (0) returns fe.degree = 1.
-      const unsigned int degree = fe.degree - 1;
 
       const std::vector<Point<dim>> &quadrature_points =
         fe_values.get_quadrature_points();
@@ -5412,6 +5409,11 @@ namespace VectorTools
           base_indices.second = (first_vector_component - fe_index_old) /
                                 fe.base_element(i).n_components();
         }
+      // Store degree as fe.degree-1
+      // For nedelec elements FE_Nedelec<dim> (0) returns fe.degree = 1.
+      // For FESystem get the degree from the base_element
+      // indicated by the first_vector_component
+      const unsigned int degree = fe.base_element(base_indices.first).degree - 1;
 
       // Find DoFs we want to constrain:
       // There are fe.dofs_per_line DoFs associated with the
