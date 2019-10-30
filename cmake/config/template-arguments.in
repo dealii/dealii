@@ -13,14 +13,14 @@ REAL_SCALARS_VECTORIZED    := { @DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED@; }
 FLOAT_VECTORIZED           := { @DEAL_II_EXPAND_FLOAT_VECTORIZED@; }
 
 // complex scalar types
-COMPLEX_SCALARS := { 
+COMPLEX_SCALARS := {
     @DEAL_II_EXPAND_COMPLEX_SCALARS@;
     }
 
 // real scalar floating point types
-REAL_AND_COMPLEX_SCALARS    := { 
+REAL_AND_COMPLEX_SCALARS    := {
         double;
-        float; 
+        float;
         @DEAL_II_EXPAND_COMPLEX_SCALARS@;
         }
 
@@ -67,7 +67,7 @@ MPI_SCALARS     := { int;
                      unsigned long long int;
                      float;
                      double;
-                     long double; 
+                     long double;
                      @DEAL_II_EXPAND_COMPLEX_SCALARS@;
                    }
 
@@ -109,7 +109,7 @@ VECTOR_TYPES := {   Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-// same as VECTOR_TYPES but only real-valued vectors (and only with PETSc 
+// same as VECTOR_TYPES but only real-valued vectors (and only with PETSc
 // vectors if the PETScScalar data type is real-valued)
 REAL_VECTOR_TYPES  := {  Vector<double>;
                          Vector<float> ;
