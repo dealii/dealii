@@ -5413,7 +5413,8 @@ namespace VectorTools
       // For nedelec elements FE_Nedelec<dim> (0) returns fe.degree = 1.
       // For FESystem get the degree from the base_element
       // indicated by the first_vector_component
-      const unsigned int degree = fe.base_element(base_indices.first).degree - 1;
+      const unsigned int degree =
+        fe.base_element(base_indices.first).degree - 1;
 
       // Find DoFs we want to constrain:
       // There are fe.dofs_per_line DoFs associated with the
@@ -5668,7 +5669,8 @@ namespace VectorTools
           base_indices.second = (first_vector_component - fe_index_old) /
                                 fe.base_element(i).n_components();
         }
-      const unsigned int degree = fe.base_element(base_indices.first).degree - 1;
+      const unsigned int degree =
+        fe.base_element(base_indices.first).degree - 1;
 
       switch (dim)
         {
@@ -6017,11 +6019,11 @@ namespace VectorTools
                 }
 
               // Solve linear system:
-              if(associated_face_dofs > 0)
-	      {
-		face_matrix_inv.invert(face_matrix);
-		face_matrix_inv.vmult(face_solution, face_rhs);
-	      }
+              if (associated_face_dofs > 0)
+                {
+                  face_matrix_inv.invert(face_matrix);
+                  face_matrix_inv.vmult(face_solution, face_rhs);
+                }
 
               // Store computed DoFs:
               for (unsigned int associated_face_dof = 0;
