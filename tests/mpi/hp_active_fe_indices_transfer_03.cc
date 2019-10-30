@@ -65,8 +65,8 @@ test()
       }
 
   // ----- transfer -----
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   tria.repartition();
 
