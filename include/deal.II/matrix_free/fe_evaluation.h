@@ -601,6 +601,16 @@ public:
   VectorizedArrayType
   read_cell_data(const AlignedVector<VectorizedArrayType> &array) const;
 
+  /**
+   * The same as above, just for std::array of length of VectorizedArrayType for
+   * arbitrary data type.
+   */
+  template <typename T>
+  std::array<T, VectorizedArrayType::n_array_elements>
+  read_cell_data(
+    const AlignedVector<std::array<T, VectorizedArrayType::n_array_elements>>
+      &array) const;
+
   //@}
 
   /**
@@ -3563,6 +3573,40 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       VectorizedArrayType out = make_vectorized_array<Number>(Number(1.));
       const unsigned int *cells =
+        is_interior_face ?
+          &this->matrix_info->get_face_info(cell).cells_interior[0] :
+          &this->matrix_info->get_face_info(cell).cells_exterior[0];
+      for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+        if (cells[i] != numbers::invalid_unsigned_int)
+          out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
+                        [cells[i] % VectorizedArrayType::n_array_elements];
+      return out;
+    }
+  else
+    return array[cell];
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+template <typename T>
+inline std::array<T, VectorizedArrayType::n_array_elements>
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  read_cell_data(
+    const AlignedVector<std::array<T, VectorizedArrayType::n_array_elements>>
+      &array) const
+{
+  Assert(matrix_info != nullptr, ExcNotImplemented());
+  AssertDimension(array.size(),
+                  matrix_info->get_task_info().cell_partition_data.back());
+  if (is_face)
+    {
+      std::array<T, VectorizedArrayType::n_array_elements> out;
+      const unsigned int *                                 cells =
         is_interior_face ?
           &this->matrix_info->get_face_info(cell).cells_interior[0] :
           &this->matrix_info->get_face_info(cell).cells_exterior[0];
