@@ -77,8 +77,6 @@ namespace parallel
           dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                          *>(&other_tria))
       {
-        mpi_communicator = other_tria_x->get_communicator();
-
         // release unused vector memory because we will have very different
         // vectors now
         ::dealii::internal::GrowingVectorMemoryImplementation::
