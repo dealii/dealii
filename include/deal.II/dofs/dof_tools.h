@@ -1150,10 +1150,24 @@ namespace DoFTools
    * This function makes sure that identity constraints don't create cycles
    * in @p constraints.
    *
+   * @p periodicity_factor can be used to to implement Bloch periodic conditions
+   * (a.k.a. phase shift periodic conditions) of the form
+   * $\psi(\mathbf{r})=e^{-i\mathbf{k}\cdot\mathbf{r}}u(\mathbf{r})$
+   * where $u$ is periodic with the same periodicity as the crystal lattice and
+   * and $\mathbf{k}$ is the wavevector, see
+   * [https://en.wikipedia.org/wiki/Bloch_wave](https://en.wikipedia.org/wiki/Bloch_wave).
+   * The solution at @p face_2 is equal to the solution at @p face_1 times
+   * @p periodicity_factor. For example, if the solution at @p face_1 is
+   * $\psi(0)$ and $\mathbf{d} is the corresponding point on @p face_2, then
+   * the solution at @p face_2 should be
+   * $\psi(d) = \psi(0)e^{-i \mathbf{k}\cdot \mathbf{d}}$. This condition can be
+   * implemented using
+   * $\mathrm{periodicity\_factor}=e^{-i \mathbf{k}\cdot \mathbf{d}}$.
+   *
    * Detailed information can be found in the see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
-   * @author Matthias Maier, 2012 - 2015
+   * @author Matthias Maier, Daniel Garcia-Sanchez 2012 - 2019
    */
   template <typename FaceIterator, typename number>
   void
@@ -1167,7 +1181,8 @@ namespace DoFTools
     const bool                       face_rotation    = false,
     const FullMatrix<double> &       matrix           = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>());
+      std::vector<unsigned int>(),
+    const number periodicity_factor = 1.);
 
 
 
@@ -1201,7 +1216,8 @@ namespace DoFTools
     AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>());
+      std::vector<unsigned int>(),
+    const number periodicity_factor = 1.);
 
 
 
@@ -1244,7 +1260,8 @@ namespace DoFTools
     const types::boundary_id   b_id2,
     const unsigned int         direction,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask     = ComponentMask(),
+    const number               periodicity_factor = 1.);
 
 
 
@@ -1280,7 +1297,8 @@ namespace DoFTools
     const types::boundary_id   b_id,
     const unsigned int         direction,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask     = ComponentMask(),
+    const number               periodicity_factor = 1.);
 
   /**
    * @}
