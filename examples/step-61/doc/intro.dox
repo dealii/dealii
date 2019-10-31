@@ -28,7 +28,7 @@ degrees of freedom on the adjacent cells from each other: cell degrees of freedo
 only couple with other cell degrees of freedom on the same cell, as well as face
 degrees of freedom, but not with cell degrees of freedom on neighboring cells.
 Consequently, the coupling of shape functions for these cell degrees of freedom
-indeed local to on exactly one cell and the degrees of freedom defined on its
+indeed couple on exactly one cell and the degrees of freedom defined on its
 faces.
 
 For a given equation, say the second order Poisson equation,
