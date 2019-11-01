@@ -29,14 +29,14 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
 ENDIF()
 
 #
-# Unset Boost_Found and run the low level FindBOOST.cmake module again to
-# pick up libboost_python.so
+# As of 1.67, boost requires specifying the suffix for the python 
+# component manually. 
 #
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-SET(Boost_FOUND)
-# Use the low level _FIND_PACKAGE function instead of our wrapper
-_FIND_PACKAGE(Boost 1.54 COMPONENTS python)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+IF(${BOOST_VERSION} VERSION_LESS 1.67)
+  _FIND_PACKAGE(Boost 1.59 COMPONENTS python REQUIRED)
+ELSE()
+  _FIND_PACKAGE(Boost 1.67 COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED)
+ENDIF()
 
 IF(NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR
