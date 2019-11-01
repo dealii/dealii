@@ -91,8 +91,9 @@ namespace hp
       const Vector<Number> &               criteria,
       const Number                         p_refine_threshold,
       const Number                         p_coarsen_threshold,
-      const ComparisonFunction<Number> &   compare_refine,
-      const ComparisonFunction<Number> &   compare_coarsen)
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
@@ -122,8 +123,9 @@ namespace hp
       const Vector<Number> &               criteria,
       const double                         p_refine_fraction,
       const double                         p_coarsen_fraction,
-      const ComparisonFunction<Number> &   compare_refine,
-      const ComparisonFunction<Number> &   compare_coarsen)
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
@@ -259,11 +261,12 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_reference(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               criteria,
-      const Vector<Number> &               references,
-      const ComparisonFunction<Number> &   compare_refine,
-      const ComparisonFunction<Number> &   compare_coarsen)
+      const hp::DoFHandler<dim, spacedim> &                      dof_handler,
+      const Vector<Number> &                                     criteria,
+      const Vector<Number> &                                     references,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       criteria.size());
