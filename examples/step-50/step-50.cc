@@ -107,6 +107,8 @@ namespace Step50
   public:
     LaplaceProblem(const unsigned int deg);
     void run();
+    using MatrixType = LA::MPI::SparseMatrix;
+    using VectorType = LA::MPI::Vector;
 
   private:
     void setup_system();
@@ -116,31 +118,30 @@ namespace Step50
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
+    MPI_Comm           mpi_communicator;
     ConditionalOStream pcout;
 
     parallel::distributed::Triangulation<dim> triangulation;
     FE_Q<dim>                                 fe;
-    DoFHandler<dim>                           mg_dof_handler;
+    DoFHandler<dim>                           dof_handler;
 
-    using matrix_t = LA::MPI::SparseMatrix;
-    using vector_t = LA::MPI::Vector;
 
-    matrix_t system_matrix;
+    MatrixType system_matrix;
 
     IndexSet locally_relevant_set;
 
     AffineConstraints<double> constraints;
 
-    vector_t solution;
-    vector_t system_rhs;
+    VectorType solution;
+    VectorType system_rhs;
 
     const unsigned int degree;
 
     // Finally we are storing the various parallel multigrid matrices. Our
     // problem is self-adjoint, so the interface matrices are the transpose
     // of each other, so we only need to compute/store them once.
-    MGLevelObject<matrix_t> mg_matrices;
-    MGLevelObject<matrix_t> mg_interface_matrices;
+    MGLevelObject<MatrixType> mg_matrices;
+    MGLevelObject<MatrixType> mg_interface_matrices;
     //
     MGConstrainedDoFs mg_constrained_dofs;
   };
@@ -225,13 +226,15 @@ namespace Step50
   // triangulation class.
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
-    : pcout(std::cout, (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0))
-    , triangulation(MPI_COMM_WORLD,
+    : mpi_communicator(MPI_COMM_WORLD)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , triangulation(mpi_communicator,
                     Triangulation<dim>::limit_level_difference_at_vertices,
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
     , fe(degree)
-    , mg_dof_handler(triangulation)
+    , dof_handler(triangulation)
     , degree(degree)
   {}
 
@@ -245,14 +248,14 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::setup_system()
   {
-    mg_dof_handler.distribute_dofs(fe);
-    mg_dof_handler.distribute_mg_dofs();
+    dof_handler.clear();
+    dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
-                                            locally_relevant_set);
+    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
 
-    solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
-    system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
+    solution.reinit(dof_handler.locally_owned_dofs(), mpi_communicator);
+    system_rhs.reinit(dof_handler.locally_owned_dofs(), mpi_communicator);
 
     // But it starts to be a wee bit different
     // here, although this still doesn't have
@@ -274,25 +277,26 @@ namespace Step50
     // correctly into the global linear system
     // right away, without the need for a later
     // clean-up stage:
+    constraints.clear();
     constraints.reinit(locally_relevant_set);
-    DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-    std::set<types::boundary_id>                        dirichlet_boundary_ids;
-    std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-    Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
-    dirichlet_boundary_ids.insert(0);
-    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values(mg_dof_handler,
-                                             dirichlet_boundary,
+    const types::boundary_id         boundary = 0;
+    std::set<types::boundary_id>     dirichlet_boundary_ids{boundary};
+    Functions::ConstantFunction<dim> boundary_values(1.0);
+
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             boundary,
+                                             boundary_values,
                                              constraints);
     constraints.close();
 
-    DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(),
-                               mg_dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(mg_dof_handler, dsp, constraints);
-    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(),
+    system_matrix.clear();
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+    system_matrix.reinit(dof_handler.locally_owned_dofs(),
                          dsp,
-                         MPI_COMM_WORLD,
+                         mpi_communicator,
                          true);
 
 
@@ -302,8 +306,8 @@ namespace Step50
     // pass the <code>dirichlet_boundary</code>
     // here as well.
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler,
+    mg_constrained_dofs.initialize(dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                        dirichlet_boundary_ids);
 
 
@@ -357,22 +361,33 @@ namespace Step50
     // matrices.
     for (unsigned int level = 0; level < n_levels; ++level)
       {
-        DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
-                                   mg_dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern(mg_dof_handler, dsp, level);
+        {
+          DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
+                                     dof_handler.n_dofs(level));
+          MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
-        mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-                                  mg_dof_handler.locally_owned_mg_dofs(level),
-                                  dsp,
-                                  MPI_COMM_WORLD,
-                                  true);
+          mg_matrices[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                    dof_handler.locally_owned_mg_dofs(level),
+                                    dsp,
+                                    mpi_communicator,
+                                    true);
+        }
 
-        mg_interface_matrices[level].reinit(
-          mg_dof_handler.locally_owned_mg_dofs(level),
-          mg_dof_handler.locally_owned_mg_dofs(level),
-          dsp,
-          MPI_COMM_WORLD,
-          true);
+        {
+          DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
+                                     dof_handler.n_dofs(level));
+          MGTools::make_interface_sparsity_pattern(dof_handler,
+                                                   mg_constrained_dofs,
+                                                   dsp,
+                                                   level);
+
+          mg_interface_matrices[level].reinit(
+            dof_handler.locally_owned_mg_dofs(level),
+            dof_handler.locally_owned_mg_dofs(level),
+            dsp,
+            mpi_communicator,
+            true);
+        }
       }
   }
 
@@ -416,7 +431,7 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values(n_q_points);
 
-    for (const auto &cell : mg_dof_handler.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
@@ -526,12 +541,11 @@ namespace Step50
     // AffineConstraints::add_lines():
     std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
-    AffineConstraints<double> empty_constraints;
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler,
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                       level,
                                                       dofset);
         boundary_constraints[level].reinit(dofset);
@@ -549,7 +563,7 @@ namespace Step50
     // need a right hand side, and more significantly (ii) we don't
     // just loop over all active cells, but in fact all cells, active
     // or not.
-    for (const auto &cell : mg_dof_handler.cell_iterators())
+    for (const auto &cell : dof_handler.cell_iterators())
       if (cell->level_subdomain_id() == triangulation.locally_owned_subdomain())
         {
           cell_matrix = 0;
@@ -619,41 +633,13 @@ namespace Step50
           // the <code>solve()</code> function) be able to just pass
           // the transpose matrix where necessary.
 
-          const IndexSet &interface_dofs_on_level =
-            mg_constrained_dofs.get_refinement_edge_indices(cell->level());
-          const unsigned int lvl = cell->level();
-
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              if (interface_dofs_on_level.is_element(
-                    local_dof_indices[i]) // at_refinement_edge(i)
-                  && !interface_dofs_on_level.is_element(
-                       local_dof_indices[j]) // !at_refinement_edge(j)
-                  &&
-                  ((!mg_constrained_dofs.is_boundary_index(
-                      lvl, local_dof_indices[i]) &&
-                    !mg_constrained_dofs.is_boundary_index(
-                      lvl,
-                      local_dof_indices[j])) // ( !boundary(i) && !boundary(j) )
-                   || (mg_constrained_dofs.is_boundary_index(
-                         lvl, local_dof_indices[i]) &&
-                       local_dof_indices[i] ==
-                         local_dof_indices[j]) // ( boundary(i) && boundary(j)
-                                               // && i==j )
-                   ))
-                {
-                  // do nothing, so add entries to interface matrix
-                }
-              else
-                {
-                  cell_matrix(i, j) = 0;
-                }
-
-
-          empty_constraints.distribute_local_to_global(
-            cell_matrix,
-            local_dof_indices,
-            mg_interface_matrices[cell->level()]);
+              if (mg_constrained_dofs.is_interface_matrix_entry(
+                    cell->level(), local_dof_indices[i], local_dof_indices[j]))
+                mg_interface_matrices[cell->level()].add(local_dof_indices[i],
+                                                         local_dof_indices[j],
+                                                         cell_matrix(i, j));
         }
 
     for (unsigned int i = 0; i < triangulation.n_global_levels(); ++i)
@@ -693,20 +679,22 @@ namespace Step50
   {
     // Create the object that deals with the transfer between
     // different refinement levels.
-    MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
+    MGTransferPrebuilt<VectorType> mg_transfer(mg_constrained_dofs);
     // Now the prolongation matrix has to be built.
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
 
-    matrix_t &coarse_matrix = mg_matrices[0];
+    MatrixType &coarse_matrix = mg_matrices[0];
 
     SolverControl        coarse_solver_control(1000, 1e-10, false, false);
-    SolverCG<vector_t>   coarse_solver(coarse_solver_control);
-    PreconditionIdentity id;
-    MGCoarseGridIterativeSolver<vector_t,
-                                SolverCG<vector_t>,
-                                matrix_t,
+    SolverCG<VectorType> coarse_solver(coarse_solver_control);
+
+    PreconditionIdentity prec;
+
+    MGCoarseGridIterativeSolver<VectorType,
+                                SolverCG<VectorType>,
+                                MatrixType,
                                 PreconditionIdentity>
-      coarse_grid_solver(coarse_solver, coarse_matrix, id);
+      coarse_grid_solver(coarse_solver, coarse_matrix, prec);
 
     // The next component of a multilevel solver or preconditioner is
     // that we need a smoother on each level. A common choice for this
@@ -739,7 +727,7 @@ namespace Step50
     // symmetric operator even for nonsymmetric
     // smoothers:
     using Smoother = LA::MPI::PreconditionJacobi;
-    MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
+    MGSmootherPrecondition<MatrixType, Smoother, VectorType> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
     // mg_smoother.set_symmetric(false);
@@ -757,27 +745,27 @@ namespace Step50
     // both up and down versions of the
     // operator with the matrices we already
     // built:
-    mg::Matrix<vector_t> mg_matrix(mg_matrices);
-    mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
-    mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
+    mg::Matrix<VectorType> mg_matrix(mg_matrices);
+    mg::Matrix<VectorType> mg_interface_up(mg_interface_matrices);
+    mg::Matrix<VectorType> mg_interface_down(mg_interface_matrices);
 
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t> mg(
+    Multigrid<VectorType> mg(
       mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     // mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-    PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
-      mg_dof_handler, mg, mg_transfer);
+    PreconditionMG<dim, VectorType, MGTransferPrebuilt<VectorType>>
+      preconditioner(dof_handler, mg, mg_transfer);
 
 
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl      solver_control(500, 1e-8 * system_rhs.l2_norm(), false);
-    SolverCG<vector_t> solver(solver_control);
+    SolverControl solver_control(500, 1e-8 * system_rhs.l2_norm(), false);
+    SolverCG<VectorType> solver(solver_control);
 
     if (false)
       {
@@ -826,17 +814,17 @@ namespace Step50
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     LA::MPI::Vector temp_solution;
-    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
+    temp_solution.reinit(locally_relevant_set, mpi_communicator);
     temp_solution = solution;
 
     KellyErrorEstimator<dim>::estimate(
-      mg_dof_handler,
+      dof_handler,
       QGauss<dim - 1>(degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
       temp_solution,
       estimated_error_per_cell);
 
-    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
+    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
       triangulation, estimated_error_per_cell, 0.3, 0.0);
 
     triangulation.execute_coarsening_and_refinement();
@@ -850,18 +838,11 @@ namespace Step50
     DataOut<dim> data_out;
 
     LA::MPI::Vector temp_solution;
-    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
+    temp_solution.reinit(locally_relevant_set, mpi_communicator);
     temp_solution = solution;
 
-
-    LA::MPI::Vector temp = solution;
-    system_matrix.residual(temp, solution, system_rhs);
-    LA::MPI::Vector res_ghosted = temp_solution;
-    res_ghosted                 = temp;
-
-    data_out.attach_dof_handler(mg_dof_handler);
+    data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(temp_solution, "solution");
-    data_out.add_data_vector(res_ghosted, "res");
     Vector<float> subdomain(triangulation.n_active_cells());
     for (unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
@@ -869,34 +850,9 @@ namespace Step50
 
     data_out.build_patches(0);
 
-    const std::string filename =
-      ("solution-" + Utilities::int_to_string(cycle, 5) + "." +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4) +
-       ".vtu");
-    std::ofstream output(filename);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back(std::string("solution-") +
-                              Utilities::int_to_string(cycle, 5) + "." +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(cycle, 5) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-
-        const std::string visit_master_filename =
-          ("solution-" + Utilities::int_to_string(cycle, 5) + ".visit");
-        std::ofstream visit_master(visit_master_filename);
-        DataOutBase::write_visit_record(visit_master, filenames);
-
-        std::cout << "   wrote " << pvtu_master_filename << std::endl;
-      }
+    const auto filename = data_out.write_vtu_with_pvtu_record(
+      "", "solution", cycle, 5, mpi_communicator, 8);
+    pcout << "    wrote " << filename << std::endl;
   }
 
 
@@ -931,11 +887,11 @@ namespace Step50
 
         setup_system();
 
-        pcout << "   Number of degrees of freedom: " << mg_dof_handler.n_dofs()
+        pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << " (by level: ";
         for (unsigned int level = 0; level < triangulation.n_global_levels();
              ++level)
-          pcout << mg_dof_handler.n_dofs(level)
+          pcout << dof_handler.n_dofs(level)
                 << (level == triangulation.n_global_levels() - 1 ? ")" : ", ");
         pcout << std::endl;
 
