@@ -319,8 +319,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            Vector<float>,
                            deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const LinearAlgebra::TpetraWrappers::Vector<float>,
-          &,
+        const LinearAlgebra::TpetraWrappers::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
         const Quadrature<deal_II_dimension> &,
