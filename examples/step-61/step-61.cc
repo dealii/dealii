@@ -362,22 +362,24 @@ namespace Step61
   // exactly the kind of information and operation provided by the
   // DoFHandler class.
   //
-  // On the other hand, we don't have such a DoFHandler object for the
-  // Raviart-Thomas space in this program. In fact, we don't even have
-  // an element that can represent the "broken" Raviart-Thomas space
-  // we really want to use here (i.e., the restriction of the
-  // Raviart-Thomas shape functions to individual cells, without the
-  // need for any kind of continuity across cell interfaces). We solve
-  // this conundrum by using the fact that one can call
+  // We could create a DoFHandler object for the "broken" Raviart-Thomas space
+  // (using the FE_DGRT class), but we really don't want to here: At
+  // least in the current function, we have no need for any globally defined
+  // degrees of freedom associated with this broken space, but really only
+  // need to reference the shape functions of such a space on the current
+  // cell. As a consequence, we use the fact that one can call
   // FEValues::reinit() also with cell iterators into Triangulation
   // objects (rather than DoFHandler objects). In this case, FEValues
   // can of course only provide us with information that only
-  // references information of cells, rather than degrees of freedom
+  // references information about cells, rather than degrees of freedom
   // enumerated on these cells. So we can't use
   // FEValuesBase::get_function_values(), but we can use
   // FEValues::shape_value() to obtain the values of shape functions
   // at quadrature points on the current cell. It is this kind of
-  // functionality we will make use of below.
+  // functionality we will make use of below. The variable that will
+  // give us this information about the Raviart-Thomas functions below
+  // is then the `fe_values_rt` (and corresponding `fe_face_values_rt`)
+  // object.
   //
   // Given this introduction, the following declarations should be
   // pretty obvious:
