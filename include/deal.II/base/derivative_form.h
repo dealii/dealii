@@ -344,12 +344,12 @@ DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
     {
       const Tensor<2, dim, Number> DF_t =
         dealii::transpose(invert(static_cast<Tensor<2, dim, Number>>(*this)));
-      return DerivativeForm<1, dim, spacedim>(DF_t);
+      return DerivativeForm<1, dim, spacedim, Number>(DF_t);
     }
   else
     {
-      const DerivativeForm<1, spacedim, dim> DF_t = this->transpose();
-      Tensor<2, dim, Number>                 G; // First fundamental form
+      const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
+      Tensor<2, dim, Number> G; // First fundamental form
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
@@ -415,11 +415,11 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
  */
 // rank=2
 template <int spacedim, int dim, typename Number>
-inline DerivativeForm<1, spacedim, dim>
+inline DerivativeForm<1, spacedim, dim, Number>
 apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
                      const Tensor<2, dim, Number> &                  D_X)
 {
-  DerivativeForm<1, spacedim, dim> dest;
+  DerivativeForm<1, spacedim, dim, Number> dest;
   for (unsigned int i = 0; i < dim; ++i)
     dest[i] = apply_transformation(grad_F, D_X[i]);
 
