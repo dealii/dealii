@@ -101,6 +101,14 @@ test()
       deallog << std::endl;
     }
 
+  // ----- check feature -----
+  hp::Refinement::p_adaptivity_from_reference(
+    dh,
+    error_indicators,
+    predicted_errors,
+    /*compare_refine=*/std::less<float>(),
+    /*compare_coarsen=*/std::less<float>());
+
   deallog << "OK" << std::endl;
 }
 
