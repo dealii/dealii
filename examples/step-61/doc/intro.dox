@@ -49,7 +49,7 @@ as easy to implement. However, as we will see in the following, this
 additional effort is not prohibitive.
  
 
-<h3>  Weak Galerkin finite element methods</h3>
+<h3> Weak Galerkin finite element methods </h3>
 
 Weak Galerkin Finite Element Methods (WGFEMs) use discrete weak functions 
 to approximate scalar unknowns, and discrete weak gradients to 
@@ -132,7 +132,7 @@ form above. This works for the case where we have to evaluate the
 test function $q_h$ on the boundary (where we would simply take its interface
 part $q_h^\partial$) but we have to be careful with the gradient because
 that is only defined in cell interiors. Consequently,
- the weak Galerkin scheme for the Poisson equation is defined by
+the weak Galerkin scheme for the Poisson equation is defined by
 @f{equation*}
 \mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left(q_h \right),
 @f}
@@ -150,7 +150,7 @@ and
 @f}
 The key point is that here, we have replaced the gradient $\nabla p_h$ by the
 <i>discrete weak gradient</i> operator
- $ \nabla_{w,d} p_h $ that makes sense for our peculiarly defined approximation $p_h$.
+$\nabla_{w,d} p_h$ that makes sense for our peculiarly defined approximation $p_h$.
  
 The question is then how that operator works. For this, let us first say how we
 think of the discrete approximation $p_h$ of the pressure. As mentioned above,
@@ -173,7 +173,8 @@ $\nabla_{w,d} p_h$ would simply be the exact gradient $\nabla p_h$. But, since
 $p_h|_K$ is not continuous between interior and boundary of $K$, we need a more
 general definition; furthermore, we can not deal with arbitrary functions, and
 so require that $\nabla_{w,d} p_h$ is also in a finite element space (which, since
-the gradient is a vector, has to be vector-valued).
+the gradient is a vector, has to be vector-valued, and because the weak gradient
+is defined on each cell separately, will also be discontinuous between cells).
 
 The way this is done is to define this weak gradient operator $\nabla_{w,d}|_K :
 DGQ_k(K) \times DGQ_r(\partial K) \rightarrow RT_s(K)$ (where $RT_s(K)$ is the
@@ -202,7 +203,17 @@ are equal for all test functions.
   Rather, it is in a "broken" Raviart-Thomas space that below we will
   represent by the symbol $DGRT_s$. (The term "broken" here refers to
   the process of "breaking something apart", and not to the synonym to
-  the expression "not functional".)
+  the expression "not functional".) One might therefore (rightfully) argue that
+  the notation used in the weak Galerkin literature is a bit misleading,
+  but as so often it all depends on the context in which a certain
+  notation is used -- in the current context, references to the
+  Raviart-Thomas space or element are always understood to be to the
+  "broken" spaces.
+
+@note deal.II happens to have an implementation of this broken Raviart-Thomas
+  space: The FE_DGRT class. As a consequence, in this tutorial we will simply
+  always use the FE_DGRT class, even though in all of those places where
+  we have to compute cell-local matrices and vectors, it makes no difference.
 
 
 <h3> Representing the weak gradient </h3>
