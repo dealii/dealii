@@ -237,6 +237,10 @@ namespace Utilities
         }
 
 #  if DEAL_II_MPI_VERSION_GTE(2, 2)
+
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, mpi_comm);
+
       // Calculate the number of messages to send to each process
       std::vector<unsigned int> dest_vector(n_procs);
       for (const auto &el : destinations)
@@ -947,6 +951,9 @@ namespace Utilities
     void
     ConsensusAlgorithm_NBX<T1, T2>::run()
     {
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, this->comm);
+
       // 1) send requests and start receiving the answers
       start_communication();
 
@@ -1273,6 +1280,9 @@ namespace Utilities
     void
     ConsensusAlgorithm_PEX<T1, T2>::run()
     {
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, this->comm);
+
       // 1) send requests and start receiving the answers
       //    especially determine how many requests are expected
       const unsigned int n_requests = start_communication();

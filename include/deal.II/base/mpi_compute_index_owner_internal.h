@@ -119,6 +119,10 @@ namespace Utilities
             this->partition(owned_indices, comm);
 
 #ifdef DEAL_II_WITH_MPI
+
+            static CollectiveMutex      mutex;
+            CollectiveMutex::ScopedLock lock(mutex, comm);
+
             unsigned int my_rank = this_mpi_process(comm);
 
             types::global_dof_index dic_local_received = 0;
@@ -630,6 +634,9 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
+            static CollectiveMutex      mutex;
+            CollectiveMutex::ScopedLock lock(mutex, comm);
+
             // reserve enough slots for the requests ahead; depending on
             // whether the owning rank is one of the requesters or not, we
             // might have one less requests to execute, so fill the requests
@@ -767,11 +774,6 @@ namespace Utilities
                          "MPI rank should be locally owned here!"));
               }
 #  endif
-
-            // This barrier is important to make sure that two successive calls
-            // to this functions do not overlap and we confuse messages. See the
-            // discussion in https://github.com/dealii/dealii/issues/8929
-            MPI_Barrier(comm);
 
 #endif // DEAL_II_WITH_MPI
 
