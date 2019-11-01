@@ -689,13 +689,10 @@ namespace Step50
     SolverCG<VectorType> coarse_solver(coarse_solver_control);
 
     PreconditionIdentity prec;
-    //  TrilinosWrappers::PreconditionAMG prec;
-    //  prec.initialize(coarse_matrix);
 
     MGCoarseGridIterativeSolver<VectorType,
                                 SolverCG<VectorType>,
                                 MatrixType,
-                                // TrilinosWrappers::PreconditionAMG
                                 PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, prec);
 
