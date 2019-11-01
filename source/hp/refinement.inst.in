@@ -59,8 +59,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
           const Vector<S> &,
           const S,
           const S,
-          const std::function<bool(const S &, const S &)> &,
-          const std::function<bool(const S &, const S &)> &);
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
 
         template void
         p_adaptivity_from_relative_threshold<deal_II_dimension,
@@ -70,8 +70,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
           const Vector<S> &,
           const double,
           const double,
-          const std::function<bool(const S &, const S &)> &,
-          const std::function<bool(const S &, const S &)> &);
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
 
         template void
         p_adaptivity_from_regularity<deal_II_dimension,
@@ -87,8 +87,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
           const Vector<S> &,
           const Vector<S> &,
-          const std::function<bool(const S &, const S &)> &,
-          const std::function<bool(const S &, const S &)> &);
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
 
         template void
         predict_error<deal_II_dimension, S, deal_II_space_dimension>(
