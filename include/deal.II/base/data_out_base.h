@@ -3038,7 +3038,7 @@ public:
    * DataOutInterface::write_pvtu_record().
    *
    * For example, running
-   * <code> write_vtu_with_pvtu_record("output/","solution", 3, 4, comm, 2)
+   * <code> write_vtu_with_pvtu_record("output/", "solution", 3, 4, comm, 2)
    * </code> on 10 processes generates the files
    * @code
    * output/solution_0003.0.vtu
