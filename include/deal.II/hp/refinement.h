@@ -138,8 +138,7 @@ namespace hp
      */
     template <typename Number>
     using ComparisonFunction =
-      std::function<bool(const typename identity<Number>::type &,
-                         const typename identity<Number>::type &)>;
+      std::function<bool(const Number &, const Number &)>;
 
     /**
      * @name Setting p-adaptivity flags
@@ -207,8 +206,10 @@ namespace hp
       const Vector<Number> &               criteria,
       const Number                         p_refine_threshold,
       const Number                         p_coarsen_threshold,
-      const ComparisonFunction<Number> &compare_refine = std::greater<Number>(),
-      const ComparisonFunction<Number> &compare_coarsen = std::less<Number>());
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_refine = std::greater<Number>(),
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen = std::less<Number>());
 
     /**
      * Adapt which finite element to use on cells whose criteria meet a certain
@@ -247,8 +248,10 @@ namespace hp
       const Vector<Number> &               criteria,
       const double                         p_refine_fraction  = 0.5,
       const double                         p_coarsen_fraction = 0.5,
-      const ComparisonFunction<Number> &compare_refine = std::greater<Number>(),
-      const ComparisonFunction<Number> &compare_coarsen = std::less<Number>());
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_refine = std::greater<Number>(),
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen = std::less<Number>());
 
     /**
      * Adapt which finite element to use on cells based on the regularity of the
@@ -317,11 +320,12 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_reference(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               criteria,
-      const Vector<Number> &               references,
-      const ComparisonFunction<Number> &   compare_refine,
-      const ComparisonFunction<Number> &   compare_coarsen);
+      const hp::DoFHandler<dim, spacedim> &                      dof_handler,
+      const Vector<Number> &                                     criteria,
+      const Vector<Number> &                                     references,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen);
     /**
      * @}
      */
