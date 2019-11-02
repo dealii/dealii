@@ -1,0 +1,6 @@
+Changed: Fixed the computation of the FiniteElement.degree in
+VectorTools::project_boundary_values_curl_conforming_l2 to be based on the
+degree of the FiniteElement selected for the application of the boundary
+values and not of the whole FiniteElement.
+<br>
+(Winnifried Wollner, 2019/11/02)
