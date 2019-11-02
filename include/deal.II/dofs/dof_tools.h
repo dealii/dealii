@@ -1158,7 +1158,7 @@ namespace DoFTools
    * [https://en.wikipedia.org/wiki/Bloch_wave](https://en.wikipedia.org/wiki/Bloch_wave).
    * The solution at @p face_2 is equal to the solution at @p face_1 times
    * @p periodicity_factor. For example, if the solution at @p face_1 is
-   * $\psi(0)$ and $\mathbf{d} is the corresponding point on @p face_2, then
+   * $\psi(0)$ and $\mathbf{d}$ is the corresponding point on @p face_2, then
    * the solution at @p face_2 should be
    * $\psi(d) = \psi(0)e^{-i \mathbf{k}\cdot \mathbf{d}}$. This condition can be
    * implemented using
