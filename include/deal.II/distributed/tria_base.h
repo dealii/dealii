@@ -98,6 +98,11 @@ namespace parallel
 
     /**
      * Implementation of the same function as in the base class.
+     *
+     * @note This function copies the cells, but not the communicator,
+     * of the source triangulation. In other words, the resulting
+     * triangulation will operate on the communicator it was constructed
+     * with.
      */
     virtual void
     copy_triangulation(
