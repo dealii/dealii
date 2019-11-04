@@ -2941,6 +2941,32 @@ namespace GridTools
     MPI_Comm                                  mpi_communicator);
 
   /**
+   * Collect for a given triangulation all locally relevant vertices that
+   * coincide due to periodicity.
+   *
+   * Coinciding vertices are put into a group, e.g.: [1, 25, 51], which is
+   * labeled by an arbitrary element from it, e.g.: "1". All coinciding vertices
+   * store the label to its group, so that they can quickly access all the
+   * coinciding vertices in that group: e.g.: 51 ->  "1" -> [1, 25, 51]
+   *
+   * @param[in] tria Triangulation.
+   * @param[out] coinciding_vertex_groups A map of equivalence classes (of
+   *             coinciding vertices) labeled by an arbitrary element from them.
+   *             Vertices not coinciding are ignored.
+   * @param[out] vertex_to_coinciding_vertex_group Map of a vertex to the label
+   *             of a group of coinciding vertices. Vertices not contained in
+   *             this vector are not coinciding with any other vertex.
+   *
+   * @author Peter Munch, 2019.
+   */
+  template <int dim, int spacedim>
+  void
+  collect_coinciding_vertices(
+    const Triangulation<dim, spacedim> &               tria,
+    std::map<unsigned int, std::vector<unsigned int>> &coinciding_vertex_groups,
+    std::map<unsigned int, unsigned int> &vertex_to_coinciding_vertex_group);
+
+  /**
    * A structure that allows the transfer of cell data of type @p T from one processor
    * to another. It corresponds to a packed buffer that stores a vector of
    * CellId and a vector of type @p T.
