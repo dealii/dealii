@@ -4428,6 +4428,13 @@ namespace internal
           Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
                  ExcInternalError());
 
+
+          // Before sending & receiving, make sure we protect this section with
+          // a mutex:
+          static Utilities::MPI::CollectiveMutex      mutex;
+          Utilities::MPI::CollectiveMutex::ScopedLock lock(
+            mutex, tria.get_communicator());
+
           //* send our requests:
           std::vector<MPI_Request> requests(level_ghost_owners.size());
           {

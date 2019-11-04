@@ -1148,6 +1148,10 @@ namespace FETools
       std::vector<MPI_Request>                 requests(cells_to_send.size());
       std::vector<unsigned int>                destinations;
 
+      // Protect the communcation below:
+      static Utilities::MPI::CollectiveMutex      mutex;
+      Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
+
       // send data
       unsigned int idx = 0;
       for (typename std::vector<CellData>::const_iterator it =
