@@ -222,7 +222,12 @@ namespace internal
                   // faces properly
                   const CellId id_mine = dcell->id();
                   if (use_active_cells && neighbor->has_children())
-                    for (unsigned int c = 0; c < dcell->face(f)->n_children();
+                    for (unsigned int c = 0;
+                         c < (dcell->has_periodic_neighbor(f) ?
+                                dcell->periodic_neighbor(f)
+                                  ->face(dcell->periodic_neighbor_face_no(f))
+                                  ->n_children() :
+                                dcell->face(f)->n_children());
                          ++c)
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
