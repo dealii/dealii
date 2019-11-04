@@ -440,8 +440,8 @@ namespace Step61
     // We need <code>FEValuesExtractors</code> to access the @p interior and
     // @p face component of the shape functions.
     const FEValuesExtractors::Vector velocities(0);
-    const FEValuesExtractors::Scalar interior(0);
-    const FEValuesExtractors::Scalar face_extractor(1);
+    const FEValuesExtractors::Scalar pressure_interior(0);
+    const FEValuesExtractors::Scalar pressure_face(1);
 
     // This finally gets us in position to loop over all cells. On
     // each cell, we will first calculate the various cell matrices
@@ -501,7 +501,8 @@ namespace Step61
               const double div_v_i = fe_values_rt[velocities].divergence(i, q);
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const double phi_j_interior = fe_values[interior].value(j, q);
+                  const double phi_j_interior =
+                    fe_values[pressure_interior].value(j, q);
 
                   cell_matrix_G(i, j) -=
                     (div_v_i * phi_j_interior * fe_values.JxW(q));
@@ -530,7 +531,7 @@ namespace Step61
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
                         const double phi_j_face =
-                          fe_face_values[face_extractor].value(j, q);
+                          fe_face_values[pressure_face].value(j, q);
 
                         cell_matrix_G(i, j) +=
                           ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));
@@ -575,7 +576,7 @@ namespace Step61
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              cell_rhs(i) += (fe_values[interior].value(i, q) *
+              cell_rhs(i) += (fe_values[pressure_interior].value(i, q) *
                               right_hand_side_values[q] * fe_values.JxW(q));
             }
 
@@ -744,8 +745,8 @@ namespace Step61
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
-    const FEValuesExtractors::Scalar interior(0);
-    const FEValuesExtractors::Scalar face_extractor(1);
+    const FEValuesExtractors::Scalar pressure_interior(0);
+    const FEValuesExtractors::Scalar pressure_face(1);
     const FEValuesExtractors::Vector velocities_dgrt(0);
 
     const ExactVelocity<dim> exact_velocity;
@@ -818,7 +819,8 @@ namespace Step61
               const double div_v_i = fe_values_rt[velocities].divergence(i, q);
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const double phi_j_interior = fe_values[interior].value(j, q);
+                  const double phi_j_interior =
+                    fe_values[pressure_interior].value(j, q);
 
                   cell_matrix_G(i, j) -=
                     (div_v_i * phi_j_interior * fe_values.JxW(q));
@@ -841,7 +843,7 @@ namespace Step61
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
                         const double phi_j_face =
-                          fe_face_values[face_extractor].value(j, q);
+                          fe_face_values[pressure_face].value(j, q);
 
                         cell_matrix_G(i, j) +=
                           ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));

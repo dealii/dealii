@@ -2333,7 +2333,7 @@ namespace Step44
     // cell face exists on a boundary on which a traction is applied and add
     // the contribution if this is the case.
     for (const auto &face : cell->face_iterators())
-      if (face->at_boundary() == true && face->boundary_id() == 6)
+      if (face->at_boundary() && face->boundary_id() == 6)
         {
           scratch.fe_face_values.reinit(cell, face);
 
