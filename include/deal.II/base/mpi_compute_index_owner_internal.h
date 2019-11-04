@@ -143,13 +143,15 @@ namespace Utilities
                 unsigned int owner_first = numbers::invalid_unsigned_int;
                 while (owner_first != owner_last)
                   {
+                    Assert(index_range.first < index_range.second,
+                           ExcInternalError());
+
                     owner_first = dof_to_dict_rank(index_range.first);
 
                     // this explicitly picks up the formula of
                     // dof_to_dict_rank, so the two places must be in sync
                     types::global_dof_index next_index =
-                      std::min((index_range.first / dofs_per_process + 1) *
-                                 dofs_per_process,
+                      std::min(get_index_offset(owner_first + 1),
                                index_range.second);
 
                     Assert(next_index > index_range.first, ExcInternalError());
@@ -287,7 +289,8 @@ namespace Utilities
           unsigned int
           dof_to_dict_rank(const types::global_dof_index i)
           {
-            // note: this formula is also explicitly used in reinit()
+            // note: this formula is also explicitly used in
+            // get_index_offset(), so keep the two in sync
             return (i / dofs_per_process) * stride_small_size;
           }
 
@@ -298,8 +301,10 @@ namespace Utilities
           types::global_dof_index
           get_index_offset(const unsigned int rank)
           {
-            return std::min(dofs_per_process * ((rank + stride_small_size - 1) /
-                                                stride_small_size),
+            return std::min(dofs_per_process *
+                              static_cast<types::global_dof_index>(
+                                (rank + stride_small_size - 1) /
+                                stride_small_size),
                             size);
           }
 
