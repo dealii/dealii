@@ -231,8 +231,8 @@ namespace Step54
     Triangulation<2, 3>::active_cell_iterator cell = tria.begin_active();
     cell->set_manifold_id(1);
 
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
-      cell->face(f)->set_manifold_id(2);
+    for (const auto &face : cell->face_iterators())
+      face->set_manifold_id(2);
 
     // Once both the CAD geometry and the initial mesh have been
     // imported and digested, we use the CAD surfaces and curves to

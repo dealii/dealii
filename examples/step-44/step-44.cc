@@ -1467,22 +1467,21 @@ namespace Step44
     // +y surface and will get boundary ID 6 (zero through five are already
     // used when creating the six faces of the cube domain):
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const auto &face : cell->face_iterators())
         {
-          if (cell->face(face)->at_boundary() == true &&
-              cell->face(face)->center()[1] == 1.0 * parameters.scale)
+          if (face->at_boundary() == true &&
+              face->center()[1] == 1.0 * parameters.scale)
             {
               if (dim == 3)
                 {
-                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale &&
-                      cell->face(face)->center()[2] < 0.5 * parameters.scale)
-                    cell->face(face)->set_boundary_id(6);
+                  if (face->center()[0] < 0.5 * parameters.scale &&
+                      face->center()[2] < 0.5 * parameters.scale)
+                    face->set_boundary_id(6);
                 }
               else
                 {
-                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale)
-                    cell->face(face)->set_boundary_id(6);
+                  if (face->center()[0] < 0.5 * parameters.scale)
+                    face->set_boundary_id(6);
                 }
             }
         }
@@ -2333,10 +2332,8 @@ namespace Step44
     // Next we assemble the Neumann contribution. We first check to see it the
     // cell face exists on a boundary on which a traction is applied and add
     // the contribution if this is the case.
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
-      if (cell->face(face)->at_boundary() == true &&
-          cell->face(face)->boundary_id() == 6)
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary() == true && face->boundary_id() == 6)
         {
           scratch.fe_face_values.reinit(cell, face);
 

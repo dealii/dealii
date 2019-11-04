@@ -454,13 +454,12 @@ namespace Step29
     GridGenerator::subdivided_hyper_cube(triangulation, 5, 0, 1);
 
     for (auto &cell : triangulation.cell_iterators())
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
-        if (cell->face(face)->at_boundary() &&
-            ((cell->face(face)->center() - transducer).norm_square() < 0.01))
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary() &&
+            ((face->center() - transducer).norm_square() < 0.01))
           {
-            cell->face(face)->set_boundary_id(1);
-            cell->face(face)->set_manifold_id(1);
+            face->set_boundary_id(1);
+            face->set_manifold_id(1);
           }
     // For the circle part of the transducer lens, a SphericalManifold object
     // is used (which, of course, in 2D just represents a circle), with center

@@ -523,12 +523,10 @@ namespace Step20
               local_rhs(i) += -phi_i_p * rhs_values[q] * fe_values.JxW(q);
             }
 
-        for (unsigned int face_n = 0;
-             face_n < GeometryInfo<dim>::faces_per_cell;
-             ++face_n)
-          if (cell->at_boundary(face_n))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              fe_face_values.reinit(cell, face_n);
+              fe_face_values.reinit(cell, face);
 
               pressure_boundary_values.value_list(
                 fe_face_values.get_quadrature_points(), boundary_values);

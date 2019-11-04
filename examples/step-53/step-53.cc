@@ -385,8 +385,8 @@ namespace Step53
     for (unsigned int i = 0; i < 6; ++i)
       {
         for (const auto &cell : triangulation.active_cell_iterators())
-          for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
-            if (cell->face(f)->boundary_id() == 5)
+          for (const auto &face : cell->face_iterators())
+            if (face->boundary_id() == 5)
               {
                 cell->set_refine_flag();
                 break;

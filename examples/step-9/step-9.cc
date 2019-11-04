@@ -675,15 +675,14 @@ namespace Step9
     // the direction of flow at this point; we obtain this information
     // using the FEFaceValues object and only decide within the main loop
     // whether a quadrature point is on the inflow boundary.
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
-      if (cell->face(face_n)->at_boundary())
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary())
         {
           // Ok, this face of the present cell is on the boundary of the
           // domain. Just as for the usual FEValues object which we have
           // used in previous examples and also above, we have to
           // reinitialize the FEFaceValues object for the present face:
-          scratch_data.fe_face_values.reinit(cell, face_n);
+          scratch_data.fe_face_values.reinit(cell, face);
 
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:

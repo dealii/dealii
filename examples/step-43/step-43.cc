@@ -1125,12 +1125,10 @@ namespace Step43
               }
           }
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              darcy_fe_face_values.reinit(cell, face_no);
+              darcy_fe_face_values.reinit(cell, face);
 
               pressure_boundary_values.value_list(
                 darcy_fe_face_values.get_quadrature_points(), boundary_values);
@@ -1310,13 +1308,11 @@ namespace Step43
                                           global_S_variation,
                                           local_dof_indices);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              darcy_fe_face_values.reinit(darcy_cell, face_no);
-              saturation_fe_face_values.reinit(cell, face_no);
+              darcy_fe_face_values.reinit(darcy_cell, face);
+              saturation_fe_face_values.reinit(cell, face);
               assemble_saturation_rhs_boundary_term(saturation_fe_face_values,
                                                     darcy_fe_face_values,
                                                     local_dof_indices);
