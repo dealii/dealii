@@ -733,6 +733,33 @@ namespace Utilities
     }
 
 
+
+    void
+    MPI_InitFinalize::register_request(MPI_Request &request)
+    {
+      // insert if it is not in the set already:
+      requests.insert(&request);
+    }
+
+
+
+    void
+    MPI_InitFinalize::unregister_request(MPI_Request &request)
+    {
+      Assert(
+        requests.find(&request) != requests.end(),
+        ExcMessage(
+          "You tried to call unregister_request() with an invalid request."));
+
+      requests.erase(&request);
+    }
+
+
+
+    std::set<MPI_Request *> MPI_InitFinalize::requests;
+
+
+
     MPI_InitFinalize::~MPI_InitFinalize()
     {
       // make memory pool release all PETSc/Trilinos/MPI-based vectors that
@@ -741,8 +768,14 @@ namespace Utilities
       // would run after MPI_Finalize is called, leading to errors
 
 #ifdef DEAL_II_WITH_MPI
-      // Start with the deal.II MPI vectors (need to do this before finalizing
-      // PETSc because it finalizes MPI).  Delete vectors from the pools:
+      // Before exiting, wait for nonblocking communication to complete:
+      for (auto request : requests)
+        {
+          const int ierr = MPI_Wait(request, MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+
+      // Start with deal.II MPI vectors and delete vectors from the pools:
       GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
       GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<double>>::
@@ -1467,6 +1500,91 @@ namespace Utilities
     template class ConsensusAlgorithmSelector<
       std::pair<types::global_dof_index, types::global_dof_index>,
       unsigned int>;
+
+
+
+    CollectiveMutex::CollectiveMutex()
+      : locked(false)
+      , request(MPI_REQUEST_NULL)
+    {
+      Utilities::MPI::MPI_InitFinalize::register_request(request);
+    }
+
+
+
+    CollectiveMutex::~CollectiveMutex()
+    {
+      Assert(
+        !locked,
+        ExcMessage(
+          "Error: MPI::CollectiveMutex is still locked while being destroyed!"));
+
+      Utilities::MPI::MPI_InitFinalize::unregister_request(request);
+    }
+
+
+
+    void
+    CollectiveMutex::lock(MPI_Comm comm)
+    {
+      (void)comm;
+
+      Assert(
+        !locked,
+        ExcMessage(
+          "Error: MPI::CollectiveMutex needs to be unlocked before lock()"));
+
+#ifdef DEAL_II_WITH_MPI
+
+      // TODO: For now, we implement this mutex with a blocking barrier
+      // in the lock and unlock. It needs to be tested, if we can move
+      // to a nonblocking barrier (code disabled below).
+
+      const int ierr = MPI_Barrier(comm);
+      AssertThrowMPI(ierr);
+
+#  if 0 && DEAL_II_MPI_VERSION_GTE(3, 0)
+      // wait for non-blocking barrier to finish. This is a noop the
+      // first time we lock().
+      const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+#  else
+      // nothing to do as blocking barrier already completed
+#  endif
+#endif
+
+      locked = true;
+    }
+
+
+
+    void
+    CollectiveMutex::unlock(MPI_Comm comm)
+    {
+      (void)comm;
+
+      Assert(
+        locked,
+        ExcMessage(
+          "Error: MPI::CollectiveMutex needs to be locked before unlock()"));
+
+#ifdef DEAL_II_WITH_MPI
+
+      // TODO: For now, we implement this mutex with a blocking barrier
+      // in the lock and unlock. It needs to be tested, if we can move
+      // to a nonblocking barrier (code disabled below):
+
+#  if 0 && DEAL_II_MPI_VERSION_GTE(3, 0)
+      const int ierr = MPI_Ibarrier(comm, &request);
+      AssertThrowMPI(ierr);
+#  else
+      const int ierr = MPI_Barrier(comm);
+      AssertThrowMPI(ierr);
+#  endif
+#endif
+
+      locked = false;
+    }
 
 #include "mpi.inst"
   } // end of namespace MPI

@@ -31,6 +31,7 @@
 // some constructs with MPI data
 // types. Therefore, create some dummies
 using MPI_Comm     = int;
+using MPI_Request  = int;
 using MPI_Datatype = int;
 using MPI_Op       = int;
 #  ifndef MPI_COMM_WORLD
@@ -38,6 +39,9 @@ using MPI_Op       = int;
 #  endif
 #  ifndef MPI_COMM_SELF
 #    define MPI_COMM_SELF 0
+#  endif
+#  ifndef MPI_REQUEST_NULL
+#    define MPI_REQUEST_NULL 0
 #  endif
 #  ifndef MPI_MIN
 #    define MPI_MIN 0
@@ -267,6 +271,117 @@ namespace Utilities
        */
       MPI_Comm comm;
     };
+
+    /**
+     * This class represents a mutex to guard a critical section for a set of
+     * processors in a parallel computation using MPI.
+     *
+     * The lock() commands waits until all MPI ranks in the communicator have
+     * released a previous lock using unlock().
+     *
+     * A typical usage involves guarding a critical section using a lock guard:
+     * @code
+     * {
+     *   static CollectiveMutex      mutex;
+     *   CollectiveMutex::ScopedLock lock(mutex, comm);
+     *   // [ critical code to be guarded]
+     * }
+     * @endcode
+     *
+     * Here, the critical code will finish on all processors before the mutex
+     * can be acquired again (for example by a second execution of the block
+     * above. The critical code block typically involves MPI communication that
+     * would yield incorrect results without the lock. For example, if the code
+     * contains nonblocking receives with MPI_ANY_SOURCE, packets can be
+     * confused between iterations.
+     *
+     * Note that the mutex needs to be the same instance between calls to the
+     * same critical region. While not required, this can be achieved by making
+     * the instance static (like in the example above). The variable can also be
+     * a global variable, or a member variable of the object to which the
+     * executing function belongs.
+     */
+    class CollectiveMutex
+    {
+    public:
+      /**
+       * This helper class provides a scoped lock for the CollectiveMutex.
+       *
+       * See the class documentation of CollectiveMutex for details.
+       */
+      class ScopedLock
+      {
+      public:
+        /**
+         * Constructor. Blocks until it can aquire the lock.
+         */
+        explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
+          : mutex(mutex)
+          , comm(comm)
+        {
+          mutex.lock(comm);
+        }
+
+        /**
+         * Destructor. Releases the lock.
+         */
+        ~ScopedLock()
+        {
+          mutex.unlock(comm);
+        }
+
+      private:
+        /**
+         * A reference to the mutex.
+         */
+        CollectiveMutex &mutex;
+        /**
+         * The communicator.
+         */
+        const MPI_Comm &comm;
+      };
+
+      /**
+       * Constructor of this class.
+       */
+      explicit CollectiveMutex();
+
+      /**
+       * Destroy the mutex. Assumes the lock is not currently held.
+       */
+      ~CollectiveMutex();
+
+      /**
+       * Aquire the mutex and, if necessary, wait until we can do so.
+       *
+       * This is a collective call that needs to be executed by all processors
+       * in the communicator.
+       */
+      void
+      lock(MPI_Comm comm);
+
+      /**
+       * Release the lock.
+       *
+       * This is a collective call that needs to be executed by all processors
+       * in the communicator.
+       */
+      void
+      unlock(MPI_Comm comm);
+
+    private:
+      /**
+       * Keep track if we have this lock right now.
+       */
+      bool locked;
+
+      /**
+       * The request to keep track of the non-blocking barrier.
+       */
+      MPI_Request request;
+    };
+
+
 
     /**
      * If @p comm is an intracommunicator, this function returns a new
@@ -704,6 +819,47 @@ namespace Utilities
        * MPI process.
        */
       ~MPI_InitFinalize();
+
+      /**
+       * Register a reference to an MPI_Request
+       * on which we need to call `MPI_Wait` before calling `MPI_Finalize`.
+       *
+       * The object @p request needs to exist when MPI_Finalize is called, which means the
+       * request is typically statically allocated. Otherwise, you need to call
+       * unregister_request() before the request goes out of scope. Note that is
+       * is acceptable for a request to be already waited on (and consequently
+       * reset to MPI_REQUEST_NULL).
+       *
+       * It is acceptable to call this function more than once with the same
+       * instance (as it is done in the example below).
+       *
+       * Typically, this function is used by CollectiveMutex and not directly,
+       * but it can also be used directly like this:
+       * @code
+       * void my_fancy_communication()
+       * {
+       *   static MPI_Request request = MPI_REQUEST_NULL;
+       *   MPI_InitFinalize::register_request(request);
+       *   MPI_Wait(&request, MPI_STATUS_IGNORE);
+       *   // [some algorithm that is not safe to be executed twice in a row.]
+       *   MPI_IBarrier(comm, &request);
+       * }
+       * @endcode
+       */
+      static void
+      register_request(MPI_Request &request);
+
+      /**
+       * Unregister a request previously added using register_request().
+       */
+      static void
+      unregister_request(MPI_Request &request);
+
+    private:
+      /**
+       * Requests to MPI_Wait before finalizing
+       */
+      static std::set<MPI_Request *> requests;
     };
 
     /**
