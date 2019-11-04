@@ -1476,6 +1476,13 @@ public:
   face(const unsigned int i) const;
 
   /**
+   * Return an array of iterators to all faces of this cell.
+   */
+  inline std::array<face_iterator,
+                    GeometryInfo<DoFHandlerType::dimension>::faces_per_cell>
+  face_iterators() const;
+
+  /**
    * Return the result of the @p neighbor_child_on_subface function of the
    * base class, but convert it so that one can also access the DoF data (the
    * function in the base class only returns an iterator with access to the

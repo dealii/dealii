@@ -227,19 +227,18 @@ namespace Step65
 
     for (const auto &cell : triangulation.cell_iterators())
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const auto &face : cell->face_iterators())
           {
             bool face_at_sphere_boundary = true;
             for (unsigned int v = 0;
                  v < GeometryInfo<dim - 1>::vertices_per_cell;
                  ++v)
               {
-                if (std::abs(cell->face(f)->vertex(v).norm_square() - 0.25) >
-                    1e-12)
+                if (std::abs(face->vertex(v).norm_square() - 0.25) > 1e-12)
                   face_at_sphere_boundary = false;
               }
             if (face_at_sphere_boundary)
-              cell->face(f)->set_all_manifold_ids(1);
+              face->set_all_manifold_ids(1);
           }
         if (cell->center().norm_square() < 0.25)
           cell->set_material_id(1);

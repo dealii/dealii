@@ -934,23 +934,18 @@ namespace Step42
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
         for (const auto &cell : triangulation.active_cell_iterators())
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
-            if (cell->face(face_no)->at_boundary())
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary())
               {
-                if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(1);
-                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[0] - p2[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[1] - p1[1]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(8);
-                if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(6);
+                if (std::fabs(face->center()[2] - p2[2]) < 1e-12)
+                  face->set_boundary_id(1);
+                if (std::fabs(face->center()[0] - p1[0]) < 1e-12 ||
+                    std::fabs(face->center()[0] - p2[0]) < 1e-12 ||
+                    std::fabs(face->center()[1] - p1[1]) < 1e-12 ||
+                    std::fabs(face->center()[1] - p2[1]) < 1e-12)
+                  face->set_boundary_id(8);
+                if (std::fabs(face->center()[2] - p1[2]) < 1e-12)
+                  face->set_boundary_id(6);
               }
       }
 
@@ -1145,10 +1140,8 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
@@ -1236,13 +1229,11 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
-              cell->face(face)->get_dof_indices(dof_indices);
+              face->get_dof_indices(dof_indices);
 
               for (unsigned int q_point = 0; q_point < n_face_q_points;
                    ++q_point)
@@ -1425,10 +1416,8 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary() && face->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1557,10 +1546,8 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary() && face->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -2125,10 +2112,8 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
 

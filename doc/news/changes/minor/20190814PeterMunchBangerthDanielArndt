@@ -1,4 +1,4 @@
-New: Add CellAccessor::face_iterators(), which returns an iterator range over
-the faces of a cell.
+New: Add CellAccessor::face_iterators() and DoFCellAccessor::face_iterators()
+which return an iterator range over the faces of a cell.
 <br>
 (Peter Munch, Wolfgang Bangerth, Daniel Arndt, 2019/08/14)

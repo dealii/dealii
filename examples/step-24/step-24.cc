@@ -341,12 +341,12 @@ namespace Step24
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-          if (cell->at_boundary(f))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
               cell_matrix = 0;
 
-              fe_values.reinit(cell, f);
+              fe_values.reinit(cell, face);
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)

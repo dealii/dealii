@@ -281,10 +281,9 @@ namespace Step46
     GridGenerator::subdivided_hyper_cube(triangulation, 8, -1, 1);
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->at_boundary() &&
-            (cell->face(f)->center()[dim - 1] == 1))
-          cell->face(f)->set_all_boundary_ids(1);
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary() && (face->center()[dim - 1] == 1))
+          face->set_all_boundary_ids(1);
 
 
     for (const auto &cell : dof_handler.active_cell_iterators())

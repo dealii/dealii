@@ -355,14 +355,12 @@ namespace Step10
             // added to the long double variable `perimeter'.
             long double perimeter = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
-              for (unsigned int face_no = 0;
-                   face_no < GeometryInfo<dim>::faces_per_cell;
-                   ++face_no)
-                if (cell->face(face_no)->at_boundary())
+              for (const auto &face : cell->face_iterators())
+                if (face->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
-                    fe_face_values.reinit(cell, face_no);
+                    fe_face_values.reinit(cell, face);
                     for (unsigned int i = 0;
                          i < fe_face_values.n_quadrature_points;
                          ++i)

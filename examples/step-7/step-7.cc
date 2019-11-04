@@ -641,11 +641,8 @@ namespace Step7
         // <code>run()</code> function further below. (The default value of
         // boundary indicators is <code>0</code>, so faces can only have an
         // indicator equal to <code>1</code> if we have explicitly set it.)
-        for (unsigned int face_number = 0;
-             face_number < GeometryInfo<dim>::faces_per_cell;
-             ++face_number)
-          if (cell->face(face_number)->at_boundary() &&
-              (cell->face(face_number)->boundary_id() == 1))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && (face->boundary_id() == 1))
             {
               // If we came into here, then we have found an external face
               // belonging to Gamma2. Next, we have to compute the values of
@@ -653,7 +650,7 @@ namespace Step7
               // need for the computation of the contour integral. This is
               // done using the <code>reinit</code> function which we already
               // know from the FEValue class:
-              fe_face_values.reinit(cell, face_number);
+              fe_face_values.reinit(cell, face);
 
               // And we can then perform the integration by using a loop over
               // all quadrature points.
@@ -971,14 +968,12 @@ namespace Step7
             triangulation.refine_global(3);
 
             for (const auto &cell : triangulation.cell_iterators())
-              for (unsigned int face_number = 0;
-                   face_number < GeometryInfo<dim>::faces_per_cell;
-                   ++face_number)
+              for (const auto &face : cell->face_iterators())
                 {
-                  const auto center = cell->face(face_number)->center();
+                  const auto center = face->center();
                   if ((std::fabs(center(0) - (-1)) < 1e-12) ||
                       (std::fabs(center(1) - (-1)) < 1e-12))
-                    cell->face(face_number)->set_boundary_id(1);
+                    face->set_boundary_id(1);
                 }
           }
         else

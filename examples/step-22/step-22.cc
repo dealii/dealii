@@ -1023,9 +1023,9 @@ namespace Step22
     // the last coordinate direction. See the example description above for
     // details.
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-        if (cell->face(f)->center()[dim - 1] == 0)
-          cell->face(f)->set_all_boundary_ids(1);
+      for (const auto &face : cell->face_iterators())
+        if (face->center()[dim - 1] == 0)
+          face->set_all_boundary_ids(1);
 
 
     // We then apply an initial refinement before solving for the first

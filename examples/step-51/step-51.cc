@@ -1333,12 +1333,11 @@ namespace Step51
     // refinement, the flags are set in every refinement step, not just at the
     // beginning.
     for (const auto &cell : triangulation.cell_iterators())
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
-        if (cell->face(face)->at_boundary())
-          if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12) ||
-              (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
-            cell->face(face)->set_boundary_id(1);
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary())
+          if ((std::fabs(face->center()(0) - (-1)) < 1e-12) ||
+              (std::fabs(face->center()(1) - (-1)) < 1e-12))
+            face->set_boundary_id(1);
   }
 
   // @sect4{HDG::run}

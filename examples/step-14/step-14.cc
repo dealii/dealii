@@ -2187,10 +2187,8 @@ namespace Step14
       FaceIntegrals face_integrals;
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          face_integrals[cell->face(face_no)] = -1e20;
+        for (const auto &face : cell->face_iterators())
+          face_integrals[face] = -1e20;
 
       auto worker = [this,
                      &error_indicators,
@@ -2229,15 +2227,11 @@ namespace Step14
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
         {
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (const auto &face : cell->face_iterators())
             {
-              Assert(face_integrals.find(cell->face(face_no)) !=
-                       face_integrals.end(),
+              Assert(face_integrals.find(face) != face_integrals.end(),
                      ExcInternalError());
-              error_indicators(present_cell) -=
-                0.5 * face_integrals[cell->face(face_no)];
+              error_indicators(present_cell) -= 0.5 * face_integrals[face];
             }
           ++present_cell;
         }

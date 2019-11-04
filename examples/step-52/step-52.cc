@@ -642,14 +642,13 @@ namespace Step52
     triangulation.refine_global(4);
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
-        if (cell->face(f)->at_boundary())
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary())
           {
-            if ((cell->face(f)->center()[0] == 0.) ||
-                (cell->face(f)->center()[0] == 5.))
-              cell->face(f)->set_boundary_id(1);
+            if ((face->center()[0] == 0.) || (face->center()[0] == 5.))
+              face->set_boundary_id(1);
             else
-              cell->face(f)->set_boundary_id(0);
+              face->set_boundary_id(0);
           }
 
     // Next, we set up the linear systems and fill them with content so that

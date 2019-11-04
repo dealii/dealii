@@ -714,12 +714,10 @@ namespace Step21
 
         // Next, we also have to deal with the pressure boundary values. This,
         // again is as in step-20:
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              fe_face_values.reinit(cell, face_no);
+              fe_face_values.reinit(cell, face);
 
               pressure_boundary_values.value_list(
                 fe_face_values.get_quadrature_points(), boundary_values);
