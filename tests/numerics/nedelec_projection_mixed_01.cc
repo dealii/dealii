@@ -19,7 +19,6 @@
 // combination element that has edge DoFs other than those just from
 // the Nedelec base element
 
-#include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_nedelec.h>
@@ -33,6 +32,8 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
+#include "../tests.h"
+
 
 
 int
@@ -40,7 +41,7 @@ main()
 {
   initlog();
 
-  const unsigned int               dim = 3;
+  const unsigned int dim = 3;
 
 
   Triangulation<dim> triangulation;
