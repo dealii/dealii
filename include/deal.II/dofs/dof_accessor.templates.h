@@ -3806,6 +3806,28 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::face(
 
 
 template <typename DoFHandlerType, bool level_dof_access>
+inline std::array<
+  typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator,
+  GeometryInfo<DoFHandlerType::dimension>::faces_per_cell>
+DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterators() const
+{
+  std::array<
+    typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator,
+    GeometryInfo<dim>::faces_per_cell>
+    face_iterators;
+
+  const unsigned int dim = DoFHandlerType::dimension;
+  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    face_iterators[i] =
+      dealii::internal::DoFCellAccessorImplementation::get_face(
+        *this, i, std::integral_constant<int, dim>());
+
+  return face_iterators;
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
 inline void
 DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices) const
