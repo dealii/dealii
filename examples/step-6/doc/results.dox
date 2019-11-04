@@ -160,7 +160,7 @@ Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
 <code>solver_control.last_step()</code> call, see
 step-4) as well as CPU time needed (using the Timer class,
-discussed, for example, in step-12) and get the
+discussed, for example, in step-28) and get the
 following results (left: iterations; right: CPU time):
 
 <table width="60%" align="center">

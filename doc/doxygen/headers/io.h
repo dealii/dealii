@@ -109,7 +109,7 @@
  * documentation of that class lists the supported formats.
  *
  * Several of the tutorial programs, notably step-1, step-6, step-9, step-10,
- * step-12, and step-14 demonstrate the use of the GridOut class.
+ * step-12b, and step-14 demonstrate the use of the GridOut class.
  *
  *
  * <h3>Matrix output</h3>

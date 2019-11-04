@@ -79,7 +79,7 @@ Thus, the functions for assembling matrices, right hand side and error
 estimates below exhibit that these loops are all generic and can be
 programmed in the same way.
 
-This program is related to step-12, in that it uses MeshWorker and
+This program is related to step-12b, in that it uses MeshWorker and
 discontinuous Galerkin methods. While there, we solved an advection
 problem, here it is a diffusion problem. Here, we also use multigrid
 preconditioning and a theoretically justified error estimator, see
