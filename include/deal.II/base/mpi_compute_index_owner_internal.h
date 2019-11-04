@@ -119,10 +119,6 @@ namespace Utilities
             this->partition(owned_indices, comm);
 
 #ifdef DEAL_II_WITH_MPI
-
-            static CollectiveMutex      mutex;
-            CollectiveMutex::ScopedLock lock(mutex, comm);
-
             unsigned int my_rank = this_mpi_process(comm);
 
             types::global_dof_index dic_local_received = 0;
@@ -187,6 +183,10 @@ namespace Utilities
                     index_range.first = next_index;
                   }
               }
+
+            // protect the following communication steps using a mutex:
+            static CollectiveMutex      mutex;
+            CollectiveMutex::ScopedLock lock(mutex, comm);
 
             n_dict_procs_in_owned_indices = buffers.size();
             std::vector<MPI_Request> request;
