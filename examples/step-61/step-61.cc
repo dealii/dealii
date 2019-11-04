@@ -261,9 +261,7 @@ namespace Step61
   WGDarcyEquation<dim>::WGDarcyEquation(const unsigned int degree)
     : fe(FE_DGQ<dim>(degree), 1, FE_FaceQ<dim>(degree), 1)
     , dof_handler(triangulation)
-    ,
-
-    fe_dgrt(0)
+    , fe_dgrt(degree)
     , dof_handler_dgrt(triangulation)
 
   {}
@@ -311,7 +309,6 @@ namespace Step61
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    darcy_velocity.reinit(dof_handler_dgrt.n_dofs());
 
     {
       constraints.clear();
@@ -386,10 +383,8 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::assemble_system()
   {
-    const FE_RaviartThomas<dim> fe_rt(fe.base_element(0).degree);
-
-    const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
-    const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim>     quadrature_formula(fe_dgrt.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe_dgrt.degree + 1);
 
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -401,21 +396,23 @@ namespace Step61
                                        update_quadrature_points |
                                        update_JxW_values);
 
-    FEValues<dim>     fe_values_rt(fe_rt,
-                               quadrature_formula,
-                               update_values | update_gradients |
-                                 update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim> fe_face_values_rt(fe_rt,
-                                        face_quadrature_formula,
-                                        update_values | update_normal_vectors |
-                                          update_quadrature_points |
-                                          update_JxW_values);
+    FEValues<dim>     fe_values_dgrt(fe_dgrt,
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+    FEFaceValues<dim> fe_face_values_dgrt(fe_dgrt,
+                                          face_quadrature_formula,
+                                          update_values |
+                                            update_normal_vectors |
+                                            update_quadrature_points |
+                                            update_JxW_values);
 
-    const unsigned int dofs_per_cell    = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
 
-    const unsigned int n_q_points    = fe_values.get_quadrature().size();
-    const unsigned int n_q_points_rt = fe_values_rt.get_quadrature().size();
+    const unsigned int n_q_points      = fe_values.get_quadrature().size();
+    const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
 
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
 
@@ -430,9 +427,9 @@ namespace Step61
 
     // Next, let us declare the various cell matrices discussed in the
     // introduction:
-    FullMatrix<double> cell_matrix_M(dofs_per_cell_rt, dofs_per_cell_rt);
-    FullMatrix<double> cell_matrix_G(dofs_per_cell_rt, dofs_per_cell);
-    FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_rt);
+    FullMatrix<double> cell_matrix_M(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
+    FullMatrix<double> cell_matrix_G(dofs_per_cell_dgrt, dofs_per_cell);
+    FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_dgrt);
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
     Vector<double>     cell_solution(dofs_per_cell);
@@ -440,8 +437,8 @@ namespace Step61
     // We need <code>FEValuesExtractors</code> to access the @p interior and
     // @p face component of the shape functions.
     const FEValuesExtractors::Vector velocities(0);
-    const FEValuesExtractors::Scalar pressure_interior(0);
-    const FEValuesExtractors::Scalar pressure_face(1);
+    const FEValuesExtractors::Scalar interior(0);
+    const FEValuesExtractors::Scalar face(1);
 
     // This finally gets us in position to loop over all cells. On
     // each cell, we will first calculate the various cell matrices
@@ -455,8 +452,9 @@ namespace Step61
       {
         fe_values.reinit(cell);
 
-        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
-        fe_values_rt.reinit(cell_rt);
+        const typename Triangulation<dim>::active_cell_iterator cell_dgrt =
+          cell;
+        fe_values_dgrt.reinit(cell_dgrt);
 
         right_hand_side.value_list(fe_values.get_quadrature_points(),
                                    right_hand_side_values);
@@ -467,15 +465,15 @@ namespace Step61
         // for the Raviart-Thomas space.  Hence, we need to loop over
         // all the quadrature points for the velocity FEValues object.
         cell_matrix_M = 0;
-        for (unsigned int q = 0; q < n_q_points_rt; ++q)
-          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+        for (unsigned int q = 0; q < n_q_points_dgrt; ++q)
+          for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
             {
-              const Tensor<1, dim> v_i = fe_values_rt[velocities].value(i, q);
-              for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+              const Tensor<1, dim> v_i = fe_values_dgrt[velocities].value(i, q);
+              for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
                 {
                   const Tensor<1, dim> v_k =
-                    fe_values_rt[velocities].value(k, q);
-                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_rt.JxW(q));
+                    fe_values_dgrt[velocities].value(k, q);
+                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_dgrt.JxW(q));
                 }
             }
         // Next we take the inverse of this matrix by using
@@ -496,13 +494,13 @@ namespace Step61
         // the interior.
         cell_matrix_G = 0;
         for (unsigned int q = 0; q < n_q_points; ++q)
-          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
             {
-              const double div_v_i = fe_values_rt[velocities].divergence(i, q);
+              const double div_v_i =
+                fe_values_dgrt[velocities].divergence(i, q);
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const double phi_j_interior =
-                    fe_values[pressure_interior].value(j, q);
+                  const double phi_j_interior = fe_values[interior].value(j, q);
 
                   cell_matrix_G(i, j) -=
                     (div_v_i * phi_j_interior * fe_values.JxW(q));
@@ -515,23 +513,25 @@ namespace Step61
         // of the polynomial space and the dot product of a basis function of
         // the Raviart-Thomas space and the normal vector. So we loop over all
         // the faces of the element and obtain the normal vector.
-        for (const auto &face : cell->face_iterators())
+        for (unsigned int face_n = 0;
+             face_n < GeometryInfo<dim>::faces_per_cell;
+             ++face_n)
           {
-            fe_face_values.reinit(cell, face);
-            fe_face_values_rt.reinit(cell_rt, face);
+            fe_face_values.reinit(cell, face_n);
+            fe_face_values_dgrt.reinit(cell_dgrt, face_n);
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
                 const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
 
-                for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+                for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
                     const Tensor<1, dim> v_i =
-                      fe_face_values_rt[velocities].value(i, q);
+                      fe_face_values_dgrt[velocities].value(i, q);
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
                         const double phi_j_face =
-                          fe_face_values[pressure_face].value(j, q);
+                          fe_face_values[face].value(j, q);
 
                         cell_matrix_G(i, j) +=
                           ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));
@@ -552,21 +552,22 @@ namespace Step61
         // the previous step, and so obtain the following after
         // suitably re-arranging the loops:
         local_matrix = 0;
-        for (unsigned int q = 0; q < n_q_points_rt; ++q)
+        for (unsigned int q = 0; q < n_q_points_dgrt; ++q)
           {
-            for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
               {
-                const Tensor<1, dim> v_k = fe_values_rt[velocities].value(k, q);
-                for (unsigned int l = 0; l < dofs_per_cell_rt; ++l)
+                const Tensor<1, dim> v_k =
+                  fe_values_dgrt[velocities].value(k, q);
+                for (unsigned int l = 0; l < dofs_per_cell_dgrt; ++l)
                   {
                     const Tensor<1, dim> v_l =
-                      fe_values_rt[velocities].value(l, q);
+                      fe_values_dgrt[velocities].value(l, q);
 
                     for (unsigned int i = 0; i < dofs_per_cell; ++i)
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         local_matrix(i, j) +=
                           (coefficient_values[q] * cell_matrix_C[i][k] * v_k) *
-                          cell_matrix_C[j][l] * v_l * fe_values_rt.JxW(q);
+                          cell_matrix_C[j][l] * v_l * fe_values_dgrt.JxW(q);
                   }
               }
           }
@@ -576,7 +577,7 @@ namespace Step61
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              cell_rhs(i) += (fe_values[pressure_interior].value(i, q) *
+              cell_rhs(i) += (fe_values[interior].value(i, q) *
                               right_hand_side_values[q] * fe_values.JxW(q));
             }
 
@@ -671,10 +672,10 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::compute_velocity_errors()
   {
-    const FE_RaviartThomas<dim> fe_rt(fe.base_element(0).degree);
+    darcy_velocity.reinit(dof_handler_dgrt.n_dofs());
 
-    const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
-    const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim>     quadrature_formula(fe_dgrt.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe_dgrt.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -686,17 +687,6 @@ namespace Step61
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
-
-    FEValues<dim> fe_values_rt(fe_rt,
-                               quadrature_formula,
-                               update_values | update_gradients |
-                                 update_quadrature_points | update_JxW_values);
-
-    FEFaceValues<dim> fe_face_values_rt(fe_rt,
-                                        face_quadrature_formula,
-                                        update_values | update_normal_vectors |
-                                          update_quadrature_points |
-                                          update_JxW_values);
 
     FEValues<dim> fe_values_dgrt(fe_dgrt,
                                  quadrature_formula,
@@ -712,42 +702,40 @@ namespace Step61
                                             update_JxW_values);
 
     const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_rt   = fe_rt.dofs_per_cell;
     const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
 
-    const unsigned int n_q_points    = fe_values.get_quadrature().size();
-    const unsigned int n_q_points_rt = fe_values_rt.get_quadrature().size();
+    const unsigned int n_q_points      = fe_values.get_quadrature().size();
+    const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
 
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
-    const unsigned int n_face_q_points_rt =
-      fe_face_values_rt.get_quadrature().size();
+    const unsigned int n_face_q_points_dgrt =
+      fe_face_values_dgrt.get_quadrature().size();
 
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices_dgrt(
       dofs_per_cell_dgrt);
 
-    FullMatrix<double> cell_matrix_M(dofs_per_cell_rt, dofs_per_cell_rt);
-    FullMatrix<double> cell_matrix_G(dofs_per_cell_rt, dofs_per_cell);
-    FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_rt);
+    FullMatrix<double> cell_matrix_M(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
+    FullMatrix<double> cell_matrix_G(dofs_per_cell_dgrt, dofs_per_cell);
+    FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_dgrt);
 
-    FullMatrix<double> cell_matrix_D(dofs_per_cell_rt, dofs_per_cell_rt);
-    FullMatrix<double> cell_matrix_E(dofs_per_cell_rt, dofs_per_cell_rt);
+    FullMatrix<double> cell_matrix_D(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
+    FullMatrix<double> cell_matrix_E(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
 
     Vector<double> cell_solution(dofs_per_cell);
-    Vector<double> cell_velocity(dofs_per_cell_rt);
+    Vector<double> cell_velocity(dofs_per_cell_dgrt);
 
     double L2_err_velocity_cell_sqr_global = 0;
     double L2_err_flux_sqr                 = 0;
 
     const Coefficient<dim>      coefficient;
-    std::vector<Tensor<2, dim>> coefficient_values(n_q_points_rt);
+    std::vector<Tensor<2, dim>> coefficient_values(n_q_points_dgrt);
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
-    const FEValuesExtractors::Scalar pressure_interior(0);
-    const FEValuesExtractors::Scalar pressure_face(1);
-    const FEValuesExtractors::Vector velocities_dgrt(0);
+    const FEValuesExtractors::Scalar interior(0);
+    const FEValuesExtractors::Scalar face(1);
 
     const ExactVelocity<dim> exact_velocity;
 
@@ -775,10 +763,7 @@ namespace Step61
         fe_values.reinit(cell);
         fe_values_dgrt.reinit(cell_dgrt);
 
-        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
-        fe_values_rt.reinit(cell_rt);
-
-        coefficient.value_list(fe_values_rt.get_quadrature_points(),
+        coefficient.value_list(fe_values_dgrt.get_quadrature_points(),
                                coefficient_values);
 
         // The component of this <code>cell_matrix_E</code> is the integral of
@@ -786,19 +771,19 @@ namespace Step61
         // the Gram matrix.
         cell_matrix_M = 0;
         cell_matrix_E = 0;
-        for (unsigned int q = 0; q < n_q_points_rt; ++q)
-          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+        for (unsigned int q = 0; q < n_q_points_dgrt; ++q)
+          for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
             {
-              const Tensor<1, dim> v_i = fe_values_rt[velocities].value(i, q);
-              for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+              const Tensor<1, dim> v_i = fe_values_dgrt[velocities].value(i, q);
+              for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
                 {
                   const Tensor<1, dim> v_k =
-                    fe_values_rt[velocities].value(k, q);
+                    fe_values_dgrt[velocities].value(k, q);
 
                   cell_matrix_E(i, k) +=
-                    (coefficient_values[q] * v_i * v_k * fe_values_rt.JxW(q));
+                    (coefficient_values[q] * v_i * v_k * fe_values_dgrt.JxW(q));
 
-                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_rt.JxW(q));
+                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_dgrt.JxW(q));
                 }
             }
 
@@ -814,36 +799,38 @@ namespace Step61
         // matrix, so we just copy it from there:
         cell_matrix_G = 0;
         for (unsigned int q = 0; q < n_q_points; ++q)
-          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
             {
-              const double div_v_i = fe_values_rt[velocities].divergence(i, q);
+              const double div_v_i =
+                fe_values_dgrt[velocities].divergence(i, q);
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const double phi_j_interior =
-                    fe_values[pressure_interior].value(j, q);
+                  const double phi_j_interior = fe_values[interior].value(j, q);
 
                   cell_matrix_G(i, j) -=
                     (div_v_i * phi_j_interior * fe_values.JxW(q));
                 }
             }
 
-        for (const auto &face : cell->face_iterators())
+        for (unsigned int face_n = 0;
+             face_n < GeometryInfo<dim>::faces_per_cell;
+             ++face_n)
           {
-            fe_face_values.reinit(cell, face);
-            fe_face_values_rt.reinit(cell_rt, face);
+            fe_face_values.reinit(cell, face_n);
+            fe_face_values_dgrt.reinit(cell_dgrt, face_n);
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
                 const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
 
-                for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+                for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
                     const Tensor<1, dim> v_i =
-                      fe_face_values_rt[velocities].value(i, q);
+                      fe_face_values_dgrt[velocities].value(i, q);
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
                         const double phi_j_face =
-                          fe_face_values[pressure_face].value(j, q);
+                          fe_face_values[face].value(j, q);
 
                         cell_matrix_G(i, j) +=
                           ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));
@@ -861,8 +848,8 @@ namespace Step61
         // unknowns (with respect to the Raviart-Thomas space we are
         // projecting the term $-\mathbf K \nabla_{w,d} p_h$ into):
         cell_velocity = 0;
-        for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
-          for (unsigned int j = 0; j < dofs_per_cell_rt; ++j)
+        for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
+          for (unsigned int j = 0; j < dofs_per_cell_dgrt; ++j)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_velocity(k) +=
                 -(cell_solution(i) * cell_matrix_C(i, j) * cell_matrix_D(k, j));
@@ -879,22 +866,22 @@ namespace Step61
         // Now, we can calculate the numerical velocity at each quadrature point
         // and compute the $L_2$ error on each cell.
         double L2_err_velocity_cell_sqr_local = 0;
-        for (unsigned int q = 0; q < n_q_points_rt; ++q)
+        for (unsigned int q = 0; q < n_q_points_dgrt; ++q)
           {
             Tensor<1, dim> velocity;
-            for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
               {
                 const Tensor<1, dim> phi_k_u =
-                  fe_values_rt[velocities].value(k, q);
+                  fe_values_dgrt[velocities].value(k, q);
                 velocity += cell_velocity(k) * phi_k_u;
               }
 
             const Tensor<1, dim> true_velocity =
-              exact_velocity.value(fe_values_rt.quadrature_point(q));
+              exact_velocity.value(fe_values_dgrt.quadrature_point(q));
 
             L2_err_velocity_cell_sqr_local +=
               ((velocity - true_velocity) * (velocity - true_velocity) *
-               fe_values_rt.JxW(q));
+               fe_values_dgrt.JxW(q));
           }
         L2_err_velocity_cell_sqr_global += L2_err_velocity_cell_sqr_local;
 
@@ -907,31 +894,33 @@ namespace Step61
         // the $L_2$ flux error on the cell and add it to the global
         // error.
         const double cell_area = cell->measure();
-        for (const auto &face : cell->face_iterators())
+        for (unsigned int face_n = 0;
+             face_n < GeometryInfo<dim>::faces_per_cell;
+             ++face_n)
           {
-            const double face_length = face->measure();
-            fe_face_values.reinit(cell, face);
-            fe_face_values_rt.reinit(cell_rt, face);
+            const double face_length = cell->face(face_n)->measure();
+            fe_face_values.reinit(cell, face_n);
+            fe_face_values_dgrt.reinit(cell_dgrt, face_n);
 
             double L2_err_flux_face_sqr_local = 0;
-            for (unsigned int q = 0; q < n_face_q_points_rt; ++q)
+            for (unsigned int q = 0; q < n_face_q_points_dgrt; ++q)
               {
                 Tensor<1, dim> velocity;
-                for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+                for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
                   {
                     const Tensor<1, dim> phi_k_u =
-                      fe_face_values_rt[velocities].value(k, q);
+                      fe_face_values_dgrt[velocities].value(k, q);
                     velocity += cell_velocity(k) * phi_k_u;
                   }
                 const Tensor<1, dim> true_velocity =
-                  exact_velocity.value(fe_face_values_rt.quadrature_point(q));
+                  exact_velocity.value(fe_face_values_dgrt.quadrature_point(q));
 
                 const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
 
                 L2_err_flux_face_sqr_local +=
                   ((velocity * normal - true_velocity * normal) *
                    (velocity * normal - true_velocity * normal) *
-                   fe_face_values_rt.JxW(q));
+                   fe_face_values_dgrt.JxW(q));
               }
             const double err_flux_each_face =
               L2_err_flux_face_sqr_local / (face_length) * (cell_area);
