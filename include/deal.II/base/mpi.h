@@ -338,7 +338,7 @@ namespace Utilities
         /**
          * The communicator.
          */
-        const MPI_Comm &comm;
+        const MPI_Comm comm;
       };
 
       /**
