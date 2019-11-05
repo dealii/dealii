@@ -183,7 +183,9 @@ namespace MatrixFreeOperators
    * @author Denis Davydov, Daniel Arndt, Martin Kronbichler, 2016, 2017
    */
   template <int dim,
-            typename VectorType = LinearAlgebra::distributed::Vector<double>>
+            typename VectorType = LinearAlgebra::distributed::Vector<double>,
+            typename VectorizedArrayType =
+              VectorizedArray<typename VectorType::value_type>>
   class Base : public Subscriptor
   {
   public:
@@ -231,7 +233,8 @@ namespace MatrixFreeOperators
      * selection, defining a diagonal block.
      */
     void
-    initialize(std::shared_ptr<const MatrixFree<dim, value_type>> data,
+    initialize(std::shared_ptr<
+                 const MatrixFree<dim, value_type, VectorizedArrayType>> data,
                const std::vector<unsigned int> &selected_row_blocks =
                  std::vector<unsigned int>(),
                const std::vector<unsigned int> &selected_column_blocks =
@@ -251,7 +254,8 @@ namespace MatrixFreeOperators
      * empty, all components are selected.
      */
     void
-    initialize(std::shared_ptr<const MatrixFree<dim, value_type>> data,
+    initialize(std::shared_ptr<
+                 const MatrixFree<dim, value_type, VectorizedArrayType>> data,
                const MGConstrainedDoFs &        mg_constrained_dofs,
                const unsigned int               level,
                const std::vector<unsigned int> &selected_row_blocks =
@@ -272,7 +276,8 @@ namespace MatrixFreeOperators
      * empty, all components are selected.
      */
     void
-    initialize(std::shared_ptr<const MatrixFree<dim, value_type>> data_,
+    initialize(std::shared_ptr<
+                 const MatrixFree<dim, value_type, VectorizedArrayType>> data_,
                const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
                const unsigned int                    level,
                const std::vector<unsigned int> &     selected_row_blocks =
@@ -359,7 +364,7 @@ namespace MatrixFreeOperators
     /**
      * Get read access to the MatrixFree object stored with this operator.
      */
-    std::shared_ptr<const MatrixFree<dim, value_type>>
+    std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
     get_matrix_free() const;
 
     /**
@@ -424,7 +429,8 @@ namespace MatrixFreeOperators
     /**
      * MatrixFree object to be used with this operator.
      */
-    std::shared_ptr<const MatrixFree<dim, value_type>> data;
+    std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
+      data;
 
     /**
      * A shared pointer to a diagonal matrix that stores the
@@ -723,19 +729,23 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d   = fe_degree + 1,
             int n_components    = 1,
-            typename VectorType = LinearAlgebra::distributed::Vector<double>>
-  class MassOperator : public Base<dim, VectorType>
+            typename VectorType = LinearAlgebra::distributed::Vector<double>,
+            typename VectorizedArrayType =
+              VectorizedArray<typename VectorType::value_type>>
+  class MassOperator : public Base<dim, VectorType, VectorizedArrayType>
   {
   public:
     /**
      * Number alias.
      */
-    using value_type = typename Base<dim, VectorType>::value_type;
+    using value_type =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    using size_type = typename Base<dim, VectorType>::size_type;
+    using size_type =
+      typename Base<dim, VectorType, VectorizedArrayType>::size_type;
 
     /**
      * Constructor.
@@ -763,10 +773,10 @@ namespace MatrixFreeOperators
      */
     void
     local_apply_cell(
-      const MatrixFree<dim, value_type> &          data,
-      VectorType &                                 dst,
-      const VectorType &                           src,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+      const MatrixFree<dim, value_type, VectorizedArrayType> &data,
+      VectorType &                                            dst,
+      const VectorType &                                      src,
+      const std::pair<unsigned int, unsigned int> &           cell_range) const;
   };
 
 
@@ -787,19 +797,23 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d   = fe_degree + 1,
             int n_components    = 1,
-            typename VectorType = LinearAlgebra::distributed::Vector<double>>
-  class LaplaceOperator : public Base<dim, VectorType>
+            typename VectorType = LinearAlgebra::distributed::Vector<double>,
+            typename VectorizedArrayType =
+              VectorizedArray<typename VectorType::value_type>>
+  class LaplaceOperator : public Base<dim, VectorType, VectorizedArrayType>
   {
   public:
     /**
      * Number alias.
      */
-    using value_type = typename Base<dim, VectorType>::value_type;
+    using value_type =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
     /**
      * size_type needed for preconditioner classes.
      */
-    using size_type = typename Base<dim, VectorType>::size_type;
+    using size_type =
+      typename Base<dim, VectorType, VectorizedArrayType>::size_type;
 
     /**
      * Constructor.
@@ -862,8 +876,8 @@ namespace MatrixFreeOperators
      * will delete the table.
      */
     void
-    set_coefficient(const std::shared_ptr<Table<2, VectorizedArray<value_type>>>
-                      &scalar_coefficient);
+    set_coefficient(
+      const std::shared_ptr<Table<2, VectorizedArrayType>> &scalar_coefficient);
 
     virtual void
     clear();
@@ -874,7 +888,7 @@ namespace MatrixFreeOperators
      * The function will throw an error if coefficients are not previously set
      * by set_coefficient() function.
      */
-    std::shared_ptr<Table<2, VectorizedArray<value_type>>>
+    std::shared_ptr<Table<2, VectorizedArrayType>>
     get_coefficient();
 
   private:
@@ -891,18 +905,18 @@ namespace MatrixFreeOperators
      */
     void
     local_apply_cell(
-      const MatrixFree<dim, value_type> &          data,
-      VectorType &                                 dst,
-      const VectorType &                           src,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+      const MatrixFree<dim, value_type, VectorizedArrayType> &data,
+      VectorType &                                            dst,
+      const VectorType &                                      src,
+      const std::pair<unsigned int, unsigned int> &           cell_range) const;
 
     /**
      * Apply diagonal part of the Laplace operator on a cell.
      */
     void
     local_diagonal_cell(
-      const MatrixFree<dim, value_type> &data,
-      VectorType &                       dst,
+      const MatrixFree<dim, value_type, VectorizedArrayType> &data,
+      VectorType &                                            dst,
       const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
 
@@ -918,7 +932,7 @@ namespace MatrixFreeOperators
     /**
      * User-provided heterogeneity coefficient.
      */
-    std::shared_ptr<Table<2, VectorizedArray<value_type>>> scalar_coefficient;
+    std::shared_ptr<Table<2, VectorizedArrayType>> scalar_coefficient;
   };
 
 
@@ -1055,20 +1069,21 @@ namespace MatrixFreeOperators
 
 
   //----------------- Base operator -----------------------------
-  template <int dim, typename VectorType>
-  Base<dim, VectorType>::Base()
+  template <int dim, typename VectorType, typename VectorizedArrayType>
+  Base<dim, VectorType, VectorizedArrayType>::Base()
     : Subscriptor()
     , have_interface_matrices(false)
   {}
 
 
 
-  template <int dim, typename VectorType>
-  typename Base<dim, VectorType>::size_type
-  Base<dim, VectorType>::m() const
+  template <int dim, typename VectorType, typename VectorizedArrayType>
+  typename Base<dim, VectorType, VectorizedArrayType>::size_type
+  Base<dim, VectorType, VectorizedArrayType>::m() const
   {
     Assert(data.get() != nullptr, ExcNotInitialized());
-    typename Base<dim, VectorType>::size_type total_size = 0;
+    typename Base<dim, VectorType, VectorizedArrayType>::size_type total_size =
+      0;
     for (unsigned int i = 0; i < selected_rows.size(); ++i)
       total_size += data->get_vector_partitioner(selected_rows[i])->size();
     return total_size;
@@ -1076,12 +1091,13 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
-  typename Base<dim, VectorType>::size_type
-  Base<dim, VectorType>::n() const
+  template <int dim, typename VectorType, typename VectorizedArrayType>
+  typename Base<dim, VectorType, VectorizedArrayType>::size_type
+  Base<dim, VectorType, VectorizedArrayType>::n() const
   {
     Assert(data.get() != nullptr, ExcNotInitialized());
-    typename Base<dim, VectorType>::size_type total_size = 0;
+    typename Base<dim, VectorType, VectorizedArrayType>::size_type total_size =
+      0;
     for (unsigned int i = 0; i < selected_columns.size(); ++i)
       total_size += data->get_vector_partitioner(selected_columns[i])->size();
     return total_size;
@@ -1089,9 +1105,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::clear()
+  Base<dim, VectorType, VectorizedArrayType>::clear()
   {
     data.reset();
     inverse_diagonal_entries.reset();
@@ -1099,10 +1115,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
-  typename Base<dim, VectorType>::value_type
-  Base<dim, VectorType>::el(const unsigned int row,
-                            const unsigned int col) const
+  template <int dim, typename VectorType, typename VectorizedArrayType>
+  typename Base<dim, VectorType, VectorizedArrayType>::value_type
+  Base<dim, VectorType, VectorizedArrayType>::el(const unsigned int row,
+                                                 const unsigned int col) const
   {
     (void)col;
     Assert(row == col, ExcNotImplemented());
@@ -1114,9 +1130,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::initialize_dof_vector(VectorType &vec) const
+  Base<dim, VectorType, VectorizedArrayType>::initialize_dof_vector(
+    VectorType &vec) const
   {
     Assert(data.get() != nullptr, ExcNotInitialized());
     AssertDimension(BlockHelper::n_blocks(vec), selected_rows.size());
@@ -1138,11 +1155,11 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::initialize(
-    std::shared_ptr<
-      const MatrixFree<dim, typename Base<dim, VectorType>::value_type>> data_,
+  Base<dim, VectorType, VectorizedArrayType>::initialize(
+    std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
+                                     data_,
     const std::vector<unsigned int> &given_row_selection,
     const std::vector<unsigned int> &given_column_selection)
   {
@@ -1191,11 +1208,11 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::initialize(
-    std::shared_ptr<
-      const MatrixFree<dim, typename Base<dim, VectorType>::value_type>> data_,
+  Base<dim, VectorType, VectorizedArrayType>::initialize(
+    std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
+                                     data_,
     const MGConstrainedDoFs &        mg_constrained_dofs,
     const unsigned int               level,
     const std::vector<unsigned int> &given_row_selection)
@@ -1207,13 +1224,14 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::initialize(
-    std::shared_ptr<const MatrixFree<dim, value_type>> data_,
-    const std::vector<MGConstrainedDoFs> &             mg_constrained_dofs,
-    const unsigned int                                 level,
-    const std::vector<unsigned int> &                  given_row_selection)
+  Base<dim, VectorType, VectorizedArrayType>::initialize(
+    std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
+                                          data_,
+    const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
+    const unsigned int                    level,
+    const std::vector<unsigned int> &     given_row_selection)
   {
     AssertThrow(level != numbers::invalid_unsigned_int,
                 ExcMessage("level is not set"));
@@ -1276,9 +1294,10 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::set_constrained_entries_to_one(VectorType &dst) const
+  Base<dim, VectorType, VectorizedArrayType>::set_constrained_entries_to_one(
+    VectorType &dst) const
   {
     for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
@@ -1294,43 +1313,49 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::vmult(VectorType &dst, const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::vmult(VectorType &      dst,
+                                                    const VectorType &src) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    dst          = Number(0.);
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    dst = Number(0.);
     vmult_add(dst, src);
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::vmult_add(VectorType &dst, const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::vmult_add(
+    VectorType &      dst,
+    const VectorType &src) const
   {
     mult_add(dst, src, false);
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::Tvmult_add(VectorType &      dst,
-                                    const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::Tvmult_add(
+    VectorType &      dst,
+    const VectorType &src) const
   {
     mult_add(dst, src, true);
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::adjust_ghost_range_if_necessary(
+  Base<dim, VectorType, VectorizedArrayType>::adjust_ghost_range_if_necessary(
     const VectorType &src,
     const bool        is_row) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     for (unsigned int i = 0; i < BlockHelper::n_blocks(src); ++i)
       {
         const unsigned int mf_component =
@@ -1361,12 +1386,14 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::preprocess_constraints(VectorType &      dst,
-                                                const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::preprocess_constraints(
+    VectorType &      dst,
+    const VectorType &src) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
 
@@ -1389,11 +1416,12 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::mult_add(VectorType &      dst,
-                                  const VectorType &src,
-                                  const bool        transpose) const
+  Base<dim, VectorType, VectorizedArrayType>::mult_add(
+    VectorType &      dst,
+    const VectorType &src,
+    const bool        transpose) const
   {
     AssertDimension(dst.size(), src.size());
     AssertDimension(BlockHelper::n_blocks(dst), BlockHelper::n_blocks(src));
@@ -1408,10 +1436,11 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::postprocess_constraints(VectorType &      dst,
-                                                 const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::postprocess_constraints(
+    VectorType &      dst,
+    const VectorType &src) const
   {
     for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
       {
@@ -1441,12 +1470,14 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::vmult_interface_down(VectorType &      dst,
-                                              const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::vmult_interface_down(
+    VectorType &      dst,
+    const VectorType &src) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
@@ -1493,12 +1524,14 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::vmult_interface_up(VectorType &      dst,
-                                            const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::vmult_interface_up(
+    VectorType &      dst,
+    const VectorType &src) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
@@ -1532,20 +1565,23 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::Tvmult(
+    VectorType &      dst,
+    const VectorType &src) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    dst          = Number(0.);
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    dst = Number(0.);
     Tvmult_add(dst, src);
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   std::size_t
-  Base<dim, VectorType>::memory_consumption() const
+  Base<dim, VectorType, VectorizedArrayType>::memory_consumption() const
   {
     return inverse_diagonal_entries.get() != nullptr ?
              inverse_diagonal_entries->memory_consumption() :
@@ -1554,19 +1590,22 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
-  std::shared_ptr<
-    const MatrixFree<dim, typename Base<dim, VectorType>::value_type>>
-  Base<dim, VectorType>::get_matrix_free() const
+  template <int dim, typename VectorType, typename VectorizedArrayType>
+  std::shared_ptr<const MatrixFree<
+    dim,
+    typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+    VectorizedArrayType>>
+  Base<dim, VectorType, VectorizedArrayType>::get_matrix_free() const
   {
     return data;
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   const std::shared_ptr<DiagonalMatrix<VectorType>> &
-  Base<dim, VectorType>::get_matrix_diagonal_inverse() const
+  Base<dim, VectorType, VectorizedArrayType>::get_matrix_diagonal_inverse()
+    const
   {
     Assert(inverse_diagonal_entries.get() != nullptr &&
              inverse_diagonal_entries->m() > 0,
@@ -1576,9 +1615,9 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   const std::shared_ptr<DiagonalMatrix<VectorType>> &
-  Base<dim, VectorType>::get_matrix_diagonal() const
+  Base<dim, VectorType, VectorizedArrayType>::get_matrix_diagonal() const
   {
     Assert(diagonal_entries.get() != nullptr && diagonal_entries->m() > 0,
            ExcNotInitialized());
@@ -1587,22 +1626,24 @@ namespace MatrixFreeOperators
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::Tapply_add(VectorType &      dst,
-                                    const VectorType &src) const
+  Base<dim, VectorType, VectorizedArrayType>::Tapply_add(
+    VectorType &      dst,
+    const VectorType &src) const
   {
     apply_add(dst, src);
   }
 
 
 
-  template <int dim, typename VectorType>
+  template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType>::precondition_Jacobi(
-    VectorType &                                     dst,
-    const VectorType &                               src,
-    const typename Base<dim, VectorType>::value_type omega) const
+  Base<dim, VectorType, VectorizedArrayType>::precondition_Jacobi(
+    VectorType &                                                          dst,
+    const VectorType &                                                    src,
+    const typename Base<dim, VectorType, VectorizedArrayType>::value_type omega)
+    const
   {
     Assert(inverse_diagonal_entries.get() && inverse_diagonal_entries->m() > 0,
            ExcNotInitialized());
@@ -1699,10 +1740,15 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    MassOperator()
-    : Base<dim, VectorType>()
+            typename VectorType,
+            typename VectorizedArrayType>
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::MassOperator()
+    : Base<dim, VectorType, VectorizedArrayType>()
   {}
 
 
@@ -1711,13 +1757,20 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    compute_diagonal()
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::compute_diagonal()
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
+           ExcNotInitialized());
 
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
@@ -1747,15 +1800,19 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    apply_add(VectorType &dst, const VectorType &src) const
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::apply_add(VectorType &      dst,
+                                               const VectorType &src) const
   {
-    Base<dim, VectorType>::data->cell_loop(&MassOperator::local_apply_cell,
-                                           this,
-                                           dst,
-                                           src);
+    Base<dim, VectorType, VectorizedArrayType>::data->cell_loop(
+      &MassOperator::local_apply_cell, this, dst, src);
   }
 
 
@@ -1764,18 +1821,33 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  MassOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::
     local_apply_cell(
-      const MatrixFree<dim, typename Base<dim, VectorType>::value_type> &data,
-      VectorType &                                                       dst,
-      const VectorType &                                                 src,
+      const MatrixFree<
+        dim,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &                     data,
+      VectorType &                                 dst,
+      const VectorType &                           src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
-      data, this->selected_rows[0]);
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    FEEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components,
+                 Number,
+                 VectorizedArrayType>
+      phi(data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
@@ -1795,10 +1867,15 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    LaplaceOperator()
-    : Base<dim, VectorType>()
+            typename VectorType,
+            typename VectorizedArrayType>
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::LaplaceOperator()
+    : Base<dim, VectorType, VectorizedArrayType>()
   {}
 
 
@@ -1807,12 +1884,17 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    clear()
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::clear()
   {
-    Base<dim, VectorType>::clear();
+    Base<dim, VectorType, VectorizedArrayType>::clear();
     scalar_coefficient.reset();
   }
 
@@ -1822,13 +1904,17 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::
     set_coefficient(
-      const std::shared_ptr<
-        Table<2, VectorizedArray<typename Base<dim, VectorType>::value_type>>>
-        &scalar_coefficient_)
+      const std::shared_ptr<Table<2, VectorizedArrayType>> &scalar_coefficient_)
   {
     scalar_coefficient = scalar_coefficient_;
   }
@@ -1839,16 +1925,15 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
-  std::shared_ptr<
-    Table<2,
-          VectorizedArray<typename LaplaceOperator<dim,
-                                                   fe_degree,
-                                                   n_q_points_1d,
-                                                   n_components,
-                                                   VectorType>::value_type>>>
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    get_coefficient()
+            typename VectorType,
+            typename VectorizedArrayType>
+  std::shared_ptr<Table<2, VectorizedArrayType>>
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::get_coefficient()
   {
     Assert(scalar_coefficient.get(), ExcNotInitialized());
     return scalar_coefficient;
@@ -1860,13 +1945,20 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    compute_diagonal()
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::compute_diagonal()
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
+           ExcNotInitialized());
 
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
@@ -1902,15 +1994,19 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
-    apply_add(VectorType &dst, const VectorType &src) const
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::apply_add(VectorType &      dst,
+                                                  const VectorType &src) const
   {
-    Base<dim, VectorType>::data->cell_loop(&LaplaceOperator::local_apply_cell,
-                                           this,
-                                           dst,
-                                           src);
+    Base<dim, VectorType, VectorizedArrayType>::data->cell_loop(
+      &LaplaceOperator::local_apply_cell, this, dst, src);
   }
 
   namespace Implementation
@@ -1933,16 +2029,23 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::
     do_operation_on_cell(
-      FEEvaluation<dim,
-                   fe_degree,
-                   n_q_points_1d,
-                   n_components,
-                   typename Base<dim, VectorType>::value_type> &phi,
-      const unsigned int                                        cell) const
+      FEEvaluation<
+        dim,
+        fe_degree,
+        n_q_points_1d,
+        n_components,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
+      const unsigned int cell) const
   {
     phi.evaluate(false, true, false);
     if (scalar_coefficient.get())
@@ -1972,16 +2075,26 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::
     local_apply_cell(
-      const MatrixFree<dim, typename Base<dim, VectorType>::value_type> &data,
-      VectorType &                                                       dst,
-      const VectorType &                                                 src,
+      const MatrixFree<
+        dim,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &                     data,
+      VectorType &                                 dst,
+      const VectorType &                           src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
@@ -1998,30 +2111,37 @@ namespace MatrixFreeOperators
             int fe_degree,
             int n_q_points_1d,
             int n_components,
-            typename VectorType>
+            typename VectorType,
+            typename VectorizedArrayType>
   void
-  LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
+  LaplaceOperator<dim,
+                  fe_degree,
+                  n_q_points_1d,
+                  n_components,
+                  VectorType,
+                  VectorizedArrayType>::
     local_diagonal_cell(
-      const MatrixFree<dim, typename Base<dim, VectorType>::value_type> &data,
-      VectorType &                                                       dst,
+      const MatrixFree<
+        dim,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &data,
+      VectorType &            dst,
       const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    using Number = typename Base<dim, VectorType>::value_type;
-    using vectorized_value_type =
-      typename MatrixFree<dim, typename Base<dim, VectorType>::value_type>::
-        vectorized_value_type;
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
       data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        vectorized_value_type local_diagonal_vector[phi.static_dofs_per_cell];
+        VectorizedArrayType local_diagonal_vector[phi.static_dofs_per_cell];
         for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_component; ++j)
-              phi.begin_dof_values()[j] = vectorized_value_type();
+              phi.begin_dof_values()[j] = VectorizedArrayType();
             phi.begin_dof_values()[i] = 1.;
             do_operation_on_cell(phi, cell);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
