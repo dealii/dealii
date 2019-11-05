@@ -1271,9 +1271,20 @@ namespace Step18
     // all these solution and other data vectors:
     data_out.build_patches();
 
-    // Let us open a file and write the data we have generated into it:
-    const auto pvtu_master_filename = data_out.write_vtu_with_pvtu_record(
-      "./", "solution", timestep_no, 4, mpi_communicator);
+    // Let us call a function that opens the necessary output files and writes
+    // the data we have generated into them. The function automatically
+    // constructs the file names from the given directory name (the first
+    // argument) and file name base (second argument). It augments the resulting
+    // string by pieces that result from the time step number and a "piece
+    // number" that corresponds to a part of the overall domain that can consist
+    // of one or more subdomains.
+    //
+    // The function also writes a record files (with suffix `.pvd`) for Paraview
+    // that describes how all of these output files combine into the data for
+    // this single time step:
+    const std::string pvtu_master_filename =
+      data_out.write_vtu_with_pvtu_record(
+        "./", "solution", timestep_no, 4, mpi_communicator);
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:
@@ -1288,13 +1299,6 @@ namespace Step18
           std::pair<double, std::string>(present_time, pvtu_master_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
-
-        std::ofstream visit_output("solution.visit");
-        static std::vector<std::pair<double, std::vector<std::string>>>
-          times_and_pieces;
-        times_and_pieces.emplace_back(
-          present_time, std::vector<std::string>(1, pvtu_master_filename));
-        DataOutBase::write_visit_record(visit_output, times_and_pieces);
       }
   }
 
