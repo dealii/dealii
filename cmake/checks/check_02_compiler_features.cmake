@@ -462,8 +462,41 @@ IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     "
     int main() { return 0; }
     "
-    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+    DEAL_II_COMPILER_LLD_LINKS_EXEC)
   RESET_CMAKE_REQUIRED()
+
+# It is observed that LLD refuses to produce a shared object from an object
+# file compiled by Intel Compiler, throwing error message saying
+#   ld.lld: error: can't create dynamic relocation R_X86_64_64 against symbol:
+#   __gxx_personality_v0 in readonly segment; recompile object files with -fPIC
+#   or pass '-Wl,-z,notext' to allow text relocations in the output
+# even if we actually had -fPIC option present. If we add -Wl,-z,notext, it
+# will link, but the produced libdeal_II.so is faulty and will crash randomly.
+#
+# Therefore here adds a check on whether LLD could produce a .so from the
+# object file compiled by the specified C++ compiler.
+# 
+# - Binrui Dong, 2019
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
+  ENDIF()
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-shared")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fPIC")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
+    "
+    DEAL_II_COMPILER_LLD_LINKS_SO)
+  RESET_CMAKE_REQUIRED()
+
+  IF(DEAL_II_COMPILER_LLD_LINKS_EXEC AND DEAL_II_COMPILER_LLD_LINKS_SO)
+    set(DEAL_II_COMPILER_HAS_FUSE_LD_LLD 1)
+  ENDIF()
 
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
