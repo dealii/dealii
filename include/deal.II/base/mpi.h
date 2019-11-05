@@ -338,7 +338,7 @@ namespace Utilities
         /**
          * The communicator.
          */
-        const MPI_Comm &comm;
+        const MPI_Comm comm;
       };
 
       /**
@@ -1503,6 +1503,10 @@ namespace Utilities
       const auto receive_from =
         Utilities::MPI::compute_point_to_point_communication_pattern(comm,
                                                                      send_to);
+
+      // Protect the following communication:
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, comm);
 
       // Sending buffers
       std::vector<std::vector<char>> buffers_to_send(send_to.size());

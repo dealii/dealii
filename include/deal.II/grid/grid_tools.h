@@ -3957,6 +3957,10 @@ namespace GridTools
             }
         }
 
+    // Protect the following communcation:
+    static Utilities::MPI::CollectiveMutex      mutex;
+    Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex,
+                                                     tria->get_communicator());
 
     // 2. send our messages
     std::set<dealii::types::subdomain_id> ghost_owners   = tria->ghost_owners();

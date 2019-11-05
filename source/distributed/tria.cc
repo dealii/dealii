@@ -4224,7 +4224,13 @@ namespace parallel
             needs_to_get_cells);
         }
 
-      // sending
+      // Send information
+
+      // We need to protect this communication below using a mutex:
+      static Utilities::MPI::CollectiveMutex      mutex;
+      Utilities::MPI::CollectiveMutex::ScopedLock lock(
+        mutex, this->get_communicator());
+
       std::vector<std::vector<char>> sendbuffers(needs_to_get_cells.size());
       std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
       std::vector<MPI_Request>  requests(needs_to_get_cells.size());
