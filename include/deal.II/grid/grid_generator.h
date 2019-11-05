@@ -21,6 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
@@ -1700,6 +1701,198 @@ namespace GridGenerator
   void
   flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
                         Triangulation<dim, spacedim2> &      out_tria);
+
+
+  /**
+   * Namespace Airfoil contains classes and functions in order to create a
+   * C-type mesh for the (flow) field around Joukowski or NACA airfoils.
+   *
+   * @ingroup GridGenerator
+   */
+  namespace Airfoil
+  {
+    /**
+     * AdditionalData collects all settings that are required to generate a
+     * airfoil triangulation with the functions Airfoil::create_triangulation().
+     */
+    struct AdditionalData
+    {
+      /**
+       * Type of the airfoil: either "NACA" or "Joukowksi" to choose airfoil
+       * geometry among NACA and Joukowski airfoil.
+       */
+      std::string airfoil_type;
+
+      /**
+       * NACA serial number defining the airfoil shape.
+       *
+       * @note Currently serial numbers with length 4 are supported.
+       * A good overview of NACA serial numbers is presented in Wikipedia
+       * (https://en.wikipedia.org/wiki/NACA_airfoil)
+       */
+      std::string naca_id;
+
+      /**
+       * Center of Joukowski circle.
+       *
+       * @note A center on the x-axis leads to a symmetrical airfoil.
+       */
+      Point<2, double> joukowski_center;
+
+      /**
+       * Chord length of the airfoil, i.e. distance from leading to trailing
+       * edge.
+       */
+      double airfoil_length;
+
+      /**
+       * Vertical distance from airfoil chord to upper boundary of the mesh
+       * i.e. half of the total mesh hight.
+       */
+      double height;
+
+      /**
+       * Length of mesh from the airfoil trailing edge to outflow boundary.
+       */
+      double length_b2;
+
+      /**
+       * Factor defining the inclination HG of the coarse grid
+       * The figure shows the upper coarse grid with two different inclinations
+       * - incline_factor = 0   --> face HG
+       * - incline_factor = 0.5 --> face HG'
+       * Coordinate of point G' is defined by incline_factor after interpolation
+       * G'(0) = G(0) + incline_factor * (K(0) - G(0))
+       * with incline_factor in [0,1).
+       *
+       *              o-----G---G'--K
+       *           /  |     |  /    |
+       *         /    o     | /     |
+       *       /    /    \  |/      |
+       *     o----o         H-------o
+       */
+      double incline_factor;
+
+      /**
+       * Factor to receive a finer mesh around the airfoil by increasing
+       * bias_factor b.
+       * Bias function: f(x) = tanh(bx) / tanh(x) with x in [0,1], leads to a
+       * compression of values close to x = 1.
+       */
+      double bias_factor;
+
+      /**
+       * Number of global refinements.
+       */
+      unsigned int refinements;
+
+      /**
+       * Number of subdivisions along the airfoil in left block.
+       */
+      unsigned int n_subdivision_x_0;
+
+      /**
+       * Number of subdivisions along the airfoil in middle block.
+       */
+      unsigned int n_subdivision_x_1;
+
+      /**
+       * Number of subdivisions in block right of the airfoil.
+       */
+      unsigned int n_subdivision_x_2;
+
+      /**
+       * Number of subdivisions normal to the airfoil contour.
+       */
+      unsigned int n_subdivision_y;
+
+      /**
+       * Factor to enhance the approximation of the airfoil geometry that
+       * happens when interpolating provided nonequidistant airfoil points to
+       * equidistant airfoil points. When generating the required vector
+       * consisting the equidistant airfoil points, it is interpolated between
+       * nonequidistand airfoil points.
+       * Increasing the provided nonequidistant airfoil points leads to
+       * a better approximation of the airfoil geometry. Parameter
+       * "airfoil_sampling_factor" therby defines the relation of
+       * provided_nonequidistant_points to required_equidistant_points.
+       */
+      unsigned int airfoil_sampling_factor;
+
+      /**
+       * Constructor.
+       */
+      AdditionalData();
+
+      /**
+       * This function adds the ParameterHandler entries.
+       *
+       * @param[in] prm Parameter handler.
+       */
+      void
+      add_parameters(ParameterHandler &prm);
+    };
+
+
+
+    /**
+     * Initialize the given triangulation with a flow field around an airfoil,
+     * i.e., a mesh of C-Type approximating Joukowski or NACA (4 digit)
+     * airfoils.
+     *
+     * The user can specify the airfoil geometry and the mesh setup by providing
+     * input parameters for the struct AdditionalData.
+     * Thereby, the user can choose among different types of Joukowski or NACA
+     * airfoils with variable chord length, far field size and mesh density.
+     *
+     * @note This function creates a refined mesh (number of global refinements
+     *       can be specified by the user). No manifold is attached. The
+     *       vertices in the final mesh are moved by this function to the
+     *       right position.
+     *
+     * @note This function is currently only implemented for 2D but the mesh
+     *       can of course be extruded into the third dimension using
+     *       GridGenerator::extrude().
+     *
+     * @param[in] tria The triangulation to be created. It needs to be empty
+     *                 upon calling this function.
+     * @param[in] additional_data Configuration of the mesh.
+     *
+     \htmlonly <style>div.image
+     *
+     img[src="https://www.dealii.org/images/grids/airfoils_naca_joukowski.png"]{width:50%;}</style>
+     \endhtmlonly
+     * @image html https://www.dealii.org/images/grids/airfoils_naca_joukowski.png
+     */
+    template <int dim>
+    void
+    create_triangulation(
+      Triangulation<dim, dim> &tria,
+      const AdditionalData &   additional_data = AdditionalData());
+
+
+
+    /**
+     * The same as above but periodic boundary conditions on the
+     * upper and lower faces of the far field are applied.
+     *
+     * @note This function is currently only implemented for 2D.
+     *
+     * @param[out] tria The triangulation to be created. It needs to be empty
+     * upon calling this function.
+     * @param[out] periodic_faces Periodic faces at upper and lower horizontal
+     *                       boundaries.
+     * @param[in] additional_data Configuration of the mesh.
+     */
+    template <int dim>
+    void
+    create_triangulation(
+      Triangulation<dim, dim> &                            tria,
+      std::vector<GridTools::PeriodicFacePair<
+        typename Triangulation<dim, dim>::cell_iterator>> &periodic_faces,
+      const AdditionalData &additional_data = AdditionalData());
+
+  } // namespace Airfoil
 
   ///@}
 
