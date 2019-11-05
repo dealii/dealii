@@ -93,7 +93,7 @@ namespace parallel
     /**
      * Return MPI communicator used by this triangulation.
      */
-    virtual MPI_Comm
+    virtual const MPI_Comm &
     get_communicator() const;
 
     /**

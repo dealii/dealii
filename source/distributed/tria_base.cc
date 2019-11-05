@@ -167,7 +167,7 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  MPI_Comm
+  const MPI_Comm &
   TriangulationBase<dim, spacedim>::get_communicator() const
   {
     return mpi_communicator;

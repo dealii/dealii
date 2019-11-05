@@ -577,7 +577,7 @@ public:
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  MPI_Comm
+  const MPI_Comm &
   get_mpi_communicator() const;
 
   /**
@@ -929,14 +929,14 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-MPI_Comm
+const MPI_Comm &
 PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
-  // currently parallel GMG works with distributed Triangulation only,
+  // currently parallel GMG works with parallel triangulations only,
   // so it should be a safe bet to use it to query MPI communicator:
   const Triangulation<dim> &tria = dof_handler_vector[0]->get_triangulation();
-  const parallel::distributed::Triangulation<dim> *ptria =
-    dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
+  const parallel::TriangulationBase<dim> *ptria =
+    dynamic_cast<const parallel::TriangulationBase<dim> *>(&tria);
   Assert(ptria != nullptr, ExcInternalError());
   return ptria->get_communicator();
 }
