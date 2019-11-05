@@ -1,0 +1,4 @@
+New: Add new GridGenerator tool to create a C-type mesh around a NACA or
+Joukowski airfoil. 
+<br>
+(Elias Dejene, Peter Munch, 2019/11/12)
