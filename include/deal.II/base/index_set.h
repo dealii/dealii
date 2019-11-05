@@ -215,7 +215,7 @@ public:
    * <code>[0,size())</code> represented by the current object.
    */
   void
-  add_indices(const IndexSet &other, const unsigned int offset = 0);
+  add_indices(const IndexSet &other, const size_type offset = 0);
 
   /**
    * Return whether the specified index is an element of the index set.

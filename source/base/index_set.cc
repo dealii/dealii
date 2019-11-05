@@ -347,7 +347,7 @@ IndexSet::pop_front()
 
 
 void
-IndexSet::add_indices(const IndexSet &other, const unsigned int offset)
+IndexSet::add_indices(const IndexSet &other, const size_type offset)
 {
   if ((this == &other) && (offset == 0))
     return;
