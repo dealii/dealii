@@ -15,8 +15,12 @@
 
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
+#include <deal.II/distributed/fully_distributed_tria_util.h>
+
+#include <deal.II/grid/grid_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -39,6 +43,10 @@ namespace parallel
     Triangulation<dim, spacedim>::Triangulation(MPI_Comm mpi_communicator)
       : parallel::DistributedTriangulationBase<dim, spacedim>(mpi_communicator)
       , settings(Settings::default_setting)
+      , partitioner([](dealii::Triangulation<dim, spacedim> &tria,
+                       const unsigned int                    n_partitions) {
+        GridTools::partition_triangulation_zorder(n_partitions, tria);
+      })
       , currently_processing_create_triangulation_for_internal_usage(false)
       , currently_processing_prepare_coarsening_and_refinement_for_internal_usage(
           false)
@@ -281,6 +289,74 @@ namespace parallel
       dealii::Triangulation<dim, spacedim>::create_triangulation(vertices,
                                                                  cells,
                                                                  subcelldata);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::copy_triangulation(
+      const dealii::Triangulation<dim, spacedim> &other_tria)
+    {
+      // pointer to the triangulation for which the construction data
+      // should be created (normally it is the input triangulation but
+      // in the case of a serial triangulation we create a copy which should
+      // be used)
+      const dealii::Triangulation<dim, spacedim> *other_tria_ptr = &other_tria;
+
+      // temporary serial triangulation (since the input triangulation is const
+      // and we might modify its subdomain_ids
+      // and level_subdomain_ids during partitioning); this pointer only points
+      // to anything if the source triangulation is serial, and ensures that our
+      // copy is eventually deleted
+      std::unique_ptr<dealii::Triangulation<dim, spacedim>> serial_tria;
+
+      // check if other triangulation is not a parallel one, which needs to be
+      // partitioned
+      if (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                         *>(&other_tria) == nullptr)
+        {
+          serial_tria =
+            std::make_unique<dealii::Triangulation<dim, spacedim>>();
+
+          // actually copy the serial triangulation
+          serial_tria->copy_triangulation(other_tria);
+
+          // partition triangulation
+          this->partitioner(*serial_tria,
+                            dealii::Utilities::MPI::n_mpi_processes(
+                              this->mpi_communicator));
+
+          // partition multigrid levels
+          if (this->is_multilevel_hierarchy_constructed())
+            GridTools::partition_multigrid_levels(*serial_tria);
+
+          // use the new serial triangulation to create the construction data
+          other_tria_ptr = serial_tria.get();
+        }
+
+      // create construction data
+      const auto construction_data =
+        Utilities::create_construction_data_from_triangulation(
+          *other_tria_ptr,
+          this->mpi_communicator,
+          this->is_multilevel_hierarchy_constructed());
+
+      // finally create triangulation
+      this->create_triangulation(construction_data);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::set_partitioner(
+      const std::function<void(dealii::Triangulation<dim, spacedim> &,
+                               const unsigned int)> &partitioner,
+      const Settings &                               settings)
+    {
+      this->partitioner = partitioner;
+      this->settings    = settings;
     }
 
 

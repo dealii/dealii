@@ -15,7 +15,7 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
     namespace parallel
     \{
@@ -23,26 +23,28 @@ for (deal_II_dimension : DIMENSIONS)
       \{
         namespace Utilities
         \{
-          template ConstructionData<deal_II_dimension, deal_II_dimension>
+#if deal_II_dimension <= deal_II_space_dimension
+          template ConstructionData<deal_II_dimension, deal_II_space_dimension>
           create_construction_data_from_triangulation(
-            const dealii::Triangulation<deal_II_dimension, deal_II_dimension>
-              &                tria,
-            const MPI_Comm     comm,
+            const dealii::Triangulation<deal_II_dimension,
+                                        deal_II_space_dimension> &tria,
+            const MPI_Comm                                        comm,
             const bool         construct_multilevel_hierarchy,
             const unsigned int my_rank_in);
 
-          template ConstructionData<deal_II_dimension, deal_II_dimension>
+          template ConstructionData<deal_II_dimension, deal_II_space_dimension>
           create_construction_data_from_triangulation_in_groups(
             std::function<void(
-              dealii::Triangulation<deal_II_dimension, deal_II_dimension> &)>
-                                   serial_grid_generator,
-            std::function<void(
-              dealii::Triangulation<deal_II_dimension, deal_II_dimension> &,
-              const MPI_Comm,
-              const unsigned int)> serial_grid_partitioner,
-            const MPI_Comm         comm,
-            const int              group_size,
-            const bool             construct_multilevel_hierarchy);
+              dealii::Triangulation<deal_II_dimension, deal_II_space_dimension>
+                &)>                                 serial_grid_generator,
+            std::function<void(dealii::Triangulation<deal_II_dimension,
+                                                     deal_II_space_dimension> &,
+                               const MPI_Comm,
+                               const unsigned int)> serial_grid_partitioner,
+            const MPI_Comm                          comm,
+            const int                               group_size,
+            const bool construct_multilevel_hierarchy);
+#endif
         \}
       \}
     \}
