@@ -42,12 +42,6 @@ namespace Utilities
         struct Dictionary
         {
           /**
-           * A tag attached to the MPI communication during the dictionary
-           * lookup
-           */
-          static const unsigned int tag_setup = 11;
-
-          /**
            * The minimum grain size for the ranges.
            */
           static const unsigned int range_minimum_grain_size = 4096;
@@ -188,6 +182,9 @@ namespace Utilities
             static CollectiveMutex      mutex;
             CollectiveMutex::ScopedLock lock(mutex, comm);
 
+            const int mpi_tag =
+              Utilities::MPI::internal::Tags::dictionary_reinit;
+
             n_dict_procs_in_owned_indices = buffers.size();
             std::vector<MPI_Request> request;
             request.reserve(n_dict_procs_in_owned_indices);
@@ -200,7 +197,7 @@ namespace Utilities
                                            rank_pair.second.size() * 2,
                                            DEAL_II_DOF_INDEX_MPI_TYPE,
                                            rank_pair.first,
-                                           tag_setup,
+                                           mpi_tag,
                                            comm,
                                            &request.back());
                 AssertThrowMPI(ierr);
@@ -211,7 +208,7 @@ namespace Utilities
               {
                 // wait for an incoming message
                 MPI_Status status;
-                auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_setup, comm, &status);
+                auto ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
                 AssertThrowMPI(ierr);
 
                 // retrieve size of incoming message
@@ -232,8 +229,8 @@ namespace Utilities
                 ierr = MPI_Recv(buffer.data(),
                                 number_amount,
                                 DEAL_II_DOF_INDEX_MPI_TYPE,
-                                other_rank,
-                                tag_setup,
+                                status.MPI_TAG,
+                                status.MPI_SOURCE,
                                 comm,
                                 &status);
                 AssertThrowMPI(ierr);
@@ -637,6 +634,9 @@ namespace Utilities
             static CollectiveMutex      mutex;
             CollectiveMutex::ScopedLock lock(mutex, comm);
 
+            const int mpi_tag = Utilities::MPI::internal::Tags::
+              consensus_algorithm_payload_get_requesters;
+
             // reserve enough slots for the requests ahead; depending on
             // whether the owning rank is one of the requesters or not, we
             // might have one less requests to execute, so fill the requests
@@ -688,7 +688,7 @@ namespace Utilities
                                 send_data[i].size(),
                                 MPI_UNSIGNED,
                                 dict.actually_owning_rank_list[i],
-                                1021,
+                                mpi_tag,
                                 comm,
                                 &send_requests.back());
                     AssertThrowMPI(ierr);
@@ -702,7 +702,7 @@ namespace Utilities
                 // wait for an incoming message
                 MPI_Status   status;
                 unsigned int ierr =
-                  MPI_Probe(MPI_ANY_SOURCE, 1021, comm, &status);
+                  MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
                 AssertThrowMPI(ierr);
 
                 // retrieve size of incoming message
@@ -718,7 +718,7 @@ namespace Utilities
                                 number_amount,
                                 MPI_UNSIGNED,
                                 status.MPI_SOURCE,
-                                1021,
+                                status.MPI_TAG,
                                 comm,
                                 &status);
                 AssertThrowMPI(ierr);

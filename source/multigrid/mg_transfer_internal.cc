@@ -296,6 +296,9 @@ namespace internal
           Utilities::MPI::CollectiveMutex::ScopedLock lock(
             mutex, tria->get_communicator());
 
+          const int mpi_tag =
+            Utilities::MPI::internal::Tags::mg_transfer_fill_copy_indices;
+
           // * send
           std::vector<MPI_Request> requests;
           {
@@ -312,7 +315,7 @@ namespace internal
                                                data.size() * sizeof(data[0]),
                                                MPI_BYTE,
                                                dest,
-                                               71,
+                                               mpi_tag,
                                                tria->get_communicator(),
                                                &*requests.rbegin());
                     AssertThrowMPI(ierr);
@@ -323,7 +326,7 @@ namespace internal
                                                0,
                                                MPI_BYTE,
                                                dest,
-                                               71,
+                                               mpi_tag,
                                                tria->get_communicator(),
                                                &*requests.rbegin());
                     AssertThrowMPI(ierr);
@@ -339,12 +342,12 @@ namespace internal
                  ++counter)
               {
                 MPI_Status status;
-                int        len;
                 int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                     71,
+                                     mpi_tag,
                                      tria->get_communicator(),
                                      &status);
                 AssertThrowMPI(ierr);
+                int len;
                 ierr = MPI_Get_count(&status, MPI_BYTE, &len);
                 AssertThrowMPI(ierr);
 

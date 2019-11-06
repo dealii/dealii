@@ -4435,6 +4435,11 @@ namespace internal
           Utilities::MPI::CollectiveMutex::ScopedLock lock(
             mutex, tria.get_communicator());
 
+          const int mpi_tag = Utilities::MPI::internal::Tags::
+            dofhandler_communicate_mg_ghost_cells;
+          const int mpi_tag_reply = Utilities::MPI::internal::Tags::
+            dofhandler_communicate_mg_ghost_cells_reply;
+
           //* send our requests:
           std::vector<MPI_Request> requests(level_ghost_owners.size());
           {
@@ -4447,7 +4452,7 @@ namespace internal
                             it.second.size() * sizeof(it.second[0]),
                             MPI_BYTE,
                             it.first,
-                            10101,
+                            mpi_tag,
                             tria.get_communicator(),
                             &requests[idx]);
                 AssertThrowMPI(ierr);
@@ -4465,16 +4470,18 @@ namespace internal
           for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
             {
               MPI_Status status;
-              int        len;
               int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                   10101,
+                                   mpi_tag,
                                    tria.get_communicator(),
                                    &status);
               AssertThrowMPI(ierr);
+
+              int len;
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
               Assert(len % sizeof(quadrant_data_to_send[idx][0]) == 0,
                      ExcInternalError());
+
               const unsigned int n_cells =
                 len / sizeof(quadrant_data_to_send[idx][0]);
               quadrant_data_to_send[idx].resize(n_cells);
@@ -4519,7 +4526,7 @@ namespace internal
                                send_dof_numbers_and_indices[idx].size(),
                                DEAL_II_DOF_INDEX_MPI_TYPE,
                                status.MPI_SOURCE,
-                               10102,
+                               mpi_tag_reply,
                                tria.get_communicator(),
                                &reply_requests[idx]);
               AssertThrowMPI(ierr);
@@ -4529,12 +4536,12 @@ namespace internal
           for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
             {
               MPI_Status status;
-              int        len;
               int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                   10102,
+                                   mpi_tag_reply,
                                    tria.get_communicator(),
                                    &status);
               AssertThrowMPI(ierr);
+              int len;
               ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
               const QuadrantBufferType &quadrants =
                 neighbor_cell_list[status.MPI_SOURCE];

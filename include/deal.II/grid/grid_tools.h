@@ -3962,6 +3962,9 @@ namespace GridTools
     Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex,
                                                      tria->get_communicator());
 
+    const int mpi_tag =
+      Utilities::MPI::internal::Tags::exchange_cell_data_to_ghosts;
+
     // 2. send our messages
     std::set<dealii::types::subdomain_id> ghost_owners   = tria->ghost_owners();
     const unsigned int                    n_ghost_owners = ghost_owners.size();
@@ -3982,7 +3985,7 @@ namespace GridTools
                                    sendbuffers[idx].size(),
                                    MPI_BYTE,
                                    *it,
-                                   786,
+                                   mpi_tag,
                                    tria->get_communicator(),
                                    &requests[idx]);
         AssertThrowMPI(ierr);
@@ -3993,10 +3996,11 @@ namespace GridTools
     for (unsigned int idx = 0; idx < n_ghost_owners; ++idx)
       {
         MPI_Status status;
-        int        len;
         int        ierr =
-          MPI_Probe(MPI_ANY_SOURCE, 786, tria->get_communicator(), &status);
+          MPI_Probe(MPI_ANY_SOURCE, mpi_tag, tria->get_communicator(), &status);
         AssertThrowMPI(ierr);
+
+        int len;
         ierr = MPI_Get_count(&status, MPI_BYTE, &len);
         AssertThrowMPI(ierr);
 
