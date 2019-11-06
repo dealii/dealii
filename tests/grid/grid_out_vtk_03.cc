@@ -37,7 +37,8 @@ void
 do_test(std::ostream &logfile,
         const bool    output_cells,
         const bool    output_faces,
-        const bool    output_co_faces)
+        const bool    output_edges,
+        const bool    output_only_relevant)
 {
   Triangulation<dim, spacedim> tria_1;
   GridGenerator::hyper_cube(tria_1, 0, 1, true);
@@ -47,14 +48,14 @@ do_test(std::ostream &logfile,
   tria_1.execute_coarsening_and_refinement();
 
   GridOutFlags::Vtk flags;
-  flags.output_cells    = output_cells;
-  flags.output_faces    = output_faces;
-  flags.output_co_faces = output_co_faces;
+  flags.output_cells         = output_cells;
+  flags.output_faces         = output_faces;
+  flags.output_edges         = output_edges;
+  flags.output_only_relevant = output_only_relevant;
 
   GridOut grid_out_1;
   grid_out_1.set_flags(flags);
   grid_out_1.write_vtk(tria_1, logfile);
-
 
   // write to buffer
   std::ostringstream buf;
@@ -82,10 +83,15 @@ template <int dim, int spacedim>
 void
 test(std::ostream &logfile)
 {
-  do_test<dim, spacedim>(logfile, true, false, false);
-  do_test<dim, spacedim>(logfile, true, false, true);
-  do_test<dim, spacedim>(logfile, true, true, false);
-  do_test<dim, spacedim>(logfile, true, true, true);
+  do_test<dim, spacedim>(logfile, true, false, false, true);
+  do_test<dim, spacedim>(logfile, true, false, true, true);
+  do_test<dim, spacedim>(logfile, true, true, false, true);
+  do_test<dim, spacedim>(logfile, true, true, true, true);
+
+  do_test<dim, spacedim>(logfile, true, false, false, false);
+  do_test<dim, spacedim>(logfile, true, false, true, false);
+  do_test<dim, spacedim>(logfile, true, true, false, false);
+  do_test<dim, spacedim>(logfile, true, true, true, false);
 }
 
 
