@@ -2498,6 +2498,13 @@ namespace GridTools
     for (; global_index_it != global_index_end; ++global_index_it)
       global_index_it->second += shift;
 
+
+    const int mpi_tag = Utilities::MPI::internal::Tags::
+      grid_tools_compute_local_to_global_vertex_index_map;
+    const int mpi_tag2 = Utilities::MPI::internal::Tags::
+      grid_tools_compute_local_to_global_vertex_index_map2;
+
+
     // In a first message, send the global ID of the vertices and the local
     // positions in the cells. In a second messages, send the cell ID as a
     // resize string. This is done in two messages so that types are not mixed
@@ -2535,7 +2542,7 @@ namespace GridTools
                          buffer_size,
                          DEAL_II_VERTEX_INDEX_MPI_TYPE,
                          destination,
-                         0,
+                         mpi_tag,
                          triangulation.get_communicator(),
                          &first_requests[i]);
         AssertThrowMPI(ierr);
@@ -2560,7 +2567,7 @@ namespace GridTools
                         buffer_size,
                         DEAL_II_VERTEX_INDEX_MPI_TYPE,
                         source,
-                        0,
+                        mpi_tag,
                         triangulation.get_communicator(),
                         MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
@@ -2601,7 +2608,7 @@ namespace GridTools
                          buffer_size,
                          MPI_CHAR,
                          destination,
-                         0,
+                         mpi_tag2,
                          triangulation.get_communicator(),
                          &second_requests[i]);
         AssertThrowMPI(ierr);
@@ -2624,7 +2631,7 @@ namespace GridTools
                         buffer_size,
                         MPI_CHAR,
                         source,
-                        0,
+                        mpi_tag2,
                         triangulation.get_communicator(),
                         MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);

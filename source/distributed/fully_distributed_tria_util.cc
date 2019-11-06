@@ -577,6 +577,9 @@ namespace parallel
           dealii::Utilities::MPI::this_mpi_process(comm);
         const unsigned int group_root = (my_rank / group_size) * group_size;
 
+        const int mpi_tag =
+          Utilities::MPI::internal::Tags::fully_distributed_create;
+
         // check if process is root of the group
         if (my_rank == group_root)
           {
@@ -613,8 +616,12 @@ namespace parallel
                 dealii::Utilities::pack(construction_data, buffer, false);
 
                 // 3c) send ConstructionData
-                const auto ierr = MPI_Send(
-                  buffer.data(), buffer.size(), MPI_CHAR, other_rank, 0, comm);
+                const auto ierr = MPI_Send(buffer.data(),
+                                           buffer.size(),
+                                           MPI_CHAR,
+                                           other_rank,
+                                           mpi_tag,
+                                           comm);
                 AssertThrowMPI(ierr);
               }
 
@@ -627,13 +634,20 @@ namespace parallel
             // 3a) recv packed ConstructionData from group-root process
             //     (counter-part of 3c of root process)
             MPI_Status status;
-            auto       ierr = MPI_Probe(group_root, 0, comm, &status);
+            auto       ierr = MPI_Probe(group_root, mpi_tag, comm, &status);
             AssertThrowMPI(ierr);
+
             int len;
             MPI_Get_count(&status, MPI_CHAR, &len);
+
             std::vector<char> buf(len);
-            ierr =
-              MPI_Recv(buf.data(), len, MPI_CHAR, group_root, 0, comm, &status);
+            ierr = MPI_Recv(buf.data(),
+                            len,
+                            MPI_CHAR,
+                            status.MPI_SOURCE,
+                            status.MPI_TAG,
+                            comm,
+                            &status);
             AssertThrowMPI(ierr);
 
             // 3b) unpack ConstructionData (counter-part of 3b of root process)

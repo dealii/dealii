@@ -253,6 +253,9 @@ namespace parallel
       int ierr = MPI_Barrier(this->mpi_communicator);
       AssertThrowMPI(ierr);
 
+      const int mpi_tag = Utilities::MPI::internal::Tags::
+        triangulation_base_fill_level_ghost_owners;
+
       // important: preallocate to avoid (re)allocation:
       std::vector<MPI_Request> requests(
         this->number_cache.level_ghost_owners.size());
@@ -268,7 +271,7 @@ namespace parallel
                            1,
                            MPI_UNSIGNED,
                            *it,
-                           9001,
+                           mpi_tag,
                            this->mpi_communicator,
                            &requests[req_counter]);
           AssertThrowMPI(ierr);
@@ -284,7 +287,7 @@ namespace parallel
                           1,
                           MPI_UNSIGNED,
                           *it,
-                          9001,
+                          mpi_tag,
                           this->mpi_communicator,
                           MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);

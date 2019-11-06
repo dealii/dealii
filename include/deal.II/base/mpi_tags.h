@@ -28,14 +28,22 @@ namespace Utilities
     namespace internal
     {
       /**
-       * This enum holds all MPI tags used in collective MPI communications with
-       * using MPI_ANY_SOURCE inside the deal.II library.
+       * This enum holds all MPI tags used in point to point MPI communications
+       * inside the deal.II library.
        *
        * We keep these tags in a central location so that they are unique within
-       * the library. Otherwise, communication that receives packages with
-       * MPI_ANY_SOURCE might pick up packets from a different algorithm.
+       * the library. Otherwise, communication that receives packages might pick
+       * up packets from a different algorithm. This is especially true if
+       * MPI_ANY_SOURCE is used.
+       *
+       * The list of MPI functions that use an MPI tag is:
+       * - MPI_Send, MPI_Recv, MPI_Sendrecv
+       * - MPI_Isend, MPI_Irecv
+       * - MPI_Probe, MPI_Iprobe
+       * - MPI_Comm_create_group, MPI_Intercomm_create,
+       * Utilities::MPI::create_group
        */
-      struct Tags
+      namespace Tags
       {
         /**
          * The enum with the tags.
@@ -87,10 +95,37 @@ namespace Utilities
           /// ConsensusAlgorithm_PEX::process
           consensus_algorithm_pex_process_deliver,
 
+          /// ConstructionData<dim,
+          /// spacedim>::create_construction_data_from_triangulation_in_groups()
+          fully_distributed_create,
+
+          /// TriangulationBase<dim, spacedim>::fill_level_ghost_owners()
+          triangulation_base_fill_level_ghost_owners,
+
+          /// GridTools::compute_local_to_global_vertex_index_map
+          grid_tools_compute_local_to_global_vertex_index_map,
+          /// GridTools::compute_local_to_global_vertex_index_map second tag
+          grid_tools_compute_local_to_global_vertex_index_map2,
+
+          /// ParticleHandler<dim, spacedim>::send_recv_particles
+          particle_handler_send_recv_particles_setup,
+          /// ParticleHandler<dim, spacedim>::send_recv_particles
+          particle_handler_send_recv_particles_send,
+
+          /// ScaLAPACKMatrix<NumberType>::copy_to
+          scalapack_copy_to,
+          /// ScaLAPACKMatrix<NumberType>::copy_to
+          scalapack_copy_to2,
+          /// ScaLAPACKMatrix<NumberType>::copy_from
+          scalapack_copy_from,
+
+          /// ProcessGrid::ProcessGrid
+          process_grid_constructor,
+
         };
-      };
-    } // namespace internal
-  }   // namespace MPI
+      } // namespace Tags
+    }   // namespace internal
+  }     // namespace MPI
 } // namespace Utilities
 
 

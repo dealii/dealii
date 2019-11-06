@@ -937,6 +937,9 @@ namespace Particles
 
     // Notify other processors how many particles we will send
     {
+      const int mpi_tag = Utilities::MPI::internal::Tags::
+        particle_handler_send_recv_particles_setup;
+
       std::vector<MPI_Request> n_requests(2 * n_neighbors);
       for (unsigned int i = 0; i < n_neighbors; ++i)
         {
@@ -944,7 +947,7 @@ namespace Particles
                                      1,
                                      MPI_UNSIGNED,
                                      neighbors[i],
-                                     0,
+                                     mpi_tag,
                                      triangulation->get_communicator(),
                                      &(n_requests[2 * i]));
           AssertThrowMPI(ierr);
@@ -955,7 +958,7 @@ namespace Particles
                                      1,
                                      MPI_UNSIGNED,
                                      neighbors[i],
-                                     0,
+                                     mpi_tag,
                                      triangulation->get_communicator(),
                                      &(n_requests[2 * i + 1]));
           AssertThrowMPI(ierr);
@@ -982,6 +985,9 @@ namespace Particles
       unsigned int             send_ops = 0;
       unsigned int             recv_ops = 0;
 
+      const int mpi_tag = Utilities::MPI::internal::Tags::
+        particle_handler_send_recv_particles_send;
+
       for (unsigned int i = 0; i < n_neighbors; ++i)
         if (n_recv_data[i] > 0)
           {
@@ -989,7 +995,7 @@ namespace Particles
                                        n_recv_data[i],
                                        MPI_CHAR,
                                        neighbors[i],
-                                       1,
+                                       mpi_tag,
                                        triangulation->get_communicator(),
                                        &(requests[send_ops]));
             AssertThrowMPI(ierr);
@@ -1003,7 +1009,7 @@ namespace Particles
                                        n_send_data[i],
                                        MPI_CHAR,
                                        neighbors[i],
-                                       1,
+                                       mpi_tag,
                                        triangulation->get_communicator(),
                                        &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
