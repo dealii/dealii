@@ -86,6 +86,9 @@ checks() {
       words=($name)
       if [ "${#words[@]}" -lt "2" ]; then
 	  echo "invalid author '$name' without firstname and lastname"
+	  echo ""
+	  echo "hint: for possible solutions, consult the webpage:"
+	  echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
 	  exit 2
       fi
   done || exit 2
@@ -95,10 +98,16 @@ checks() {
       words=($name)
       if ! echo "$email" | grep -q "\."; then
 	  echo "invalid email '$email'"
+          echo ""
+          echo "hint: for possible solutions, consult the webpage:"
+          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
 	  exit 3
       fi
       if ! echo "$email" | grep -q -v -e "\.local$"; then
 	  echo "invalid email '$email'"
+          echo ""
+          echo "hint: for possible solutions, consult the webpage:"
+          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
 	  exit 3
       fi
   done || exit 3
