@@ -48,7 +48,7 @@ namespace Utilities
         /**
          * The enum with the tags.
          */
-        enum enumeration
+        enum enumeration : std::uint16_t
         {
           /// Utilities::MPI::some_to_some()
           mpi_some_to_some = 300,
