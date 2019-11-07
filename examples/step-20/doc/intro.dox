@@ -362,10 +362,12 @@ it. The problem here is: the matrix has a zero block at the bottom right
 (there is no term in the bilinear form that couples the pressure $p$ with the
 pressure test function $q$), and it is indefinite. At least it is
 symmetric. In other words: the Conjugate Gradient method is not going to
-work. We would have to resort to other iterative solvers instead, such as
+work since it is only applicable to problems in which the matrix is
+symmetric and positive definite. 
+We would have to resort to other iterative solvers instead, such as
 MinRes, SymmLQ, or GMRES, that can deal with indefinite systems. However, then
 the next problem immediately surfaces: due to the zero block, there are zeros
-on the diagonal and none of the usual preconditioners (Jacobi, SSOR) will work
+on the diagonal and none of the usual, "simple" preconditioners (Jacobi, SSOR) will work
 as they require division by diagonal elements.
 
 For the matrix sizes we expect to run with this program, the by far simplest
@@ -374,7 +376,7 @@ SparseDirectUMFPACK class that is bundled with deal.II). step-29 goes this
 route and shows that solving <i>any</i> linear system can be done in just
 3 or 4 lines of code.
 
-But then, this is a tutorial: we teach how to do things. Consequently,
+But then, this is a tutorial: We teach how to do things. Consequently,
 in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
 large matrix and vectors, but we will want to decompose matrices
@@ -382,7 +384,7 @@ into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are
 much better ways to efficiently compute the system, for example those
 explained in the results section of step-22 or the one we use in step-43
-for a problem similar to the current one. Here, our goal shall be to
+for a problem similar to the current one. Here, our goal is simply to
 introduce new solution techniques and how they can be implemented in
 deal.II.
 
@@ -392,7 +394,7 @@ deal.II.
 In view of the difficulties using standard solvers and preconditioners
 mentioned above, let us take another look at the matrix. If we sort our
 degrees of freedom so that all velocity come before all pressure variables,
-then we can subdivide the linear system $Ax=h$ into the following blocks:
+then we can subdivide the linear system $Ax=b$ into the following blocks:
 @f{eqnarray*}
   \left(\begin{array}{cc}
     M & B \\ B^T & 0
@@ -417,25 +419,39 @@ second row from it):
   B^TM^{-1}B P &=& B^TM^{-1} F - G, \\
   MU &=& F - BP.
 @f}
-Here, the matrix $S=B^TM^{-1}B$ (called the <em>Schur complement</em> of $A$)
+Here, the matrix $S=B^TM^{-1}B$ (called the 
+<a href="https://en.wikipedia.org/wiki/Schur_complement">Schur complement</a> 
+of $A$)
 is obviously symmetric and, owing to the positive definiteness of $M$ and the
 fact that $B$ has full column rank, $S$ is also positive
 definite.
 
 Consequently, if we could compute $S$, we could apply the Conjugate Gradient
-method to it. However, computing $S$ is expensive, and $S$ is in fact
-also a full matrix. On the other hand, the CG algorithm doesn't require
-us to actually have a representation of $S$, it is sufficient to form
-matrix-vector products with it. We can do so in steps: to compute $Sv=B^TM^{-1}Bv=B^T(M^{-1}(Bv))$, we
+method to it. However, computing $S$ is expensive because it requires us
+to compute the inverse of the (possibly large) matrix $M$; and $S$ is in fact
+also a full matrix because even though $M$ is sparse, its inverse $M^{-1}$
+will generally be a dense matrix. 
+On the other hand, the CG algorithm doesn't require
+us to actually have a representation of $S$: It is sufficient to form
+matrix-vector products with it. We can do so in steps, using the fact that
+matrix products are associative (i.e., we can set parentheses in such a
+way that the product is more convenient to compute): 
+To compute $Sv=(B^TM^{-1}B)v=B^T(M^{-1}(Bv))$, we
 <ol>
- <li> form $w = B v$;
+ <li> compute $w = B v$;
  <li> solve $My = w$ for $y=M^{-1}w$, using the CG method applied to the
   positive definite and symmetric mass matrix $M$;
- <li> form $z=B^Ty$ to obtain $z=Sv$.
+ <li> compute $z=B^Ty$ to obtain $z=Sv$.
 </ol>
 Note how we evaluate the expression $B^TM^{-1}Bv$ right to left to
 avoid matrix-matrix products; this way, all we have to do is evaluate
 matrix-vector products.
+
+In the following, we will then have to come up with ways to represent the
+matrix $S$ so that it can be used in a Conjugate Gradient solver, 
+as well as to define ways in which we can precondition the solution
+of the linear system involving $S$, and deal with solving linear systems
+with the matrix $M$ (the second step above). 
 
 @note The key point in this consideration is to recognize that to implement
 an iterative solver such as CG or GMRES, we never actually need the actual
