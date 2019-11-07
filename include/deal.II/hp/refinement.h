@@ -22,6 +22,7 @@
 #include <deal.II/base/template_constraints.h>
 
 #include <functional>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
