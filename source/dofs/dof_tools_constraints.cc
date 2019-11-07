@@ -1823,7 +1823,8 @@ namespace DoFTools
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
-      const bool                                   face_rotation)
+      const bool                                   face_rotation,
+      const number                                 periodicity_factor)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -1864,7 +1865,8 @@ namespace DoFTools
                                           component_mask,
                                           face_orientation,
                                           face_flip,
-                                          face_rotation);
+                                          face_rotation,
+                                          periodicity_factor);
             }
           return;
         }
@@ -1966,19 +1968,19 @@ namespace DoFTools
 
           // We have to be careful to treat so called "identity
           // constraints" special. These are constraints of the form
-          // x1 == factor * x_2. In this case, if the constraint
-          // x2 == 1./factor * x1 already exists we are in trouble.
+          // x1 == constraint_factor * x_2. In this case, if the constraint
+          // x2 == 1./constraint_factor * x1 already exists we are in trouble.
           //
           // Consequently, we have to check that we have indeed such an
           // "identity constraint". We do this by looping over all entries
           // of the row of the transformation matrix and check whether we
           // find exactly one nonzero entry. If this is the case, set
           // "is_identity_constrained" to true and record the corresponding
-          // index and factor.
+          // index and constraint_factor.
 
           bool         is_identity_constrained = false;
           unsigned int target                  = numbers::invalid_unsigned_int;
-          double       factor                  = 1.;
+          number       constraint_factor       = periodicity_factor;
 
           constexpr double eps = 1.e-13;
           for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
@@ -1996,7 +1998,7 @@ namespace DoFTools
                     }
                   is_identity_constrained = true;
                   target                  = jj;
-                  factor                  = entry;
+                  constraint_factor       = entry * periodicity_factor;
                 }
             }
 
@@ -2052,11 +2054,11 @@ namespace DoFTools
                !affine_constraints.is_constrained(dof_right)))
             {
               std::swap(dof_left, dof_right);
-              factor = 1. / factor;
+              constraint_factor = 1. / constraint_factor;
             }
 
           // Next, we try to enter the constraint
-          //   dof_left = factor * dof_right;
+          //   dof_left = constraint_factor * dof_right;
 
           // If both degrees of freedom are constrained, there is nothing we
           // can do. Simply continue with the next dof.
@@ -2068,8 +2070,8 @@ namespace DoFTools
           // constraint does not create a constraint cycle. Thus, check for
           // a dependency cycle:
 
-          bool   constraints_are_cyclic = true;
-          number cycle_factor           = factor;
+          bool   constraints_are_cyclic  = true;
+          number cycle_constraint_factor = constraint_factor;
 
           for (auto test_dof = dof_right; test_dof != dof_left;)
             {
@@ -2084,7 +2086,7 @@ namespace DoFTools
               if (constraint_entries.size() == 1)
                 {
                   test_dof = constraint_entries[0].first;
-                  cycle_factor *= constraint_entries[0].second;
+                  cycle_constraint_factor *= constraint_entries[0].second;
                 }
               else
                 {
@@ -2094,23 +2096,50 @@ namespace DoFTools
             }
 
           // In case of a dependency cycle we, either
-          //  - do nothing if cycle_factor == 1. In this case all degrees
+          //  - do nothing if cycle_constraint_factor == 1. In this case all
+          //    degrees
           //    of freedom are already periodically constrained,
           //  - otherwise, force all dofs to zero (by setting dof_left to
           //    zero). The reasoning behind this is the fact that
-          //    cycle_factor != 1 occurs in situations such as
+          //    cycle_constraint_factor != 1 occurs in situations such as
           //    x1 == x2 and x2 == -1. * x1. This system is only solved by
           //    x_1 = x_2 = 0.
 
           if (constraints_are_cyclic)
             {
-              if (std::abs(cycle_factor - 1.) > eps)
+              if (std::abs(cycle_constraint_factor - 1.) > eps)
                 affine_constraints.add_line(dof_left);
             }
           else
             {
               affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left, dof_right, factor);
+              affine_constraints.add_entry(dof_left,
+                                           dof_right,
+                                           constraint_factor);
+              // The number 1e10 in the assert below is arbitrary. If the
+              // absolute value of constraint_factor is too large, then probably
+              // the absolute value of periodicity_factor is too large or too
+              // small. This would be equivalent to an evanescent wave that has
+              // a very small wavelength. A quick calculation shows that if
+              // |periodicity_factor| > 1e10 -> |np.exp(ikd)|> 1e10, therefore k
+              // is imaginary (evanescent wave) and the evanescent wavelength is
+              // 0.27 times smaller than the dimension of the structure,
+              // lambda=((2*pi)/log(1e10))*d. Imaginary wavenumbers can be
+              // interesting in some cases
+              // (https://doi.org/10.1103/PhysRevA.94.033813).In order to
+              // implement the case of in which the wavevector can be imaginary
+              // it would be necessary to rewrite this function and the dof
+              // ordering method should be modified.
+              // Let's take the following constraint a*x1 + b*x2 = 0. You could
+              // just always pick x1 = b/a*x2, but in practice this is not so
+              // stable if a could be a small number -- intended to be zero, but
+              // just very small due to roundoff. Of course, constraining x2 in
+              // terms of x1 has the same problem. So one chooses x1 = b/a*x2 if
+              // |b|<|a|, and x2 = a/b*x1 if |a|<|b|.
+              Assert(
+                std::abs(constraint_factor) < 1e10,
+                ExcMessage(
+                  "The periodicity constraint is too large. The parameter periodicity_factor might be too large or too small."));
             }
         } /* for dofs_per_face */
     }
@@ -2227,7 +2256,8 @@ namespace DoFTools
     const bool                                   face_flip,
     const bool                                   face_rotation,
     const FullMatrix<double> &                   matrix,
-    const std::vector<unsigned int> &            first_vector_components)
+    const std::vector<unsigned int> &            first_vector_components,
+    const number                                 periodicity_factor)
   {
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2365,7 +2395,8 @@ namespace DoFTools
                                          face_flip,
                                          face_rotation,
                                          matrix,
-                                         first_vector_components);
+                                         first_vector_components,
+                                         periodicity_factor);
           }
       }
     else
@@ -2402,7 +2433,8 @@ namespace DoFTools
                                             component_mask,
                                             face_orientation,
                                             face_flip,
-                                            face_rotation);
+                                            face_rotation,
+                                            periodicity_factor);
               }
             else
               {
@@ -2416,7 +2448,8 @@ namespace DoFTools
                                             component_mask,
                                             face_orientation,
                                             face_flip,
-                                            face_rotation);
+                                            face_rotation,
+                                            periodicity_factor);
               }
           }
         else
@@ -2438,7 +2471,8 @@ namespace DoFTools
                                         face_orientation ?
                                           face_rotation ^ face_flip :
                                           face_flip,
-                                        face_rotation);
+                                        face_rotation,
+                                        periodicity_factor);
           }
       }
   }
@@ -2453,7 +2487,8 @@ namespace DoFTools
       &                              periodic_faces,
     AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask,
-    const std::vector<unsigned int> &first_vector_components)
+    const std::vector<unsigned int> &first_vector_components,
+    const number                     periodicity_factor)
   {
     // Loop over all periodic faces...
     for (auto &pair : periodic_faces)
@@ -2477,7 +2512,8 @@ namespace DoFTools
                                      pair.orientation[1],
                                      pair.orientation[2],
                                      pair.matrix,
-                                     first_vector_components);
+                                     first_vector_components,
+                                     periodicity_factor);
       }
   }
 
@@ -2492,7 +2528,8 @@ namespace DoFTools
                                const types::boundary_id           b_id2,
                                const unsigned int                 direction,
                                dealii::AffineConstraints<number> &constraints,
-                               const ComponentMask &component_mask)
+                               const ComponentMask &component_mask,
+                               const number         periodicity_factor)
   {
     static const int space_dim = DoFHandlerType::space_dimension;
     (void)space_dim;
@@ -2513,7 +2550,9 @@ namespace DoFTools
 
     make_periodicity_constraints<DoFHandlerType>(matched_faces,
                                                  constraints,
-                                                 component_mask);
+                                                 component_mask,
+                                                 std::vector<unsigned int>(),
+                                                 periodicity_factor);
   }
 
 
@@ -2524,7 +2563,8 @@ namespace DoFTools
                                const types::boundary_id   b_id,
                                const unsigned int         direction,
                                AffineConstraints<number> &constraints,
-                               const ComponentMask &      component_mask)
+                               const ComponentMask &      component_mask,
+                               const number               periodicity_factor)
   {
     static const int dim       = DoFHandlerType::dimension;
     static const int space_dim = DoFHandlerType::space_dimension;
@@ -2548,7 +2588,9 @@ namespace DoFTools
 
     make_periodicity_constraints<DoFHandlerType>(matched_faces,
                                                  constraints,
-                                                 component_mask);
+                                                 component_mask,
+                                                 std::vector<unsigned int>(),
+                                                 periodicity_factor);
   }
 
 
