@@ -229,8 +229,8 @@ namespace Utilities
                 ierr = MPI_Recv(buffer.data(),
                                 number_amount,
                                 DEAL_II_DOF_INDEX_MPI_TYPE,
-                                status.MPI_TAG,
                                 status.MPI_SOURCE,
+                                status.MPI_TAG,
                                 comm,
                                 &status);
                 AssertThrowMPI(ierr);
