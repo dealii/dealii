@@ -48,10 +48,14 @@
 #  include <BRepAdaptor_HCurve.hxx>
 #  include <BRepAdaptor_Surface.hxx>
 #  include <BRepAlgo_Section.hxx>
+#  include <BRepBndLib.hxx>
 #  include <BRepBuilderAPI_MakeEdge.hxx>
+#  include <BRepBuilderAPI_Sewing.hxx>
 #  include <BRepBuilderAPI_Transform.hxx>
+#  include <BRepMesh_FastDiscret.hxx>
 #  include <BRepTools.hxx>
 #  include <BRep_Builder.hxx>
+#  include <Bnd_Box.hxx>
 #  include <GCPnts_AbscissaPoint.hxx>
 #  include <GeomAPI_Interpolate.hxx>
 #  include <GeomAPI_ProjectPointOnCurve.hxx>
@@ -61,16 +65,21 @@
 #  include <Geom_BoundedCurve.hxx>
 #  include <Geom_Plane.hxx>
 #  include <IntCurvesFace_ShapeIntersector.hxx>
+#  include <Poly_Triangulation.hxx>
 #  include <ShapeAnalysis_Surface.hxx>
+#  include <StlAPI_Reader.hxx>
+#  include <StlAPI_Writer.hxx>
 #  include <TColStd_HSequenceOfTransient.hxx>
 #  include <TColStd_SequenceOfTransient.hxx>
 #  include <TColgp_HArray1OfPnt.hxx>
+#  include <TopLoc_Location.hxx>
 #  include <gp_Lin.hxx>
 #  include <gp_Pnt.hxx>
 #  include <gp_Vec.hxx>
 
 #  include <algorithm>
 #  include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -265,6 +274,63 @@ namespace OpenCASCADE
     ICW.ComputeModel();
     Standard_Boolean OK = ICW.Write(filename.c_str());
     AssertThrow(OK, ExcMessage("Failed to write IGES file."));
+  }
+
+
+  TopoDS_Shape
+  read_STL(const std::string &filename)
+  {
+    StlAPI_Reader reader;
+    TopoDS_Shape  shape;
+    reader.Read(shape, filename.c_str());
+    return shape;
+  }
+
+  void
+  write_STL(const TopoDS_Shape &shape,
+            const std::string & filename,
+            const double        deflection,
+            const double        angular_deflection,
+            const bool          sew_different_faces,
+            const double        sewer_tolerance)
+  {
+    TopLoc_Location            Loc;
+    std::vector<TopoDS_Vertex> vertices;
+    std::vector<TopoDS_Edge>   edges;
+    std::vector<TopoDS_Face>   faces;
+    OpenCASCADE::extract_geometrical_shapes(shape, faces, edges, vertices);
+    bool mesh_is_present = true;
+    for (unsigned int i = 0; i < faces.size(); ++i)
+      {
+        Handle(Poly_Triangulation) theTriangulation =
+          BRep_Tool::Triangulation(faces[i], Loc);
+        if (theTriangulation.IsNull())
+          mesh_is_present = false;
+      }
+    TopoDS_Shape shape_to_be_written = shape;
+    if (!mesh_is_present)
+      {
+        if (sew_different_faces)
+          {
+            BRepBuilderAPI_Sewing sewer(sewer_tolerance);
+            sewer.Add(shape_to_be_written);
+            sewer.Perform();
+            shape_to_be_written = sewer.SewedShape();
+          }
+        else
+          shape_to_be_written = shape;
+        double  x_min, y_min, z_min, x_max, y_max, z_max;
+        Bnd_Box bnd_box;
+        BRepBndLib::Add(shape_to_be_written, bnd_box);
+        bnd_box.Get(x_min, y_min, z_min, x_max, y_max, z_max);
+        BRepMesh_FastDiscret mesh_fd(deflection, angular_deflection, bnd_box);
+        mesh_fd.Perform(shape_to_be_written);
+      }
+
+    StlAPI_Writer writer;
+    const auto    error = writer.Write(shape_to_be_written, filename.c_str());
+    AssertThrow(error == StlAPI_StatusOK,
+                ExcMessage("Error writing STL from shape."));
   }
 
   TopoDS_Shape

@@ -128,6 +128,36 @@ namespace OpenCASCADE
   void
   write_IGES(const TopoDS_Shape &shape, const std::string &filename);
 
+
+  /**
+   * Read STL files and translate their content into openCascade topological
+   * entities.  The return object is a
+   * TopoDS_Shape which contains all objects from the file.
+   */
+  TopoDS_Shape
+  read_STL(const std::string &filename);
+
+  /**
+   * Write the given topological shape into an STL file. In order to do so the
+   * shape must contain a mesh structure, the function checks if all the faces
+   * of the shape have an attached mesh, if this is not the case it proceeds to
+   * mesh it automatically. We remark that the automatic mesh generation in
+   * OpenCASCADE takes care only of the geometrical resemblance between the
+   * shape and the mesh, to control the shape and regularity of the triangles
+   * you should use other meshing softwares. The two arguments `deflection` and
+   * `angular_deflection` select the accuracy of the created triangulation with
+   * respect to the orginal topological shape. The argument
+   * `sew_different_faces` gives the possibility to use a Sewer from OpenCASCADE
+   * to create a watertight closed STL using the argument `sewer_tolerance`.
+   */
+  void
+  write_STL(const TopoDS_Shape &shape,
+            const std::string & filename,
+            const double        deflection,
+            const double        angular_deflection,
+            const bool          sew_different_faces = false,
+            const double        sewer_tolerance     = 1e-6);
+
   /**
    * Read STEP files and translate their content into openCascade topological
    * entities. The option scale_factor is used to compensate for different
