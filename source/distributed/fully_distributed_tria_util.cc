@@ -578,7 +578,7 @@ namespace parallel
         const unsigned int group_root = (my_rank / group_size) * group_size;
 
         const int mpi_tag =
-          Utilities::MPI::internal::Tags::fully_distributed_create;
+          dealii::Utilities::MPI::internal::Tags::fully_distributed_create;
 
         // check if process is root of the group
         if (my_rank == group_root)
