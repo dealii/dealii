@@ -1429,7 +1429,7 @@ namespace DoFTools
    * @ref GlossComponentMask)
    * shall equal the number of components in the finite element used by @p
    * dof. The size of @p selected_dofs shall equal
-   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array or
+   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array are
    * overwritten.
    *
    * Using the usual convention, if a shape function is non-zero in more than
@@ -1446,7 +1446,7 @@ namespace DoFTools
    * DoFTools::extract_boundary_dofs function.
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
-   * live on which cell
+   * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
    * @ref GlossComponentMask).
@@ -1486,7 +1486,7 @@ namespace DoFTools
    * @ref GlossLocallyRelevantDof "locally relevant DoFs").
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
-   * live on which cell
+   * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
    * @ref GlossComponentMask).
