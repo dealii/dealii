@@ -389,18 +389,18 @@ TimerOutput::~TimerOutput()
   if (std::uncaught_exception() == true && mpi_communicator != MPI_COMM_SELF)
 #  endif
     {
-      std::cerr << "---------------------------------------------------------"
-                << std::endl
-                << "TimerOutput objects finalize timed values printed to the"
-                << std::endl
-                << "screen by communicating over MPI in their destructors."
-                << std::endl
-                << "Since an exception is currently uncaught, this" << std::endl
-                << "synchronization (and subsequent output) will be skipped to"
-                << std::endl
-                << "avoid a possible deadlock." << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
+      const unsigned int myid =
+        Utilities::MPI::this_mpi_process(mpi_communicator);
+      if (myid == 0)
+        std::cerr
+          << "---------------------------------------------------------\n"
+          << "TimerOutput objects finalize timed values printed to the\n"
+          << "screen by communicating over MPI in their destructors.\n"
+          << "Since an exception is currently uncaught, this\n"
+          << "synchronization (and subsequent output) will be skipped\n"
+          << "to avoid a possible deadlock.\n"
+          << "---------------------------------------------------------"
+          << std::endl;
     }
   else
     {
