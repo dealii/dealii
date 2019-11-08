@@ -18,6 +18,7 @@
 #include <boost/python.hpp>
 #include <point_wrapper.h>
 #include <triangulation_wrapper.h>
+#include <tria_accessor_wrapper.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -240,6 +241,56 @@ namespace python
         static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
       return cell->manifold_id();
     }
+
+
+
+    template <int dim, int spacedim>
+    bool at_boundary(const void *cell_accessor)
+    {
+      const CellAccessor<dim,spacedim> *cell =
+        static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
+      return cell->at_boundary();
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool has_boundary_lines(const void *cell_accessor)
+    {
+      const CellAccessor<dim,spacedim> *cell =
+        static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
+      return cell->has_boundary_lines();
+    }
+
+
+
+    template <int dim, int spacedim>
+    const CellAccessor<dim,spacedim>* neighbor(const int i, const void *cell_accessor)
+    {
+      const CellAccessor<dim,spacedim> *cell =
+        static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
+      return cell->neighbor(i);
+    }
+
+
+
+    template <int dim, int spacedim>
+    boost::python::list faces(const void *cell_accessor)
+    {
+      const CellAccessor<dim,spacedim> *cell =
+        static_cast<const CellAccessor<dim,spacedim>*>(cell_accessor);
+
+      boost::python::list faces_list;
+
+      auto face_iterators = cell->face_iterators();
+      for(auto &it : face_iterators)
+      {
+        TriaAccessor<dim-1,dim,spacedim> *face_accessor = new TriaAccessor<dim-1,dim,spacedim>(*it);
+        faces_list.append(TriaAccessorWrapper(face_accessor, dim - 1, dim, spacedim));
+      }
+
+      return faces_list;
+    }
   }
 
 
@@ -271,6 +322,15 @@ namespace python
       AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
   }
 
+
+
+  CellAccessorWrapper::CellAccessorWrapper()
+    :
+    dim(0),
+    spacedim(0),
+    cell_accessor(nullptr)
+  {
+  }
 
 
 
@@ -318,8 +378,8 @@ namespace python
           }
         else if ((dim == 2) && (spacedim == 3))
           {
-            CellAccessor<3,3> *tmp =
-              static_cast<CellAccessor<3,3>*>(cell_accessor);
+            CellAccessor<2,3> *tmp =
+              static_cast<CellAccessor<2,3>*>(cell_accessor);
             delete tmp;
           }
         else
@@ -382,6 +442,7 @@ namespace python
     else
       return internal::get_coarsen_flag<3,3>(cell_accessor);
   }
+
 
 
   PointWrapper CellAccessorWrapper::get_barycenter() const
@@ -472,6 +533,58 @@ namespace python
     else
       return internal::get_manifold_id<3,3>(cell_accessor);
   }
+
+
+
+  bool CellAccessorWrapper::at_boundary() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::at_boundary<2,2>(cell_accessor);
+    else if ((dim== 2) && (spacedim == 3))
+      return internal::at_boundary<2,3>(cell_accessor);
+    else
+      return internal::at_boundary<3,3>(cell_accessor);
+  }
+
+
+
+  bool CellAccessorWrapper::has_boundary_lines() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::has_boundary_lines<2,2>(cell_accessor);
+    else if ((dim== 2) && (spacedim == 3))
+      return internal::has_boundary_lines<2,3>(cell_accessor);
+    else
+      return internal::has_boundary_lines<3,3>(cell_accessor);
+  }
+
+
+
+  CellAccessorWrapper CellAccessorWrapper::neighbor(const int i) const
+  {
+    AssertThrow(i<(2*dim),
+                ExcNeighborDoesNotExist(i, 2*dim));
+
+    if ((dim == 2) && (spacedim == 2))
+      return construct_neighbor_wrapper<2, 2>(i);
+    else if ((dim== 2) && (spacedim == 3))
+      return construct_neighbor_wrapper<2, 3>(i);
+    else
+      return construct_neighbor_wrapper<3, 3>(i);
+  }
+
+
+
+  boost::python::list CellAccessorWrapper::faces() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::faces<2, 2>(cell_accessor);
+    else if ((dim== 2) && (spacedim == 3))
+      return internal::faces<2, 3>(cell_accessor);
+    else
+      return internal::faces<3, 3>(cell_accessor);
+  }
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

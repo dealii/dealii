@@ -90,10 +90,12 @@ INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(_src
   wrappers.cc
+  export_tria_accessor.cc
   export_cell_accessor.cc
   export_point.cc
   export_triangulation.cc
   cell_accessor_wrapper.cc
+  tria_accessor_wrapper.cc
   point_wrapper.cc
   triangulation_wrapper.cc
   )

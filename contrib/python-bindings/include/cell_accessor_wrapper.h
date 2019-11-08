@@ -16,6 +16,8 @@
 #ifndef dealii_cell_accessor_wrapper_h
 #define dealii_cell_accessor_wrapper_h
 
+#include <boost/python.hpp>
+
 #include <deal.II/base/config.h>
 
 #include <deal.II/grid/tria_accessor.h>
@@ -42,6 +44,11 @@ namespace python
     CellAccessorWrapper(TriangulationWrapper &triangulation_wrapper,
                         const int             level,
                         const int             index);
+
+    /**
+     * Constructor for an empty object.
+     */
+    CellAccessorWrapper();
 
     /**
      * Destructor.
@@ -108,6 +115,31 @@ namespace python
     int get_manifold_id() const;
 
     /**
+     * Return the ith neighbor of a cell. If the neighbor does not exist, 
+     * i.e., if the ith face of the current object is at the boundary, 
+     * then an exception is thrown.
+     */
+    CellAccessorWrapper neighbor(const int i) const;
+
+    /**
+     * Return whether the cell is at the boundary.
+     */
+    bool at_boundary() const;
+
+    /**
+     * This is a slight variation to the at_boundary function: 
+     * for 2 dimensions it is equivalent, for three 
+     * dimensions it returns whether at least one of the 12 
+     * lines of the hexahedron is at a boundary.
+     */
+    bool has_boundary_lines() const;
+
+    /**
+     * Get faces of the underlying cell.
+     */ 
+    boost::python::list faces() const;
+
+    /**
      * Exception.
      */
     DeclException2(ExcVertexDoesNotExist,
@@ -116,7 +148,15 @@ namespace python
                    << " does not exist. The largest vertex number "
                    << "acceptable is "<< arg2-1);
 
+    DeclException2(ExcNeighborDoesNotExist,
+                   int, int,
+                   << "Requested neighbor number " << arg1
+                   << " does not exist. The largest neighbor number "
+                   << "acceptable is "<< arg2-1);
   private:
+    template<int dim, int spacedim>
+    const CellAccessorWrapper construct_neighbor_wrapper(const int i) const;
+
     /**
      * Dimension of the underlying CellAccessor object.
      */
@@ -133,6 +173,22 @@ namespace python
     void *cell_accessor;
 
   };
+
+
+  template<int dim, int spacedim>
+  const CellAccessorWrapper CellAccessorWrapper::construct_neighbor_wrapper(const int i) const
+  {
+	CellAccessor<dim,spacedim> *cell =
+        	static_cast<CellAccessor<dim,spacedim>*>(cell_accessor);
+
+	auto neighbor = cell->neighbor(i);
+
+	CellAccessorWrapper neighbor_wrapper;
+        neighbor_wrapper.dim = dim;
+        neighbor_wrapper.spacedim = spacedim;
+	neighbor_wrapper.cell_accessor = new CellAccessor<dim,spacedim>(&neighbor->get_triangulation(), neighbor->level(), neighbor->index());
+	return neighbor_wrapper;
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
