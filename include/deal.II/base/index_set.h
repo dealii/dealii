@@ -975,7 +975,7 @@ private:
  * @relatesalso IndexSet
  */
 inline IndexSet
-complete_index_set(const unsigned int N)
+complete_index_set(const types::global_dof_index N)
 {
   IndexSet is(N);
   is.add_range(0, N);
