@@ -720,7 +720,7 @@ public:
   /**
    * Iterator to the first active cell on level @p level. If the given level
    * does not contain any active cells (i.e., all cells on this level are
-   * further refined, then this function returns
+   * further refined), then this function returns
    * <code>end_active(level)</code> so that loops of the kind
    * @code
    *   for (cell=dof_handler.begin_active(level);
