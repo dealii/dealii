@@ -288,9 +288,9 @@ public:
    * range.
    *
    * In other words, the return value is nth_index_in_set(x), where x is the
-   * index of the largest contiguous range of indices in the IndexSet. The value
-   * is therefore equal to the number of elements in the set that come before
-   * the largest range.
+   * first index of the largest contiguous range of indices in the
+   * IndexSet. The return value is therefore equal to the number of elements
+   * in the set that come before the largest range.
    *
    * This call assumes that the IndexSet is nonempty.
    */
