@@ -18,8 +18,10 @@
 
 #include <deal.II/base/config.h>
 
-#include <point_wrapper.h>
 #include <boost/python.hpp>
+
+#include <point_wrapper.h>
+
 #include <string>
 #include <vector>
 
@@ -56,46 +58,52 @@ namespace python
     /**
      * Return the number of active cells.
      */
-    unsigned int n_active_cells() const;
+    unsigned int
+    n_active_cells() const;
 
     /**
      * Generate a hyper cube (square in 2D and cube in 3D) with exactly one
      * cell.
      */
-    void generate_hyper_cube(const double left = 0.,
-                             const double right = 1.,
-                             const bool   colorize = false);
+    void
+    generate_hyper_cube(const double left     = 0.,
+                        const double right    = 1.,
+                        const bool   colorize = false);
 
     /**
      * Generate a simplex with (dim+1) vertices and mesh cells.
      */
-    void generate_simplex(boost::python::list &vertices);
+    void
+    generate_simplex(boost::python::list &vertices);
 
     /**
      * Same as hyper_cube but not only one cell is created but each coordinate
      * direction is subdivided in @p repetitions cells.
      */
-    void generate_subdivided_hyper_cube(const unsigned int repetitions,
-                                        const double       left = 0.,
-                                        const double       right = 1.);
+    void
+    generate_subdivided_hyper_cube(const unsigned int repetitions,
+                                   const double       left  = 0.,
+                                   const double       right = 1.);
 
     /**
      * Generate a coordinate-parallel brick from the two diagonally opposite
      * corners points @p p1 and @p p2.
      */
-    void generate_hyper_rectangle(PointWrapper &p1,
-                                  PointWrapper &p2,
-                                  const bool    colorize = false);
+    void
+    generate_hyper_rectangle(PointWrapper &p1,
+                             PointWrapper &p2,
+                             const bool    colorize = false);
 
     /**
      * Generate a coordinate-parallel brick from the two diagonally opposite
      * corners points @p p1 and @p p2. In direction i, repetitions[i] cells are
      * created.
      */
-    void generate_subdivided_hyper_rectangle(boost::python::list &repetitions,
-                                             PointWrapper        &p1,
-                                             PointWrapper        &p2,
-                                             const bool           colorize = false);
+    void
+    generate_subdivided_hyper_rectangle(boost::python::list &repetitions,
+                                        PointWrapper &       p1,
+                                        PointWrapper &       p2,
+                                        const bool           colorize = false);
 
     /**
      * Like the previous function. However, here the first argument does not
@@ -105,10 +113,11 @@ namespace python
      * concentrated in certains areas, rather than a uniformly subdidived mesh
      * as the previous function generates.
      */
-    void generate_subdivided_steps_hyper_rectangle(boost::python::list &step_sizes,
-                                                   PointWrapper        &p1,
-                                                   PointWrapper        &p2,
-                                                   const bool           colorize = false);
+    void
+    generate_subdivided_steps_hyper_rectangle(boost::python::list &step_sizes,
+                                              PointWrapper &       p1,
+                                              PointWrapper &       p2,
+                                              const bool colorize = false);
 
     /**
      * Like the previous function, but with the following twist: the @p
@@ -118,10 +127,12 @@ namespace python
      * cell is deleted from the triangulation, i.e. the domain will have a void
      * there.
      */
-    void generate_subdivided_material_hyper_rectangle(boost::python::list &spacing,
-                                                      PointWrapper        &p,
-                                                      boost::python::list &material_id,
-                                                      const bool           colorize = false);
+    void
+    generate_subdivided_material_hyper_rectangle(
+      boost::python::list &spacing,
+      PointWrapper &       p,
+      boost::python::list &material_id,
+      const bool           colorize = false);
 
     /**
      * Rectangular domain with rectangular pattern of holes. The domain itself
@@ -131,7 +142,8 @@ namespace python
      * total number of mesh cells in that direction is then this number plus
      * one. The number of holes in one direction must be at least one.
      */
-    void generate_cheese(boost::python::list &holes);
+    void
+    generate_cheese(boost::python::list &holes);
 
     /**
      * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
@@ -143,8 +155,9 @@ namespace python
      * 2d and 3d. If it is true, the boundary is colorized as in
      * hyper_rectangle(). In 1d, the indicators are always colorized.
      */
-    void generate_general_cell(boost::python::list &vertices,
-                               const bool           colorize = false);
+    void
+    generate_general_cell(boost::python::list &vertices,
+                          const bool           colorize = false);
 
     /**
      * A parallelogram. The first corner point is the origin. The @tparam dim
@@ -153,8 +166,9 @@ namespace python
      * same way as in hyper_rectangle().
      * @note This function is implemented in 2d only.
      */
-    void generate_parallelogram(boost::python::list &corners,
-                                const bool           colorize = false);
+    void
+    generate_parallelogram(boost::python::list &corners,
+                           const bool           colorize = false);
 
     /**
      * A parallelepiped. The first corner point is the origin. The @tparam dim
@@ -167,8 +181,9 @@ namespace python
      * in the array of @p corners will no longer refer to the same
      * triangulation.
      */
-    void generate_parallelepiped(boost::python::list &corners,
-                                 const bool           colorize = false);
+    void
+    generate_parallelepiped(boost::python::list &corners,
+                            const bool           colorize = false);
 
     /**
      * A subdivided parallelepiped. The first corner point is the origin. The
@@ -178,18 +193,21 @@ namespace python
      * of subdivisions in each of the @tparam dim directions. Colorizing is odne
      * according to hyper_rectangle().
      */
-    void generate_fixed_subdivided_parallelepiped(const unsigned int   n_subdivisions, 
-                                                  boost::python::list &corners,
-                                                  const bool           colorize = false);
+    void
+    generate_fixed_subdivided_parallelepiped(const unsigned int n_subdivisions,
+                                             boost::python::list &corners,
+                                             const bool colorize = false);
 
     /**
      * A subdivided parallelepided, i.e., the same as above, but where the
      * number of subdivisions in each of the @tparam dim directions may vary.
      * Colorizing is done according to hyper_rectangle().
      */
-    void generate_varying_subdivided_parallelepiped(boost::python::list &n_subdivisions,
-                                                    boost::python::list &corners,
-                                                    const bool           colorize = false);
+    void
+    generate_varying_subdivided_parallelepiped(
+      boost::python::list &n_subdivisions,
+      boost::python::list &corners,
+      const bool           colorize = false);
 
     /**
      * Hypercube with a layer of hypercubes around it. The first two parameters
@@ -200,10 +218,11 @@ namespace python
      * In y-direction 4/8, in z-direction 16/32. The cells at corners and edges
      * (3d) get these values bitwise or'd.
      */
-    void generate_enclosed_hyper_cube(const double left = 0.,
-                                      const double right = 1.,
-                                      const double thickness = 1.,
-                                      const bool   colorize = false);
+    void
+    generate_enclosed_hyper_cube(const double left      = 0.,
+                                 const double right     = 1.,
+                                 const double thickness = 1.,
+                                 const bool   colorize  = false);
 
     /**
      * Generate a hyperball, i.e. a circle or a ball around @p center with
@@ -214,8 +233,8 @@ namespace python
      * SphericalManifold to the cells and faces for correct placement of
      * vertices upon refinement and to be able to use higher order mappings.
      */
-    void generate_hyper_ball(PointWrapper &center,
-                             const double  radius = 1.);
+    void
+    generate_hyper_ball(PointWrapper &center, const double radius = 1.);
 
     /**
      * Generate a hyper sphere, i.e., a surface of a ball in @tparam spacedim
@@ -224,8 +243,8 @@ namespace python
      * for correct placement of vertices upon refinement and to be able to use
      * higher order mappings.
      */
-    void generate_hyper_sphere(PointWrapper &center,
-                               const double  radius = 1.);
+    void
+    generate_hyper_sphere(PointWrapper &center, const double radius = 1.);
 
     /**
      * Generate a hyper-ball intersected with the positive orthant relate to @p
@@ -234,8 +253,8 @@ namespace python
      * and 1 for the cut plane. The appropriate manifold class is
      * SphericalManifold.
      */
-    void generate_quarter_hyper_ball(PointWrapper &center,
-                                     const double  radius = 1.);
+    void
+    generate_quarter_hyper_ball(PointWrapper &center, const double radius = 1.);
 
     /**
      * Generate a half hyper-ball around @p center, which contains four elements
@@ -244,21 +263,23 @@ namespace python
      * boundary and 1 for the cut plane. The appropriate manifold class is
      * SphericalManifold.
      */
-    void generate_half_hyper_ball(PointWrapper &center,
-                                  const double  radius = 1.);
+    void
+    generate_half_hyper_ball(PointWrapper &center, const double radius = 1.);
 
     /**
      * Shift each vertex of the Triangulation by the given @p shift_list.
      */
-    void shift(boost::python::list &shift_list);
+    void
+    shift(boost::python::list &shift_list);
 
     /**
      * Given two triangulations, create the triangulation that contains the
      * cells of both triangulations.
      */
-    void merge_triangulations(TriangulationWrapper &triangulation_1,
-                              TriangulationWrapper &triangulation_2);
-    
+    void
+    merge_triangulations(TriangulationWrapper &triangulation_1,
+                         TriangulationWrapper &triangulation_2);
+
     /**
      * Create a new flat triangulation @param out_tria which contains a single
      * level with all active cells of the input triangulation. If the spacedim
@@ -276,61 +297,73 @@ namespace python
      * manifold ids on interior faces, they have to be specified manually after
      * the triangulation is created. This function will fail the input
      * Triangulation contains hanging nodes.
-     */    
-    void flatten_triangulation(TriangulationWrapper &tria_out);
+     */
+    void
+    flatten_triangulation(TriangulationWrapper &tria_out);
 
     /**
      * Refine all the cells @p n times.
      */
-    void refine_global(const unsigned int n);
+    void
+    refine_global(const unsigned int n);
 
     /**
      * Execute both refinement and coarsening of the Triangulation.
      */
-    void execute_coarsening_and_refinement();
+    void
+    execute_coarsening_and_refinement();
 
     /**
      * Return the list of active cell accessors associated to the underlying
      * Triangulation.
      */
-    boost::python::list active_cells();
+    boost::python::list
+    active_cells();
 
     /**
-     * Write mesh to the output file @filename according to the given data format.
+     * Write mesh to the output file @filename according to the given data
+     * format.
      */
-    void write(const std::string &filename, const std::string format) const;
+    void
+    write(const std::string &filename, const std::string format) const;
 
     /**
      * Write the Triangulation in file.
      */
-    void save(const std::string &filename) const;
+    void
+    save(const std::string &filename) const;
 
     /**
      * Load the Triangulation from a file.
      */
-    void load(const std::string &filename);
+    void
+    load(const std::string &filename);
 
     /**
      * Return the dimension of the underlying Triangulation object.
      */
-    int get_dim() const;
+    int
+    get_dim() const;
 
     /**
      * Return the space dimension of the underlying Triangulation object.
      */
-    int get_spacedim() const;
+    int
+    get_spacedim() const;
 
     /**
      * Return a pointer that can be casted to the underlying Triangulation
      * object.
      */
-    void *get_triangulation();
+    void *
+    get_triangulation();
 
   private:
     /**
      * Helper function for the constructors.
      */
-    void setup(const std::string &dimension, const std::string &spacedimension);
+    void
+    setup(const std::string &dimension, const std::string &spacedimension);
 
     /**
      * Dimension of the underlying Triangulation object.
@@ -349,32 +382,32 @@ namespace python
   };
 
 
-//-------------------- inline functions -----------------------//
+  //-------------------- inline functions -----------------------//
 
 
 
-  inline
-  int TriangulationWrapper::get_dim() const
+  inline int
+  TriangulationWrapper::get_dim() const
   {
     return dim;
   }
 
 
 
-  inline
-  int TriangulationWrapper::get_spacedim() const
+  inline int
+  TriangulationWrapper::get_spacedim() const
   {
     return spacedim;
   }
 
 
 
-  inline
-  void *TriangulationWrapper::get_triangulation()
+  inline void *
+  TriangulationWrapper::get_triangulation()
   {
     return triangulation;
   }
-}
+} // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 

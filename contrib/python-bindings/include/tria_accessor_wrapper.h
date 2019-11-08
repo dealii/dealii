@@ -38,7 +38,10 @@ namespace python
     /**
      * Constructor.
      */
-    TriaAccessorWrapper(void* tria_accessor, const int structdim, const int dim, const int spacedim);
+    TriaAccessorWrapper(void *    tria_accessor,
+                        const int structdim,
+                        const int dim,
+                        const int spacedim);
 
     /**
      * Destructor.
@@ -48,56 +51,66 @@ namespace python
     /**
      * Get the barycenter of the cell.
      */
-    PointWrapper get_barycenter() const;
+    PointWrapper
+    get_barycenter() const;
 
     /**
      * Set the ith vertex of the cell to @p point_wrapper.
      */
-    void set_vertex(const int i, PointWrapper &point_wrapper);
+    void
+    set_vertex(const int i, PointWrapper &point_wrapper);
 
     /**
      * Return the ith vertex of the cell.
      */
-    PointWrapper get_vertex(const int i) const;
+    PointWrapper
+    get_vertex(const int i) const;
 
     /**
      * Set the manifold id.
      */
-    void set_manifold_id(const int manifold_id);
+    void
+    set_manifold_id(const int manifold_id);
 
     /**
      * Get the manifold id.
      */
-    int get_manifold_id() const;
+    int
+    get_manifold_id() const;
 
     /**
      * Set the boundary id.
      */
-    void set_boundary_id(const int boundary_id);
+    void
+    set_boundary_id(const int boundary_id);
 
     /**
      * Get the boundary id.
      */
-    int get_boundary_id() const;
+    int
+    get_boundary_id() const;
 
     /**
      * Set the boundary id for all objects.
      */
-    void set_all_boundary_ids(const int boundary_id);
+    void
+    set_all_boundary_ids(const int boundary_id);
 
     /**
      * Return whether the cell is at the boundary.
      */
-    bool at_boundary() const;
+    bool
+    at_boundary() const;
 
     /**
      * Exception.
      */
     DeclException2(ExcVertexDoesNotExist,
-                   int, int,
+                   int,
+                   int,
                    << "Requested vertex number " << arg1
                    << " does not exist. The largest vertex number "
-                   << "acceptable is "<< arg2-1);
+                   << "acceptable is " << arg2 - 1);
 
   private:
     /**
@@ -121,7 +134,7 @@ namespace python
      */
     void *tria_accessor;
   };
-}
+} // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 
