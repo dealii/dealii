@@ -523,7 +523,8 @@ namespace LinearAlgebra
        * In case this function is called for more than one vector before @p
        * compress_finish() is invoked, it is mandatory to specify a unique
        * communication channel to each such call, in order to avoid several
-       * messages with the same ID that will corrupt this operation.
+       * messages with the same ID that will corrupt this operation. Any
+       * communication channel less than 100 is a valid value.
        */
       void
       compress_start(
@@ -561,6 +562,7 @@ namespace LinearAlgebra
        * update_ghost_values_finish() is invoked, it is mandatory to specify a
        * unique communication channel to each such call, in order to avoid
        * several messages with the same ID that will corrupt this operation.
+       * Any communication channel less than 100 is a valid value.
        */
       void
       update_ghost_values_start(

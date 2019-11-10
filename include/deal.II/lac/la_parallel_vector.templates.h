@@ -897,10 +897,10 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress_start(
-      const unsigned int                counter,
+      const unsigned int                communication_channel,
       ::dealii::VectorOperation::values operation)
     {
-      (void)counter;
+      (void)communication_channel;
       (void)operation;
       Assert(vector_is_ghosted == false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
@@ -972,7 +972,7 @@ namespace LinearAlgebra
         {
           partitioner->import_from_ghosted_array_start(
             operation,
-            counter,
+            communication_channel,
             ArrayView<Number, MemorySpace::CUDA>(
               data.values_dev.get() + partitioner->local_size(),
               partitioner->n_ghost_indices()),
@@ -985,7 +985,7 @@ namespace LinearAlgebra
         {
           partitioner->import_from_ghosted_array_start(
             operation,
-            counter,
+            communication_channel,
             ArrayView<Number, MemorySpace::Host>(
               data.values.get() + partitioner->local_size(),
               partitioner->n_ghost_indices()),
@@ -1076,7 +1076,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::update_ghost_values_start(
-      const unsigned int counter) const
+      const unsigned int communication_channel) const
     {
 #ifdef DEAL_II_WITH_MPI
       // nothing to do when we neither have import nor ghost indices.
@@ -1141,7 +1141,7 @@ namespace LinearAlgebra
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
-        counter,
+        communication_channel,
         ArrayView<const Number, MemorySpace::Host>(data.values.get(),
                                                    partitioner->local_size()),
         ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
@@ -1152,7 +1152,7 @@ namespace LinearAlgebra
         update_ghost_values_requests);
 #  else
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
-        counter,
+        communication_channel,
         ArrayView<const Number, MemorySpace::CUDA>(data.values_dev.get(),
                                                    partitioner->local_size()),
         ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
@@ -1164,7 +1164,7 @@ namespace LinearAlgebra
 #  endif
 
 #else
-      (void)counter;
+      (void)communication_channel;
 #endif
     }
 

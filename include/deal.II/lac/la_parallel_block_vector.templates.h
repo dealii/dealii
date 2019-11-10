@@ -262,10 +262,11 @@ namespace LinearAlgebra
           // start all requests for all blocks before finishing the transfers as
           // this saves repeated synchronizations. In order to avoid conflict
           // with possible other ongoing communication requests (from
-          // LA::distributed::Vector that supports unfinished requests), add an
-          // arbitrary number 8273 to the communication tag
+          // LA::distributed::Vector that supports unfinished requests), add
+          // 100 to the communication tag (the first 100 can be used by normal
+          // vectors).
           for (unsigned int block = start; block < end; ++block)
-            this->block(block).compress_start(block + 8273 - start, operation);
+            this->block(block).compress_start(block - start + 100, operation);
           for (unsigned int block = start; block < end; ++block)
             this->block(block).compress_finish(operation);
         }
