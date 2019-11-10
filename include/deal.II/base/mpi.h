@@ -1068,6 +1068,9 @@ namespace Utilities
        */
       virtual ~ConsensusAlgorithm() = default;
 
+      /**
+       * Run consensus algorithm.
+       */
       virtual void
       run() = 0;
 
@@ -1133,7 +1136,7 @@ namespace Utilities
       virtual ~ConsensusAlgorithm_NBX() = default;
 
       /**
-       * Run consensus algorithm.
+       * @copydoc ConsensusAlgorithm::run()
        */
       virtual void
       run() override;
@@ -1275,7 +1278,7 @@ namespace Utilities
       virtual ~ConsensusAlgorithm_PEX() = default;
 
       /**
-       * Run consensus algorithm.
+       * @copydoc ConsensusAlgorithm::run()
        */
       virtual void
       run() override;
@@ -1374,8 +1377,9 @@ namespace Utilities
       virtual ~ConsensusAlgorithmSelector() = default;
 
       /**
-       * Run consensus algorithm. The function call is delegated to another
-       * ConsensusAlgorithm implementation.
+       * @copydoc ConsensusAlgorithm::run()
+       *
+       * @note The function call is delegated to another ConsensusAlgorithm implementation.
        */
       virtual void
       run() override;
