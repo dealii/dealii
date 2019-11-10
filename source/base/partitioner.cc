@@ -194,8 +194,10 @@ namespace Utilities
         }
 
       types::global_dof_index my_size = local_size();
-      // Allow non-zero start index for the vector. send this data to all
-      // processors
+
+      // Allow non-zero start index for the vector. Part 1:
+      // Assume for now that the index set of rank 0 starts with 0
+      // and therefore has an increased size.
       if (my_pid == 0)
         my_size += local_range_data.first;
 
@@ -209,7 +211,18 @@ namespace Utilities
                                     communicator);
         AssertThrowMPI(ierr);
       }
-      if (my_shift != local_range_data.first)
+
+      // Allow non-zero start index for the vector. Part 2:
+      // We correct the assumption made above and let the
+      // index set of rank 0 actually start from the
+      // correct value, i.e. we correct the shift to
+      // its start.
+      if (my_pid == 0)
+        my_shift = local_range_data.first;
+
+      // Fix the index start in case the index set could not give us that
+      // information.
+      if (local_range_data.first == 0 && my_shift != 0)
         {
           const types::global_dof_index old_local_size = local_size();
           local_range_data.first                       = my_shift;
