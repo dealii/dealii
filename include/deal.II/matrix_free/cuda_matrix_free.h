@@ -21,6 +21,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
@@ -602,13 +603,17 @@ namespace CUDAWrappers
            cells_per_block_shmem(int dim, int fe_degree)
   {
     /* clang-format off */
-    return dim==2 ? (fe_degree==1 ? 32 :
-                     fe_degree==2 ? 8 :
-                     fe_degree==3 ? 4 :
-                     fe_degree==4 ? 4 :
+    // We are limiting the number of threads according to the
+    // following formulas:
+    //  - in 2D: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
+    //  - in 3D: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
+    return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
+                     fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
+                     fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64
+                     fe_degree==4 ? CUDAWrappers::warp_size/8 :  // 100
                      1) :
-           dim==3 ? (fe_degree==1 ? 8 :
-                     fe_degree==2 ? 2 :
+           dim==3 ? (fe_degree==1 ? CUDAWrappers::warp_size/4 :  //  64
+                     fe_degree==2 ? CUDAWrappers::warp_size/16 : //  54
                      1) : 1;
     /* clang-format on */
   }

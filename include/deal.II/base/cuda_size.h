@@ -33,6 +33,11 @@ namespace CUDAWrappers
    * changed depending on the architecture the code is running on.
    */
   constexpr int chunk_size = 1;
+
+  /**
+   * Define the number of threads in a warp.
+   */
+  constexpr int warp_size = 32;
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
