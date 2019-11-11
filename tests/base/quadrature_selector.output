@@ -6,3 +6,15 @@ DEAL::gauss 2 ok
 DEAL::gauss 6 ok
 DEAL::gauss 10 ok
 DEAL::weddle 0 ok
+DEAL::gauss_lobatto 2 ok
+DEAL::gauss_lobatto 3 ok
+DEAL::gauss_lobatto 4 ok
+DEAL::gauss_chebyshev 2 ok
+DEAL::gauss_chebyshev 3 ok
+DEAL::gauss_chebyshev 4 ok
+DEAL::gauss_radau_chebyshev 2 ok
+DEAL::gauss_radau_chebyshev 3 ok
+DEAL::gauss_radau_chebyshev 4 ok
+DEAL::gauss_lobatto_chebyshev 2 ok
+DEAL::gauss_lobatto_chebyshev 3 ok
+DEAL::gauss_lobatto_chebyshev 4 ok
