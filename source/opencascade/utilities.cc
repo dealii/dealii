@@ -306,7 +306,10 @@ namespace OpenCASCADE
         Handle(Poly_Triangulation) theTriangulation =
           BRep_Tool::Triangulation(faces[i], Loc);
         if (theTriangulation.IsNull())
-          mesh_is_present = false;
+          {
+            mesh_is_present = false;
+            break;
+          }
       }
     TopoDS_Shape shape_to_be_written = shape;
     if (!mesh_is_present)
