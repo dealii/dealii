@@ -261,7 +261,7 @@ public:
    * n_elements().
    */
   size_type
-  nth_index_in_set(const unsigned int local_index) const;
+  nth_index_in_set(const size_type local_index) const;
 
   /**
    * Return the how-manyth element of this set (counted in ascending order) @p
@@ -286,8 +286,15 @@ public:
   /**
    * This function returns the local index of the beginning of the largest
    * range.
+   *
+   * In other words, the return value is nth_index_in_set(x), where x is the
+   * first index of the largest contiguous range of indices in the
+   * IndexSet. The return value is therefore equal to the number of elements
+   * in the set that come before the largest range.
+   *
+   * This call assumes that the IndexSet is nonempty.
    */
-  unsigned int
+  size_type
   largest_range_starting_index() const;
 
   /**
@@ -975,7 +982,7 @@ private:
  * @relatesalso IndexSet
  */
 inline IndexSet
-complete_index_set(const unsigned int N)
+complete_index_set(const IndexSet::size_type N)
 {
   IndexSet is(N);
   is.add_range(0, N);
@@ -1829,7 +1836,7 @@ IndexSet::n_intervals() const
 
 
 
-inline unsigned int
+inline IndexSet::size_type
 IndexSet::largest_range_starting_index() const
 {
   Assert(ranges.empty() == false, ExcMessage("IndexSet cannot be empty."));
@@ -1844,7 +1851,7 @@ IndexSet::largest_range_starting_index() const
 
 
 inline IndexSet::size_type
-IndexSet::nth_index_in_set(const unsigned int n) const
+IndexSet::nth_index_in_set(const size_type n) const
 {
   Assert(n < n_elements(), ExcIndexRangeType<size_type>(n, 0, n_elements()));
 

@@ -1,0 +1,57 @@
+
+DEAL::* complete:
+DEAL::IndexSet: size 50000000000
+n_elements 50000000000
+n_intervals 1
+largest_range_starting_index 0
+is_element(1) 1
+contents:
+{[0,49999999999]}
+DEAL::global: 30000000000 index_within_set: 30000000000
+DEAL::local: 30000000000 nth_index_in_set: 30000000000
+DEAL::* interval far in:
+DEAL::IndexSet: size 50000000000
+n_elements 10000000000
+n_intervals 1
+largest_range_starting_index 0
+is_element(1) 0
+contents:
+{[20000000000,29999999999]}
+DEAL::global: 20000000001 index_within_set: 1
+DEAL::local: 3 nth_index_in_set: 20000000003
+DEAL::get view:
+DEAL::IndexSet: size 10000000000
+n_elements 9999999999
+n_intervals 1
+largest_range_starting_index 0
+is_element(1) 1
+contents:
+{[1,9999999999]}
+DEAL::* complete minus interval:
+DEAL::IndexSet: size 50000000000
+n_elements 40000000000
+n_intervals 2
+largest_range_starting_index 0
+is_element(1) 1
+contents:
+{[0,19999999999], [30000000000,49999999999]}
+DEAL::global: 30000000001 index_within_set: 20000000001
+DEAL::local: 20000000001 nth_index_in_set: 30000000001
+DEAL::* add_indices far in:
+DEAL::IndexSet: size 50000000000
+n_elements 4
+n_intervals 2
+largest_range_starting_index 1
+is_element(1) 0
+contents:
+{20000000001, [20000000004,20000000006]}
+DEAL::* two large ranges:
+DEAL::IndexSet: size 50000000000
+n_elements 29999999999
+n_intervals 2
+largest_range_starting_index 9999999999
+is_element(1) 1
+contents:
+{[1,9999999999], [20000000000,39999999999]}
+DEAL::global: 30000000000 index_within_set: 19999999999
+DEAL::local: 19999999999 nth_index_in_set: 30000000000
