@@ -219,6 +219,66 @@ namespace Utilities
 
 
 
+    /**
+     * A re-implementation of compute_point_to_point_communication_pattern
+     * using the ConsensusAlgorithm.
+     */
+    class ConsensusAlgorithmProcessTargets
+      : public ConsensusAlgorithmProcess<int, int>
+    {
+    public:
+      ConsensusAlgorithmProcessTargets(const std::vector<unsigned int> &target)
+        : target(target)
+      {}
+
+      using T1 = int;
+      using T2 = int;
+
+      virtual void
+      process_request(const unsigned int other_rank,
+                      const std::vector<T1> &,
+                      std::vector<T2> &) override
+      {
+        this->sources.push_back(other_rank);
+      }
+
+      /**
+       * Simply return the user-provided list.
+       *
+       * @return List of processes this process wants to send requests to.
+       */
+      virtual std::vector<unsigned int>
+      compute_targets() override
+      {
+        return target;
+      }
+
+      /**
+       * The result of the consensus algorithm.
+       * @return Sorted list of ranks of processes wanting to send a request to
+       *         this process.
+       */
+      std::vector<unsigned int>
+      get_result()
+      {
+        std::sort(sources.begin(), sources.end());
+        return sources;
+      }
+
+    private:
+      /**
+       * List of processes this process wants to send requests to.
+       */
+      const std::vector<unsigned int> &target;
+
+      /**
+       * List of ranks of processes wanting to send a request to this process.
+       */
+      std::vector<unsigned int> sources;
+    };
+
+
+
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
       const MPI_Comm &                 mpi_comm,
@@ -236,7 +296,16 @@ namespace Utilities
                    "There is no point in communicating with ourselves."));
         }
 
-#  if DEAL_II_MPI_VERSION_GTE(2, 2)
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+
+      ConsensusAlgorithmProcessTargets process(destinations);
+      ConsensusAlgorithm_NBX<ConsensusAlgorithmProcessTargets::T1,
+                             ConsensusAlgorithmProcessTargets::T2>
+        consensus_algorithm(process, mpi_comm);
+      consensus_algorithm.run();
+      return process.get_result();
+
+#  elif DEAL_II_MPI_VERSION_GTE(2, 2)
 
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, mpi_comm);
@@ -1207,66 +1276,6 @@ namespace Utilities
 
 
 
-    /**
-     * A re-implementation of compute_point_to_point_communication_pattern
-     * using the ConsensusAlgorithm.
-     */
-    class ConsensusAlgorithmProcessTargets
-      : public ConsensusAlgorithmProcess<int, int>
-    {
-    public:
-      ConsensusAlgorithmProcessTargets(std::vector<unsigned int> &target)
-        : target(target)
-      {}
-
-      using T1 = int;
-      using T2 = int;
-
-      virtual void
-      process_request(const unsigned int other_rank,
-                      const std::vector<T1> &,
-                      std::vector<T2> &) override
-      {
-        this->sources.push_back(other_rank);
-      }
-
-      /**
-       * Simply return the user-provided list.
-       *
-       * @return List of processes this process wants to send requests to.
-       */
-      virtual std::vector<unsigned int>
-      compute_targets() override
-      {
-        return target;
-      }
-
-      /**
-       * The result of the consensus algorithm.
-       * @return Sorted list of ranks of processes wanting to send a request to
-       *         this process.
-       */
-      std::vector<unsigned int>
-      get_result()
-      {
-        std::sort(sources.begin(), sources.end());
-        return sources;
-      }
-
-    private:
-      /**
-       * List of processes this process wants to send requests to.
-       */
-      const std::vector<unsigned int> &target;
-
-      /**
-       * List of ranks of processes wanting to send a request to this process.
-       */
-      std::vector<unsigned int> sources;
-    };
-
-
-
     template <typename T1, typename T2>
     ConsensusAlgorithm_PEX<T1, T2>::ConsensusAlgorithm_PEX(
       ConsensusAlgorithmProcess<T1, T2> &process,
@@ -1356,21 +1365,8 @@ namespace Utilities
       targets = this->process.compute_targets();
 
       // 2) determine who wants to communicate with this process
-      const bool use_nbx = false;
-      if (!use_nbx)
-        {
-          sources =
-            compute_point_to_point_communication_pattern(this->comm, targets);
-        }
-      else
-        {
-          ConsensusAlgorithmProcessTargets process(targets);
-          ConsensusAlgorithm_NBX<ConsensusAlgorithmProcessTargets::T1,
-                                 ConsensusAlgorithmProcessTargets::T2>
-            consensus_algorithm(process, this->comm);
-          consensus_algorithm.run();
-          sources = process.get_result();
-        }
+      sources =
+        compute_point_to_point_communication_pattern(this->comm, targets);
 
       const auto n_targets = targets.size();
       const auto n_sources = sources.size();
