@@ -33,7 +33,5 @@ main()
     SOURCE_DIR "/iges_files/DTMB-5415_bulbous_bow.iges";
   const std::string output_open_stl = "output";
   auto              shape_bow       = OpenCASCADE::read_IGES(open_iges, 1e-3);
-  write_STL(shape_bow, output_open_stl, 0.1, false, 1e-6, false, 0.1, false);
-
-  return 0;
+  write_STL(shape_bow, output_open_stl, 0.5, false, 1e-6, false, 0.5, false);
 }

@@ -51,5 +51,4 @@ main()
   GridOut       gridout;
   std::ofstream ofile("output");
   gridout.write_ucd(tria, ofile);
-  return 0;
 }

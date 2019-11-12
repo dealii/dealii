@@ -285,6 +285,7 @@ namespace OpenCASCADE
     return shape;
   }
 
+
   void
   write_STL(const TopoDS_Shape &shape,
             const std::string & filename,
@@ -332,7 +333,7 @@ namespace OpenCASCADE
 
     StlAPI_Writer writer;
     const auto    error = writer.Write(shape_to_be_written, filename.c_str());
-#  if (OCC_VERSION_MAJOR >= 6 && OCC_VERSION_MINOR >= 9)
+#  if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) >= 690)
     AssertThrow(error == StlAPI_StatusOK,
                 ExcMessage("Error writing STL from shape."));
 #  endif
