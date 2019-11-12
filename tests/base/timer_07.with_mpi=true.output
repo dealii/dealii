@@ -4,16 +4,16 @@ DEAL::TimerOutput
 TimerOutput objects finalize timed values printed to the
 screen by communicating over MPI in their destructors.
 Since an exception is currently uncaught, this
-synchronization (and subsequent output) will be skipped to
-avoid a possible deadlock.
+synchronization (and subsequent output) will be skipped
+to avoid a possible deadlock.
 ---------------------------------------------------------
 TimerOutput::Scope
 ---------------------------------------------------------
 TimerOutput objects finalize timed values printed to the
 screen by communicating over MPI in their destructors.
 Since an exception is currently uncaught, this
-synchronization (and subsequent output) will be skipped to
-avoid a possible deadlock.
+synchronization (and subsequent output) will be skipped
+to avoid a possible deadlock.
 ---------------------------------------------------------
 TimerOutput::Scope with MPI_COMM_SELF
 
