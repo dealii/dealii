@@ -120,8 +120,10 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const DoFHandler<dim> &                 mg_dof,
-      const MGConstrainedDoFs *               mg_constrained_dofs,
+      const DoFHandler<dim> &  mg_dof,
+      const MGConstrainedDoFs *mg_constrained_dofs,
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &                                     external_partitioners,
       ElementInfo<Number> &                   elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
       std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
@@ -130,8 +132,8 @@ namespace internal
       std::vector<std::vector<std::vector<unsigned short>>> &dirichlet_indices,
       std::vector<std::vector<Number>> &                     weights_on_refined,
       std::vector<Table<2, unsigned int>> &copy_indices_global_mine,
-      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-        &ghosted_level_vector);
+      MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &vector_partitioners);
 
   } // namespace MGTransfer
 } // namespace internal

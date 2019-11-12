@@ -222,7 +222,8 @@ namespace internal
           "We should only be sending information with a parallel Triangulation!"));
 
 #ifdef DEAL_II_WITH_MPI
-      if (tria)
+      if (tria && Utilities::MPI::sum(send_data_temp.size(),
+                                      tria->get_communicator()) > 0)
         {
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
@@ -419,14 +420,15 @@ namespace internal
 
     // initialize the vectors needed for the transfer (and merge with the
     // content in copy_indices_global_mine)
-    template <typename Number>
     void
-    reinit_ghosted_vector(
-      const IndexSet &                            locally_owned,
-      std::vector<types::global_dof_index> &      ghosted_level_dofs,
-      const MPI_Comm &                            communicator,
-      LinearAlgebra::distributed::Vector<Number> &ghosted_level_vector,
-      Table<2, unsigned int> &                    copy_indices_global_mine)
+    reinit_level_partitioner(
+      const IndexSet &                      locally_owned,
+      std::vector<types::global_dof_index> &ghosted_level_dofs,
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+        &                                                 external_partitioner,
+      const MPI_Comm &                                    communicator,
+      std::shared_ptr<const Utilities::MPI::Partitioner> &target_partitioner,
+      Table<2, unsigned int> &copy_indices_global_mine)
     {
       std::sort(ghosted_level_dofs.begin(), ghosted_level_dofs.end());
       IndexSet ghosted_dofs(locally_owned.size());
@@ -436,20 +438,51 @@ namespace internal
       ghosted_dofs.compress();
 
       // Add possible ghosts from the previous content in the vector
-      if (ghosted_level_vector.size() == locally_owned.size())
+      if (target_partitioner.get() != nullptr &&
+          target_partitioner->size() == locally_owned.size())
+        {
+          ghosted_dofs.add_indices(target_partitioner->ghost_indices());
+        }
+
+      // check if the given partitioner's ghosts represent a superset of the
+      // ghosts we require in this function
+      const int ghosts_locally_contained =
+        (external_partitioner.get() != nullptr &&
+         (external_partitioner->ghost_indices() & ghosted_dofs) ==
+           ghosted_dofs) ?
+          1 :
+          0;
+      if (external_partitioner.get() != nullptr &&
+          Utilities::MPI::min(ghosts_locally_contained, communicator) == 1)
         {
           // shift the local number of the copy indices according to the new
-          // partitioner that we are going to use for the vector
-          const auto &part = ghosted_level_vector.get_partitioner();
-          ghosted_dofs.add_indices(part->ghost_indices());
-          for (unsigned int i = 0; i < copy_indices_global_mine.n_cols(); ++i)
-            copy_indices_global_mine(1, i) =
-              locally_owned.n_elements() +
-              ghosted_dofs.index_within_set(
-                part->local_to_global(copy_indices_global_mine(1, i)));
+          // partitioner that we are going to use during the access to the
+          // entries
+          if (target_partitioner.get() != nullptr &&
+              target_partitioner->size() == locally_owned.size())
+            for (unsigned int i = 0; i < copy_indices_global_mine.n_cols(); ++i)
+              copy_indices_global_mine(1, i) =
+                external_partitioner->global_to_local(
+                  target_partitioner->local_to_global(
+                    copy_indices_global_mine(1, i)));
+          target_partitioner = external_partitioner;
         }
-      ghosted_level_vector.reinit(locally_owned, ghosted_dofs, communicator);
+      else
+        {
+          if (target_partitioner.get() != nullptr &&
+              target_partitioner->size() == locally_owned.size())
+            for (unsigned int i = 0; i < copy_indices_global_mine.n_cols(); ++i)
+              copy_indices_global_mine(1, i) =
+                locally_owned.n_elements() +
+                ghosted_dofs.index_within_set(
+                  target_partitioner->local_to_global(
+                    copy_indices_global_mine(1, i)));
+          target_partitioner.reset(new Utilities::MPI::Partitioner(
+            locally_owned, ghosted_dofs, communicator));
+        }
     }
+
+
 
     // Transform the ghost indices to local index space for the vector
     inline void
@@ -469,6 +502,8 @@ namespace internal
         if (remote[i] != numbers::invalid_dof_index)
           localized_indices[i + mine.size()] = part.global_to_local(remote[i]);
     }
+
+
 
     // given the collection of child cells in lexicographic ordering as seen
     // from the parent, compute the first index of the given child
@@ -497,6 +532,8 @@ namespace internal
         }
       return shift;
     }
+
+
 
     // puts the indices on the given child cell in lexicographic ordering with
     // respect to the collection of all child cells as seen from the parent
@@ -534,6 +571,8 @@ namespace internal
                 indices[index] = local_dof_indices[lexicographic_numbering[m]];
               }
     }
+
+
 
     template <int dim, typename Number>
     void
@@ -596,6 +635,8 @@ namespace internal
               fe.get_prolongation_matrix(c)(renumbering[j], renumbering[i]);
     }
 
+
+
     namespace
     {
       /**
@@ -627,13 +668,17 @@ namespace internal
       }
     } // namespace
 
+
+
     // Sets up most of the internal data structures of the MGTransferMatrixFree
     // class
     template <int dim, typename Number>
     void
     setup_transfer(
-      const dealii::DoFHandler<dim> &         mg_dof,
-      const MGConstrainedDoFs *               mg_constrained_dofs,
+      const dealii::DoFHandler<dim> &mg_dof,
+      const MGConstrainedDoFs *      mg_constrained_dofs,
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &                                     external_partitioners,
       ElementInfo<Number> &                   elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
       std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
@@ -642,8 +687,8 @@ namespace internal
       std::vector<std::vector<std::vector<unsigned short>>> &dirichlet_indices,
       std::vector<std::vector<Number>> &                     weights_on_refined,
       std::vector<Table<2, unsigned int>> &copy_indices_global_mine,
-      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-        &ghosted_level_vector)
+      MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &target_partitioners)
     {
       level_dof_indices.clear();
       parent_child_connect.clear();
@@ -691,11 +736,10 @@ namespace internal
         mg_dof.get_fe().dofs_per_cell);
       dirichlet_indices.resize(n_levels - 1);
 
-      // We use the vectors stored ghosted_level_vector in the base class for
-      // keeping ghosted transfer indices. To avoid keeping two very similar
-      // vectors, we merge them here.
-      if (ghosted_level_vector.max_level() != n_levels - 1)
-        ghosted_level_vector.resize(0, n_levels - 1);
+      AssertDimension(target_partitioners.max_level(), n_levels - 1);
+      Assert(external_partitioners.empty() ||
+               external_partitioners.size() == n_levels,
+             ExcDimensionMismatch(external_partitioners.size(), n_levels));
 
       for (unsigned int level = n_levels - 1; level > 0; --level)
         {
@@ -892,38 +936,48 @@ namespace internal
                   i->first += counter;
                 }
 
-          // step 2.7: Initialize the ghosted vector
+          // step 2.7: Initialize the partitioner for the ghosted vector
+          //
+          // We use a vector based on the target partitioner handed in also in
+          // the base class for keeping ghosted transfer indices. To avoid
+          // keeping two very similar vectors, we keep one single ghosted
+          // vector that is augmented/filled here.
           const parallel::TriangulationBase<dim, dim> *ptria =
             (dynamic_cast<const parallel::TriangulationBase<dim, dim> *>(
               &tria));
           const MPI_Comm communicator =
             ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
 
-          reinit_ghosted_vector(mg_dof.locally_owned_mg_dofs(level),
-                                ghosted_level_dofs,
-                                communicator,
-                                ghosted_level_vector[level],
-                                copy_indices_global_mine[level]);
+          reinit_level_partitioner(mg_dof.locally_owned_mg_dofs(level),
+                                   ghosted_level_dofs,
+                                   external_partitioners.empty() ?
+                                     nullptr :
+                                     external_partitioners[level],
+                                   communicator,
+                                   target_partitioners[level],
+                                   copy_indices_global_mine[level]);
 
-          copy_indices_to_mpi_local_numbers(
-            *ghosted_level_vector[level].get_partitioner(),
-            global_level_dof_indices,
-            global_level_dof_indices_remote,
-            level_dof_indices[level]);
+          copy_indices_to_mpi_local_numbers(*target_partitioners[level],
+                                            global_level_dof_indices,
+                                            global_level_dof_indices_remote,
+                                            level_dof_indices[level]);
           // step 2.8: Initialize the ghosted vector for level 0
           if (level == 1)
             {
               for (unsigned int i = 0; i < parent_child_connect[0].size(); ++i)
                 parent_child_connect[0][i] = std::make_pair(i, 0U);
 
-              reinit_ghosted_vector(mg_dof.locally_owned_mg_dofs(0),
-                                    ghosted_level_dofs_l0,
-                                    communicator,
-                                    ghosted_level_vector[0],
-                                    copy_indices_global_mine[0]);
+              reinit_level_partitioner(mg_dof.locally_owned_mg_dofs(0),
+                                       ghosted_level_dofs_l0,
+                                       external_partitioners.empty() ?
+                                         nullptr :
+                                         external_partitioners[0],
+                                       communicator,
+                                       target_partitioners[0],
+                                       copy_indices_global_mine[0]);
 
               copy_indices_to_mpi_local_numbers(
-                *ghosted_level_vector[0].get_partitioner(),
+                *target_partitioners[0],
                 global_level_dof_indices_l0,
                 std::vector<types::global_dof_index>(),
                 level_dof_indices[0]);
@@ -940,14 +994,15 @@ namespace internal
       weights_on_refined.resize(n_levels - 1);
       for (unsigned int level = 1; level < n_levels; ++level)
         {
-          ghosted_level_vector[level] = 0;
+          LinearAlgebra::distributed::Vector<Number> touch_count(
+            target_partitioners[level]);
           for (unsigned int c = 0; c < n_owned_level_cells[level - 1]; ++c)
             for (unsigned int j = 0; j < elem_info.n_child_cell_dofs; ++j)
-              ghosted_level_vector[level].local_element(
+              touch_count.local_element(
                 level_dof_indices[level][elem_info.n_child_cell_dofs * c +
                                          j]) += Number(1.);
-          ghosted_level_vector[level].compress(VectorOperation::add);
-          ghosted_level_vector[level].update_ghost_values();
+          touch_count.compress(VectorOperation::add);
+          touch_count.update_ghost_values();
 
           std::vector<unsigned int> degree_to_3(n_child_dofs_1d);
           degree_to_3[0] = 0;
@@ -970,7 +1025,7 @@ namespace internal
                                        1][c * Utilities::fixed_power<dim>(3) +
                                           shift + degree_to_3[i]] =
                       Number(1.) /
-                      ghosted_level_vector[level].local_element(
+                      touch_count.local_element(
                         level_dof_indices[level]
                                          [elem_info.n_child_cell_dofs * c + m]);
                 }
