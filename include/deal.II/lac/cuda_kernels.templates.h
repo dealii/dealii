@@ -191,11 +191,11 @@ namespace LinearAlgebra
 
       template <typename Number, typename Operation>
       __device__ void
-      reduce(Number *        result,
-             Number *        result_buffer,
-             const size_type local_idx,
-             const size_type global_idx,
-             const size_type N)
+      reduce(Number *         result,
+             volatile Number *result_buffer,
+             const size_type  local_idx,
+             const size_type  global_idx,
+             const size_type  N)
       {
         for (size_type s = block_size / 2; s > warp_size; s = s >> 1)
           {
