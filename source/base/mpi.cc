@@ -286,6 +286,8 @@ namespace Utilities
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
+      (void)myid;
+      (void)n_procs;
 
       for (const unsigned int destination : destinations)
         {
