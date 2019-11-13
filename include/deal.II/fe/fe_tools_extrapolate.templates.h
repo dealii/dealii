@@ -1152,6 +1152,10 @@ namespace FETools
       static Utilities::MPI::CollectiveMutex      mutex;
       Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
 
+      // We pick a new tag in each round. Wrap around after 10 rounds:
+      const int mpi_tag =
+        Utilities::MPI::internal::Tags::fe_tools_extrapolate + round % 10;
+
       // send data
       unsigned int idx = 0;
       for (typename std::vector<CellData>::const_iterator it =
@@ -1166,7 +1170,7 @@ namespace FETools
                                      buffer->size(),
                                      MPI_BYTE,
                                      it->receiver,
-                                     round,
+                                     mpi_tag,
                                      communicator,
                                      &requests[idx]);
           AssertThrowMPI(ierr);
@@ -1184,9 +1188,10 @@ namespace FETools
       for (unsigned int index = 0; index < n_senders; ++index)
         {
           MPI_Status status;
-          int        len;
-          int ierr = MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, communicator, &status);
           AssertThrowMPI(ierr);
+
+          int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
           receive.resize(len);

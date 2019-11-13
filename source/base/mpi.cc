@@ -19,6 +19,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
@@ -312,6 +313,9 @@ namespace Utilities
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, mpi_comm);
 
+      const int mpi_tag =
+        internal::Tags::compute_point_to_point_communication_pattern;
+
       // Calculate the number of messages to send to each process
       std::vector<unsigned int> dest_vector(n_procs);
       for (const auto &el : destinations)
@@ -335,7 +339,7 @@ namespace Utilities
                       1,
                       MPI_UNSIGNED,
                       el,
-                      32766,
+                      mpi_tag,
                       mpi_comm,
                       send_requests.data() + (&el - destinations.data()));
           AssertThrowMPI(ierr);
@@ -352,7 +356,7 @@ namespace Utilities
                                     1,
                                     MPI_UNSIGNED,
                                     MPI_ANY_SOURCE,
-                                    32766,
+                                    mpi_tag,
                                     mpi_comm,
                                     MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
@@ -1111,6 +1115,12 @@ namespace Utilities
     ConsensusAlgorithm_NBX<T1, T2>::process_requests()
     {
 #ifdef DEAL_II_WITH_MPI
+
+      const int tag_request =
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_request;
+      const int tag_deliver =
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_deliver;
+
       // check if there is a request pending
       MPI_Status status;
       int        request_is_pending;
@@ -1164,7 +1174,7 @@ namespace Utilities
                            request_buffer.size() * sizeof(T2),
                            MPI_BYTE,
                            other_rank,
-                           tag_delivery,
+                           tag_deliver,
                            this->comm,
                            request_requests.back().get());
           AssertThrowMPI(ierr);
@@ -1182,6 +1192,11 @@ namespace Utilities
       // 1)
       targets              = this->process.compute_targets();
       const auto n_targets = targets.size();
+
+      const int tag_request =
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_request;
+      const int tag_deliver =
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_deliver;
 
       // 2) allocate memory
       recv_buffers.resize(n_targets);
@@ -1217,7 +1232,7 @@ namespace Utilities
                              recv_buffer.size() * sizeof(T2),
                              MPI_BYTE,
                              rank,
-                             tag_delivery,
+                             tag_deliver,
                              this->comm,
                              &recv_requests[index]);
             AssertThrowMPI(ierr);
@@ -1313,6 +1328,11 @@ namespace Utilities
     ConsensusAlgorithm_PEX<T1, T2>::process_requests(int index)
     {
 #ifdef DEAL_II_WITH_MPI
+      const int tag_request =
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_request;
+      const int tag_deliver =
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_deliver;
+
       MPI_Status status;
       MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
 
@@ -1347,7 +1367,7 @@ namespace Utilities
                        request_buffer.size() * sizeof(T2),
                        MPI_BYTE,
                        other_rank,
-                       tag_delivery,
+                       tag_deliver,
                        this->comm,
                        &requests_answers[index]);
       AssertThrowMPI(ierr);
@@ -1365,6 +1385,11 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       // 1) determine with which processes this process wants to communicate
       targets = this->process.compute_targets();
+
+      const int tag_request =
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_request;
+      const int tag_deliver =
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_deliver;
 
       // 2) determine who wants to communicate with this process
       sources =
@@ -1407,7 +1432,7 @@ namespace Utilities
                            recv_buffer.size() * sizeof(T2),
                            MPI_BYTE,
                            rank,
-                           tag_delivery,
+                           tag_deliver,
                            this->comm,
                            &send_and_recv_buffers[i]);
           AssertThrowMPI(ierr);

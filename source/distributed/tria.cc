@@ -4231,6 +4231,9 @@ namespace parallel
       Utilities::MPI::CollectiveMutex::ScopedLock lock(
         mutex, this->get_communicator());
 
+      const int mpi_tag = Utilities::MPI::internal::Tags::
+        triangulation_communicate_locally_moved_vertices;
+
       std::vector<std::vector<char>> sendbuffers(needs_to_get_cells.size());
       std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
       std::vector<MPI_Request>  requests(needs_to_get_cells.size());
@@ -4261,7 +4264,7 @@ namespace parallel
                                      buffer->size(),
                                      MPI_BYTE,
                                      it->first,
-                                     123,
+                                     mpi_tag,
                                      this->get_communicator(),
                                      &requests[idx]);
           AssertThrowMPI(ierr);
@@ -4282,10 +4285,13 @@ namespace parallel
       for (unsigned int i = 0; i < n_senders; ++i)
         {
           MPI_Status status;
-          int        len;
-          int        ierr =
-            MPI_Probe(MPI_ANY_SOURCE, 123, this->get_communicator(), &status);
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                               mpi_tag,
+                               this->get_communicator(),
+                               &status);
           AssertThrowMPI(ierr);
+
+          int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
           receive.resize(len);

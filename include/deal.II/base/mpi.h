@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 
 #include <map>
@@ -1117,10 +1118,6 @@ namespace Utilities
     class ConsensusAlgorithm_NBX : public ConsensusAlgorithm<T1, T2>
     {
     public:
-      // Unique tags to be used during Isend and Irecv
-      static const unsigned int tag_request  = 12;
-      static const unsigned int tag_delivery = 13;
-
       /**
        * Constructor.
        *
@@ -1259,10 +1256,6 @@ namespace Utilities
     class ConsensusAlgorithm_PEX : public ConsensusAlgorithm<T1, T2>
     {
     public:
-      // Unique tags to be used during Isend and Irecv
-      static const unsigned int tag_request  = 14;
-      static const unsigned int tag_delivery = 15;
-
       /**
        * Constructor.
        *
@@ -1512,6 +1505,9 @@ namespace Utilities
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, comm);
 
+      const int mpi_tag =
+        internal::Tags::compute_point_to_point_communication_pattern;
+
       // Sending buffers
       std::vector<std::vector<char>> buffers_to_send(send_to.size());
       std::vector<MPI_Request>       buffer_send_requests(send_to.size());
@@ -1525,7 +1521,7 @@ namespace Utilities
                                        buffers_to_send[i].size(),
                                        MPI_CHAR,
                                        rank,
-                                       21,
+                                       mpi_tag,
                                        comm,
                                        &buffer_send_requests[i]);
             AssertThrowMPI(ierr);
@@ -1542,7 +1538,7 @@ namespace Utilities
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
-            int        ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
+            int        ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
             AssertThrowMPI(ierr);
 
             // Length of the message
@@ -1555,8 +1551,13 @@ namespace Utilities
             const unsigned int rank = status.MPI_SOURCE;
 
             // Actually receive the message
-            ierr = MPI_Recv(
-              buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
+            ierr = MPI_Recv(buffer.data(),
+                            len,
+                            MPI_CHAR,
+                            status.MPI_SOURCE,
+                            status.MPI_TAG,
+                            comm,
+                            MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
             Assert(received_objects.find(rank) == received_objects.end(),
                    ExcInternalError(

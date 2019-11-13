@@ -392,9 +392,11 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   MPI_Group              group_B;
   MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
   MPI_Comm communicator_B;
+
+  const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_from;
   Utilities::MPI::create_group(this->grid->mpi_communicator,
                                group_B,
-                               0,
+                               mpi_tag,
                                &communicator_B);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
@@ -560,9 +562,11 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   MPI_Group              group_B;
   MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
   MPI_Comm communicator_B;
+
+  const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to;
   Utilities::MPI::create_group(this->grid->mpi_communicator,
                                group_B,
-                               0,
+                               mpi_tag,
                                &communicator_B);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
@@ -893,9 +897,11 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       // first argument, even if the program we are currently running
       // and that is calling this function only works on a subset of
       // processes. the same holds for the wrapper/fallback we are using here.
-      ierr = Utilities::MPI::create_group(MPI_COMM_WORLD,
+
+      const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to2;
+      ierr              = Utilities::MPI::create_group(MPI_COMM_WORLD,
                                           group_union,
-                                          5,
+                                          mpi_tag,
                                           &mpi_communicator_union);
       AssertThrowMPI(ierr);
 

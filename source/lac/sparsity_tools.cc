@@ -1180,6 +1180,9 @@ namespace SparsityTools
     static Utilities::MPI::CollectiveMutex      mutex;
     Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, mpi_comm);
 
+    const int mpi_tag = Utilities::MPI::internal::Tags::
+      sparsity_tools_distribute_sparsity_pattern;
+
     {
       unsigned int idx = 0;
       for (const auto &sparsity_line : send_data)
@@ -1189,7 +1192,7 @@ namespace SparsityTools
                       sparsity_line.second.size(),
                       DEAL_II_DOF_INDEX_MPI_TYPE,
                       sparsity_line.first,
-                      124,
+                      mpi_tag,
                       mpi_comm,
                       &requests[idx++]);
           AssertThrowMPI(ierr);
@@ -1202,12 +1205,13 @@ namespace SparsityTools
       for (unsigned int index = 0; index < num_receive; ++index)
         {
           MPI_Status status;
-          int        len;
-          int        ierr = MPI_Probe(MPI_ANY_SOURCE, 124, mpi_comm, &status);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, mpi_comm, &status);
           AssertThrowMPI(ierr);
 
+          int len;
           ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
           AssertThrowMPI(ierr);
+
           recv_buf.resize(len);
           ierr = MPI_Recv(recv_buf.data(),
                           len,
