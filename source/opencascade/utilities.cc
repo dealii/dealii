@@ -324,6 +324,9 @@ namespace OpenCASCADE
           }
         else
           shape_to_be_written = shape;
+        // BRepMesh_IncrementalMesh automatically calls the perform method to
+        // create the triangulation which is stored in the argument
+        // `shape_to_be_written`.
         BRepMesh_IncrementalMesh mesh_im(shape_to_be_written,
                                          deflection,
                                          is_relative,
@@ -334,8 +337,14 @@ namespace OpenCASCADE
     StlAPI_Writer writer;
     const auto    error = writer.Write(shape_to_be_written, filename.c_str());
 #  if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) >= 690)
+
+#    if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) < 720)
     AssertThrow(error == StlAPI_StatusOK,
                 ExcMessage("Error writing STL from shape."));
+#    else
+    AssertThrow(error == true, ExcMessage("Error writing STL from shape."));
+#    endif
+
 #  endif
   }
 
