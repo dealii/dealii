@@ -122,6 +122,15 @@ namespace Utilities
           /// ProcessGrid::ProcessGrid
           process_grid_constructor,
 
+          /// 200 tags for Partitioner::import_from_ghosted_array_start
+          partitioner_import_start,
+          partitioner_import_end = partitioner_import_start + 200,
+
+          /// 200 tags for Partitioner::export_to_ghosted_array_start
+          partitioner_export_start,
+          partitioner_export_end = partitioner_export_start + 200,
+
+
         };
       } // namespace Tags
     }   // namespace internal

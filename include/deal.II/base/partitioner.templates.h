@@ -47,6 +47,7 @@ namespace Utilities
       std::vector<MPI_Request> &                      requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
+      AssertIndexRange(communication_channel, 200);
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
@@ -62,6 +63,12 @@ namespace Utilities
       Assert(requests.size() == 0,
              ExcMessage("Another operation seems to still be running. "
                         "Call update_ghost_values_finish() first."));
+
+      const unsigned int mpi_tag =
+        Utilities::MPI::internal::Tags::partitioner_export_start +
+        communication_channel;
+      Assert(mpi_tag <= Utilities::MPI::internal::Tags::partitioner_export_end,
+             ExcInternalError());
 
       // Need to send and receive the data. Use non-blocking communication,
       // where it is usually less overhead to first initiate the receive and
@@ -90,7 +97,7 @@ namespace Utilities
                       ghost_targets_data[i].second * sizeof(Number),
                       MPI_BYTE,
                       ghost_targets_data[i].first,
-                      ghost_targets_data[i].first + communication_channel,
+                      mpi_tag,
                       communicator,
                       &requests[i]);
           AssertThrowMPI(ierr);
@@ -159,7 +166,7 @@ namespace Utilities
                       import_targets_data[i].second * sizeof(Number),
                       MPI_BYTE,
                       import_targets_data[i].first,
-                      my_pid + communication_channel,
+                      mpi_tag,
                       communicator,
                       &requests[n_ghost_targets + i]);
           AssertThrowMPI(ierr);
@@ -264,6 +271,7 @@ namespace Utilities
       std::vector<MPI_Request> &                requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
+      AssertIndexRange(communication_channel, 200);
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
              ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
@@ -298,8 +306,11 @@ namespace Utilities
       // where it is generally less overhead to first initiate the receive and
       // then actually send the data
 
-      // set channels in different range from update_ghost_values channels
-      const unsigned int channel = communication_channel + 401;
+      const unsigned int mpi_tag =
+        Utilities::MPI::internal::Tags::partitioner_import_start +
+        communication_channel;
+      Assert(mpi_tag <= Utilities::MPI::internal::Tags::partitioner_import_end,
+             ExcInternalError());
       requests.resize(n_import_targets + n_ghost_targets);
 
       // initiate the receive operations
@@ -318,7 +329,7 @@ namespace Utilities
                       import_targets_data[i].second * sizeof(Number),
                       MPI_BYTE,
                       import_targets_data[i].first,
-                      import_targets_data[i].first + channel,
+                      mpi_tag,
                       communicator,
                       &requests[i]);
           AssertThrowMPI(ierr);
@@ -411,7 +422,7 @@ namespace Utilities
                       ghost_targets_data[i].second * sizeof(Number),
                       MPI_BYTE,
                       ghost_targets_data[i].first,
-                      this_mpi_process() + channel,
+                      mpi_tag,
                       communicator,
                       &requests[n_import_targets + i]);
           AssertThrowMPI(ierr);

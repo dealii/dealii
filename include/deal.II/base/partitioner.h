@@ -393,7 +393,8 @@ namespace Utilities
        * @param communication_channel Sets an offset to the MPI_Isend and
        * MPI_Irecv calls that avoids interference with other ongoing
        * export_to_ghosted_array_start() calls on different entries. Typically
-       * handled within the blocks of a block vector.
+       * handled within the blocks of a block vector. Any value less than 200
+       * is a valid value.
        *
        * @param locally_owned_array The array of data from which the data is
        * extracted and sent to the ghost entries on a remote processor.
@@ -464,6 +465,7 @@ namespace Utilities
        * MPI_Irecv calls that avoids interference with other ongoing
        * import_from_ghosted_array_start() calls on different
        * entries. Typically handled within the blocks of a block vector.
+       * Any value less than 200 is a valid value.
        *
        * @param ghost_array The array of ghost data that is sent to a remote
        * owner of the respective index in a vector. Its size must either be
