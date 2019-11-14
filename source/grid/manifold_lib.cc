@@ -1308,6 +1308,7 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const Tensor<1, chartdim> &periodicity,
   const double               tolerance)
   : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , const_map()
   , push_forward_function(&push_forward_function)
   , pull_back_function(&pull_back_function)
   , tolerance(tolerance)

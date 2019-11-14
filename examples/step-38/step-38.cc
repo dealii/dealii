@@ -370,7 +370,7 @@ namespace Step38
     std::vector<double>                  rhs_values(n_q_points);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    const RightHandSide<spacedim> rhs;
+    const RightHandSide<spacedim> rhs{};
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {

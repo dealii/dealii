@@ -269,7 +269,7 @@ namespace Step41
     system_rhs    = 0;
 
     const QGauss<dim>        quadrature_formula(fe.degree + 1);
-    const RightHandSide<dim> right_hand_side;
+    const RightHandSide<dim> right_hand_side{};
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,

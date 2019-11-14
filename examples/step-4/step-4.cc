@@ -324,7 +324,7 @@ void Step4<dim>::assemble_system()
   // the class declared above to generate the necessary data. Since this right
   // hand side object is only used locally in the present function, we declare
   // it here as a local variable:
-  const RightHandSide<dim> right_hand_side;
+  const RightHandSide<dim> right_hand_side{};
 
   // Compared to the previous example, in order to evaluate the non-constant
   // right hand side function we now also need the quadrature points on the

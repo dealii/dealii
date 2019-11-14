@@ -716,7 +716,7 @@ namespace Step63
 
     scratch_data.fe_values.reinit(cell);
 
-    const RightHandSide<dim> right_hand_side;
+    const RightHandSide<dim> right_hand_side{};
     std::vector<double>      rhs_values(n_q_points);
 
     right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),

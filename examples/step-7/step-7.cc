@@ -587,7 +587,7 @@ namespace Step7
     // Note that the operations we will do with the right hand side object are
     // only querying data, never changing the object. We can therefore declare
     // it <code>const</code>:
-    const RightHandSide<dim> right_hand_side;
+    const RightHandSide<dim> right_hand_side{};
     std::vector<double>      rhs_values(n_q_points);
 
     // Finally we define an object denoting the exact solution function. We
@@ -597,7 +597,7 @@ namespace Step7
     // Neumann values are prescribed. We will, however, be a little bit lazy
     // and use what we already have in information. Real-life programs would
     // to go other ways here, of course.
-    const Solution<dim> exact_solution;
+    const Solution<dim> exact_solution{};
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.

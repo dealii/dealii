@@ -545,6 +545,7 @@ namespace Step51
       , trace_values(face_quadrature_formula.size())
       , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
+      , exact_solution()
     {
       for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
            ++face)
@@ -587,6 +588,7 @@ namespace Step51
       , trace_values(sd.trace_values)
       , fe_local_support_on_face(sd.fe_local_support_on_face)
       , fe_support_on_face(sd.fe_support_on_face)
+      , exact_solution()
     {}
   };
 
