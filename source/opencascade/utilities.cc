@@ -335,16 +335,24 @@ namespace OpenCASCADE
       }
 
     StlAPI_Writer writer;
-    const auto    error = writer.Write(shape_to_be_written, filename.c_str());
-#  if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) >= 690)
 
+#  if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) >= 690)
+    // opencascade versions 6.9.0 onwards return an error status
+    const auto error = writer.Write(shape_to_be_written, filename.c_str());
+
+    // which is a custom type between 6.9.0 and 7.1.0
 #    if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) < 720)
     AssertThrow(error == StlAPI_StatusOK,
                 ExcMessage("Error writing STL from shape."));
 #    else
+    // and a boolean from version 7.2.0 onwards
     AssertThrow(error == true, ExcMessage("Error writing STL from shape."));
 #    endif
 
+#  else
+
+    // for opencascade versions 6.8.0 and older the return value is void
+    writer.Write(shape_to_be_written, filename.c_str());
 #  endif
   }
 
