@@ -167,7 +167,7 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    HangingNodes<dim>::HangingNodes(
+    inline HangingNodes<dim>::HangingNodes(
       unsigned int                     fe_degree,
       const DoFHandler<dim> &          dof_handler,
       const std::vector<unsigned int> &lexicographic_mapping)
@@ -186,14 +186,14 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    void
+    inline void
     HangingNodes<dim>::setup_line_to_cell()
     {}
 
 
 
     template <>
-    void
+    inline void
     HangingNodes<3>::setup_line_to_cell()
     {
       // In 3D, we can have DoFs on only an edge being constrained (e.g. in a
@@ -267,7 +267,7 @@ namespace CUDAWrappers
 
     template <int dim>
     template <typename CellIterator>
-    void
+    inline void
     HangingNodes<dim>::setup_constraints(
       std::vector<types::global_dof_index> &                    dof_indices,
       const CellIterator &                                      cell,
@@ -587,7 +587,7 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    void
+    inline void
     HangingNodes<dim>::rotate_subface_index(int           times,
                                             unsigned int &subface_index) const
     {
@@ -602,7 +602,7 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    void
+    inline void
     HangingNodes<dim>::rotate_face(
       int                                   times,
       unsigned int                          n_dofs_1d,
@@ -651,7 +651,7 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    unsigned int
+    inline unsigned int
     HangingNodes<dim>::line_dof_idx(int          local_line,
                                     unsigned int dof,
                                     unsigned int n_dofs_1d) const
@@ -679,7 +679,7 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    void
+    inline void
     HangingNodes<dim>::transpose_face(
       std::vector<types::global_dof_index> &dofs) const
     {
