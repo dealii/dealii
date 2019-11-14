@@ -78,6 +78,35 @@ namespace python
 
 
 
+   const char at_boundary_docstring [] =
+    " Return whether the cell is at the boundary                        \n"
+    ; 
+
+
+
+   const char has_boundary_lines_docstring [] =
+    " This is a slight variation to the at_boundary function:           \n"
+    " for two dimensions, it is equivalent, for three                   \n"
+    " dimensions it returns whether at least one of the 12              \n" 
+    " lines of the hexahedron is at a boundary.                         \n"
+    ;
+
+
+
+   const char neighbor_docstring [] =
+    " Return the ith neighbor of a cell. If the neighbor does not exist,\n" 
+    " i.e., if the ith face of the current object is at the boundary,   \n" 
+    " then an exception is thrown.                                      \n"
+    ; 
+
+
+
+   const char faces_docstring [] =
+    " Return list of cell's faces.                                      \n"
+    ; 
+
+
+
   void export_cell_accessor()
   {
     boost::python::class_<CellAccessorWrapper>("CellAccessor",
@@ -102,7 +131,19 @@ namespace python
          boost::python::args("self", "i", "point_wrapper"))
     .def("get_vertex", &CellAccessorWrapper::get_vertex,
          get_vertex_docstring,
-         boost::python::args("self", "i"));
+         boost::python::args("self", "i"))
+    .def("at_boundary", &CellAccessorWrapper::at_boundary,
+         at_boundary_docstring,
+         boost::python::args("self"))
+    .def("has_boundary_lines", &CellAccessorWrapper::has_boundary_lines,
+         has_boundary_lines_docstring,
+         boost::python::args("self"))
+    .def("neighbor", &CellAccessorWrapper::neighbor,
+         neighbor_docstring,
+         boost::python::args("self", "i"))
+    .def("faces", &CellAccessorWrapper::faces,
+         faces_docstring,
+         boost::python::args("self"));
   }
 }
 
