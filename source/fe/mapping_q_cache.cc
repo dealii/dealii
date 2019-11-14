@@ -77,7 +77,23 @@ MappingQCache<dim, spacedim>::initialize(
   const MappingQGeneric<dim, spacedim> &mapping)
 {
   AssertDimension(this->get_degree(), mapping.get_degree());
+  initialize(triangulation,
+             [&mapping](const typename Triangulation<dim>::cell_iterator &cell)
+               -> std::vector<Point<spacedim>> {
+               return mapping.compute_mapping_support_points(cell);
+             });
+}
 
+
+
+template <int dim, int spacedim>
+void
+MappingQCache<dim, spacedim>::initialize(
+  const Triangulation<dim, spacedim> &triangulation,
+  const std::function<std::vector<Point<spacedim>>(
+    const typename Triangulation<dim, spacedim>::cell_iterator &)>
+    &compute_points_on_cell)
+{
   clear_signal = triangulation.signals.any_change.connect(
     [&]() -> void { this->support_point_cache.reset(); });
 
@@ -94,7 +110,10 @@ MappingQCache<dim, spacedim>::initialize(
         void *,
         void *) {
       (*support_point_cache)[cell->level()][cell->index()] =
-        mapping.compute_mapping_support_points(cell);
+        compute_points_on_cell(cell);
+      AssertDimension(
+        (*support_point_cache)[cell->level()][cell->index()].size(),
+        Utilities::pow(this->get_degree() + 1, dim));
     },
     /* copier */ std::function<void(void *)>(),
     /* scratch_data */ nullptr,
