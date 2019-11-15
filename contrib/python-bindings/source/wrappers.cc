@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 #include <boost/python.hpp>
@@ -22,11 +23,15 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  void export_tria_accessor();
-  void export_cell_accessor();
-  void export_point();
-  void export_triangulation();
-}
+  void
+  export_tria_accessor();
+  void
+  export_cell_accessor();
+  void
+  export_point();
+  void
+  export_triangulation();
+} // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 
@@ -36,8 +41,7 @@ char const *pydealii_docstring =
   "========                                                     \n"
   "This module contains the python bindings to deal.II.         \n"
   "The Debug module uses deal.II compiled in Debug mode while   \n"
-  "the Release module uses deal.II compiled in Release mode.    \n"
-  ;
+  "the Release module uses deal.II compiled in Release mode.    \n";
 
 #ifdef DEBUG
 

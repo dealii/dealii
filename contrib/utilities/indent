@@ -56,15 +56,15 @@ checks
 # Process all source and header files:
 #
 
-process_changed "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
+process_changed "tests include source examples contrib/python-bindings" ".*\.(cc|h|cu|cuh)" format_file
 process_changed "source" ".*\.inst.in" format_inst
 
 #
 # Fix permissions and convert to unix line ending if necessary:
 #
 
-process_changed "tests include source examples" \
+process_changed "tests include source examples contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-process_changed "tests include source examples" \
+process_changed "tests include source examples contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix

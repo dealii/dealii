@@ -13,69 +13,72 @@
 //
 // ---------------------------------------------------------------------
 
+#include <boost/python.hpp>
+
 #include <tria_accessor_wrapper.h>
 #include <triangulation_wrapper.h>
-#include <boost/python.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  const char manifold_id_docstring [] =
-    "Get/Set the manifold_id of the face                                \n"
-    ;
+  const char manifold_id_docstring[] =
+    "Get/Set the manifold_id of the face                                \n";
 
-  const char boundary_id_docstring [] =
-    "Get/Set the boundary_id of the face                                \n"
-    ;
+  const char boundary_id_docstring[] =
+    "Get/Set the boundary_id of the face                                \n";
 
-  const char set_all_boundary_ids_docstring [] =
+  const char set_all_boundary_ids_docstring[] =
     "Do as set_boundary_id() but also set the boundary indicators       \n"
-    "of the objects that bound the current object.                      \n"  
-    ;
+    "of the objects that bound the current object.                      \n";
 
-  const char barycenter_docstring [] =
-    "Return the barycenter of the current face                          \n"
-    ;
+  const char barycenter_docstring[] =
+    "Return the barycenter of the current face                          \n";
 
-  const char set_vertex_docstring [] =
-    " Set the ith vertex of the face to point_wrapper                   \n"
-    ;
+  const char set_vertex_docstring[] =
+    " Set the ith vertex of the face to point_wrapper                   \n";
 
-  const char get_vertex_docstring [] =
-    " Get the ith vertex of the face                                    \n"
-    ;
+  const char get_vertex_docstring[] =
+    " Get the ith vertex of the face                                    \n";
 
-   const char at_boundary_docstring [] =
-    " Return whether the face is at the boundary                        \n"
-    ; 
+  const char at_boundary_docstring[] =
+    " Return whether the face is at the boundary                        \n";
 
-  void export_tria_accessor()
+  void
+  export_tria_accessor()
   {
-    boost::python::class_<TriaAccessorWrapper>("TriaAccessor",
-                                               boost::python::init<void*, const int, const int, const int> ())
-    .add_property("boundary_id", &TriaAccessorWrapper::get_boundary_id,
-                  &TriaAccessorWrapper::set_boundary_id,
-                  boundary_id_docstring)
-    .add_property("manifold_id", &TriaAccessorWrapper::get_manifold_id,
-                  &TriaAccessorWrapper::set_manifold_id,
-                  manifold_id_docstring)
-    .def("barycenter", &TriaAccessorWrapper::get_barycenter,
-         barycenter_docstring,
-         boost::python::args("self"))
-    .def("set_vertex", &TriaAccessorWrapper::set_vertex,
-         set_vertex_docstring,
-         boost::python::args("self", "i", "point_wrapper"))
-    .def("get_vertex", &TriaAccessorWrapper::get_vertex,
-         get_vertex_docstring,
-         boost::python::args("self", "i"))
-    .def("at_boundary", &TriaAccessorWrapper::at_boundary,
-         at_boundary_docstring,
-         boost::python::args("self"))
-    .def("set_all_boundary_ids", &TriaAccessorWrapper::set_all_boundary_ids,
-         set_all_boundary_ids_docstring,
-         boost::python::args("self", "boundary_id"));
+    boost::python::class_<TriaAccessorWrapper>(
+      "TriaAccessor",
+      boost::python::init<void *, const int, const int, const int>())
+      .add_property("boundary_id",
+                    &TriaAccessorWrapper::get_boundary_id,
+                    &TriaAccessorWrapper::set_boundary_id,
+                    boundary_id_docstring)
+      .add_property("manifold_id",
+                    &TriaAccessorWrapper::get_manifold_id,
+                    &TriaAccessorWrapper::set_manifold_id,
+                    manifold_id_docstring)
+      .def("barycenter",
+           &TriaAccessorWrapper::get_barycenter,
+           barycenter_docstring,
+           boost::python::args("self"))
+      .def("set_vertex",
+           &TriaAccessorWrapper::set_vertex,
+           set_vertex_docstring,
+           boost::python::args("self", "i", "point_wrapper"))
+      .def("get_vertex",
+           &TriaAccessorWrapper::get_vertex,
+           get_vertex_docstring,
+           boost::python::args("self", "i"))
+      .def("at_boundary",
+           &TriaAccessorWrapper::at_boundary,
+           at_boundary_docstring,
+           boost::python::args("self"))
+      .def("set_all_boundary_ids",
+           &TriaAccessorWrapper::set_all_boundary_ids,
+           set_all_boundary_ids_docstring,
+           boost::python::args("self", "boundary_id"));
   }
-}
+} // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
