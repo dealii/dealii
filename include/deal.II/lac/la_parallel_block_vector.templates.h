@@ -289,10 +289,10 @@ namespace LinearAlgebra
 
           // In order to avoid conflict with possible other ongoing
           // communication requests (from LA::distributed::Vector that supports
-          // unfinished requests), add an arbitrary number 9923 to the
-          // communication tag
+          // unfinished requests), add 100 to the communication tag (the first
+          // 100 can be used by normal vectors)
           for (unsigned int block = start; block < end; ++block)
-            this->block(block).update_ghost_values_start(block - start + 9923);
+            this->block(block).update_ghost_values_start(block - start + 100);
           for (unsigned int block = start; block < end; ++block)
             this->block(block).update_ghost_values_finish();
         }

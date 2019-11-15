@@ -2923,10 +2923,12 @@ namespace internal
   template <int dim, typename Number, typename VectorizedArrayType>
   struct VectorDataExchange
   {
-    // An arbitrary shift for communication to reduce the risk for accidental
+    // A shift for the MPI messages to reduce the risk for accidental
     // interaction with other open communications that a user program might
-    // set up
-    static constexpr unsigned int channel_shift = 103;
+    // set up (parallel vectors support unfinished communication). We let
+    // the other vectors use the first 20 assigned numbers and start the
+    // matrix-free communication.
+    static constexpr unsigned int channel_shift = 20;
 
 
 
