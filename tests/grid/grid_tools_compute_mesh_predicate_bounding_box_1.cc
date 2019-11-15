@@ -35,11 +35,10 @@
 #include "../tests.h"
 
 // predicate: test if the cell is locally owned
-template <int spacedim>
+template <int dim, int spacedim>
 bool
-pred_locally_owned(
-  const typename parallel::distributed::Triangulation<spacedim>::cell_iterator
-    &cell)
+pred_locally_owned(const typename parallel::distributed::
+                     Triangulation<dim, spacedim>::cell_iterator &cell)
 {
   return cell->is_locally_owned();
 }
@@ -53,19 +52,19 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
           << " refinement: " << ref << " max number of boxes: " << max_bbox
           << std::endl;
 
-  parallel::distributed::Triangulation<spacedim> tria(mpi_communicator);
+  parallel::distributed::Triangulation<dim, spacedim> tria(mpi_communicator);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(4);
 
-  typedef typename parallel::distributed::Triangulation<
-    spacedim>::active_cell_iterator cell_iterator;
+  typedef typename parallel::distributed::Triangulation<dim, spacedim>::
+    active_cell_iterator cell_iterator;
 
   std::function<bool(const cell_iterator &)> predicate =
-    pred_locally_owned<spacedim>;
+    pred_locally_owned<dim, spacedim>;
 
   std::vector<BoundingBox<spacedim>> local_bbox =
     GridTools::compute_mesh_predicate_bounding_box<
-      parallel::distributed::Triangulation<spacedim>>(
+      parallel::distributed::Triangulation<dim, spacedim>>(
       tria, predicate, ref, true, max_bbox);
 
   if (local_bbox.size() > 0)
@@ -94,8 +93,7 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
   // Looking if every point is at least inside a bounding box
   for (; cell < endc; ++cell)
     if (cell->is_locally_owned())
-      for (unsigned int v = 0; v < GeometryInfo<spacedim>::vertices_per_cell;
-           ++v)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
           bool inside_a_box = false;
           for (unsigned int i = 0; i < local_bbox.size(); ++i)
@@ -126,6 +124,10 @@ main(int argc, char *argv[])
   test_hypercube<2>(1, 4);
   test_hypercube<2>(2, 4);
   test_hypercube<2>(2, 2);
+  // test_hypercube<2, 3>(0, 4);
+  // test_hypercube<2, 3>(1, 4);
+  // test_hypercube<2, 3>(2, 4);
+  // test_hypercube<2, 3>(2, 2);
   test_hypercube<3>(0, 4);
   test_hypercube<3>(1, 4);
   test_hypercube<3>(2, 4);

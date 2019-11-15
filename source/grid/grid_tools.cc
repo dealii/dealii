@@ -2021,7 +2021,7 @@ namespace GridTools
         for (; i < active_cells.size(); ++i)
           if (predicate(active_cells[i]))
             for (unsigned int v = 0;
-                 v < GeometryInfo<spacedim>::vertices_per_cell;
+                 v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
                  ++v)
               for (unsigned int d = 0; d < spacedim; ++d)
                 {
