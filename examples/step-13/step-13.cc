@@ -1357,10 +1357,10 @@ namespace Step13
     Triangulation<dim> triangulation;
     GridGenerator::hyper_cube(triangulation, -1, 1);
     triangulation.refine_global(2);
-    const FE_Q<dim>          fe(1);
-    const QGauss<dim>        quadrature(4);
-    const RightHandSide<dim> rhs_function{};
-    const Solution<dim>      boundary_values{};
+    const FE_Q<dim>    fe(1);
+    const QGauss<dim>  quadrature(4);
+    RightHandSide<dim> rhs_function;
+    Solution<dim>      boundary_values;
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!
