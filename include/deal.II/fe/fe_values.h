@@ -3113,10 +3113,16 @@ public:
   get_inverse_jacobians() const;
 
   /**
-   * For a face, return the outward normal vector to the cell at the
-   * <tt>i</tt>th quadrature point.
+   * Return the normal vector at a quadrature point. If you call this
+   * function for a face (i.e., when using a FEFaceValues or FESubfaceValues
+   * object), then this function returns the outward normal vector to
+   * the cell at the <tt>i</tt>th quadrature point of the face.
    *
-   * For a cell of codimension one, return the normal vector. There are of
+   * In contrast, if you call this function for a cell of codimension one
+   * (i.e., when using a `FEValues<dim,spacedim>` object with
+   * `spacedim>dim`), then this function returns the normal vector to the
+   * cell -- in other words, an approximation to the normal vector to the
+   * manifold in which the triangulation is embedded. There are of
    * course two normal directions to a manifold in that case, and this
    * function returns the "up" direction as induced by the numbering of the
    * vertices.
@@ -3129,9 +3135,9 @@ public:
   normal_vector(const unsigned int i) const;
 
   /**
-   * Return the normal vectors at the quadrature points. For a face, these are
-   * the outward normal vectors to the cell. For a cell of codimension one,
-   * the orientation is given by the numbering of vertices.
+   * Return the normal vectors at all quadrature points represented by
+   * this object. See the normal_vector() function for what the normal
+   * vectors represent.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    *
@@ -3143,9 +3149,9 @@ public:
   get_all_normal_vectors() const;
 
   /**
-   * Return the normal vectors at the quadrature points. For a face, these are
-   * the outward normal vectors to the cell. For a cell of codimension one,
-   * the orientation is given by the numbering of vertices.
+   * Return the normal vectors at all quadrature points represented by
+   * this object. See the normal_vector() function for what the normal
+   * vectors represent.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
