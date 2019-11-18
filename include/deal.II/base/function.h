@@ -178,6 +178,11 @@ public:
            const time_type    initial_time = 0.0);
 
   /**
+   * Copy constructor.
+   */
+  Function(const Function &f) = default;
+
+  /**
    * Virtual destructor; absolutely necessary in this case.
    *
    * This destructor is declared pure virtual, such that objects of this class
