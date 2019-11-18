@@ -31,6 +31,8 @@ namespace python
   export_point();
   void
   export_triangulation();
+  void
+  export_mapping();
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
@@ -63,6 +65,7 @@ BOOST_PYTHON_MODULE(Debug)
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
   dealii::python::export_triangulation();
+  dealii::python::export_mapping();
 }
 
 #else
@@ -80,6 +83,7 @@ BOOST_PYTHON_MODULE(Release)
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
   dealii::python::export_triangulation();
+  dealii::python::export_mapping();
 }
 
 #endif

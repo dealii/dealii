@@ -167,7 +167,7 @@ namespace python
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
       Point<spacedim>     barycenter = cell->barycenter();
       boost::python::list barycenter_list;
-      for (int i = 0; i < dim; ++i)
+      for (int i = 0; i < spacedim; ++i)
         barycenter_list.append(barycenter[i]);
 
       return PointWrapper(barycenter_list);
