@@ -119,6 +119,8 @@ test()
     {
       deallog << "Triangulation changed" << std::endl;
     }
+#else
+  deallog << "Triangulation changed" << std::endl;
 #endif
 
   // make sure no processor is hanging
