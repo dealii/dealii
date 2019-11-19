@@ -433,7 +433,7 @@ namespace hp
      * // [initialisation...]
      * Vector<float> predicted_error_per_cell(triangulation.n_active_cells());
      * for(unsigned int i = 0; i < triangulation.n_active_cells(); ++i)
-     *   predicted_error_per_cell[i] = std::numeric_limits<float>::max();
+     *   predicted_error_per_cell[i] = std::numeric_limits<float>::infinity();
      *
      * // [during each refinement step...]
      * // set h-adaptivity flags
@@ -448,7 +448,7 @@ namespace hp
      *   predicted_error_per_cell,
      *   std::less<float>(),
      *   std::less<float>());
-     * hp::Refinement::{choose|force}_p_over_h(...);
+     * hp::Refinement::{choose|force}_p_over_h(hp_dof_handler);
      *
      * // predict error for the subsequent adaptation
      * triangulation.prepare_coarsening_and_refinement();
