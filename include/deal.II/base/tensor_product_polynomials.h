@@ -231,10 +231,9 @@ protected:
    * dimensional polynomials for each space direction, given the index
    * <i>i</i>.
    */
-  // fix to avoid compiler warnings about zero length arrays
   void
-  compute_index(const unsigned int i,
-                unsigned int (&indices)[(dim > 0 ? dim : 1)]) const;
+  compute_index(const unsigned int             i,
+                std::array<unsigned int, dim> &indices) const;
 
   /**
    * TensorProductPolynomialsBubbles has a TensorProductPolynomials class
@@ -410,8 +409,8 @@ private:
    * <tt>i</tt>.
    */
   void
-  compute_index(const unsigned int i,
-                unsigned int (&indices)[(dim > 0 ? dim : 1)]) const;
+  compute_index(const unsigned int             i,
+                std::array<unsigned int, dim> &indices) const;
 
   /**
    * Given the input to the constructor, compute <tt>n_pols</tt>.
@@ -479,10 +478,10 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  unsigned int indices[dim];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  double v[dim][5];
+  std::array<std::array<double, 5>, dim> v;
   {
     std::vector<double> tmp(5);
     for (unsigned int d = 0; d < dim; ++d)
@@ -607,7 +606,7 @@ Tensor<order, dim>
 AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
                                                 const Point<dim> & p) const
 {
-  unsigned int indices[dim];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   std::vector<std::vector<double>> v(dim, std::vector<double>(order + 1));

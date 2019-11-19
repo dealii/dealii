@@ -30,7 +30,7 @@ template <int dim>
 void
 TensorProductPolynomialsConst<dim>::output_indices(std::ostream &out) const
 {
-  unsigned int ix[dim];
+  std::array<unsigned int, dim> ix;
   for (unsigned int i = 0; i < tensor_polys.n(); ++i)
     {
       tensor_polys.compute_index(i, ix);
