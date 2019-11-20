@@ -33,7 +33,7 @@ namespace internal
 {
   namespace
   {
-    template <int dim>
+    template <std::size_t dim>
     inline void
     compute_tensor_index(const unsigned int,
                          const unsigned int,
@@ -43,33 +43,30 @@ namespace internal
       Assert(false, ExcNotImplemented());
     }
 
-    template <>
     inline void
-    compute_tensor_index<1>(const unsigned int n,
-                            const unsigned int,
-                            const unsigned int,
-                            std::array<unsigned int, 1> &indices)
+    compute_tensor_index(const unsigned int n,
+                         const unsigned int,
+                         const unsigned int,
+                         std::array<unsigned int, 1> &indices)
     {
       indices[0] = n;
     }
 
-    template <>
     inline void
-    compute_tensor_index<2>(const unsigned int n,
-                            const unsigned int n_pols_0,
-                            const unsigned int,
-                            std::array<unsigned int, 2> &indices)
+    compute_tensor_index(const unsigned int n,
+                         const unsigned int n_pols_0,
+                         const unsigned int,
+                         std::array<unsigned int, 2> &indices)
     {
       indices[0] = n % n_pols_0;
       indices[1] = n / n_pols_0;
     }
 
-    template <>
     inline void
-    compute_tensor_index<3>(const unsigned int           n,
-                            const unsigned int           n_pols_0,
-                            const unsigned int           n_pols_1,
-                            std::array<unsigned int, 3> &indices)
+    compute_tensor_index(const unsigned int           n,
+                         const unsigned int           n_pols_0,
+                         const unsigned int           n_pols_1,
+                         std::array<unsigned int, 3> &indices)
     {
       indices[0] = n % n_pols_0;
       indices[1] = (n / n_pols_0) % n_pols_1;
@@ -88,10 +85,10 @@ TensorProductPolynomials<dim, PolynomialType>::compute_index(
 {
   Assert(i < Utilities::fixed_power<dim>(polynomials.size()),
          ExcInternalError());
-  internal::compute_tensor_index<dim>(index_map[i],
-                                      polynomials.size(),
-                                      polynomials.size(),
-                                      indices);
+  internal::compute_tensor_index(index_map[i],
+                                 polynomials.size(),
+                                 polynomials.size(),
+                                 indices);
 }
 
 
@@ -473,15 +470,15 @@ AnisotropicPolynomials<dim>::compute_index(
     {
     }
   else if (dim == 1)
-    internal::compute_tensor_index<dim>(i,
-                                        polynomials[0].size(),
-                                        0 /*not used*/,
-                                        indices);
+    internal::compute_tensor_index(i,
+                                   polynomials[0].size(),
+                                   0 /*not used*/,
+                                   indices);
   else
-    internal::compute_tensor_index<dim>(i,
-                                        polynomials[0].size(),
-                                        polynomials[1].size(),
-                                        indices);
+    internal::compute_tensor_index(i,
+                                   polynomials[0].size(),
+                                   polynomials[1].size(),
+                                   indices);
 }
 
 
