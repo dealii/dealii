@@ -269,8 +269,7 @@ namespace DataOutBase
     /**
      * Patch indices of neighbors of the current patch. This is made available
      * for the OpenDX format that requires neighbor
-     * information for advanced output. For dim==0 we still allow one
-     * neighbor, to avoid compiler warnings about zero-sized arrays.
+     * information for advanced output.
      */
     std::array<unsigned int, GeometryInfo<dim>::faces_per_cell> neighbors;
 
