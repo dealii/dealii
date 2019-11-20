@@ -33,12 +33,12 @@ namespace internal
 {
   namespace
   {
-    template <int dim>
+    template <std::size_t dim>
     inline void
     compute_tensor_index(const unsigned int,
                          const unsigned int,
                          const unsigned int,
-                         unsigned int (&)[dim])
+                         std::array<unsigned int, dim> &)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -47,7 +47,7 @@ namespace internal
     compute_tensor_index(const unsigned int n,
                          const unsigned int,
                          const unsigned int,
-                         unsigned int (&indices)[1])
+                         std::array<unsigned int, 1> &indices)
     {
       indices[0] = n;
     }
@@ -56,17 +56,17 @@ namespace internal
     compute_tensor_index(const unsigned int n,
                          const unsigned int n_pols_0,
                          const unsigned int,
-                         unsigned int (&indices)[2])
+                         std::array<unsigned int, 2> &indices)
     {
       indices[0] = n % n_pols_0;
       indices[1] = n / n_pols_0;
     }
 
     inline void
-    compute_tensor_index(const unsigned int n,
-                         const unsigned int n_pols_0,
-                         const unsigned int n_pols_1,
-                         unsigned int (&indices)[3])
+    compute_tensor_index(const unsigned int           n,
+                         const unsigned int           n_pols_0,
+                         const unsigned int           n_pols_1,
+                         std::array<unsigned int, 3> &indices)
     {
       indices[0] = n % n_pols_0;
       indices[1] = (n / n_pols_0) % n_pols_1;
@@ -80,8 +80,8 @@ namespace internal
 template <int dim, typename PolynomialType>
 inline void
 TensorProductPolynomials<dim, PolynomialType>::compute_index(
-  const unsigned int i,
-  unsigned int (&indices)[(dim > 0 ? dim : 1)]) const
+  const unsigned int             i,
+  std::array<unsigned int, dim> &indices) const
 {
   Assert(i < Utilities::fixed_power<dim>(polynomials.size()),
          ExcInternalError());
@@ -98,7 +98,7 @@ void
 TensorProductPolynomials<dim, PolynomialType>::output_indices(
   std::ostream &out) const
 {
-  unsigned int ix[(dim > 0) ? dim : 1];
+  std::array<unsigned int, dim> ix;
   for (unsigned int i = 0; i < this->n(); ++i)
     {
       compute_index(i, ix);
@@ -146,7 +146,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_value(
 {
   Assert(dim > 0, ExcNotImplemented());
 
-  unsigned int indices[dim];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   double value = 1.;
@@ -164,14 +164,14 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  unsigned int indices[dim];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   // compute values and
   // uni-directional derivatives at
   // the given point in each
   // co-ordinate direction
-  double v[dim][2];
+  std::array<std::array<double, 2>, dim> v;
   {
     std::vector<double> tmp(2);
     for (unsigned int d = 0; d < dim; ++d)
@@ -212,10 +212,10 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  unsigned int indices[(dim > 0) ? dim : 1];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  double v[dim][3];
+  std::array<std::array<double, 3>, dim> v;
   {
     std::vector<double> tmp(3);
     for (unsigned int d = 0; d < dim; ++d)
@@ -456,8 +456,8 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
 template <int dim>
 void
 AnisotropicPolynomials<dim>::compute_index(
-  const unsigned int i,
-  unsigned int (&indices)[(dim > 0 ? dim : 1)]) const
+  const unsigned int             i,
+  std::array<unsigned int, dim> &indices) const
 {
 #ifdef DEBUG
   unsigned int n_poly = 1;
@@ -488,7 +488,7 @@ double
 AnisotropicPolynomials<dim>::compute_value(const unsigned int i,
                                            const Point<dim> & p) const
 {
-  unsigned int indices[(dim > 0) ? dim : 1];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   double value = 1.;
@@ -504,7 +504,7 @@ Tensor<1, dim>
 AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
                                           const Point<dim> & p) const
 {
-  unsigned int indices[(dim > 0) ? dim : 1];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   // compute values and
@@ -532,7 +532,7 @@ Tensor<2, dim>
 AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
                                                const Point<dim> & p) const
 {
-  unsigned int indices[(dim > 0) ? dim : 1];
+  std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
   std::vector<std::vector<double>> v(dim, std::vector<double>(3));
@@ -627,7 +627,7 @@ AnisotropicPolynomials<dim>::evaluate(
       // one-dimensional indices of
       // this particular tensor
       // product polynomial
-      unsigned int indices[(dim > 0) ? dim : 1];
+      std::array<unsigned int, dim> indices;
       compute_index(i, indices);
 
       if (update_values)
