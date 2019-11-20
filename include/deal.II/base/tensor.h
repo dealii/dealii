@@ -715,9 +715,7 @@ private:
   /**
    * Array of tensors holding the subelements.
    */
-  Tensor<rank_ - 1, dim, Number> values[(dim != 0) ? dim : 1];
-  // ... avoid a compiler warning in case of dim == 0 and ensure that the
-  // array always has positive size.
+  std::array<Tensor<rank_ - 1, dim, Number>, dim> values;
 
   /**
    * Internal helper function for unroll.
@@ -1158,12 +1156,12 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV //
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV
   typename Tensor<rank_, dim, Number>::value_type &Tensor<rank_, dim, Number>::
                                                    operator[](const unsigned int i)
 {
   return dealii::internal::TensorSubscriptor::subscript(
-    values, i, std::integral_constant<int, dim>());
+    values.data(), i, std::integral_constant<int, dim>());
 }
 
 
@@ -1355,8 +1353,8 @@ namespace internal
                   !std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
-                      division_operator(Tensor<rank, dim, Number> (&t)[dim],
-                                        const OtherNumber &factor)
+                      division_operator(std::array<Tensor<rank, dim, Number>, dim> &t,
+                                        const OtherNumber &                         factor)
     {
       const Number inverse_factor = Number(1.) / factor;
       // recurse over the base objects
@@ -1375,8 +1373,8 @@ namespace internal
                   std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
-                      division_operator(dealii::Tensor<rank, dim, Number> (&t)[dim],
-                                        const OtherNumber &factor)
+                      division_operator(std::array<Tensor<rank, dim, Number>, dim> &t,
+                                        const OtherNumber &                         factor)
     {
       // recurse over the base objects
       for (unsigned int d = 0; d < dim; ++d)

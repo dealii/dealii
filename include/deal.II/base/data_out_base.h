@@ -272,7 +272,7 @@ namespace DataOutBase
      * information for advanced output. For dim==0 we still allow one
      * neighbor, to avoid compiler warnings about zero-sized arrays.
      */
-    unsigned int neighbors[dim > 0 ? GeometryInfo<dim>::faces_per_cell : 1];
+    std::array<unsigned int, GeometryInfo<dim>::faces_per_cell> neighbors;
 
     /**
      * Number of this patch. Since we are not sure patches are always
