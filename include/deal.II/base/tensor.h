@@ -1111,12 +1111,10 @@ namespace internal
 {
   namespace TensorSubscriptor
   {
-    template <typename ArrayElementType, int dim>
+    template <typename ArrayElementType, std::size_t dim>
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
       DEAL_II_CUDA_HOST_DEV ArrayElementType &
-                            subscript(ArrayElementType * values,
-                                      const unsigned int i,
-                                      std::integral_constant<int, dim>)
+                            subscript(std::array<ArrayElementType, dim> &values, const unsigned int i)
     {
       // We cannot use Assert in a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -1140,15 +1138,17 @@ namespace internal
     Type Uninitialized<Type>::value;
 
     template <typename ArrayElementType>
-    DEAL_II_CONSTEXPR inline ArrayElementType &
-    subscript(ArrayElementType *,
-              const unsigned int,
-              std::integral_constant<int, 0>)
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+      DEAL_II_CUDA_HOST_DEV ArrayElementType &
+                            subscript(std::array<ArrayElementType, 0> &, const unsigned int)
     {
+      // We cannot use Assert in a CUDA kernel
+#ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
+#endif
       return Uninitialized<ArrayElementType>::value;
     }
   } // namespace TensorSubscriptor
@@ -1160,8 +1160,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV
   typename Tensor<rank_, dim, Number>::value_type &Tensor<rank_, dim, Number>::
                                                    operator[](const unsigned int i)
 {
-  return dealii::internal::TensorSubscriptor::subscript(
-    values.data(), i, std::integral_constant<int, dim>());
+  return dealii::internal::TensorSubscriptor::subscript(values, i);
 }
 
 
