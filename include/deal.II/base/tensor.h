@@ -1346,6 +1346,7 @@ namespace internal
     template <int rank,
               int dim,
               typename Number,
+              std::size_t array_dim,
               typename OtherNumber,
               typename std::enable_if<
                 !std::is_integral<
@@ -1353,9 +1354,10 @@ namespace internal
                   !std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
-                      division_operator(std::array<Tensor<rank, dim, Number>, dim> &t,
-                                        const OtherNumber &                         factor)
+                      division_operator(std::array<Tensor<rank, dim, Number>, array_dim> &t,
+                                        const OtherNumber &                               factor)
     {
+      static_assert(dim == array_dim, "Dimensions must be equal");
       const Number inverse_factor = Number(1.) / factor;
       // recurse over the base objects
       for (unsigned int d = 0; d < dim; ++d)
@@ -1366,6 +1368,7 @@ namespace internal
     template <int rank,
               int dim,
               typename Number,
+              std::size_t array_dim,
               typename OtherNumber,
               typename std::enable_if<
                 std::is_integral<
@@ -1373,9 +1376,10 @@ namespace internal
                   std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
-                      division_operator(std::array<Tensor<rank, dim, Number>, dim> &t,
-                                        const OtherNumber &                         factor)
+                      division_operator(std::array<Tensor<rank, dim, Number>, array_dim> &t,
+                                        const OtherNumber &                               factor)
     {
+      static_assert(dim == array_dim, "Dimensions must be equal");
       // recurse over the base objects
       for (unsigned int d = 0; d < dim; ++d)
         t[d] /= factor;
