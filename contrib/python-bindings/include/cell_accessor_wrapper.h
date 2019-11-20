@@ -172,7 +172,7 @@ namespace python
                    << "acceptable is " << arg2 - 1);
 
   private:
-    template <int dim, int spacedim>
+    template <int dim_, int spacedim_>
     const CellAccessorWrapper
     construct_neighbor_wrapper(const int i) const;
 
@@ -193,22 +193,22 @@ namespace python
   };
 
 
-  template <int dim, int spacedim>
+  template <int dim_, int spacedim_>
   const CellAccessorWrapper
   CellAccessorWrapper::construct_neighbor_wrapper(const int i) const
   {
-    CellAccessor<dim, spacedim> *cell =
-      static_cast<CellAccessor<dim, spacedim> *>(cell_accessor);
+    Assert(dim_ == dim && spacedim_ == spacedim, ExcInternalError());
+    auto *cell = static_cast<CellAccessor<dim_, spacedim_> *>(cell_accessor);
 
     auto neighbor = cell->neighbor(i);
 
     CellAccessorWrapper neighbor_wrapper;
-    neighbor_wrapper.dim      = dim;
-    neighbor_wrapper.spacedim = spacedim;
+    neighbor_wrapper.dim      = dim_;
+    neighbor_wrapper.spacedim = spacedim_;
     neighbor_wrapper.cell_accessor =
-      new CellAccessor<dim, spacedim>(&neighbor->get_triangulation(),
-                                      neighbor->level(),
-                                      neighbor->index());
+      new CellAccessor<dim_, spacedim_>(&neighbor->get_triangulation(),
+                                        neighbor->level(),
+                                        neighbor->index());
     return neighbor_wrapper;
   }
 } // namespace python
