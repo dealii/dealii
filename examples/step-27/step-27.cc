@@ -317,7 +317,7 @@ namespace Step27
                                      update_quadrature_points |
                                      update_JxW_values);
 
-    const RightHandSide<dim> rhs_function;
+    RightHandSide<dim> rhs_function;
 
     FullMatrix<double> cell_matrix;
     Vector<double>     cell_rhs;

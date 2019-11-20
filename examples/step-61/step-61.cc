@@ -419,8 +419,8 @@ namespace Step61
 
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
 
-    const RightHandSide<dim> right_hand_side;
-    std::vector<double>      right_hand_side_values(n_q_points);
+    RightHandSide<dim>  right_hand_side;
+    std::vector<double> right_hand_side_values(n_q_points);
 
     const Coefficient<dim>      coefficient;
     std::vector<Tensor<2, dim>> coefficient_values(n_q_points);
