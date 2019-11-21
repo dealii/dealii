@@ -1,0 +1,101 @@
+# Turek-Hron FSI2 in 2D, expressed with the current step-80 parameter API.
+#
+# The native channel_with_cylinder generator creates [0,2.2] x [0,0.41]
+# with a radius-0.05 cylinder centered at (0.2,0.2). The benchmark channel
+# length is 2.5, so this native grid is 0.3 shorter downstream.
+# The rectangular elastic flag occupies [0.25,0.60] x [0.19,0.21].
+# Its left edge is tangent to the cylinder at (0.25,0.2); this rectangular
+# approximation does not follow the curved cylinder boundary.
+#
+# The current step-80 implementation has one density parameter and does not
+# expose a separate solid density. The canonical FSI2 density ratio is 10.
+# Thus this file runs the geometry and flow setup, but cannot reproduce all
+# canonical FSI2 material data without extending the implementation.
+
+set dimension       = 2
+set space dimension = 2
+subsection Navier-Stokes Immersed Problem
+  set Dirichlet boundary ids                = 0, 2, 3
+  set Final time                            = 20
+  set Number of time steps                  = 5001
+  set Output directory                      = ./turek_hron_fsi2_2d/
+  set Output frequency                      = 1
+  subsection Finite element spaces
+    set Velocity            = FE_Q<2>(2)
+    set Pressure            = FE_Q<2>(1)
+    set Displacement        = FE_Q<2>(1)
+    set Lagrange multiplier = FE_Q<2>(1)
+  end
+  subsection Grid generation
+    set Fluid grid generator                     = channel_with_cylinder
+    set Fluid grid generator arguments           = 0.03: 2: 2.0: true
+    set Initial fluid refinement                 = 3
+    # Coarse cell sides are approximately 0.02 m in both directions.
+    set Solid grid generator                     = subdivided_hyper_rectangle
+    set Solid grid generator arguments           = 18, 1: 0.25, 0.19: 0.60, 0.21: true
+    set Initial solid refinement                 = 2
+  end
+  subsection Initial displacement and multiplier
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes boundary conditions
+    # Start from rest and smoothly reach the nominal inlet velocity at T_ramp.
+    set Function constants  = Ubar=1, H=0.41, T_ramp=2
+    set Function expression = x < 1e-8 ? 6*Ubar*y*(H-y)/(H*H)*(t <= 0 ? 0 : (t < T_ramp ? (1-cos(pi*t/T_ramp))/2 : 1)) : 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes initial conditions
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Physical properties
+    set Density                 = 1000
+    set Lame lambda             = 2e6
+    set Lame mu                 = 5e5
+    set Include convective term = true
+    set Solid model             = linear
+    set Viscosity               = 1
+  end
+  subsection Reference configuration and multiplier
+    set Function constants  =
+    set Function expression = x; y; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 200000
+    set Refinement coarsening fraction = 0.2
+    set Refinement fraction            = 0.2
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 2
+    set Refinement step frequency      = 25
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Solid right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Solver parameters
+    set Solver type                                = augmented_split
+    set Use operator augmentation                  = false
+    set Coupling quadrature type                   = gauss
+    set Gamma AL background                        = 100
+    set Gamma AL immersed                          = 0.01
+    set Inner Lagrangian solver maximum iterations = 500
+    set Inner Lagrangian solver tolerance          = 1e-2
+    set Log inner Lagrangian iterations            = false
+    set Inner solver maximum iterations            = 100
+    set Inner solver tolerance                     = 1e-10
+    set Outer solver maximum iterations            = 1000
+    set Outer solver tolerance                     = 1e-5
+    set Outer solver maximum Krylov vectors        = 100
+  end
+end
