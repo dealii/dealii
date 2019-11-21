@@ -524,7 +524,78 @@ namespace Particles
         &data_range);
   };
 
-  /* ---------------------- inline and template functions ------------------ */
+  /**
+   * This class manages the DataOut of a Particle Handler
+   * It currently only supports witing the particle position
+   * and their ID
+   *
+   * @ingroup Particle
+   *
+   * @author : Bruno Blais, Luca Heltai 2019
+   */
+
+  template <int dim, int spacedim>
+  class ParticleOutput : public dealii::DataOutInterface<0, spacedim>
+  {
+  public:
+    ParticleOutput() = default;
+
+    void
+    build_patches(const Particles::ParticleHandler<dim, spacedim> &particles)
+    {
+      dataset_names.reserve(1);
+      dataset_names.emplace_back("id");
+      patches.resize(particles.n_locally_owned_particles());
+
+      auto particle = particles.begin();
+      for (unsigned int i = 0; particle != particles.end(); ++particle, ++i)
+        {
+          patches[i].vertices[0]    = particle->get_location();
+          patches[i].patch_index    = i;
+          patches[i].n_subdivisions = 1;
+          patches[i].data.reinit(dataset_names.size(), 1);
+
+          patches[i].data(0, 0) = particle->get_id();
+        }
+    }
+
+
+
+    ~ParticleOutput() = default;
+
+  protected:
+    /**
+     * Implementation of the corresponding function of the base class.
+     */
+    virtual const std::vector<DataOutBase::Patch<0, spacedim>> &
+    get_patches() const
+    {
+      return patches;
+    }
+
+    /**
+     * Implementation of the corresponding function of the base class.
+     */
+    virtual std::vector<std::string>
+    get_dataset_names() const
+    {
+      return dataset_names;
+    }
+
+  private:
+    std::vector<DataOutBase::Patch<0, spacedim>> patches;
+
+    /**
+     * A list of field names for all data components stored in patches.
+     */
+    std::vector<std::string> dataset_names;
+  };
+
+
+  /* ---------------------- inline and template functions ------------------
+   */
+
+
 
   template <int dim, int spacedim>
   template <class Archive>
