@@ -707,6 +707,19 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  IndexSet
+  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
+  {
+    IndexSet set(get_next_free_particle_index());
+    for (const auto &p : *this)
+      set.add_index(p.get_id());
+    set.compress();
+    return set;
+  }
+
+
+
+  template <int dim, int spacedim>
   PropertyPool &
   ParticleHandler<dim, spacedim>::get_property_pool() const
   {

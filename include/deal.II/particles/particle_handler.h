@@ -355,6 +355,27 @@ namespace Particles
     get_next_free_particle_index() const;
 
     /**
+     * Extract an IndexSet with global dimensions equal to
+     * get_next_free_particle_index(), containing the locally owned
+     * particle indices.
+     *
+     * This function can be used to construct distributed vectors and matrices
+     * to manipulate particles using linear algebra operations.
+     *
+     * Notice that it is the user's responsability to guarantee that particle
+     * indices are unique, and no check is performed to verify that this is the
+     * case, nor that the union of all IndexSet objects on each mpi process is
+     * complete.
+     *
+     * @return An IndexSet of size get_next_free_particle_index(), containing
+     * n_locally_owned_particle() indices.
+     *
+     * @author Luca Heltai, Bruno Blais, 2019.
+     */
+    IndexSet
+    locally_relevant_ids() const;
+
+    /**
      * Return the number of properties each particle has.
      */
     unsigned int
