@@ -21,6 +21,7 @@
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
 #  include <deal.II/differentiation/ad/adolc_number_types.h>
 
+#  include <functional>
 #  include <utility>
 
 DEAL_II_NAMESPACE_OPEN
