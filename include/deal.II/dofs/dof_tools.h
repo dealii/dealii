@@ -26,6 +26,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/component_mask.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/hp/dof_handler.h>
 
@@ -2355,6 +2356,63 @@ namespace DoFTools
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points);
+
+  // Same as above but with support for a component mask
+
+  template <int dim, int spacedim>
+  void
+  map_dofs_to_support_points(
+    const Mapping<dim, spacedim> &                      mapping,
+    const DoFHandler<dim, spacedim> &                   dof_handler,
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask)
+  {
+    const auto &tria = dof_handler.get_triangulation();
+    const auto &fe   = dof_handler.get_fe();
+
+    // Check if the FE has support points
+    Assert(fe.has_support_points(),
+           typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+
+    // Create quadrature at support point
+    Quadrature<dim> quad(fe.get_unit_support_points());
+
+    // Now loop over all cells and enquire the support points on each
+    // of these. we use dummy quadrature formulas where the quadrature
+    // points are located at the unit support points to enquire the
+    // location of the support points in real space.
+    //
+    // The weights of the quadrature rule have been set to invalid
+    // values by the used constructor.
+    //
+    // The mask is used to assess if a component should be kept
+    // or not
+    FEValues<dim, spacedim> fe_values(mapping,
+                                      fe,
+                                      quad,
+                                      update_quadrature_points);
+
+    std::vector<types::global_dof_index> local_dof_indices;
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      // only work on locally relevant cells
+      if (cell->is_artificial() == false)
+        {
+          fe_values.reinit(cell);
+
+          local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+          cell->get_dof_indices(local_dof_indices);
+
+          const std::vector<Point<spacedim>> &points =
+            fe_values.get_quadrature_points();
+          for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
+            {
+              unsigned int dof_comp = fe.system_to_component_index(i).first;
+              // insert the values into the map
+              if (mask[dof_comp])
+                support_points[local_dof_indices[i]] = points[i];
+            }
+        }
+  }
 
   /**
    * Same as the previous function but for the hp case.
