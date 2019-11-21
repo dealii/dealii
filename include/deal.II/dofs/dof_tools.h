@@ -1697,8 +1697,25 @@ namespace DoFTools
   extract_locally_relevant_dofs(const DoFHandlerType &dof_handler,
                                 IndexSet &            dof_set);
 
+
   /**
+   * Extract the set of locally owned DoF indices for each component within the
+   * mask that are owned by the current  processor. For components disabled by
+   * the mask, an empty IndexSet is returned. For a scalar DoFHandler built on a
+   * sequential triangulation, the return vector contains a single complete
+   * IndexSet with all DoF indices. If the mask contains all components (which
+   * also corresponds to the default value), then the union of the returned
+   * index sets equlas what DoFHandler::locally_owned_dofs() returns.
    *
+   * @authors Bruno Blais, Luca Heltai, 2019
+   */
+  template <typename DoFHandlerType>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_component(
+    const DoFHandlerType &dof_handler,
+    const ComponentMask & components = ComponentMask());
+
+  /**
    * For each processor, determine the set of locally owned degrees of freedom
    * as an IndexSet. This function then returns a vector of index sets, where
    * the vector has size equal to the number of MPI processes that participate
