@@ -1001,6 +1001,44 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
 
 
 
+#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+namespace internal
+{
+  namespace SymmetricTensorImplementation
+  {
+    template <>
+    struct Inverse<4, 3, adouble>;
+  } // namespace SymmetricTensorImplementation
+} // namespace internal
+
+template <>
+std::array<adouble, 1>
+eigenvalues(const SymmetricTensor<2, 1, adouble> & /*T*/);
+
+template <>
+std::array<adouble, 2>
+eigenvalues(const SymmetricTensor<2, 2, adouble> & /*T*/);
+
+template <>
+std::array<adouble, 3>
+eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/);
+
+template <>
+std::array<std::pair<adouble, Tensor<1, 1, adouble>>, 1>
+eigenvectors(const SymmetricTensor<2, 1, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
+
+template <>
+std::array<std::pair<adouble, Tensor<1, 2, adouble>>, 2>
+eigenvectors(const SymmetricTensor<2, 2, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
+
+template <>
+std::array<std::pair<adouble, Tensor<1, 3, adouble>>, 3>
+eigenvectors(const SymmetricTensor<2, 3, adouble> & /*T*/,
+             const SymmetricTensorEigenvectorMethod /*method*/);
+#endif
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
