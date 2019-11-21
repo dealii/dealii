@@ -326,7 +326,7 @@ namespace python
     generate_enclosed_hyper_cube(const double left,
                                  const double right,
                                  const double thickness,
-                                 const double colorize,
+                                 const bool   colorize,
                                  void *       triangulation)
     {
       Triangulation<dim> *tria =

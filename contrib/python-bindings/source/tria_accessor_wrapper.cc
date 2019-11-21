@@ -272,8 +272,8 @@ namespace python
   void
   TriaAccessorWrapper::set_vertex(const int i, PointWrapper &point_wrapper)
   {
-    AssertThrow(i < std::pow(2, dim),
-                ExcVertexDoesNotExist(i, std::pow(2, dim)));
+    AssertThrow(i < static_cast<int>(Utilities::pow(2, dim)),
+                ExcVertexDoesNotExist(i, Utilities::pow(2, dim)));
     if ((dim == 2) && (spacedim == 2) && (structdim == 1))
       internal::set_vertex<1, 2, 2>(i, point_wrapper, tria_accessor);
     else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
@@ -287,8 +287,8 @@ namespace python
   PointWrapper
   TriaAccessorWrapper::get_vertex(const int i) const
   {
-    AssertThrow(i < std::pow(2, dim),
-                ExcVertexDoesNotExist(i, std::pow(2, dim)));
+    AssertThrow(i < static_cast<int>(Utilities::pow(2, dim)),
+                ExcVertexDoesNotExist(i, Utilities::pow(2, dim)));
     if ((dim == 2) && (spacedim == 2) && (structdim == 1))
       return internal::get_vertex<1, 2, 2>(i, tria_accessor);
     else if ((dim == 2) && (spacedim == 3) && (structdim == 1))

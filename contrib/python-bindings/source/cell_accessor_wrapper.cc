@@ -505,8 +505,8 @@ namespace python
   void
   CellAccessorWrapper::set_vertex(const int i, PointWrapper &point_wrapper)
   {
-    AssertThrow(i < std::pow(2, dim),
-                ExcVertexDoesNotExist(i, std::pow(2, dim)));
+    AssertThrow(i < static_cast<int>(Utilities::pow(2, dim)),
+                ExcVertexDoesNotExist(i, Utilities::pow(2, dim)));
     if ((dim == 2) && (spacedim == 2))
       internal::set_vertex<2, 2>(i, point_wrapper, cell_accessor);
     else if ((dim == 2) && (spacedim == 3))
@@ -520,8 +520,8 @@ namespace python
   PointWrapper
   CellAccessorWrapper::get_vertex(const int i) const
   {
-    AssertThrow(i < std::pow(2, dim),
-                ExcVertexDoesNotExist(i, std::pow(2, dim)));
+    AssertThrow(i < static_cast<int>(Utilities::pow(2, dim)),
+                ExcVertexDoesNotExist(i, Utilities::pow(2, dim)));
     if ((dim == 2) && (spacedim == 2))
       return internal::get_vertex<2, 2>(i, cell_accessor);
     else if ((dim == 2) && (spacedim == 3))
