@@ -457,6 +457,40 @@ namespace DoFTools
 
 
   template <typename DoFHandlerType>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_component(const DoFHandlerType &dof,
+                                   const ComponentMask & component_mask)
+  {
+    const auto n_comps = dof.get_fe_collection().n_components();
+    Assert(component_mask.represents_n_components(n_comps),
+           ExcMessage(
+             "The given component mask is not sized correctly to represent the "
+             "components of the given finite element."));
+
+    const auto &locally_owned_dofs = dof.locally_owned_dofs();
+
+    // get the component association of each DoF and then select the ones
+    // that match the given set of components
+    std::vector<unsigned char> dofs_by_component(dof.n_locally_owned_dofs());
+    internal::get_component_association(dof, component_mask, dofs_by_component);
+
+    std::vector<IndexSet> index_per_comp(n_comps, IndexSet(dof.n_dofs()));
+
+    for (types::global_dof_index i = 0; i < dof.n_locally_owned_dofs(); ++i)
+      {
+        const auto &comp_i = dofs_by_component[i];
+        if (component_mask[comp_i])
+          index_per_comp[comp_i].add_index(
+            locally_owned_dofs.nth_index_in_set(i));
+      }
+    for (auto &c : index_per_comp)
+      c.compress();
+    return index_per_comp;
+  }
+
+
+
+  template <typename DoFHandlerType>
   void
   extract_level_dofs(const unsigned int    level,
                      const DoFHandlerType &dof,

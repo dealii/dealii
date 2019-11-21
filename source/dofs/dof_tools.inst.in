@@ -38,6 +38,11 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
       DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
       IndexSet &                                                    dof_set);
+
+    template std::vector<IndexSet> DoFTools::locally_owned_dofs_per_component<
+      DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
+      const ComponentMask &                                         components);
 #endif
   }
 
