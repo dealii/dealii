@@ -18,8 +18,14 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
 
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/generators.h>
 
@@ -390,6 +396,75 @@ namespace Particles
 
         particle_handler.insert_particles(particles);
       }
+    }
+
+    template <int dim, int spacedim>
+    void
+    dof_support_points(const DoFHandler<dim, spacedim> &dof_handler,
+                       const std::vector<std::vector<BoundingBox<spacedim>>>
+                         &                             global_bounding_boxes,
+                       ParticleHandler<dim, spacedim> &particle_handler,
+                       const Mapping<dim, spacedim> &  mapping,
+                       const ComponentMask &           components)
+    {
+      const auto &fe = dof_handler.get_fe();
+
+      // Take care of components
+      const ComponentMask mask =
+        (components.size() == 0 ? ComponentMask(fe.n_components(), true) :
+                                  components);
+
+      std::map<types::global_dof_index, Point<spacedim>> support_points_map;
+
+      DoFTools::map_dofs_to_support_points(mapping,
+                                           dof_handler,
+                                           support_points_map,
+                                           mask);
+
+      // Generate the vector of points from the map
+      // Memory is reserved for efficiency reasons
+      std::vector<Point<spacedim>> support_points_vec;
+      support_points_vec.reserve(support_points_map.size());
+      for (auto const &element : support_points_map)
+        support_points_vec.push_back(element.second);
+
+      particle_handler.insert_global_particles(support_points_vec,
+                                               global_bounding_boxes);
+    }
+
+
+    template <int dim, int spacedim>
+    void
+    quadrature_points(
+      const Triangulation<dim, spacedim> &particle_tria,
+      const Quadrature<dim> &             quadrature,
+      // const std::vector<Point<dim>> &     particle_reference_locations,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &                             global_bounding_boxes,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping)
+    {
+      const std::vector<Point<dim>> &particle_reference_locations =
+        quadrature.get_points();
+      std::vector<Point<spacedim>> points_to_generate;
+
+      //       Loop through cells and gather gauss points
+      for (const auto &cell : particle_tria.active_cell_iterators())
+        {
+          if (cell->is_locally_owned())
+            {
+              for (const auto &reference_location :
+                   particle_reference_locations)
+                {
+                  const Point<spacedim> position_real =
+                    mapping.transform_unit_to_real_cell(cell,
+                                                        reference_location);
+                  points_to_generate.push_back(position_real);
+                }
+            }
+        }
+      particle_handler.insert_global_particles(points_to_generate,
+                                               global_bounding_boxes);
     }
   } // namespace Generators
 } // namespace Particles
