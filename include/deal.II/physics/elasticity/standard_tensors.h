@@ -273,8 +273,8 @@ namespace Physics
        * @dealiiHolzapfelA{228,6.82}
        */
       template <typename Number>
-      static constexpr SymmetricTensor<2, dim, Number>
-      ddet_F_dC(const Tensor<2, dim, Number> &F);
+      static DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                               ddet_F_dC(const Tensor<2, dim, Number> &F);
 
       //@}
 
@@ -368,8 +368,8 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
 
 template <int dim>
 template <typename Number>
-constexpr SymmetricTensor<2, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
+DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                  Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
   const Tensor<2, dim, Number> &F)
 {
   return Number(0.5) * determinant(F) * symmetrize(invert(transpose(F) * F));
