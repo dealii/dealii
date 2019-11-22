@@ -731,28 +731,30 @@ CHECK_CXX_SOURCE_COMPILES(
 # expression, C++14 allows to call non-constexpr functions from constexpr
 # functions. Unfortunately, not all compilers obey the standard in this regard.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #define Assert(x,y) if (!(x)) throw y;
-  void bar()
-  {}
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #define Assert(x,y) if (!(x)) throw y;
+    void bar()
+    {}
 
-  constexpr int
-  foo(const int n)
-  {
-    Assert(n>0, \"hello\");
-    if(!(n >= 0))
-      bar();
-    return n;
-  }
+    constexpr int
+    foo(const int n)
+    {
+      Assert(n>0, \"hello\");
+      if(!(n >= 0))
+        bar();
+      return n;
+    }
 
-  int main()
-  {
-    constexpr unsigned int n=foo(1);
-    return n;
-  }
-  "
-  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+    int main()
+    {
+      constexpr unsigned int n=foo(1);
+      return n;
+    }
+    "
+    DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+ENDIF()
 
 #
 # The macro DEAL_II_CONSTEXPR allows using c++ constexpr features in a portable way.

@@ -464,7 +464,13 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
-                                  Tensor() = default;
+                                  Tensor()
+#ifdef DEAL_II_MSVC
+    : values{}
+  {}
+#else
+    = default;
+#endif
 
   /**
    * Constructor, where the data is copied from a C-style array.
