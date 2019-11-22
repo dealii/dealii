@@ -18,6 +18,8 @@
 // Create a particle handler then generate an output
 // Tests the Visualization class of the particle handler
 
+#include <deal.II/base/data_out_base.h>
+
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/mapping_q.h>
@@ -25,6 +27,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
+#include <deal.II/particles/data_out.h>
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
@@ -69,13 +72,13 @@ test()
     particle_handler.insert_particle(particle1, cell1);
     particle_handler.insert_particle(particle2, cell2);
 
-    Particles::ParticleOutput<dim, spacedim> particle_viz;
+    Particles::DataOut<dim, spacedim> particle_viz;
     particle_viz.build_patches(particle_handler);
     particle_viz.write_gnuplot(deallog.get_file_stream());
 
-    for (const auto &particle : particle_handler)
-      deallog << "Particle id " << particle.get_id() << " is in cell "
-              << particle.get_surrounding_cell(tr) << std::endl;
+    //    for (const auto &particle : particle_handler)
+    //      deallog << "Particle id " << particle.get_id() << " is in cell "
+    //              << particle.get_surrounding_cell(tr) << std::endl;
   }
 
   deallog << "OK" << std::endl;
