@@ -19,6 +19,7 @@ SET(_unity_include_src
   grid_refinement.cc
   cell_weights.cc
   cell_data_transfer.cc
+  error_predictor.cc
   fully_distributed_tria.cc
   solution_transfer.cc
   tria.cc
@@ -43,6 +44,7 @@ SET(_inst
   grid_refinement.inst.in
   cell_weights.inst.in
   cell_data_transfer.inst.in
+  error_predictor.inst.in
   fully_distributed_tria.inst.in
   solution_transfer.inst.in
   tria.inst.in
