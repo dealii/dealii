@@ -731,6 +731,10 @@ CHECK_CXX_SOURCE_COMPILES(
 # expression, C++14 allows to call non-constexpr functions from constexpr
 # functions. Unfortunately, not all compilers obey the standard in this regard.
 #
+# In some cases, MSVC 2019 crashes with an internal compiler error when we
+# declare the respective functions as 'constexpr' even though the test below
+# passes, see #9080.
+#
 IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   CHECK_CXX_SOURCE_COMPILES(
     "
