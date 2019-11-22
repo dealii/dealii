@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -49,6 +50,11 @@ namespace LinearAlgebraDealII
    * Typedef for sparse matrix type used
    */
   using SparseMatrix = SparseMatrix<double>;
+
+  /**
+   * Typedef describing sparse matrices that consist of multiple blocks.
+   */
+  using BlockSparseMatrix = BlockSparseMatrix<double>;
 
   /**
    * Typedef for the SSOR preconditioner used
