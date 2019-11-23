@@ -1142,15 +1142,19 @@ namespace internal
     Type Uninitialized<Type>::value;
 
     template <typename ArrayElementType>
-    DEAL_II_CONSTEXPR inline ArrayElementType &
-    subscript(ArrayElementType *,
-              const unsigned int,
-              std::integral_constant<int, 0>)
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+      DEAL_II_CUDA_HOST_DEV ArrayElementType &
+                            subscript(ArrayElementType *,
+                                      const unsigned int,
+                                      std::integral_constant<int, 0>)
     {
+      // We cannot use Assert in a CUDA kernel
+#ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
+#endif
       return Uninitialized<ArrayElementType>::value;
     }
   } // namespace TensorSubscriptor
@@ -1158,7 +1162,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV //
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV
   typename Tensor<rank_, dim, Number>::value_type &Tensor<rank_, dim, Number>::
                                                    operator[](const unsigned int i)
 {
@@ -1375,7 +1379,7 @@ namespace internal
                   std::is_same<Number, Differentiation::SD::Expression>::value,
                 int>::type = 0>
     DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
-                      division_operator(dealii::Tensor<rank, dim, Number> (&t)[dim],
+                      division_operator(Tensor<rank, dim, Number> (&t)[dim],
                                         const OtherNumber &factor)
     {
       // recurse over the base objects
