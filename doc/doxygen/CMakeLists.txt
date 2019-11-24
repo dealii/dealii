@@ -287,6 +287,7 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${PERL_EXECUTABLE}
   ARGS
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.pl
+  COMMAND ${CMAKE_COMMAND} -E echo "-- Documentation is available at ${CMAKE_CURRENT_BINARY_DIR}/deal.II/index.html"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
