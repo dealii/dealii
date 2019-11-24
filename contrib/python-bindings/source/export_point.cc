@@ -20,6 +20,11 @@
 
 #include <point_wrapper.h>
 
+#ifdef __clang__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wself-assign-overloaded"
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace python
@@ -99,3 +104,7 @@ namespace python
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE
+
+#ifdef __clang__
+#  pragma GCC diagnostic pop
+#endif
