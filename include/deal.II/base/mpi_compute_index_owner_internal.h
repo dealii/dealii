@@ -35,6 +35,120 @@ namespace Utilities
       namespace ComputeIndexOwner
       {
         /**
+         * Specialization of ConsensusAlgorithmProcess for setting up the
+         * Dictionary even if there are ranges in the IndexSet space not owned
+         * by any processes.
+         *
+         * @note Only for internal usage.
+         */
+        class DictionaryPayLoad
+          : public ConsensusAlgorithmProcess<
+              std::pair<types::global_dof_index, types::global_dof_index>,
+              unsigned int>
+        {
+        public:
+          /**
+           * Constructor.
+           */
+          DictionaryPayLoad(
+            const std::map<unsigned int,
+                           std::vector<std::pair<types::global_dof_index,
+                                                 types::global_dof_index>>>
+              &                        buffers,
+            std::vector<unsigned int> &actually_owning_ranks,
+            const std::pair<types::global_dof_index, types::global_dof_index>
+              &                        local_range,
+            std::vector<unsigned int> &actually_owning_rank_list)
+            : buffers(buffers)
+            , actually_owning_ranks(actually_owning_ranks)
+            , local_range(local_range)
+            , actually_owning_rank_list(actually_owning_rank_list)
+          {}
+
+          /**
+           * Implementation of
+           * Utilities::MPI::ConsensusAlgorithmProcess::compute_targets().
+           */
+          virtual std::vector<unsigned int>
+          compute_targets() override
+          {
+            std::vector<unsigned int> targets;
+            for (const auto &rank_pair : buffers)
+              targets.push_back(rank_pair.first);
+
+            return targets;
+          }
+
+          /**
+           * Implementation of
+           * Utilities::MPI::ConsensusAlgorithmProcess::pack_recv_buffer().
+           */
+          virtual void
+          pack_recv_buffer(const int other_rank,
+                           std::vector<std::pair<types::global_dof_index,
+                                                 types::global_dof_index>>
+                             &send_buffer) override
+          {
+            send_buffer = this->buffers.at(other_rank);
+          }
+
+          /**
+           * Implementation of
+           * Utilities::MPI::ConsensusAlgorithmProcess::process_request().
+           */
+          virtual void
+          process_request(
+            const unsigned int                                     other_rank,
+            const std::vector<std::pair<types::global_dof_index,
+                                        types::global_dof_index>> &buffer_recv,
+            std::vector<unsigned int> &request_buffer) override
+          {
+            (void)request_buffer; // not needed
+
+
+            // process message: loop over all intervals
+            for (auto interval : buffer_recv)
+              {
+#ifdef DEBUG
+                for (types::global_dof_index i = interval.first;
+                     i < interval.second;
+                     i++)
+                  Assert(actually_owning_ranks[i - local_range.first] ==
+                           numbers::invalid_unsigned_int,
+                         ExcInternalError());
+                Assert(interval.first >= local_range.first &&
+                         interval.first < local_range.second,
+                       ExcInternalError());
+                Assert(interval.second > local_range.first &&
+                         interval.second <= local_range.second,
+                       ExcInternalError());
+#endif
+                std::fill(actually_owning_ranks.data() + interval.first -
+                            local_range.first,
+                          actually_owning_ranks.data() + interval.second -
+                            local_range.first,
+                          other_rank);
+              }
+            actually_owning_rank_list.push_back(other_rank);
+          }
+
+        private:
+          const std::map<unsigned int,
+                         std::vector<std::pair<types::global_dof_index,
+                                               types::global_dof_index>>>
+            &buffers;
+
+          std::vector<unsigned int> &actually_owning_ranks;
+
+          const std::pair<types::global_dof_index, types::global_dof_index>
+            &local_range;
+
+          std::vector<unsigned int> &actually_owning_rank_list;
+        };
+
+
+
+        /**
          * Dictionary class with basic partitioning in terms of a single
          * interval of fixed size known to all MPI ranks for two-stage index
          * lookup.
@@ -121,6 +235,10 @@ namespace Utilities
                                            types::global_dof_index>>>
               buffers;
 
+            std::fill(actually_owning_ranks.begin(),
+                      actually_owning_ranks.end(),
+                      numbers::invalid_subdomain_id);
+
             // 2) collect relevant processes and process local dict entries
             for (auto interval = owned_indices.begin_intervals();
                  interval != owned_indices.end_intervals();
@@ -180,88 +298,119 @@ namespace Utilities
                   }
               }
 
-            // protect the following communication steps using a mutex:
-            static CollectiveMutex      mutex;
-            CollectiveMutex::ScopedLock lock(mutex, comm);
-
-            const int mpi_tag =
-              Utilities::MPI::internal::Tags::dictionary_reinit;
-
             n_dict_procs_in_owned_indices = buffers.size();
             std::vector<MPI_Request> request;
-            request.reserve(n_dict_procs_in_owned_indices);
 
-            // 3) send messages with local dofs to the right dict process
-            for (const auto &rank_pair : buffers)
+            // Check if index set space is partitioned globally without gaps.
+            if (Utilities::MPI::sum(owned_indices.n_elements(), comm) ==
+                owned_indices.size())
               {
-                request.push_back(MPI_Request());
-                const int ierr = MPI_Isend(rank_pair.second.data(),
-                                           rank_pair.second.size() * 2,
-                                           DEAL_II_DOF_INDEX_MPI_TYPE,
-                                           rank_pair.first,
-                                           mpi_tag,
-                                           comm,
-                                           &request.back());
-                AssertThrowMPI(ierr);
-              }
+                // no gaps: setup is simple! Processes send their locally owned
+                // indices to the dictionary. The dictionary stores the sending
+                // rank for each index. The dictionary knows exactly
+                // when it is set up when all indices it is responsible for
+                // have been processed.
 
-            // 4) receive messages until all dofs in dict are processed
-            while (this->local_size != dic_local_received)
-              {
-                // wait for an incoming message
-                MPI_Status status;
-                auto ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
-                AssertThrowMPI(ierr);
+                request.reserve(n_dict_procs_in_owned_indices);
 
-                // retrieve size of incoming message
-                int number_amount;
-                ierr = MPI_Get_count(&status,
-                                     DEAL_II_DOF_INDEX_MPI_TYPE,
-                                     &number_amount);
-                AssertThrowMPI(ierr);
+                // protect the following communication steps using a mutex:
+                static CollectiveMutex      mutex;
+                CollectiveMutex::ScopedLock lock(mutex, comm);
 
-                const auto other_rank = status.MPI_SOURCE;
-                actually_owning_rank_list.push_back(other_rank);
+                const int mpi_tag =
+                  Utilities::MPI::internal::Tags::dictionary_reinit;
 
-                // receive message
-                Assert(number_amount % 2 == 0, ExcInternalError());
-                std::vector<
-                  std::pair<types::global_dof_index, types::global_dof_index>>
-                  buffer(number_amount / 2);
-                ierr = MPI_Recv(buffer.data(),
-                                number_amount,
-                                DEAL_II_DOF_INDEX_MPI_TYPE,
-                                status.MPI_SOURCE,
-                                status.MPI_TAG,
-                                comm,
-                                &status);
-                AssertThrowMPI(ierr);
 
-                // process message: loop over all intervals
-                for (auto interval : buffer)
+                // 3) send messages with local dofs to the right dict process
+                for (const auto &rank_pair : buffers)
                   {
+                    request.push_back(MPI_Request());
+                    const int ierr = MPI_Isend(rank_pair.second.data(),
+                                               rank_pair.second.size() * 2,
+                                               DEAL_II_DOF_INDEX_MPI_TYPE,
+                                               rank_pair.first,
+                                               mpi_tag,
+                                               comm,
+                                               &request.back());
+                    AssertThrowMPI(ierr);
+                  }
+
+                // 4) receive messages until all dofs in dict are processed
+                while (this->local_size != dic_local_received)
+                  {
+                    // wait for an incoming message
+                    MPI_Status status;
+                    auto       ierr =
+                      MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
+                    AssertThrowMPI(ierr);
+
+                    // retrieve size of incoming message
+                    int number_amount;
+                    ierr = MPI_Get_count(&status,
+                                         DEAL_II_DOF_INDEX_MPI_TYPE,
+                                         &number_amount);
+                    AssertThrowMPI(ierr);
+
+                    const auto other_rank = status.MPI_SOURCE;
+                    actually_owning_rank_list.push_back(other_rank);
+
+                    // receive message
+                    Assert(number_amount % 2 == 0, ExcInternalError());
+                    std::vector<std::pair<types::global_dof_index,
+                                          types::global_dof_index>>
+                      buffer(number_amount / 2);
+                    ierr = MPI_Recv(buffer.data(),
+                                    number_amount,
+                                    DEAL_II_DOF_INDEX_MPI_TYPE,
+                                    status.MPI_SOURCE,
+                                    status.MPI_TAG,
+                                    comm,
+                                    MPI_STATUS_IGNORE);
+                    AssertThrowMPI(ierr);
+                    // process message: loop over all intervals
+                    for (auto interval : buffer)
+                      {
 #  ifdef DEBUG
-                    for (types::global_dof_index i = interval.first;
-                         i < interval.second;
-                         i++)
-                      Assert(actually_owning_ranks[i - local_range.first] ==
-                               numbers::invalid_unsigned_int,
-                             ExcInternalError());
-                    Assert(interval.first >= local_range.first &&
-                             interval.first < local_range.second,
-                           ExcInternalError());
-                    Assert(interval.second > local_range.first &&
-                             interval.second <= local_range.second,
-                           ExcInternalError());
+                        for (types::global_dof_index i = interval.first;
+                             i < interval.second;
+                             i++)
+                          Assert(actually_owning_ranks[i - local_range.first] ==
+                                   numbers::invalid_unsigned_int,
+                                 ExcInternalError());
+                        Assert(interval.first >= local_range.first &&
+                                 interval.first < local_range.second,
+                               ExcInternalError());
+                        Assert(interval.second > local_range.first &&
+                                 interval.second <= local_range.second,
+                               ExcInternalError());
 #  endif
 
-                    std::fill(actually_owning_ranks.data() + interval.first -
-                                local_range.first,
-                              actually_owning_ranks.data() + interval.second -
-                                local_range.first,
-                              other_rank);
-                    dic_local_received += interval.second - interval.first;
+                        std::fill(actually_owning_ranks.data() +
+                                    interval.first - local_range.first,
+                                  actually_owning_ranks.data() +
+                                    interval.second - local_range.first,
+                                  other_rank);
+                        dic_local_received += interval.second - interval.first;
+                      }
                   }
+              }
+            else
+              {
+                // with gap: use ConsensusAlgorithm to determine when all
+                // dictionaries have been set up.
+
+                // 3/4) use ConsensusAlgorithm to send messages with local dofs
+                // to the right dict process
+                DictionaryPayLoad temp(buffers,
+                                       actually_owning_ranks,
+                                       local_range,
+                                       actually_owning_rank_list);
+
+                ConsensusAlgorithmSelector<
+                  std::pair<types::global_dof_index, types::global_dof_index>,
+                  unsigned int>
+                  consensus_algo(temp, comm);
+                consensus_algo.run();
               }
 
             std::sort(actually_owning_rank_list.begin(),
