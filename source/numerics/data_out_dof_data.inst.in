@@ -27,7 +27,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DataVectorType,
         const std::vector<
           DataComponentInterpretation::DataComponentInterpretation> &,
-        const bool);
+        const bool,
+        const unsigned int);
 
     template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
                                   deal_II_dimension,
@@ -36,7 +37,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &,
+        const unsigned int);
 
 
 
@@ -52,7 +54,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DataVectorType,
         const std::vector<
           DataComponentInterpretation::DataComponentInterpretation> &,
-        const bool);
+        const bool,
+        const unsigned int);
 
     template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
                                   deal_II_dimension - 1,
@@ -61,7 +64,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &,
+        const unsigned int);
 
 
 
@@ -78,7 +82,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DataVectorType,
         const std::vector<
           DataComponentInterpretation::DataComponentInterpretation> &,
-        const bool);
+        const bool,
+        const unsigned int);
 
     template void DataOut_DoFData<DH<deal_II_dimension, deal_II_dimension>,
                                   deal_II_dimension + 1,
@@ -87,7 +92,8 @@ for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
         const DH<deal_II_dimension, deal_II_dimension> &,
         const VEC &,
         const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &);
+          DH<deal_II_dimension, deal_II_dimension>::space_dimension> &,
+        const unsigned int);
 #endif
   }
 

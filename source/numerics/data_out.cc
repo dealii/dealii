@@ -32,6 +32,7 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <sstream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -739,7 +740,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
       // first_cell/next_cell functions only return active cells
       if (this->cell_data.size() != 0)
         {
-          Assert(!cell_and_index->first->has_children(), ExcNotImplemented());
+          // Assert(!cell_and_index->first->has_children(),
+          // ExcNotImplemented());
 
           for (unsigned int dataset = 0; dataset < this->cell_data.size();
                ++dataset)
@@ -910,19 +912,18 @@ DataOut<dim, DoFHandlerType>::build_patches(
     // data from (cell data vectors do not have the length distance computed by
     // first_locally_owned_cell/next_locally_owned_cell because this might skip
     // some values (FilteredIterator).
-    active_cell_iterator active_cell  = this->triangulation->begin_active();
-    unsigned int         active_index = 0;
-    cell_iterator        cell         = first_locally_owned_cell();
+    cell_iterator active_cell  = this->triangulation->begin();
+    unsigned int  active_index = 0;
+    cell_iterator cell         = first_locally_owned_cell();
     for (; cell != this->triangulation->end();
          cell = next_locally_owned_cell(cell))
       {
         // move forward until active_cell points at the cell (cell) we are
         // looking at to compute the current active_index
-        while (active_cell != this->triangulation->end() && cell->active() &&
-               active_cell_iterator(cell) != active_cell)
+        while (active_cell != this->triangulation->end())
           {
             ++active_cell;
-            ++active_index;
+            //++active_index;
           }
 
         Assert(static_cast<unsigned int>(cell->level()) <
@@ -931,12 +932,12 @@ DataOut<dim, DoFHandlerType>::build_patches(
         Assert(static_cast<unsigned int>(cell->index()) <
                  cell_to_patch_index_map[cell->level()].size(),
                ExcInternalError());
-        Assert(active_index < this->triangulation->n_active_cells(),
-               ExcInternalError());
+        // Assert(active_index < this->triangulation->n_active_cells(),
+        //       ExcInternalError());
         cell_to_patch_index_map[cell->level()][cell->index()] =
           all_cells.size();
 
-        all_cells.emplace_back(cell, active_index);
+        all_cells.emplace_back(cell, active_index++);
       }
   }
 

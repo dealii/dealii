@@ -739,8 +739,9 @@ public:
     const std::vector<std::string> &names,
     const DataVectorType            type = type_automatic,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation =
+        std::vector<DataComponentInterpretation::DataComponentInterpretation>(),
+    const unsigned int mg_level = numbers::invalid_unsigned_int);
 
   /**
    * This function is an abbreviation to the above one (see there for a
@@ -765,8 +766,9 @@ public:
     const std::string &  name,
     const DataVectorType type = type_automatic,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation =
+        std::vector<DataComponentInterpretation::DataComponentInterpretation>(),
+    const unsigned int mg_level = numbers::invalid_unsigned_int);
 
   /**
    * This function is an extension of the above one (see there for a
@@ -789,8 +791,9 @@ public:
     const VectorType &              data,
     const std::vector<std::string> &names,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation =
+        std::vector<DataComponentInterpretation::DataComponentInterpretation>(),
+    const unsigned int mg_level = numbers::invalid_unsigned_int);
 
 
   /**
@@ -804,8 +807,9 @@ public:
     const VectorType &    data,
     const std::string &   name,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &data_component_interpretation = std::vector<
-        DataComponentInterpretation::DataComponentInterpretation>());
+      &data_component_interpretation =
+        std::vector<DataComponentInterpretation::DataComponentInterpretation>(),
+    const unsigned int mg_level = numbers::invalid_unsigned_int);
 
   /**
    * This function is an alternative to the above ones, allowing the output of
@@ -837,7 +841,8 @@ public:
   void
   add_data_vector(const VectorType &data,
                   const DataPostprocessor<DoFHandlerType::space_dimension>
-                    &data_postprocessor);
+                    &                data_postprocessor,
+                  const unsigned int mg_level = numbers::invalid_unsigned_int);
 
   /**
    * Same function as above, but with a DoFHandler object that does not need
@@ -850,7 +855,8 @@ public:
   add_data_vector(const DoFHandlerType &dof_handler,
                   const VectorType &    data,
                   const DataPostprocessor<DoFHandlerType::space_dimension>
-                    &data_postprocessor);
+                    &                data_postprocessor,
+                  const unsigned int mg_level = numbers::invalid_unsigned_int);
 
   /**
    * Release the pointers to the data vectors. This allows output of a new set
@@ -1009,8 +1015,9 @@ private:
     const std::vector<std::string> &names,
     const DataVectorType            type,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &        data_component_interpretation,
-    const bool deduce_output_names);
+      &                data_component_interpretation,
+    const bool         deduce_output_names,
+    const unsigned int mg_level = numbers::invalid_unsigned_int);
 };
 
 
@@ -1024,13 +1031,14 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const std::string &  name,
   const DataVectorType type,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    &data_component_interpretation)
+    &                data_component_interpretation,
+  const unsigned int mg_level)
 {
   Assert(triangulation != nullptr,
          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
   std::vector<std::string> names(1, name);
   add_data_vector_internal(
-    dofs, vec, names, type, data_component_interpretation, true);
+    dofs, vec, names, type, data_component_interpretation, true, mg_level);
 }
 
 
@@ -1043,12 +1051,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const std::vector<std::string> &names,
   const DataVectorType            type,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    &data_component_interpretation)
+    &                data_component_interpretation,
+  const unsigned int mg_level)
 {
   Assert(triangulation != nullptr,
          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
   add_data_vector_internal(
-    dofs, vec, names, type, data_component_interpretation, false);
+    dofs, vec, names, type, data_component_interpretation, false, mg_level);
 }
 
 
@@ -1061,7 +1070,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const VectorType &    data,
   const std::string &   name,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    &data_component_interpretation)
+    &                data_component_interpretation,
+  const unsigned int mg_level)
 {
   std::vector<std::string> names(1, name);
   add_data_vector_internal(&dof_handler,
@@ -1069,7 +1079,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
                            names,
                            type_dof_data,
                            data_component_interpretation,
-                           true);
+                           true,
+                           mg_level);
 }
 
 
@@ -1082,14 +1093,16 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const VectorType &              data,
   const std::vector<std::string> &names,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    &data_component_interpretation)
+    &                data_component_interpretation,
+  const unsigned int mg_level)
 {
   add_data_vector_internal(&dof_handler,
                            data,
                            names,
                            type_dof_data,
                            data_component_interpretation,
-                           false);
+                           false,
+                           mg_level);
 }
 
 
@@ -1099,11 +1112,12 @@ template <typename VectorType>
 void
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const VectorType &                                        vec,
-  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor,
+  const unsigned int                                        mg_level)
 {
   Assert(dofs != nullptr,
          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
-  add_data_vector(*dofs, vec, data_postprocessor);
+  add_data_vector(*dofs, vec, data_postprocessor, mg_level);
 }
 
 

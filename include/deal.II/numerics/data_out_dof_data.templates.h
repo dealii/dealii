@@ -231,7 +231,7 @@ namespace internal
               duplicate = true;
           if (duplicate == false)
             {
-              typename DoFHandlerType::active_cell_iterator dh_cell(
+              typename DoFHandlerType::cell_iterator dh_cell(
                 &cell->get_triangulation(),
                 cell->level(),
                 cell->index(),
@@ -1042,8 +1042,10 @@ void
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const DoFHandlerType &                                    dof_handler,
   const VectorType &                                        vec,
-  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor,
+  const unsigned int                                        mg_level)
 {
+  (void)mg_level;
   // this is a specialized version of the other function where we have a
   // postprocessor. if we do, we know that we have type_dof_data, which makes
   // things a bit simpler, we also don't need to deal with some of the other
@@ -1087,8 +1089,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     const std::vector<std::string> &names,
     const DataVectorType            type,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &        data_component_interpretation_,
-    const bool deduce_output_names)
+      &                data_component_interpretation_,
+    const bool         deduce_output_names,
+    const unsigned int mg_level)
 {
   // Check available mesh information:
   if (triangulation == nullptr)
@@ -1170,7 +1173,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
       case type_dof_data:
         Assert(dof_handler != nullptr,
                Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
-        Assert(data_vector.size() == dof_handler->n_dofs(),
+        Assert(data_vector.size() == dof_handler->n_dofs(mg_level),
                Exceptions::DataOutImplementation::ExcInvalidVectorSize(
                  data_vector.size(),
                  dof_handler->n_dofs(),

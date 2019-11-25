@@ -3907,25 +3907,39 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
   ForwardIterator    local_values_end) const
 {
   (void)local_values_end;
-  Assert(this->is_artificial() == false,
-         ExcMessage("Can't ask for DoF indices on artificial cells."));
-  Assert(!this->has_children(), ExcMessage("Cell must be active."));
-  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+  // Assert(this->is_artificial() == false,
+  //       ExcMessage("Can't ask for DoF indices on artificial cells."));
+  // Assert(!this->has_children(), ExcMessage("Cell must be active."));
+  // Assert(this->dof_handler != nullptr, typename
+  // BaseClass::ExcInvalidObject());
 
-  Assert(static_cast<unsigned int>(local_values_end - local_values_begin) ==
-           this->get_fe().dofs_per_cell,
-         typename DoFCellAccessor::ExcVectorDoesNotMatch());
-  Assert(values.size() == this->get_dof_handler().n_dofs(),
-         typename DoFCellAccessor::ExcVectorDoesNotMatch());
+  // Assert(static_cast<unsigned int>(local_values_end - local_values_begin) ==
+  //         this->get_fe().dofs_per_cell,
+  //       typename DoFCellAccessor::ExcVectorDoesNotMatch());
+  // Assert(values.size() == this->get_dof_handler().n_dofs(),
+  //       typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
-  const types::global_dof_index *cache =
+  std::vector<types::global_dof_index> temp;
+  types::global_dof_index *            cache;
+  if (this->active())
     this->dof_handler->levels[this->present_level]->get_cell_cache_start(
       this->present_index, this->get_fe().dofs_per_cell);
+  else
+    {
+      temp.resize(this->get_fe().dofs_per_cell);
+      this->get_mg_dof_indices(temp);
+      cache = &temp[0];
+    }
+
   dealii::internal::DoFAccessorImplementation::Implementation::
     extract_subvector_to(values,
                          cache,
                          cache + this->get_fe().dofs_per_cell,
                          local_values_begin);
+
+  for (unsigned int i = 0; i < this->get_fe().dofs_per_cell; i++)
+    std::cout << local_values_begin[i] << std::endl;
+  std::cout << std::endl;
 }
 
 

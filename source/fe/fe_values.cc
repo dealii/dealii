@@ -2851,7 +2851,8 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
 
   std::vector<types::global_dof_index> dof_indices(
     cell->get_fe().dofs_per_cell);
-  cell->get_dof_indices(dof_indices);
+
+  cell->get_active_or_mg_dof_indices(dof_indices);
 
   for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
     out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
@@ -3586,7 +3587,8 @@ FEValuesBase<dim, spacedim>::get_function_values(
   AssertDimension(fe->n_components(), 1);
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
-  AssertDimension(fe_function.size(), present_cell->n_dofs_for_dof_handler());
+  // AssertDimension(fe_function.size(),
+  // present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
   Vector<Number> dof_values(dofs_per_cell);
