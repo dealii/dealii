@@ -95,7 +95,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
           cell_and_index->first,
           GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
 
-  // create DoFHandlerType::active_cell_iterator and initialize FEValues
+  // initialize FEValues
   scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
 
   const FEValuesBase<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
@@ -202,7 +202,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.patch_values_scalar.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
 
-                  const typename DoFHandlerType::active_cell_iterator dh_cell(
+                  const typename DoFHandlerType::cell_iterator dh_cell(
                     &cell_and_index->first->get_triangulation(),
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
@@ -627,7 +627,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     scratch_data.patch_values_system.evaluation_points =
                       this_fe_patch_values.get_quadrature_points();
 
-                  const typename DoFHandlerType::active_cell_iterator dh_cell(
+                  const typename DoFHandlerType::cell_iterator dh_cell(
                     &cell_and_index->first->get_triangulation(),
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
