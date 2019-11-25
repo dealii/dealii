@@ -121,7 +121,7 @@ By making a contribution to this project, I certify that:
 ```
 
 
-Full license text of the [GNU Lesser Genreal Public License version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
+Full license text of the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
 -------------------------------------------------------------------------------------------------------------------
 ----
 ```
