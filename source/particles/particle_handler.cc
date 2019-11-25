@@ -477,9 +477,6 @@ namespace Particles
                                              0u);
       }
 
-    const auto n_global_particles =
-      std::accumulate(n_particles_per_proc.begin(), n_particles_per_proc.end());
-
     auto distributed_tuple =
       GridTools::distributed_compute_point_locations(cache,
                                                      positions,
