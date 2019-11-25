@@ -228,7 +228,11 @@ namespace internal
           bool duplicate = false;
           for (unsigned int j = 0; j < dataset; ++j)
             if (finite_elements[dataset].get() == finite_elements[j].get())
-              duplicate = true;
+              {
+                duplicate = true;
+                break;
+              }
+
           if (duplicate == false)
             {
               typename DoFHandlerType::active_cell_iterator dh_cell(

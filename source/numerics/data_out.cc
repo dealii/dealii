@@ -910,16 +910,16 @@ DataOut<dim, DoFHandlerType>::build_patches(
     // data from (cell data vectors do not have the length distance computed by
     // first_locally_owned_cell/next_locally_owned_cell because this might skip
     // some values (FilteredIterator).
-    active_cell_iterator active_cell  = this->triangulation->begin_active();
-    unsigned int         active_index = 0;
-    cell_iterator        cell         = first_locally_owned_cell();
+    auto          active_cell  = this->triangulation->begin_active();
+    unsigned int  active_index = 0;
+    cell_iterator cell         = first_locally_owned_cell();
     for (; cell != this->triangulation->end();
          cell = next_locally_owned_cell(cell))
       {
         // move forward until active_cell points at the cell (cell) we are
         // looking at to compute the current active_index
         while (active_cell != this->triangulation->end() && cell->active() &&
-               active_cell_iterator(cell) != active_cell)
+               decltype(active_cell)(cell) != active_cell)
           {
             ++active_cell;
             ++active_index;
