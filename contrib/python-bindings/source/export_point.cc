@@ -20,6 +20,8 @@
 
 #include <point_wrapper.h>
 
+// clang complains about explicitly assigning boost::python::self to itself
+// below. However, this is the correct way to define the python bindings.
 #ifdef __clang__
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wself-assign-overloaded"
