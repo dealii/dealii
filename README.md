@@ -57,4 +57,10 @@ https://www.dealii.org.
 Continuous Integration Status:
 ------------------------
 
-[![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii)
+| System | Status | Info |
+| --- | --- | --- |
+| indent | [![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii) | using https://travis-ci.org |
+| Linux | https://jenkins.tjhei.info/job/dealii/ | build on https://jenkins.tjhei.info |
+| MacOS | [![Build Status](https://jenkins.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii-OSX/job/master/) | build on https://jenkins.tjhei.info |
+| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/e1kltrbje54ikah8/branch/master?svg=true)](https://ci.appveyor.com/project/tjhei/dealii-8th3t/branch/master) | using https://appveyor.com |
+| CDash | https://cdash.43-1.org/index.php?project=deal.II | various builds |
