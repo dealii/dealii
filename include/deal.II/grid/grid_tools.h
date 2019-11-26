@@ -1348,7 +1348,7 @@ namespace GridTools
     const Mapping<dim, spacedim> & mapping,
     const MeshType<dim, spacedim> &mesh,
     const Point<spacedim> &        p,
-    const double                   tolerance       = 1e-12,
+    const double                   tolerance       = 1e-10,
     const std::vector<bool> &      marked_vertices = {});
 
   /**
