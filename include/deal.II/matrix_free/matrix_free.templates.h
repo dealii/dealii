@@ -1547,8 +1547,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                       ghost_indices.push_back(
                         part.local_to_global(di.dof_indices[i]));
 
+                  const unsigned int fe_index = di.dofs_per_cell.size() == 1 ?
+                                                  0 :
+                                                  di.cell_active_fe_index[cell];
+                  const unsigned int dofs_this_cell =
+                    di.dofs_per_cell[fe_index];
+
                   for (unsigned int i = di.row_starts_plain_indices[cell];
-                       i < di.row_starts_plain_indices[cell + 1];
+                       i < di.row_starts_plain_indices[cell] + dofs_this_cell;
                        ++i)
                     if (di.plain_dof_indices[i] >= part.local_size())
                       ghost_indices.push_back(
