@@ -34,7 +34,7 @@ namespace python
           tria_accessor);
       Point<spacedim>     barycenter = accessor->barycenter();
       boost::python::list barycenter_list;
-      for (int i = 0; i < dim; ++i)
+      for (int i = 0; i < spacedim; ++i)
         barycenter_list.append(barycenter[i]);
 
       return PointWrapper(barycenter_list);

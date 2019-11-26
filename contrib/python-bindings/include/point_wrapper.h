@@ -230,6 +230,8 @@ namespace python
      * Pointer to the underlying Point object.
      */
     void *point;
+
+    friend class MappingQGenericWrapper;
   };
 
 

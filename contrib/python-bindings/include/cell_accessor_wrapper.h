@@ -190,6 +190,8 @@ namespace python
      * Pointer that can be casted to the underlying CellAccessor object.
      */
     void *cell_accessor;
+
+    friend class MappingQGenericWrapper;
   };
 
 
