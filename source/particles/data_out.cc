@@ -18,8 +18,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 namespace Particles
 {
   template <int dim, int spacedim>
@@ -59,14 +57,10 @@ namespace Particles
 
 } // namespace Particles
 
-#endif // DEAL_II_WITH_P4EST
-
 DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-#  include "data_out.inst"
-#endif
+#include "data_out.inst"
 
 DEAL_II_NAMESPACE_CLOSE

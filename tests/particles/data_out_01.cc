@@ -43,8 +43,7 @@ test()
     tr.refine_global(2);
     MappingQ<dim, spacedim> mapping(1);
 
-    // both processes create a particle handler, but only the first creates
-    // particles
+    // Create a particle handler using two manually created particles
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
     std::vector<Point<spacedim>>              position(2);
     std::vector<Point<dim>>                   reference_position(2);
@@ -72,13 +71,9 @@ test()
     particle_handler.insert_particle(particle1, cell1);
     particle_handler.insert_particle(particle2, cell2);
 
-    Particles::DataOut<dim, spacedim> particle_viz;
-    particle_viz.build_patches(particle_handler);
-    particle_viz.write_gnuplot(deallog.get_file_stream());
-
-    //    for (const auto &particle : particle_handler)
-    //      deallog << "Particle id " << particle.get_id() << " is in cell "
-    //              << particle.get_surrounding_cell(tr) << std::endl;
+    Particles::DataOut<dim, spacedim> particle_output;
+    particle_output.build_patches(particle_handler);
+    particle_output.write_gnuplot(deallog.get_file_stream());
   }
 
   deallog << "OK" << std::endl;

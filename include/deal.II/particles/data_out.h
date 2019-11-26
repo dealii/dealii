@@ -15,26 +15,18 @@
 #ifndef dealii_particles_data_out_h
 #define dealii_particles_data_out_h
 
-#include <deal.II/base/array_view.h>
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/subscriptor.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/particles/particle_handler.h>
 
-#include <deal.II/fe/mapping.h>
+#include <string>
+#include <vector>
 
-#include <deal.II/particles/particle.h>
-#include <deal.II/particles/particle_iterator.h>
-#include <deal.II/particles/property_pool.h>
-
-#include <boost/range/iterator_range.hpp>
-#include <boost/serialization/map.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-
-#ifdef DEAL_II_WITH_P4EST
 
 namespace Particles
 {
@@ -49,24 +41,28 @@ namespace Particles
    *
    * @author Bruno Blais, Luca Heltai 2019
    */
-
   template <int dim, int spacedim>
   class DataOut : public dealii::DataOutInterface<0, spacedim>
   {
   public:
+    /**
+     *Default constructor for the Particles::DataOut class.
+     */
     DataOut() = default;
 
+    /**
+     *Default destructor for the Particles::DataOut class.
+     */
     ~DataOut() = default;
 
 
     /**
-     * Build the particles for a given partcle handler
+     * Build the patches for a given particles handler.
      *
-     * @param [in] particle_handler A particle handler for which the patches will be build
-     * A dim=0 patch is build for each particle. The position of the particle is
+     * @param [in] particle_handler A particle handler for which the patches will be built
+     * A dim=0 patch is built for each particle. The position of the particle is
      * used to build the node position and the ID of the particle is added as a
-     * single data element
-     *
+     * single data element.
      *
      * @author Bruno Blais, Luca Heltai 2019
      */
@@ -80,9 +76,6 @@ namespace Particles
      */
     virtual const std::vector<DataOutBase::Patch<0, spacedim>> &
     get_patches() const override;
-    //    {
-    //      return patches;
-    //    }
 
     /**
      * Returns the name of the data sets associated with the patches. In the
@@ -90,9 +83,6 @@ namespace Particles
      */
     virtual std::vector<std::string>
     get_dataset_names() const override;
-    //    {
-    //      return dataset_names;
-    //    }
 
   private:
     std::vector<DataOutBase::Patch<0, spacedim>> patches;
@@ -104,8 +94,6 @@ namespace Particles
   };
 
 } // namespace Particles
-
-#endif // DEAL_II_WITH_P4EST
 
 DEAL_II_NAMESPACE_CLOSE
 
