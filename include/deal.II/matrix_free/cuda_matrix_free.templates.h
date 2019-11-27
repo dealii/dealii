@@ -605,69 +605,27 @@ namespace CUDAWrappers
   void
   MatrixFree<dim, Number>::free()
   {
-    for (unsigned int i = 0; i < q_points.size(); ++i)
-      {
-        if (q_points[i] != nullptr)
-          {
-            cudaError_t cuda_error = cudaFree(q_points[i]);
-            AssertCuda(cuda_error);
-            q_points[i] = nullptr;
-          }
-      }
-
-    for (unsigned int i = 0; i < local_to_global.size(); ++i)
-      {
-        if (local_to_global[i] != nullptr)
-          {
-            cudaError_t cuda_error = cudaFree(local_to_global[i]);
-            AssertCuda(cuda_error);
-            local_to_global[i] = nullptr;
-          }
-      }
-
-    for (unsigned int i = 0; i < inv_jacobian.size(); ++i)
-      {
-        if (inv_jacobian[i] != nullptr)
-          {
-            cudaError_t cuda_error = cudaFree(inv_jacobian[i]);
-            AssertCuda(cuda_error);
-            inv_jacobian[i] = nullptr;
-          }
-      }
-
-    for (unsigned int i = 0; i < JxW.size(); ++i)
-      {
-        if (JxW[i] != nullptr)
-          {
-            cudaError_t cuda_error = cudaFree(JxW[i]);
-            AssertCuda(cuda_error);
-            JxW[i] = nullptr;
-          }
-      }
-
-    for (unsigned int i = 0; i < constraint_mask.size(); ++i)
-      {
-        if (constraint_mask[i] != nullptr)
-          {
-            cudaError_t cuda_error = cudaFree(constraint_mask[i]);
-            AssertCuda(cuda_error);
-            constraint_mask[i] = nullptr;
-          }
-      }
-
-
+    for (auto &q_points_color_ptr : q_points)
+      Utilities::CUDA::free(q_points_color_ptr);
     q_points.clear();
+
+    for (auto &local_to_global_color_ptr : local_to_global)
+      Utilities::CUDA::free(local_to_global_color_ptr);
     local_to_global.clear();
+
+    for (auto &inv_jacobian_color_ptr : inv_jacobian)
+      Utilities::CUDA::free(inv_jacobian_color_ptr);
     inv_jacobian.clear();
+
+    for (auto &JxW_color_ptr : JxW)
+      Utilities::CUDA::free(JxW_color_ptr);
     JxW.clear();
+
+    for (auto &constraint_mask_color_ptr : constraint_mask)
+      Utilities::CUDA::free(constraint_mask_color_ptr);
     constraint_mask.clear();
 
-    if (constrained_dofs != nullptr)
-      {
-        cudaError_t cuda_error = cudaFree(constrained_dofs);
-        AssertCuda(cuda_error);
-        constrained_dofs = nullptr;
-      }
+    Utilities::CUDA::free(constrained_dofs);
   }
 
 
