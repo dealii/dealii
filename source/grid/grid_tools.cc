@@ -3037,7 +3037,8 @@ namespace GridTools
   template <int dim, int spacedim>
   void
   partition_triangulation_zorder(const unsigned int            n_partitions,
-                                 Triangulation<dim, spacedim> &triangulation)
+                                 Triangulation<dim, spacedim> &triangulation,
+                                 const bool                    group_siblings)
   {
     Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
               &triangulation) == nullptr),
@@ -3100,40 +3101,41 @@ namespace GridTools
     // the processor with the largest number of children
     // (ties are broken by picking the lower rank).
     // Duplicate this logic here.
-    {
-      typename Triangulation<dim, spacedim>::cell_iterator
-        cell = triangulation.begin(),
-        endc = triangulation.end();
-      for (; cell != endc; ++cell)
-        {
-          if (cell->active())
-            continue;
-          bool                                 all_children_active = true;
-          std::map<unsigned int, unsigned int> map_cpu_n_cells;
-          for (unsigned int n = 0; n < cell->n_children(); ++n)
-            if (!cell->child(n)->active())
-              {
-                all_children_active = false;
-                break;
-              }
-            else
-              ++map_cpu_n_cells[cell->child(n)->subdomain_id()];
+    if (group_siblings)
+      {
+        typename Triangulation<dim, spacedim>::cell_iterator
+          cell = triangulation.begin(),
+          endc = triangulation.end();
+        for (; cell != endc; ++cell)
+          {
+            if (cell->active())
+              continue;
+            bool                                 all_children_active = true;
+            std::map<unsigned int, unsigned int> map_cpu_n_cells;
+            for (unsigned int n = 0; n < cell->n_children(); ++n)
+              if (!cell->child(n)->active())
+                {
+                  all_children_active = false;
+                  break;
+                }
+              else
+                ++map_cpu_n_cells[cell->child(n)->subdomain_id()];
 
-          if (!all_children_active)
-            continue;
+            if (!all_children_active)
+              continue;
 
-          unsigned int new_owner = cell->child(0)->subdomain_id();
-          for (std::map<unsigned int, unsigned int>::iterator it =
-                 map_cpu_n_cells.begin();
-               it != map_cpu_n_cells.end();
-               ++it)
-            if (it->second > map_cpu_n_cells[new_owner])
-              new_owner = it->first;
+            unsigned int new_owner = cell->child(0)->subdomain_id();
+            for (std::map<unsigned int, unsigned int>::iterator it =
+                   map_cpu_n_cells.begin();
+                 it != map_cpu_n_cells.end();
+                 ++it)
+              if (it->second > map_cpu_n_cells[new_owner])
+                new_owner = it->first;
 
-          for (unsigned int n = 0; n < cell->n_children(); ++n)
-            cell->child(n)->set_subdomain_id(new_owner);
-        }
-    }
+            for (unsigned int n = 0; n < cell->n_children(); ++n)
+              cell->child(n)->set_subdomain_id(new_owner);
+          }
+      }
   }
 
 

@@ -2006,15 +2006,23 @@ namespace GridTools
 
   /**
    * Generates a partitioning of the active cells making up the entire domain
-   * using the same partitioning scheme as in the p4est library. After calling
-   * this function, the subdomain ids of all active cells will have values
-   * between zero and @p n_partitions-1. You can access the subdomain id of a
-   * cell by using <tt>cell-@>subdomain_id()</tt>.
+   * using the same partitioning scheme as in the p4est library if the flag
+   * @p group_siblings is set to true (default behavior of this function).
+   * After calling this function, the subdomain ids of all active cells will
+   * have values between zero and @p n_partitions-1. You can access the
+   * subdomain id of a cell by using <tt>cell-@>subdomain_id()</tt>.
+   *
+   * @note If the flag @p group_siblings is set to false, children of a
+   *       cell might be placed on different processors even though they are all
+   *       active, which is an assumption made by p4est. By relaxing this, we
+   *       can can create partitions owning a single cell (also for refined
+   *       meshes).
    */
   template <int dim, int spacedim>
   void
   partition_triangulation_zorder(const unsigned int            n_partitions,
-                                 Triangulation<dim, spacedim> &triangulation);
+                                 Triangulation<dim, spacedim> &triangulation,
+                                 const bool group_siblings = true);
 
   /**
    * Partitions the cells of a multigrid hierarchy by assigning level subdomain
