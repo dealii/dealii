@@ -46,16 +46,80 @@ namespace CUDAWrappers
   namespace internal
   {
     // These variables are stored in the device constant memory.
-    // TODO: use a template parameter
     constexpr unsigned int max_elem_degree = 10;
+
+    template <typename NumberType>
+    using DataArray = NumberType[(max_elem_degree + 1) * (max_elem_degree + 1)];
+
     __constant__ double
-      global_shape_values[(max_elem_degree + 1) * (max_elem_degree + 1)];
+      global_shape_values_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    __constant__ float
+      global_shape_values_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
+
+    template <typename Number>
+    __host__ __device__ inline DataArray<Number> &
+             get_global_shape_values();
+
+    template <>
+    __host__ __device__ inline DataArray<double> &
+             get_global_shape_values<double>()
+    {
+      return global_shape_values_d;
+    }
+
+    template <>
+    __host__ __device__ inline DataArray<float> &
+             get_global_shape_values<float>()
+    {
+      return global_shape_values_f;
+    }
+
     __constant__ double
-      global_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
+      global_shape_gradients_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    __constant__ float
+      global_shape_gradients_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
+
+    template <typename Number>
+    __host__ __device__ inline DataArray<Number> &
+             get_global_shape_gradients();
+
+    template <>
+    __host__ __device__ inline DataArray<double> &
+             get_global_shape_gradients<double>()
+    {
+      return global_shape_gradients_d;
+    }
+
+    template <>
+    __host__ __device__ inline DataArray<float> &
+             get_global_shape_gradients<float>()
+    {
+      return global_shape_gradients_f;
+    }
 
     // for collocation methods
-    __constant__ double
-      global_co_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    __constant__ double global_co_shape_gradients_d[(max_elem_degree + 1) *
+                                                    (max_elem_degree + 1)];
+    __constant__ float  global_co_shape_gradients_f[(max_elem_degree + 1) *
+                                                   (max_elem_degree + 1)];
+
+    template <typename Number>
+    __host__ __device__ inline DataArray<Number> &
+             get_global_co_shape_gradients();
+
+    template <>
+    __host__ __device__ inline DataArray<double> &
+             get_global_co_shape_gradients<double>()
+    {
+      return global_co_shape_gradients_d;
+    }
+
+    template <>
+    __host__ __device__ inline DataArray<float> &
+             get_global_co_shape_gradients<float>()
+    {
+      return global_co_shape_gradients_f;
+    }
 
     template <typename Number>
     using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
@@ -805,27 +869,30 @@ namespace CUDAWrappers
     unsigned int size_co_shape_values =
       n_q_points_1d * n_q_points_1d * sizeof(Number);
 
-    cudaError_t cuda_error = cudaMemcpyToSymbol(internal::global_shape_values,
-                                                shape_info.shape_values.data(),
-                                                size_shape_values,
-                                                0,
-                                                cudaMemcpyHostToDevice);
+    cudaError_t cuda_error =
+      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(),
+                         shape_info.shape_values.data(),
+                         size_shape_values,
+                         0,
+                         cudaMemcpyHostToDevice);
     AssertCuda(cuda_error);
 
     if (update_flags & update_gradients)
       {
-        cuda_error = cudaMemcpyToSymbol(internal::global_shape_gradients,
-                                        shape_info.shape_gradients.data(),
-                                        size_shape_values,
-                                        0,
-                                        cudaMemcpyHostToDevice);
+        cuda_error =
+          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(),
+                             shape_info.shape_gradients.data(),
+                             size_shape_values,
+                             0,
+                             cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
 
-        cuda_error = cudaMemcpyToSymbol(internal::global_co_shape_gradients,
-                                        shape_info_co.shape_gradients.data(),
-                                        size_co_shape_values,
-                                        0,
-                                        cudaMemcpyHostToDevice);
+        cuda_error =
+          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(),
+                             shape_info_co.shape_gradients.data(),
+                             size_co_shape_values,
+                             0,
+                             cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
       }
 
