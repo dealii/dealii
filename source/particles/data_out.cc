@@ -41,12 +41,16 @@ namespace Particles
       }
   }
 
+
+
   template <int dim, int spacedim>
   const std::vector<DataOutBase::Patch<0, spacedim>> &
   DataOut<dim, spacedim>::get_patches() const
   {
     return patches;
   }
+
+
 
   template <int dim, int spacedim>
   std::vector<std::string>

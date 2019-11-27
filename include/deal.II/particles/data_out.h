@@ -16,22 +16,20 @@
 #define dealii_particles_data_out_h
 
 #include <deal.II/base/config.h>
-
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/mpi.h>
-
-#include <deal.II/particles/particle_handler.h>
 
 #include <string>
 #include <vector>
-
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  template <int dim, int spacedim>
+  class ParticleHandler ;
+
   /**
-   * This class manages the DataOut of a Particle Handler
+   * This class generates graphical output for the particles stored by a ParticleHandler object.
    * From a particle handler, it generates patches which can then be used to
    * write traditional output files. This class currently only supports witing
    * the particle position and their ID and does not allow to write the
@@ -46,20 +44,20 @@ namespace Particles
   {
   public:
     /**
-     *Default constructor for the Particles::DataOut class.
+     * Default constructor for the Particles::DataOut class.
      */
     DataOut() = default;
 
     /**
-     *Default destructor for the Particles::DataOut class.
-     */
+     * Destructor for the Particles::DataOut class.
+    */
     ~DataOut() = default;
 
 
     /**
-     * Build the patches for a given particles handler.
+     * Build the patches for a given particle handler.
      *
-     * @param [in] particle_handler A particle handler for which the patches will be built
+     * @param [in] particle_handler A particle handler for which the patches will be built.
      * A dim=0 patch is built for each particle. The position of the particle is
      * used to build the node position and the ID of the particle is added as a
      * single data element.
@@ -78,13 +76,17 @@ namespace Particles
     get_patches() const override;
 
     /**
-     * Returns the name of the data sets associated with the patches. In the
-     * current implementation the particles only contain the ID
+     * Virtual function through which the names of data sets are obtained from this class
      */
     virtual std::vector<std::string>
     get_dataset_names() const override;
 
   private:
+    /**
+     * This is a list of patches that is created each time build_patches() is
+     * called. These patches are used in the output routines of the base
+     * classes.
+     */
     std::vector<DataOutBase::Patch<0, spacedim>> patches;
 
     /**
