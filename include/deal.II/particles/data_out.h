@@ -16,6 +16,7 @@
 #define dealii_particles_data_out_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/data_out_base.h>
 
 #include <string>
@@ -26,14 +27,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
-  class ParticleHandler ;
+  class ParticleHandler;
 
   /**
-   * This class generates graphical output for the particles stored by a ParticleHandler object.
-   * From a particle handler, it generates patches which can then be used to
-   * write traditional output files. This class currently only supports witing
-   * the particle position and their ID and does not allow to write the
-   * properties attached to the particles
+   * This class generates graphical output for the particles stored by a
+   * ParticleHandler object. From a particle handler, it generates patches which
+   * can then be used to write traditional output files. This class currently
+   * only supports witing the particle position and their ID and does not allow
+   * to write the properties attached to the particles
    *
    * @ingroup Particle
    *
@@ -50,7 +51,7 @@ namespace Particles
 
     /**
      * Destructor for the Particles::DataOut class.
-    */
+     */
     ~DataOut() = default;
 
 
@@ -76,7 +77,8 @@ namespace Particles
     get_patches() const override;
 
     /**
-     * Virtual function through which the names of data sets are obtained from this class
+     * Virtual function through which the names of data sets are obtained from
+     * this class
      */
     virtual std::vector<std::string>
     get_dataset_names() const override;
