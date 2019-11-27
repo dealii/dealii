@@ -688,20 +688,12 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
 
   const unsigned int n_q_points = q.size();
 
-  // see if we need the (transformation) shape function values
-  // and/or gradients and resize the necessary arrays
-  if (this->update_each & update_quadrature_points)
-    shape_values.resize(n_shape_functions * n_q_points);
-
-  if (this->update_each &
-      (update_covariant_transformation | update_contravariant_transformation |
-       update_JxW_values | update_boundary_forms | update_normal_vectors |
-       update_jacobians | update_jacobian_grads | update_inverse_jacobians |
-       update_jacobian_pushed_forward_grads | update_jacobian_2nd_derivatives |
-       update_jacobian_pushed_forward_2nd_derivatives |
-       update_jacobian_3rd_derivatives |
-       update_jacobian_pushed_forward_3rd_derivatives))
-    shape_derivatives.resize(n_shape_functions * n_q_points);
+  const bool needs_higher_order_terms =
+    this->update_each &
+    (update_jacobian_pushed_forward_grads | update_jacobian_2nd_derivatives |
+     update_jacobian_pushed_forward_2nd_derivatives |
+     update_jacobian_3rd_derivatives |
+     update_jacobian_pushed_forward_3rd_derivatives);
 
   if (this->update_each & update_covariant_transformation)
     covariant.resize(n_original_q_points);
@@ -712,26 +704,11 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
   if (this->update_each & update_volume_elements)
     volume_elements.resize(n_original_q_points);
 
-  if (this->update_each &
-      (update_jacobian_grads | update_jacobian_pushed_forward_grads))
-    shape_second_derivatives.resize(n_shape_functions * n_q_points);
-
-  if (this->update_each & (update_jacobian_2nd_derivatives |
-                           update_jacobian_pushed_forward_2nd_derivatives))
-    shape_third_derivatives.resize(n_shape_functions * n_q_points);
-
-  if (this->update_each & (update_jacobian_3rd_derivatives |
-                           update_jacobian_pushed_forward_3rd_derivatives))
-    shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
-
-  const std::vector<Point<dim>> &ref_q_points = q.get_points();
-  // now also fill the various fields with their correct values
-  compute_shape_function_values(ref_q_points);
-
   tensor_product_quadrature = q.is_tensor_product();
 
-  // use of MatrixFree only for higher order elements
-  if (polynomial_degree < 2)
+  // use of MatrixFree only for higher order elements and with more than one
+  // point where tensor products do not make sense
+  if (polynomial_degree < 2 || n_q_points == 1)
     tensor_product_quadrature = false;
 
   if (dim > 1)
@@ -787,6 +764,43 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
               values_dofs.resize(n_comp * n_shape_values);
             }
         }
+    }
+
+  // Only fill the big arrays on demand in case we cannot use the tensor
+  // product quadrature code path
+  if (dim == 1 || !tensor_product_quadrature || needs_higher_order_terms)
+    {
+      // see if we need the (transformation) shape function values
+      // and/or gradients and resize the necessary arrays
+      if (this->update_each & update_quadrature_points)
+        shape_values.resize(n_shape_functions * n_q_points);
+
+      if (this->update_each &
+          (update_covariant_transformation |
+           update_contravariant_transformation | update_JxW_values |
+           update_boundary_forms | update_normal_vectors | update_jacobians |
+           update_jacobian_grads | update_inverse_jacobians |
+           update_jacobian_pushed_forward_grads |
+           update_jacobian_2nd_derivatives |
+           update_jacobian_pushed_forward_2nd_derivatives |
+           update_jacobian_3rd_derivatives |
+           update_jacobian_pushed_forward_3rd_derivatives))
+        shape_derivatives.resize(n_shape_functions * n_q_points);
+
+      if (this->update_each &
+          (update_jacobian_grads | update_jacobian_pushed_forward_grads))
+        shape_second_derivatives.resize(n_shape_functions * n_q_points);
+
+      if (this->update_each & (update_jacobian_2nd_derivatives |
+                               update_jacobian_pushed_forward_2nd_derivatives))
+        shape_third_derivatives.resize(n_shape_functions * n_q_points);
+
+      if (this->update_each & (update_jacobian_3rd_derivatives |
+                               update_jacobian_pushed_forward_3rd_derivatives))
+        shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
+
+      // now also fill the various fields with their correct values
+      compute_shape_function_values(q.get_points());
     }
 }
 
