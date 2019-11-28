@@ -1392,6 +1392,13 @@ namespace GridTools
    * @param[in] cell An iterator pointing to a cell of the mesh.
    * @param[out] active_neighbors A list of active descendants of the given
    * cell
+   *
+   * @note Since in C++ the MeshType template argument can not be deduced from
+   * a function call, you will have to specify it after the function name, as
+   * for example in
+   * @code
+   *   GridTools::get_active_neighbors<DoFHandler<dim>>(cell, active_neighbors)
+   * @endcode
    */
   template <class MeshType>
   void
