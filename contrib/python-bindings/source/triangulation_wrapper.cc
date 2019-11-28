@@ -1266,6 +1266,39 @@ namespace python
   }
 
 
+
+  void
+  TriangulationWrapper::set_manifold(const int        number,
+                                     ManifoldWrapper &manifold)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        Triangulation<2, 2> *tria =
+          static_cast<Triangulation<2, 2> *>(triangulation);
+        Manifold<2, 2> *m =
+          static_cast<Manifold<2, 2> *>(manifold.get_manifold());
+        tria->set_manifold(number, *m);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        Triangulation<2, 3> *tria =
+          static_cast<Triangulation<2, 3> *>(triangulation);
+        Manifold<2, 3> *m =
+          static_cast<Manifold<2, 3> *>(manifold.get_manifold());
+        tria->set_manifold(number, *m);
+      }
+    else
+      {
+        Triangulation<3, 3> *tria =
+          static_cast<Triangulation<3, 3> *>(triangulation);
+        Manifold<3, 3> *m =
+          static_cast<Manifold<3, 3> *>(manifold.get_manifold());
+        tria->set_manifold(number, *m);
+      }
+  }
+
+
+
   void
   TriangulationWrapper::setup(const std::string &dimension,
                               const std::string &spacedimension)

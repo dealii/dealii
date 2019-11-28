@@ -333,6 +333,13 @@ namespace python
 
 
 
+  const char set_manifold_docstring[] =
+    "Assign a manifold object to a certain part of the triangulation.       \n"
+    "The manifold_object is not copied and MUST persist until the           \n"
+    "triangulation is destroyed.                                            \n";
+
+
+
   void
   export_triangulation()
   {
@@ -470,7 +477,11 @@ namespace python
       .def("load",
            &TriangulationWrapper::load,
            load_docstring,
-           boost::python::args("self", "filename"));
+           boost::python::args("self", "filename"))
+      .def("set_manifold",
+           &TriangulationWrapper::set_manifold,
+           set_manifold_docstring,
+           boost::python::args("self", "number", "manifold"));
   }
 } // namespace python
 
