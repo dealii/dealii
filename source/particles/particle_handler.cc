@@ -454,10 +454,10 @@ namespace Particles
       AssertDimension(properties.size(),
                       positions.size() * n_properties_per_particle());
 
-    const auto my_cpu =
+    const auto mpi_process =
       Utilities::MPI::this_mpi_process(triangulation->get_communicator());
 
-    const auto n_cpus =
+    const auto n_mpi_processes =
       Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
 
     GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
@@ -468,13 +468,14 @@ namespace Particles
                                  positions.size());
 
     // Calculate all starting points locally
-    std::vector<unsigned int> starting_points(n_cpus);
+    std::vector<unsigned int> particle_start_indices(n_mpi_processes);
 
-    for (unsigned int i = 0; i < starting_points.size(); ++i)
+    unsigned int particle_start_index = 0;
+    for (unsigned int process = 0; process < particle_start_indices.size();
+         ++process)
       {
-        starting_points[i] = std::accumulate(n_particles_per_proc.begin(),
-                                             n_particles_per_proc.begin() + i,
-                                             0u);
+        particle_start_indices[process] = particle_start_index;
+        particle_start_index += n_particles_per_proc[process];
       }
 
     auto distributed_tuple =
@@ -484,52 +485,72 @@ namespace Particles
 
     // Finally create the particles
     std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
-                                         cell_iterators = std::get<0>(distributed_tuple);
-    std::vector<std::vector<Point<dim>>> dist_reference_points =
+      local_cells_containing_particles = std::get<0>(distributed_tuple);
+
+    // The reference position of every particle in the local part of the
+    // triangulation.
+    std::vector<std::vector<Point<dim>>> local_reference_positions =
       std::get<1>(distributed_tuple);
-    std::vector<std::vector<unsigned int>> dist_map =
+    // The original index in the positions vector for each particle in the local
+    // part of the triangulation
+    std::vector<std::vector<unsigned int>> origin_indices_of_local_particles =
       std::get<2>(distributed_tuple);
-    std::vector<std::vector<Point<spacedim>>> dist_points =
+    // The real spatial position of every particle in the local part of the
+    // triangulation.
+    std::vector<std::vector<Point<spacedim>>> local_positions =
       std::get<3>(distributed_tuple);
-    std::vector<std::vector<unsigned int>> dist_procs =
+    // The MPI process that inserted each particle
+    std::vector<std::vector<unsigned int>> calling_process_index =
       std::get<4>(distributed_tuple);
 
-    // Create the multimap of particles
+    // Create the multimap of local particles
     std::multimap<typename Triangulation<dim, spacedim>::active_cell_iterator,
                   Particle<dim, spacedim>>
       particles;
 
     // Create the map of cpu to indices, indicating whom sent us what
     // point
-    std::map<unsigned int, IndexSet> cpu_to_indices;
+    std::map<unsigned int, IndexSet> origin_process_to_local_particle_indices;
 
-    for (unsigned int i_cell = 0; i_cell < cell_iterators.size(); ++i_cell)
+    for (unsigned int i_cell = 0;
+         i_cell < local_cells_containing_particles.size();
+         ++i_cell)
       {
         for (unsigned int i_particle = 0;
-             i_particle < dist_points[i_cell].size();
+             i_particle < local_positions[i_cell].size();
              ++i_particle)
           {
-            const auto &local_id = dist_map[i_cell][i_particle];
-            const auto &cpu      = dist_procs[i_cell][i_particle];
+            const auto &local_id_on_calling_process =
+              origin_indices_of_local_particles[i_cell][i_particle];
+            const auto &calling_process =
+              calling_process_index[i_cell][i_particle];
 
-            const unsigned int particle_id = local_id + starting_points[cpu];
+            const unsigned int particle_id =
+              local_id_on_calling_process +
+              particle_start_indices[calling_process];
 
-            particles.emplace(
-              cell_iterators[i_cell],
-              Particle<dim, spacedim>(dist_points[i_cell][i_particle],
-                                      dist_reference_points[i_cell][i_particle],
-                                      particle_id));
+            particles.emplace(local_cells_containing_particles[i_cell],
+                              Particle<dim, spacedim>(
+                                local_positions[i_cell][i_particle],
+                                local_reference_positions[i_cell][i_particle],
+                                particle_id));
 
-            if (cpu_to_indices.find(cpu) == cpu_to_indices.end())
-              cpu_to_indices.insert({cpu, IndexSet(n_particles_per_proc[cpu])});
+            if (origin_process_to_local_particle_indices.find(
+                  calling_process) ==
+                origin_process_to_local_particle_indices.end())
+              origin_process_to_local_particle_indices.insert(
+                {calling_process,
+                 IndexSet(n_particles_per_proc[calling_process])});
 
-            cpu_to_indices[cpu].add_index(local_id);
+            origin_process_to_local_particle_indices[calling_process].add_index(
+              local_id_on_calling_process);
           }
       }
 
     this->insert_particles(particles);
-    for (auto &c : cpu_to_indices)
-      c.second.compress();
+    for (auto &process_and_particle_indices :
+         origin_process_to_local_particle_indices)
+      process_and_particle_indices.second.compress();
 
     // Take care of properties, if the input vector contains them.
     const auto global_n_properties =
@@ -538,9 +559,11 @@ namespace Particles
       {
         // [TODO]: fix this in some_to_some, to allow communication from
         // my cpu to my cpu.
-        auto cpu_to_indices_to_send = cpu_to_indices;
-        if (cpu_to_indices_to_send.find(my_cpu) != cpu_to_indices_to_send.end())
-          cpu_to_indices_to_send.erase(cpu_to_indices_to_send.find(my_cpu));
+        auto cpu_to_indices_to_send = origin_process_to_local_particle_indices;
+        if (cpu_to_indices_to_send.find(mpi_process) !=
+            cpu_to_indices_to_send.end())
+          cpu_to_indices_to_send.erase(
+            cpu_to_indices_to_send.find(mpi_process));
 
         // Gather whom I sent my own particles to, to decide whom to send
         // the particle properties
@@ -582,15 +605,15 @@ namespace Particles
         // Compute the association between particle id and start of
         // property data in the vector containing all local properties
         std::map<types::particle_index, unsigned int> property_start;
-        for (const auto &it : cpu_to_indices)
-          if (it.first != my_cpu)
+        for (const auto &it : origin_process_to_local_particle_indices)
+          if (it.first != mpi_process)
             {
               unsigned int sequential_index = 0;
               // Process all properties coming from other mpi processes
               for (const auto &el : it.second)
                 {
                   types::particle_index particle_id =
-                    el + starting_points[it.first];
+                    el + particle_start_indices[it.first];
                   property_start.insert({particle_id, local_properties.size()});
 
                   local_properties.insert(
@@ -610,7 +633,7 @@ namespace Particles
               for (const auto &el : it.second)
                 {
                   types::particle_index particle_id =
-                    el + starting_points[my_cpu];
+                    el + particle_start_indices[mpi_process];
                   property_start.insert({particle_id, local_properties.size()});
 
                   local_properties.insert(local_properties.end(),
@@ -634,7 +657,7 @@ namespace Particles
                local_properties.begin() + start + n_properties_per_particle()});
           }
       }
-    return cpu_to_indices;
+    return origin_process_to_local_particle_indices;
   }
 
 
