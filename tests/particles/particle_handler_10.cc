@@ -90,6 +90,11 @@ main(int argc, char *argv[])
   deallog.push("2d/2d");
   test<2, 2>();
   deallog.pop();
+  // [TODO]: There is a bug that prevents this from working in dimensions <2,3>
+  // The construction of the bounding boxes is not robust in that case
+  // and there is no easy and obvious fix for the moment. Keep this here
+  // as a reminder that we still need to address that.
+
   // deallog.push("2d/3d");
   // test<2, 3>();
   // deallog.pop();
