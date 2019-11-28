@@ -251,13 +251,14 @@ namespace Particles
      * the triangulation from whoever owns them.
      *
      * In order to keep track of what mpi process received what points, a map
-     * from mpi process to IndexSet is returned by the function. This IndexSet contains
-     * the local indices of the points that were passed to this function on the
-     * calling mpi process, and that falls within the part of triangulation
-     * owned by this mpi process.
+     * from mpi process to IndexSet is returned by the function. This IndexSet
+     * contains the local indices of the points that were passed to this
+     * function on the calling mpi process, and that falls within the part of
+     * triangulation owned by this mpi process.
      *
      * @param[in] A vector of points that do not need to be on the local
-     * processor
+     * processor, but have to be in the triangulation that is associated with
+     * this ParticleHandler object.
      *
      * @param[in] A vector of vectors of bounding boxes. The bounding boxes
      * global_bboxes[rk] describe which part of the mesh is locally owned by
@@ -271,12 +272,20 @@ namespace Particles
      * or it should be `positions.size()*this->n_properties_per_particle()`.
      * Notice that this function call will transfer the properties from the
      * local mpi process to the final mpi process that will own each of the
-     * particle, and it may therefore be communication intensive.
+     * particle, and it may therefore be communication intensive. Properties
+     * should be ordered particle wise, i.e., for N particles with n properties
+     * each:
+     * @code
+     * particle_1_property_1, particle_1_property_2, ..., particle_1_property_n,
+     * particle_2_property_1, particle_2_property_2, ..., particle_2_property_n,
+     * ...
+     * particle_N_property_1, particle_N_property_2, ..., particle_N_property_n.
+     * @endcode
      *
-     * @return A pair of maps from owner to IndexSet, that contains the local
-     * indices of the points that other mpi processes have sent to the current
-     * processor, and a map that identifies the new owner of the points that
-     * were originally located on this processor.
+     * @return A map from owner to IndexSet, that contains the local indices
+     * of the points that were passed to this function on the calling mpi
+     * process, and that falls within the part of triangulation owned by this
+     * mpi process.
      *
      * @author : Bruno Blais, Luca Heltai 2019
      */
