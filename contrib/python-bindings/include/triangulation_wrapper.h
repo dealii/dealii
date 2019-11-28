@@ -20,6 +20,7 @@
 
 #include <boost/python.hpp>
 
+#include <manifold_wrapper.h>
 #include <point_wrapper.h>
 
 #include <string>
@@ -300,6 +301,12 @@ namespace python
      */
     void
     flatten_triangulation(TriangulationWrapper &tria_out);
+
+    /**
+     *
+     */
+    void
+    set_manifold(const int number, ManifoldWrapper &manifold);
 
     /**
      * Refine all the cells @p n times.

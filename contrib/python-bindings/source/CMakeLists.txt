@@ -95,11 +95,13 @@ SET(_src
   export_point.cc
   export_triangulation.cc
   export_mapping.cc
+  export_manifold.cc
   cell_accessor_wrapper.cc
   tria_accessor_wrapper.cc
   point_wrapper.cc
   triangulation_wrapper.cc
   mapping_wrapper.cc
+  manifold_wrapper.cc
   )
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
