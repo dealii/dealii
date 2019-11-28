@@ -245,11 +245,11 @@ namespace Particles
      * This function figures out what mpi process owns all points that do not
      * fall within the locally owned part of the triangulation, it sends
      * to that process the points passed to this function on this process,
-     * and receives from the points that fall within the locally owned cells of
+     * and receives the points that fall within the locally owned cells of
      * the triangulation from whoever owns them.
      *
-     * In order to keep track of what mpi process recieved what points, a maps
-     * from mpi process to IndexSet is returned by the function, that contains
+     * In order to keep track of what mpi process received what points, a map
+     * from mpi process to IndexSet is returned by the function. This IndexSet contains
      * the local indices of the points that were passed to this function on the
      * calling mpi process, and that falls within the part of triangulation
      * owned by this mpi process.
@@ -267,7 +267,7 @@ namespace Particles
      * local point. The size of the vector should be either zero (no
      * properties will be transfered nor attached to the generated particles)
      * or it should be `positions.size()*this->n_properties_per_particle()`.
-     * Notice that this function call will tranfer the properties from the
+     * Notice that this function call will transfer the properties from the
      * local mpi process to the final mpi process that will own each of the
      * particle, and it may therefore be communication intensive.
      *
