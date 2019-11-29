@@ -297,7 +297,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       partition_triangulation_zorder(
         const unsigned int,
-        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const bool);
 
       template void
       partition_multigrid_levels(
