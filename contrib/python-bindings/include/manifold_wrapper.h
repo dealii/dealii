@@ -60,7 +60,7 @@ namespace python
      * Create CylindricalManifold
      */
     void
-    create_cylindrical(const int axis, const double tolerance);
+    create_cylindrical(const int axis = 0, const double tolerance = 1e-10);
 
     /**
      * Return pointer to an underlying manifold object

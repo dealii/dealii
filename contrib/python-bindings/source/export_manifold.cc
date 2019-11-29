@@ -21,6 +21,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(create_cylindrical_overloads,
+                                         create_cylindrical,
+                                         0,
+                                         2)
+
+
   const char create_spherical_docstring[] =
     " Create spherical manifold with a given center point       \n";
 
@@ -39,7 +45,7 @@ namespace python
   export_manifold()
   {
     boost::python::class_<ManifoldWrapper>(
-      "ManifoldWrapper",
+      "Manifold",
       boost::python::init<const int, const int>(
         boost::python::args("dim", "spacedim")))
       .def("create_spherical",
@@ -52,8 +58,9 @@ namespace python
            boost::python::args("self", "center"))
       .def("create_cylindrical",
            &ManifoldWrapper::create_cylindrical,
-           create_cylindrical_docstring,
-           boost::python::args("self", "axis", "tolerance"));
+           create_cylindrical_overloads(
+             boost::python::args("self", "axis", "tolerance"),
+             create_cylindrical_docstring));
   }
 } // namespace python
 

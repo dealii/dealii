@@ -268,6 +268,19 @@ namespace python
     generate_half_hyper_ball(PointWrapper &center, const double radius = 1.);
 
     /**
+     * Produce a hyper-shell, the region between two spheres around center,
+     * with given inner_radius and outer_radius. The number n_cells indicates
+     * the number of cells of the resulting triangulation, i.e., how many
+     * cells form the ring (in 2d) or the shell (in 3d).
+     * The appropriate manifold class is SphericalManifold.
+     */
+    void
+    generate_hyper_shell(PointWrapper & center,
+                         const double   inner_radius,
+                         const double   outer_radius,
+                         const unsigned n_cells = 0);
+
+    /**
      * Shift each vertex of the Triangulation by the given @p shift_list.
      */
     void
@@ -333,6 +346,13 @@ namespace python
      */
     void
     write(const std::string &filename, const std::string format) const;
+
+    /**
+     * Read mesh from the file @filename using the given data
+     * format.
+     */
+    void
+    read(const std::string &filename, const std::string format) const;
 
     /**
      * Write the Triangulation in file.
