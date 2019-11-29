@@ -34,8 +34,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 namespace Particles
 {
   /**
@@ -77,10 +75,9 @@ namespace Particles
      * This constructor is equivalent to calling the default constructor and
      * the initialize function.
      */
-    ParticleHandler(
-      const parallel::distributed::Triangulation<dim, spacedim> &tria,
-      const Mapping<dim, spacedim> &                             mapping,
-      const unsigned int n_properties = 0);
+    ParticleHandler(const Triangulation<dim, spacedim> &tria,
+                    const Mapping<dim, spacedim> &      mapping,
+                    const unsigned int                  n_properties = 0);
 
     /**
      * Destructor.
@@ -89,13 +86,13 @@ namespace Particles
 
     /**
      * Initialize the particle handler. This function does not clear the
-     * internal data structures, it just sets the connections to the
-     * MPI communicator and the triangulation.
+     * internal data structures, it just sets the triangulation and the mapping
+     * to be used.
      */
     void
-    initialize(const parallel::distributed::Triangulation<dim, spacedim> &tria,
-               const Mapping<dim, spacedim> &mapping,
-               const unsigned int            n_properties = 0);
+    initialize(const Triangulation<dim, spacedim> &tria,
+               const Mapping<dim, spacedim> &      mapping,
+               const unsigned int                  n_properties = 0);
 
     /**
      * Clear all particle related data.
@@ -367,7 +364,7 @@ namespace Particles
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const parallel::distributed::Triangulation<dim, spacedim>,
+    SmartPointer<const Triangulation<dim, spacedim>,
                  ParticleHandler<dim, spacedim>>
       triangulation;
 
@@ -464,7 +461,7 @@ namespace Particles
      */
     unsigned int handle;
 
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
     /**
      * Transfer particles that have crossed subdomain boundaries to other
      * processors.
@@ -500,7 +497,7 @@ namespace Particles
           types::subdomain_id,
           std::vector<
             typename Triangulation<dim, spacedim>::active_cell_iterator>>());
-#  endif
+#endif
 
     /**
      * Called by listener functions from Triangulation for every cell
@@ -545,8 +542,6 @@ namespace Particles
         &                          next_free_particle_index;
   }
 } // namespace Particles
-
-#endif // DEAL_II_WITH_P4EST
 
 DEAL_II_NAMESPACE_CLOSE
 
