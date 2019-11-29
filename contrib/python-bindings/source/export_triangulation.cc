@@ -94,7 +94,10 @@ namespace python
                                          1,
                                          2)
 
-
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
+                                         generate_hyper_shell,
+                                         3,
+                                         4)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells                                      \n";
@@ -252,6 +255,15 @@ namespace python
 
 
 
+  const char generate_hyper_shell_docstring[] =
+    "Produce a hyper-shell, the region between two spheres around center,   \n"
+    "with given inner_radius and outer_radius. The number n_cells indicates \n"
+    "the number of cells of the resulting triangulation, i.e., how many     \n"
+    "cells form the ring (in 2d) or the shell (in 3d).                      \n"
+    "The appropriate manifold class is SphericalManifold.                   \n";
+
+
+
   const char generate_half_hyper_ball_docstring[] =
     "Generate a half hyper-ball around center, which contains four          \n"
     "elements in 2d and 6 in 3d. The cut plane is perpendicular to the      \n"
@@ -320,6 +332,14 @@ namespace python
     "  - mathgl                                                             \n"
     "  - vtk                                                                \n"
     "  - vtu                                                                \n";
+
+
+
+  const char read_docstring[] =
+    "Read a mesh from the file according to the given data format.          \n"
+    "The possible formats are:                                              \n"
+    "  - msh                                                                \n"
+    "  - vtk                                                                \n";
 
 
 
@@ -442,6 +462,14 @@ namespace python
            generate_half_hyper_ball_overloads(
              boost::python::args("self", "center", "radius"),
              generate_half_hyper_ball_docstring))
+      .def("generate_hyper_shell",
+           &TriangulationWrapper::generate_hyper_shell,
+           generate_hyper_shell_overloads(boost::python::args("self",
+                                                              "center",
+                                                              "inner_radius",
+                                                              "outer_radius",
+                                                              "n_cells"),
+                                          generate_hyper_shell_docstring))
       .def("shift",
            &TriangulationWrapper::shift,
            shift_docstring,
@@ -469,6 +497,10 @@ namespace python
       .def("write",
            &TriangulationWrapper::write,
            write_docstring,
+           boost::python::args("self", "filename", "format"))
+      .def("read",
+           &TriangulationWrapper::read,
+           read_docstring,
            boost::python::args("self", "filename", "format"))
       .def("save",
            &TriangulationWrapper::save,

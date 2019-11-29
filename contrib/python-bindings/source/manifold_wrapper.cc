@@ -26,7 +26,7 @@ namespace python
   {
     template <int dim, int spacedim>
     Manifold<dim, spacedim> *
-    create_spherical_manifold(PointWrapper center)
+    create_spherical_manifold(const PointWrapper &center)
     {
       const Point<spacedim> *point =
         static_cast<const Point<spacedim> *>(center.get_point());
@@ -37,7 +37,7 @@ namespace python
 
     template <int dim, int spacedim>
     Manifold<dim, spacedim> *
-    create_polar_manifold(PointWrapper center)
+    create_polar_manifold(const PointWrapper &center)
     {
       const Point<spacedim> *point =
         static_cast<const Point<spacedim> *>(center.get_point());
@@ -71,6 +71,12 @@ namespace python
                  dynamic_cast<const PolarManifold<dim, spacedim> *>(manifold))
         {
           return new PolarManifold<dim, spacedim>(*d);
+        }
+      else if (const CylindricalManifold<dim, spacedim> *d =
+                 dynamic_cast<const CylindricalManifold<dim, spacedim> *>(
+                   manifold))
+        {
+          return new CylindricalManifold<dim, spacedim>(*d);
         }
       else
         ExcMessage("Unsupported manifold type in clone.");

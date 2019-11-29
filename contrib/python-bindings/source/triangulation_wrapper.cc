@@ -16,6 +16,7 @@
 #include <deal.II/base/types.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
@@ -373,6 +374,25 @@ namespace python
     }
 
 
+    template <int dim>
+    void
+    generate_hyper_shell(PointWrapper & center,
+                         const double   inner_radius,
+                         const double   outer_radius,
+                         const unsigned n_cells,
+                         void *         triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      Point<dim> center_point =
+        *(static_cast<Point<dim> *>(center.get_point()));
+
+      Triangulation<dim> *tria =
+        static_cast<Triangulation<dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::hyper_shell(
+        *tria, center_point, inner_radius, outer_radius, n_cells);
+    }
+
 
     template <int dim>
     void
@@ -518,6 +538,34 @@ namespace python
       std::ofstream ofs(filename);
       mesh_writer.write(*tria, ofs, output_format);
       ofs.close();
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    read(const std::string &filename,
+         const std::string &format,
+         void *             triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+
+      tria->clear();
+
+      typename GridIn<dim, spacedim>::Format input_format;
+      if (format.compare("msh") == 0)
+        input_format = GridIn<dim, spacedim>::Format::msh;
+      else if (format.compare("vtk") == 0)
+        input_format = GridIn<dim, spacedim>::Format::vtk;
+      else
+        ExcMessage("Cannot read triangulation of the given format.");
+
+      GridIn<dim, spacedim> mesh_reader;
+      mesh_reader.attach_triangulation(*tria);
+      std::ifstream ifs(filename);
+      mesh_reader.read(ifs, input_format);
+      ifs.close();
     }
   } // namespace internal
 
@@ -1004,6 +1052,27 @@ namespace python
   }
 
 
+
+  void
+  TriangulationWrapper::generate_hyper_shell(PointWrapper & center,
+                                             const double   inner_radius,
+                                             const double   outer_radius,
+                                             const unsigned n_cells)
+  {
+    AssertThrow(
+      dim == spacedim,
+      ExcMessage(
+        "This function is only implemented for dim equal to spacedim."));
+    if (dim == 2)
+      internal::generate_hyper_shell<2>(
+        center, inner_radius, outer_radius, n_cells, triangulation);
+    else
+      internal::generate_hyper_shell<3>(
+        center, inner_radius, outer_radius, n_cells, triangulation);
+  }
+
+
+
   void
   TriangulationWrapper::generate_hyper_sphere(PointWrapper &center,
                                               const double  radius)
@@ -1186,6 +1255,20 @@ namespace python
       internal::write<2, 3>(filename, format, triangulation);
     else
       internal::write<3, 3>(filename, format, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::read(const std::string &filename,
+                             const std::string  format) const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::read<2, 2>(filename, format, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::read<2, 3>(filename, format, triangulation);
+    else
+      internal::read<3, 3>(filename, format, triangulation);
   }
 
 
