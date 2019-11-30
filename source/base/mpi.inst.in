@@ -51,11 +51,19 @@ for (S : MPI_SCALARS)
                                       const MPI_Comm &,
                                       std::vector<S> &);
 
+    template void max<S>(const ArrayView<const S> &,
+                         const MPI_Comm &,
+                         const ArrayView<S> &);
+
     template S min<S>(const S &, const MPI_Comm &);
 
     template void min<std::vector<S>>(const std::vector<S> &,
                                       const MPI_Comm &,
                                       std::vector<S> &);
+
+    template void min<S>(const ArrayView<const S> &,
+                         const MPI_Comm &,
+                         const ArrayView<S> &);
 
     // The fixed-length array (i.e., things declared like T(&values)[N])
     // versions of the functions above live in the header file mpi.h since the
