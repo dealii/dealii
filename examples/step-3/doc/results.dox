@@ -52,7 +52,7 @@ of the solution. Several video lectures show how to use these programs.
 
 
 <a name="extensions"></a>
-<h3>Possibilities for extensions</h3>
+<h2>Possibilities for extensions</h2>
 
 If you want to play around a little bit with this program, here are a few
 suggestions:
@@ -221,4 +221,210 @@ suggestions:
   </table>
   Again, the difference between two adjacent values goes down by about a
   factor of four, indicating convergence as ${\cal O}(h^2)$.
+</ul>
+<h3>Using the %HDF5 Library to output the solution and additional data</h3>
+%HDF5 is a commonly used format that can be read by many scripting languages (e.g. R or Python). Here are some 
+insights on what is possible.
+<h4> Changing the output from .gnuplot to .h5:</h4>
+To fully make use of the automation we first need to introduce a private variable for the number of 
+global refinement steps <code>unsigned int n_refinement_steps </code>, which will be used for the output filename. 
+In <code>make_grid()</code> we replace <code>triangulation.refine_global(5);</code> with
+@code
+n_refinement_steps = 5;
+triangulation.refine_global(n_refinement_steps);
+@endcode
+The deal.II library has two different %HDF5 bindings, one in the HDF5 namespace
+and another one in DataOut. 
+Although the HDF5 deal.II binding supports both, serial and MPI, the %HDF5 DataOut binding 
+only supports parallel output.
+For this reason we need to initialize an MPI
+communicator with only one processor. This is done by adding the following code.
+@code
+int main(int argc, char* argv[])
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  ...
+}
+@endcode
+Next we change the output routine as described in the namespace documentation.
+@code
+const std::string filename_h5 = "solution_" + std::to_string(n_refinement_steps) + ".h5";
+DataOutBase::DataOutFilterFlags flags(true, true);
+DataOutBase::DataOutFilter data_filter(flags);
+data_out.write_filtered_data(data_filter);
+data_out.write_hdf5_parallel(data_filter, filename_h5, MPI_COMM_WORLD);
+@endcode
+
+ 
+<h4> Adding the point value and the mean (see extension above) into the .h5 file: </h4>
+After outputing the solution, the file can be opened again to include more datasets.
+This allows us to keep all the necessary information of our experiment in a single result file, 
+which can then be read and processed by some postprocessing script.<br>
+Have a further look at HDF5::Group::write_dataset() for further information on the possible output options.<br>
+First we include the necessary header into our file.
+@code 
+"<deal.II/base/hdf5.h>" 
+@endcode
+Adding the following lines to the end 
+of our output routine adds the additional information to our %HDF5 file.
+@code
+HDF5::File data_file(filename_h5, HDF5::File::FileAccessMode::open, MPI_COMM_WORLD);
+Vector<double> point_value(1);
+point_value[0] = VectorTools::point_value(dof_handler, solution, Point<2>(1./3, 1./3));
+data_file.write_dataset("point_value", point_value);
+Vector<double> mean_value(1);
+mean_value[0] = VectorTools::compute_mean_value(dof_handler, QGauss<2>(fe.degree + 1), solution, 0);
+data_file.write_dataset("mean_value",mean_value);
+@endcode
+
+<h4> Using R and ggplot2 to generate PDFs with plots of the grid, the solution and convergence curves: </h4>
+If you are unfamiliar with R and ggplot2 you could check out the data carpentry course on R 
+<a href=https://datacarpentry.org/R-ecology-lesson/index.html> here</a>. <br>
+Furthermore, since most search engines struggle with searches of the form "R + topic", 
+we recommend using the specializes service <a href=http://rseek.org>RSeek </a> instead.
+The most prominent difference between R and other languages is that the assignment operator (a = 5) is interchangable with
+(a <- 5). As the latter is considered standard we will use it in our examples as well.
+To open the .h5 file in R you have to install the <a href=https://bioconductor.org/packages/release/bioc/html/rhdf5.html>rhdf5</a> package, which is a part of the Bioconductor package.
+<br>First we will include all necessary packages and have a look at how the data is structured in our file.
+@code
+library(rhdf5) #library for handling HDF5 files
+library(ggplot2) #main plotting library
+library(grDevices) #needed for output to PDF
+library(viridis) #contains good colormaps for sequential data
+refinement <- 5
+h5f <- H5Fopen(paste("solution_",refinement,".h5",sep=""))
+print(h5f)
+@endcode
+This gives the following output
+@code
+HDF5 FILE 
+   name /
+filename 
+
+    name       otype  dclass     dim
+0 cells       H5I_DATASET INTEGER  x 1024
+1 mean_value  H5I_DATASET FLOAT   1      
+2 nodes       H5I_DATASET FLOAT    x 1089
+3 point_value H5I_DATASET FLOAT   1      
+4 solution    H5I_DATASET FLOAT    x 1089
+@endcode
+The datasets can be accessed by <code>h5f\$name</code>. The function <code>dim(h5f\$cells)</code> gives us
+the dimensions of our cell matrix. We can see the following three matrices, as well as the two additional
+data points we added.
+<ul> 
+<li> <code>cells</code>: a 4x1024 matrix that stores the  (C++) vertex indices for each cell 
+<li> <code>nodes</code>: a 2x1089 matrix storing the position values (x,y) for our cell vertices
+<li> <code>solution</code>: a 1x1089 matrix storing the values of our solution at each vertex
+</ul>
+Now we can use this data to generate our various plots. Plotting with ggplot2 usually splits into two steps.
+At first the data needs to be manipulated and added to a <code> data.frame</code>.
+After that a <code>ggplot</code> object is constructed and manipulated by adding plot elements to it.
+
+<code>nodes</code> and <code>cells</code> contain all the information we need to plot our grid. 
+The following code wraps all the data into one dataframe for plotting our grid
+@code
+#counting in R starts at 1 instead of 0 so we need to increment all vertex indices
+cell_ids <- h5f$cells+1 
+#store the x and y positions of each vertex in one big vector in a cell by cell fashion 
+#  (every 4 entries belong to one cell)
+cells_x <- h5f$nodes[1,][cell_ids]
+cells_y <- h5f$nodes[2,][cell_ids]
+#construct a vector that stores the matching cell by cell grouping (1,1,1,1,2,2,2,2,...)
+groups <- rep(1:ncol(cell_ids),each=4)
+#finally put everything into one dataframe   
+meshdata <- data.frame(x = cells_x, y = cells_y, id = groups)
+@endcode
+With the finished dataframe we have everything we need to plot our grid
+@code
+pdf (paste("grid_",refinement,".pdf",sep=""),width = 5,height = 5) #Open new PDF file
+plt <- ggplot(meshdata,aes(x=x,y=y,group=id)) #construction of our plot object, at first only data 
+plt <- plt + geom_polygon(fill="white",colour="black") #actual plotting of the grid as polygons
+plt <- plt + ggtitle(paste("grid at refinement level #",refinement))
+print(plt) #show the current state of the plot/ add it to the pdf
+dev.off() #close PDF file
+@endcode
+<table width="60%" align="center">
+  <tr>
+   <td align="center">
+     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.grid_5.png" alt="Grid after 5 refinement steps of step-3">
+   </td>
+  </tr>
+</table>
+To make a 2D pseudocolor plot of our solution we will use <code> geom_raster </code>.
+This function needs a structured grid, i.e. uniform in x and y directions.
+Luckily our data at this point is structured in the right way. 
+A description of the data manipulation needed for unstructured grids will be added to step-6.
+The following code plots a pseudocolor representation of our surface into a new PDF.
+@code
+pdf (paste("pseudocolor_",refinement,".pdf",sep=""),width = 5,height = 4.2) #Open new PDF file
+colordata <- data.frame(x = h5f$nodes[1,],y = h5f$nodes[2,] , solution = h5f$solution[1,])
+plt <- ggplot(colordata,aes(x=x,y=y,fill=solution))
+plt <- plt + geom_raster(interpolate=TRUE)
+plt <- plt + scale_fill_viridis()
+plt <- plt + ggtitle(paste("solution at refinement level #",refinement))
+print(plt) #show the current state of the plot/ add it to the pdf
+dev.off() #close PDF file 
+H5Fclose(h5f) #close HDF5 file
+@endcode
+<table width="60%" align="center">
+ <tr>
+   <td align="center">
+     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.pseudocolor_5.png" alt="Solution after 5 refinement steps of step-3">
+   </td>
+ </tr>
+</table>
+<li> 
+For plotting the converge curves we need to re-run the C++ code multiple times with different values for <code>n_refinement_steps</code>
+starting from 1. 
+Since every file only contains a single data point we need to loop over them and concatenate the results into a single vector.
+@code
+n_ref <- 8 #maximum refinement level for which results are existing
+#first we initiate all vectors with the results of the first level
+h5f <- H5Fopen("solution_1.h5")
+dofs <- dim(h5f$solution)[2]
+mean <- h5f$mean_value
+point <- h5f$point_value
+H5Fclose(h5f)
+for (reflevel in 2:n_ref)
+{
+   h5f <- H5Fopen(paste("solution_",reflevel,".h5",sep=""))
+   dofs <- c(dofs,dim(h5f\$solution)[2])
+   mean <- c(mean,h5f\$mean_value)
+   point <- c(point,h5f\$point_value)
+   H5Fclose(h5f)
+}
+@endcode
+As we are not interested in the values themselves but rather in the error compared to a "exact" solution we will
+assume our highest refinement level to be that solution and omit it from the data.
+@code
+#calculate the error w.r.t. our maximum refinement step
+mean_error <- abs(mean[1:n_ref-1]-mean[n_ref])
+point_error <- abs(point[1:n_ref-1]-point[n_ref])
+#remove the highest value from our DoF data
+dofs <- dofs[1:n_ref-1]
+convdata <- data.frame(dofs = dofs, mean_value= mean_error, point_value = point_error)
+@endcode
+Now we have all the data available to generate our plots.
+As is usual we will plot our results on a log-log scale.
+@code
+pdf (paste("convergence.pdf",sep=""),width = 5,height = 4.2)
+plt <- ggplot(convdata,mapping=aes(x = dofs, y = mean_value))
+plt <- plt+geom_line()
+plt <- plt+labs(x="#DoFs",y = "mean value error")
+plt <- plt+scale_x_log10()+scale_y_log10()
+print(plt)
+plt <- ggplot(convdata,mapping=aes(x = dofs, y = point_value))
+plt <- plt+geom_line()
+plt <- plt+labs(x="#DoFs",y = "point value error")
+plt <- plt+scale_x_log10()+scale_y_log10()
+print(plt)
+dev.off()
+@endcode
+</ul>
+ <table style="width:50%" align="center">
+  <tr>
+     <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
+     <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
+  </tr>
+ </table>     
 </ul>
