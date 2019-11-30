@@ -1,3 +1,21 @@
+/* ---------------------------------------------------------------------
+ *
+ * Copyright (C) 2019 by the deal.II authors
+ *
+ * This file is part of the deal.II library.
+ *
+ * The deal.II library is free software; you can use it, redistribute
+ * it, and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * The full text of the license can be found in the file LICENSE.md at
+ * the top level directory of deal.II.
+ *
+ * ---------------------------------------------------------------------
+
+ *
+ * Author:
+ */
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 
@@ -58,13 +76,14 @@ namespace StepBiharmonic
       static_assert(dim == 2, "Only dim==2 is implemented");
 
       virtual double value(const Point<dim> &p,
-                           const unsigned int /*component*/ = 0) const
+                           const unsigned int /*component*/ = 0) const override
       {
         return std::sin(PI * p[0]) * std::sin(PI * p[1]);
       }
 
       virtual Tensor<1, dim>
-      gradient(const Point<dim> &p, const unsigned int /*component*/ = 0) const
+      gradient(const Point<dim> &p,
+               const unsigned int /*component*/ = 0) const override
       {
         Tensor<1, dim> r;
         r[0] = PI * std::cos(PI * p[0]) * std::sin(PI * p[1]);
@@ -72,9 +91,10 @@ namespace StepBiharmonic
         return r;
       }
 
-      virtual void hessian_list(const std::vector<Point<dim>> &       points,
-                                std::vector<SymmetricTensor<2, dim>> &hessians,
-                                const unsigned int /*component*/ = 0) const
+      virtual void
+      hessian_list(const std::vector<Point<dim>> &       points,
+                   std::vector<SymmetricTensor<2, dim>> &hessians,
+                   const unsigned int /*component*/ = 0) const override
       {
         for (unsigned i = 0; i < points.size(); ++i)
           {
@@ -99,7 +119,7 @@ namespace StepBiharmonic
       static_assert(dim == 2, "Only dim==2 is implemented");
 
       virtual double value(const Point<dim> &p,
-                           const unsigned int /*component*/ = 0) const
+                           const unsigned int /*component*/ = 0) const override
 
       {
         return 4 * std::pow(PI, 4.0) * std::sin(PI * p[0]) *
@@ -265,8 +285,8 @@ namespace StepBiharmonic
   template <int dim>
   void BiharmonicProblem<dim>::assemble_system()
   {
-    typedef decltype(dof_handler.begin_active()) Iterator;
-    const ExactSolution::RightHandSide<dim>      right_hand_side;
+    using Iterator = decltype(dof_handler.begin_active());
+    const ExactSolution::RightHandSide<dim> right_hand_side;
 
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
@@ -280,8 +300,6 @@ namespace StepBiharmonic
       const FEValues<dim> &      fe_v = scratch_data.fe_values;
       const std::vector<double> &JxW  = fe_v.get_JxW_values();
 
-      // scalar_product(fe.shape_hessian_component(j,k,d),
-      // fe.shape_hessian_component(i,k,d));
       const double nu = 1.0;
 
       for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
@@ -297,7 +315,6 @@ namespace StepBiharmonic
                                    fe_v.shape_hessian(j, point)) *
                     JxW[point]; // dx
                 }
-
 
               copy_data.cell_rhs(i) += fe_v.shape_value(i, point) *
                                        right_hand_side.value(q_points[point]) *
@@ -366,15 +383,6 @@ namespace StepBiharmonic
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               {
-                Assert((fe_i.average_hessian(i, qpoint) * n * n) ==
-                         contract3(n, fe_i.average_hessian(i, qpoint), n),
-                       ExcInternalError());
-
-                Assert((fe_i.jump_gradient(j, qpoint) * n) ==
-                         (n * fe_i.jump_gradient(j, qpoint)),
-                       ExcInternalError());
-
-
                 copy_data_face.cell_matrix(i, j) +=
                   (-(fe_i.average_hessian(i, qpoint) * n *
                      n)                                    // - {grad^2 v n n }
@@ -451,9 +459,9 @@ namespace StepBiharmonic
                                                              //
                    + 2.0 * gamma *
                        (fe_i.jump_gradient(i, qpoint) * n) // 2 gamma [grad v n]
-                       * (fe_i.jump_gradient(j, qpoint) * n)) // [grad u n]
-                  * JxW[qpoint];                              // dx
-
+                       * (fe_i.jump_gradient(j, qpoint) * n) // [grad u n]
+                   ) *
+                  JxW[qpoint]; // dx
 
               copy_data.cell_rhs(i) +=
                 (-(fe_i.average_hessian(i, qpoint) * n *
