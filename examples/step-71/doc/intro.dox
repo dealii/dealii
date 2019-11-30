@@ -8,5 +8,152 @@ Heister, Wolfgang Bangerth, and Zhuoran Wang.
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+This program deals with the <a
+href="https://en.wikipedia.org/wiki/Biharmonic_equation">biharmonic
+equation</a>,
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega.
+@f}
+This equation appears in the modeling of thin structures such as roofs
+of stadiums. These objects are of course in reality
+three-dimensional with a large aspect ratio of lateral extent to
+perpendicular thickness, but one can often very accurately model these
+structures as two dimensional by making assumptions about how internal
+forces vary in the perpendicular direction, and this leads to the
+equation above.
+
+The model typically comes in two different kinds, depending on what
+kinds of boundary conditions are imposed. The first case,
+@f{align*}{
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega,
+@f}
+corresponds to the edges of the thin structure attached to the top of
+a wall of height $g(\mathbf x)$ in such a way that the bending forces
+that act on the structure are $h(\mathbf x)$; in most physical
+situations, one will have $h=0$, corresponding to the structure simply
+sitting atop the wall.
+
+In the second possible case of boundary values, one would have
+@f{align*}{
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \frac{\partial u(\mathbf x)}{\partial \mathbf n} &= j(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+This corresponds to a "clamped" structure for which a nonzero
+$j(\mathbf x)$ implies a certain angle against the horizontal.
+
+As with Dirichlet and Neumann boundary conditions for the Laplace
+equation, it is of course possible to have one kind of boundary
+conditions on one part of the boundary, and the other on the
+remainder.
+
+
+<h2> What's the issue? </h2>
+
+The fundamental issue with the equation is that it takes four
+derivatives of the solution. In the case of the Laplace equation
+we treated in step-3, step-4, and several other tutorial programs,
+one multiplies by a test function, integrates, integrates by parts,
+and ends up with only one derivative on both the test function and
+trial function -- something one can do with functions that are
+continuous globally, but may have kinks at the interfaces between
+cells: The derivative may not be defined at the interfaces, but
+that is on a lower-dimensional manifold (and so doesn't show up
+in the integrated value).
+
+But for the biharmonic equation, if one followed the same procedure,
+one would end up with two derivatives on the test functions and trial
+functions each. If one were to use the usual piecewise polynomial
+functions with their kinks on cell interfaces, the first derivative
+would yield a discontinuous gradient, and the second derivative with
+delta functions on the interfaces -- but because both the second
+derivatives of the test functions and of the trial functions yield a
+delta function, we would try to integrate the product of two delta
+functions. This can't work.
+
+Historically, numerical analysts have tried to address this by
+inventing finite elements that are "$C^1$ continuous", i.e., that use
+shape functions that are not just continuous but also have continuous
+first derivatives. This is the realm of elements such as the Argyris
+element, the Clough-Tocher element and others, all developed in the
+late 1960s. From a twenty-first century perspective, they can only be
+described as bizarre in their construction. They are also exceedingly
+cumbersome to implement if one wants to use general meshes. As a
+consequence, they have largely fallen out of favor and deal.II does
+not contain implementations of these shape functions.
+
+
+<h2> What to do instead? </h2>
+
+So how does one approach solving such problems then? That depends a
+bit on the boundary conditions. If one has the first set of boundary
+conditions, i.e., if the equation is
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega,
+@f}
+then the following trick works: In much the same as we obtained the
+mixed Laplace equation of step-20 from the regular Laplace equation by
+introducing a second variable, we can here introduce a variable
+$v=\Delta u$ and can then replace the equations above by the
+following, "mixed" system:
+@f{align*}{
+  -\Delta u(\mathbf x) +v(\mathbf x) &= 0
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  -\Delta v(\mathbf x) &= -f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  v(\mathbf x) &= h(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+In other words, we end up with what is in essence a system of two
+coupled Laplace equations for $u,v$, each with Dirichlet-type boundary
+conditions. We know how to solve such problems, and it should not be
+very difficult to construct good solvers and preconditioners for this
+system either using the techniques of step-20 and step-22. So this
+case is pretty simple to deal with.
+
+The more complicated situation is if we have the "clamped" boundary
+conditions, i.e., if the equation looks like this:
+@f{align*}{
+  \Delta^2 u(\mathbf x) &= f(\mathbf x)
+  \qquad \qquad &&\forall \mathbf x \in \Omega, \\
+  u(\mathbf x) &= g(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega, \\
+  \frac{\partial u(\mathbf x)}{\partial \mathbf n} &= j(\mathbf x) \qquad \qquad
+  &&\forall \mathbf x \in \partial\Omega.
+@f}
+The same trick with the mixed system does not work here, because we
+would end up with <i>both</i> Dirichlet and Neumann boundary
+conditions for $u$, but none for $v$.
+
+The solution to this conundrum arrived with the Discontinuous Galerkin
+method wave in the 1990s and early 2000s: In much the same way as one
+can use <i>discontinuous</i> shape functions for the Laplace equation
+by penalizing the size of the discontinuity to obtain a scheme for an
+equation that has one derivative on each shape function, we can use a
+scheme that uses <i>continuous</i> (but not $C^1$ continuous) shape
+functions and penalize the jump in the derivative to obtain a scheme
+for an equation that has two derivatives on each shape function. In
+analogy to the Interior Penality (IP) method for the Laplace equation,
+this scheme for the biharmonic equation is typically called the C0IP
+method, since it uses $C^0$ (continuous but not continuously
+differentiable) shape functions with an interior penality.
+
+
+<h2> Derivation of the C0IP method </h2>
+
+...Natasha to write...
+
 
 <h2>The testcase</h2>
