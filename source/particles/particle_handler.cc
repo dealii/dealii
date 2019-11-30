@@ -193,17 +193,21 @@ namespace Particles
         global_number_of_particles = dealii::Utilities::MPI::sum(
           particles.size(), parallel_triangulation->get_communicator());
         next_free_particle_index =
-          dealii::Utilities::MPI::max(
-            locally_highest_index, parallel_triangulation->get_communicator()) +
-          1;
+          global_number_of_particles == 0 ?
+            0 :
+            dealii::Utilities::MPI::max(
+              locally_highest_index,
+              parallel_triangulation->get_communicator()) +
+              1;
         global_max_particles_per_cell = dealii::Utilities::MPI::max(
           local_max_particles_per_cell,
           parallel_triangulation->get_communicator());
       }
     else
       {
-        global_number_of_particles    = particles.size();
-        next_free_particle_index      = locally_highest_index + 1;
+        global_number_of_particles = particles.size();
+        next_free_particle_index =
+          global_number_of_particles == 0 ? 0 : locally_highest_index + 1;
         global_max_particles_per_cell = local_max_particles_per_cell;
       }
   }
