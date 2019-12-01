@@ -39,7 +39,7 @@ void
 test()
 {
   {
-    parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
+    Triangulation<dim, spacedim> tr;
 
     GridGenerator::hyper_shell(tr, Point<dim>(), 0.5, 1.0);
 
@@ -73,8 +73,6 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
   initlog();
 
   deallog.push("2d/2d");
