@@ -1725,13 +1725,6 @@ public:
   const internal::MatrixFreeFunctions::TaskInfo &
   get_task_info() const;
 
-  /**
-   * Return information on system size.
-   */
-  DEAL_II_DEPRECATED
-  const internal::MatrixFreeFunctions::TaskInfo &
-  get_size_info() const;
-
   /*
    * Return geometry-dependent information on the cells.
    */
@@ -2104,15 +2097,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_base_elements(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::TaskInfo &
 MatrixFree<dim, Number, VectorizedArrayType>::get_task_info() const
-{
-  return task_info;
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-inline const internal::MatrixFreeFunctions::TaskInfo &
-MatrixFree<dim, Number, VectorizedArrayType>::get_size_info() const
 {
   return task_info;
 }
