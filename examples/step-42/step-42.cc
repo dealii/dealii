@@ -623,7 +623,8 @@ namespace Step42
     void solve_newton();
     void refine_grid();
     void move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const;
-    void output_results(const std::string &filename_base);
+    void output_results(const unsigned int current_refinement_cycle);
+
     void output_contact_force() const;
 
     // As far as member variables are concerned, we start with ones that we use
@@ -1959,7 +1960,7 @@ namespace Step42
   // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
   void PlasticityContactProblem<dim>::output_results(
-    const std::string &filename_base)
+    const unsigned int current_refinement_cycle)
   {
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
@@ -2033,31 +2034,9 @@ namespace Step42
     // output files. We then do the same again for the competitor of
     // Paraview, the Visit visualization program, by creating a matching
     // <code>.visit</code> file.
-    const std::string filename =
-      (output_dir + filename_base + "-" +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
-
-    std::ofstream output_vtu((filename + ".vtu"));
-    data_out.write_vtu(output_vtu);
-    pcout << output_dir + filename_base << ".pvtu" << std::endl;
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back(filename_base + "-" +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream pvtu_master_output(
-          (output_dir + filename_base + ".pvtu"));
-        data_out.write_pvtu_record(pvtu_master_output, filenames);
-
-        std::ofstream visit_master_output(
-          (output_dir + filename_base + ".visit"));
-        DataOutBase::write_visit_record(visit_master_output, filenames);
-      }
+    const std::string master_name = data_out.write_vtu_with_pvtu_record(
+      output_dir, "solution", current_refinement_cycle, 2, mpi_communicator);
+    pcout << master_name << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;
@@ -2169,8 +2148,7 @@ namespace Step42
 
         solve_newton();
 
-        output_results(std::string("solution-") +
-                       Utilities::int_to_string(current_refinement_cycle, 2));
+        output_results(current_refinement_cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();

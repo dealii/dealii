@@ -500,29 +500,8 @@ namespace Step48
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3);
-
-    std::ofstream output(
-      filename + "." +
-      Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                               4) +
-      ".vtu");
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(timestep_number, 3) +
-                              "." + Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream master_output((filename + ".pvtu"));
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", timestep_number, 3, MPI_COMM_WORLD);
   }
 
 
