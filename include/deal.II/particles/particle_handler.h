@@ -524,7 +524,12 @@ namespace Particles
         &data_range);
   };
 
-  /* ---------------------- inline and template functions ------------------ */
+
+
+  /* ---------------------- inline and template functions ------------------
+   */
+
+
 
   template <int dim, int spacedim>
   template <class Archive>
