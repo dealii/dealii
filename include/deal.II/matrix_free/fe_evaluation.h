@@ -3050,7 +3050,7 @@ inline FEEvaluationBase<dim,
 {
   set_data_pointers();
   Assert(matrix_info->mapping_initialized() == true, ExcNotInitialized());
-  AssertDimension(matrix_info->get_size_info().vectorization_length,
+  AssertDimension(matrix_info->get_task_info().vectorization_length,
                   VectorizedArrayType::n_array_elements);
   AssertDimension((is_face ? data->n_q_points_face : data->n_q_points),
                   n_quadrature_points);
