@@ -145,7 +145,7 @@ public:
   /**
    * Return the update flags set.
    */
-  const UpdateFlags
+  UpdateFlags
   get_update_flags() const;
 
   /**
@@ -521,7 +521,7 @@ FEInterfaceValues<dim, spacedim>::reinit(
     for (auto &x : tempmap)
       {
         interface_dof_indices[idx] = x.first;
-        dofmap[idx]                = {x.second.first, x.second.second};
+        dofmap[idx]                = {{x.second.first, x.second.second}};
         ++idx;
       }
   }
@@ -547,7 +547,7 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
 
   for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
     {
-      dofmap[i] = {i, numbers::invalid_unsigned_int};
+      dofmap[i] = {{i, numbers::invalid_unsigned_int}};
     }
 }
 
@@ -596,7 +596,7 @@ FEInterfaceValues<dim, spacedim>::get_quadrature_points() const
 
 
 template <int dim, int spacedim>
-const UpdateFlags
+UpdateFlags
 FEInterfaceValues<dim, spacedim>::get_update_flags() const
 {
   return internal_fe_face_values.get_update_flags();

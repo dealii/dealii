@@ -281,7 +281,7 @@ The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
 variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the
 inflow part of the boundary of $K$) are quantities taken from the neighboring
 cell. Some more context on discontinuous element techniques and evaluation of
-fluxes can also be found in step-12.
+fluxes can also be found in step-12 and step-12b.
 
 
 <h3>Linear solvers</h3>
