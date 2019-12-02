@@ -1490,15 +1490,19 @@ namespace Utilities
 #  else
       const auto my_proc = this_mpi_process(comm);
 
+      std::map<unsigned int, T> received_objects;
+
       std::vector<unsigned int> send_to;
       send_to.reserve(objects_to_send.size());
       for (const auto &m : objects_to_send)
-        if (m.first != my_proc)
+        if (m.first == my_proc)
+          received_objects[my_proc] = m.second;
+        else
           send_to.emplace_back(m.first);
 
       // Shortcut, when running in serial
       if (send_to.size() == 0)
-        return objects_to_send;
+        return received_objects;
 
       const auto receive_from =
         Utilities::MPI::compute_point_to_point_communication_pattern(comm,
@@ -1533,8 +1537,7 @@ namespace Utilities
             }
       }
 
-      // Receiving buffers
-      std::map<unsigned int, T> received_objects;
+      // Fill the output map
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
@@ -1574,10 +1577,6 @@ namespace Utilities
       MPI_Waitall(send_to.size(),
                   buffer_send_requests.data(),
                   MPI_STATUSES_IGNORE);
-
-      // If necessary, insert my own objects into the received_objects
-      if (objects_to_send.find(my_proc) != objects_to_send.end())
-        received_objects[my_proc] = objects_to_send.at(my_proc);
 
       return received_objects;
 #  endif // deal.II with MPI
