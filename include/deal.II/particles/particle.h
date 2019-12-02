@@ -271,6 +271,14 @@ namespace Particles
     get_id() const;
 
     /**
+     * Set the ID number of this particle.
+     *
+     * @param[in] new_id The new ID number for this particle.
+     */
+    void
+    set_id(const types::particle_index &new_id);
+
+    /**
      * Tell the particle where to store its properties (even if it does not
      * own properties). Usually this is only done once per particle, but
      * since the particle does not know about the properties,
