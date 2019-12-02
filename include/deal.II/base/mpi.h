@@ -1504,9 +1504,8 @@ namespace Utilities
       if (send_to.size() == 0)
         return received_objects;
 
-      const auto receive_from =
-        Utilities::MPI::compute_point_to_point_communication_pattern(comm,
-                                                                     send_to);
+      const auto n_point_point_communications =
+        Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
 
       // Protect the following communication:
       static CollectiveMutex      mutex;
@@ -1541,7 +1540,7 @@ namespace Utilities
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i < receive_from.size(); ++i)
+        for (unsigned int i = 0; i < n_point_point_communications; ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
