@@ -57,6 +57,12 @@ namespace python
 
 
 
+  const char set_all_manifold_ids_docstring[] =
+    "Do as set_manifold_id() but also set the manifold indicators of    \n"
+    "the objects that bound the current object.                         \n";
+
+
+
   const char barycenter_docstring[] =
     "Return the barycenter of the current cell                          \n";
 
@@ -97,6 +103,11 @@ namespace python
 
 
 
+  const char measure_docstring[] =
+    " Compute the dim-dimensional measure of the object.                 \n";
+
+
+
   void
   export_cell_accessor()
   {
@@ -119,6 +130,10 @@ namespace python
                     &CellAccessorWrapper::get_manifold_id,
                     &CellAccessorWrapper::set_manifold_id,
                     manifold_id_docstring)
+      .def("set_all_manifold_ids",
+           &CellAccessorWrapper::set_all_manifold_ids,
+           set_all_manifold_ids_docstring,
+           boost::python::args("self", "number"))
       .def("barycenter",
            &CellAccessorWrapper::get_barycenter,
            barycenter_docstring,
@@ -146,6 +161,10 @@ namespace python
       .def("faces",
            &CellAccessorWrapper::faces,
            faces_docstring,
+           boost::python::args("self"))
+      .def("measure",
+           &CellAccessorWrapper::measure,
+           measure_docstring,
            boost::python::args("self"));
   }
 } // namespace python

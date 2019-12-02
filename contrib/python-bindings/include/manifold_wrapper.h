@@ -68,6 +68,17 @@ namespace python
     void *
     get_manifold() const;
 
+    /**
+     * Return the dimension of the underlying object
+     */
+    int
+    get_dim() const;
+
+    /**
+     * Return the space dimension of the underlying object
+     */
+    int
+    get_spacedim() const;
 
   private:
     /**

@@ -278,7 +278,8 @@ namespace python
     generate_hyper_shell(PointWrapper & center,
                          const double   inner_radius,
                          const double   outer_radius,
-                         const unsigned n_cells = 0);
+                         const unsigned n_cells  = 0,
+                         bool           colorize = false);
 
     /**
      * Shift each vertex of the Triangulation by the given @p shift_list.
@@ -316,10 +317,25 @@ namespace python
     flatten_triangulation(TriangulationWrapper &tria_out);
 
     /**
-     *
+     * Assign a manifold object to a certain part of the triangulation.
+     * If an object with manifold number is refined, this object
+     * is used to find the location of new vertices (see the results
+     * section of step-49 for a more in-depth discussion of this, with
+     * examples). It is also used for non-linear (i.e.: non-Q1)
+     * transformations of cells to the unit cell in shape function
+     * calculations.
      */
     void
     set_manifold(const int number, ManifoldWrapper &manifold);
+
+    /**
+     * Reset those parts of the triangulation with the given manifold_number to
+     * use a FlatManifold object. This is the default state of a non-curved
+     * triangulation, and undoes assignment of a different Manifold object by
+     * the function Triangulation::set_manifold().
+     */
+    void
+    reset_manifold(const int number);
 
     /**
      * Refine all the cells @p n times.

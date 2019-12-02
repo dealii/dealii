@@ -103,6 +103,18 @@ namespace python
     at_boundary() const;
 
     /**
+     * Compute the dim-dimensional measure of the object.
+     * For a dim-dimensional cell in dim-dimensional space,
+     * this equals its volume. On the other hand, for a 2d
+     * cell in 3d space, or if the current object pointed to
+     * is a 2d face of a 3d cell in 3d space, then the function
+     * computes the area the object occupies. For a
+     * one-dimensional object, return its length.
+     */
+    double
+    measure() const;
+
+    /**
      * Exception.
      */
     DeclException2(ExcVertexDoesNotExist,

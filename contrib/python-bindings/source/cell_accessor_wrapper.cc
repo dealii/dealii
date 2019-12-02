@@ -252,6 +252,17 @@ namespace python
 
 
     template <int dim, int spacedim>
+    void
+    set_all_manifold_ids(const int manifold_id, void *cell_accessor)
+    {
+      const CellAccessor<dim, spacedim> *cell =
+        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
+      return cell->set_all_manifold_ids(manifold_id);
+    }
+
+
+
+    template <int dim, int spacedim>
     bool
     at_boundary(const void *cell_accessor)
     {
@@ -303,6 +314,18 @@ namespace python
         }
 
       return faces_list;
+    }
+
+
+
+    template <int dim, int spacedim>
+    double
+    measure(const void *cell_accessor)
+    {
+      const CellAccessor<dim, spacedim> *cell =
+        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
+
+      return cell->measure();
     }
   } // namespace internal
 
@@ -558,6 +581,19 @@ namespace python
 
 
 
+  void
+  CellAccessorWrapper::set_all_manifold_ids(const int manifold_id)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::set_all_manifold_ids<2, 2>(manifold_id, cell_accessor);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::set_all_manifold_ids<2, 3>(manifold_id, cell_accessor);
+    else
+      internal::set_all_manifold_ids<3, 3>(manifold_id, cell_accessor);
+  }
+
+
+
   bool
   CellAccessorWrapper::at_boundary() const
   {
@@ -608,6 +644,19 @@ namespace python
       return internal::faces<2, 3>(cell_accessor);
     else
       return internal::faces<3, 3>(cell_accessor);
+  }
+
+
+
+  double
+  CellAccessorWrapper::measure() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::measure<2, 2>(cell_accessor);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::measure<2, 3>(cell_accessor);
+    else
+      return internal::measure<3, 3>(cell_accessor);
   }
 
 } // namespace python

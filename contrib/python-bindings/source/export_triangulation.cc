@@ -93,11 +93,10 @@ namespace python
                                          generate_half_hyper_ball,
                                          1,
                                          2)
-
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
                                          generate_hyper_shell,
                                          3,
-                                         4)
+                                         5)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells                                      \n";
@@ -360,6 +359,12 @@ namespace python
 
 
 
+  const char reset_manifold_docstring[] =
+    "Reset those parts of the triangulation with the given manifold_number  \n"
+    "to use a FlatManifold object.                                          \n";
+
+
+
   void
   export_triangulation()
   {
@@ -468,7 +473,8 @@ namespace python
                                                               "center",
                                                               "inner_radius",
                                                               "outer_radius",
-                                                              "n_cells"),
+                                                              "n_cells",
+                                                              "colorize"),
                                           generate_hyper_shell_docstring))
       .def("shift",
            &TriangulationWrapper::shift,
@@ -513,7 +519,11 @@ namespace python
       .def("set_manifold",
            &TriangulationWrapper::set_manifold,
            set_manifold_docstring,
-           boost::python::args("self", "number", "manifold"));
+           boost::python::args("self", "number", "manifold"))
+      .def("reset_manifold",
+           &TriangulationWrapper::reset_manifold,
+           reset_manifold_docstring,
+           boost::python::args("self", "number"));
   }
 } // namespace python
 
