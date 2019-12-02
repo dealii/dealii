@@ -19,7 +19,10 @@
 // @sect3{Include files}
 // This program is based on step-7, step-20 and step-51,
 // so most of the following header files are familiar. We
-// need the following:
+// need the following, of which only the one that
+// imports the FE_DGRaviartThomas class (namely, `deal.II/fe/fe_dg_vector.h`)
+// is really new; the FE_DGRaviartThomas implements the "broken" Raviart-Thomas
+// space discussed in the introduction:
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_function.h>
@@ -49,13 +52,9 @@
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_faces.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
 
 #include <fstream>
 #include <iostream>
@@ -76,7 +75,14 @@ namespace Step61
   //
   // The structure of the class is not fundamentally different from that of
   // previous tutorial programs, so there is little need to comment on the
-  // details.
+  // details with one exception: The class has a member variable `fe_dgrt`
+  // that corresponds to the "broken" Raviart-Thomas space mentioned in the
+  // introduction. There is a matching `dof_handler_dgrt` that represents a
+  // global enumeration of a finite element field created from this element, and
+  // a vector `darcy_velocity` that holds nodal values for this field. We will
+  // use these three variables after solving for the pressure to compute a
+  // postprocessed velocity field for which we can then evaluate the error
+  // and which we can output for visualization.
   template <int dim>
   class WGDarcyEquation
   {
@@ -98,9 +104,6 @@ namespace Step61
     FESystem<dim>   fe;
     DoFHandler<dim> dof_handler;
 
-    FE_DGRaviartThomas<dim> fe_dgrt;
-    DoFHandler<dim>         dof_handler_dgrt;
-
     AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
@@ -109,7 +112,9 @@ namespace Step61
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    Vector<double> darcy_velocity;
+    FE_DGRaviartThomas<dim> fe_dgrt;
+    DoFHandler<dim>         dof_handler_dgrt;
+    Vector<double>          darcy_velocity;
   };
 
 
@@ -263,7 +268,6 @@ namespace Step61
     , dof_handler(triangulation)
     , fe_dgrt(degree)
     , dof_handler_dgrt(triangulation)
-
   {}
 
 
@@ -1026,7 +1030,6 @@ int main()
 {
   try
     {
-      dealii::deallog.depth_console(2);
       Step61::WGDarcyEquation<2> wg_darcy(0);
       wg_darcy.run();
     }
