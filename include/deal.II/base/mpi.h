@@ -1481,21 +1481,24 @@ namespace Utilities
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0,
+      Assert(objects_to_send.size() < 2,
              ExcMessage("Cannot send to more than one processor."));
       Assert(objects_to_send.find(0) != objects_to_send.end() ||
                objects_to_send.size() == 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
+      const auto my_proc = this_mpi_process(comm);
 
-      std::vector<unsigned int> send_to(objects_to_send.size());
-      {
-        unsigned int i = 0;
-        for (const auto &m : objects_to_send)
-          send_to[i++] = m.first;
-      }
-      AssertDimension(send_to.size(), objects_to_send.size());
+      std::vector<unsigned int> send_to;
+      send_to.reserve(objects_to_send.size());
+      for (const auto &m : objects_to_send)
+        if (m.first != my_proc)
+          send_to.emplace_back(m.first);
+
+      // Shortcut, when running in serial
+      if (send_to.size() == 0)
+        return objects_to_send;
 
       const auto receive_from =
         Utilities::MPI::compute_point_to_point_communication_pattern(comm,
@@ -1514,19 +1517,20 @@ namespace Utilities
       {
         unsigned int i = 0;
         for (const auto &rank_obj : objects_to_send)
-          {
-            const auto &rank   = rank_obj.first;
-            buffers_to_send[i] = Utilities::pack(rank_obj.second);
-            const int ierr     = MPI_Isend(buffers_to_send[i].data(),
-                                       buffers_to_send[i].size(),
-                                       MPI_CHAR,
-                                       rank,
-                                       mpi_tag,
-                                       comm,
-                                       &buffer_send_requests[i]);
-            AssertThrowMPI(ierr);
-            ++i;
-          }
+          if (rank_obj.first != my_proc)
+            {
+              const auto &rank   = rank_obj.first;
+              buffers_to_send[i] = Utilities::pack(rank_obj.second);
+              const int ierr     = MPI_Isend(buffers_to_send[i].data(),
+                                         buffers_to_send[i].size(),
+                                         MPI_CHAR,
+                                         rank,
+                                         mpi_tag,
+                                         comm,
+                                         &buffer_send_requests[i]);
+              AssertThrowMPI(ierr);
+              ++i;
+            }
       }
 
       // Receiving buffers
@@ -1570,6 +1574,10 @@ namespace Utilities
       MPI_Waitall(send_to.size(),
                   buffer_send_requests.data(),
                   MPI_STATUSES_IGNORE);
+
+      // If necessary, insert my own objects into the received_objects
+      if (objects_to_send.find(my_proc) != objects_to_send.end())
+        received_objects[my_proc] = objects_to_send.at(my_proc);
 
       return received_objects;
 #  endif // deal.II with MPI
