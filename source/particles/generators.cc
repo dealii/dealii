@@ -25,8 +25,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 namespace Particles
 {
   namespace Generators
@@ -114,6 +112,7 @@ namespace Particles
     {
       types::particle_index particle_index = 0;
 
+#ifdef DEAL_II_WITH_MPI
       if (const auto tria =
             dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
               &triangulation))
@@ -131,6 +130,7 @@ namespace Particles
                      MPI_SUM,
                      tria->get_communicator());
         }
+#endif
 
       for (const auto &cell : triangulation.active_cell_iterators())
         {
@@ -284,6 +284,7 @@ namespace Particles
         // the weights of all processes with a lower rank
         double local_start_weight = 0.0;
 
+#ifdef DEAL_II_WITH_MPI
         if (const auto tria =
               dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
                 &triangulation))
@@ -295,6 +296,7 @@ namespace Particles
                        MPI_SUM,
                        tria->get_communicator());
           }
+#endif
 
         // Calculate start id and number of local particles
         start_particle_id =
@@ -392,14 +394,6 @@ namespace Particles
   } // namespace Generators
 } // namespace Particles
 
-#endif // DEAL_II_WITH_P4EST
-
-DEAL_II_NAMESPACE_CLOSE
-
-DEAL_II_NAMESPACE_OPEN
-
-#ifdef DEAL_II_WITH_P4EST
-#  include "generators.inst"
-#endif
+#include "generators.inst"
 
 DEAL_II_NAMESPACE_CLOSE

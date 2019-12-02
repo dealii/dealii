@@ -16,7 +16,7 @@
 
 
 // check the creation and destruction of particle within the particle handler
-// class using a particle generator.
+// class for a serial triangulation.
 
 #include <deal.II/distributed/tria.h>
 
@@ -25,7 +25,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
@@ -38,24 +37,34 @@ test()
     Triangulation<dim, spacedim> tr;
 
     GridGenerator::hyper_cube(tr);
+    tr.refine_global(2);
+
     MappingQ<dim, spacedim> mapping(1);
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    std::vector<Point<dim>> particle_reference_locations(1, Point<dim>());
-    Particles::Generators::regular_reference_locations(
-      tr, particle_reference_locations, particle_handler);
+    std::vector<Point<spacedim>> points(10);
+    for (unsigned int i = 0; i < 10; ++i)
+      {
+        const double coordinate = static_cast<double>(i) / 10.0;
+        for (unsigned int j = 0; j < spacedim; ++j)
+          points[i][j] = 0.05 + coordinate;
+      }
+
+    particle_handler.insert_particles(points);
+    particle_handler.update_cached_numbers();
 
     deallog << "Particle number: " << particle_handler.n_global_particles()
             << std::endl;
 
-    for (const auto &particle : particle_handler)
-      {
-        deallog << "Particle location: " << particle.get_location()
-                << std::endl;
-        deallog << "Particle reference location: "
-                << particle.get_reference_location() << std::endl;
-      }
+    for (auto particle = particle_handler.begin();
+         particle != particle_handler.end();
+         ++particle)
+      deallog << "Particle id " << particle->get_id() << " is in cell "
+              << particle->get_surrounding_cell(tr) << std::endl
+              << "     at location " << particle->get_location() << std::endl
+              << "     at reference location "
+              << particle->get_reference_location() << std::endl;
   }
 
   deallog << "OK" << std::endl;

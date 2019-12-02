@@ -30,8 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 namespace Particles
 {
   /**
@@ -164,8 +162,6 @@ namespace Particles
 
   } // namespace Generators
 } // namespace Particles
-
-#endif // DEAL_II_WITH_P4EST
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -15,10 +15,8 @@
 
 
 
-// Create a particle handler then generate an output
-// Tests the Visualization class of the particle handler
-
-#include <deal.II/base/data_out_base.h>
+// check the particle sort within the particle handler class in serial models.
+// Same as particle_handler_03 for a serial triangulation.
 
 #include <deal.II/distributed/tria.h>
 
@@ -27,7 +25,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/particles/data_out.h>
 #include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
@@ -40,18 +37,18 @@ test()
     Triangulation<dim, spacedim> tr;
 
     GridGenerator::hyper_cube(tr);
-    tr.refine_global(2);
+    tr.refine_global(1);
     MappingQ<dim, spacedim> mapping(1);
 
-    // Create a particle handler using two manually created particles
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
-    std::vector<Point<spacedim>>              position(2);
-    std::vector<Point<dim>>                   reference_position(2);
+
+    std::vector<Point<spacedim>> position(2);
+    std::vector<Point<dim>>      reference_position(2);
 
     for (unsigned int i = 0; i < dim; ++i)
       {
-        position[0](i) = 0.125;
-        position[1](i) = 0.525;
+        position[0](i) = 0.25;
+        position[1](i) = 0.75;
       }
 
     Particles::Particle<dim, spacedim> particle1(position[0],
@@ -62,18 +59,40 @@ test()
                                                  1);
 
     typename Triangulation<dim, spacedim>::active_cell_iterator cell1(&tr,
-                                                                      2,
+                                                                      1,
                                                                       0);
     typename Triangulation<dim, spacedim>::active_cell_iterator cell2(&tr,
-                                                                      2,
+                                                                      1,
                                                                       0);
 
     particle_handler.insert_particle(particle1, cell1);
     particle_handler.insert_particle(particle2, cell2);
 
-    Particles::DataOut<dim, spacedim> particle_output;
-    particle_output.build_patches(particle_handler);
-    particle_output.write_gnuplot(deallog.get_file_stream());
+    for (const auto &particle : particle_handler)
+      deallog << "Before sort particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
+              << std::endl;
+
+    particle_handler.sort_particles_into_subdomains_and_cells();
+
+    for (const auto &particle : particle_handler)
+      deallog << "After sort particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
+              << std::endl;
+
+    // Move all points up by 0.5. This will change cell for particle 1, and will
+    // move particle 2 out of the domain. Note that we need to change the
+    // coordinate dim-1 despite having a spacedim point.
+    Point<spacedim> shift;
+    shift(dim - 1) = 0.5;
+    for (auto &particle : particle_handler)
+      particle.set_location(particle.get_location() + shift);
+
+    particle_handler.sort_particles_into_subdomains_and_cells();
+    for (const auto &particle : particle_handler)
+      deallog << "After shift particle id " << particle.get_id()
+              << " is in cell " << particle.get_surrounding_cell(tr)
+              << std::endl;
   }
 
   deallog << "OK" << std::endl;
@@ -85,6 +104,7 @@ int
 main(int argc, char *argv[])
 {
   initlog();
+
   deallog.push("2d/2d");
   test<2, 2>();
   deallog.pop();

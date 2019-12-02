@@ -24,8 +24,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 namespace Particles
 {
   namespace
@@ -106,9 +104,9 @@ namespace Particles
 
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler(
-    const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
-    const Mapping<dim, spacedim> &                             mapping,
-    const unsigned int                                         n_properties)
+    const Triangulation<dim, spacedim> &triangulation,
+    const Mapping<dim, spacedim> &      mapping,
+    const unsigned int                  n_properties)
     : triangulation(&triangulation, typeid(*this).name())
     , mapping(&mapping, typeid(*this).name())
     , particles()
@@ -128,10 +126,9 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::initialize(
-    const parallel::distributed::Triangulation<dim, spacedim>
-      &                           new_triangulation,
-    const Mapping<dim, spacedim> &new_mapping,
-    const unsigned int            n_properties)
+    const Triangulation<dim, spacedim> &new_triangulation,
+    const Mapping<dim, spacedim> &      new_mapping,
+    const unsigned int                  n_properties)
   {
     triangulation = &new_triangulation;
     mapping       = &new_mapping;
@@ -189,16 +186,30 @@ namespace Particles
           std::max(local_max_particles_per_cell, current_particles_per_cell);
       }
 
-    global_number_of_particles =
-      dealii::Utilities::MPI::sum(particles.size(),
-                                  triangulation->get_communicator());
-    next_free_particle_index =
-      dealii::Utilities::MPI::max(locally_highest_index,
-                                  triangulation->get_communicator()) +
-      1;
-    global_max_particles_per_cell =
-      dealii::Utilities::MPI::max(local_max_particles_per_cell,
-                                  triangulation->get_communicator());
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            &*triangulation))
+      {
+        global_number_of_particles = dealii::Utilities::MPI::sum(
+          particles.size(), parallel_triangulation->get_communicator());
+        next_free_particle_index =
+          global_number_of_particles == 0 ?
+            0 :
+            dealii::Utilities::MPI::max(
+              locally_highest_index,
+              parallel_triangulation->get_communicator()) +
+              1;
+        global_max_particles_per_cell = dealii::Utilities::MPI::max(
+          local_max_particles_per_cell,
+          parallel_triangulation->get_communicator());
+      }
+    else
+      {
+        global_number_of_particles = particles.size();
+        next_free_particle_index =
+          global_number_of_particles == 0 ? 0 : locally_highest_index + 1;
+        global_max_particles_per_cell = local_max_particles_per_cell;
+      }
   }
 
 
@@ -380,17 +391,22 @@ namespace Particles
       get_next_free_particle_index();
     types::particle_index local_start_index = 0;
 
-#  ifdef DEAL_II_WITH_MPI
-    types::particle_index particles_to_add_locally = positions.size();
-    const int             ierr = MPI_Scan(&particles_to_add_locally,
-                              &local_start_index,
-                              1,
-                              DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                              MPI_SUM,
-                              triangulation->get_communicator());
-    AssertThrowMPI(ierr);
-    local_start_index -= particles_to_add_locally;
-#  endif
+#ifdef DEAL_II_WITH_MPI
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            &*triangulation))
+      {
+        types::particle_index particles_to_add_locally = positions.size();
+        const int             ierr = MPI_Scan(&particles_to_add_locally,
+                                  &local_start_index,
+                                  1,
+                                  DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                                  MPI_SUM,
+                                  parallel_triangulation->get_communicator());
+        AssertThrowMPI(ierr);
+        local_start_index -= particles_to_add_locally;
+      }
+#endif
 
     local_start_index += local_next_particle_index;
 
@@ -598,8 +614,11 @@ namespace Particles
     sorted_particles.reserve(
       static_cast<vector_size>(particles_out_of_cell.size() * 1.25));
 
-    const std::set<types::subdomain_id> ghost_owners =
-      triangulation->ghost_owners();
+    std::set<types::subdomain_id> ghost_owners;
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            &*triangulation))
+      ghost_owners = parallel_triangulation->ghost_owners();
 
     for (const auto ghost_owner : ghost_owners)
       moved_particles[ghost_owner].reserve(
@@ -743,11 +762,18 @@ namespace Particles
       sorted_particles_map;
 
     // Exchange particles between processors if we have more than one process
-#  ifdef DEAL_II_WITH_MPI
-    if (dealii::Utilities::MPI::n_mpi_processes(
-          triangulation->get_communicator()) > 1)
-      send_recv_particles(moved_particles, sorted_particles_map, moved_cells);
-#  endif
+#ifdef DEAL_II_WITH_MPI
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            &*triangulation))
+      {
+        if (dealii::Utilities::MPI::n_mpi_processes(
+              parallel_triangulation->get_communicator()) > 1)
+          send_recv_particles(moved_particles,
+                              sorted_particles_map,
+                              moved_cells);
+      }
+#endif
 
     sorted_particles_map.insert(sorted_particles.begin(),
                                 sorted_particles.end());
@@ -766,11 +792,19 @@ namespace Particles
   ParticleHandler<dim, spacedim>::exchange_ghost_particles()
   {
     // Nothing to do in serial computations
-    if (dealii::Utilities::MPI::n_mpi_processes(
-          triangulation->get_communicator()) == 1)
+    const auto parallel_triangulation =
+      dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        &*triangulation);
+    if (parallel_triangulation != nullptr)
+      {
+        if (dealii::Utilities::MPI::n_mpi_processes(
+              parallel_triangulation->get_communicator()) == 1)
+          return;
+      }
+    else
       return;
 
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
     // First clear the current ghost_particle information
     ghost_particles.clear();
 
@@ -778,7 +812,7 @@ namespace Particles
       ghost_particles_by_domain;
 
     const std::set<types::subdomain_id> ghost_owners =
-      triangulation->ghost_owners();
+      parallel_triangulation->ghost_owners();
     for (const auto ghost_owner : ghost_owners)
       ghost_particles_by_domain[ghost_owner].reserve(
         static_cast<typename std::vector<particle_iterator>::size_type>(
@@ -827,12 +861,12 @@ namespace Particles
       }
 
     send_recv_particles(ghost_particles_by_domain, ghost_particles);
-#  endif
+#endif
   }
 
 
 
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::send_recv_particles(
@@ -845,9 +879,17 @@ namespace Particles
       std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
       &send_cells)
   {
+    const auto parallel_triangulation =
+      dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+        &*triangulation);
+    Assert(
+      parallel_triangulation,
+      ExcMessage(
+        "This function is only implemented for parallel::Triangulation objects."));
+
     // Determine the communication pattern
     const std::set<types::subdomain_id> ghost_owners =
-      triangulation->ghost_owners();
+      parallel_triangulation->ghost_owners();
     const std::vector<types::subdomain_id> neighbors(ghost_owners.begin(),
                                                      ghost_owners.end());
     const unsigned int                     n_neighbors = neighbors.size();
@@ -948,7 +990,7 @@ namespace Particles
                                      MPI_UNSIGNED,
                                      neighbors[i],
                                      mpi_tag,
-                                     triangulation->get_communicator(),
+                                     parallel_triangulation->get_communicator(),
                                      &(n_requests[2 * i]));
           AssertThrowMPI(ierr);
         }
@@ -959,7 +1001,7 @@ namespace Particles
                                      MPI_UNSIGNED,
                                      neighbors[i],
                                      mpi_tag,
-                                     triangulation->get_communicator(),
+                                     parallel_triangulation->get_communicator(),
                                      &(n_requests[2 * i + 1]));
           AssertThrowMPI(ierr);
         }
@@ -991,13 +1033,14 @@ namespace Particles
       for (unsigned int i = 0; i < n_neighbors; ++i)
         if (n_recv_data[i] > 0)
           {
-            const int ierr = MPI_Irecv(&(recv_data[recv_offsets[i]]),
-                                       n_recv_data[i],
-                                       MPI_CHAR,
-                                       neighbors[i],
-                                       mpi_tag,
-                                       triangulation->get_communicator(),
-                                       &(requests[send_ops]));
+            const int ierr =
+              MPI_Irecv(&(recv_data[recv_offsets[i]]),
+                        n_recv_data[i],
+                        MPI_CHAR,
+                        neighbors[i],
+                        mpi_tag,
+                        parallel_triangulation->get_communicator(),
+                        &(requests[send_ops]));
             AssertThrowMPI(ierr);
             send_ops++;
           }
@@ -1005,13 +1048,14 @@ namespace Particles
       for (unsigned int i = 0; i < n_neighbors; ++i)
         if (n_send_data[i] > 0)
           {
-            const int ierr = MPI_Isend(&(send_data[send_offsets[i]]),
-                                       n_send_data[i],
-                                       MPI_CHAR,
-                                       neighbors[i],
-                                       mpi_tag,
-                                       triangulation->get_communicator(),
-                                       &(requests[send_ops + recv_ops]));
+            const int ierr =
+              MPI_Isend(&(send_data[send_offsets[i]]),
+                        n_send_data[i],
+                        MPI_CHAR,
+                        neighbors[i],
+                        mpi_tag,
+                        parallel_triangulation->get_communicator(),
+                        &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
             recv_ops++;
           }
@@ -1053,7 +1097,7 @@ namespace Particles
                   "The amount of data that was read into new particles "
                   "does not match the amount of data sent around."));
   }
-#  endif
+#endif
 
 
 
@@ -1079,8 +1123,12 @@ namespace Particles
     parallel::distributed::Triangulation<dim, spacedim>
       *non_const_triangulation =
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-          &(*triangulation));
+          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                         *>(&(*triangulation)));
 
+    Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
+
+#ifdef DEAL_II_WITH_P4EST
     // Only save and load particles if there are any, we might get here for
     // example if somebody created a ParticleHandler but generated 0 particles.
     update_cached_numbers();
@@ -1098,6 +1146,7 @@ namespace Particles
         handle = non_const_triangulation->register_data_attach(
           callback_function, /*returns_variable_size_data=*/true);
       }
+#endif
   }
 
 
@@ -1114,8 +1163,12 @@ namespace Particles
     parallel::distributed::Triangulation<dim, spacedim>
       *non_const_triangulation =
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-          &(*triangulation));
+          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                         *>(&(*triangulation)));
 
+    Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
+
+#ifdef DEAL_II_WITH_P4EST
     // If we are resuming from a checkpoint, we first have to register the
     // store function again, to set the triangulation in the same state as
     // before the serialization. Only by this it knows how to deserialize the
@@ -1155,6 +1208,9 @@ namespace Particles
         handle = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
+#else
+    (void)serialization;
+#endif
   }
 
 
@@ -1279,19 +1335,19 @@ namespace Particles
                 // particles. This is a C++11 function, but not all compilers
                 // that report a -std=c++11 (like gcc 4.6) implement it, so
                 // require C++14 instead.
-#  ifdef DEAL_II_WITH_CXX14
+#ifdef DEAL_II_WITH_CXX14
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#  else
+#else
                 position_hint =
                   particles.insert(position_hint,
                                    std::make_pair(std::make_pair(cell->level(),
                                                                  cell->index()),
                                                   std::move(particle)));
-#  endif
+#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1315,19 +1371,19 @@ namespace Particles
                 // particles. This is a C++11 function, but not all compilers
                 // that report a -std=c++11 (like gcc 4.6) implement it, so
                 // require C++14 instead.
-#  ifdef DEAL_II_WITH_CXX14
+#ifdef DEAL_II_WITH_CXX14
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#  else
+#else
                 position_hint =
                   particles.insert(position_hint,
                                    std::make_pair(std::make_pair(cell->level(),
                                                                  cell->index()),
                                                   std::move(particle)));
-#  endif
+#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1374,19 +1430,19 @@ namespace Particles
                             // but not all compilers that report a -std=c++11
                             // (like gcc 4.6) implement it, so require C++14
                             // instead.
-#  ifdef DEAL_II_WITH_CXX14
+#ifdef DEAL_II_WITH_CXX14
                             position_hints[child_index] =
                               particles.emplace_hint(
                                 position_hints[child_index],
                                 std::make_pair(child->level(), child->index()),
                                 std::move(particle));
-#  else
+#else
                             position_hints[child_index] = particles.insert(
                               position_hints[child_index],
                               std::make_pair(std::make_pair(child->level(),
                                                             child->index()),
                                              std::move(particle)));
-#  endif
+#endif
                             // Move the hint position forward by one, i.e., for
                             // the next particle. The 'hint' position will thus
                             // be right after the one just inserted.
@@ -1408,14 +1464,6 @@ namespace Particles
   }
 } // namespace Particles
 
-#endif
-
-DEAL_II_NAMESPACE_CLOSE
-
-DEAL_II_NAMESPACE_OPEN
-
-#ifdef DEAL_II_WITH_P4EST
-#  include "particle_handler.inst"
-#endif
+#include "particle_handler.inst"
 
 DEAL_II_NAMESPACE_CLOSE
