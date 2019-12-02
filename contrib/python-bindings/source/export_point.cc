@@ -22,7 +22,7 @@
 
 // clang complains about explicitly assigning boost::python::self to itself
 // below. However, this is the correct way to define the python bindings.
-#ifdef __clang__
+#if defined(__clang__) && __clang_major__ > 6
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wself-assign-overloaded"
 #endif
@@ -107,6 +107,6 @@ namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 
-#ifdef __clang__
+#if defined(__clang__) && __clang_major__ > 6
 #  pragma GCC diagnostic pop
 #endif
