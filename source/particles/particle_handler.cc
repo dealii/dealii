@@ -1125,6 +1125,7 @@ namespace Particles
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                          *>(&(*triangulation)));
+    (void)non_const_triangulation;
 
     Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
 
@@ -1165,6 +1166,7 @@ namespace Particles
         const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                          *>(&(*triangulation)));
+    (void)non_const_triangulation;
 
     Assert(non_const_triangulation != nullptr, dealii::ExcNotImplemented());
 
