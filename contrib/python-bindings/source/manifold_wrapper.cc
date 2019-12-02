@@ -215,11 +215,29 @@ namespace python
   }
 
 
+
   void *
   ManifoldWrapper::get_manifold() const
   {
     return manifold_ptr;
   }
+
+
+
+  int
+  ManifoldWrapper::get_dim() const
+  {
+    return dim;
+  }
+
+
+
+  int
+  ManifoldWrapper::get_spacedim() const
+  {
+    return spacedim;
+  }
+
 
 } // namespace python
 

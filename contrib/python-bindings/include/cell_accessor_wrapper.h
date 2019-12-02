@@ -126,6 +126,13 @@ namespace python
     get_manifold_id() const;
 
     /**
+     * Do as set_manifold_id() but also set the manifold indicators of
+     * the objects that bound the current object.
+     */
+    void
+    set_all_manifold_ids(const int manifold_id);
+
+    /**
      * Return the ith neighbor of a cell. If the neighbor does not exist,
      * i.e., if the ith face of the current object is at the boundary,
      * then an exception is thrown.
@@ -153,6 +160,18 @@ namespace python
      */
     boost::python::list
     faces() const;
+
+    /**
+     * Compute the dim-dimensional measure of the object.
+     * For a dim-dimensional cell in dim-dimensional space,
+     * this equals its volume. On the other hand, for a 2d
+     * cell in 3d space, or if the current object pointed to
+     * is a 2d face of a 3d cell in 3d space, then the function
+     * computes the area the object occupies. For a
+     * one-dimensional object, return its length.
+     */
+    double
+    measure() const;
 
     /**
      * Exception.

@@ -380,6 +380,7 @@ namespace python
                          const double   inner_radius,
                          const double   outer_radius,
                          const unsigned n_cells,
+                         bool           colorize,
                          void *         triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
@@ -390,7 +391,7 @@ namespace python
         static_cast<Triangulation<dim> *>(triangulation);
       tria->clear();
       GridGenerator::hyper_shell(
-        *tria, center_point, inner_radius, outer_radius, n_cells);
+        *tria, center_point, inner_radius, outer_radius, n_cells, colorize);
     }
 
 
@@ -1057,7 +1058,8 @@ namespace python
   TriangulationWrapper::generate_hyper_shell(PointWrapper & center,
                                              const double   inner_radius,
                                              const double   outer_radius,
-                                             const unsigned n_cells)
+                                             const unsigned n_cells,
+                                             bool           colorize)
   {
     AssertThrow(
       dim == spacedim,
@@ -1065,10 +1067,10 @@ namespace python
         "This function is only implemented for dim equal to spacedim."));
     if (dim == 2)
       internal::generate_hyper_shell<2>(
-        center, inner_radius, outer_radius, n_cells, triangulation);
+        center, inner_radius, outer_radius, n_cells, colorize, triangulation);
     else
       internal::generate_hyper_shell<3>(
-        center, inner_radius, outer_radius, n_cells, triangulation);
+        center, inner_radius, outer_radius, n_cells, colorize, triangulation);
   }
 
 
@@ -1354,6 +1356,15 @@ namespace python
   TriangulationWrapper::set_manifold(const int        number,
                                      ManifoldWrapper &manifold)
   {
+    AssertThrow(
+      dim == manifold.get_dim(),
+      ExcMessage(
+        "The Triangulation and Manifold should have the same dimension."));
+    AssertThrow(
+      spacedim == manifold.get_spacedim(),
+      ExcMessage(
+        "The Triangulation and Manifold should have the same space dimension."));
+
     if ((dim == 2) && (spacedim == 2))
       {
         Triangulation<2, 2> *tria =
@@ -1377,6 +1388,31 @@ namespace python
         Manifold<3, 3> *m =
           static_cast<Manifold<3, 3> *>(manifold.get_manifold());
         tria->set_manifold(number, *m);
+      }
+  }
+
+
+
+  void
+  TriangulationWrapper::reset_manifold(const int number)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        Triangulation<2, 2> *tria =
+          static_cast<Triangulation<2, 2> *>(triangulation);
+        tria->reset_manifold(number);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        Triangulation<2, 3> *tria =
+          static_cast<Triangulation<2, 3> *>(triangulation);
+        tria->reset_manifold(number);
+      }
+    else
+      {
+        Triangulation<3, 3> *tria =
+          static_cast<Triangulation<3, 3> *>(triangulation);
+        tria->reset_manifold(number);
       }
   }
 
