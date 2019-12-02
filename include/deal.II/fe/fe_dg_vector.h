@@ -135,7 +135,11 @@ private:
 
 /**
  * A vector-valued DG element based on the polynomials space of FE_Nedelec.
+ * This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the Nedelec element.
  *
+ * The related class FE_DGRT is used in step-61.
  * @ingroup fe
  * @author Guido Kanschat
  * @date 2011
@@ -163,7 +167,11 @@ public:
 
 /**
  * A vector-valued DG element based on the polynomials space of
- * FE_RaviartThomas.
+ * FE_RaviartThomas. This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the Raviart-Thomas element.
+ *
+ * The class is used in step-61.
  *
  * @ingroup fe
  * @author Guido Kanschat
@@ -192,6 +200,11 @@ public:
 
 /**
  * A vector-valued DG element based on the polynomials space of FE_BDM.
+ * This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the BDM element.
+ *
+ * The related class FE_DGRT is used in step-61.
  *
  * @ingroup fe
  * @author Guido Kanschat
