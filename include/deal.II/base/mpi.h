@@ -1500,12 +1500,15 @@ namespace Utilities
         else
           send_to.emplace_back(m.first);
 
-      // Shortcut, when running in serial
-      if (send_to.size() == 0)
-        return received_objects;
-
       const auto n_point_point_communications =
         Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
+
+      // If we have something to send, or we expect something from other
+      // processors, we need to visit one of the two scopes below. Otherwise,
+      // no other action is required by this mpi process, and we can safely
+      // return.
+      if (send_to.size() == 0 && n_point_point_communications == 0)
+        return received_objects;
 
       // Protect the following communication:
       static CollectiveMutex      mutex;
