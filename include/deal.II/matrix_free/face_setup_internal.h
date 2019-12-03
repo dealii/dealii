@@ -17,6 +17,8 @@
 #ifndef dealii_face_setup_internal_h
 #define dealii_face_setup_internal_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
 

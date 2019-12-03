@@ -17,6 +17,8 @@
 #define dealii_mg_coarse_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/linear_operator.h>

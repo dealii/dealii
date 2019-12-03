@@ -17,6 +17,8 @@
 #define dealii_chunk_sparse_matrix_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
 

@@ -17,6 +17,8 @@
 #define dealii_fe_poly_face_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/std_cxx14/memory.h>
 

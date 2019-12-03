@@ -16,6 +16,8 @@
 #ifndef dealii_boost_adaptor_bounding_box_h
 #define dealii_boost_adaptor_bounding_box_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/bounding_box.h>
 
 #include <deal.II/boost_adaptors/point.h>

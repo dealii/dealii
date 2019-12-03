@@ -16,6 +16,8 @@
 #ifndef dealii_boost_adaptor_segment_h
 #define dealii_boost_adaptor_segment_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
 
 #include <deal.II/boost_adaptors/point.h>

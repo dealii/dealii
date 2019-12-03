@@ -17,6 +17,8 @@
 #ifndef dealii_vector_operations_internal_h
 #define dealii_vector_operations_internal_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>

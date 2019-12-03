@@ -17,6 +17,8 @@
 #define dealii_fe_tools_extrapolate_templates_H
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
 

@@ -16,6 +16,8 @@
 #ifndef dealii_mg_sparse_matrix_collection_h
 #define dealii_mg_sparse_matrix_collection_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/mg_level_object.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>

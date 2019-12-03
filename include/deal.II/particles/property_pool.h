@@ -16,6 +16,8 @@
 #ifndef dealii_particles_property_pool_h
 #define dealii_particles_property_pool_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
 
 DEAL_II_NAMESPACE_OPEN

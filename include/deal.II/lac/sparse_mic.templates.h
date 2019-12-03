@@ -17,6 +17,8 @@
 #define dealii_sparse_mic_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/lac/sparse_mic.h>

@@ -16,6 +16,8 @@
 #ifndef dealii_fe_interface_values_h
 #define dealii_fe_interface_values_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 

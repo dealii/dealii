@@ -16,6 +16,8 @@
 #ifndef dealii_relaxation_block_templates_h
 #define dealii_relaxation_block_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/trilinos_vector.h>

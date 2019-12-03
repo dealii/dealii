@@ -16,6 +16,8 @@
 #ifndef dealii_lac_exceptions_h
 #define dealii_lac_exceptions_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN

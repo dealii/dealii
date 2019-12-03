@@ -17,6 +17,8 @@
 #define dealii_fe_field_function_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 

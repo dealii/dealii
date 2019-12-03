@@ -16,6 +16,8 @@
 #ifndef dealii_la_vector_templates_h
 #define dealii_la_vector_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_operations_internal.h>

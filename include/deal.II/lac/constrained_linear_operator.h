@@ -16,6 +16,8 @@
 #ifndef dealii_constrained_linear_operator_h
 #define dealii_constrained_linear_operator_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>

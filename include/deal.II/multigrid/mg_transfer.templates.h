@@ -17,6 +17,8 @@
 #ifndef dealii_mg_transfer_templates_h
 #define dealii_mg_transfer_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>

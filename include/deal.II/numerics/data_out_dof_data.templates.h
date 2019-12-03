@@ -17,6 +17,8 @@
 #define dealii_data_out_dof_data_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>

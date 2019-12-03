@@ -16,6 +16,8 @@
 #ifndef dealii_matrix_lib_templates_h
 #define dealii_matrix_lib_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/vector.h>

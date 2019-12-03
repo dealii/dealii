@@ -17,6 +17,8 @@
 #ifndef dealii_mg_transfer_component_templates_h
 #define dealii_mg_transfer_component_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe.h>

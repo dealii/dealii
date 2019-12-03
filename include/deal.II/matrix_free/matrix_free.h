@@ -17,6 +17,8 @@
 #ifndef dealii_matrix_free_h
 #define dealii_matrix_free_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature.h>

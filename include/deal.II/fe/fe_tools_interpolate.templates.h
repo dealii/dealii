@@ -17,6 +17,8 @@
 #define dealii_fe_tools_interpolate_templates_H
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>

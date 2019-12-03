@@ -16,6 +16,8 @@
 #ifndef dealii_particles_particle_handler_h
 #define dealii_particles_particle_handler_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>

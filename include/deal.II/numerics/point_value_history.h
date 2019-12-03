@@ -17,6 +17,8 @@
 #ifndef dealii_point_value_history_h
 #define dealii_point_value_history_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>

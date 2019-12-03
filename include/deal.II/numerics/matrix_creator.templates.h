@@ -16,6 +16,8 @@
 #ifndef dealii_matrix_creator_templates_h
 #define dealii_matrix_creator_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
@@ -55,6 +57,8 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #endif
 
+
+#include <deal.II/base/config.h>
 
 #include <algorithm>
 #include <cmath>

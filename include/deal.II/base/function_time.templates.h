@@ -16,6 +16,8 @@
 #ifndef dealii_function_time_templates_h
 #define dealii_function_time_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function_time.h>
 
 DEAL_II_NAMESPACE_OPEN

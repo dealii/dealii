@@ -17,6 +17,8 @@
 #define dealii_dof_output_operator_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/numerics/dof_output_operator.h>
 
 DEAL_II_NAMESPACE_OPEN
