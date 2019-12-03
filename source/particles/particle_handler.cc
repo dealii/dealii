@@ -447,12 +447,17 @@ namespace Particles
   ParticleHandler<dim, spacedim>::insert_global_particles(
     const std::vector<Point<spacedim>> &positions,
     const std::vector<std::vector<BoundingBox<spacedim>>>
-      &                        global_bounding_boxes,
-    const std::vector<double> &properties)
+      &                                     global_bounding_boxes,
+    const std::vector<std::vector<double>> &properties)
   {
     if (!properties.empty())
-      AssertDimension(properties.size(),
-                      positions.size() * n_properties_per_particle());
+      {
+        AssertDimension(properties.size(), positions.size());
+#ifdef DEBUG
+        for (const auto &p : properties)
+          AssertDimension(p.size(), n_properties_per_particle());
+#endif
+      }
 
     const auto tria =
       dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -498,8 +503,8 @@ namespace Particles
     // triangulation.
     const auto &local_reference_positions =
       std::get<1>(cells_positions_and_index_maps);
-    // The original index in the positions vector for each particle in the local
-    // part of the triangulation
+    // The original index in the positions vector for each particle in the
+    // local part of the triangulation
     const auto &original_indices_of_local_particles =
       std::get<2>(cells_positions_and_index_maps);
     // The real spatial position of every particle in the local part of the
@@ -509,7 +514,8 @@ namespace Particles
     const auto &calling_process_indices =
       std::get<4>(cells_positions_and_index_maps);
 
-    // Create the map of cpu to indices, indicating who sent us what particle.
+    // Create the map of cpu to indices, indicating who sent us what
+    // particle.
     std::map<unsigned int, IndexSet> original_process_to_local_particle_indices;
     for (unsigned int i_cell = 0;
          i_cell < local_cells_containing_particles.size();
@@ -566,10 +572,7 @@ namespace Particles
               std::vector<double>(n_properties_per_particle()));
             unsigned int index = 0;
             for (const auto &el : it.second)
-              properties_to_send[index++] = {
-                properties.begin() + el * n_properties_per_particle(),
-                properties.begin() + (el + 1) * n_properties_per_particle()};
-
+              properties_to_send[index++] = properties[el];
             non_locally_owned_properties.insert({it.first, properties_to_send});
           }
 
@@ -801,10 +804,10 @@ namespace Particles
       moved_cells;
 
     // We do not know exactly how many particles are lost, exchanged between
-    // domains, or remain on this process. Therefore we pre-allocate approximate
-    // sizes for these vectors. If more space is needed an automatic and
-    // relatively fast (compared to other parts of this algorithm)
-    // re-allocation will happen.
+    // domains, or remain on this process. Therefore we pre-allocate
+    // approximate sizes for these vectors. If more space is needed an
+    // automatic and relatively fast (compared to other parts of this
+    // algorithm) re-allocation will happen.
     using vector_size = typename std::vector<particle_iterator>::size_type;
     sorted_particles.reserve(
       static_cast<vector_size>(particles_out_of_cell.size() * 1.25));
@@ -1092,14 +1095,14 @@ namespace Particles
     if (send_cells.size() != 0)
       Assert(particles_to_send.size() == send_cells.size(), ExcInternalError());
 
-    // If we do not know the subdomain this particle needs to be send to, throw
-    // an error
+    // If we do not know the subdomain this particle needs to be send to,
+    // throw an error
     Assert(particles_to_send.find(numbers::artificial_subdomain_id) ==
              particles_to_send.end(),
            ExcInternalError());
 
-    // TODO: Implement the shipping of particles to processes that are not ghost
-    // owners of the local domain
+    // TODO: Implement the shipping of particles to processes that are not
+    // ghost owners of the local domain
     for (auto send_particles = particles_to_send.begin();
          send_particles != particles_to_send.end();
          ++send_particles)
@@ -1326,7 +1329,8 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_P4EST
     // Only save and load particles if there are any, we might get here for
-    // example if somebody created a ParticleHandler but generated 0 particles.
+    // example if somebody created a ParticleHandler but generated 0
+    // particles.
     update_cached_numbers();
 
     if (global_max_particles_per_cell > 0)
@@ -1623,10 +1627,10 @@ namespace Particles
                           {
                             particle.set_reference_location(p_unit);
                             // Use std::multimap::emplace_hint to speed up
-                            // insertion of particles. This is a C++11 function,
-                            // but not all compilers that report a -std=c++11
-                            // (like gcc 4.6) implement it, so require C++14
-                            // instead.
+                            // insertion of particles. This is a C++11
+                            // function, but not all compilers that report a
+                            // -std=c++11 (like gcc 4.6) implement it, so
+                            // require C++14 instead.
 #ifdef DEAL_II_WITH_CXX14
                             position_hints[child_index] =
                               particles.emplace_hint(
@@ -1640,9 +1644,9 @@ namespace Particles
                                                             child->index()),
                                              std::move(particle)));
 #endif
-                            // Move the hint position forward by one, i.e., for
-                            // the next particle. The 'hint' position will thus
-                            // be right after the one just inserted.
+                            // Move the hint position forward by one, i.e.,
+                            // for the next particle. The 'hint' position will
+                            // thus be right after the one just inserted.
                             ++position_hints[child_index];
                             break;
                           }

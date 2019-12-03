@@ -236,7 +236,7 @@ namespace Particles
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then distributed and added to the local
      * particle collection of a procesor. Note that this function uses
-     * GridTools::distributed_compute_point_locations. Consequently, it can
+     * GridTools::distributed_compute_point_locations(). Consequently, it can
      * require intense communications between the processors.
      *
      * This function figures out what mpi process owns the points that do not
@@ -256,40 +256,34 @@ namespace Particles
      * this ParticleHandler object.
      *
      * @param[in] A vector of vectors of bounding boxes. The bounding boxes
-     * global_bboxes[rk] describe which part of the mesh is locally owned by
-     * the mpi process with rank rk. The local description can be obtained from
-     * GridTools::compute_mesh_predicate_bounding_box, and the global one can
-     * be obtained by passing the local ones to Utilities::MPI::all_gather.
+     * `global_bboxes[rk]` describe which part of the mesh is locally owned by
+     * the mpi process with rank `rk`. The local description can be obtained
+     * from GridTools::compute_mesh_predicate_bounding_box(), and the global one
+     * can be obtained by passing the local ones to
+     * Utilities::MPI::all_gather().
      *
-     * @param[in] (Optional) a vector of properties associated with each
-     * local point. The size of the vector should be either zero (no
+     * @param[in] (Optional) A vector of vector of properties associated with
+     * each local point. The size of the vector should be either zero (no
      * properties will be transfered nor attached to the generated particles)
-     * or it should be `positions.size()*this->n_properties_per_particle()`.
-     * Notice that this function call will transfer the properties from the
-     * local mpi process to the final mpi process that will own each of the
-     * particle, and it may therefore be communication intensive. Properties
-     * should be ordered particle wise, i.e., for N particles with n properties
-     * each:
-     * @code
-     * particle_1_property_1, particle_1_property_2, ..., particle_1_property_n,
-     * particle_2_property_1, particle_2_property_2, ..., particle_2_property_n,
-     * ...
-     * particle_N_property_1, particle_N_property_2, ..., particle_N_property_n.
-     * @endcode
+     * or it should be a vector of `positions.size()` vectors of size
+     * `n_properties_per_particle()`. Notice that this function call will
+     * transfer the properties from the local mpi process to the final mpi
+     * process that will own each of the particles, and it may therefore be
+     * communication intensive.
      *
      * @return A map from owner to IndexSet, that contains the local indices
      * of the points that were passed to this function on the calling mpi
      * process, and that falls within the part of triangulation owned by this
      * mpi process.
      *
-     * @author : Bruno Blais, Luca Heltai 2019
+     * @author Bruno Blais, Luca Heltai 2019
      */
     std::map<unsigned int, IndexSet>
     insert_global_particles(
       const std::vector<Point<spacedim>> &positions,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                        global_bounding_boxes,
-      const std::vector<double> &properties = {});
+        &                                     global_bounding_boxes,
+      const std::vector<std::vector<double>> &properties = {});
 
     /**
      * This function allows to register three additional functions that are
