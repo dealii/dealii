@@ -885,8 +885,11 @@ namespace Utilities
      * @param[in] comm MPI communicator.
      *
      * @param[in] objects_to_send A map from the rank (unsigned int) of the
-     *  process meant to receive the data and the object to send (the type T
-     *  must be serializable for this function to work properly).
+     *  process meant to receive the data and the object to send (the type `T`
+     *  must be serializable for this function to work properly). If this
+     *  map contains an entry with a key equal to the rank of the current
+     *  process (i.e., an instruction to a process to send data to itself),
+     *  then this data item is simply copied to the returned object.
      *
      * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
@@ -1500,7 +1503,7 @@ namespace Utilities
         else
           send_to.emplace_back(m.first);
 
-      const auto n_point_point_communications =
+      const unsigned int n_point_point_communications =
         Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
 
       // If we have something to send, or we expect something from other
