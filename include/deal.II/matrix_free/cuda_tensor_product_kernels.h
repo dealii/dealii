@@ -256,25 +256,37 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              values<1, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              values<1, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<2, true, false, true>(global_shape_values, u, u);
+              values<2, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
 
               break;
             }
@@ -300,25 +312,37 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
 
               break;
             }
           case 2:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              values<1, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
 
               break;
             }
           case 3:
             {
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              values<1, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<2, false, false, true>(global_shape_values, u, u);
+              values<2, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
 
               break;
             }
@@ -345,61 +369,61 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
+              gradients<0, true, false, false>(
+                get_global_shape_gradients<Number>(), u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[1]);
+              gradients<0, true, false, false>(
+                get_global_shape_gradients<Number>(), u, grad_u[0]);
+              values<0, true, false, false>(get_global_shape_values<Number>(),
+                                            u,
+                                            grad_u[1]);
 
               __syncthreads();
 
-              values<1, true, false, true>(global_shape_values,
+              values<1, true, false, true>(get_global_shape_values<Number>(),
                                            grad_u[0],
                                            grad_u[0]);
-              gradients<1, true, false, true>(global_shape_gradients,
-                                              grad_u[1],
-                                              grad_u[1]);
+              gradients<1, true, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[1], grad_u[1]);
 
               break;
             }
           case 3:
             {
-              gradients<0, true, false, false>(global_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[1]);
-              values<0, true, false, false>(global_shape_values, u, grad_u[2]);
+              gradients<0, true, false, false>(
+                get_global_shape_gradients<Number>(), u, grad_u[0]);
+              values<0, true, false, false>(get_global_shape_values<Number>(),
+                                            u,
+                                            grad_u[1]);
+              values<0, true, false, false>(get_global_shape_values<Number>(),
+                                            u,
+                                            grad_u[2]);
 
               __syncthreads();
 
-              values<1, true, false, true>(global_shape_values,
+              values<1, true, false, true>(get_global_shape_values<Number>(),
                                            grad_u[0],
                                            grad_u[0]);
-              gradients<1, true, false, true>(global_shape_gradients,
-                                              grad_u[1],
-                                              grad_u[1]);
-              values<1, true, false, true>(global_shape_values,
+              gradients<1, true, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[1], grad_u[1]);
+              values<1, true, false, true>(get_global_shape_values<Number>(),
                                            grad_u[2],
                                            grad_u[2]);
 
               __syncthreads();
 
-              values<2, true, false, true>(global_shape_values,
+              values<2, true, false, true>(get_global_shape_values<Number>(),
                                            grad_u[0],
                                            grad_u[0]);
-              values<2, true, false, true>(global_shape_values,
+              values<2, true, false, true>(get_global_shape_values<Number>(),
                                            grad_u[1],
                                            grad_u[1]);
-              gradients<2, true, false, true>(global_shape_gradients,
-                                              grad_u[2],
-                                              grad_u[2]);
+              gradients<2, true, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[2], grad_u[2]);
 
               break;
             }
@@ -427,49 +451,55 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
+              gradients<0, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              values<1, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              gradients<1, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[1]);
+              gradients<0, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[0]);
+              gradients<1, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[1]);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(global_shape_values, u, u);
+              values<0, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<1, true, false, true>(global_shape_values, u, u);
+              values<1, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
-              values<2, true, false, true>(global_shape_values, u, u);
+              values<2, true, false, true>(get_global_shape_values<Number>(),
+                                           u,
+                                           u);
               __syncthreads();
 
-              gradients<0, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[0]);
-              gradients<1, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[1]);
-              gradients<2, true, false, false>(global_co_shape_gradients,
-                                               u,
-                                               grad_u[2]);
+              gradients<0, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[0]);
+              gradients<1, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[1]);
+              gradients<2, true, false, false>(
+                get_global_co_shape_gradients<Number>(), u, grad_u[2]);
 
               break;
             }
@@ -497,64 +527,64 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              gradients<0, false, add, false>(global_shape_gradients,
-                                              grad_u[dim],
-                                              u);
+              gradients<0, false, add, false>(
+                get_global_shape_gradients<Number>(), grad_u[dim], u);
 
               break;
             }
           case 2:
             {
-              gradients<0, false, false, true>(global_shape_gradients,
-                                               grad_u[0],
-                                               grad_u[0]);
-              values<0, false, false, true>(global_shape_values,
+              gradients<0, false, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[0], grad_u[0]);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
                                             grad_u[1],
                                             grad_u[1]);
 
               __syncthreads();
 
-              values<1, false, add, false>(global_shape_values, grad_u[0], u);
+              values<1, false, add, false>(get_global_shape_values<Number>(),
+                                           grad_u[0],
+                                           u);
               __syncthreads();
-              gradients<1, false, true, false>(global_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              gradients<1, false, true, false>(
+                get_global_shape_gradients<Number>(), grad_u[1], u);
 
               break;
             }
           case 3:
             {
-              gradients<0, false, false, true>(global_shape_gradients,
-                                               grad_u[0],
-                                               grad_u[0]);
-              values<0, false, false, true>(global_shape_values,
+              gradients<0, false, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[0], grad_u[0]);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
                                             grad_u[1],
                                             grad_u[1]);
-              values<0, false, false, true>(global_shape_values,
+              values<0, false, false, true>(get_global_shape_values<Number>(),
                                             grad_u[2],
                                             grad_u[2]);
 
               __syncthreads();
 
-              values<1, false, false, true>(global_shape_values,
+              values<1, false, false, true>(get_global_shape_values<Number>(),
                                             grad_u[0],
                                             grad_u[0]);
-              gradients<1, false, false, true>(global_shape_gradients,
-                                               grad_u[1],
-                                               grad_u[1]);
-              values<1, false, false, true>(global_shape_values,
+              gradients<1, false, false, true>(
+                get_global_shape_gradients<Number>(), grad_u[1], grad_u[1]);
+              values<1, false, false, true>(get_global_shape_values<Number>(),
                                             grad_u[2],
                                             grad_u[2]);
 
               __syncthreads();
 
-              values<2, false, add, false>(global_shape_values, grad_u[0], u);
+              values<2, false, add, false>(get_global_shape_values<Number>(),
+                                           grad_u[0],
+                                           u);
               __syncthreads();
-              values<2, false, true, false>(global_shape_values, grad_u[1], u);
+              values<2, false, true, false>(get_global_shape_values<Number>(),
+                                            grad_u[1],
+                                            u);
               __syncthreads();
-              gradients<2, false, true, false>(global_shape_gradients,
-                                               grad_u[2],
-                                               u);
+              gradients<2, false, true, false>(
+                get_global_shape_gradients<Number>(), grad_u[2], u);
 
               break;
             }
@@ -582,53 +612,59 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              gradients<0, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[0], u);
               __syncthreads();
 
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
 
               break;
             }
           case 2:
             {
-              gradients<1, false, true, false>(global_co_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              gradients<1, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[1], u);
               __syncthreads();
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              gradients<0, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[0], u);
               __syncthreads();
 
-              values<1, false, false, true>(global_shape_values, u, u);
+              values<1, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
 
               break;
             }
           case 3:
             {
-              gradients<2, false, true, false>(global_co_shape_gradients,
-                                               grad_u[2],
-                                               u);
+              gradients<2, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[2], u);
               __syncthreads();
-              gradients<1, false, true, false>(global_co_shape_gradients,
-                                               grad_u[1],
-                                               u);
+              gradients<1, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[1], u);
               __syncthreads();
-              gradients<0, false, true, false>(global_co_shape_gradients,
-                                               grad_u[0],
-                                               u);
+              gradients<0, false, true, false>(
+                get_global_co_shape_gradients<Number>(), grad_u[0], u);
               __syncthreads();
 
-              values<2, false, false, true>(global_shape_values, u, u);
+              values<2, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<1, false, false, true>(global_shape_values, u, u);
+              values<1, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
-              values<0, false, false, true>(global_shape_values, u, u);
+              values<0, false, false, true>(get_global_shape_values<Number>(),
+                                            u,
+                                            u);
               __syncthreads();
 
               break;
