@@ -16,10 +16,11 @@
 #ifndef dealii_std_cxx11_iterator_h
 #define dealii_std_cxx11_iterator_h
 
-#warning \
-  "This file is deprecated. Simply use the corresponding C++11 header <iterator>."
-
 #include <deal.II/base/config.h>
+
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++11 header <iterator>.")
+
 
 #include <iterator>
 DEAL_II_NAMESPACE_OPEN

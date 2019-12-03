@@ -17,10 +17,11 @@
 #define dealii_std_cxx11_unique_ptr_h
 
 
-#warning \
-  "This file is deprecated. Simply use the corresponding C++11 header <memory>."
-
 #include <deal.II/base/config.h>
+
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++11 header <memory>.")
+
 
 #include <memory>
 DEAL_II_NAMESPACE_OPEN
