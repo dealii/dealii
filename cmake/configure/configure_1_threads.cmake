@@ -38,6 +38,16 @@ MACRO(SETUP_THREADING)
 
     RESET_CMAKE_REQUIRED()
 
+    #
+    # The FindThreads macro returned a linker option instead of the actual
+    # library name in earlier versions. We still require the linker option,
+    # so we fix the corresponding variable.
+    #  - See: https://gitlab.kitware.com/cmake/cmake/issues/19747
+    #
+    IF(CMAKE_THREAD_LIBS_INIT AND NOT "${CMAKE_THREAD_LIBS_INIT}" MATCHES "^-l")
+      STRING(PREPEND CMAKE_THREAD_LIBS_INIT "-l")
+    ENDIF()
+
   ELSE()
 
     #
