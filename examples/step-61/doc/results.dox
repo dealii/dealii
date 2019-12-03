@@ -21,7 +21,8 @@ $\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
 
 The following figures show interior pressures and face pressures using the
 $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ element. The mesh is refined 2 times (top)
-and 4 times (bottom), respectively. When the mesh is coarse, one can see
+and 4 times (bottom), respectively. (This number can be adjusted in the
+`make_grid()` function.) When the mesh is coarse, one can see
 the face pressures $p^\partial$ neatly between the values of the interior
 pressures $p^\circ$ on the two adjacent cells.
 
@@ -45,7 +46,8 @@ in the interior of the cell, as expected.
 
 <h4>Convergence table</h4>
 
-We run the code with finer meshes and get the following convergence rates of pressure, 
+We run the code with differently refined meshes (chosen in the `make_grid()` function)
+and get the following convergence rates of pressure, 
 velocity, and flux (as defined in the introduction).
 
 <table align="center" class="doxtable">
