@@ -17,19 +17,14 @@
 #define dealii_particles_particle_handler_h
 
 #include <deal.II/base/array_view.h>
-#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/mapping.h>
-
-#include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
@@ -227,7 +222,7 @@ namespace Particles
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then added to the local particle
      * collection. Note that this function currently uses
-     * GridTools::compute_point_locations, which assumes all positions are
+     * GridTools::compute_point_locations(), which assumes all positions are
      * within the local part of the triangulation. If one of them is not in the
      * local domain this function will throw an exception.
      */
@@ -242,11 +237,11 @@ namespace Particles
      * GridTools::distributed_compute_point_locations. Consequently, it can
      * require intense communications between the processors.
      *
-     * This function figures out what mpi process owns all points that do not
+     * This function figures out what mpi process owns the points that do not
      * fall within the locally owned part of the triangulation, it sends
      * to that process the points passed to this function on this process,
      * and receives the points that fall within the locally owned cells of
-     * the triangulation from whoever owns them.
+     * the triangulation from whoever received them as input.
      *
      * In order to keep track of what mpi process received what points, a map
      * from mpi process to IndexSet is returned by the function. This IndexSet
@@ -292,7 +287,7 @@ namespace Particles
       const std::vector<Point<spacedim>> &positions,
       const std::vector<std::vector<BoundingBox<spacedim>>>
         &                        global_bounding_boxes,
-      const std::vector<double> &properties = std::vector<double>());
+      const std::vector<double> &properties = {});
 
     /**
      * This function allows to register three additional functions that are
