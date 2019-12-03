@@ -16,6 +16,8 @@
 #ifndef dealii_std_cxx11_array_h
 #define dealii_std_cxx11_array_h
 
+#warning \
+  "This file is deprecated. Simply use the corresponding C++11 header <array>."
 
 #include <deal.II/base/config.h>
 

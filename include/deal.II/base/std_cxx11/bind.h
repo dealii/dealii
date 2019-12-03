@@ -17,6 +17,9 @@
 #define dealii_std_cxx11_bind_h
 
 
+#warning \
+  "This file is deprecated. Simply use the corresponding C++11 header <functional>."
+
 #include <deal.II/base/config.h>
 
 #include <functional>
