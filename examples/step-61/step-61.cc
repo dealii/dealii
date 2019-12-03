@@ -958,15 +958,40 @@ namespace Step61
   // because these are only available on interfaces and not cell
   // interiors. Consequently, you will see them shown as an invalid
   // value (such as an infinity).
+  //
+  // For the cell interior output, we also want to output the velocity
+  // variables. This is a bit tricky since it lives on the same mesh
+  // but uses a different DoFHandler object (the pressure variables live
+  // on the `dof_handler` object, the Darcy velocity on the `dof_handler_dgrt`
+  // object). Fortunately, there are variations of the
+  // DataOut::add_data_vector() function that allow specifying which
+  // DoFHandler a vector corresponds to, and consequently we can visualize
+  // the data from both DoFHandler objects within the same file.
   template <int dim>
   void WGDarcyEquation<dim>::output_results() const
   {
     {
       DataOut<dim> data_out;
-      data_out.attach_dof_handler(dof_handler);
-      data_out.add_data_vector(solution, "Pressure_Interior");
+
+      // First attach the pressure solution to the DataOut object:
+      const std::vector<std::string> solution_names = {"interior_pressure",
+                                                       "interface_pressure"};
+      data_out.add_data_vector(dof_handler, solution, solution_names);
+
+      // Then do the same with the Darcy velocity field, and continue
+      // with writing everything out into a file.
+      const std::vector<std::string> velocity_names(dim, "velocity");
+      const std::vector<
+        DataComponentInterpretation::DataComponentInterpretation>
+        velocity_component_interpretation(
+          dim, DataComponentInterpretation::component_is_part_of_vector);
+      data_out.add_data_vector(dof_handler_dgrt,
+                               darcy_velocity,
+                               velocity_names,
+                               velocity_component_interpretation);
+
       data_out.build_patches(fe.degree);
-      std::ofstream output("Pressure_Interior.vtu");
+      std::ofstream output("solution_interior.vtu");
       data_out.write_vtu(output);
     }
 
@@ -975,25 +1000,8 @@ namespace Step61
       data_out_faces.attach_dof_handler(dof_handler);
       data_out_faces.add_data_vector(solution, "Pressure_Face");
       data_out_faces.build_patches(fe.degree);
-      std::ofstream face_output("Pressure_Face.vtu");
+      std::ofstream face_output("solution_interface.vtu");
       data_out_faces.write_vtu(face_output);
-    }
-    // Output Darcy velocity vectors.
-    {
-      std::vector<std::string> solution_names(dim, "velocity");
-      std::vector<DataComponentInterpretation::DataComponentInterpretation>
-        data_component_interpretation(
-          dim, DataComponentInterpretation::component_is_part_of_vector);
-
-      DataOut<dim> data_out_dgrt;
-      data_out_dgrt.attach_dof_handler(dof_handler_dgrt);
-      data_out_dgrt.add_data_vector(darcy_velocity,
-                                    solution_names,
-                                    DataOut<dim>::type_dof_data,
-                                    data_component_interpretation);
-      data_out_dgrt.build_patches(fe_dgrt.degree);
-      std::ofstream dgrt_output("Darcy_velocity.vtk");
-      data_out_dgrt.write_vtk(dgrt_output);
     }
   }
 

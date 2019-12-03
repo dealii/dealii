@@ -773,14 +773,15 @@ public:
    * discussion of the arguments except the first one) and allows to set a
    * vector with its own DoFHandler object. This DoFHandler needs to be
    * compatible with the other DoFHandler objects assigned with calls to @p
-   * add_data_vector or @p attach_dof_handler, in the sense that the
+   * add_data_vector or @p attach_dof_handler, in the sense that all of the
    * DoFHandler objects need to be based on the same triangulation. This
-   * function allows you to export data from multiple DoFHandlers that
-   * describe different solution components.
+   * function allows you to export data from multiple DoFHandler objects that
+   * describe different solution components. An example of using this function
+   * is given in step-61.
    *
    * Since this function takes a DoFHandler object and hence naturally
    * represents dof data, the data vector type argument present in the other
-   * methods above is skipped.
+   * methods above is not necessary.
    */
   template <class VectorType>
   void
