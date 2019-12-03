@@ -454,18 +454,23 @@ namespace Particles
       AssertDimension(properties.size(),
                       positions.size() * n_properties_per_particle());
 
-    const auto mpi_process =
-      Utilities::MPI::this_mpi_process(triangulation->get_communicator());
+    const auto tria =
+      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+        &(*triangulation));
+    const auto comm =
+      (tria != nullptr ? tria->get_communicator() : MPI_COMM_WORLD);
 
-    const auto n_mpi_processes =
-      Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
+    const auto n_mpi_processes = Utilities::MPI::n_mpi_processes(comm);
 
     GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
 
+    // Compute the global number of properties
+    const auto n_global_properties =
+      Utilities::MPI::sum(properties.size(), comm);
+
     // Gather the number of points per processor
     const auto n_particles_per_proc =
-      Utilities::MPI::all_gather(triangulation->get_communicator(),
-                                 positions.size());
+      Utilities::MPI::all_gather(comm, positions.size());
 
     // Calculate all starting points locally
     std::vector<unsigned int> particle_start_indices(n_mpi_processes);
@@ -478,37 +483,34 @@ namespace Particles
         particle_start_index += n_particles_per_proc[process];
       }
 
-    const auto distributed_tuple =
+    // Get all local information
+    const auto cells_positions_and_index_maps =
       GridTools::distributed_compute_point_locations(cache,
                                                      positions,
                                                      global_bounding_boxes);
 
-    // Finally create the particles
+    // Unpack the information into several vectors:
+    // All cells that contain at least one particle
     const auto &local_cells_containing_particles =
-      std::get<0>(distributed_tuple);
+      std::get<0>(cells_positions_and_index_maps);
 
     // The reference position of every particle in the local part of the
     // triangulation.
-    const auto &local_reference_positions = std::get<1>(distributed_tuple);
+    const auto &local_reference_positions =
+      std::get<1>(cells_positions_and_index_maps);
     // The original index in the positions vector for each particle in the local
     // part of the triangulation
     const auto &original_indices_of_local_particles =
-      std::get<2>(distributed_tuple);
+      std::get<2>(cells_positions_and_index_maps);
     // The real spatial position of every particle in the local part of the
     // triangulation.
-    const auto &local_positions = std::get<3>(distributed_tuple);
+    const auto &local_positions = std::get<3>(cells_positions_and_index_maps);
     // The MPI process that inserted each particle
-    const auto &calling_process_index = std::get<4>(distributed_tuple);
+    const auto &calling_process_indices =
+      std::get<4>(cells_positions_and_index_maps);
 
-    // Create the multimap of local particles
-    std::multimap<typename Triangulation<dim, spacedim>::active_cell_iterator,
-                  Particle<dim, spacedim>>
-      particles;
-
-    // Create the map of cpu to indices, indicating who sent us what
-    // point
-    std::map<unsigned int, IndexSet> origin_process_to_local_particle_indices;
-
+    // Create the map of cpu to indices, indicating who sent us what particle.
+    std::map<unsigned int, IndexSet> original_process_to_local_particle_indices;
     for (unsigned int i_cell = 0;
          i_cell < local_cells_containing_particles.size();
          ++i_cell)
@@ -517,144 +519,120 @@ namespace Particles
              i_particle < local_positions[i_cell].size();
              ++i_particle)
           {
-            const auto &local_id_on_calling_process =
+            const unsigned int &local_id_on_calling_process =
               original_indices_of_local_particles[i_cell][i_particle];
-            const auto &calling_process =
-              calling_process_index[i_cell][i_particle];
+            const unsigned int &calling_process =
+              calling_process_indices[i_cell][i_particle];
 
-            const unsigned int particle_id =
-              local_id_on_calling_process +
-              particle_start_indices[calling_process];
-
-            particles.emplace(local_cells_containing_particles[i_cell],
-                              Particle<dim, spacedim>(
-                                local_positions[i_cell][i_particle],
-                                local_reference_positions[i_cell][i_particle],
-                                particle_id));
-
-            if (origin_process_to_local_particle_indices.find(
+            if (original_process_to_local_particle_indices.find(
                   calling_process) ==
-                origin_process_to_local_particle_indices.end())
-              origin_process_to_local_particle_indices.insert(
+                original_process_to_local_particle_indices.end())
+              original_process_to_local_particle_indices.insert(
                 {calling_process,
                  IndexSet(n_particles_per_proc[calling_process])});
 
-            origin_process_to_local_particle_indices[calling_process].add_index(
-              local_id_on_calling_process);
+            original_process_to_local_particle_indices[calling_process]
+              .add_index(local_id_on_calling_process);
           }
       }
-
-    this->insert_particles(particles);
     for (auto &process_and_particle_indices :
-         origin_process_to_local_particle_indices)
+         original_process_to_local_particle_indices)
       process_and_particle_indices.second.compress();
 
-    // Take care of properties, if the input vector contains them.
-    const auto global_n_properties =
-      Utilities::MPI::sum(properties.size(), triangulation->get_communicator());
-    if (global_n_properties > 0)
-      {
-        // [TODO]: fix this in some_to_some, to allow communication from
-        // my cpu to my cpu.
-        auto cpu_to_indices_to_send = origin_process_to_local_particle_indices;
-        if (cpu_to_indices_to_send.find(mpi_process) !=
-            cpu_to_indices_to_send.end())
-          cpu_to_indices_to_send.erase(
-            cpu_to_indices_to_send.find(mpi_process));
 
+    // A map from mpi process to properties, ordered as in the IndexSet.
+    // Notice that this ordering maybe different from the ordering in the
+    // vectors above, since no local ordering is guaranteed by the
+    // distribute_compute_point_locations() call.
+    // This is only filled if n_global_properties is > 0
+    std::map<unsigned int, std::vector<std::vector<double>>>
+      locally_owned_properties_from_other_processes;
+
+    if (n_global_properties > 0)
+      {
         // Gather whom I sent my own particles to, to decide whom to send
         // the particle properties
-        auto send_to_cpu =
-          Utilities::MPI::some_to_some(triangulation->get_communicator(),
-                                       cpu_to_indices_to_send);
-        std::map<unsigned int, std::vector<double>>
+        auto send_to_cpu = Utilities::MPI::some_to_some(
+          comm, original_process_to_local_particle_indices);
+
+        std::map<unsigned int, std::vector<std::vector<double>>>
           non_locally_owned_properties;
 
-        // Prepare the vector of non_locally_owned properties,
+        // Prepare the vector of properties to send
         for (const auto &it : send_to_cpu)
           {
-            std::vector<double> properties_to_send;
-            properties_to_send.reserve(it.second.n_elements() *
-                                       n_properties_per_particle());
-
+            std::vector<std::vector<double>> properties_to_send(
+              it.second.n_elements(),
+              std::vector<double>(n_properties_per_particle()));
+            unsigned int index = 0;
             for (const auto &el : it.second)
-              properties_to_send.insert(
-                properties_to_send.end(),
+              properties_to_send[index++] = {
                 properties.begin() + el * n_properties_per_particle(),
-                properties.begin() + (el + 1) * n_properties_per_particle());
+                properties.begin() + (el + 1) * n_properties_per_particle()};
 
             non_locally_owned_properties.insert({it.first, properties_to_send});
           }
 
         // Send the non locally owned properties to each mpi process
         // that needs them
-        auto locally_owned_properties_from_other_cpus =
-          Utilities::MPI::some_to_some(triangulation->get_communicator(),
-                                       non_locally_owned_properties);
+        locally_owned_properties_from_other_processes =
+          Utilities::MPI::some_to_some(comm, non_locally_owned_properties);
 
-        // Store all local properties in a single vector. This includes
-        // properties coming from my own mpi process, and properties that
-        // were sent to me in the call above.
-        std::vector<double> local_properties;
-        local_properties.reserve(n_locally_owned_particles() *
-                                 n_properties_per_particle());
+        AssertDimension(locally_owned_properties_from_other_processes.size(),
+                        original_process_to_local_particle_indices.size());
+      }
 
-        // Compute the association between particle id and start of
-        // property data in the vector containing all local properties
-        std::map<types::particle_index, unsigned int> property_start;
-        for (const auto &it : origin_process_to_local_particle_indices)
-          if (it.first != mpi_process)
-            {
-              unsigned int sequential_index = 0;
-              // Process all properties coming from other mpi processes
-              for (const auto &el : it.second)
-                {
-                  types::particle_index particle_id =
-                    el + particle_start_indices[it.first];
-                  property_start.insert({particle_id, local_properties.size()});
 
-                  local_properties.insert(
-                    local_properties.end(),
-                    locally_owned_properties_from_other_cpus.at(it.first)
-                        .begin() +
-                      sequential_index * n_properties_per_particle(),
-                    locally_owned_properties_from_other_cpus.at(it.first)
-                        .begin() +
-                      (sequential_index + 1) * n_properties_per_particle());
-                  sequential_index++;
-                }
-            }
-          else
-            {
-              // Process all properties that we already own
-              for (const auto &el : it.second)
-                {
-                  types::particle_index particle_id =
-                    el + particle_start_indices[mpi_process];
-                  property_start.insert({particle_id, local_properties.size()});
+    // Create the multimap of local particles
+    std::multimap<typename Triangulation<dim, spacedim>::active_cell_iterator,
+                  Particle<dim, spacedim>>
+      particles;
 
-                  local_properties.insert(local_properties.end(),
-                                          properties.begin() +
-                                            el * n_properties_per_particle(),
-                                          properties.begin() +
-                                            (el + 1) *
-                                              n_properties_per_particle());
-                }
-            }
-        // Actually fill the property pool of each particle.
-        for (auto particle : *this)
+    // Now fill up the actual particles
+    for (unsigned int i_cell = 0;
+         i_cell < local_cells_containing_particles.size();
+         ++i_cell)
+      {
+        for (unsigned int i_particle = 0;
+             i_particle < local_positions[i_cell].size();
+             ++i_particle)
           {
-            particle.set_property_pool(get_property_pool());
-            const auto id = particle.get_id();
-            Assert(property_start.find(id) != property_start.end(),
-                   ExcInternalError());
-            const auto start = property_start[id];
-            particle.set_properties(
-              {local_properties.begin() + start,
-               local_properties.begin() + start + n_properties_per_particle()});
+            const unsigned int &local_id_on_calling_process =
+              original_indices_of_local_particles[i_cell][i_particle];
+            const unsigned int &calling_process =
+              calling_process_indices[i_cell][i_particle];
+
+            const unsigned int particle_id =
+              local_id_on_calling_process +
+              particle_start_indices[calling_process];
+
+            Particle<dim, spacedim> particle(
+              local_positions[i_cell][i_particle],
+              local_reference_positions[i_cell][i_particle],
+              particle_id);
+
+            if (n_global_properties > 0)
+              {
+                const unsigned int index_within_set =
+                  original_process_to_local_particle_indices[calling_process]
+                    .index_within_set(local_id_on_calling_process);
+
+                const auto &this_particle_properties =
+                  locally_owned_properties_from_other_processes
+                    [calling_process][index_within_set];
+
+                particle.set_property_pool(get_property_pool());
+                particle.set_properties(this_particle_properties);
+              }
+
+            particles.emplace(local_cells_containing_particles[i_cell],
+                              particle);
           }
       }
-    return origin_process_to_local_particle_indices;
+
+    this->insert_particles(particles);
+
+    return original_process_to_local_particle_indices;
   }
 
 
