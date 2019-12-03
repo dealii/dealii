@@ -62,8 +62,8 @@ test()
   auto global_bounding_boxes =
     Utilities::MPI::all_gather(MPI_COMM_WORLD, my_bounding_box);
 
-  std::vector<Point<spacedim>> points(n_points);
-  std::vector<double>          properties(n_points, my_cpu);
+  std::vector<Point<spacedim>>     points(n_points);
+  std::vector<std::vector<double>> properties(n_points, {my_cpu});
 
   for (auto &p : points)
     p = random_point<spacedim>();
