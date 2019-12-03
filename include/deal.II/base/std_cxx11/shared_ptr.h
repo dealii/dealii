@@ -16,6 +16,8 @@
 #ifndef dealii_std_cxx11_shared_ptr_h
 #define dealii_std_cxx11_shared_ptr_h
 
+#warning \
+  "This file is deprecated. Simply use the corresponding C++11 header <memory>."
 
 #include <deal.II/base/config.h>
 
