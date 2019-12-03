@@ -1,0 +1,3 @@
+Fixed: Utilities::MPI::some_to_some() now allows sending to our own mpi process.
+<br>
+(Luca Heltai, 2019/12/02)

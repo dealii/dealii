@@ -1481,25 +1481,34 @@ namespace Utilities
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0,
+      Assert(objects_to_send.size() < 2,
              ExcMessage("Cannot send to more than one processor."));
       Assert(objects_to_send.find(0) != objects_to_send.end() ||
                objects_to_send.size() == 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
+      const auto my_proc = this_mpi_process(comm);
 
-      std::vector<unsigned int> send_to(objects_to_send.size());
-      {
-        unsigned int i = 0;
-        for (const auto &m : objects_to_send)
-          send_to[i++] = m.first;
-      }
-      AssertDimension(send_to.size(), objects_to_send.size());
+      std::map<unsigned int, T> received_objects;
 
-      const auto receive_from =
-        Utilities::MPI::compute_point_to_point_communication_pattern(comm,
-                                                                     send_to);
+      std::vector<unsigned int> send_to;
+      send_to.reserve(objects_to_send.size());
+      for (const auto &m : objects_to_send)
+        if (m.first == my_proc)
+          received_objects[my_proc] = m.second;
+        else
+          send_to.emplace_back(m.first);
+
+      const auto n_point_point_communications =
+        Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
+
+      // If we have something to send, or we expect something from other
+      // processors, we need to visit one of the two scopes below. Otherwise,
+      // no other action is required by this mpi process, and we can safely
+      // return.
+      if (send_to.size() == 0 && n_point_point_communications == 0)
+        return received_objects;
 
       // Protect the following communication:
       static CollectiveMutex      mutex;
@@ -1514,27 +1523,27 @@ namespace Utilities
       {
         unsigned int i = 0;
         for (const auto &rank_obj : objects_to_send)
-          {
-            const auto &rank   = rank_obj.first;
-            buffers_to_send[i] = Utilities::pack(rank_obj.second);
-            const int ierr     = MPI_Isend(buffers_to_send[i].data(),
-                                       buffers_to_send[i].size(),
-                                       MPI_CHAR,
-                                       rank,
-                                       mpi_tag,
-                                       comm,
-                                       &buffer_send_requests[i]);
-            AssertThrowMPI(ierr);
-            ++i;
-          }
+          if (rank_obj.first != my_proc)
+            {
+              const auto &rank   = rank_obj.first;
+              buffers_to_send[i] = Utilities::pack(rank_obj.second);
+              const int ierr     = MPI_Isend(buffers_to_send[i].data(),
+                                         buffers_to_send[i].size(),
+                                         MPI_CHAR,
+                                         rank,
+                                         mpi_tag,
+                                         comm,
+                                         &buffer_send_requests[i]);
+              AssertThrowMPI(ierr);
+              ++i;
+            }
       }
 
-      // Receiving buffers
-      std::map<unsigned int, T> received_objects;
+      // Fill the output map
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i < receive_from.size(); ++i)
+        for (unsigned int i = 0; i < n_point_point_communications; ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;

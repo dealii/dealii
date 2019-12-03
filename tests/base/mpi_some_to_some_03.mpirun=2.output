@@ -1,0 +1,11 @@
+
+DEAL:0::Sent                      : 0:1; 1:10
+DEAL:0::Received                  : 0:1; 1:20
+DEAL:0::Received(Received) == Sent: 0:1; 1:10
+DEAL:0::OK
+
+DEAL:1::Sent                      : 0:20; 1:2
+DEAL:1::Received                  : 0:10; 1:2
+DEAL:1::Received(Received) == Sent: 0:20; 1:2
+DEAL:1::OK
+
