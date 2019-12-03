@@ -16,8 +16,11 @@
 #ifndef dealii_std_cxx11_type_traits_h
 #define dealii_std_cxx11_type_traits_h
 
-
 #include <deal.II/base/config.h>
+
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++11 header <type_traits>.")
+
 
 #include <type_traits>
 DEAL_II_NAMESPACE_OPEN

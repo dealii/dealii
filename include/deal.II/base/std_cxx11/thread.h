@@ -16,8 +16,10 @@
 #ifndef dealii_std_cxx11_thread_h
 #define dealii_std_cxx11_thread_h
 
-
 #include <deal.II/base/config.h>
+
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++11 header <thread>.")
 
 #include <thread>
 DEAL_II_NAMESPACE_OPEN

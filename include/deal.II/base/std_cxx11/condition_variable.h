@@ -16,8 +16,10 @@
 #ifndef dealii_std_cxx11_condition_variable_h
 #define dealii_std_cxx11_condition_variable_h
 
-
 #include <deal.II/base/config.h>
+
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++11 header <condition_variable>.")
 
 #include <condition_variable>
 DEAL_II_NAMESPACE_OPEN
