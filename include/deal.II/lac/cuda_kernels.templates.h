@@ -16,6 +16,8 @@
 #ifndef dealii_cuda_kernels_templates_h
 #define dealii_cuda_kernels_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/cuda_kernels.h>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE

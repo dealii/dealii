@@ -17,6 +17,8 @@
 #define dealii_newton_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/newton.h>
 
 #include <deal.II/base/logstream.h>

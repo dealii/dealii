@@ -17,6 +17,8 @@
 #ifndef dealii_polynomials_rannacher_turek_h
 #define dealii_polynomials_rannacher_turek_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
 #include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>

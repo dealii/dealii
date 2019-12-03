@@ -16,6 +16,8 @@
 #ifndef dealii_physics_notation_h
 #define dealii_physics_notation_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>

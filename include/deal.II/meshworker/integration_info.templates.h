@@ -17,6 +17,8 @@
 #define dealii_integration_info_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/meshworker/dof_info.h>

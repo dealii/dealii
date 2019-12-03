@@ -17,6 +17,8 @@
 #ifndef dealii_newton_h
 #define dealii_newton_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/operator.h>
 

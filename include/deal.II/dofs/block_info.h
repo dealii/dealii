@@ -16,6 +16,8 @@
 #ifndef dealii_block_info_h
 #define dealii_block_info_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/subscriptor.h>
 

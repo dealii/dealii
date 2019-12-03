@@ -17,6 +17,8 @@
 #ifndef dealii_matrix_free_evaluation_selector_h
 #define dealii_matrix_free_evaluation_selector_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/matrix_free/evaluation_kernels.h>
 
 DEAL_II_NAMESPACE_OPEN

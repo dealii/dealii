@@ -16,6 +16,8 @@
 #ifndef dealii_fe_function_h
 #define dealii_fe_function_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx17/optional.h>

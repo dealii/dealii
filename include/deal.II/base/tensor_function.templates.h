@@ -16,6 +16,8 @@
 #ifndef dealii_tensor_function_templates_h
 #define dealii_tensor_function_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_function.h>
 

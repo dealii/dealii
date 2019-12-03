@@ -16,6 +16,8 @@
 #ifndef dealii_differentiation_ad_ad_number_traits_h
 #define dealii_differentiation_ad_ad_number_traits_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
 

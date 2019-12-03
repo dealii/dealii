@@ -17,6 +17,8 @@
 #ifndef dealii_theta_timestepping_h
 #define dealii_theta_timestepping_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/timestep_control.h>
 

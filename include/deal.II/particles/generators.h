@@ -16,6 +16,8 @@
 #ifndef dealii_particles_particle_generator_h
 #define dealii_particles_particle_generator_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 
 #include <deal.II/distributed/tria.h>

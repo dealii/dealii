@@ -16,6 +16,8 @@
 #ifndef dealii_p4est_wrappers_h
 #define dealii_p4est_wrappers_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 
 #ifdef DEAL_II_WITH_P4EST
