@@ -463,7 +463,7 @@ namespace Particles
     GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
 
     // Gather the number of points per processor
-    auto n_particles_per_proc =
+    const auto n_particles_per_proc =
       Utilities::MPI::all_gather(triangulation->get_communicator(),
                                  positions.size());
 
@@ -478,37 +478,34 @@ namespace Particles
         particle_start_index += n_particles_per_proc[process];
       }
 
-    auto distributed_tuple =
+    const auto distributed_tuple =
       GridTools::distributed_compute_point_locations(cache,
                                                      positions,
                                                      global_bounding_boxes);
 
     // Finally create the particles
-    std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
-      local_cells_containing_particles = std::get<0>(distributed_tuple);
+    const auto &local_cells_containing_particles =
+      std::get<0>(distributed_tuple);
 
     // The reference position of every particle in the local part of the
     // triangulation.
-    std::vector<std::vector<Point<dim>>> local_reference_positions =
-      std::get<1>(distributed_tuple);
+    const auto &local_reference_positions = std::get<1>(distributed_tuple);
     // The original index in the positions vector for each particle in the local
     // part of the triangulation
-    std::vector<std::vector<unsigned int>> origin_indices_of_local_particles =
+    const auto &original_indices_of_local_particles =
       std::get<2>(distributed_tuple);
     // The real spatial position of every particle in the local part of the
     // triangulation.
-    std::vector<std::vector<Point<spacedim>>> local_positions =
-      std::get<3>(distributed_tuple);
+    const auto &local_positions = std::get<3>(distributed_tuple);
     // The MPI process that inserted each particle
-    std::vector<std::vector<unsigned int>> calling_process_index =
-      std::get<4>(distributed_tuple);
+    const auto &calling_process_index = std::get<4>(distributed_tuple);
 
     // Create the multimap of local particles
     std::multimap<typename Triangulation<dim, spacedim>::active_cell_iterator,
                   Particle<dim, spacedim>>
       particles;
 
-    // Create the map of cpu to indices, indicating whom sent us what
+    // Create the map of cpu to indices, indicating who sent us what
     // point
     std::map<unsigned int, IndexSet> origin_process_to_local_particle_indices;
 
@@ -521,7 +518,7 @@ namespace Particles
              ++i_particle)
           {
             const auto &local_id_on_calling_process =
-              origin_indices_of_local_particles[i_cell][i_particle];
+              original_indices_of_local_particles[i_cell][i_particle];
             const auto &calling_process =
               calling_process_index[i_cell][i_particle];
 
