@@ -95,6 +95,7 @@ namespace Step61
     void setup_system();
     void assemble_system();
     void solve();
+    void compute_postprocessed_velocity();
     void compute_velocity_errors();
     void compute_pressure_error();
     void output_results() const;
@@ -610,48 +611,10 @@ namespace Step61
   }
 
 
+  // @sect4{WGDarcyEquation<dim>::compute_postprocessed_velocity}
 
-  // @sect4{WGDarcyEquation<dim>::compute_pressure_error}
-
-  // This part is to calculate the $L_2$ error of the pressure.  We
-  // define a vector that holds the norm of the error on each cell.
-  // Next, we use VectorTool::integrate_difference() to compute the
-  // error in the $L_2$ norm on each cell. However, we really only
-  // care about the error in the interior component of the solution
-  // vector (we can't even evaluate the interface pressures at the
-  // quadrature points because these are all located in the interior
-  // of cells) and consequently have to use a weight function that
-  // ensures that the interface component of the solution variable is
-  // ignored. This is done by using the ComponentSelectFunction whose
-  // arguments indicate which component we want to select (component
-  // zero, i.e., the interior pressures) and how many components there
-  // are in total (two).
-  template <int dim>
-  void WGDarcyEquation<dim>::compute_pressure_error()
-  {
-    Vector<float> difference_per_cell(triangulation.n_active_cells());
-    const ComponentSelectFunction<dim> select_interior_pressure(0, 2);
-    VectorTools::integrate_difference(dof_handler,
-                                      solution,
-                                      ExactPressure<dim>(),
-                                      difference_per_cell,
-                                      QGauss<dim>(fe.degree + 2),
-                                      VectorTools::L2_norm,
-                                      &select_interior_pressure);
-
-    const double L2_error = difference_per_cell.l2_norm();
-    std::cout << "L2_error_pressure " << L2_error << std::endl;
-  }
-
-
-
-  // @sect4{WGDarcyEquation<dim>::compute_velocity_errors}
-
-  // In this function, we evaluate $L_2$ errors for the velocity on
-  // each cell, and $L_2$ errors for the flux on faces.
-
-  // We are going to evaluate velocities on each cell and calculate
-  // the difference between numerical and exact velocities. The
+  // In this function, compute the velocity field from the pressure
+  // solution previously computed. The
   // velocity is defined as $\mathbf{u}_h = \mathbf{Q}_h \left(
   // -\mathbf{K}\nabla_{w,d}p_h \right)$, which requires us to compute
   // many of the same terms as in the assembly of the system matrix.
@@ -674,7 +637,7 @@ namespace Step61
   // -- maybe with storing local matrices elsewhere -- could be
   // adapted for the current program.)
   template <int dim>
-  void WGDarcyEquation<dim>::compute_velocity_errors()
+  void WGDarcyEquation<dim>::compute_postprocessed_velocity()
   {
     darcy_velocity.reinit(dof_handler_dgrt.n_dofs());
 
@@ -712,8 +675,6 @@ namespace Step61
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
 
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
-    const unsigned int n_face_q_points_dgrt =
-      fe_face_values_dgrt.get_quadrature().size();
 
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -723,15 +684,11 @@ namespace Step61
     FullMatrix<double> cell_matrix_M(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
     FullMatrix<double> cell_matrix_G(dofs_per_cell_dgrt, dofs_per_cell);
     FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_dgrt);
-
     FullMatrix<double> cell_matrix_D(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
     FullMatrix<double> cell_matrix_E(dofs_per_cell_dgrt, dofs_per_cell_dgrt);
 
     Vector<double> cell_solution(dofs_per_cell);
     Vector<double> cell_velocity(dofs_per_cell_dgrt);
-
-    double L2_err_velocity_cell_sqr_global = 0;
-    double L2_err_flux_sqr                 = 0;
 
     const Coefficient<dim>      coefficient;
     std::vector<Tensor<2, dim>> coefficient_values(n_q_points_dgrt);
@@ -741,12 +698,6 @@ namespace Step61
     const FEValuesExtractors::Scalar interior(0);
     const FEValuesExtractors::Scalar face(1);
 
-    const ExactVelocity<dim> exact_velocity;
-
-    // In the loop over all cells, we will calculate $L_2$ errors of velocity
-    // and flux.
-
-    // First, we calculate the $L_2$ velocity error.
     // In the introduction, we explained how to calculate the numerical velocity
     // on the cell. We need the pressure solution values on each cell,
     // coefficients of the Gram matrix and coefficients of the $L_2$ projection.
@@ -866,20 +817,103 @@ namespace Step61
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               darcy_velocity(local_dof_indices_dgrt[k]) +=
                 -(cell_solution(i) * cell_matrix_C(i, j) * cell_matrix_D(k, j));
+      }
+  }
 
-        // Now, we can calculate the numerical velocity at each quadrature point
-        // and compute the $L_2$ error on each cell.
+
+
+  // @sect4{WGDarcyEquation<dim>::compute_pressure_error}
+
+  // This part is to calculate the $L_2$ error of the pressure.  We
+  // define a vector that holds the norm of the error on each cell.
+  // Next, we use VectorTool::integrate_difference() to compute the
+  // error in the $L_2$ norm on each cell. However, we really only
+  // care about the error in the interior component of the solution
+  // vector (we can't even evaluate the interface pressures at the
+  // quadrature points because these are all located in the interior
+  // of cells) and consequently have to use a weight function that
+  // ensures that the interface component of the solution variable is
+  // ignored. This is done by using the ComponentSelectFunction whose
+  // arguments indicate which component we want to select (component
+  // zero, i.e., the interior pressures) and how many components there
+  // are in total (two).
+  template <int dim>
+  void WGDarcyEquation<dim>::compute_pressure_error()
+  {
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
+    const ComponentSelectFunction<dim> select_interior_pressure(0, 2);
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      ExactPressure<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(fe.degree + 2),
+                                      VectorTools::L2_norm,
+                                      &select_interior_pressure);
+
+    const double L2_error = difference_per_cell.l2_norm();
+    std::cout << "L2_error_pressure " << L2_error << std::endl;
+  }
+
+
+
+  // @sect4{WGDarcyEquation<dim>::compute_velocity_error}
+
+  // In this function, we evaluate $L_2$ errors for the velocity on
+  // each cell, and $L_2$ errors for the flux on faces. The function
+  // relies on the `compute_postprocessed_velocity()` function having
+  // previous computed, which computes the velocity field based on the
+  // pressure solution that has previously been computed.
+  //
+  // We are going to evaluate velocities on each cell and calculate
+  // the difference between numerical and exact velocities.
+  template <int dim>
+  void WGDarcyEquation<dim>::compute_velocity_errors()
+  {
+    const QGauss<dim>     quadrature_formula(fe_dgrt.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe_dgrt.degree + 1);
+
+    FEValues<dim> fe_values_dgrt(fe_dgrt,
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    FEFaceValues<dim> fe_face_values_dgrt(fe_dgrt,
+                                          face_quadrature_formula,
+                                          update_values |
+                                            update_normal_vectors |
+                                            update_quadrature_points |
+                                            update_JxW_values);
+
+    const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
+    const unsigned int n_face_q_points_dgrt =
+      fe_face_values_dgrt.get_quadrature().size();
+
+    std::vector<Tensor<1, dim>> velocity_values(n_q_points_dgrt);
+    std::vector<Tensor<1, dim>> velocity_face_values(n_face_q_points_dgrt);
+
+    const FEValuesExtractors::Vector velocities(0);
+
+    const ExactVelocity<dim> exact_velocity;
+
+    double L2_err_velocity_cell_sqr_global = 0;
+    double L2_err_flux_sqr                 = 0;
+
+    // Having previously computed the postprocessed velocity, we here
+    // only have to extract the corresponding values on each cell and
+    // face and compare it to the exact values.
+    for (const auto &cell_dgrt : dof_handler_dgrt.active_cell_iterators())
+      {
+        fe_values_dgrt.reinit(cell_dgrt);
+
+        // First compute the $L_2$ error between the postprocessed velocity
+        // field and the exact one:
+        fe_values_dgrt[velocities].get_function_values(darcy_velocity,
+                                                       velocity_values);
         double L2_err_velocity_cell_sqr_local = 0;
         for (unsigned int q = 0; q < n_q_points_dgrt; ++q)
           {
-            Tensor<1, dim> velocity;
-            for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
-              {
-                const Tensor<1, dim> phi_k_u =
-                  fe_values_dgrt[velocities].value(k, q);
-                velocity += cell_velocity(k) * phi_k_u;
-              }
-
+            const Tensor<1, dim> velocity = velocity_values[q];
             const Tensor<1, dim> true_velocity =
               exact_velocity.value(fe_values_dgrt.quadrature_point(q));
 
@@ -890,36 +924,32 @@ namespace Step61
         L2_err_velocity_cell_sqr_global += L2_err_velocity_cell_sqr_local;
 
         // For reconstructing the flux we need the size of cells and
-        // faces.  Since fluxes are calculated on faces, we have the
+        // faces. Since fluxes are calculated on faces, we have the
         // loop over all four faces of each cell. To calculate the
-        // face velocity, we use the coefficients `cell_velocity` we
-        // have computed previously. Then, we calculate the squared
-        // velocity error in normal direction. Finally, we calculate
-        // the $L_2$ flux error on the cell and add it to the global
-        // error.
-        const double cell_area = cell->measure();
+        // face velocity, we extract values at the quadrature points from the
+        // `darcy_velocity` which we have computed previously. Then, we
+        // calculate the squared velocity error in normal direction. Finally, we
+        // calculate the $L_2$ flux error on the cell by appropriately scaling
+        // with face and cell areas and add it to the global error.
+        const double cell_area = cell_dgrt->measure();
         for (unsigned int face_n = 0;
              face_n < GeometryInfo<dim>::faces_per_cell;
              ++face_n)
           {
-            const double face_length = cell->face(face_n)->measure();
-            fe_face_values.reinit(cell, face_n);
+            const double face_length = cell_dgrt->face(face_n)->measure();
             fe_face_values_dgrt.reinit(cell_dgrt, face_n);
+            fe_face_values_dgrt[velocities].get_function_values(
+              darcy_velocity, velocity_face_values);
 
             double L2_err_flux_face_sqr_local = 0;
             for (unsigned int q = 0; q < n_face_q_points_dgrt; ++q)
               {
-                Tensor<1, dim> velocity;
-                for (unsigned int k = 0; k < dofs_per_cell_dgrt; ++k)
-                  {
-                    const Tensor<1, dim> phi_k_u =
-                      fe_face_values_dgrt[velocities].value(k, q);
-                    velocity += cell_velocity(k) * phi_k_u;
-                  }
+                const Tensor<1, dim> velocity = velocity_face_values[q];
                 const Tensor<1, dim> true_velocity =
                   exact_velocity.value(fe_face_values_dgrt.quadrature_point(q));
 
-                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+                const Tensor<1, dim> normal =
+                  fe_face_values_dgrt.normal_vector(q);
 
                 L2_err_flux_face_sqr_local +=
                   ((velocity * normal - true_velocity * normal) *
@@ -927,7 +957,7 @@ namespace Step61
                    fe_face_values_dgrt.JxW(q));
               }
             const double err_flux_each_face =
-              L2_err_flux_face_sqr_local / (face_length) * (cell_area);
+              L2_err_flux_face_sqr_local / face_length * cell_area;
             L2_err_flux_sqr += err_flux_each_face;
           }
       }
@@ -1023,6 +1053,7 @@ namespace Step61
     setup_system();
     assemble_system();
     solve();
+    compute_postprocessed_velocity();
     compute_pressure_error();
     compute_velocity_errors();
     output_results();
