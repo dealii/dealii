@@ -187,11 +187,11 @@ namespace hp
      * refinement or coarsening and its criterion successfully compares to the
      * corresponding threshold. Let us be more specific on the default case: We
      * consider a cell for p-refinement if it is flagged for refinement and its
-     * criterion is larger than the corresponding threshold. The same applies
-     * for p-coarsening, but the cell's criterion must be lower than the
-     * threshold. However, different compare function objects can be supplied
-     * via the parameters @p compare_refine and @p compare_coarsen to impose
-     * different decision strategies.
+     * criterion is larger than or equal to the corresponding threshold. The
+     * same applies for p-coarsening, but the cell's criterion must be lower
+     * than or equal to the threshold. However, different compare function
+     * objects can be supplied via the parameters @p compare_refine and
+     * @p compare_coarsen to impose different decision strategies.
      *
      * Each entry of the parameter @p criteria needs to correspond to an active
      * cell.
@@ -208,9 +208,9 @@ namespace hp
       const Number                         p_refine_threshold,
       const Number                         p_coarsen_threshold,
       const ComparisonFunction<typename identity<Number>::type>
-        &compare_refine = std::greater<Number>(),
+        &compare_refine = std::greater_equal<Number>(),
       const ComparisonFunction<typename identity<Number>::type>
-        &compare_coarsen = std::less<Number>());
+        &compare_coarsen = std::less_equal<Number>());
 
     /**
      * Adapt which finite element to use on cells whose criteria meet a certain
@@ -228,11 +228,11 @@ namespace hp
      * refinement or coarsening and its criterion successfully compares to the
      * corresponding threshold. Let us be more specific on the default case: We
      * consider a cell for p-refinement if it is flagged for refinement and its
-     * criterion is larger than the corresponding threshold. The same applies
-     * for p-coarsening, but the cell's criterion must be lower than the
-     * threshold. However, different compare function objects can be supplied
-     * via the parameters @p compare_refine and @p compare_coarsen to impose
-     * different decision strategies.
+     * criterion is larger than or equal to the corresponding threshold. The
+     * same applies for p-coarsening, but the cell's criterion must be lower
+     * than or equal to the threshold. However, different compare function
+     * objects can be supplied via the parameters @p compare_refine and
+     * @p compare_coarsen to impose different decision strategies.
      *
      * Each entry of the parameter @p criteria needs to correspond to an active
      * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
@@ -250,9 +250,9 @@ namespace hp
       const double                         p_refine_fraction  = 0.5,
       const double                         p_coarsen_fraction = 0.5,
       const ComparisonFunction<typename identity<Number>::type>
-        &compare_refine = std::greater<Number>(),
+        &compare_refine = std::greater_equal<Number>(),
       const ComparisonFunction<typename identity<Number>::type>
-        &compare_coarsen = std::less<Number>());
+        &compare_coarsen = std::less_equal<Number>());
 
     /**
      * Adapt which finite element to use on cells based on the regularity of the
