@@ -317,9 +317,14 @@ namespace hp
           {
             if (cell->future_fe_index_set()) // p adaptation
               {
-                Assert(!cell->refine_flag_set() && !cell->coarsen_flag_set(),
-                       ExcMessage("Cell has to be either flagged for h or p "
-                                  "adaptation, and not for both!"));
+                Assert(cell->future_fe_index_set() && !cell->refine_flag_set(),
+                       ExcMessage(
+                         "For error prediction, a cell marked for p-adaptation "
+                         "should not also be flagged for h-refinement!"));
+                Assert(cell->future_fe_index_set() && !cell->coarsen_flag_set(),
+                       ExcMessage(
+                         "For error prediction, a cell marked for p-adaptation "
+                         "should not also be flagged for h-coarsening!"));
 
                 const int degree_difference =
                   dof_handler.get_fe_collection()[cell->future_fe_index()]
