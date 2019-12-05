@@ -28,15 +28,6 @@
 
 #ifdef DEAL_II_WITH_MUPARSER
 #  include <muParser.h>
-#else
-
-
-
-namespace fparser
-{
-  class FunctionParser
-  {};
-} // namespace fparser
 #endif
 
 DEAL_II_NAMESPACE_OPEN
