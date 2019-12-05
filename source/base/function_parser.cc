@@ -112,37 +112,26 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
               ExcMessage("Wrong number of variables"));
 
-  // We check that the number of
-  // components of this function
-  // matches the number of components
-  // passed in as a vector of
-  // strings.
+  // We check that the number of components of this function matches the
+  // number of components passed in as a vector of strings.
   AssertThrow(this->n_components == expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
 
-  // Now we define how many variables
-  // we expect to read in.  We
-  // distinguish between two cases:
-  // Time dependent problems, and not
-  // time dependent problems. In the
-  // first case the number of
-  // variables is given by the
-  // dimension plus one. In the other
-  // case, the number of variables is
-  // equal to the dimension. Once we
-  // parsed the variables string, if
-  // none of this is the case, then
-  // an exception is thrown.
+  // Now we define how many variables we expect to read in.  We distinguish
+  // between two cases: Time dependent problems, and not time dependent
+  // problems. In the first case the number of variables is given by the
+  // dimension plus one. In the other case, the number of variables is equal
+  // to the dimension. Once we parsed the variables string, if none of this is
+  // the case, then an exception is thrown.
   if (time_dependent)
     n_vars = dim + 1;
   else
     n_vars = dim;
 
-  // create a parser object for the current thread we can then query
-  // in value() and vector_value(). this is not strictly necessary
-  // because a user may never call these functions on the current
-  // thread, but it gets us error messages about wrong formulas right
-  // away
+  // create a parser object for the current thread we can then query in
+  // value() and vector_value(). this is not strictly necessary because a user
+  // may never call these functions on the current thread, but it gets us
+  // error messages about wrong formulas right away
   init_muparser();
 
   // finally set the initialization bit
