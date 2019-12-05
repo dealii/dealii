@@ -281,11 +281,6 @@ public:
   using ConstMap = std::map<std::string, double>;
 
   /**
-   * Iterator for the constants map. Used by the initialize() method.
-   */
-  using ConstMapIterator = ConstMap::iterator;
-
-  /**
    * Initialize the object by setting the actual parsed functions.
    *
    * @param[in] vars a string with the variables that will be used by the
