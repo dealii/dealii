@@ -54,6 +54,12 @@ class FEInterfaceValues
 {
 public:
   /**
+   * Number of quadrature points.
+   */
+  const unsigned int n_quadrature_points;
+
+
+  /**
    * Construct the FEInterfaceValues with a single FiniteElement (same on both
    * sides of the facet). The FEFaceValues objects will be initialized with
    * the given @p mapping, @p quadrature, and @p update_flags.
@@ -163,6 +169,20 @@ public:
    */
   bool
   at_boundary() const;
+
+  /**
+   * Mapped quadrature weight. This value equals the
+   * mapped surface element times the weight of the quadrature
+   * point.
+   *
+   * You can think of the quantity returned by this function as the
+   * surface element $ds$ in the integral that we implement here by
+   * quadrature.
+   *
+   * @dealiiRequiresUpdateFlags{update_JxW_values}
+   */
+  double
+  JxW(const unsigned int quadrature_point) const;
 
   /**
    * Return the vector of JxW values for each quadrature point.
@@ -414,7 +434,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const FiniteElement<dim, spacedim> &fe,
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
-  : internal_fe_face_values(mapping, fe, quadrature, update_flags)
+  : n_quadrature_points(quadrature.size())
+  , internal_fe_face_values(mapping, fe, quadrature, update_flags)
   , internal_fe_subface_values(mapping, fe, quadrature, update_flags)
   , internal_fe_face_values_neighbor(mapping, fe, quadrature, update_flags)
   , internal_fe_subface_values_neighbor(mapping, fe, quadrature, update_flags)
@@ -429,7 +450,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const FiniteElement<dim, spacedim> &fe,
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
-  : internal_fe_face_values(StaticMappingQ1<dim, spacedim>::mapping,
+  : n_quadrature_points(quadrature.size())
+  , internal_fe_face_values(StaticMappingQ1<dim, spacedim>::mapping,
                             fe,
                             quadrature,
                             update_flags)
@@ -551,6 +573,17 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
     {
       dofmap[i] = {{i, numbers::invalid_unsigned_int}};
     }
+}
+
+
+
+template <int dim, int spacedim>
+inline double
+FEInterfaceValues<dim, spacedim>::JxW(const unsigned int q) const
+{
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
+  return fe_face_values->JxW(q);
 }
 
 
