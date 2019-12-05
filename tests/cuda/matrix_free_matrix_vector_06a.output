@@ -1,7 +1,13 @@
 
-DEAL:2d::Testing FE_Q<2>(1)
-DEAL:2d::Norm of difference: 0
-DEAL:2d::
-DEAL:3d::Testing FE_Q<3>(1)
-DEAL:3d::Norm of difference: 0
-DEAL:3d::
+DEAL:double:2d::Testing FE_Q<2>(1)
+DEAL:double:2d::Norm of difference: 2.98e-15
+DEAL:double:2d::
+DEAL:double:3d::Testing FE_Q<3>(1)
+DEAL:double:3d::Norm of difference: 6.11e-16
+DEAL:double:3d::
+DEAL:float:2d::Testing FE_Q<2>(1)
+DEAL:float:2d::Norm of difference: 3.16e-15
+DEAL:float:2d::
+DEAL:float:3d::Testing FE_Q<3>(1)
+DEAL:float:3d::Norm of difference: 6.99e-16
+DEAL:float:3d::

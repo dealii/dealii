@@ -381,9 +381,9 @@ namespace CUDAWrappers
         {
           const std::vector<Point<dim>> &q_points =
             fe_values.get_quadrature_points();
-          memcpy(&q_points_host[cell_id * padding_length],
-                 q_points.data(),
-                 q_points_per_cell * sizeof(Point<dim>));
+          std::copy(q_points.begin(),
+                    q_points.end(),
+                    &q_points_host[cell_id * padding_length]);
         }
 
       if (update_flags & update_JxW_values)
@@ -398,9 +398,11 @@ namespace CUDAWrappers
         {
           const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
             fe_values.get_inverse_jacobians();
-          memcpy(&inv_jacobian_host[cell_id * padding_length * dim * dim],
-                 inv_jacobians.data(),
-                 q_points_per_cell * sizeof(DerivativeForm<1, dim, dim>));
+          std::copy(&inv_jacobians[0][0][0],
+                    &inv_jacobians[0][0][0] +
+                      q_points_per_cell * sizeof(DerivativeForm<1, dim, dim>) /
+                        sizeof(double),
+                    &inv_jacobian_host[cell_id * padding_length * dim * dim]);
         }
     }
 
