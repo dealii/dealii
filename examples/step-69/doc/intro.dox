@@ -1,0 +1,367 @@
+<i>
+  This program was contributed by Matthias Maier (Texas A&M University),
+  and Ignacio Tomas (Sandia National Laboratories, Albuquerque).
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.TODO,https://zenodo.org/badge/DOI/10.5281/zenodo.TODO.svg}
+
+@note This tutorial step implements a first-order accurate <i>guaranteed
+maximum wavespeed method</i> based on a first-order <i>graph viscosity</i>
+for solving Euler's equations of gas dynamics @cite GuermondPopov2016. As
+such it is presented primarily for educational purposes. For actual
+research computations you might want to consider exploring a corresponding
+high-performance implementation of a second-order accurate scheme that uses
+<i>convex limiting</i> techniques, and strong stability-preserving (SSP)
+time integration @cite GuermondEtAl2018. The repository can be found at
+TODO.
+
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+
+<h1>Introduction</h1>
+
+This tutorial presents a first-order scheme for solving compressible
+Euler's equations that is based on three ingredients: a
+<i>collocation</i>-type discretization of Euler's equations in context of
+finite elements; a graph-viscosity stabilization based on a
+<i>guaranteed</i> upper bound of the local wave speed; and explicit
+time-stepping. As such the ideas and techniques presented in this tutorial
+step are drastically different from those used in Step-33, which focuses on
+the use of automatic differentiation. From a programming perspective this
+tutorial will focus on a number of techniques found in large-scale
+computations: hybrid thread- and process- (MPI) parallelization; efficient
+local numbering of degrees of freedom; concurrent post-processing and
+write-out of results using worker threads; as well as checkpointing and
+restart.
+
+It should be noted that first-order schemes in the context of hyperbolic
+conservation laws require prohibitively many degrees of freedom to resolve
+certain key features of the simulated fluid, and thus, typically only serve
+as elementary building blocks in higher-order schemes
+@cite GuermondEtAl2018. However, we hope that the reader still finds the
+tutorial step to be a good starting point (in particular with respect to
+the programming techniques) before jumping into full research codes such as
+the second-order scheme @cite GuermondEtAl2018 maintained TODO.
+
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+
+<a name="eulerequations"></a>
+<h3>Euler's equations of gas dynamics</h3>
+
+The compressible Euler's equations of gas dynamics are written in
+conservative form as follows:
+
+@f{align}
+\mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0} ,
+@f}
+
+where $\mathbf{u}(\textbf{x},t):\mathbb{R}^{d} \times \mathbb{R}
+\rightarrow \mathbb{R}^{d+2}$, and $\mathbb{f}(\mathbf{u}):\mathbb{R}^{d+2}
+\rightarrow \mathbb{R}^{(d+2) \times d}$, and $d \geq 1$ is the space
+dimension. We say that $\mathbf{u} \in \mathbb{R}^{d+2}$ is the state and
+$\mathbb{f}(\mathbf{u}) \in  \mathbb{R}^{(d+2) \times d}$ is the flux of
+the system. In the case of Euler's equations the state is given by
+$\textbf{u} = [\rho, \textbf{m},E]^{\top}$: where $\rho \in \mathbb{R}^+$
+denotes the density, $\textbf{m} \in \mathbb{R}^d$ is the momentum, and $E
+\in \mathbb{R}^+$ is the total energy of the system. The flux of the system
+$\mathbb{f}(\mathbf{u})$ is defined as
+
+@f{align*}
+\mathbb{f}(\textbf{u})
+=
+\begin{bmatrix}
+  \textbf{m}^\top \\
+  \rho^{-1} \textbf{m} \otimes \textbf{m} + \mathbb{I} p\\
+  \tfrac{\textbf{m}^\top}{\rho} (E + p)
+\end{bmatrix},
+@f}
+
+where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
+$\otimes$ denotes the tensor product. Here, we have introduced the pressure
+$p$ that, in general, is defined by an closed-form equation of state. 
+For the tutorial we limit the discussion to the class of polytropic ideal gases 
+for which the pressure is given by
+@f{align*}
+p = p(\textbf{u}) := (\gamma -1) \Big(E - \frac{\|\textbf{m}\|^2}{2\,\rho} 
+\Big),
+@f}
+
+where the factor $\gamma \in (1,5/3]$ denotes the
+<a href="https://en.wikipedia.org/wiki/Heat_capacity_ratio">ratio of
+specific heats</a>, and $\|\,.\|$ denotes the Euclidian norm.
+
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+
+<h4>Solution theory</h4>
+
+Hyperbolic conservation laws, such as
+@f{align*}
+\mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0},
+@f}
+pose a significant challenge with respect to solution theory. An evident
+observation is that rewriting the equation in variational form and testing with
+the solution itself does not lead to an energy estimate because the pairing
+$\langle \text{div} \, \mathbb{f}(\mathbf{u}), \mathbf{u}\rangle$ (understood as
+the $L^2(\Omega)$ inner product or duality pairing) is not guaranteed to be
+non-negative. Notions such as energy-stability or $L^2(\Omega)$-stability are
+(in general) meaningles in this context.
+
+Historically, the most fruitful step taken in order to deepen the
+understanding of hyperbolic conservation laws was to assume that the
+solution is formally defined as $\mathbf{u} := \lim_{\epsilon \rightarrow
+0^+} \mathbf{u}^{\epsilon}$ where $\mathbf{u}^{\epsilon}$ is the solution
+of the parabolic regularization
+
+@f{align}
+\mathbf{u}_t^{\epsilon} + \text{div} \, \mathbb{f}(\mathbf{u}^{\epsilon})
+= {\epsilon} \Delta \mathbf{u}^{\epsilon}.
+@f}
+
+Such solutions, which are understood as the solution recovered in the
+zero-viscosity limit, are often refered to as <i>viscosity solutions</i>.
+Global existence and uniqueness of such solutions is a widely open issue.
+However, we know at least that if such viscosity solutions exists they have
+to satisfy the constraint $\textbf{u}(\mathbf{x},t) \in \mathcal{B}$ for
+all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
+
+@f{align}
+  \mathcal{B} = \big\{ \textbf{u} =
+  [\rho, \textbf{m},E]^{\top} \in \mathbb{R}^{d+2} \, \big |
+  \quad
+  \rho > 0,
+  \quad
+  \ E - \tfrac{|\textbf{m}|_{\ell^2}^2}{2 \rho} > 0,
+  \quad
+  s(\mathbf{u}) \geq \min_{x \in \Omega} s(\mathbf{u}_0(\mathbf{x}))
+  \big\}.
+@f}
+
+Here, $s(\mathbf{u})$ denotes the specific entropy
+
+@f{align}
+  s(\mathbf{u}) = \ln \Big(\frac{p(\mathbf{u})}{\rho^{\gamma}}\Big).
+@f}
+
+In other words, a state $\mathbf{u}(\mathbf{x},t)\in\mathcal{B}$ obeys
+positivity of the density, positivity of the internal energy, and a local
+minimum principle on the specific entropy. This condition is a simplified
+version of a class of pointwise stability constraints satisfied by the
+exact (viscosity) solution. By pointwise we mean that the constraint has to
+be satisfied at every point of the domain, not just in an averaged
+(integral, or high order moments) sense.
+
+In context of a numerical approximation, a violation of such a constraint
+has dire consequences: it almost surely leads to catrastrophic failure of
+the numerical scheme; loss of hyperbolicity, and overall, loss of
+well-posedness of the (discrete) problem. In the following we will
+formulate a scheme that ensures that the discrete approximation of
+$\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
+
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+
+<h4>Variational versus collocation-type discretizations</h3>
+
+Following Step-9, Step-12, and Step-33, at this point it might look tempting 
+to base a discretization of Euler's equations on a (semi-discrete) variational
+formulation:
+
+@f{align*}
+  (\partial_t\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)}
+  - ( \mathbb{f}(\mathbf{u}_{h}) ,\text{grad} \, \textbf{v}_{h})_{L^2(\Omega)}
+  + s_h(\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)} = \boldsymbol{0}
+  \quad\forall \textbf{v}_h \in \mathbb{V}_h.
+@f}
+
+Here, $\mathbb{V}_h$ is an appropriate finite element space, and
+$s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
+(possibly complemented with some ad-hoc shock-capturing technique, see for 
+instance @cite GuermondErn2004 Chapter 5 and references therein). Most
+time-dependent discretization approaches described in the deal.II tutorials
+are based on such a (semi-discrete) variational approach. Fundamentally,
+from an analysis perspective, variational discretizations are conceived in
+order to provide some notion of global (integral) stabiliy, meaning an estimate
+of the form
+
+@f{align*}
+  |\!|\!| \mathbf{u}_{h}(t) |\!|\!| \leq |\!|\!| \mathbf{u}_{h}(0) |\!|\!|
+@f}
+
+holds true, where $|\!|\!| \cdot |\!|\!| $ could represent the
+$L^2(\Omega)$-norm or, more generally, some discrete (possibly mesh
+dependent) energy-norm. Variational discretizations of hyperbolic
+conservation laws have been very popular since the mid eighties, in
+particular combined with SUPG-type stabilization and/or upwinding
+techniques (see the early work of @cite Brooks1982 and @cite Johnson1986). They 
+have proven to be some of the best approaches for simulations in the subsonic 
+shockless regime and similarly benign regimes.
+
+However, in the transonic and supersonic regime, and shock-hydrodynamics 
+applications the use of variational schemes might be questionable. In fact, at 
+the time of this writing, most shock-hydrodynamics codes are still firmly 
+grounded on finite volumes methods. The main reason for failure of variational 
+schemes in such extreme regimes is the lack of pointwise stability. This stems 
+from the fact that <i>a priori</i> bounds on integrated quantities (e.g. 
+integrals of moments) have in general no implications on pointwise properties 
+of the solution. While some of these problems might be alleviated by the 
+(perpetual) chase of the right shock capturing scheme, finite difference-like 
+and finite volume schemes still have an edge in many regards.
+
+In this tutorial step we therefore depart from variational schemes. We will
+present a completely algebraic formulation (with the flavor of a
+collocation-type scheme) that preserves constraints pointwise, i.e.,
+
+@f{align*}
+  \textbf{u}_h(\mathbf{x}_i,t) \in \mathcal{B}
+  \;\text{at every node}\;\mathbf{x}_i\;\text{of the mesh}.
+@f}
+
+However, contrary to finite difference/volume schemes, the
+scheme implemented in this step maximizes the use of finite element
+software infrastructure, works in any mesh, in any space dimension, and is
+theoretically guaranteed to always work, all the time, no exception. This
+illustrates that deal.ii can be used far beyond the context of variational
+schemes in Hilbert spaces and that a large number of classes, modules and
+namespaces from deal.ii can be adapted for such purpose.
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+<h3>Description of the scheme </h3>
+
+Let $\mathbb{V}_h$ be scalar-valued finite dimensional space spanned by a
+basis $\{\phi_i\}_{i \in \mathcal{V}}$ where: $\phi_i:\Omega \rightarrow
+\mathbb{R}$ and $\mathcal{V}$ is the set of all indices (nonnegative
+integers) identifying each scalar Degree of Freedom (DOF) in the mesh.
+Therefore a scalar finite element functiona $u_h \in \mathbb{V}_h$ it can
+be written as $u_h = \sum_{i \in \mathcal{V}} U_i \phi_i$ with $U_i \in
+\mathbb{R}$. We introduce the notation for vector-valued approximation
+spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
+\in \pmb{\mathbb{V}}_h$, then it can be written as $\mathbf{u}_h = \sum_{i
+\in \mathcal{V}} \mathbf{U}_i \phi_i$ where $\mathbf{U}_i \in
+\mathbb{R}^{d+2}$ and $\phi_i$ is a scalar-valued shape function.
+
+<b>Note.</b>
+For simplicity we will consider the usual Lagrange finite elements. In such 
+context $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ be the set of all "support 
+points" (see @ref GlossSupport "this glossary entry") where $\mathbf{x}_i \in 
+\mathbb{R}^d$. Then each integer index $i \in \mathcal{V}$ 
+uniquely identifies a support point $\mathbf{x}_i$ and/or scalar-valued shape 
+function $\phi_i$.
+
+With this notation we can define the scheme as
+
+@f{align*}
+  m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
+  + \sum_{j \in \mathcal{I}(i)} \mathbb{f}(\mathbf{U}_j^{n})\cdot
+  \mathbf{c}_{ij} - d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0}
+@f}
+
+Where
+  - $m_i := \int_{\Omega} \phi_i \, \mathrm{d}\mathbf{x}$
+  - $\tau$ is the time step size
+  - $\mathbf{c}_{ij} := \int_{\Omega} \nabla\phi_j\phi_i \,
+    \mathrm{d}\mathbf{x}$ (note that $\mathbf{c}_{ij}\in \mathbb{R}^d$)
+  - $\mathcal{I}(i) := \{j \in \mathcal{V} \ | \ \mathbf{c}_{ij} \not \equiv
+    \boldsymbol{0}\} \cup \{i\}$. We will refer to $\mathcal{I}(i)$ as the
+    "stencil" (or adjacency list) at the support point $i$. 
+  - $\mathbb{f}(\mathbf{U}_j^{n})$ is just the flux $\mathbb{f}$ of the
+    hyperbolic system evaluated at the state $\mathbf{U}_j^{n}$ stored at the
+    support point $j$.
+  - $d_{ij} := \max \{ \lambda_{\text{max}}
+    (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
+    \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
+    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
+  - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\|_{\ell^2} }$
+
+The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
+\textbf{n})$ is far from trivial and we will postpone their definition in
+order to focus on the computational/coding issues of this tutorial Step.
+For the time being let's note that
+  - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time. It makes sense to
+    compute and store them once, and later recall them at very time step.
+    They are part of what we are going to call off-line data.
+  - At every time step we have to evaluate $\mathbb{f}(\mathbf{U}_j^{n})$ and
+    $d_{ij} := \max \{ \lambda_{\text{max}}
+    (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
+    \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
+    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
+    
+Before we start with the description of the implementation of this scheme, it
+is worth saying a thing or two about the "assembly" of this system. Consider 
+for instance a hypothetical pseudo-code, illustrating
+a possible strategy to compute the solution $\textbf{U}^{n+1}$:
+
+@f{align*}
+&\textbf{For } i \in \mathcal{V} \\
+&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} := 
+\texttt{gather_cij_vectors}(\textbf{c}, \mathcal{I}(i)) \\
+&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} :=
+\texttt{gather_state_vectors}(\textbf{U}^n, \mathcal{I}(i)) \\
+&\ \ \ \ \ \textbf{U}_i^{n+1} := \mathbf{U}_i^{n} \\
+&\ \ \ \ \textbf{For } j \in \mathcal{I}(i) \\
+&\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} := \textbf{U}_i^{n+1} - \frac{\tau}{m_i}
+ \mathbb{f}(\mathbf{U}_j^{n})\cdot
+   \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
+&\ \ \ \ \textbf{EndFor} \\
+&\textbf{EndFor}
+@f}
+We note here that:
+- This "assembly" does not require any form of quadrature or cell-loops.
+- Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector 
+containing all the vectors $\mathbf{c}_{ij}$ and all the states 
+$\mathbf{U}_j^n$ respectively.
+- $\texttt{gather_cij_vectors}$ and $\texttt{gather_state_vectors}$ are
+hypothetical implementations that collect (from global matrices and vectors)
+only the quantities required to compute the update at the node $i$.
+- Note that: if we assume a cartesian mesh in two space
+dimensions, first-order polynomial space $\mathbb{Q}^1$, and that 
+$\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary 
+of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain 
+nine state-vectors (i.e. all the states in the patch/macro element associated to 
+the shape function $\phi_i$). This is one of the major differences with the 
+usual cell-based loop where the gather functionality (encoded in 
+FEValuesBase<dim, spacedim>.get_function_values() ) only collects values for the
+local cell (just a subset of the patch).
+
+It is worth noting that, from a practitioner's point of view
+fully-algebraic schemes (i.e. no bilinear forms, no cell-loops, and no
+quadratures) are not unusual at all in the CFD community. There is rich history
+of application of this kind of schemes, also called "edge-based" or
+"graph-based" finite element schemes (see for instance @cite Rainald2008 for
+more historical references).
+
+This pseudo-code was introduced only to prepare the mindset of the reader for
+what is going to be presented in the in the next section. The 
+actual implementation described in the next section is somewhat different from
+what is described in the pseudo-code but shares the same core mentality: we do
+not loop on cells but rather we loop on the edges of the sparsity graph (hence
+the name "edge-based" code) in order to assemble the system.
+
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+<!-- ####################################################################### -->
+
+<h3>Implementation of the scheme </h3>
+
+
+
+
+
+
+
+
+
