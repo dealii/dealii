@@ -2134,7 +2134,7 @@ namespace DoFTools
                 fe_values.get_quadrature_points();
               for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
                 {
-                  unsigned int dof_comp =
+                  const unsigned int dof_comp =
                     cell->get_fe().system_to_component_index(i).first;
 
                   // insert the values into the map if it is a valid component

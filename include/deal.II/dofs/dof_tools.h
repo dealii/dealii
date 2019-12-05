@@ -26,7 +26,6 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/component_mask.h>
-#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/hp/dof_handler.h>
 
@@ -2305,6 +2304,17 @@ namespace DoFTools
    * function unsuitable for the case that the given DoFHandler object derives
    * from a parallel::distributed::Triangulation object.  Consequently, this
    * function will produce an error if called with such a DoFHandler.
+   *
+   * @param mapping The mapping from the reference cell to the real cell on
+   * which DoFs are defined.
+   * @param dof_handler The object that describes which DoF indices live on
+   * which cell of the triangulation.
+   * @param support_points A vector that stores the corresponding location of the dofs
+   * in real space coordinates. Previous content of this object is deleted in
+   * this function.
+   * @param component_mask An optional component mask that restricts the
+   * components from which the support points are extracted.
+   *
    */
   template <int dim, int spacedim>
   void
@@ -2352,7 +2362,7 @@ namespace DoFTools
    * contains the corresponding location in real space coordinates. Previous
    * content of this object is deleted in this function.
    * @param component_mask An optional component mask that restricts the
-   * components from which the support points are extracted
+   * components from which the support points are extracted.
    */
   template <int dim, int spacedim>
   void
