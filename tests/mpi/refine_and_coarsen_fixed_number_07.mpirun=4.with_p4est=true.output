@@ -1,7 +1,7 @@
 
 DEAL:0::total active cells = 1280
 DEAL:0::n_refined = 56
-DEAL:0::n_coarsened = 60
+DEAL:0::n_coarsened = 56
 DEAL:0::total active cells = 1421
 DEAL:0::cell number upper limit = 1408
 

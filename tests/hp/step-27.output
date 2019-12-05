@@ -4,21 +4,21 @@ Cycle 0:
    Number of constraints       : 384
 Cycle 1:
    Number of active cells:       966
-   Number of degrees of freedom: 5245
-   Number of constraints       : 936
+   Number of degrees of freedom: 5237
+   Number of constraints       : 932
 Cycle 2:
    Number of active cells:       1143
-   Number of degrees of freedom: 8441
-   Number of constraints       : 1929
+   Number of degrees of freedom: 8425
+   Number of constraints       : 1923
 Cycle 3:
    Number of active cells:       1356
-   Number of degrees of freedom: 12349
-   Number of constraints       : 3046
+   Number of degrees of freedom: 12319
+   Number of constraints       : 3034
 Cycle 4:
    Number of active cells:       1644
-   Number of degrees of freedom: 18178
-   Number of constraints       : 4713
+   Number of degrees of freedom: 18118
+   Number of constraints       : 4697
 Cycle 5:
    Number of active cells:       1728
-   Number of degrees of freedom: 22591
-   Number of constraints       : 6095
+   Number of degrees of freedom: 22531
+   Number of constraints       : 6086
