@@ -95,7 +95,7 @@ namespace internal
 
     private:
       /**
-       * Pool were vectors are obtained from.
+       * Pool where vectors are obtained from.
        */
       VectorMemory<VectorType> &mem;
 
