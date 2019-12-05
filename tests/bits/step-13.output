@@ -23,28 +23,31 @@ DEAL::Running tests with "kelly" refinement criterion:
 DEAL::------------------------------------------------
 DEAL::Refinement cycle: 0 Starting value 7.7
 DEAL:cg::Convergence step 8 value 0
-DEAL::1 Starting value 25.
+DEAL::1 Starting value 19.
 DEAL:cg::Convergence step 11 value 0
 DEAL::2 Starting value 29.
-DEAL:cg::Convergence step 15 value 0
+DEAL:cg::Convergence step 14 value 0
 DEAL::3 Starting value 35.
-DEAL:cg::Convergence step 20 value 0
-DEAL::4 Starting value 40.
-DEAL:cg::Convergence step 27 value 0
-DEAL::5 Starting value 40.
-DEAL:cg::Convergence step 37 value 0
-DEAL::6 Starting value 41.
-DEAL:cg::Convergence step 52 value 0
-DEAL::7 Starting value 46.
-DEAL:cg::Convergence step 68 value 0
+DEAL:cg::Convergence step 19 value 0
+DEAL::4 Starting value 41.
+DEAL:cg::Convergence step 26 value 0
+DEAL::5 Starting value 39.
+DEAL:cg::Convergence step 35 value 0
+DEAL::6 Starting value 43.
+DEAL:cg::Convergence step 48 value 0
+DEAL::7 Starting value 45.
+DEAL:cg::Convergence step 64 value 0
+DEAL::8 Starting value 50.
+DEAL:cg::Convergence step 88 value 0
 DEAL::
 DoFs u(x_0) 
 25   1.2868 
-47   0.8775 
-89   1.5365 
-165  1.2974 
-316  1.6442 
-589  1.5221 
-1093 1.5724 
-2042 1.5627 
+43   0.9789 
+86   1.1580 
+155  1.3960 
+292  1.6537 
+540  1.5091 
+982  1.5713 
+1855 1.5643 
+3403 1.5923 
 DEAL::
