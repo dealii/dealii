@@ -79,9 +79,11 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-// We deliberately delay the definition of the default destructor
-// so that we don't need to include the definition of mu::Parser
-// in the header file.
+
+// Note: we explicitly define the destructor here (instead of silently using
+// the default destructor by declaring nothing in the header) since we do not
+// expect muParser.h to be available in user projects: i.e., the destructor
+// must be defined in the source file.
 template <int dim>
 FunctionParser<dim>::~FunctionParser() = default;
 

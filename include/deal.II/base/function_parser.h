@@ -256,10 +256,9 @@ public:
   FunctionParser(FunctionParser &&) = delete;
 
   /**
-   * Destructor. Explicitly delete the FunctionParser objects (there is one
-   * for each component of the function).
+   * Destructor.
    */
-  ~FunctionParser() override;
+  virtual ~FunctionParser() override;
 
   /**
    * Copy operator. Objects of this type can not be copied, and
