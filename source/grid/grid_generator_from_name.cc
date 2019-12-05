@@ -322,7 +322,7 @@ namespace GridGenerator
                                                             arguments,
                                                             tria);
     else if (name == "subdivided_hyper_cube")
-      parse_and_create<dim, spacedim, unsigned int, double, double>(
+      parse_and_create<dim, spacedim, unsigned int, double, double, bool>(
         subdivided_hyper_cube, arguments, tria);
     else if (name == "hyper_rectangle")
       parse_and_create<dim,

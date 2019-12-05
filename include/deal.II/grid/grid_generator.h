@@ -147,13 +147,16 @@ namespace GridGenerator
    * @param left Lower bound for the interval used to create the hyper cube.
    *
    * @param right Upper bound for the interval used to create the hyper cube.
+   *
+   * @param colorize Assign different boundary ids if set to true.
    */
   template <int dim, int spacedim>
   void
   subdivided_hyper_cube(Triangulation<dim, spacedim> &tria,
                         const unsigned int            repetitions,
-                        const double                  left  = 0.,
-                        const double                  right = 1.);
+                        const double                  left     = 0.,
+                        const double                  right    = 1.,
+                        const bool                    colorize = false);
 
   /**
    * Create a coordinate-parallel brick from the two diagonally opposite

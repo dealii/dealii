@@ -1234,7 +1234,8 @@ namespace GridGenerator
   subdivided_hyper_cube(Triangulation<dim, spacedim> &tria,
                         const unsigned int            repetitions,
                         const double                  left,
-                        const double                  right)
+                        const double                  right,
+                        const bool                    colorize)
   {
     Assert(repetitions >= 1, ExcInvalidRepetitions(repetitions));
     Assert(left < right,
@@ -1248,7 +1249,7 @@ namespace GridGenerator
       }
 
     std::vector<unsigned int> reps(dim, repetitions);
-    subdivided_hyper_rectangle(tria, reps, p0, p1);
+    subdivided_hyper_rectangle(tria, reps, p0, p1, colorize);
   }
 
 
