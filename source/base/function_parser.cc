@@ -281,12 +281,9 @@ FunctionParser<dim>::init_muparser() const
     {
       fp.get().emplace_back(new mu::Parser());
 
-      for (std::map<std::string, double>::const_iterator constant =
-             constants.begin();
-           constant != constants.end();
-           ++constant)
+      for (const auto &constant : constants)
         {
-          fp.get()[component]->DefineConst(constant->first, constant->second);
+          fp.get()[component]->DefineConst(constant.first, constant.second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
