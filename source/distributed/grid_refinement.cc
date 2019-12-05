@@ -481,8 +481,8 @@ namespace parallel
           bottom_threshold = RefineAndCoarsenFixedNumber::compute_threshold(
             locally_owned_indicators,
             global_min_and_max,
-            static_cast<unsigned int>((1 - adjusted_fractions.second) *
-                                      tria.n_global_active_cells()),
+            static_cast<unsigned int>(std::ceil(
+              (1 - adjusted_fractions.second) * tria.n_global_active_cells())),
             mpi_communicator);
         else
           {
