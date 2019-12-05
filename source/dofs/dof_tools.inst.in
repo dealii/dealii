@@ -562,7 +562,10 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension == 3
 
     template void DoFTools::map_dofs_to_support_points<1, 3>(
-      const Mapping<1, 3> &, const DoFHandler<1, 3> &, std::vector<Point<3>> &,const ComponentMask &);
+      const Mapping<1, 3> &,
+      const DoFHandler<1, 3> &,
+      std::vector<Point<3>> &,
+      const ComponentMask &);
 
     template void DoFTools::count_dofs_per_block<DoFHandler<1, 3>>(
       const DoFHandler<1, 3> &,
