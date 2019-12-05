@@ -231,10 +231,10 @@ GridRefinement::refine_and_coarsen_fixed_number(
           else
             {
               std::nth_element(tmp.begin(),
-                               tmp.begin() + refine_cells,
+                               tmp.begin() + refine_cells - 1,
                                tmp.end(),
                                std::greater<double>());
-              refine(tria, criteria, *(tmp.begin() + refine_cells));
+              refine(tria, criteria, *(tmp.begin() + refine_cells - 1));
             }
         }
 
