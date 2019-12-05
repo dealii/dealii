@@ -93,8 +93,10 @@ namespace python
                                          generate_half_hyper_ball,
                                          1,
                                          2)
-
-
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
+                                         generate_hyper_shell,
+                                         3,
+                                         5)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells                                      \n";
@@ -252,6 +254,15 @@ namespace python
 
 
 
+  const char generate_hyper_shell_docstring[] =
+    "Produce a hyper-shell, the region between two spheres around center,   \n"
+    "with given inner_radius and outer_radius. The number n_cells indicates \n"
+    "the number of cells of the resulting triangulation, i.e., how many     \n"
+    "cells form the ring (in 2d) or the shell (in 3d).                      \n"
+    "The appropriate manifold class is SphericalManifold.                   \n";
+
+
+
   const char generate_half_hyper_ball_docstring[] =
     "Generate a half hyper-ball around center, which contains four          \n"
     "elements in 2d and 6 in 3d. The cut plane is perpendicular to the      \n"
@@ -323,6 +334,14 @@ namespace python
 
 
 
+  const char read_docstring[] =
+    "Read a mesh from the file according to the given data format.          \n"
+    "The possible formats are:                                              \n"
+    "  - msh                                                                \n"
+    "  - vtk                                                                \n";
+
+
+
   const char save_docstring[] =
     "Write the Triangulation to a file                                      \n";
 
@@ -330,6 +349,19 @@ namespace python
 
   const char load_docstring[] =
     "Load the Triangulation from a file                                     \n";
+
+
+
+  const char set_manifold_docstring[] =
+    "Assign a manifold object to a certain part of the triangulation.       \n"
+    "The manifold_object is not copied and MUST persist until the           \n"
+    "triangulation is destroyed.                                            \n";
+
+
+
+  const char reset_manifold_docstring[] =
+    "Reset those parts of the triangulation with the given manifold_number  \n"
+    "to use a FlatManifold object.                                          \n";
 
 
 
@@ -435,6 +467,15 @@ namespace python
            generate_half_hyper_ball_overloads(
              boost::python::args("self", "center", "radius"),
              generate_half_hyper_ball_docstring))
+      .def("generate_hyper_shell",
+           &TriangulationWrapper::generate_hyper_shell,
+           generate_hyper_shell_overloads(boost::python::args("self",
+                                                              "center",
+                                                              "inner_radius",
+                                                              "outer_radius",
+                                                              "n_cells",
+                                                              "colorize"),
+                                          generate_hyper_shell_docstring))
       .def("shift",
            &TriangulationWrapper::shift,
            shift_docstring,
@@ -463,6 +504,10 @@ namespace python
            &TriangulationWrapper::write,
            write_docstring,
            boost::python::args("self", "filename", "format"))
+      .def("read",
+           &TriangulationWrapper::read,
+           read_docstring,
+           boost::python::args("self", "filename", "format"))
       .def("save",
            &TriangulationWrapper::save,
            save_docstring,
@@ -470,7 +515,15 @@ namespace python
       .def("load",
            &TriangulationWrapper::load,
            load_docstring,
-           boost::python::args("self", "filename"));
+           boost::python::args("self", "filename"))
+      .def("set_manifold",
+           &TriangulationWrapper::set_manifold,
+           set_manifold_docstring,
+           boost::python::args("self", "number", "manifold"))
+      .def("reset_manifold",
+           &TriangulationWrapper::reset_manifold,
+           reset_manifold_docstring,
+           boost::python::args("self", "number"));
   }
 } // namespace python
 

@@ -13,12 +13,6 @@
 #
 # ---------------------------------------------------------------------
 
-import os
-import sys
-module_path = os.path.abspath('/home/agrayver/lib/dealii/build_gofem/lib/python3.7/site-packages')
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
 import unittest
 from PyDealII.Debug import *
 

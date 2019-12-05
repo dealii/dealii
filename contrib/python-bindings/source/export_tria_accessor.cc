@@ -44,6 +44,9 @@ namespace python
   const char at_boundary_docstring[] =
     " Return whether the face is at the boundary                        \n";
 
+  const char measure_docstring[] =
+    " Compute the dim-dimensional measure of the object.                 \n";
+
   void
   export_tria_accessor()
   {
@@ -77,7 +80,11 @@ namespace python
       .def("set_all_boundary_ids",
            &TriaAccessorWrapper::set_all_boundary_ids,
            set_all_boundary_ids_docstring,
-           boost::python::args("self", "boundary_id"));
+           boost::python::args("self", "boundary_id"))
+      .def("measure",
+           &TriaAccessorWrapper::measure,
+           measure_docstring,
+           boost::python::args("self"));
   }
 } // namespace python
 

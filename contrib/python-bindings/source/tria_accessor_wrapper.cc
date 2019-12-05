@@ -140,6 +140,17 @@ namespace python
           tria_accessor);
       return accessor->at_boundary();
     }
+
+
+    template <int structdim, int dim, int spacedim>
+    double
+    measure(const void *tria_accessor)
+    {
+      const TriaAccessor<structdim, dim, spacedim> *accessor =
+        static_cast<const TriaAccessor<structdim, dim, spacedim> *>(
+          tria_accessor);
+      return accessor->measure();
+    }
   } // namespace internal
 
 
@@ -334,6 +345,19 @@ namespace python
       return internal::at_boundary<1, 2, 3>(tria_accessor);
     else
       return internal::at_boundary<2, 3, 3>(tria_accessor);
+  }
+
+
+
+  double
+  TriaAccessorWrapper::measure() const
+  {
+    if ((dim == 2) && (spacedim == 2) && (structdim == 1))
+      return internal::measure<1, 2, 2>(tria_accessor);
+    else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
+      return internal::measure<1, 2, 3>(tria_accessor);
+    else
+      return internal::measure<2, 3, 3>(tria_accessor);
   }
 
 } // namespace python
