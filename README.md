@@ -57,11 +57,11 @@ https://www.dealii.org.
 Continuous Integration Status:
 ------------------------
 
-| System | Status | Info |
+| System | Status | More information |
 | --- | --- | --- |
-| indent | [![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii) | using https://travis-ci.org |
-| Linux | [![Build Status](https://jenkins.tjhei.info/job/dealii/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii/job/master/) | using https://jenkins.tjhei.info |
-| MacOS | [![Build Status](https://jenkins.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii-OSX/job/master/) | using https://jenkins.tjhei.info |
-| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/e1kltrbje54ikah8/branch/master?svg=true)](https://ci.appveyor.com/project/tjhei/dealii-8th3t/branch/master) | using https://appveyor.com |
-| CDash | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.43-1.org%2Findex.php%3Fproject%3Ddeal.II)](https://cdash.43-1.org/index.php?project=deal.II) | various builds and configurations on https://cdash.43-1.org/index.php?project=deal.II |
+| Indent | [![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii) | See https://travis-ci.org |
+| Linux | [![Build Status](https://jenkins.tjhei.info/job/dealii/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii/job/master/) | See https://jenkins.tjhei.info |
+| MacOS | [![Build Status](https://jenkins.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii-OSX/job/master/) | See https://jenkins.tjhei.info |
+| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/e1kltrbje54ikah8/branch/master?svg=true)](https://ci.appveyor.com/project/tjhei/dealii-8th3t/branch/master) | See https://appveyor.com |
+| CDash | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.43-1.org%2Findex.php%3Fproject%3Ddeal.II)](https://cdash.43-1.org/index.php?project=deal.II) | Various builds and configurations on https://cdash.43-1.org/index.php?project=deal.II |
 
