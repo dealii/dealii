@@ -61,6 +61,12 @@ namespace python
     PointWrapper
     transform_real_to_unit_cell(CellAccessorWrapper &cell, PointWrapper &point);
 
+    /**
+     * Get the underlying mapping
+     */
+    void *
+    get_mapping();
+
   private:
     /**
      * Dimension of the underlying Mapping object.

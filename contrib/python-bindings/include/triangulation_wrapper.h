@@ -21,6 +21,7 @@
 #include <boost/python.hpp>
 
 #include <manifold_wrapper.h>
+#include <mapping_wrapper.h>
 #include <point_wrapper.h>
 
 #include <string>
@@ -315,6 +316,44 @@ namespace python
      */
     void
     flatten_triangulation(TriangulationWrapper &tria_out);
+
+    /**
+     * Take a 2d Triangulation that is being extruded in z direction by
+     * the total height of height using n_slices slices (minimum is 2).
+     * The boundary indicators of the faces of input are going to be
+     * assigned to the corresponding side walls in z direction. The
+     * bottom and top get the next two free boundary indicators.
+     */
+    void
+    extrude_triangulation(const unsigned int    n_slices,
+                          const double          height,
+                          TriangulationWrapper &tria_out);
+
+    /**
+     * Distort the given triangulation by randomly moving around all the
+     * vertices of the grid. The direction of movement of each vertex is
+     * random, while the length of the shift vector has a value of factor
+     * times the minimal length of the active edges adjacent to this vertex.
+     * Note that factor should obviously be well below 0.5.
+     */
+    void
+    distort_random(const double factor, const bool keep_boundary = true);
+
+    /**
+     * Transform the vertices of the given triangulation by applying the
+     * function object provided as first argument to all its vertices.
+     */
+    void
+    transform(boost::python::object &transformation);
+
+    /**
+     * Find and return an active cell that surrounds a given point p.
+     * The mapping used to determine whether the given point is inside a given
+     * cell.
+     */
+    CellAccessorWrapper
+    find_active_cell_around_point(PointWrapper &          p,
+                                  MappingQGenericWrapper &mapping);
 
     /**
      * Assign a manifold object to a certain part of the triangulation.

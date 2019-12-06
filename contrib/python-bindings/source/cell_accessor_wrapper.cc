@@ -173,6 +173,22 @@ namespace python
       return PointWrapper(barycenter_list);
     }
 
+    template <int dim, int spacedim>
+    PointWrapper
+    get_center(const bool  respect_manifold,
+               const bool  interpolate_from_surrounding,
+               const void *cell_accessor)
+    {
+      const CellAccessor<dim, spacedim> *cell =
+        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
+      Point<spacedim> center =
+        cell->center(respect_manifold, interpolate_from_surrounding);
+      boost::python::list center_list;
+      for (int i = 0; i < spacedim; ++i)
+        center_list.append(center[i]);
+
+      return PointWrapper(center_list);
+    }
 
 
     template <int dim, int spacedim>
@@ -492,6 +508,26 @@ namespace python
       return internal::get_barycenter<2, 3>(cell_accessor);
     else
       return internal::get_barycenter<3, 3>(cell_accessor);
+  }
+
+
+
+  PointWrapper
+  CellAccessorWrapper::get_center(const bool respect_manifold,
+                                  const bool interpolate_from_surrounding) const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::get_center<2, 2>(respect_manifold,
+                                        interpolate_from_surrounding,
+                                        cell_accessor);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::get_center<2, 3>(respect_manifold,
+                                        interpolate_from_surrounding,
+                                        cell_accessor);
+    else
+      return internal::get_center<3, 3>(respect_manifold,
+                                        interpolate_from_surrounding,
+                                        cell_accessor);
   }
 
 
