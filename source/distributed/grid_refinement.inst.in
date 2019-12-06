@@ -15,6 +15,44 @@
 
 
 
+for (S : REAL_SCALARS)
+  {
+    namespace internal
+    \{
+      namespace parallel
+      \{
+        namespace distributed
+        \{
+          namespace GridRefinement
+          \{
+            template std::pair<S, S>
+            compute_global_min_and_max_at_root<S>(const dealii::Vector<S> &,
+                                                  MPI_Comm);
+
+            namespace RefineAndCoarsenFixedNumber
+            \{
+              template S
+              compute_threshold<S>(const dealii::Vector<S> &,
+                                   const std::pair<double, double> &,
+                                   const unsigned int,
+                                   MPI_Comm);
+            \}
+            namespace RefineAndCoarsenFixedFraction
+            \{
+              template S
+              compute_threshold<S>(const dealii::Vector<S> &,
+                                   const std::pair<double, double> &,
+                                   const double,
+                                   MPI_Comm);
+            \}
+          \}
+        \}
+      \}
+    \}
+  }
+
+
+
 for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
   {
     namespace parallel
