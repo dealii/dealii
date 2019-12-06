@@ -231,10 +231,10 @@ GridRefinement::refine_and_coarsen_fixed_number(
           else
             {
               std::nth_element(tmp.begin(),
-                               tmp.begin() + refine_cells,
+                               tmp.begin() + refine_cells - 1,
                                tmp.end(),
                                std::greater<double>());
-              refine(tria, criteria, *(tmp.begin() + refine_cells));
+              refine(tria, criteria, *(tmp.begin() + refine_cells - 1));
             }
         }
 
@@ -292,14 +292,13 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 
   // compute thresholds
   typename Vector<Number>::const_iterator pp = tmp.begin();
-  for (double sum = 0;
-       (sum < top_fraction * total_error) && (pp != (tmp.end() - 1));
+  for (double sum = 0; (sum < top_fraction * total_error) && (pp != tmp.end());
        ++pp)
     sum += *pp;
   double top_threshold = (pp != tmp.begin() ? (*pp + *(pp - 1)) / 2 : *pp);
   typename Vector<Number>::const_iterator qq = (tmp.end() - 1);
   for (double sum = 0;
-       (sum < bottom_fraction * total_error) && (qq != tmp.begin());
+       (sum < bottom_fraction * total_error) && (qq != tmp.begin() - 1);
        --qq)
     sum += *qq;
   double bottom_threshold = (qq != (tmp.end() - 1) ? (*qq + *(qq + 1)) / 2 : 0);
@@ -318,7 +317,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
   // refinemnt as well.
   {
     const unsigned int refine_cells  = pp - tmp.begin(),
-                       coarsen_cells = tmp.end() - qq;
+                       coarsen_cells = tmp.end() - 1 - qq;
 
     if (static_cast<unsigned int>(
           tria.n_active_cells() +
