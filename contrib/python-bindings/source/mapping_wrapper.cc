@@ -222,6 +222,14 @@ namespace python
                                                          p.point);
   }
 
+
+
+  void *
+  MappingQGenericWrapper::get_mapping()
+  {
+    return mapping_ptr;
+  }
+
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE

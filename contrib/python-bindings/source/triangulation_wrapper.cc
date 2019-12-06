@@ -485,6 +485,73 @@ namespace python
 
 
     template <int dim, int spacedim>
+    void
+    distort_random(const double factor,
+                   const bool   keep_boundary,
+                   void *       triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+
+      GridTools::distort_random(factor, *tria, keep_boundary);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    transform(boost::python::object &transformation, void *triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+
+      auto func = [&transformation](const Point<spacedim> &p_in) {
+        boost::python::list p_list_in;
+
+        for (int d = 0; d < spacedim; ++d)
+          p_list_in.append(p_in[d]);
+
+        boost::python::list p_list_out =
+          boost::python::extract<boost::python::list>(
+            transformation(p_list_in));
+
+        Point<spacedim> p_out;
+
+        for (int d = 0; d < spacedim; ++d)
+          p_out[d] = boost::python::extract<double>(p_list_out[d]);
+
+        return p_out;
+      };
+
+      GridTools::transform(func, *tria);
+    }
+
+
+
+    template <int dim, int spacedim>
+    std::pair<int, int>
+    find_active_cell_around_point(PointWrapper &          p,
+                                  MappingQGenericWrapper &mapping_wrapper,
+                                  void *                  triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+
+      Point<spacedim> point = *(static_cast<Point<spacedim> *>(p.get_point()));
+
+      const MappingQGeneric<dim, spacedim> *mapping =
+        static_cast<const MappingQGeneric<dim, spacedim> *>(
+          mapping_wrapper.get_mapping());
+
+      auto cell_pair =
+        GridTools::find_active_cell_around_point(*mapping, *tria, point);
+
+      return std::make_pair(cell_pair.first->level(), cell_pair.first->index());
+    }
+
+
+
+    template <int dim, int spacedim>
     boost::python::list
     active_cells(TriangulationWrapper &triangulation_wrapper)
     {
@@ -1195,6 +1262,91 @@ namespace python
       internal::flatten_triangulation<2, 3, 2>(triangulation, tria_out);
     else
       internal::flatten_triangulation<3, 3, 3>(triangulation, tria_out);
+  }
+
+
+
+  void
+  TriangulationWrapper::extrude_triangulation(
+    const unsigned int    n_slices,
+    const double          height,
+    TriangulationWrapper &triangulation_out)
+  {
+    AssertThrow((dim == 2) && (spacedim == 2),
+                ExcMessage(
+                  "Extrude can only be applied to the dim and spacedim two."));
+    AssertThrow((triangulation_out.get_dim() == 3) &&
+                  (triangulation_out.get_spacedim() == 3),
+                ExcMessage(
+                  "The output Triangulation must be of dimension three"));
+
+    if ((dim == 2) && (spacedim == 2))
+      {
+        Triangulation<2, 2> *tria =
+          static_cast<Triangulation<2, 2> *>(triangulation);
+        Triangulation<3, 3> *tria_out = static_cast<Triangulation<3, 3> *>(
+          triangulation_out.get_triangulation());
+        GridGenerator::extrude_triangulation(*tria,
+                                             n_slices,
+                                             height,
+                                             *tria_out);
+      }
+  }
+
+
+
+  void
+  TriangulationWrapper::distort_random(const double factor,
+                                       const bool   keep_boundary)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::distort_random<2, 2>(factor, keep_boundary, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::distort_random<2, 3>(factor, keep_boundary, triangulation);
+    else
+      internal::distort_random<3, 3>(factor, keep_boundary, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::transform(boost::python::object &transformation)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::transform<2, 2>(transformation, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::transform<2, 3>(transformation, triangulation);
+    else
+      internal::transform<3, 3>(transformation, triangulation);
+  }
+
+
+
+  CellAccessorWrapper
+  TriangulationWrapper::find_active_cell_around_point(
+    PointWrapper &          p,
+    MappingQGenericWrapper &mapping)
+  {
+    std::pair<int, int> level_index_pair;
+    if ((dim == 2) && (spacedim == 2))
+      level_index_pair =
+        internal::find_active_cell_around_point<2, 2>(p,
+                                                      mapping,
+                                                      triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      level_index_pair =
+        internal::find_active_cell_around_point<2, 3>(p,
+                                                      mapping,
+                                                      triangulation);
+    else
+      level_index_pair =
+        internal::find_active_cell_around_point<3, 3>(p,
+                                                      mapping,
+                                                      triangulation);
+
+    return CellAccessorWrapper(*this,
+                               level_index_pair.first,
+                               level_index_pair.second);
   }
 
 
