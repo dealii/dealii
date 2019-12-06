@@ -16,6 +16,8 @@
 #ifndef dealii_sparse_mic_h
 #define dealii_sparse_mic_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/sparse_decomposition.h>
 #include <deal.II/lac/sparse_matrix.h>
 

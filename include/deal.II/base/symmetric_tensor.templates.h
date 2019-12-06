@@ -17,6 +17,8 @@
 #define dealii_symmetric_tensor_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/symmetric_tensor.h>
 

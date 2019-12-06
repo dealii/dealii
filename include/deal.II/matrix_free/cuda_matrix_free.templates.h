@@ -17,6 +17,8 @@
 #ifndef dealii_cuda_matrix_free_templates_h
 #define dealii_cuda_matrix_free_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE

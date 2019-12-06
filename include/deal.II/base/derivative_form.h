@@ -16,6 +16,8 @@
 #ifndef dealii_derivative_form_h
 #define dealii_derivative_form_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN

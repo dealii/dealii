@@ -16,6 +16,8 @@
 #ifndef dealii_solver_bfgs_h
 #define dealii_solver_bfgs_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/solver.h>
 
 #include <deal.II/numerics/history.h>

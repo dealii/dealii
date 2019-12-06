@@ -16,6 +16,8 @@
 #ifndef dealii_fully_distributed_tria_util_h
 #define dealii_fully_distributed_tria_util_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/distributed/fully_distributed_tria.h>
 
 DEAL_II_NAMESPACE_OPEN

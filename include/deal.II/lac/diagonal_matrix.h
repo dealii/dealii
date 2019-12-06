@@ -17,6 +17,8 @@
 #define dealii_diagonal_matrix_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operation.h>
 

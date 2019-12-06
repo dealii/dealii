@@ -16,6 +16,8 @@
 #ifndef dealii_matrix_free_mapping_info_templates_h
 #define dealii_matrix_free_mapping_info_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/thread_management.h>

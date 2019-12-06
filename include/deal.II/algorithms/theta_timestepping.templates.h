@@ -17,6 +17,8 @@
 #define dealii_theta_timestepping_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/theta_timestepping.h>
 
 #include <deal.II/base/parameter_handler.h>

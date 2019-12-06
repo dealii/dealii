@@ -18,6 +18,8 @@
 #define dealii_matrix_free_face_info_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>

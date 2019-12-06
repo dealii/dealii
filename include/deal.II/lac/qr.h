@@ -16,6 +16,8 @@
 #ifndef dealii_qr_h
 #define dealii_qr_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/std_cxx14/memory.h>
 

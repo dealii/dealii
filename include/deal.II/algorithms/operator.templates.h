@@ -17,6 +17,8 @@
 #define dealii_operator_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/operator.h>
 
 #include <deal.II/base/logstream.h>

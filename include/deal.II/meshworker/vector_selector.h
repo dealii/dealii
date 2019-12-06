@@ -16,6 +16,8 @@
 #ifndef dealii_mesh_worker_vector_selector_h
 #define dealii_mesh_worker_vector_selector_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/named_selection.h>
 

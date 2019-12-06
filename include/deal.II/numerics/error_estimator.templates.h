@@ -16,6 +16,8 @@
 #ifndef dealii_error_estimator_templates_h
 #define dealii_error_estimator_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>

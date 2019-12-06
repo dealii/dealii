@@ -15,6 +15,10 @@
 
 #ifndef dealii_multigrid_templates_h
 #define dealii_multigrid_templates_h
+
+
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/logstream.h>
 
 #include <deal.II/multigrid/multigrid.h>

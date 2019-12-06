@@ -16,6 +16,8 @@
 #ifndef dealii_fe_nedelec_sz_h
 #define dealii_fe_nedelec_sz_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 #include <deal.II/base/qprojector.h>

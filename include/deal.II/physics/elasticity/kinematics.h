@@ -17,6 +17,8 @@
 #define dealii_elasticity_kinematics_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>

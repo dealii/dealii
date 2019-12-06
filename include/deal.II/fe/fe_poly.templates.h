@@ -17,6 +17,8 @@
 #define dealii_fe_poly_templates_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>

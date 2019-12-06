@@ -17,6 +17,8 @@
 #define dealii_qprojector_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 

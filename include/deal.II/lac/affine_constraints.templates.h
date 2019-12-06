@@ -16,6 +16,8 @@
 #ifndef dealii_affine_constraints_templates_h
 #define dealii_affine_constraints_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/cuda_size.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>

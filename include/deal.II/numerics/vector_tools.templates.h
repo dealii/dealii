@@ -17,6 +17,8 @@
 #ifndef dealii_vector_tools_templates_h
 #define dealii_vector_tools_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/numbers.h>

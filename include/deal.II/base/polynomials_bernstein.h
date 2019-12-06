@@ -17,6 +17,8 @@
 #define dealii_polynomials_bernstein_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/polynomial.h>
 
 #include <fstream>

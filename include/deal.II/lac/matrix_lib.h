@@ -16,6 +16,8 @@
 #ifndef dealii_matrix_lib_h
 #define dealii_matrix_lib_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/solver_richardson.h>

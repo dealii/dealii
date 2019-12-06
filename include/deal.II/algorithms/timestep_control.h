@@ -17,6 +17,8 @@
 #ifndef dealii_time_step_control_h
 #define dealii_time_step_control_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
