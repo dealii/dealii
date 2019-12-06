@@ -26,8 +26,6 @@ SET(_unity_include_src
   chunk_sparsity_pattern.cc
   dynamic_sparsity_pattern.cc
   exceptions.cc
-  full_matrix.cc
-  lapack_full_matrix.cc
   scalapack.cc
   la_vector.cc
   la_parallel_vector.cc
@@ -50,14 +48,17 @@ SET(_unity_include_src
   sparsity_pattern.cc
   sparsity_tools.cc
   swappable_vector.cc
-  tridiagonal_matrix.cc
   vector.cc
   vector_memory.cc
   )
 
+# make sure that files requiring the LAPACK wrappers are compiled separately.
 SET(_separate_src
+  full_matrix.cc
+  lapack_full_matrix.cc
   sparse_matrix.cc
   sparse_matrix_inst2.cc
+  tridiagonal_matrix.cc
   )
 
 # Add CUDA wrapper files
