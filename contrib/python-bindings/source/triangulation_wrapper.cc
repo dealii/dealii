@@ -554,13 +554,15 @@ namespace python
 
       tria->clear();
 
-      typename GridIn<dim, spacedim>::Format input_format;
+      typename GridIn<dim, spacedim>::Format input_format =
+        GridIn<dim, spacedim>::Format::Default;
       if (format.compare("msh") == 0)
         input_format = GridIn<dim, spacedim>::Format::msh;
       else if (format.compare("vtk") == 0)
         input_format = GridIn<dim, spacedim>::Format::vtk;
       else
-        ExcMessage("Cannot read triangulation of the given format.");
+        Assert(false,
+               ExcMessage("Cannot read triangulation of the given format."));
 
       GridIn<dim, spacedim> mesh_reader;
       mesh_reader.attach_triangulation(*tria);
