@@ -3011,7 +3011,7 @@ namespace Differentiation
      *     // This example is sufficiently complex to warrant the use of AD to,
      *     // at the very least, verify an unassisted implementation.
      *     const double mu_e = 10;          // Shear modulus
-     *     const double lambda_e = 15;      // Lame parameter
+     *     const double lambda_e = 15;      // Lam&eacute; parameter
      *     const double mu_0 = 4*M_PI*1e-7; // Magnetic permeability constant
      *     const double mu_r = 5;           // Relative magnetic permeability
      *
