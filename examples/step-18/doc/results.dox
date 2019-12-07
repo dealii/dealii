@@ -463,7 +463,7 @@ Incompressibility is characterized by Poisson's ratio
 @f[
   \nu = \frac{\lambda}{2(\lambda+\mu)},
 @f]
-where $\lambda,\mu$ are the Lam\'e constants of the material.
+where $\lambda,\mu$ are the Lam&eacute; constants of the material.
 Physical constraints indicate that $-1\le \nu\le \frac 12$ (the condition
 also follows from mathematical stability considerations). If $\nu$
 approaches $\frac 12$, then the material becomes incompressible. In that

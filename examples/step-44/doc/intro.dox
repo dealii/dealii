@@ -286,7 +286,7 @@ The Helmholtz free energy corresponding to a compressible <a href="http://en.wik
         \underbrace{\kappa [ \mathcal{G}(J) ] }_{\Psi_{\textrm{vol}}(J)}
         + \underbrace{\bigl[c_1 [ \overline{I}_1 - 3] \bigr]}_{\Psi_{\text{iso}}(\overline{\mathbf{b}})} \, ,
 @f]
-where $\kappa \dealcoloneq \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lame parameters)
+where $\kappa \dealcoloneq \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lam&eacute; parameters)
 and $\overline{I}_1 \dealcoloneq \textrm{tr}\ \overline{\mathbf{b}}$.
 The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$,
 among others, see Holzapfel (2001) for further details.
