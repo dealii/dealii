@@ -1716,7 +1716,7 @@ namespace internal
                     else
                       r0 += shapes[mid * offset + col] * xmid;
                   }
-                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0))
+                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0 || mm == 3))
                   r0 += shapes[col * offset + mid] * xmid;
 
                 if (add == false)
@@ -1737,7 +1737,7 @@ namespace internal
                   }
               }
             if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
-                mm % 2 == 1)
+                mm % 2 == 1 && mm > 3)
               {
                 if (add == false)
                   out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;

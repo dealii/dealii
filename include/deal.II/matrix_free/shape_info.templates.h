@@ -30,6 +30,8 @@
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_q_dg0.h>
 
+#include <deal.II/lac/householder.h>
+
 #include <deal.II/matrix_free/shape_info.h>
 
 
@@ -277,15 +279,115 @@ namespace internal
         {
           shape_gradients_collocation.resize(n_q_points_1d * n_q_points_1d);
           shape_hessians_collocation.resize(n_q_points_1d * n_q_points_1d);
-          FE_DGQArbitraryNodes<1> fe(quad.get_points());
+          FE_DGQArbitraryNodes<1> fe_coll(quad.get_points());
           for (unsigned int i = 0; i < n_q_points_1d; ++i)
             for (unsigned int q = 0; q < n_q_points_1d; ++q)
               {
                 shape_gradients_collocation[i * n_q_points_1d + q] =
-                  fe.shape_grad(i, quad.get_points()[q])[0];
+                  fe_coll.shape_grad(i, quad.get_points()[q])[0];
                 shape_hessians_collocation[i * n_q_points_1d + q] =
-                  fe.shape_grad_grad(i, quad.get_points()[q])[0][0];
+                  fe_coll.shape_grad_grad(i, quad.get_points()[q])[0][0];
               }
+
+          // compute the inverse shape functions in three steps: we first
+          // change from the given quadrature formula and the associated
+          // Lagrange polynomials to the Lagrange polynomials at quadrature
+          // points. in this basis, we can then perform the second step, which
+          // is the computation of a projection matrix from the potentially
+          // higher polynomial degree associated to the quadrature points to a
+          // polynomial space of degree equal to the degree of the given
+          // elements. in the third step, we change from the Lagrange
+          // polynomials in the Gauss quadrature points to the polynomial
+          // space of the given element
+
+          // step 1: change basis from the Lagrange polynomials at the given
+          // quadrature points to the Lagrange basis at Gauss quadrature
+          // points. this is often the identity operation as we often compute
+          // with Gaussian quadrature, but not necessarily so
+          QGauss<1>          quad_gauss(n_q_points_1d);
+          FullMatrix<double> transform_to_gauss(n_q_points_1d, n_q_points_1d);
+          for (unsigned int i = 0; i < n_q_points_1d; ++i)
+            for (unsigned int j = 0; j < n_q_points_1d; ++j)
+              transform_to_gauss(i, j) =
+                fe_coll.shape_value(j, quad_gauss.point(i));
+
+          // step 2: computation for the projection (in reference coordinates)
+          // from higher to lower polynomial degree
+          //
+          // loop over quadrature points, multiply by q-weight on high degree
+          // integrate loop going from high degree to low degree loop over new
+          // points, multiply by inverse q-weight on low degree
+          //
+          // This projection step is for the special case of Lagrange
+          // polynomials where most of the interpolation matrices are unit
+          // matrices when applying the inverse mass matrix, so we do not need
+          // to compute much.
+          QGauss<1>               quad_project(n_dofs_1d);
+          FE_DGQArbitraryNodes<1> fe_project(quad_project.get_points());
+
+          FullMatrix<double> project_gauss(n_dofs_1d, n_q_points_1d);
+
+          for (unsigned int i = 0; i < n_dofs_1d; ++i)
+            for (unsigned int q = 0; q < n_q_points_1d; ++q)
+              project_gauss(i, q) =
+                fe_project.shape_value(i, quad_gauss.get_points()[q]) *
+                (quad_gauss.weight(q) / quad_project.weight(i));
+          FullMatrix<double> project_to_dof_space(n_dofs_1d, n_q_points_1d);
+          project_gauss.mmult(project_to_dof_space, transform_to_gauss);
+
+          // step 3: change the basis back to the given finite element
+          // space. we can use a shortcut for elements that define support
+          // points, in which case we can evaluate the Lagrange polynomials of
+          // the Gauss quadrature in those points. this will give more
+          // accurate results than the inversion of a matrix. for more general
+          // polynomial spaces, we must invert a matrix of a Vandermonde type,
+          // which we do by a Householder transformation to keep roundoff
+          // errors low.
+          inverse_shape_values.resize_fast(array_size);
+          FullMatrix<double> transform_from_gauss(n_dofs_1d, n_dofs_1d);
+          if (fe->has_support_points())
+            {
+              for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                for (unsigned int j = 0; j < n_dofs_1d; ++j)
+                  transform_from_gauss(i, j) = fe_project.shape_value(
+                    j,
+                    Point<1>(
+                      fe->get_unit_support_points()[scalar_lexicographic[i]]
+                                                   [0]));
+              FullMatrix<double> result(n_dofs_1d, n_q_points_1d);
+              transform_from_gauss.mmult(result, project_to_dof_space);
+
+              // set very small entries to zero - we are in reference space
+              // with normalized numbers, so this is straight-forward to check
+              // here
+              for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                for (unsigned int q = 0; q < n_q_points_1d; ++q)
+                  inverse_shape_values[i * n_q_points_1d + q] =
+                    std::abs(result(i, q)) < 1e-15 ? 0 : result(i, q);
+            }
+          else
+            {
+              for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                for (unsigned int j = 0; j < n_dofs_1d; ++j)
+                  {
+                    Point<dim> q_point = unit_point;
+                    q_point[0]         = quad_project.point(i)[0];
+
+                    transform_from_gauss(i, j) =
+                      fe->shape_value(scalar_lexicographic[j], q_point);
+                  }
+              Householder<double> H(transform_from_gauss);
+              Vector<double>      in(n_dofs_1d), out(n_dofs_1d);
+              for (unsigned int q = 0; q < n_q_points_1d; ++q)
+                {
+                  for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                    in(i) = project_to_dof_space(i, q);
+                  H.least_squares(out, in);
+                  for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                    inverse_shape_values[i * n_q_points_1d + q] =
+                      std::abs(out(i)) < 1e-15 ? 0. : out(i);
+                }
+            }
         }
 
       if (element_type == tensor_general &&
@@ -419,8 +521,8 @@ namespace internal
             return false;
 
       // shape values should be zero at x=0.5 for all basis functions except
-      // for the middle one
-      if (n_q_points_1d % 2 == 1 && n_dofs_1d % 2 == 1)
+      // for the middle one for degrees of 4 and higher
+      if (n_dofs_1d > 3 && n_q_points_1d % 2 == 1 && n_dofs_1d % 2 == 1)
         {
           for (unsigned int i = 0; i < n_dofs_1d / 2; ++i)
             if (std::abs(get_first_array_element(
@@ -460,36 +562,36 @@ namespace internal
             return false;
 
       auto convert_to_eo = [](const AlignedVector<Number> &array,
-                              const unsigned               n_points_dst,
-                              const unsigned               n_points_src) {
-        const unsigned int    stride = (n_points_dst + 1) / 2;
-        AlignedVector<Number> array_eo(n_points_src * stride);
-        for (unsigned int i = 0; i < n_points_src / 2; ++i)
+                              const unsigned               n_rows,
+                              const unsigned               n_cols) {
+        const unsigned int    stride = (n_cols + 1) / 2;
+        AlignedVector<Number> array_eo(n_rows * stride);
+        for (unsigned int i = 0; i < n_rows / 2; ++i)
           for (unsigned int q = 0; q < stride; ++q)
             {
               array_eo[i * stride + q] =
-                0.5 * (array[i * n_points_dst + q] +
-                       array[i * n_points_dst + n_points_dst - 1 - q]);
-              array_eo[(n_points_src - 1 - i) * stride + q] =
-                0.5 * (array[i * n_points_dst + q] -
-                       array[i * n_points_dst + n_points_dst - 1 - q]);
+                0.5 *
+                (array[i * n_cols + q] + array[i * n_cols + n_cols - 1 - q]);
+              array_eo[(n_rows - 1 - i) * stride + q] =
+                0.5 *
+                (array[i * n_cols + q] - array[i * n_cols + n_cols - 1 - q]);
             }
-        if ((n_points_src - 1) % 2 == 0)
+        if ((n_rows - 1) % 2 == 0)
           for (unsigned int q = 0; q < stride; ++q)
             {
-              array_eo[(n_points_src - 1) / 2 * stride + q] =
-                array[((n_points_src - 1) / 2) * n_points_dst + q];
+              array_eo[(n_rows - 1) / 2 * stride + q] =
+                array[((n_rows - 1) / 2) * n_cols + q];
             }
 
         return array_eo;
       };
 
       shape_values_eo =
-        convert_to_eo(shape_values, n_q_points_1d, fe_degree + 1);
+        convert_to_eo(shape_values, fe_degree + 1, n_q_points_1d);
       shape_gradients_eo =
-        convert_to_eo(shape_gradients, n_q_points_1d, fe_degree + 1);
+        convert_to_eo(shape_gradients, fe_degree + 1, n_q_points_1d);
       shape_hessians_eo =
-        convert_to_eo(shape_hessians, n_q_points_1d, fe_degree + 1);
+        convert_to_eo(shape_hessians, fe_degree + 1, n_q_points_1d);
 
       // FE_DGQArbitraryNodes underflow (see also above where
       // shape_gradients_collocation and shape_hessians_collocation is set up).
@@ -503,6 +605,8 @@ namespace internal
             convert_to_eo(shape_hessians_collocation,
                           n_q_points_1d,
                           n_q_points_1d);
+          inverse_shape_values_eo =
+            convert_to_eo(inverse_shape_values, fe_degree + 1, n_q_points_1d);
         }
 
       return true;
@@ -572,10 +676,9 @@ namespace internal
       return memory;
     }
 
-    // end of functions for ShapeInfo
+  } // namespace MatrixFreeFunctions
 
-  } // end of namespace MatrixFreeFunctions
-} // end of namespace internal
+} // namespace internal
 
 
 DEAL_II_NAMESPACE_CLOSE
