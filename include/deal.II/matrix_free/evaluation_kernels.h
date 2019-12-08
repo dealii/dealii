@@ -3037,6 +3037,9 @@ namespace internal
 
 
 
+  /**
+   * This struct implements the action of the inverse mass matrix operation
+   */
   template <int dim, int fe_degree, int n_components, typename Number>
   struct CellwiseInverseMassMatrixImpl
   {
@@ -3078,30 +3081,30 @@ namespace internal
           Number *      out = out_array + d * dofs_per_component;
           // Need to select 'apply' method with hessian slot because values
           // assume symmetries that do not exist in the inverse shapes
-          evaluator.template hessians<0, false, false>(in, out);
+          evaluator.template hessians<0, true, false>(in, out);
           if (dim > 1)
             {
-              evaluator.template hessians<1, false, false>(out, out);
+              evaluator.template hessians<1, true, false>(out, out);
 
               if (dim == 3)
                 {
-                  evaluator.template hessians<2, false, false>(out, out);
+                  evaluator.template hessians<2, true, false>(out, out);
                   for (unsigned int q = 0; q < dofs_per_component; ++q)
                     out[q] *= inv_coefficient[q];
-                  evaluator.template hessians<2, true, false>(out, out);
+                  evaluator.template hessians<2, false, false>(out, out);
                 }
               else if (dim == 2)
                 for (unsigned int q = 0; q < dofs_per_component; ++q)
                   out[q] *= inv_coefficient[q];
 
-              evaluator.template hessians<1, true, false>(out, out);
+              evaluator.template hessians<1, false, false>(out, out);
             }
           else
             {
               for (unsigned int q = 0; q < dofs_per_component; ++q)
                 out[q] *= inv_coefficient[q];
             }
-          evaluator.template hessians<0, true, false>(out, out);
+          evaluator.template hessians<0, false, false>(out, out);
 
           inv_coefficient += shift_coefficient;
         }
@@ -3130,17 +3133,17 @@ namespace internal
 
           if (dim == 3)
             {
-              evaluator.template hessians<2, true, false>(in, out);
-              evaluator.template hessians<1, true, false>(out, out);
-              evaluator.template hessians<0, true, false>(out, out);
+              evaluator.template hessians<2, false, false>(in, out);
+              evaluator.template hessians<1, false, false>(out, out);
+              evaluator.template hessians<0, false, false>(out, out);
             }
           if (dim == 2)
             {
-              evaluator.template hessians<1, true, false>(in, out);
-              evaluator.template hessians<0, true, false>(out, out);
+              evaluator.template hessians<1, false, false>(in, out);
+              evaluator.template hessians<0, false, false>(out, out);
             }
           if (dim == 1)
-            evaluator.template hessians<0, true, false>(in, out);
+            evaluator.template hessians<0, false, false>(in, out);
         }
     }
   };
