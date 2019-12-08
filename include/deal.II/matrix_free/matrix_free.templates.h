@@ -1484,7 +1484,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         true);
       face_info.cell_and_face_boundary_id.fill(numbers::invalid_boundary_id);
 
-      for (unsigned int f = 0; f < task_info.boundary_partition_data.back();
+      for (unsigned int f = 0; f < task_info.ghost_face_partition_data.back();
            ++f)
         for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
                                  face_info.faces[f].cells_interior[v] !=
