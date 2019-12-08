@@ -137,7 +137,8 @@ namespace Step42
   // The constructor of the ConstitutiveLaw class sets the required material
   // parameter for our deformable body. Material parameters for elastic
   // isotropic media can be defined in a variety of ways, such as the pair $E,
-  // \nu$ (elastic modulus and Poisson's number), using the Lame parameters
+  // \nu$ (elastic modulus and Poisson's number), using the Lam&eacute;
+  // parameters
   // $\lambda,mu$ or several other commonly used conventions. Here, the
   // constructor takes a description of material parameters in the form of
   // $E,\nu$, but since this turns out to these are not the coefficients that

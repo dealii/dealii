@@ -72,7 +72,7 @@ relationship between strain $\varepsilon(\mathbf u)=\frac{1}{2}\left(\nabla \mat
 the fourth-order compliance tensor $A$; $\varepsilon^p$ provides the plastic
 component of the strain to ensure that the stress does not exceed the yield
 stress. We will only consider isotropic
-materials for which $A$ can be expressed in terms of the Lam\'e moduli
+materials for which $A$ can be expressed in terms of the Lam&eacute; moduli
 $\lambda$ and $\mu$ or alternatively in terms of the bulk modulus
 $\kappa$ and $\mu$.
 The second equation is the force balance; we will here

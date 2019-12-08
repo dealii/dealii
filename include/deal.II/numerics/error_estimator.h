@@ -157,8 +157,8 @@ namespace hp
  * finite element field and each component of the error estimator will then be
  * weighted by the respective component in this coefficient function. In the
  * other case, when all components have the same meaning (for example the
- * displacements in Lame's equations of elasticity), you can specify a scalar
- * coefficient which will then be used for all components.
+ * displacements in Lam&eacute;'s equations of elasticity), you can specify a
+ * scalar coefficient which will then be used for all components.
  *
  *
  * <h3>Boundary values</h3>

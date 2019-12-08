@@ -504,8 +504,8 @@ namespace Step44
   // 1 - 2\textrm{ln}\; \widetilde{J} ]$, where $\kappa \dealcoloneq \lambda +
   // 2/3 \mu$ is the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk
   // modulus</a> and $\lambda$ is <a
-  // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first
-  // parameter</a>.
+  // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lam&eacute;'s
+  // first parameter</a>.
   //
   // The following class will be used to characterize the material we work with,
   // and provides a central point that one would need to modify if one were to
