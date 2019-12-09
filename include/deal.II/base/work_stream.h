@@ -126,7 +126,11 @@ DEAL_II_NAMESPACE_OPEN
  * Once an item is processed by the copier, it is deleted and the ScratchData
  * and CopyData objects that were used in its computation are considered
  * unused and may be re-used for the next invocation of the worker function,
- * on this or another thread.
+ * on this or another thread. However, the WorkStream functions make no
+ * attempt to reset these objects to any kind of pristine state -- a worker
+ * should assume that the CopyData object it gets handed has prior content
+ * and clear it first in whatever manner seems appropriate, before putting
+ * content into it that can later be processed again by the copier.
  *
  * The member variables in ScratchData and CopyData can be accessed
  * independently of other concurrent uses of copies of these data structures.
@@ -139,7 +143,13 @@ DEAL_II_NAMESPACE_OPEN
  * CopyData can be resized in accordance with the number of local DoFs on the
  * current cell.
  *
- * The functions in this namespace only really work in parallel when
+ * @note For integration over cells and faces, it is often useful to use
+ * methods more specific to the task than the current function (which doesn't
+ * care whether the iterators are over cells, vector elements, or any other
+ * kind of range). An implementation of an interface specifically suited to
+ * integration is the MeshWorker::mesh_loop() function.
+ *
+ * @note The functions in this namespace only really work in parallel when
  * multithread mode was selected during deal.II configuration. Otherwise they
  * simply work on each item sequentially.
  *

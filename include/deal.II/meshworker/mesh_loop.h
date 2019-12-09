@@ -120,7 +120,7 @@ namespace MeshWorker
    * identify the corresponding subface on either the current or the neighbor
    * faces.
    *
-   * This method externalises that logic (which is independent from user codes)
+   * This method externalizes that logic (which is independent from user codes)
    * and separates the assembly of face terms (internal faces, boundary faces,
    * or faces between different subdomain ids on parallel computations) from
    * the assembling on cells, allowing the user to specify two additional
@@ -128,7 +128,7 @@ namespace MeshWorker
    * are called automatically in each @p cell, according to the specific
    * AssembleFlags @p flags that are passed. The @p cell_worker is passed the
    * cell identifier, a ScratchData object, and a CopyData object, following
-   * the same principles of WorkStream::run. Internally the function passes to
+   * the same principles of WorkStream::run(). Internally the function passes to
    * @p boundary_worker, in addition to the above, also a @p face_no parameter
    * that identifies the face on which the integration should be performed. The
    * @p face_worker instead needs to identify the current face unambiguously
@@ -155,7 +155,14 @@ namespace MeshWorker
    *
    * The two data types ScratchData and CopyData need to have a working copy
    * constructor. ScratchData is only used in the worker function, while
-   * CopyData is the object passed from the worker to the copier.
+   * CopyData is the object passed from the worker to the copier. The CopyData
+   * object is reset to the value provided to this function every time this
+   * function visits a new cell (where it then calls the cell and face
+   * workers). In other words, no state carries over between calling the
+   * `copier` on one cell and the `cell_worker`/`face_worker`/`boundary_worker`
+   * functions on the next cell, and user code needs not reset the copy
+   * object either at the beginning of the cell integration or end of the
+   * copy operation.
    *
    * The queue_length argument indicates the number of items that can be live at
    * any given time. Each item consists of chunk_size elements of the input
@@ -164,7 +171,7 @@ namespace MeshWorker
    *
    * If your data objects are large, or their constructors are expensive, it is
    * helpful to keep in mind that queue_length copies of the ScratchData object
-   * and queue_length*chunk_size copies of the CopyData object are generated.
+   * and `queue_length*chunk_size` copies of the CopyData object are generated.
    *
    * @note More information about requirements on template types and meaning
    * of @p queue_length and @p chunk_size can be found in the documentation of the
