@@ -1778,6 +1778,15 @@ public:
     VectorizedArrayType::n_array_elements> &
   get_face_info(const unsigned int face_batch_number) const;
 
+
+  /**
+   * Return the table that translates a triple of the macro cell number,
+   * the index of a face within a cell and the index within the cell batch of
+   * vectorization into the index within the faces array.
+   */
+  const Table<3, unsigned int> &
+  get_cell_and_face_to_plain_faces() const;
+
   /**
    * Obtains a scratch data object for internal use. Make sure to release it
    * afterwards by passing the pointer you obtain from this object to the
@@ -2461,6 +2470,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_info(
 {
   AssertIndexRange(macro_face, face_info.faces.size());
   return face_info.faces[macro_face];
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+inline const Table<3, unsigned int> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_and_face_to_plain_faces()
+  const
+{
+  return face_info.cell_and_face_to_plain_faces;
 }
 
 

@@ -611,6 +611,13 @@ public:
     const AlignedVector<std::array<T, VectorizedArrayType::n_array_elements>>
       &array) const;
 
+  /**
+   * Return the id of the cells this FEEvaluation or FEFaceEvaluation is
+   * associated with.
+   */
+  std::array<unsigned int, VectorizedArrayType::n_array_elements>
+  get_cell_ids() const;
+
   //@}
 
   /**
@@ -3555,6 +3562,82 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     return jacobian[q_index];
 }
 
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+std::array<unsigned int, VectorizedArrayType::n_array_elements>
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  get_cell_ids() const
+{
+  const unsigned int v_len = VectorizedArrayType::n_array_elements;
+  std::array<unsigned int, VectorizedArrayType::n_array_elements> cells;
+
+  // initialize array
+  for (unsigned int i = 0; i < v_len; ++i)
+    cells[i] = numbers::invalid_unsigned_int;
+
+  if ((is_face == false) ||
+      (is_face &&
+       this->dof_access_index ==
+         internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+       this->is_interior_face))
+    {
+      // cell or interior face face (element-centric loop)
+      for (unsigned int i = 0; i < v_len; ++i)
+        cells[i] = cell * v_len + i;
+    }
+  else if (is_face &&
+           this->dof_access_index ==
+             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+           this->is_interior_face == false)
+    {
+      // exterior face (element-centric loop): for this case, we need to
+      // look into the FaceInfo field that collects information from both
+      // sides of a face once for the global mesh, and pick the face id that
+      // is not the local one (cell_this).
+      for (unsigned int i = 0; i < v_len; i++)
+        {
+          // compute actual (non vectorized) cell ID
+          const unsigned int cell_this = this->cell * v_len + i;
+          // compute face ID
+          unsigned int face_index =
+            this->matrix_info->get_cell_and_face_to_plain_faces()(this->cell,
+                                                                  this->face_no,
+                                                                  i);
+
+          if (face_index == numbers::invalid_unsigned_int)
+            continue; // invalid face ID: no neighbor on boundary
+
+          // get cell ID on both sides of face
+          auto cell_m = this->matrix_info->get_face_info(face_index / v_len)
+                          .cells_interior[face_index % v_len];
+          auto cell_p = this->matrix_info->get_face_info(face_index / v_len)
+                          .cells_exterior[face_index % v_len];
+
+          // compare the IDs with the given cell ID
+          if (cell_m == cell_this)
+            cells[i] = cell_p; // neighbor has the other ID
+          else if (cell_p == cell_this)
+            cells[i] = cell_m;
+        }
+    }
+  else if (is_face)
+    {
+      // face-centric faces
+      const unsigned int *cells_ =
+        is_interior_face ?
+          &this->matrix_info->get_face_info(cell).cells_interior[0] :
+          &this->matrix_info->get_face_info(cell).cells_exterior[0];
+      for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+        if (cells_[i] != numbers::invalid_unsigned_int)
+          cells[i] = cells_[i];
+    }
+
+  return cells;
+}
+
 
 
 template <int dim,
@@ -3569,21 +3652,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(matrix_info != nullptr, ExcNotImplemented());
   AssertDimension(array.size(),
                   matrix_info->get_task_info().cell_partition_data.back());
-  if (is_face)
-    {
-      VectorizedArrayType out = make_vectorized_array<Number>(Number(1.));
-      const unsigned int *cells =
-        is_interior_face ?
-          &this->matrix_info->get_face_info(cell).cells_interior[0] :
-          &this->matrix_info->get_face_info(cell).cells_exterior[0];
-      for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
-        if (cells[i] != numbers::invalid_unsigned_int)
-          out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
-                        [cells[i] % VectorizedArrayType::n_array_elements];
-      return out;
-    }
-  else
-    return array[cell];
+
+  // 1) collect ids of cell
+  const auto cells = this->get_cell_ids();
+
+  // 2) actually gather values
+  VectorizedArrayType out = make_vectorized_array<Number>(Number(1.));
+  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+    if (cells[i] != numbers::invalid_unsigned_int)
+      out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
+                    [cells[i] % VectorizedArrayType::n_array_elements];
+  return out;
 }
 
 
@@ -3603,21 +3682,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(matrix_info != nullptr, ExcNotImplemented());
   AssertDimension(array.size(),
                   matrix_info->get_task_info().cell_partition_data.back());
-  if (is_face)
-    {
-      std::array<T, VectorizedArrayType::n_array_elements> out;
-      const unsigned int *                                 cells =
-        is_interior_face ?
-          &this->matrix_info->get_face_info(cell).cells_interior[0] :
-          &this->matrix_info->get_face_info(cell).cells_exterior[0];
-      for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
-        if (cells[i] != numbers::invalid_unsigned_int)
-          out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
-                        [cells[i] % VectorizedArrayType::n_array_elements];
-      return out;
-    }
-  else
-    return array[cell];
+
+  // 1) collect ids of cell
+  const auto cells = this->get_cell_ids();
+
+  // 2) actually gather values
+  std::array<T, VectorizedArrayType::n_array_elements> out;
+  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+    if (cells[i] != numbers::invalid_unsigned_int)
+      out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
+                    [cells[i] % VectorizedArrayType::n_array_elements];
+  return out;
 }
 
 
@@ -7313,10 +7388,6 @@ FEFaceEvaluation<dim,
   Assert(this->mapped_geometry == nullptr,
          ExcMessage("FEEvaluation was initialized without a matrix-free object."
                     " Integer indexing is not possible"));
-  Assert(this->is_interior_face == true,
-         ExcMessage(
-           "Cell-based FEFaceEvaluation::reinit only possible for the "
-           "interior face with second argument to constructor as true"));
   if (this->mapped_geometry != nullptr)
     return;
   Assert(this->matrix_info != nullptr, ExcNotInitialized());
