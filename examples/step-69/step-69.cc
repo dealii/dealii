@@ -700,7 +700,11 @@ namespace Step69
   //   data using WorkStream. It acts as a container: it is just a
   //  struct where WorkStream stores the local cell contributions.
   // - <code>get_entry</code>: it reads the value stored at the entry
-  //  pointed by the iterator <code>it</code> of <code>matrix</code>
+  //  pointed by the iterator <code>it</code> of <code>matrix</code>. Here is
+  //  where we might want to keep an eye on complexity: we want this operation
+  //  to have constant complexity (that's the case of this implementation).
+  //  Note also that the return argument (<code>Matrix::value_type</code>) is 
+  //  going to be (in general) a double.
   // - <code>set_entry</code>: it sets <code>value</code> at the entry
   //  pointed by the iterator <code>it</code> of <code>matrix</code>.
   // - <code>gather_get_entry</code>: we note that
