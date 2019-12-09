@@ -85,11 +85,11 @@ $\mathbb{f}(\mathbf{u})$ is defined as
 
 where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
 $\otimes$ denotes the tensor product. Here, we have introduced the pressure
-$p$ that, in general, is defined by an closed-form equation of state. 
-For the tutorial we limit the discussion to the class of polytropic ideal gases 
+$p$ that, in general, is defined by an closed-form equation of state.
+For the tutorial we limit the discussion to the class of polytropic ideal gases
 for which the pressure is given by
 @f{align*}
-p = p(\textbf{u}) := (\gamma -1) \Big(E - \frac{\|\textbf{m}\|^2}{2\,\rho} 
+p = p(\textbf{u}) := (\gamma -1) \Big(E - \frac{\|\textbf{m}\|^2}{2\,\rho}
 \Big),
 @f}
 
@@ -174,7 +174,7 @@ $\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
 
 <h4>Variational versus collocation-type discretizations</h3>
 
-Following Step-9, Step-12, and Step-33, at this point it might look tempting 
+Following Step-9, Step-12, and Step-33, at this point it might look tempting
 to base a discretization of Euler's equations on a (semi-discrete) variational
 formulation:
 
@@ -187,7 +187,7 @@ formulation:
 
 Here, $\mathbb{V}_h$ is an appropriate finite element space, and
 $s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
-(possibly complemented with some ad-hoc shock-capturing technique, see for 
+(possibly complemented with some ad-hoc shock-capturing technique, see for
 instance @cite GuermondErn2004 Chapter 5 and references therein). Most
 time-dependent discretization approaches described in the deal.II tutorials
 are based on such a (semi-discrete) variational approach. Fundamentally,
@@ -204,19 +204,19 @@ $L^2(\Omega)$-norm or, more generally, some discrete (possibly mesh
 dependent) energy-norm. Variational discretizations of hyperbolic
 conservation laws have been very popular since the mid eighties, in
 particular combined with SUPG-type stabilization and/or upwinding
-techniques (see the early work of @cite Brooks1982 and @cite Johnson1986). They 
-have proven to be some of the best approaches for simulations in the subsonic 
+techniques (see the early work of @cite Brooks1982 and @cite Johnson1986). They
+have proven to be some of the best approaches for simulations in the subsonic
 shockless regime and similarly benign regimes.
 
-However, in the transonic and supersonic regime, and shock-hydrodynamics 
-applications the use of variational schemes might be questionable. In fact, at 
-the time of this writing, most shock-hydrodynamics codes are still firmly 
-grounded on finite volumes methods. The main reason for failure of variational 
-schemes in such extreme regimes is the lack of pointwise stability. This stems 
-from the fact that <i>a priori</i> bounds on integrated quantities (e.g. 
-integrals of moments) have in general no implications on pointwise properties 
-of the solution. While some of these problems might be alleviated by the 
-(perpetual) chase of the right shock capturing scheme, finite difference-like 
+However, in the transonic and supersonic regime, and shock-hydrodynamics
+applications the use of variational schemes might be questionable. In fact, at
+the time of this writing, most shock-hydrodynamics codes are still firmly
+grounded on finite volumes methods. The main reason for failure of variational
+schemes in such extreme regimes is the lack of pointwise stability. This stems
+from the fact that <i>a priori</i> bounds on integrated quantities (e.g.
+integrals of moments) have in general no implications on pointwise properties
+of the solution. While some of these problems might be alleviated by the
+(perpetual) chase of the right shock capturing scheme, finite difference-like
 and finite volume schemes still have an edge in many regards.
 
 In this tutorial step we therefore depart from variational schemes. We will
@@ -255,11 +255,11 @@ spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
 \mathbb{R}^{d+2}$ and $\phi_i$ is a scalar-valued shape function.
 
 <b>Note.</b>
-For simplicity we will consider the usual Lagrange finite elements. In such 
-context $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ be the set of all "support 
-points" (see @ref GlossSupport "this glossary entry") where $\mathbf{x}_i \in 
-\mathbb{R}^d$. Then each integer index $i \in \mathcal{V}$ 
-uniquely identifies a support point $\mathbf{x}_i$ and/or scalar-valued shape 
+For simplicity we will consider the usual Lagrange finite elements. In such
+context $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ be the set of all "support
+points" (see @ref GlossSupport "this glossary entry") where $\mathbf{x}_i \in
+\mathbb{R}^d$. Then each integer index $i \in \mathcal{V}$
+uniquely identifies a support point $\mathbf{x}_i$ and/or scalar-valued shape
 function $\phi_i$.
 
 With this notation we can define the scheme as
@@ -277,7 +277,7 @@ Where
     \mathrm{d}\mathbf{x}$ (note that $\mathbf{c}_{ij}\in \mathbb{R}^d$)
   - $\mathcal{I}(i) := \{j \in \mathcal{V} \ | \ \mathbf{c}_{ij} \not \equiv
     \boldsymbol{0}\} \cup \{i\}$. We will refer to $\mathcal{I}(i)$ as the
-    "stencil" (or adjacency list) at the support point $i$. 
+    "stencil" (or adjacency list) at the support point $i$.
   - $\mathbb{f}(\mathbf{U}_j^{n})$ is just the flux $\mathbb{f}$ of the
     hyperbolic system evaluated at the state $\mathbf{U}_j^{n}$ stored at the
     support point $j$.
@@ -299,15 +299,15 @@ For the time being let's note that
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
     \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
-    
+
 Before we start with the description of the implementation of this scheme, it
-is worth saying a thing or two about the "assembly" of this system. Consider 
+is worth saying a thing or two about the "assembly" of this system. Consider
 for instance a hypothetical pseudo-code, illustrating
 a possible strategy to compute the solution $\textbf{U}^{n+1}$:
 
 @f{align*}
 &\textbf{For } i \in \mathcal{V} \\
-&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} := 
+&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} :=
 \texttt{gather_cij_vectors}(\textbf{c}, \mathcal{I}(i)) \\
 &\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} :=
 \texttt{gather_state_vectors}(\textbf{U}^n, \mathcal{I}(i)) \\
@@ -321,19 +321,19 @@ a possible strategy to compute the solution $\textbf{U}^{n+1}$:
 @f}
 We note here that:
 - This "assembly" does not require any form of quadrature or cell-loops.
-- Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector 
-containing all the vectors $\mathbf{c}_{ij}$ and all the states 
+- Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
+containing all the vectors $\mathbf{c}_{ij}$ and all the states
 $\mathbf{U}_j^n$ respectively.
 - $\texttt{gather_cij_vectors}$ and $\texttt{gather_state_vectors}$ are
 hypothetical implementations that collect (from global matrices and vectors)
 only the quantities required to compute the update at the node $i$.
 - Note that: if we assume a cartesian mesh in two space
-dimensions, first-order polynomial space $\mathbb{Q}^1$, and that 
-$\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary 
-of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain 
-nine state-vectors (i.e. all the states in the patch/macro element associated to 
-the shape function $\phi_i$). This is one of the major differences with the 
-usual cell-based loop where the gather functionality (encoded in 
+dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
+$\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary
+of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
+nine state-vectors (i.e. all the states in the patch/macro element associated to
+the shape function $\phi_i$). This is one of the major differences with the
+usual cell-based loop where the gather functionality (encoded in
 FEValuesBase<dim, spacedim>.get_function_values() ) only collects values for the
 local cell (just a subset of the patch).
 
@@ -345,7 +345,7 @@ of application of this kind of schemes, also called "edge-based" or
 more historical references).
 
 This pseudo-code was introduced only to prepare the mindset of the reader for
-what is going to be presented in the in the next section. The 
+what is going to be presented in the in the next section. The
 actual implementation described in the next section is somewhat different from
 what is described in the pseudo-code but shares the same core mentality: we do
 not loop on cells but rather we loop on the edges of the sparsity graph (hence
