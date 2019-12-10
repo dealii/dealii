@@ -28,15 +28,6 @@
 
 #ifdef DEAL_II_WITH_MUPARSER
 #  include <muParser.h>
-#else
-
-
-
-namespace fparser
-{
-  class FunctionParser
-  {};
-} // namespace fparser
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -88,9 +79,11 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-// We deliberately delay the definition of the default destructor
-// so that we don't need to include the definition of mu::Parser
-// in the header file.
+
+// Note: we explicitly define the destructor here (instead of silently using
+// the default destructor by declaring nothing in the header) since we do not
+// expect muParser.h to be available in user projects: i.e., the destructor
+// must be defined in the source file.
 template <int dim>
 FunctionParser<dim>::~FunctionParser() = default;
 
@@ -112,37 +105,26 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
               ExcMessage("Wrong number of variables"));
 
-  // We check that the number of
-  // components of this function
-  // matches the number of components
-  // passed in as a vector of
-  // strings.
+  // We check that the number of components of this function matches the
+  // number of components passed in as a vector of strings.
   AssertThrow(this->n_components == expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
 
-  // Now we define how many variables
-  // we expect to read in.  We
-  // distinguish between two cases:
-  // Time dependent problems, and not
-  // time dependent problems. In the
-  // first case the number of
-  // variables is given by the
-  // dimension plus one. In the other
-  // case, the number of variables is
-  // equal to the dimension. Once we
-  // parsed the variables string, if
-  // none of this is the case, then
-  // an exception is thrown.
+  // Now we define how many variables we expect to read in.  We distinguish
+  // between two cases: Time dependent problems, and not time dependent
+  // problems. In the first case the number of variables is given by the
+  // dimension plus one. In the other case, the number of variables is equal
+  // to the dimension. Once we parsed the variables string, if none of this is
+  // the case, then an exception is thrown.
   if (time_dependent)
     n_vars = dim + 1;
   else
     n_vars = dim;
 
-  // create a parser object for the current thread we can then query
-  // in value() and vector_value(). this is not strictly necessary
-  // because a user may never call these functions on the current
-  // thread, but it gets us error messages about wrong formulas right
-  // away
+  // create a parser object for the current thread we can then query in
+  // value() and vector_value(). this is not strictly necessary because a user
+  // may never call these functions on the current thread, but it gets us
+  // error messages about wrong formulas right away
   init_muparser();
 
   // finally set the initialization bit
@@ -292,12 +274,9 @@ FunctionParser<dim>::init_muparser() const
     {
       fp.get().emplace_back(new mu::Parser());
 
-      for (std::map<std::string, double>::const_iterator constant =
-             constants.begin();
-           constant != constants.end();
-           ++constant)
+      for (const auto &constant : constants)
         {
-          fp.get()[component]->DefineConst(constant->first, constant->second);
+          fp.get()[component]->DefineConst(constant.first, constant.second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
