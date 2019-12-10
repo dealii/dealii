@@ -2077,7 +2077,8 @@ namespace DoFTools
                                     DoFHandlerType::space_dimension> &mapping,
         const DoFHandlerType &                            dof_handler,
         std::map<types::global_dof_index,
-                 Point<DoFHandlerType::space_dimension>> &support_points)
+                 Point<DoFHandlerType::space_dimension>> &support_points,
+        const ComponentMask &                             in_mask)
       {
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
@@ -2095,6 +2096,12 @@ namespace DoFTools
             q_coll_dummy.push_back(Quadrature<dim>(
               fe_collection[fe_index].get_unit_support_points()));
           }
+
+        // Take care of components
+        const ComponentMask mask =
+          (in_mask.size() == 0 ?
+             ComponentMask(fe_collection.n_components(), true) :
+             in_mask);
 
         // Now loop over all cells and enquire the support points on each
         // of these. we use dummy quadrature formulas where the quadrature
@@ -2126,8 +2133,14 @@ namespace DoFTools
               const std::vector<Point<spacedim>> &points =
                 fe_values.get_quadrature_points();
               for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
-                // insert the values into the map
-                support_points[local_dof_indices[i]] = points[i];
+                {
+                  const unsigned int dof_comp =
+                    cell->get_fe().system_to_component_index(i).first;
+
+                  // insert the values into the map if it is a valid component
+                  if (mask[dof_comp])
+                    support_points[local_dof_indices[i]] = points[i];
+                }
             }
       }
 
@@ -2138,13 +2151,17 @@ namespace DoFTools
         const hp::MappingCollection<DoFHandlerType::dimension,
                                     DoFHandlerType::space_dimension> &mapping,
         const DoFHandlerType &                               dof_handler,
-        std::vector<Point<DoFHandlerType::space_dimension>> &support_points)
+        std::vector<Point<DoFHandlerType::space_dimension>> &support_points,
+        const ComponentMask &                                mask)
       {
         // get the data in the form of the map as above
         std::map<types::global_dof_index,
                  Point<DoFHandlerType::space_dimension>>
           x_support_points;
-        map_dofs_to_support_points(mapping, dof_handler, x_support_points);
+        map_dofs_to_support_points(mapping,
+                                   dof_handler,
+                                   x_support_points,
+                                   mask);
 
         // now convert from the map to the linear vector. make sure every
         // entry really appeared in the map
@@ -2152,6 +2169,7 @@ namespace DoFTools
           {
             Assert(x_support_points.find(i) != x_support_points.end(),
                    ExcInternalError());
+
             support_points[i] = x_support_points[i];
           }
       }
@@ -2162,7 +2180,8 @@ namespace DoFTools
   void
   map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             std::vector<Point<spacedim>> &   support_points)
+                             std::vector<Point<spacedim>> &   support_points,
+                             const ComponentMask &            mask)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert((dynamic_cast<
@@ -2178,7 +2197,8 @@ namespace DoFTools
 
     internal::map_dofs_to_support_points(mapping_collection,
                                          dof_handler,
-                                         support_points);
+                                         support_points,
+                                         mask);
   }
 
 
@@ -2187,7 +2207,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &       dof_handler,
-    std::vector<Point<spacedim>> &              support_points)
+    std::vector<Point<spacedim>> &              support_points,
+    const ComponentMask &                       mask)
   {
     AssertDimension(support_points.size(), dof_handler.n_dofs());
     Assert((dynamic_cast<
@@ -2199,7 +2220,10 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping, dof_handler, support_points);
+    internal::map_dofs_to_support_points(mapping,
+                                         dof_handler,
+                                         support_points,
+                                         mask);
   }
 
 
@@ -2208,7 +2232,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points)
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask)
   {
     support_points.clear();
 
@@ -2218,7 +2243,8 @@ namespace DoFTools
 
     internal::map_dofs_to_support_points(mapping_collection,
                                          dof_handler,
-                                         support_points);
+                                         support_points,
+                                         mask);
   }
 
 
@@ -2227,13 +2253,17 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const hp::DoFHandler<dim, spacedim> &               dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points)
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask)
   {
     support_points.clear();
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping, dof_handler, support_points);
+    internal::map_dofs_to_support_points(mapping,
+                                         dof_handler,
+                                         support_points,
+                                         mask);
   }
 
   template <int spacedim>

@@ -2304,12 +2304,24 @@ namespace DoFTools
    * function unsuitable for the case that the given DoFHandler object derives
    * from a parallel::distributed::Triangulation object.  Consequently, this
    * function will produce an error if called with such a DoFHandler.
+   *
+   * @param mapping The mapping from the reference cell to the real cell on
+   * which DoFs are defined.
+   * @param dof_handler The object that describes which DoF indices live on
+   * which cell of the triangulation.
+   * @param support_points A vector that stores the corresponding location of the dofs
+   * in real space coordinates. Previous content of this object is deleted in
+   * this function.
+   * @param component_mask An optional component mask that restricts the
+   * components from which the support points are extracted.
+   *
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             std::vector<Point<spacedim>> &   support_points);
+                             std::vector<Point<spacedim>> &   support_points,
+                             const ComponentMask &mask = ComponentMask());
 
   /**
    * Same as the previous function but for the hp case.
@@ -2320,7 +2332,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &               dof_handler,
-    std::vector<Point<spacedim>> &                      support_points);
+    std::vector<Point<spacedim>> &                      support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2348,13 +2361,16 @@ namespace DoFTools
    * @param support_points A map that for every locally relevant DoF index
    * contains the corresponding location in real space coordinates. Previous
    * content of this object is deleted in this function.
+   * @param component_mask An optional component mask that restricts the
+   * components from which the support points are extracted.
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points);
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
   /**
    * Same as the previous function but for the hp case.
@@ -2364,7 +2380,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &               dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points);
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
 
   /**
