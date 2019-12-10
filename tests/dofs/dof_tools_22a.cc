@@ -124,7 +124,7 @@ test()
   deallog.push(Utilities::int_to_string(myid));
 
   deallog << "**** proc " << myid << ": \n\n";
-  deallog << "Sparsity pattern:\n";
+  deallog << "Sparsity pattern:" << std::endl;
   sp.print_gnuplot(deallog.get_file_stream());
 
   MPI_Barrier(MPI_COMM_WORLD);
