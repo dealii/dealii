@@ -274,6 +274,15 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
+  Particle<dim, spacedim>::set_id(const types::particle_index &new_id)
+  {
+    id = new_id;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
     property_pool = &new_property_pool;
