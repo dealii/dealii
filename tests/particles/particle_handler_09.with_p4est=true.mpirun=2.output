@@ -1,0 +1,11 @@
+
+DEAL:0:2d/2d::On CPU 0, we own             : {0, 2}
+DEAL:0:2d/2d::On CPU 0, we received from 1 : {[1,3], [5,7], 9}
+DEAL:0:3d/3d::On CPU 0, we own             : {[1,2], 6, [8,9]}
+DEAL:0:3d/3d::On CPU 0, we received from 1 : {[0,1], 3, 7, 9}
+
+DEAL:1:2d/2d::On CPU 1, we received from 0 : {1, [3,9]}
+DEAL:1:2d/2d::On CPU 1, we own             : {0, 4, 8}
+DEAL:1:3d/3d::On CPU 1, we received from 0 : {0, [3,5], 7}
+DEAL:1:3d/3d::On CPU 1, we own             : {2, [4,6], 8}
+

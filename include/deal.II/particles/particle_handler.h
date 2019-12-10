@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
@@ -223,12 +224,66 @@ namespace Particles
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then added to the local particle
      * collection. Note that this function currently uses
-     * GridTools::compute_point_locations, which assumes all positions are
+     * GridTools::compute_point_locations(), which assumes all positions are
      * within the local part of the triangulation. If one of them is not in the
      * local domain this function will throw an exception.
      */
     void
     insert_particles(const std::vector<Point<spacedim>> &positions);
+
+    /**
+     * Create and insert a number of particles into the collection of particles.
+     * This function takes a list of positions and creates a set of particles
+     * at these positions, which are then distributed and added to the local
+     * particle collection of a procesor. Note that this function uses
+     * GridTools::distributed_compute_point_locations(). Consequently, it can
+     * require intense communications between the processors.
+     *
+     * This function figures out what mpi process owns the points that do not
+     * fall within the locally owned part of the triangulation, it sends
+     * to that process the points passed to this function on this process,
+     * and receives the points that fall within the locally owned cells of
+     * the triangulation from whoever received them as input.
+     *
+     * In order to keep track of what mpi process received what points, a map
+     * from mpi process to IndexSet is returned by the function. This IndexSet
+     * contains the local indices of the points that were passed to this
+     * function on the calling mpi process, and that falls within the part of
+     * triangulation owned by this mpi process.
+     *
+     * @param[in] A vector of points that do not need to be on the local
+     * processor, but have to be in the triangulation that is associated with
+     * this ParticleHandler object.
+     *
+     * @param[in] A vector of vectors of bounding boxes. The bounding boxes
+     * `global_bboxes[rk]` describe which part of the mesh is locally owned by
+     * the mpi process with rank `rk`. The local description can be obtained
+     * from GridTools::compute_mesh_predicate_bounding_box(), and the global one
+     * can be obtained by passing the local ones to
+     * Utilities::MPI::all_gather().
+     *
+     * @param[in] (Optional) A vector of vector of properties associated with
+     * each local point. The size of the vector should be either zero (no
+     * properties will be transfered nor attached to the generated particles)
+     * or it should be a vector of `positions.size()` vectors of size
+     * `n_properties_per_particle()`. Notice that this function call will
+     * transfer the properties from the local mpi process to the final mpi
+     * process that will own each of the particles, and it may therefore be
+     * communication intensive.
+     *
+     * @return A map from owner to IndexSet, that contains the local indices
+     * of the points that were passed to this function on the calling mpi
+     * process, and that falls within the part of triangulation owned by this
+     * mpi process.
+     *
+     * @author Bruno Blais, Luca Heltai 2019
+     */
+    std::map<unsigned int, IndexSet>
+    insert_global_particles(
+      const std::vector<Point<spacedim>> &positions,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &                                     global_bounding_boxes,
+      const std::vector<std::vector<double>> &properties = {});
 
     /**
      * This function allows to register three additional functions that are
