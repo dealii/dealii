@@ -17,7 +17,7 @@
 
 // check Utilities::MPI::mean_and_standard_deviation()
 
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 
 #include "../tests.h"
 
