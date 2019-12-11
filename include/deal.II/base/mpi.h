@@ -1506,16 +1506,16 @@ namespace Utilities
       const unsigned int n_point_point_communications =
         Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
 
+      // Protect the following communication:
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, comm);
+
       // If we have something to send, or we expect something from other
       // processors, we need to visit one of the two scopes below. Otherwise,
       // no other action is required by this mpi process, and we can safely
       // return.
       if (send_to.size() == 0 && n_point_point_communications == 0)
         return received_objects;
-
-      // Protect the following communication:
-      static CollectiveMutex      mutex;
-      CollectiveMutex::ScopedLock lock(mutex, comm);
 
       const int mpi_tag =
         internal::Tags::compute_point_to_point_communication_pattern;
