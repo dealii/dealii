@@ -112,37 +112,17 @@ Refinement cycle 2
    Solving...
 @endcode
 You'll notice that the big bottleneck is the solver: SparseDirectUmfpack needs
-approximately 8 hours and some 42 GB of memory to solve the last iteration of
-this problem on a 2010 workstation (the second to last iteration took only 6
+nearly 5 hours and some 80 GB of memory to solve the last iteration of
+this problem on a 2016 workstation (the second to last iteration took only 16
 minutes). Clearly a better solver is needed here, a topic discussed below.
 
-The results can also be visualized and yield some good pictures:
+The results can also be visualized and yield good pictures as
+well. Here is one, showing both a vector plot for the velocity (in
+oranges), the solid displacement (in blues), and shading the solid region:
 
-<table width="60%" align="center">
-  <tr valign="top">
-    <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">
-      <p align="center">
-        Vectors of the fluid velocity and magnitude of the
-        displacement of the solid part.
-      </p>
-    </td>
-    <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.streamlines.png" alt="">
-      <p align="center">
-        Streamlines of the velocity, with the mesh superimposed.
-      </p>
-    </td>
-  </tr>
-  <tr valign="top">
-    <td valign="top" align="center" colspan="2">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.displacement.png" alt="">
-      <p align="center">
-        Solid displacement.
-      </p>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.3d.png" alt="">
+</p>
 
 In addition to the lack of a good solver, the mesh is a bit
 unbalanced: mesh refinement heavily favors the fluid subdomain (in 2d,
