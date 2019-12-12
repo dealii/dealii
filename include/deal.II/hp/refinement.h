@@ -150,9 +150,9 @@ namespace hp
      * Each cell flagged for h-refinement will also be flagged for p-refinement.
      * The same applies to coarsening.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, int spacedim>
     void
@@ -167,9 +167,9 @@ namespace hp
      * Each entry of the parameter @p p_flags needs to correspond to an active
      * cell.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, int spacedim>
     void
@@ -196,9 +196,9 @@ namespace hp
      * Each entry of the parameter @p criteria needs to correspond to an active
      * cell.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -238,13 +238,56 @@ namespace hp
      * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
      * in the interval $[0,1]$.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_relative_threshold(
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &               criteria,
+      const double                         p_refine_fraction  = 0.5,
+      const double                         p_coarsen_fraction = 0.5,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_refine = std::greater_equal<Number>(),
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen = std::less_equal<Number>());
+
+    /**
+     * Adapt which finite element to use on a given fraction of cells.
+     *
+     * Out of all cells flagged for a certain type of adaptation, be it
+     * refinement or coarsening, we will determine a fixed number of cells among
+     * this subset that will be flagged for the corresponding p-adaptive
+     * variant.
+     *
+     * For each of both refinement and coarsening subsets, we will determine a
+     * threshold based on the provided parameter @p criteria containing
+     * indicators for every active cell. In the default case for refinement, all
+     * cells with an indicator larger than or equal to the corresponding
+     * threshold will be considered for p-refinement, while for coarsening all
+     * cells with an indicator less than or equal to the matching threshold are
+     * taken into account. However, different compare function objects can be
+     * supplied via the parameters @p compare_refine and @p compare_coarsen to
+     * impose different decision strategies.
+     *
+     * For refinement, the threshold will be associated with the cell that has
+     * the @p p_refine_fraction times Triangulation::n_active_cells() largest
+     * indicator, while it is the cell with the @p p_refine_coarsen times
+     * Triangulation::n_active_cells() lowest indicator for coarsening.
+     *
+     * Each entry of the parameter @p criteria needs to correspond to an active
+     * cell. Parameters @p p_refine_fraction and @p p_coarsen_fraction need to be
+     * in the interval $[0,1]$.
+     *
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
+     */
+    template <int dim, typename Number, int spacedim>
+    void
+    p_adaptivity_fixed_number(
       const hp::DoFHandler<dim, spacedim> &dof_handler,
       const Vector<Number> &               criteria,
       const double                         p_refine_fraction  = 0.5,
@@ -289,9 +332,9 @@ namespace hp
      * }
      * @endcode
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -314,9 +357,9 @@ namespace hp
      * Each entry of the parameters @p criteria and @p references needs to
      * correspond to an active cell.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, typename Number, int spacedim>
     void
@@ -515,9 +558,9 @@ namespace hp
      * Removes all refine and coarsen flags on cells that have a
      * @p future_fe_index assigned.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, int spacedim>
     void
@@ -559,9 +602,9 @@ namespace hp
      *   the decision that Triangulation::prepare_coarsening_and_refinement()
      *   would have made later on.
      *
-     * @note Preceeding calls of Triangulation::prepare_for_coarsening_and_refinement()
-     *   may change refine and coarsen flags, which will ultimately change the
-     *   results of this function.
+     * @note Triangulation::prepare_for_coarsening_and_refinement() may change
+     *   refine and coarsen flags. Avoid calling it before this particular
+     *   function.
      */
     template <int dim, int spacedim>
     void
