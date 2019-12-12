@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------
 //
 // Copyright (C) 2019 by the deal.II authors
 //
@@ -16,7 +16,7 @@
 
 
 // validate algorithms that will flag cells for p-adaptivity:
-// - hp::Refinement::p_adaptivity_from_flags
+// - hp::Refinement::full_p_adaptivity
 
 
 #include <deal.II/base/geometry_info.h>
@@ -100,19 +100,9 @@ test()
   validate(dh);
 
 
-  // We flag the first half of all cells to be refined and the last half of all
-  // cells to be coarsened for p adapativity. Ultimately, the first quarter of
-  // all cells will be flagged for p refinement, and the last quarter for p
-  // coarsening.
+  hp::Refinement::full_p_adaptivity(dh);
 
-  const unsigned int n_active = tria.n_active_cells();
-  std::vector<bool>  p_flags(n_active, false);
-  std::fill(p_flags.begin(), p_flags.begin() + .25 * n_active, true);
-  std::fill(p_flags.end() - .25 * n_active, p_flags.end(), true);
-
-  hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
-
-  deallog << "p-adaptivity from flags" << std::endl;
+  deallog << "full p-adaptivity" << std::endl;
   validate(dh);
 
 
