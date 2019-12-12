@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------
 //
 // Copyright (C) 2019 by the deal.II authors
 //
@@ -16,7 +16,7 @@
 
 
 // validate algorithms that will flag cells for p-adaptivity:
-// - hp::Refinement::p_adaptivity_from_flags
+// - hp::Refinement::p_adaptivity_from_regularity
 
 
 #include <deal.II/base/geometry_info.h>
@@ -106,13 +106,20 @@ test()
   // coarsening.
 
   const unsigned int n_active = tria.n_active_cells();
-  std::vector<bool>  p_flags(n_active, false);
-  std::fill(p_flags.begin(), p_flags.begin() + .25 * n_active, true);
-  std::fill(p_flags.end() - .25 * n_active, p_flags.end(), true);
+  Vector<double>     sobolev_indices(n_active);
+  for (unsigned int i = 0; i < n_active; ++i)
+    {
+      if (i < .25 * n_active)
+        sobolev_indices[i] = 3. + 1e-4;
+      else if (i < .75 * n_active)
+        sobolev_indices[i] = 2.;
+      else
+        sobolev_indices[i] = 1. - 1e-4;
+    }
 
-  hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
+  hp::Refinement::p_adaptivity_from_regularity(dh, sobolev_indices);
 
-  deallog << "p-adaptivity from flags" << std::endl;
+  deallog << "p-adaptivity from regularity" << std::endl;
   validate(dh);
 
 

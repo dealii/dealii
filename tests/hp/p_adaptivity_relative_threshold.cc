@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------
 //
 // Copyright (C) 2019 by the deal.II authors
 //
@@ -16,7 +16,7 @@
 
 
 // validate algorithms that will flag cells for p-adaptivity:
-// - hp::Refinement::p_adaptivity_from_flags
+// - hp::Refinement::p_adaptivity_from_relative_threshold
 
 
 #include <deal.II/base/geometry_info.h>
@@ -106,13 +106,20 @@ test()
   // coarsening.
 
   const unsigned int n_active = tria.n_active_cells();
-  std::vector<bool>  p_flags(n_active, false);
-  std::fill(p_flags.begin(), p_flags.begin() + .25 * n_active, true);
-  std::fill(p_flags.end() - .25 * n_active, p_flags.end(), true);
+  Vector<double>     indicators(n_active);
+  for (unsigned int i = 0; i < n_active; ++i)
+    {
+      if (i < .25 * n_active)
+        indicators[i] = 2.;
+      else if (i < .75 * n_active)
+        indicators[i] = 1.;
+      else
+        indicators[i] = 0.;
+    }
 
-  hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
+  hp::Refinement::p_adaptivity_from_relative_threshold(dh, indicators);
 
-  deallog << "p-adaptivity from flags" << std::endl;
+  deallog << "p-adaptivity from relative threshold" << std::endl;
   validate(dh);
 
 
