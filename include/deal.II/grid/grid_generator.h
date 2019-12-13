@@ -1857,8 +1857,8 @@ namespace GridGenerator
      *       can of course be extruded into the third dimension using
      *       GridGenerator::extrude().
      *
-     * @param[in] tria The triangulation to be created. It needs to be empty
-     *                 upon calling this function.
+     * @param[out] tria The triangulation to be created. It needs to be empty
+     *             upon calling this function.
      * @param[in] additional_data Configuration of the mesh.
      *
      \htmlonly <style>div.image
