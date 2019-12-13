@@ -353,6 +353,25 @@ public:
   subtract_set(const IndexSet &other);
 
   /**
+   * Return a new IndexSet, with global size equal to
+   * `this->size()*other.size()`, containing for every element `n` of this
+   * IndexSet, the entries in the half open range `[n*other.size(),
+   * (n+1)*other.size())` of the @p other IndexSet.
+   *
+   * The name results from the perspective that one starts with an IndexSet and
+   * takes the tensor product with another IndexSet with `other.size()`
+   * elements; this results in a matrix of size `this->size()` times
+   * `other.size()` that has ones in exactly the rows for which this IndexSet
+   * contained an index and in the columns for which the @p other IndexSet
+   * contained an index. This matrix is then "unrolled" again by going through
+   * each row one by one and reindexing the entries of the matrix in consecutive
+   * order. A one in the matrix then corresponds to an entry in the reindexed
+   * IndexSet that is returned by this function.
+   */
+  IndexSet
+  tensor_product(const IndexSet &other) const;
+
+  /**
    * Remove and return the last element of the last range.
    * This function throws an exception if the IndexSet is empty.
    */

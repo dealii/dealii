@@ -306,6 +306,18 @@ IndexSet::subtract_set(const IndexSet &other)
 
 
 
+IndexSet
+IndexSet::tensor_product(const IndexSet &other) const
+{
+  IndexSet set(this->size() * other.size());
+  for (const auto el : *this)
+    set.add_indices(other, el * other.size());
+  set.compress();
+  return set;
+}
+
+
+
 IndexSet::size_type
 IndexSet::pop_back()
 {
