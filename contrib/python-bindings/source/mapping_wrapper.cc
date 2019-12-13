@@ -87,6 +87,15 @@ namespace python
 
 
 
+  MappingQGenericWrapper::MappingQGenericWrapper()
+    : dim(-1)
+    , spacedim(-1)
+    , degree(-1)
+    , mapping_ptr(nullptr)
+  {}
+
+
+
   MappingQGenericWrapper::MappingQGenericWrapper(const int dim,
                                                  const int spacedim,
                                                  const int degree)
