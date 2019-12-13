@@ -539,14 +539,22 @@ namespace python
 
       Point<spacedim> point = *(static_cast<Point<spacedim> *>(p.get_point()));
 
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(
-          mapping_wrapper.get_mapping());
+      if (mapping_wrapper.get_mapping() != nullptr)
+        {
+          const MappingQGeneric<dim, spacedim> *mapping =
+            static_cast<const MappingQGeneric<dim, spacedim> *>(
+              mapping_wrapper.get_mapping());
 
-      auto cell_pair =
-        GridTools::find_active_cell_around_point(*mapping, *tria, point);
-
-      return std::make_pair(cell_pair.first->level(), cell_pair.first->index());
+          auto cell_pair =
+            GridTools::find_active_cell_around_point(*mapping, *tria, point);
+          return std::make_pair(cell_pair.first->level(),
+                                cell_pair.first->index());
+        }
+      else
+        {
+          auto cell = GridTools::find_active_cell_around_point(*tria, point);
+          return std::make_pair(cell->level(), cell->index());
+        }
     }
 
 
@@ -1280,17 +1288,12 @@ namespace python
                 ExcMessage(
                   "The output Triangulation must be of dimension three"));
 
-    if ((dim == 2) && (spacedim == 2))
-      {
-        Triangulation<2, 2> *tria =
-          static_cast<Triangulation<2, 2> *>(triangulation);
-        Triangulation<3, 3> *tria_out = static_cast<Triangulation<3, 3> *>(
-          triangulation_out.get_triangulation());
-        GridGenerator::extrude_triangulation(*tria,
-                                             n_slices,
-                                             height,
-                                             *tria_out);
-      }
+
+    Triangulation<2, 2> *tria =
+      static_cast<Triangulation<2, 2> *>(triangulation);
+    Triangulation<3, 3> *tria_out =
+      static_cast<Triangulation<3, 3> *>(triangulation_out.get_triangulation());
+    GridGenerator::extrude_triangulation(*tria, n_slices, height, *tria_out);
   }
 
 
@@ -1324,8 +1327,8 @@ namespace python
 
   CellAccessorWrapper
   TriangulationWrapper::find_active_cell_around_point(
-    PointWrapper &          p,
-    MappingQGenericWrapper &mapping)
+    PointWrapper &         p,
+    MappingQGenericWrapper mapping)
   {
     std::pair<int, int> level_index_pair;
     if ((dim == 2) && (spacedim == 2))

@@ -101,6 +101,11 @@ namespace python
                                          distort_random,
                                          1,
                                          2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(
+    find_active_cell_around_point_overloads,
+    find_active_cell_around_point,
+    1,
+    2)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells                                      \n";
@@ -536,8 +541,9 @@ namespace python
            boost::python::args("self", "transformation"))
       .def("find_active_cell_around_point",
            &TriangulationWrapper::find_active_cell_around_point,
-           find_active_cell_around_point_docstring,
-           boost::python::args("self", "point", "mapping"))
+           find_active_cell_around_point_overloads(
+             boost::python::args("self", "point", "mapping"),
+             find_active_cell_around_point_docstring))
       .def("refine_global",
            &TriangulationWrapper::refine_global,
            refine_global_docstring,

@@ -90,7 +90,7 @@ namespace python
     get_barycenter() const;
 
     /**
-     * Get the barycenter of the cell.
+     * Get the center of the cell.
      */
     PointWrapper
     get_center(const bool respect_manifold             = false,

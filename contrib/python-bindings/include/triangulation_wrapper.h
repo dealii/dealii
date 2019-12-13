@@ -348,12 +348,13 @@ namespace python
 
     /**
      * Find and return an active cell that surrounds a given point p.
-     * The mapping used to determine whether the given point is inside a given
-     * cell.
+     * The mapping is used to determine whether the given point is inside a
+     * given cell.
      */
     CellAccessorWrapper
-    find_active_cell_around_point(PointWrapper &          p,
-                                  MappingQGenericWrapper &mapping);
+    find_active_cell_around_point(
+      PointWrapper &         p,
+      MappingQGenericWrapper mapping = MappingQGenericWrapper());
 
     /**
      * Assign a manifold object to a certain part of the triangulation.

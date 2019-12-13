@@ -38,6 +38,11 @@ namespace python
     MappingQGenericWrapper(const MappingQGenericWrapper &other);
 
     /**
+     * Default constructor.
+     */
+    MappingQGenericWrapper();
+
+    /**
      * Constructor.
      */
     MappingQGenericWrapper(const int dim, const int spacedim, const int degree);
@@ -62,7 +67,7 @@ namespace python
     transform_real_to_unit_cell(CellAccessorWrapper &cell, PointWrapper &point);
 
     /**
-     * Get the underlying mapping
+     * Get the underlying mapping.
      */
     void *
     get_mapping();
