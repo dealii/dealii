@@ -1,0 +1,22 @@
+
+DEAL::==========================================================
+DEAL::dim = 1, Symengine
+DEAL::x: x, f: t*x + x**2, df: t + 2*x, H:2
+DEAL::SymbolicFunction<dim>: x, t -> t*x + x**2
+DEAL::p: 1.00000, f(p): 1.00000, grad(f)(p): 2.00000, laplacian(f)(p): 2.00000, H(f)(p): 2.00000
+DEAL::Time derivative of SymbolicFunction<dim>: x, t -> x
+DEAL::p: 1.00000, f_t(p): 1.00000, grad(f_t)(p): 1.00000, laplacian(f_t)(p): 0.00000, H(f_t)(p): 0.00000
+DEAL::==========================================================
+DEAL::dim = 2, Symengine
+DEAL::x: x y, f: x + y + cos(exp(t*x*y)), df: 1 - t*y*exp(t*x*y)*sin(exp(t*x*y)) 1 - t*x*exp(t*x*y)*sin(exp(t*x*y)), H:-t**2*y**2*exp(t*x*y)*sin(exp(t*x*y)) - t**2*y**2*exp(2*t*x*y)*cos(exp(t*x*y)) -t*exp(t*x*y)*sin(exp(t*x*y)) - t**2*x*y*exp(t*x*y)*sin(exp(t*x*y)) - t**2*x*y*exp(2*t*x*y)*cos(exp(t*x*y)) -t*exp(t*x*y)*sin(exp(t*x*y)) - t**2*x*y*exp(t*x*y)*sin(exp(t*x*y)) - t**2*x*y*exp(2*t*x*y)*cos(exp(t*x*y)) -t**2*x**2*exp(t*x*y)*sin(exp(t*x*y)) - t**2*x**2*exp(2*t*x*y)*cos(exp(t*x*y))
+DEAL::SymbolicFunction<dim>: x, y, t -> x + y + cos(exp(t*x*y))
+DEAL::p: 1.00000 2.00000, f(p): 3.54030, grad(f)(p): 1.00000 1.00000, laplacian(f)(p): 0.00000, H(f)(p): 0.00000 0.00000 0.00000 0.00000
+DEAL::Time derivative of SymbolicFunction<dim>: x, y, t -> -x*y*exp(t*x*y)*sin(exp(t*x*y))
+DEAL::p: 1.00000 2.00000, f_t(p): -1.68294, grad(f_t)(p): -1.68294 -0.841471, laplacian(f_t)(p): 0.00000, H(f_t)(p): 0.00000 -0.841471 -0.841471 0.00000
+DEAL::==========================================================
+DEAL::dim = 3, Symengine
+DEAL::x: x y z, f: tan(t**2*z) + atan(y/x), df: -y/(x**2*(1 + y**2/x**2)) 1/(x*(1 + y**2/x**2)) t**2*(1 + tan(t**2*z)**2), H:-2*y**3/(x**5*(1 + y**2/x**2)**2) + 2*y/(x**3*(1 + y**2/x**2)) -1/(x**2*(1 + y**2/x**2)) + 2*y**2/(x**4*(1 + y**2/x**2)**2) 0 -1/(x**2*(1 + y**2/x**2)) + 2*y**2/(x**4*(1 + y**2/x**2)**2) -2*y/(x**3*(1 + y**2/x**2)**2) 0 0 0 2*t**4*tan(t**2*z)*(1 + tan(t**2*z)**2)
+DEAL::SymbolicFunction<dim>: x, y, z, t -> tan(t**2*z) + atan(y/x)
+DEAL::p: 1.00000 2.00000 3.00000, f(p): 1.10715, grad(f)(p): -0.400000 0.200000 0.00000, laplacian(f)(p): 2.77556e-17, H(f)(p): 0.160000 0.120000 0.00000 0.120000 -0.160000 0.00000 0.00000 0.00000 0.00000
+DEAL::Time derivative of SymbolicFunction<dim>: x, y, z, t -> 2*t*z*(1 + tan(t**2*z)**2)
+DEAL::p: 1.00000 2.00000 3.00000, f_t(p): 0.00000, grad(f_t)(p): 0.00000 0.00000 0.00000, laplacian(f_t)(p): 0.00000, H(f_t)(p): 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000

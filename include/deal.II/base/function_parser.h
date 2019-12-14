@@ -211,6 +211,11 @@ class Vector;
  *                        constants);
  * @endcode
  *
+ * @note The difference between this class and the SymbolicFunction class is
+ * that the SymbolicFunction class allows to compute first and second order
+ * derivatives (in a symbolic way), while this class computes first order
+ * derivatives only, using finite differences. For complicated expressions,
+ * this class is generally faster than SymbolicFunction.
  *
  * @ingroup functions
  * @author Luca Heltai, Timo Heister 2005, 2014
