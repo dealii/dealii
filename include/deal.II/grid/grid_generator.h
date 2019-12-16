@@ -407,7 +407,7 @@ namespace GridGenerator
    * </ol>
    * Since the cylinder is slightly offset from the center of the channel,
    * this geometry results in vortex shedding at moderate Reynolds
-   * numbers. Here is the grid (after one global refinement) in 2D:
+   * numbers. Here is the grid (without additional global refinement) in 2D:
    *
    * @image html channel_with_cylinder_2d.png
    *
