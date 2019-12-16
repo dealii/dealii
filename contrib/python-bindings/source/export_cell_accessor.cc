@@ -22,6 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_center_overloads, get_center, 0, 2)
+
   const char refine_flag_docstring[] =
     "Get/Set the refine_flag of the cell. In 2D, the possibilities are: \n"
     "  - isotropic                                                      \n"
@@ -65,6 +67,12 @@ namespace python
 
   const char barycenter_docstring[] =
     "Return the barycenter of the current cell                          \n";
+
+
+
+  const char center_docstring[] =
+    "Center of the object. This method can take into account manifold   \n"
+    "attached to a cell.                                                \n";
 
 
 
@@ -138,6 +146,13 @@ namespace python
            &CellAccessorWrapper::get_barycenter,
            barycenter_docstring,
            boost::python::args("self"))
+      .def("center",
+           &CellAccessorWrapper::get_center,
+           get_center_overloads(
+             boost::python::args("self",
+                                 "respect_manifold",
+                                 "interpolate_from_surrounding"),
+             center_docstring))
       .def("set_vertex",
            &CellAccessorWrapper::set_vertex,
            set_vertex_docstring,

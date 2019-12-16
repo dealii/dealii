@@ -97,6 +97,15 @@ namespace python
                                          generate_hyper_shell,
                                          3,
                                          5)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(distort_random_overloads,
+                                         distort_random,
+                                         1,
+                                         2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(
+    find_active_cell_around_point_overloads,
+    find_active_cell_around_point,
+    1,
+    2)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells                                      \n";
@@ -283,6 +292,15 @@ namespace python
 
 
 
+  const char extrude_docstring[] =
+    "Take a 2d Triangulation that is being extruded in z direction by       \n"
+    "the total height of height using n_slices slices (minimum is 2).       \n"
+    "The boundary indicators of the faces of input are going to be          \n"
+    "assigned to the corresponding side walls in z direction. The           \n"
+    "bottom and top get the next two free boundary indicators.              \n";
+
+
+
   const char flatten_triangulation_docstring[] =
     "Create a new flat triangulation out_tria which contains a single       \n"
     "level with all active cells of the input triangulation. If the spacedim\n"
@@ -300,6 +318,15 @@ namespace python
     "specify manifold ids on interior faces, they have to be specified      \n"
     "manually after the triangulation is created. This function will fail   \n"
     "if the input Triangulation contains hanging nodes.                     \n";
+
+
+
+  const char distort_random_docstring[] =
+    "Distort the given triangulation by randomly moving around all the      \n"
+    "vertices of the grid. The direction of movement of each vertex is      \n"
+    "random, while the length of the shift vector has a value of factor     \n"
+    "times the minimal length of the active edges adjacent to this vertex.  \n"
+    "Note that factor should obviously be well below 0.5.                   \n";
 
 
 
@@ -362,6 +389,17 @@ namespace python
   const char reset_manifold_docstring[] =
     "Reset those parts of the triangulation with the given manifold_number  \n"
     "to use a FlatManifold object.                                          \n";
+
+
+
+  const char transform_docstring[] =
+    "Transform the vertices of the given triangulation by applying the      \n"
+    "function object provided as first argument to all its vertices.        \n";
+
+
+
+  const char find_active_cell_around_point_docstring[] =
+    "Find and return an active cell that surrounds a given point p.         \n";
 
 
 
@@ -484,10 +522,28 @@ namespace python
            &TriangulationWrapper::merge_triangulations,
            merge_docstring,
            boost::python::args("self", "triangulation_1", "triangulation_2"))
+      .def("extrude_triangulation",
+           &TriangulationWrapper::extrude_triangulation,
+           extrude_docstring,
+           boost::python::args("self", "n_slices", "depth", "tria_out"))
       .def("flatten_triangulation",
            &TriangulationWrapper::flatten_triangulation,
            flatten_triangulation_docstring,
            boost::python::args("self", "tria_out"))
+      .def("distort_random",
+           &TriangulationWrapper::distort_random,
+           distort_random_overloads(
+             boost::python::args("self", "factor", "keep_boundary"),
+             distort_random_docstring))
+      .def("transform",
+           &TriangulationWrapper::transform,
+           transform_docstring,
+           boost::python::args("self", "transformation"))
+      .def("find_active_cell_around_point",
+           &TriangulationWrapper::find_active_cell_around_point,
+           find_active_cell_around_point_overloads(
+             boost::python::args("self", "point", "mapping"),
+             find_active_cell_around_point_docstring))
       .def("refine_global",
            &TriangulationWrapper::refine_global,
            refine_global_docstring,

@@ -87,6 +87,15 @@ namespace python
 
 
 
+  MappingQGenericWrapper::MappingQGenericWrapper()
+    : dim(-1)
+    , spacedim(-1)
+    , degree(-1)
+    , mapping_ptr(nullptr)
+  {}
+
+
+
   MappingQGenericWrapper::MappingQGenericWrapper(const int dim,
                                                  const int spacedim,
                                                  const int degree)
@@ -220,6 +229,14 @@ namespace python
       return internal::transform_real_to_unit_cell<3, 3>(mapping_ptr,
                                                          cell.cell_accessor,
                                                          p.point);
+  }
+
+
+
+  void *
+  MappingQGenericWrapper::get_mapping()
+  {
+    return mapping_ptr;
   }
 
 } // namespace python
