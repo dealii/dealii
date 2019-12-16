@@ -610,7 +610,6 @@ namespace internal
 
       // step 1.3: create a dummy 1D quadrature formula to extract the
       // lexicographic numbering for the elements
-      std::vector<Point<1>> basic_support_points = fe.get_unit_support_points();
       Assert(fe.dofs_per_vertex == 0 || fe.dofs_per_vertex == 1,
              ExcNotImplemented());
       const unsigned int shift = fe.dofs_per_cell - fe.dofs_per_vertex;
