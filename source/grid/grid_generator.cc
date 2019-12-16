@@ -3625,6 +3625,31 @@ namespace GridGenerator
     GridGenerator::merge_triangulations(
       tria_without_cylinder, cylinder_tria, tria, vertex_tolerance, true);
 
+    // Move the vertices in the middle of the faces of cylinder_tria slightly
+    // to give a better mesh quality. We have to balance the quality of these
+    // cells with the quality of the outer cells (initially rectangles). For
+    // constant radial distance, we would place them at the distance 0.1 *
+    // sqrt(2.) from the center. In case the shell region width is more than
+    // 0.1/6., we choose to place them at 0.1 * 4./3. from the center, which
+    // ensures that the shortest edge of the outer cells is 2./3. of the
+    // original length. If the shell region width is less, we make the edge
+    // length of the inner part and outer part (in the shorter x direction)
+    // the same.
+    {
+      const double shift =
+        std::min(0.125 + shell_region_width * 0.5, 0.1 * 4. / 3.);
+      for (const auto &cell : tria.active_cell_iterators())
+        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          if (cell->vertex(v).distance(Point<2>(0.1, 0.205)) < 1e-10)
+            cell->vertex(v) = Point<2>(0.2 - shift, 0.205);
+          else if (cell->vertex(v).distance(Point<2>(0.3, 0.205)) < 1e-10)
+            cell->vertex(v) = Point<2>(0.2 + shift, 0.205);
+          else if (cell->vertex(v).distance(Point<2>(0.2, 0.1025)) < 1e-10)
+            cell->vertex(v) = Point<2>(0.2, 0.2 - shift);
+          else if (cell->vertex(v).distance(Point<2>(0.2, 0.3075)) < 1e-10)
+            cell->vertex(v) = Point<2>(0.2, 0.2 + shift);
+    }
+
     // Ensure that all manifold ids on a polar cell really are set to the
     // polar manifold id:
     for (const auto &cell : tria.active_cell_iterators())
