@@ -22,6 +22,19 @@ namespace python
   namespace internal
   {
     template <int dim>
+    boost::python::list
+    to_list(const void *point)
+    {
+      const Point<dim> &p = *static_cast<const Point<dim> *>(point);
+
+      boost::python::list p_list;
+      for (int d = 0; d < dim; ++d)
+        p_list.append(p[d]);
+
+      return p_list;
+    }
+
+    template <int dim>
     double
     distance(const Point<dim> &p1, const Point<dim> &p2)
     {
@@ -189,6 +202,17 @@ namespace python
   {
     clear();
     dim = -1;
+  }
+
+
+
+  boost::python::list
+  PointWrapper::to_list() const
+  {
+    if (dim == 2)
+      return internal::to_list<2>(point);
+    else
+      return internal::to_list<3>(point);
   }
 
 

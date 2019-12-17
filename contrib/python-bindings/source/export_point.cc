@@ -31,6 +31,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
+  const char to_list_docstring[] =
+    "Convert point's coordinates to a python list with [x,y] or [x,y,z]     \n"
+    "for 2-D or 3-D, respectively.                                          \n";
+
+
+
   const char distance_docstring[] =
     "Return the Euclidean distance of this point to the point p             \n";
 
@@ -66,6 +72,10 @@ namespace python
   {
     boost::python::class_<PointWrapper>(
       "Point", boost::python::init<boost::python::list>())
+      .def("to_list",
+           &PointWrapper::to_list,
+           to_list_docstring,
+           boost::python::args("self"))
       .def("distance",
            &PointWrapper::distance,
            distance_docstring,

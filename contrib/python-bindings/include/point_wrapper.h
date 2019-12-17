@@ -77,6 +77,13 @@ namespace python
     norm_square() const;
 
     /**
+     * Convert point's coordinates to a python list with [x,y] or [x,y,z]
+     * for 2-D and 3-D, respectively.
+     */
+    boost::python::list
+    to_list() const;
+
+    /**
      * Assignment operator. The dimension of the point is changed if it is
      * different than the one of @p other.
      */

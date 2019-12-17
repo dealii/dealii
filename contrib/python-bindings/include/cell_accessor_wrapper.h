@@ -181,6 +181,47 @@ namespace python
     measure() const;
 
     /**
+     * Test whether the cell has children (this is the criterion for activity of
+     * a cell).
+     */
+    bool
+    active() const;
+
+    /**
+     * Return the level within the mesh hierarchy at which this cell is
+     * located.
+     */
+    int
+    level() const;
+
+    /**
+     * Return the index of the element presently pointed to on the present
+     * level.
+     */
+    int
+    index() const;
+
+    /**
+     * Return whether the neighbor is coarser then the present cell.
+     */
+    bool
+    neighbor_is_coarser(const unsigned int neighbor) const;
+
+    /**
+     * Return the how-many'th neighbor this cell is of cell->neighbor(neighbor),
+     * i.e. return the face_no such that
+     * cell->neighbor(neighbor)->neighbor(face_no)==cell.
+     */
+    unsigned int
+    neighbor_of_neighbor(const unsigned int neighbor) const;
+
+    /**
+     * Return the global index of i-th vertex of a cell.
+     */
+    unsigned int
+    vertex_index(const unsigned int i) const;
+
+    /**
      * Exception.
      */
     DeclException2(ExcVertexDoesNotExist,

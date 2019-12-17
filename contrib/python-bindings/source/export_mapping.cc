@@ -25,10 +25,19 @@ namespace python
     " Map the point p on the unit cell to the corresponding point       \n"
     " on the real cell.                                                 \n";
 
+
   const char transform_real_to_unit_cell_docstring[] =
     " Map the point p on the real cell to the corresponding point       \n"
     " on the unit cell.                                                 \n";
 
+
+  const char project_real_point_to_unit_point_on_face_docstring[] =
+    " Transform the point on the real cell to the corresponding point   \n"
+    " on the unit cell, and then projects it to a dim-1 point on the    \n"
+    " face with the given face number face_no. Ideally the point is     \n"
+    " near the face face_no, but any point in the cell can technically  \n"
+    " be projected. The returned point is of dimension dim with         \n"
+    " dim-1 coodinate value explicitly set to zero.                     \n";
 
 
   void
@@ -41,11 +50,15 @@ namespace python
       .def("transform_real_to_unit_cell",
            &MappingQGenericWrapper::transform_real_to_unit_cell,
            transform_real_to_unit_cell_docstring,
-           boost::python::args("self", "cell_wrapper", "point_wrapper"))
+           boost::python::args("self", "cell", "point"))
       .def("transform_unit_to_real_cell",
            &MappingQGenericWrapper::transform_unit_to_real_cell,
            transform_unit_to_real_cell_docstring,
-           boost::python::args("self", "cell_wrapper", "point_wrapper"));
+           boost::python::args("self", "cell", "point"))
+      .def("project_real_point_to_unit_point_on_face",
+           &MappingQGenericWrapper::project_real_point_to_unit_point_on_face,
+           project_real_point_to_unit_point_on_face_docstring,
+           boost::python::args("self", "cell", "face_no", "point"));
   }
 } // namespace python
 

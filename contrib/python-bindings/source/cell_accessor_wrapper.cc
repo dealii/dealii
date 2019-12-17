@@ -281,28 +281,6 @@ namespace python
 
 
     template <int dim, int spacedim>
-    bool
-    at_boundary(const void *cell_accessor)
-    {
-      const CellAccessor<dim, spacedim> *cell =
-        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
-      return cell->at_boundary();
-    }
-
-
-
-    template <int dim, int spacedim>
-    bool
-    has_boundary_lines(const void *cell_accessor)
-    {
-      const CellAccessor<dim, spacedim> *cell =
-        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
-      return cell->has_boundary_lines();
-    }
-
-
-
-    template <int dim, int spacedim>
     const CellAccessor<dim, spacedim> *
     neighbor(const int i, const void *cell_accessor)
     {
@@ -337,13 +315,10 @@ namespace python
 
 
     template <int dim, int spacedim>
-    double
-    measure(const void *cell_accessor)
+    const CellAccessor<dim, spacedim> *
+    cell_cast(const void *cell_accessor)
     {
-      const CellAccessor<dim, spacedim> *cell =
-        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
-
-      return cell->measure();
+      return static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor);
     }
   } // namespace internal
 
@@ -636,11 +611,11 @@ namespace python
   CellAccessorWrapper::at_boundary() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::at_boundary<2, 2>(cell_accessor);
+      return internal::cell_cast<2, 2>(cell_accessor)->at_boundary();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::at_boundary<2, 3>(cell_accessor);
+      return internal::cell_cast<2, 3>(cell_accessor)->at_boundary();
     else
-      return internal::at_boundary<3, 3>(cell_accessor);
+      return internal::cell_cast<3, 3>(cell_accessor)->at_boundary();
   }
 
 
@@ -649,11 +624,11 @@ namespace python
   CellAccessorWrapper::has_boundary_lines() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::has_boundary_lines<2, 2>(cell_accessor);
+      return internal::cell_cast<2, 2>(cell_accessor)->has_boundary_lines();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::has_boundary_lines<2, 3>(cell_accessor);
+      return internal::cell_cast<2, 3>(cell_accessor)->has_boundary_lines();
     else
-      return internal::has_boundary_lines<3, 3>(cell_accessor);
+      return internal::cell_cast<3, 3>(cell_accessor)->has_boundary_lines();
   }
 
 
@@ -690,11 +665,95 @@ namespace python
   CellAccessorWrapper::measure() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::measure<2, 2>(cell_accessor);
+      return internal::cell_cast<2, 2>(cell_accessor)->measure();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::measure<2, 3>(cell_accessor);
+      return internal::cell_cast<2, 3>(cell_accessor)->measure();
     else
-      return internal::measure<3, 3>(cell_accessor);
+      return internal::cell_cast<3, 3>(cell_accessor)->measure();
+  }
+
+
+
+  bool
+  CellAccessorWrapper::active() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->active();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->active();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->active();
+  }
+
+
+
+  int
+  CellAccessorWrapper::level() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->level();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->level();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->level();
+  }
+
+
+
+  int
+  CellAccessorWrapper::index() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->index();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->index();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->index();
+  }
+
+
+
+  bool
+  CellAccessorWrapper::neighbor_is_coarser(const unsigned int neighbor) const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)
+        ->neighbor_is_coarser(neighbor);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)
+        ->neighbor_is_coarser(neighbor);
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)
+        ->neighbor_is_coarser(neighbor);
+  }
+
+
+
+  unsigned int
+  CellAccessorWrapper::neighbor_of_neighbor(const unsigned int neighbor) const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)
+        ->neighbor_of_neighbor(neighbor);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)
+        ->neighbor_of_neighbor(neighbor);
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)
+        ->neighbor_of_neighbor(neighbor);
+  }
+
+
+
+  unsigned int
+  CellAccessorWrapper::vertex_index(const unsigned int i) const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->vertex_index(i);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->vertex_index(i);
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->vertex_index(i);
   }
 
 } // namespace python

@@ -357,6 +357,13 @@ namespace python
       MappingQGenericWrapper mapping = MappingQGenericWrapper());
 
     /**
+     * Find and return a list of active cells that surround a given vertex with
+     * index vertex_index.
+     */
+    boost::python::list
+    find_cells_adjacent_to_vertex(const unsigned int vertex_index);
+
+    /**
      * Assign a manifold object to a certain part of the triangulation.
      * If an object with manifold number is refined, this object
      * is used to find the location of new vertices (see the results
@@ -395,6 +402,18 @@ namespace python
      */
     boost::python::list
     active_cells();
+
+    /**
+     * Return the diameter of the smallest active cell of a triangulation
+     */
+    double
+    minimal_cell_diameter() const;
+
+    /**
+     * Return the diameter of the largest active cell of a triangulation
+     */
+    double
+    maximal_cell_diameter() const;
 
     /**
      * Write mesh to the output file @filename according to the given data
