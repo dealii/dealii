@@ -74,7 +74,7 @@ test(unsigned int n_ref)
   MappingQGeneric<dim, spacedim> mapping(3);
 
   Point<dim> p1;
-  p1[0] = 0.3;
+  p1[0] = 0.28;
   p1[1] = 0.2;
   if (dim == 3)
     p1[2] = 0.205;
@@ -86,7 +86,8 @@ test(unsigned int n_ref)
   print_result(mapping, tria, p1, 1e-10);
   print_result(mapping, tria, p1);
   Point<dim> p2 = p1;
-  p2[0]         = 0.1;
+  // this point lies on exactly 2 cells in 2D and 4 in 3D, up to a
+  p2[0] = 0.0682926829268293;
   print_result(mapping, tria, p2, 1e-3);
   print_result(mapping, tria, p2, 1e-4);
   print_result(mapping, tria, p2, 1e-5);
