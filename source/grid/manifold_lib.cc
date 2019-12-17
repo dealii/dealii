@@ -1323,6 +1323,26 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
 
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
+  std::unique_ptr<Function<chartdim>> push_forward_function,
+  std::unique_ptr<Function<spacedim>> pull_back_function,
+  const Tensor<1, chartdim> &         periodicity,
+  const double                        tolerance)
+  : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , const_map()
+  , push_forward_function(push_forward_function.release())
+  , pull_back_function(pull_back_function.release())
+  , tolerance(tolerance)
+  , owns_pointers(true)
+  , finite_difference_step(0)
+{
+  AssertDimension(push_forward_function->n_components, spacedim);
+  AssertDimension(pull_back_function->n_components, chartdim);
+}
+
+
+
+template <int dim, int spacedim, int chartdim>
+FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const std::string                                 push_forward_expression,
   const std::string                                 pull_back_expression,
   const Tensor<1, chartdim> &                       periodicity,
@@ -1376,13 +1396,15 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
   // push forward and the pull back charts, or by providing two Function
   // objects. In the first case, the push_forward and pull_back functions are
   // created internally in FunctionManifold, and destroyed when this object is
-  // deleted. We need to make sure that our cloned object is constructed in the
+  // deleted. In the second case, the function objects are destroyed if they
+  // are passed as pointers upon construction.
+  // We need to make sure that our cloned object is constructed in the
   // same way this class was constructed, and that its internal Function
   // pointers point either to the same Function objects used to construct this
-  // function (owns_pointers == false) or that the newly generated manifold
-  // creates internally the push_forward and pull_back functions using the same
-  // expressions that were used to construct this class (own_pointers == true).
-  if (owns_pointers == true)
+  // function or that the newly generated manifold creates internally the
+  // push_forward and pull_back functions using the same expressions that were
+  // used to construct this class.
+  if (!(push_forward_expression.empty() && pull_back_expression.empty()))
     {
       return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         push_forward_expression,
@@ -1395,11 +1417,18 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
         finite_difference_step);
     }
   else
-    return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
-      *push_forward_function,
-      *pull_back_function,
-      this->get_periodicity(),
-      tolerance);
+    {
+      auto manifold_clone =
+        std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
+          *push_forward_function,
+          *pull_back_function,
+          this->get_periodicity(),
+          tolerance);
+
+      Assert(owns_pointers == false, ExcNotImplemented());
+
+      return manifold_clone;
+    }
 }
 
 

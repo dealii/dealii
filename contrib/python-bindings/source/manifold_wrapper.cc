@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/grid/manifold_lib.h>
 
 #include <manifold_wrapper.h>
@@ -57,6 +59,28 @@ namespace python
 
     template <int dim, int spacedim>
     Manifold<dim, spacedim> *
+    create_function_manifold(const std::string &push_forward,
+                             const std::string &pull_back)
+    {
+      return new FunctionManifold<dim, spacedim>(push_forward, pull_back);
+    }
+
+
+
+    template <int dim, int spacedim>
+    Manifold<dim, spacedim> *
+    create_function_manifold(boost::python::object &push_forward,
+                             boost::python::object &pull_back)
+    {
+      return new FunctionManifold<dim, spacedim>(
+        std_cxx14::make_unique<FunctionWrapper<dim>>(push_forward, spacedim),
+        std_cxx14::make_unique<FunctionWrapper<spacedim>>(pull_back, dim));
+    }
+
+
+
+    template <int dim, int spacedim>
+    Manifold<dim, spacedim> *
     clone(void *manifold_ptr)
     {
       const Manifold<dim, spacedim> *manifold =
@@ -77,6 +101,12 @@ namespace python
                    manifold))
         {
           return new CylindricalManifold<dim, spacedim>(*d);
+        }
+      else if (const FunctionManifold<dim, spacedim> *d =
+                 dynamic_cast<const FunctionManifold<dim, spacedim> *>(
+                   manifold))
+        {
+          return new FunctionManifold<dim, spacedim>(*d);
         }
       else
         ExcMessage("Unsupported manifold type in clone.");
@@ -120,7 +150,9 @@ namespace python
         manifold_ptr = internal::clone<3, 3>(other.manifold_ptr);
       }
     else
-      AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
   }
 
 
@@ -171,7 +203,9 @@ namespace python
         manifold_ptr = internal::create_spherical_manifold<3, 3>(center);
       }
     else
-      AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
   }
 
 
@@ -192,7 +226,9 @@ namespace python
         manifold_ptr = internal::create_polar_manifold<3, 3>(center);
       }
     else
-      AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
   }
 
 
@@ -211,7 +247,63 @@ namespace python
           internal::create_cylindrical_manifold<3, 3>(axis, tolerance);
       }
     else
-      AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
+  }
+
+
+
+  void
+  ManifoldWrapper::create_function_string(const std::string &push_forward,
+                                          const std::string &pull_back)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<2, 2>(push_forward, pull_back);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<2, 3>(push_forward, pull_back);
+      }
+    else if ((dim == 3) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<3, 3>(push_forward, pull_back);
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
+  }
+
+
+
+  void
+  ManifoldWrapper::create_function(boost::python::object &push_forward,
+                                   boost::python::object &pull_back)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<2, 2>(push_forward, pull_back);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<2, 3>(push_forward, pull_back);
+      }
+    else if ((dim == 3) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_function_manifold<3, 3>(push_forward, pull_back);
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
   }
 
 

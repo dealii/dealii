@@ -28,16 +28,26 @@ namespace python
 
 
   const char create_spherical_docstring[] =
-    " Create spherical manifold with a given center point       \n";
+    " Create spherical manifold with a given center point.      \n";
 
 
   const char create_polar_docstring[] =
-    " Create polar manifold with a given center point           \n";
+    " Create polar manifold with a given center point.          \n";
+
+
+  const char create_function_docstring[] =
+    " Create manifold with the given python push forward and    \n"
+    " pull back functions.                                      \n";
+
+
+  const char create_function_string_docstring[] =
+    " Create manifold with given string expression for the push \n"
+    " forward and pull back functions.                          \n";
 
 
   const char create_cylindrical_docstring[] =
     " Create cylindrical manifold along a given axis            \n"
-    " (0 - x, 1 - y, 2 - z)                                     \n";
+    " (0 - x, 1 - y, 2 - z).                                    \n";
 
 
 
@@ -60,7 +70,15 @@ namespace python
            &ManifoldWrapper::create_cylindrical,
            create_cylindrical_overloads(
              boost::python::args("self", "axis", "tolerance"),
-             create_cylindrical_docstring));
+             create_cylindrical_docstring))
+      .def("create_function",
+           &ManifoldWrapper::create_function,
+           create_function_docstring,
+           boost::python::args("self", "push_forward", "pull_back"))
+      .def("create_function_string",
+           &ManifoldWrapper::create_function_string,
+           create_function_string_docstring,
+           boost::python::args("self", "push_forward", "pull_back"));
   }
 } // namespace python
 
