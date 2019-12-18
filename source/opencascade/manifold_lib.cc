@@ -302,7 +302,45 @@ namespace OpenCASCADE
           }
         default:
           {
-            AssertThrow(false, ExcNotImplemented());
+            // Given an arbitrary number of points we compute all the possible
+            // normal vectors
+            for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+              for (unsigned int j = 0; j < surrounding_points.size(); ++j)
+                if (j != i)
+                  for (unsigned int k = 0; k < surrounding_points.size(); ++k)
+                    if (k != j && k != i)
+                      {
+                        Tensor<1, 3> u =
+                          surrounding_points[i] - surrounding_points[j];
+                        Tensor<1, 3> v =
+                          surrounding_points[i] - surrounding_points[k];
+                        const double n_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                                    u[2] * v[0] - u[0] * v[2],
+                                                    u[0] * v[1] - u[1] * v[0]};
+                        Tensor<1, 3> n1(n_coords);
+                        if (n1.norm() > tolerance)
+                          {
+                            n1 = n1 / n1.norm();
+                            if (average_normal.norm() < tolerance)
+                              average_normal = n1;
+                            else
+                              {
+                                auto dot_prod = n1 * average_normal;
+                                // We check that the direction of the normal
+                                // vector w.r.t the current average, and make
+                                // sure we flip it if it is opposite
+                                if (dot_prod > 0)
+                                  average_normal += n1;
+                                else
+                                  average_normal -= n1;
+                              }
+                          }
+                      }
+            Assert(
+              average_normal.norm() > tolerance,
+              ExcMessage(
+                "Failed to compute a normal: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+            average_normal = average_normal / average_normal.norm();
             break;
           }
       }
