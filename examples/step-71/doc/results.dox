@@ -1,2 +1,155 @@
 <h1>Results</h1>
 
+We run the program with a right hand side that will produce the
+solution $u = \sin(\pi x) \sin(\pi y)$ and with clamped
+boundary conditions in the domain $\Omega = (0,1)^2$.
+We test this setup using $Q_2$, $Q_3$, and $Q_4$ elements, which one can
+change `fe\_degree` in `main()`. With mesh
+refinement, the $L_2$ convergence rates, $H_1$-seminorm convergence
+and $H_2$-seminorm convergence of $u$
+should then be around 2, 2, 1 for $Q_2$ , 4, 3, 2 for
+$Q_3$, and 5, 4, 3 for $Q_4$ separately.
+We use different penalties $\eta = 1$, $2$, and $p(p+1)$ where $p$
+is the degree of polynomials,
+and compare convergence rates of numerical solutions computed by these
+penalties.
+
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = p(p+1)</i> </h3>
+
+<h4>Convergence table</h4>
+
+We run the code with differently refined meshes
+and get the following convergence rates.
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    1.539e-02 </td><td>       </td><td>   8.528e-02   </td><td>           </td><td>  1.602 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>    4.563e-03   </td><td>  1.75  </td><td>  2.408e-02   </td><td>     1.82     </td><td> 7.965e-01  </td><td>  1.00  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>    1.250e-03   </td><td>  1.86    </td><td>  6.438e-03    </td><td>  1.90        </td><td>   3.969e-01 </td><td> 1.00  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>    3.277e-04 </td><td>  1.93   </td><td>   1.666e-03   </td><td>    1.94        </td><td> 1.981e-01  </td><td>  1.00    </td>
+  </tr>
+</table>
+We can see that the $L_2$ convergence rates are around 2,
+$H_1$-seminorm convergence rates are around 2,
+and $H_2$-seminorm convergence rates are around 1.
+
+<h3>Test results on <i>Q<sub>3</sub></i> with <i>\eta = p(p+1)</i> </h3>
+
+<h4>Convergence table</h4>
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    2.187e-04 </td><td>       </td><td>   4.46269e-03   </td><td>           </td><td>  1.638e-01 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>    1.334e-05   </td><td>  4.03  </td><td>  5.54622e-04   </td><td>    3.00     </td><td> 4.095e-02  </td><td>  2.00  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>    8.273e-07   </td><td>  4.01    </td><td>  6.90599e-05    </td><td>  3.00        </td><td>   1.023e-02 </td><td> 2.00  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>    5.164e-08 </td><td>  4.00   </td><td>   8.62168e-06  </td><td>    3.00        </td><td> 2.558e-03  </td><td>  2.00    </td>
+  </tr>
+</table>
+We can see that the $L_2$ convergence rates are around 4,
+$H_1$-seminorm convergence rates are around 3,
+and $H_2$-seminorm convergence rates are around 2.
+This, of course, matches our theoretical expectations.
+
+<h3>Test results on <i>Q<sub>4</sub></i> with <i>\eta = p(p+1)</i> </h3>
+
+<h4>Convergence table</h4>
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    8.34446e-06 </td><td>       </td><td>   0.000239323   </td><td>           </td><td>  0.0109785 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>   2.98497e-07   </td><td>  4.80  </td><td>  1.63221e-05  </td><td>   3.87     </td><td> 0.0013551 </td><td>  3.01  </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>    9.87063e-09  </td><td>  4.91   </td><td>  1.06066e-06    </td><td> 3.94       </td><td>  0.000167898 </td><td> 3.01  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>   7.88939e-10 </td><td>  3.64  </td><td>    6.75478e-08 </td><td>  3.97       </td><td> 2.08912e-05   </td><td>  3.00    </td>
+  </tr>
+</table>
+We can see that the $L_2$ norm convergence rates are around 5,
+$H_1$-seminorm convergence rates are around 4,
+and $H_2$-seminorm convergence rates are around 3.
+On the finest mesh, the $L_2$ norm convergence rate
+is much smaller than our theoretical expectations
+because the linear solver becomes the limiting factor due
+to round-off. But the $L_2$ error is pretty small in that case.
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = 1</i> </h3>
+
+<h4>Convergence table</h4>
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    4.86048e-02 </td><td>       </td><td>   3.30386e-01   </td><td>           </td><td>  4.34917 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>    1.29921e-02   </td><td>  1.90  </td><td> 1.4852e-01   </td><td>    1.15    </td><td> 4.01192  </td><td>  0.116 </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>   3.33539e-03   </td><td>  1.96    </td><td>  7.20252e-02    </td><td>  1.04       </td><td>  3.96138 </td><td> 0.018  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>    8.41058e-04 </td><td>  1.98   </td><td>  3.57705e-02  </td><td>    1.00       </td><td> 3.95719  </td><td>  0.001   </td>
+  </tr>
+</table>
+Although $L_2$ norm and $H_1$-seminorm convergence rates of $u$
+follow the theoretical expectations, $H_2$-seminorm does not converge.
+Comparing results from $\eta = 1$ and $\eta = p(p+1)$,
+$\eta = p(p+1)$ is a better penalty.
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = 2</i> </h3>
+
+<h4>Convergence table</h4>
+
+
+<table align="center" class="doxtable">
+  <tr>
+   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    5.482e-03 </td><td>       </td><td>   7.652e-02  </td><td>           </td><td>  1.756e-00 </td><td>   </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>    2.227e-02   </td><td>  1.29  </td><td> 2.177e-02   </td><td>   1.81   </td><td> 8.711e-01  </td><td> 1.01 </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>  9.088e-04   </td><td>  1.29    </td><td> 6.026e-03    </td><td>  1.85       </td><td> 4.196e-01 </td><td> 1.05  </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>   2.822e-04  </td><td>  1.68  </td><td> 1.605e-03 </td><td>    1.90     </td><td> 2.041e-01  </td><td> 1.03  </td>
+  </tr>
+</table>
+In the case, all convergence rates of $u$
+follow the theoretical expectations.
+But compared to the results from $\eta = p(p+1)$,
+it does not show a good convergence on $L_2$ errors.
