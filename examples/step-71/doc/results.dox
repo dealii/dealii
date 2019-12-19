@@ -4,15 +4,19 @@ We run the program with a right hand side that will produce the
 solution $u = \sin(\pi x) \sin(\pi y)$ and with clamped
 boundary conditions in the domain $\Omega = (0,1)^2$.
 We test this setup using $Q_2$, $Q_3$, and $Q_4$ elements, which one can
-change `fe\_degree` in `main()`. With mesh
+change via the `fe_degree` variable in the `main()` function. With mesh
 refinement, the $L_2$ convergence rates, $H_1$-seminorm convergence
 and $H_2$-seminorm convergence of $u$
 should then be around 2, 2, 1 for $Q_2$ , 4, 3, 2 for
-$Q_3$, and 5, 4, 3 for $Q_4$ separately.
-We use different penalties $\eta = 1$, $2$, and $p(p+1)$ where $p$
-is the degree of polynomials,
-and compare convergence rates of numerical solutions computed by these
-penalties.
+$Q_3$, and 5, 4, 3 for $Q_4$, respectively.
+
+From the papers by Brenner et al., it is not immediately clear what
+the penalty parameter $\eta$ should be. Educated guesses, comparing
+to the discontinuous Galerkin formulations for the Laplace equation,
+suggest that $\eta = 1$, $2$, and $p(p+1)$ would all be reasonable,
+where $p$ is the degree of polynomials. This is easy to change
+in the code from its current default. Below we show results for
+all of these.
 
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = p(p+1)</i> </h3>
@@ -124,7 +128,7 @@ to round-off. But the $L_2$ error is pretty small in that case.
 </table>
 Although $L_2$ norm and $H_1$-seminorm convergence rates of $u$
 follow the theoretical expectations, $H_2$-seminorm does not converge.
-Comparing results from $\eta = 1$ and $\eta = p(p+1)$,
+Comparing results from $\eta = 1$ and $\eta = p(p+1)$, it is clear that
 $\eta = p(p+1)$ is a better penalty.
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = 2</i> </h3>
@@ -153,3 +157,10 @@ In the case, all convergence rates of $u$
 follow the theoretical expectations.
 But compared to the results from $\eta = p(p+1)$,
 it does not show a good convergence on $L_2$ errors.
+
+
+<h3> Conclusions for the choice of the penalty parameter </3>
+
+The conclusions for which of the "reasonable" choices one should use for the penalty parameter
+is that $\eta=p(p+1)$ yields the expected results. It is, consequently, what the code
+uses as currently written.
