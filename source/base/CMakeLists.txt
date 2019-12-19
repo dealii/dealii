@@ -45,6 +45,7 @@ SET(_unity_include_src
   logstream.cc
   hdf5.cc
   mpi.cc
+  mu_parser_internal.cc
   multithread_info.cc
   named_selection.cc
   numbers.cc
@@ -79,6 +80,7 @@ SET(_unity_include_src
   subscriptor.cc
   table_handler.cc
   tensor_function.cc
+  tensor_function_parser.cc
   tensor_product_polynomials.cc
   tensor_product_polynomials_bubbles.cc
   tensor_product_polynomials_const.cc
@@ -128,6 +130,7 @@ SET(_inst
   symmetric_tensor.inst.in
   tensor.inst.in
   tensor_function.inst.in
+  tensor_function_parser.inst.in
   time_stepping.inst.in
   )
 

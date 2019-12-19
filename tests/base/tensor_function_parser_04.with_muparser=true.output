@@ -1,0 +1,12 @@
+
+DEAL::Initialize Succeeded with dim = 2, rank = 1, 2 expressions, x,y,t as variables.
+DEAL::Value at p = (0.5,0.5): 
+DEAL::-1.83697e-16   -1.00000   at time t = 0
+DEAL::Value at p = (0.5,0.5): 
+DEAL::-4.28626e-16   -1.00000   at time t = 1
+DEAL::Value at p = (0.5,0.5): 
+DEAL::-2.44991e-15   -1.00000   at time t = 2
+DEAL::Value at p = (0.5,0.5): 
+DEAL::-2.69484e-15   -1.00000   at time t = 3
+DEAL::Value at p = (0.5,0.5): 
+DEAL::-2.93977e-15   -1.00000   at time t = 4
