@@ -227,6 +227,12 @@ public:
                                  const Point<dim> & p,
                                  const unsigned int component) const override;
 
+  /**
+   * Return an estimate (in bytes) for the memory consumption of this object.
+   */
+  virtual std::size_t
+  memory_consumption() const override;
+
 protected:
   /*
    * NOTE: The following function has its definition inlined into the class

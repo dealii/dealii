@@ -581,6 +581,16 @@ FE_Poly<PolynomialType, dim, spacedim>::get_poly_space_numbering_inverse() const
 
 
 
+template <class PolynomialType, int dim, int spacedim>
+std::size_t
+FE_Poly<PolynomialType, dim, spacedim>::memory_consumption() const
+{
+  return FiniteElement<dim, spacedim>::memory_consumption() +
+         poly_space.memory_consumption();
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

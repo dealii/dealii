@@ -209,6 +209,12 @@ public:
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
 
+  /**
+   * Return an estimate (in bytes) for the memory consumption of this object.
+   */
+  virtual std::size_t
+  memory_consumption() const override;
+
 protected:
   /**
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.

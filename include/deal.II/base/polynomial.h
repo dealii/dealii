@@ -225,6 +225,12 @@ namespace Polynomials
     void
     serialize(Archive &ar, const unsigned int version);
 
+    /**
+     * Return an estimate (in bytes) for the memory consumption of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const;
+
   protected:
     /**
      * This function performs the actual scaling.

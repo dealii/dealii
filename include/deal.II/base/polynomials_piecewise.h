@@ -132,6 +132,12 @@ namespace Polynomials
     void
     serialize(Archive &ar, const unsigned int version);
 
+    /**
+     * Return an estimate (in bytes) for the memory consumption of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const;
+
   protected:
     /**
      * Underlying polynomial object that is scaled to a subinterval and
