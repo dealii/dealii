@@ -138,6 +138,12 @@ public:
   virtual std::string
   name() const = 0;
 
+  /**
+   * Return an estimate (in bytes) for the memory consumption of this object.
+   */
+  virtual std::size_t
+  memory_consumption() const;
+
 private:
   /**
    * The highest polynomial degree of this functions represented by this object.

@@ -320,17 +320,6 @@ public:
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const override;
 
-  /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object.
-   *
-   * This function is made virtual, since finite element objects are usually
-   * accessed through pointers to their base class, rather than the class
-   * itself.
-   */
-  virtual std::size_t
-  memory_consumption() const override;
-
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 

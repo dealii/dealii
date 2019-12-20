@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
@@ -431,6 +432,17 @@ TensorProductPolynomials<dim, PolynomialType>::clone() const
 {
   return std_cxx14::make_unique<TensorProductPolynomials<dim, PolynomialType>>(
     *this);
+}
+
+
+
+template <int dim, typename PolynomialType>
+std::size_t
+TensorProductPolynomials<dim, PolynomialType>::memory_consumption() const
+{
+  return (MemoryConsumption::memory_consumption(polynomials) +
+          MemoryConsumption::memory_consumption(index_map) +
+          MemoryConsumption::memory_consumption(index_map_inverse));
 }
 
 

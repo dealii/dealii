@@ -819,16 +819,6 @@ FE_DGQ<dim, spacedim>::get_constant_modes() const
 
 
 
-template <int dim, int spacedim>
-std::size_t
-FE_DGQ<dim, spacedim>::memory_consumption() const
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
-
-
-
 // ------------------------------ FE_DGQArbitraryNodes -----------------------
 
 template <int dim, int spacedim>
