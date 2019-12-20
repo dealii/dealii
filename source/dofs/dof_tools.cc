@@ -227,9 +227,7 @@ namespace DoFTools
 
       // then loop over all cells and do the work
       std::vector<types::global_dof_index> indices;
-      for (typename DoFHandlerType::active_cell_iterator c = dof.begin_active();
-           c != dof.end();
-           ++c)
+      for (const auto &c : dof.active_cell_iterators())
         if (c->is_locally_owned())
           {
             const unsigned int fe_index      = c->active_fe_index();
@@ -444,6 +442,70 @@ namespace DoFTools
 
 
   template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof, const ComponentMask &component_mask)
+  {
+    Assert(component_mask.represents_n_components(
+             dof.get_fe_collection().n_components()),
+           ExcMessage(
+             "The given component mask is not sized correctly to represent the "
+             "components of the given finite element."));
+
+    // Two special cases: no component is selected, and all components are
+    // selected; both rather stupid, but easy to catch
+    if (component_mask.n_selected_components(
+          dof.get_fe_collection().n_components()) == 0)
+      return IndexSet(dof.n_dofs());
+    else if (component_mask.n_selected_components(
+               dof.get_fe_collection().n_components()) ==
+             dof.get_fe_collection().n_components())
+      return dof.locally_owned_dofs();
+
+    // If we have to deal with a partial component mask, then
+    // set up a table for the degrees of freedom on the reference cell (for
+    // each element in the collection) to see whether it belongs to one of the
+    // desired components.
+    const auto &                   fe_collection = dof.get_fe_collection();
+    std::vector<std::vector<bool>> local_selected_dofs;
+    Assert(fe_collection.n_components() < 256, ExcNotImplemented());
+    for (unsigned int f = 0; f < fe_collection.size(); ++f)
+      {
+        // First get the component for each shape function
+        const std::vector<unsigned char> local_component_association =
+          internal::get_local_component_association(fe_collection[f],
+                                                    component_mask);
+
+        // Check which dofs were selected
+        std::vector<bool> this_selected_dofs(fe_collection[f].dofs_per_cell);
+        for (unsigned int i = 0; i < fe_collection[f].dofs_per_cell; ++i)
+          this_selected_dofs[i] =
+            component_mask[local_component_association[i]];
+
+        local_selected_dofs.emplace_back(std::move(this_selected_dofs));
+      }
+
+    // Then loop over all cells and do the work
+    IndexSet                             selected_dofs(dof.n_dofs());
+    std::vector<types::global_dof_index> local_dof_indices;
+    for (const auto &c : dof.active_cell_iterators())
+      if (c->is_locally_owned())
+        {
+          const unsigned int fe_index      = c->active_fe_index();
+          const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
+          local_dof_indices.resize(dofs_per_cell);
+          c->get_dof_indices(local_dof_indices);
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            if (dof.locally_owned_dofs().is_element(local_dof_indices[i]) &&
+                local_selected_dofs[fe_index][i])
+              selected_dofs.add_index(local_dof_indices[i]);
+        }
+
+    return selected_dofs;
+  }
+
+
+
+  template <typename DoFHandlerType>
   void
   extract_dofs(const DoFHandlerType &dof,
                const BlockMask &     block_mask,
@@ -452,6 +514,17 @@ namespace DoFTools
     // simply forward to the function that works based on a component mask
     extract_dofs<DoFHandlerType>(
       dof, dof.get_fe_collection().component_mask(block_mask), selected_dofs);
+  }
+
+
+
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof, const BlockMask &block_mask)
+  {
+    // simply forward to the function that works based on a component mask
+    return extract_dofs<DoFHandlerType>(
+      dof, dof.get_fe_collection().component_mask(block_mask));
   }
 
 
