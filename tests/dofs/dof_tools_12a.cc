@@ -25,16 +25,13 @@ template <typename DoFHandlerType>
 void
 check_this(const DoFHandlerType &dof_handler)
 {
-  std::vector<bool> selected_dofs(dof_handler.n_locally_owned_dofs());
   std::vector<bool> mask(dof_handler.get_fe().n_components(), false);
 
   // only select first component
   mask[0] = true;
-  DoFTools::extract_dofs(dof_handler, ComponentMask(mask), selected_dofs);
-  output_bool_vector(selected_dofs);
+  output_bool_vector(DoFTools::extract_dofs(dof_handler, ComponentMask(mask)));
 
   // also select last component
   mask.back() = true;
-  DoFTools::extract_dofs(dof_handler, ComponentMask(mask), selected_dofs);
-  output_bool_vector(selected_dofs);
+  output_bool_vector(DoFTools::extract_dofs(dof_handler, ComponentMask(mask)));
 }

@@ -91,12 +91,11 @@ SystemTest<dim>::check()
     {
       deallog << "Checking for component " << c << std::endl;
       std::vector<bool> x(fe.n_components(), false);
-      x[c] = true;
-      std::vector<bool> sel(dof_handler.n_dofs());
-      DoFTools::extract_dofs(dof_handler, ComponentMask(x), sel);
+      x[c]         = true;
+      IndexSet sel = DoFTools::extract_dofs(dof_handler, ComponentMask(x));
 
       for (unsigned int i = 0; i < sel.size(); ++i)
-        if (sel[i])
+        if (sel.is_element(i))
           deallog << "  DoF " << i << std::endl;
     };
 
