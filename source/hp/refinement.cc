@@ -18,6 +18,8 @@
 
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_refinement.h>
@@ -28,6 +30,25 @@
 #include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace
+{
+  /**
+   * ComparisonFunction returning 'true' or 'false' for any set of parameters.
+   *
+   * These will be used to overwrite user-provided comparison functions whenever
+   * no actual comparison is required in the decision process, i.e. when no or
+   * all cells will be refined or coarsened.
+   */
+  template <typename Number>
+  hp::Refinement::ComparisonFunction<Number> compare_false =
+    [](const Number &, const Number &) { return false; };
+  template <typename Number>
+  hp::Refinement::ComparisonFunction<Number> compare_true =
+    [](const Number &, const Number &) { return true; };
+} // namespace
+
+
 
 namespace hp
 {
@@ -168,9 +189,12 @@ namespace hp
               }
           }
 
-      if (const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &dof_handler.get_triangulation()))
+      const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &dof_handler.get_triangulation());
+      if (parallel_tria != nullptr &&
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) == nullptr)
         {
           max_criterion_refine =
             Utilities::MPI::max(max_criterion_refine,
@@ -203,6 +227,191 @@ namespace hp
                                            threshold_coarsen,
                                            compare_refine,
                                            compare_coarsen);
+    }
+
+
+
+    template <int dim, typename Number, int spacedim>
+    void
+    p_adaptivity_fixed_number(
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &               criteria,
+      const double                         p_refine_fraction,
+      const double                         p_coarsen_fraction,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
+    {
+      AssertDimension(dof_handler.get_triangulation().n_active_cells(),
+                      criteria.size());
+      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+
+      // 1.) First extract from the vector of indicators the ones that
+      //     correspond to cells that we locally own.
+      unsigned int   n_flags_refinement = 0;
+      unsigned int   n_flags_coarsening = 0;
+      Vector<Number> indicators_refinement(
+        dof_handler.get_triangulation().n_active_cells());
+      Vector<Number> indicators_coarsening(
+        dof_handler.get_triangulation().n_active_cells());
+      for (const auto &cell :
+           dof_handler.get_triangulation().active_cell_iterators())
+        if (!cell->is_artificial() && cell->is_locally_owned())
+          {
+            if (cell->refine_flag_set())
+              indicators_refinement(n_flags_refinement++) =
+                criteria(cell->active_cell_index());
+            else if (cell->coarsen_flag_set())
+              indicators_coarsening(n_flags_coarsening++) =
+                criteria(cell->active_cell_index());
+          }
+      indicators_refinement.grow_or_shrink(n_flags_refinement);
+      indicators_coarsening.grow_or_shrink(n_flags_coarsening);
+
+      // 2.) Determine the number of cells for p-refinement and p-coarsening on
+      //     basis of the flagged cells.
+      //
+      // 3.) Find thresholds for p-refinment and p-coarsening on only those
+      //     cells flagged for adaptation.
+      //
+      //     For cases in which no or all cells flagged for refinement and/or
+      //     coarsening are subject to p-adaptation, we usually pick thresholds
+      //     that apply to all or none of the cells at once. However here, we
+      //     do not know which threshold would suffice for this task because the
+      //     user could provide any comparison function. Thus if necessary, we
+      //     overwrite the user's choice with suitable functions simplying
+      //     returning 'true' and 'false' for any cell with reference wrappers.
+      //     Thus, no function object copies are stored.
+      //
+      // 4.) Perform p-adaptation with absolute thresholds.
+      Number threshold_refinement      = 0.;
+      Number threshold_coarsening      = 0.;
+      auto   reference_compare_refine  = std::cref(compare_refine);
+      auto   reference_compare_coarsen = std::cref(compare_coarsen);
+
+      const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &dof_handler.get_triangulation());
+      if (parallel_tria != nullptr &&
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) == nullptr)
+        {
+#ifndef DEAL_II_WITH_P4EST
+          Assert(false, ExcInternalError());
+#else
+          //
+          // parallel implementation with distributed memory
+          //
+
+          MPI_Comm mpi_communicator = parallel_tria->get_communicator();
+
+          // 2.) Communicate the number of cells scheduled for p-adaptation
+          //     globally.
+          const unsigned int n_global_flags_refinement =
+            Utilities::MPI::sum(n_flags_refinement, mpi_communicator);
+          const unsigned int n_global_flags_coarsening =
+            Utilities::MPI::sum(n_flags_coarsening, mpi_communicator);
+
+          const unsigned int target_index_refinement =
+            static_cast<unsigned int>(
+              std::floor(p_refine_fraction * n_global_flags_refinement));
+          const unsigned int target_index_coarsening =
+            static_cast<unsigned int>(
+              std::ceil((1 - p_coarsen_fraction) * n_global_flags_coarsening));
+
+          // 3.) Figure out the global max and min of the criteria. We don't
+          //     need it here, but it's a collective communication call.
+          const std::pair<Number, Number> global_min_max_refinement =
+            dealii::internal::parallel::distributed::GridRefinement::
+              compute_global_min_and_max_at_root(indicators_refinement,
+                                                 mpi_communicator);
+
+          const std::pair<Number, Number> global_min_max_coarsening =
+            dealii::internal::parallel::distributed::GridRefinement::
+              compute_global_min_and_max_at_root(indicators_coarsening,
+                                                 mpi_communicator);
+
+          // 3.) Compute thresholds if necessary.
+          if (target_index_refinement == 0)
+            reference_compare_refine = std::cref(compare_false<Number>);
+          else if (target_index_refinement == n_global_flags_refinement)
+            reference_compare_refine = std::cref(compare_true<Number>);
+          else
+            threshold_refinement = dealii::internal::parallel::distributed::
+              GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
+                indicators_refinement,
+                global_min_max_refinement,
+                target_index_refinement,
+                mpi_communicator);
+
+          if (target_index_coarsening == n_global_flags_coarsening)
+            reference_compare_coarsen = std::cref(compare_false<Number>);
+          else if (target_index_coarsening == 0)
+            reference_compare_coarsen = std::cref(compare_true<Number>);
+          else
+            threshold_coarsening = dealii::internal::parallel::distributed::
+              GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
+                indicators_coarsening,
+                global_min_max_coarsening,
+                target_index_coarsening,
+                mpi_communicator);
+#endif
+        }
+      else
+        {
+          //
+          // serial implementation (and parallel::shared implementation)
+          //
+
+          // 2.) Determine the number of cells scheduled for p-adaptation.
+          const unsigned int n_p_refine_cells = static_cast<unsigned int>(
+            std::floor(p_refine_fraction * n_flags_refinement));
+          const unsigned int n_p_coarsen_cells = static_cast<unsigned int>(
+            std::floor(p_coarsen_fraction * n_flags_coarsening));
+
+          // 3.) Compute thresholds if necessary.
+          if (n_p_refine_cells == 0)
+            reference_compare_refine = std::cref(compare_false<Number>);
+          else if (n_p_refine_cells == n_flags_refinement)
+            reference_compare_refine = std::cref(compare_true<Number>);
+          else
+            {
+              std::nth_element(indicators_refinement.begin(),
+                               indicators_refinement.begin() +
+                                 n_p_refine_cells - 1,
+                               indicators_refinement.end(),
+                               std::greater<Number>());
+              threshold_refinement =
+                *(indicators_refinement.begin() + n_p_refine_cells - 1);
+            }
+
+          if (n_p_coarsen_cells == 0)
+            reference_compare_coarsen = std::cref(compare_false<Number>);
+          else if (n_p_coarsen_cells == n_flags_coarsening)
+            reference_compare_coarsen = std::cref(compare_true<Number>);
+          else
+            {
+              std::nth_element(indicators_coarsening.begin(),
+                               indicators_coarsening.begin() +
+                                 n_p_coarsen_cells - 1,
+                               indicators_coarsening.end(),
+                               std::less<Number>());
+              threshold_coarsening =
+                *(indicators_coarsening.begin() + n_p_coarsen_cells - 1);
+            }
+        }
+
+      // 4.) Finally perform adaptation.
+      p_adaptivity_from_absolute_threshold(dof_handler,
+                                           criteria,
+                                           threshold_refinement,
+                                           threshold_coarsening,
+                                           std::cref(reference_compare_refine),
+                                           std::cref(
+                                             reference_compare_coarsen));
     }
 
 

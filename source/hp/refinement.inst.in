@@ -74,6 +74,17 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
           const ComparisonFunction<typename identity<S>::type> &);
 
         template void
+        p_adaptivity_fixed_number<deal_II_dimension,
+                                  S,
+                                  deal_II_space_dimension>(
+          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const Vector<S> &,
+          const double,
+          const double,
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
+
+        template void
         p_adaptivity_from_regularity<deal_II_dimension,
                                      S,
                                      deal_II_space_dimension>(
