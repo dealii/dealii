@@ -426,7 +426,7 @@ namespace Step71
 
 
     // The next building block is the one that assembled penalty terms on each
-    // of the interior faces of the mesh. As described in the documention of
+    // of the interior faces of the mesh. As described in the documentation of
     // MeshWorker::mesh_loop(), this function receives arguments that denote
     // a cell and its neighboring cell, as well as (for each of the two
     // cells) the face (and potentially sub-face) we have to integrate
