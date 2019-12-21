@@ -107,8 +107,8 @@ test()
 
   const unsigned int n_active = tria.n_active_cells();
   std::vector<bool>  p_flags(n_active, false);
-  std::fill(p_flags.begin(), p_flags.begin() + .25 * n_active, true);
-  std::fill(p_flags.end() - .25 * n_active, p_flags.end(), true);
+  std::fill(p_flags.begin(), p_flags.begin() + n_active / 4, true);
+  std::fill(p_flags.end() - n_active / 4, p_flags.end(), true);
 
   hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
 

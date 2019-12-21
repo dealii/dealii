@@ -385,8 +385,8 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &) const
 template <int rank, int dim, typename Number>
 void
 TensorFunctionParser<rank, dim, Number>::value_list(
-  const std::vector<Point<dim>> &         p,
-  std::vector<Tensor<rank, dim, Number>> &values) const
+  const std::vector<Point<dim>> &,
+  std::vector<Tensor<rank, dim, Number>> &) const
 {
   Assert(false, ExcNeedsFunctionparser());
 }
