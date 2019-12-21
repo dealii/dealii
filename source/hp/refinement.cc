@@ -31,25 +31,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
-{
-  /**
-   * ComparisonFunction returning 'true' or 'false' for any set of parameters.
-   *
-   * These will be used to overwrite user-provided comparison functions whenever
-   * no actual comparison is required in the decision process, i.e. when no or
-   * all cells will be refined or coarsened.
-   */
-  template <typename Number>
-  hp::Refinement::ComparisonFunction<Number> compare_false =
-    [](const Number &, const Number &) { return false; };
-  template <typename Number>
-  hp::Refinement::ComparisonFunction<Number> compare_true =
-    [](const Number &, const Number &) { return true; };
-} // namespace
-
-
-
 namespace hp
 {
   namespace Refinement
@@ -249,6 +230,15 @@ namespace hp
       Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
              dealii::GridRefinement::ExcInvalidParameterValue());
 
+      // ComparisonFunction returning 'true' or 'false' for any set of
+      // parameters. These will be used to overwrite user-provided comparison
+      // functions whenever no actual comparison is required in the decision
+      // process, i.e. when no or all cells will be refined or coarsened.
+      const ComparisonFunction<Number> compare_false =
+        [](const Number &, const Number &) { return false; };
+      const ComparisonFunction<Number> compare_true =
+        [](const Number &, const Number &) { return true; };
+
       // 1.) First extract from the vector of indicators the ones that
       //     correspond to cells that we locally own.
       unsigned int   n_flags_refinement = 0;
@@ -336,9 +326,9 @@ namespace hp
 
           // 3.) Compute thresholds if necessary.
           if (target_index_refinement == 0)
-            reference_compare_refine = std::cref(compare_false<Number>);
+            reference_compare_refine = std::cref(compare_false);
           else if (target_index_refinement == n_global_flags_refinement)
-            reference_compare_refine = std::cref(compare_true<Number>);
+            reference_compare_refine = std::cref(compare_true);
           else
             threshold_refinement = dealii::internal::parallel::distributed::
               GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
@@ -348,9 +338,9 @@ namespace hp
                 mpi_communicator);
 
           if (target_index_coarsening == n_global_flags_coarsening)
-            reference_compare_coarsen = std::cref(compare_false<Number>);
+            reference_compare_coarsen = std::cref(compare_false);
           else if (target_index_coarsening == 0)
-            reference_compare_coarsen = std::cref(compare_true<Number>);
+            reference_compare_coarsen = std::cref(compare_true);
           else
             threshold_coarsening = dealii::internal::parallel::distributed::
               GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
@@ -374,9 +364,9 @@ namespace hp
 
           // 3.) Compute thresholds if necessary.
           if (n_p_refine_cells == 0)
-            reference_compare_refine = std::cref(compare_false<Number>);
+            reference_compare_refine = std::cref(compare_false);
           else if (n_p_refine_cells == n_flags_refinement)
-            reference_compare_refine = std::cref(compare_true<Number>);
+            reference_compare_refine = std::cref(compare_true);
           else
             {
               std::nth_element(indicators_refinement.begin(),
@@ -389,9 +379,9 @@ namespace hp
             }
 
           if (n_p_coarsen_cells == 0)
-            reference_compare_coarsen = std::cref(compare_false<Number>);
+            reference_compare_coarsen = std::cref(compare_false);
           else if (n_p_coarsen_cells == n_flags_coarsening)
-            reference_compare_coarsen = std::cref(compare_true<Number>);
+            reference_compare_coarsen = std::cref(compare_true);
           else
             {
               std::nth_element(indicators_coarsening.begin(),
