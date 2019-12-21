@@ -1015,7 +1015,7 @@ namespace internal
  *   triangulation.set_all_manifold_ids_on_boundary(42);
  *
  *   // set_manifold stores a copy of its second argument,
- *   // so a temporary is ookay
+ *   // so a temporary is okay
  *   triangulation.set_manifold(42, PolarManifold<2>());
  *   for (unsigned int i = 0; i < 4; ++i)
  *     {
