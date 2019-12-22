@@ -211,7 +211,7 @@ public:
       const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;

@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -657,6 +658,17 @@ namespace Polynomials
         {
           out << coefficients[i] << " x^" << i << std::endl;
         }
+  }
+
+
+  template <typename number>
+  std::size_t
+  Polynomial<number>::memory_consumption() const
+  {
+    return (MemoryConsumption::memory_consumption(coefficients) +
+            MemoryConsumption::memory_consumption(in_lagrange_product_form) +
+            MemoryConsumption::memory_consumption(lagrange_support_points) +
+            MemoryConsumption::memory_consumption(lagrange_weight));
   }
 
 

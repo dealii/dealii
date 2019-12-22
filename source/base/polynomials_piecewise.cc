@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
 
 
@@ -113,6 +114,18 @@ namespace Polynomials
     // change sign if necessary
     for (unsigned int j = 1; j <= n_derivatives; j += 2)
       values[j] *= derivative_change_sign;
+  }
+
+
+
+  template <typename number>
+  std::size_t
+  PiecewisePolynomial<number>::memory_consumption() const
+  {
+    return (polynomial.memory_consumption() +
+            MemoryConsumption::memory_consumption(n_intervals) +
+            MemoryConsumption::memory_consumption(interval) +
+            MemoryConsumption::memory_consumption(spans_two_intervals));
   }
 
 
