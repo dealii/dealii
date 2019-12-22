@@ -2398,19 +2398,19 @@ namespace DoFTools
    * @note The precondition to this function that the output argument needs to
    * have size equal to the total number of degrees of freedom makes this
    * function unsuitable for the case that the given DoFHandler object derives
-   * from a parallel::distributed::Triangulation object.  Consequently, this
-   * function will produce an error if called with such a DoFHandler.
+   * from a parallel::TriangulationBase object (or any of the classes derived
+   * from parallel::TriangulationBase). Consequently, this function will produce
+   * an error if called with such a DoFHandler.
    *
-   * @param mapping The mapping from the reference cell to the real cell on
+   * @param[in] mapping The mapping from the reference cell to the real cell on
    * which DoFs are defined.
-   * @param dof_handler The object that describes which DoF indices live on
+   * @param[in] dof_handler The object that describes which DoF indices live on
    * which cell of the triangulation.
-   * @param support_points A vector that stores the corresponding location of the dofs
-   * in real space coordinates. Previous content of this object is deleted in
-   * this function.
-   * @param component_mask An optional component mask that restricts the
+   * @param[in,out] support_points A vector that stores the corresponding
+   * location of the dofs in real space coordinates. Previous content of this
+   * object is deleted in this function.
+   * @param[in] component_mask An optional component mask that restricts the
    * components from which the support points are extracted.
-   *
    */
   template <int dim, int spacedim>
   void
@@ -2422,7 +2422,6 @@ namespace DoFTools
   /**
    * Same as the previous function but for the hp case.
    */
-
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
@@ -2438,7 +2437,8 @@ namespace DoFTools
    * with one entry for each global degree of freedom, but instead a map that
    * maps from the DoFs index to its location. The point of this function is
    * that it is also usable in cases where the DoFHandler is based on a
-   * parallel::distributed::Triangulation object. In such cases, each
+   * parallel::TriangulationBase object (or any of the classes derived from
+   * parallel::TriangulationBase). In such cases, each
    * processor will not be able to determine the support point location of all
    * DoFs, and worse no processor may be able to hold a vector that would
    * contain the locations of all DoFs even if they were known. As a
@@ -2450,14 +2450,14 @@ namespace DoFTools
    * For non-distributed triangulations, the map returned as @p support_points
    * is of course dense, i.e., every DoF is to be found in it.
    *
-   * @param mapping The mapping from the reference cell to the real cell on
+   * @param[in] mapping The mapping from the reference cell to the real cell on
    * which DoFs are defined.
-   * @param dof_handler The object that describes which DoF indices live on
+   * @param[in] dof_handler The object that describes which DoF indices live on
    * which cell of the triangulation.
-   * @param support_points A map that for every locally relevant DoF index
-   * contains the corresponding location in real space coordinates. Previous
-   * content of this object is deleted in this function.
-   * @param component_mask An optional component mask that restricts the
+   * @param[in,out] support_points A map that for every locally relevant DoF
+   * index contains the corresponding location in real space coordinates.
+   * Previous content of this object is deleted in this function.
+   * @param[in] component_mask An optional component mask that restricts the
    * components from which the support points are extracted.
    */
   template <int dim, int spacedim>
