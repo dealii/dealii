@@ -1895,7 +1895,7 @@ namespace internal
     };
 
     template <typename Number>
-    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    struct VectorUpdatesRange : public ::dealii::parallel::ParallelForInteger
     {
       VectorUpdatesRange(const VectorUpdater<Number> &updater,
                          const std::size_t            size)
