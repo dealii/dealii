@@ -385,6 +385,17 @@ namespace Step71
     //    f^K_i = \int_K varphi_i(x) f(x) dx
     // @f}
     // to the right hand side vector.
+    //
+    // We use the same technique as used in the assembly of step-22
+    // to accelerate the function: Instead of calling
+    // `fe_values.shape_hessian(i, qpoint)` in the innermost loop,
+    // we instead create a variable `hessian_i` that evaluates this
+    // value once in the loop over `i` and re-use the so-evaluated
+    // value in the loop over `j`. For symmetry, we do the same with a
+    // variable `hessian_j`, although it is indeed only used once and
+    // we could have left the call to `fe_values.shape_hessian(j,qpoint)`
+    // in the instruction that computes the scalar product between
+    // the two terms.
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
@@ -401,36 +412,36 @@ namespace Step71
       const unsigned int dofs_per_cell =
         scratch_data.fe_values.get_fe().dofs_per_cell;
 
-      for (unsigned int point = 0; point < fe_values.n_quadrature_points;
-           ++point)
+      for (unsigned int qpoint = 0; qpoint < fe_values.n_quadrature_points;
+           ++qpoint)
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               const Tensor<2, dim> hessian_i =
-                fe_values.shape_hessian(i, point);
+                fe_values.shape_hessian(i, qpoint);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
                   const Tensor<2, dim> hessian_j =
-                    fe_values.shape_hessian(j, point);
+                    fe_values.shape_hessian(j, qpoint);
 
                   copy_data.cell_matrix(i, j) +=
                     scalar_product(hessian_i,   // nabla^2 phi_i(x)
                                    hessian_j) * // nabla^2 phi_j(x)
-                    fe_values.JxW(point);       // dx
+                    fe_values.JxW(qpoint);      // dx
                 }
 
               copy_data.cell_rhs(i) +=
-                fe_values.shape_value(i, point) * // phi_i(x)
+                fe_values.shape_value(i, qpoint) * // phi_i(x)
                 right_hand_side.value(
-                  fe_values.quadrature_point(point)) * // f(x)
-                fe_values.JxW(point);                  // dx
+                  fe_values.quadrature_point(qpoint)) * // f(x)
+                fe_values.JxW(qpoint);                  // dx
             }
         }
     };
 
 
-    // The next building block is the one that assembled penalty terms on each
+    // The next building block is the one that assembles penalty terms on each
     // of the interior faces of the mesh. As described in the documentation of
     // MeshWorker::mesh_loop(), this function receives arguments that denote
     // a cell and its neighboring cell, as well as (for each of the two
@@ -445,9 +456,12 @@ namespace Step71
     // the number of faces (or subfaces) over which we integrate for a
     // given cell differs from cell to cell, and the sizes of these
     // matrices also differ, depending on what degrees of freedom
-    // are adjacent to the face or subface.
-    //
-    // TODO: Complete once we've got all terms and factors pinned down.
+    // are adjacent to the face or subface. As discussed in the documentation
+    // of MeshWorker::mesh_loop(), the copy object is reset every time a new
+    // cell is visited, so that what we push to the end of
+    // `copy_data.face_data()` is really all that the later `copier` function
+    // gets to see when it copies the contributions of each cell to the global
+    // matrix and right hand side objects.
     auto face_worker = [&](const Iterator &    cell,
                            const unsigned int &f,
                            const unsigned int &sf,
@@ -471,46 +485,40 @@ namespace Step71
       copy_data_face.cell_matrix.reinit(n_interface_dofs, n_interface_dofs);
 
       // The second part deals with determining what the penalty
-      // parameter should be.
-      // TODO: Complete
-
-      // eta = 1/2 + 2C_2
-      // gamma = eta/|e|
-
-      double gamma = 1.0; // TODO:
-
-      {
-        int                degree = fe.tensor_degree();
-        const unsigned int normal1 =
-          GeometryInfo<dim>::unit_normal_direction[f];
-        const unsigned int normal2 =
-          GeometryInfo<dim>::unit_normal_direction[nf];
-        const unsigned int deg1sq =
-          degree * (degree + 1); //(deg1 == 0) ? 1 : deg1 * (deg1+1);
-        const unsigned int deg2sq =
-          degree * (degree + 1); //(deg2 == 0) ? 1 : deg2 * (deg2+1);
-
-        double penalty1 = deg1sq / cell->extent_in_direction(normal1);
-        double penalty2 = deg2sq / ncell->extent_in_direction(normal2);
-        if (cell->has_children() ^ ncell->has_children())
-          {
-            penalty1 *= 8;
-          }
-        gamma = 0.5 * (penalty1 + penalty2);
-      }
-
+      // parameter should be. The simplest formula for this parameter $\gamma$
+      // is $\frac{p(p+1)}{h_K}$ where $p$ is the polynomial degree of the
+      // finite element used and $h_K$ is the size of cell $K$. But this
+      // is not quite so straightforward: If one uses highly stretched cells,
+      // then a more involved theory says that $h$ should be replaced be the
+      // diameter of cell $K$ normal to the direction of the edge in question.
+      // It turns out that there is a function in deal.II for that. Secondly,
+      // $h_K$ may be different when viewed from the two different sides of
+      // a face.
+      //
+      // To stay on the safe side, we take the maximum of the two values.
+      // We will note that it is possible that this computation has to be
+      // further adjusted if one were to use hanging nodes resulting from
+      // adaptive mesh refinement.
+      const unsigned int p = fe.degree;
+      const double       gamma =
+        std::max((1.0 * p * (p + 1) /
+                  cell->extent_in_direction(
+                    GeometryInfo<dim>::unit_normal_direction[f])),
+                 (1.0 * p * (p + 1) /
+                  ncell->extent_in_direction(
+                    GeometryInfo<dim>::unit_normal_direction[nf])));
 
       // Finally, and as usual, we loop over the quadrature points
       // and indices `i` and `j` to add up the contributions of this
       // face or sub-face. These are then stored in the `copy_data.face_data`
-      // object created above.
+      // object created above. As for the cell worker, we pull the evalation
+      // of averages and jumps out of the loops if possible, introducing
+      // local variables that store these results. The assembly then only
+      // needs to use these local variables in the innermost loop.
       for (unsigned int qpoint = 0;
            qpoint < fe_interface_values.n_quadrature_points;
            ++qpoint)
         {
-          // \int_F -{grad^2 u n n } [grad v n]
-          //   - {grad^2 v n n } [grad u n]
-          //   +  gamma [grad u n ][grad v n]
           const auto &n = fe_interface_values.normal(qpoint);
 
           for (unsigned int i = 0; i < n_interface_dofs; ++i)
@@ -528,13 +536,14 @@ namespace Step71
                     (fe_interface_values.jump_gradient(j, qpoint) * n);
 
                   copy_data_face.cell_matrix(i, j) +=
-                    (-av_hessian_i_dot_n_dot_n  // - {grad^2 v n n }
-                       * jump_grad_j_dot_n      // [grad u n]
-                     - av_hessian_j_dot_n_dot_n // - {grad^2 u n n }
-                         * jump_grad_i_dot_n    // [grad v n]
-                     +
-                     // gamma [grad u n ][grad v n]:
-                     gamma * jump_grad_i_dot_n * jump_grad_j_dot_n) *
+                    (-av_hessian_i_dot_n_dot_n       // - {grad^2 v n n }
+                       * jump_grad_j_dot_n           // [grad u n]
+                     - av_hessian_j_dot_n_dot_n      // - {grad^2 u n n }
+                         * jump_grad_i_dot_n         // [grad v n]
+                     +                               // +
+                     gamma *                         // gamma
+                       jump_grad_i_dot_n *           // [grad v n]
+                       jump_grad_j_dot_n) *          // [grad u n]
                     fe_interface_values.JxW(qpoint); // dx
                 }
             }
@@ -547,12 +556,12 @@ namespace Step71
     // with only the difference that there are now penalty terms that
     // also go into the right hand side.
     //
-    // TODO: Complete, same as above.
+    // As before, the first part of the function simply sets up some
+    // helper objects:
     auto boundary_worker = [&](const Iterator &    cell,
                                const unsigned int &face_no,
                                ScratchData<dim> &  scratch_data,
                                CopyData &          copy_data) {
-      // return;
       FEInterfaceValues<dim> &fe_interface_values =
         scratch_data.fe_interface_values;
       fe_interface_values.reinit(cell, face_no);
@@ -578,22 +587,19 @@ namespace Step71
       exact_solution.gradient_list(q_points, exact_gradients);
 
 
-      // eta = 1/2 + 2C_2
-      // gamma = eta/|e|
+      // Positively, because we now only deal with one cell adjacent to the
+      // face (as we are on the boundary), the computation of the penalty
+      // factor $\gamma$ is substantially simpler:
+      const unsigned int p = fe.degree;
+      const double       gamma =
+        (1.0 * p * (p + 1) /
+         cell->extent_in_direction(
+           GeometryInfo<dim>::unit_normal_direction[face_no]));
 
-      double gamma = 1.0;
-
-      {
-        int                degree = fe.tensor_degree();
-        const unsigned int normal1 =
-          GeometryInfo<dim>::unit_normal_direction[face_no];
-        const unsigned int deg1sq =
-          degree * (degree + 1); //(deg1 == 0) ? 1 : deg1 * (deg1+1);
-
-        gamma = deg1sq / cell->extent_in_direction(normal1);
-        //      gamma = 0.5*(penalty1 + penalty2);
-      }
-
+      // The third piece is the assembly of terms. This is now slightly more
+      // involved since these contains both terms for the matrix and for
+      // the right hand side. The latter requires us to evaluate the
+      //
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
           const auto &n = normals[qpoint];
@@ -613,26 +619,26 @@ namespace Step71
                     (fe_interface_values.jump_gradient(j, qpoint) * n);
 
                   copy_data_face.cell_matrix(i, j) +=
-                    (-av_hessian_i_dot_n_dot_n         // - {grad^2 v n n }
-                       * jump_grad_j_dot_n             // [grad u n]
-                                                       //
-                     - av_hessian_j_dot_n_dot_n        // - {grad^2 u n n }
-                         * jump_grad_i_dot_n           //  [grad v n]
-                                                       //
-                     + 2.0 * gamma * jump_grad_i_dot_n // 2 gamma [grad v n]
-                         * jump_grad_j_dot_n           // [grad u n]
+                    (-av_hessian_i_dot_n_dot_n  // - {grad^2 v n n}
+                       * jump_grad_j_dot_n      //   [grad u n]
+                                                //
+                     - av_hessian_j_dot_n_dot_n // - {grad^2 u n n}
+                         * jump_grad_i_dot_n    //   [grad v n]
+                                                //
+                     + 2.0 * gamma              // + 2 gamma
+                         * jump_grad_i_dot_n    // [grad v n]
+                         * jump_grad_j_dot_n    // [grad u n]
                      ) *
                     JxW[qpoint]; // dx
                 }
 
               copy_data.cell_rhs(i) +=
-                (-(fe_interface_values.average_hessian(i, qpoint) * n *
-                   n) *                          //  - {grad^2 v n n }
-                   (exact_gradients[qpoint] * n) // (grad u_exact n)
-                 + 2.0 * gamma                   //
-                     * (fe_interface_values.jump_gradient(i, qpoint) *
-                        n)                           // [grad v n]
-                     * (exact_gradients[qpoint] * n) // (grad u_exact n)
+                (-av_hessian_i_dot_n_dot_n *       // - {grad^2 v n n }
+                   (exact_gradients[qpoint] * n)   //   (grad u_exact n)
+                 +                                 // +
+                 2.0 * gamma                       // 2 gamma
+                   * jump_grad_i_dot_n             // [grad v n]
+                   * (exact_gradients[qpoint] * n) // (grad u_exact n)
                  ) *
                 JxW[qpoint]; // dx
             }
