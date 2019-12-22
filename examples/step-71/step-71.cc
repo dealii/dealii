@@ -406,13 +406,18 @@ namespace Step71
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
+              const Tensor<2, dim> hessian_i =
+                fe_values.shape_hessian(i, point);
+
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
+                  const Tensor<2, dim> hessian_j =
+                    fe_values.shape_hessian(j, point);
+
                   copy_data.cell_matrix(i, j) +=
-                    scalar_product(
-                      fe_values.shape_hessian(i, point),   // nabla^2 phi_i(x)
-                      fe_values.shape_hessian(j, point)) * // nabla^2 phi_j(x)
-                    fe_values.JxW(point);                  // dx
+                    scalar_product(hessian_i,   // nabla^2 phi_i(x)
+                                   hessian_j) * // nabla^2 phi_j(x)
+                    fe_values.JxW(point);       // dx
                 }
 
               copy_data.cell_rhs(i) +=
@@ -499,32 +504,40 @@ namespace Step71
       // and indices `i` and `j` to add up the contributions of this
       // face or sub-face. These are then stored in the `copy_data.face_data`
       // object created above.
-      for (unsigned int point = 0;
-           point < fe_interface_values.n_quadrature_points;
-           ++point)
+      for (unsigned int qpoint = 0;
+           qpoint < fe_interface_values.n_quadrature_points;
+           ++qpoint)
         {
           // \int_F -{grad^2 u n n } [grad v n]
           //   - {grad^2 v n n } [grad u n]
           //   +  gamma [grad u n ][grad v n]
-          const auto &n = fe_interface_values.normal(point);
+          const auto &n = fe_interface_values.normal(qpoint);
 
           for (unsigned int i = 0; i < n_interface_dofs; ++i)
-            for (unsigned int j = 0; j < n_interface_dofs; ++j)
-              {
-                copy_data_face.cell_matrix(i, j) +=
-                  (-(fe_interface_values.average_hessian(i, point) * n *
-                     n) // - {grad^2 v n n }
-                     * (fe_interface_values.jump_gradient(j, point) *
-                        n) // [grad u n]
-                   - (fe_interface_values.average_hessian(j, point) * n *
-                      n) // - {grad^2 u n n }
-                       * (fe_interface_values.jump_gradient(i, point) *
-                          n) // [grad v n]
-                   // gamma [grad u n ][grad v n]:
-                   + gamma * (fe_interface_values.jump_gradient(i, point) * n) *
-                       (fe_interface_values.jump_gradient(j, point) * n)) *
-                  fe_interface_values.JxW(point); // dx
-              }
+            {
+              const double av_hessian_i_dot_n_dot_n =
+                (fe_interface_values.average_hessian(i, qpoint) * n * n);
+              const double jump_grad_i_dot_n =
+                (fe_interface_values.jump_gradient(i, qpoint) * n);
+
+              for (unsigned int j = 0; j < n_interface_dofs; ++j)
+                {
+                  const double av_hessian_j_dot_n_dot_n =
+                    (fe_interface_values.average_hessian(j, qpoint) * n * n);
+                  const double jump_grad_j_dot_n =
+                    (fe_interface_values.jump_gradient(j, qpoint) * n);
+
+                  copy_data_face.cell_matrix(i, j) +=
+                    (-av_hessian_i_dot_n_dot_n  // - {grad^2 v n n }
+                       * jump_grad_j_dot_n      // [grad u n]
+                     - av_hessian_j_dot_n_dot_n // - {grad^2 u n n }
+                         * jump_grad_i_dot_n    // [grad v n]
+                     +
+                     // gamma [grad u n ][grad v n]:
+                     gamma * jump_grad_i_dot_n * jump_grad_j_dot_n) *
+                    fe_interface_values.JxW(qpoint); // dx
+                }
+            }
         }
     };
 
@@ -587,25 +600,30 @@ namespace Step71
 
           for (unsigned int i = 0; i < n_dofs; ++i)
             {
+              const double av_hessian_i_dot_n_dot_n =
+                (fe_interface_values.average_hessian(i, qpoint) * n * n);
+              const double jump_grad_i_dot_n =
+                (fe_interface_values.jump_gradient(i, qpoint) * n);
+
               for (unsigned int j = 0; j < n_dofs; ++j)
-                copy_data_face.cell_matrix(i, j) +=
-                  (-(fe_interface_values.average_hessian(i, qpoint) * n *
-                     n) // - {grad^2 v n n }
-                     * (fe_interface_values.jump_gradient(j, qpoint) *
-                        n) // [grad u n]
-                   //
-                   - (fe_interface_values.average_hessian(j, qpoint) * n *
-                      n) // - {grad^2 u n n }
-                       * (fe_interface_values.jump_gradient(i, qpoint) *
-                          n) //  [grad v n]
-                             //
-                   + 2.0 * gamma *
-                       (fe_interface_values.jump_gradient(i, qpoint) *
-                        n) // 2 gamma [grad v n]
-                       * (fe_interface_values.jump_gradient(j, qpoint) *
-                          n) // [grad u n]
-                   ) *
-                  JxW[qpoint]; // dx
+                {
+                  const double av_hessian_j_dot_n_dot_n =
+                    (fe_interface_values.average_hessian(j, qpoint) * n * n);
+                  const double jump_grad_j_dot_n =
+                    (fe_interface_values.jump_gradient(j, qpoint) * n);
+
+                  copy_data_face.cell_matrix(i, j) +=
+                    (-av_hessian_i_dot_n_dot_n         // - {grad^2 v n n }
+                       * jump_grad_j_dot_n             // [grad u n]
+                                                       //
+                     - av_hessian_j_dot_n_dot_n        // - {grad^2 u n n }
+                         * jump_grad_i_dot_n           //  [grad v n]
+                                                       //
+                     + 2.0 * gamma * jump_grad_i_dot_n // 2 gamma [grad v n]
+                         * jump_grad_j_dot_n           // [grad u n]
+                     ) *
+                    JxW[qpoint]; // dx
+                }
 
               copy_data.cell_rhs(i) +=
                 (-(fe_interface_values.average_hessian(i, qpoint) * n *
