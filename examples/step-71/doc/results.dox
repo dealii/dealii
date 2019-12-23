@@ -154,10 +154,10 @@ $\gamma = p(p+1)$ is a better penalty.
    <td>   5                  </td><td>   2.822e-04  </td><td>  1.68  </td><td> 1.605e-03 </td><td>    1.90     </td><td> 2.041e-01  </td><td> 1.03  </td>
   </tr>
 </table>
-In the case, all convergence rates of $u$
-follow the theoretical expectations.
-But compared to the results from $\gamma = p(p+1)$,
-it does not show a good convergence on $L_2$ errors.
+In this case, all convergence rates of $u$
+follow the theoretical expectations, but,
+compared to the results from $\gamma = p(p+1)$,
+we don't see good convergence of the $L_2$ errors.
 
 
 <h3> Conclusions for the choice of the penalty parameter </h3>

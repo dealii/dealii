@@ -108,7 +108,7 @@ does not make sense. Similar reasoning can be applied for 2d and 3d
 situations.
 
 In other words: This approach of trying to integrate over the entire
-domain and the integrating by parts can't work. 
+domain and then integrating by parts can't work.
 
 Historically, numerical analysts have tried to address this by
 inventing finite elements that are "C<sup>1</sup> continuous", i.e., that use
@@ -118,8 +118,8 @@ element, the Clough-Tocher element and others, all developed in the
 late 1960s. From a twenty-first century perspective, they can only be
 described as bizarre in their construction. They are also exceedingly
 cumbersome to implement if one wants to use general meshes. As a
-consequence, they have largely fallen out of favor and deal.II does
-not contain implementations of these shape functions.
+consequence, they have largely fallen out of favor and deal.II currently
+does not contain implementations of these shape functions.
 
 
 <h2> What to do instead? </h2>
@@ -209,7 +209,7 @@ for an equation that has two derivatives on each shape function. In
 analogy to the Interior Penalty (IP) method for the Laplace equation,
 this scheme for the biharmonic equation is typically called the $C^0$ IP
 (or C0IP) method, since it uses $C^0$ (continuous but not continuously
-differentiable) shape functions with an interior penalty.
+differentiable) shape functions with an interior penalty formulation.
 
 
 <h3> Derivation of the $C^0$ IP method </h3>
@@ -217,7 +217,7 @@ differentiable) shape functions with an interior penalty.
 We base this program on the $C^0$ IP method presented by Susanne
 Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
 for Linear Fourth Order Boundary Value Problems on polygonal
-domains'' @cite Brenner2005 , where the method is
+domains'' (@cite Brenner2005), where the method is
 derived for the biharmonic equation with "clamped" boundary
 conditions.
 
@@ -343,7 +343,7 @@ stability of the method. We will discuss our choice in the program below.
 On polygonal domains, the weak solution $u$ to the biharmonic equation
 lives in $H^{2 +\alpha}(\Omega)$ where $\alpha \in(1/2, 2]$ is
 determined by the interior angles at the corners of $\Omega$. For
-instance, whenever $\Omega$ is convex, $\alph=1$; $\alpha$ may be less
+instance, whenever $\Omega$ is convex, $\alpha=1$; $\alpha$ may be less
 than one if the domain has re-entrant corners but
 $\alpha$ is close to $1$ if one of all interior angles is close to
 $\pi$.
@@ -354,7 +354,8 @@ discretization outlined above yields the convergence rates as
 discussed below.
 
 
-<b>Convergence in the $C^0$ IP-norm:</b>
+<b>Convergence in the $C^0$ IP-norm</b>
+
 Ideally, we would like to measure convergence in the "energy norm"
 $\|D^2(u-u_h)\|$. However, this does not work because, again, the
 discrete solution $u_h$ does not have two (weak) derivatives. Instead,
@@ -387,23 +388,27 @@ that $\alpha\ge p-1$; this can
 only happen if (i) the domain is convex with a sufficiently smooth
 boundary, and (ii) $m\ge p-3$. In practice, of course, the solution is
 what it is (independent of the polynomial degree we choose), and the
-last condition can then equivalent be read as saying that there is
+last condition can then equivalently be read as saying that there is
 definitely no point in choosing $p$ large if $m$ is not also
 large. In other words, the only reasonably choices for $p$ are $p\le
 m+3$ because larger polynomial degrees do not result in higher
 convergence orders.
 
 
-<b>Convergence in the $L_2$-norm:</b> The optimal convergence rate in
-the $L_2$-norm is $\mathcal{O}(h^{p+1})$ provided  $p \ge 3$. More
-details can be found in Theorem 4.6 of @cite Engel2002 .
+<b>Convergence in the $L_2$-norm</b>
+
+The optimal convergence rate in the $L_2$-norm is $\mathcal{O}(h^{p+1})$
+provided $p \ge 3$. More details can be found in Theorem 4.6 of @cite
+Engel2002 .
 
 The default in the program below is to choose $p=2$. In that case, the
 theorem does not apply, and indeed one only gets $\mathcal{O}(h^2)$
 instead of $\mathcal{O}(h^3)$ as we will show in the results section.
 
 
-<b>Convergence in the $H^1$-seminorm:</b> Given that we expect
+<b>Convergence in the $H^1$-seminorm</b>
+
+Given that we expect
 $\mathcal{O}(h^{p-1})$ in the best of cases for a norm equivalent to
 the $H^2$ seminorm, and $\mathcal{O}(h^{p+1})$ for the $L_2$ norm, one
 may ask about what happens in the $H^1$ seminorm that is intermediate
