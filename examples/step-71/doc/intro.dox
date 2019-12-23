@@ -3,6 +3,11 @@
 <i>
 This program was contributed by Natasha Sharma, Guido Kanschat, Timo
 Heister, Wolfgang Bangerth, and Zhuoran Wang.
+
+The first author would like  acknowledge the support of NSF Grant
+No. DMS-1520862.
+Timo Heister and Wolfgang Bangerth acknowledge support through NSF
+awards DMS-1821210, EAR-1550901, and OAC-1835673.
 </i>
 
 <a name="Intro"></a>
@@ -74,7 +79,34 @@ would yield a discontinuous gradient, and the second derivative with
 delta functions on the interfaces -- but because both the second
 derivatives of the test functions and of the trial functions yield a
 delta function, we would try to integrate the product of two delta
-functions. This can't work.
+functions. This can't work. 
+
+\textcolor{magenta}{But for the biharmonic equation, if one followed
+the same procedure using the test and trial functions that work for
+the weak form of the Laplace equation, these test and trial functions
+contain insufficient regularity to support the integration by parts
+performed twice over $\Omega$. Instead, if one were to partition
+$\Omega=\bigcup\limits_{K\in \mathcal{T}_h}K$ and use the usual
+globally continuous, cellwise polynomial functions with their kinks on
+the cell interfaces, say $v,w \in C^{\infty}(\bar{K})$ where $K\in
+\mathcal{T}_h$. This allows us to perform the integration by parts
+twice in the following manner:
+@f{align*}{
+  \int_K v (\Delta^2 w) \ dx
+  &= \int_{\partial K} v \frac{\partial \Delta w}{\partial \mathbf n} \ ds
+   - \int_K \nabla v \cdot \nabla (\Delta w)\  dx
+  \\
+  &= \int_{\partial K} v \frac{\partial \Delta w}{\partial \mathbf n} \ ds
+  - \int_{\partial K} \nabla v \cdot \frac{\partial \nabla w}{\partial \mathbf n}  \ dx
+  \\
+  &+ \int_K D^2v:D^2w \ dx.
+@f}
+When we sum over all cells $K \in \mathcal{T}_h$, we end up with
+multi-valued gradient and third order derivative on each interface
+shared by $K_{+}$ and $K_{-}$.}
+
+\textcolor{magenta}{
+(I needed to write this here because the moment we consider piecewise polynomials, we are able to perform the integration by parts on each cell and the lack of continuity across the interface is taken care of by the multi-valued interface terms. in other words, we are in the "DG"-regime.)} 
 
 Historically, numerical analysts have tried to address this by
 inventing finite elements that are "$C^1$ continuous", i.e., that use
@@ -123,6 +155,12 @@ very difficult to construct good solvers and preconditioners for this
 system either using the techniques of step-20 and step-22. So this
 case is pretty simple to deal with.
 
+\textcolor{magenta}{Should we mention that the domain needs to be
+convex for the solution to the above "mixed system" to coincide with
+the solution to the biharmonic equation? Because typically on
+nonconvex domains, the solution obtained from the second order
+equations does not live in $H^2(\Omega)$.}
+
 The more complicated situation is if we have the "clamped" boundary
 conditions, i.e., if the equation looks like this:
 @f{align*}{
@@ -134,8 +172,9 @@ conditions, i.e., if the equation looks like this:
   &&\forall \mathbf x \in \partial\Omega.
 @f}
 The same trick with the mixed system does not work here, because we
-would end up with <i>both</i> Dirichlet and Neumann boundary
-conditions for $u$, but none for $v$.
+would end up with <i>both</i> Dirichlet and Neumann boundary conditions for
+$u$, but none for $v$.
+
 
 The solution to this conundrum arrived with the Discontinuous Galerkin
 method wave in the 1990s and early 2000s: In much the same way as one
@@ -145,15 +184,156 @@ equation that has one derivative on each shape function, we can use a
 scheme that uses <i>continuous</i> (but not $C^1$ continuous) shape
 functions and penalize the jump in the derivative to obtain a scheme
 for an equation that has two derivatives on each shape function. In
-analogy to the Interior Penality (IP) method for the Laplace equation,
-this scheme for the biharmonic equation is typically called the C0IP
-method, since it uses $C^0$ (continuous but not continuously
-differentiable) shape functions with an interior penality.
+analogy to the Interior Penalty (IP) method for the Laplace equation,
+this scheme for the biharmonic equation is typically called the $C^0$ IP
+(or C0IP) method, since it uses $C^0$ (continuous but not continuously
+differentiable) shape functions with an interior penalty.
 
 
-<h2> Derivation of the C0IP method </h2>
+<h3> Derivation of the $C^0$ IP method </h3>
 
-...Natasha to write...
+We base this program on the $C^0$ IP method presented by Susanne
+Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
+for Linear Fourth Order Boundary Value Problems on polygonal
+domains'', J. Sci. Comput., 22(1-3):83--118, 2005, where the method is
+derived for the biharmonic equation with "clamped" boundary
+conditions.
+
+As mentioned, this method relies on the use of $C^0$ Lagrange finite
+elements where the $C^1$ continuity requirement is relaxed and has
+been replaced with interior penalty techniques. To derive this method,
+we consider a $C^0$ shape function $v_h$ which vanishes on
+$\partial\Omega$. Since the higher order derivatives of $v_h$ have two
+values on each interface $e\in \mathbb{F}$ (shared by the two cells
+$K_{+},K_{-} \in \mathbb{T}$), we cope with this discontinuity by
+defining the following single-valued functions on $e$:
+@f{align*}{
+\Bigg[\!\Bigg[\frac{\partial^k v_h}{\partial \mathbf n^k}\Bigg]\!\Bigg]&= \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e - \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e,\\
+\Bigg\{\!\Bigg\{\frac{\partial^k v_h}{\partial \mathbf n^k}\Bigg\}\!\Bigg\}&=\frac{1}{2} \bigg( \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e + \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e \bigg )  
+@f}
+for $k =1,2$ (i.e., for the gradient and the matrix of second
+derivatives), and where $\mathbf n$ denotes a unit vector normal to
+$e$ pointing from $K_+$ to $K_-$ (cf. Figure 1 below). In the
+literature, these functions are referred to as the "jump'' and
+"average" operations, respectively.
+
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+\draw[thick] (-1,0) -- (4,0) -- (5,4) -- (0,4) -- (-1,0);
+\node[ text width =1cm] at (1,2) {$K_+$};
+\draw[thick,-] (1.6,0) -- (2.5,4);
+\draw[thick,->, color=red] (2.05,2) -- (2+.275,3);
+\draw[thick,->, color=red] (2.05,2) -- (2+.95,2);
+\node[ text width =1cm] at (2.3,3) {$\mathbf t$};
+\node[ text width =1cm] at (3,1) {$K_-$};
+\node[ text width =1cm] at (3.25,2.35) {$\mathbf n$};
+\node[ text width =1cm] at (2.05,1.75) {$e$};
+\end{tikzpicture}
+\end{center}
+\caption[Caption in ToC]{Orientation of the unit normal, tangent to
+the interface $e$ shared by the cells $K_{-}$ and $K_{+}$ in 2D.}
+\end{figure}
+
+To obtain the $C^0$ IP approximation $u_h$, we left multiply the
+biharmonic equation by $v_h$, integrate and apply the following
+integration-by-parts formula on each mesh cell $T \in {\mathbb{T}}$:
+@f{align*}{
+\int_K v (\Delta^2 w) \ dx %& = \int_{\partial K} \frac{\partial \Delta u}{\partial \mathbf n}v_h \ ds - \int_K \nabla (\Delta u) \nabla v dx \\
+& = \int_{\partial K} \frac{\partial \Delta v}{\partial \mathbf n}w \ ds - \int_{\partial K} \frac{\partial^2 v}{\partial \mathbf n \partial \mathbf t} \frac{\partial w}{\partial \mathbf t} \ ds - \int_{\partial K} \frac{\partial^2 v}{\partial \mathbf n^2} \frac{\partial w}{\partial \mathbf n}\ ds \\
+&+ \int_K D^2v:D^2w \ dx,
+@f}
+where  $\mathbf t$ is the counterclockwise tangent and $D^2 v : D^2 w
+$ is the Frobenius inner product of Hessian matrices of $v$ and
+$w$. Then, summing over all the cells $K \in  \mathbb{T}$, taking into
+account the jump and average operator, adding the following (symmetric
+and stability) term
+@f{align*}{
+-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \ ds
++ \sum_{e \in \mathbb{F}} 
+\frac{\sigma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
+\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg] \ ds,
+@f}
+and, after making the cancellations we arrive at the following $C^0$
+IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
+g$ on $\partial \Omega$ and
+@f{align*}{
+\mathcal{A}(v_h,u_h)&=\mathcal{F}(v_h) \quad \text{holds for all test functions } v_h,
+@f}
+where
+@f{align*}{
+\mathcal{A}(v_h,u_h):=&\sum_{K \in \mathbb{T}}\int_K D^2v_h:D^2u_h \ dx
+-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] 
+ ds
+\\
+&-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \ ds
+\\
+&+ \sum_{e \in \mathbb{F}} 
+\frac{\sigma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
+\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg] \ ds,
+@f}
+and 
+@f{align*}{
+\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx +\sum_{e \in \mathbb{F}^b} \frac{\sigma}{h_e}\int_e 
+\frac{\partial v_h}{\partial \mathbf n} j \ ds.
+@f}
+Here, $\sigma$ is the penalty parameter which weakly enforces the boundary condition 
+@f{align*}{
+\frac{\partial u(\mathbf x)}{\partial \mathbf n} = j(\mathbf x)
+@f}
+on the boundary interfaces $e \in \mathbb{F}^b$  and is chosen to be
+large enough to guarantee the stability of the method.
+
+
+<h4>Quality of the Solutions</h4>
+
+On polygonal domains, the weak solution $u$ to the biharmonic equation
+lives in $H^{2 +\alpha}(\Omega)$ where $\alpha \in(1/2, 2]$ is
+determined by the interior angles at the corners of $\Omega$. For
+instance, whenever $\Omega$ is convex, $\alpha$ is larger than $1$ and
+$\alpha$ is close to $1$ if one of the interior angles is close to
+$\pi$.
+
+
+<h4>Convergence Rates} 
+Suppose that the $C^0$ IP solution $u_h$ is approximated by $C^0$
+shape functions whose degree on each cell is at most $p \ge 2$.
+
+<b>Convergence in the $L^2$-norm:</b> The optimal convergence rate in
+the $L^2$-norm is $\mathcal{O}(h^{p+1})$ provided  $p \ge 3$. More
+details can be found in Theorem 4.6, "Continuous/discontinuous
+finite element approximations of fourth-order elliptic problems in
+structural and continuum mechanics with applications to thin beams
+and plates, and strain gradient elasticity",
+Comput. Method. Appl. M., 191(34): 3669--3750, 2002." 
+
+<b>Convergence in the $C^0$ IP-norm:</b>
+Assume that $f \in H^m(\Omega)$, $u \in H^{k}(\Omega)$ where $ 2 < k  \le m+4$, $m\ge0$.
+Then, the convergence rate of the $C^0$ IP method is
+$\mathcal{O}(h^{\min\{p-1, k-2\}})$ measured in the following
+mesh-dependent $C^0$ IP norm:
+@f{align*}{
+ \|u_h\|_{h}^2:=  \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2 + \sigma \sum\limits_{e \in \mathbb{F} }
+ h_e^{-1} \big\| \  \!\big[ \!\big[ \partial u_h/\partial \mathbf n\big]\!\big]  \ \big\|_{L^2(e)}^2.
+@f}
+ 
+The optimal convergence rate $\mathcal{O}(h^{m+2})$ is achieved
+whenever $u \in H^{m+4}(\Omega)$ and $p$ is chosen to be at least
+$m+3$. This regularity assumption does not always guaranteed on
+polygonal domains however, is satisfied on smooth domains which do not
+contain angular corners.
+ 
+ 
+<h3>Other Boundary Conditions</h3>
+
+We remark that the derivation of the $C^0$ IP method for the
+biharmonic equation with other boundary conditions -- for instance,
+for the first set of boundary conditions namely $u(\mathbf x) =
+g(\mathbf x)$ and $\Delta u(\mathbf x)= h(\mathbf x)$ on
+$\partial\Omega$ -- can be obtained with suitable modifications to
+$\mathcal{A}(\cdot,\cdot)$ and $\mathcal{F}(\cdot)$ described in the
+book chapter "$C^0$ Interior Penalty Methods'', In: Frontiers in
+Numerical Analysis-Durham 2010, pages 79--147, Springer, 2011.
 
 
 <h2>The testcase</h2>
