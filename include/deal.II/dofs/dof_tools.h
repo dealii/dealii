@@ -1323,9 +1323,12 @@ namespace DoFTools
    * for large parallel computations -- in fact, it may be too large to store on
    * each processor. In that case, you may want to choose the variant of this
    * function that returns an IndexSet object.
+   *
+   * @deprecated For the reason stated above, this function is deprecated in
+   *   favor of the following function.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   extract_hanging_node_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                             std::vector<bool> &              selected_dofs);
 
@@ -1372,12 +1375,55 @@ namespace DoFTools
    *   vector just holds the locally owned extracted degrees of freedom, which
    *   first have to be mapped to the global degrees of freedom, to correspond
    *   with them.
+   *
+   * @deprecated This function is difficult to use in parallel contexts because
+   *   it returns a vector that needs to be indexed based on the position
+   *   of a degree of freedom within the set of locally owned degrees of
+   *   freedom. It is consequently deprecated in favor of the following
+   *   function.
    */
   template <typename DoFHandlerType>
-  void
+  DEAL_II_DEPRECATED void
   extract_dofs(const DoFHandlerType &dof_handler,
                const ComponentMask & component_mask,
                std::vector<bool> &   selected_dofs);
+
+  /**
+   * Extract the (locally owned) indices of the degrees of freedom belonging to
+   * certain vector components of a vector-valued finite element. The
+   * @p component_mask defines which components or blocks of an FESystem or
+   * vector-valued element are to be extracted
+   * from the DoFHandler @p dof. The entries in the output object then
+   * correspond to degrees of freedom belonging to these
+   * components.
+   *
+   * If the finite element under consideration is not primitive, i.e., some or
+   * all of its shape functions are non-zero in more than one vector component
+   * (which holds, for example, for FE_Nedelec or FE_RaviartThomas elements),
+   * then shape functions cannot be associated with a single vector component.
+   * In this case, if <em>one</em> shape vector component of this element is
+   * flagged in @p component_mask (see
+   * @ref GlossComponentMask),
+   * then this is equivalent to selecting <em>all</em> vector components
+   * corresponding to this non-primitive base element.
+   *
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] component_mask A mask that states which components you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   components in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossComponentMask "the glossary entry on component masks"
+   *   for more information.
+   * @return An IndexSet object that will contain exactly those entries that
+   *   (i) correspond to degrees of freedom selected by the mask above, and
+   *   (ii) are locally owned. The size of the index set is equal to the global
+   *   number of degrees of freedom. Note that the resulting object is always
+   *   a subset of what DoFHandler::locally_owned_dofs() returns.
+   */
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof_handler,
+               const ComponentMask & component_mask);
 
   /**
    * This function is the equivalent to the DoFTools::extract_dofs() functions
@@ -1402,12 +1448,45 @@ namespace DoFTools
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
    *   sequential computations of course equals DoFHandler::n_dofs(). The
    *   previous contents of this array are overwritten.
+   *
+   * @deprecated This function is difficult to use in parallel contexts because
+   *   it returns a vector that needs to be indexed based on the position
+   *   of a degree of freedom within the set of locally owned degrees of
+   *   freedom. It is consequently deprecated in favor of the following
+   *   function.
    */
   template <typename DoFHandlerType>
-  void
+  DEAL_II_DEPRECATED void
   extract_dofs(const DoFHandlerType &dof_handler,
                const BlockMask &     block_mask,
                std::vector<bool> &   selected_dofs);
+
+  /**
+   * This function is the equivalent to the DoFTools::extract_dofs() functions
+   * above except that the selection of which degrees of freedom to extract is
+   * not done based on components (see
+   * @ref GlossComponent)
+   * but instead based on whether they are part of a particular block (see
+   * @ref GlossBlock).
+   * Consequently, the second argument is not a ComponentMask but a BlockMask
+   * object.
+   *
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] block_mask A mask that states which blocks you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   blocks in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossBlockMask "the glossary entry on block masks"
+   *   for more information.
+   * @return An IndexSet object that will contain exactly those entries that
+   *   (i) correspond to degrees of freedom selected by the mask above, and
+   *   (ii) are locally owned. The size of the index set is equal to the global
+   *   number of degrees of freedom. Note that the resulting object is always
+   *   a subset of what DoFHandler::locally_owned_dofs() returns.
+   */
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof_handler, const BlockMask &block_mask);
 
   /**
    * Do the same thing as the corresponding extract_dofs() function for one

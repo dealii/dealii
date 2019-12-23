@@ -69,11 +69,11 @@ check()
       for (unsigned int c = 0; c < element.n_blocks(); ++c)
         component_mask[c] = (int_mask & (1 << c));
 
-      std::vector<bool> dofs(dof.n_dofs());
-      DoFTools::extract_dofs(dof, BlockMask(component_mask), dofs);
+      const IndexSet dofs =
+        DoFTools::extract_dofs(dof, BlockMask(component_mask));
 
       for (unsigned int d = 0; d < dof.n_dofs(); ++d)
-        deallog << dofs[d];
+        deallog << dofs.is_element(d);
       deallog << std::endl;
     }
 }
