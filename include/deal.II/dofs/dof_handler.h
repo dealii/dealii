@@ -30,6 +30,7 @@
 
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/deprecated_function_map.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
