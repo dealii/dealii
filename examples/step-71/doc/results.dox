@@ -7,19 +7,19 @@ We test this setup using $Q_2$, $Q_3$, and $Q_4$ elements, which one can
 change via the `fe_degree` variable in the `main()` function. With mesh
 refinement, the $L_2$ convergence rates, $H_1$-seminorm convergence
 and $H_2$-seminorm convergence of $u$
-should then be around 2, 2, 1 for $Q_2$ , 4, 3, 2 for
-$Q_3$, and 5, 4, 3 for $Q_4$, respectively.
+should then be around 2, 2, 1 for $Q_2$; 4, 3, 2 for
+$Q_3$; and 5, 4, 3 for $Q_4$, respectively.
 
 From the papers by Brenner et al., it is not immediately clear what
-the penalty parameter $\eta$ should be. Educated guesses, comparing
+the penalty parameter $\gamma$ should be. Educated guesses, comparing
 to the discontinuous Galerkin formulations for the Laplace equation,
-suggest that $\eta = 1$, $2$, and $p(p+1)$ would all be reasonable,
+suggest that $\gamma = 1$, $2$, and $p(p+1)$ would all be reasonable,
 where $p$ is the degree of polynomials. This is easy to change
 in the code from its current default. Below we show results for
 all of these.
 
 
-<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = p(p+1)</i> </h3>
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
 
 <h4>Convergence table</h4>
 
@@ -28,7 +28,7 @@ and get the following convergence rates.
 
 <table align="center" class="doxtable">
   <tr>
-   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    1.539e-02 </td><td>       </td><td>   8.528e-02   </td><td>           </td><td>  1.602 </td><td>   </td>
@@ -47,14 +47,14 @@ We can see that the $L_2$ convergence rates are around 2,
 $H_1$-seminorm convergence rates are around 2,
 and $H_2$-seminorm convergence rates are around 1.
 
-<h3>Test results on <i>Q<sub>3</sub></i> with <i>\eta = p(p+1)</i> </h3>
+<h3>Test results on <i>Q<sub>3</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
 
 <h4>Convergence table</h4>
 
 
 <table align="center" class="doxtable">
   <tr>
-   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    2.187e-04 </td><td>       </td><td>   4.46269e-03   </td><td>           </td><td>  1.638e-01 </td><td>   </td>
@@ -74,14 +74,14 @@ $H_1$-seminorm convergence rates are around 3,
 and $H_2$-seminorm convergence rates are around 2.
 This, of course, matches our theoretical expectations.
 
-<h3>Test results on <i>Q<sub>4</sub></i> with <i>\eta = p(p+1)</i> </h3>
+<h3>Test results on <i>Q<sub>4</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
 
 <h4>Convergence table</h4>
 
 
 <table align="center" class="doxtable">
   <tr>
-   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    8.34446e-06 </td><td>       </td><td>   0.000239323   </td><td>           </td><td>  0.0109785 </td><td>   </td>
@@ -104,14 +104,14 @@ is much smaller than our theoretical expectations
 because the linear solver becomes the limiting factor due
 to round-off. But the $L_2$ error is pretty small in that case.
 
-<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = 1</i> </h3>
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 1</i> </h3>
 
 <h4>Convergence table</h4>
 
 
 <table align="center" class="doxtable">
   <tr>
-   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    4.86048e-02 </td><td>       </td><td>   3.30386e-01   </td><td>           </td><td>  4.34917 </td><td>   </td>
@@ -128,17 +128,18 @@ to round-off. But the $L_2$ error is pretty small in that case.
 </table>
 Although $L_2$ norm and $H_1$-seminorm convergence rates of $u$
 follow the theoretical expectations, $H_2$-seminorm does not converge.
-Comparing results from $\eta = 1$ and $\eta = p(p+1)$, it is clear that
-$\eta = p(p+1)$ is a better penalty.
+Comparing results from $\gamma = 1$ and $\gamma = p(p+1)$, it is clear that
+$\gamma = p(p+1)$ is a better penalty.
 
-<h3>Test results on <i>Q<sub>2</sub></i> with <i>\eta = 2</i> </h3>
+
+<h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 2</i> </h3>
 
 <h4>Convergence table</h4>
 
 
 <table align="center" class="doxtable">
   <tr>
-   <th>number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    5.482e-03 </td><td>       </td><td>   7.652e-02  </td><td>           </td><td>  1.756e-00 </td><td>   </td>
@@ -155,12 +156,12 @@ $\eta = p(p+1)$ is a better penalty.
 </table>
 In the case, all convergence rates of $u$
 follow the theoretical expectations.
-But compared to the results from $\eta = p(p+1)$,
+But compared to the results from $\gamma = p(p+1)$,
 it does not show a good convergence on $L_2$ errors.
 
 
-<h3> Conclusions for the choice of the penalty parameter </3>
+<h3> Conclusions for the choice of the penalty parameter </h3>
 
 The conclusions for which of the "reasonable" choices one should use for the penalty parameter
-is that $\eta=p(p+1)$ yields the expected results. It is, consequently, what the code
+is that $\gamma=p(p+1)$ yields the expected results. It is, consequently, what the code
 uses as currently written.

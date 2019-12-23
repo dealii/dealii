@@ -71,7 +71,8 @@ cells: The derivative may not be defined at the interfaces, but
 that is on a lower-dimensional manifold (and so doesn't show up
 in the integrated value).
 
-But for the biharmonic equation, if one followed the same procedure,
+But for the biharmonic equation, if one followed the same procedure
+using integrals over the entire domain (i.e., the union of all cells),
 one would end up with two derivatives on the test functions and trial
 functions each. If one were to use the usual piecewise polynomial
 functions with their kinks on cell interfaces, the first derivative
@@ -79,37 +80,38 @@ would yield a discontinuous gradient, and the second derivative with
 delta functions on the interfaces -- but because both the second
 derivatives of the test functions and of the trial functions yield a
 delta function, we would try to integrate the product of two delta
-functions. This can't work. 
-
-\textcolor{magenta}{But for the biharmonic equation, if one followed
-the same procedure using the test and trial functions that work for
-the weak form of the Laplace equation, these test and trial functions
-contain insufficient regularity to support the integration by parts
-performed twice over $\Omega$. Instead, if one were to partition
-$\Omega=\bigcup\limits_{K\in \mathcal{T}_h}K$ and use the usual
-globally continuous, cellwise polynomial functions with their kinks on
-the cell interfaces, say $v,w \in C^{\infty}(\bar{K})$ where $K\in
-\mathcal{T}_h$. This allows us to perform the integration by parts
-twice in the following manner:
+functions. For example, in 1d, where $\varphi_i$ are the usual
+piecewise linear "hat functions", we would get integrals of the sort
 @f{align*}{
-  \int_K v (\Delta^2 w) \ dx
-  &= \int_{\partial K} v \frac{\partial \Delta w}{\partial \mathbf n} \ ds
-   - \int_K \nabla v \cdot \nabla (\Delta w)\  dx
-  \\
-  &= \int_{\partial K} v \frac{\partial \Delta w}{\partial \mathbf n} \ ds
-  - \int_{\partial K} \nabla v \cdot \frac{\partial \nabla w}{\partial \mathbf n}  \ dx
-  \\
-  &+ \int_K D^2v:D^2w \ dx.
+  \int_0^L (\Delta \varphi_i) (\Delta \varphi_j)
+  =
+  \int_0^L
+  \frac 1h \right[\delta(x-x_{i-1}) - 2\delta(x-x_i) + \delta(x-x_{i+1})\right]
+  \frac 1h \right[\delta(x-x_{j-1}) - 2\delta(x-x_j) + \delta(x-x_{j+1})\right]
 @f}
-When we sum over all cells $K \in \mathcal{T}_h$, we end up with
-multi-valued gradient and third order derivative on each interface
-shared by $K_{+}$ and $K_{-}$.}
+where $x_i$ is the node location at which the shape function
+$\varphi_i$ is defined, and $h$ is the mesh size (assumed
+uniform). The problem is that delta functions in integrals are defined
+using the relationship
+@f{align*}{
+  \int_0^L \delta(x-\hat x) f(x) \; dx
+  =
+  f(\hat x).
+@f}
+But that only works if (i) $f(\cdot)$ is actually well defined at
+$\hat x$, and (ii) if it is finite. On the other hand, an integral of
+the form
+@f{align*}{
+\int_0^L \delta(x-x_i) \delta (x-x_i)
+@f}
+does not make sense. Similar reasoning can be applied for 2d and 3d
+situations.
 
-\textcolor{magenta}{
-(I needed to write this here because the moment we consider piecewise polynomials, we are able to perform the integration by parts on each cell and the lack of continuity across the interface is taken care of by the multi-valued interface terms. in other words, we are in the "DG"-regime.)} 
+In other words: This approach of trying to integrate over the entire
+domain and the integrating by parts can't work. 
 
 Historically, numerical analysts have tried to address this by
-inventing finite elements that are "$C^1$ continuous", i.e., that use
+inventing finite elements that are "C<sup>1</sup> continuous", i.e., that use
 shape functions that are not just continuous but also have continuous
 first derivatives. This is the realm of elements such as the Argyris
 element, the Clough-Tocher element and others, all developed in the
@@ -133,7 +135,8 @@ conditions, i.e., if the equation is
   \Delta u(\mathbf x) &= h(\mathbf x) \qquad \qquad
   &&\forall \mathbf x \in \partial\Omega,
 @f}
-then the following trick works: In much the same as we obtained the
+then the following trick works (at least if the domain is convex, see
+below): In much the same as we obtained the
 mixed Laplace equation of step-20 from the regular Laplace equation by
 introducing a second variable, we can here introduce a variable
 $v=\Delta u$ and can then replace the equations above by the
@@ -155,11 +158,30 @@ very difficult to construct good solvers and preconditioners for this
 system either using the techniques of step-20 and step-22. So this
 case is pretty simple to deal with.
 
-\textcolor{magenta}{Should we mention that the domain needs to be
-convex for the solution to the above "mixed system" to coincide with
-the solution to the biharmonic equation? Because typically on
-nonconvex domains, the solution obtained from the second order
-equations does not live in $H^2(\Omega)$.}
+@note It is worth pointing out that this only works if the domain is
+  convex. This sounds like a rather random condition, but it makes
+  sense in view of the following two facts: The solution of the
+  original biharmonic equation must satisfy $u\in H^2(\Omega)$. On the
+  other hand, the mixed system reformulation above suggests that both
+  $u$ and $v$ satisfy $u,v\in H^1(\Omega)$ because both variables only
+  solve a Poisson equation. In other words, if we want to ensure that
+  the solution $u$ of the mixed problem is also a solution of the
+  original biharmonic equation, then we need to be able to somehow
+  guarantee that the solution of $-\Delta u=v$ is in fact more smooth
+  than just $H^1(\Omega)$. This can be argued as follows: For convex
+  domains,
+  <a href="https://en.wikipedia.org/wiki/Elliptic_operator#Elliptic_regularity_theorem">"elliptic
+  regularity"</a> implies that if the right hand side $v\in H^s$, then
+  $u\in H^{s+2}$ if the domain is convex and the boundary is smooth
+  enough. We know that $v\in H^1$ because it solves the equation
+  $-\Delta v=f$, but we are still left with the condition on convexity
+  of the boundary; one can show that polygonal, convex domains are
+  good enough to guarantee that $u\in H^2$ in this case (smoothly
+  bounded, convex domains would result in $u\in H^3$, but we don't
+  need this much regularity). On the other hand, if the domain is not
+  convex, we can not guarantee that the solution of the mixed system
+  is in $H^2$, and consequently may obtain a solution that can't be
+  equal to the solution of the original biharmonic equation.
 
 The more complicated situation is if we have the "clamped" boundary
 conditions, i.e., if the equation looks like this:
@@ -195,7 +217,7 @@ differentiable) shape functions with an interior penalty.
 We base this program on the $C^0$ IP method presented by Susanne
 Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
 for Linear Fourth Order Boundary Value Problems on polygonal
-domains'', J. Sci. Comput., 22(1-3):83--118, 2005, where the method is
+domains'' @cite Brenner2005 , where the method is
 derived for the biharmonic equation with "clamped" boundary
 conditions.
 
@@ -213,48 +235,77 @@ defining the following single-valued functions on $e$:
 @f}
 for $k =1,2$ (i.e., for the gradient and the matrix of second
 derivatives), and where $\mathbf n$ denotes a unit vector normal to
-$e$ pointing from $K_+$ to $K_-$ (cf. Figure 1 below). In the
-literature, these functions are referred to as the "jump'' and
+$e$ pointing from $K_+$ to $K_-$. In the
+literature, these functions are referred to as the "jump" and
 "average" operations, respectively.
 
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}
-\draw[thick] (-1,0) -- (4,0) -- (5,4) -- (0,4) -- (-1,0);
-\node[ text width =1cm] at (1,2) {$K_+$};
-\draw[thick,-] (1.6,0) -- (2.5,4);
-\draw[thick,->, color=red] (2.05,2) -- (2+.275,3);
-\draw[thick,->, color=red] (2.05,2) -- (2+.95,2);
-\node[ text width =1cm] at (2.3,3) {$\mathbf t$};
-\node[ text width =1cm] at (3,1) {$K_-$};
-\node[ text width =1cm] at (3.25,2.35) {$\mathbf n$};
-\node[ text width =1cm] at (2.05,1.75) {$e$};
-\end{tikzpicture}
-\end{center}
-\caption[Caption in ToC]{Orientation of the unit normal, tangent to
-the interface $e$ shared by the cells $K_{-}$ and $K_{+}$ in 2D.}
-\end{figure}
-
 To obtain the $C^0$ IP approximation $u_h$, we left multiply the
-biharmonic equation by $v_h$, integrate and apply the following
-integration-by-parts formula on each mesh cell $T \in {\mathbb{T}}$:
+biharmonic equation by $v_h$, and then integrate over $\Omega$. As
+explained above, we can't do the integration by parts on all of
+$\Omega$ with these shape functions, but we can do it on each cell
+individually since the shape functions are just polynomials on each
+cell. Consequently, we start by using the following
+integration-by-parts formula on each mesh cell $K \in {\mathbb{T}}$:
 @f{align*}{
-\int_K v (\Delta^2 w) \ dx %& = \int_{\partial K} \frac{\partial \Delta u}{\partial \mathbf n}v_h \ ds - \int_K \nabla (\Delta u) \nabla v dx \\
-& = \int_{\partial K} \frac{\partial \Delta v}{\partial \mathbf n}w \ ds - \int_{\partial K} \frac{\partial^2 v}{\partial \mathbf n \partial \mathbf t} \frac{\partial w}{\partial \mathbf t} \ ds - \int_{\partial K} \frac{\partial^2 v}{\partial \mathbf n^2} \frac{\partial w}{\partial \mathbf n}\ ds \\
-&+ \int_K D^2v:D^2w \ dx,
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K v_h (\nabla\cdot\nabla) (\Delta w_h)
+  \\
+  &= -\int_K \nabla v_h \cdot (\nabla \Delta w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n).
 @f}
-where  $\mathbf t$ is the counterclockwise tangent and $D^2 v : D^2 w
-$ is the Frobenius inner product of Hessian matrices of $v$ and
-$w$. Then, summing over all the cells $K \in  \mathbb{T}$, taking into
-account the jump and average operator, adding the following (symmetric
-and stability) term
+At this point, we have two options: We can integrate the domain term's
+$\nabla\Delta w_h$ one more time to obtain
 @f{align*}{
--\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \ ds
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K (\Delta v_h) (\Delta w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h \cdot \mathbf n) \Delta w_h.
+@f}
+For a variety of reasons, this turns out to be a variation that is not
+useful for our purposes.
+
+Instead, what we do is recognize that
+$\nabla\Delta w_h = \text{grad}\,(\text{div}\,\text{grad}\, w_h)$, and we
+can re-sort these operations as
+$\nabla\Delta w_h = \text{div}\,(\text{grad}\,\text{grad}\, w_h)$ where we
+typically write $\text{grad}\,\text{grad}\, w_h = D^2 w_h$ to indicate
+that this is the "Hessian" matrix of second derivatives. With this
+re-ordering, we can now integrate the divergence, rather than the
+gradient operator, and we get the following instead:
+@f{align*}{
+  \int_K v_h (\Delta^2 w_h)
+  &= \int_K (\nabla \nabla v_h) : (\nabla \nabla w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h \otimes \mathbf n) : (\nabla\nabla w_h)
+  \\
+  &= \int_K (D^2 v_h) : (D^2 w_h)
+     +\int_{\partial K} v_h (\nabla \Delta w_h \cdot \mathbf n)
+     -\int_{\partial K} (\nabla v_h) \cdot (D^2 w_h \mathbf n).
+@f}
+Here, the colon indicates a double-contraction over the indices of the
+matrices to its left and right, i.e., the scalar product between two
+tensors.
+
+Then, we sum over all cells $K \in  \mathbb{T}$, and take into account
+that this means that every (interior) face appears twice in the
+sum. If we therefore split everything into a sum of integrals over
+cell interiors and a separate sum over cell interfaces, we can use
+the jump and average operators defined above. There are two steps
+left: First, because our shape functions are continuous, the gradients
+of the shape functions may be discontinuous, but the continuity
+guarantees that really only the normal component of the gradient is
+discontinuous across faces whereas the tangential component(s) are
+continuous. Second, the discrete formulation that results is not
+stable as the mesh size goes to zero, and to obtain a stable
+formulation that converges to the correct solution, we need to add
+the following terms:
+@f{align*}{
+-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg]
 + \sum_{e \in \mathbb{F}} 
 \frac{\sigma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
-\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg] \ ds,
+\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg].
 @f}
-and, after making the cancellations we arrive at the following $C^0$
+Then, after making cancellations that arise, we arrive at the following $C^0$
 IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
 g$ on $\partial \Omega$ and
 @f{align*}{
@@ -269,59 +320,98 @@ where
 &-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \ ds
 \\
 &+ \sum_{e \in \mathbb{F}} 
-\frac{\sigma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
+\frac{\gamma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
 \bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg] \ ds,
 @f}
 and 
 @f{align*}{
-\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx +\sum_{e \in \mathbb{F}^b} \frac{\sigma}{h_e}\int_e 
+\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx +\sum_{e \in \mathbb{F}^b} \frac{\gamma}{h_e}\int_e 
 \frac{\partial v_h}{\partial \mathbf n} j \ ds.
 @f}
-Here, $\sigma$ is the penalty parameter which weakly enforces the boundary condition 
+Here, $\gamma$ is the penalty parameter which both weakly enforces the
+boundary condition
 @f{align*}{
 \frac{\partial u(\mathbf x)}{\partial \mathbf n} = j(\mathbf x)
 @f}
-on the boundary interfaces $e \in \mathbb{F}^b$  and is chosen to be
-large enough to guarantee the stability of the method.
+on the boundary interfaces $e \in \mathbb{F}^b$, and also ensures that
+in the limit $h\rightarrow 0$, $u_h$ converges to a $C^1$ continuous
+function. $\gamma$ is chosen to be large enough to guarantee the
+stability of the method. We will discuss our choice in the program below.
 
 
-<h4>Quality of the Solutions</h4>
-
+<h4>Convergence Rates </h4>
 On polygonal domains, the weak solution $u$ to the biharmonic equation
 lives in $H^{2 +\alpha}(\Omega)$ where $\alpha \in(1/2, 2]$ is
 determined by the interior angles at the corners of $\Omega$. For
-instance, whenever $\Omega$ is convex, $\alpha$ is larger than $1$ and
-$\alpha$ is close to $1$ if one of the interior angles is close to
+instance, whenever $\Omega$ is convex, $\alph=1$; $\alpha$ may be less
+than one if the domain has re-entrant corners but
+$\alpha$ is close to $1$ if one of all interior angles is close to
 $\pi$.
 
+Now suppose that the $C^0$ IP solution $u_h$ is approximated by $C^0$
+shape functions with polynomial degree $p \ge 2$. Then the
+discretization outlined above yields the convergence rates as
+discussed below.
 
-<h4>Convergence Rates} 
-Suppose that the $C^0$ IP solution $u_h$ is approximated by $C^0$
-shape functions whose degree on each cell is at most $p \ge 2$.
-
-<b>Convergence in the $L^2$-norm:</b> The optimal convergence rate in
-the $L^2$-norm is $\mathcal{O}(h^{p+1})$ provided  $p \ge 3$. More
-details can be found in Theorem 4.6, "Continuous/discontinuous
-finite element approximations of fourth-order elliptic problems in
-structural and continuum mechanics with applications to thin beams
-and plates, and strain gradient elasticity",
-Comput. Method. Appl. M., 191(34): 3669--3750, 2002." 
 
 <b>Convergence in the $C^0$ IP-norm:</b>
-Assume that $f \in H^m(\Omega)$, $u \in H^{k}(\Omega)$ where $ 2 < k  \le m+4$, $m\ge0$.
-Then, the convergence rate of the $C^0$ IP method is
-$\mathcal{O}(h^{\min\{p-1, k-2\}})$ measured in the following
-mesh-dependent $C^0$ IP norm:
+Ideally, we would like to measure convergence in the "energy norm"
+$\|D^2(u-u_h)\|$. However, this does not work because, again, the
+discrete solution $u_h$ does not have two (weak) derivatives. Instead,
+one can define a discrete ($C^0$ IP) norm that is "equivalent" to the
+energy norm, as follows:
 @f{align*}{
- \|u_h\|_{h}^2:=  \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2 + \sigma \sum\limits_{e \in \mathbb{F} }
- h_e^{-1} \big\| \  \!\big[ \!\big[ \partial u_h/\partial \mathbf n\big]\!\big]  \ \big\|_{L^2(e)}^2.
+ \|u_h\|_{h}^2 :=
+ \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
+ +
+ \sum\limits_{e \in \mathbb{F} }
+ \frac{\gamma }{h_e} \left\|
+ \ \!\bigg[ \!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \right\|_{L^2(e)}^2.
 @f}
- 
-The optimal convergence rate $\mathcal{O}(h^{m+2})$ is achieved
-whenever $u \in H^{m+4}(\Omega)$ and $p$ is chosen to be at least
-$m+3$. This regularity assumption does not always guaranteed on
-polygonal domains however, is satisfied on smooth domains which do not
-contain angular corners.
+
+In this norm, the theory in the paper mentioned above yields that we
+can expect
+@f{align*}{
+ \|u-u_h\|_{h}^2 = {\cal O}(h^{p-1}),
+@f}
+much as one would expect given the convergence rates we know are true
+for the usual discretizations of the Laplace equation.
+
+Of course, this is true only if the exact solution is sufficiently
+smooth. Indeed, if $f \in H^m(\Omega)$ with $m \ge 0$,
+$u \in H^{2+\alpha}(\Omega)$ where $ 2 < 2+\alpha  \le m+4$,
+then the convergence rate of the $C^0$ IP method is
+$\mathcal{O}(h^{\min\{p-1, \alpha\}})$. In other words, the optimal
+convergence rate can only be expected if the solution is so smooth
+that $\alpha\ge p-1$; this can
+only happen if (i) the domain is convex with a sufficiently smooth
+boundary, and (ii) $m\ge p-3$. In practice, of course, the solution is
+what it is (independent of the polynomial degree we choose), and the
+last condition can then equivalent be read as saying that there is
+definitely no point in choosing $p$ large if $m$ is not also
+large. In other words, the only reasonably choices for $p$ are $p\le
+m+3$ because larger polynomial degrees do not result in higher
+convergence orders.
+
+
+<b>Convergence in the $L_2$-norm:</b> The optimal convergence rate in
+the $L_2$-norm is $\mathcal{O}(h^{p+1})$ provided  $p \ge 3$. More
+details can be found in Theorem 4.6 of @cite Engel2002 .
+
+The default in the program below is to choose $p=2$. In that case, the
+theorem does not apply, and indeed one only gets $\mathcal{O}(h^2)$
+instead of $\mathcal{O}(h^3)$ as we will show in the results section.
+
+
+<b>Convergence in the $H^1$-seminorm:</b> Given that we expect
+$\mathcal{O}(h^{p-1})$ in the best of cases for a norm equivalent to
+the $H^2$ seminorm, and $\mathcal{O}(h^{p+1})$ for the $L_2$ norm, one
+may ask about what happens in the $H^1$ seminorm that is intermediate
+to the two others. A reasonable guess is that one should expect
+$\mathcal{O}(h^{p})$. There is probably a paper somewhere that proves
+this, but we also verify that this conjecture is experimentally true
+below.
+
  
  
 <h3>Other Boundary Conditions</h3>
@@ -331,9 +421,41 @@ biharmonic equation with other boundary conditions -- for instance,
 for the first set of boundary conditions namely $u(\mathbf x) =
 g(\mathbf x)$ and $\Delta u(\mathbf x)= h(\mathbf x)$ on
 $\partial\Omega$ -- can be obtained with suitable modifications to
-$\mathcal{A}(\cdot,\cdot)$ and $\mathcal{F}(\cdot)$ described in the
-book chapter "$C^0$ Interior Penalty Methods'', In: Frontiers in
-Numerical Analysis-Durham 2010, pages 79--147, Springer, 2011.
+$\mathcal{A}(\cdot,\cdot)$ and $\mathcal{F}(\cdot)$ described in
+the book chapter @cite Brenner2011 .
 
 
 <h2>The testcase</h2>
+
+The last step that remains to describe is what this program solves
+for. As always, a trigonometric function is both a good and a bad
+choice because it does not lie in any polynomial space in which we may
+seek the solution while at the same time being smoother than real
+solutions typically are (here, it is in $C^\infty$ while real
+solutions are typically only in $H^3$ or so on convex polygonal
+domains, or somewhere between $H^2$ and $H^3$ if the domain is not
+convex). But, since we don't have the means to describe solutions of
+realistic problems in terms of relatively simple formulas, we just go
+with the following, on the unit square for the domain $\Omega$:
+@f{align*}{
+  u = \sin(\pi x) \sin(\pi y).
+@f}
+As a consequence, we then need choose as boundary conditions the following:
+@f{align*}{
+  g &= u|_{\partial\Omega} = \sin(\pi x) \sin(\pi y)|_{\partial\Omega},
+  \\
+  j &= \frac{\partial u}{\partial\mathbf n}|_{\partial\Omega}
+  \\
+    &= \left.\begin{pmatrix}
+                \pi\cos(\pi x) \sin(\pi y) \\
+                \pi\sin(\pi x) \cos(\pi y)
+             \end{pmatrix}\right|_{\partial\Omega} \cdot \mathbf n.
+@f}
+The right hand side is easily computes as
+@f{align*}{
+  f = \Delta^2 u = 4 \pi^4 \sin(\pi x) \sin(\pi y).
+@f}
+The program has classes `ExactSolution::Solution` and
+`ExactSolution::RightHandSide` that encode this information.
+
+
