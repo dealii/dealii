@@ -383,6 +383,7 @@ _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")                \
 _Pragma("GCC diagnostic ignored \"-Woverflow\"")                        \
 _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")              \
 _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                        \
+_Pragma("GCC diagnostic ignored \"-Wsuggest-override\"")                \
 _Pragma("GCC diagnostic ignored \"-Wtautological-constant-out-of-range-compare\"") \
 _Pragma("GCC diagnostic ignored \"-Wtype-limits\"")                     \
 _Pragma("GCC diagnostic ignored \"-Wundef\"")                           \
@@ -429,7 +430,9 @@ _Pragma("GCC diagnostic pop")
  * types.h
  */
 #if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #include <deal.II/base/numbers.h>
