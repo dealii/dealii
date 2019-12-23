@@ -224,6 +224,27 @@ namespace internal
       AlignedVector<Number> shape_hessians_collocation_eo;
 
       /**
+       * Stores the inverse transformation from the data at quadrature points
+       * to the basis defined by the shape_values fields. The data at
+       * quadrature points is interpreted either implicitly by its polynomial
+       * interpolation, or explicitly in terms of separate polynomials such as
+       * with the `_collocation` fields. The size of the array equals the
+       * layout of the `shape_values` array, and it is combined with the shape
+       * values array such that this matrix is the pseudo inverse of
+       * shape_values. In case the number of 1D quadrature points equals the
+       * size of the basis, this array is exactly the inverse of the
+       * shape_values array. The length of this array is <tt>n_dofs_1d *
+       * n_q_points_1d</tt> and quadrature points are the index running
+       * fastest.
+       */
+      AlignedVector<Number> inverse_shape_values;
+
+      /**
+       * Stores the even-odd variant of the `inverse_shape_values` field.
+       */
+      AlignedVector<Number> inverse_shape_values_eo;
+
+      /**
        * Collects all data of 1D shape values evaluated at the point 0 and 1
        * (the vertices) in one data structure. Sorting is first the values,
        * then gradients, then second derivatives.

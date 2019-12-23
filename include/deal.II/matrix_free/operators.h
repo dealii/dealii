@@ -709,11 +709,6 @@ namespace MatrixFreeOperators
                            Number,
                            false,
                            VectorizedArrayType> &fe_eval;
-
-    /**
-     * A structure to hold inverse shape functions
-     */
-    AlignedVector<VectorizedArrayType> inverse_shape;
   };
 
 
@@ -958,26 +953,7 @@ namespace MatrixFreeOperators
                              false,
                              VectorizedArrayType> &fe_eval)
     : fe_eval(fe_eval)
-  {
-    FullMatrix<double> shapes_1d(fe_degree + 1, fe_degree + 1);
-    for (unsigned int i = 0, c = 0; i < shapes_1d.m(); ++i)
-      for (unsigned int j = 0; j < shapes_1d.n(); ++j, ++c)
-        shapes_1d(i, j) = fe_eval.get_shape_info().shape_values[c][0];
-    shapes_1d.gauss_jordan();
-    const unsigned int stride = (fe_degree + 2) / 2;
-    inverse_shape.resize(stride * (fe_degree + 1));
-    for (unsigned int i = 0; i < stride; ++i)
-      for (unsigned int q = 0; q < (fe_degree + 2) / 2; ++q)
-        {
-          inverse_shape[i * stride + q] =
-            0.5 * (shapes_1d(i, q) + shapes_1d(i, fe_degree - q));
-          inverse_shape[(fe_degree - i) * stride + q] =
-            0.5 * (shapes_1d(i, q) - shapes_1d(i, fe_degree - q));
-        }
-    if (fe_degree % 2 == 0)
-      for (unsigned int q = 0; q < (fe_degree + 2) / 2; ++q)
-        inverse_shape[fe_degree / 2 * stride + q] = shapes_1d(fe_degree / 2, q);
-  }
+  {}
 
 
 
@@ -1030,15 +1006,15 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<
-      dim,
-      fe_degree,
-      n_components,
-      VectorizedArrayType>::apply(inverse_shape,
-                                  inverse_coefficients,
-                                  n_actual_components,
-                                  in_array,
-                                  out_array);
+    internal::CellwiseInverseMassMatrixImpl<dim,
+                                            fe_degree,
+                                            n_components,
+                                            VectorizedArrayType>::
+      apply(fe_eval.get_shape_info().inverse_shape_values_eo,
+            inverse_coefficients,
+            n_actual_components,
+            in_array,
+            out_array);
   }
 
 
@@ -1062,10 +1038,11 @@ namespace MatrixFreeOperators
                                             fe_degree,
                                             n_components,
                                             VectorizedArrayType>::
-      transform_from_q_points_to_basis(inverse_shape,
-                                       n_actual_components,
-                                       in_array,
-                                       out_array);
+      transform_from_q_points_to_basis(
+        fe_eval.get_shape_info().inverse_shape_values_eo,
+        n_actual_components,
+        in_array,
+        out_array);
   }
 
 
