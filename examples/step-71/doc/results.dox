@@ -1,34 +1,42 @@
 <h1>Results</h1>
 
-We run the program with a right hand side that will produce the
-solution $u = \sin(\pi x) \sin(\pi y)$ and with clamped
-boundary conditions in the domain $\Omega = (0,1)^2$.
+We run the program with right hand side and boundary values as
+discussed in the introduction. These will produce the
+solution $u = \sin(\pi x) \sin(\pi y)$ on the domain $\Omega = (0,1)^2$.
 We test this setup using $Q_2$, $Q_3$, and $Q_4$ elements, which one can
 change via the `fe_degree` variable in the `main()` function. With mesh
-refinement, the $L_2$ convergence rates, $H_1$-seminorm convergence
-and $H_2$-seminorm convergence of $u$
-should then be around 2, 2, 1 for $Q_2$; 4, 3, 2 for
+refinement, the $L_2$ convergence rates, $H^1$-seminorm rate,
+and $H^2$-seminorm convergence of $u$
+should then be around 2, 2, 1 for $Q_2$ (with the $L_2$ norm
+sub-optimal as discussed in the introduction); 4, 3, 2 for
 $Q_3$; and 5, 4, 3 for $Q_4$, respectively.
 
-From the papers by Brenner et al., it is not immediately clear what
-the penalty parameter $\gamma$ should be. Educated guesses, comparing
+From the literature, it is not immediately clear what
+the penalty parameter $\gamma$ should be. For example,
+@cite Brenner2009 state that it needs to be larger than one, and
+choose $\gamma=5$. The FEniCS/Dolphin tutorial chooses it as
+$\gamma=8$. @cite Wells2007 uses a value for $\gamma$ larger than the
+number of edges belonging to an element for Kirchhoff plates (see
+their Section 4.2). This suggests that maybe
+$\gamma = 1$, $2$, are too small; on the other hand, a value
+$p(p+1)$ would be reasonable,
+where $p$ is the degree of polynomials. The last of these choices is
+the one one would expect to work by comparing
 to the discontinuous Galerkin formulations for the Laplace equation,
-suggest that $\gamma = 1$, $2$, and $p(p+1)$ would all be reasonable,
-where $p$ is the degree of polynomials. This is easy to change
-in the code from its current default. Below we show results for
-all of these.
+and it will turn out to also work here.
+But we should check what value of $\gamma$ is right, and we will do so
+below; changing $\gamma$ is easy in the two `face_worker` and
+`boundary_worker` functions defined in `assemble_system()`.
 
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
-
-<h4>Convergence table</h4>
 
 We run the code with differently refined meshes
 and get the following convergence rates.
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    1.539e-02 </td><td>       </td><td>   8.528e-02   </td><td>           </td><td>  1.602 </td><td>   </td>
@@ -44,17 +52,19 @@ and get the following convergence rates.
   </tr>
 </table>
 We can see that the $L_2$ convergence rates are around 2,
-$H_1$-seminorm convergence rates are around 2,
-and $H_2$-seminorm convergence rates are around 1.
+$H^1$-seminorm convergence rates are around 2,
+and $H^2$-seminorm convergence rates are around 1. The latter two
+match the theoretically expected rates; for the former, we have no
+theorem but are not surprised that it is sub-optimal given the remark
+in the introduction.
+  
 
 <h3>Test results on <i>Q<sub>3</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
-
-<h4>Convergence table</h4>
 
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    2.187e-04 </td><td>       </td><td>   4.46269e-03   </td><td>           </td><td>  1.638e-01 </td><td>   </td>
@@ -70,18 +80,16 @@ and $H_2$-seminorm convergence rates are around 1.
   </tr>
 </table>
 We can see that the $L_2$ convergence rates are around 4,
-$H_1$-seminorm convergence rates are around 3,
-and $H_2$-seminorm convergence rates are around 2.
+$H^1$-seminorm convergence rates are around 3,
+and $H^2$-seminorm convergence rates are around 2.
 This, of course, matches our theoretical expectations.
+
 
 <h3>Test results on <i>Q<sub>4</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
 
-<h4>Convergence table</h4>
-
-
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    8.34446e-06 </td><td>       </td><td>   0.000239323   </td><td>           </td><td>  0.0109785 </td><td>   </td>
@@ -97,21 +105,23 @@ This, of course, matches our theoretical expectations.
   </tr>
 </table>
 We can see that the $L_2$ norm convergence rates are around 5,
-$H_1$-seminorm convergence rates are around 4,
-and $H_2$-seminorm convergence rates are around 3.
+$H^1$-seminorm convergence rates are around 4,
+and $H^2$-seminorm convergence rates are around 3.
 On the finest mesh, the $L_2$ norm convergence rate
 is much smaller than our theoretical expectations
 because the linear solver becomes the limiting factor due
-to round-off. But the $L_2$ error is pretty small in that case.
+to round-off. Of course the $L_2$ error is also very small already in
+that case.
+
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 1</i> </h3>
 
-<h4>Convergence table</h4>
-
+For comparison with the results above, let us now also consider the
+case where we simply choose $\gamma=1$:
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    4.86048e-02 </td><td>       </td><td>   3.30386e-01   </td><td>           </td><td>  4.34917 </td><td>   </td>
@@ -126,20 +136,21 @@ to round-off. But the $L_2$ error is pretty small in that case.
    <td>   5                  </td><td>    8.41058e-04 </td><td>  1.98   </td><td>  3.57705e-02  </td><td>    1.00       </td><td> 3.95719  </td><td>  0.001   </td>
   </tr>
 </table>
-Although $L_2$ norm and $H_1$-seminorm convergence rates of $u$
-follow the theoretical expectations, $H_2$-seminorm does not converge.
+Although $L_2$ norm and $H^1$-seminorm convergence rates of $u$
+follow the theoretical expectations, the $H^2$-seminorm does not seem to converge.
 Comparing results from $\gamma = 1$ and $\gamma = p(p+1)$, it is clear that
 $\gamma = p(p+1)$ is a better penalty.
 
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 2</i> </h3>
 
-<h4>Convergence table</h4>
-
+Since $\gamma=1$ is clearly too small, one might conjecture that
+$\gamma=2$ might actually work better. Here is what one obtains in
+that case:
 
 <table align="center" class="doxtable">
   <tr>
-   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H_1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H_2}$ </th><th> Conv. rates </th>
+   <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
    <td>   2                  </td><td>    5.482e-03 </td><td>       </td><td>   7.652e-02  </td><td>           </td><td>  1.756e-00 </td><td>   </td>
@@ -154,10 +165,12 @@ $\gamma = p(p+1)$ is a better penalty.
    <td>   5                  </td><td>   2.822e-04  </td><td>  1.68  </td><td> 1.605e-03 </td><td>    1.90     </td><td> 2.041e-01  </td><td> 1.03  </td>
   </tr>
 </table>
-In this case, all convergence rates of $u$
-follow the theoretical expectations, but,
-compared to the results from $\gamma = p(p+1)$,
-we don't see good convergence of the $L_2$ errors.
+In this case, the convergence rates more or less follow the
+theoretical expectations, but, compared to the results from $\gamma =
+p(p+1)$, are more variable. That suggests that the penalty parameter
+is already too small even for the value $p=2$ chosen here, and one can
+readily check that it is indeed too small when using higher polynomial
+degrees.
 
 
 <h3> Conclusions for the choice of the penalty parameter </h3>
@@ -165,3 +178,26 @@ we don't see good convergence of the $L_2$ errors.
 The conclusions for which of the "reasonable" choices one should use for the penalty parameter
 is that $\gamma=p(p+1)$ yields the expected results. It is, consequently, what the code
 uses as currently written.
+
+
+<h2> Possibilities for extensions </h2>
+
+There are a number of obvious extensions to this program that would
+make sense:
+
+- The program uses a square domain and a uniform mesh. Real problems
+  don't come this way, and one should verify convergence also on
+  domains with other shapes and, in particular, curved boundaries. One
+  may also be interested in resolving areas of less regularity by
+  using adaptive mesh refinement.
+
+- From a more theoretical perspective, the convergence results above
+  only used the "broken" $H^2$ seminorm $|\cdot|^\circ_{H^2}$ instead
+  of the "equivalent" norm $|\cdot|_h$. This is good enough to
+  convince ourselves that the program isn't fundamentally
+  broken. However, it might be interesting to measure the error in the
+  actual norm for which we have theoretical results. Implementing this
+  addition should not be overly difficult using, for example, the
+  FEInterfaceValues class combined with MeshWorker::mesh_loop() in the
+  same spirit as we used for the assembly of the linear system.
+

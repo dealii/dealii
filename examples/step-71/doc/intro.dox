@@ -217,7 +217,7 @@ differentiable) shape functions with an interior penalty formulation.
 We base this program on the $C^0$ IP method presented by Susanne
 Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
 for Linear Fourth Order Boundary Value Problems on polygonal
-domains'' (@cite Brenner2005), where the method is
+domains'' @cite Brenner2005 , where the method is
 derived for the biharmonic equation with "clamped" boundary
 conditions.
 
@@ -359,10 +359,10 @@ discussed below.
 Ideally, we would like to measure convergence in the "energy norm"
 $\|D^2(u-u_h)\|$. However, this does not work because, again, the
 discrete solution $u_h$ does not have two (weak) derivatives. Instead,
-one can define a discrete ($C^0$ IP) norm that is "equivalent" to the
+one can define a discrete ($C^0$ IP) semi-norm that is "equivalent" to the
 energy norm, as follows:
 @f{align*}{
- \|u_h\|_{h}^2 :=
+ |u_h|_{h}^2 :=
  \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
  +
  \sum\limits_{e \in \mathbb{F} }
@@ -370,10 +370,10 @@ energy norm, as follows:
  \ \!\bigg[ \!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \right\|_{L^2(e)}^2.
 @f}
 
-In this norm, the theory in the paper mentioned above yields that we
+In this (semi)norm, the theory in the paper mentioned above yields that we
 can expect
 @f{align*}{
- \|u-u_h\|_{h}^2 = {\cal O}(h^{p-1}),
+ |u-u_h|_{h}^2 = {\cal O}(h^{p-1}),
 @f}
 much as one would expect given the convergence rates we know are true
 for the usual discretizations of the Laplace equation.
@@ -394,12 +394,34 @@ large. In other words, the only reasonably choices for $p$ are $p\le
 m+3$ because larger polynomial degrees do not result in higher
 convergence orders.
 
+For the purposes of this program, we're a bit too lazy to actually
+implement this equivalent norm -- though it's not very difficult and
+would make for a good exercise. Instead, we'll simply check in the
+program what the "broken" $H^2$ seminorm
+@f{align*}{
+ |u_h|^\circ_{H^2}^2
+ :=
+ \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
+ =
+ \sum\limits_{K \in \mathbb{T}} \big|D^2 u_h\big|_{L_2}^2
+@f}
+yields. The convergence rate in this norm can, from a theoretical
+perspective, of course not be <i>worse</i> than the one for
+$|\cdot|_h$, but it could be worse. It could also be the case that
+we get the optimal convergence rate even though there is a bug in the
+program, and that that bug would only show up in sub-optimal rates for
+the additional terms present in $|\cdot|_h$. But, one might hope
+that if we get the optimal rate in the broken norm and the norms
+discussed below, then the program is indeed correct. The results
+section will demonstrate that we obtain optimal rates in all norms
+shown.
+
 
 <b>Convergence in the $L_2$-norm</b>
 
 The optimal convergence rate in the $L_2$-norm is $\mathcal{O}(h^{p+1})$
-provided $p \ge 3$. More details can be found in Theorem 4.6 of @cite
-Engel2002 .
+provided $p \ge 3$. More details can be found in Theorem 4.6 of
+@cite Engel2002 .
 
 The default in the program below is to choose $p=2$. In that case, the
 theorem does not apply, and indeed one only gets $\mathcal{O}(h^2)$
