@@ -511,6 +511,12 @@
  *        advanced manifold operations.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-71</td>
+ *        <td> Solving the fourth-order biharmonic equation using the $C^0$ 
+ *        Interior Penalty (C0IP) method.
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -532,7 +538,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Solve the Laplace equation
+ *     <td> Solving the Laplace equation
  *     <td>step-3</td>
  *     </td>
  *   </tr>
@@ -732,7 +738,8 @@
  *       step-46,
  *       step-51,
  *       step-59,
- *       step-61
+ *       step-61,
+ *       step-71
  *     </td>
  *   </tr>
  *
@@ -837,6 +844,18 @@
  *     <td> BiCGStab
  *     </td>
  *     <td>step-9</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Direct solvers
+ *     </td>
+ *     <td>
+ *       step-29,
+ *       step-44,
+ *       step-46,
+ *       step-62,
+ *       step-71
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -950,7 +969,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> The heat equation
+ *     <td> Heat equation
  *     </td>
  *     <td>
  *       step-26
@@ -1044,6 +1063,12 @@
  *     <td> An eigenspectrum problem
  *     </td>
  *     <td>step-36</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Fourth-order biharmonic equation
+ *     </td>
+ *     <td>step-71</td>
  *   </tr>
  *
  *   <tr valign="top">
