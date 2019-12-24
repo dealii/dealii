@@ -515,6 +515,7 @@
  *       <td>step-71</td>
  *        <td> Solving the fourth-order biharmonic equation using the $C^0$ 
  *        Interior Penalty (C0IP) method.
+ *        <br/> Keywords: FEInterfaceValues
  *       </td></tr>
  *
  * </table>
