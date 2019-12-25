@@ -147,6 +147,18 @@ PersistentTriangulation<dim, spacedim>::create_triangulation(
 
 template <int dim, int spacedim>
 void
+PersistentTriangulation<dim, spacedim>::create_triangulation(
+  const TriangulationDescription::Description<dim, spacedim> &construction_data)
+{
+  (void)construction_data;
+
+  Assert(false, ExcInternalError());
+}
+
+
+
+template <int dim, int spacedim>
+void
 PersistentTriangulation<dim, spacedim>::create_triangulation_compatibility(
   const std::vector<Point<spacedim>> &,
   const std::vector<CellData<dim>> &,

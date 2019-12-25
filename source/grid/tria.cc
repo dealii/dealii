@@ -10746,6 +10746,125 @@ Triangulation<dim, spacedim>::create_triangulation(
 
 template <int dim, int spacedim>
 void
+Triangulation<dim, spacedim>::create_triangulation(
+  const TriangulationDescription::Description<dim, spacedim> &construction_data)
+{
+  // 1) create coarse grid
+  create_triangulation(construction_data.coarse_cell_vertices,
+                       construction_data.coarse_cells,
+                       SubCellData());
+
+  // create a copy of cell_infos such that we can sort them
+  auto cell_infos = construction_data.cell_infos;
+
+  // sort cell_infos on each level separately
+  for (auto &cell_info : cell_infos)
+    std::sort(
+      cell_info.begin(),
+      cell_info.end(),
+      [&](TriangulationDescription::CellData<dim> a,
+          TriangulationDescription::CellData<dim> b) {
+        const CellId a_id(a.id);
+        const CellId b_id(b.id);
+
+        const auto a_coarse_cell_index =
+          this->coarse_cell_id_to_coarse_cell_index(a_id.get_coarse_cell_id());
+        const auto b_coarse_cell_index =
+          this->coarse_cell_id_to_coarse_cell_index(b_id.get_coarse_cell_id());
+
+        // according to their coarse-cell index and if that is
+        // same according to their cell id (the result is that
+        // cells on each level are sorted according to their
+        // index on that level - what we need in the following
+        // operations)
+        if (a_coarse_cell_index != b_coarse_cell_index)
+          return a_coarse_cell_index < b_coarse_cell_index;
+        else
+          return a_id < b_id;
+      });
+
+  // 2) create all levels via a sequence of refinements
+  for (unsigned int level = 0; level < cell_infos.size(); ++level)
+    {
+      // a) set manifold ids here (because new vertices have to be
+      //    positioned correctly during each refinement step)
+      {
+        auto cell      = this->begin(level);
+        auto cell_info = cell_infos[level].begin();
+        for (; cell_info != cell_infos[level].end(); ++cell_info)
+          {
+            while (cell_info->id != cell->id().template to_binary<dim>())
+              ++cell;
+            if (spacedim == 3)
+              for (unsigned int quad = 0;
+                   quad < GeometryInfo<spacedim>::quads_per_cell;
+                   ++quad)
+                cell->quad(quad)->set_manifold_id(
+                  cell_info->manifold_quad_ids[quad]);
+
+            if (spacedim >= 2)
+              for (unsigned int line = 0;
+                   line < GeometryInfo<spacedim>::lines_per_cell;
+                   ++line)
+                cell->line(line)->set_manifold_id(
+                  cell_info->manifold_line_ids[line]);
+
+            cell->set_manifold_id(cell_info->manifold_id);
+          }
+      }
+
+      // b) perform refinement on all levels but on the finest
+      if (level + 1 != cell_infos.size())
+        {
+          // find cells that should have children and mark them for
+          // refinement
+          auto coarse_cell    = this->begin(level);
+          auto fine_cell_info = cell_infos[level + 1].begin();
+
+          // loop over all cells on the next level
+          for (; fine_cell_info != cell_infos[level + 1].end();
+               ++fine_cell_info)
+            {
+              // find the parent of that cell
+              while (
+                !coarse_cell->id().is_parent_of(CellId(fine_cell_info->id)))
+                ++coarse_cell;
+
+              // set parent for refinement
+              coarse_cell->set_refine_flag();
+            }
+
+          // execute refinement
+          dealii::Triangulation<dim,
+                                spacedim>::execute_coarsening_and_refinement();
+        }
+    }
+
+  // 3) set boundary ids
+  for (unsigned int level = 0; level < cell_infos.size(); ++level)
+    {
+      auto cell      = this->begin(level);
+      auto cell_info = cell_infos[level].begin();
+      for (; cell_info != cell_infos[level].end(); ++cell_info)
+        {
+          // find cell that has the correct cell
+          while (cell_info->id != cell->id().template to_binary<dim>())
+            ++cell;
+
+          // boundary ids
+          for (auto pair : cell_info->boundary_ids)
+            {
+              Assert(cell->at_boundary(pair.first),
+                     ExcMessage("Cell face is not on the boundary!"));
+              cell->face(pair.first)->set_boundary_id(pair.second);
+            }
+        }
+    }
+}
+
+
+template <int dim, int spacedim>
+void
 Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
   AssertThrow(dim + 1 == spacedim,

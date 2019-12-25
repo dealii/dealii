@@ -28,6 +28,7 @@ SET(_unity_include_src
   manifold_lib.cc
   persistent_tria.cc
   tria_accessor.cc
+  tria_description.cc
   tria_faces.cc
   tria_levels.cc
   tria_objects.cc
@@ -63,6 +64,7 @@ SET(_inst
   manifold.inst.in
   manifold_lib.inst.in
   tria_accessor.inst.in
+  tria_description.inst.in
   tria.inst.in
   tria_objects.inst.in
   )

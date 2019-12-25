@@ -270,6 +270,16 @@ namespace parallel
                            const std::vector<CellData<dim>> &  cells,
                            const SubCellData &subcelldata) override;
 
+      /*
+       * @copydoc Triangulation::create_triangulation()
+       *
+       * @note Not inmplemented yet.
+       */
+      virtual void
+      create_triangulation(
+        const TriangulationDescription::Description<dim, spacedim>
+          &construction_data) override;
+
       /**
        * Copy @p other_tria to this triangulation.
        *

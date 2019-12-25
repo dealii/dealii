@@ -20,7 +20,6 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -53,7 +52,7 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
     [](dealii::Triangulation<dim> &tria, const unsigned int n_partitions) {
       GridTools::partition_triangulation_zorder(n_partitions, tria);
     },
-    parallel::fullydistributed::Settings::construct_multigrid_hierarchy);
+    TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   // actually create triangulation
   tria_pft.copy_triangulation(basetria);

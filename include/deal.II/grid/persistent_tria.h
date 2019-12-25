@@ -202,6 +202,16 @@ public:
                        const std::vector<CellData<dim>> &  cells,
                        const SubCellData &subcelldata) override;
 
+  /*
+   * @copydoc Triangulation::create_triangulation()
+   *
+   * @note Not inmplemented yet.
+   */
+  virtual void
+  create_triangulation(
+    const TriangulationDescription::Description<dim, spacedim>
+      &construction_data) override;
+
   /**
    * An overload of the respective function of the base class.
    *
