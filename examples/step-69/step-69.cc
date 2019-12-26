@@ -1993,16 +1993,9 @@ namespace Step69
   template <int dim>
   void TimeLoop<dim>::run()
   {
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        pcout << "Reading parameters and allocating objects... " << std::flush;
-        ParameterAcceptor::initialize("step-69.prm");
-        pcout << "done" << std::endl;
-      }
-    else
-      {
-        ParameterAcceptor::initialize("step-69.prm");
-      }
+    pcout << "Reading parameters and allocating objects... " << std::flush;
+    ParameterAcceptor::initialize("step-69.prm");
+    pcout << "done" << std::endl;
 
     print_head(pcout, "create triangulation");
     discretization.setup();
@@ -2177,28 +2170,7 @@ namespace Step69
                                   DataOutBase::VtkFlags::best_speed);
       data_out.set_flags(flags);
 
-      const auto filename = [&](const unsigned int i) -> std::string {
-        const auto seq = dealii::Utilities::int_to_string(i, 4);
-        return name + "-" + Utilities::int_to_string(cycle, 6) + "-" + seq +
-               ".vtu";
-      };
-
-      const unsigned int i = triangulation.locally_owned_subdomain();
-      std::ofstream      output(filename(i));
-      data_out.write_vtu(output);
-
-      if (dealii::Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-        {
-          const unsigned int n_mpi_processes =
-            dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
-          std::vector<std::string> filenames;
-          for (unsigned int i = 0; i < n_mpi_processes; ++i)
-            filenames.push_back(filename(i));
-
-          std::ofstream output(name + "-" + Utilities::int_to_string(cycle, 6) +
-                               ".pvtu");
-          data_out.write_pvtu_record(output, filenames);
-        }
+      data_out.write_vtu_with_pvtu_record("", name, cycle, 6, mpi_communicator);
     };
 
     output_thread = std::move(std::thread(output_worker));
