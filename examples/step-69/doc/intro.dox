@@ -3,8 +3,6 @@
   and Ignacio Tomas (Sandia National Laboratories, Albuquerque).
 </i>
 
-@dealiiTutorialDOI{10.5281/zenodo.TODO,https://zenodo.org/badge/DOI/10.5281/zenodo.TODO.svg}
-
 @note This tutorial step implements a first-order accurate <i>guaranteed
 maximum wavespeed method</i> based on a first-order <i>graph viscosity</i>
 for solving Euler's equations of gas dynamics @cite GuermondPopov2016. As
@@ -13,6 +11,8 @@ research computations you might want to consider exploring a corresponding
 high-performance implementation of a second-order accurate scheme that uses
 <i>convex limiting</i> techniques, and strong stability-preserving (SSP)
 time integration, see @cite GuermondEtAl2018.
+
+@todo Add zenodo link
 
 
 <h1>Introduction</h1>
@@ -38,7 +38,9 @@ as elementary building blocks in higher-order schemes
 @cite GuermondEtAl2018. However, we hope that the reader still finds the
 tutorial step to be a good starting point (in particular with respect to
 the programming techniques) before jumping into full research codes such as
-the second-order scheme @cite GuermondEtAl2018 maintained TODO.
+the second-order scheme @cite GuermondEtAl2018.
+
+@todo Add link to repository and project of the second order code.
 
 
 <a name="eulerequations"></a>
@@ -173,8 +175,8 @@ instance @cite GuermondErn2004 Chapter 5 and references therein). Most
 time-dependent discretization approaches described in the deal.II tutorials
 are based on such a (semi-discrete) variational approach. Fundamentally,
 from an analysis perspective, variational discretizations are conceived in
-order to provide some notion of global (integral) stabiliy, meaning an estimate
-of the form
+order to provide some notion of global (integral) stabiliy, meaning an
+estimate of the form
 
 @f{align*}
   |\!|\!| \mathbf{u}_{h}(t) |\!|\!| \leq |\!|\!| \mathbf{u}_{h}(0) |\!|\!|
@@ -190,15 +192,17 @@ have proven to be some of the best approaches for simulations in the subsonic
 shockless regime and similarly benign regimes.
 
 However, in the transonic and supersonic regime, and shock-hydrodynamics
-applications the use of variational schemes might be questionable. In fact, at
-the time of this writing, most shock-hydrodynamics codes are still firmly
-grounded on finite volumes methods. The main reason for failure of variational
-schemes in such extreme regimes is the lack of pointwise stability. This stems
-from the fact that <i>a priori</i> bounds on integrated quantities (e.g.
-integrals of moments) have in general no implications on pointwise properties
-of the solution. While some of these problems might be alleviated by the
-(perpetual) chase of the right shock capturing scheme, finite difference-like
-and finite volume schemes still have an edge in many regards.
+
+applications the use of variational schemes might be questionable. In fact,
+at the time of this writing, most shock-hydrodynamics codes are still
+firmly grounded on finite volumes methods. The main reason for failure of
+variational schemes in such extreme regimes is the lack of pointwise
+stability. This stems from the fact that <i>a priori</i> bounds on
+integrated quantities (e.g. integrals of moments) have in general no
+implications on pointwise properties of the solution. While some of these
+problems might be alleviated by the (perpetual) chase of the right shock
+capturing scheme, finite difference-like and finite volume schemes still
+have an edge in many regards.
 
 In this tutorial step we therefore depart from variational schemes. We will
 present a completely algebraic formulation (with the flavor of a
@@ -209,13 +213,13 @@ collocation-type scheme) that preserves constraints pointwise, i.e.,
   \;\text{at every node}\;\mathbf{x}_i\;\text{of the mesh}.
 @f}
 
-However, contrary to finite difference/volume schemes, the
-scheme implemented in this step maximizes the use of finite element
-software infrastructure, works in any mesh, in any space dimension, and is
-theoretically guaranteed to always work, all the time, no exception. This
-illustrates that deal.ii can be used far beyond the context of variational
-schemes in Hilbert spaces and that a large number of classes, modules and
-namespaces from deal.ii can be adapted for such purpose.
+Contrary to finite difference/volume schemes, the scheme implemented in
+this step maximizes the use of finite element software infrastructure,
+works in any mesh, in any space dimension, and is theoretically guaranteed
+to always work, all the time, no exception. This illustrates that deal.ii
+can be used far beyond the context of variational schemes in Hilbert spaces
+and that a large number of classes, modules and namespaces from deal.ii can
+be adapted for such purpose.
 
 
 <h3>Description of the scheme </h3>
@@ -232,15 +236,14 @@ spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
 \in \mathcal{V}} \mathbf{U}_i \phi_i$ where $\mathbf{U}_i \in
 \mathbb{R}^{d+2}$ and $\phi_i$ is a scalar-valued shape function.
 
-<b>Note.</b>
-For simplicity we will consider the usual Lagrange finite elements. In such
-context $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ be the set of all "support
-points" (see @ref GlossSupport "this glossary entry") where $\mathbf{x}_i \in
-\mathbb{R}^d$. Then each integer index $i \in \mathcal{V}$
-uniquely identifies a support point $\mathbf{x}_i$ and/or scalar-valued shape
-function $\phi_i$.
+@note For simplicity we will consider the usual Lagrange finite elements.
+In such this context we let $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ denote
+the set of all support points (see @ref GlossSupport "this glossary
+entry"), where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
+\mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as
+a scalar-valued shape function $\phi_i$.
 
-With this notation we can define the scheme as
+With this notation at hand we can define the scheme as
 
 @f{align*}
   m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
@@ -266,44 +269,40 @@ Where
   - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\|_{\ell^2} }$
 
 The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
-\textbf{n})$ is far from trivial and we will postpone their definition in
-order to focus on the computational/coding issues of this tutorial Step.
-For the time being let's note that
-  - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time. It makes sense to
-    compute and store them once, and later recall them at very time step.
-    They are part of what we are going to call off-line data.
+\textbf{n})$ is far from trivial and we will postpone the precise
+definition in order to focus first on some algorithmic and implementational
+questions. We note that
+  - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time (provided we keep the
+    discretization fixed). It thus makes sense to assemble the matrices
+    once in a so called <i>offline computation</i> and reuse them in every
+    time step. They are part of what we are going to call off-line data.
   - At every time step we have to evaluate $\mathbb{f}(\mathbf{U}_j^{n})$ and
     $d_{ij} := \max \{ \lambda_{\text{max}}
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
-    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
+    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $, which will
+    constitute the bulk of the computational cost.
 
-<<<<<<< HEAD
-Before we start with the description of the implementation of this scheme, it
-is worth saying a thing or two about the "assembly" of this system. Consider
-for instance a hypothetical pseudo-code, illustrating
-a possible strategy to compute the solution $\textbf{U}^{n+1}$:
-=======
-Before we start with the description of the implementation of this scheme,
-it is worth saying a thing or two about the "assembly" of this system.
-Consider for instance a hypothetical pseudo-code, illustrating a possible
-strategy to compute the solution $\textbf{U}^{n+1}$:
->>>>>>> ee60914d6e... reindent, layout changes and address some review comments
+Consider the following pseudo-code, illustrating a possible straight
+forward strategy for computing the solution $\textbf{U}^{n+1}$ at a new
+time $t_{n+1} = t_n + \tau_n$ given a known state $\textbf{U}^{n}$ at time
+$t_n$:
 
 @f{align*}
-&\textbf{For } i \in \mathcal{V} \\
-&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} :=
-\texttt{gather_cij_vectors}(\textbf{c}, \mathcal{I}(i)) \\
-&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} :=
-\texttt{gather_state_vectors}(\textbf{U}^n, \mathcal{I}(i)) \\
-&\ \ \ \ \ \textbf{U}_i^{n+1} := \mathbf{U}_i^{n} \\
-&\ \ \ \ \textbf{For } j \in \mathcal{I}(i) \\
-&\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} := \textbf{U}_i^{n+1} - \frac{\tau}{m_i}
- \mathbb{f}(\mathbf{U}_j^{n})\cdot
-   \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
-&\ \ \ \ \textbf{EndFor} \\
-&\textbf{EndFor}
+&\textbf{for } i \in \mathcal{V} \\
+&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow \texttt{gather} (\textbf{c}, \mathcal{I}(i)) \\
+&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow \texttt{gather} (\textbf{U}^n, \mathcal{I}(i)) \\
+&\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
+&\ \ \ \ \textbf{for } j \in \mathcal{I}(i) \\
+&\ \ \ \ \ \ \ \  \texttt{compute } d_{ij} \\
+&\ \ \ \ \ \ \ \  \texttt{compute } \mathbb{f}(\mathbf{U}_j^{n}) \\
+&\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} \leftarrow \textbf{U}_i^{n+1} - \frac{\tau_n}{m_i}
+ \mathbb{f}(\mathbf{U}_j^{n})\cdot \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
+&\ \ \ \ \textbf{end} \\
+&\ \ \ \ \texttt{scatter} (\textbf{U}^n, \mathcal{I}(i), \textbf{U}_i^n)) \\
+&\textbf{end}
 @f}
+<<<<<<< HEAD
 We note here that:
 - This "assembly" does not require any form of quadrature or cell-loops.
 - Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
@@ -329,22 +328,43 @@ of application of this kind of schemes, also called "edge-based" or
 "graph-based" finite element schemes (see for instance @cite Rainald2008 for
 more historical references).
 
-<<<<<<< HEAD
-This pseudo-code was introduced only to prepare the mindset of the reader for
-what is going to be presented in the in the next section. The
-actual implementation described in the next section is somewhat different from
-what is described in the pseudo-code but shares the same core mentality: we do
-not loop on cells but rather we loop on the edges of the sparsity graph (hence
-the name "edge-based" code) in order to assemble the system.
-=======
-This pseudo-code was introduced only to prepare the mindset of the reader
-for what is going to be presented in the in the next section. The actual
-implementation described in the next section is somewhat different from
-what is described in the pseudo-code but shares the same core mentality: we
-do not loop on cells but rather we loop on the edges of the sparsity graph
-(hence the name "edge-based" code) in order to assemble the system.
->>>>>>> ee60914d6e... reindent, layout changes and address some review comments
+We note that:
+- This algorithm does not require any form of quadrature or cell-loops.
+- Here, $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
+  containing all the vectors $\mathbf{c}_{ij}$ and all the states
+  $\mathbf{U}_j^n$, respectively.
+- $\texttt{gather}$ and $\texttt{scatter}$ are helper functions
+  that collect from, or distribute values from global vectors and matrices.
+- For an interior node $\mathbf{x}_i$ on a regular mesh in two space
+  dimensions (assuming a first-order polynomial space $\mathbb{Q}^1$) the
+  stencil $\mathcal{I}(i)$ contains nine entries. The update for a single
+  state $\textbf{U}_i^n$ thus depends on nine state-vectors
+  $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ (i.e., all the states in the
+  patch formed by the support of the shape function $\phi_i$). This is one
+  of the major differences compared to cell-based loop, where an update
+  typically only operates on states associated with a single cell.
 
+The actual implementation will deviate from above code in one key aspect:
+The time-step size $\tau$ has to be chosen subject to a CFL condition
+@f{align*}
+  \tau_n = c_{\text{cfl}}\,\min_{
+  i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right),
+@f}
+where $0<c_{\text{cfl}}\le1$ is a chosen constant. This will require to
+compute all $d_{ij}$ in a separte step prior to actually performing above
+update. The core principle remains unchanged, though: we do not loop over
+cells but rather over all edges of the sparsity graph.
+
+@note It is not uncommon to encounter such fully algebraic schemes (i.e.,
+no bilinear forms, no cell loops, and no quadrature) outside of the finite
+element community in the wieder CFD community. There is a rich history of
+application of this kind of schemes, also called <i>edge-based</i> or
+<i>graph-based</i> finite element schemes (see for instance @cite
+Rainald2008 for a historical overview).
+
+@todo Explain what to do for slip, dirichlet and do-nothing boundary
+conditions.
 
 <h3>Implementation of the scheme </h3>
 
+@todo Maybe comment on some key features of the implementation?!

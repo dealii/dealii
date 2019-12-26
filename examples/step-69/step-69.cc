@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -19,93 +19,115 @@
  */
 
 // @sect3{Include files}
-// The set of include files is quite standard. The most intriguing part
-// is that: either though this code is a "thread and mpi parallel"
-// we are using neither Trilinos nor PETSC vectors. Actually we are using dealii
-// distributed vectors <code>la_parallel_vector.h</code> and the regular dealii
-// sparse matrices <code>sparse_matrix.h</code>
+
+// The set of include files is quite standard. The most intriguing part is
+// the fact that we will rely solely on deal.II data structures for MPI
+// parallelization, in particular distributed::Triangulation and
+// LinearAlgebra::distributed::Vector included through
+// <code>distributed/tria.h</code> and
+// <code>lac/la_parallel_vector.h</code>. Instead of a Trilinos, or PETSc
+// specific matrix class, we will use a non-distributed
+// dealii::SparseMatrix (<code>lac/sparse_matrix.h</code>) to store the local
+// part of the $c_{ij}$, $n_{ij}$ and $d_{ij}$ matrices.
 #include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
+
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/vector.h>
+
 #include <deal.II/meshworker/scratch_data.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
+// In addition to above deal.II specific includes, we also include four
+// boost headers. The first two are for binary archives that we will use
+// for implementing a checkpointing and restart mechanism.
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/core/demangle.hpp>
+
+// The last two boost header files are for creating custom iterator ranges
+// over integer intervals.
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#include <filesystem>
+// @sect3{Class template declarations}
 
-
-// @sect3{Declaration/s of the namespace Step69}
-
+// Next we declare all data structures and class templates of the example
+// step.
 namespace Step69
 {
-  enum Boundary : dealii::types::boundary_id
+  using namespace dealii;
+
+  // We start with an enum describing all possible boundary conditions
+  // encountered in this tutorial step. Such an enum allows us to refer to
+  // boundary types by a mnemonic (such as
+  // <code>Boundary::do_nothing</code>) rather than a numerical value.
+  enum Boundary : types::boundary_id
   {
     do_nothing = 0,
     slip       = 2,
     dirichlet  = 3,
   };
 
-
-  // @sect4{Declaration of <code>Discretization</code> class template}
-
-  // The main goal of this class is to digest the input file and act as a
-  // "container" of members that may be changed/decided at run time (through the
-  // input file). It was natural to derive this class from
-  // <code>dealii::ParameterAcceptor</code>. This class is in charge of
-  // initializing mpi comunicator, geometry dimensions, triangulation, mapping,
-  // finite element, mapping, and quadratures. If we think of the class
-  // <code>Discretization</code> as a "container": it doesn't contain any
-  // memmory demanding class member such a dof_handlers, vectors or matrices.
-  // The most memmory thirsty class member is the <code>
-  // dealii::parallel::distributed::Triangulation<dim></code>.
-
+  // @sect4{class <code>Discretization</code>}
+  //
+  // The class <code>Discretization</code> contains all data structures
+  // concerning the mesh (triangulation) and discretization (mapping,
+  // finite element, quadrature) of the problem. We use the
+  // ParameterAcceptor class to automatically populate problem-specific
+  // parameters, such as the geometry information
+  // (<code>immersed_disc_length</code>, etc.) or the refinement level
+  // (<code>refinement</code>) from a parameter file. This requires us to
+  // split the initialization of data structures into two functions: We
+  // initialize everything that does not depend on parameters in the
+  // constructor, and defer the creation of the mesh to the
+  // <code>setup()</code> method that can be called once all parameters are
+  // read-in via ParameterAcceptor::initialize().
+  //
   template <int dim>
-  class Discretization : public dealii::ParameterAcceptor
+  class Discretization : public ParameterAcceptor
   {
   public:
-    Discretization(const MPI_Comm &     mpi_communicator,
-                   dealii::TimerOutput &computing_timer,
-                   const std::string &  subsection = "Discretization");
+    Discretization(const MPI_Comm &   mpi_communicator,
+                   TimerOutput &      computing_timer,
+                   const std::string &subsection = "Discretization");
 
     void setup();
 
     const MPI_Comm &mpi_communicator;
 
-    dealii::parallel::distributed::Triangulation<dim> triangulation;
+    parallel::distributed::Triangulation<dim> triangulation;
 
-    const dealii::MappingQ<dim>   mapping;
-    const dealii::FE_Q<dim>       finite_element;
-    const dealii::QGauss<dim>     quadrature;
-    const dealii::QGauss<dim - 1> face_quadrature;
+    const MappingQ<dim>   mapping;
+    const FE_Q<dim>       finite_element;
+    const QGauss<dim>     quadrature;
+    const QGauss<dim - 1> face_quadrature;
 
   private:
-    dealii::TimerOutput &computing_timer;
+    TimerOutput &computing_timer;
 
     double immersed_disc_length;
     double immersed_disc_height;
@@ -115,87 +137,110 @@ namespace Step69
     unsigned int refinement;
   };
 
-  // @sect4{Declaration of <code>OfflineData</code> class template}
-
-  // The class OfflineData is initializes (and "owns")
-  // pretty much all the components of the discretization that
-  // do not evolve in time. In particular: dof_handler, sparsity
-  // patterns, boundary maps, lumped mass matrix, and other matrices
-  // and vectors that do not change in time are members of this class.
-  // The term "offline" here refers to the idea that all the class members
-  // of <code>OfflineData</code> are initialized and assigned values
-  // a "time step zero" and are not meant to be modified at any other later
-  // time step. For instance, the sparsity pattern should not
-  // change as we advance in time (we are not doing any form of adaptivity in
-  // space). Similarly, the entries of the vector
-  // <code>lumped_mass_matrix</code> should not be modified as we advance in
-  // time either.
+  // @sect4{class <code>OfflineData</code>}
   //
-  // Placeholder: Say something about BoundaryNormalMap.
+  // The class <code>OfflineData</code> contains pretty much all components
+  // of the discretization that do not evolve in time, in particular, the
+  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, $c_ij$,
+  // and $n_ij$ matrices.
+  //
+  // Here, the term <i>offline</i> refers to the fact that all the class
+  // members of <code>OfflineData</code> have well-defined values
+  // independent of the current time step. This means that they can be
+  // initialized ahead of time (at <i>time step zero</i>) and are not meant
+  // to be modified at any other later time step. For instance, the
+  // sparsity pattern should not change as we advance in time (we are not
+  // doing any form of adaptivity in space). Similarly, the entries of the
+  // lumped mass matrix should not be modified as we advance in time
+  // either.
+  //
+  // We also compute and store a <code>boundary_normal_map</code> that
+  // contains a map from a global index of type `types:global_dof_index` of
+  // a boundary degree of freedom to a tuple consisting of a normal vector,
+  // the boundary id, and the position associated with the degree of
+  // freedom. We actually have to compuate and store this geometric
+  // information in this class because we won't have access to geometric
+  // (or cell-based) information later on in the algebraic loops over the
+  // sparsity pattern.
+  //
+  // @note Even though this class currently does not have any parameters
+  // that could be read in from a parameter file we nevertheless dervie
+  // from ParameterAcceptor and follow the same idiom of providing a
+  // <code>setup()</code> (and <code>assemble()</code>) method as for the
+  // class Discretization.
 
   template <int dim>
-  class OfflineData : public dealii::ParameterAcceptor
+  class OfflineData : public ParameterAcceptor
   {
   public:
     using BoundaryNormalMap =
-      std::map<dealii::types::global_dof_index,
-               std::tuple<dealii::Tensor<1, dim> /* normal */,
-                          dealii::types::boundary_id /* id */,
-                          dealii::Point<dim>> /* position */>;
+      std::map<types::global_dof_index,
+               std::tuple<Tensor<1, dim>, types::boundary_id, Point<dim>>>;
 
     OfflineData(const MPI_Comm &           mpi_communicator,
-                dealii::TimerOutput &      computing_timer,
+                TimerOutput &              computing_timer,
                 const Discretization<dim> &discretization,
                 const std::string &        subsection = "OfflineData");
 
     void setup();
     void assemble();
 
-    dealii::DoFHandler<dim> dof_handler;
+    DoFHandler<dim> dof_handler;
 
-    std::shared_ptr<const dealii::Utilities::MPI::Partitioner> partitioner;
+    std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
     unsigned int n_locally_owned;
     unsigned int n_locally_relevant;
 
-    dealii::SparsityPattern sparsity_pattern;
+    SparsityPattern sparsity_pattern;
 
     BoundaryNormalMap boundary_normal_map;
 
-    dealii::SparseMatrix<double>                  lumped_mass_matrix;
-    std::array<dealii::SparseMatrix<double>, dim> cij_matrix;
-    std::array<dealii::SparseMatrix<double>, dim> nij_matrix;
-    dealii::SparseMatrix<double>                  norm_matrix;
+    SparseMatrix<double>                  lumped_mass_matrix;
+    std::array<SparseMatrix<double>, dim> cij_matrix;
+    std::array<SparseMatrix<double>, dim> nij_matrix;
+    SparseMatrix<double>                  norm_matrix;
 
   private:
-    const MPI_Comm &     mpi_communicator;
-    dealii::TimerOutput &computing_timer;
+    const MPI_Comm &mpi_communicator;
+    TimerOutput &   computing_timer;
 
-    dealii::SmartPointer<const Discretization<dim>> discretization;
+    SmartPointer<const Discretization<dim>> discretization;
   };
 
-  // @sect4{Declaration of <code>ProblemDescription</code> class template}
-
-  // Most of the implementations of the members of this class will be utility
-  // classes/functions specific for Euler's equations:
-  // - The type alias <code>rank1_type</code> will be used for the states
-  // $\mathbf{U}_i^n$
-  // - The type alias <code>rank2_type</code> will be used for the fluxes
-  // $\mathbb{f}(\mathbf{U}_j^n)$.
-  // - The implementation of <code>momentum</code> will extract $\textbf{m}$
-  //   (out of the state vector $[\rho,\textbf{m},E]$) and store it in a
-  //   <code>Tensor<1, dim></code> for our convenience.
-  // - The implementation of <code>internal_energy</code> will compute
-  //   $E - \frac{|\textbf{m}|^2}{2\rho}$ from the state vector
+  // @sect4{class <code>ProblemDescription</code>}
+  //
+  // The member functions of this class are utility functions specific to
+  // Euler's equations:
+  // - The type alias <code>rank1_type</code> is used for the states
+  //   $\mathbf{U}_i^n$
+  // - The type alias <code>rank2_type</code> is used for the fluxes
+  //   $\mathbb{f}(\mathbf{U}_j^n)$.
+  // - The <code>momentum</code> function extracts $\textbf{m}$
+  //   out of the state vector $[\rho,\textbf{m},E]$) and stores it in a
+  //   <code>Tensor<1, dim></code>.
+  // - The <code>internal_energy</code> function computes $E -
+  //   \frac{|\textbf{m}|^2}{2\rho}$ from a given state vector
   //   $[\rho,\textbf{m},E]$.
   //
-  // The purpose of the remaining class members <code>component_names</code>,
-  // <code>pressure</code>, and <code>speed_of_sound</code>,
-  // is evident from their names. Most notably, the last
-  // one <code>compute_lambda_max</code> is in charge of computing
-  // $\lambda_{max}(\mathbf{U},\mathbf{V},\mathbf{n})$ which is required
-  // to compute the first order viscosity $d_{ij}$ as detailed in the section
-  // <b>Description of the scheme</b>.
+  // The purpose of the class members <code>component_names</code>,
+  // <code>pressure</code>, and <code>speed_of_sound</code>, is evident
+  // from their names. We also provide a function
+  // <code>compute_lambda_max</code>, that computes the wave speed estimate
+  // mentioned above, $\lambda_{max}(\mathbf{U},\mathbf{V},\mathbf{n})$,
+  // which is used in the computation of the $d_{ij}$ matrix.
+  //
+  // @note The <code>DEAL_II_ALWAYS_INLINE</code> macro expands to a
+  // (compiler specific) pragma that ensures that the corresponding
+  // function defined in this class is always inlined, i.e., the function
+  // body is put in place for every invocation of the function, and no call
+  // (and code indirection) is generated. This is stronger than the
+  // <code>inline</code> keyword, which is more or less a (mild) suggestion
+  // to the compiler that the programmer things it would be beneficial to
+  // inline the function. <code>DEAL_II_ALWAYS_INLINE</code> should only be
+  // used rarely and with caution in situations such as this one, where we
+  // actually know (due to benchmarking) that inlining the function in
+  // question actually improves performance.
 
   template <int dim>
   class ProblemDescription
@@ -203,15 +248,14 @@ namespace Step69
   public:
     static constexpr unsigned int problem_dimension = 2 + dim;
 
-    using rank1_type = dealii::Tensor<1, problem_dimension>;
-    using rank2_type =
-      dealii::Tensor<1, problem_dimension, dealii::Tensor<1, dim>>;
+    using rank1_type = Tensor<1, problem_dimension>;
+    using rank2_type = Tensor<1, problem_dimension, Tensor<1, dim>>;
 
     const static std::array<std::string, dim + 2> component_names;
 
     static constexpr double gamma = 7. / 5.;
 
-    static DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, dim>
+    static DEAL_II_ALWAYS_INLINE inline Tensor<1, dim>
     momentum(const rank1_type U);
 
     static DEAL_II_ALWAYS_INLINE inline double
@@ -225,34 +269,43 @@ namespace Step69
     static DEAL_II_ALWAYS_INLINE inline rank2_type f(const rank1_type U);
 
     static DEAL_II_ALWAYS_INLINE inline double
-    compute_lambda_max(const rank1_type              U_i,
-                       const rank1_type              U_j,
-                       const dealii::Tensor<1, dim> &n_ij);
+    compute_lambda_max(const rank1_type      U_i,
+                       const rank1_type      U_j,
+                       const Tensor<1, dim> &n_ij);
   };
 
-  // @sect4{Declaration of <code>InitialValues</code> class template}
-
-  // Placeholder here
+  // @sect4{class <code>InitialValues</code>}
+  //
+  // The class <code>InitialValues</code> only public data type is a
+  // function <code>initial_state</code> that computes the initial state of
+  // a given point and time. For the purpose of this example step we simply
+  // implement a homogeneous uniform flow field for which the direction and
+  // a 1D primitive state (density, velocity, pressure) are read from the
+  // parameter file.
+  //
+  // Instead of implementing yet another <code>setup()</code> function we
+  // use a callback function <code>parse_parameters_callback</code> that
+  // can be hooked up to corresponding signal of the ParameterAcceptor,
+  // <code>ParameterAcceptor::parse_parameters_call_back.connect(...)</code>.
 
   template <int dim>
-  class InitialValues : public dealii::ParameterAcceptor
+  class InitialValues : public ParameterAcceptor
   {
   public:
     using rank1_type = typename ProblemDescription<dim>::rank1_type;
 
     InitialValues(const std::string &subsection = "InitialValues");
 
-    std::function<rank1_type(const dealii::Point<dim> &point, double t)>
-      initial_state;
+    std::function<rank1_type(const Point<dim> &point, double t)> initial_state;
 
   private:
     void parse_parameters_callback();
 
-    dealii::Tensor<1, dim> initial_direction;
-    dealii::Tensor<1, 3>   initial_1d_state;
+    Tensor<1, dim> initial_direction;
+    Tensor<1, 3>   initial_1d_state;
   };
 
-  // @sect4{Declaration of <code>TimeStep</code> class template}
+  // @sect4{class <code>TimeStep</code>}
 
   // Placeholder here
 
@@ -393,14 +446,7 @@ namespace Step69
     vector_type output_vector;
   };
 
-} // namespace Step69
-
-
-// @sect3{Implementation of the classes in namespace <code>Step69</code>}
-
-namespace Step69
-{
-  using namespace dealii;
+  // @sect3{Implementation of the classes in namespace <code>Step69</code>}
 
   // @sect4{Implementation of the members of the class <code>Discretization</code>}
 
