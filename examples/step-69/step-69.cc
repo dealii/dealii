@@ -256,21 +256,21 @@ namespace Step69
     static constexpr double gamma = 7. / 5.;
 
     static DEAL_II_ALWAYS_INLINE inline Tensor<1, dim>
-    momentum(const rank1_type U);
+    momentum(const rank1_type &U);
 
     static DEAL_II_ALWAYS_INLINE inline double
-    internal_energy(const rank1_type U);
+    internal_energy(const rank1_type &U);
 
-    static DEAL_II_ALWAYS_INLINE inline double pressure(const rank1_type U);
-
-    static DEAL_II_ALWAYS_INLINE inline double
-    speed_of_sound(const rank1_type U);
-
-    static DEAL_II_ALWAYS_INLINE inline rank2_type f(const rank1_type U);
+    static DEAL_II_ALWAYS_INLINE inline double pressure(const rank1_type &U);
 
     static DEAL_II_ALWAYS_INLINE inline double
-    compute_lambda_max(const rank1_type      U_i,
-                       const rank1_type      U_j,
+    speed_of_sound(const rank1_type &U);
+
+    static DEAL_II_ALWAYS_INLINE inline rank2_type f(const rank1_type &U);
+
+    static DEAL_II_ALWAYS_INLINE inline double
+    compute_lambda_max(const rank1_type &    U_i,
+                       const rank1_type &    U_j,
                        const Tensor<1, dim> &n_ij);
   };
 
@@ -791,7 +791,7 @@ namespace Step69
 
 
     template <typename Matrix, typename Iterator>
-    inline DEAL_II_ALWAYS_INLINE void
+    DEAL_II_ALWAYS_INLINE inline void
     set_entry(Matrix &                    matrix,
               const Iterator &            it,
               typename Matrix::value_type value)
@@ -1303,7 +1303,7 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, dim>
-  ProblemDescription<dim>::momentum(const rank1_type U)
+  ProblemDescription<dim>::momentum(const rank1_type &U)
   {
     dealii::Tensor<1, dim> result;
     std::copy(&U[1], &U[1 + dim], &result[0]);
@@ -1312,7 +1312,7 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::internal_energy(const rank1_type U)
+  ProblemDescription<dim>::internal_energy(const rank1_type &U)
   {
     const double &rho = U[0];
     const auto    m   = momentum(U);
@@ -1322,14 +1322,14 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::pressure(const rank1_type U)
+  ProblemDescription<dim>::pressure(const rank1_type &U)
   {
     return (gamma - 1.) * internal_energy(U);
   }
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::speed_of_sound(const rank1_type U)
+  ProblemDescription<dim>::speed_of_sound(const rank1_type &U)
   {
     const double &rho = U[0];
     const double  p   = pressure(U);
@@ -1339,7 +1339,7 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline typename ProblemDescription<dim>::rank2_type
-  ProblemDescription<dim>::f(const rank1_type U)
+  ProblemDescription<dim>::f(const rank1_type &U)
   {
     const double &rho = U[0];
     const auto    m   = momentum(U);
@@ -1472,8 +1472,8 @@ namespace Step69
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
   ProblemDescription<dim>::compute_lambda_max(
-    const rank1_type              U_i,
-    const rank1_type              U_j,
+    const rank1_type &            U_i,
+    const rank1_type &            U_j,
     const dealii::Tensor<1, dim> &n_ij)
   {
     const auto riemann_data_i = riemann_data_from_state(U_i, n_ij);
@@ -2187,8 +2187,9 @@ namespace Step69
                              dealii::Utilities::int_to_string(i, 4) +
                              ".archive";
 
-          if (std::filesystem::exists(name))
-            std::filesystem::rename(name, name + "~");
+          // FIXME: Refactor to Boost (this is C++17)
+          // if (std::filesystem::exists(name))
+          //   std::filesystem::rename(name, name + "~");
 
           std::ofstream file(name, std::ios::binary | std::ios::trunc);
 
