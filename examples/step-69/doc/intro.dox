@@ -12,13 +12,7 @@ such it is presented primarily for educational purposes. For actual
 research computations you might want to consider exploring a corresponding
 high-performance implementation of a second-order accurate scheme that uses
 <i>convex limiting</i> techniques, and strong stability-preserving (SSP)
-time integration @cite GuermondEtAl2018. The repository can be found at
-TODO.
-
-
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
+time integration, see @cite GuermondEtAl2018.
 
 
 <h1>Introduction</h1>
@@ -45,11 +39,6 @@ as elementary building blocks in higher-order schemes
 tutorial step to be a good starting point (in particular with respect to
 the programming techniques) before jumping into full research codes such as
 the second-order scheme @cite GuermondEtAl2018 maintained TODO.
-
-
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
 
 
 <a name="eulerequations"></a>
@@ -96,10 +85,6 @@ p = p(\textbf{u}) := (\gamma -1) \Big(E - \frac{\|\textbf{m}\|^2}{2\,\rho}
 where the factor $\gamma \in (1,5/3]$ denotes the
 <a href="https://en.wikipedia.org/wiki/Heat_capacity_ratio">ratio of
 specific heats</a>, and $\|\,.\|$ denotes the Euclidian norm.
-
-
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
 
 
 <h4>Solution theory</h4>
@@ -168,10 +153,6 @@ formulate a scheme that ensures that the discrete approximation of
 $\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
 
 
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
-
-
 <h4>Variational versus collocation-type discretizations</h3>
 
 Following Step-9, Step-12, and Step-33, at this point it might look tempting
@@ -236,9 +217,6 @@ illustrates that deal.ii can be used far beyond the context of variational
 schemes in Hilbert spaces and that a large number of classes, modules and
 namespaces from deal.ii can be adapted for such purpose.
 
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
 
 <h3>Description of the scheme </h3>
 
@@ -300,10 +278,17 @@ For the time being let's note that
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
     \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
 
+<<<<<<< HEAD
 Before we start with the description of the implementation of this scheme, it
 is worth saying a thing or two about the "assembly" of this system. Consider
 for instance a hypothetical pseudo-code, illustrating
 a possible strategy to compute the solution $\textbf{U}^{n+1}$:
+=======
+Before we start with the description of the implementation of this scheme,
+it is worth saying a thing or two about the "assembly" of this system.
+Consider for instance a hypothetical pseudo-code, illustrating a possible
+strategy to compute the solution $\textbf{U}^{n+1}$:
+>>>>>>> ee60914d6e... reindent, layout changes and address some review comments
 
 @f{align*}
 &\textbf{For } i \in \mathcal{V} \\
@@ -344,24 +329,22 @@ of application of this kind of schemes, also called "edge-based" or
 "graph-based" finite element schemes (see for instance @cite Rainald2008 for
 more historical references).
 
+<<<<<<< HEAD
 This pseudo-code was introduced only to prepare the mindset of the reader for
 what is going to be presented in the in the next section. The
 actual implementation described in the next section is somewhat different from
 what is described in the pseudo-code but shares the same core mentality: we do
 not loop on cells but rather we loop on the edges of the sparsity graph (hence
 the name "edge-based" code) in order to assemble the system.
+=======
+This pseudo-code was introduced only to prepare the mindset of the reader
+for what is going to be presented in the in the next section. The actual
+implementation described in the next section is somewhat different from
+what is described in the pseudo-code but shares the same core mentality: we
+do not loop on cells but rather we loop on the edges of the sparsity graph
+(hence the name "edge-based" code) in order to assemble the system.
+>>>>>>> ee60914d6e... reindent, layout changes and address some review comments
 
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
-<!-- ####################################################################### -->
 
 <h3>Implementation of the scheme </h3>
-
-
-
-
-
-
-
-
 

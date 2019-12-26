@@ -19,7 +19,7 @@
  */
 
 // @sect3{Include files}
-// The set of include files is quite standard. The most intriguing part 
+// The set of include files is quite standard. The most intriguing part
 // is that: either though this code is a "thread and mpi parallel"
 // we are using neither Trilinos nor PETSC vectors. Actually we are using dealii
 // distributed vectors <code>la_parallel_vector.h</code> and the regular dealii
@@ -828,10 +828,10 @@ namespace Step69
   // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|}$ where
   // $\boldsymbol{\nu}_i = \sum_{F \subset \text{supp}(\phi_i)}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})$, here: $F \subset \partial \Omega$ denotes 
-  // faces of elements at the boundary of the domain, and $\mathbf{x}_{q,F}$ 
+  // \phi_i(\mathbf{x}_{q,F})$, here: $F \subset \partial \Omega$ denotes
+  // faces of elements at the boundary of the domain, and $\mathbf{x}_{q,F}$
   // are quadrature points on such face.
-  // Other more sophisticated definitions for $\nu_i$ are 
+  // Other more sophisticated definitions for $\nu_i$ are
   // possible but none of them have much influence in theory or practice.
   // We remind the reader that <code>CopyData</code> includes the class member
   // <code>local_boundary_normal_map</code> in order to store these local
@@ -941,10 +941,10 @@ namespace Step69
                 if (!discretization->finite_element.has_support_on_face(j, f))
                   continue;
 
-                /* Note that "normal" will only represent the contributions 
-                   from one of the faces in the support of the shape 
-                   function \phi_j. So we cannot normalize this local 
-                   contribution right here, we have to take it "as is" and pass 
+                /* Note that "normal" will only represent the contributions
+                   from one of the faces in the support of the shape
+                   function \phi_j. So we cannot normalize this local
+                   contribution right here, we have to take it "as is" and pass
                    it to the copy data routine. */
                 Tensor<1, dim> normal;
                 if (id == Boundary::slip)
@@ -985,8 +985,13 @@ namespace Step69
 
         for (const auto &it : local_boundary_normal_map)
           {
-            auto &[normal, id, position] = boundary_normal_map[it.first];
-            auto &[new_normal, new_id, new_position] = it.second;
+            auto &normal   = std::get<0>(boundary_normal_map[it.first]);
+            auto &id       = std::get<1>(boundary_normal_map[it.first]);
+            auto &position = std::get<2>(boundary_normal_map[it.first]);
+
+            const auto &new_normal   = std::get<0>(it.second);
+            const auto &new_id       = std::get<1>(it.second);
+            const auto &new_position = std::get<2>(it.second);
 
             normal += new_normal;
             id       = std::max(id, new_id);
@@ -1015,30 +1020,30 @@ namespace Step69
     // contains a just copy of the matrix <code>cij_matrix</code>.
     // That's not what we really
     // want: we have to normalize its entries. In addition, we have not even
-    // touched the entries of the matrix <code>norm_matrix</code> yet, and the 
+    // touched the entries of the matrix <code>norm_matrix</code> yet, and the
     // vectors stored in the map
     // <code>OfflineData<dim>::BoundaryNormalMap</code> are not normalized.
     //
     // In principle, this is just offline data, it doesn't make much sense
     // to over-optimize their computation, since their cost will get amortized
-    // over the many time steps that we are going to use. However, 
+    // over the many time steps that we are going to use. However,
     // computing/storing the entries of the matrix
     // <code>norm_matrix</code> and the normalization of <code>nij_matrix</code>
-    // are perfect to illustrate thread-parallel node-loops: 
-    // - We want to visit every node $i$ in the mesh/sparsity graph, 
+    // are perfect to illustrate thread-parallel node-loops:
+    // - We want to visit every node $i$ in the mesh/sparsity graph,
     // - and for every such node we want to visit to every $j$ such that
     // $\mathbf{c}_{ij} \not \equiv 0$.
     //
-    // From an algebraic point of view, this is equivalent to: visiting 
+    // From an algebraic point of view, this is equivalent to: visiting
     // every row in the matrix (equivalently sparsity
     // pattern) and for each one of these rows execute a loop on the columns.
     // Node-loops is a core theme of this tutorial step (see the pseudo-code
-    // in the introduction) that will repeat over and over again. That's why 
+    // in the introduction) that will repeat over and over again. That's why
     // this is the right time to introduce them.
     //
     // We have the thread paralellization capability
     // parallel::apply_to_subranges that is somehow more general than the
-    // WorkStream framework. In particular, it can be used for our 
+    // WorkStream framework. In particular, it can be used for our
     // node-loops.
     // This functionality requires four input arguments:
     // - A begin iterator: <code>indices.begin()</code>
@@ -1073,8 +1078,8 @@ namespace Step69
     // element schemes when they are properly implemented.
     //
     // Finally, we normalize the vector stored in
-    // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has 
-    // not been thread paralellized as it would not illustrate any important 
+    // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
+    // not been thread paralellized as it would not illustrate any important
     // concept.
 
     {
@@ -1125,22 +1130,22 @@ namespace Step69
       /* This is not thread parallelized, too bad! */
       for (auto &it : boundary_normal_map)
         {
-          auto &[normal, id, _] = it.second;
+          auto &normal = std::get<0>(it.second);
           normal /= (normal.norm() + std::numeric_limits<double>::epsilon());
         }
     }
 
     // In order to implement reflecting boundary conditions
     // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ (or equivalently $\mathbf{v}
-    // \cdot \boldsymbol{\nu}_i =0$ ) the vectors $\mathbf{c}_{ij}$ at the 
+    // \cdot \boldsymbol{\nu}_i =0$ ) the vectors $\mathbf{c}_{ij}$ at the
     // boundary have to be modified as:
     //
     // $\mathbf{c}_{ij} += \int_{\partial \Omega}
     // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_j \, \mathrm{d}s$
     //
     // Otherwise we will not be able to claim conservation. The ideas repeat
-    // themselves: we use Workstream in order to compute this correction, most 
-    // of the following code is about the definition of the worker 
+    // themselves: we use Workstream in order to compute this correction, most
+    // of the following code is about the definition of the worker
     // <code>local_assemble_system</code>.
 
     {
@@ -1247,7 +1252,7 @@ namespace Step69
   // Now we define the implementation of <code>momentum</code>,
   // <code>internal_energy</code>, <code>pressure</code>,
   // <code>speed_of_sound</code>, and <code>f</code> (the flux of the system).
-  // The functionality of each one of these functions is self-explanatory from 
+  // The functionality of each one of these functions is self-explanatory from
   // their names.
 
   template <int dim>
@@ -1308,15 +1313,15 @@ namespace Step69
     return result;
   }
 
-  // The following function, <code>riemann_data_from_state</code>, takes the 
-  // full state $\mathbf{u} = [\rho,\mathbf{m},E]^\top$ defines a new 
+  // The following function, <code>riemann_data_from_state</code>, takes the
+  // full state $\mathbf{u} = [\rho,\mathbf{m},E]^\top$ defines a new
   // "projected state" defined as
   //
   // $\widetilde{\mathbf{u}} = [\rho,
   // \mathbf{m} - (\mathbf{m}\cdot \mathbf{n}_{ij})\mathbf{n}_{ij},
   //  E - \tfrac{(\mathbf{m}\cdot \mathbf{n}_{ij})^2}{2\rho} ]^\top$
   //
-  // Projected states appear naturally when attempting to compute a maximum 
+  // Projected states appear naturally when attempting to compute a maximum
   // wavespeed appearing in Riemann problems.
 
   namespace
@@ -1414,7 +1419,7 @@ namespace Step69
 
       return std::max(std::abs(u_i), std::abs(u_j)) + 5. * std::max(a_i, a_j);
     }
-  } /* End of namespace dedicated to the computation of the maximum wavespeed */
+  } // namespace
 
   // Placeholder here.
 
@@ -1721,7 +1726,9 @@ namespace Step69
             if (i >= n_locally_owned)
               continue;
 
-            const auto &[normal, id, position] = it->second;
+            const auto &normal   = std::get<0>(it->second);
+            const auto &id       = std::get<1>(it->second);
+            const auto &position = std::get<2>(it->second);
 
             /* Skip constrained degrees of freedom */
             if (++sparsity.begin(i) == sparsity.end(i))
@@ -1741,7 +1748,7 @@ namespace Step69
 
             /* On boundary 2 enforce initial conditions: */
 
-            if (id == Boundary::dirichlet)
+            else if (id == Boundary::dirichlet)
               {
                 U_i = initial_values->initial_state(position, t + tau_max);
               }
@@ -1845,15 +1852,13 @@ namespace Step69
             const auto bnm_it = boundary_normal_map.find(i);
             if (bnm_it != boundary_normal_map.end())
               {
-                const auto [normal, id, _] = bnm_it->second;
+                const auto &normal = std::get<0>(bnm_it->second);
+                const auto &id     = std::get<1>(bnm_it->second);
+
                 if (id == Boundary::slip)
-                  {
-                    r_i -= 1. * (r_i * normal) * normal;
-                  }
+                  r_i -= 1. * (r_i * normal) * normal;
                 else
-                  {
-                    r_i = 0.;
-                  }
+                  r_i = 0.;
               }
 
             const double m_i = lumped_mass_matrix.diag_element(i);
