@@ -16,12 +16,11 @@
 #include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/thread_management.h>
 
-#include <boost/random.hpp>
-
 #include <cmath>
 #include <ctime>
 #include <map>
 #include <mutex>
+#include <random>
 #include <vector>
 
 
@@ -121,20 +120,17 @@ namespace internal
     double
     mu_rand_seed(double seed)
     {
-      static Threads::Mutex       rand_mutex;
+      static std::mutex           rand_mutex;
       std::lock_guard<std::mutex> lock(rand_mutex);
 
-      static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                             1);
+      std::uniform_real_distribution<> uniform_distribution(0., 1.);
 
-      // for each seed an unique random number generator is created,
+      // for each seed a unique random number generator is created,
       // which is initialized with the seed itself
-      // we could use std::mt19937 but doing so results in compiler-dependent
-      // output.
-      static std::map<double, boost::random::mt19937> rng_map;
+      static std::map<double, std::mt19937> rng_map;
 
       if (rng_map.find(seed) == rng_map.end())
-        rng_map[seed] = boost::random::mt19937(static_cast<unsigned int>(seed));
+        rng_map[seed] = std::mt19937(static_cast<unsigned int>(seed));
 
       return uniform_distribution(rng_map[seed]);
     }
@@ -143,12 +139,11 @@ namespace internal
     double
     mu_rand()
     {
-      static Threads::Mutex                             rand_mutex;
-      std::lock_guard<std::mutex>                       lock(rand_mutex);
-      static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                             1);
-      static boost::random::mt19937                     rng(
-                            static_cast<unsigned long>(std::time(nullptr)));
+      static std::mutex                rand_mutex;
+      std::lock_guard<std::mutex>      lock(rand_mutex);
+      std::uniform_real_distribution<> uniform_distribution(0., 1.);
+      const unsigned int  seed = static_cast<unsigned long>(std::time(nullptr));
+      static std::mt19937 rng(seed);
       return uniform_distribution(rng);
     }
 
