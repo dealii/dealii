@@ -124,48 +124,20 @@ SET(src_umfpack_GENERAL
 
 
 #-------------------------------------------------------------------------------
-# compile each int and long routine (with no real/complex version)
+# Compile each of the following files as long int routines; UMFPACK also allows
+# compiling with int indices, but we don't use these and so let's not
+# bother -- it only takes compile time unnecessarily.
 #-------------------------------------------------------------------------------
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_I_UMF OBJECT ${src_umfpack_UMF})
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_I_UMF "DINT")
 
 DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMF OBJECT ${src_umfpack_UMF})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMF "DLONG")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_I_UMFPACK OBJECT ${src_umfpack_UMFPACK})
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_I_UMFPACK "DINT")
 
 DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMFPACK OBJECT ${src_umfpack_UMFPACK})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMFPACK "DLONG")
 
 #-------------------------------------------------------------------------------
-# compile each routine in the DI version
-#-------------------------------------------------------------------------------
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TSOLVE "DINT" "CONJUGATE_SOLVE")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_MAP_NOX "DINT" "DO_MAP")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_MAP_X "DINT" "DO_MAP" "DO_VALUES")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_NOMAP_X "DINT" "DO_VALUES")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_STORE OBJECT umf_store_lu.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_STORE "DINT" "DROP")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_ASSEMBLE OBJECT umf_assemble.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_ASSEMBLE "DINT" "FIXQ")
-
-DEAL_II_ADD_LIBRARY(obj_umfpack_DI_SOLVE OBJECT umfpack_solve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_SOLVE "DINT" "WSOLVE")
-
-#-------------------------------------------------------------------------------
-# compile each routine in the DL version
+# The following files are special. We again compile each routine in the DL
+# version (i.e., with long ints as indices).
 #-------------------------------------------------------------------------------
 
 DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
