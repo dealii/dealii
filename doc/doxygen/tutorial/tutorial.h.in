@@ -544,6 +544,13 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-67</td>
+ *        <td> Solving the Euler equations of compressible gas dynamics with an
+ *        explicit time integrator and high-order discontinuous Galerkin
+ *        methods based on matrix-free implementations
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-69</td>
  *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
  *        wavespeed method for the compressible Euler equations
@@ -700,6 +707,7 @@
  *       step-42,
  *       step-55,
  *       step-59,
+ *       step-67,
  *       step-69
  *     </td>
  *   </tr>
@@ -731,7 +739,8 @@
  *       step-11,
  *       step-32,
  *       step-60,
- *       step-65
+ *       step-65,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -772,7 +781,8 @@
  *       step-47,
  *       step-51,
  *       step-59,
- *       step-61
+ *       step-61,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -826,7 +836,8 @@
  *       step-37,
  *       step-48,
  *       step-59,
- *       step-64
+ *       step-64,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -1043,6 +1054,7 @@
  *     </td>
  *     <td>
  *       step-33,
+ *       step-67,
  *       step-69
  *     </td>
  *   </tr>
@@ -1173,6 +1185,7 @@
  *     </td>
  *     <td>
  *       step-33,
+ *       step-67,
  *       step-69
  *     </td>
  *   </tr>
@@ -1235,6 +1248,7 @@
  *     </td>
  *     <td>
  *       step-33,
+ *       step-67,
  *       step-69
  *     </td>
  *   </tr>
