@@ -296,7 +296,7 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
 
 void
 SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
-                           bool            transpose /*=false*/) const
+                           const bool      transpose /*=false*/) const
 {
   // make sure that some kind of factorize() call has happened before
   Assert(Ap.size() != 0, ExcNotInitialized());
@@ -328,7 +328,7 @@ SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
 
 void
 SparseDirectUMFPACK::solve(BlockVector<double> &rhs_and_solution,
-                           bool                 transpose /*=false*/) const
+                           const bool           transpose /*=false*/) const
 {
   // the UMFPACK functions want a contiguous array of elements, so
   // there is no way around copying data around. thus, just copy the
@@ -345,7 +345,7 @@ template <class Matrix>
 void
 SparseDirectUMFPACK::solve(const Matrix &  matrix,
                            Vector<double> &rhs_and_solution,
-                           bool            transpose /*=false*/)
+                           const bool      transpose /*=false*/)
 {
   factorize(matrix);
   solve(rhs_and_solution, transpose);
@@ -356,7 +356,7 @@ template <class Matrix>
 void
 SparseDirectUMFPACK::solve(const Matrix &       matrix,
                            BlockVector<double> &rhs_and_solution,
-                           bool                 transpose /*=false*/)
+                           const bool           transpose /*=false*/)
 {
   factorize(matrix);
   solve(rhs_and_solution, transpose);
@@ -392,7 +392,7 @@ SparseDirectUMFPACK::factorize(const Matrix &)
 
 
 void
-SparseDirectUMFPACK::solve(Vector<double> &, bool) const
+SparseDirectUMFPACK::solve(Vector<double> &, const bool) const
 {
   AssertThrow(
     false,
@@ -403,7 +403,7 @@ SparseDirectUMFPACK::solve(Vector<double> &, bool) const
 
 
 void
-SparseDirectUMFPACK::solve(BlockVector<double> &, bool) const
+SparseDirectUMFPACK::solve(BlockVector<double> &, const bool) const
 {
   AssertThrow(
     false,
@@ -414,7 +414,7 @@ SparseDirectUMFPACK::solve(BlockVector<double> &, bool) const
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &, Vector<double> &, bool)
+SparseDirectUMFPACK::solve(const Matrix &, Vector<double> &, const bool)
 {
   AssertThrow(
     false,
@@ -426,7 +426,7 @@ SparseDirectUMFPACK::solve(const Matrix &, Vector<double> &, bool)
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &, BlockVector<double> &, bool)
+SparseDirectUMFPACK::solve(const Matrix &, BlockVector<double> &, const bool)
 {
   AssertThrow(
     false,
