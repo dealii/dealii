@@ -51,8 +51,8 @@ SparseDirectUMFPACK::initialize(const SparsityPattern &)
 #ifdef DEAL_II_WITH_UMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK()
-  : _m(0)
-  , _n(0)
+  : n_rows(0)
+  , n_cols(0)
   , symbolic_decomposition(nullptr)
   , numeric_decomposition(nullptr)
   , control(UMFPACK_CONTROL)
@@ -198,8 +198,8 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
 
     clear();
 
-  _m = matrix.m();
-  _n = matrix.n();
+  n_rows = matrix.m();
+  n_cols = matrix.n();
 
   const size_type N = matrix.m();
 
@@ -367,8 +367,8 @@ SparseDirectUMFPACK::solve(const Matrix &       matrix,
 
 
 SparseDirectUMFPACK::SparseDirectUMFPACK()
-  : _m(0)
-  , _n(0)
+  : n_rows(0)
+  , n_cols(0)
   , symbolic_decomposition(nullptr)
   , numeric_decomposition(nullptr)
   , control(0)
@@ -484,15 +484,15 @@ SparseDirectUMFPACK::Tvmult(BlockVector<double> &      dst,
 SparseDirectUMFPACK::size_type
 SparseDirectUMFPACK::m() const
 {
-  Assert(_m != 0, ExcNotInitialized());
-  return _m;
+  Assert(n_rows != 0, ExcNotInitialized());
+  return n_rows;
 }
 
 SparseDirectUMFPACK::size_type
 SparseDirectUMFPACK::n() const
 {
-  Assert(_n != 0, ExcNotInitialized());
-  return _n;
+  Assert(n_cols != 0, ExcNotInitialized());
+  return n_cols;
 }
 
 

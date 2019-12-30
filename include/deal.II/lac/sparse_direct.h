@@ -317,14 +317,15 @@ public:
 
 private:
   /**
-   * The dimension of the range space.
+   * The dimension of the range space, i.e., the number of rows of the matrix.
    */
-  size_type _m;
+  size_type n_rows;
 
   /**
-   * The dimension of the domain space.
+   * The dimension of the domain space, i.e., the number of columns of the
+   * matrix.
    */
-  size_type _n;
+  size_type n_cols;
 
   /**
    * The UMFPACK routines allocate objects in which they store information
