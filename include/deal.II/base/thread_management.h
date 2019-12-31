@@ -1833,10 +1833,8 @@ namespace Threads
     void
     join_all() const
     {
-      for (typename std::list<Task<RT>>::const_iterator t = tasks.begin();
-           t != tasks.end();
-           ++t)
-        t->join();
+      for (auto &t : tasks)
+        t.join();
     }
 
   private:
