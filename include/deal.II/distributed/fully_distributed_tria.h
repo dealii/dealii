@@ -248,7 +248,7 @@ namespace parallel
      * parallel::fullydistributed::ConstructionData. The user has to fill this
      * data structure - in a pre-processing step - before actually creating the
      * triangulation. Predefined functions to create ConstructionData
-     * can be found in the namespace dealii::fullydistributed::Utilities.
+     * can be found in the namespace parallel::fullydistributed::Utilities.
      *
      * Once the ConstructionData `construction_data` has been constructed, the
      * triangulation `tria` can be created by calling
@@ -298,8 +298,8 @@ namespace parallel
       /**
        * Create a triangulation from the provided ConstructionData.
        *
-       * @note The namespace dealii::fullydistributed::Util contains functions
-       *       to create ConstructionData.
+       * @note The namespace parallel::fullydistributed::Utilities contains
+       *       functions to create ConstructionData.
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other
