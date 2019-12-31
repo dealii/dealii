@@ -227,17 +227,19 @@ public:
   /**
    * Solve for a certain right hand side vector. This function may be called
    * multiple times for different right hand side vectors after the matrix has
-   * been factorized. This yields a big saving in computing time, since the
-   * actual solution is fast, compared to the factorization of the matrix.
+   * been factorized. This yields substantial savings in computing time, since
+   * the actual solution is fast, compared to the factorization of the matrix.
    *
    * The solution will be returned in place of the right hand side vector.
    *
-   * If the factorization has not happened before, strange things will happen.
-   * Note that we can't actually call the factorize() function from here if it
-   * has not yet been called, since we have no access to the actual matrix.
+   * @param[in,out] rhs_and_solution A vector that contains the right hand side
+   *   $b$ of a linear system $Ax=b$ upon calling this function, and that
+   *   contains the solution $x$ of the linear system after calling this
+   *   function.
+   * @param[in] transpose If set to true, this function solves the linear
+   *   $A^T x = b$ instead of $Ax=b$.
    *
-   * If @p transpose is set to true this function solves for the transpose of
-   * the matrix, i.e. $x=A^{-T}b$.
+   * @pre You need to call factorize() before this function can be called.
    */
   void
   solve(Vector<double> &rhs_and_solution, const bool transpose = false) const;
