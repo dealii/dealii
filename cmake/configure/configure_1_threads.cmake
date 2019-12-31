@@ -150,6 +150,18 @@ MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
   ENDIF()
 
   #
+  # TBB currently uses the version numbering scheme
+  #
+  #     YYYY.X
+  #
+  # (e.g., 2018.0) where YYYY is the year of the release and X is the yearly
+  # release number. Older versions use
+  #
+  #     X.Y.Z
+  #
+  # (e.g., 4.2.1). Since we are compatible with all versions that use the new
+  # numbering scheme we only check for very old versions here.
+  #
   # TBB versions before 4.2 are missing some explicit calls to std::atomic::load
   # in ternary expressions; these cause compilation errors in some compilers
   # (such as GCC 8.1 and newer). To fix this we simply blacklist all older
