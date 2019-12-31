@@ -141,8 +141,8 @@ namespace Step69
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
-  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, $c_ij$,
-  // and $n_ij$ matrices.
+  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, $c_{ij}$,
+  // and $n_{ij}$ matrices.
   //
   // Here, the term <i>offline</i> refers to the fact that all the class
   // members of <code>OfflineData</code> have well-defined values
@@ -158,7 +158,7 @@ namespace Step69
   // contains a map from a global index of type `types:global_dof_index` of
   // a boundary degree of freedom to a tuple consisting of a normal vector,
   // the boundary id, and the position associated with the degree of
-  // freedom. We actually have to compuate and store this geometric
+  // freedom. We actually have to compute and store this geometric
   // information in this class because we won't have access to geometric
   // (or cell-based) information later on in the algebraic loops over the
   // sparsity pattern.
@@ -744,7 +744,10 @@ namespace Step69
   // Now we define a collection of assembly utilities:
   // - <code>CopyData</code>: This will only be used to compute the off-line
   //   data using WorkStream. It acts as a container: it is just a
-  //  struct where WorkStream stores the local cell contributions.
+  //  struct where WorkStream stores the local cell contributions. Note 
+  //  it also contains a class member
+  // <code>local_boundary_normal_map</code> used to store the local 
+  // contributions required to compute the normals at the boundary.
   // - <code>get_entry</code>: it reads the value stored at the entry
   //  pointed by the iterator <code>it</code> of <code>matrix</code>. Here is
   //  where we might want to keep an eye on complexity: we want this operation
@@ -762,9 +765,9 @@ namespace Step69
   //  $\mathbf{n}_{ij}$. The purpose of <code>gather_get_entry</code>
   //  is to retrieve those entries a store them into a
   //  <code>Tensor<1, dim></code> for our convenience.
-  // - <code>gather</code> (first interface):
-  // - <code>gather</code> (second interface):
-  // - <code>scatter</code>:
+  // - <code>gather</code> (first interface): Placeholder
+  // - <code>gather</code> (second interface): Placeholder
+  // - <code>scatter</code>: Placeholder
 
   namespace
   {
@@ -869,19 +872,20 @@ namespace Step69
   // WorkStream framework since the vast majority of ideas are reasonably
   // well-documented in Step-9, Step-13 and Step-32 among others.
   //
-  // Finally the boundary normals are defined as
-  // $\widehat{\boldsymbol{\nu}}_i =
+  // Finally, assuming that $\mathbf{x}_i$ is a support point at the boundary,
+  // the normals are defined as
+  // $\widehat{\boldsymbol{\nu}}_i :=
   // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|}$ where
-  // $\boldsymbol{\nu}_i = \sum_{F \subset \text{supp}(\phi_i)}
+  // $\boldsymbol{\nu}_i := \sum_{T \in \text{supp}(\phi_i)}
+  // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})$, here: $F \subset \partial \Omega$ denotes
-  // faces of elements at the boundary of the domain, and $\mathbf{x}_{q,F}$
+  // \phi_i(\mathbf{x}_{q,F})$, here: $T$ denotes elements, 
+  // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
+  // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
   // are quadrature points on such face.
   // Other more sophisticated definitions for $\nu_i$ are
   // possible but none of them have much influence in theory or practice.
-  // We remind the reader that <code>CopyData</code> includes the class member
-  // <code>local_boundary_normal_map</code> in order to store these local
-  // contributions for the boundary map.
+
 
   template <int dim>
   void OfflineData<dim>::assemble()
@@ -943,7 +947,7 @@ namespace Step69
                          return partitioner->global_to_local(index);
                        });
 
-        /* We compute the local contributions for the  lumped mass
+        /* We compute the local contributions for the lumped mass
          matrix entries m_i and and vectors c_ij */
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
@@ -967,8 +971,8 @@ namespace Step69
           }         /* for q */
 
         /* Now we have to compute the boundary normals. Note that the
-           following loop does not actually do much unless the faces of the
-           cell are actually faces on the boundary of the domain */
+           following loop does not actually do much unless the the element
+           has faces on the boundary of the domain */
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
             const auto face = cell->face(f);
@@ -989,9 +993,10 @@ namespace Step69
 
                 /* Note that "normal" will only represent the contributions
                    from one of the faces in the support of the shape
-                   function \phi_j. So we cannot normalize this local
-                   contribution right here, we have to take it "as is" and pass
-                   it to the copy data routine. */
+                   function phi_j. So we cannot normalize this local
+                   contribution right here, we have to take it "as is", store 
+                   it and pass it to the copy data routine. The proper 
+                   normalization requires an additional loop on nodes.*/
                 Tensor<1, dim> normal;
                 if (id == Boundary::slip)
                   {
@@ -1065,8 +1070,8 @@ namespace Step69
     // $\mathbf{c}_{ij}$, but so far the matrix <code>nij_matrix</code>
     // contains a just copy of the matrix <code>cij_matrix</code>.
     // That's not what we really
-    // want: we have to normalize its entries. In addition, we have not even
-    // touched the entries of the matrix <code>norm_matrix</code> yet, and the
+    // want: we have to normalize its entries. In addition, we have not filled
+    // the entries of the matrix <code>norm_matrix</code>  and the
     // vectors stored in the map
     // <code>OfflineData<dim>::BoundaryNormalMap</code> are not normalized.
     //
@@ -1076,7 +1081,7 @@ namespace Step69
     // computing/storing the entries of the matrix
     // <code>norm_matrix</code> and the normalization of <code>nij_matrix</code>
     // are perfect to illustrate thread-parallel node-loops:
-    // - We want to visit every node $i$ in the mesh/sparsity graph,
+    // - we want to visit every node $i$ in the mesh/sparsity graph,
     // - and for every such node we want to visit to every $j$ such that
     // $\mathbf{c}_{ij} \not \equiv 0$.
     //
@@ -1089,23 +1094,33 @@ namespace Step69
     //
     // We have the thread paralellization capability
     // parallel::apply_to_subranges that is somehow more general than the
-    // WorkStream framework. In particular, it can be used for our
-    // node-loops.
+    // WorkStream framework. In particular, parallel::apply_to_subranges can 
+    // be used for our node-loops.
     // This functionality requires four input arguments:
     // - A begin iterator: <code>indices.begin()</code>
-    // - A end iterator: <code>indices.end()</code>
+    // - An end iterator: <code>indices.end()</code>
     // - A function f(i1,i2), where <code>i1</code> and <code>i2</code> define a
-    //   sub-range with the range spanned by the the end and begin iterators
+    //   sub-range within the range spanned by the the end and begin iterators
     //   of the previous two bullets. The function <code>f(i1,i2)</code> is
     //   called <code>on_subranges</code> in this example. It applies an
     //   operation for every "abstract element" in the subrange. In this case
     //   each "element" is a row of the sparsity pattern.
     // - Grainsize: minimum number of "elements" (in this case rows) processed
-    // by
-    //   each thread. We decided for a minimum of 4096 rows.
+    // by each thread. We decided for a minimum of 4096 rows.
     //
-    // We start by defining the operation <code>on_subranges</code> to be
-    // applied at each row in the sub-range. Given a fixed
+    // Here the <code>indices.begin()</code> and <code>indices.end()</code> 
+    // iterators will represent an interval of "rows"
+    // in the sparsity graph/matrix. A minor caveat here is that the 
+    // iterators supplied to
+    // parallel::apply_to_subranges have to be random access iterators:
+    // internally, apply_to_subranges will break the range defined by the
+    // <code>indices.begin()</code> and <code>indices.end()</code>  iterators 
+    // into subranges (we want to be able to read any entry in those 
+    // subranges with constant complexity). In order to provide such 
+    // iterators we resort to boost::irange.
+    //
+    // We define the operation <code>on_subranges</code> to be
+    // applied at each row of the sub-range. Given a fixed
     // <code>row_index</code> we want to visit every entry in such row. In order
     // to execute such columns-loops we use <a
     // href="http://www.cplusplus.com/reference/algorithm/for_each/">
@@ -1138,7 +1153,7 @@ namespace Step69
           {
             const auto row_index = *i1;
 
-            /* First column-loop: we compute/store the entries of the matrix
+            /* First column-loop: we compute and store the entries of the matrix
             norm_matrix */
             std::for_each(sparsity_pattern.begin(row_index),
                           sparsity_pattern.end(row_index),
@@ -1172,8 +1187,9 @@ namespace Step69
                                    on_subranges,
                                    4096);
 
-      /* We normalize the normals at the boundary. */
-      /* This is not thread parallelized, too bad! */
+      /* We normalize the normals at the boundary. This is not thread 
+         parallelized. It just loops over the very few nodes that happen 
+         to be at the boundary */
       for (auto &it : boundary_normal_map)
         {
           auto &normal = std::get<0>(it.second);
@@ -1186,7 +1202,7 @@ namespace Step69
     // \cdot \boldsymbol{\nu}_i =0$ ) the vectors $\mathbf{c}_{ij}$ at the
     // boundary have to be modified as:
     //
-    // $\mathbf{c}_{ij} += \int_{\partial \Omega}
+    // $\mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
     // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_j \, \mathrm{d}s$
     //
     // Otherwise we will not be able to claim conservation. The ideas repeat
@@ -1295,7 +1311,8 @@ namespace Step69
 
   // At this point we are very much done with anything related to offline data.
   //
-  // Now we define the implementation of <code>momentum</code>,
+  // Now we define the implementation of the utility 
+  // functions <code>momentum</code>,
   // <code>internal_energy</code>, <code>pressure</code>,
   // <code>speed_of_sound</code>, and <code>f</code> (the flux of the system).
   // The functionality of each one of these functions is self-explanatory from
@@ -1363,12 +1380,14 @@ namespace Step69
   // full state $\mathbf{u} = [\rho,\mathbf{m},E]^\top$ defines a new
   // "projected state" defined as
   //
-  // $\widetilde{\mathbf{u}} = [\rho,
+  // $\widetilde{\mathbf{u}} := [\rho,
   // \mathbf{m} - (\mathbf{m}\cdot \mathbf{n}_{ij})\mathbf{n}_{ij},
   //  E - \tfrac{(\mathbf{m}\cdot \mathbf{n}_{ij})^2}{2\rho} ]^\top$
   //
-  // Projected states appear naturally when attempting to compute a maximum
-  // wavespeed appearing in Riemann problems.
+  // Projected states appear when attempting to compute a maximum 
+  // wavespeed appearing in Riemann problems. See for 
+  // instance: Chapter 4, E.Toro, Riemann Solvers and Numerical Methods for 
+  // Fluid Dynamics, 2009.
 
   namespace
   {
