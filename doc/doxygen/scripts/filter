@@ -60,6 +60,11 @@ while (<>)
         s/::dealii::(.*)\\$/::\1        \\/g;
         s/dealii::(.*)\\$/\1        \\/g;
     }
+    elsif (m/using namespace dealii::/)
+    {
+        # namespace declarations (see, e.g., step-40) in source code don't work
+        # if we cut off the 'dealii::' part, so leave it in that case.
+    }
     else
     {
         s/(::)?dealii::/::/g;
