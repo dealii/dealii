@@ -276,17 +276,17 @@ namespace Step69
 
   // @sect4{class <code>InitialValues</code>}
   //
-  // The class <code>InitialValues</code> only public data type is a
-  // function <code>initial_state</code> that computes the initial state of
-  // a given point and time. For the purpose of this example step we simply
-  // implement a homogeneous uniform flow field for which the direction and
-  // a 1D primitive state (density, velocity, pressure) are read from the
-  // parameter file.
+  // The class <code>InitialValues</code>'s only public data attribute is a
+  // std::function <code>initial_state</code> that computes the initial
+  // state of a given point and time. For the purpose of this example step
+  // we simply implement a homogeneous uniform flow field for which the
+  // direction and a 1D primitive state (density, velocity, pressure) are
+  // read from the parameter file.
   //
   // Instead of implementing yet another <code>setup()</code> function we
   // use a callback function <code>parse_parameters_callback</code> that
-  // can be hooked up to corresponding signal of the ParameterAcceptor,
-  // <code>ParameterAcceptor::parse_parameters_call_back.connect(...)</code>.
+  // can be hooked up to the corresponding signal
+  // ParameterAcceptor::parse_parameters_call_back.
 
   template <int dim>
   class InitialValues : public ParameterAcceptor
@@ -306,11 +306,18 @@ namespace Step69
   };
 
   // @sect4{class <code>TimeStep</code>}
-
-  // Placeholder here
+  //
+  // With the <code>OfflineData</code> and <code>ProblemDescription</code>
+  // classes at hand we can now implement the explicit time-stepping scheme
+  // that was introduced in the discussion above. The main method of the
+  // <code>TimeStep</code> class is <code>step(vector_type &U, double
+  // t)</code>. That takes a reference to a state vector <code>U</code> and
+  // a time point <code>t</code> as arguments, updates the state vector in
+  // place and returns the chosen step-size $\tau$.
+  //
 
   template <int dim>
-  class TimeStep : public dealii::ParameterAcceptor
+  class TimeStep : public ParameterAcceptor
   {
   public:
     static constexpr unsigned int problem_dimension =
@@ -319,12 +326,12 @@ namespace Step69
     using rank1_type = typename ProblemDescription<dim>::rank1_type;
     using rank2_type = typename ProblemDescription<dim>::rank2_type;
 
-    typedef std::array<dealii::LinearAlgebra::distributed::Vector<double>,
+    typedef std::array<LinearAlgebra::distributed::Vector<double>,
                        problem_dimension>
       vector_type;
 
     TimeStep(const MPI_Comm &          mpi_communicator,
-             dealii::TimerOutput &     computing_timer,
+             TimerOutput &             computing_timer,
              const OfflineData<dim> &  offline_data,
              const InitialValues<dim> &initial_values,
              const std::string &       subsection = "TimeStep");
@@ -334,35 +341,35 @@ namespace Step69
     double step(vector_type &U, double t);
 
   private:
-    const MPI_Comm &     mpi_communicator;
-    dealii::TimerOutput &computing_timer;
+    const MPI_Comm &mpi_communicator;
+    TimerOutput &   computing_timer;
 
-    dealii::SmartPointer<const OfflineData<dim>>   offline_data;
-    dealii::SmartPointer<const InitialValues<dim>> initial_values;
+    SmartPointer<const OfflineData<dim>>   offline_data;
+    SmartPointer<const InitialValues<dim>> initial_values;
 
-    dealii::SparseMatrix<double> dij_matrix;
+    SparseMatrix<double> dij_matrix;
 
     vector_type temp;
 
     double cfl_update;
   };
 
-  // @sect4{Declaration of <code>SchlierenPostprocessor</code> class template}
-
-  // At its core, the Schilieren class implements the class member
+  // @sect4{class <code>SchlierenPostprocessor</code>}
+  //
+  // At its core, the Schlieren class implements the class member
   // <code>compute_schlieren</code>. The main purpose of this class member
-  // is to compute auxiliary finite element field <code>schlieren</code>
-  // at each node, defined as
+  // is to compute an auxiliary finite element field
+  // <code>schlieren</code>, that is defined at each node by
   // \f[ \text{schlieren}[i] = e^{\beta \frac{ |\nabla r_i|
-  // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } } \f]
-  // where $r$ in principle could be any scalar finite element field.
-  // The natural candidate is choosing $r := \rho$. Schlieren postprocessing
-  // is a standard methodology to enhance the contrast of the visualization
-  // inspired in actual X-ray and shadowgraphy experimental techniques of
-  // visualization.
+  // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } }, \f]
+  // where $r$ can in principle be any scalar quantitiy, in practice
+  // though, the density is a natural candidate, viz. $r := \rho$.
+  // Schlieren postprocessing is a standard method for enhancing the
+  // contrast of a visualization inspired by actual experimental X-ray and
+  // shadowgraphy techniques of visualization.
 
   template <int dim>
-  class SchlierenPostprocessor : public dealii::ParameterAcceptor
+  class SchlierenPostprocessor : public ParameterAcceptor
   {
   public:
     static constexpr unsigned int problem_dimension =
@@ -371,12 +378,11 @@ namespace Step69
     using rank1_type = typename ProblemDescription<dim>::rank1_type;
 
     using vector_type =
-      std::array<dealii::LinearAlgebra::distributed::Vector<double>,
-                 problem_dimension>;
+      std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
 
     SchlierenPostprocessor(
       const MPI_Comm &        mpi_communicator,
-      dealii::TimerOutput &   computing_timer,
+      TimerOutput &           computing_timer,
       const OfflineData<dim> &offline_data,
       const std::string &     subsection = "SchlierenPostprocessor");
 
@@ -384,26 +390,31 @@ namespace Step69
 
     void compute_schlieren(const vector_type &U);
 
-    dealii::LinearAlgebra::distributed::Vector<double> schlieren;
+    LinearAlgebra::distributed::Vector<double> schlieren;
 
   private:
-    const MPI_Comm &     mpi_communicator;
-    dealii::TimerOutput &computing_timer;
+    const MPI_Comm &mpi_communicator;
+    TimerOutput &   computing_timer;
 
-    dealii::SmartPointer<const OfflineData<dim>> offline_data;
+    SmartPointer<const OfflineData<dim>> offline_data;
 
-    dealii::Vector<double> r;
+    Vector<double> r;
 
     unsigned int schlieren_index;
     double       schlieren_beta;
   };
 
-  // @sect4{Declaration of <code>TimeLoop</code> class template}
-
-  // Placeholder here
+  // @sect4{class <code>TimeLoop</code>}
+  //
+  // Now, all that is left to do is to chain the methods implemented in the
+  // <code>TimeStep</code>, <code>InitialValues</code>, and
+  // <code>SchlierenPostprocessor</code> classes together. We do this in a
+  // separate class <code>TimeLoop</code> that contains an object of every
+  // class and again reads in a number of parameters with the help of the
+  // ParameterAcceptor class.
 
   template <int dim>
-  class TimeLoop : public dealii::ParameterAcceptor
+  class TimeLoop : public ParameterAcceptor
   {
   public:
     using vector_type = typename TimeStep<dim>::vector_type;
@@ -421,11 +432,11 @@ namespace Step69
                 unsigned int       cycle,
                 bool               checkpoint = false);
 
-    const MPI_Comm &    mpi_communicator;
-    std::ostringstream  timer_output;
-    dealii::TimerOutput computing_timer;
+    const MPI_Comm &   mpi_communicator;
+    std::ostringstream timer_output;
+    TimerOutput        computing_timer;
 
-    dealii::ConditionalOStream pcout;
+    ConditionalOStream pcout;
 
     std::string base_name;
     double      t_final;
@@ -446,7 +457,7 @@ namespace Step69
     vector_type output_vector;
   };
 
-  // @sect3{Implementation of the classes in namespace <code>Step69</code>}
+  // @sect3{Class template implementations}
 
   // @sect4{Implementation of the members of the class <code>Discretization</code>}
 
@@ -744,9 +755,9 @@ namespace Step69
   // Now we define a collection of assembly utilities:
   // - <code>CopyData</code>: This will only be used to compute the off-line
   //   data using WorkStream. It acts as a container: it is just a
-  //  struct where WorkStream stores the local cell contributions. Note 
+  //  struct where WorkStream stores the local cell contributions. Note
   //  it also contains a class member
-  // <code>local_boundary_normal_map</code> used to store the local 
+  // <code>local_boundary_normal_map</code> used to store the local
   // contributions required to compute the normals at the boundary.
   // - <code>get_entry</code>: it reads the value stored at the entry
   //  pointed by the iterator <code>it</code> of <code>matrix</code>. Here is
@@ -775,10 +786,10 @@ namespace Step69
     struct CopyData
     {
       bool                                         is_artificial;
-      std::vector<dealii::types::global_dof_index> local_dof_indices;
+      std::vector<types::global_dof_index>         local_dof_indices;
       typename OfflineData<dim>::BoundaryNormalMap local_boundary_normal_map;
-      dealii::FullMatrix<double>                   cell_lumped_mass_matrix;
-      std::array<dealii::FullMatrix<double>, dim>  cell_cij_matrix;
+      FullMatrix<double>                           cell_lumped_mass_matrix;
+      std::array<FullMatrix<double>, dim>          cell_cij_matrix;
     };
 
 
@@ -806,10 +817,10 @@ namespace Step69
 
 
     template <typename T1, std::size_t k, typename T2>
-    DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, k>
+    DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
     gather_get_entry(const std::array<T1, k> &U, const T2 it)
     {
-      dealii::Tensor<1, k> result;
+      Tensor<1, k> result;
       for (unsigned int j = 0; j < k; ++j)
         result[j] = get_entry(U[j], it);
       return result;
@@ -817,10 +828,10 @@ namespace Step69
 
 
     template <typename T1, std::size_t k, typename T2, typename T3>
-    DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, k>
+    DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
     gather(const std::array<T1, k> &U, const T2 i, const T3 l)
     {
-      dealii::Tensor<1, k> result;
+      Tensor<1, k> result;
       for (unsigned int j = 0; j < k; ++j)
         result[j] = U[j](i, l);
       return result;
@@ -828,10 +839,10 @@ namespace Step69
 
 
     template <typename T1, std::size_t k, typename T2>
-    DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, k>
-    gather(const std::array<T1, k> &U, const T2 i)
+    DEAL_II_ALWAYS_INLINE inline Tensor<1, k> gather(const std::array<T1, k> &U,
+                                                     const T2                 i)
     {
-      dealii::Tensor<1, k> result;
+      Tensor<1, k> result;
       for (unsigned int j = 0; j < k; ++j)
         result[j] = U[j].local_element(i);
       return result;
@@ -879,7 +890,7 @@ namespace Step69
   // $\boldsymbol{\nu}_i := \sum_{T \in \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})$, here: $T$ denotes elements, 
+  // \phi_i(\mathbf{x}_{q,F})$, here: $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
   // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
   // are quadrature points on such face.
@@ -994,8 +1005,8 @@ namespace Step69
                 /* Note that "normal" will only represent the contributions
                    from one of the faces in the support of the shape
                    function phi_j. So we cannot normalize this local
-                   contribution right here, we have to take it "as is", store 
-                   it and pass it to the copy data routine. The proper 
+                   contribution right here, we have to take it "as is", store
+                   it and pass it to the copy data routine. The proper
                    normalization requires an additional loop on nodes.*/
                 Tensor<1, dim> normal;
                 if (id == Boundary::slip)
@@ -1094,7 +1105,7 @@ namespace Step69
     //
     // We have the thread paralellization capability
     // parallel::apply_to_subranges that is somehow more general than the
-    // WorkStream framework. In particular, parallel::apply_to_subranges can 
+    // WorkStream framework. In particular, parallel::apply_to_subranges can
     // be used for our node-loops.
     // This functionality requires four input arguments:
     // - A begin iterator: <code>indices.begin()</code>
@@ -1108,15 +1119,15 @@ namespace Step69
     // - Grainsize: minimum number of "elements" (in this case rows) processed
     // by each thread. We decided for a minimum of 4096 rows.
     //
-    // Here the <code>indices.begin()</code> and <code>indices.end()</code> 
+    // Here the <code>indices.begin()</code> and <code>indices.end()</code>
     // iterators will represent an interval of "rows"
-    // in the sparsity graph/matrix. A minor caveat here is that the 
+    // in the sparsity graph/matrix. A minor caveat here is that the
     // iterators supplied to
     // parallel::apply_to_subranges have to be random access iterators:
     // internally, apply_to_subranges will break the range defined by the
-    // <code>indices.begin()</code> and <code>indices.end()</code>  iterators 
-    // into subranges (we want to be able to read any entry in those 
-    // subranges with constant complexity). In order to provide such 
+    // <code>indices.begin()</code> and <code>indices.end()</code>  iterators
+    // into subranges (we want to be able to read any entry in those
+    // subranges with constant complexity). In order to provide such
     // iterators we resort to boost::irange.
     //
     // We define the operation <code>on_subranges</code> to be
@@ -1133,10 +1144,10 @@ namespace Step69
     // argument required by std::for_each is the operation applied at each
     // column (a lambda expression in this case) of such row. We note that
     // because of the nature of the data that we want to modify (we want to
-    // modify entries of a entire row at a time) threads cannot collide
-    // attempting to write the same entry (we do not need a scheduler). This
-    // advantage appears to be a particular characteristic of edge-based finite
-    // element schemes when they are properly implemented.
+    // modify entries of a entire row at a time) threads cannot conflict
+    // attempting to read/write the same entry (we do not need a scheduler).
+    // This advantage appears to be a particular characteristic of
+    // edge-based finite element schemes when they are properly implemented.
     //
     // Finally, we normalize the vector stored in
     // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
@@ -1187,8 +1198,8 @@ namespace Step69
                                    on_subranges,
                                    4096);
 
-      /* We normalize the normals at the boundary. This is not thread 
-         parallelized. It just loops over the very few nodes that happen 
+      /* We normalize the normals at the boundary. This is not thread
+         parallelized. It just loops over the very few nodes that happen
          to be at the boundary */
       for (auto &it : boundary_normal_map)
         {
@@ -1311,7 +1322,7 @@ namespace Step69
 
   // At this point we are very much done with anything related to offline data.
   //
-  // Now we define the implementation of the utility 
+  // Now we define the implementation of the utility
   // functions <code>momentum</code>,
   // <code>internal_energy</code>, <code>pressure</code>,
   // <code>speed_of_sound</code>, and <code>f</code> (the flux of the system).
@@ -1319,10 +1330,10 @@ namespace Step69
   // their names.
 
   template <int dim>
-  DEAL_II_ALWAYS_INLINE inline dealii::Tensor<1, dim>
+  DEAL_II_ALWAYS_INLINE inline Tensor<1, dim>
   ProblemDescription<dim>::momentum(const rank1_type &U)
   {
-    dealii::Tensor<1, dim> result;
+    Tensor<1, dim> result;
     std::copy(&U[1], &U[1 + dim], &result[0]);
     return result;
   }
@@ -1377,40 +1388,40 @@ namespace Step69
   }
 
   // Now we discuss the computation of $\lambda_{\text{max}}
-  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. Let's start 
-  // by mentioning a thing or two about the actual computation of an estimate  
-  // for maximum wavespeed of Riemann problem. In general, obtaining a sharp 
-  // guaranteed upper-bound on the maximum wavespeed requires solving a 
-  // quite expensive scalar nonlinear problem. In order to simplify the 
-  // presentation we decided not to include such iterative scheme. Here we have 
-  // taken the following shortcut: formulas (2.11) (3.7), (3.8) and (4.3) from 
-  // - J-L Guermond, B. Popov, Fast estimation of 
-  //   the maximum wave speed in the Riemann problem for the Euler equations, 
+  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. Let's start
+  // by mentioning a thing or two about the actual computation of an estimate
+  // for maximum wavespeed of Riemann problem. In general, obtaining a sharp
+  // guaranteed upper-bound on the maximum wavespeed requires solving a
+  // quite expensive scalar nonlinear problem. In order to simplify the
+  // presentation we decided not to include such iterative scheme. Here we have
+  // taken the following shortcut: formulas (2.11) (3.7), (3.8) and (4.3) from
+  // - J-L Guermond, B. Popov, Fast estimation of
+  //   the maximum wave speed in the Riemann problem for the Euler equations,
   //   JCP, 2016,
   //
-  // are enough to define a guaranteed upper bound on the maximum 
+  // are enough to define a guaranteed upper bound on the maximum
   // wavespeed. This estimate is returned by the a call to the function
   // <code>lambda_max_two_rarefaction</code>.
-  // At its core the construction of such upper bound uses the 
-  // so-called two-rarefaction approximation 
+  // At its core the construction of such upper bound uses the
+  // so-called two-rarefaction approximation
   // for the intermediate pressure $p^*$, see for instance
-  // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical 
+  // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical
   //   Methods for Fluid Dynamics, 2009.
   //
-  // This estimate is in general very sharp and it would be enough to 
-  // for this code. However, for some specific situations (in 
-  // particular when one of states is close to vacuum conditions) such 
-  // estimate will be very overly pessimistic. That's why we used a second 
-  // estimate to avoid this degeneracy that will be invoked by a call to 
-  // the function <code>lambda_max_expansion</code>. Finally we take the minimum 
+  // This estimate is in general very sharp and it would be enough to
+  // for this code. However, for some specific situations (in
+  // particular when one of states is close to vacuum conditions) such
+  // estimate will be overly pessimistic. That's why we used a second
+  // estimate to avoid this degeneracy that will be invoked by a call to
+  // the function <code>lambda_max_expansion</code>. Finally we take the minimum
   // between both estimates inside the call to <code>compute_lambda_max</code>.
   //
-  // The analysis and derivation of sharp upper-bounds of maximum wavespeeds of 
-  // Riemann problems is a very technical endeavor and we cannot include an 
+  // The analysis and derivation of sharp upper-bounds of maximum wavespeeds of
+  // Riemann problems is a very technical endeavor and we cannot include an
   // advanced discussion about it in this tutorial. In this portion of the
-  // documentation we will limit ourselves to sketch the main functionality of 
-  // these auxiliary functions and point to specific references/formulas in 
-  // order to help the interested reader trace the 
+  // documentation we will limit ourselves to sketch the main functionality of
+  // these auxiliary functions and point to specific references/formulas in
+  // order to help the interested reader trace the
   // source (and proper mathematical justification) of these ideas.
   //
   // The most important function here is <code>compute_lambda_max</code>
@@ -1418,7 +1429,7 @@ namespace Step69
   // - <code>lambda_max_two_rarefaction</code>
   // - <code>lambda_max_expansion</code>
   //
-  // The remaining functions 
+  // The remaining functions
   // - <code>riemann_data_from_state</code>
   // - <code>positive_part</code>
   // - <code>negative_part</code>
@@ -1432,9 +1443,9 @@ namespace Step69
     template <int dim>
     DEAL_II_ALWAYS_INLINE inline std::array<double, 4> riemann_data_from_state(
       const typename ProblemDescription<dim>::rank1_type U,
-      const dealii::Tensor<1, dim> &                     n_ij)
+      const Tensor<1, dim> &                             n_ij)
     {
-      dealii::Tensor<1, 3> projected_U;
+      Tensor<1, 3> projected_U;
       projected_U[0] = U[0];
 
       const auto m   = ProblemDescription<dim>::momentum(U);
@@ -1518,9 +1529,9 @@ namespace Step69
     };
 
 
-    /* This estimate is, in general, not as sharp as the two-rarefaction 
-       estimate. But it will save the day in the context of near vacuum 
-       conditions when the two-rarefaction approximation will tend to 
+    /* This estimate is, in general, not as sharp as the two-rarefaction
+       estimate. But it will save the day in the context of near vacuum
+       conditions when the two-rarefaction approximation will tend to
        exaggerate the maximum wave speed. */
     DEAL_II_ALWAYS_INLINE inline double
     lambda_max_expansion(const std::array<double, 4> &riemann_data_i,
@@ -1529,7 +1540,7 @@ namespace Step69
       const auto &[rho_i, u_i, p_i, a_i] = riemann_data_i;
       const auto &[rho_j, u_j, p_j, a_j] = riemann_data_j;
 
-      /* Here the constant 5.0 multiplying the soundspeeds is NOT 
+      /* Here the constant 5.0 multiplying the soundspeeds is NOT
          an ad-hoc constant. Do not play with it.*/
       return std::max(std::abs(u_i), std::abs(u_j)) + 5. * std::max(a_i, a_j);
     }
@@ -1540,10 +1551,9 @@ namespace Step69
   // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$.
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::compute_lambda_max(
-    const rank1_type &            U_i,
-    const rank1_type &            U_j,
-    const dealii::Tensor<1, dim> &n_ij)
+  ProblemDescription<dim>::compute_lambda_max(const rank1_type &    U_i,
+                                              const rank1_type &    U_j,
+                                              const Tensor<1, dim> &n_ij)
   {
     const auto riemann_data_i = riemann_data_from_state(U_i, n_ij);
     const auto riemann_data_j = riemann_data_from_state(U_j, n_ij);
@@ -1557,21 +1567,28 @@ namespace Step69
     return std::min(lambda_1, lambda_2);
   }
 
-  // Placeholder here.
+  // Here <code>component_names</code> are just tags
+  // that we will use for the output.
 
   template <>
-  const std::array<std::string, 3> //
-    ProblemDescription<1>::component_names{"rho", "m", "E"};
+  const std::array<std::string, 3> ProblemDescription<1>::component_names{"rho",
+                                                                          "m",
+                                                                          "E"};
 
   template <>
-  const std::array<std::string, 4> //
-    ProblemDescription<2>::component_names{"rho", "m_1", "m_2", "E"};
+  const std::array<std::string, 4> ProblemDescription<2>::component_names{"rho",
+                                                                          "m_1",
+                                                                          "m_2",
+                                                                          "E"};
 
   template <>
-  const std::array<std::string, 5> //
-    ProblemDescription<3>::component_names{"rho", "m_1", "m_2", "m_3", "E"};
+  const std::array<std::string, 5> ProblemDescription<3>::component_names{"rho",
+                                                                          "m_1",
+                                                                          "m_2",
+                                                                          "m_3",
+                                                                          "E"};
 
-  // Placeholder here.
+  // Implementation of the constructor for the class InitialValues.
 
   template <int dim>
   InitialValues<dim>::InitialValues(const std::string &subsection)
@@ -1607,7 +1624,7 @@ namespace Step69
     static constexpr auto gamma = ProblemDescription<dim>::gamma;
 
     const auto from_1d_state =
-      [=](const dealii::Tensor<1, 3, double> &state_1d) -> rank1_type {
+      [=](const Tensor<1, 3, double> &state_1d) -> rank1_type {
       const auto &rho = state_1d[0];
       const auto &u   = state_1d[1];
       const auto &p   = state_1d[2];
@@ -1622,16 +1639,16 @@ namespace Step69
       return state;
     };
 
-    initial_state = [=](const dealii::Point<dim> & /*point*/, double /*t*/) {
+    initial_state = [=](const Point<dim> & /*point*/, double /*t*/) {
       return from_1d_state(initial_1d_state);
     };
   }
 
-  // Placeholder here.
+  // Implementation of the constructor for the class TimeStep.
 
   template <int dim>
   TimeStep<dim>::TimeStep(const MPI_Comm &          mpi_communicator,
-                          dealii::TimerOutput &     computing_timer,
+                          TimerOutput &             computing_timer,
                           const OfflineData<dim> &  offline_data,
                           const InitialValues<dim> &initial_values,
                           const std::string &       subsection /*= "TimeStep"*/)
@@ -1663,7 +1680,39 @@ namespace Step69
     dij_matrix.reinit(sparsity);
   }
 
-  // Placeholder here.
+  // Implementation of "step" (to be called be
+  // <code>TimeLoop<dim>::run()</code>). We Start by computing the matrix
+  // $d_{ij}$. Pretty much all the ideas used to compute/store the entries
+  // of the matrix
+  // <code>norm_matrix</code> and the normalization of <code>nij_matrix</code>
+  // (described a few hundreds of lines above) are used here again. We use
+  // thread-parallel node-loops (again) via
+  // <code>parallel::apply_to_subranges</code>: therefore we have to
+  // define a "worker" <code>on_subranges</code> for this new task.
+  //
+  // We note here that $\int_{\Omega} \nabla \phi_j
+  // \phi_i   \, \mathrm{d}\mathbf{x}= - \int_{\Omega} \nabla \phi_i \phi_j
+  // \, \mathrm{d}\mathbf{x}$ (or equivanlently $\mathbf{c}_{ij} =
+  // - \mathbf{c}_{ji}$) provided either $\mathbf{x}_i$ or $\mathbf{x}_j$ is a
+  // support point at the boundary. In such case we can check that:
+  //
+  // $\lambda_{\text{max}} (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
+  //  \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
+  //  \mathbf{U}_i^{n},
+  //  \textbf{n}_{ji})$.
+  //
+  // However, if both support points $\mathbf{x}_i$ or $\mathbf{x}_j$ happen to
+  // lie on the boundary then the equality $\lambda_{\text{max}}
+  // (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
+  //  \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
+  //  \mathbf{U}_i^{n},
+  //  \textbf{n}_{ji})$ is not necessarily true. The only mathematically
+  // safe solution for this dilemma is to compute both of them and take the
+  // largest one.
+  //
+  // The matrix $d_{ij}$ has to be symmetric by construction. Exploiting this
+  // natural constraint of the scheme we only compute the upper-triangular
+  // portion of it and then copy the result to the lower-triangular side.
 
   template <int dim>
   double TimeStep<dim>::step(vector_type &U, double t)
@@ -1687,6 +1736,7 @@ namespace Step69
     {
       TimerOutput::Scope time(computing_timer, "time_step - 1 compute d_ij");
 
+      /* Definition of the "worker" that computes the viscosity d_{ij} */
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
           {
@@ -1697,6 +1747,8 @@ namespace Step69
               {
                 const auto j = jt->column();
 
+                /* We compute only dij and later we copy this
+                   entry into dji. */
                 if (j >= i)
                   continue;
 
@@ -1710,6 +1762,8 @@ namespace Step69
 
                 double d = norm * lambda_max;
 
+                /* If both support points happen to be at the boundary
+                   we have to compute dji too and then take max(dij,dji) */
                 if (boundary_normal_map.count(i) != 0 &&
                     boundary_normal_map.count(j) != 0)
                   {
@@ -1735,6 +1789,33 @@ namespace Step69
                                    4096);
     } /* End of the computation of the off-diagonal entries of dij_matrix */
 
+    // So far the matrix <code>dij_matrix</code> contains the off-diagonal
+    // components. We still have to fill its diagonal entries defined as
+    // $d_{ii}^n = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}^n$. We
+    // use <code>parallel::apply_to_subranges</code> again in order to speed-up
+    // its computation.
+
+    // While computing the $d_{ii}$'s we also record the largest admissible
+    // time-step, which is defined as
+    //
+    // $\tau_n := c_{\text{cfl}}\,\min_{
+    // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right)$ .
+    //
+    // We note that the operation $\min_{i \in \mathcal{V}}$ is intrinsically
+    // global, it operates on all nodes: first we would have to first take the
+    // $\min$ among all threads and finally take the $\min$ among all MPI
+    // processes. In the current implementation:
+    // - We do not take the $\min$ among threads: we simply define
+    //  <code>tau_max</code> as <a
+    //  href="http://www.cplusplus.com/reference/atomic/atomic/">
+    //  std::atomic<double> </a>. The internal implementation of std::atomic
+    //  will take care of resolving any possible conflict when more than
+    //  one thread attempts read or write tau_max at the same time.
+    // - In order to take the min among all MPI process we use the utility
+    //   <code>Utilities::MPI::min</code>.
+
+    /* Atomic double in order to avoid any read/write conflict
+     * between threads */
     std::atomic<double> tau_max{std::numeric_limits<double>::infinity()};
 
     {
@@ -1748,6 +1829,7 @@ namespace Step69
           {
             double d_sum = 0.;
 
+            /* See the definition of dii */
             for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
               {
                 const auto j = jt->column();
@@ -1760,7 +1842,8 @@ namespace Step69
 
             dij_matrix.diag_element(i) = d_sum;
 
-            const double mass   = lumped_mass_matrix.diag_element(i);
+            const double mass = lumped_mass_matrix.diag_element(i);
+            /* See the definition of time-step constraint (CFL) */
             const double tau    = cfl_update * mass / (-2. * d_sum);
             tau_max_on_subrange = std::min(tau_max_on_subrange, tau);
           }
@@ -1770,7 +1853,7 @@ namespace Step69
           current_tau_max > tau_max_on_subrange &&
           !tau_max.compare_exchange_weak(current_tau_max, tau_max_on_subrange))
           ;
-      };
+      }; /* End of definition of on_subranges */
 
       parallel::apply_to_subranges(indices_relevant.begin(),
                                    indices_relevant.end(),
@@ -1783,6 +1866,8 @@ namespace Step69
                   ExcMessage("I'm sorry, Dave. I'm afraid I can't "
                              "do that. - We crashed."));
     } /* End of the computation of the diagonal entries of dij_matrix */
+
+    // Placeholder Here
 
     {
       TimerOutput::Scope time(computing_timer, "time_step - 3 perform update");
@@ -1883,12 +1968,14 @@ namespace Step69
     return tau_max;
   } /* End of TimeStep<dim>::step */
 
+
+
   // Placeholder here.
 
   template <int dim>
   SchlierenPostprocessor<dim>::SchlierenPostprocessor(
     const MPI_Comm &        mpi_communicator,
-    dealii::TimerOutput &   computing_timer,
+    TimerOutput &           computing_timer,
     const OfflineData<dim> &offline_data,
     const std::string &     subsection /*= "SchlierenPostprocessor"*/)
     : ParameterAcceptor(subsection)
@@ -2074,9 +2161,9 @@ namespace Step69
 
   namespace
   {
-    void print_head(dealii::ConditionalOStream &pcout,
-                    std::string                 header,
-                    std::string                 secondary = "")
+    void print_head(ConditionalOStream &pcout,
+                    std::string         header,
+                    std::string         secondary = "")
     {
       const auto header_size   = header.size();
       const auto padded_header = std::string((34 - header_size) / 2, ' ') +
@@ -2136,7 +2223,7 @@ namespace Step69
         const auto &       triangulation = discretization.triangulation;
         const unsigned int i    = triangulation.locally_owned_subdomain();
         std::string        name = base_name + "-checkpoint-" +
-                           dealii::Utilities::int_to_string(i, 4) + ".archive";
+                           Utilities::int_to_string(i, 4) + ".archive";
         std::ifstream file(name, std::ios::binary);
 
         boost::archive::binary_iarchive ia(file);
@@ -2253,8 +2340,7 @@ namespace Step69
         {
           const unsigned int i    = triangulation.locally_owned_subdomain();
           std::string        name = base_name + "-checkpoint-" +
-                             dealii::Utilities::int_to_string(i, 4) +
-                             ".archive";
+                             Utilities::int_to_string(i, 4) + ".archive";
 
           // FIXME: Refactor to Boost (this is C++17)
           // if (std::filesystem::exists(name))
@@ -2269,7 +2355,7 @@ namespace Step69
               oa << it2;
         }
 
-      dealii::DataOut<dim> data_out;
+      DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
 
       for (unsigned int i = 0; i < problem_dimension; ++i)
@@ -2309,4 +2395,3 @@ int main(int argc, char *argv[])
 
   time_loop.run();
 }
-

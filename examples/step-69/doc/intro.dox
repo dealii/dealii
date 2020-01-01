@@ -265,7 +265,8 @@ Where
   - $d_{ij} := \max \{ \lambda_{\text{max}}
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
-    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2} $
+    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|_{\ell^2}$ if $i \not = j$
+  - $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$
   - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\|_{\ell^2} }$
 
 The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
@@ -359,8 +360,8 @@ cells but rather over all edges of the sparsity graph.
 no bilinear forms, no cell loops, and no quadrature) outside of the finite
 element community in the wieder CFD community. There is a rich history of
 application of this kind of schemes, also called <i>edge-based</i> or
-<i>graph-based</i> finite element schemes (see for instance @cite
-Rainald2008 for a historical overview).
+<i>graph-based</i> finite element schemes (see for instance 
+@cite Rainald2008 for a historical overview).
 
 @todo Explain what to do for slip, dirichlet and do-nothing boundary
 conditions.
