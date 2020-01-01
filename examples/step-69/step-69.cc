@@ -1376,18 +1376,56 @@ namespace Step69
     return result;
   }
 
-  // The following function, <code>riemann_data_from_state</code>, takes the
-  // full state $\mathbf{u} = [\rho,\mathbf{m},E]^\top$ defines a new
-  // "projected state" defined as
+  // Now we discuss the computation of $\lambda_{\text{max}}
+  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. Let's start 
+  // by mentioning a thing or two about the actual computation of an estimate  
+  // for maximum wavespeed of Riemann problem. In general, obtaining a sharp 
+  // guaranteed upper-bound on the maximum wavespeed requires solving a 
+  // quite expensive scalar nonlinear problem. In order to simplify the 
+  // presentation we decided not to include such iterative scheme. Here we have 
+  // taken the following shortcut: formulas (2.11) (3.7), (3.8) and (4.3) from 
+  // - J-L Guermond, B. Popov, Fast estimation of 
+  //   the maximum wave speed in the Riemann problem for the Euler equations, 
+  //   JCP, 2016,
   //
-  // $\widetilde{\mathbf{u}} := [\rho,
-  // \mathbf{m} - (\mathbf{m}\cdot \mathbf{n}_{ij})\mathbf{n}_{ij},
-  //  E - \tfrac{(\mathbf{m}\cdot \mathbf{n}_{ij})^2}{2\rho} ]^\top$
+  // are enough to define a guaranteed upper bound on the maximum 
+  // wavespeed. This estimate is returned by the a call to the function
+  // <code>lambda_max_two_rarefaction</code>.
+  // At its core the construction of such upper bound uses the 
+  // so-called two-rarefaction approximation 
+  // for the intermediate pressure $p^*$, see for instance
+  // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical 
+  //   Methods for Fluid Dynamics, 2009.
   //
-  // Projected states appear when attempting to compute a maximum 
-  // wavespeed appearing in Riemann problems. See for 
-  // instance: Chapter 4, E.Toro, Riemann Solvers and Numerical Methods for 
-  // Fluid Dynamics, 2009.
+  // This estimate is in general very sharp and it would be enough to 
+  // for this code. However, for some specific situations (in 
+  // particular when one of states is close to vacuum conditions) such 
+  // estimate will be very overly pessimistic. That's why we used a second 
+  // estimate to avoid this degeneracy that will be invoked by a call to 
+  // the function <code>lambda_max_expansion</code>. Finally we take the minimum 
+  // between both estimates inside the call to <code>compute_lambda_max</code>.
+  //
+  // The analysis and derivation of sharp upper-bounds of maximum wavespeeds of 
+  // Riemann problems is a very technical endeavor and we cannot include an 
+  // advanced discussion about it in this tutorial. In this portion of the
+  // documentation we will limit ourselves to sketch the main functionality of 
+  // these auxiliary functions and point to specific references/formulas in 
+  // order to help the interested reader trace the 
+  // source (and proper mathematical justification) of these ideas.
+  //
+  // The most important function here is <code>compute_lambda_max</code>
+  // which takes the minimum between the estimates
+  // - <code>lambda_max_two_rarefaction</code>
+  // - <code>lambda_max_expansion</code>
+  //
+  // The remaining functions 
+  // - <code>riemann_data_from_state</code>
+  // - <code>positive_part</code>
+  // - <code>negative_part</code>
+  // - <code>lambda1_minus</code>
+  // - <code>lambda2_minus</code>
+  //
+  // are just auxiliary functions required in order to compute both estimates.
 
   namespace
   {
@@ -1427,6 +1465,7 @@ namespace Step69
     }
 
 
+    /* Implements formula (3.7) in Guermond-Popov-2016 */
     DEAL_II_ALWAYS_INLINE inline double
     lambda1_minus(const std::array<double, 4> &riemann_data,
                   const double                 p_star)
@@ -1440,6 +1479,7 @@ namespace Step69
     }
 
 
+    /* Implements formula (3.8) in Guermond-Popov-2016 */
     DEAL_II_ALWAYS_INLINE inline double
     lambda3_plus(const std::array<double, 4> &riemann_data, const double p_star)
     {
@@ -1452,6 +1492,7 @@ namespace Step69
     }
 
 
+    /* Implements formula (2.11) in Guermond-Popov-2016*/
     DEAL_II_ALWAYS_INLINE inline double
     lambda_max_two_rarefaction(const std::array<double, 4> &riemann_data_i,
                                const std::array<double, 4> &riemann_data_j)
@@ -1465,16 +1506,22 @@ namespace Step69
       const double denominator =
         a_i * std::pow(p_i / p_j, -1. * (gamma - 1.) / 2. / gamma) + a_j * 1.;
 
+      /* Formula (4.3) in Guermond-Popov-2016 */
       const double p_star =
         p_j * std::pow(numerator / denominator, 2. * gamma / (gamma - 1));
 
       const double lambda1 = lambda1_minus(riemann_data_i, p_star);
       const double lambda3 = lambda3_plus(riemann_data_j, p_star);
 
+      /* Returns formula (2.11) in Guermond-Popov-2016 */
       return std::max(positive_part(lambda3), negative_part(lambda1));
     };
 
 
+    /* This estimate is, in general, not as sharp as the two-rarefaction 
+       estimate. But it will save the day in the context of near vacuum 
+       conditions when the two-rarefaction approximation will tend to 
+       exaggerate the maximum wave speed. */
     DEAL_II_ALWAYS_INLINE inline double
     lambda_max_expansion(const std::array<double, 4> &riemann_data_i,
                          const std::array<double, 4> &riemann_data_j)
@@ -1482,12 +1529,15 @@ namespace Step69
       const auto &[rho_i, u_i, p_i, a_i] = riemann_data_i;
       const auto &[rho_j, u_j, p_j, a_j] = riemann_data_j;
 
+      /* Here the constant 5.0 multiplying the soundspeeds is NOT 
+         an ad-hoc constant. Do not play with it.*/
       return std::max(std::abs(u_i), std::abs(u_j)) + 5. * std::max(a_i, a_j);
     }
   } // namespace
 
-  // Placeholder here.
-
+  // The is the main function that we are going to call in order to compute
+  // $\lambda_{\text{max}}
+  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$.
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
   ProblemDescription<dim>::compute_lambda_max(
@@ -2259,3 +2309,4 @@ int main(int argc, char *argv[])
 
   time_loop.run();
 }
+
