@@ -4202,6 +4202,9 @@ namespace internal
 
 
       /* --------------------- class ParallelDistributed ---------------- */
+
+#ifdef DEAL_II_WITH_P4EST
+
       namespace
       {
         template <int dim, int spacedim>
@@ -4604,10 +4607,10 @@ namespace internal
           const DoFHandlerType &dof_handler,
           const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
         {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
           (void)vertices_with_ghost_neighbors;
           Assert(false, ExcNotImplemented());
-#else
+#  else
           const unsigned int dim      = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -4655,7 +4658,7 @@ namespace internal
                 // nothing we need to send that hasn't been sent so far.
                 // so return an empty array, but also verify that indeed
                 // the cell is complete
-#  ifdef DEBUG
+#    ifdef DEBUG
                 std::vector<types::global_dof_index> local_dof_indices(
                   cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices(local_dof_indices);
@@ -4666,7 +4669,7 @@ namespace internal
                              numbers::invalid_dof_index) ==
                    local_dof_indices.end());
                 Assert(is_complete, ExcInternalError());
-#  endif
+#    endif
                 return std_cxx17::optional<
                   std::vector<types::global_dof_index>>();
               }
@@ -4765,13 +4768,14 @@ namespace internal
                        "The function communicate_dof_indices_on_marked_cells() "
                        "only works with parallel distributed triangulations."));
             }
-#endif
+#  endif
         }
 
 
 
       } // namespace
 
+#endif // DEAL_II_WITH_P4EST
 
 
       template <class DoFHandlerType>
@@ -4786,6 +4790,10 @@ namespace internal
       NumberCache
       ParallelDistributed<DoFHandlerType>::distribute_dofs() const
       {
+#ifndef DEAL_II_WITH_P4EST
+        Assert(false, ExcNotImplemented());
+        return NumberCache();
+#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -4965,15 +4973,15 @@ namespace internal
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
-#ifdef DEBUG
+#  ifdef DEBUG
           for (const auto &cell : dof_handler->active_cell_iterators())
             Assert(cell->user_flag_set() == false, ExcInternalError());
-#endif
+#  endif
 
           triangulation->load_user_flags(user_flags);
         }
 
-#ifdef DEBUG
+#  ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
@@ -5008,8 +5016,9 @@ namespace internal
                   }
               }
         }
-#endif // DEBUG
+#  endif // DEBUG
         return number_cache;
+#endif   // DEAL_II_WITH_P4EST
       }
 
 
@@ -5018,6 +5027,10 @@ namespace internal
       std::vector<NumberCache>
       ParallelDistributed<DoFHandlerType>::distribute_mg_dofs() const
       {
+#ifndef DEAL_II_WITH_P4EST
+        Assert(false, ExcNotImplemented());
+        return std::vector<NumberCache>();
+#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -5192,7 +5205,7 @@ namespace internal
           // in Phase 1.
           communicate_mg_ghost_cells(*triangulation, *dof_handler);
 
-#ifdef DEBUG
+#  ifdef DEBUG
           // make sure we have removed all flags:
           {
             typename DoFHandlerType::level_cell_iterator cell,
@@ -5203,14 +5216,14 @@ namespace internal
                   !cell->is_locally_owned_on_level())
                 Assert(cell->user_flag_set() == false, ExcInternalError());
           }
-#endif
+#  endif
 
           triangulation->load_user_flags(user_flags);
         }
 
 
 
-#ifdef DEBUG
+#  ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
@@ -5232,9 +5245,10 @@ namespace internal
                   }
               }
         }
-#endif // DEBUG
+#  endif // DEBUG
 
         return number_caches;
+#endif   // DEAL_II_WITH_P4EST
       }
 
 
@@ -5248,6 +5262,10 @@ namespace internal
         Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
                ExcInternalError());
 
+#ifndef DEAL_II_WITH_P4EST
+        Assert(false, ExcNotImplemented());
+        return NumberCache();
+#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -5488,6 +5506,7 @@ namespace internal
               number_cache.locally_owned_dofs.n_elements();
             return number_cache;
           }
+#endif // DEAL_II_WITH_P4EST
       }
 
 
