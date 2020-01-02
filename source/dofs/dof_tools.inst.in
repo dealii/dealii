@@ -490,64 +490,7 @@ for (deal_II_dimension : DIMENSIONS)
       std::vector<types::global_dof_index> &);
 
 
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension>(
-      const Mapping<deal_II_dimension, deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      std::vector<Point<deal_II_dimension>> &,
-      const ComponentMask &);
-
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension>(
-      const hp::MappingCollection<deal_II_dimension, deal_II_dimension> &,
-      const hp::DoFHandler<deal_II_dimension> &,
-      std::vector<Point<deal_II_dimension>> &,
-      const ComponentMask &);
-
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension>(
-      const Mapping<deal_II_dimension, deal_II_dimension> &,
-      const DoFHandler<deal_II_dimension> &,
-      std::map<types::global_dof_index, Point<deal_II_dimension>> &,
-      const ComponentMask &);
-
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension>(
-      const hp::MappingCollection<deal_II_dimension, deal_II_dimension> &,
-      const hp::DoFHandler<deal_II_dimension> &,
-      std::map<types::global_dof_index, Point<deal_II_dimension>> &,
-      const ComponentMask &);
-
 #if deal_II_dimension < 3
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension,
-                                                       deal_II_dimension + 1>(
-      const Mapping<deal_II_dimension, deal_II_dimension + 1> &,
-      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::vector<Point<deal_II_dimension + 1>> &,
-      const ComponentMask &);
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension,
-                                                       deal_II_dimension + 1>(
-      const hp::MappingCollection<deal_II_dimension, deal_II_dimension + 1> &,
-      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::vector<Point<deal_II_dimension + 1>> &,
-      const ComponentMask &);
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension,
-                                                       deal_II_dimension + 1>(
-      const Mapping<deal_II_dimension, deal_II_dimension + 1> &,
-      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::map<types::global_dof_index, Point<deal_II_dimension + 1>> &,
-      const ComponentMask &);
-
-    template void DoFTools::map_dofs_to_support_points<deal_II_dimension,
-                                                       deal_II_dimension + 1>(
-      const hp::MappingCollection<deal_II_dimension, deal_II_dimension + 1> &,
-      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::map<types::global_dof_index, Point<deal_II_dimension + 1>> &,
-      const ComponentMask &);
-
 
     template void DoFTools::count_dofs_per_block<
       DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
@@ -565,12 +508,6 @@ for (deal_II_dimension : DIMENSIONS)
 
 
 #if deal_II_dimension == 3
-
-    template void DoFTools::map_dofs_to_support_points<1, 3>(
-      const Mapping<1, 3> &,
-      const DoFHandler<1, 3> &,
-      std::vector<Point<3>> &,
-      const ComponentMask &);
 
     template void DoFTools::count_dofs_per_block<DoFHandler<1, 3>>(
       const DoFHandler<1, 3> &,
@@ -675,6 +612,37 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
     \{
+      template void
+      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::vector<Point<deal_II_space_dimension>> &,
+        const ComponentMask &);
+
+      template void
+      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
+        const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
+          &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::vector<Point<deal_II_space_dimension>> &,
+        const ComponentMask &);
+
+      template void
+      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
+        const ComponentMask &);
+
+      template void
+      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
+        const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
+          &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
+        const ComponentMask &);
+
+
       template unsigned int
       count_dofs_on_patch<
         DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
