@@ -4778,6 +4778,7 @@ namespace internal
 #endif // DEAL_II_WITH_P4EST
 
 
+
       template <class DoFHandlerType>
       ParallelDistributed<DoFHandlerType>::ParallelDistributed(
         DoFHandlerType &dof_handler)
@@ -5248,7 +5249,8 @@ namespace internal
 #  endif // DEBUG
 
         return number_caches;
-#endif   // DEAL_II_WITH_P4EST
+
+#endif // DEAL_II_WITH_P4EST
       }
 
 
@@ -5506,7 +5508,7 @@ namespace internal
               number_cache.locally_owned_dofs.n_elements();
             return number_cache;
           }
-#endif // DEAL_II_WITH_P4EST
+#endif
       }
 
 
