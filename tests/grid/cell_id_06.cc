@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// testing parent and child relationship of CellIds
+// testing parent/ancestor and child relationship of CellIds
 
 #include <deal.II/grid/cell_id.h>
 
@@ -32,19 +32,16 @@ main()
   CellId id3(0, {0, 0, 0});
   CellId id4(1, {0});
 
-  // same cell (expected: false)
   deallog << std::boolalpha;
-  deallog << id0.is_parent_of(id0) << std::endl;
 
-  // same level (false)
-  deallog << id0.is_parent_of(id1) << std::endl;
-
-  // child (true)
-  deallog << id0.is_parent_of(id2) << std::endl;
-
-  // grand child (false)
-  deallog << id0.is_parent_of(id3) << std::endl;
-
-  // cell with different coarse-cell id (false)
-  deallog << id0.is_parent_of(id4) << std::endl;
+  for (const auto &pair :
+       std::vector<std::pair<CellId, CellId>>{
+         {id0, id0}, // same cell (expected: false, false)
+         {id0, id1}, // same level (false, false)
+         {id0, id2}, // child (true, true)
+         {id0, id3}, // grand child (false, true)
+         {id0, id4}} // cell with different coarse-cell id (false, false)
+  )
+    deallog << pair.first.is_parent_of(pair.second) << " "
+            << pair.first.is_ancestor_of(pair.second) << std::endl;
 }
