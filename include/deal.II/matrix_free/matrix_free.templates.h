@@ -53,6 +53,50 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 
+namespace internal
+{
+  template <
+    typename DoFHandlerType,
+    typename std::enable_if<
+      std::is_same<DoFHandlerType,
+                   ::dealii::DoFHandler<DoFHandlerType::dimension>>::value,
+      int>::type = 0>
+  const DoFHandlerType &
+  get_dof_handler(
+    const std::vector<
+      SmartPointer<const ::dealii::DoFHandler<DoFHandlerType::dimension>>>
+      &dof_handler,
+    const std::vector<
+      SmartPointer<const ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>>
+      &,
+    const unsigned int n_dof_handlers,
+    const unsigned int dof_handler_index)
+  {
+    AssertDimension(dof_handler.size(), n_dof_handlers);
+    return *dof_handler[dof_handler_index];
+  }
+
+  template <
+    typename DoFHandlerType,
+    typename std::enable_if<
+      std::is_same<DoFHandlerType,
+                   ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>::value,
+      int>::type = 0>
+  const DoFHandlerType &
+  get_dof_handler(
+    const std::vector<
+      SmartPointer<const ::dealii::DoFHandler<DoFHandlerType::dimension>>> &,
+    const std::vector<
+      SmartPointer<const ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>>
+      &                hp_dof_handler,
+    const unsigned int n_dof_handlers,
+    const unsigned int dof_handler_index)
+  {
+    AssertDimension(hp_dof_handler.size(), n_dof_handlers);
+    return *hp_dof_handler[dof_handler_index];
+  }
+} // namespace internal
+
 // --------------------- MatrixFree -----------------------------------
 
 template <int dim, typename Number, typename VectorizedArrayType>
@@ -132,24 +176,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::renumber_dofs(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-const DoFHandler<dim> &
+template <typename DoFHandlerType>
+const DoFHandlerType &
 MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
   const unsigned int dof_handler_index) const
 {
   AssertIndexRange(dof_handler_index, n_components());
-  if (dof_handlers.active_dof_handler == DoFHandlers::usual)
-    {
-      AssertDimension(dof_handlers.dof_handler.size(),
-                      dof_handlers.n_dof_handlers);
-      return *dof_handlers.dof_handler[dof_handler_index];
-    }
-  else
-    {
-      AssertThrow(false, ExcNotImplemented());
-      // put pseudo return argument to avoid compiler error, but trigger a
-      // segfault in case this is only run in optimized mode
-      return *dof_handlers.dof_handler[numbers::invalid_unsigned_int];
-    }
+  return internal::get_dof_handler<DoFHandlerType>(dof_handlers.dof_handler,
+                                                   dof_handlers.hp_dof_handler,
+                                                   dof_handlers.n_dof_handlers,
+                                                   dof_handler_index);
 }
 
 
