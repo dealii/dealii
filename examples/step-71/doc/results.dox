@@ -39,16 +39,16 @@ and get the following convergence rates.
    <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
-   <td>   2                  </td><td>    1.539e-02 </td><td>       </td><td>   8.528e-02   </td><td>           </td><td>  1.602 </td><td>   </td>
+   <td>   2                  </td><td>   8.780e-03 </td><td>       </td><td>  7.095e-02   </td><td>           </td><td>  1.645 </td><td>   </td>
   </tr>
   <tr>
-   <td>   3                  </td><td>    4.563e-03   </td><td>  1.75  </td><td>  2.408e-02   </td><td>     1.82     </td><td> 7.965e-01  </td><td>  1.00  </td>
+   <td>   3                  </td><td>   3.515e-03   </td><td>  1.32 </td><td> 2.174e-02  </td><td>     1.70     </td><td> 8.121e-01  </td><td>  1.018  </td>
   </tr>
   <tr>
-   <td>   4                  </td><td>    1.250e-03   </td><td>  1.86    </td><td>  6.438e-03    </td><td>  1.90        </td><td>   3.969e-01 </td><td> 1.00  </td>
+   <td>   4                  </td><td>   1.103e-03   </td><td>  1.67   </td><td> 6.106e-03    </td><td>  1.83        </td><td>   4.015e-01 </td><td> 1.016  </td>
   </tr>
   <tr>
-   <td>   5                  </td><td>    3.277e-04 </td><td>  1.93   </td><td>   1.666e-03   </td><td>    1.94        </td><td> 1.981e-01  </td><td>  1.00    </td>
+   <td>   5                  </td><td>  3.084e-04  </td><td>  1.83   </td><td>  1.622e-03   </td><td>    1.91        </td><td> 1.993e-01 </td><td>  1.010   </td>
   </tr>
 </table>
 We can see that the $L_2$ convergence rates are around 2,
@@ -57,7 +57,7 @@ and $H^2$-seminorm convergence rates are around 1. The latter two
 match the theoretically expected rates; for the former, we have no
 theorem but are not surprised that it is sub-optimal given the remark
 in the introduction.
-  
+
 
 <h3>Test results on <i>Q<sub>3</sub></i> with <i>&gamma; = p(p+1)</i> </h3>
 
@@ -67,16 +67,16 @@ in the introduction.
    <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
-   <td>   2                  </td><td>    2.187e-04 </td><td>       </td><td>   4.46269e-03   </td><td>           </td><td>  1.638e-01 </td><td>   </td>
+   <td>   2                  </td><td>    2.045e-04 </td><td>       </td><td>   4.402e-03   </td><td>           </td><td> 1.641e-01 </td><td>   </td>
   </tr>
   <tr>
-   <td>   3                  </td><td>    1.334e-05   </td><td>  4.03  </td><td>  5.54622e-04   </td><td>    3.00     </td><td> 4.095e-02  </td><td>  2.00  </td>
+   <td>   3                  </td><td>   1.312e-05   </td><td> 3.96  </td><td>  5.537e-04  </td><td>   2.99     </td><td> 4.096e-02 </td><td>  2.00  </td>
   </tr>
   <tr>
-   <td>   4                  </td><td>    8.273e-07   </td><td>  4.01    </td><td>  6.90599e-05    </td><td>  3.00        </td><td>   1.023e-02 </td><td> 2.00  </td>
+   <td>   4                  </td><td>   8.239e-07 </td><td>  3.99  </td><td> 6.904e-05   </td><td> 3.00     </td><td> 1.023e-02 </td><td> 2.00 </td>
   </tr>
   <tr>
-   <td>   5                  </td><td>    5.164e-08 </td><td>  4.00   </td><td>   8.62168e-06  </td><td>    3.00        </td><td> 2.558e-03  </td><td>  2.00    </td>
+   <td>   5                  </td><td>   5.158e-08  </td><td>  3.99 </td><td> 8.621e-06 </td><td>  3.00      </td><td> 2.558e-03  </td><td>  2.00  </td>
   </tr>
 </table>
 We can see that the $L_2$ convergence rates are around 4,
@@ -92,16 +92,16 @@ This, of course, matches our theoretical expectations.
    <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
-   <td>   2                  </td><td>    8.34446e-06 </td><td>       </td><td>   0.000239323   </td><td>           </td><td>  0.0109785 </td><td>   </td>
+   <td>   2                  </td><td>    6.510e-06 </td><td>       </td><td> 2.215e-04   </td><td>           </td><td>  1.275e-02 </td><td>   </td>
   </tr>
   <tr>
-   <td>   3                  </td><td>   2.98497e-07   </td><td>  4.80  </td><td>  1.63221e-05  </td><td>   3.87     </td><td> 0.0013551 </td><td>  3.01  </td>
+   <td>   3                  </td><td>   2.679e-07  </td><td>  4.60  </td><td> 1.569e-05  </td><td>   3.81    </td><td> 1.496e-03 </td><td>  3.09  </td>
   </tr>
   <tr>
-   <td>   4                  </td><td>    9.87063e-09  </td><td>  4.91   </td><td>  1.06066e-06    </td><td> 3.94       </td><td>  0.000167898 </td><td> 3.01  </td>
+   <td>   4                  </td><td>   9.404e-09  </td><td> 4.83   </td><td> 1.040e-06    </td><td> 3.91       </td><td> 1.774e-04 </td><td> 3.07 </td>
   </tr>
   <tr>
-   <td>   5                  </td><td>   7.88939e-10 </td><td>  3.64  </td><td>    6.75478e-08 </td><td>  3.97       </td><td> 2.08912e-05   </td><td>  3.00    </td>
+   <td>   5                  </td><td>   7.943e-10 </td><td>  3.56  </td><td>   6.693e-08 </td><td> 3.95     </td><td> 2.150e-05  </td><td> 3.04    </td>
   </tr>
 </table>
 We can see that the $L_2$ norm convergence rates are around 5,
@@ -124,22 +124,29 @@ case where we simply choose $\gamma=1$:
    <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
-   <td>   2                  </td><td>    4.86048e-02 </td><td>       </td><td>   3.30386e-01   </td><td>           </td><td>  4.34917 </td><td>   </td>
+   <td>   2                  </td><td>   7.350e-02 </td><td>       </td><td>   7.323e-01   </td><td>           </td><td> 10.343 </td><td>   </td>
   </tr>
   <tr>
-   <td>   3                  </td><td>    1.29921e-02   </td><td>  1.90  </td><td> 1.4852e-01   </td><td>    1.15    </td><td> 4.01192  </td><td>  0.116 </td>
+   <td>   3                  </td><td>   6.798e-03   </td><td> 3.43  </td><td> 1.716e-01   </td><td>   2.09    </td><td>4.836 </td><td>  1.09 </td>
   </tr>
   <tr>
-   <td>   4                  </td><td>   3.33539e-03   </td><td>  1.96    </td><td>  7.20252e-02    </td><td>  1.04       </td><td>  3.96138 </td><td> 0.018  </td>
+   <td>   4                  </td><td>  9.669e-04   </td><td> 2.81   </td><td> 6.436e-02    </td><td> 1.41      </td><td>  3.590 </td><td> 0.430 </td>
   </tr>
   <tr>
-   <td>   5                  </td><td>    8.41058e-04 </td><td>  1.98   </td><td>  3.57705e-02  </td><td>    1.00       </td><td> 3.95719  </td><td>  0.001   </td>
+   <td>   5                  </td><td>   1.755e-04 </td><td> 2.46 </td><td>  2.831e-02  </td><td>    1.18      </td><td>3.144  </td><td>  0.19  </td>
   </tr>
 </table>
-Although $L_2$ norm and $H^1$-seminorm convergence rates of $u$
-follow the theoretical expectations, the $H^2$-seminorm does not seem to converge.
+Although $L_2$ norm convergence rates of $u$ more or less
+follows the theoretical expectations,
+the $H^1$-seminorm and $H^2$-seminorm do not seem to converge as expected.
 Comparing results from $\gamma = 1$ and $\gamma = p(p+1)$, it is clear that
 $\gamma = p(p+1)$ is a better penalty.
+Given that $\gamma=1$ is already too small for $Q_2$ elements, it may not be surprising that if one repeated the
+experiment with a $Q_3$ element, the results are even more disappointing: One again only obtains convergence
+rates of 2, 1, zero -- i.e., no better than for the $Q_2$ element (although the errors are smaller in magnitude).
+Maybe surprisingly, however, one obtains more or less the expected convergence orders when using $Q_4$
+elements. Regardless, this uncertainty suggests that $\gamma=1$ is at best a risky choice, and at worst an
+unreliable one and that we should choose $\gamma$ larger.
 
 
 <h3>Test results on <i>Q<sub>2</sub></i> with <i>&gamma; = 2</i> </h3>
@@ -153,24 +160,26 @@ that case:
    <th>Number of refinements </th><th>  $\|u-u_h^\circ\|_{L_2}$ </th><th>  Conv. rates  </th><th>  $|u-u_h|_{H^1}$ </th><th> Conv. rates </th><th> $|u-u_h|_{H^2}$ </th><th> Conv. rates </th>
   </tr>
   <tr>
-   <td>   2                  </td><td>    5.482e-03 </td><td>       </td><td>   7.652e-02  </td><td>           </td><td>  1.756e-00 </td><td>   </td>
+   <td>   2                  </td><td>   4.133e-02 </td><td>       </td><td>  2.517e-01   </td><td>           </td><td> 3.056 </td><td>   </td>
   </tr>
   <tr>
-   <td>   3                  </td><td>    2.227e-02   </td><td>  1.29  </td><td> 2.177e-02   </td><td>   1.81   </td><td> 8.711e-01  </td><td> 1.01 </td>
+   <td>   3                  </td><td>  6.500e-03   </td><td>2.66  </td><td> 5.916e-02  </td><td>  2.08    </td><td>1.444 </td><td>  1.08 </td>
   </tr>
   <tr>
-   <td>   4                  </td><td>  9.088e-04   </td><td>  1.29    </td><td> 6.026e-03    </td><td>  1.85       </td><td> 4.196e-01 </td><td> 1.05  </td>
+   <td>   4                  </td><td> 6.780e-04   </td><td> 3.26  </td><td> 1.203e-02    </td><td> 2.296      </td><td> 6.151e-01 </td><td> 1.231 </td>
   </tr>
   <tr>
-   <td>   5                  </td><td>   2.822e-04  </td><td>  1.68  </td><td> 1.605e-03 </td><td>    1.90     </td><td> 2.041e-01  </td><td> 1.03  </td>
+   <td>   5                  </td><td> 1.622e-04 </td><td> 2.06 </td><td>  2.448e-03  </td><td>   2.297     </td><td> 2.618e-01  </td><td> 1.232  </td>
   </tr>
 </table>
 In this case, the convergence rates more or less follow the
 theoretical expectations, but, compared to the results from $\gamma =
-p(p+1)$, are more variable. That suggests that the penalty parameter
-is already too small even for the value $p=2$ chosen here, and one can
-readily check that it is indeed too small when using higher polynomial
-degrees.
+p(p+1)$, are more variable.
+Again, we could repeat this kind of experiment for $Q_3$ and $Q_4$ elements. In both cases, we will find that we
+obtain roughly the expected convergence rates. Of more interest may then be to compare the absolute
+size of the errors. While in the table above, for the $Q_2$ case, the errors on the finest grid are comparable between
+the $\gamma=p(p+1)$ and $\gamma=2$ case, for $Q_3$ the errors are substantially larger for $\gamma=2$ than for
+$\gamma=p(p+1)$. The same is true for the $Q_4$ case.
 
 
 <h3> Conclusions for the choice of the penalty parameter </h3>
@@ -200,4 +209,3 @@ make sense:
   addition should not be overly difficult using, for example, the
   FEInterfaceValues class combined with MeshWorker::mesh_loop() in the
   same spirit as we used for the assembly of the linear system.
-

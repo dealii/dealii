@@ -631,7 +631,7 @@ namespace Step71
                      - av_hessian_j_dot_n_dot_n // - {grad^2 u n n}
                          * jump_grad_i_dot_n    //   [grad v n]
                                                 //
-                     + 2.0 * gamma              // + 2 gamma
+                     + gamma                    //  gamma
                          * jump_grad_i_dot_n    // [grad v n]
                          * jump_grad_j_dot_n    // [grad u n]
                      ) *
@@ -642,7 +642,7 @@ namespace Step71
                 (-av_hessian_i_dot_n_dot_n *       // - {grad^2 v n n }
                    (exact_gradients[qpoint] * n)   //   (grad u_exact . n)
                  +                                 // +
-                 2.0 * gamma                       // 2 gamma
+                 gamma                             //  gamma
                    * jump_grad_i_dot_n             // [grad v n]
                    * (exact_gradients[qpoint] * n) // (grad u_exact . n)
                  ) *
