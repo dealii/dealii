@@ -4202,24 +4202,18 @@ namespace internal
 
 
       /* --------------------- class ParallelDistributed ---------------- */
-
-#ifdef DEAL_II_WITH_P4EST
-
       namespace
       {
         template <int dim, int spacedim>
         void
         get_mg_dofindices_recursively(
           const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &                                           quadrant,
+            &                                           dealii_cell,
+          const CellId &                                quadrant,
           std::vector<dealii::types::global_dof_index> &dof_numbers_and_indices)
         {
-          if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
+          if (dealii_cell->id() == quadrant)
             {
               // why would somebody request a cell that is not ours?
               Assert(dealii_cell->level_subdomain_id() ==
@@ -4241,21 +4235,13 @@ namespace internal
           if (!dealii_cell->has_children())
             return;
 
-          if (!internal::p4est::quadrant_is_ancestor<dim>(p4est_cell, quadrant))
+          if (!dealii_cell->id().is_ancestor_of(quadrant))
             return;
-
-          typename dealii::internal::p4est::types<dim>::quadrant
-            p4est_child[GeometryInfo<dim>::max_children_per_cell];
-          internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
             get_mg_dofindices_recursively<dim, spacedim>(
-              tria,
-              p4est_child[c],
-              dealii_cell->child(c),
-              quadrant,
-              dof_numbers_and_indices);
+              tria, dealii_cell->child(c), quadrant, dof_numbers_and_indices);
         }
 
 
@@ -4268,32 +4254,18 @@ namespace internal
           const unsigned int tree_index,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
           std::map<dealii::types::subdomain_id,
-                   std::vector<std::pair<
-                     unsigned int,
-                     typename dealii::internal::p4est::types<dim>::quadrant>>>
+                   std::vector<std::pair<unsigned int, CellId>>>
             &neighbor_cell_list)
         {
           // recurse...
           if (dealii_cell->has_children())
             {
-              typename dealii::internal::p4est::types<dim>::quadrant
-                p4est_child[GeometryInfo<dim>::max_children_per_cell];
-              internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                           p4est_child);
-
-
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
                 find_marked_mg_ghost_cells_recursively<dim, spacedim>(
-                  tria,
-                  tree_index,
-                  dealii_cell->child(c),
-                  p4est_child[c],
-                  neighbor_cell_list);
+                  tria, tree_index, dealii_cell->child(c), neighbor_cell_list);
             }
 
           if (dealii_cell->user_flag_set() &&
@@ -4301,7 +4273,7 @@ namespace internal
                 tria.locally_owned_subdomain())
             {
               neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .emplace_back(tree_index, p4est_cell);
+                .emplace_back(tree_index, dealii_cell->id());
             }
         }
 
@@ -4311,15 +4283,12 @@ namespace internal
         void
         set_mg_dofindices_recursively(
           const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &                              quadrant,
+            &                              dealii_cell,
+          const CellId &                   quadrant,
           dealii::types::global_dof_index *dofs)
         {
-          if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
+          if (dealii_cell->id() == quadrant)
             {
               Assert(dealii_cell->level_subdomain_id() !=
                        dealii::numbers::artificial_subdomain_id,
@@ -4363,17 +4332,15 @@ namespace internal
           if (!dealii_cell->has_children())
             return;
 
-          if (!internal::p4est::quadrant_is_ancestor<dim>(p4est_cell, quadrant))
+          if (!dealii_cell->id().is_ancestor_of(quadrant))
             return;
-
-          typename dealii::internal::p4est::types<dim>::quadrant
-            p4est_child[GeometryInfo<dim>::max_children_per_cell];
-          internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
-            set_mg_dofindices_recursively<dim, spacedim>(
-              tria, p4est_child[c], dealii_cell->child(c), quadrant, dofs);
+            set_mg_dofindices_recursively<dim, spacedim>(tria,
+                                                         dealii_cell->child(c),
+                                                         quadrant,
+                                                         dofs);
         }
 
 
@@ -4385,9 +4352,8 @@ namespace internal
             &             tria,
           DoFHandlerType &dof_handler)
         {
-          using QuadrantBufferType = std::vector<
-            std::pair<unsigned int,
-                      typename dealii::internal::p4est::types<dim>::quadrant>>;
+          using QuadrantBufferType =
+            std::vector<std::pair<unsigned int, CellId>>;
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners =
             tria.level_ghost_owners();
@@ -4401,10 +4367,6 @@ namespace internal
                cell != dof_handler.end(0);
                ++cell)
             {
-              typename dealii::internal::p4est::types<dim>::quadrant
-                p4est_coarse_cell;
-              internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
-
               types::coarse_cell_id coarse_cell_id = 0;
               try
                 {
@@ -4419,11 +4381,7 @@ namespace internal
                 };
 
               find_marked_mg_ghost_cells_recursively<dim, spacedim>(
-                tria,
-                coarse_cell_id,
-                cell,
-                p4est_coarse_cell,
-                neighbor_cell_list);
+                tria, coarse_cell_id, cell, neighbor_cell_list);
             }
           Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
                  ExcInternalError());
@@ -4509,13 +4467,8 @@ namespace internal
                     temp->index(),
                     &dof_handler);
 
-                  typename dealii::internal::p4est::types<dim>::quadrant
-                    p4est_coarse_cell;
-                  internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
-
                   get_mg_dofindices_recursively<dim, spacedim>(
                     tria,
-                    p4est_coarse_cell,
                     cell,
                     quadrant_data_to_send[idx][c].second,
                     send_dof_numbers_and_indices[idx]);
@@ -4571,15 +4524,13 @@ namespace internal
                   typename DoFHandlerType::level_cell_iterator cell(
                     &tria, 0, temp->index(), &dof_handler);
 
-                  typename dealii::internal::p4est::types<dim>::quadrant
-                    p4est_coarse_cell;
-                  internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
-
                   Assert(cell->get_fe().dofs_per_cell == dofs[0],
                          ExcInternalError());
 
-                  set_mg_dofindices_recursively<dim, spacedim>(
-                    tria, p4est_coarse_cell, cell, it.second, dofs + 1);
+                  set_mg_dofindices_recursively<dim, spacedim>(tria,
+                                                               cell,
+                                                               it.second,
+                                                               dofs + 1);
                   dofs += 1 + dofs[0];
                 }
               Assert(dofs == receive_dof_numbers_and_indices.data() +
@@ -4653,10 +4604,10 @@ namespace internal
           const DoFHandlerType &dof_handler,
           const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
         {
-#  ifndef DEAL_II_WITH_MPI
+#ifndef DEAL_II_WITH_MPI
           (void)vertices_with_ghost_neighbors;
           Assert(false, ExcNotImplemented());
-#  else
+#else
           const unsigned int dim      = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -4704,7 +4655,7 @@ namespace internal
                 // nothing we need to send that hasn't been sent so far.
                 // so return an empty array, but also verify that indeed
                 // the cell is complete
-#    ifdef DEBUG
+#  ifdef DEBUG
                 std::vector<types::global_dof_index> local_dof_indices(
                   cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices(local_dof_indices);
@@ -4715,7 +4666,7 @@ namespace internal
                              numbers::invalid_dof_index) ==
                    local_dof_indices.end());
                 Assert(is_complete, ExcInternalError());
-#    endif
+#  endif
                 return std_cxx17::optional<
                   std::vector<types::global_dof_index>>();
               }
@@ -4814,14 +4765,12 @@ namespace internal
                        "The function communicate_dof_indices_on_marked_cells() "
                        "only works with parallel distributed triangulations."));
             }
-#  endif
+#endif
         }
 
 
 
       } // namespace
-
-#endif // DEAL_II_WITH_P4EST
 
 
 
@@ -4837,10 +4786,6 @@ namespace internal
       NumberCache
       ParallelDistributed<DoFHandlerType>::distribute_dofs() const
       {
-#ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
-        return NumberCache();
-#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -5020,15 +4965,15 @@ namespace internal
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
-#  ifdef DEBUG
+#ifdef DEBUG
           for (const auto &cell : dof_handler->active_cell_iterators())
             Assert(cell->user_flag_set() == false, ExcInternalError());
-#  endif
+#endif
 
           triangulation->load_user_flags(user_flags);
         }
 
-#  ifdef DEBUG
+#ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
@@ -5063,9 +5008,8 @@ namespace internal
                   }
               }
         }
-#  endif // DEBUG
+#endif // DEBUG
         return number_cache;
-#endif   // DEAL_II_WITH_P4EST
       }
 
 
@@ -5074,10 +5018,6 @@ namespace internal
       std::vector<NumberCache>
       ParallelDistributed<DoFHandlerType>::distribute_mg_dofs() const
       {
-#ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
-        return std::vector<NumberCache>();
-#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -5252,7 +5192,7 @@ namespace internal
           // in Phase 1.
           communicate_mg_ghost_cells(*triangulation, *dof_handler);
 
-#  ifdef DEBUG
+#ifdef DEBUG
           // make sure we have removed all flags:
           {
             typename DoFHandlerType::level_cell_iterator cell,
@@ -5263,14 +5203,14 @@ namespace internal
                   !cell->is_locally_owned_on_level())
                 Assert(cell->user_flag_set() == false, ExcInternalError());
           }
-#  endif
+#endif
 
           triangulation->load_user_flags(user_flags);
         }
 
 
 
-#  ifdef DEBUG
+#ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
@@ -5292,11 +5232,9 @@ namespace internal
                   }
               }
         }
-#  endif // DEBUG
+#endif // DEBUG
 
         return number_caches;
-
-#endif // DEAL_II_WITH_P4EST
       }
 
 
@@ -5310,10 +5248,6 @@ namespace internal
         Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
                ExcInternalError());
 
-#ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
-        return NumberCache();
-#else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -5554,7 +5488,6 @@ namespace internal
               number_cache.locally_owned_dofs.n_elements();
             return number_cache;
           }
-#endif
       }
 
 
