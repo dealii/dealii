@@ -218,6 +218,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const FiniteElement<deal_II_dimension> &,
         const FiniteElement<deal_II_dimension> &,
         FullMatrix<double> &);
+      template void
+      get_projection_matrix<deal_II_dimension>(
+        const FiniteElement<deal_II_dimension> &,
+        const FiniteElement<deal_II_dimension> &,
+        FullMatrix<float> &);
 
       template void
       compute_face_embedding_matrices<deal_II_dimension, double>(
