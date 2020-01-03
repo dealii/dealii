@@ -64,7 +64,7 @@
 
 // In addition to above deal.II specific includes, we also include four
 // boost headers. The first two are for binary archives that we will use
-// for implementing a checkpointing and restart mechanism.
+// for implementing a check-pointing and restart mechanism.
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
@@ -74,9 +74,24 @@
 #include <boost/range/iterator_range.hpp>
 
 // @sect3{Class template declarations}
+//
+// We begin our actual implementation by declaring all classes with its
+// data structures and methods upfront. In contrast to previous example
+// steps we use a more fine-grained encapsulation of concepts, data
+// structures, and parameters into individual classes. A single class thus
+// usually centers around either a  single data structure (such as the
+// Triangulation) in the <code>Discretization</code> class, or a single
+// method (such as the <code>step()</code> function of the
+// <code>TimeStep</code> class). We typically declare parameter variables
+// and scratch data object private and make methods and data structures
+// used by other classes public.
+//
+// @note: A cleaner approach would be to guard access to all data
+// structures by <a
+// href="https://en.wikipedia.org/wiki/Mutator_method">getter/setter
+// functions</a>. For the sake of brevity, we refrain from that approach,
+// though.
 
-// Next we declare all data structures and class templates of the example
-// step.
 namespace Step69
 {
   using namespace dealii;
@@ -88,18 +103,18 @@ namespace Step69
   enum Boundary : types::boundary_id
   {
     do_nothing = 0,
-    slip       = 2,
-    dirichlet  = 3,
+    slip       = 1,
+    dirichlet  = 2,
   };
 
-  // @sect4{class <code>Discretization</code>}
+  // @sect4{The <code>Discretization</code> class}
   //
   // The class <code>Discretization</code> contains all data structures
   // concerning the mesh (triangulation) and discretization (mapping,
   // finite element, quadrature) of the problem. We use the
   // ParameterAcceptor class to automatically populate problem-specific
   // parameters, such as the geometry information
-  // (<code>immersed_disc_length</code>, etc.) or the refinement level
+  // (<code>length</code>, etc.) or the refinement level
   // (<code>refinement</code>) from a parameter file. This requires us to
   // split the initialization of data structures into two functions: We
   // initialize everything that does not depend on parameters in the
@@ -129,15 +144,15 @@ namespace Step69
   private:
     TimerOutput &computing_timer;
 
-    double immersed_disc_length;
-    double immersed_disc_height;
-    double immersed_disc_object_position;
-    double immersed_disc_object_diameter;
+    double length;
+    double height;
+    double disc_position;
+    double disc_diameter;
 
     unsigned int refinement;
   };
 
-  // @sect4{class <code>OfflineData</code>}
+  // @sect4{The <code>OfflineData</code> class}
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
@@ -208,7 +223,7 @@ namespace Step69
     SmartPointer<const Discretization<dim>> discretization;
   };
 
-  // @sect4{class <code>ProblemDescription</code>}
+  // @sect4{The <code>ProblemDescription</code> class}
   //
   // The member functions of this class are utility functions specific to
   // Euler's equations:
@@ -274,7 +289,7 @@ namespace Step69
                        const Tensor<1, dim> &n_ij);
   };
 
-  // @sect4{class <code>InitialValues</code>}
+  // @sect4{The <code>InitialValues</code> class}
   //
   // The class <code>InitialValues</code>'s only public data attribute is a
   // std::function <code>initial_state</code> that computes the initial
@@ -305,7 +320,7 @@ namespace Step69
     Tensor<1, 3>   initial_1d_state;
   };
 
-  // @sect4{class <code>TimeStep</code>}
+  // @sect4{The <code>TimeStep</code> class}
   //
   // With the <code>OfflineData</code> and <code>ProblemDescription</code>
   // classes at hand we can now implement the explicit time-stepping scheme
@@ -354,7 +369,7 @@ namespace Step69
     double cfl_update;
   };
 
-  // @sect4{class <code>SchlierenPostprocessor</code>}
+  // @sect4{The <code>SchlierenPostprocessor</code> class}
   //
   // At its core, the Schlieren class implements the class member
   // <code>compute_schlieren</code>. The main purpose of this class member
@@ -404,7 +419,7 @@ namespace Step69
     double       schlieren_beta;
   };
 
-  // @sect4{class <code>TimeLoop</code>}
+  // @sect4{The <code>TimeLoop</code> class}
   //
   // Now, all that is left to do is to chain the methods implemented in the
   // <code>TimeStep</code>, <code>InitialValues</code>, and
@@ -457,12 +472,18 @@ namespace Step69
     vector_type output_vector;
   };
 
-  // @sect3{Class template implementations}
+  // @sect3{Grid generation and assembly}
 
-  // @sect4{Implementation of the members of the class <code>Discretization</code>}
-
-  // Not much is done here other that initializing the corresponding
-  // class members in the initialization list.
+  // The first major task at hand is the typical triplet of grid
+  // generation, setup of data structures, and assembly. A notable novelty
+  // in this example step is the use of the ParameterAcceptor class that we
+  // use to populate parameter values: We first initialize the
+  // ParameterAcceptor class by calling its constructor with a string
+  // <code>subsection</code> denoting the correct subsection in the
+  // parameter file. Then, in the constructor body every parameter value is
+  // initialized to a sensible default value and registered with the
+  // ParameterAcceptor class with a call to
+  // ParameterAcceptor::add_parameter.
 
   template <int dim>
   Discretization<dim>::Discretization(const MPI_Comm &   mpi_communicator,
@@ -477,24 +498,24 @@ namespace Step69
     , face_quadrature(3)
     , computing_timer(computing_timer)
   {
-    immersed_disc_length = 4.;
+    length = 4.;
     add_parameter("immersed disc - length",
-                  immersed_disc_length,
+                  length,
                   "Immersed disc: length of computational domain");
 
-    immersed_disc_height = 2.;
+    height = 2.;
     add_parameter("immersed disc - height",
-                  immersed_disc_height,
+                  height,
                   "Immersed disc: height of computational domain");
 
-    immersed_disc_object_position = 0.6;
+    disc_position = 0.6;
     add_parameter("immersed disc - object position",
-                  immersed_disc_object_position,
+                  disc_position,
                   "Immersed disc: x position of immersed disc center point");
 
-    immersed_disc_object_diameter = 0.5;
+    disc_diameter = 0.5;
     add_parameter("immersed disc - object diameter",
-                  immersed_disc_object_diameter,
+                  disc_diameter,
                   "Immersed disc: diameter of immersed disc");
 
     refinement = 5;
@@ -505,38 +526,35 @@ namespace Step69
 
   // Note that in the previous constructor we only passed the MPI
   // communicator to the <code>triangulation</code>but we still have not
-  // initialized the underlying geometry/mesh. In order to define the geometry
-  // we will use the class <code>create_immersed_disc_geometry</code>
-  // that uses the tools in GridGenerator in order to create a
-  // rectangular domain with a whole.
-
-  // The following is just a dummy implementation/placeholder that does
-  // nothing other than throwing an exception if we want to run this program
-  // with a space dimension that is not 2.
+  // initialized the underlying geometry/mesh. As mentioned earlier, we
+  // have to postpone this task to the <code>setup()</code> function that
+  // gets called after the ParameterAcceptor::initialize() function has
+  // populated all parameter variables with the final values read from the
+  // parameter file.
+  //
+  // The <code>setup()</code> function is the last class member that has to
+  // be implemented. It creates the actual triangulation that is a
+  // benchmark configuration consisting of a channel with a disc obstacle, see
+  // @cite GuermondEtAl2018. We construct the geometry by modifying the
+  // mesh generated by GridGenerator::hyper_cube_with_cylindrical_hole().
+  // We refer to Step-49, Step-53, and Step-54 for an overview how to
+  // create advanced meshes.
 
   template <int dim>
-  void
-  create_immersed_disc_geometry(parallel::distributed::Triangulation<dim> &,
-                                const double /*length*/,
-                                const double /*height*/,
-                                const double /*step_position*/,
-                                const double /*step_height*/)
+  void Discretization<dim>::setup()
   {
-    AssertThrow(false, ExcNotImplemented());
-  }
+    TimerOutput::Scope t(computing_timer, "discretization - setup");
 
-  // For the two-dimensional case we have the following template
-  // specialization that creates the geometry.
+    triangulation.clear();
 
-  template <>
-  void create_immersed_disc_geometry<2>(
-    parallel::distributed::Triangulation<2> &triangulation,
-    const double                             length,
-    const double                             height,
-    const double                             disc_position,
-    const double                             disc_diameter)
-  {
-    constexpr int dim = 2;
+    // We first create 4 temporary (non distributed) coarse triangulations
+    // that we stitch together with the
+    // GridGenerator::merge_triangulation() function. We center the disc at
+    // $(0,0)$ with a diameter of <code>disc_diameter</code>. The lower
+    // left corner of the channel has coordinates
+    // (<code>-disc_position</code>, <code>-height/2</code>) and the upper
+    // right corner has (<code>length-disc_position</code>,
+    // <code>height/2</code>).
 
     Triangulation<dim> tria1, tria2, tria3, tria4;
 
@@ -568,6 +586,10 @@ namespace Step69
 
     triangulation.set_manifold(0, PolarManifold<2>(Point<2>()));
 
+    // We have to fix up the left edge that is currently located at
+    // $x=-$<code>disc_diameter</code> and has to be shifted to
+    // $x=-$<code>disc_position</code>:
+
     for (auto cell : triangulation.active_cell_iterators())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
@@ -575,6 +597,12 @@ namespace Step69
           if (vertex[0] <= -disc_diameter + 1.e-6)
             vertex[0] = -disc_position;
         }
+
+    // As a last step the boundary has to be colorized with
+    // <code>Boundary::do_nothing</code> on the right,
+    // <code>Boundary::dirichlet</code> on the left and
+    // <code>Boundary::slip</code> on the upper and lower outer boundaries
+    // and the obstacle:
 
     for (auto cell : triangulation.active_cell_iterators())
       {
@@ -595,34 +623,13 @@ namespace Step69
               face->set_boundary_id(Boundary::slip);
           }
       }
-  }
-
-  // This the the last class member to be implemented of the class.
-  // <code>Discretization</code>: it initializes the actual mesh
-  // of the triangulation by calling <code>create_immersed_disc_geometry</code>.
-
-  template <int dim>
-  void Discretization<dim>::setup()
-  {
-    TimerOutput::Scope t(computing_timer, "discretization - setup");
-
-    triangulation.clear();
-
-    create_immersed_disc_geometry(triangulation,
-                                  immersed_disc_length,
-                                  immersed_disc_height,
-                                  immersed_disc_object_position,
-                                  immersed_disc_object_diameter);
 
     triangulation.refine_global(refinement);
   }
 
-
-  // @sect4{Implementation of the members of the class <code>OfflineData</code>}
-
-  // Not much is done here other that initializing the corresponding
-  // class members in the initialization list.
-  // Constructor of the class <code>OfflineData</code>.
+  // Not much is done in the constructor of <code>OfflineData</code> other
+  // than initializing the corresponding class members in the
+  // initialization list.
 
   template <int dim>
   OfflineData<dim>::OfflineData(const MPI_Comm &           mpi_communicator,
@@ -635,11 +642,10 @@ namespace Step69
     , discretization(&discretization)
   {}
 
-  // Now the class member <code>OfflineData<dim>::setup()</code> will take care
-  // of initializating
-  //   - The <code>dof_handler</code>.
-  //   - The IndexSets corresponding to locally owned and locally relevant DOFs.
-  //   - The partitioner.
+  // Now we can initialize the DoFHandler, extract the IndexSet objects for
+  // locally owned and locally relevant DOFs, and initialize a
+  // Utilities::MPI::Partitioner object that is needed for distributed
+  // vectors.
 
   template <int dim>
   void OfflineData<dim>::setup()
@@ -652,18 +658,12 @@ namespace Step69
 
       dof_handler.initialize(discretization->triangulation,
                              discretization->finite_element);
+
       DoFRenumbering::Cuthill_McKee(dof_handler);
 
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
-    }
 
-    {
-      TimerOutput::Scope t(
-        computing_timer,
-        "offline_data - create partitioner and affine constraints");
-
-      locally_relevant.clear();
       DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant);
       n_locally_relevant = locally_relevant.n_elements();
 
@@ -674,41 +674,60 @@ namespace Step69
 
     const auto dofs_per_cell = discretization->finite_element.dofs_per_cell;
 
-    // Here we create the sparsity patterns for the off-line data. There are
-    // quite a few peculiarities that deserve our attention:
-    // - Our "local" dynamic sparsity pattern (<code>dsp</code>)
-    //   will be of dimensions
-    //   <code>n_locally_relevant</code> $\times$
-    //   <code>n_locally_relevant</code> (this choice is definitely unusual).
-    //   The goal behind such choice is to reduce communication: we do
-    //   not want to request (to another mpi process) ghosted offline data (such
-    //   as the vectors $\mathbf{c}_{ij}$ when $j$ is not locally owned) for
-    //   every time step. It is more efficient to simply take more memory by
-    //   storing (locally) all relevant off-line data.
-    // - We loop on all locally owned and ghosted cells (see @ref
-    //   GlossArtificialCell "this glossary entry") order to:
-    //   <ul>
-    //   <li> Extract the <code>dof_indices</code> associated to the cell DOFs
-    //   (having global numbering) and renumber them using
-    //   <code>partitioner->global_to_local(index)</code>. For the case
-    //   of locally owned DOFs: such renumbering consist in applying a
-    //   shift (i.e. we subtract a number) such that now they will
-    //   become a number in the integer interval
-    //   $[0,$<code>n_locally_owned</code>$)$. However, for the case of
-    //   "ghosted DOFs" (i.e. not locally owned) the situation is quite
-    //   different, since the global indices associated to ghosted DOFs
-    //   will not be (in general) a contiguous set of integers.
-    //   </li>
-    //   <li> Once, we are done with that, we add the corresponding entries to
-    //   the rows of the dynamic sparsity pattern with
-    //   <code>dsp.add_entries</code></li>
-    //   </ul>
-    // Finally we use <code>dsp</code> to initialize the actual sparsity
-    // pattern <code>sparsity_pattern</code>.
+    // @sect4{Translation to local index ranges}
+
+    // We are now in a position to create the sparsity pattern for our
+    // matrices. There are quite a few peculiarities that need a detailed
+    // explanation. We avoid using a distributed matrix class (as for
+    // example provided by Trilinos or PETSc) and instead rely on deal.II's
+    // own SparseMatrix object to store the local part of all matrices.
+    // This design decision is motivated by the fact that we actually never
+    // perform a matrix-vector multiplication. Instead, we will have to
+    // perform nonlinear updates while iterating over (the local part) of a
+    // connectivity stencil; a task for which deal.II own SparsityPattern
+    // is specificially optimized for.
+    //
+    // This design consideration has a caveat, though. What makes the
+    // deal.II SparseMatrix class fast is the <a
+    // href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed row
+    // storage (CSR)</a> used in the SparsityPattern (see @ref Sparsity).
+    // This, unfortunately, does not play nicely with a global distributed
+    // index range because a sparsity pattern with CSR cannot contain
+    // "holes" in the index range. The distributed matrices offered by
+    // deal.II avoid this by translating from a global index range into a
+    // contiguous local index range. But this is the precisely the type of
+    // index manipulation we want to avoid.
+    //
+    // Lucky enough, the Utilities::MPI::Partitioner used for distributed
+    // vectors provides exactly what we need: It manages a translation from
+    // a global index range to a contiguous local (per MPI rank) index
+    // range. We therefore simply create a "local" sparsity pattern for the
+    // contiguous index range $[0,$<code>n_locally_relevant</code>$)$ and
+    // translate between global dof indices and the above local range with
+    // the help of the Utilities::MPI::Partitioner::global_to_local()
+    // function. All that is left to do is to ensure that we always access
+    // elements of a distributed vector by a call to
+    // LinearAlgebra::distributed::Vector::local_element(). That way we
+    // avoid index translations altogether.
 
     {
-      TimerOutput::Scope t(computing_timer,
-                           "offline_data - create sparsity pattern");
+      TimerOutput::Scope t(
+        computing_timer,
+        "offline_data - create sparsity pattern and set up matrices");
+
+      // We have to create the "local" sparsity pattern by hand. We
+      // therefore loop over all locally owned and ghosted cells (see @ref
+      // GlossArtificialCell) and extract the (global)
+      // <code>dof_indices</code> associated to the cell DOFs and renumber
+      // them using <code>partitioner->global_to_local(index)</code>.
+      //
+      // @note In the case of a locally owned dof, such renumbering consist
+      // of applying a shift (i.e. we subtract an offset) such that now they
+      // will become a number in the integer interval
+      // $[0,$<code>n_locally_owned</code>$)$. However, in the case of a
+      // ghosted dof (i.e. not locally owned) the situation is quite
+      // different, since the global indices associated to ghosted DOFs will
+      // not be (in general) a contiguous set of integers.
 
       DynamicSparsityPattern dsp(n_locally_relevant, n_locally_relevant);
 
@@ -732,13 +751,6 @@ namespace Step69
         }
 
       sparsity_pattern.copy_from(dsp);
-    }
-
-    // We initialize the off-line data matrices. Note that these matrices do
-    // not require an mpi communicator (that's the idea).
-
-    {
-      TimerOutput::Scope t(computing_timer, "offline_data - set up matrices");
 
       lumped_mass_matrix.reinit(sparsity_pattern);
       norm_matrix.reinit(sparsity_pattern);
@@ -1320,6 +1332,8 @@ namespace Step69
     }
   } /* assemble() */
 
+  // @sect3{Problem specific setup and approximate Riemann solver}
+
   // At this point we are very much done with anything related to offline data.
   //
   // Now we define the implementation of the utility
@@ -1587,6 +1601,8 @@ namespace Step69
                                                                           "m_2",
                                                                           "m_3",
                                                                           "E"};
+
+  // @sect3{Initial values and time stepping}
 
   // Implementation of the constructor for the class InitialValues.
 
@@ -2115,7 +2131,7 @@ namespace Step69
     schlieren.update_ghost_values();
   }
 
-  // Placeholder here.
+  // @sect3{The Timeloop::run() function}
 
   template <int dim>
   TimeLoop<dim>::TimeLoop(const MPI_Comm &mpi_comm)
