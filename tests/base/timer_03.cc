@@ -77,14 +77,14 @@ main()
   Timer       t1, t2;
   TimerOutput tO(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
 
-  tO.enter_section("Section1");
-  tO.enter_section("Section2");
+  tO.enter_subsection("Section1");
+  tO.enter_subsection("Section2");
   burn(50);
-  tO.exit_section("Section2");
-  tO.enter_section("Section2");
+  tO.leave_subsection("Section2");
+  tO.enter_subsection("Section2");
   burn(50);
-  tO.exit_section("Section2");
-  tO.exit_section("Section1");
+  tO.leave_subsection("Section2");
+  tO.leave_subsection("Section1");
 
   std::map<std::string, double> cpu_times =
     tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
