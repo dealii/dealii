@@ -2048,14 +2048,18 @@ namespace internal
                     cells[cell * vectorization_width + v].second);
                   fe_val.reinit(cell_it, face);
 
-                  const bool is_local = cell_it->is_locally_owned();
+                  const bool is_local =
+                    cell_it->is_locally_owned() &&
+                    (!cell_it->at_boundary(face) ||
+                     (cell_it->at_boundary(face) &&
+                      cell_it->has_periodic_neighbor(face)));
 
                   if (is_local)
                     {
                       auto cell_it_neigh =
                         cell_it->neighbor_or_periodic_neighbor(face);
                       fe_val_neigh.reinit(cell_it_neigh,
-                                          cell_it->at_boundary() ?
+                                          cell_it->at_boundary(face) ?
                                             cell_it->periodic_neighbor_face_no(
                                               face) :
                                             cell_it->neighbor_face_no(face));
