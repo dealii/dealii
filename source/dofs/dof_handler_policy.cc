@@ -4213,10 +4213,10 @@ namespace internal
           const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &                                           dealii_cell,
-          const CellId &                                quadrant,
+          const typename CellId::binary_type &          quadrant,
           std::vector<dealii::types::global_dof_index> &dof_numbers_and_indices)
         {
-          if (dealii_cell->id() == quadrant)
+          if (dealii_cell->id() == CellId(quadrant))
             {
               // why would somebody request a cell that is not ours?
               Assert(dealii_cell->level_subdomain_id() ==
@@ -4238,7 +4238,7 @@ namespace internal
           if (!dealii_cell->has_children())
             return;
 
-          if (!dealii_cell->id().is_ancestor_of(quadrant))
+          if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
             return;
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
@@ -4257,8 +4257,9 @@ namespace internal
           const unsigned int tree_index,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &dealii_cell,
-          std::map<dealii::types::subdomain_id,
-                   std::vector<std::pair<unsigned int, CellId>>>
+          std::map<
+            dealii::types::subdomain_id,
+            std::vector<std::pair<unsigned int, typename CellId::binary_type>>>
             &neighbor_cell_list)
         {
           // recurse...
@@ -4276,7 +4277,8 @@ namespace internal
                 tria.locally_owned_subdomain())
             {
               neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .emplace_back(tree_index, dealii_cell->id());
+                .emplace_back(tree_index,
+                              dealii_cell->id().template to_binary<spacedim>());
             }
         }
 
@@ -4287,11 +4289,11 @@ namespace internal
         set_mg_dofindices_recursively(
           const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &                              dealii_cell,
-          const CellId &                   quadrant,
-          dealii::types::global_dof_index *dofs)
+            &                                 dealii_cell,
+          const typename CellId::binary_type &quadrant,
+          dealii::types::global_dof_index *   dofs)
         {
-          if (dealii_cell->id() == quadrant)
+          if (dealii_cell->id() == CellId(quadrant))
             {
               Assert(dealii_cell->level_subdomain_id() !=
                        dealii::numbers::artificial_subdomain_id,
@@ -4335,7 +4337,7 @@ namespace internal
           if (!dealii_cell->has_children())
             return;
 
-          if (!dealii_cell->id().is_ancestor_of(quadrant))
+          if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
             return;
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
@@ -4356,7 +4358,7 @@ namespace internal
           DoFHandlerType &dof_handler)
         {
           using QuadrantBufferType =
-            std::vector<std::pair<unsigned int, CellId>>;
+            std::vector<std::pair<unsigned int, typename CellId::binary_type>>;
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners =
             tria.level_ghost_owners();
