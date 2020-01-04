@@ -1978,12 +1978,18 @@ namespace internal
             storage_length * GeometryInfo<dim>::faces_per_cell);
           face_data_by_cells[my_q].jacobians[0].resize_fast(
             storage_length * GeometryInfo<dim>::faces_per_cell);
+          face_data_by_cells[my_q].jacobians[1].resize_fast(
+            storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_normal_vectors)
             face_data_by_cells[my_q].normal_vectors.resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[0].resize_fast(
+              storage_length * GeometryInfo<dim>::faces_per_cell);
+          if (update_flags & update_normal_vectors &&
+              update_flags & update_jacobians)
+            face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_jacobian_grads)
             face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
@@ -2002,6 +2008,10 @@ namespace internal
         fe_face_values(face_data_by_cells.size());
       for (unsigned int i = 0; i < fe_face_values.size(); ++i)
         fe_face_values[i].resize(face_data_by_cells[i].descriptor.size());
+      std::vector<std::vector<std::shared_ptr<dealii::FEFaceValues<dim>>>>
+        fe_face_values_neigh(face_data_by_cells.size());
+      for (unsigned int i = 0; i < fe_face_values_neigh.size(); ++i)
+        fe_face_values_neigh[i].resize(face_data_by_cells[i].descriptor.size());
       for (unsigned int cell = 0; cell < cell_type.size(); ++cell)
         for (unsigned int my_q = 0; my_q < face_data_by_cells.size(); ++my_q)
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
@@ -2014,8 +2024,17 @@ namespace internal
                     dummy_fe,
                     face_data_by_cells[my_q].descriptor[fe_index].quadrature,
                     update_flags));
+              if (fe_face_values_neigh[my_q][fe_index].get() == nullptr)
+                fe_face_values_neigh[my_q][fe_index].reset(
+                  new dealii::FEFaceValues<dim>(
+                    mapping,
+                    dummy_fe,
+                    face_data_by_cells[my_q].descriptor[fe_index].quadrature,
+                    update_flags));
               dealii::FEFaceValues<dim> &fe_val =
                 *fe_face_values[my_q][fe_index];
+              dealii::FEFaceValues<dim> &fe_val_neigh =
+                *fe_face_values_neigh[my_q][fe_index];
               const unsigned int offset =
                 face_data_by_cells[my_q]
                   .data_index_offsets[cell * GeometryInfo<dim>::faces_per_cell +
@@ -2028,6 +2047,19 @@ namespace internal
                     cells[cell * vectorization_width + v].first,
                     cells[cell * vectorization_width + v].second);
                   fe_val.reinit(cell_it, face);
+
+                  const bool is_local = cell_it->is_locally_owned();
+
+                  if (is_local)
+                    {
+                      auto cell_it_neigh =
+                        cell_it->neighbor_or_periodic_neighbor(face);
+                      fe_val_neigh.reinit(cell_it_neigh,
+                                          cell_it->at_boundary() ?
+                                            cell_it->periodic_neighbor_face_no(
+                                              face) :
+                                            cell_it->neighbor_face_no(face));
+                    }
 
                   // copy data for affine data type
                   if (cell_type[cell] <= affine)
@@ -2051,6 +2083,23 @@ namespace internal
                                   inv_jac[d][ee];
                               }
                         }
+                      if (is_local && (update_flags & update_jacobians))
+                        for (unsigned int q = 0; q < fe_val.n_quadrature_points;
+                             ++q)
+                          {
+                            DerivativeForm<1, dim, dim> inv_jac =
+                              fe_val_neigh.jacobian(q).covariant_form();
+                            for (unsigned int d = 0; d < dim; ++d)
+                              for (unsigned int e = 0; e < dim; ++e)
+                                {
+                                  const unsigned int ee = ExtractFaceHelper::
+                                    reorder_face_derivative_indices<dim>(face,
+                                                                         e);
+                                  face_data_by_cells[my_q]
+                                    .jacobians[1][offset + q][d][e][v] =
+                                    inv_jac[d][ee];
+                                }
+                          }
                       if (update_flags & update_jacobian_grads)
                         {
                           Assert(false, ExcNotImplemented());
@@ -2117,6 +2166,16 @@ namespace internal
                     .normals_times_jacobians[0][offset + q] =
                     face_data_by_cells[my_q].normal_vectors[offset + q] *
                     face_data_by_cells[my_q].jacobians[0][offset + q];
+              if (update_flags & update_normal_vectors &&
+                  update_flags & update_jacobians)
+                for (unsigned int q = 0; q < (cell_type[cell] <= affine ?
+                                                1 :
+                                                fe_val.n_quadrature_points);
+                     ++q)
+                  face_data_by_cells[my_q]
+                    .normals_times_jacobians[1][offset + q] =
+                    face_data_by_cells[my_q].normal_vectors[offset + q] *
+                    face_data_by_cells[my_q].jacobians[1][offset + q];
             }
     }
 
