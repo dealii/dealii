@@ -39,7 +39,7 @@ main(int argc, char **argv)
                             std::cerr,
                             TimerOutput::summary,
                             TimerOutput::cpu_times);
-      timer_out.enter_section("Section1");
+      timer_out.enter_subsection("Section1");
 
       throw Timer07Exception();
     }

@@ -790,12 +790,11 @@ public:
 
   /**
    * Same as @p enter_subsection.
+   *
+   * @deprecated Use enter_subsection() instead.
    */
-  void
+  DEAL_II_DEPRECATED void
   enter_section(const std::string &section_name);
-
-  // TODO: make some of these functions DEPRECATED (I would keep
-  // enter/exit_section)
 
   /**
    * Leave a section. If no name is given, the last section that was entered
@@ -806,8 +805,10 @@ public:
 
   /**
    * Same as @p leave_subsection.
+   *
+   * @deprecated Use leave_subsection() instead.
    */
-  void
+  DEAL_II_DEPRECATED void
   exit_section(const std::string &section_name = "");
 
   /**
