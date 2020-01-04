@@ -78,6 +78,8 @@ IF(DEAL_II_COMPONENT_PYTHON_BINDINGS)
 
   ADD_SUBDIRECTORY(source)
 
+  ADD_SUBDIRECTORY(tests)
+
   MESSAGE(STATUS "Setting up python bindings - Done")
   MESSAGE(STATUS "")
 
