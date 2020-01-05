@@ -122,8 +122,8 @@ namespace Particles
      * (if option @p random_cell_selection set to true). In either case the position of
      * individual particles inside the cell is computed randomly.
      *
-     * The algorithm implemented in the function is described in @cite
-     * GLHPW2018.
+     * The algorithm implemented in the function is described in
+     * @cite GLHPW2018.
      *
      * @param[in] triangulation The triangulation associated with the @p particle_handler.
      *
