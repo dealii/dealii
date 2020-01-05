@@ -3043,6 +3043,58 @@ namespace internal
   template <int dim, int fe_degree, int n_components, typename Number>
   struct CellwiseInverseMassMatrixImpl
   {
+    template <typename FEEvaluationType>
+    static void
+    apply(const FEEvaluationType &fe_eval,
+          const Number *          in_array,
+          Number *                out_array)
+    {
+      constexpr unsigned int dofs_per_component =
+        Utilities::pow(fe_degree + 1, dim);
+
+      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+      Assert(fe_eval.get_shape_info().element_type <=
+               MatrixFreeFunctions::tensor_symmetric,
+             ExcNotImplemented());
+
+      internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
+                                       dim,
+                                       fe_degree + 1,
+                                       fe_degree + 1,
+                                       Number>
+        evaluator(AlignedVector<Number>(),
+                  AlignedVector<Number>(),
+                  fe_eval.get_shape_info().inverse_shape_values_eo);
+
+      for (unsigned int d = 0; d < n_components; ++d)
+        {
+          const Number *in  = in_array + d * dofs_per_component;
+          Number *      out = out_array + d * dofs_per_component;
+          // Need to select 'apply' method with hessian slot because values
+          // assume symmetries that do not exist in the inverse shapes
+          evaluator.template hessians<0, true, false>(in, out);
+          if (dim > 1)
+            evaluator.template hessians<1, true, false>(out, out);
+          if (dim > 2)
+            evaluator.template hessians<2, true, false>(out, out);
+        }
+      for (unsigned int q = 0; q < dofs_per_component; ++q)
+        {
+          const Number inverse_JxW_q = Number(1.) / fe_eval.JxW(q);
+          for (unsigned int d = 0; d < n_components; ++d)
+            out_array[q + d * dofs_per_component] *= inverse_JxW_q;
+        }
+      for (unsigned int d = 0; d < n_components; ++d)
+        {
+          Number *out = out_array + d * dofs_per_component;
+          if (dim > 2)
+            evaluator.template hessians<2, false, false>(out, out);
+          if (dim > 1)
+            evaluator.template hessians<1, false, false>(out, out);
+          evaluator.template hessians<0, false, false>(out, out);
+        }
+    }
+
     static void
     apply(const AlignedVector<Number> &inverse_shape,
           const AlignedVector<Number> &inverse_coefficients,
@@ -3083,27 +3135,17 @@ namespace internal
           // assume symmetries that do not exist in the inverse shapes
           evaluator.template hessians<0, true, false>(in, out);
           if (dim > 1)
-            {
-              evaluator.template hessians<1, true, false>(out, out);
+            evaluator.template hessians<1, true, false>(out, out);
+          if (dim > 2)
+            evaluator.template hessians<2, true, false>(out, out);
 
-              if (dim == 3)
-                {
-                  evaluator.template hessians<2, true, false>(out, out);
-                  for (unsigned int q = 0; q < dofs_per_component; ++q)
-                    out[q] *= inv_coefficient[q];
-                  evaluator.template hessians<2, false, false>(out, out);
-                }
-              else if (dim == 2)
-                for (unsigned int q = 0; q < dofs_per_component; ++q)
-                  out[q] *= inv_coefficient[q];
+          for (unsigned int q = 0; q < dofs_per_component; ++q)
+            out[q] *= inv_coefficient[q];
 
-              evaluator.template hessians<1, false, false>(out, out);
-            }
-          else
-            {
-              for (unsigned int q = 0; q < dofs_per_component; ++q)
-                out[q] *= inv_coefficient[q];
-            }
+          if (dim > 2)
+            evaluator.template hessians<2, false, false>(out, out);
+          if (dim > 1)
+            evaluator.template hessians<1, false, false>(out, out);
           evaluator.template hessians<0, false, false>(out, out);
 
           inv_coefficient += shift_coefficient;
