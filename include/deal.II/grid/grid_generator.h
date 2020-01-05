@@ -100,8 +100,7 @@ namespace GridGenerator
    *
    * The @p vertices argument contains a vector with all d+1 vertices of the
    * simplex. They must be given in an order such that the vectors from the
-   * first vertex to each of the others form a right-handed system. And I am
-   * not happy about the discrimination involved here.
+   * first vertex to each of the others form a right-handed system.
    *
    * The meshes generated in two and three dimensions are
    *
