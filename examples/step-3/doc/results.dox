@@ -225,7 +225,7 @@ suggestions:
 <h3>Using the %HDF5 Library to output the solution and additional data</h3>
 %HDF5 is a commonly used format that can be read by many scripting languages (e.g. R or Python). Here are some 
 insights on what is possible.
-<h4> Changing the output from .gnuplot to .h5:</h4>
+<h4> Changing the output from .vtk to .h5:</h4>
 To fully make use of the automation we first need to introduce a private variable for the number of 
 global refinement steps <code>unsigned int n_refinement_steps </code>, which will be used for the output filename. 
 In <code>make_grid()</code> we replace <code>triangulation.refine_global(5);</code> with
