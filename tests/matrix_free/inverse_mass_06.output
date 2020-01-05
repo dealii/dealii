@@ -1,0 +1,16 @@
+
+DEAL:2d::Testing FE_DGQ<2>(1)
+DEAL:2d::Norm of difference: 2.21e-13
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(2)
+DEAL:2d::Norm of difference: 1.29e-13
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(4)
+DEAL:2d::Norm of difference: 4.60e-14
+DEAL:2d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference: 3.27e-14
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference: 1.03e-15
+DEAL:3d::
