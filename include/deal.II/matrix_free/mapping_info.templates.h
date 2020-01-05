@@ -2049,7 +2049,9 @@ namespace internal
                   fe_val.reinit(cell_it, face);
 
                   const bool is_local =
-                    cell_it->is_locally_owned() &&
+                    (cell_it->active() ?
+                       cell_it->is_locally_owned() :
+                       cell_it->is_locally_owned_on_level()) &&
                     (!cell_it->at_boundary(face) ||
                      (cell_it->at_boundary(face) &&
                       cell_it->has_periodic_neighbor(face)));
