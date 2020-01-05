@@ -4203,7 +4203,7 @@ namespace internal
 
       /* --------------------- class ParallelDistributed ---------------- */
 
-#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
 
       namespace
       {
@@ -4463,7 +4463,7 @@ namespace internal
                    ++c)
                 {
                   const auto temp =
-                    CellId(quadrant_data_to_send[idx][c].first, 0, NULL)
+                    CellId(quadrant_data_to_send[idx][c].first, 0, nullptr)
                       .to_cell(tria);
 
                   typename DoFHandlerType::level_cell_iterator cell(
@@ -4524,7 +4524,7 @@ namespace internal
                 receive_dof_numbers_and_indices.data();
               for (const auto &it : quadrants)
                 {
-                  const auto temp = CellId(it.first, 0, NULL).to_cell(tria);
+                  const auto temp = CellId(it.first, 0, nullptr).to_cell(tria);
 
                   typename DoFHandlerType::level_cell_iterator cell(
                     &tria, 0, temp->index(), &dof_handler);
@@ -4777,7 +4777,7 @@ namespace internal
 
       } // namespace
 
-#endif // DEAL_II_WITH_P4EST
+#endif // DEAL_II_WITH_MPI
 
 
 
@@ -4793,7 +4793,7 @@ namespace internal
       NumberCache
       ParallelDistributed<DoFHandlerType>::distribute_dofs() const
       {
-#ifndef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
@@ -5021,7 +5021,7 @@ namespace internal
         }
 #  endif // DEBUG
         return number_cache;
-#endif   // DEAL_II_WITH_P4EST
+#endif   // DEAL_II_WITH_MPI
       }
 
 
@@ -5030,7 +5030,7 @@ namespace internal
       std::vector<NumberCache>
       ParallelDistributed<DoFHandlerType>::distribute_mg_dofs() const
       {
-#ifndef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNotImplemented());
         return std::vector<NumberCache>();
 #else
@@ -5252,7 +5252,7 @@ namespace internal
 
         return number_caches;
 
-#endif // DEAL_II_WITH_P4EST
+#endif // DEAL_II_WITH_MPI
       }
 
 
@@ -5266,7 +5266,7 @@ namespace internal
         Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
                ExcInternalError());
 
-#ifndef DEAL_II_WITH_P4EST
+#ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNotImplemented());
         return NumberCache();
 #else

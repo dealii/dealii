@@ -7417,11 +7417,11 @@ FEFaceEvaluation<dim,
                             .normal_vectors[offsets];
   this->jacobian = &this->matrix_info->get_mapping_info()
                       .face_data_by_cells[this->quad_no]
-                      .jacobians[!this->is_minus_face][offsets];
+                      .jacobians[!this->is_interior_face][offsets];
   this->normal_x_jacobian =
     &this->matrix_info->get_mapping_info()
        .face_data_by_cells[this->quad_no]
-       .normals_times_jacobians[!this->is_minus_face][offsets];
+       .normals_times_jacobians[!this->is_interior_face][offsets];
 
 #  ifdef DEBUG
   this->dof_values_initialized     = false;
