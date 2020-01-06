@@ -96,8 +96,13 @@ namespace GridGenerator
              const bool                    colorize = false);
 
   /**
-   * \brief Create a d-simplex (a triangle in 2d, a tetrahedron in 3d) with
-   * (d+1) corners made out of (d+1) cells.
+   * Create a $d$-<a href="https://en.wikipedia.org/wiki/Simplex">simplex</a>
+   * (i.e., a triangle in 2d, or a tetrahedron in 3d) with
+   * $d+1$ corners. Since deal.II does not support triangular and
+   * tetrahedral cells, the simplex described by the input arguments
+   * is subdivided into quadrilaterals and hexahedra by adding edge,
+   * face, and simplex midpoints, resulting in a mesh that consists of
+   * $d+1$ quadrilateral or hexahedral cells.
    *
    * The @p vertices argument contains a vector with all d+1 vertices defining
    * the corners of the simplex. They must be given in an order such that the
