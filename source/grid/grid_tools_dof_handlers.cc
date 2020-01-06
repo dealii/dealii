@@ -747,9 +747,7 @@ namespace GridTools
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
         for (unsigned int v = 0;
              v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
@@ -759,9 +757,7 @@ namespace GridTools
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain
     // These comprise the halo layer
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // False predicate --> Potential halo cell
         for (unsigned int v = 0;
              v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
@@ -908,9 +904,7 @@ namespace GridTools
 
     // Find the cells for which the predicate is false
     // These are the cells which are around the predicate subdomain
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // Negation of predicate --> Not Part of subdomain
         {
           for (unsigned int v = 0;
@@ -930,9 +924,7 @@ namespace GridTools
 
     // Find the cells that conform to the predicate
     // but share a vertex with the cell not in the predicate subdomain
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Potential boundary cell of the
                            // subdomain
         for (unsigned int v = 0;
@@ -993,9 +985,7 @@ namespace GridTools
     // cells that are inside the extended bounding box but are not part of the
     // predicate subdomain are possible candidates to be within the distance to
     // the boundary cells of the predicate subdomain.
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       {
         // Ignore all the cells that are in the predicate subdomain
         if (predicate(cell))
@@ -1092,9 +1082,7 @@ namespace GridTools
     Point<MeshType::space_dimension> maxp, minp;
 
     // initialize minp and maxp with the first predicate cell center
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell))
         {
           minp = cell->center();
@@ -1104,9 +1092,7 @@ namespace GridTools
 
     // Run through all the cells to check if it belongs to predicate domain,
     // if it belongs to the predicate domain, extend the bounding box.
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
         for (unsigned int v = 0;
              v < GeometryInfo<MeshType::dimension>::vertices_per_cell;

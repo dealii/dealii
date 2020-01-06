@@ -290,15 +290,13 @@ namespace DoFTools
 
       // then loop over all cells and do the work
       std::vector<types::global_dof_index> indices;
-      for (typename DoFHandlerType::active_cell_iterator c = dof.begin_active();
-           c != dof.end();
-           ++c)
-        if (c->is_locally_owned())
+      for (const auto &cell : dof.active_cell_iterators())
+        if (cell->is_locally_owned())
           {
-            const unsigned int fe_index      = c->active_fe_index();
-            const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
+            const unsigned int fe_index      = cell->active_fe_index();
+            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
             indices.resize(dofs_per_cell);
-            c->get_dof_indices(indices);
+            cell->get_dof_indices(indices);
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               if (dof.locally_owned_dofs().is_element(indices[i]))
                 dofs_by_block[dof.locally_owned_dofs().index_within_set(

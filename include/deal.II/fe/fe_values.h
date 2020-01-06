@@ -2020,9 +2020,7 @@ namespace FEValuesViews
  *
  * @code
  * FEValues values (mapping, finite_element, quadrature, flags);
- * for (cell = dof_handler.begin_active();
- *      cell != dof_handler.end();
- *      ++cell)
+ * for (const auto &cell : dof_handler.active_cell_iterators())
  *   {
  *     values.reinit(cell);
  *     for (unsigned int q=0; q<quadrature.size(); ++q)

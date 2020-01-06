@@ -333,10 +333,8 @@ namespace internal
                ++level)
             {
               types::global_dof_index counter = 0;
-              typename HpDoFHandler<dim, spacedim>::active_cell_iterator
-                cell = dof_handler.begin_active(level),
-                endc = dof_handler.end_active(level);
-              for (; cell != endc; ++cell)
+              for (const auto &cell :
+                   dof_handler.active_cell_iterators_on_level(level))
                 if (!cell->has_children() && !cell->is_artificial())
                   counter += cell->get_fe().template n_dofs_per_object<dim>();
 
@@ -348,7 +346,8 @@ namespace internal
               // number of active, non-artificial cells (because these are
               // exactly the cells on which we do something)
               unsigned int n_active_non_artificial_cells = 0;
-              for (cell = dof_handler.begin_active(level); cell != endc; ++cell)
+              for (const auto &cell :
+                   dof_handler.active_cell_iterators_on_level(level))
                 if (!cell->has_children() && !cell->is_artificial())
                   ++n_active_non_artificial_cells;
 

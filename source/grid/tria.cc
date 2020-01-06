@@ -10726,8 +10726,7 @@ Triangulation<dim, spacedim>::create_triangulation(
           // is disconnected that we
           // still get all cells
           if (next_round.size() == 0)
-            for (active_cell_iterator cell = begin_active(); cell != end();
-                 ++cell)
+            for (const auto &cell : this->active_cell_iterators())
               if (cell->user_flag_set() == false)
                 {
                   next_round.push_back(cell);
@@ -10753,7 +10752,7 @@ Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
   AssertThrow(dim + 1 == spacedim,
               ExcMessage("Only works for dim == spacedim-1"));
-  for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     cell->set_direction_flag(!cell->direction_flag());
 }
 

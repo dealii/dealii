@@ -9670,14 +9670,13 @@ namespace VectorTools
                                quadrature,
                                UpdateFlags(update_JxW_values | update_values));
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator cell;
-    std::vector<Vector<Number>>                              values(
+    std::vector<Vector<Number>> values(
       quadrature.size(), Vector<Number>(dof.get_fe(0).n_components()));
 
     Number                                            mean = Number();
     typename numbers::NumberTraits<Number>::real_type area = 0.;
     // Compute mean value
-    for (cell = dof.begin_active(); cell != dof.end(); ++cell)
+    for (const auto &cell : dof.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe.reinit(cell);

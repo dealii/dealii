@@ -125,11 +125,8 @@ namespace MGTools
     user_flags_triangulation.save_user_flags(old_flags);
     user_flags_triangulation.clear_user_flags();
 
-    const typename DoFHandler<dim, spacedim>::cell_iterator end =
-      dofs.end(level);
-    typename DoFHandler<dim, spacedim>::active_cell_iterator cell;
-    std::vector<types::global_dof_index>                     cell_indices;
-    std::vector<types::global_dof_index>                     neighbor_indices;
+    std::vector<types::global_dof_index> cell_indices;
+    std::vector<types::global_dof_index> neighbor_indices;
 
     // We loop over cells and go from
     // cells to lower dimensional
@@ -138,7 +135,7 @@ namespace MGTools
     // unknown number of cells may
     // share an object of dimension
     // smaller than dim-1.
-    for (cell = dofs.begin(level); cell != end; ++cell)
+    for (const auto &cell : dofs.cell_iterators_on_level(level))
       {
         const FiniteElement<dim> &fe = cell->get_fe();
         cell_indices.resize(fe.dofs_per_cell);
@@ -310,11 +307,8 @@ namespace MGTools
     user_flags_triangulation.save_user_flags(old_flags);
     user_flags_triangulation.clear_user_flags();
 
-    const typename DoFHandler<dim, spacedim>::cell_iterator end =
-      dofs.end(level);
-    typename DoFHandler<dim, spacedim>::active_cell_iterator cell;
-    std::vector<types::global_dof_index>                     cell_indices;
-    std::vector<types::global_dof_index>                     neighbor_indices;
+    std::vector<types::global_dof_index> cell_indices;
+    std::vector<types::global_dof_index> neighbor_indices;
 
     // We have to translate the
     // couplings from components to
@@ -332,7 +326,7 @@ namespace MGTools
     // unknown number of cells may
     // share an object of dimension
     // smaller than dim-1.
-    for (cell = dofs.begin_active(); cell != end; ++cell)
+    for (const auto &cell : dofs.cell_iterators_on_level(level))
       {
         const FiniteElement<dim> &fe       = cell->get_fe();
         const unsigned int        fe_index = cell->active_fe_index();
