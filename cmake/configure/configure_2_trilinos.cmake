@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-        Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
+        Amesos Epetra Ifpack AztecOO Teuchos ML
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -110,7 +110,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     IF(DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI)
       MESSAGE(STATUS "Incompatible configuration settings: "
         "MPI must be enabled to use both Trilinos and PETSc, as both libraries "
-      	"provide mutually incompatible MPI stubs."
+        "provide mutually incompatible MPI stubs."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
@@ -171,7 +171,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       #
       # Check for modules.
       #
-      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra Zoltan)
+      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra MueLu Zoltan)
         ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
