@@ -96,13 +96,15 @@ namespace GridGenerator
              const bool                    colorize = false);
 
   /**
-   * \brief %Triangulation of a d-simplex with (d+1) vertices and mesh cells.
+   * \brief Create a d-simplex (a triangle in 2d, a tetrahedron in 3d) with
+   * (d+1) corners made out of (d+1) cells.
    *
-   * The @p vertices argument contains a vector with all d+1 vertices of the
-   * simplex. They must be given in an order such that the vectors from the
-   * first vertex to each of the others form a right-handed system.
+   * The @p vertices argument contains a vector with all d+1 vertices defining
+   * the corners of the simplex. They must be given in an order such that the
+   * vectors from the first vertex to each of the others form a right-handed
+   * system.
    *
-   * The meshes generated in two and three dimensions are
+   * The meshes generated in two and three dimensions are:
    *
    * @image html simplex_2d.png
    * @image html simplex_3d.png
@@ -116,7 +118,6 @@ namespace GridGenerator
    * <tt>Triangulation@<3,3@></tt>.
    *
    * @author Guido Kanschat
-   * @date 2015
    */
   template <int dim>
   void
@@ -322,7 +323,6 @@ namespace GridGenerator
    *
    * @param holes Positive number of holes in each of the dim directions.
    * @author Guido Kanschat
-   * @date 2015
    */
   template <int dim, int spacedim>
   void
@@ -841,13 +841,12 @@ namespace GridGenerator
    * zero, and then the legs are numbered starting at one (see
    * @ref GlossColorization "the glossary entry on colorization").
    *
-   * Examples in two and three dimensions are
+   * Examples in two and three dimensions are:
    *
    * @image html hyper_cross_2d.png
    * @image html hyper_cross_3d.png
    *
    * @author Guido Kanschat
-   * @date 2015
    */
   template <int dim, int spacedim>
   void
