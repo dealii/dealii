@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 // more fine-grained solution
 namespace
 {
-  Threads::Mutex coefficients_lock;
+  std::mutex coefficients_lock;
 }
 
 
