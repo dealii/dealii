@@ -246,6 +246,43 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDIF()
 
+    IF(DEAL_II_TRILINOS_WITH_MUELU)
+      #
+      # Check if MueLu is actually usable.
+      #
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <MueLu_CreateEpetraPreconditioner.hpp>
+        int
+        main()
+        {
+          Epetra_CrsMatrix *matrix;
+          const auto teuchos_wrapped_matrix = Teuchos::rcp(matrix, false);	
+          Teuchos::ParameterList parameters;
+          MueLu::CreateEpetraPreconditioner(teuchos_wrapped_matrix, parameters);
+          return 0;
+        }
+        "
+        TRILINOS_MUELU_IS_FUNCTIONAL
+        )
+
+      RESET_CMAKE_REQUIRED()
+
+      IF(NOT TRILINOS_MUELU_IS_FUNCTIONAL)
+        MESSAGE(
+          STATUS
+          "MueLu was found but is not usable through Epetra! Disabling MueLu support."
+          )
+        SET(DEAL_II_TRILINOS_WITH_MUELU OFF)
+      ENDIF()
+    ENDIF()
+
     IF(${DEAL_II_TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
