@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test extract_index_set.
+// Test ParticleHandler::locally_relevant_ids().
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
