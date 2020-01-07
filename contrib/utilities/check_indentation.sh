@@ -34,6 +34,6 @@ else
 	echo "Running indentation test on Pull Request #${TRAVIS_PULL_REQUEST}"
 fi
 
-./contrib/utilities/indent-all
+./contrib/utilities/indent-all || exit $?
 git diff
 git diff-files --quiet 
