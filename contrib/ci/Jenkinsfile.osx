@@ -84,7 +84,7 @@ pipeline
         {
           steps
           {
-            timeout(time: 1, unit: 'HOURS')
+            timeout(time: 2, unit: 'HOURS')
             {
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
