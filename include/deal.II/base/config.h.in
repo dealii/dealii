@@ -230,17 +230,6 @@
       DEAL_II_P4EST_VERSION_PATCH) \
     >=  \
     (major)*1000000 + (minor)*10000 + (subminor)*100 + (patch))
-#else
-  // p4est up to 0.3.4.1 didn't define P4EST_VERSION_*. since
-  // we didn't supports anything before 0.3.4, we assume 0.3.4
-  // This means that we can't use the new features in 0.3.4.1
-#  define DEAL_II_P4EST_VERSION_GTE(major,minor,subminor,patch) \
-  ((0 * 1000000 + \
-    3 * 10000 + \
-    4 * 100 + \
-    0) \
-    >=  \
-    (major)*1000000 + (minor)*10000 + (subminor)*100 + (patch))
 #endif
 
 /*
