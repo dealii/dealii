@@ -120,13 +120,10 @@ suggestions:
   (here 1e-12) of -1 and 1. Try this immediately after calling
   GridGenerator::hyper_cube(), as before:
   @code
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-        for (auto &face : cell->face_iterators())
-          if ((std::fabs(face->center()(1) - (-1.0)) < 1e-12) ||
-              (std::fabs(face->center()(1) - (1.0)) < 1e-12))
-            face->set_boundary_id(1);
-    }
+  for (auto &face : triangulation.active_face_iterators())
+     if (std::fabs(face->center()(1) - (-1.0)) < 1e-12 || 
+         std::fabs(face->center()(1) - (1.0)) < 1e-12)
+         face->set_boundary_id(1);
   @endcode
   Although this code is significantly longer than before, it is useful for
   complex geometries, as it does not require knowledge of face labels.
