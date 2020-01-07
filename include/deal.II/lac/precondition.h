@@ -1210,7 +1210,7 @@ private:
    * A mutex to avoid that multiple vmult() invocations by different threads
    * overwrite the temporary vectors.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 
   /**
    * Initializes the factors theta and delta based on an eigenvalue

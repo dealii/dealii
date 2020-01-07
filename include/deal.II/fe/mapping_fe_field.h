@@ -634,7 +634,7 @@ private:
   /**
    * A variable to guard access to the fe_values variable.
    */
-  mutable Threads::Mutex fe_values_mutex;
+  mutable std::mutex fe_values_mutex;
 
   void
   compute_data(const UpdateFlags      update_flags,

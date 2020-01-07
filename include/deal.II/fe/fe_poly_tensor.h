@@ -492,7 +492,7 @@ protected:
   /**
    * A mutex to be used to guard access to the variables below.
    */
-  mutable Threads::Mutex cache_mutex;
+  mutable std::mutex cache_mutex;
 
   /**
    * If a shape function is computed at a single point, we must compute all of

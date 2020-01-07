@@ -462,7 +462,7 @@ private:
    * Mutex to synchronize access to internal data of this object from multiple
    * threads.
    */
-  static Threads::Mutex mutex;
+  static std::mutex mutex;
 };
 
 

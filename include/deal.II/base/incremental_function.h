@@ -120,7 +120,7 @@ namespace Functions
     /**
      * Thread mutex for supporting evaluation in multi-threaded contexts.
      */
-    mutable Threads::Mutex mutex;
+    mutable std::mutex mutex;
   };
 
 } // namespace Functions

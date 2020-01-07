@@ -1231,7 +1231,7 @@ private:
   /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 
   friend class FE_Enriched<dim, spacedim>;
 };

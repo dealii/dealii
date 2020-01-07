@@ -1393,7 +1393,7 @@ namespace LinearAlgebra
        * update_ghost_values functions give reasonable results also when used
        * with several threads.
        */
-      mutable Threads::Mutex mutex;
+      mutable std::mutex mutex;
 
       /**
        * A helper function that clears the compress_requests and
