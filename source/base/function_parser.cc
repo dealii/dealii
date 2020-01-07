@@ -22,8 +22,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/random.hpp>
-
 #include <cmath>
 #include <map>
 
