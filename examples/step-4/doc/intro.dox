@@ -90,7 +90,7 @@ The same can be done with member variables. Consider the following
 function, which might in turn call the above one:
 @code
   template <int dim>
-  void make_grid_and_dofs (Triangulation<dim> &triangulation)
+  void make_grid (Triangulation<dim> &triangulation)
   {
     make_grid (triangulation);
 
