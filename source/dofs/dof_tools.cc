@@ -1900,13 +1900,15 @@ namespace DoFTools
     } // namespace
   }   // namespace internal
 
+
+
   template <typename DoFHandlerType>
   void
   count_dofs_per_component(
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
-    bool                                  only_once,
-    std::vector<unsigned int>             target_component)
+    const bool                            only_once,
+    const std::vector<unsigned int> &     target_component_)
   {
     const unsigned int n_components = dof_handler.get_fe(0).n_components();
 
@@ -1916,6 +1918,7 @@ namespace DoFTools
 
     // If the empty vector was given as default argument, set up this
     // vector as identity.
+    std::vector<unsigned int> target_component = target_component_;
     if (target_component.size() == 0)
       {
         target_component.resize(n_components);
