@@ -19,8 +19,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/quadrature.h>
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -162,6 +165,87 @@ namespace Particles
         StaticMappingQ1<dim, spacedim>::mapping,
       const unsigned int random_number_seed = 5432);
 
+
+    /**
+     * A function that generates particles at the locations of the support
+     * points of a DoFHandler, possibly based on a different Triangulation with
+     * respect to the one used to construct the ParticleHandler.
+     * The total number of particles that is added to the @p particle_handler object is
+     * the number of dofs of the DoFHandler that is passed that are within the
+     * triangulation and whose components are within the ComponentMask.
+     * This function uses insert_global_particles and consequently may induce
+     * considerable mpi communication overhead.
+     *
+     * @param[in] dof_handler A DOF handler that may live on another
+     * triangulation that is used to establsh the positions of the particles.
+     *
+     * @param[in] A vector that contains all the bounding boxes for all
+     * processors. This vector can be established by first using
+     * 'GridTools::compute_mesh_predicate_bounding_box()' and gathering all the
+     * bounding boxes using 'Utilities::MPI::all_gather().
+     *
+     * @param[in,out] particle_handler The particle handler that will take
+     * ownership of the generated particles. The particles that are generated
+     * will be appended to the particles currently owned by the particle
+     * handler.
+     *
+     * @param[in] mapping An optional mapping object that is used to map
+     * the DOF locations. If no mapping is provided a MappingQ1 is assumed.
+     *
+     * @param[in] components Component mask that decides which subset of the
+     * support points of the dof_handler are used to generate the particles.
+     *
+     * @author Bruno Blais, Luca Heltai, 2019
+     */
+    template <int dim, int spacedim = dim>
+    void
+    dof_support_points(const DoFHandler<dim, spacedim> &dof_handler,
+                       const std::vector<std::vector<BoundingBox<spacedim>>>
+                         &                             global_bounding_boxes,
+                       ParticleHandler<dim, spacedim> &particle_handler,
+                       const Mapping<dim, spacedim> &  mapping =
+                         StaticMappingQ1<dim, spacedim>::mapping,
+                       const ComponentMask &components = ComponentMask());
+
+    /**
+     * A function that generates particles at the locations of the quadrature
+     * points of a Triangulation. This Triangulation can be different
+     * from the one used to construct the ParticleHandler.
+     * The total number of particles that is added to the @p particle_handler object is the
+     * number of cells multiplied by the number of particle reference locations
+     * which are generally constructed using a quadrature.
+     * This function uses insert_global_particles and consequently may
+     * induce considerable mpi communication overhead.
+     *
+     * @param[in] triangulation The possibly non-matching triangulation which is
+     * used to insert the particles into the domain.
+     *
+     * @param[in] quadrature A quadrature whose reference location are used to
+     * insert the particles within the cells.
+     *
+     * @param[in] global_bounding_boxes A vector that contains all the bounding
+     * boxes for all processors. This vector can be established by first using
+     * 'GridTools::compute_mesh_predicate_bounding_box()' and gathering all the
+     * bounding boxes using 'Utilities::MPI::all_gather.
+     *
+     * @param[in,out] particle_handler The particle handler that will take
+     * ownership of the generated particles.
+     *
+     * @param[in] mapping An optional mapping object that is used to map
+     * the quadrature locations. If no mapping is provided a MappingQ1 is
+     * assumed.
+     *
+     * @author Bruno Blais, Luca Heltai, 2019
+     */
+    template <int dim, int spacedim = dim>
+    void
+    quadrature_points(const Triangulation<dim, spacedim> &particle_tria,
+                      const Quadrature<dim> &             quadrature,
+                      const std::vector<std::vector<BoundingBox<spacedim>>>
+                        &                             global_bounding_boxes,
+                      ParticleHandler<dim, spacedim> &particle_handler,
+                      const Mapping<dim, spacedim> &  mapping =
+                        StaticMappingQ1<dim, spacedim>::mapping);
   } // namespace Generators
 } // namespace Particles
 

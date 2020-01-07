@@ -51,6 +51,29 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
           const unsigned int random_number_seed);
+
+        template void
+        dof_support_points<deal_II_dimension, deal_II_space_dimension>(
+          const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_dof_handler,
+          const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
+            &global_bounding_boxes,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const ComponentMask &components);
+
+        template void
+        quadrature_points<deal_II_dimension, deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension>
+            &                                  particle_tria,
+          const Quadrature<deal_II_dimension> &quadrature,
+          const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
+            &global_bounding_boxes,
+          ParticleHandler<deal_II_dimension, deal_II_space_dimension>
+            &particle_handler,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+
       \}
     \}
 #endif
