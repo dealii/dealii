@@ -2262,7 +2262,7 @@ namespace DoFTools
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     const bool                            vector_valued_once = false,
-    std::vector<unsigned int>             target_component   = {});
+    const std::vector<unsigned int> &     target_component   = {});
 
   /**
    * Count the degrees of freedom in each block. This function is similar to
