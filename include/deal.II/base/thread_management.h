@@ -1824,6 +1824,21 @@ namespace Threads
       return *this;
     }
 
+
+    /**
+     * Return how many tasks have been put into this group. This
+     * function does not distinguish how many of these tasks have
+     * already run and have finished, are still waiting to be
+     * scheduled to a CPU resource, or are currently running. Tasks
+     * that have been joined already are also still counted.
+     */
+    std::size_t
+    size() const
+    {
+      return tasks.size();
+    }
+
+
     /**
      * Wait for all tasks in the collection to finish. It is not a problem if
      * some of them have already been waited for, i.e. you may call this
