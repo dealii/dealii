@@ -118,7 +118,7 @@ private:
 // simply be omitted for scalar functions.
 //
 // Function objects are used in lots of places in the library (for example, in
-// step-2 we used a Functions::ZeroFunction instance as an argument to
+// step-3 we used a Functions::ZeroFunction instance as an argument to
 // VectorTools::interpolate_boundary_values) and this is the first tutorial
 // where we define a new class that inherits from Function. Since we only ever
 // call Function::value(), we could get away with just a plain function (and
