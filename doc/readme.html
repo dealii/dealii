@@ -179,7 +179,8 @@
   make --jobs=4 install
   make test
     </pre>
-    One should usually use one job for each processor core on the machine.
+    One should usually use one job for each processor core on the
+    machine.
 
     <p>
         These steps compile, link, install the deal.II library, and run a few consistency checks. The whole process should take between a few minutes and an hour, depending on your machine.
@@ -209,6 +210,17 @@
 
         <li> If you are changing part of the <acronym>deal.II</acronym> code itself, you can re-compile the library using only the last two commands above in the previously created build directory. It is also possible to change the configuration used in this
             directory by calling <code>cmake</code> a second time, possibly with different arguments. However, this sometimes leads to surprising results and you may not get exactly what you were hoping for. For more information, see <a href="users/cmake.html">here</a>.
+        </li>
+
+        <li>
+          Compilers require a lot of memory. If your machine has many
+          cores but not so much memory, then using <code>-jN</code>
+          with a large <code>N</code> might lead to situations where
+          not enough memory is available for all compilers, and this
+          typically manifests as an "internal compiler error" or a
+          segmentation fault. If that happens, just
+          reduce <code>N</code> and type the <code>make install</code>
+          command again.
         </li>
     </ul>
 
