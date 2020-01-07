@@ -672,8 +672,8 @@ int
 main()
 {
   initlog();
-  deallog.get_file_stream().precision(4);
-  deallog << std::setprecision(4);
+  deallog.get_file_stream().precision(5);
+  deallog << std::setprecision(5);
 
   try
     {
