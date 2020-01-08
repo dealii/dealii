@@ -5229,15 +5229,17 @@ namespace DataOutBase
         ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
          (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
       if (n_metadata > 0)
-        out << "FIELD FieldData " << n_metadata << "\n";
+        {
+          out << "FIELD FieldData " << n_metadata << "\n";
 
-      if (flags.cycle != std::numeric_limits<unsigned int>::min())
-        {
-          out << "CYCLE 1 1 int\n" << flags.cycle << "\n";
-        }
-      if (flags.time != std::numeric_limits<double>::min())
-        {
-          out << "TIME 1 1 double\n" << flags.time << "\n";
+          if (flags.cycle != std::numeric_limits<unsigned int>::min())
+            {
+              out << "CYCLE 1 1 int\n" << flags.cycle << "\n";
+            }
+          if (flags.time != std::numeric_limits<double>::min())
+            {
+              out << "TIME 1 1 double\n" << flags.time << "\n";
+            }
         }
     }
 
