@@ -70,7 +70,20 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &,
         const std::vector<unsigned int> &);
-        
+
+      template unsigned int
+      count_dofs_on_patch<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const std::vector<
+          DoFHandler<deal_II_dimension,
+                     deal_II_space_dimension>::active_cell_iterator> &patch);
+
+      template std::vector<types::global_dof_index>
+      get_dofs_on_patch<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const std::vector<
+          DoFHandler<deal_II_dimension,
+                     deal_II_space_dimension>::active_cell_iterator> &patch);
+
       // extract_dofs(): Deprecated versions that return information through
       // the last argument
       template void
@@ -563,35 +576,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
         const ComponentMask &);
 
-
-      template unsigned int
-      count_dofs_on_patch<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const std::vector<
-          DoFHandler<deal_II_dimension,
-                     deal_II_space_dimension>::active_cell_iterator> &patch);
-
-      template std::vector<types::global_dof_index>
-      get_dofs_on_patch<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const std::vector<
-          DoFHandler<deal_II_dimension,
-                     deal_II_space_dimension>::active_cell_iterator> &patch);
-
-      template unsigned int
-      count_dofs_on_patch<
-        hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const std::vector<
-          hp::DoFHandler<deal_II_dimension,
-                         deal_II_space_dimension>::active_cell_iterator>
-          &patch);
-
-      template std::vector<types::global_dof_index>
-      get_dofs_on_patch<
-        hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const std::vector<
-          hp::DoFHandler<deal_II_dimension,
-                         deal_II_space_dimension>::active_cell_iterator>
-          &patch);
 
       // extract_level_dofs() for ComponentMask and BlockMask
       template void
