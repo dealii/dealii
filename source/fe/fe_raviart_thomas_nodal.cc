@@ -278,10 +278,8 @@ FE_RaviartThomasNodal<dim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // The first degrees of freedom are
   // on the faces and each face has

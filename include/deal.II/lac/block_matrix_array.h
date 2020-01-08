@@ -568,8 +568,8 @@ BlockMatrixArray<number, BlockVectorType>::enter(const MatrixType &matrix,
                                                  number            prefix,
                                                  bool              transpose)
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(col < n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(col, n_block_cols());
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
 }
 

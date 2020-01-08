@@ -276,8 +276,7 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
 
       for (unsigned int i = 0; i < target_component.size(); ++i)
         {
-          Assert(i < target_component.size(),
-                 ExcIndexRange(i, 0, target_component.size()));
+          AssertIndexRange(i, target_component.size());
         }
     }
   // Do the same for the multilevel
@@ -297,8 +296,7 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
 
       for (unsigned int i = 0; i < mg_target_component.size(); ++i)
         {
-          Assert(i < mg_target_component.size(),
-                 ExcIndexRange(i, 0, mg_target_component.size()));
+          AssertIndexRange(i, mg_target_component.size());
         }
     }
 

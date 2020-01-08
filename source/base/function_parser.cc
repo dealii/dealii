@@ -277,8 +277,7 @@ FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
   Assert(initialized == true, ExcNotInitialized());
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  AssertIndexRange(component, this->n_components);
 
   // initialize the parser if that hasn't happened yet on the current thread
   if (fp.get().size() == 0)

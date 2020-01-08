@@ -47,7 +47,7 @@ template <>
 std::array<unsigned int, 1>
 PolynomialSpace<1>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   return {{index_map[i]}};
 }
 
@@ -57,7 +57,7 @@ template <>
 std::array<unsigned int, 2>
 PolynomialSpace<2>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not
@@ -83,7 +83,7 @@ template <>
 std::array<unsigned int, 3>
 PolynomialSpace<3>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  AssertIndexRange(i, index_map.size());
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not

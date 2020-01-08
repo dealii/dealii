@@ -45,8 +45,7 @@ namespace internal
         std::vector<unsigned int> out(in.size());
         for (unsigned int i = 0; i < in.size(); ++i)
           {
-            Assert(in[i] < out.size(),
-                   dealii::ExcIndexRange(in[i], 0, out.size()));
+            AssertIndexRange(in[i], out.size());
             out[in[i]] = i;
           }
         return out;
@@ -206,10 +205,7 @@ FE_Q_Hierarchical<dim>::get_prolongation_matrix(
     ExcMessage(
       "Prolongation matrices are only available for isotropic refinement!"));
 
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   return this->prolongation[refinement_case - 1][child];
 }
@@ -2143,10 +2139,8 @@ bool
 FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int shape_index,
                                           const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<1>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<1>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<1>::faces_per_cell);
 
 
   // in 1d, things are simple. since
@@ -2166,10 +2160,8 @@ bool
 FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
                                             const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // first, special-case interior
   // shape functions, since they

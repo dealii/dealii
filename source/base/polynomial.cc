@@ -754,11 +754,10 @@ namespace Polynomials
                                             const unsigned int   support_point,
                                             std::vector<double> &a)
   {
-    Assert(support_point < n + 1, ExcIndexRange(support_point, 0, n + 1));
+    AssertIndexRange(support_point, n + 1);
 
     unsigned int n_functions = n + 1;
-    Assert(support_point < n_functions,
-           ExcIndexRange(support_point, 0, n_functions));
+    AssertIndexRange(support_point, n_functions);
     double const *x = nullptr;
 
     switch (n)

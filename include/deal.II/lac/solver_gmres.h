@@ -553,7 +553,7 @@ namespace internal
     inline VectorType &TmpVectors<VectorType>::
                        operator[](const unsigned int i) const
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
 
       Assert(data[i] != nullptr, ExcNotInitialized());
       return *data[i];
@@ -566,7 +566,7 @@ namespace internal
     TmpVectors<VectorType>::operator()(const unsigned int i,
                                        const VectorType & temp)
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));

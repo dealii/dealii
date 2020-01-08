@@ -4185,8 +4185,7 @@ template <int dim, int spacedim>
 inline bool
 Triangulation<dim, spacedim>::vertex_used(const unsigned int index) const
 {
-  Assert(index < vertices_used.size(),
-         ExcIndexRange(index, 0, vertices_used.size()));
+  AssertIndexRange(index, vertices_used.size());
   return vertices_used[index];
 }
 

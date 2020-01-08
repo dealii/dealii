@@ -5493,63 +5493,58 @@ namespace GridGenerator
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
+    AssertIndexRange(n, 5);
 
-    if (n <= 5)
+    // These are for the two lower squares
+    const double d = outer_radius / std::sqrt(2.0);
+    const double a = inner_radius / std::sqrt(2.0);
+    // These are for the two upper square
+    const double b = a / 2.0;
+    const double c = d / 2.0;
+    // And so are these
+    const double hb = inner_radius * std::sqrt(3.0) / 2.0;
+    const double hc = outer_radius * std::sqrt(3.0) / 2.0;
+
+    Point<3> vertices[16] = {
+      center + Point<3>(0, d, -d),
+      center + Point<3>(0, -d, -d),
+      center + Point<3>(0, a, -a),
+      center + Point<3>(0, -a, -a),
+      center + Point<3>(0, a, a),
+      center + Point<3>(0, -a, a),
+      center + Point<3>(0, d, d),
+      center + Point<3>(0, -d, d),
+
+      center + Point<3>(hc, c, -c),
+      center + Point<3>(hc, -c, -c),
+      center + Point<3>(hb, b, -b),
+      center + Point<3>(hb, -b, -b),
+      center + Point<3>(hb, b, b),
+      center + Point<3>(hb, -b, b),
+      center + Point<3>(hc, c, c),
+      center + Point<3>(hc, -c, c),
+    };
+
+    int cell_vertices[5][8] = {{0, 1, 8, 9, 2, 3, 10, 11},
+                               {0, 2, 8, 10, 6, 4, 14, 12},
+                               {1, 7, 9, 15, 3, 5, 11, 13},
+                               {6, 4, 14, 12, 7, 5, 15, 13},
+                               {8, 10, 9, 11, 14, 12, 15, 13}};
+
+    std::vector<CellData<3>> cells(5, CellData<3>());
+
+    for (unsigned int i = 0; i < 5; ++i)
       {
-        // These are for the two lower squares
-        const double d = outer_radius / std::sqrt(2.0);
-        const double a = inner_radius / std::sqrt(2.0);
-        // These are for the two upper square
-        const double b = a / 2.0;
-        const double c = d / 2.0;
-        // And so are these
-        const double hb = inner_radius * std::sqrt(3.0) / 2.0;
-        const double hc = outer_radius * std::sqrt(3.0) / 2.0;
-
-        Point<3> vertices[16] = {
-          center + Point<3>(0, d, -d),
-          center + Point<3>(0, -d, -d),
-          center + Point<3>(0, a, -a),
-          center + Point<3>(0, -a, -a),
-          center + Point<3>(0, a, a),
-          center + Point<3>(0, -a, a),
-          center + Point<3>(0, d, d),
-          center + Point<3>(0, -d, d),
-
-          center + Point<3>(hc, c, -c),
-          center + Point<3>(hc, -c, -c),
-          center + Point<3>(hb, b, -b),
-          center + Point<3>(hb, -b, -b),
-          center + Point<3>(hb, b, b),
-          center + Point<3>(hb, -b, b),
-          center + Point<3>(hc, c, c),
-          center + Point<3>(hc, -c, c),
-        };
-
-        int cell_vertices[5][8] = {{0, 1, 8, 9, 2, 3, 10, 11},
-                                   {0, 2, 8, 10, 6, 4, 14, 12},
-                                   {1, 7, 9, 15, 3, 5, 11, 13},
-                                   {6, 4, 14, 12, 7, 5, 15, 13},
-                                   {8, 10, 9, 11, 14, 12, 15, 13}};
-
-        std::vector<CellData<3>> cells(5, CellData<3>());
-
-        for (unsigned int i = 0; i < 5; ++i)
-          {
-            for (unsigned int j = 0; j < 8; ++j)
-              cells[i].vertices[j] = cell_vertices[i][j];
-            cells[i].material_id = 0;
-          }
-
-        tria.create_triangulation(std::vector<Point<3>>(std::begin(vertices),
-                                                        std::end(vertices)),
-                                  cells,
-                                  SubCellData()); // no boundary information
+        for (unsigned int j = 0; j < 8; ++j)
+          cells[i].vertices[j] = cell_vertices[i][j];
+        cells[i].material_id = 0;
       }
-    else
-      {
-        Assert(false, ExcIndexRange(n, 0, 5));
-      }
+
+    tria.create_triangulation(std::vector<Point<3>>(std::begin(vertices),
+                                                    std::end(vertices)),
+                              cells,
+                              SubCellData()); // no boundary information
+
     if (colorize)
       {
         // We want to use a standard boundary description where

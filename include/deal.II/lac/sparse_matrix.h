@@ -2417,7 +2417,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return const_iterator(this, cols->rowstart[r]);
 }
@@ -2428,7 +2428,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return const_iterator(this, cols->rowstart[r + 1]);
 }
@@ -2439,7 +2439,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return iterator(this, cols->rowstart[r]);
 }
@@ -2450,7 +2450,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::end(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return iterator(this, cols->rowstart[r + 1]);
 }

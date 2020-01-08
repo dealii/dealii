@@ -10277,8 +10277,7 @@ Triangulation<dim, spacedim>::set_manifold(
   const types::manifold_id       m_number,
   const Manifold<dim, spacedim> &manifold_object)
 {
-  Assert(m_number < numbers::flat_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
+  AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   manifold[m_number] = manifold_object.clone();
 }
@@ -10297,8 +10296,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
 {
-  Assert(m_number < numbers::flat_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
+  AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   // delete the entry located at number.
   manifold.erase(m_number);
@@ -12756,7 +12754,7 @@ template <>
 unsigned int
 Triangulation<1, 1>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -12775,7 +12773,7 @@ template <>
 unsigned int
 Triangulation<1, 2>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -12793,7 +12791,7 @@ template <>
 unsigned int
 Triangulation<1, 3>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -12828,8 +12826,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_lines(const unsigned int level) const
 {
-  Assert(level < number_cache.n_lines_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
+  AssertIndexRange(level, number_cache.n_lines_level.size());
   Assert(dim == 1, ExcFacesHaveNoLevel());
   return number_cache.n_lines_level[level];
 }
@@ -12847,8 +12844,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_active_lines(const unsigned int level) const
 {
-  Assert(level < number_cache.n_lines_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
+  AssertIndexRange(level, number_cache.n_lines_level.size());
   Assert(dim == 1, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_lines_level[level];
@@ -13014,8 +13010,7 @@ unsigned int
 Triangulation<dim, spacedim>::n_quads(const unsigned int level) const
 {
   Assert(dim == 2, ExcFacesHaveNoLevel());
-  Assert(level < number_cache.n_quads_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
+  AssertIndexRange(level, number_cache.n_quads_level.size());
   return number_cache.n_quads_level[level];
 }
 
@@ -13025,7 +13020,7 @@ template <>
 unsigned int
 Triangulation<2, 2>::n_raw_quads(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -13035,7 +13030,7 @@ template <>
 unsigned int
 Triangulation<2, 3>::n_raw_quads(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -13081,8 +13076,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_active_quads(const unsigned int level) const
 {
-  Assert(level < number_cache.n_quads_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
+  AssertIndexRange(level, number_cache.n_quads_level.size());
   Assert(dim == 2, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_quads_level[level];
@@ -13145,8 +13139,7 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_hexs(const unsigned int level) const
 {
-  Assert(level < number_cache.n_hexes_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
+  AssertIndexRange(level, number_cache.n_hexes_level.size());
 
   return number_cache.n_hexes_level[level];
 }
@@ -13157,7 +13150,7 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  AssertIndexRange(level, n_levels());
   return levels[level]->cells.cells.size();
 }
 
@@ -13175,8 +13168,7 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_active_hexs(const unsigned int level) const
 {
-  Assert(level < number_cache.n_hexes_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
+  AssertIndexRange(level, number_cache.n_hexes_level.size());
 
   return number_cache.n_active_hexes_level[level];
 }

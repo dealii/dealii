@@ -834,7 +834,7 @@ namespace Utilities
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        AssertIndexRange(permutation[i], n);
         out[permutation[i]] = i;
       }
 
@@ -870,7 +870,7 @@ namespace Utilities
 
     for (unsigned long long int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        AssertIndexRange(permutation[i], n);
         out[permutation[i]] = i;
       }
 
@@ -909,7 +909,7 @@ namespace Utilities
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        AssertIndexRange(permutation[i], n);
         out[permutation[i]] = i;
       }
 

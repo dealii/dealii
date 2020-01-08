@@ -9662,8 +9662,7 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
     Assert(v.size() == dof.n_dofs(),
            ExcDimensionMismatch(v.size(), dof.n_dofs()));
-    Assert(component < dof.get_fe(0).n_components(),
-           ExcIndexRange(component, 0, dof.get_fe(0).n_components()));
+    AssertIndexRange(component, dof.get_fe(0).n_components());
 
     FEValues<dim, spacedim> fe(mapping,
                                dof.get_fe(),

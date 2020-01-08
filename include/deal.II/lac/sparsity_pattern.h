@@ -1463,7 +1463,7 @@ SparsityPatternBase::end() const
 inline SparsityPatternBase::iterator
 SparsityPatternBase::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   return {this, rowstart[r]};
 }
@@ -1473,7 +1473,7 @@ SparsityPatternBase::begin(const size_type r) const
 inline SparsityPatternBase::iterator
 SparsityPatternBase::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
 
   return {this, rowstart[r + 1]};
 }
@@ -1515,7 +1515,7 @@ SparsityPattern::stores_only_added_elements() const
 inline unsigned int
 SparsityPatternBase::row_length(const size_type row) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
+  AssertIndexRange(row, rows);
   return rowstart[row + 1] - rowstart[row];
 }
 
@@ -1525,8 +1525,8 @@ inline SparsityPattern::size_type
 SparsityPatternBase::column_number(const size_type    row,
                                    const unsigned int index) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(index, row_length(row));
 
   return colnums[rowstart[row] + index];
 }
@@ -1709,7 +1709,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
         {
           const size_type col =
             internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-          Assert(col < n_cols, ExcIndexRange(col, 0, n_cols));
+          AssertIndexRange(col, n_cols);
 
           if ((col != row) || !is_square)
             *cols++ = col;

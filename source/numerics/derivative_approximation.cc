@@ -985,8 +985,7 @@ namespace DerivativeApproximation
              ExcVectorLengthVsNActiveCells(
                derivative_norm.size(),
                dof_handler.get_triangulation().n_active_cells()));
-      Assert(component < dof_handler.get_fe(0).n_components(),
-             ExcIndexRange(component, 0, dof_handler.get_fe(0).n_components()));
+      AssertIndexRange(component, dof_handler.get_fe(0).n_components());
 
       using Iterators = std::tuple<
         TriaActiveIterator<

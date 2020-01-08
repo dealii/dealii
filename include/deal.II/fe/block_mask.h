@@ -264,8 +264,7 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert(block_index < block_mask.size(),
-             ExcIndexRange(block_index, 0, block_mask.size()));
+      AssertIndexRange(block_index, block_mask.size());
       return block_mask[block_index];
     }
 }

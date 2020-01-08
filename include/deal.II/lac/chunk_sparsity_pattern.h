@@ -1123,7 +1123,7 @@ ChunkSparsityPattern::end() const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r};
 }
 
@@ -1132,7 +1132,7 @@ ChunkSparsityPattern::begin(const size_type r) const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r + 1};
 }
 

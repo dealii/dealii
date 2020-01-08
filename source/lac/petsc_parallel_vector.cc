@@ -254,7 +254,7 @@ namespace PETScWrappers
     Vector::create_vector(const size_type n, const size_type local_size)
     {
       (void)n;
-      Assert(local_size <= n, ExcIndexRange(local_size, 0, n));
+      AssertIndexRange(local_size, n + 1);
       ghosted = false;
 
       const PetscErrorCode ierr =
@@ -272,7 +272,7 @@ namespace PETScWrappers
                           const IndexSet &ghostnodes)
     {
       (void)n;
-      Assert(local_size <= n, ExcIndexRange(local_size, 0, n));
+      AssertIndexRange(local_size, n + 1);
       ghosted       = true;
       ghost_indices = ghostnodes;
 

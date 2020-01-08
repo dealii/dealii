@@ -757,10 +757,7 @@ MappingQGeneric<dim, spacedim>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -771,10 +768,7 @@ inline double &
 MappingQGeneric<dim, spacedim>::InternalData::shape(const unsigned int qpoint,
                                                     const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -785,10 +779,8 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -800,10 +792,8 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -814,11 +804,8 @@ MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -829,11 +816,8 @@ MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -843,10 +827,8 @@ MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -857,10 +839,8 @@ MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -871,11 +851,8 @@ MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -886,11 +863,8 @@ MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 

@@ -635,7 +635,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].p;
     }
 
@@ -648,7 +648,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].p;
     }
 
@@ -661,7 +661,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].i;
     }
 
@@ -670,7 +670,7 @@ namespace internal
     inline void
     TriaObjects<G>::clear_user_data(const unsigned int i)
     {
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       user_data[i].i = 0;
     }
 
@@ -692,7 +692,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].i;
     }
 
@@ -768,13 +768,10 @@ namespace internal
     TriaObjectsHex::face_orientation(const unsigned int cell,
                                      const unsigned int face) const
     {
-      Assert(cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0,
-                           cell,
-                           face_orientations.size() /
-                             GeometryInfo<3>::faces_per_cell));
-      Assert(face < GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
+      AssertIndexRange(cell,
+                       face_orientations.size() /
+                         GeometryInfo<3>::faces_per_cell);
+      AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
 
       return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face];
     }

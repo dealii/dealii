@@ -139,7 +139,7 @@ FE_DGPNonparametric<dim, spacedim>::shape_value(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return 0;
@@ -157,8 +157,8 @@ FE_DGPNonparametric<dim, spacedim>::shape_value_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, 1);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return 0;
@@ -173,7 +173,7 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<1, dim>();
@@ -190,8 +190,8 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, 1);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<1, dim>();
@@ -206,7 +206,7 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_grad(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<2, dim>();
@@ -224,8 +224,8 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_grad_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, 1);
   AssertThrow(false,
               (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<2, dim>();

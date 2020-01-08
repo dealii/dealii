@@ -686,7 +686,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   // general one, you should use the
   // one with the Point<2> in the
   // constructor.
-  Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
+  AssertIndexRange(vertex_index, 4);
 
   // Start with the gauss quadrature formula on the (u,v) reference
   // element.
@@ -698,7 +698,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   // quadrilateral. We are planning to do this also for the support
   // points of arbitrary FE_Q elements, to allow the use of this
   // class in boundary element programs with higher order mappings.
-  Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
+  AssertIndexRange(vertex_index, 4);
 
   // We create only the first one. All other pieces are rotation of
   // this one.

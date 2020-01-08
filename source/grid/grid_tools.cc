@@ -1601,8 +1601,7 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
+    AssertIndexRange(vertex, mesh.get_triangulation().n_vertices());
     Assert(mesh.get_triangulation().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 

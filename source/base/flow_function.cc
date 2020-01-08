@@ -103,7 +103,7 @@ namespace Functions
   FlowFunction<dim>::value(const Point<dim> & point,
                            const unsigned int comp) const
   {
-    Assert(comp < dim + 1, ExcIndexRange(comp, 0, dim + 1));
+    AssertIndexRange(comp, dim + 1);
     const unsigned int      n_points = 1;
     std::vector<Point<dim>> points(1);
     points[0] = point;

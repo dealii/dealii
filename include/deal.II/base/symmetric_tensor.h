@@ -103,7 +103,7 @@ namespace internal
                                                          const unsigned int     new_index,
                                                          const unsigned int     position)
     {
-      Assert(position < 2, ExcIndexRange(position, 0, 2));
+      AssertIndexRange(position, 2);
 
       if (position == 0)
         return {new_index, numbers::invalid_unsigned_int};
@@ -124,7 +124,7 @@ namespace internal
                                                          const unsigned int     new_index,
                                                          const unsigned int     position)
     {
-      Assert(position < 4, ExcIndexRange(position, 0, 4));
+      AssertIndexRange(position, 4);
 
       switch (position)
         {
@@ -1957,7 +1957,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
                                                operator()(const TableIndices<rank_> &indices)
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    AssertIndexRange(indices[r], dimension);
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -1969,7 +1969,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
                                                      operator()(const TableIndices<rank_> &indices) const
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    AssertIndexRange(indices[r], dimension);
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -2248,8 +2248,8 @@ namespace internal
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE unsigned int
     component_to_unrolled_index(const TableIndices<2> &indices)
     {
-      Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-      Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+      AssertIndexRange(indices[0], dim);
+      AssertIndexRange(indices[1], dim);
 
       switch (dim)
         {

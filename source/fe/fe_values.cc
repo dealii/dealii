@@ -147,8 +147,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(component < fe.n_components(),
-           ExcIndexRange(component, 0, fe.n_components()));
+    AssertIndexRange(component, fe.n_components());
 
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
@@ -193,10 +192,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(first_vector_component + spacedim - 1 < fe.n_components(),
-           ExcIndexRange(first_vector_component + spacedim - 1,
-                         0,
-                         fe.n_components()));
+    AssertIndexRange(first_vector_component + spacedim - 1, fe.n_components());
 
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
@@ -364,10 +360,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(first_tensor_component + dim * dim - 1 < fe.n_components(),
-           ExcIndexRange(first_tensor_component + dim * dim - 1,
-                         0,
-                         fe.n_components()));
+    AssertIndexRange(first_tensor_component + dim * dim - 1, fe.n_components());
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
     // at the time we get here, so re-create it all
@@ -4767,8 +4760,7 @@ FEFaceValues<dim, spacedim>::reinit(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
 
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
@@ -4803,8 +4795,7 @@ FEFaceValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no)
 {
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
@@ -4970,8 +4961,7 @@ FESubfaceValues<dim, spacedim>::reinit(
            static_cast<const FiniteElementData<dim> &>(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
   // We would like to check for subface_no < cell->face(face_no)->n_children(),
   // but unfortunately the current function is also called for
   // faces without children (see tests/fe/mapping.cc). Therefore,
@@ -5027,25 +5017,17 @@ FESubfaceValues<dim, spacedim>::reinit(
   const unsigned int                                          face_no,
   const unsigned int                                          subface_no)
 {
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
   // We would like to check for subface_no < cell->face(face_no)->n_children(),
   // but unfortunately the current function is also called for
   // faces without children for periodic faces, which have hanging nodes on
-  // the other side (see
-  // include/deal.II/matrix_free/mapping_info.templates.h).
-  Assert(subface_no < cell->face(face_no)->n_children() ||
-           (cell->has_periodic_neighbor(face_no) &&
-            subface_no < cell->periodic_neighbor(face_no)
-                           ->face(cell->periodic_neighbor_face_no(face_no))
-                           ->n_children()),
-         ExcIndexRange(subface_no,
-                       0,
-                       (cell->has_periodic_neighbor(face_no) ?
-                          cell->periodic_neighbor(face_no)
-                            ->face(cell->periodic_neighbor_face_no(face_no))
-                            ->n_children() :
-                          cell->face(face_no)->n_children())));
+  // the other side (see include/deal.II/matrix_free/mapping_info.templates.h).
+  AssertIndexRange(subface_no,
+                   (cell->has_periodic_neighbor(face_no) ?
+                      cell->periodic_neighbor(face_no)
+                        ->face(cell->periodic_neighbor_face_no(face_no))
+                        ->n_children() :
+                      cell->face(face_no)->n_children()));
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<

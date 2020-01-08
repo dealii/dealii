@@ -1175,7 +1175,7 @@ template <typename Number>
 inline Number
 Vector<Number>::operator()(const size_type i) const
 {
-  Assert(i < size(), ExcIndexRange(i, 0, size()));
+  AssertIndexRange(i, size());
   return values[i];
 }
 
@@ -1185,7 +1185,7 @@ template <typename Number>
 inline Number &
 Vector<Number>::operator()(const size_type i)
 {
-  Assert(i < size(), ExcIndexRangeType<size_type>(i, 0, size()));
+  AssertIndexRange(i, size());
   return values[i];
 }
 
@@ -1284,7 +1284,7 @@ Vector<Number>::add(const size_type    n_indices,
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
-      Assert(indices[i] < size(), ExcIndexRange(indices[i], 0, size()));
+      AssertIndexRange(indices[i], size());
       Assert(
         numbers::is_finite(values[i]),
         ExcMessage(

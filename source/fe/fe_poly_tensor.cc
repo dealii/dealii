@@ -218,7 +218,7 @@ FE_PolyTensor<dim, spacedim>::get_mapping_kind(const unsigned int i) const
   if (single_mapping_kind())
     return mapping_kind[0];
 
-  Assert(i < mapping_kind.size(), ExcIndexRange(i, 0, mapping_kind.size()));
+  AssertIndexRange(i, mapping_kind.size());
   return mapping_kind[i];
 }
 
@@ -243,8 +243,8 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
@@ -288,8 +288,8 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
@@ -334,8 +334,8 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 

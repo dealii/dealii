@@ -356,8 +356,8 @@ DynamicSparsityPattern::max_entries_per_row() const
 bool
 DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
   Assert(
     rowset.size() == 0 || rowset.is_element(i),
     ExcMessage(
@@ -657,14 +657,8 @@ DynamicSparsityPattern::column_index(
   const DynamicSparsityPattern::size_type row,
   const DynamicSparsityPattern::size_type col) const
 {
-  Assert(row < n_rows(),
-         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
-                                                              0,
-                                                              n_rows()));
-  Assert(col < n_cols(),
-         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
-                                                              0,
-                                                              n_cols()));
+  AssertIndexRange(row, n_rows());
+  AssertIndexRange(col, n_cols());
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const DynamicSparsityPattern::size_type local_row =

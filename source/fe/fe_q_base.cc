@@ -1034,10 +1034,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  Assert(face_index < this->dofs_per_face,
-         ExcIndexRange(face_index, 0, this->dofs_per_face));
-  Assert(face < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_index, this->dofs_per_face);
+  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
 
   // TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
@@ -1172,17 +1170,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -1374,17 +1367,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -1521,10 +1509,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // in 1d, things are simple. since there is only one degree of freedom per
   // vertex in this class, the first is on vertex 0 (==face 0 in some sense),

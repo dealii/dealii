@@ -167,8 +167,7 @@ namespace internal
     inline int
     TriaObject<structdim>::face(const unsigned int i) const
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
       return faces[i];
     }
 
@@ -178,8 +177,7 @@ namespace internal
     inline void
     TriaObject<structdim>::set_face(const unsigned int i, const int index)
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
       faces[i] = index;
     }
 

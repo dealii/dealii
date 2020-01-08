@@ -104,8 +104,7 @@ namespace
     std::vector<std::vector<types::global_dof_index>> &ndofs)
   {
     const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-    Assert(selected_block < n_blocks,
-           ExcIndexRange(selected_block, 0, n_blocks));
+    AssertIndexRange(selected_block, n_blocks);
 
     std::vector<bool> selected(n_blocks, false);
     selected[selected_block] = true;

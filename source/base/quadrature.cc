@@ -1063,8 +1063,7 @@ Quadrature<dim>
 QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature,
                                   const unsigned int     child_no)
 {
-  Assert(child_no < GeometryInfo<dim>::max_children_per_cell,
-         ExcIndexRange(child_no, 0, GeometryInfo<dim>::max_children_per_cell));
+  AssertIndexRange(child_no, GeometryInfo<dim>::max_children_per_cell);
 
   const unsigned int n_q_points = quadrature.size();
 

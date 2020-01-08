@@ -1131,7 +1131,7 @@ namespace internal
     {
       // We cannot use Assert in a CUDA kernel
 #ifndef __CUDA_ARCH__
-      Assert(i < dim, ExcIndexRange(i, 0, dim));
+      AssertIndexRange(i, dim);
 #endif
       return values[i];
     }
@@ -1527,8 +1527,7 @@ template <int rank_, int dim, typename Number>
 DEAL_II_CONSTEXPR inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  Assert(i < n_independent_components,
-         ExcIndexRange(i, 0, n_independent_components));
+  AssertIndexRange(i, n_independent_components);
 
   TableIndices<rank_> indices;
 

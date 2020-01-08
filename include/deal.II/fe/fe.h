@@ -3110,8 +3110,7 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::system_to_component_index(
   const unsigned int index) const
 {
-  Assert(index < system_to_component_table.size(),
-         ExcIndexRange(index, 0, system_to_component_table.size()));
+  AssertIndexRange(index, system_to_component_table.size());
   Assert(is_primitive(index),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            index)));
@@ -3171,8 +3170,7 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_component_index(
   const unsigned int index) const
 {
-  Assert(index < face_system_to_component_table.size(),
-         ExcIndexRange(index, 0, face_system_to_component_table.size()));
+  AssertIndexRange(index, face_system_to_component_table.size());
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3201,8 +3199,7 @@ inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::system_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < system_to_base_table.size(),
-         ExcIndexRange(index, 0, system_to_base_table.size()));
+  AssertIndexRange(index, system_to_base_table.size());
   return system_to_base_table[index];
 }
 
@@ -3213,8 +3210,7 @@ inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < face_system_to_base_table.size(),
-         ExcIndexRange(index, 0, face_system_to_base_table.size()));
+  AssertIndexRange(index, face_system_to_base_table.size());
   return face_system_to_base_table[index];
 }
 
@@ -3235,8 +3231,7 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::component_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < component_to_base_table.size(),
-         ExcIndexRange(index, 0, component_to_base_table.size()));
+  AssertIndexRange(index, component_to_base_table.size());
 
   return component_to_base_table[index].first;
 }
@@ -3258,8 +3253,7 @@ inline std::pair<unsigned int, types::global_dof_index>
 FiniteElement<dim, spacedim>::system_to_block_index(
   const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  AssertIndexRange(index, this->dofs_per_cell);
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
@@ -3276,8 +3270,7 @@ inline bool
 FiniteElement<dim, spacedim>::restriction_is_additive(
   const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  AssertIndexRange(index, this->dofs_per_cell);
   return restriction_is_additive_flags[index];
 }
 
@@ -3287,7 +3280,7 @@ template <int dim, int spacedim>
 inline const ComponentMask &
 FiniteElement<dim, spacedim>::get_nonzero_components(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   return nonzero_components[i];
 }
 
@@ -3297,7 +3290,7 @@ template <int dim, int spacedim>
 inline unsigned int
 FiniteElement<dim, spacedim>::n_nonzero_components(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   return n_nonzero_components_table[i];
 }
 
@@ -3316,7 +3309,7 @@ template <int dim, int spacedim>
 inline bool
 FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
 
   // return primitivity of a shape
   // function by checking whether it
@@ -3340,8 +3333,7 @@ inline GeometryPrimitive
 FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   const unsigned int cell_dof_index) const
 {
-  Assert(cell_dof_index < this->dofs_per_cell,
-         ExcIndexRange(cell_dof_index, 0, this->dofs_per_cell));
+  AssertIndexRange(cell_dof_index, this->dofs_per_cell);
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell

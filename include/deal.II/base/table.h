@@ -2189,7 +2189,7 @@ namespace internal
     inline Accessor<N, T, C, P - 1> Accessor<N, T, C, P>::
                                     operator[](const size_type i) const
     {
-      Assert(i < table.size()[N - P], ExcIndexRange(i, 0, table.size()[N - P]));
+      AssertIndexRange(i, table.size()[N - P]);
 
       // access i-th
       // subobject. optimize on the
@@ -2397,7 +2397,7 @@ template <int N, typename T>
 inline typename TableBase<N, T>::size_type
 TableBase<N, T>::size(const unsigned int i) const
 {
-  Assert(i < N, ExcIndexRange(i, 0, N));
+  AssertIndexRange(i, N);
   return table_size[i];
 }
 

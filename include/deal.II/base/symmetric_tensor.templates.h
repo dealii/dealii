@@ -752,7 +752,7 @@ namespace internal
                          const double       rotation_angle,
                          const unsigned int axis = 0)
     {
-      Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+      AssertIndexRange(axis, 3);
 
       Tensor<2, 3> R;
       switch (axis)
