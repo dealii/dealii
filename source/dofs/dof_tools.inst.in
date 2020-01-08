@@ -43,6 +43,13 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
       DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
       const ComponentMask &                                         components);
+
+    template void DoFTools::count_dofs_per_component<
+      DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      std::vector<types::global_dof_index> &,
+      const bool,
+      const std::vector<unsigned int> &);
 #endif
   }
 
@@ -296,6 +303,7 @@ for (deal_II_dimension : DIMENSIONS)
     DoFTools::locally_relevant_dofs_per_subdomain<
       DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_handler);
+
     template std::vector<IndexSet>
     DoFTools::locally_relevant_dofs_per_subdomain<
       hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
@@ -645,23 +653,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
         std::vector<bool> &);
-
-
-      template void
-      count_dofs_per_component<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        std::vector<types::global_dof_index> &,
-        const bool,
-        const std::vector<unsigned int> &);
-
-      template void
-      count_dofs_per_component<
-        hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        std::vector<types::global_dof_index> &,
-        const bool,
-        const std::vector<unsigned int> &);
 
       template void
       make_cell_patches<deal_II_dimension, deal_II_space_dimension>(
