@@ -127,7 +127,7 @@ Step5<dim>::Step5()
 
 // @sect4{Step5::setup_system}
 
-// This is the function <code>make_grid_and_dofs</code> from the previous
+// This is the function <code>make_grid</code> from the previous
 // example, minus the generation of the grid. Everything else is unchanged:
 template <int dim>
 void Step5<dim>::setup_system()
