@@ -5157,7 +5157,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                                   const unsigned int j) const
 {
   Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
-  Assert(this->update_flags & update_hessians,
+  Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.get() != nullptr,
@@ -5194,7 +5194,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int component) const
 {
   Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
-  Assert(this->update_flags & update_hessians,
+  Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(component < fe->n_components(),
          ExcIndexRange(component, 0, fe->n_components()));
