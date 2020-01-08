@@ -70,6 +70,32 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &,
         const std::vector<unsigned int> &);
+        
+      // extract_dofs(): Deprecated versions that return information through
+      // the last argument
+      template void
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const ComponentMask &,
+        std::vector<bool> &);
+
+      template void
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const BlockMask &,
+        std::vector<bool> &);
+
+
+      // extract_dofs(): New versions that return information as an IndexSet
+      template IndexSet
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const ComponentMask &);
+
+      template IndexSet
+      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const BlockMask &);
     \}
 #endif
   }
@@ -566,54 +592,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
           hp::DoFHandler<deal_II_dimension,
                          deal_II_space_dimension>::active_cell_iterator>
           &patch);
-
-      // Deprecated versions that return information through the last
-      // argument
-      template void
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &,
-        std::vector<bool> &);
-
-      template void
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const BlockMask &,
-        std::vector<bool> &);
-
-      template void
-      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &,
-        std::vector<bool> &);
-
-      template void
-      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const BlockMask &,
-        std::vector<bool> &);
-
-
-      // New versions that return information as an IndexSet
-      template IndexSet
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &);
-
-      template IndexSet
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const BlockMask &);
-
-      template IndexSet
-      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ComponentMask &);
-
-      template IndexSet
-      extract_dofs<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const BlockMask &);
 
       // extract_level_dofs() for ComponentMask and BlockMask
       template void
