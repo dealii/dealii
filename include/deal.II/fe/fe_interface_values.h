@@ -96,9 +96,9 @@ public:
    * @param[in] face_no An integer identifying which face of the first cell the
    *   interface is on.
    * @param[in] sub_face_no An integer identifying the subface (child) of the
-   *   face identified by the previous two arguments the interface corresponds
-   *   to. If equal to numbers::invalid_unsigned_int, then the interface is
-   *   considered to be the entire face.
+   *   face (identified by the previous two arguments) that the interface
+   *   corresponds to. If equal to numbers::invalid_unsigned_int, then the
+   *   interface is considered to be the entire face.
    * @param[in] cell_neighbor An iterator to the second cell adjacent to
    *   the interface. The type of this iterator does not have to equal that
    *   of `cell`, but must be convertible to it. This allows using an
@@ -358,7 +358,7 @@ public:
                   const unsigned int component = 0) const;
 
   /**
-   * Return the jump if the gradient $[\nabla u]=\nabla u_{\text{cell0}} -
+   * Return the jump in the gradient $[\nabla u]=\nabla u_{\text{cell0}} -
    * \nabla u_{\text{cell1}}$ on the interface for the shape function @p
    * interface_dof_index at the quadrature point @p q_point of component @p
    * component.
