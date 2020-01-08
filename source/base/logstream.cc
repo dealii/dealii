@@ -28,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  Threads::Mutex log_lock;
-  Threads::Mutex write_lock;
+  std::mutex log_lock;
+  std::mutex write_lock;
 } // namespace
 
 

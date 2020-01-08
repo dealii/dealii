@@ -1280,11 +1280,11 @@ namespace FETools
       // and accessing the fe_name_map variable. make this lock local to
       // this file.
       //
-      // this and the next variable are declared static (even though
-      // they're in an anonymous namespace) in order to make icc happy
+      // This variable is declared static (even though
+      // it belongs to an internal namespace) in order to make icc happy
       // (which otherwise reports a multiply defined symbol when linking
-      // libraries for more than one space dimension together
-      static Threads::Mutex fe_name_map_lock;
+      // libraries for more than one space dimension together)
+      static std::mutex fe_name_map_lock;
 
       // This is the map used by FETools::get_fe_by_name and
       // FETools::add_fe_name. It is only accessed by functions in this

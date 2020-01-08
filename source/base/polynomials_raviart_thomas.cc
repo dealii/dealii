@@ -94,7 +94,7 @@ PolynomialsRaviartThomas<dim>::evaluate(
   // deal.II/create_mass_matrix_05)
   // will start to produce random
   // results in multithread mode
-  static Threads::Mutex       mutex;
+  static std::mutex           mutex;
   std::lock_guard<std::mutex> lock(mutex);
 
   static std::vector<double>         p_values;
