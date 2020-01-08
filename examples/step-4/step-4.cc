@@ -469,14 +469,6 @@ void Step4<dim>::solve()
 // This function also does what the respective one did in step-3. No changes
 // here for dimension independence either.
 //
-// The only difference to the previous example is that we want to write output
-// in VTK format, rather than for gnuplot. VTK format is currently the most
-// widely used one and is supported by a number of visualization programs such
-// as Visit and Paraview (for ways to obtain these programs see the ReadMe
-// file of deal.II). To write data in this format, we simply replace the
-// <code>data_out.write_gnuplot</code> call by
-// <code>data_out.write_vtk</code>.
-//
 // Since the program will run both 2d and 3d versions of the Laplace solver,
 // we use the dimension in the filename to generate distinct filenames for
 // each run (in a better program, one would check whether <code>dim</code> can
