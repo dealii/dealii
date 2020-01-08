@@ -164,16 +164,36 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
     CHECK_MPI_INTERFACE(TRILINOS ${var})
 
+    #
+    # Check which optional features of trilinos are installed.
+    #
     IF (${var})
+      #
+      # Check for modules.
+      #
       FOREACH(_optional_module EpetraExt ROL Sacado Tpetra Zoltan)
-      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
+        ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+        IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
           STRING(TOUPPER "${_optional_module}" _optional_module_upper)
           SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
-      ELSE()
+        ELSE()
           MESSAGE(STATUS "Module ${_optional_module} not found!")
-      ENDIF()
+        ENDIF()
+      ENDFOREACH()
+
+      #
+      # Check for third-party libraries (tpl).
+      #
+      FOREACH(_optional_tpl MUMPS)
+        ITEM_MATCHES(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
+        IF(_tpl_found)
+          MESSAGE(STATUS "Found ${_optional_tpl}")
+          STRING(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
+          SET(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
+        ELSE()
+          MESSAGE(STATUS "Module ${_optional_tpl} not found!")
+        ENDIF()
       ENDFOREACH()
     ENDIF()
 
