@@ -1036,27 +1036,32 @@ namespace Utilities
     };
 
     /**
-     * The task of the implementations of this class is to provide the
+     * A base class for algorithms that implement the task of coming up with
      * communication patterns to retrieve data from other processes in a
-     * dynamic-sparse way.
+     * dynamic-sparse way. In computer science, this is often called a
+     * <a href="https://en.wikipedia.org/wiki/Consensus_algorithm">consensus
+     * problem</a>.
      *
      * Dynamic-sparse means in this context:
-     * - by the time this function is called, the other processes do
-     *   not know yet that they have to answer requests
-     * - each process only has to communicate with a small subset of
-     *   processes of the MPI communicator
+     * - By the time this function is called, the other processes do
+     *   not know yet that they have to answer requests.
+     * - Each process only has to communicate with a small subset of
+     *   processes of the MPI communicator.
      *
      * Naturally, the user has to provide:
-     * - a communicator
-     * - for each rank a list of ranks of processes this process should
-     *   communicate to
-     * - a functionality to pack/unpack data to be sent/received
+     * - A communicator.
+     * - For each rank a list of ranks of processes this process should
+     *   communicate to.
+     * - Functionality to pack/unpack data to be sent/received.
      *
-     * The latter two features should be implemented in a class derived from
-     * ConsensusAlgorithmProcess.
+     * This base class only introduces a basic interface to achieve
+     * these goals, while derived classes implement different algorithms
+     * to actually compute such communication patterns.
+     * The last two features of the list above this paragraph are implemented
+     * in classes derived from ConsensusAlgorithmProcess.
      *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
      *
      * @author Peter Munch, 2019
      */
@@ -1100,9 +1105,11 @@ namespace Utilities
       const unsigned int n_procs;
     };
 
+
     /**
-     * This class implements ConsensusAlgorithm, using only point-to-point
-     * communications and a single IBarrier.
+     * This class implements a concrete algorithm for the ConsensusAlgorithm
+     * base class, using only point-to-point communications and a single
+     * IBarrier.
      *
      * @note This class closely follows the paper Hoefler, Siebert, Lumsdaine
      *       "Scalable Communication Protocols for Dynamic Sparse Data
@@ -1112,8 +1119,8 @@ namespace Utilities
      *       Isend/Irecv, where Irecv receives the answer to a request (with
      *       payload).
      *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
      *
      * @author Peter Munch, 2019
      */
@@ -1233,7 +1240,8 @@ namespace Utilities
     };
 
     /**
-     * This class implements ConsensusAlgorithm, using a two step approach. In
+     * This class implements a concrete algorithm for the ConsensusAlgorithm
+     * base class, using a two step approach. In
      * the first step the source ranks are determined and in the second step
      * a static sparse data exchange is performed.
      *
@@ -1245,13 +1253,14 @@ namespace Utilities
      *       when this process can stop waiting for requests, no IBarrier is
      *       needed.
      *
-     * @note The function compute_point_to_point_communication_pattern() is used
-     *       to determine the source processes, which implements a
-     *       PEX-algorithm from Hoefner et. al. "Scalable Communication
-     *       Protocols for Dynamic Sparse Data Exchange"
+     * @note The function
+     *       Utilities::MPI::compute_point_to_point_communication_pattern() is
+     *       used to determine the source processes, which implements a
+     *       PEX-algorithm from Hoefner et al., "Scalable Communication
+     *       Protocols for Dynamic Sparse Data Exchange".
      *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
      *
      * @author Peter Munch, 2019
      */
@@ -1345,12 +1354,12 @@ namespace Utilities
      * A class which delegates its task to other ConsensusAlgorithm
      * implementations depending on the number of processes in the
      * MPI communicator. For a small number of processes it uses
-     * ConsensusAlgorithm_PEX and for large number of processes
+     * ConsensusAlgorithm_PEX and for a large number of processes
      * ConsensusAlgorithm_NBX. The threshold depends if the program is
      * compiled in debug or release mode.
      *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
      *
      * @author Peter Munch, 2019
      */
@@ -1394,9 +1403,9 @@ namespace Utilities
      * One might think: "But we know which rank a ghost DoF belongs to based on
      * the subdomain id of the cell it is on". But this heuristic fails for DoFs
      * on interfaces between ghost cells with different subdomain_ids, or
-     * between a ghost cell and an artificial cell. Furthermore, this class
+     * between a ghost cell and an artificial cell. Furthermore, this function
      * enables a completely abstract exchange of information without the help of
-     * the grid in terms of neighbors.
+     * the mesh in terms of neighbors.
      *
      * The first argument passed to this function, @p owned_indices, must
      * uniquely partition an index space between all processes.
