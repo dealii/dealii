@@ -46,6 +46,8 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
 #endif
   }
 
+
+
 for (deal_II_dimension : DIMENSIONS)
   {
     template std::vector<unsigned int> DoFTools::make_vertex_patches(
@@ -394,36 +396,7 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
 
-
-    template void DoFTools::count_dofs_per_component<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     std::vector<types::global_dof_index> &,
-                                     const bool,
-                                     const std::vector<unsigned int> &);
-
-    template void
-    DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension>>(
-      const hp::DoFHandler<deal_II_dimension> &,
-      std::vector<types::global_dof_index> &,
-      const bool,
-      const std::vector<unsigned int> &);
-
-
 #if deal_II_dimension < 3
-    template void DoFTools::count_dofs_per_component<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
-      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::vector<types::global_dof_index> &,
-      const bool,
-      const std::vector<unsigned int> &);
-
-    template void DoFTools::count_dofs_per_component<
-      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
-      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
-      std::vector<types::global_dof_index> &,
-      const bool,
-      const std::vector<unsigned int> &);
-
     template void DoFTools::extract_level_dofs<
       DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
       const unsigned int level,
@@ -435,18 +408,6 @@ for (deal_II_dimension : DIMENSIONS)
 
 
 #if deal_II_dimension == 3
-    template void DoFTools::count_dofs_per_component<DoFHandler<1, 3>>(
-      const DoFHandler<1, 3> &,
-      std::vector<types::global_dof_index> &,
-      const bool,
-      const std::vector<unsigned int> &);
-
-    template void DoFTools::count_dofs_per_component<hp::DoFHandler<1, 3>>(
-      const hp::DoFHandler<1, 3> &,
-      std::vector<types::global_dof_index> &,
-      const bool,
-      const std::vector<unsigned int> &);
-
     template void DoFTools::extract_level_dofs<DoFHandler<1, 3>>(
       const unsigned int level,
       const DoFHandler<1, 3> &,
@@ -720,7 +681,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &);
 
+      template void
+      count_dofs_per_component<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::vector<types::global_dof_index> &,
+        const bool,
+        const std::vector<unsigned int> &);
 
+      template void
+      count_dofs_per_component<
+        hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        std::vector<types::global_dof_index> &,
+        const bool,
+        const std::vector<unsigned int> &);
 
       template void
       make_cell_patches<deal_II_dimension, deal_II_space_dimension>(
