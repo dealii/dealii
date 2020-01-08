@@ -1286,41 +1286,34 @@ namespace
 
 
   // a 2d face in 3d space
+  template <int dim>
   double
-  measure(const dealii::TriaAccessor<2, 3, 3> &accessor)
+  measure(const dealii::TriaAccessor<2, dim, 3> &accessor)
   {
-    // If the face is planar, the diagonal from vertex 0 to vertex 3,
-    // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
-    // the normal vector of P_012 and test if v_03 is orthogonal to
-    // that. If so, the face is planar and computing its area is simple.
-    const Tensor<1, 3> v01 = accessor.vertex(1) - accessor.vertex(0);
-    const Tensor<1, 3> v02 = accessor.vertex(2) - accessor.vertex(0);
+    // In general the area can be computed as
+    // 0.25*(v_0+v_1-v_2-v_3)*(v_0-v_1+v_2-v_3)
 
-    const Tensor<1, 3> normal = cross_product_3d(v01, v02);
+    const Tensor<1, 3> piece_1 = accessor.vertex(0) + accessor.vertex(1) -
+                                 accessor.vertex(2) - accessor.vertex(3);
+    const Tensor<1, 3> piece_2 = accessor.vertex(0) - accessor.vertex(1) +
+                                 accessor.vertex(2) - accessor.vertex(3);
 
-    const Tensor<1, 3> v03 = accessor.vertex(3) - accessor.vertex(0);
-
-    // check whether v03 does not lie in the plane of v01 and v02
-    // (i.e., whether the face is not planar). we do so by checking
-    // whether the triple product (v01 x v02) * v03 forms a positive
-    // volume relative to |v01|*|v02|*|v03|. the test checks the
-    // squares of these to avoid taking norms/square roots:
-    if (std::abs((v03 * normal) * (v03 * normal) /
-                 ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
-      {
-        Assert(
-          false,
-          ExcMessage(
-            "Computing the measure of a nonplanar face is not implemented!"));
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-
-    // the face is planar. then its area is 1/2 of the norm of the
-    // cross product of the two diagonals
-    const Tensor<1, 3> v12        = accessor.vertex(2) - accessor.vertex(1);
-    const Tensor<1, 3> twice_area = cross_product_3d(v03, v12);
-    return 0.5 * twice_area.norm();
+    return 0.25 * cross_product_3d(piece_1, piece_2).norm();
   }
+
+  // // a 2d cell in 3d space
+  // double
+  // measure(const dealii::TriaAccessor<2, 2, 3> &accessor)
+  // {
+  //   // In general the area can be computed as
+  //   // 0.25*(v_0+v_1-v_2-v_3)*(v_0-v_1+v_2-v_3)
+
+  //   const Tensor<1, 3> piece_1 = accessor.vertex(0) + accessor.vertex(1) -
+  //                                accessor.vertex(2) - accessor.vertex(3);
+  //   const Tensor<1, 3> piece_2 = accessor.vertex(0) - accessor.vertex(1) +
+  //                                accessor.vertex(2) - accessor.vertex(3);
+  //   return 0.25 * cross_product_3d(piece_1, piece_2).norm();
+  // }
 
 
 
