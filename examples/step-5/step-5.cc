@@ -63,7 +63,7 @@ using namespace dealii;
 // @sect3{The <code>Step5</code> class template}
 
 // The main class is mostly as in the previous example. The most visible
-// change is that the function <code>make_grid_and_dofs</code> has been
+// change is that the function <code>make_grid</code> has been
 // removed, since creating the grid is now done in the <code>run</code>
 // function and the rest of its functionality is now in
 // <code>setup_system</code>. Apart from this, everything is as before.
