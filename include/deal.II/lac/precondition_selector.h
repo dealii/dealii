@@ -91,7 +91,7 @@ class SparseMatrix;
  * @endcode
  * Now the use of the @p SolverSelector in combination with the @p
  * PreconditionSelector allows the user to select both, the solver and the
- * preconditioner, at the beginning of his program and each time the solver is
+ * preconditioner, at the beginning of their program and each time the solver is
  * started (that is several times e.g. in a nonlinear iteration) this
  * preselected solver and preconditioner is called.
  *

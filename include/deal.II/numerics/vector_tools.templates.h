@@ -7988,7 +7988,7 @@ namespace VectorTools
       {
         // we need to return double as a norm, but mean value is a complex
         // number. Panic and return real-part while warning the user that
-        // he shall never do that.
+        // they shall never do that.
         Assert(
           false,
           ExcMessage(

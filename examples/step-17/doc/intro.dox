@@ -128,7 +128,7 @@ into the mail and it will be delivered. But that's the extent to which
 you can control things. If you want the receiver to do something
 with the content of the letter, for example return to you data you want
 from over there, then two things need to happen: (i) the receiver needs
-to actually go check whether there is anything in her mailbox, and (ii) if
+to actually go check whether there is anything in their mailbox, and (ii) if
 there is, react appropriately, for example by sending data back. If you
 wait for this return message but the original receiver was distracted
 and not paying attention, then you're out of luck: you'll simply have to

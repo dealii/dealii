@@ -109,7 +109,7 @@ All entries are signed with the names of the author.
        class="class">SparseMatrix&lt;long double&gt;</code> are removed as a
        prerelease of gcc3.0 fails to compile it. Now the user of <code
        class="class">SparseMatrix&lt;long double&gt;</code> needs to include
-       <code>lac/include/lac/sparse_matrix.templates.h</code> into his
+       <code>lac/include/lac/sparse_matrix.templates.h</code> into their
        source file and to use a different compiler, e.g. gcc 2.95.2 or
        a future version of gcc3.0 (that will then hopefully be fixed).
        <br>

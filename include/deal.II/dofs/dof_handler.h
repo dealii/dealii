@@ -164,7 +164,7 @@ namespace internal
  * renumbering. Using this array, the renumber_dofs() function of the present
  * class is called, which actually performs the change from old DoF indices to
  * the ones given in the array. In some cases, however, a user may want to
- * compute her own renumbering order; in this case, one can allocate an array
+ * compute their own renumbering order; in this case, one can allocate an array
  * with one element per degree of freedom and fill it with the number that the
  * respective degree of freedom shall be assigned. This number may, for
  * example, be obtained by sorting the support points of the degrees of

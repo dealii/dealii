@@ -2745,7 +2745,7 @@ private:
  * be possible to call FEValues::reinit() with a tria iterator only; this class
  * makes this possible, but whenever one of the functions of FEValues tries to
  * call any of the functions of this class, an exception will be raised
- * reminding the user that if she wants to use these features, then the FEValues
+ * reminding the user that if they want to use these features, then the FEValues
  * object has to be reinitialized with a cell iterator that allows to extract
  * degree of freedom information.
  *

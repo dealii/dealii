@@ -9732,7 +9732,7 @@ namespace internal
         // indicate anisotropic refinemnt cases on faces. all data
         // should be cleared by now, but the information whether we
         // used indices or pointers is still present. reset it now to
-        // enable the user to use whichever he likes later on.
+        // enable the user to use whichever they like later on.
         triangulation.faces->quads.clear_user_data();
 
         // return the list with distorted children

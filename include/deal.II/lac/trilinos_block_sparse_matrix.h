@@ -142,7 +142,7 @@ namespace TrilinosWrappers
      * the sizes may be varying, the maximum number of elements per row may be
      * varying, etc. It is simpler not to reproduce the interface of the @p
      * SparsityPattern class here but rather let the user call whatever
-     * function she desires.
+     * function they desire.
      */
     void
     reinit(const size_type n_block_rows, const size_type n_block_columns);

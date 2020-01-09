@@ -246,7 +246,7 @@ namespace TrilinosWrappers
       // Otherwise, we have to check that the two vectors are already of the
       // same size, create an object for the data exchange and then insert all
       // the data. The first assertion is only a check whether the user knows
-      // what she is doing.
+      // what they are doing.
       else
         {
           Assert(omit_zeroing_entries == false,

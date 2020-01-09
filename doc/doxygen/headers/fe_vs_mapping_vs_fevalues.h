@@ -145,7 +145,7 @@
  * <h2>What to compute?</h2>
  *
  * Let's say a user wants to compute the gradients of shape functions,
- * for example to compute the integral above. Then she would initialize
+ * for example to compute the integral above. Then they would initialize
  * an FEValues object by giving the update_gradients flag (as is done
  * in basically every tutorial program, starting with step-3). What
  * this indicates is that the user expects the FEValues object to be
