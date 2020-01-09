@@ -782,7 +782,7 @@ namespace StandardExceptions
    *
    * We usually leave in these assertions even after we are confident that the
    * implementation is correct, since if someone later changes or extends the
-   * algorithm, these exceptions will indicate to him if he violates
+   * algorithm, these exceptions will indicate to them if they violate
    * assumptions that are used later in the algorithm. Furthermore, it
    * sometimes happens that an algorithm does not work in very rare corner
    * cases. These cases will then be trapped sooner or later by the exception,

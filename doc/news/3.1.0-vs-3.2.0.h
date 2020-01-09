@@ -572,7 +572,7 @@ All entries are signed with the names of the author.
        removed as a prerelease of gcc3.0 fails to compile it. A user
        of <code>SparseMatrix&lt;long double&gt;</code>
        needs now to include
-       <code>lac/include/lac/sparse_matrix.templates.h</code> into his
+       <code>lac/include/lac/sparse_matrix.templates.h</code> into their
        source file and to use an appropriate compiler, e.g. gcc2.95.2 or
        a future version of gcc3.0 (that will then hopefully be fixed).
        <br>
@@ -932,7 +932,7 @@ All entries are signed with the names of the author.
        class="member">create_mass_matrix</code> function with two
        arguments is removed, as it relied on the <code
        class="member">get_local_mass_matrix</code> function. If in
-       future the user wants to create a mass matrix he needs to use
+       future the user wants to create a mass matrix they need to use
        one of the remaining <code
        class="class">MatrixCreator</code>::<code
        class="member">create_mass_matrix</code> functions that require

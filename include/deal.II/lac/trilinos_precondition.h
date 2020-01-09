@@ -1300,7 +1300,7 @@ namespace TrilinosWrappers
        * smoothing), but not the way the solver classes expect a
        * preconditioner to work (where one ignores the content in <tt>dst</tt>
        * for the preconditioner application). The user should really know what
-       * she is doing when touching this flag.
+       * they are doing when touching this flag.
        */
       bool nonzero_starting;
     };

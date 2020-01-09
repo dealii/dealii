@@ -150,7 +150,7 @@
  * 
  * As outlined above, we have now determined the final set of things that are
  * necessary to satisfy a user's desired pieces of information as conveyed by
- * the update flags she provided. This information will then typically be queried
+ * the update flags they provided. This information will then typically be queried
  * on every cell the user code visits in a subsequent integration loop.
  * 
  * Given that many of the things mappings or finite element classes compute are
