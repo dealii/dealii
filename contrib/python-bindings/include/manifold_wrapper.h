@@ -18,8 +18,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/function.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <boost/python.hpp>
 
+#include <function_wrapper.h>
 #include <point_wrapper.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -45,22 +50,38 @@ namespace python
     ~ManifoldWrapper();
 
     /**
-     * Create SphericalManifold
+     * Create SphericalManifold.
      */
     void
     create_spherical(const PointWrapper center);
 
     /**
-     * Create PolarManifold
+     * Create PolarManifold.
      */
     void
     create_polar(const PointWrapper center);
 
     /**
-     * Create CylindricalManifold
+     * Create CylindricalManifold.
      */
     void
     create_cylindrical(const int axis = 0, const double tolerance = 1e-10);
+
+    /**
+     * Create FunctionManifold with string expressions for the push
+     * forward and pull back functions.
+     */
+    void
+    create_function_string(const std::string &push_forward,
+                           const std::string &pull_back);
+
+    /**
+     * Create FunctionManifold with python the push forward and
+     * pull back functions.
+     */
+    void
+    create_function(boost::python::object &push_forward,
+                    boost::python::object &pull_back);
 
     /**
      * Return pointer to an underlying manifold object

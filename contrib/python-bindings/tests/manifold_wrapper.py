@@ -67,5 +67,46 @@ class TestManifoldWrapperBall(unittest.TestCase):
 
         self.assertTrue(abs(volume - 4./3. * math.pi) / (4./3.*math.pi) < 2e-2)
 
+class TestManifoldWrapperFunction(unittest.TestCase):
+
+    def setUp(self):
+        self.manifold_1 = Manifold(dim = 2, spacedim = 2)
+        self.manifold_1.create_function("x^2;y^2", "sqrt(x);sqrt(y)")
+
+        self.manifold_2 = Manifold(dim = 2, spacedim = 2)
+        self.manifold_2.create_function(lambda p: [p[0]**2., p[1]**2.],\
+                                        lambda p: [math.sqrt(p[0]), math.sqrt(p[1])] )
+
+        self.tria_reference = Triangulation('2D')
+        self.tria_reference.read('manifold_wrapper.vtk', 'vtk')
+
+    def test_manifold_str(self):
+        self.triangulation = Triangulation('2D')
+        p_center = Point([0., 0., 0.])
+        self.triangulation.generate_hyper_cube()
+        self.triangulation.reset_manifold(number = 0)
+        self.triangulation.set_manifold(number = 0, manifold = self.manifold_2)
+        for cell in self.triangulation.active_cells():
+            cell.set_all_manifold_ids(0)
+
+        self.triangulation.refine_global(2)
+
+        for cell_ref, cell in zip(self.tria_reference.active_cells(), self.triangulation.active_cells()):
+            self.assertTrue(abs(cell_ref.measure() - cell.measure()) < 1e-8)
+
+    def test_manifold_lambda(self):
+        self.triangulation = Triangulation('2D')
+        p_center = Point([0., 0., 0.])
+        self.triangulation.generate_hyper_cube()
+        self.triangulation.reset_manifold(number = 0)
+        self.triangulation.set_manifold(number = 0, manifold = self.manifold_2)
+        for cell in self.triangulation.active_cells():
+            cell.set_all_manifold_ids(0)
+
+        self.triangulation.refine_global(2)
+
+        for cell_ref, cell in zip(self.tria_reference.active_cells(), self.triangulation.active_cells()):
+            self.assertTrue(abs(cell_ref.measure() - cell.measure()) < 1e-8)
+
 if __name__ == '__main__':
     unittest.main()

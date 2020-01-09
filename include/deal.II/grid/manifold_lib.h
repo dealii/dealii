@@ -601,6 +601,23 @@ public:
     const double               tolerance   = 1e-10);
 
   /**
+   * Same as previous, except this constructor takes ownership of the Function
+   * objects passed as first and second argument, and is ultimately in charge
+   * of deleting the pointers when the FunctionManifold object is destroyed.
+   *
+   * This constructor is useful because it allows creating function objects at
+   * the place of calling the constructor without having to name and later
+   * delete these objects. This allows the following idiom:
+   * FunctionManifold<dim> manifold(std_cxx14::make_unique<MyPushForward>(...),
+   *                                std_cxx14::make_unique<MyPullBack>(...));
+   */
+  FunctionManifold(
+    std::unique_ptr<Function<chartdim>> push_forward_function,
+    std::unique_ptr<Function<spacedim>> pull_back_function,
+    const Tensor<1, chartdim> &         periodicity = Tensor<1, chartdim>(),
+    const double                        tolerance   = 1e-10);
+
+  /**
    * Expressions constructor. Takes the expressions of the push_forward
    * function of spacedim components, and of the pull_back function of @p
    * chartdim components. See the documentation of the base class
@@ -711,7 +728,7 @@ private:
    * destructor will delete the function objects pointed to be the two
    * pointers.
    */
-  const bool owns_pointers;
+  bool owns_pointers;
 
   /**
    * The expression used to construct the push_forward function.
