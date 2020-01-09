@@ -1291,29 +1291,36 @@ namespace
   measure(const dealii::TriaAccessor<2, dim, 3> &accessor)
   {
     // In general the area can be computed as
-    // 0.25*(v_0+v_1-v_2-v_3)*(v_0-v_1+v_2-v_3)
+    // the integral of the cross product of the two tangential vectors
 
-    const Tensor<1, 3> piece_1 = accessor.vertex(0) + accessor.vertex(1) -
-                                 accessor.vertex(2) - accessor.vertex(3);
-    const Tensor<1, 3> piece_2 = accessor.vertex(0) - accessor.vertex(1) +
-                                 accessor.vertex(2) - accessor.vertex(3);
+    // If we assume a bilinear patch parametrized in u and v we get that
+    // t_u = (v_1 - v_0) + v (v_3 - v_2 - v_1 + v_0)
+    // t_v = (v_2 - v_0) + u (v_3 - v_2 - v_1 + v_0)
+    // So t_u x t_v = (v_1 - v_0) x (v_2 - v_0) + u (v_1 - v_0) x (v_3 - v_2 -
+    // v_1 + v_0) + v (v_3 - v_2 - v_1 + v_0) x (v_2 - v_0) t_u x t_v = w_1 + u
+    // w_2 + v w_3 we can integrate the square norm (t_u x t_v) * (t_u x t_v) =
+    // w_1*w_1 + u^2 w_2*w_2 + v^2 w_3*w_3 + 2u w_1*w_2 + 2v w_1*w_3 + 2uv
+    // w_2*w_3 in u and v getting (between zero and one) w_1*w_1 + 1/3 w_2*w_2 +
+    // 1/3 w_3*w_3 + w_1*w_2 + w_1*w_3 + 1/2 w_2*w_3
 
-    return 0.25 * cross_product_3d(piece_1, piece_2).norm();
+    const Tensor<1, 3> w_1 =
+      cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                       accessor.vertex(2) - accessor.vertex(0));
+    const Tensor<1, 3> w_2 =
+      cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                       accessor.vertex(3) - accessor.vertex(2) -
+                         accessor.vertex(1) + accessor.vertex(0));
+    const Tensor<1, 3> w_3 =
+      cross_product_3d(accessor.vertex(3) - accessor.vertex(2) -
+                         accessor.vertex(1) + accessor.vertex(0),
+                       accessor.vertex(2) - accessor.vertex(0));
+
+
+    return std::sqrt(scalar_product(w_1, w_1) + scalar_product(w_1, w_2) +
+                     scalar_product(w_1, w_3) + 0.5 * scalar_product(w_2, w_3) +
+                     1. / 3 * scalar_product(w_2, w_2) +
+                     1. / 3 * scalar_product(w_3, w_3));
   }
-
-  // // a 2d cell in 3d space
-  // double
-  // measure(const dealii::TriaAccessor<2, 2, 3> &accessor)
-  // {
-  //   // In general the area can be computed as
-  //   // 0.25*(v_0+v_1-v_2-v_3)*(v_0-v_1+v_2-v_3)
-
-  //   const Tensor<1, 3> piece_1 = accessor.vertex(0) + accessor.vertex(1) -
-  //                                accessor.vertex(2) - accessor.vertex(3);
-  //   const Tensor<1, 3> piece_2 = accessor.vertex(0) - accessor.vertex(1) +
-  //                                accessor.vertex(2) - accessor.vertex(3);
-  //   return 0.25 * cross_product_3d(piece_1, piece_2).norm();
-  // }
 
 
 
