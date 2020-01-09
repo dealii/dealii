@@ -1065,6 +1065,9 @@ Tensor<0, dim, Number>::serialize(Archive &ar, const unsigned int)
 }
 
 
+template <int dim, typename Number>
+constexpr unsigned int Tensor<0, dim, Number>::n_independent_components;
+
 
 /*-------------------- Inline functions: Tensor<rank,dim> --------------------*/
 
@@ -1565,6 +1568,10 @@ Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
   ar &values;
 }
+
+
+template <int rank, int dim, typename Number>
+constexpr unsigned int Tensor<rank, dim, Number>::n_independent_components;
 
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
