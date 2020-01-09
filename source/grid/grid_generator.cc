@@ -3305,7 +3305,7 @@ namespace GridGenerator
     if (with_padding)
       {
         // hyper_cube_with_cylindrical_hole will have 2 cells along
-        // each face, so he element size is outer_radius
+        // each face, so the element size is outer_radius
 
         auto add_sizes = [](std::vector<double> &step_sizes,
                             const double         padding,
