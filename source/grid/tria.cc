@@ -276,7 +276,7 @@ namespace
         if (cell_will_be_coarsened(neighbor))
           return false;
         else
-          // if the neighor is refined, then he
+          // if the neighbor is refined, then it
           // is also refined at our current
           // face. He will stay so without
           // coarsening, so return true in that
@@ -288,7 +288,7 @@ namespace
       }
 
     // now, the neighbor is not refined, but
-    // perhaps he will be
+    // perhaps it will be
     const RefinementCase<dim> nb_ref_flag = neighbor->refine_flag_set();
     if (nb_ref_flag != RefinementCase<dim>::no_refinement)
       {
@@ -382,7 +382,7 @@ namespace
                 Assert(dim == 3, ExcInternalError());
                 // In that case, however, no
                 // matter what the neighbor
-                // does, he won't be finer
+                // does, it won't be finer
                 // after the next refinement
                 // step.
                 return false;
