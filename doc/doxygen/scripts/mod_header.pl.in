@@ -43,6 +43,6 @@ if (eof)
 {
     print '<!--Extra macros for MathJax:-->', "\n";
     print '<div style="display:none">', "\n";
-    print '\(\newcommand{\dealcoloneq}{\mathrel{\vcenter{:}}=}\)', "\n";
+    print '\(\newcommand{\dealcoloneq}{\mathrel{\vcenter{:}=}}\)', "\n";
     print '</div>', "\n";
 }
