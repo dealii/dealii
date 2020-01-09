@@ -900,7 +900,7 @@ namespace Step56
 
         // Transfer operators between levels
         MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-        mg_transfer.build_matrices(velocity_dof_handler);
+        mg_transfer.build(velocity_dof_handler);
 
         // Setup coarse grid solver
         FullMatrix<double> coarse_matrix;

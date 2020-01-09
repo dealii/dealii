@@ -56,13 +56,13 @@ namespace internal
      */
     template <int dim, typename number, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<dealii::Vector<number>> &v)
     {
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
-          unsigned int n = mg_dof.n_dofs(level);
+          unsigned int n = dof_handler.n_dofs(level);
           v[level].reinit(n);
         }
     }
@@ -75,11 +75,11 @@ namespace internal
      */
     template <int dim, typename number, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
                   std::vector<unsigned int>                target_component,
                   MGLevelObject<BlockVector<number>> &     v)
     {
-      const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+      const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
       if (target_component.size() == 0)
         {
           target_component.resize(n_blocks);
@@ -93,9 +93,9 @@ namespace internal
       const unsigned int n_target_blocks = max_block + 1;
 
       std::vector<std::vector<types::global_dof_index>> ndofs(
-        mg_dof.get_triangulation().n_levels(),
+        dof_handler.get_triangulation().n_levels(),
         std::vector<types::global_dof_index>(n_target_blocks));
-      MGTools::count_dofs_per_block(mg_dof, ndofs, target_component);
+      MGTools::count_dofs_per_block(dof_handler, ndofs, target_component);
 
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
@@ -115,13 +115,13 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
     {
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
         (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &mg_dof.get_triangulation()));
+          &dof_handler.get_triangulation()));
       AssertThrow(
         tria != nullptr,
         ExcMessage(
@@ -129,7 +129,7 @@ namespace internal
 
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
-          v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
+          v[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                           tria->get_communicator());
         }
     }
@@ -143,13 +143,13 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
+    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<PETScWrappers::MPI::Vector> &v)
     {
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
         (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &mg_dof.get_triangulation()));
+          &dof_handler.get_triangulation()));
       AssertThrow(
         tria != nullptr,
         ExcMessage(
@@ -157,7 +157,7 @@ namespace internal
 
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
-          v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
+          v[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                           tria->get_communicator());
         }
     }
@@ -206,16 +206,14 @@ template <typename VectorType>
 template <int dim, class InVector, int spacedim>
 void
 MGLevelGlobalTransfer<VectorType>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &mg_dof_handler,
+  const DoFHandler<dim, spacedim> &dof_handler,
   MGLevelObject<VectorType> &      dst,
   const InVector &                 src) const
 {
   AssertIndexRange(dst.max_level(),
-                   mg_dof_handler.get_triangulation().n_global_levels());
+                   dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
-  internal::MGTransfer::reinit_vector(mg_dof_handler,
-                                      component_to_block_map,
-                                      dst);
+  internal::MGTransfer::reinit_vector(dof_handler, component_to_block_map, dst);
 #ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
   int ierr = MPI_Barrier(MPI_COMM_WORLD);
@@ -277,13 +275,13 @@ template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
 MGLevelGlobalTransfer<VectorType>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &mg_dof_handler,
+  const DoFHandler<dim, spacedim> &dof_handler,
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
-  (void)mg_dof_handler;
+  (void)dof_handler;
   AssertIndexRange(src.max_level(),
-                   mg_dof_handler.get_triangulation().n_global_levels());
+                   dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
   if (perform_plain_copy)
     {
@@ -351,7 +349,7 @@ template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
 MGLevelGlobalTransfer<VectorType>::copy_from_mg_add(
-  const DoFHandler<dim, spacedim> & /*mg_dof_handler*/,
+  const DoFHandler<dim, spacedim> & /*dof_handler*/,
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
@@ -400,11 +398,11 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &                          mg_dof_handler,
+  const DoFHandler<dim, spacedim> &                          dof_handler,
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
   const LinearAlgebra::distributed::Vector<Number2> &        src) const
 {
-  copy_to_mg(mg_dof_handler, dst, src, false);
+  copy_to_mg(dof_handler, dst, src, false);
 }
 
 
@@ -412,7 +410,7 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &                          mg_dof_handler,
+  const DoFHandler<dim, spacedim> &                          dof_handler,
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
   const LinearAlgebra::distributed::Vector<Number2> &        src,
   const bool solution_transfer) const
@@ -425,29 +423,29 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
     solution_transfer ? solution_copy_indices_level_mine :
                         copy_indices_level_mine;
 
-  (void)mg_dof_handler;
+  (void)dof_handler;
 
   AssertIndexRange(dst.max_level(),
-                   mg_dof_handler.get_triangulation().n_global_levels());
+                   dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
-    if (dst[level].size() != mg_dof_handler.n_dofs(level) ||
+    if (dst[level].size() != dof_handler.n_dofs(level) ||
         dst[level].local_size() !=
-          mg_dof_handler.locally_owned_mg_dofs(level).n_elements())
+          dof_handler.locally_owned_mg_dofs(level).n_elements())
       {
         // In case a ghosted level vector has been initialized, we can simply
         // use that as a template for the vector partitioning. If not, we
         // resort to the locally owned range of the dof handler.
         if (level <= ghosted_level_vector.max_level() &&
-            ghosted_level_vector[level].size() == mg_dof_handler.n_dofs(level))
+            ghosted_level_vector[level].size() == dof_handler.n_dofs(level))
           dst[level].reinit(ghosted_level_vector[level], false);
         else
           {
             const parallel::TriangulationBase<dim, spacedim> *tria =
               (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-                &mg_dof_handler.get_triangulation()));
-            dst[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+                &dof_handler.get_triangulation()));
+            dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                               tria != nullptr ? tria->get_communicator() :
                                                 MPI_COMM_SELF);
           }
@@ -518,13 +516,13 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &            mg_dof_handler,
-  LinearAlgebra::distributed::Vector<Number2> &dst,
+  const DoFHandler<dim, spacedim> &                                dof_handler,
+  LinearAlgebra::distributed::Vector<Number2> &                    dst,
   const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {
-  (void)mg_dof_handler;
+  (void)dof_handler;
   AssertIndexRange(src.max_level(),
-                   mg_dof_handler.get_triangulation().n_global_levels());
+                   dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
   if (perform_plain_copy)
     {
@@ -593,7 +591,7 @@ template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim> & /*mg_dof_handler*/,
+    const DoFHandler<dim, spacedim> & /*dof_handler*/,
     LinearAlgebra::distributed::Vector<Number2> &                    dst,
     const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {

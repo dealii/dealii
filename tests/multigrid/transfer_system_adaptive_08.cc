@@ -166,13 +166,8 @@ check(const FiniteElement<dim> &fe)
                               boundary_indices);
 
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(mg_dof_handler,
-                          mg_dof_handler,
-                          0,
-                          0,
-                          block_selected,
-                          block_selected,
-                          boundary_indices);
+  transfer.build(
+    mg_dof_handler, 0, 0, block_selected, block_selected, boundary_indices);
 
   std::vector<std::vector<types::global_dof_index>> dofs_per_block(
     tr.n_levels(), std::vector<types::global_dof_index>(2));

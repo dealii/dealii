@@ -1060,7 +1060,7 @@ namespace Step63
 
     using Transfer = MGTransferPrebuilt<Vector<double>>;
     Transfer mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);

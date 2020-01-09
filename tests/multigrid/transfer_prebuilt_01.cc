@@ -61,7 +61,7 @@ check_simple(const FiniteElement<dim> &fe)
   mgdof.distribute_mg_dofs();
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   transfer.print_matrices(deallog.get_file_stream());
   transfer.print_indices(deallog.get_file_stream());

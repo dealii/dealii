@@ -46,12 +46,12 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &    mg_dof_handler,
+  const DoFHandler<dim, spacedim> &    dof_handler,
   BlockVector<number2> &               dst,
   const MGLevelObject<Vector<number>> &src) const
 {
   for (unsigned int level = 0;
-       level < mg_dof_handler.get_triangulation().n_levels();
+       level < dof_handler.get_triangulation().n_levels();
        ++level)
     for (IT i = copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end();
@@ -65,12 +65,12 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &    mg_dof_handler,
+  const DoFHandler<dim, spacedim> &    dof_handler,
   Vector<number2> &                    dst,
   const MGLevelObject<Vector<number>> &src) const
 {
   for (unsigned int level = 0;
-       level < mg_dof_handler.get_triangulation().n_levels();
+       level < dof_handler.get_triangulation().n_levels();
        ++level)
     for (IT i = copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end();
@@ -84,12 +84,12 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add(
-  const DoFHandler<dim, spacedim> &    mg_dof_handler,
+  const DoFHandler<dim, spacedim> &    dof_handler,
   BlockVector<number2> &               dst,
   const MGLevelObject<Vector<number>> &src) const
 {
   for (unsigned int level = 0;
-       level < mg_dof_handler.get_triangulation().n_levels();
+       level < dof_handler.get_triangulation().n_levels();
        ++level)
     for (IT i = copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end();
@@ -103,12 +103,12 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add(
-  const DoFHandler<dim, spacedim> &    mg_dof_handler,
+  const DoFHandler<dim, spacedim> &    dof_handler,
   Vector<number2> &                    dst,
   const MGLevelObject<Vector<number>> &src) const
 {
   for (unsigned int level = 0;
-       level < mg_dof_handler.get_triangulation().n_levels();
+       level < dof_handler.get_triangulation().n_levels();
        ++level)
     for (IT i = copy_indices[selected_block][level].begin();
          i != copy_indices[selected_block][level].end();
@@ -134,14 +134,14 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &         mg_dof_handler,
+  const DoFHandler<dim, spacedim> &         dof_handler,
   BlockVector<number2> &                    dst,
   const MGLevelObject<BlockVector<number>> &src) const
 {
   for (unsigned int block = 0; block < selected.size(); ++block)
     if (selected[block])
       for (unsigned int level = 0;
-           level < mg_dof_handler.get_triangulation().n_levels();
+           level < dof_handler.get_triangulation().n_levels();
            ++level)
         for (IT i = copy_indices[block][level].begin();
              i != copy_indices[block][level].end();
@@ -156,14 +156,14 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg_add(
-  const DoFHandler<dim, spacedim> &         mg_dof_handler,
+  const DoFHandler<dim, spacedim> &         dof_handler,
   BlockVector<number2> &                    dst,
   const MGLevelObject<BlockVector<number>> &src) const
 {
   for (unsigned int block = 0; block < selected.size(); ++block)
     if (selected[block])
       for (unsigned int level = 0;
-           level < mg_dof_handler.get_triangulation().n_levels();
+           level < dof_handler.get_triangulation().n_levels();
            ++level)
         for (IT i = copy_indices[block][level].begin();
              i != copy_indices[block][level].end();

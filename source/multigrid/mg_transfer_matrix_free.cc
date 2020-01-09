@@ -95,14 +95,15 @@ MGTransferMatrixFree<dim, Number>::clear()
 template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::build(
-  const DoFHandler<dim, dim> &mg_dof,
+  const DoFHandler<dim, dim> &dof_handler,
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
-  this->fill_and_communicate_copy_indices(mg_dof);
+  this->fill_and_communicate_copy_indices(dof_handler);
 
   vector_partitioners.resize(0,
-                             mg_dof.get_triangulation().n_global_levels() - 1);
+                             dof_handler.get_triangulation().n_global_levels() -
+                               1);
   for (unsigned int level = 0; level <= this->ghosted_level_vector.max_level();
        ++level)
     vector_partitioners[level] =
@@ -113,7 +114,7 @@ MGTransferMatrixFree<dim, Number>::build(
   internal::MGTransfer::ElementInfo<Number> elem_info;
 
   internal::MGTransfer::setup_transfer<dim, Number>(
-    mg_dof,
+    dof_handler,
     this->mg_constrained_dofs,
     external_partitioners,
     elem_info,
@@ -149,7 +150,8 @@ MGTransferMatrixFree<dim, Number>::build(
 
   // reshuffle into aligned vector of vectorized arrays
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
-  const unsigned int n_levels = mg_dof.get_triangulation().n_global_levels();
+  const unsigned int n_levels =
+    dof_handler.get_triangulation().n_global_levels();
 
   const unsigned int n_weights_per_cell = Utilities::fixed_power<dim>(3);
   weights_on_refined.resize(n_levels - 1);
@@ -717,10 +719,10 @@ MGTransferBlockMatrixFree<dim, Number>::clear()
 template <int dim, typename Number>
 void
 MGTransferBlockMatrixFree<dim, Number>::build(
-  const DoFHandler<dim, dim> &mg_dof)
+  const DoFHandler<dim, dim> &dof_handler)
 {
   AssertDimension(matrix_free_transfer_vector.size(), 1);
-  matrix_free_transfer_vector[0].build(mg_dof);
+  matrix_free_transfer_vector[0].build(dof_handler);
 }
 
 
@@ -728,11 +730,11 @@ MGTransferBlockMatrixFree<dim, Number>::build(
 template <int dim, typename Number>
 void
 MGTransferBlockMatrixFree<dim, Number>::build(
-  const std::vector<const DoFHandler<dim, dim> *> &mg_dof)
+  const std::vector<const DoFHandler<dim, dim> *> &dof_handler)
 {
-  AssertDimension(matrix_free_transfer_vector.size(), mg_dof.size());
-  for (unsigned int i = 0; i < mg_dof.size(); ++i)
-    matrix_free_transfer_vector[i].build(*mg_dof[i]);
+  AssertDimension(matrix_free_transfer_vector.size(), dof_handler.size());
+  for (unsigned int i = 0; i < dof_handler.size(); ++i)
+    matrix_free_transfer_vector[i].build(*dof_handler[i]);
 }
 
 

@@ -57,7 +57,7 @@ print_matrix(Triangulation<dim> &      tr,
   dof.distribute_mg_dofs();
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(dof);
+  transfer.build(dof);
 
   unsigned int   n_coarse = dof.n_dofs(level - 1);
   unsigned int   n_fine   = dof.n_dofs(level);

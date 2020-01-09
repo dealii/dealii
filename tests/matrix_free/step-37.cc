@@ -575,7 +575,7 @@ namespace Step37
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);

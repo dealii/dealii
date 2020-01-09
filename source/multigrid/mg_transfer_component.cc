@@ -253,10 +253,20 @@ MGTransferSelect<number>::do_copy_to_mg(
 }
 
 
+
 template <int dim, int spacedim>
 void
 MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
                                         const DoFHandler<dim, spacedim> &mg_dof)
+{
+  build(mg_dof);
+}
+
+
+
+template <int dim, int spacedim>
+void
+MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
 {
   // Fill target component with
   // standard values (identity) if it
@@ -561,11 +571,28 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
 }
 
 
+
 template <typename number>
 template <int dim, int spacedim>
 void
 MGTransferSelect<number>::build_matrices(
-  const DoFHandler<dim, spacedim> &                     dof,
+  const DoFHandler<dim, spacedim> & /*dof*/,
+  const DoFHandler<dim, spacedim> &                     mg_dof,
+  unsigned int                                          select,
+  unsigned int                                          mg_select,
+  const std::vector<unsigned int> &                     t_component,
+  const std::vector<unsigned int> &                     mg_t_component,
+  const std::vector<std::set<types::global_dof_index>> &bdry_indices)
+{
+  build(mg_dof, select, mg_select, t_component, mg_t_component, bdry_indices);
+}
+
+
+
+template <typename number>
+template <int dim, int spacedim>
+void
+MGTransferSelect<number>::build(
   const DoFHandler<dim, spacedim> &                     mg_dof,
   unsigned int                                          select,
   unsigned int                                          mg_select,
@@ -621,7 +648,7 @@ MGTransferSelect<number>::build_matrices(
         }
     }
 
-  MGTransferComponentBase::build_matrices(dof, mg_dof);
+  MGTransferComponentBase::build(mg_dof);
 
   interface_dofs.resize(mg_dof.get_triangulation().n_levels());
   for (unsigned int l = 0; l < mg_dof.get_triangulation().n_levels(); ++l)
@@ -636,7 +663,8 @@ MGTransferSelect<number>::build_matrices(
   std::vector<types::global_dof_index> temp_copy_indices;
   std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
-  for (int level = dof.get_triangulation().n_levels() - 1; level >= 0; --level)
+  for (int level = mg_dof.get_triangulation().n_levels() - 1; level >= 0;
+       --level)
     {
       copy_to_and_from_indices[level].clear();
       typename DoFHandler<dim, spacedim>::active_cell_iterator level_cell =

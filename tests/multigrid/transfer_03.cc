@@ -208,10 +208,10 @@ check_simple(const FiniteElement<dim> &fe)
     DoFRenumbering::component_wise(mgdof_renumbered, level, block_component);
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGTransferPrebuilt<Vector<double>> transfer_renumbered;
-  transfer_renumbered.build_matrices(mgdof_renumbered);
+  transfer_renumbered.build(mgdof_renumbered);
 
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof, u);

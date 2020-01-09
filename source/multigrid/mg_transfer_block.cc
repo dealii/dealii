@@ -52,7 +52,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks(
-    const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+    const dealii::DoFHandler<dim, spacedim> &          dof_handler,
     MGLevelObject<BlockVector<number>> &               v,
     const std::vector<bool> &                          sel,
     std::vector<std::vector<types::global_dof_index>> &ndofs)
@@ -65,10 +65,10 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
-          mg_dof.get_triangulation().n_levels(),
+          dof_handler.get_triangulation().n_levels(),
           std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
-        MGTools::count_dofs_per_block(mg_dof, ndofs);
+        MGTools::count_dofs_per_block(dof_handler, ndofs);
       }
 
     for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
@@ -98,12 +98,12 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks(
-    const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+    const dealii::DoFHandler<dim, spacedim> &          dof_handler,
     MGLevelObject<dealii::Vector<number>> &            v,
     const unsigned int                                 selected_block,
     std::vector<std::vector<types::global_dof_index>> &ndofs)
   {
-    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+    const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
     AssertIndexRange(selected_block, n_blocks);
 
     std::vector<bool> selected(n_blocks, false);
@@ -112,10 +112,10 @@ namespace
     if (ndofs.size() == 0)
       {
         std::vector<std::vector<types::global_dof_index>> new_dofs(
-          mg_dof.get_triangulation().n_levels(),
+          dof_handler.get_triangulation().n_levels(),
           std::vector<types::global_dof_index>(selected.size()));
         std::swap(ndofs, new_dofs);
-        MGTools::count_dofs_per_block(mg_dof, ndofs);
+        MGTools::count_dofs_per_block(dof_handler, ndofs);
       }
 
     for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
@@ -130,16 +130,16 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &mg_dof_handler,
+  const DoFHandler<dim, spacedim> &dof_handler,
   MGLevelObject<Vector<number>> &  dst,
   const BlockVector<number2> &     src) const
 {
-  reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+  reinit_vector_by_blocks(dof_handler, dst, selected_block, sizes);
   // For MGTransferBlockSelect, the
   // multilevel block is always the
   // first, since only one block is
   // selected.
-  for (unsigned int level = mg_dof_handler.get_triangulation().n_levels();
+  for (unsigned int level = dof_handler.get_triangulation().n_levels();
        level != 0;)
     {
       --level;
@@ -156,15 +156,15 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &mg_dof_handler,
+  const DoFHandler<dim, spacedim> &dof_handler,
   MGLevelObject<Vector<number>> &  dst,
   const Vector<number2> &          src) const
 {
-  reinit_vector_by_blocks(mg_dof_handler, dst, selected_block, sizes);
+  reinit_vector_by_blocks(dof_handler, dst, selected_block, sizes);
   // For MGTransferBlockSelect, the
   // multilevel block is always the
   // first, since only one block is selected.
-  for (unsigned int level = mg_dof_handler.get_triangulation().n_levels();
+  for (unsigned int level = dof_handler.get_triangulation().n_levels();
        level != 0;)
     {
       --level;
@@ -181,12 +181,12 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &   mg_dof_handler,
+  const DoFHandler<dim, spacedim> &   dof_handler,
   MGLevelObject<BlockVector<number>> &dst,
   const BlockVector<number2> &        src) const
 {
-  reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
-  for (unsigned int level = mg_dof_handler.get_triangulation().n_levels();
+  reinit_vector_by_blocks(dof_handler, dst, selected, sizes);
+  for (unsigned int level = dof_handler.get_triangulation().n_levels();
        level != 0;)
     {
       --level;
@@ -204,13 +204,23 @@ MGTransferBlock<number>::copy_to_mg(
 
 template <int dim, int spacedim>
 void
-MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
-                                    const DoFHandler<dim, spacedim> &mg_dof)
+MGTransferBlockBase::build_matrices(
+  const DoFHandler<dim, spacedim> &dof,
+  const DoFHandler<dim, spacedim> &mg_dof_handler)
 {
-  const FiniteElement<dim> &fe            = mg_dof.get_fe();
+  build(mg_dof_handler);
+}
+
+
+
+template <int dim, int spacedim>
+void
+MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
+{
+  const FiniteElement<dim> &fe            = dof_handler.get_fe();
   const unsigned int        n_blocks      = fe.n_blocks();
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int        n_levels = mg_dof.get_triangulation().n_levels();
+  const unsigned int n_levels = dof_handler.get_triangulation().n_levels();
 
   Assert(selected.size() == n_blocks,
          ExcDimensionMismatch(selected.size(), n_blocks));
@@ -229,7 +239,7 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
   // Compute the lengths of all blocks
   sizes.clear();
   sizes.resize(n_levels, std::vector<types::global_dof_index>(fe.n_blocks()));
-  MGTools::count_dofs_per_block(mg_dof, sizes);
+  MGTools::count_dofs_per_block(dof_handler, sizes);
 
   // Fill some index vectors
   // for later use.
@@ -248,7 +258,7 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
 
   block_start.resize(n_blocks);
   DoFTools::count_dofs_per_block(
-    static_cast<const DoFHandler<dim, spacedim> &>(mg_dof), block_start);
+    static_cast<const DoFHandler<dim, spacedim> &>(dof_handler), block_start);
 
   types::global_dof_index k = 0;
   for (types::global_dof_index &first_index : block_start)
@@ -328,8 +338,8 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
       prolongation_sparsities[level]->collect_sizes();
 
       for (typename DoFHandler<dim, spacedim>::cell_iterator cell =
-             mg_dof.begin(level);
-           cell != mg_dof.end(level);
+             dof_handler.begin(level);
+           cell != dof_handler.end(level);
            ++cell)
         if (cell->has_children())
           {
@@ -344,7 +354,7 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation =
-                  mg_dof.get_fe().get_prolongation_matrix(
+                  dof_handler.get_fe().get_prolongation_matrix(
                     child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices(dof_indices_child);
@@ -371,8 +381,8 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
       prolongation_matrices[level]->reinit(*prolongation_sparsities[level]);
       // now actually build the matrices
       for (typename DoFHandler<dim, spacedim>::cell_iterator cell =
-             mg_dof.begin(level);
-           cell != mg_dof.end(level);
+             dof_handler.begin(level);
+           cell != dof_handler.end(level);
            ++cell)
         if (cell->has_children())
           {
@@ -387,7 +397,7 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation =
-                  mg_dof.get_fe().get_prolongation_matrix(
+                  dof_handler.get_fe().get_prolongation_matrix(
                     child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices(dof_indices_child);
@@ -468,35 +478,44 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
     }
 }
 
-
-
 template <typename number>
 template <int dim, int spacedim>
 void
 MGTransferBlockSelect<number>::build_matrices(
-  const DoFHandler<dim, spacedim> &dof,
+  const DoFHandler<dim, spacedim> & /*dof*/,
   const DoFHandler<dim, spacedim> &mg_dof,
   unsigned int                     select)
 {
-  const FiniteElement<dim> &fe       = mg_dof.get_fe();
-  unsigned int              n_blocks = mg_dof.get_fe().n_blocks();
+  build(mg_dof, select);
+}
+
+template <typename number>
+template <int dim, int spacedim>
+void
+MGTransferBlockSelect<number>::build(
+  const DoFHandler<dim, spacedim> &dof_handler,
+  unsigned int                     select)
+{
+  const FiniteElement<dim> &fe       = dof_handler.get_fe();
+  unsigned int              n_blocks = dof_handler.get_fe().n_blocks();
 
   selected_block = select;
   selected.resize(n_blocks, false);
   selected[select] = true;
 
-  MGTransferBlockBase::build_matrices(dof, mg_dof);
+  MGTransferBlockBase::build(dof_handler);
 
   std::vector<types::global_dof_index> temp_copy_indices;
   std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
 
-  for (int level = dof.get_triangulation().n_levels() - 1; level >= 0; --level)
+  for (int level = dof_handler.get_triangulation().n_levels() - 1; level >= 0;
+       --level)
     {
       typename DoFHandler<dim, spacedim>::active_cell_iterator level_cell =
-        mg_dof.begin_active(level);
+        dof_handler.begin_active(level);
       const typename DoFHandler<dim, spacedim>::active_cell_iterator level_end =
-        mg_dof.end_active(level);
+        dof_handler.end_active(level);
 
       temp_copy_indices.resize(0);
       temp_copy_indices.resize(sizes[level][selected_block],
@@ -558,16 +577,25 @@ MGTransferBlockSelect<number>::build_matrices(
 }
 
 
+template <typename number>
+template <int dim, int spacedim>
+void
+MGTransferBlock<number>::build_matrices(
+  const DoFHandler<dim, spacedim> & /*dof*/,
+  const DoFHandler<dim, spacedim> &mg_dof,
+  const std::vector<bool> &        sel)
+{
+  build(mg_dof, sel);
+}
 
 template <typename number>
 template <int dim, int spacedim>
 void
-MGTransferBlock<number>::build_matrices(const DoFHandler<dim, spacedim> &dof,
-                                        const DoFHandler<dim, spacedim> &mg_dof,
-                                        const std::vector<bool> &        sel)
+MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
+                               const std::vector<bool> &        sel)
 {
-  const FiniteElement<dim> &fe       = mg_dof.get_fe();
-  unsigned int              n_blocks = mg_dof.get_fe().n_blocks();
+  const FiniteElement<dim> &fe       = dof_handler.get_fe();
+  unsigned int              n_blocks = dof_handler.get_fe().n_blocks();
 
   if (sel.size() != 0)
     {
@@ -578,17 +606,18 @@ MGTransferBlock<number>::build_matrices(const DoFHandler<dim, spacedim> &dof,
   if (selected.size() == 0)
     selected = std::vector<bool>(n_blocks, true);
 
-  MGTransferBlockBase::build_matrices(dof, mg_dof);
+  MGTransferBlockBase::build(dof_handler);
 
   std::vector<std::vector<types::global_dof_index>> temp_copy_indices(n_blocks);
   std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
-  for (int level = dof.get_triangulation().n_levels() - 1; level >= 0; --level)
+  for (int level = dof_handler.get_triangulation().n_levels() - 1; level >= 0;
+       --level)
     {
       typename DoFHandler<dim, spacedim>::active_cell_iterator level_cell =
-        mg_dof.begin_active(level);
+        dof_handler.begin_active(level);
       const typename DoFHandler<dim, spacedim>::active_cell_iterator level_end =
-        mg_dof.end_active(level);
+        dof_handler.end_active(level);
 
       for (unsigned int block = 0; block < n_blocks; ++block)
         if (selected[block])

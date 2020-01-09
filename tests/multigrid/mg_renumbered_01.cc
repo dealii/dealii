@@ -359,10 +359,10 @@ LaplaceProblem<dim>::test()
                                             dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
   MGTransferPrebuilt<Vector<double>> mg_transfer_renumbered(
     mg_constrained_dofs_renumbered);
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
+  mg_transfer_renumbered.build(mg_dof_handler_renumbered);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);

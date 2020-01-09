@@ -110,7 +110,7 @@ check(const FiniteElement<dim> &fe)
   std::vector<unsigned int> mask(2);
   mask[0] = 0;
   mask[1] = 1;
-  transfer.build_matrices(mg_dof_handler, mg_dof_handler, 0, 0, mask, mask);
+  transfer.build(mg_dof_handler, 0, 0, mask, mask);
 
   // use only the first half of all
   // components

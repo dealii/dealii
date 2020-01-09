@@ -591,7 +591,7 @@ namespace Step39
     SolverCG<Vector<double>> solver(control);
 
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrix[0]);

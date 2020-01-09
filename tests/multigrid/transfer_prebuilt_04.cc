@@ -92,7 +92,7 @@ check()
         // create this if we have Trilinos
         MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>>
           transfer_ref(mg_constrained_dofs);
-        transfer_ref.build_matrices(mgdof);
+        transfer_ref.build(mgdof);
       }
 #endif
       {

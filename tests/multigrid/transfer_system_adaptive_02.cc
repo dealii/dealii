@@ -160,7 +160,7 @@ check(const FiniteElement<dim> &fe)
   mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mg_dof_handler);
+  transfer.build(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));

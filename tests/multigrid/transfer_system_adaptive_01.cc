@@ -152,7 +152,7 @@ check(const FiniteElement<dim> &fe)
     DoFRenumbering::component_wise(mg_dof_handler, level);
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(mg_dof_handler);
+  transfer.build(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));

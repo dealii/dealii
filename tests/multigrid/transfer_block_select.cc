@@ -82,8 +82,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  DoFHandler<dim>  mgdof(tr);
-  DoFHandler<dim> &dof = mgdof;
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
@@ -110,7 +109,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
     }
 
   MGTransferBlockSelect<double> transfer;
-  transfer.build_matrices(dof, mgdof, selected);
+  transfer.build(mgdof, selected);
 
   // First, prolongate the constant
   // function from the coarsest mesh

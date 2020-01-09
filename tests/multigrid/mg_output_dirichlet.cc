@@ -243,11 +243,11 @@ check_simple(const FiniteElement<dim> &fe)
                                             dirichlet_boundary_functions);
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGTransferPrebuilt<Vector<double>> transfer_renumbered(
     mg_constrained_dofs_renumbered);
-  transfer_renumbered.build_matrices(mgdof_renumbered);
+  transfer_renumbered.build(mgdof_renumbered);
 
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof, u);
