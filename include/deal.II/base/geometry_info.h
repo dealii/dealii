@@ -4274,26 +4274,6 @@ GeometryInfo<4>::child_cell_on_face(const RefinementCase<4> &,
 
 template <>
 inline unsigned int
-GeometryInfo<1>::face_to_cell_lines(const unsigned int face,
-                                    const unsigned int line,
-                                    const bool,
-                                    const bool,
-                                    const bool)
-{
-  (void)face;
-  (void)line;
-  Assert(face + 1 < faces_per_cell + 1, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(line + 1 < lines_per_face + 1, ExcIndexRange(line, 0, lines_per_face));
-
-  // There is only a single line, so
-  // it must be this.
-  return 0;
-}
-
-
-
-template <>
-inline unsigned int
 GeometryInfo<2>::face_to_cell_lines(const unsigned int face,
                                     const unsigned int line,
                                     const bool,
