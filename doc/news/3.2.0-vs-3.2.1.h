@@ -34,7 +34,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fixed: he <code>DoFHandler</code> class had a
+       Fixed: The <code>DoFHandler</code> class had a
        memory leak. This is now fixed.
        <br>
        (WB 2001/11/28)
