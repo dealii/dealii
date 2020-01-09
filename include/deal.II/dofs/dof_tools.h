@@ -2257,7 +2257,18 @@ namespace DoFTools
    * The indices not targeted by target_components are left untouched.
    */
   template <typename DoFHandlerType>
-  void
+  std::vector<types::global_dof_index>
+  count_dofs_per_component(
+    const DoFHandlerType &           dof_handler,
+    const bool                       vector_valued_once = false,
+    const std::vector<unsigned int> &target_component   = {});
+
+  /**
+   * @deprecated A version of the previous function that returns its
+   * information through the non-`const` second argument.
+   */
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED void
   count_dofs_per_component(
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
@@ -2274,14 +2285,24 @@ namespace DoFTools
    * assertion is thrown.
    *
    * This function is used in the step-22, step-31, and step-32 tutorial
-   * programs.
+   * programs, among others.
    *
    * @pre The dofs_per_block variable has as many components as the finite
    * element used by the dof_handler argument has blocks, or alternatively as
    * many blocks as are enumerated in the target_blocks argument if given.
    */
   template <typename DoFHandlerType>
-  void
+  std::vector<types::global_dof_index>
+  count_dofs_per_block(const DoFHandlerType &           dof,
+                       const std::vector<unsigned int> &target_block =
+                         std::vector<unsigned int>());
+
+  /**
+   * @deprecated A version of the previous function that returns its
+   * information through the non-`const` second argument.
+   */
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED void
   count_dofs_per_block(const DoFHandlerType &                dof,
                        std::vector<types::global_dof_index> &dofs_per_block,
                        const std::vector<unsigned int> &     target_block =
