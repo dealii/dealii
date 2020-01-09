@@ -161,8 +161,8 @@ namespace LocalIntegrators
     /**
      * The curl-curl operator
      * @f[
-     * \int_Z \nabla\!\times\! u \cdot
-     * \nabla\!\times\! v \,dx
+     * \int_Z \nabla\times u \cdot
+     * \nabla \times v \,dx
      * @f]
      * in weak form.
      *
@@ -215,7 +215,7 @@ namespace LocalIntegrators
     /**
      * The matrix for the curl operator
      * @f[
-     * \int_Z \nabla\!\times\! u \cdot v \,dx.
+     * \int_Z \nabla \times u \cdot v \,dx.
      * @f]
      *
      * This is the standard curl operator in 3D and the scalar curl in 2D. The

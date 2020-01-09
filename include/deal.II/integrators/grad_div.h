@@ -46,7 +46,7 @@ namespace LocalIntegrators
     /**
      * The weak form of the grad-div operator penalizing volume changes
      * @f[
-     *  \int_Z \nabla\!\cdot\!u \nabla\!\cdot\!v \,dx
+     *  \int_Z \nabla\cdot u \nabla \cdot v \,dx
      * @f]
      *
      * @author Guido Kanschat
