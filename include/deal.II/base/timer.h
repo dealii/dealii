@@ -911,7 +911,7 @@ private:
    * A lock that makes sure that this class gives reasonable results even when
    * used with several threads.
    */
-  std::mutex mutex;
+  Threads::Mutex mutex;
 };
 
 

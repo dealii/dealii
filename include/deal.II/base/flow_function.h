@@ -128,7 +128,7 @@ namespace Functions
     /**
      * A mutex that guards the following scratch arrays.
      */
-    mutable std::mutex mutex;
+    mutable Threads::Mutex mutex;
 
     /**
      * Auxiliary values for the usual Function interface.

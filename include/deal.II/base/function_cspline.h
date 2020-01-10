@@ -132,7 +132,7 @@ namespace Functions
     /**
      * A mutex for accelerator object.
      */
-    mutable std::mutex acc_mutex;
+    mutable Threads::Mutex acc_mutex;
   };
 } // namespace Functions
 

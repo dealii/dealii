@@ -38,7 +38,7 @@ GrowingVectorMemory<VectorType>::get_pool()
 
 
 template <typename VectorType>
-std::mutex GrowingVectorMemory<VectorType>::mutex;
+Threads::Mutex GrowingVectorMemory<VectorType>::mutex;
 
 
 

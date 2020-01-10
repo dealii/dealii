@@ -985,7 +985,7 @@ private:
   /**
    * Thread mutex.
    */
-  mutable std::mutex mutex;
+  mutable Threads::Mutex mutex;
 };
 
 // ----------------------- inline functions ----------------------------

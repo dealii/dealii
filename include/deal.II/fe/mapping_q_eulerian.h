@@ -266,7 +266,7 @@ private:
     /**
      * A variable to guard access to the fe_values variable.
      */
-    mutable std::mutex fe_values_mutex;
+    mutable Threads::Mutex fe_values_mutex;
   };
 };
 

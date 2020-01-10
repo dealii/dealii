@@ -529,7 +529,7 @@ public:
   /**
    * Move constructor.
    */
-  FESystem(FESystem<dim, spacedim> &&other_fe_system)
+  FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
     : FiniteElement<dim, spacedim>(std::move(other_fe_system))
   {
     base_elements = std::move(other_fe_system.base_elements);
