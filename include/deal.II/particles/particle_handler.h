@@ -20,6 +20,7 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
@@ -284,6 +285,136 @@ namespace Particles
       const std::vector<std::vector<BoundingBox<spacedim>>>
         &                                     global_bounding_boxes,
       const std::vector<std::vector<double>> &properties = {});
+
+    /**
+     * Set the position of the particles by using the values contained in the
+     * vector @p input_vector.
+     *
+     * The vector @p input_vector should have read access to the indices
+     * created by extracting the locally relevant ids with
+     * locally_relevant_ids(), and taking its tensor
+     * product with the index set representing the range `[0, spacedim)`, i.e.:
+     * @code
+     * IndexSet ids = particle_handler.locally_relevant_ids().
+     *  tensor_product(complete_index_set(spacedim));
+     * @endcode
+     *
+     * The position of the particle with global index `id` is read from
+     * spacedim consecutive entries starting from
+     * `input_vector[id*spacedim]`.
+     *
+     * If the argument @p displace_particles is set to false, then the new
+     * position is computed by setting it to the values contained in
+     * @p input_vector. By default, the particles are displaced of the
+     * amount contained in the @p input_vector.
+     *
+     * After setting the new position, this function calls internally the method
+     * sort_particles_into_subdomains_and_cells(). You should
+     * make sure you satisfy the requirements of that function.
+     *
+     * @param[in] input_vector A parallel distributed vector containing
+     * the displacement to apply to each particle, or their new absolute
+     * position.
+     *
+     * @param[in] displace_particles Control if the @p input_vector should
+     * be interpreted as a displacement vector, or a vector of absolute
+     * positions.
+     *
+     * @authors Luca Heltai, Bruno Blais, 2019.
+     */
+    template <class VectorType>
+    void
+    set_particle_positions(const VectorType &input_vector,
+                           const bool        displace_particles = true);
+
+    /**
+     * Set the position of the particles within the particle handler using a
+     * vector of points. The new set of point defined by the
+     * vector has to be sufficiently close to the original one to ensure that
+     * the sort_particles_into_subdomains_and_cells() function manages to find
+     * the new cells in which the particles belong
+     *
+     * @param [in] new_positions A vector of points of dimension
+     * particle_handler.n_locally_owned_particles()
+     *
+     * @param [in] displace_particles When true, this add the value of the
+     * vector of points to the
+     * current position of the particle, thus displacing them by the
+     * amount given by the function. When false, the position of the
+     * particle is replaced by the value in the vector
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     */
+    void
+    set_particle_positions(const std::vector<Point<spacedim>> &new_positions,
+                           const bool displace_particles = true);
+
+
+    /**
+     * Set the position of the particles within the particle handler using a
+     * function with spacedim components. The new set of point defined by the
+     * fuction has to be sufficiently close to the original one to ensure that
+     * the sort_particles_into_subdomains_and_cells algorithm manages to find
+     * the new cells in which the particles belong.
+     *
+     * @param [in] function A function that has n_components==spacedim that
+     * describes either the displacement or the new position of the particles
+     *
+     * @param [in] displace_particles When true, this add the results of the
+     * function to the current position of the particle, thus displacing them by
+     * the amount given by the function. When false, the position of the
+     * particle is is replaced by the value of the function
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     */
+    void
+    set_particle_positions(const Function<spacedim> &function,
+                           const bool                displace_particles = true);
+
+    /**
+     * Read the position of the particles and store them into the distributed
+     * vector @p output_vector. By default the
+     * @p output_vector is overwritten by this operation, but you can add to
+     * its entries by setting @p add_to_output_vector to `true`.
+     *
+     * This is the reverse operation of the set_particle_positions() function.
+     * The position of the particle with global index `id` is written to
+     * spacedim consecutive entries starting from
+     * `output_vector[id*spacedim]`.
+     *
+     * @param[out] output_vector A parallel distributed vector containing
+     * the positions of the particles, or updated with the positions of the
+     * particles.
+     *
+     * @param[in] add_to_output_vector Control if the function should set the
+     * entries of the @p output_vector or if should add to them.
+     *
+     * @author Luca Heltai, Bruno Blais, 2019.
+     */
+    template <class VectorType>
+    void
+    get_particle_positions(VectorType &output_vector,
+                           const bool  add_to_output_vector = false);
+
+    /**
+     * Gather the position of the particles within the particle handler in
+     * a vector of points.
+     *
+     * @param [in,out] positions A vector preallocated at size
+     * (particle_handler.n_locally_owned_articles) and whose points will become
+     * the positions of the locally owned particles
+     *
+     * @param [in] add_to_output_vector When true, the value of the point of
+     * the particles is added to the positions vector. When false,
+     * the value of the points in the positions vector are replaced by the
+     * position of the particles.
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     *
+     */
+    void
+    get_particle_positions(std::vector<Point<spacedim>> &positions,
+                           const bool add_to_output_vector = false);
 
     /**
      * This function allows to register three additional functions that are
@@ -619,6 +750,58 @@ namespace Particles
       &global_number_of_particles &global_max_particles_per_cell
         &                          next_free_particle_index;
   }
+
+
+
+  template <int dim, int spacedim>
+  template <class VectorType>
+  void
+  ParticleHandler<dim, spacedim>::set_particle_positions(
+    const VectorType &input_vector,
+    const bool        displace_particles)
+  {
+    AssertDimension(input_vector.size(),
+                    get_next_free_particle_index() * spacedim);
+    for (auto &p : *this)
+      {
+        const auto &point     = p.get_location();
+        auto        new_point = point * (displace_particles ? 1.0 : 0.0);
+        const auto  id        = p.get_id();
+        for (unsigned int i = 0; i < spacedim; ++i)
+          new_point[i] += input_vector[id * spacedim + i];
+        p.set_location(new_point);
+      }
+    sort_particles_into_subdomains_and_cells();
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class VectorType>
+  void
+  ParticleHandler<dim, spacedim>::get_particle_positions(
+    VectorType &output_vector,
+    const bool  add_to_output_vector)
+  {
+    AssertDimension(output_vector.size(),
+                    get_next_free_particle_index() * spacedim);
+    for (const auto &p : *this)
+      {
+        auto &     point = p.get_location();
+        const auto id    = p.get_id();
+        if (add_to_output_vector)
+          for (unsigned int i = 0; i < spacedim; ++i)
+            output_vector[id * spacedim + i] += point[i];
+        else
+          for (unsigned int i = 0; i < spacedim; ++i)
+            output_vector[id * spacedim + i] = point[i];
+      }
+    if (add_to_output_vector)
+      output_vector.compress(VectorOperation::add);
+    else
+      output_vector.compress(VectorOperation::insert);
+  }
+
 } // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE

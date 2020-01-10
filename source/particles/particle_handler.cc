@@ -720,6 +720,77 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::get_particle_positions(
+    std::vector<Point<spacedim>> &positions,
+    const bool                    add_to_output_vector)
+  {
+    // There should be one point per particle to gather
+    AssertDimension(positions.size(), n_locally_owned_particles());
+
+    unsigned int i = 0;
+    for (auto it = begin(); it != end(); ++it, ++i)
+      {
+        if (add_to_output_vector)
+          positions[i] = positions[i] + it->get_location();
+        else
+          positions[i] = it->get_location();
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::set_particle_positions(
+    const std::vector<Point<spacedim>> &new_positions,
+    const bool                          displace_particles)
+  {
+    // There should be one point per particle to fix the new position
+    AssertDimension(new_positions.size(), n_locally_owned_particles());
+
+    unsigned int i = 0;
+    for (auto it = begin(); it != end(); ++it, ++i)
+      {
+        if (displace_particles)
+          it->set_location(it->get_location() + new_positions[i]);
+        else
+          it->set_location(new_positions[i]);
+      }
+    sort_particles_into_subdomains_and_cells();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::set_particle_positions(
+    const Function<spacedim> &function,
+    const bool                displace_particles)
+  {
+    // The function should have sufficient components to displace the
+    // particles
+    AssertDimension(function.n_components, spacedim);
+
+    Vector<double> new_position(spacedim);
+    for (auto &particle : *this)
+      {
+        Point<spacedim> particle_location = particle.get_location();
+        function.vector_value(particle_location, new_position);
+        if (displace_particles)
+          for (unsigned int d = 0; d < spacedim; ++d)
+            particle_location[d] = particle_location[d] + new_position[d];
+        else
+          for (unsigned int d = 0; d < spacedim; ++d)
+            particle_location[d] = new_position[d];
+        particle.set_location(particle_location);
+      }
+    sort_particles_into_subdomains_and_cells();
+  }
+
+
+
+  template <int dim, int spacedim>
   PropertyPool &
   ParticleHandler<dim, spacedim>::get_property_pool() const
   {

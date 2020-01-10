@@ -1,0 +1,19 @@
+
+DEAL:0:2d/2d::Local set: {[0,1], [4,5], [22,27], [30,35], [38,39]}
+DEAL:0:2d/2d::
+DEAL:0:2d/2d::Local vector norm: 0.990603
+DEAL:0:2d/2d::New position norm: 0.000990603
+DEAL:0:3d/3d::Local set: {[3,8], [18,20], [24,35], [39,41], [51,53], [57,59]}
+DEAL:0:3d/3d::
+DEAL:0:3d/3d::Local vector norm: 0.998925
+DEAL:0:3d/3d::New position norm: 0.000998925
+
+DEAL:1:2d/2d::Local set: {[2,3], [6,21], [28,29], [36,37]}
+DEAL:1:2d/2d::
+DEAL:1:2d/2d::Local vector norm: 0.990603
+DEAL:1:2d/2d::New position norm: 0.000990603
+DEAL:1:3d/3d::Local set: {[0,2], [9,17], [21,23], [36,38], [42,50], [54,56]}
+DEAL:1:3d/3d::
+DEAL:1:3d/3d::Local vector norm: 0.998925
+DEAL:1:3d/3d::New position norm: 0.000998925
+
