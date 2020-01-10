@@ -535,12 +535,10 @@ TimeStepBase_Tria<dim>::restore_grid()
 
       // limit refinement depth if the user
       // desired so
-      //       if (flags.max_refinement_level != 0)
+      //    if (flags.max_refinement_level != 0)
       //      {
       //        typename Triangulation<dim>::active_cell_iterator cell, endc;
-      //        for (cell = tria->begin_active(),
-      //             endc = tria->end();
-      //             cell!=endc; ++cell)
+      //        for (const auto &cell : tria->active_cell_iterators())
       //          if (static_cast<unsigned int>(cell->level()) >=
       //              flags.max_refinement_level)
       //            cell->clear_refine_flag();

@@ -1124,9 +1124,7 @@ namespace GridTools
       new_points.end();
 
     // fill these maps using the data given by new_points
-    typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin_active(),
-                                            endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         // loop over all vertices of the cell and see if it is listed in the map
         // given as first argument of the function
@@ -1164,7 +1162,7 @@ namespace GridTools
     // change the coordinates of the points of the triangulation
     // according to the computed values
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
-    for (cell = dof_handler.begin_active(); cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (unsigned int vertex_no = 0;
            vertex_no < GeometryInfo<dim>::vertices_per_cell;
            ++vertex_no)
@@ -4076,17 +4074,13 @@ namespace GridTools
     unsigned int iter                = 0;
     bool         continue_refinement = true;
 
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = tria.begin_active(),
-      endc = tria.end();
-
     while (continue_refinement && (iter < max_iterations))
       {
         if (max_iterations != numbers::invalid_unsigned_int)
           iter++;
         continue_refinement = false;
 
-        for (cell = tria.begin_active(); cell != endc; ++cell)
+        for (const auto &cell : tria.active_cell_iterators())
           for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; j++)
             if (cell->at_boundary(j) == false &&
                 cell->neighbor(j)->has_children())
@@ -4113,15 +4107,11 @@ namespace GridTools
     unsigned int iter                = 0;
     bool         continue_refinement = true;
 
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = tria.begin_active(),
-      endc = tria.end();
-
     while (continue_refinement && (iter < max_iterations))
       {
         iter++;
         continue_refinement = false;
-        for (cell = tria.begin_active(); cell != endc; ++cell)
+        for (const auto &cell : tria.active_cell_iterators())
           {
             std::pair<unsigned int, double> info =
               GridTools::get_longest_direction<dim, spacedim>(cell);

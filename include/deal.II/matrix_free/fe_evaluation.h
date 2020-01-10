@@ -1844,9 +1844,7 @@ protected:
  * @code
  * FEEvaluation<dim,fe_degree> fe_eval (mapping, finite_element,
  *                                      QGauss<1>(fe_degree+1), flags);
- * for (cell = dof_handler.begin_active();
- *      cell != dof_handler.end();
- *      ++cell)
+ * for (const auto &cell : dof_handler.active_cell_iterators())
  *   {
  *     fe_eval.reinit(cell);
  *     for (unsigned int i=0; i<dofs_per_cell;

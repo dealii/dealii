@@ -820,11 +820,6 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
       renumber[i] = new_number++;
   Assert(new_number == n_vertices, ExcInternalError());
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator       cell;
-  const typename Triangulation<dim, spacedim>::active_cell_iterator endc =
-    tria.end();
-
-
   // write the vertices
   out << "object \"vertices\" class array type float rank 1 shape " << dim
       << " items " << n_vertices << " data follows" << '\n';
@@ -850,7 +845,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
           << n_vertices_per_cell << " items " << n_cells << " data follows"
           << '\n';
 
-      for (cell = tria.begin_active(); cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                ++v)
@@ -874,13 +869,13 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       out << "object \"material\" class array type int rank 0 items " << n_cells
           << " data follows" << '\n';
-      for (cell = tria.begin_active(); cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         out << ' ' << cell->material_id();
       out << '\n' << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 
       out << "object \"level\" class array type int rank 0 items " << n_cells
           << " data follows" << '\n';
-      for (cell = tria.begin_active(); cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         out << ' ' << cell->level();
       out << '\n' << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 
@@ -888,7 +883,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
         {
           out << "object \"measure\" class array type float rank 0 items "
               << n_cells << " data follows" << '\n';
-          for (cell = tria.begin_active(); cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             out << '\t' << cell->measure();
           out << '\n'
               << "attribute \"dep\" string \"connections\"" << '\n'
@@ -899,7 +894,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
         {
           out << "object \"diameter\" class array type float rank 0 items "
               << n_cells << " data follows" << '\n';
-          for (cell = tria.begin_active(); cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             out << '\t' << cell->diameter();
           out << '\n'
               << "attribute \"dep\" string \"connections\"" << '\n'
@@ -913,7 +908,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
           << n_vertices_per_face << " items " << n_faces << " data follows"
           << '\n';
 
-      for (cell = tria.begin_active(); cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
@@ -942,7 +937,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       out << "object \"boundary\" class array type int rank 0 items " << n_faces
           << " data follows" << '\n';
-      for (cell = tria.begin_active(); cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           // Little trick to get -1 for the interior
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -959,7 +954,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
         {
           out << "object \"face measure\" class array type float rank 0 items "
               << n_faces << " data follows" << '\n';
-          for (cell = tria.begin_active(); cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             {
               for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
                    ++f)
@@ -973,7 +968,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
         {
           out << "object \"face diameter\" class array type float rank 0 items "
               << n_faces << " data follows" << '\n';
-          for (cell = tria.begin_active(); cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             {
               for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
                    ++f)
@@ -1053,11 +1048,6 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   const std::vector<bool> &           vertex_used = tria.get_used_vertices();
 
   const unsigned int n_vertices = tria.n_used_vertices();
-
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-    tria.begin_active();
-  const typename Triangulation<dim, spacedim>::active_cell_iterator endc =
-    tria.end();
 
   // Write Header
   // The file format is:
@@ -1148,7 +1138,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  for (cell = tria.begin_active(); cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     {
       out << cell->active_cell_index() + 1 << ' ' << elm_type << ' '
           << static_cast<unsigned int>(cell->material_id()) << ' '
@@ -1201,11 +1191,6 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
 
   const unsigned int n_vertices = tria.n_used_vertices();
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-    tria.begin_active();
-  const typename Triangulation<dim, spacedim>::active_cell_iterator endc =
-    tria.end();
-
   // write preamble
   if (ucd_flags.write_preamble)
     {
@@ -1249,7 +1234,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  for (cell = tria.begin_active(); cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     {
       out << cell->active_cell_index() + 1 << ' '
           << static_cast<unsigned int>(cell->material_id()) << ' ';
@@ -1398,10 +1383,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
   // on finer levels. Level 0
   // corresponds to a depth of 900,
   // each level subtracting 1
-  Triangulation<dim, spacedim>::cell_iterator       cell = tria.begin();
-  const Triangulation<dim, spacedim>::cell_iterator end  = tria.end();
-
-  for (; cell != end; ++cell)
+  for (const auto &cell : tria.cell_iterators())
     {
       // If depth is not encoded, write finest level only
       if (!xfig_flags.level_depth && !cell->active())
@@ -1813,9 +1795,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   y_max_perspective = projection_decomposition[1];
   y_min_perspective = projection_decomposition[1];
 
-  for (Triangulation<2, 2>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (const auto &cell : tria.cell_iterators())
     {
       point[0] = cell->vertex(0)[0];
       point[1] = cell->vertex(0)[1];
@@ -2124,10 +2104,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   for (unsigned int level_index = min_level; level_index <= max_level;
        level_index++)
     {
-      Triangulation<2, 2>::cell_iterator cell = tria.begin(level_index),
-                                         endc = tria.end(level_index);
-
-      for (; cell != endc; ++cell)
+      for (const auto &cell : tria.cell_iterators_on_level(level_index))
         {
           if (!svg_flags.convert_level_number_to_height && !cell->active())
             continue;
@@ -2841,12 +2818,8 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
 
   // run over all active cells and write out a list of
   // xyz-coordinates that correspond to vertices
-  typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
-
   // No global indices in deal.II, so we make one up here.
-  for (; cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     {
       for (unsigned int i = 0; i < dim; ++i)
         {
@@ -3341,8 +3314,7 @@ GridOut::write_mesh_per_processor_as_vtu(
 
   const unsigned int n_q_points = GeometryInfo<dim>::vertices_per_cell;
 
-  typename Triangulation<dim, spacedim>::cell_iterator cell, endc;
-  for (cell = tria.begin(), endc = tria.end(); cell != endc; ++cell)
+  for (const auto &cell : tria.cell_iterators())
     {
       if (!view_levels)
         {
@@ -3512,8 +3484,7 @@ GridOut::n_boundary_faces(const Triangulation<dim, spacedim> &tria) const
   typename Triangulation<dim, spacedim>::active_face_iterator face, endf;
   unsigned int                                                n_faces = 0;
 
-  for (face = tria.begin_active_face(), endf = tria.end_face(); face != endf;
-       ++face)
+  for (const auto &face : tria.active_face_iterators())
     if ((face->at_boundary()) && (face->boundary_id() != 0))
       n_faces++;
 
@@ -3537,9 +3508,7 @@ GridOut::n_boundary_lines(const Triangulation<dim, spacedim> &tria) const
 
   unsigned int n_lines = 0;
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
-
-  for (cell = tria.begin_active(), endc = tria.end(); cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary() && (cell->line(l)->boundary_id() != 0) &&
           (cell->line(l)->user_flag_set() == false))
@@ -3635,10 +3604,8 @@ GridOut::write_msh_faces(const Triangulation<dim, spacedim> &tria,
                          std::ostream &                      out) const
 {
   unsigned int current_element_index = next_element_index;
-  typename Triangulation<dim, spacedim>::active_face_iterator face, endf;
 
-  for (face = tria.begin_active_face(), endf = tria.end_face(); face != endf;
-       ++face)
+  for (const auto &face : tria.active_face_iterators())
     if (face->at_boundary() && (face->boundary_id() != 0))
       {
         out << current_element_index << ' ';
@@ -3689,9 +3656,7 @@ GridOut::write_msh_lines(const Triangulation<dim, spacedim> &tria,
   const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
     .clear_user_flags_line();
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
-
-  for (cell = tria.begin_active(), endc = tria.end(); cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary() && (cell->line(l)->boundary_id() != 0) &&
           (cell->line(l)->user_flag_set() == false))
@@ -3802,8 +3767,7 @@ GridOut::write_ucd_faces(const Triangulation<dim, spacedim> &tria,
   unsigned int current_element_index = next_element_index;
   typename Triangulation<dim, spacedim>::active_face_iterator face, endf;
 
-  for (face = tria.begin_active_face(), endf = tria.end_face(); face != endf;
-       ++face)
+  for (const auto &face : tria.active_face_iterators())
     if (face->at_boundary() && (face->boundary_id() != 0))
       {
         out << current_element_index << "  "
@@ -3853,9 +3817,7 @@ GridOut::write_ucd_lines(const Triangulation<dim, spacedim> &tria,
   const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
     .clear_user_flags_line();
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
-
-  for (cell = tria.begin_active(), endc = tria.end(); cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary() && (cell->line(l)->boundary_id() != 0) &&
           (cell->line(l)->user_flag_set() == false))
@@ -3928,13 +3890,7 @@ namespace internal
     {
       AssertThrow(out, ExcIO());
 
-      const int dim = 1;
-
-      typename dealii::Triangulation<dim, spacedim>::active_cell_iterator cell =
-        tria.begin_active();
-      const typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-        endc = tria.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
@@ -3970,11 +3926,6 @@ namespace internal
         gnuplot_flags.n_boundary_face_points;
       const unsigned int n_points = 2 + n_additional_points;
 
-      typename dealii::Triangulation<dim, spacedim>::active_cell_iterator cell =
-        tria.begin_active();
-      const typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-        endc = tria.end();
-
       // If we need to plot curved lines then generate a quadrature formula to
       // place points via the mapping
       Quadrature<dim> *           q_projector = nullptr;
@@ -3994,7 +3945,7 @@ namespace internal
             QProjector<dim>::project_to_all_faces(quadrature));
         }
 
-      for (; cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
@@ -4096,11 +4047,6 @@ namespace internal
         gnuplot_flags.n_boundary_face_points;
       const unsigned int n_points = 2 + n_additional_points;
 
-      typename dealii::Triangulation<dim, spacedim>::active_cell_iterator cell =
-        tria.begin_active();
-      const typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-        endc = tria.end();
-
       // If we need to plot curved lines then generate a quadrature formula to
       // place points via the mapping
       Quadrature<dim> *     q_projector = nullptr;
@@ -4122,7 +4068,7 @@ namespace internal
             QProjector<dim>::project_to_all_faces(quadrature));
         }
 
-      for (; cell != endc; ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         {
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
@@ -4427,10 +4373,7 @@ namespace internal
 
           case 2:
             {
-              for (typename dealii::Triangulation<dim, spacedim>::
-                     active_cell_iterator cell = tria.begin_active();
-                   cell != tria.end();
-                   ++cell)
+              for (const auto &cell : tria.active_cell_iterators())
                 for (unsigned int line_no = 0;
                      line_no < GeometryInfo<dim>::lines_per_cell;
                      ++line_no)
@@ -4502,10 +4445,7 @@ namespace internal
                   // boundary faces and
                   // generate the info from
                   // them
-                  for (typename dealii::Triangulation<dim, spacedim>::
-                         active_cell_iterator cell = tria.begin_active();
-                       cell != tria.end();
-                       ++cell)
+                  for (const auto &cell : tria.active_cell_iterators())
                     for (unsigned int face_no = 0;
                          face_no < GeometryInfo<dim>::faces_per_cell;
                          ++face_no)
@@ -4558,11 +4498,6 @@ namespace internal
               // presently not supported
               Assert(mapping == nullptr, ExcNotImplemented());
 
-              typename dealii::Triangulation<dim,
-                                             spacedim>::active_cell_iterator
-                cell = tria.begin_active(),
-                endc = tria.end();
-
               // loop over all lines and compute their
               // projection on the plane perpendicular
               // to the direction of sight
@@ -4611,7 +4546,7 @@ namespace internal
               const Tensor<1, dim> unit_vector2 = vector2 / vector2.norm();
 
 
-              for (; cell != endc; ++cell)
+              for (const auto &cell : tria.active_cell_iterators())
                 for (unsigned int line_no = 0;
                      line_no < GeometryInfo<dim>::lines_per_cell;
                      ++line_no)
@@ -4777,10 +4712,7 @@ namespace internal
         {
           out << "(Helvetica) findfont 140 scalefont setfont" << '\n';
 
-          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-            cell = tria.begin_active(),
-            endc = tria.end();
-          for (; cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             {
               out << (cell->center()(0) - offset(0)) * scale << ' '
                   << (cell->center()(1) - offset(1)) * scale << " m" << '\n'
@@ -4805,10 +4737,7 @@ namespace internal
           // already tracked, to avoid
           // doing this multiply
           std::set<unsigned int> treated_vertices;
-          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-            cell = tria.begin_active(),
-            endc = tria.end();
-          for (; cell != endc; ++cell)
+          for (const auto &cell : tria.active_cell_iterators())
             for (unsigned int vertex = 0;
                  vertex < GeometryInfo<dim>::vertices_per_cell;
                  ++vertex)
