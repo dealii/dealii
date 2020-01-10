@@ -205,7 +205,7 @@ MGTransferBlock<number>::copy_to_mg(
 template <int dim, int spacedim>
 void
 MGTransferBlockBase::build_matrices(
-  const DoFHandler<dim, spacedim> &dof,
+  const DoFHandler<dim, spacedim> & /*dof*/,
   const DoFHandler<dim, spacedim> &mg_dof_handler)
 {
   build(mg_dof_handler);
