@@ -110,9 +110,8 @@ protected:
    *
    * @deprecated Use build() instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof,
                  const DoFHandler<dim, spacedim> &mg_dof);
 
@@ -250,9 +249,8 @@ public:
    *
    * @deprecated Use the build() function instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof,
                  const DoFHandler<dim, spacedim> &mg_dof,
                  const std::vector<bool> &        selected);
@@ -393,9 +391,8 @@ public:
    *
    * @deprecated Use build() instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof,
                  const DoFHandler<dim, spacedim> &mg_dof,
                  unsigned int                     selected);

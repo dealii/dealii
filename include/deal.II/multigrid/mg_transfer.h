@@ -717,9 +717,8 @@ public:
    *
    * @deprecated use build() instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**

@@ -97,9 +97,8 @@ protected:
    *
    * @deprecated Use build() instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof,
                  const DoFHandler<dim, spacedim> &mg_dof);
 
@@ -240,9 +239,8 @@ public:
    *
    * @deprecated Use build() instead.
    */
-  DEAL_II_DEPRECATED
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(
     const DoFHandler<dim, spacedim> &dof,
     const DoFHandler<dim, spacedim> &mg_dof,
