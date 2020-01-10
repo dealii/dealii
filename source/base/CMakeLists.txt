@@ -85,7 +85,6 @@ SET(_unity_include_src
   tensor_product_polynomials_bubbles.cc
   tensor_product_polynomials_const.cc
   thread_management.cc
-  tensor.cc
   timer.cc
   time_stepping.cc
   utilities.cc
@@ -128,7 +127,6 @@ SET(_inst
   partitioner.cuda.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
-  tensor.inst.in
   tensor_function.inst.in
   tensor_function_parser.inst.in
   time_stepping.inst.in
