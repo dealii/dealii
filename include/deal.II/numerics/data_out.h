@@ -146,13 +146,6 @@ namespace internal
  * this pair of functions and they return a non-active cell, then an exception
  * will be thrown.
  *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
- *
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
@@ -162,6 +155,10 @@ class DataOut : public DataOut_DoFData<DoFHandlerType,
                                        DoFHandlerType::space_dimension>
 {
 public:
+  static_assert(dim == DoFHandlerType::dimension,
+                "The dimension given explicitly as a template argument to "
+                "this class must match the dimension of the DoFHandler "
+                "template argument");
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
