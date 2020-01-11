@@ -379,11 +379,8 @@ namespace parallel
     Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
       const unsigned int coarse_cell_index) const
     {
-      Assert(coarse_cell_index <
-               coarse_cell_index_to_coarse_cell_id_vector.size(),
-             ExcIndexRange(coarse_cell_index,
-                           0,
-                           coarse_cell_index_to_coarse_cell_id_vector.size()));
+      AssertIndexRange(coarse_cell_index,
+                       coarse_cell_index_to_coarse_cell_id_vector.size());
 
       const auto coarse_cell_id =
         coarse_cell_index_to_coarse_cell_id_vector[coarse_cell_index];

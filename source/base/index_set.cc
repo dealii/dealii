@@ -364,11 +364,10 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
   if ((this == &other) && (offset == 0))
     return;
 
-  Assert(other.ranges.size() == 0 ||
-           other.ranges.back().end - 1 < index_space_size,
-         ExcIndexRangeType<size_type>(other.ranges.back().end - 1,
-                                      0,
-                                      index_space_size));
+  if (other.ranges.size() != 0)
+    {
+      AssertIndexRange(other.ranges.back().end - 1, index_space_size);
+    }
 
   compress();
   other.compress();

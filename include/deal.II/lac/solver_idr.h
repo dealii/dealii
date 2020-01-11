@@ -204,7 +204,7 @@ namespace internal
     inline VectorType &TmpVectors<VectorType>::
                        operator[](const unsigned int i) const
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
 
       Assert(data[i] != nullptr, ExcNotInitialized());
       return *data[i];

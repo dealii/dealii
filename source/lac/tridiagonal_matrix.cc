@@ -264,7 +264,7 @@ number
 TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 {
   Assert(state == LAPACKSupport::eigenvalues, ExcState(state));
-  Assert(i < n(), ExcIndexRange(i, 0, n()));
+  AssertIndexRange(i, n());
   return diagonal[i];
 }
 

@@ -615,8 +615,8 @@ void
 ImplicitQR<VectorType>::apply_givens_rotation(const unsigned int i,
                                               const unsigned int k)
 {
-  Assert(i < k, ExcIndexRange(i, 0, k));
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(i, k);
+  AssertIndexRange(k, this->current_size);
   const std::array<Number, 3> csr =
     dealii::Utilities::LinearAlgebra::givens_rotation<Number>(this->R(i, k),
                                                               this->R(k, k));
@@ -751,8 +751,8 @@ void
 QR<VectorType>::apply_givens_rotation(const unsigned int i,
                                       const unsigned int k)
 {
-  Assert(i < k, ExcIndexRange(i, 0, k));
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(i, k);
+  AssertIndexRange(k, this->current_size);
   const std::array<Number, 3> csr =
     dealii::Utilities::LinearAlgebra::givens_rotation<Number>(this->R(i, k),
                                                               this->R(k, k));
@@ -788,7 +788,7 @@ template <typename VectorType>
 void
 QR<VectorType>::remove_column(const unsigned int k)
 {
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(k, this->current_size);
   Assert(this->current_size > 0,
          ExcMessage("Can not remove a column if QR is empty"));
   // apply a sequence of Givens rotations

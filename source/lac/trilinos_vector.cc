@@ -42,7 +42,7 @@ namespace TrilinosWrappers
   {
     VectorReference::operator TrilinosScalar() const
     {
-      Assert(index < vector.size(), ExcIndexRange(index, 0, vector.size()));
+      AssertIndexRange(index, vector.size());
 
       // Trilinos allows for vectors to be referenced by the [] or ()
       // operators but only () checks index bounds. We check these bounds by

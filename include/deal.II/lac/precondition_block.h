@@ -955,7 +955,7 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   b_iterator = matrix->inverse(a_block).begin(r);
   b_end      = matrix->inverse(a_block).end();
 
-  Assert(a_block < matrix->size(), ExcIndexRange(a_block, 0, matrix->size()));
+  AssertIndexRange(a_block, matrix->size());
 }
 
 
@@ -1106,7 +1106,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::begin(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  AssertIndexRange(r, this->A->m());
   return const_iterator(this, r);
 }
 
@@ -1118,7 +1118,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::end(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  AssertIndexRange(r, this->A->m());
   return const_iterator(this, r + 1);
 }
 

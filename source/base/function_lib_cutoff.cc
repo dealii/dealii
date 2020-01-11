@@ -251,8 +251,7 @@ namespace Functions
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
 
 
     if (this->selected == CutOffFunctionBase<dim>::no_component ||

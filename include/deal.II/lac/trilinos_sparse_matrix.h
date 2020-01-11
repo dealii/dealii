@@ -2912,7 +2912,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::begin(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
     if (in_local_range(r) && (row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
@@ -2924,7 +2924,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::end(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -2959,7 +2959,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::begin(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
     if (in_local_range(r) && (row_length(r) > 0))
       return iterator(this, r, 0);
     else
@@ -2971,7 +2971,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::end(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    AssertIndexRange(r, m());
 
     // place the iterator on the first entry
     // past this line, or at the end of the

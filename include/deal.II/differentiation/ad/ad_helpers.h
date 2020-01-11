@@ -2443,8 +2443,7 @@ namespace Differentiation
                        const NumberType &  value)
       {
         // Where possible, set values using TableIndices
-        Assert(unrolled_index < t.n_independent_components,
-               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        AssertIndexRange(unrolled_index, t.n_independent_components);
         t[TensorType::unrolled_to_component_indices(unrolled_index)] = value;
       }
 
@@ -2458,7 +2457,7 @@ namespace Differentiation
                                    const unsigned int &        unrolled_index,
                                    const NumberType &          value)
       {
-        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
         t = value;
       }
@@ -2475,7 +2474,7 @@ namespace Differentiation
                        const unsigned int &unrolled_index,
                        const NumberType &  value)
       {
-        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
         t = value;
       }
@@ -2495,14 +2494,10 @@ namespace Differentiation
         // Fourth order symmetric tensors require a specialized interface
         // to extract values.
         using SubTensorType = SymmetricTensor<2, dim, NumberType>;
-        Assert(unrolled_index_row < SubTensorType::n_independent_components,
-               ExcIndexRange(unrolled_index_row,
-                             0,
-                             SubTensorType::n_independent_components));
-        Assert(unrolled_index_col < SubTensorType::n_independent_components,
-               ExcIndexRange(unrolled_index_col,
-                             0,
-                             SubTensorType::n_independent_components));
+        AssertIndexRange(unrolled_index_row,
+                         SubTensorType::n_independent_components);
+        AssertIndexRange(unrolled_index_col,
+                         SubTensorType::n_independent_components);
         const TableIndices<2> indices_row =
           SubTensorType::unrolled_to_component_indices(unrolled_index_row);
         const TableIndices<2> indices_col =
@@ -2525,8 +2520,7 @@ namespace Differentiation
                        const unsigned int &                     unrolled_index)
       {
         // Where possible, get values using TableIndices
-        Assert(unrolled_index < t.n_independent_components,
-               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        AssertIndexRange(unrolled_index, t.n_independent_components);
         return t[TensorType<rank, dim, NumberType>::
                    unrolled_to_component_indices(unrolled_index)];
       }
@@ -2543,7 +2537,7 @@ namespace Differentiation
       get_tensor_entry(const TensorType<0, dim, NumberType> &t,
                        const unsigned int &                  unrolled_index)
       {
-        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
         return t;
       }
@@ -2558,7 +2552,7 @@ namespace Differentiation
       inline const NumberType &
       get_tensor_entry(const NumberType &t, const unsigned int &unrolled_index)
       {
-        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
         return t;
       }
@@ -2577,8 +2571,7 @@ namespace Differentiation
                        const unsigned int &               unrolled_index)
       {
         // Where possible, get values using TableIndices
-        Assert(unrolled_index < t.n_independent_components,
-               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        AssertIndexRange(unrolled_index, t.n_independent_components);
         return t[TensorType<rank, dim, NumberType>::
                    unrolled_to_component_indices(unrolled_index)];
       }
@@ -2594,7 +2587,7 @@ namespace Differentiation
       NumberType &get_tensor_entry(TensorType<0, dim, NumberType> &t,
                                    const unsigned int &            index)
       {
-        Assert(index == 0, ExcIndexRange(index, 0, 1));
+        AssertIndexRange(index, 1);
         (void)index;
         return t;
       }
@@ -2609,7 +2602,7 @@ namespace Differentiation
       inline NumberType &
       get_tensor_entry(NumberType &t, const unsigned int &index)
       {
-        Assert(index == 0, ExcIndexRange(index, 0, 1));
+        AssertIndexRange(index, 1);
         (void)index;
         return t;
       }

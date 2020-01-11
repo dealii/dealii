@@ -202,8 +202,7 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
+    AssertIndexRange(vertex, mesh.get_triangulation().n_vertices());
     Assert(mesh.get_triangulation().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
@@ -2047,8 +2046,7 @@ namespace GridTools
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
 #ifdef DEBUG
     {
@@ -2143,8 +2141,7 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(dim == space_dim, ExcNotImplemented());
 
@@ -2226,8 +2223,7 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     // Loop over all cells on the highest level and collect all boundary
     // faces belonging to b_id1 and b_id2:
@@ -2308,8 +2304,7 @@ namespace GridTools
                       const Tensor<1, spacedim> &offset,
                       const FullMatrix<double> & matrix)
   {
-    Assert(0 <= direction && direction < spacedim,
-           ExcIndexRange(direction, 0, spacedim));
+    AssertIndexRange(direction, spacedim);
 
     Assert(matrix.m() == matrix.n(), ExcInternalError());
 

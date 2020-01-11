@@ -382,8 +382,7 @@ namespace Functions
     const Point<dim> &,
     const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
     return function_value_vector[component];
   }
 
@@ -414,8 +413,7 @@ namespace Functions
   {
     // To avoid warning of unused parameter
     (void)points;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
     Assert(return_values.size() == points.size(),
            ExcDimensionMismatch(return_values.size(), points.size()))
 
@@ -536,7 +534,7 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   : ConstantFunction<dim, RangeNumberType>(1., n_components)
   , selected_components(std::make_pair(selected, selected + 1))
 {
-  Assert(selected < n_components, ExcIndexRange(selected, 0, n_components));
+  AssertIndexRange(selected, n_components);
 }
 
 
@@ -650,8 +648,7 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::
   , function_object(function_object)
   , selected_component(selected_component)
 {
-  Assert(selected_component < this->n_components,
-         ExcIndexRange(selected_component, 0, this->n_components));
+  AssertIndexRange(selected_component, this->n_components);
 }
 
 
@@ -662,8 +659,7 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::value(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  AssertIndexRange(component, this->n_components);
 
   if (component == selected_component)
     return function_object(p);
@@ -705,8 +701,7 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::
 {
   // Verify that the Tensor<1,dim,RangeNumberType> will fit in the given length
   // selected_components and not hang over the end of the vector.
-  Assert(selected_component + dim - 1 < this->n_components,
-         ExcIndexRange(selected_component, 0, this->n_components));
+  AssertIndexRange(selected_component + dim - 1, this->n_components);
 }
 
 
@@ -717,8 +712,7 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::value(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  AssertIndexRange(component, this->n_components);
 
   // if the requested component is out of the range selected, then we can
   // return early

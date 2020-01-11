@@ -767,8 +767,8 @@ inline SparsityPatternType &
 BlockSparsityPatternBase<SparsityPatternType>::block(const size_type row,
                                                      const size_type column)
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(column, columns);
   return *sub_objects[row][column];
 }
 
@@ -780,8 +780,8 @@ BlockSparsityPatternBase<SparsityPatternType>::block(
   const size_type row,
   const size_type column) const
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(column, columns);
   return *sub_objects[row][column];
 }
 
@@ -973,7 +973,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
   const std::pair<size_type, size_type> row_index =
     row_indices.global_to_local(row);
 
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  AssertIndexRange(index, row_length(row));
 
   size_type c             = 0;
   size_type block_columns = 0; // sum of n_cols for all blocks to the left

@@ -686,7 +686,7 @@ namespace MeshWorker
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::fe_values(unsigned int i) const
   {
-    Assert(i < fevalv.size(), ExcIndexRange(i, 0, fevalv.size()));
+    AssertIndexRange(i, fevalv.size());
     return *fevalv[i];
   }
 

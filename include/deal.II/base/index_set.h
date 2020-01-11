@@ -1521,8 +1521,7 @@ inline IndexSet::ElementIterator
 IndexSet::at(const size_type global_index) const
 {
   compress();
-  Assert(global_index < size(),
-         ExcIndexRangeType<size_type>(global_index, 0, size()));
+  AssertIndexRange(global_index, size());
 
   if (ranges.empty())
     return end();
@@ -1644,8 +1643,7 @@ IndexSet::compress() const
 inline void
 IndexSet::add_index(const size_type index)
 {
-  Assert(index < index_space_size,
-         ExcIndexRangeType<size_type>(index, 0, index_space_size));
+  AssertIndexRange(index, index_space_size);
 
   const Range new_range(index, index + 1);
   if (ranges.size() == 0 || index > ranges.back().end)
@@ -1670,7 +1668,7 @@ IndexSet::add_range(const size_type begin, const size_type end)
          ExcIndexRangeType<size_type>(begin, 0, index_space_size));
   Assert(end <= index_space_size,
          ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
-  Assert(begin <= end, ExcIndexRangeType<size_type>(begin, 0, end));
+  AssertIndexRange(begin, end + 1);
 
   if (begin != end)
     {
@@ -1872,7 +1870,7 @@ IndexSet::largest_range_starting_index() const
 inline IndexSet::size_type
 IndexSet::nth_index_in_set(const size_type n) const
 {
-  Assert(n < n_elements(), ExcIndexRangeType<size_type>(n, 0, n_elements()));
+  AssertIndexRange(n, n_elements());
 
   compress();
 
@@ -1916,7 +1914,7 @@ IndexSet::index_within_set(const size_type n) const
   // to make this call thread-safe, compress() must not be called through this
   // function
   Assert(is_compressed == true, ExcMessage("IndexSet must be compressed."));
-  Assert(n < size(), ExcIndexRangeType<size_type>(n, 0, size()));
+  AssertIndexRange(n, size());
 
   // return immediately if the index set is empty
   if (is_empty())

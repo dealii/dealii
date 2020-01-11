@@ -831,8 +831,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to
           // numbers::invalid_material_id-1
-          Assert(material_id < numbers::invalid_material_id,
-                 ExcIndexRange(material_id, 0, numbers::invalid_material_id));
+          AssertIndexRange(material_id, numbers::invalid_material_id);
 
           if (apply_all_indicators_to_manifolds)
             cells.back().manifold_id =
@@ -873,10 +872,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          AssertIndexRange(material_id, numbers::internal_face_boundary_id);
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -927,10 +923,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          AssertIndexRange(material_id, numbers::internal_face_boundary_id);
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -1853,10 +1846,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::material_id>::max()));
                 // we use only material_ids in the range from 0 to
                 // numbers::invalid_material_id-1
-                Assert(material_id < numbers::invalid_material_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::invalid_material_id));
+                AssertIndexRange(material_id, numbers::invalid_material_id);
 
                 cells.back().material_id =
                   static_cast<types::material_id>(material_id);
@@ -1895,10 +1885,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                Assert(material_id < numbers::internal_face_boundary_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::internal_face_boundary_id));
+                AssertIndexRange(material_id,
+                                 numbers::internal_face_boundary_id);
 
                 subcelldata.boundary_lines.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);
@@ -1937,10 +1925,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                Assert(material_id < numbers::internal_face_boundary_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::internal_face_boundary_id));
+                AssertIndexRange(material_id,
+                                 numbers::internal_face_boundary_id);
 
                 subcelldata.boundary_quads.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);

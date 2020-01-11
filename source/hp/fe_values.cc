@@ -71,12 +71,9 @@ namespace hp
     const unsigned int mapping_index,
     const unsigned int q_index)
   {
-    Assert(fe_index < fe_collection->size(),
-           ExcIndexRange(fe_index, 0, fe_collection->size()));
-    Assert(mapping_index < mapping_collection->size(),
-           ExcIndexRange(mapping_index, 0, mapping_collection->size()));
-    Assert(q_index < q_collection.size(),
-           ExcIndexRange(q_index, 0, q_collection.size()));
+    AssertIndexRange(fe_index, fe_collection->size());
+    AssertIndexRange(mapping_index, mapping_collection->size());
+    AssertIndexRange(q_index, q_collection.size());
 
 
     // set the triple of indices
@@ -163,14 +160,9 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and
@@ -204,14 +196,9 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and
@@ -285,14 +272,9 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and
@@ -327,14 +309,9 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and
@@ -409,14 +386,9 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and
@@ -452,14 +424,9 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    Assert(real_q_index < this->q_collection.size(),
-           ExcIndexRange(real_q_index, 0, this->q_collection.size()));
-    Assert(real_mapping_index < this->mapping_collection->size(),
-           ExcIndexRange(real_mapping_index,
-                         0,
-                         this->mapping_collection->size()));
-    Assert(real_fe_index < this->fe_collection->size(),
-           ExcIndexRange(real_fe_index, 0, this->fe_collection->size()));
+    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_mapping_index, this->mapping_collection->size());
+    AssertIndexRange(real_fe_index, this->fe_collection->size());
 
     // now finally actually get the
     // corresponding object and

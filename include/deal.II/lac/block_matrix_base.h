@@ -1570,8 +1570,8 @@ inline typename BlockMatrixBase<MatrixType>::BlockType &
 BlockMatrixBase<MatrixType>::block(const unsigned int row,
                                    const unsigned int column)
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
 
   return *sub_objects[row][column];
 }
@@ -1583,8 +1583,8 @@ inline const typename BlockMatrixBase<MatrixType>::BlockType &
 BlockMatrixBase<MatrixType>::block(const unsigned int row,
                                    const unsigned int column) const
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
 
   return *sub_objects[row][column];
 }
@@ -2543,7 +2543,7 @@ template <class MatrixType>
 inline typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r);
 }
 
@@ -2553,7 +2553,7 @@ template <class MatrixType>
 inline typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r + 1);
 }
 
@@ -2581,7 +2581,7 @@ template <class MatrixType>
 inline typename BlockMatrixBase<MatrixType>::iterator
 BlockMatrixBase<MatrixType>::begin(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r);
 }
 
@@ -2591,7 +2591,7 @@ template <class MatrixType>
 inline typename BlockMatrixBase<MatrixType>::iterator
 BlockMatrixBase<MatrixType>::end(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r + 1);
 }
 

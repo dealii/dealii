@@ -2498,7 +2498,7 @@ template <>
 inline RefinementCase<1>
 RefinementCase<1>::cut_axis(const unsigned int i)
 {
-  Assert(i < 1, ExcIndexRange(i, 0, 1));
+  AssertIndexRange(i, 1);
 
   const RefinementCase options[1] = {RefinementPossibilities<1>::cut_x};
   return options[i];
@@ -2510,7 +2510,7 @@ template <>
 inline RefinementCase<2>
 RefinementCase<2>::cut_axis(const unsigned int i)
 {
-  Assert(i < 2, ExcIndexRange(i, 0, 2));
+  AssertIndexRange(i, 2);
 
   const RefinementCase options[2] = {RefinementPossibilities<2>::cut_x,
                                      RefinementPossibilities<2>::cut_y};
@@ -2523,7 +2523,7 @@ template <>
 inline RefinementCase<3>
 RefinementCase<3>::cut_axis(const unsigned int i)
 {
-  Assert(i < 3, ExcIndexRange(i, 0, 3));
+  AssertIndexRange(i, 3);
 
   const RefinementCase options[3] = {RefinementPossibilities<3>::cut_x,
                                      RefinementPossibilities<3>::cut_y,
@@ -2636,8 +2636,7 @@ template <>
 inline Point<1>
 GeometryInfo<1>::unit_cell_vertex(const unsigned int vertex)
 {
-  Assert(vertex < vertices_per_cell,
-         ExcIndexRange(vertex, 0, vertices_per_cell));
+  AssertIndexRange(vertex, vertices_per_cell);
 
   return Point<1>(static_cast<double>(vertex));
 }
@@ -2648,8 +2647,7 @@ template <>
 inline Point<2>
 GeometryInfo<2>::unit_cell_vertex(const unsigned int vertex)
 {
-  Assert(vertex < vertices_per_cell,
-         ExcIndexRange(vertex, 0, vertices_per_cell));
+  AssertIndexRange(vertex, vertices_per_cell);
 
   return {static_cast<double>(vertex % 2), static_cast<double>(vertex / 2)};
 }
@@ -2660,8 +2658,7 @@ template <>
 inline Point<3>
 GeometryInfo<3>::unit_cell_vertex(const unsigned int vertex)
 {
-  Assert(vertex < vertices_per_cell,
-         ExcIndexRange(vertex, 0, vertices_per_cell));
+  AssertIndexRange(vertex, vertices_per_cell);
 
   return {static_cast<double>(vertex % 2),
           static_cast<double>(vertex / 2 % 2),
@@ -2736,7 +2733,7 @@ GeometryInfo<1>::cell_to_child_coordinates(const Point<1> &        p,
                                            const RefinementCase<1> refine_case)
 
 {
-  Assert(child_index < 2, ExcIndexRange(child_index, 0, 2));
+  AssertIndexRange(child_index, 2);
   Assert(refine_case == RefinementCase<1>::cut_x, ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
@@ -2752,10 +2749,7 @@ GeometryInfo<2>::cell_to_child_coordinates(const Point<2> &        p,
                                            const RefinementCase<2> refine_case)
 
 {
-  Assert(child_index < GeometryInfo<2>::n_children(refine_case),
-         ExcIndexRange(child_index,
-                       0,
-                       GeometryInfo<2>::n_children(refine_case)));
+  AssertIndexRange(child_index, GeometryInfo<2>::n_children(refine_case));
 
   Point<2> point = p;
   switch (refine_case)
@@ -2790,10 +2784,7 @@ GeometryInfo<3>::cell_to_child_coordinates(const Point<3> &        p,
                                            const RefinementCase<3> refine_case)
 
 {
-  Assert(child_index < GeometryInfo<3>::n_children(refine_case),
-         ExcIndexRange(child_index,
-                       0,
-                       GeometryInfo<3>::n_children(refine_case)));
+  AssertIndexRange(child_index, GeometryInfo<3>::n_children(refine_case));
 
   Point<3> point = p;
   // there might be a cleverer way to do
@@ -2880,7 +2871,7 @@ GeometryInfo<1>::child_to_cell_coordinates(const Point<1> &        p,
                                            const RefinementCase<1> refine_case)
 
 {
-  Assert(child_index < 2, ExcIndexRange(child_index, 0, 2));
+  AssertIndexRange(child_index, 2);
   Assert(refine_case == RefinementCase<1>::cut_x, ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
@@ -2896,10 +2887,7 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
                                            const RefinementCase<3> refine_case)
 
 {
-  Assert(child_index < GeometryInfo<3>::n_children(refine_case),
-         ExcIndexRange(child_index,
-                       0,
-                       GeometryInfo<3>::n_children(refine_case)));
+  AssertIndexRange(child_index, GeometryInfo<3>::n_children(refine_case));
 
   Point<3> point = p;
   // there might be a cleverer way to do
@@ -2971,10 +2959,7 @@ GeometryInfo<2>::child_to_cell_coordinates(const Point<2> &        p,
                                            const unsigned int      child_index,
                                            const RefinementCase<2> refine_case)
 {
-  Assert(child_index < GeometryInfo<2>::n_children(refine_case),
-         ExcIndexRange(child_index,
-                       0,
-                       GeometryInfo<2>::n_children(refine_case)));
+  AssertIndexRange(child_index, GeometryInfo<2>::n_children(refine_case));
 
   Point<2> point = p;
   switch (refine_case)
@@ -3095,8 +3080,8 @@ GeometryInfo<1>::line_to_cell_vertices(const unsigned int line,
                                        const unsigned int vertex)
 {
   (void)line;
-  Assert(line < lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert(vertex < 2, ExcIndexRange(vertex, 0, 2));
+  AssertIndexRange(line, lines_per_cell);
+  AssertIndexRange(vertex, 2);
 
   return vertex;
 }
@@ -3118,8 +3103,8 @@ inline unsigned int
 GeometryInfo<3>::line_to_cell_vertices(const unsigned int line,
                                        const unsigned int vertex)
 {
-  Assert(line < lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert(vertex < 2, ExcIndexRange(vertex, 0, 2));
+  AssertIndexRange(line, lines_per_cell);
+  AssertIndexRange(vertex, 2);
 
   constexpr unsigned vertices[lines_per_cell][2] = {{0, 2}, // bottom face
                                                     {1, 3},
@@ -3153,8 +3138,7 @@ GeometryInfo<3>::standard_to_real_face_vertex(const unsigned int vertex,
                                               const bool face_flip,
                                               const bool face_rotation)
 {
-  Assert(vertex < GeometryInfo<3>::vertices_per_face,
-         ExcIndexRange(vertex, 0, GeometryInfo<3>::vertices_per_face));
+  AssertIndexRange(vertex, GeometryInfo<3>::vertices_per_face);
 
   // set up a table to make sure that
   // we handle non-standard faces correctly
@@ -3209,8 +3193,7 @@ GeometryInfo<dim>::standard_to_real_face_vertex(const unsigned int vertex,
                                                 const bool)
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
-  Assert(vertex < GeometryInfo<dim>::vertices_per_face,
-         ExcIndexRange(vertex, 0, GeometryInfo<dim>::vertices_per_face));
+  AssertIndexRange(vertex, GeometryInfo<dim>::vertices_per_face);
   return vertex;
 }
 
@@ -3414,12 +3397,9 @@ GeometryInfo<2>::face_refinement_case(
   const bool)
 {
   const unsigned int dim = 2;
-  Assert(cell_refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(cell_refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(cell_refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   const RefinementCase<dim - 1>
     ref_cases[RefinementCase<dim>::isotropic_refinement +
@@ -3448,12 +3428,9 @@ GeometryInfo<3>::face_refinement_case(
   const bool face_rotation)
 {
   const unsigned int dim = 3;
-  Assert(cell_refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(cell_refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(cell_refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   const RefinementCase<dim - 1>
     ref_cases[RefinementCase<dim>::isotropic_refinement + 1]
@@ -3535,12 +3512,9 @@ GeometryInfo<1>::line_refinement_case(
   (void)line_no;
   const unsigned int dim = 1;
   (void)dim;
-  Assert(cell_refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(cell_refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(line_no < GeometryInfo<dim>::lines_per_cell,
-         ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
+  AssertIndexRange(cell_refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
+  AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
   return cell_refinement_case;
 }
@@ -3564,12 +3538,9 @@ GeometryInfo<3>::line_refinement_case(
   const unsigned int       line_no)
 {
   const unsigned int dim = 3;
-  Assert(cell_refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(cell_refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(line_no < GeometryInfo<dim>::lines_per_cell,
-         ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
+  AssertIndexRange(cell_refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
+  AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
   // array indicating, which simple refine
   // case cuts a line in direction x, y or
@@ -3633,13 +3604,9 @@ GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(
   const bool)
 {
   const unsigned int dim = 2;
-  Assert(face_refinement_case <
-           RefinementCase<dim - 1>::isotropic_refinement + 1,
-         ExcIndexRange(face_refinement_case,
-                       0,
-                       RefinementCase<dim - 1>::isotropic_refinement + 1));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_refinement_case,
+                   RefinementCase<dim - 1>::isotropic_refinement + 1);
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   if (face_refinement_case == RefinementCase<dim>::cut_x)
     return (face_no / 2) ? RefinementCase<dim>::cut_x :
@@ -3659,13 +3626,9 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(
   const bool face_rotation)
 {
   const unsigned int dim = 3;
-  Assert(face_refinement_case <
-           RefinementCase<dim - 1>::isotropic_refinement + 1,
-         ExcIndexRange(face_refinement_case,
-                       0,
-                       RefinementCase<dim - 1>::isotropic_refinement + 1));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_refinement_case,
+                   RefinementCase<dim - 1>::isotropic_refinement + 1);
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   const RefinementCase<2> flip[4] = {RefinementCase<2>::no_refinement,
                                      RefinementCase<2>::cut_y,
@@ -3727,7 +3690,7 @@ GeometryInfo<1>::min_cell_refinement_case_for_line_refinement(
   const unsigned int line_no)
 {
   (void)line_no;
-  Assert(line_no == 0, ExcIndexRange(line_no, 0, 1));
+  AssertIndexRange(line_no, 1);
 
   return RefinementCase<1>::cut_x;
 }
@@ -3740,8 +3703,7 @@ GeometryInfo<2>::min_cell_refinement_case_for_line_refinement(
 {
   const unsigned int dim = 2;
   (void)dim;
-  Assert(line_no < GeometryInfo<dim>::lines_per_cell,
-         ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
+  AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
   return (line_no / 2) ? RefinementCase<2>::cut_x : RefinementCase<2>::cut_y;
 }
@@ -3753,8 +3715,7 @@ GeometryInfo<3>::min_cell_refinement_case_for_line_refinement(
   const unsigned int line_no)
 {
   const unsigned int dim = 3;
-  Assert(line_no < GeometryInfo<dim>::lines_per_cell,
-         ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
+  AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
   const RefinementCase<dim> ref_cases[6] = {
     RefinementCase<dim>::cut_y,  // lines  0 and  1
@@ -3776,8 +3737,7 @@ GeometryInfo<3>::real_to_standard_face_vertex(const unsigned int vertex,
                                               const bool face_flip,
                                               const bool face_rotation)
 {
-  Assert(vertex < GeometryInfo<3>::vertices_per_face,
-         ExcIndexRange(vertex, 0, GeometryInfo<3>::vertices_per_face));
+  AssertIndexRange(vertex, GeometryInfo<3>::vertices_per_face);
 
   // set up a table to make sure that
   // we handle non-standard faces correctly
@@ -3832,8 +3792,7 @@ GeometryInfo<dim>::real_to_standard_face_vertex(const unsigned int vertex,
                                                 const bool)
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
-  Assert(vertex < GeometryInfo<dim>::vertices_per_face,
-         ExcIndexRange(vertex, 0, GeometryInfo<dim>::vertices_per_face));
+  AssertIndexRange(vertex, GeometryInfo<dim>::vertices_per_face);
   return vertex;
 }
 
@@ -3846,8 +3805,7 @@ GeometryInfo<3>::standard_to_real_face_line(const unsigned int line,
                                             const bool         face_flip,
                                             const bool         face_rotation)
 {
-  Assert(line < GeometryInfo<3>::lines_per_face,
-         ExcIndexRange(line, 0, GeometryInfo<3>::lines_per_face));
+  AssertIndexRange(line, GeometryInfo<3>::lines_per_face);
 
 
   // make sure we handle
@@ -3914,8 +3872,7 @@ GeometryInfo<3>::real_to_standard_face_line(const unsigned int line,
                                             const bool         face_flip,
                                             const bool         face_rotation)
 {
-  Assert(line < GeometryInfo<3>::lines_per_face,
-         ExcIndexRange(line, 0, GeometryInfo<3>::lines_per_face));
+  AssertIndexRange(line, GeometryInfo<3>::lines_per_face);
 
 
   // make sure we handle
@@ -3986,9 +3943,8 @@ GeometryInfo<1>::child_cell_on_face(const RefinementCase<1> &,
                                     const RefinementCase<0> &)
 {
   (void)subface;
-  Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(subface < max_children_per_face,
-         ExcIndexRange(subface, 0, max_children_per_face));
+  AssertIndexRange(face, faces_per_cell);
+  AssertIndexRange(subface, max_children_per_face);
 
   return face;
 }
@@ -4005,9 +3961,8 @@ GeometryInfo<2>::child_cell_on_face(const RefinementCase<2> &ref_case,
                                     const bool /*face_rotation*/,
                                     const RefinementCase<1> &)
 {
-  Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(subface < max_children_per_face,
-         ExcIndexRange(subface, 0, max_children_per_face));
+  AssertIndexRange(face, faces_per_cell);
+  AssertIndexRange(subface, max_children_per_face);
 
   // always return the child adjacent to the specified
   // subface. if the face of a cell is not refined, don't
@@ -4051,11 +4006,13 @@ GeometryInfo<3>::child_cell_on_face(const RefinementCase<3> &ref_case,
 
   Assert(ref_case > RefinementCase<dim - 1>::no_refinement,
          ExcMessage("Cell has no children."));
-  Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(subface < GeometryInfo<dim - 1>::n_children(face_ref_case) ||
-           (subface == 0 &&
-            face_ref_case == RefinementCase<dim - 1>::no_refinement),
-         ExcIndexRange(subface, 0, GeometryInfo<2>::n_children(face_ref_case)));
+  AssertIndexRange(face, faces_per_cell);
+  if (!(subface == 0 &&
+        face_ref_case == RefinementCase<dim - 1>::no_refinement))
+    {
+      AssertIndexRange(subface,
+                       GeometryInfo<dim - 1>::n_children(face_ref_case));
+    }
 
   // invalid number used for invalid cases,
   // e.g. when the children are more refined at
@@ -4274,26 +4231,6 @@ GeometryInfo<4>::child_cell_on_face(const RefinementCase<4> &,
 
 template <>
 inline unsigned int
-GeometryInfo<1>::face_to_cell_lines(const unsigned int face,
-                                    const unsigned int line,
-                                    const bool,
-                                    const bool,
-                                    const bool)
-{
-  (void)face;
-  (void)line;
-  Assert(face + 1 < faces_per_cell + 1, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(line + 1 < lines_per_face + 1, ExcIndexRange(line, 0, lines_per_face));
-
-  // There is only a single line, so
-  // it must be this.
-  return 0;
-}
-
-
-
-template <>
-inline unsigned int
 GeometryInfo<2>::face_to_cell_lines(const unsigned int face,
                                     const unsigned int line,
                                     const bool,
@@ -4301,8 +4238,8 @@ GeometryInfo<2>::face_to_cell_lines(const unsigned int face,
                                     const bool)
 {
   (void)line;
-  Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(line < lines_per_face, ExcIndexRange(line, 0, lines_per_face));
+  AssertIndexRange(face, faces_per_cell);
+  AssertIndexRange(line, lines_per_face);
 
   // The face is a line itself.
   return face;
@@ -4318,8 +4255,8 @@ GeometryInfo<3>::face_to_cell_lines(const unsigned int face,
                                     const bool         face_flip,
                                     const bool         face_rotation)
 {
-  Assert(face < faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert(line < lines_per_face, ExcIndexRange(line, 0, lines_per_face));
+  AssertIndexRange(face, faces_per_cell);
+  AssertIndexRange(line, lines_per_face);
 
   const unsigned lines[faces_per_cell][lines_per_face] = {
     {8, 10, 0, 4},  // left face
@@ -4404,8 +4341,7 @@ inline double
 GeometryInfo<dim>::d_linear_shape_function(const Point<dim> & xi,
                                            const unsigned int i)
 {
-  Assert(i < GeometryInfo<dim>::vertices_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<dim>::vertices_per_cell));
+  AssertIndexRange(i, GeometryInfo<dim>::vertices_per_cell);
 
   switch (dim)
     {
@@ -4480,8 +4416,7 @@ Tensor<1, 1> inline GeometryInfo<1>::d_linear_shape_function_gradient(
   const Point<1> &,
   const unsigned int i)
 {
-  Assert(i < GeometryInfo<1>::vertices_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<1>::vertices_per_cell));
+  AssertIndexRange(i, GeometryInfo<1>::vertices_per_cell);
 
   switch (i)
     {
@@ -4501,8 +4436,7 @@ Tensor<1, 2> inline GeometryInfo<2>::d_linear_shape_function_gradient(
   const Point<2> &   xi,
   const unsigned int i)
 {
-  Assert(i < GeometryInfo<2>::vertices_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<2>::vertices_per_cell));
+  AssertIndexRange(i, GeometryInfo<2>::vertices_per_cell);
 
   const double x = xi[0];
   const double y = xi[1];
@@ -4527,8 +4461,7 @@ Tensor<1, 3> inline GeometryInfo<3>::d_linear_shape_function_gradient(
   const Point<3> &   xi,
   const unsigned int i)
 {
-  Assert(i < GeometryInfo<3>::vertices_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<3>::vertices_per_cell));
+  AssertIndexRange(i, GeometryInfo<3>::vertices_per_cell);
 
   const double x = xi[0];
   const double y = xi[1];

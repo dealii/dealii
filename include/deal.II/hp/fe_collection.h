@@ -900,8 +900,7 @@ namespace hp
   inline const FiniteElement<dim, spacedim> &FECollection<dim, spacedim>::
                                              operator[](const unsigned int index) const
   {
-    Assert(index < finite_elements.size(),
-           ExcIndexRange(index, 0, finite_elements.size()));
+    AssertIndexRange(index, finite_elements.size());
     return *finite_elements[index];
   }
 

@@ -4026,8 +4026,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(
       fe_values->update_flags & update_values,
       ((typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -4050,8 +4049,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4074,8 +4072,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::hessian(const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4097,8 +4094,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::third_derivative(const unsigned int shape_function,
                                           const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4121,8 +4117,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4160,8 +4155,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4201,8 +4195,7 @@ namespace FEValuesViews
                                     const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4239,8 +4232,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
 
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4412,8 +4404,7 @@ namespace FEValuesViews
                                  const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4453,8 +4444,7 @@ namespace FEValuesViews
                                           const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4497,7 +4487,7 @@ namespace FEValuesViews
     inline dealii::SymmetricTensor<2, 1>
     symmetrize_single_row(const unsigned int n, const dealii::Tensor<1, 1> &t)
     {
-      Assert(n < 1, ExcIndexRange(n, 0, 1));
+      AssertIndexRange(n, 1);
       (void)n;
 
       return {{t[0]}};
@@ -4520,7 +4510,7 @@ namespace FEValuesViews
             }
           default:
             {
-              Assert(false, ExcIndexRange(n, 0, 2));
+              AssertIndexRange(n, 2);
               return {};
             }
         }
@@ -4547,7 +4537,7 @@ namespace FEValuesViews
             }
           default:
             {
-              Assert(false, ExcIndexRange(n, 0, 3));
+              AssertIndexRange(n, 3);
               return {};
             }
         }
@@ -4561,8 +4551,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::symmetric_gradient(const unsigned int shape_function,
                                             const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4597,8 +4586,7 @@ namespace FEValuesViews
   SymmetricTensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                            const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4643,8 +4631,7 @@ namespace FEValuesViews
     const unsigned int shape_function,
     const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4722,8 +4709,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4773,8 +4759,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
                                        const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4830,8 +4815,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::gradient(const unsigned int shape_function,
                                      const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4891,10 +4875,7 @@ template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &FEValuesBase<dim, spacedim>::
                                                    operator[](const FEValuesExtractors::Scalar &scalar) const
 {
-  Assert(scalar.component < fe_values_views_cache.scalars.size(),
-         ExcIndexRange(scalar.component,
-                       0,
-                       fe_values_views_cache.scalars.size()));
+  AssertIndexRange(scalar.component, fe_values_views_cache.scalars.size());
 
   return fe_values_views_cache.scalars[scalar.component];
 }
@@ -4905,10 +4886,8 @@ template <int dim, int spacedim>
 inline const FEValuesViews::Vector<dim, spacedim> &FEValuesBase<dim, spacedim>::
                                                    operator[](const FEValuesExtractors::Vector &vector) const
 {
-  Assert(vector.first_vector_component < fe_values_views_cache.vectors.size(),
-         ExcIndexRange(vector.first_vector_component,
-                       0,
-                       fe_values_views_cache.vectors.size()));
+  AssertIndexRange(vector.first_vector_component,
+                   fe_values_views_cache.vectors.size());
 
   return fe_values_views_cache.vectors[vector.first_vector_component];
 }
@@ -4938,11 +4917,8 @@ inline const FEValuesViews::Tensor<2, dim, spacedim> &
   FEValuesBase<dim, spacedim>::
   operator[](const FEValuesExtractors::Tensor<2> &tensor) const
 {
-  Assert(tensor.first_tensor_component <
-           fe_values_views_cache.second_order_tensors.size(),
-         ExcIndexRange(tensor.first_tensor_component,
-                       0,
-                       fe_values_views_cache.second_order_tensors.size()));
+  AssertIndexRange(tensor.first_tensor_component,
+                   fe_values_views_cache.second_order_tensors.size());
 
   return fe_values_views_cache
     .second_order_tensors[tensor.first_tensor_component];
@@ -4955,7 +4931,7 @@ inline const double &
 FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
                                          const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -4992,11 +4968,10 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5022,7 +4997,7 @@ inline const Tensor<1, spacedim> &
 FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
                                         const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5059,11 +5034,10 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5088,7 +5062,7 @@ inline const Tensor<2, spacedim> &
 FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
                                            const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5125,11 +5099,10 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5154,7 +5127,7 @@ inline const Tensor<3, spacedim> &
 FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                                   const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5191,11 +5164,10 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5450,8 +5422,7 @@ FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int i) const
 {
   Assert(this->update_flags & update_quadrature_points,
          ExcAccessToUninitializedField("update_quadrature_points"));
-  Assert(i < this->mapping_output.quadrature_points.size(),
-         ExcIndexRange(i, 0, this->mapping_output.quadrature_points.size()));
+  AssertIndexRange(i, this->mapping_output.quadrature_points.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5466,8 +5437,7 @@ FEValuesBase<dim, spacedim>::JxW(const unsigned int i) const
 {
   Assert(this->update_flags & update_JxW_values,
          ExcAccessToUninitializedField("update_JxW_values"));
-  Assert(i < this->mapping_output.JxW_values.size(),
-         ExcIndexRange(i, 0, this->mapping_output.JxW_values.size()));
+  AssertIndexRange(i, this->mapping_output.JxW_values.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5482,8 +5452,7 @@ FEValuesBase<dim, spacedim>::jacobian(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobians,
          ExcAccessToUninitializedField("update_jacobians"));
-  Assert(i < this->mapping_output.jacobians.size(),
-         ExcIndexRange(i, 0, this->mapping_output.jacobians.size()));
+  AssertIndexRange(i, this->mapping_output.jacobians.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5498,8 +5467,7 @@ FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobian_grads,
          ExcAccessToUninitializedField("update_jacobians_grads"));
-  Assert(i < this->mapping_output.jacobian_grads.size(),
-         ExcIndexRange(i, 0, this->mapping_output.jacobian_grads.size()));
+  AssertIndexRange(i, this->mapping_output.jacobian_grads.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5514,8 +5482,7 @@ FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int i) const
 {
   Assert(this->update_flags & update_inverse_jacobians,
          ExcAccessToUninitializedField("update_inverse_jacobians"));
-  Assert(i < this->mapping_output.inverse_jacobians.size(),
-         ExcIndexRange(i, 0, this->mapping_output.inverse_jacobians.size()));
+  AssertIndexRange(i, this->mapping_output.inverse_jacobians.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5531,8 +5498,7 @@ FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
   Assert(this->update_flags & update_normal_vectors,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
-  Assert(i < this->mapping_output.normal_vectors.size(),
-         ExcIndexRange(i, 0, this->mapping_output.normal_vectors.size()));
+  AssertIndexRange(i, this->mapping_output.normal_vectors.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5605,8 +5571,7 @@ template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
 FEFaceValuesBase<dim, spacedim>::boundary_form(const unsigned int i) const
 {
-  Assert(i < this->mapping_output.boundary_forms.size(),
-         ExcIndexRange(i, 0, this->mapping_output.boundary_forms.size()));
+  AssertIndexRange(i, this->mapping_output.boundary_forms.size());
   Assert(this->update_flags & update_boundary_forms,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_boundary_forms")));

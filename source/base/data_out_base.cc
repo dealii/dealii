@@ -723,18 +723,15 @@ namespace
         switch (dim)
           {
             case 3:
-              Assert(zstep < n_subdivisions + 1,
-                     ExcIndexRange(zstep, 0, n_subdivisions + 1));
+              AssertIndexRange(zstep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * (n_subdivisions + 1) * zstep;
               DEAL_II_FALLTHROUGH;
             case 2:
-              Assert(ystep < n_subdivisions + 1,
-                     ExcIndexRange(ystep, 0, n_subdivisions + 1));
+              AssertIndexRange(ystep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * ystep;
               DEAL_II_FALLTHROUGH;
             case 1:
-              Assert(xstep < n_subdivisions + 1,
-                     ExcIndexRange(xstep, 0, n_subdivisions + 1));
+              AssertIndexRange(xstep, n_subdivisions + 1);
               point_no += xstep;
               DEAL_II_FALLTHROUGH;
             case 0:
@@ -1763,7 +1760,7 @@ namespace DataOutBase
     for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       neighbors[i] = no_neighbor;
 
-    Assert(dim <= spacedim, ExcIndexRange(dim, 0, spacedim));
+    AssertIndexRange(dim, spacedim + 1);
     Assert(spacedim <= 3, ExcNotImplemented());
   }
 
@@ -6279,9 +6276,10 @@ namespace DataOutBase
 
     projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < first_patch.data.n_rows()) ||
-             first_patch.data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
+    if (first_patch.data.n_rows() != 0)
+      {
+        AssertIndexRange(flags.height_vector, first_patch.data.n_rows());
+      }
 
     double x_min = projected_point[0];
     double x_max = x_min;
@@ -6486,9 +6484,10 @@ namespace DataOutBase
 
     projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < first_patch.data.n_rows()) ||
-             first_patch.data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
+    if (first_patch.data.n_rows() != 0)
+      {
+        AssertIndexRange(flags.height_vector, first_patch.data.n_rows());
+      }
 
     point[0] = projected_point[0];
     point[1] = projected_point[1];

@@ -481,8 +481,7 @@ PreconditionBlockBase<number>::inverse(size_type i) const
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  AssertIndexRange(i, var_inverse_full.size());
   return var_inverse_full[i];
 }
 
@@ -520,7 +519,7 @@ PreconditionBlockBase<number>::diagonal(size_type i) const
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  AssertIndexRange(i, var_diagonal.size());
   return var_diagonal[i];
 }
 
@@ -534,8 +533,7 @@ PreconditionBlockBase<number>::inverse(size_type i)
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  AssertIndexRange(i, var_inverse_full.size());
   return var_inverse_full[i];
 }
 
@@ -577,7 +575,7 @@ PreconditionBlockBase<number>::diagonal(size_type i)
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  AssertIndexRange(i, var_diagonal.size());
   return var_diagonal[i];
 }
 

@@ -89,10 +89,7 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -102,10 +99,8 @@ const Tensor<1, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -116,10 +111,8 @@ Tensor<1, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -130,11 +123,8 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   second_derivative(const unsigned int qpoint,
                     const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -145,11 +135,8 @@ Tensor<2, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   second_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -159,10 +146,8 @@ const Tensor<3, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   third_derivative(const unsigned int qpoint, const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -173,10 +158,8 @@ Tensor<3, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   third_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -187,11 +170,8 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   fourth_derivative(const unsigned int qpoint,
                     const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -202,11 +182,8 @@ Tensor<4, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -364,10 +341,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 

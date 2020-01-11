@@ -762,7 +762,7 @@ namespace internal
                      true)) == true,
                ExcMessage("This cell is not active and therefore can't be "
                           "queried for its active FE indices"));
-        Assert(n == 0, ExcIndexRange(n, 0, 1));
+        AssertIndexRange(n, 1);
 
         return dealii::DoFHandler<dim, spacedim>::default_fe_index;
       }
@@ -1048,10 +1048,7 @@ namespace internal
           (fe_index == dealii::DoFHandler<dim, spacedim>::default_fe_index),
           ExcMessage(
             "Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert(local_index < dof_handler.get_fe().dofs_per_vertex,
-               ExcIndexRange(local_index,
-                             0,
-                             dof_handler.get_fe().dofs_per_vertex));
+        AssertIndexRange(local_index, dof_handler.get_fe().dofs_per_vertex);
 
         dof_handler
           .vertex_dofs[vertex_index * dof_handler.get_fe().dofs_per_vertex +
@@ -1074,10 +1071,8 @@ namespace internal
         Assert(dof_handler.fe_collection.size() > 0,
                ExcMessage("No finite element collection is associated with "
                           "this DoFHandler"));
-        Assert(local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
-               ExcIndexRange(local_index,
-                             0,
-                             dof_handler.get_fe(fe_index).dofs_per_vertex));
+        AssertIndexRange(local_index,
+                         dof_handler.get_fe(fe_index).dofs_per_vertex);
         Assert(fe_index < dof_handler.fe_collection.size(), ExcInternalError());
         Assert(dof_handler.vertex_dof_offsets[vertex_index] !=
                  numbers::invalid_unsigned_int,
@@ -1140,10 +1135,7 @@ namespace internal
           (fe_index == dealii::DoFHandler<dim, spacedim>::default_fe_index),
           ExcMessage(
             "Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert(local_index < dof_handler.get_fe().dofs_per_vertex,
-               ExcIndexRange(local_index,
-                             0,
-                             dof_handler.get_fe().dofs_per_vertex));
+        AssertIndexRange(local_index, dof_handler.get_fe().dofs_per_vertex);
 
         return dof_handler
           .vertex_dofs[vertex_index * dof_handler.get_fe().dofs_per_vertex +
@@ -1166,14 +1158,9 @@ namespace internal
         Assert(dof_handler.fe_collection.size() > 0,
                ExcMessage("No finite element collection is associated with "
                           "this DoFHandler"));
-        Assert(local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
-               ExcIndexRange(local_index,
-                             0,
-                             dof_handler.get_fe(fe_index).dofs_per_vertex));
-        Assert(vertex_index < dof_handler.vertex_dof_offsets.size(),
-               ExcIndexRange(vertex_index,
-                             0,
-                             dof_handler.vertex_dof_offsets.size()));
+        AssertIndexRange(local_index,
+                         dof_handler.get_fe(fe_index).dofs_per_vertex);
+        AssertIndexRange(vertex_index, dof_handler.vertex_dof_offsets.size());
         Assert(dof_handler.vertex_dof_offsets[vertex_index] !=
                  numbers::invalid_unsigned_int,
                ExcMessage(
@@ -1745,12 +1732,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_vertex_dof_index(
 {
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
-  Assert(vertex < GeometryInfo<structdim>::vertices_per_cell,
-         ExcIndexRange(vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert(i < this->dof_handler->get_fe(fe_index).dofs_per_vertex,
-         ExcIndexRange(i,
-                       0,
-                       this->dof_handler->get_fe(fe_index).dofs_per_vertex));
+  AssertIndexRange(vertex, GeometryInfo<structdim>::vertices_per_cell);
+  AssertIndexRange(i, this->dof_handler->get_fe(fe_index).dofs_per_vertex);
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
     mg_vertex_dof_index(*this->dof_handler,
@@ -1785,12 +1768,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
 {
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
-  Assert(vertex < GeometryInfo<structdim>::vertices_per_cell,
-         ExcIndexRange(vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert(i < this->dof_handler->get_fe(fe_index).dofs_per_vertex,
-         ExcIndexRange(i,
-                       0,
-                       this->dof_handler->get_fe(fe_index).dofs_per_vertex));
+  AssertIndexRange(vertex, GeometryInfo<structdim>::vertices_per_cell);
+  AssertIndexRange(i, this->dof_handler->get_fe(fe_index).dofs_per_vertex);
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
     set_mg_vertex_dof_index(
@@ -2550,7 +2529,7 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::vertex_dof_index(
   const unsigned int fe_index) const
 {
   (void)vertex;
-  Assert(vertex == 0, ExcIndexRange(vertex, 0, 1));
+  AssertIndexRange(vertex, 1);
   return dealii::internal::DoFAccessorImplementation::Implementation::
     get_vertex_dof_index(*dof_handler, this->global_vertex_index, fe_index, i);
 }
@@ -3795,8 +3774,7 @@ inline typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator
 DoFCellAccessor<DoFHandlerType, level_dof_access>::face(
   const unsigned int i) const
 {
-  Assert(i < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
 
   const unsigned int dim = DoFHandlerType::dimension;
   return dealii::internal::DoFCellAccessorImplementation::get_face(

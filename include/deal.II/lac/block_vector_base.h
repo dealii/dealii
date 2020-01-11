@@ -1478,7 +1478,7 @@ template <class VectorType>
 inline typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i)
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }
@@ -1489,7 +1489,7 @@ template <class VectorType>
 inline const typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i) const
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }

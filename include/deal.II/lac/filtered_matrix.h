@@ -581,8 +581,7 @@ inline FilteredMatrix<VectorType>::Accessor::Accessor(
   : matrix(matrix)
   , index(index)
 {
-  Assert(index <= matrix->constraints.size(),
-         ExcIndexRange(index, 0, matrix->constraints.size()));
+  AssertIndexRange(index, matrix->constraints.size() + 1);
 }
 
 

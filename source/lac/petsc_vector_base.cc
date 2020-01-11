@@ -34,7 +34,7 @@ namespace PETScWrappers
   {
     VectorReference::operator PetscScalar() const
     {
-      Assert(index < vector.size(), ExcIndexRange(index, 0, vector.size()));
+      AssertIndexRange(index, vector.size());
 
       // The vector may have ghost entries. In that case, we first need to
       // figure out which elements we own locally, then get a pointer to the

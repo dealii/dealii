@@ -1667,7 +1667,7 @@ namespace Utilities
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
       const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
 
-      Assert(root_process < n_procs, ExcIndexRange(root_process, 0, n_procs));
+      AssertIndexRange(root_process, n_procs);
 
       std::vector<char> buffer       = Utilities::pack(object_to_send);
       int               n_local_data = buffer.size();

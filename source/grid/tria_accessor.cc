@@ -1470,7 +1470,7 @@ double
 TriaAccessor<1, 1, 1>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  AssertIndexRange(axis, 1);
 
   return this->diameter();
 }
@@ -1481,7 +1481,7 @@ double
 TriaAccessor<1, 1, 2>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  AssertIndexRange(axis, 1);
 
   return this->diameter();
 }
@@ -1495,7 +1495,7 @@ TriaAccessor<2, 2, 2>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  AssertIndexRange(axis, 2);
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1509,7 +1509,7 @@ TriaAccessor<2, 2, 3>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  AssertIndexRange(axis, 2);
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1525,7 +1525,7 @@ TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
     {0, 1, 4, 5},    /// Lines along y-axis
     {8, 9, 10, 11}}; /// Lines along z-axis
 
-  Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+  AssertIndexRange(axis, 3);
 
   double lengths[4] = {this->line(lines[axis][0])->diameter(),
                        this->line(lines[axis][1])->diameter(),
@@ -1945,8 +1945,7 @@ CellAccessor<dim, spacedim>::set_material_id(
   const types::material_id mat_id) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(mat_id < numbers::invalid_material_id,
-         ExcIndexRange(mat_id, 0, numbers::invalid_material_id));
+  AssertIndexRange(mat_id, numbers::invalid_material_id);
   this->tria->levels[this->present_level]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id = mat_id;
@@ -2789,8 +2788,7 @@ bool
 CellAccessor<dim, spacedim>::at_boundary(const unsigned int i) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(i < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
 
   return (neighbor_index(i) == -1);
 }
@@ -2921,8 +2919,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           const typename Triangulation<dim, spacedim>::face_iterator
                              mother_face    = this->face(face);
           const unsigned int total_children = mother_face->number_of_children();
-          Assert(subface < total_children,
-                 ExcIndexRange(subface, 0, total_children));
+          AssertIndexRange(subface, total_children);
           Assert(total_children <= GeometryInfo<3>::max_children_per_face,
                  ExcInternalError());
 

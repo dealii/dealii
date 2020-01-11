@@ -293,7 +293,7 @@ namespace Utilities
       for (const unsigned int destination : destinations)
         {
           (void)destination;
-          Assert(destination < n_procs, ExcIndexRange(destination, 0, n_procs));
+          AssertIndexRange(destination, n_procs);
           Assert(destination != myid,
                  ExcMessage(
                    "There is no point in communicating with ourselves."));
@@ -431,7 +431,7 @@ namespace Utilities
       for (const unsigned int destination : destinations)
         {
           (void)destination;
-          Assert(destination < n_procs, ExcIndexRange(destination, 0, n_procs));
+          AssertIndexRange(destination, n_procs);
           Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
                  ExcMessage(
                    "There is no point in communicating with ourselves."));

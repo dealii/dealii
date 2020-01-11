@@ -2533,8 +2533,7 @@ namespace DoFTools
   {
     static const int space_dim = DoFHandlerType::space_dimension;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(b_id1 != b_id2,
            ExcMessage("The boundary indicators b_id1 and b_id2 must be "
@@ -2571,8 +2570,7 @@ namespace DoFTools
     (void)dim;
     (void)space_dim;
 
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(dim == space_dim, ExcNotImplemented());
 

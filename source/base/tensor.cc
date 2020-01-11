@@ -24,15 +24,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <int dim, typename Number>
-constexpr unsigned int Tensor<0, dim, Number>::n_independent_components;
-
-template <int rank, int dim, typename Number>
-constexpr unsigned int Tensor<rank, dim, Number>::n_independent_components;
-
-
 #include "tensor.inst"
-
 
 DEAL_II_NAMESPACE_CLOSE

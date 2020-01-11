@@ -690,7 +690,7 @@ namespace Physics
         inline std::pair<unsigned int, unsigned int>
         indices_from_component<1>(const unsigned int component_n, const bool)
         {
-          Assert(component_n < 1, ExcIndexRange(component_n, 0, 1));
+          AssertIndexRange(component_n, 1);
 
           return std::make_pair(0u, 0u);
         }

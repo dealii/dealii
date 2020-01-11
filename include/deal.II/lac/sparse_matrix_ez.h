@@ -1104,8 +1104,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  AssertIndexRange(row, m());
+  AssertIndexRange(col, n());
 
   const RowInfo & r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1135,8 +1135,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  AssertIndexRange(row, m());
+  AssertIndexRange(col, n());
 
   RowInfo &       r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1238,8 +1238,8 @@ SparseMatrixEZ<number>::set(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  AssertIndexRange(i, m());
+  AssertIndexRange(j, n());
 
   if (elide_zero_values && value == 0.)
     {
@@ -1264,8 +1264,8 @@ SparseMatrixEZ<number>::add(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  AssertIndexRange(i, m());
+  AssertIndexRange(j, n());
 
   // ignore zero additions
   if (std::abs(value) == 0.)
@@ -1386,7 +1386,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   const_iterator result(this, r, 0);
   return result;
 }
@@ -1395,7 +1395,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   const_iterator result(this, r + 1, 0);
   return result;
 }

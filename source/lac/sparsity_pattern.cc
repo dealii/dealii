@@ -663,8 +663,8 @@ SparsityPattern::size_type
 SparsityPattern::operator()(const size_type i, const size_type j) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
   Assert(compressed, ExcNotCompressed());
 
   // let's see whether there is something in this line
@@ -701,8 +701,8 @@ void
 SparsityPatternBase::add(const size_type i, const size_type j)
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
   Assert(compressed == false, ExcMatrixIsCompressed());
 
   for (std::size_t k = rowstart[i]; k < rowstart[i + 1]; k++)
@@ -778,8 +778,8 @@ bool
 SparsityPatternBase::exists(const size_type i, const size_type j) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
 
   for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
@@ -796,8 +796,8 @@ SparsityPatternBase::size_type
 SparsityPatternBase::row_position(const size_type i, const size_type j) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
 
   for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
@@ -814,8 +814,7 @@ std::pair<SparsityPatternBase::size_type, SparsityPatternBase::size_type>
 SparsityPatternBase::matrix_position(const std::size_t global_index) const
 {
   Assert(compressed == true, ExcNotCompressed());
-  Assert(global_index < n_nonzero_elements(),
-         ExcIndexRange(global_index, 0, n_nonzero_elements()));
+  AssertIndexRange(global_index, n_nonzero_elements());
 
   // first find the row in which the entry is located. for this note that the
   // rowstart array indexes the global indices at which each row starts. since

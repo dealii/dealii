@@ -220,7 +220,7 @@ template <int order, int dim, int spacedim, typename Number>
 inline Tensor<order, dim, Number> &
   DerivativeForm<order, dim, spacedim, Number>::operator[](const unsigned int i)
 {
-  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
+  AssertIndexRange(i, spacedim);
 
   return tensor[i];
 }
@@ -232,7 +232,7 @@ inline const Tensor<order, dim, Number> &
   DerivativeForm<order, dim, spacedim, Number>::
   operator[](const unsigned int i) const
 {
-  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
+  AssertIndexRange(i, spacedim);
 
   return tensor[i];
 }

@@ -515,7 +515,7 @@ template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
   ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
-  Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
+  AssertIndexRange(i, n_elements);
   Assert(
     (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
     ExcMessage(

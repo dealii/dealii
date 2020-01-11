@@ -129,8 +129,7 @@ inline VectorSlice<VectorType>::VectorSlice(VectorType & v,
   : ArrayViewType(
       make_array_view(std::begin(v) + start, std::begin(v) + start + length))
 {
-  Assert((start + length <= v.size()),
-         ExcIndexRange(length, 0, v.size() - start + 1));
+  AssertIndexRange(length, v.size() - start + 1);
 }
 
 DEAL_II_NAMESPACE_CLOSE
