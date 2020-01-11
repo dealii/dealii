@@ -66,6 +66,24 @@ namespace internal
 
 
 template <int dim, typename DoFHandlerType>
+DataOut<dim, DoFHandlerType>::DataOut()
+{
+  // For the moment, just call the existing virtual functions. This
+  // preserves backward compatibility. When these deprecated functions are
+  // removed, we'll just inline their functionality into the lambda
+  // functions created here.
+  set_cell_selection(
+    [this](const Triangulation<dim, spacedim> &) {
+      return this->first_locally_owned_cell();
+    },
+    [this](const Triangulation<dim, spacedim> &, const cell_iterator &cell) {
+      return this->next_locally_owned_cell(cell);
+    });
+}
+
+
+
+template <int dim, typename DoFHandlerType>
 void
 DataOut<dim, DoFHandlerType>::build_one_patch(
   const std::pair<cell_iterator, unsigned int> *cell_and_index,
@@ -875,7 +893,7 @@ DataOut<dim, DoFHandlerType>::build_patches(
   // - active_index: index for a cell when counting from begin_active() using
   //   ++cell (identical to cell->active_cell_index())
   // - cell_index: unique index of a cell counted using
-  //   next_locally_owned_cell() starting from first_locally_owned_cell()
+  //   next_cell_function() starting from first_cell_function()
   //
   // It turns out that we create one patch for each selected cell, so
   // patch_index==cell_index.
@@ -888,9 +906,9 @@ DataOut<dim, DoFHandlerType>::build_patches(
     {
       // max_index is the largest cell->index on level l
       unsigned int max_index = 0;
-      for (cell_iterator cell = first_locally_owned_cell();
+      for (cell_iterator cell = first_cell_function(*this->triangulation);
            cell != this->triangulation->end();
-           cell = next_locally_owned_cell(cell))
+           cell = next_cell_function(*this->triangulation, cell))
         if (static_cast<unsigned int>(cell->level()) == l)
           max_index =
             std::max(max_index, static_cast<unsigned int>(cell->index()));
@@ -908,13 +926,13 @@ DataOut<dim, DoFHandlerType>::build_patches(
     // important: we need to compute the active_index of the cell in the range
     // 0..n_active_cells() because this is where we need to look up cell
     // data from (cell data vectors do not have the length distance computed by
-    // first_locally_owned_cell/next_locally_owned_cell because this might skip
+    // first_cell_function/next_cell_function because this might skip
     // some values (FilteredIterator).
     auto          active_cell  = this->triangulation->begin_active();
     unsigned int  active_index = 0;
-    cell_iterator cell         = first_locally_owned_cell();
+    cell_iterator cell         = first_cell_function(*this->triangulation);
     for (; cell != this->triangulation->end();
-         cell = next_locally_owned_cell(cell))
+         cell = next_cell_function(*this->triangulation, cell))
       {
         // move forward until active_cell points at the cell (cell) we are
         // looking at to compute the current active_index
@@ -1030,6 +1048,61 @@ DataOut<dim, DoFHandlerType>::build_patches(
                     // @ref workstream_paper, on 32 cores) and if
                     8 * MultithreadInfo::n_threads(),
                     64);
+}
+
+
+
+template <int dim, typename DoFHandlerType>
+void
+DataOut<dim, DoFHandlerType>::set_cell_selection(
+  const std::function<cell_iterator(const Triangulation<dim, spacedim> &)>
+    &                                                        first_cell,
+  const std::function<cell_iterator(const Triangulation<dim, spacedim> &,
+                                    const cell_iterator &)> &next_cell)
+{
+  first_cell_function = first_cell;
+  next_cell_function  = next_cell;
+}
+
+
+
+template <int dim, typename DoFHandlerType>
+void
+DataOut<dim, DoFHandlerType>::set_cell_selection(
+  const FilteredIterator<cell_iterator> &filtered_iterator)
+{
+  const auto first_cell =
+    [filtered_iterator](const Triangulation<dim, spacedim> &triangulation) {
+      // Create a copy of the filtered iterator so that we can
+      // call a non-const function -- though we are really only
+      // interested in the return value of that function, not the
+      // state of the object
+      FilteredIterator<cell_iterator> x = filtered_iterator;
+      return x.set_to_next_positive(triangulation.begin());
+    };
+
+
+  const auto next_cell =
+    [filtered_iterator](const Triangulation<dim, spacedim> &,
+                        const cell_iterator &cell) {
+      // Create a copy of the filtered iterator so that we can
+      // call a non-const function -- though we are really only
+      // interested in the return value of that function, not the
+      // state of the object
+      FilteredIterator<cell_iterator> x = filtered_iterator;
+
+      // Set the iterator to 'cell'. Since 'cell' must satisfy the
+      // predicate (that's how it was created), set_to_next_positive
+      // simply sets the iterator to 'cell'.
+      x.set_to_next_positive(cell);
+
+      // Advance by one:
+      ++x;
+
+      return x;
+    };
+
+  set_cell_selection(first_cell, next_cell);
 }
 
 
