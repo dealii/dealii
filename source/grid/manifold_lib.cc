@@ -1418,16 +1418,13 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
     }
   else
     {
-      auto manifold_clone =
-        std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
-          *push_forward_function,
-          *pull_back_function,
-          this->get_periodicity(),
-          tolerance);
-
       Assert(owns_pointers == false, ExcNotImplemented());
 
-      return manifold_clone;
+      return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
+        *push_forward_function,
+        *pull_back_function,
+        this->get_periodicity(),
+        tolerance);
     }
 }
 
