@@ -138,7 +138,7 @@ Here, $s(\mathbf{u})$ denotes the specific entropy
 @f{align}
   s(\mathbf{u}) = \ln \Big(\frac{p(\mathbf{u})}{\rho^{\gamma}}\Big).
 @f}
-
+We will refer to $\mathcal{B}$ as the invariant set of Euler's equations. 
 In other words, a state $\mathbf{u}(\mathbf{x},t)\in\mathcal{B}$ obeys
 positivity of the density, positivity of the internal energy, and a local
 minimum principle on the specific entropy. This condition is a simplified
@@ -358,7 +358,7 @@ cells but rather over all edges of the sparsity graph.
 
 @note It is not uncommon to encounter such fully algebraic schemes (i.e.,
 no bilinear forms, no cell loops, and no quadrature) outside of the finite
-element community in the wieder CFD community. There is a rich history of
+element community in the wider CFD community. There is a rich history of
 application of this kind of schemes, also called <i>edge-based</i> or
 <i>graph-based</i> finite element schemes (see for instance 
 @cite Rainald2008 for a historical overview).

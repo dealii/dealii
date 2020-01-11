@@ -179,7 +179,7 @@ namespace Step69
   // sparsity pattern.
   //
   // @note Even though this class currently does not have any parameters
-  // that could be read in from a parameter file we nevertheless dervie
+  // that could be read in from a parameter file we nevertheless derive
   // from ParameterAcceptor and follow the same idiom of providing a
   // <code>setup()</code> (and <code>assemble()</code>) method as for the
   // class Discretization.
@@ -232,7 +232,7 @@ namespace Step69
   // - The type alias <code>rank2_type</code> is used for the fluxes
   //   $\mathbb{f}(\mathbf{U}_j^n)$.
   // - The <code>momentum</code> function extracts $\textbf{m}$
-  //   out of the state vector $[\rho,\textbf{m},E]$) and stores it in a
+  //   out of the state vector $[\rho,\textbf{m},E]$ and stores it in a
   //   <code>Tensor<1, dim></code>.
   // - The <code>internal_energy</code> function computes $E -
   //   \frac{|\textbf{m}|^2}{2\rho}$ from a given state vector
@@ -472,7 +472,7 @@ namespace Step69
     vector_type output_vector;
   };
 
-  // @sect3{Grid generation and assembly}
+  // @sect4{The <code>Discretization</code> class}
 
   // The first major task at hand is the typical triplet of grid
   // generation, setup of data structures, and assembly. A notable novelty
@@ -627,6 +627,8 @@ namespace Step69
     triangulation.refine_global(refinement);
   }
 
+  // @sect4{The <code>OfflineData</code> class}
+
   // Not much is done in the constructor of <code>OfflineData</code> other
   // than initializing the corresponding class members in the
   // initialization list.
@@ -767,30 +769,51 @@ namespace Step69
   // Now we define a collection of assembly utilities:
   // - <code>CopyData</code>: This will only be used to compute the off-line
   //   data using WorkStream. It acts as a container: it is just a
-  //  struct where WorkStream stores the local cell contributions. Note
-  //  it also contains a class member
-  // <code>local_boundary_normal_map</code> used to store the local
-  // contributions required to compute the normals at the boundary.
-  // - <code>get_entry</code>: it reads the value stored at the entry
-  //  pointed by the iterator <code>it</code> of <code>matrix</code>. Here is
-  //  where we might want to keep an eye on complexity: we want this operation
-  //  to have constant complexity (that's the case of this implementation).
-  //  Note also that the return argument (<code>Matrix::value_type</code>) is
-  //  going to be (in general) a double.
+  //   struct where WorkStream stores the local cell contributions. Note
+  //   it also contains a class member
+  //   <code>local_boundary_normal_map</code> used to store the local
+  //   contributions required to compute the normals at the boundary.
+  // - <code>get_entry</code>: it will be used to read the value stored at the 
+  //   entry pointed by the iterator <code>it</code> of <code>matrix</code>.
+  //   However, there is a context for the use of such function. If we are using 
+  //   CRS matrix format, a computationally inexpensive way to loop/traverse all 
+  //   is entries is to loop all it rows (top to bottom) and for each row loop 
+  //   all its nonzero columns (left to right). And that's the path that the 
+  //   iterator <code>it</code> is meant to follow.
   // - <code>set_entry</code>: it sets <code>value</code> at the entry
-  //  pointed by the iterator <code>it</code> of <code>matrix</code>.
+  //   pointed by the iterator <code>it</code> of <code>matrix</code>.
   // - <code>gather_get_entry</code>: we note that
   //   $\mathbf{c}_{ij} \in \mathbb{R}^d$. If $d=2$ then
   //   $\mathbf{c}_{ij} = [\mathbf{c}_{ij}^1,\mathbf{c}_{ij}^2]^\top$.
   //   Which basically implies
   //   that we need one matrix per space dimension to store the
-  //  $\mathbf{c}_{ij}$ vectors. Similar observation follows for the matrix
-  //  $\mathbf{n}_{ij}$. The purpose of <code>gather_get_entry</code>
-  //  is to retrieve those entries a store them into a
-  //  <code>Tensor<1, dim></code> for our convenience.
-  // - <code>gather</code> (first interface): Placeholder
-  // - <code>gather</code> (second interface): Placeholder
-  // - <code>scatter</code>: Placeholder
+  //   $\mathbf{c}_{ij}$ vectors. Similar observation follows for the matrix
+  //   $\mathbf{n}_{ij}$. The purpose of <code>gather_get_entry</code>
+  //   is to retrieve those entries a store them into a
+  //   <code>Tensor<1, dim></code> for our convenience. 
+  // - <code>gather</code> (first interface): this first function signature,
+  //   having three input arguments, will be used to retrieve the individual 
+  //   components <code>(i,l)</code> of a matrix. The functionality of 
+  //   <code>gather_get_entry</code> and <code>gather</code> is very much the 
+  //   same, but their context is different: the function <code>gather</code>
+  //   is meant to be used in exceptional/limited number of cases.
+  //   The reader should be aware that accessing an arbitrary 
+  //   <code>(i,l)</code> entry of a matrix (say for instance Trilinos or PETSc  
+  //   matrices) is very expensive. Here is where we might want to keep an eye 
+  //   on complexity: we want this operation to have constant complexity 
+  //   (and that's the case of this implementation using deal.ii matrices).
+  // - <code>gather</code> (second interface): this second function signature 
+  //   having two input arguments will be used to gather the state at a node 
+  //   <code>i</code> and return <code>Tensor<1, problem_dimension></code> for 
+  //   our convenience.
+  // - <code>scatter</code>: this function has three input arguments, the first 
+  //   one is meant to be a global object (say a locally owned vector), the 
+  //   second argument which could be a 
+  //   <code>Tensor<1,problem_dimension></code>,
+  //   and the last argument which represents a index of the global object. 
+  //   This function will be primarily used to write the updated nodal 
+  //   values, stored as <code>Tensor<1,problem_dimension></code>, into the 
+  //   globally owned vector.
 
   namespace
   {
@@ -897,18 +920,20 @@ namespace Step69
   //
   // Finally, assuming that $\mathbf{x}_i$ is a support point at the boundary,
   // the normals are defined as
+  //
   // $\widehat{\boldsymbol{\nu}}_i :=
   // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|}$ where
   // $\boldsymbol{\nu}_i := \sum_{T \in \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})$, here: $T$ denotes elements,
+  // \phi_i(\mathbf{x}_{q,F})$
+  //
+  // here $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
   // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
   // are quadrature points on such face.
   // Other more sophisticated definitions for $\nu_i$ are
   // possible but none of them have much influence in theory or practice.
-
 
   template <int dim>
   void OfflineData<dim>::assemble()
@@ -1163,8 +1188,8 @@ namespace Step69
     //
     // Finally, we normalize the vector stored in
     // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
-    // not been thread paralellized as it would not illustrate any important
-    // concept.
+    // not been thread paralellized as it would neither illustrate any important
+    // concept nor lead to any noticeable speed gain.
 
     {
       TimerOutput::Scope t(computing_timer,
@@ -1332,9 +1357,17 @@ namespace Step69
     }
   } /* assemble() */
 
-  // @sect3{Problem specific setup and approximate Riemann solver}
-
   // At this point we are very much done with anything related to offline data.
+
+  // @sect3{The class <code>ProblemDescription</code> implementation.}
+
+  // In this section we describe the implementation of the class members of
+  // <code>ProblemDescription</code>. All these class member only have meaning 
+  // in the context of Euler's equations using with ideal gas law. If we wanted 
+  // to re-purpose Step-69 for a different conservation law (say for instance 
+  // shallow water equations) the implementation of this entire class would 
+  // have to change. But most of the other classes, in particular those 
+  // defining loop structures, would remain unchanged.
   //
   // Now we define the implementation of the utility
   // functions <code>momentum</code>,
@@ -1402,41 +1435,40 @@ namespace Step69
   }
 
   // Now we discuss the computation of $\lambda_{\text{max}}
-  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. Let's start
-  // by mentioning a thing or two about the actual computation of an estimate
-  // for maximum wavespeed of Riemann problem. In general, obtaining a sharp
-  // guaranteed upper-bound on the maximum wavespeed requires solving a
-  // quite expensive scalar nonlinear problem. In order to simplify the
-  // presentation we decided not to include such iterative scheme. Here we have
-  // taken the following shortcut: formulas (2.11) (3.7), (3.8) and (4.3) from
-  // - J-L Guermond, B. Popov, Fast estimation of
-  //   the maximum wave speed in the Riemann problem for the Euler equations,
-  //   JCP, 2016,
+  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. The analysis 
+  // and derivation of sharp upper-bounds of maximum wavespeeds of Riemann 
+  // problems is a very technical endeavor and we cannot include an
+  // advanced discussion about it in this tutorial. In this portion 
+  // of the documentation we will limit ourselves to sketch the main 
+  // functionality of these auxiliary functions and point to specific 
+  // academic references in order to help the interested reader trace the
+  // source (and proper mathematical justification) of these ideas.
+  // 
+  // In general, obtaining a sharp guaranteed upper-bound on the maximum
+  // wavespeed requires solving a quite expensive scalar nonlinear problem.
+  // In order to simplify the presentation we decided not to include such
+  // iterative scheme. Here we have taken the following shortcut: formulas
+  // (2.11) (3.7), (3.8) and (4.3) from
+  //
+  // - J-L Guermond, B. Popov, Fast estimation of the maximum wave speed in
+  //  the Riemann problem for the Euler equations, JCP, 2016,
   //
   // are enough to define a guaranteed upper bound on the maximum
   // wavespeed. This estimate is returned by the a call to the function
-  // <code>lambda_max_two_rarefaction</code>.
-  // At its core the construction of such upper bound uses the
-  // so-called two-rarefaction approximation
+  // <code>lambda_max_two_rarefaction</code>. At its core the construction 
+  // of such upper bound uses the so-called two-rarefaction approximation
   // for the intermediate pressure $p^*$, see for instance
+  // 
   // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical
   //   Methods for Fluid Dynamics, 2009.
   //
-  // This estimate is in general very sharp and it would be enough to
-  // for this code. However, for some specific situations (in
+  // This estimate is in general very sharp and it would be enough for the 
+  // purposes of this code. However, for some specific situations (in
   // particular when one of states is close to vacuum conditions) such
   // estimate will be overly pessimistic. That's why we used a second
   // estimate to avoid this degeneracy that will be invoked by a call to
   // the function <code>lambda_max_expansion</code>. Finally we take the minimum
   // between both estimates inside the call to <code>compute_lambda_max</code>.
-  //
-  // The analysis and derivation of sharp upper-bounds of maximum wavespeeds of
-  // Riemann problems is a very technical endeavor and we cannot include an
-  // advanced discussion about it in this tutorial. In this portion of the
-  // documentation we will limit ourselves to sketch the main functionality of
-  // these auxiliary functions and point to specific references/formulas in
-  // order to help the interested reader trace the
-  // source (and proper mathematical justification) of these ideas.
   //
   // The most important function here is <code>compute_lambda_max</code>
   // which takes the minimum between the estimates
@@ -1555,7 +1587,8 @@ namespace Step69
       const auto &[rho_j, u_j, p_j, a_j] = riemann_data_j;
 
       /* Here the constant 5.0 multiplying the soundspeeds is NOT
-         an ad-hoc constant. Do not play with it.*/
+         an ad-hoc constant or tuning parameter. It defines a upper bound 
+         for any $\gamma \in [0,5/3]$. Do not play with it! */
       return std::max(std::abs(u_i), std::abs(u_j)) + 5. * std::max(a_i, a_j);
     }
   } // namespace
@@ -1582,7 +1615,8 @@ namespace Step69
   }
 
   // Here <code>component_names</code> are just tags
-  // that we will use for the output.
+  // that we will use for the output. We consider the template specializations
+  // for dimensions dimensions one, two and three.
 
   template <>
   const std::array<std::string, 3> ProblemDescription<1>::component_names{"rho",
@@ -1602,9 +1636,9 @@ namespace Step69
                                                                           "m_3",
                                                                           "E"};
 
-  // @sect3{Initial values and time stepping}
+  // @sect3{Class <code>InitialValues</code> implementation}
 
-  // Implementation of the constructor for the class InitialValues.
+  // Constructor for the class InitialValues.
 
   template <int dim>
   InitialValues<dim>::InitialValues(const std::string &subsection)
@@ -1660,7 +1694,7 @@ namespace Step69
     };
   }
 
-  // Implementation of the constructor for the class TimeStep.
+  // @sect3{Class <code>TimeStep</code> implementation}
 
   template <int dim>
   TimeStep<dim>::TimeStep(const MPI_Comm &          mpi_communicator,
@@ -1699,23 +1733,25 @@ namespace Step69
   // Implementation of "step" (to be called be
   // <code>TimeLoop<dim>::run()</code>). We Start by computing the matrix
   // $d_{ij}$. Pretty much all the ideas used to compute/store the entries
-  // of the matrix
-  // <code>norm_matrix</code> and the normalization of <code>nij_matrix</code>
-  // (described a few hundreds of lines above) are used here again. We use
-  // thread-parallel node-loops (again) via
+  // of the matrix <code>norm_matrix</code> and the normalization of 
+  // <code>nij_matrix</code> (described a few hundreds of lines above) are 
+  // used here again. We use thread-parallel node-loops (again) via
   // <code>parallel::apply_to_subranges</code>: therefore we have to
   // define a "worker" <code>on_subranges</code> for this new task.
   //
-  // We note here that $\int_{\Omega} \nabla \phi_j
-  // \phi_i   \, \mathrm{d}\mathbf{x}= - \int_{\Omega} \nabla \phi_i \phi_j
-  // \, \mathrm{d}\mathbf{x}$ (or equivanlently $\mathbf{c}_{ij} =
+  // We note here that 
+  // $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= - 
+  // \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$ 
+  // (or equivanlently $\mathbf{c}_{ij} =
   // - \mathbf{c}_{ji}$) provided either $\mathbf{x}_i$ or $\mathbf{x}_j$ is a
   // support point at the boundary. In such case we can check that:
   //
   // $\lambda_{\text{max}} (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
   //  \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
   //  \mathbf{U}_i^{n},
-  //  \textbf{n}_{ji})$.
+  //  \textbf{n}_{ji})$
+  //
+  // which is enough to guarantee that $d_{ij} = d_{ji}$.
   //
   // However, if both support points $\mathbf{x}_i$ or $\mathbf{x}_j$ happen to
   // lie on the boundary then the equality $\lambda_{\text{max}}
@@ -1763,7 +1799,7 @@ namespace Step69
               {
                 const auto j = jt->column();
 
-                /* We compute only dij and later we copy this
+                /* We compute only dij (i < j) and later we copy this
                    entry into dji. */
                 if (j >= i)
                   continue;
@@ -1871,11 +1907,13 @@ namespace Step69
           ;
       }; /* End of definition of on_subranges */
 
+      /* Thread-parallel loop on locally owned rows */
       parallel::apply_to_subranges(indices_relevant.begin(),
                                    indices_relevant.end(),
                                    on_subranges,
                                    4096);
 
+      /* We find the tau_max min among all MPI processes */
       tau_max.store(Utilities::MPI::min(tau_max.load(), mpi_communicator));
 
       AssertThrow(!std::isnan(tau_max) && !std::isinf(tau_max) && tau_max > 0.,
@@ -1883,11 +1921,26 @@ namespace Step69
                              "do that. - We crashed."));
     } /* End of the computation of the diagonal entries of dij_matrix */
 
-    // Placeholder Here
+    // At this point, we have computed all viscosity coefficients $d_{ij}$ and 
+    // we know what is the maximum time-step size we can use (which is, 
+    // strictly speaking, a consequence of the size of the viscosity 
+    // coefficients). So we compute the update as:
+    //
+    // $\mathbf{U}_i^{n+1} = \mathbf{U}_i^{n} - \frac{\tau_{\text{max}} }{m_i}
+    //  \sum_{j \in \mathcal{I}(i)} (\mathbb{f}(\mathbf{U}_j^{n}) -
+    //  \mathbb{f}(\mathbf{U}_i^{n})) \cdot \mathbf{c}_{ij} - d_{ij}
+    //  (\mathbf{U}_j^{n} - \mathbf{U}_i)^{n}$
+    //
+    // This update formula is different from that one used in the
+    // pseudo-code. However, it can be shown that it is algebraically
+    // equivalent (it will produce the same numerical values). We favor
+    // this second formula since it has natural cancellation properties
+    // that might help avoid numerical artifacts.
 
     {
       TimerOutput::Scope time(computing_timer, "time_step - 3 perform update");
 
+      /* We define the "worker" for the subranges of rows */
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
           {
@@ -1900,6 +1953,7 @@ namespace Step69
 
             auto U_i_new = U_i;
 
+            /* This is the loop on the columns */
             for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
               {
                 const auto j = jt->column();
@@ -1910,6 +1964,7 @@ namespace Step69
                 const auto c_ij = gather_get_entry(cij_matrix, jt);
                 const auto d_ij = get_entry(dij_matrix, jt);
 
+                /* We define use the update formula here */
                 for (unsigned int k = 0; k < problem_dimension; ++k)
                   {
                     U_i_new[k] +=
@@ -1922,12 +1977,49 @@ namespace Step69
           }
       };
 
-      /* Only iterate over locally owned subset! */
+      /* Thread-parallel loop on locally owned rows */
       parallel::apply_to_subranges(indices_owned.begin(),
                                    indices_owned.end(),
                                    on_subranges,
                                    4096);
     } /* End of the computation of the new solution */
+
+    // The vast majority of the updated values is right, except those at the 
+    // boundary which have to be corrected. This is known as
+    // explicit treatment of the boundary conditions:
+    // - You advance in time satisfying no boundary condition at all,
+    // - At the end of the time step you enforce them (you post process
+    //   your solution).
+    //
+    // When solving parabolic and/or elliptic equations, we know that: in order 
+    // to enforce essential boundary conditions we should make them part 
+    // of the approximation space, while natural boundary conditions 
+    // should become part of the variational formulation. We also know 
+    // that explicit treatment of the boundary conditions (in the context of 
+    // parabolic PDE) almost surely leads to catastrophic consequences. 
+    // However, in the context of nonlinear hyperbolic equations there is enough 
+    // numerical evidence suggesting that explicit treatment of essential 
+    // boundary conditions is stable (at least in the eye-ball norm) and does 
+    // not introduce any loss in accuracy (convergence rates). In addition,
+    // it is relatively straightforward to prove that (for the case of 
+    // reflecting boundary conditions) explicit treatment of boundary 
+    // conditions is not only conservative but also guarantees preservation of  
+    // the invariant set. We are not aware of any theoretical result showing
+    // that it is possible to provide such invariant-set guarantees when
+    // using either direct enforcement of boundary conditions into the 
+    // approximation space and/or weak enforcement using Nitsche penalty
+    // method (e.g. widely used in dG schemes).
+    // 
+    // Here the worker <code>on_subranges</code> executes the correction
+    //
+    // $\mathbf{m}_i := \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
+    //   \boldsymbol{\nu}_i$
+    //
+    // which removes the normal component of $\mathbf{m}$. We note that 
+    // conservation is not just a consequence of this operation but also a 
+    // consequence of modification of the $\mathbf{c}_{ij}$ coefficients at the 
+    // boundary (see the third thread-parallel loop on nodes in 
+    // <code>OfflineData<dim>::assemble()</code>).
 
     {
       TimerOutput::Scope time(computing_timer,
@@ -1963,7 +2055,6 @@ namespace Step69
               }
 
             /* On boundary 2 enforce initial conditions: */
-
             else if (id == Boundary::dirichlet)
               {
                 U_i = initial_values->initial_state(position, t + tau_max);
@@ -1984,9 +2075,16 @@ namespace Step69
     return tau_max;
   } /* End of TimeStep<dim>::step */
 
+  // @sect4{Class <code>SchlierenPostprocessor</code> implementation}
 
-
-  // Placeholder here.
+  // Constructor of <code>SchlierenPostprocessor</code>.
+  // Here
+  // - schlieren_beta: is an ad-hoc amplification factor in order to 
+  //   enhance/exaggerate contrast in the visualization. Its actual value is a 
+  //   matter of taste.
+  // - schlieren_index: indicates which component of the state 
+  //   $[\rho, \mathbf{m},E]$ are we going to use in order generate the 
+  //   visualization. 
 
   template <int dim>
   SchlierenPostprocessor<dim>::SchlierenPostprocessor(
@@ -2011,6 +2109,9 @@ namespace Step69
                   "schlieren plot");
   }
 
+  // Here <code>prepare()</code> initializes the vector <code>r</code>
+  // and <code>schlieren</code> with proper sizes. 
+
   template <int dim>
   void SchlierenPostprocessor<dim>::prepare()
   {
@@ -2023,6 +2124,9 @@ namespace Step69
     r.reinit(n_locally_relevant);
     schlieren.reinit(partitioner);
   }
+
+  // Now <code>compute_schlieren(const vector_type &U)</code> takes a
+  // component of <code>U</code> and computes the Schlieren indicator.
 
   template <int dim>
   void SchlierenPostprocessor<dim>::compute_schlieren(const vector_type &U)
@@ -2315,7 +2419,7 @@ namespace Step69
     return U;
   }
 
-  // Implementation of the class member <code >TimeLoop </code>.
+  // Implementation of the class member <code>output </code>.
 
   template <int dim>
   void TimeLoop<dim>::output(const typename TimeLoop<dim>::vector_type &U,
@@ -2396,6 +2500,7 @@ namespace Step69
 
 } // namespace Step69
 
+// @sect3{The main()}
 
 int main(int argc, char *argv[])
 {
