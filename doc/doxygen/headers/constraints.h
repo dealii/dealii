@@ -179,7 +179,7 @@
  * see the discussion below.
  *
  *
- * <h5>Condensing vectors</h5>
+ * <h4>Condensing vectors</h4>
  *
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
