@@ -297,7 +297,7 @@ public:
               const unsigned int component = 0) const;
 
   /**
-   * Return the jump $[u]=u_{\text{cell0}} - u_{\text{cell1}}$ on the
+   * Return the jump $\jump{u}=u_{\text{cell0}} - u_{\text{cell1}}$ on the
    * interface
    * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
@@ -308,7 +308,7 @@ public:
    * here uses "value here minus value there", as seen from the first cell.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $[u]=u_{\text{cell0}}$.
+   * $\jump{u}=u_{\text{cell0}}$.
    */
   double
   jump(const unsigned int interface_dof_index,
@@ -316,13 +316,13 @@ public:
        const unsigned int component = 0) const;
 
   /**
-   * Return the average $\{u\}=\frac{1}{2}u_{\text{cell0}} +
+   * Return the average $\average{u}=\frac{1}{2}u_{\text{cell0}} +
    * \frac{1}{2}u_{\text{cell1}}$ on the interface
    * for the shape function @p interface_dof_index at the quadrature point
    * @p q_point of component @p component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $\{u\}=u_{\text{cell0}}$.
+   * $\average{u}=u_{\text{cell0}}$.
    */
   double
   average(const unsigned int interface_dof_index,
@@ -330,13 +330,13 @@ public:
           const unsigned int component = 0) const;
 
   /**
-   * Return the average of the gradient $\{\nabla u \} = \frac{1}{2}\nabla
+   * Return the average of the gradient $\average{\nabla u} = \frac{1}{2}\nabla
    * u_{\text{cell0}} + \frac{1}{2} \nabla u_{\text{cell1}}$ on the interface
    * for the shape function @p interface_dof_index at the quadrature point @p
    * q_point of component @p component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $\{\nabla u\}=\nabla u_{\text{cell0}}$.
+   * $\average{\nabla u}=\nabla u_{\text{cell0}}$.
    */
   Tensor<1, dim>
   average_gradient(const unsigned int interface_dof_index,
@@ -344,13 +344,14 @@ public:
                    const unsigned int component = 0) const;
 
   /**
-   * Return the average of the Hessian $\{\nabla^2 u \} = \frac{1}{2}\nabla^2
-   * u_{\text{cell0}} + \frac{1}{2} \nabla^2 u_{\text{cell1}}$ on the interface
+   * Return the average of the Hessian $\average{\nabla^2 u} =
+   * \frac{1}{2}\nabla^2 u_{\text{cell0}} + \frac{1}{2} \nabla^2
+   * u_{\text{cell1}}$ on the interface
    * for the shape function @p interface_dof_index at the quadrature point @p
    * q_point of component @p component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $\{\nabla^2 u\}=\nabla^2 u_{\text{cell0}}$.
+   * $\average{\nabla^2 u}=\nabla^2 u_{\text{cell0}}$.
    */
   Tensor<2, dim>
   average_hessian(const unsigned int interface_dof_index,
@@ -358,13 +359,13 @@ public:
                   const unsigned int component = 0) const;
 
   /**
-   * Return the jump in the gradient $[\nabla u]=\nabla u_{\text{cell0}} -
+   * Return the jump in the gradient $\jump{\nabla u}=\nabla u_{\text{cell0}} -
    * \nabla u_{\text{cell1}}$ on the interface for the shape function @p
    * interface_dof_index at the quadrature point @p q_point of component @p
    * component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $[\nabla u]=\nabla u_{\text{cell0}}$.
+   * $\jump{\nabla u}=\nabla u_{\text{cell0}}$.
    */
   Tensor<1, dim>
   jump_gradient(const unsigned int interface_dof_index,

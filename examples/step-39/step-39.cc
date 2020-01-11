@@ -327,7 +327,7 @@ namespace Step39
   // them are equivalent to each other uniformly with mesh size (some not
   // uniformly with polynomial degree). Here, we choose @f[ \|u\|_{1,h} =
   // \sum_{K\in \mathbb T_h} \|\nabla u\|_K^2 + \sum_{F \in F_h^i}
-  // 4\sigma_F\|\{\!\{ u \mathbf n\}\!\}\|^2_F + \sum_{F \in F_h^b}
+  // 4\sigma_F\|\average{ u \mathbf n}\|^2_F + \sum_{F \in F_h^b}
   // 2\sigma_F\|u\|^2_F @f]
 
   template <int dim>
