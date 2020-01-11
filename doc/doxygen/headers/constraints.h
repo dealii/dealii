@@ -164,8 +164,7 @@
  * auxiliary vectors (e.g. methods using explicit orthogonalization
  * procedures).
  * Nevertheless, this process is more efficient due to its lower
- * memory consumption and is discussed in the first few programs
- * of the @ref Tutorial , for example in step-6.
+ * memory consumption.
  *
  * The condensation functions exist for different argument types: SparsityPattern,
  * SparseMatrix and
