@@ -94,8 +94,7 @@
  * AffineConstraints::distribute() function. Note that the
  * AffineConstraints::condense() function is applied to matrix and right hand
  * side of the linear system, while the AffineConstraints::distribute()
- * function is applied to the solution vector. This is the method used in
- * the first few tutorial programs, see for example step-6.
+ * function is applied to the solution vector.
  *
  * This scheme of first building a linear system and then eliminating
  * constrained degrees of freedom is inefficient, and a bottleneck if there
