@@ -349,7 +349,7 @@ namespace IteratorFilters
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
  *
- * This class is used in step-18 and step-32.
+ * This class is used in step-32.
  *
  *
  * <h3>Predicates</h3>
