@@ -374,10 +374,11 @@ namespace GridTools
    *
    * This function is called by some <tt>GridIn::read_*</tt> functions. Only
    * the vertices with indices in @p considered_vertices are tested for
-   * equality. This speeds up the algorithm, which is quadratic and thus quite
-   * slow to begin with. However, if you wish to consider all vertices, simply
-   * pass an empty vector. In that case, the function fills
-   * @p considered_vertices with all vertices.
+   * equality. This speeds up the algorithm, which is, for worst-case hyper
+   * cube geometries $O(N^{3/2})$ in 2D and $O(N^{5/3})$ in 3D: quite slow.
+   * However, if you wish to consider all vertices, simply pass an empty
+   * vector. In that case, the function fills @p considered_vertices with all
+   * vertices.
    *
    * Two vertices are considered equal if their difference in each coordinate
    * direction is less than @p tol.
