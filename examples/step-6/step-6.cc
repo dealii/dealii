@@ -513,13 +513,12 @@ void Step6<dim>::output_results(const unsigned int cycle) const
 // disk, in that we adaptively instead of globally refine the mesh, and that
 // we output the solution on the final mesh in the present function.
 //
-// The first block in the main loop of the function deals with mesh
-// generation. If this is the first cycle of the program, instead of reading
-// the grid from a file on disk as in the previous example, we now again
-// create it using a library function. The domain is again a circle, which is
-// why we have to provide a suitable boundary object as well. We place the
-// center of the circle at the origin and have the radius be one (these are
-// the two hidden arguments to the function, which have default values).
+// The first block in the main loop of the function deals with mesh generation.
+// If this is the first cycle of the program, instead of reading the grid from
+// a file on disk as in the previous example, we now again create it using a
+// library function. The domain is again a circle with center at the origin and
+// a radius of one (these are the two hidden arguments to the function, which
+// have default values).
 //
 // You will notice by looking at the coarse grid that it is of inferior
 // quality than the one which we read from the file in the previous example:
