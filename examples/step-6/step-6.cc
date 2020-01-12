@@ -321,9 +321,9 @@ void Step6<dim>::assemble_system()
   // constraints. The constrained nodes are still in the linear system (there
   // is a nonzero entry, chosen in a way that the matrix is well conditioned,
   // on the diagonal of the matrix and all other entries for this line are set
-  // to zero) but the computed values are invalid (i.e., the correspond entry
-  // in <code>system_rhs</code> is currently meaningless). We compute the
-  // correct values for these nodes at the end of the <code>solve</code>
+  // to zero) but the computed values are invalid (i.e., the corresponding
+  // entries in <code>system_rhs</code> is currently meaningless). We compute
+  // the correct values for these nodes at the end of the <code>solve</code>
   // function.
 }
 
