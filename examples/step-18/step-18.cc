@@ -61,11 +61,6 @@
 // the introduction:
 #include <deal.II/base/symmetric_tensor.h>
 
-// And a header that implements filters for iterators looping over all
-// cells. We will use this when selecting only those cells for output that are
-// owned by the present process in a %parallel program:
-#include <deal.II/grid/filtered_iterator.h>
-
 // And lastly a header that contains some functions that will help us compute
 // rotaton matrices of the local coordinate systems at specific points in the
 // domain.
