@@ -74,10 +74,10 @@ namespace hp
  * the conormal derivative $a\frac{du}{dn} = g$.
  *
  * The error estimator returns a vector of estimated errors per cell which can
- * be used to feed the GridRefinement::refine_fixed_fraction,
- * GridRefinement::refine_fixed_number, and similar functions. This vector
- * contains elements of data type @p float, rather than @p double, since
- * accuracy is not important in the current context.
+ * be used to feed the GridRefinement::refine_and_coarsen_fixed_fraction(),
+ * GridRefinement::refine_and_coarsen_fixed_number(), and similar functions.
+ * This vector contains elements of data type @p float, rather than @p double,
+ * since accuracy is not important in the current context.
  *
  * The full reference for the paper in which this error estimator is defined
  * is as follows:
@@ -164,7 +164,7 @@ namespace hp
  * <h3>Boundary values</h3>
  *
  * If the face is at the boundary, i.e. there is no neighboring cell to which
- * the jump in the gradiend could be computed, there are two possibilities:
+ * the jump in the gradient could be computed, there are two possibilities:
  * <ul>
  * <li> The face belongs to a Dirichlet boundary. Then the face is not
  * considered, which can be justified looking at a dual problem technique and
