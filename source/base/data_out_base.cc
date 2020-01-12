@@ -7499,12 +7499,23 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   ierr = MPI_File_seek_shared(fh, header_size, MPI_SEEK_SET);
   AssertThrowMPI(ierr);
   {
+    const auto &patches = get_patches();
+    const types::global_dof_index my_n_patches = patches.size();
+    const types::global_dof_index global_n_patches =
+      Utilities::MPI::sum(my_n_patches, comm);
+
+    // Do not write pieces with 0 cells as this will crash paraview if this is
+    // the first piece written. But if nobody has any pieces to write (file is
+    // empty), let processor 0 write their empty data, otherwise the vtk file is
+    // invalid.
     std::stringstream ss;
-    DataOutBase::write_vtu_main(get_patches(),
-                                get_dataset_names(),
-                                get_nonscalar_data_ranges(),
-                                vtk_flags,
-                                ss);
+    if (my_n_patches > 0 || (global_n_patches == 0 && myrank == 0))
+      DataOutBase::write_vtu_main(patches,
+                                  get_dataset_names(),
+                                  get_nonscalar_data_ranges(),
+                                  vtk_flags,
+                                  ss);
+
     ierr = MPI_File_write_ordered(fh,
                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
                                   ss.str().size(),
