@@ -16,7 +16,6 @@
 #ifndef dealii_point_h
 #define dealii_point_h
 
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
@@ -107,8 +106,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, 1997
  */
 template <int dim, typename Number = double>
-class Point : public Tensor<1, dim, Number>
-{
+class Point : public Tensor<1, dim, Number> {
 public:
   /**
    * Standard constructor. Creates an object that corresponds to the origin,
@@ -122,8 +120,7 @@ public:
   /**
    * Convert a tensor to a point.
    */
-  explicit DEAL_II_CUDA_HOST_DEV
-  Point(const Tensor<1, dim, Number> &);
+  explicit DEAL_II_CUDA_HOST_DEV Point(const Tensor<1, dim, Number> &);
 
   /**
    * Constructor for one dimensional points. This function is only implemented
@@ -133,8 +130,7 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  explicit DEAL_II_CUDA_HOST_DEV
-  Point(const Number x);
+  explicit DEAL_II_CUDA_HOST_DEV Point(const Number x);
 
   /**
    * Constructor for two dimensional points. This function is only implemented
@@ -166,8 +162,8 @@ public:
   template <std::size_t dummy_dim,
             typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
                                     int>::type = 0>
-  Point(const boost::geometry::model::
-          point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
+  Point(const boost::geometry::model::point<
+        Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
 
   /**
    * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a vector
@@ -177,23 +173,21 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   static DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                               unit_vector(const unsigned int i);
+  unit_vector(const unsigned int i);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number
-                        operator()(const unsigned int index) const;
+  DEAL_II_CUDA_HOST_DEV Number operator()(const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number &
-                        operator()(const unsigned int index);
+  DEAL_II_CUDA_HOST_DEV Number &operator()(const unsigned int index);
 
   /**
    * Assignment operator from Tensor<1, dim, Number> with different underlying
@@ -201,8 +195,7 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Point<dim, Number> &
-  operator=(const Tensor<1, dim, OtherNumber> &p);
+  Point<dim, Number> &operator=(const Tensor<1, dim, OtherNumber> &p);
 
   /**
    * @name Addition and subtraction of points.
@@ -215,7 +208,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                        operator+(const Tensor<1, dim, Number> &) const;
+  operator+(const Tensor<1, dim, Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -227,7 +220,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV Tensor<1, dim, Number>
-                        operator-(const Point<dim, Number> &) const;
+  operator-(const Point<dim, Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -238,15 +231,14 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                        operator-(const Tensor<1, dim, Number> &) const;
+  operator-(const Tensor<1, dim, Number> &) const;
 
   /**
    * The opposite vector.
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                        operator-() const;
+  DEAL_II_CUDA_HOST_DEV Point<dim, Number> operator-() const;
 
   /**
    * @}
@@ -265,11 +257,10 @@ public:
    * @relatesalso EnableIfScalar
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>
-  operator*(const OtherNumber) const;
+  DEAL_II_CUDA_HOST_DEV
+      Point<dim, typename ProductType<
+                     Number, typename EnableIfScalar<OtherNumber>::type>::type>
+      operator*(const OtherNumber) const;
 
   /**
    * Divide the current point by a factor.
@@ -277,11 +268,10 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>
-  operator/(const OtherNumber) const;
+  DEAL_II_CUDA_HOST_DEV
+      Point<dim, typename ProductType<
+                     Number, typename EnableIfScalar<OtherNumber>::type>::type>
+      operator/(const OtherNumber) const;
 
   /**
    * Return the scalar product of the vectors representing two points.
@@ -307,7 +297,7 @@ public:
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
-   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
+   * <tt>p</tt>, i.e. the $l_2$ norm of the difference between the
    * vectors representing the two points.
    *
    * @note This function can also be used in CUDA device code.
@@ -333,8 +323,7 @@ public:
    * of serialization
    */
   template <class Archive>
-  void
-  serialize(Archive &ar, const unsigned int version);
+  void serialize(Archive &ar, const unsigned int version);
 };
 
 /*--------------------------- Inline functions: Point -----------------------*/
@@ -344,106 +333,88 @@ public:
 // At least clang-3.7 requires us to have a user-defined constructor
 // and we can't use 'Point<dim,Number>::Point () = default' here.
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
-Point<dim, Number>::Point() // NOLINT
+inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>::Point() // NOLINT
 {}
-
-
 
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV
 Point<dim, Number>::Point(const Tensor<1, dim, Number> &t)
-  : Tensor<1, dim, Number>(t)
-{}
-
-
+    : Tensor<1, dim, Number>(t) {}
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
-Point<dim, Number>::Point(const Number x)
-{
-#  ifndef __CUDA_ARCH__
+inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>::Point(const Number x) {
+#ifndef __CUDA_ARCH__
   Assert(dim == 1,
          ExcMessage(
-           "You can only initialize Point<1> objects using the constructor "
-           "that takes only one argument. Point<dim> objects with dim!=1 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
+             "You can only initialize Point<1> objects using the constructor "
+             "that takes only one argument. Point<dim> objects with dim!=1 "
+             "require initialization with the constructor that takes 'dim' "
+             "arguments."));
+#endif
 
   // we can only get here if we pass the assertion. use the switch anyway so
   // as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
-  switch (dim)
-    {
-      case 1:
-        this->values[0] = x;
-        break;
+  switch (dim) {
+  case 1:
+    this->values[0] = x;
+    break;
 
-      default:;
-    }
+  default:;
+  }
 }
 
-
-
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV
-Point<dim, Number>::Point(const Number x, const Number y)
-{
-#  ifndef __CUDA_ARCH__
+inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>::Point(const Number x,
+                                                       const Number y) {
+#ifndef __CUDA_ARCH__
   Assert(dim == 2,
          ExcMessage(
-           "You can only initialize Point<2> objects using the constructor "
-           "that takes two arguments. Point<dim> objects with dim!=2 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
+             "You can only initialize Point<2> objects using the constructor "
+             "that takes two arguments. Point<dim> objects with dim!=2 "
+             "require initialization with the constructor that takes 'dim' "
+             "arguments."));
+#endif
 
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
   constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
-  this->values[0]                = x;
-  this->values[y_index]          = y;
+  this->values[0] = x;
+  this->values[y_index] = y;
 }
-
-
 
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV
-Point<dim, Number>::Point(const Number x, const Number y, const Number z)
-{
-#  ifndef __CUDA_ARCH__
+Point<dim, Number>::Point(const Number x, const Number y, const Number z) {
+#ifndef __CUDA_ARCH__
   Assert(dim == 3,
          ExcMessage(
-           "You can only initialize Point<3> objects using the constructor "
-           "that takes three arguments. Point<dim> objects with dim!=3 "
-           "require initialization with the constructor that takes 'dim' "
-           "arguments."));
-#  endif
+             "You can only initialize Point<3> objects using the constructor "
+             "that takes three arguments. Point<dim> objects with dim!=3 "
+             "require initialization with the constructor that takes 'dim' "
+             "arguments."));
+#endif
 
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
   constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
   constexpr unsigned int z_index = (dim < 3) ? 0 : 2;
-  this->values[0]                = x;
-  this->values[y_index]          = y;
-  this->values[z_index]          = z;
+  this->values[0] = x;
+  this->values[y_index] = y;
+  this->values[z_index] = z;
 }
-
-
 
 template <int dim, typename Number>
 template <
-  std::size_t dummy_dim,
-  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
+    std::size_t dummy_dim,
+    typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
 inline Point<dim, Number>::Point(
-  const boost::geometry::model::
-    point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt)
-{
+    const boost::geometry::model::point<
+        Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt) {
   Assert(dim <= 3, ExcNotImplemented());
-  this->values[0]                = boost::geometry::get<0>(boost_pt);
+  this->values[0] = boost::geometry::get<0>(boost_pt);
   constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
   constexpr unsigned int z_index = (dim < 3) ? 0 : 2;
 
@@ -454,180 +425,131 @@ inline Point<dim, Number>::Point(
     this->values[z_index] = boost::geometry::get<z_index>(boost_pt);
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-                             Point<dim, Number>::unit_vector(unsigned int i)
-{
+Point<dim, Number>::unit_vector(unsigned int i) {
   Point<dim, Number> p;
   p[i] = 1.;
   return p;
 }
 
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Number
-Point<dim, Number>::operator()(const unsigned int index) const
-{
-#  ifndef __CUDA_ARCH__
+Point<dim, Number>::operator()(const unsigned int index) const {
+#ifndef __CUDA_ARCH__
   AssertIndexRange(index, dim);
-#  endif
+#endif
   return this->values[index];
 }
-
-
 
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Number &
-Point<dim, Number>::operator()(const unsigned int index)
-{
-#  ifndef __CUDA_ARCH__
+Point<dim, Number>::operator()(const unsigned int index) {
+#ifndef __CUDA_ARCH__
   AssertIndexRange(index, dim);
-#  endif
+#endif
   return this->values[index];
 }
-
-
 
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE Point<dim, Number> &
-Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p)
-{
+Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p) {
   Tensor<1, dim, Number>::operator=(p);
   return *this;
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-Point<dim, Number>::operator+(const Tensor<1, dim, Number> &p) const
-{
+Point<dim, Number>::operator+(const Tensor<1, dim, Number> &p) const {
   Point<dim, Number> tmp = *this;
   tmp += p;
   return tmp;
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Tensor<1, dim, Number>
-Point<dim, Number>::operator-(const Point<dim, Number> &p) const
-{
+Point<dim, Number>::operator-(const Point<dim, Number> &p) const {
   return (Tensor<1, dim, Number>(*this) -= p);
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-Point<dim, Number>::operator-(const Tensor<1, dim, Number> &p) const
-{
+Point<dim, Number>::operator-(const Tensor<1, dim, Number> &p) const {
   Point<dim, Number> tmp = *this;
   tmp -= p;
   return tmp;
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Point<dim, Number>
-Point<dim, Number>::operator-() const
-{
+Point<dim, Number>::operator-() const {
   Point<dim, Number> result;
   for (unsigned int i = 0; i < dim; ++i)
     result.values[i] = -this->values[i];
   return result;
 }
 
-
-
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
-    Point<dim,
-        typename ProductType<Number,
-                             typename EnableIfScalar<OtherNumber>::type>::type>
-    Point<dim, Number>::operator*(const OtherNumber factor) const
-{
+    Point<dim, typename ProductType<
+                   Number, typename EnableIfScalar<OtherNumber>::type>::type>
+        Point<dim, Number>::operator*(const OtherNumber factor) const {
   Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
   for (unsigned int i = 0; i < dim; ++i)
     tmp[i] = this->operator[](i) * factor;
   return tmp;
 }
 
-
-
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
-  Point<dim,
-        typename ProductType<Number,
-                             typename EnableIfScalar<OtherNumber>::type>::type>
-  Point<dim, Number>::operator/(const OtherNumber factor) const
-{
+    Point<dim, typename ProductType<
+                   Number, typename EnableIfScalar<OtherNumber>::type>::type>
+    Point<dim, Number>::operator/(const OtherNumber factor) const {
   const Tensor<1, dim, Number> &base_object = *this;
-  return Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>(
-    dealii::operator/(base_object, factor));
+  return Point<dim, typename ProductType<Number, typename EnableIfScalar<
+                                                     OtherNumber>::type>::type>(
+      dealii::operator/(base_object, factor));
 }
 
-
-
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Number Point<dim, Number>::
-                                    operator*(const Tensor<1, dim, Number> &p) const
-{
+inline DEAL_II_CUDA_HOST_DEV Number
+    Point<dim, Number>::operator*(const Tensor<1, dim, Number> &p) const {
   Number res = Number();
   for (unsigned int i = 0; i < dim; ++i)
     res += this->operator[](i) * p[i];
   return res;
 }
 
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
-Point<dim, Number>::square() const
-{
+Point<dim, Number>::square() const {
   return this->norm_square();
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
-Point<dim, Number>::distance(const Point<dim, Number> &p) const
-{
+Point<dim, Number>::distance(const Point<dim, Number> &p) const {
   return std::sqrt(distance_square(p));
 }
 
-
-
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
-Point<dim, Number>::distance_square(const Point<dim, Number> &p) const
-{
+Point<dim, Number>::distance_square(const Point<dim, Number> &p) const {
   Number sum = internal::NumberType<Number>::value(0.0);
-  for (unsigned int i = 0; i < dim; ++i)
-    {
-      const Number diff = static_cast<Number>(this->values[i]) - p(i);
-      sum += numbers::NumberTraits<Number>::abs_square(diff);
-    }
+  for (unsigned int i = 0; i < dim; ++i) {
+    const Number diff = static_cast<Number>(this->values[i]) - p(i);
+    sum += numbers::NumberTraits<Number>::abs_square(diff);
+  }
 
   return sum;
 }
 
-
-
 template <int dim, typename Number>
 template <class Archive>
-inline void
-Point<dim, Number>::serialize(Archive &ar, const unsigned int)
-{
+inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int) {
   // forward to serialization
   // function in the base class
   ar &static_cast<Tensor<1, dim, Number> &>(*this);
@@ -635,9 +557,7 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
 
 #endif // DOXYGEN
 
-
 /*--------------------------- Global functions: Point -----------------------*/
-
 
 /**
  * Global operator scaling a point vector by a scalar.
@@ -649,15 +569,11 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  */
 template <int dim, typename Number, typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
-  Point<dim,
-        typename ProductType<Number,
-                             typename EnableIfScalar<OtherNumber>::type>::type>
-  operator*(const OtherNumber factor, const Point<dim, Number> &p)
-{
+    Point<dim, typename ProductType<
+                   Number, typename EnableIfScalar<OtherNumber>::type>::type>
+    operator*(const OtherNumber factor, const Point<dim, Number> &p) {
   return p * factor;
 }
-
-
 
 /**
  * Output operator for points. Print the elements consecutively, with a space
@@ -665,9 +581,8 @@ inline DEAL_II_CUDA_HOST_DEV
  * @relatesalso Point
  */
 template <int dim, typename Number>
-inline std::ostream &
-operator<<(std::ostream &out, const Point<dim, Number> &p)
-{
+inline std::ostream &operator<<(std::ostream &out,
+                                const Point<dim, Number> &p) {
   for (unsigned int i = 0; i < dim - 1; ++i)
     out << p[i] << ' ';
   out << p[dim - 1];
@@ -675,22 +590,17 @@ operator<<(std::ostream &out, const Point<dim, Number> &p)
   return out;
 }
 
-
-
 /**
  * Input operator for points. Inputs the elements consecutively.
  * @relatesalso Point
  */
 template <int dim, typename Number>
-inline std::istream &
-operator>>(std::istream &in, Point<dim, Number> &p)
-{
+inline std::istream &operator>>(std::istream &in, Point<dim, Number> &p) {
   for (unsigned int i = 0; i < dim; ++i)
     in >> p[i];
 
   return in;
 }
-
 
 #ifndef DOXYGEN
 
@@ -700,9 +610,7 @@ operator>>(std::istream &in, Point<dim, Number> &p)
  * loop is empty.
  */
 template <typename Number>
-inline std::ostream &
-operator<<(std::ostream &out, const Point<1, Number> &p)
-{
+inline std::ostream &operator<<(std::ostream &out, const Point<1, Number> &p) {
   out << p[0];
 
   return out;
