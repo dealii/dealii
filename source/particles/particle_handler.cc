@@ -779,7 +779,7 @@ namespace Particles
         function.vector_value(particle_location, new_position);
         if (displace_particles)
           for (unsigned int d = 0; d < spacedim; ++d)
-            particle_location[d] = particle_location[d] + new_position[d];
+            particle_location[d] += new_position[d];
         else
           for (unsigned int d = 0; d < spacedim; ++d)
             particle_location[d] = new_position[d];

@@ -304,9 +304,11 @@ namespace Particles
      * `input_vector[id*spacedim]`.
      *
      * If the argument @p displace_particles is set to false, then the new
-     * position is computed by setting it to the values contained in
-     * @p input_vector. By default, the particles are displaced of the
-     * amount contained in the @p input_vector.
+     * position taken from the values contained in
+     * @p input_vector, replacing the previously stored particle position.
+     * By default, the particles are displaced by the amount contained in the
+     * @p input_vector, i.e., the contents of the vector are considered
+     * *offsets* that are added to the previous position.
      *
      * After setting the new position, this function calls internally the method
      * sort_particles_into_subdomains_and_cells(). You should
@@ -337,11 +339,11 @@ namespace Particles
      * @param [in] new_positions A vector of points of dimension
      * particle_handler.n_locally_owned_particles()
      *
-     * @param [in] displace_particles When true, this add the value of the
-     * vector of points to the
+     * @param [in] displace_particles When true, this function adds the value
+     * of the vector of points to the
      * current position of the particle, thus displacing them by the
      * amount given by the function. When false, the position of the
-     * particle is replaced by the value in the vector
+     * particle is replaced by the value in the vector.
      *
      * @authors Bruno Blais, Luca Heltai (2019)
      */
@@ -360,10 +362,10 @@ namespace Particles
      * @param [in] function A function that has n_components==spacedim that
      * describes either the displacement or the new position of the particles
      *
-     * @param [in] displace_particles When true, this add the results of the
-     * function to the current position of the particle, thus displacing them by
-     * the amount given by the function. When false, the position of the
-     * particle is is replaced by the value of the function
+     * @param [in] displace_particles When true, this function adds the results
+     * of the function to the current position of the particle, thus displacing
+     * them by the amount given by the function. When false, the position of the
+     * particle is replaced by the value of the function.
      *
      * @authors Bruno Blais, Luca Heltai (2019)
      */
@@ -787,7 +789,7 @@ namespace Particles
                     get_next_free_particle_index() * spacedim);
     for (const auto &p : *this)
       {
-        auto &     point = p.get_location();
+        auto       point = p.get_location();
         const auto id    = p.get_id();
         if (add_to_output_vector)
           for (unsigned int i = 0; i < spacedim; ++i)
