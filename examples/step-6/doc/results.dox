@@ -142,8 +142,6 @@ into
   preconditioner.initialize(system_matrix, 1.0);
 @endcode
 we can try out different relaxation parameters for SSOR. By using
-(you have to also add the header file <code>lac/sparse_ilu.h</code> to
-the include list at the top of the file)
 @code
   PreconditionJacobi<> preconditioner;
   preconditioner.initialize(system_matrix);
@@ -153,8 +151,10 @@ we can use Jacobi as a preconditioner. And by using
   SparseILU<double> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
-we can use a simple incomplete LU decomposition without any
-thresholding or strengthening of the diagonal.
+we can use a simple incomplete LU decomposition without any thresholding or
+strengthening of the diagonal (to use this preconditioner, you have to also
+add the header file <code>deal.II/lac/sparse_ilu.h</code> to the include list
+at the top of the file).
 
 Using these various different preconditioners, we can compare the
 number of CG iterations needed (available through the
@@ -504,12 +504,12 @@ methods because the mesh will have to resolve the singularity that causes
 the solution to not be in $W^{1,\infty}$ any more.
 
 The typical example one uses for this is called the <i>Kellogg problem</i>
-(referring to @cite Kel74), which in the commonly used form has a coefficient 
-$a(\mathbf x)$ that has different values in the four quadrants of the plane 
-(or eight different values in the octants of ${\mathbb R}^3$). The exact degree 
-of regularity (the $s$ in the index of the Sobolev space above) depends on the 
-values of $a(\mathbf x)$ coming together at the origin, and by choosing the 
-jumps large enough, the regularity of the solution can be made as close as 
+(referring to @cite Kel74), which in the commonly used form has a coefficient
+$a(\mathbf x)$ that has different values in the four quadrants of the plane
+(or eight different values in the octants of ${\mathbb R}^3$). The exact degree
+of regularity (the $s$ in the index of the Sobolev space above) depends on the
+values of $a(\mathbf x)$ coming together at the origin, and by choosing the
+jumps large enough, the regularity of the solution can be made as close as
 desired to $H^1$.
 
 To implement something like this, one could replace the coefficient
