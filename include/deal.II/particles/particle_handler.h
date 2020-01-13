@@ -334,7 +334,11 @@ namespace Particles
      * vector of points. The new set of point defined by the
      * vector has to be sufficiently close to the original one to ensure that
      * the sort_particles_into_subdomains_and_cells() function manages to find
-     * the new cells in which the particles belong
+     * the new cells in which the particles belong.
+     *
+     * Points are numbered in the same way they are traversed locally by the
+     * ParticleHandler. A typical way to use this method, is to first call the
+     * get_particle_positions() function, and then modify the resulting vector.
      *
      * @param [in] new_positions A vector of points of dimension
      * particle_handler.n_locally_owned_particles()
@@ -359,8 +363,11 @@ namespace Particles
      * the sort_particles_into_subdomains_and_cells algorithm manages to find
      * the new cells in which the particles belong.
      *
+     * The function is evaluated at the current location of the particles.
+     *
      * @param [in] function A function that has n_components==spacedim that
-     * describes either the displacement or the new position of the particles
+     * describes either the displacement or the new position of the particles as
+     * a function of the current location of the particle.
      *
      * @param [in] displace_particles When true, this function adds the results
      * of the function to the current position of the particle, thus displacing
@@ -384,7 +391,7 @@ namespace Particles
      * spacedim consecutive entries starting from
      * `output_vector[id*spacedim]`.
      *
-     * @param[out] output_vector A parallel distributed vector containing
+     * @param[in, out] output_vector A parallel distributed vector containing
      * the positions of the particles, or updated with the positions of the
      * particles.
      *
@@ -400,7 +407,8 @@ namespace Particles
 
     /**
      * Gather the position of the particles within the particle handler in
-     * a vector of points.
+     * a vector of points. The order of the points is the same on would obtain
+     * by iterating over all (local) particles, and querying their locations.
      *
      * @param [in,out] positions A vector preallocated at size
      * (particle_handler.n_locally_owned_articles) and whose points will become
@@ -766,9 +774,9 @@ namespace Particles
                     get_next_free_particle_index() * spacedim);
     for (auto &p : *this)
       {
-        const auto &point     = p.get_location();
-        auto        new_point = point * (displace_particles ? 1.0 : 0.0);
-        const auto  id        = p.get_id();
+        auto       new_point(displace_particles ? p.get_location() :
+                                            Point<spacedim>());
+        const auto id = p.get_id();
         for (unsigned int i = 0; i < spacedim; ++i)
           new_point[i] += input_vector[id * spacedim + i];
         p.set_location(new_point);
