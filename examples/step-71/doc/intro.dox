@@ -86,8 +86,8 @@ piecewise linear "hat functions", we would get integrals of the sort
   \int_0^L (\Delta \varphi_i) (\Delta \varphi_j)
   =
   \int_0^L
-  \frac 1h \right[\delta(x-x_{i-1}) - 2\delta(x-x_i) + \delta(x-x_{i+1})\right]
-  \frac 1h \right[\delta(x-x_{j-1}) - 2\delta(x-x_j) + \delta(x-x_{j+1})\right]
+  \frac 1h \left[\delta(x-x_{i-1}) - 2\delta(x-x_i) + \delta(x-x_{i+1})\right]
+  \frac 1h \left[\delta(x-x_{j-1}) - 2\delta(x-x_j) + \delta(x-x_{j+1})\right]
 @f}
 where $x_i$ is the node location at which the shape function
 $\varphi_i$ is defined, and $h$ is the mesh size (assumed
@@ -230,8 +230,16 @@ values on each interface $e\in \mathbb{F}$ (shared by the two cells
 $K_{+},K_{-} \in \mathbb{T}$), we cope with this discontinuity by
 defining the following single-valued functions on $e$:
 @f{align*}{
-\Bigg[\!\Bigg[\frac{\partial^k v_h}{\partial \mathbf n^k}\Bigg]\!\Bigg]&= \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e - \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e,\\
-\Bigg\{\!\Bigg\{\frac{\partial^k v_h}{\partial \mathbf n^k}\Bigg\}\!\Bigg\}&=\frac{1}{2} \bigg( \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e + \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e \bigg )  
+  \jump{\frac{\partial^k v_h}{\partial \mathbf n^k}}
+  &=
+  \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e
+  - \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e,
+  \\
+  \average{\frac{\partial^k v_h}{\partial \mathbf n^k}}
+  &=
+  \frac{1}{2}
+  \bigg( \frac{\partial^k v_h|_{K_+}}{\partial \mathbf n^k} \bigg |_e
+  + \frac{\partial^k v_h|_{K_-}}{\partial \mathbf n^k} \bigg |_e \bigg )
 @f}
 for $k =1,2$ (i.e., for the gradient and the matrix of second
 derivatives), and where $\mathbf n$ denotes a unit vector normal to
@@ -300,10 +308,13 @@ stable as the mesh size goes to zero, and to obtain a stable
 formulation that converges to the correct solution, we need to add
 the following terms:
 @f{align*}{
--\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg]
+-\sum_{e \in \mathbb{F}} \int_{e}
+  \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+  \jump{\frac{\partial u_h}{\partial \mathbf n}}
 + \sum_{e \in \mathbb{F}} 
-\frac{\sigma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
-\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg].
+  \frac{\sigma}{h_e}\int_e
+  \jump{\frac{\partial v_h}{\partial \mathbf n}}
+  \jump{\frac{\partial u_h}{\partial \mathbf n}}.
 @f}
 Then, after making cancellations that arise, we arrive at the following $C^0$
 IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
@@ -314,19 +325,28 @@ g$ on $\partial \Omega$ and
 where
 @f{align*}{
 \mathcal{A}(v_h,u_h):=&\sum_{K \in \mathbb{T}}\int_K D^2v_h:D^2u_h \ dx
--\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] 
- ds
 \\
-&-\sum_{e \in \mathbb{F}} \int_{e} \bigg \{\!\bigg\{ \frac{\partial^2 v_h}{\partial \mathbf n^2}\bigg\}\!\bigg\} \bigg [\!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \ ds
+&
+ -\sum_{e \in \mathbb{F}} \int_{e}
+  \jump{ \frac{\partial^2 v_h}{\partial \mathbf n^2}}
+  \average{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+ -\sum_{e \in \mathbb{F}} \int_{e}
+ \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
 \\
 &+ \sum_{e \in \mathbb{F}} 
-\frac{\gamma}{h_e}\int_e \bigg[\!\bigg[\! \frac{\partial v_h}{\partial \mathbf n} \bigg]\!\bigg] 
-\bigg[\!\bigg[ \frac{\partial u_h}{\partial \mathbf n} \bigg]\!\bigg] \ ds,
+ \frac{\gamma}{h_e}
+ \int_e
+ \jump{\frac{\partial v_h}{\partial \mathbf n}}
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds,
 @f}
 and 
 @f{align*}{
-\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx +\sum_{e \in \mathbb{F}^b} \frac{\gamma}{h_e}\int_e 
-\frac{\partial v_h}{\partial \mathbf n} j \ ds.
+\mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx
++
+\sum_{e \in \mathbb{F}, e\subset\partial\Omega}
+\frac{\gamma}{h_e}
+\int_e \frac{\partial v_h}{\partial \mathbf n} j \ ds.
 @f}
 Here, $\gamma$ is the penalty parameter which both weakly enforces the
 boundary condition
@@ -367,7 +387,7 @@ energy norm, as follows:
  +
  \sum\limits_{e \in \mathbb{F} }
  \frac{\gamma }{h_e} \left\|
- \ \!\bigg[ \!\bigg[ \frac{\partial u_h}{\partial \mathbf n}\bigg]\!\bigg] \right\|_{L^2(e)}^2.
+ \jump{\frac{\partial u_h}{\partial \mathbf n}} \right\|_{L^2(e)}^2.
 @f}
 
 In this (semi)norm, the theory in the paper mentioned above yields that we

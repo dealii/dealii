@@ -397,10 +397,10 @@ namespace Step71
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
 
-      scratch_data.fe_values.reinit(cell);
-      cell->get_dof_indices(copy_data.local_dof_indices);
-
       const FEValues<dim> &fe_values = scratch_data.fe_values;
+      fe_values.reinit(cell);
+
+      cell->get_dof_indices(copy_data.local_dof_indices);
 
       const ExactSolution::RightHandSide<dim> right_hand_side;
 
@@ -512,13 +512,29 @@ namespace Step71
                   ncell->extent_in_direction(
                     GeometryInfo<dim>::unit_normal_direction[nf])));
 
-      // Finally, and as usual, we loop over the quadrature points
-      // and indices `i` and `j` to add up the contributions of this
-      // face or sub-face. These are then stored in the `copy_data.face_data`
-      // object created above. As for the cell worker, we pull the evalation
-      // of averages and jumps out of the loops if possible, introducing
-      // local variables that store these results. The assembly then only
-      // needs to use these local variables in the innermost loop.
+      // Finally, and as usual, we loop over the quadrature points and
+      // indices `i` and `j` to add up the contributions of this face
+      // or sub-face. These are then stored in the
+      // `copy_data.face_data` object created above. As for the cell
+      // worker, we pull the evalation of averages and jumps out of
+      // the loops if possible, introducing local variables that store
+      // these results. The assembly then only needs to use these
+      // local variables in the innermost loop. Regarding the concrete
+      // formula this code implements, recall that the interface terms
+      // of the bilinear form were as follows:
+      // @f{align*}{
+      //  -\sum_{e \in \mathbb{F}} \int_{e}
+      //  \jump{ \frac{\partial^2 v_h}{\partial \mathbf n^2}}
+      //  \average{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+      // -\sum_{e \in \mathbb{F}} \int_{e}
+      // \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
+      // \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+      // + \sum_{e \in \mathbb{F}}
+      // \frac{\gamma}{h_e}
+      // \int_e
+      // \jump{\frac{\partial v_h}{\partial \mathbf n}}
+      // \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds.
+      // @f}
       for (unsigned int qpoint = 0;
            qpoint < fe_interface_values.n_quadrature_points;
            ++qpoint)
@@ -600,12 +616,19 @@ namespace Step71
          cell->extent_in_direction(
            GeometryInfo<dim>::unit_normal_direction[face_no]));
 
-      // The third piece is the assembly of terms. This is now slightly more
-      // involved since these contains both terms for the matrix and for
-      // the right hand side. The latter requires us to evaluate the
-      // boundary conditions $j(\mathbf x)$, which in the current
-      // case (where we know the exact solution) we compute from
-      // $j(\mathbf x) = \frac{\partial u(\mathbf x)}{\partial {\mathbf n}}$:
+      // The third piece is the assembly of terms. This is now
+      // slightly more involved since these contains both terms for
+      // the matrix and for the right hand side. The former is exactly
+      // the same as for the interior faces stated above if one just
+      // defines the jump and average appropriately (which is what the
+      // FEInterfaceValues class does). The latter requires us to
+      // evaluate the boundary conditions $j(\mathbf x)$, which in the
+      // current case (where we know the exact solution) we compute
+      // from $j(\mathbf x) = \frac{\partial u(\mathbf x)}{\partial
+      // {\mathbf n}}$. The term to be added to the right hand side
+      // vector is then
+      // $\frac{\gamma}{h_e}\int_e
+      // \frac{\partial v_h}{\partial \mathbf n} j \ ds$.
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
           const auto &n = normals[qpoint];
