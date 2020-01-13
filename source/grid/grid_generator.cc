@@ -5493,7 +5493,9 @@ namespace GridGenerator
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
-    AssertIndexRange(n, 5);
+    Assert(n == 0 || n == 5,
+           ExcMessage("Invalid number of coarse mesh cells."));
+    (void)n;
 
     // These are for the two lower squares
     const double d = outer_radius / std::sqrt(2.0);

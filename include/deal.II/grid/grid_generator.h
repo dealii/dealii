@@ -1056,7 +1056,8 @@ namespace GridGenerator
    * Produce a half hyper-shell, i.e. the space between two circles in two
    * space dimensions and the region between two spheres in 3d, with given
    * inner and outer radius and a given number of elements for this initial
-   * triangulation.  However, opposed to the previous function, it does not
+   * triangulation (5 in 3d and 6, 12 or 96 in 2d).
+   * However, opposed to the previous function, it does not
    * produce a whole shell, but only one half of it, namely that part for
    * which the first component is restricted to non-negative values. The
    * purpose of this class is to enable computations for solutions which have
