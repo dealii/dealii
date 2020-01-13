@@ -441,7 +441,7 @@ approximation and the quadrature approximation of the integral will
 both be accurate. Note that such an alignment is common in many
 practical cases, so deal.II provides a number of functions (such as
 @ref GlossMaterialId "material_id") to help manage such a scenario.
-Refer to step-28 and step-46 for examples of how material id's can be
+Refer to step-28 and step-46 for examples of how material ids can be
 applied.
 
 Finally, let us consider the case of a coefficient that has a smooth
