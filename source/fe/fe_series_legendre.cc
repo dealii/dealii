@@ -15,7 +15,7 @@
 
 
 
-#include <deal.II/base/config.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe_series.h>
 
@@ -198,6 +198,35 @@ namespace FESeries
     , legendre_transform_matrices(fe_collection.size())
     , unrolled_coefficients(Utilities::fixed_power<dim>(N), 0.)
   {}
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  Legendre<dim, spacedim>::
+  operator==(const Legendre<dim, spacedim> &legendre) const
+  {
+    return (
+      (N == legendre.N) && (*fe_collection == *(legendre.fe_collection)) &&
+      (*q_collection == *(legendre.q_collection)) &&
+      (legendre_transform_matrices == legendre.legendre_transform_matrices));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  Legendre<dim, spacedim>::precalculate_all_transformation_matrices()
+  {
+    Threads::TaskGroup<> task_group;
+    for (unsigned int fe = 0; fe < fe_collection->size(); ++fe)
+      task_group += Threads::new_task([&, fe]() {
+        ensure_existence(
+          *fe_collection, *q_collection, N, fe, legendre_transform_matrices);
+      });
+
+    task_group.join_all();
+  }
 
 
 

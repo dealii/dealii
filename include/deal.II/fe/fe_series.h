@@ -115,6 +115,46 @@ namespace FESeries
               const unsigned int            cell_active_fe_index,
               Table<dim, CoefficientType> & fourier_coefficients);
 
+    /**
+     * Calculate all transformation matrices to transfer the finite element
+     * solution to the series expansion representation.
+     *
+     * These matrices will be generated on demand by calling calculate() and
+     * stored for recurring purposes. Usually, this operation consumes a lot of
+     * workload. With this function, all matrices will be calculated in advance.
+     * This way, we can separate their costly generation from the actual
+     * application.
+     */
+    void
+    precalculate_all_transformation_matrices();
+
+    /**
+     * Write all transformation matrices of this object to a stream for the
+     * purpose of serialization.
+     *
+     * Since any of its transformation matrices has to be generated only once
+     * for a given scenario, it is common practice to determine them in advance
+     * calling precalculate_all_transformation_matrices() and keep them via
+     * serialization.
+     */
+    template <class Archive>
+    void
+    save_transformation_matrices(Archive &ar, const unsigned int version);
+
+    /**
+     * Read all transformation matrices from a stream and recover them for this
+     * object.
+     */
+    template <class Archive>
+    void
+    load_transformation_matrices(Archive &ar, const unsigned int version);
+
+    /**
+     * Test for equality of two series expansion objects.
+     */
+    bool
+    operator==(const Fourier<dim, spacedim> &fourier) const;
+
   private:
     /**
      * hp::FECollection for which transformation matrices will be calculated.
@@ -212,6 +252,46 @@ namespace FESeries
     calculate(const dealii::Vector<Number> &local_dof_values,
               const unsigned int            cell_active_fe_index,
               Table<dim, CoefficientType> & legendre_coefficients);
+
+    /**
+     * Calculate all transformation matrices to transfer the finite element
+     * solution to the series expansion representation.
+     *
+     * These matrices will be generated on demand by calling calculate() and
+     * stored for recurring purposes. Usually, this operation consumes a lot of
+     * workload. With this function, all matrices will be calculated in advance.
+     * This way, we can separate their costly generation from the actual
+     * application.
+     */
+    void
+    precalculate_all_transformation_matrices();
+
+    /**
+     * Write all transformation matrices of this object to a stream for the
+     * purpose of serialization.
+     *
+     * Since any of its transformation matrices has to be generated only once
+     * for a given scenario, it is common practice to determine them in advance
+     * calling precalculate_all_transformation_matrices() and keep them via
+     * serialization.
+     */
+    template <class Archive>
+    void
+    save_transformation_matrices(Archive &ar, const unsigned int version);
+
+    /**
+     * Read all transformation matrices from a stream and recover them for this
+     * object.
+     */
+    template <class Archive>
+    void
+    load_transformation_matrices(Archive &ar, const unsigned int version);
+
+    /**
+     * Test for equality of two series expansion objects.
+     */
+    bool
+    operator==(const Legendre<dim, spacedim> &legendre) const;
 
   private:
     /**
@@ -432,6 +512,156 @@ FESeries::process_coefficients(
     }
 
   return std::make_pair(predicate_values, norm_values);
+}
+
+
+
+template <int dim, int spacedim>
+template <class Archive>
+inline void
+FESeries::Fourier<dim, spacedim>::save_transformation_matrices(
+  Archive &ar,
+  const unsigned int /*version*/)
+{
+  // Store information about those resources which have been used to generate
+  // the transformation matrices.
+  // mode vector
+  unsigned int size = k_vectors.n_elements();
+  ar &         size;
+
+  // finite element collection
+  size = fe_collection->size();
+  ar &size;
+  for (unsigned int i = 0; i < size; ++i)
+    ar &(*fe_collection)[i].get_name();
+
+  // quadrature collection
+  size = q_collection->size();
+  ar &size;
+  for (unsigned int i = 0; i < size; ++i)
+    ar &(*q_collection)[i];
+
+  // Store the actual transform matrices.
+  ar &fourier_transform_matrices;
+}
+
+
+
+template <int dim, int spacedim>
+template <class Archive>
+inline void
+FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
+  Archive &ar,
+  const unsigned int /*version*/)
+{
+  // Check whether the currently registered resources are compatible with
+  // the transformation matrices to load.
+  // mode vector
+  unsigned int size;
+  ar &         size;
+  AssertDimension(size, k_vectors.n_elements());
+
+  // finite element collection
+  ar &size;
+  AssertDimension(size, fe_collection->size());
+  std::string name;
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      ar &name;
+      Assert(name.compare((*fe_collection)[i].get_name()) == 0,
+             ExcMessage("A different FECollection has been used to generate "
+                        "the transformation matrices you are about to load!"));
+    }
+
+  // quadrature collection
+  ar &size;
+  AssertDimension(size, q_collection->size());
+  Quadrature<dim> quadrature;
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      ar &quadrature;
+      Assert(quadrature == (*q_collection)[i],
+             ExcMessage("A different QCollection has been used to generate "
+                        "the transformation matrices you are about to load!"));
+    }
+
+  // Restore the transform matrices since all prerequisites are fulfilled.
+  ar &fourier_transform_matrices;
+}
+
+
+
+template <int dim, int spacedim>
+template <class Archive>
+inline void
+FESeries::Legendre<dim, spacedim>::save_transformation_matrices(
+  Archive &ar,
+  const unsigned int /*version*/)
+{
+  // Store information about those resources which have been used to generate
+  // the transformation matrices.
+  // mode vector
+  unsigned int size = N;
+  ar &         size;
+
+  // finite element collection
+  size = fe_collection->size();
+  ar &size;
+  for (unsigned int i = 0; i < size; ++i)
+    ar &(*fe_collection)[i].get_name();
+
+  // quadrature collection
+  size = q_collection->size();
+  ar &size;
+  for (unsigned int i = 0; i < size; ++i)
+    ar &(*q_collection)[i];
+
+  // Store the actual transform matrices.
+  ar &legendre_transform_matrices;
+}
+
+
+
+template <int dim, int spacedim>
+template <class Archive>
+inline void
+FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
+  Archive &ar,
+  const unsigned int /*version*/)
+{
+  // Check whether the currently registered resources are compatible with
+  // the transformation matrices to load.
+  // mode vector
+  unsigned int size;
+  ar &         size;
+  AssertDimension(size, N);
+
+  // finite element collection
+  ar &size;
+  AssertDimension(size, fe_collection->size());
+  std::string name;
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      ar &name;
+      Assert(name.compare((*fe_collection)[i].get_name()) == 0,
+             ExcMessage("A different FECollection has been used to generate "
+                        "the transformation matrices you are about to load!"));
+    }
+
+  // quadrature collection
+  ar &size;
+  AssertDimension(size, q_collection->size());
+  Quadrature<dim> quadrature;
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      ar &quadrature;
+      Assert(quadrature == (*q_collection)[i],
+             ExcMessage("A different QCollection has been used to generate "
+                        "the transformation matrices you are about to load!"));
+    }
+
+  // Restore the transform matrices since all prerequisites are fulfilled.
+  ar &legendre_transform_matrices;
 }
 
 
