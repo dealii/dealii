@@ -7,22 +7,6 @@ DEAL:0::hyper_cube
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="0" NumberOfCells="0" >
-<Cells>
-<DataArray type="UInt8" Name="types"></DataArray>
-</Cells>
-  <PointData Scalars="scalars">
-    <DataArray type="Float32" Name="x"></DataArray>
-  </PointData>
-</Piece>
-<Piece NumberOfPoints="0" NumberOfCells="0" >
-<Cells>
-<DataArray type="UInt8" Name="types"></DataArray>
-</Cells>
-  <PointData Scalars="scalars">
-    <DataArray type="Float32" Name="x"></DataArray>
-  </PointData>
-</Piece>
 <Piece NumberOfPoints="4" NumberOfCells="1" >
   <Points>
     <DataArray type="Float32" NumberOfComponents="3" format="binary">
