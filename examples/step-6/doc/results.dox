@@ -493,10 +493,16 @@ solution.
 In general, if the coefficient $a(\mathbf x)$ is discontinuous along a line in 2d,
 or a plane in 3d, then the solution may have a kink, but the gradient of the
 solution will not go to infinity. That means, that the solution is at least
-still in the space $W^{1,\infty}$. On the other hand, we know that in the most
+still in the <a href="https://en.wikipedia.org/wiki/Sobolev_space">Sobolev space</a>
+$W^{1,\infty}$ (i.e., roughly speaking, in the
+space of functions whose derivatives are bounded). On the other hand,
+we know that in the most 
 extreme cases -- i.e., where the domain has reentrant corners, the
 right hand side only satisfies $f\in H^{-1}$, or the coefficient $a$ is only in
-$L^\infty$ -- all we can expect is that $u\in H^1$, a much larger space than
+$L^\infty$ -- all we can expect is that $u\in H^1$ (i.e., the
+<a
+href="https://en.wikipedia.org/wiki/Sobolev_space#Sobolev_spaces_with_integer_k">Sobolev
+space</a> of functions whose derivative is square integrable), a much larger space than
 $W^{1,\infty}$. It is not very difficult to create cases where
 the solution is in a space $H^{1+s}$ where we can get $s$ to become as small
 as we want. Such cases are often used to test adaptive finite element
