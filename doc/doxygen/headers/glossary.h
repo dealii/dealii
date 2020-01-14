@@ -327,14 +327,9 @@
  * this, here setting the boundary indicator to 42 for all faces located at
  * $x=-1$:
  * @code
- *   for (typename Triangulation<dim>::active_cell_iterator
- *          cell = triangulation.begin_active();
- *        cell != triangulation.end();
- *        ++cell)
- *     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
- *       if (cell->face(f)->at_boundary())
- *         if (cell->face(f)->center()[0] == -1)
- *           cell->face(f)->set_boundary_id (42);
+ * for (auto &face : triangulation.active_face_iterators())
+     if (face->center()(0) == -1)
+       face->set_boundary_id(1);
  * @endcode
  * This calls functions TriaAccessor::set_boundary_id. In 3d, it may
  * also be appropriate to call TriaAccessor::set_all_boundary_ids instead
@@ -1273,9 +1268,7 @@
  * center has an $x$ component less than zero:
  *
  * @code
- * for (typename Triangulation<dim>::active_cell_iterator cell =
- *  triangulation.begin_active();
- *  cell != triangulation.end(); ++cell)
+ * for (auto &cell : triangulation.active_cell_iterators())
  *   if (cell->center()[0] < 0)
  *     cell->set_manifold_id (42);
  * @endcode
