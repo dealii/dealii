@@ -722,7 +722,7 @@ namespace Step39
     // preconditioner. First, we need transfer between grid levels. The object
     // we are using here generates sparse matrices for these transfers.
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     // Then, we need an exact solver for the matrix on the coarsest level.
     FullMatrix<double> coarse_matrix;

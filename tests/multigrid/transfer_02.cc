@@ -103,7 +103,7 @@ check_simple(const FiniteElement<dim> &fe)
   mgdof.distribute_mg_dofs();
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGLevelObject<Vector<double>> u(0, tr.n_levels() - 1);
   reinit_vector(mgdof, u);

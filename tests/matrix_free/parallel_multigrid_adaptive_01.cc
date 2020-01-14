@@ -560,7 +560,7 @@ do_test(const DoFHandler<dim> &dof)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
 
   MGTransferMF<LevelMatrixType> mg_transfer(mg_matrices, mg_constrained_dofs);
-  mg_transfer.build_matrices(dof);
+  mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);

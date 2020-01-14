@@ -67,12 +67,11 @@ check(const FiniteElement<dim> &fe, const unsigned int selected_block)
 
   MGTransferSelect<double> transfer;
 
-  transfer.build_matrices(mg_dof_handler,
-                          mg_dof_handler,
-                          selected_block,
-                          selected_block,
-                          block_component,
-                          block_component);
+  transfer.build(mg_dof_handler,
+                 selected_block,
+                 selected_block,
+                 block_component,
+                 block_component);
 
   std::vector<types::global_dof_index> dofs_per_block(3);
   DoFTools::count_dofs_per_block(mg_dof_handler,

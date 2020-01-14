@@ -136,7 +136,7 @@ check_fe(FiniteElement<dim> &fe)
   hanging_node_constraints.close();
 
   MGTransferPrebuilt<vector_t> transfer(mg_constrained_dofs);
-  transfer.build_matrices(dofh);
+  transfer.build(dofh);
   // transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels() - 1);

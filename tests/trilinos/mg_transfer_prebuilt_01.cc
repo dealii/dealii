@@ -81,7 +81,7 @@ check_simple(const FiniteElement<dim> &fe)
   mgdof.distribute_mg_dofs();
 
   MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> transfer;
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGLevelObject<TrilinosWrappers::MPI::Vector> u(0, tr.n_levels() - 1);
   reinit_vector(mgdof, u);

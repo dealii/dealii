@@ -109,12 +109,11 @@ check(const FiniteElement<dim> &fe)
   // group all components into one
   // block, and do the transfer
   // matrices on this block
-  transfer.build_matrices(mg_dof_handler,
-                          mg_dof_handler,
-                          0,
-                          0,
-                          std::vector<unsigned int>(2, 0U),
-                          std::vector<unsigned int>(2, 0U));
+  transfer.build(mg_dof_handler,
+                 0,
+                 0,
+                 std::vector<unsigned int>(2, 0U),
+                 std::vector<unsigned int>(2, 0U));
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));

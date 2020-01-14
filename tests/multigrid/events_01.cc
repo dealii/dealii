@@ -390,7 +390,7 @@ namespace Step50
     const MGCoarseGridBase<vector_t> &coarse_grid_solver)
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     typedef LA::MPI::PreconditionJacobi                  Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;

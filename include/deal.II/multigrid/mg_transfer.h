@@ -293,7 +293,7 @@ public:
    */
   template <int dim, class InVector, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
+  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
              MGLevelObject<VectorType> &      dst,
              const InVector &                 src) const;
 
@@ -306,7 +306,7 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg(const DoFHandler<dim, spacedim> &mg_dof,
+  copy_from_mg(const DoFHandler<dim, spacedim> &dof_handler,
                OutVector &                      dst,
                const MGLevelObject<VectorType> &src) const;
 
@@ -317,7 +317,7 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg_add(const DoFHandler<dim, spacedim> &mg_dof,
+  copy_from_mg_add(const DoFHandler<dim, spacedim> &dof_handler,
                    OutVector &                      dst,
                    const MGLevelObject<VectorType> &src) const;
 
@@ -357,7 +357,8 @@ protected:
    */
   template <int dim, int spacedim>
   void
-  fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof);
+  fill_and_communicate_copy_indices(
+    const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Sizes of the multi-level vectors.
@@ -450,7 +451,7 @@ public:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &                          mg_dof,
+  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
              MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
              const LinearAlgebra::distributed::Vector<Number2> &src) const;
 
@@ -464,8 +465,8 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg(
-    const DoFHandler<dim, spacedim> &                                mg_dof,
-    LinearAlgebra::distributed::Vector<Number2> &                    dst,
+    const DoFHandler<dim, spacedim> &            dof_handler,
+    LinearAlgebra::distributed::Vector<Number2> &dst,
     const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
 
   /**
@@ -476,8 +477,8 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim> &                                mg_dof,
-    LinearAlgebra::distributed::Vector<Number2> &                    dst,
+    const DoFHandler<dim, spacedim> &            dof_handler,
+    LinearAlgebra::distributed::Vector<Number2> &dst,
     const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
 
   /**
@@ -517,7 +518,7 @@ protected:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &                          mg_dof,
+  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
              MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
              const LinearAlgebra::distributed::Vector<Number2> &        src,
              const bool solution_transfer) const;
@@ -527,7 +528,8 @@ protected:
    */
   template <int dim, int spacedim>
   void
-  fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof);
+  fill_and_communicate_copy_indices(
+    const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Sizes of the multi-level vectors.
@@ -681,13 +683,13 @@ public:
   virtual ~MGTransferPrebuilt() override = default;
 
   /**
-   * Initialize the constraints to be used in build_matrices().
+   * Initialize the constraints to be used in build().
    */
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
-   * Initialize the constraints to be used in build_matrices().
+   * Initialize the constraints to be used in build().
    *
    * @deprecated @p constraints is unused.
    */
@@ -703,11 +705,21 @@ public:
   clear();
 
   /**
-   * Actually build the prolongation matrices for each level.
+   * Actually build the information required for the transfer operations. Needs
+   * to be called before prolongate() or restrict_and_add() can be used.
    */
   template <int dim, int spacedim>
   void
-  build_matrices(const DoFHandler<dim, spacedim> &mg_dof);
+  build(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Actually build the prolongation matrices for each level.
+   *
+   * @deprecated use build() instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED void
+  build_matrices(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -751,7 +763,7 @@ public:
   DeclException0(ExcNoProlongation);
 
   /**
-   * You have to call build_matrices() before using this object.
+   * You have to call build() before using this object.
    */
   DeclException0(ExcMatricesNotBuilt);
 

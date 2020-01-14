@@ -163,13 +163,8 @@ check(const FiniteElement<dim> &fe)
 
   std::vector<unsigned int> block_selected(2, 0U);
   MGTransferSelect<double>  transfer;
-  transfer.build_matrices(mg_dof_handler,
-                          mg_dof_handler,
-                          0,
-                          0,
-                          block_selected,
-                          block_selected,
-                          boundary_indices);
+  transfer.build(
+    mg_dof_handler, 0, 0, block_selected, block_selected, boundary_indices);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));

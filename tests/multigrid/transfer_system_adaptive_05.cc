@@ -157,8 +157,7 @@ check(const FiniteElement<dim> &fe)
   block_selected[0] = 0;
   block_selected[1] = 1;
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(
-    mg_dof_handler, mg_dof_handler, 0, 0, block_selected, block_selected);
+  transfer.build(mg_dof_handler, 0, 0, block_selected, block_selected);
 
   // use only the first half of all
   // components

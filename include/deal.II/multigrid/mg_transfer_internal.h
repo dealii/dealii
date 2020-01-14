@@ -44,7 +44,7 @@ namespace internal
     template <int dim, int spacedim>
     void
     fill_copy_indices(
-      const DoFHandler<dim, spacedim> &mg_dof,
+      const DoFHandler<dim, spacedim> &dof_handler,
       const MGConstrainedDoFs *        mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
@@ -122,7 +122,7 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const DoFHandler<dim> &  mg_dof,
+      const DoFHandler<dim> &  dof_handler,
       const MGConstrainedDoFs *mg_constrained_dofs,
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
         &                                     external_partitioners,

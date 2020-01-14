@@ -452,7 +452,7 @@ namespace Step50
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];
 

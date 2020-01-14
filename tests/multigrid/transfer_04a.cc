@@ -130,7 +130,7 @@ check_fe(FiniteElement<dim> &fe)
   typedef TrilinosWrappers::MPI::Vector vector_t;
   {}
   MGTransferPrebuilt<vector_t> transfer;
-  transfer.build_matrices(dofh);
+  transfer.build(dofh);
   transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels() - 1);

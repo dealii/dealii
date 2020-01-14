@@ -172,7 +172,7 @@ public:
 #ifndef _MSC_VER
   DEAL_II_DEPRECATED
 #endif
-  Multigrid(const DoFHandler<dim> &             mg_dof_handler,
+  Multigrid(const DoFHandler<dim> &             dof_handler,
             const MGMatrixBase<VectorType> &    matrix,
             const MGCoarseGridBase<VectorType> &coarse,
             const MGTransferBase<VectorType> &  transfer,
@@ -638,7 +638,7 @@ private:
 
 template <typename VectorType>
 template <int dim>
-Multigrid<VectorType>::Multigrid(const DoFHandler<dim> &         mg_dof_handler,
+Multigrid<VectorType>::Multigrid(const DoFHandler<dim> &         dof_handler,
                                  const MGMatrixBase<VectorType> &matrix,
                                  const MGCoarseGridBase<VectorType> &coarse,
                                  const MGTransferBase<VectorType> &  transfer,
@@ -659,7 +659,7 @@ Multigrid<VectorType>::Multigrid(const DoFHandler<dim> &         mg_dof_handler,
   , debug(0)
 {
   const unsigned int dof_handler_max_level =
-    mg_dof_handler.get_triangulation().n_global_levels() - 1;
+    dof_handler.get_triangulation().n_global_levels() - 1;
   if (max_level == numbers::invalid_unsigned_int)
     maxlevel = dof_handler_max_level;
   else

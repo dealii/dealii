@@ -630,7 +630,7 @@ namespace Step39
     SolverCG<TrilinosWrappers::MPI::Vector> solver(control);
 
     MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     SolverControl coarse_solver_control(1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(

@@ -580,7 +580,7 @@ do_test(const DoFHandler<dim> &dof)
   mg_smoother.initialize(mg_matrices, smoother_data);
 
   MGTransferMF<LevelMatrixType> mg_transfer(mg_matrices);
-  mg_transfer.build_matrices(dof);
+  mg_transfer.build(dof);
 
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 

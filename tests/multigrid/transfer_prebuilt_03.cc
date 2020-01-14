@@ -71,7 +71,7 @@ check_simple(const FiniteElement<dim> &fe)
   mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   transfer.print_matrices(deallog.get_file_stream());
   transfer.print_indices(deallog.get_file_stream());

@@ -110,8 +110,7 @@ check(const FiniteElement<dim> &fe)
 
   MGTransferSelect<double> transfer;
 
-  transfer.build_matrices(
-    mg_dof_handler, mg_dof_handler, 0, 0, block_component, block_component);
+  transfer.build(mg_dof_handler, 0, 0, block_component, block_component);
 
   std::vector<std::vector<types::global_dof_index>> dofs_per_block(
     tr.n_levels(), std::vector<types::global_dof_index>(2));

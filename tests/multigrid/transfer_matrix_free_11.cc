@@ -63,7 +63,7 @@ check(const unsigned int fe_degree)
   // build reference
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> transfer_ref(
     mg_constrained_dofs);
-  transfer_ref.build_matrices(mgdof);
+  transfer_ref.build(mgdof);
   deallog << "Transfer matrices: " << std::endl;
   transfer_ref.print_matrices(deallog.get_file_stream());
   deallog << std::endl;
