@@ -88,9 +88,7 @@ using namespace dealii;
 // The main class is again almost unchanged. Two additions, however, are made:
 // we have added the <code>refine_grid</code> function, which is used to
 // adaptively refine the grid (instead of the global refinement in the
-// previous examples), and a variable which will hold the constraints. In
-// addition, we have added a destructor to the class for reasons that will
-// become clear when we discuss its implementation.
+// previous examples), and a variable which will hold the constraints.
 template <int dim>
 class Step6
 {
