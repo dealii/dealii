@@ -373,13 +373,14 @@ public:
                 const unsigned int component = 0) const;
 
   /**
-   * Return the jump in the Hessian $[\nabla^2 u] = \nabla^2 u_{\text{cell0}} -
-   * \nabla^2 u_{\text{cell1}}$ on the interface for the shape function
+   * Return the jump in the Hessian $\jump{\nabla^2 u} = \nabla^2
+   * u_{\text{cell0}} - \nabla^2 u_{\text{cell1}}$ on the interface for the
+   * shape function
    * @p interface_dof_index at the quadrature point @p q_point of component
    * @p component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $[\nabla^2 u] = \nabla^2 u_{\text{cell0}}$.
+   * $\jump{\nabla^2 u} = \nabla^2 u_{\text{cell0}}$.
    */
   Tensor<2, dim>
   jump_hessian(const unsigned int interface_dof_index,
@@ -387,13 +388,13 @@ public:
                const unsigned int component = 0) const;
 
   /**
-   * Return the jump in the third derivative $[\nabla^3 u] = \nabla^3
+   * Return the jump in the third derivative $\jump{\nabla^3 u} = \nabla^3
    * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
    * shape function @p interface_dof_index at the quadrature point @p q_point of
    * component @p component.
    *
    * If this is a boundary face (at_boundary() returns true), then
-   * $[\nabla^3 u] = \nabla^3 u_{\text{cell0}}$.
+   * $\jump{\nabla^3 u} = \nabla^3 u_{\text{cell0}}$.
    */
   Tensor<3, dim>
   jump_3rd_derivative(const unsigned int interface_dof_index,
