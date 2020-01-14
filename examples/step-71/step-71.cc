@@ -59,7 +59,7 @@
 // The two most interesting header files will be these two:
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/meshworker/mesh_loop.h>
-// The first of these is responsible for providing the class FEInterfaceValue
+// The first of these is responsible for providing the class FEInterfaceValues
 // that can be used to evaluate quantities such as the jump or average
 // of shape functions (or their gradients) across interfaces between cells.
 // This class will be quite useful in evaluating the penalty terms that appear
@@ -227,12 +227,9 @@ namespace Step71
     constraints.close();
 
 
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_flux_sparsity_pattern(dof_handler,
-                                         c_sparsity,
-                                         constraints,
-                                         true);
-    sparsity_pattern.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, constraints, true);
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit(sparsity_pattern);
 
     solution.reinit(dof_handler.n_dofs());
@@ -244,7 +241,7 @@ namespace Step71
   // @sect4{Assembling the linear system}
   //
   // The following pieces of code are more interesting. They all relate to the
-  // assembly of the linear system. While assemling the cell-interior terms
+  // assembly of the linear system. While assembling the cell-interior terms
   // is not of great difficulty -- that works in essence like the assembly
   // of the corresponding terms of the Laplace equation, and you have seen
   // how this works in step-4 or step-6, for example -- the difficulty
@@ -268,7 +265,7 @@ namespace Step71
   // for this task: Based on the ideas outlined in the WorkStream
   // namespace documentation, MeshWorker::mesh_loop() requires three
   // functions that do work on cells, interior faces, and boundary
-  // faces; these functions work on scratch objects for intermediate
+  // faces. These functions work on scratch objects for intermediate
   // results, and then copy the result of their computations into
   // copy data objects from where a copier function copies them into
   // the global matrix and right hand side objects.
@@ -339,10 +336,10 @@ namespace Step71
 
   // The more interesting part is where we actually assemble the linear system.
   // Fundamentally, this function has five parts:
-  // - The definition of the `cell_worker` "lambda function", a small
-  //   function that is defined within the surrounding `assemble_system()`
+  // - The definition of the `cell_worker` lambda function, a small
+  //   function that is defined within the `assemble_system()`
   //   function and that will be responsible for computing the local
-  //   integrals on an individual cell; it will work on a copy of the
+  //   integrals on an individual cell. It will work on a copy of the
   //   `ScratchData` class and put its results into the corresponding
   //   `CopyData` object.
   // - The definition of the `face_worker` lambda function that does
@@ -397,7 +394,7 @@ namespace Step71
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
 
-      const FEValues<dim> &fe_values = scratch_data.fe_values;
+      FEValues<dim> &fe_values = scratch_data.fe_values;
       fe_values.reinit(cell);
 
       cell->get_dof_indices(copy_data.local_dof_indices);
@@ -516,7 +513,7 @@ namespace Step71
       // indices `i` and `j` to add up the contributions of this face
       // or sub-face. These are then stored in the
       // `copy_data.face_data` object created above. As for the cell
-      // worker, we pull the evalation of averages and jumps out of
+      // worker, we pull the evaluation of averages and jumps out of
       // the loops if possible, introducing local variables that store
       // these results. The assembly then only needs to use these
       // local variables in the innermost loop. Regarding the concrete
@@ -825,7 +822,7 @@ namespace Step71
 
       std::vector<SymmetricTensor<2, dim>> exact_hessians(n_q_points);
       std::vector<Tensor<2, dim>>          hessians(n_q_points);
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (auto &cell : dof_handler.active_cell_iterators())
         {
           fe_values.reinit(cell);
           fe_values[scalar].get_function_hessians(solution, hessians);

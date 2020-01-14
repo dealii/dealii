@@ -4,7 +4,7 @@
 This program was contributed by Natasha Sharma, Guido Kanschat, Timo
 Heister, Wolfgang Bangerth, and Zhuoran Wang.
 
-The first author would like  acknowledge the support of NSF Grant
+The first author would like to acknowledge the support of NSF Grant
 No. DMS-1520862.
 Timo Heister and Wolfgang Bangerth acknowledge support through NSF
 awards DMS-1821210, EAR-1550901, and OAC-1835673.
@@ -25,7 +25,7 @@ of stadiums. These objects are of course in reality
 three-dimensional with a large aspect ratio of lateral extent to
 perpendicular thickness, but one can often very accurately model these
 structures as two dimensional by making assumptions about how internal
-forces vary in the perpendicular direction, and this leads to the
+forces vary in the perpendicular direction. These assumptions lead to the
 equation above.
 
 The model typically comes in two different kinds, depending on what
@@ -136,7 +136,7 @@ conditions, i.e., if the equation is
   &&\forall \mathbf x \in \partial\Omega,
 @f}
 then the following trick works (at least if the domain is convex, see
-below): In much the same as we obtained the
+below): In the same way as we obtained the
 mixed Laplace equation of step-20 from the regular Laplace equation by
 introducing a second variable, we can here introduce a variable
 $v=\Delta u$ and can then replace the equations above by the
@@ -158,8 +158,10 @@ very difficult to construct good solvers and preconditioners for this
 system either using the techniques of step-20 and step-22. So this
 case is pretty simple to deal with.
 
-@note It is worth pointing out that this only works if the domain is
-  convex. This sounds like a rather random condition, but it makes
+@note It is worth pointing out that this only works for domains whose
+  boundary has corners if the domain is also convex -- in other words,
+  if there are no re-entrant corners.
+  This sounds like a rather random condition, but it makes
   sense in view of the following two facts: The solution of the
   original biharmonic equation must satisfy $u\in H^2(\Omega)$. On the
   other hand, the mixed system reformulation above suggests that both
@@ -173,7 +175,10 @@ case is pretty simple to deal with.
   <a href="https://en.wikipedia.org/wiki/Elliptic_operator#Elliptic_regularity_theorem">"elliptic
   regularity"</a> implies that if the right hand side $v\in H^s$, then
   $u\in H^{s+2}$ if the domain is convex and the boundary is smooth
-  enough. We know that $v\in H^1$ because it solves the equation
+  enough. (This could also be guaranteed if the domain boundary is
+  sufficiently smooth -- but domains whose boundaries have no corners
+  are not very practical in real life.)
+  We know that $v\in H^1$ because it solves the equation
   $-\Delta v=f$, but we are still left with the condition on convexity
   of the boundary; one can show that polygonal, convex domains are
   good enough to guarantee that $u\in H^2$ in this case (smoothly
@@ -212,7 +217,7 @@ this scheme for the biharmonic equation is typically called the $C^0$ IP
 differentiable) shape functions with an interior penalty formulation.
 
 
-<h3> Derivation of the $C^0$ IP method </h3>
+<h3> Derivation of the C0IP method </h3>
 
 We base this program on the $C^0$ IP method presented by Susanne
 Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
@@ -292,10 +297,11 @@ gradient operator, and we get the following instead:
 @f}
 Here, the colon indicates a double-contraction over the indices of the
 matrices to its left and right, i.e., the scalar product between two
-tensors.
+tensors. The outer product of two vectors $a \otimes b$ yields the
+matrix $(a \otimes b)_{ij} = a_i b_j$.
 
 Then, we sum over all cells $K \in  \mathbb{T}$, and take into account
-that this means that every (interior) face appears twice in the
+that this means that every interior face appears twice in the
 sum. If we therefore split everything into a sum of integrals over
 cell interiors and a separate sum over cell interfaces, we can use
 the jump and average operators defined above. There are two steps
@@ -316,8 +322,8 @@ the following terms:
   \jump{\frac{\partial v_h}{\partial \mathbf n}}
   \jump{\frac{\partial u_h}{\partial \mathbf n}}.
 @f}
-Then, after making cancellations that arise, we arrive at the following $C^0$
-IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
+Then, after making cancellations that arise, we arrive at the following
+C0IP formulation of the biharmonic equation: find $u_h$ such that $u_h =
 g$ on $\partial \Omega$ and
 @f{align*}{
 \mathcal{A}(v_h,u_h)&=\mathcal{F}(v_h) \quad \text{holds for all test functions } v_h,
@@ -379,7 +385,7 @@ discussed below.
 Ideally, we would like to measure convergence in the "energy norm"
 $\|D^2(u-u_h)\|$. However, this does not work because, again, the
 discrete solution $u_h$ does not have two (weak) derivatives. Instead,
-one can define a discrete ($C^0$ IP) semi-norm that is "equivalent" to the
+one can define a discrete ($C^0$ IP) seminorm that is "equivalent" to the
 energy norm, as follows:
 @f{align*}{
  |u_h|_{h}^2 :=
@@ -390,7 +396,7 @@ energy norm, as follows:
  \jump{\frac{\partial u_h}{\partial \mathbf n}} \right\|_{L^2(e)}^2.
 @f}
 
-In this (semi)norm, the theory in the paper mentioned above yields that we
+In this seminorm, the theory in the paper mentioned above yields that we
 can expect
 @f{align*}{
  |u-u_h|_{h}^2 = {\cal O}(h^{p-1}),
@@ -415,11 +421,11 @@ m+3$ because larger polynomial degrees do not result in higher
 convergence orders.
 
 For the purposes of this program, we're a bit too lazy to actually
-implement this equivalent norm -- though it's not very difficult and
+implement this equivalent seminorm -- though it's not very difficult and
 would make for a good exercise. Instead, we'll simply check in the
 program what the "broken" $H^2$ seminorm
 @f{align*}{
- |u_h|^\circ_{H^2}^2
+ \left(|u_h|^\circ_{H^2}\right)^2
  :=
  \sum\limits_{K \in \mathbb{T}} \big|u_h\big|_{H^2(K)}^2
  =
@@ -427,7 +433,8 @@ program what the "broken" $H^2$ seminorm
 @f}
 yields. The convergence rate in this norm can, from a theoretical
 perspective, of course not be <i>worse</i> than the one for
-$|\cdot|_h$, but it could be worse. It could also be the case that
+$|\cdot|_h$ because it contains only a subset of the necessary terms,
+but it could at least conceivably be better. It could also be the case that
 we get the optimal convergence rate even though there is a bug in the
 program, and that that bug would only show up in sub-optimal rates for
 the additional terms present in $|\cdot|_h$. But, one might hope
@@ -504,5 +511,3 @@ The right hand side is easily computes as
 @f}
 The program has classes `ExactSolution::Solution` and
 `ExactSolution::RightHandSide` that encode this information.
-
-

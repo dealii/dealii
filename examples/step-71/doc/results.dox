@@ -15,7 +15,9 @@ From the literature, it is not immediately clear what
 the penalty parameter $\gamma$ should be. For example,
 @cite Brenner2009 state that it needs to be larger than one, and
 choose $\gamma=5$. The FEniCS/Dolphin tutorial chooses it as
-$\gamma=8$. @cite Wells2007 uses a value for $\gamma$ larger than the
+$\gamma=8$, see
+https://fenicsproject.org/docs/dolfin/1.6.0/python/demo/documented/biharmonic/python/documentation.html
+. @cite Wells2007 uses a value for $\gamma$ larger than the
 number of edges belonging to an element for Kirchhoff plates (see
 their Section 4.2). This suggests that maybe
 $\gamma = 1$, $2$, are too small; on the other hand, a value
