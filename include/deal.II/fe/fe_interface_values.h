@@ -373,6 +373,34 @@ public:
                 const unsigned int component = 0) const;
 
   /**
+   * Return the jump in the Hessian $[\nabla^2 u] = \nabla^2 u_{\text{cell0}} -
+   * \nabla^2 u_{\text{cell1}}$ on the interface for the shape function
+   * @p interface_dof_index at the quadrature point @p q_point of component
+   * @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $[\nabla^2 u] = \nabla^2 u_{\text{cell0}}$.
+   */
+  Tensor<2, dim>
+  jump_hessian(const unsigned int interface_dof_index,
+               const unsigned int q_point,
+               const unsigned int component = 0) const;
+
+  /**
+   * Return the jump in the third derivative $[\nabla^3 u] = \nabla^3
+   * u_{\text{cell0}} - \nabla^3 u_{\text{cell1}}$ on the interface for the
+   * shape function @p interface_dof_index at the quadrature point @p q_point of
+   * component @p component.
+   *
+   * If this is a boundary face (at_boundary() returns true), then
+   * $[\nabla^3 u] = \nabla^3 u_{\text{cell0}}$.
+   */
+  Tensor<3, dim>
+  jump_3rd_derivative(const unsigned int interface_dof_index,
+                      const unsigned int q_point,
+                      const unsigned int component = 0) const;
+
+  /**
    * @}
    */
 
@@ -868,6 +896,67 @@ FEInterfaceValues<dim, spacedim>::jump_gradient(
     value += -1.0 * get_fe_face_values(1).shape_grad_component(dof_pair[1],
                                                                q_point,
                                                                component);
+
+  return value;
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<2, dim>
+FEInterfaceValues<dim, spacedim>::jump_hessian(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  if (at_boundary())
+    return get_fe_face_values(0).shape_hessian_component(dof_pair[0],
+                                                         q_point,
+                                                         component);
+
+  Tensor<2, dim> value;
+
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value += 1.0 * get_fe_face_values(0).shape_hessian_component(dof_pair[0],
+                                                                 q_point,
+                                                                 component);
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value += -1.0 * get_fe_face_values(1).shape_hessian_component(dof_pair[1],
+                                                                  q_point,
+                                                                  component);
+
+  return value;
+}
+
+
+template <int dim, int spacedim>
+Tensor<3, dim>
+FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
+  const unsigned int interface_dof_index,
+  const unsigned int q_point,
+  const unsigned int component) const
+{
+  const auto dof_pair = dofmap[interface_dof_index];
+
+  if (at_boundary())
+    return get_fe_face_values(0).shape_3rd_derivative_component(dof_pair[0],
+                                                                q_point,
+                                                                component);
+
+  Tensor<3, dim> value;
+
+  if (dof_pair[0] != numbers::invalid_unsigned_int)
+    value +=
+      1.0 * get_fe_face_values(0).shape_3rd_derivative_component(dof_pair[0],
+                                                                 q_point,
+                                                                 component);
+  if (dof_pair[1] != numbers::invalid_unsigned_int)
+    value +=
+      -1.0 * get_fe_face_values(1).shape_3rd_derivative_component(dof_pair[1],
+                                                                  q_point,
+                                                                  component);
 
   return value;
 }
