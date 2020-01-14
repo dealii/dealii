@@ -759,20 +759,24 @@ namespace DoFTools
     {
       // implementation of the same function in namespace DoFTools for
       // non-hp DoFHandlers
-      template <typename DoFHandlerType,
+      template <int dim,
+                int spacedim,
                 typename SparsityPatternType,
                 typename number>
       void
-      make_flux_sparsity_pattern(const DoFHandlerType &           dof,
-                                 SparsityPatternType &            sparsity,
-                                 const AffineConstraints<number> &constraints,
-                                 const bool keep_constrained_dofs,
-                                 const Table<2, Coupling> &int_mask,
-                                 const Table<2, Coupling> &flux_mask,
-                                 const types::subdomain_id subdomain_id)
+      make_flux_sparsity_pattern(
+        const DoFHandler<dim, spacedim> &dof,
+        SparsityPatternType &            sparsity,
+        const AffineConstraints<number> &constraints,
+        const bool                       keep_constrained_dofs,
+        const Table<2, Coupling> &       int_mask,
+        const Table<2, Coupling> &       flux_mask,
+        const types::subdomain_id        subdomain_id,
+        const std::function<
+          bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
+               const unsigned int)> &face_has_flux_coupling)
       {
-        const FiniteElement<DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension> &fe = dof.get_fe();
+        const FiniteElement<dim, spacedim> &fe = dof.get_fe();
 
         std::vector<types::global_dof_index> dofs_on_this_cell(
           fe.dofs_per_cell);
@@ -783,13 +787,10 @@ namespace DoFTools
           int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
           flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
 
-        Table<2, bool> support_on_face(
-          fe.dofs_per_cell,
-          GeometryInfo<DoFHandlerType::dimension>::faces_per_cell);
+        Table<2, bool> support_on_face(fe.dofs_per_cell,
+                                       GeometryInfo<dim>::faces_per_cell);
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          for (unsigned int f = 0;
-               f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-               ++f)
+          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             support_on_face(i, f) = fe.has_support_on_face(i, f);
 
         // Convert the int_dof_mask to bool_int_dof_mask so we can pass it
@@ -801,8 +802,9 @@ namespace DoFTools
             if (int_dof_mask(i, j) != none)
               bool_int_dof_mask(i, j) = true;
 
-        typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
-                                                      endc = dof.end();
+        typename DoFHandler<dim, spacedim>::active_cell_iterator
+          cell = dof.begin_active(),
+          endc = dof.end();
         for (; cell != endc; ++cell)
           if (((subdomain_id == numbers::invalid_subdomain_id) ||
                (subdomain_id == cell->subdomain_id())) &&
@@ -816,12 +818,11 @@ namespace DoFTools
                                                       bool_int_dof_mask);
               // Loop over all interior neighbors
               for (unsigned int face_n = 0;
-                   face_n <
-                   GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
+                   face_n < GeometryInfo<dim>::faces_per_cell;
                    ++face_n)
                 {
-                  const typename DoFHandlerType::face_iterator cell_face =
-                    cell->face(face_n);
+                  const typename DoFHandler<dim, spacedim>::face_iterator
+                    cell_face = cell->face(face_n);
 
                   const bool periodic_neighbor =
                     cell->has_periodic_neighbor(face_n);
@@ -846,8 +847,11 @@ namespace DoFTools
                     }
                   else
                     {
-                      typename DoFHandlerType::level_cell_iterator neighbor =
-                        cell->neighbor_or_periodic_neighbor(face_n);
+                      if (!face_has_flux_coupling(cell, face_n))
+                        continue;
+
+                      typename DoFHandler<dim, spacedim>::level_cell_iterator
+                        neighbor = cell->neighbor_or_periodic_neighbor(face_n);
                       // If the cells are on the same level (and both are
                       // active, locally-owned cells) then only add to the
                       // sparsity pattern if the current cell is 'greater' in
@@ -886,7 +890,7 @@ namespace DoFTools
                       // if (neighbor->has_children()) section below. We need to
                       // do this since we otherwise iterate over the children of
                       // the face, which are always 0 in 1D.
-                      if (DoFHandlerType::dimension == 1)
+                      if (dim == 1)
                         while (neighbor->has_children())
                           neighbor = neighbor->child(face_n == 0 ? 1 : 0);
 
@@ -896,8 +900,8 @@ namespace DoFTools
                                sub_nr != cell_face->n_children();
                                ++sub_nr)
                             {
-                              const typename DoFHandlerType::level_cell_iterator
-                                sub_neighbor =
+                              const typename DoFHandler<dim, spacedim>::
+                                level_cell_iterator sub_neighbor =
                                   periodic_neighbor ?
                                     cell->periodic_neighbor_child_on_subface(
                                       face_n, sub_nr) :
@@ -1069,7 +1073,11 @@ namespace DoFTools
         const bool                                   keep_constrained_dofs,
         const Table<2, Coupling> &                   int_mask,
         const Table<2, Coupling> &                   flux_mask,
-        const types::subdomain_id                    subdomain_id)
+        const types::subdomain_id                    subdomain_id,
+        const std::function<
+          bool(const typename dealii::hp::DoFHandler<dim, spacedim>::
+                 active_cell_iterator &,
+               const unsigned int)> &face_has_flux_coupling)
       {
         // while the implementation above is quite optimized and caches a
         // lot of data (see e.g. the int/flux_dof_mask tables), this is no
@@ -1155,6 +1163,9 @@ namespace DoFTools
                       typename dealii::hp::DoFHandler<dim, spacedim>::
                         level_cell_iterator neighbor =
                           cell->neighbor_or_periodic_neighbor(face);
+
+                      if (!face_has_flux_coupling(cell, face))
+                        continue;
 
                       // Like the non-hp case: If the cells are on the same
                       // level (and both are active, locally-owned cells) then
@@ -1336,26 +1347,34 @@ namespace DoFTools
 
     const bool keep_constrained_dofs = true;
 
-    make_flux_sparsity_pattern(dof,
-                               sparsity,
-                               dummy,
-                               keep_constrained_dofs,
-                               int_mask,
-                               flux_mask,
-                               subdomain_id);
+    make_flux_sparsity_pattern(
+      dof,
+      sparsity,
+      dummy,
+      keep_constrained_dofs,
+      int_mask,
+      flux_mask,
+      subdomain_id,
+      internal::always_couple_on_faces<DoFHandlerType>);
   }
+
+
 
   template <typename DoFHandlerType,
             typename SparsityPatternType,
             typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
-                             SparsityPatternType &            sparsity,
-                             const AffineConstraints<number> &constraints,
-                             const bool                keep_constrained_dofs,
-                             const Table<2, Coupling> &int_mask,
-                             const Table<2, Coupling> &flux_mask,
-                             const types::subdomain_id subdomain_id)
+  make_flux_sparsity_pattern(
+    const DoFHandlerType &           dof,
+    SparsityPatternType &            sparsity,
+    const AffineConstraints<number> &constraints,
+    const bool                       keep_constrained_dofs,
+    const Table<2, Coupling> &       int_mask,
+    const Table<2, Coupling> &       flux_mask,
+    const types::subdomain_id        subdomain_id,
+    const std::function<
+      bool(const typename DoFHandlerType::active_cell_iterator &,
+           const unsigned int)> &face_has_flux_coupling)
   {
     // do the error checking and frame code here, and then pass on to more
     // specialized functions in the internal namespace
@@ -1390,15 +1409,21 @@ namespace DoFTools
              "associated DoF handler objects, asking for any subdomain other "
              "than the locally owned one does not make sense."));
 
+    Assert(
+      face_has_flux_coupling,
+      ExcMessage(
+        "The function which specifies if a flux coupling occurs over a given "
+        "face is empty."));
+
     internal::make_flux_sparsity_pattern(dof,
                                          sparsity,
                                          constraints,
                                          keep_constrained_dofs,
                                          int_mask,
                                          flux_mask,
-                                         subdomain_id);
+                                         subdomain_id,
+                                         face_has_flux_coupling);
   }
-
 
 } // end of namespace DoFTools
 

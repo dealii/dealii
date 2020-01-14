@@ -194,7 +194,10 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       const bool,
       const Table<2, Coupling> &,
       const Table<2, Coupling> &,
-      const types::subdomain_id);
+      const types::subdomain_id,
+      const std::function<bool(
+        const typename DoFHandler<deal_II_dimension>::active_cell_iterator &,
+        const unsigned int)> &);
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
@@ -220,7 +223,10 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       const bool,
       const Table<2, Coupling> &,
       const Table<2, Coupling> &,
-      const types::subdomain_id);
+      const types::subdomain_id,
+      const std::function<bool(const typename hp::DoFHandler<
+                                 deal_II_dimension>::active_cell_iterator &,
+                               const unsigned int)> &);
 
 #if deal_II_dimension < 3
 
