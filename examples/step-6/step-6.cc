@@ -240,18 +240,9 @@ void Step6<dim>::setup_system()
 
 // @sect4{Step6::assemble_system}
 
-// Next, we have to assemble the matrix again. There are two code changes
-// compared to step-5:
-//
-// First, we have to use a higher-order quadrature formula to account for the
-// higher polynomial degree in the finite element shape functions. This is
-// easy to change: the constructor of the <code>QGauss</code> class takes the
-// number of quadrature points in each space direction. Previously, we had two
-// points for bilinear elements. Now we should use three points for
-// biquadratic elements.
-//
-// Second, to copy the local matrix and vector on each cell into the global
-// system, we are no longer using a hand-written loop. Instead, we use
+// Next, we have to assemble the matrix. However, to copy the local matrix and
+// vector on each cell into the global system, we are no longer using a
+// hand-written loop. Instead, we use
 // AffineConstraints::distribute_local_to_global() that internally executes
 // this loop while performing Gaussian elimination on rows and columns
 // corresponding to constrained degrees on freedom.
