@@ -344,7 +344,7 @@ cells and their faces and identify the correct faces (for example using
 `cell->center()` to query the coordinates of the center of a cell as we
 do in step-1, or using `cell->face(f)->get_boundary_id()` to query the current
 boundary indicator of the $f$th face of the cell). You can then use
-cell->face(f)->set_boundary_id() to set the boundary id to something different.
+`cell->face(f)->set_boundary_id()` to set the boundary id to something different.
 You can take a look back at step-1 how iteration over the meshes is done there.
 
 <h4> Extracting a boundary mesh </h4>
@@ -354,10 +354,10 @@ mesh embedded into a higher dimensional space. While some can be constructed
 using the GridGenerator namespace or loaded from a file, it is sometimes
 useful to extract a surface mesh from a volume mesh.
 
-Use the function GridTools::extract_boundary_mesh() to extract the surface
-elements of a mesh. Using the function on a 3d mesh (a Triangulation<3,3>, for
-example from grid_4()), this will return a Triangulation<2,3> that you can use
-in step-38.  Also try extracting the boundary mesh of a Triangulation<2,2>.
+Use the function GridGenerator::extract_boundary_mesh() to extract the surface
+elements of a mesh. Using the function on a 3d mesh (a `Triangulation<3,3>`, for
+example from `grid_4()`), this will return a `Triangulation<2,3>` that you can use
+in step-38.  Also try extracting the boundary mesh of a `Triangulation<2,2>`.
 
 
 <!--

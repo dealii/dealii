@@ -72,14 +72,9 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // we then increment it):
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      {
-        for (const auto &face : cell->face_iterators())
-          {
-            if (face->at_boundary())
-              boundary_count[face->boundary_id()]++;
-          }
-      }
+    for (const auto &face : triangulation.active_face_iterators())
+      if (face->at_boundary())
+        boundary_count[face->boundary_id()]++;
 
     std::cout << " boundary indicators: ";
     for (const std::pair<const types::boundary_id, unsigned int> &pair :
@@ -250,7 +245,7 @@ void grid_5()
 
   GridTools::transform(
     [](const Point<2> &in) -> Point<2> {
-      return {in[0], in[1] + std::sin(in[0] / 5.0 * numbers::PI)};
+      return {in[0], in[1] + std::sin(numbers::PI * in[0] / 5.0)};
     },
     triangulation);
   print_mesh_info(triangulation, "grid-5.vtu");

@@ -54,7 +54,7 @@ If there is no good fit in the GridGenerator namespace for what you want to
 do, you can always create a
 Triangulation in your program "by hand". For that, you need a list of vertices
 with their coordinates and a list of cells referencing those vertices. You can
-find an example in the function create_coarse_grid in step-14.
+find an example in the function <tt>create_coarse_grid()</tt> in step-14.
 All the functions in GridGenerator are implemented in this fashion.
 
 We are happy to accept more functions to be added to GridGenerator. So, if
@@ -84,7 +84,7 @@ supported at the time of writing this tutorial (early 2013).
 
 In Gmsh, a mesh is described in a text based <code>.geo</code> file, that can
 contain computations, loops, variables, etc. It is very flexible. The mesh is
-generated from a surface representation, which is build from a list of line
+generated from a surface representation, which is built from a list of line
 loops, which is build from a list of lines, which are in turn built from
 points. The <code>.geo</code> script can be written and edited by hand or it
 can be generated automatically by creating objects graphically inside Gmsh. In
@@ -99,7 +99,7 @@ indicators as well as the mesh discussed further down below):
 <img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
 
 You might want to open the <code>example.geo</code> file in a text editor (it
-is located in the same directory as the <code>step-49.cc</code> source file) to
+is located in the same directory as the <tt>step-49.cc</tt> source file) to
 see how it is structured. You can see how the boundary of the domain is
 composed of a number of lines and how later on we combine several lines into
 "physical lines" (or "physical surfaces") that list the logical lines'
@@ -277,5 +277,3 @@ refinement. This is not difficult &mdash; in fact, there is nothing else to do
 often not the case if you have a more complex geometry and more steps than
 just creating the mesh are necessary. We will go over some of these steps in
 the <a href="#Results">results section</a> below.
-
-
