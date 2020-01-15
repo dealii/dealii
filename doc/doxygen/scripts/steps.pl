@@ -27,13 +27,14 @@ while (my $line = <TUTORIAL>)
 }
 
 # List of additional node and edge attributes to highlight purpose and state of
-# a tutorial or code gallery program
+# a tutorial or code gallery program. For a list of colors, take a look here:
+#   https://www.graphviz.org/doc/info/colors.html
 my %colors = (
  "basic"          => 'green',
  "techniques"     => 'orange',
  "fluids"         => 'yellow2',
  "solids"         => 'lightblue',
- "time dependent" => 'blue',
+ "time dependent" => 'dodgerblue1',
  "unfinished"     => 'black',
  "code-gallery"   => 'black',
     );
