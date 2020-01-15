@@ -1900,19 +1900,28 @@ namespace DoFTools
 
 
 
+  // deprecated function
   template <typename DoFHandlerType>
   void
   count_dofs_per_component(
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     const bool                            only_once,
-    const std::vector<unsigned int> &     target_component_)
+    const std::vector<unsigned int> &     target_component)
+  {
+    dofs_per_component =
+      count_dofs_per_component(dof_handler, only_once, target_component);
+  }
+
+
+
+  template <typename DoFHandlerType>
+  std::vector<types::global_dof_index>
+  count_dofs_per_component(const DoFHandlerType &           dof_handler,
+                           const bool                       only_once,
+                           const std::vector<unsigned int> &target_component_)
   {
     const unsigned int n_components = dof_handler.get_fe(0).n_components();
-
-    std::fill(dofs_per_component.begin(),
-              dofs_per_component.end(),
-              types::global_dof_index(0));
 
     // If the empty vector was given as default argument, set up this
     // vector as identity.
@@ -1931,16 +1940,16 @@ namespace DoFTools
     const unsigned int max_component =
       *std::max_element(target_component.begin(), target_component.end());
     const unsigned int n_target_components = max_component + 1;
-    (void)n_target_components; // silence possible warning about unused variable
 
-    AssertDimension(dofs_per_component.size(), n_target_components);
+    std::vector<types::global_dof_index> dofs_per_component(
+      n_target_components, types::global_dof_index(0));
 
     // special case for only one component. treat this first since it does
     // not require any computations
     if (n_components == 1)
       {
         dofs_per_component[0] = dof_handler.n_locally_owned_dofs();
-        return;
+        return dofs_per_component;
       }
 
 
@@ -1993,63 +2002,82 @@ namespace DoFTools
         AssertThrowMPI(ierr);
       }
 #endif
+
+    return dofs_per_component;
+  }
+
+
+
+  // deprecated function
+  template <typename DoFHandlerType>
+  void
+  count_dofs_per_block(const DoFHandlerType &                dof_handler,
+                       std::vector<types::global_dof_index> &dofs_per_block,
+                       const std::vector<unsigned int> &     target_block)
+  {
+    dofs_per_block = count_dofs_per_block(dof_handler, target_block);
   }
 
 
 
   template <typename DoFHandlerType>
-  void
-  count_dofs_per_block(const DoFHandlerType &                dof_handler,
-                       std::vector<types::global_dof_index> &dofs_per_block,
-                       const std::vector<unsigned int> &     target_block_)
+  std::vector<types::global_dof_index>
+  count_dofs_per_block(const DoFHandlerType &           dof_handler,
+                       const std::vector<unsigned int> &target_block_)
   {
-    std::vector<unsigned int> target_block = target_block_;
-
     const dealii::hp::FECollection<DoFHandlerType::dimension,
                                    DoFHandlerType::space_dimension>
       &fe_collection = dof_handler.get_fe_collection();
     Assert(fe_collection.size() < 256, ExcNotImplemented());
 
-    for (unsigned int this_fe = 0; this_fe < fe_collection.size(); ++this_fe)
+    // If the empty vector for target_block(e.g., as default argument), then
+    // set up this vector as identity. We do this set up with the first
+    // element of the collection, but the whole thing can only work if
+    // all elements have the same number of blocks anyway -- so check
+    // that right after
+    const unsigned int n_blocks = fe_collection[0].n_blocks();
+
+    std::vector<unsigned int> target_block = target_block_;
+    if (target_block.size() == 0)
+      {
+        target_block.resize(fe_collection[0].n_blocks());
+        for (unsigned int i = 0; i < n_blocks; ++i)
+          target_block[i] = i;
+      }
+    else
+      Assert(target_block.size() == n_blocks,
+             ExcDimensionMismatch(target_block.size(), n_blocks));
+    for (unsigned int f = 1; f < fe_collection.size(); ++f)
+      Assert(fe_collection[0].n_blocks() == fe_collection[f].n_blocks(),
+             ExcMessage("This function can only work if all elements in a "
+                        "collection have the same number of blocks."));
+
+    // special case for only one block. treat this first since it does
+    // not require any computations
+    if (n_blocks == 1)
+      {
+        std::vector<types::global_dof_index> dofs_per_block(1);
+        dofs_per_block[0] = dof_handler.n_dofs();
+        return dofs_per_block;
+      }
+
+    // Otherwise set up the right-sized object and start working
+    const unsigned int max_block =
+      *std::max_element(target_block.begin(), target_block.end());
+    const unsigned int n_target_blocks = max_block + 1;
+
+    std::vector<types::global_dof_index> dofs_per_block(n_target_blocks);
+
+    // Loop over the elements of the collection, but really only consider
+    // the last element (see #9271)
+    for (unsigned int this_fe = fe_collection.size() - 1;
+         this_fe < fe_collection.size();
+         ++this_fe)
       {
         const FiniteElement<DoFHandlerType::dimension,
                             DoFHandlerType::space_dimension> &fe =
           fe_collection[this_fe];
-        std::fill(dofs_per_block.begin(),
-                  dofs_per_block.end(),
-                  types::global_dof_index(0));
 
-        // If the empty vector was given as default argument, set up this
-        // vector as identity.
-        if (target_block.size() == 0)
-          {
-            target_block.resize(fe.n_blocks());
-            for (unsigned int i = 0; i < fe.n_blocks(); ++i)
-              target_block[i] = i;
-          }
-        else
-          Assert(target_block.size() == fe.n_blocks(),
-                 ExcDimensionMismatch(target_block.size(), fe.n_blocks()));
-
-
-
-        const unsigned int max_block =
-          *std::max_element(target_block.begin(), target_block.end());
-        const unsigned int n_target_blocks = max_block + 1;
-        (void)n_target_blocks; // silence possible warning about unused variable
-
-        const unsigned int n_blocks = fe.n_blocks();
-
-        AssertDimension(dofs_per_block.size(), n_target_blocks);
-
-        // special case for only one block. treat this first since it does
-        // not require any computations
-        if (n_blocks == 1)
-          {
-            dofs_per_block[0] = dof_handler.n_dofs();
-            return;
-          }
-        // otherwise determine the number of dofs in each block separately.
         std::vector<unsigned char> dofs_by_block(
           dof_handler.n_locally_owned_dofs());
         internal::get_block_association(dof_handler, dofs_by_block);
@@ -2081,6 +2109,8 @@ namespace DoFTools
           }
 #endif
       }
+
+    return dofs_per_block;
   }
 
 
