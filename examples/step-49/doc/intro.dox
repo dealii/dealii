@@ -78,20 +78,24 @@ meshes won't work (this means tools like tetgen can not be used directly).
 
 We will describe a possible workflow using Gmsh. Gmsh is the smallest and
 most quickly set up open source tool we are aware of. It can generate
-unstructured 2d quad meshes, but in 3d it can only extrude 2d meshes to
-get hexahedral meshes. 3D meshing of unstructured geometry into hexahedra is not
-supported at the time of writing this tutorial (early 2013).
+unstructured 2d quad meshes. In 3d, it can extrude 2d meshes to
+get hexahedral meshes; 3D meshing of unstructured geometry into hexahedra is
+possible, though there are some issues with the quality of these meshes
+that imply that these meshes only sometimes work in deal.II.
 
-In Gmsh, a mesh is described in a text based <code>.geo</code> file, that can
-contain computations, loops, variables, etc. It is very flexible. The mesh is
-generated from a surface representation, which is built from a list of line
+In Gmsh, a mesh is fundamentally described in a text-based 
+<code>.geo</code> file whose format can
+contain computations, loops, variables, etc. This format is quite flexible
+in allowing the description of complex geometries. The mesh is then
+generated from a surface representation, which is build from a list of line
 loops, which is build from a list of lines, which are in turn built from
 points. The <code>.geo</code> script can be written and edited by hand or it
 can be generated automatically by creating objects graphically inside Gmsh. In
 many cases it is best to combine both approaches. The file can be easily
-reloaded by pressing "reload" under the "Geometry" tab.
+reloaded by pressing "reload" under the "Geometry" tab if you want to write
+it by hand and see the effects in the graphical user interface of gmsh.
 
-This tutorial contains an example <code>.geo</code> file, that describes a box
+This tutorial contains an example <code>.geo</code> file that describes a box
 with two objects cut out in the interior. This is how
 <code>example.geo</code> looks like in Gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
@@ -107,9 +111,9 @@ numbers. "Physical" object are the ones that carry information about the
 boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
 
 @note It is important that this file contain "physical lines" and "physical
-surfaces". These give the boundary indicators and material ids for use
-in deal.II. Without these physical entities, nothing will be imported into
-deal.II.
+  surfaces". These give the boundary indicators and material ids for use
+  in deal.II. Without these physical entities, nothing will be imported into
+  deal.II.
 
 deal.II's GridIn class can read the <code>.msh</code> format written by
 Gmsh and that contains a mesh created for the geometry described by the
@@ -126,6 +130,19 @@ and saved again by deal.II as an image (see the <code>grid_1</code> function
 of the current program):
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
+
+@note gmsh has a number of other interfaces by which one can describe
+  geometries to it. In particular, it has the ability to interface with
+  scripting languages like Python and Julia, but it can also be scripted
+  from C++. These interfaces are useful if one doesn't just want to generate
+  a mesh for a single geometry (in which case the graphical interface or,
+  in simple cases, a hand-written `.geo` file is probably the simplest
+  approach), but instead wants to do parametric studies over the geometry
+  for which it is necessary to generate many meshes for geometries that
+  differ in certain parameters. Another case where this is useful is if there
+  is already a CAD geometry for which one only needs a mesh; indeed, this
+  can be done from within deal.II using the 
+  Gmsh::create_triangulation_from_boundary_curve() function.
 
 
 <h3>Modifying a Mesh</h3>
