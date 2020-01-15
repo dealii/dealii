@@ -651,15 +651,19 @@ namespace GridGenerator
   /**
    * Initialize the given triangulation with several
    * @ref GlossCoarseMesh "coarse mesh cells"
-   * that cover a hyperball, i.e. a circle or a
-   * ball around @p center with given @p radius.
+   * that cover a hyperball, i.e. a circle in 2d or a
+   * ball in 3d, around @p center with given @p radius. The function is
+   * used in step-6.
    *
    * In order to avoid degenerate cells at the boundaries, the circle is
-   * triangulated by five cells, the ball by seven cells. Specifically, these
+   * triangulated by five cells, whereas in 3d the ball is subdivided by
+   * seven cells. Specifically, these
    * cells are one cell in the center plus one "cap" cell on each of the faces
    * of this center cell. This ensures that under repeated refinement, none
    * of the cells at the outer boundary will degenerate to have an interior
-   * angle approaching 180 degrees. The diameter of the
+   * angle approaching 180 degrees, as opposed to the case where one might
+   * start with just one square (or cube) to approximate the domain.
+   * The diameter of the
    * center cell is chosen so that the aspect ratio of the boundary cells
    * after one refinement is optimized.
    *
@@ -676,10 +680,46 @@ namespace GridGenerator
    * not be the optimal one to create a good a mesh for a hyperball. The
    * "Possibilities for extensions" section of step-6 has an extensive
    * discussion of how one would construct better meshes and what one needs to
-   * do for it. Selecting the argument @p
-   * attach_spherical_manifold_on_boundary_cells to true attaches a
-   * SphericalManifold manifold also to the boundary cells, and not only to the
-   * boundary faces.
+   * do for it. Setting the argument
+   * `attach_spherical_manifold_on_boundary_cells` to true attaches a
+   * SphericalManifold manifold also to the cells adjacent to the boundary, and
+   * not only to the boundary faces.
+   *
+   * @note Since this is likely one of the earliest functions users typically
+   *   consider to create meshes with curved boundaries, let us also comment
+   *   on one aspect that is often confusing: Namely, that what one sees is not
+   *   always what is actually happening. Specifically, if you output the coarse
+   *   mesh with a function such as GridOut::write_vtk() using default options,
+   *   then one doesn't generally get to see curved faces at the boundary.
+   *   That's because most file formats by default only store vertex locations,
+   *   with the implicit understanding that cells are composed from these
+   *   vertices and bounded by straight edges. At the same time, the fact
+   *   that this function attaches a SphericalManifold object to the boundary
+   *   faces means that at least *internally*, edges really are curved. If
+   *   you want to see them that way, you need to make sure that the function
+   *   you use to output the mesh actually plots boundary faces as curved
+   *   lines rather than straight lines characterized by only the locations
+   *   of the two end points. For example, GridOut::write_gnuplot() can do
+   *   that if you set the corresponding flag in the GridOutFlags::Gnuplot
+   *   structure. It is, however, an entirely separate consideration whether
+   *   you are actually *computing* on curved cells. In typical finite
+   *   element computations, one has to compute integrals and these are
+   *   computed by transforming back actual cells using a mapping to the
+   *   reference cell. What mapping is used determines what shape the
+   *   cells have for these internal computations: For example, with the
+   *   widely used $Q_1$ mapping (implicitly used in step-6), integration
+   *   always happens on cells that are assumed to have straight boundaries
+   *   described by only the vertex locations. In other words, if such a
+   *   mapping is used, then the cells of the domain really do have
+   *   straight edges, regardless of the manifold description attached
+   *   to these edges and regardless of the flags given when generating
+   *   output. As a consequence of all of this, it is important to
+   *   distinguish three things: (i) the manifold description attached to an
+   *   object in the mesh; (ii) the mapping used in integration; and (iii) the
+   *   style used in outputting graphical information about the mesh. All of
+   *   these can be chosen more or less independently of each other, and
+   *   what you see visualized is not necessarily exactly what is
+   *   happening.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */

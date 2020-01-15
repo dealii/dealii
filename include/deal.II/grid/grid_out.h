@@ -1044,7 +1044,7 @@ public:
    * Write the triangulation in the gnuplot format.
    *
    * In GNUPLOT format, each cell is written as a sequence of its confining
-   * lines. Apart from the coordinates of the line's end points, the level and
+   * lines. Apart from the coordinates of the lines' end points, the level and
    * the material of the cell are appended to each line of output. Therefore,
    * if you let GNUPLOT draw a 2d grid as a 3d plot, you will see more refined
    * cells being raised against cells with less refinement.  Also, if you draw
