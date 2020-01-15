@@ -19,9 +19,9 @@ the aspect ratio of the generated output is actually 1:1, i.e. a
 circle is drawn as a circle on your screen, rather than as an
 ellipse. The third line switches off the key in the graphic, as that
 will only print information (the filename) which is not that important
-right now. Similarly, the third and fourth disable tic marks. The plot
-is then generated with a specific line width ("`lw`", here set to 4)
-and line type ("`lt`", here chosen by saying that the line should be
+right now. Similarly, the fourth and fifth disable tick marks. The plot
+is then generated with a specific line width ("lw", here set to 4)
+and line type ("lt", here chosen by saying that the line should be
 drawn using the RGB color "black").
 
 The following table shows the triangulated computational domain for $Q_1$,

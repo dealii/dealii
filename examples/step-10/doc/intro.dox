@@ -41,17 +41,16 @@ different methods.
 
 
 
-The first method uses a triangulated approximation of the circle with
-unit radius and integrates the function that is constant one over it. Of course, if
-the domain were the exact unit circle, then the area would be $\pi$, but
-since we only use an approximation by piecewise polynomial segments,
-the value of the area we integrate over is not exactly $\pi$. However, it is known that as
-we refine the triangulation, a $Q_p$ mapping approximates the boundary
-with an order $h^{p+1}$, where $h$ is the mesh
-size. We will check the values of the computed area of the circle and
-their convergence towards $\pi$ under mesh refinement for different
-mappings. We will also find a convergence behavior that is surprising
-at first, but has a good explanation.
+The first method uses a triangulated approximation of the circle with unit
+radius and integrates a unit magnitude constant function ($f = 1$) over it. Of
+course, if the domain were the exact unit circle, then the area would be $\pi$,
+but since we only use an approximation by piecewise polynomial segments, the
+value of the area we integrate over is not exactly $\pi$. However, it is known
+that as we refine the triangulation, a $Q_p$ mapping approximates the boundary
+with an order $h^{p+1}$, where $h$ is the mesh size. We will check the values
+of the computed area of the circle and their convergence towards $\pi$ under
+mesh refinement for different mappings. We will also find a convergence
+behavior that is surprising at first, but has a good explanation.
 
 
 
