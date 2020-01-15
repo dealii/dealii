@@ -162,7 +162,7 @@ namespace GridGenerator
         /**
          * Constructor.
          */
-        MeshGenerator(AdditionalData data)
+        MeshGenerator(const AdditionalData &data)
           : refinements(data.refinements)
           , n_subdivision_x_0(data.n_subdivision_x_0)
           , n_subdivision_x_1(data.n_subdivision_x_1)

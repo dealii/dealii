@@ -1588,9 +1588,10 @@ namespace Utilities
       }
 
       // Wait to have sent all objects.
-      MPI_Waitall(send_to.size(),
-                  buffer_send_requests.data(),
-                  MPI_STATUSES_IGNORE);
+      const int ierr = MPI_Waitall(send_to.size(),
+                                   buffer_send_requests.data(),
+                                   MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
 
       return received_objects;
 #  endif // deal.II with MPI

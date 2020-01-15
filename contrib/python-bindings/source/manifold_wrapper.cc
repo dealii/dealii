@@ -120,6 +120,7 @@ namespace python
   ManifoldWrapper::ManifoldWrapper(const int dim, const int spacedim)
     : dim(dim)
     , spacedim(spacedim)
+    , manifold_ptr(nullptr)
   {
     AssertThrow(((dim == 2) && (spacedim == 2)) ||
                   ((dim == 2) && (spacedim == 3)) ||
