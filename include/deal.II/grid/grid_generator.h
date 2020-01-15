@@ -1063,9 +1063,10 @@ namespace GridGenerator
    * rotational symmetry, in which case the half shell in 2d represents a
    * shell in 3d.
    *
-   * If the number of initial cells is zero (as is the default), then it is
-   * computed adaptively such that the resulting elements have the least
-   * aspect ratio.
+   * If the number of initial cells @p n_cells is zero in 2d (as is the
+   * default), then it is computed adaptively such that the resulting elements
+   * have the least aspect ratio. The argument is ignored in 3d, where the
+   * coarse mesh always has 5 cells.
    *
    * If colorize is set to <code>true</code>, the inner, outer, and the part
    * of the boundary where $x=0$, get indicator 0, 1, and 2,

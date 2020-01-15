@@ -5484,16 +5484,15 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void half_hyper_shell(Triangulation<3> & tria,
-                        const Point<3> &   center,
-                        const double       inner_radius,
-                        const double       outer_radius,
-                        const unsigned int n,
-                        const bool         colorize)
+  void half_hyper_shell(Triangulation<3> &tria,
+                        const Point<3> &  center,
+                        const double      inner_radius,
+                        const double      outer_radius,
+                        const unsigned int /*n_cells*/,
+                        const bool colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
-    AssertIndexRange(n, 5);
 
     // These are for the two lower squares
     const double d = outer_radius / std::sqrt(2.0);
