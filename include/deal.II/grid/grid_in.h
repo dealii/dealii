@@ -146,7 +146,7 @@ struct CellData;
  * fairly simple to extend it.
  *
  * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p Gmsh mesh
- * generator (see http://www.geuz.org/gmsh/). The documentation in the @p Gmsh
+ * generator (see http://gmsh.info/). The documentation in the @p Gmsh
  * manual explains how to generate meshes compatible with the deal.II library
  * (i.e. quads rather than triangles). In order to use this format, Gmsh has
  * to output the file in the old format 1.0. This is done adding the line
@@ -485,7 +485,7 @@ public:
   /**
    * Read grid data from an msh file, either version 1 or version 2 of that
    * file format. The Gmsh formats are documented at
-   * http://www.geuz.org/gmsh/.
+   * http://www.gmsh.info/.
    *
    * @note The input function of deal.II does not distinguish between newline
    * and other whitespace. Therefore, deal.II will be able to read files in a

@@ -69,7 +69,7 @@ disk. How this is done is explained in step-5 and can be seen in the function
 <code>grid_1</code> in this example, see the code below.
 
 Meshes can be generated from different tools like <a
-href="http://geuz.org/gmsh/" target="_top">gmsh</a>, <a
+href="http://gmsh.info" target="_top">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" target="_top">lagrit</a> and <a
 href="http://cubit.sandia.gov/" target="_top">cubit</a>. See the
 documentation of GridIn for more information. The problem is that deal.II
