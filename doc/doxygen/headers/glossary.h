@@ -407,7 +407,7 @@
  *
  *   Triangulation objects store cells in <i>levels</i>: in
  *   particular, all cells of a coarse mesh are on level zero. Their
- *   children (if we executed Triangulation::refine_global(1) on a
+ *   children (if we executed `Triangulation::refine_global(1)` on a
  *   coarse mesh) would then be at level one, etc. The coarse mesh of a
  *   triangulation (in the sense of the previous paragraph) then
  *   consists of exactly the level-zero cells of a triangulation. (Whether
