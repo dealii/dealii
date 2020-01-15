@@ -848,53 +848,111 @@ namespace GridTools
                              std::vector<CellData<dim>> &  cells,
                              SubCellData &                 subcelldata,
                              std::vector<unsigned int> &   considered_vertices,
-                             double                        tol)
+                             const double                  tol)
   {
-    // create a vector of vertex
-    // indices. initialize it to the identity,
-    // later on change that if necessary.
+    AssertIndexRange(2, vertices.size());
+    // create a vector of vertex indices. initialize it to the identity, later
+    // on change that if necessary.
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
-    for (unsigned int i = 0; i < vertices.size(); ++i)
-      new_vertex_numbers[i] = i;
+    std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);
 
-    // if the considered_vertices vector is
-    // empty, consider all vertices
+    // if the considered_vertices vector is empty, consider all vertices
     if (considered_vertices.size() == 0)
       considered_vertices = new_vertex_numbers;
-
     Assert(considered_vertices.size() <= vertices.size(), ExcInternalError());
 
+    // The algorithm below improves upon the naive O(n^2) algorithm by first
+    // sorting vertices by their value in one component and then only
+    // comparing vertices for equality which are nearly equal in that
+    // component. For example, if @p vertices form a cube, then we will only
+    // compare points that have the same x coordinate when we try to find
+    // duplicated vertices.
 
-    // now loop over all vertices to be
-    // considered and try to find an identical
-    // one
-    for (unsigned int i = 0; i < considered_vertices.size(); ++i)
+    // Start by finding the longest coordinate direction. This minimizes the
+    // number of points that need to be compared against each-other in a
+    // single set for typical geometries.
+    const BoundingBox<spacedim> bbox(vertices);
+    const auto &                min = bbox.get_boundary_points().first;
+    const auto &                max = bbox.get_boundary_points().second;
+
+    unsigned int longest_coordinate_direction = 0;
+    double       longest_coordinate_length    = max[0] - min[0];
+    for (unsigned int d = 1; d < spacedim; ++d)
       {
-        Assert(considered_vertices[i] < vertices.size(), ExcInternalError());
-        if (new_vertex_numbers[considered_vertices[i]] !=
-            considered_vertices[i])
-          // this vertex has been identified with
-          // another one already, skip it in the
-          // test
-          continue;
-        // this vertex is not identified with
-        // another one so far. search in the list
-        // of remaining vertices. if a duplicate
-        // vertex is found, set the new vertex
-        // index for that vertex to this vertex'
-        // index.
-        for (unsigned int j = i + 1; j < considered_vertices.size(); ++j)
+        const double coordinate_length = max[d] - min[d];
+        if (longest_coordinate_length < coordinate_length)
           {
-            bool equal = true;
-            for (unsigned int d = 0; d < spacedim; ++d)
-              equal &= (std::abs(vertices[considered_vertices[j]](d) -
-                                 vertices[considered_vertices[i]](d)) < tol);
-            if (equal)
-              {
-                new_vertex_numbers[considered_vertices[j]] =
-                  considered_vertices[i];
-              }
+            longest_coordinate_length    = coordinate_length;
+            longest_coordinate_direction = d;
           }
+      }
+
+    // Sort vertices (while preserving their vertex numbers) along that
+    // coordinate direction:
+    std::vector<std::pair<unsigned int, Point<spacedim>>> sorted_vertices;
+    sorted_vertices.reserve(vertices.size());
+    for (const unsigned int vertex_n : considered_vertices)
+      {
+        AssertIndexRange(vertex_n, vertices.size());
+        sorted_vertices.emplace_back(vertex_n, vertices[vertex_n]);
+      }
+    std::sort(sorted_vertices.begin(),
+              sorted_vertices.end(),
+              [&](const std::pair<unsigned int, Point<spacedim>> &a,
+                  const std::pair<unsigned int, Point<spacedim>> &b) {
+                return a.second[longest_coordinate_direction] <
+                       b.second[longest_coordinate_direction];
+              });
+
+    auto within_tolerance = [=](const Point<spacedim> &a,
+                                const Point<spacedim> &b) {
+      for (unsigned int d = 0; d < spacedim; ++d)
+        if (std::abs(a[d] - b[d]) > tol)
+          return false;
+      return true;
+    };
+
+    // Find a range of numbers that have the same component in the longest
+    // coordinate direction:
+    auto range_start = sorted_vertices.begin();
+    while (range_start != sorted_vertices.end())
+      {
+        auto range_end = range_start + 1;
+        while (range_end != sorted_vertices.end() &&
+               std::abs(range_end->second[longest_coordinate_direction] -
+                        range_start->second[longest_coordinate_direction]) <
+                 tol)
+          ++range_end;
+
+        // preserve behavior with older versions of this function by replacing
+        // higher vertex numbers by lower vertex numbers
+        std::sort(range_start,
+                  range_end,
+                  [](const std::pair<unsigned int, Point<spacedim>> &a,
+                     const std::pair<unsigned int, Point<spacedim>> &b) {
+                    return a.first < b.first;
+                  });
+
+        // Now de-duplicate [range_start, range_end)
+        //
+        // We have identified all points that are within a strip of width 'tol'
+        // in one coordinate direction. Now we need to figure out which of these
+        // are also close in other coordinate directions. If two are close, we
+        // can mark the second one for deletion.
+        for (auto reference = range_start; reference != range_end; ++reference)
+          {
+            if (reference->first != numbers::invalid_unsigned_int)
+              for (auto it = reference + 1; it != range_end; ++it)
+                {
+                  if (within_tolerance(reference->second, it->second))
+                    {
+                      new_vertex_numbers[it->first] = reference->first;
+                      // skip the replaced vertex in the future
+                      it->first = numbers::invalid_unsigned_int;
+                    }
+                }
+          }
+        range_start = range_end;
       }
 
     // now we got a renumbering list. simply renumber all vertices

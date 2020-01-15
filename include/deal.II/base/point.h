@@ -307,7 +307,7 @@ public:
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
-   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
+   * <tt>p</tt>, i.e. the $l_2$ norm of the difference between the
    * vectors representing the two points.
    *
    * @note This function can also be used in CUDA device code.

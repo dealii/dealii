@@ -108,18 +108,28 @@ namespace python
     2)
 
   const char n_active_cells_docstring[] =
-    "Return the number of active cells                                      \n";
+    "Return the number of active cells.                                     \n";
+
+
+
+  const char dim_docstring[] =
+    "Return the dimension of the Triangulation                              \n";
+
+
+
+  const char spacedim_docstring[] =
+    "Return the space dimension of the Triangulation.                       \n";
 
 
 
   const char generate_hyper_cube_docstring[] =
     "Generate a hyper_cube (square in 2D and cube in 3D)                    \n"
-    "with exactly one cell                                                  \n";
+    "with exactly one cell.                                                 \n";
 
 
 
   const char generate_simplex_docstring[] =
-    "Generate a simplex with (dim+1) vertices and mesh cells                \n";
+    "Generate a simplex with (dim+1) vertices and mesh cells.               \n";
 
 
 
@@ -131,14 +141,14 @@ namespace python
 
   const char generate_hyper_rectangle_docstring[] =
     "Generate a coordinate-parallel brick from the two diagonally opposite  \n"
-    "corners points p1 and p2                                               \n";
+    "corners points p1 and p2.                                              \n";
 
 
 
   const char generate_subdivided_hyper_rectangle_docstring[] =
     "Generate a coordinate-parallel brick from the two diagonally opposite  \n"
     "corners point p1 and p2. In direction i, repetitions[i] cells are      \n"
-    "created                                                                \n";
+    "created.                                                               \n";
 
 
 
@@ -282,13 +292,13 @@ namespace python
 
 
   const char shift_docstring[] =
-    "Shift every vertex of the Triangulation by the given shift vector      \n";
+    "Shift every vertex of the Triangulation by the given shift vector.     \n";
 
 
 
   const char merge_docstring[] =
     "Given two triangulations, create the triangulation that contains       \n"
-    "the cells of both triangulations                                       \n";
+    "the cells of both triangulations.                                      \n";
 
 
 
@@ -331,16 +341,16 @@ namespace python
 
 
   const char refine_global_docstring[] =
-    "Refine all the cells times time                                        \n";
+    "Refine all the cells times time.                                       \n";
 
 
 
   const char execute_coarsening_and_refinement_docstring[] =
-    "Execute both refinement and coarsening of the Triangulation            \n";
+    "Execute both refinement and coarsening of the Triangulation.           \n";
 
 
   const char active_cells_docstring[] =
-    "Return the list of active cell accessors of the Triangulation          \n";
+    "Return the list of active cell accessors of the Triangulation.         \n";
 
 
 
@@ -370,12 +380,12 @@ namespace python
 
 
   const char save_docstring[] =
-    "Write the Triangulation to a file                                      \n";
+    "Write the Triangulation to a file.                                     \n";
 
 
 
   const char load_docstring[] =
-    "Load the Triangulation from a file                                     \n";
+    "Load the Triangulation from a file.                                    \n";
 
 
 
@@ -403,6 +413,21 @@ namespace python
 
 
 
+  const char find_cells_adjacent_to_vertex_docstring[] =
+    "Find and return a list of active cells that surround a given           \n"
+    "vertex with index vertex_index.                                        \n";
+
+
+
+  const char minimal_cell_diameter_docstring[] =
+    "Return the diameter of the smallest active cell of a triangulation.    \n";
+
+
+
+  const char maximal_cell_diameter_docstring[] =
+    "Return the diameter of the largest active cell of a triangulation.    \n";
+
+
   void
   export_triangulation()
   {
@@ -412,6 +437,26 @@ namespace python
       .def("n_active_cells",
            &TriangulationWrapper::n_active_cells,
            n_active_cells_docstring,
+           boost::python::args("self"))
+      .def("dim",
+           &TriangulationWrapper::get_dim,
+           dim_docstring,
+           boost::python::args("self"))
+      .def("spacedim",
+           &TriangulationWrapper::get_spacedim,
+           spacedim_docstring,
+           boost::python::args("self"))
+      .def("n_active_cells",
+           &TriangulationWrapper::n_active_cells,
+           n_active_cells_docstring,
+           boost::python::args("self"))
+      .def("minimal_cell_diameter",
+           &TriangulationWrapper::minimal_cell_diameter,
+           minimal_cell_diameter_docstring,
+           boost::python::args("self"))
+      .def("maximal_cell_diameter",
+           &TriangulationWrapper::maximal_cell_diameter,
+           maximal_cell_diameter_docstring,
            boost::python::args("self"))
       .def("generate_hyper_cube",
            &TriangulationWrapper::generate_hyper_cube,
@@ -544,6 +589,10 @@ namespace python
            find_active_cell_around_point_overloads(
              boost::python::args("self", "point", "mapping"),
              find_active_cell_around_point_docstring))
+      .def("find_cells_adjacent_to_vertex",
+           &TriangulationWrapper::find_cells_adjacent_to_vertex,
+           find_cells_adjacent_to_vertex_docstring,
+           boost::python::args("self", "vertex_index"))
       .def("refine_global",
            &TriangulationWrapper::refine_global,
            refine_global_docstring,

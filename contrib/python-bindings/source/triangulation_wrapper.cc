@@ -558,6 +558,29 @@ namespace python
     }
 
 
+    template <int dim, int spacedim>
+    boost::python::list
+    find_cells_adjacent_to_vertex(const unsigned int    vertex_index,
+                                  TriangulationWrapper &triangulation_wrapper)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(
+          triangulation_wrapper.get_triangulation());
+
+      std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
+        adjacent_cells =
+          GridTools::find_cells_adjacent_to_vertex(*tria, vertex_index);
+
+      boost::python::list cells;
+      for (auto &cell : adjacent_cells)
+        cells.append(CellAccessorWrapper(triangulation_wrapper,
+                                         cell->level(),
+                                         cell->index()));
+
+      return cells;
+    }
+
+
 
     template <int dim, int spacedim>
     boost::python::list
@@ -573,6 +596,28 @@ namespace python
                                          cell->index()));
 
       return cells;
+    }
+
+
+
+    template <int dim, int spacedim>
+    double
+    maximal_cell_diameter(const void *triangulation)
+    {
+      const Triangulation<dim, spacedim> *tria =
+        static_cast<const Triangulation<dim, spacedim> *>(triangulation);
+      return GridTools::maximal_cell_diameter(*tria);
+    }
+
+
+
+    template <int dim, int spacedim>
+    double
+    minimal_cell_diameter(const void *triangulation)
+    {
+      const Triangulation<dim, spacedim> *tria =
+        static_cast<const Triangulation<dim, spacedim> *>(triangulation);
+      return GridTools::minimal_cell_diameter(*tria);
     }
 
 
@@ -1354,6 +1399,20 @@ namespace python
 
 
 
+  boost::python::list
+  TriangulationWrapper::find_cells_adjacent_to_vertex(
+    const unsigned int vertex_index)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::find_cells_adjacent_to_vertex<2, 2>(vertex_index, *this);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::find_cells_adjacent_to_vertex<2, 3>(vertex_index, *this);
+    else
+      return internal::find_cells_adjacent_to_vertex<3, 3>(vertex_index, *this);
+  }
+
+
+
   void
   TriangulationWrapper::refine_global(const unsigned int n)
   {
@@ -1404,6 +1463,32 @@ namespace python
 
 
 
+  double
+  TriangulationWrapper::minimal_cell_diameter() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::minimal_cell_diameter<2, 2>(triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::minimal_cell_diameter<2, 3>(triangulation);
+    else
+      return internal::minimal_cell_diameter<3, 3>(triangulation);
+  }
+
+
+
+  double
+  TriangulationWrapper::maximal_cell_diameter() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::maximal_cell_diameter<2, 2>(triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::maximal_cell_diameter<2, 3>(triangulation);
+    else
+      return internal::maximal_cell_diameter<3, 3>(triangulation);
+  }
+
+
+
   void
   TriangulationWrapper::write(const std::string &filename,
                               const std::string  format) const
@@ -1435,15 +1520,15 @@ namespace python
   void
   TriangulationWrapper::save(const std::string &filename) const
   {
-    std::ofstream                 ofs(filename);
-    boost::archive::text_oarchive oa(ofs);
+    std::ofstream                   ofs(filename);
+    boost::archive::binary_oarchive oa(ofs);
 
     if ((dim == 2) && (spacedim == 2))
       {
         Triangulation<2, 2> *tria =
           static_cast<Triangulation<2, 2> *>(triangulation);
 
-        oa << *tria;
+        tria->save(oa, 0);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
@@ -1451,7 +1536,7 @@ namespace python
           Triangulation<2, 3> *tria =
             static_cast<Triangulation<2, 3> *>(triangulation);
 
-          oa << *tria;
+          tria->save(oa, 0);
         }
       }
     else
@@ -1459,7 +1544,7 @@ namespace python
         Triangulation<3, 3> *tria =
           static_cast<Triangulation<3, 3> *>(triangulation);
 
-        oa << *tria;
+        tria->save(oa, 0);
       }
   }
 
@@ -1468,29 +1553,29 @@ namespace python
   void
   TriangulationWrapper::load(const std::string &filename)
   {
-    std::ifstream                 ifs(filename);
-    boost::archive::text_iarchive ia(ifs);
+    std::ifstream                   ifs(filename);
+    boost::archive::binary_iarchive ia(ifs);
 
     if ((dim == 2) && (spacedim == 2))
       {
         Triangulation<2, 2> *tria =
           static_cast<Triangulation<2, 2> *>(triangulation);
 
-        ia >> *tria;
+        tria->load(ia, 0);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
         Triangulation<2, 3> *tria =
           static_cast<Triangulation<2, 3> *>(triangulation);
 
-        ia >> *tria;
+        tria->load(ia, 0);
       }
     else
       {
         Triangulation<3> *tria =
           static_cast<Triangulation<3, 3> *>(triangulation);
 
-        ia >> *tria;
+        tria->load(ia, 0);
       }
   }
 
