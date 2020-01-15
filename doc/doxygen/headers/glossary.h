@@ -1273,9 +1273,7 @@
  * center has an $x$ component less than zero:
  *
  * @code
- * for (typename Triangulation<dim>::active_cell_iterator cell =
- *  triangulation.begin_active();
- *  cell != triangulation.end(); ++cell)
+ * for ( auto &cell : triangulation.active_cell_iterator() )
  *   if (cell->center()[0] < 0)
  *     cell->set_manifold_id (42);
  * @endcode
