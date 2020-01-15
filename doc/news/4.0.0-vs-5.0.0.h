@@ -592,7 +592,7 @@ inconvenience this causes.
   </p>
 
   <li> <p>
-       New: Added support for <a href="http://www.geuz.org/gmsh/"
+       New: Added support for <a href="http://www.gmsh.info"
        target="_top">gmsh</a> mesh format in <code>GridIn::read_msh</code>.
        <br>
        (Luca Heltai 2004/04/21)
