@@ -83,6 +83,43 @@ namespace python
 
       return PointWrapper(coord_list);
     }
+
+
+
+    template <int dim, int spacedim>
+    PointWrapper
+    project_real_point_to_unit_point_on_face(void *mapping_ptr,
+                                             void *cell_accessor_ptr,
+                                             const unsigned int face_no,
+                                             void *             point_ptr)
+    {
+      const MappingQGeneric<dim, spacedim> *mapping =
+        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+
+      const CellAccessor<dim, spacedim> *cell_accessor =
+        static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
+
+      const Point<spacedim> *point =
+        static_cast<const Point<spacedim> *>(point_ptr);
+
+      typename Triangulation<dim, spacedim>::active_cell_iterator cell(
+        &cell_accessor->get_triangulation(),
+        cell_accessor->level(),
+        cell_accessor->index());
+
+      Point<dim - 1> p_face =
+        mapping->project_real_point_to_unit_point_on_face(cell,
+                                                          face_no,
+                                                          *point);
+
+      boost::python::list coord_list;
+      for (int i = 0; i < dim - 1; ++i)
+        coord_list.append(p_face[i]);
+      coord_list.append(0.);
+
+      return PointWrapper(coord_list);
+    }
+
   } // namespace internal
 
 
@@ -229,6 +266,30 @@ namespace python
       return internal::transform_real_to_unit_cell<3, 3>(mapping_ptr,
                                                          cell.cell_accessor,
                                                          p.point);
+  }
+
+
+
+  PointWrapper
+  MappingQGenericWrapper::project_real_point_to_unit_point_on_face(
+    CellAccessorWrapper &cell,
+    const unsigned int   face_no,
+    PointWrapper &       p)
+  {
+    AssertThrow(
+      spacedim == p.get_dim(),
+      ExcMessage(
+        "Dimension of the point is not equal to the space dimension of the mapping."));
+
+    if ((dim == 2) && (spacedim == 2))
+      return internal::project_real_point_to_unit_point_on_face<2, 2>(
+        mapping_ptr, cell.cell_accessor, face_no, p.point);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::project_real_point_to_unit_point_on_face<2, 3>(
+        mapping_ptr, cell.cell_accessor, face_no, p.point);
+    else
+      return internal::project_real_point_to_unit_point_on_face<3, 3>(
+        mapping_ptr, cell.cell_accessor, face_no, p.point);
   }
 
 

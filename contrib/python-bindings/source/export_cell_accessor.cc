@@ -45,17 +45,17 @@ namespace python
 
 
   const char coarsen_flag_docstring[] =
-    "Get/Set the coarsen_flag of the cell                               \n";
+    "Get/Set the coarsen_flag of the cell.                              \n";
 
 
 
   const char material_id_docstring[] =
-    "Get/Set the material_id of the cell                                \n";
+    "Get/Set the material_id of the cell.                               \n";
 
 
 
   const char manifold_id_docstring[] =
-    "Get/Set the manifold_id of the cell                                \n";
+    "Get/Set the manifold_id of the cell.                               \n";
 
 
 
@@ -66,7 +66,7 @@ namespace python
 
 
   const char barycenter_docstring[] =
-    "Return the barycenter of the current cell                          \n";
+    "Return the barycenter of the current cell.                         \n";
 
 
 
@@ -77,17 +77,17 @@ namespace python
 
 
   const char set_vertex_docstring[] =
-    " Set the ith vertex of the cell to point_wrapper                   \n";
+    " Set the ith vertex of the cell to point_wrapper.                  \n";
 
 
 
   const char get_vertex_docstring[] =
-    " Get the ith vertex of the cell                                    \n";
+    " Get the ith vertex of the cell.                                   \n";
 
 
 
   const char at_boundary_docstring[] =
-    " Return whether the cell is at the boundary                        \n";
+    " Return whether the cell is at the boundary.                       \n";
 
 
 
@@ -114,6 +114,40 @@ namespace python
   const char measure_docstring[] =
     " Compute the dim-dimensional measure of the object.                 \n";
 
+
+
+  const char vertex_index_docstring[] =
+    " Return the global index of i-th vertex of a cell.                  \n";
+
+
+
+  const char neighbor_of_neighbor_docstring[] =
+    " Return the how-many'th neighbor this cell is of                    \n"
+    " cell.neighbor(neighbor), i.e. return the face_no such that         \n"
+    " cell.neighbor(neighbor).neighbor(face_no)==cell.                   \n";
+
+
+
+  const char neighbor_is_coarser_docstring[] =
+    " Return whether the neighbor is coarser then the present cell.      \n";
+
+
+
+  const char index_docstring[] =
+    " Return the index of the element presently pointed to               \n"
+    " on the present.                                                    \n";
+
+
+
+  const char level_docstring[] =
+    " Return the level within the mesh hierarchy at which this cell      \n"
+    " is located.                                                        \n";
+
+
+
+  const char active_docstring[] =
+    " Test whether the cell has children (this is the criterion          \n"
+    " for activity of a cell).                                           \n";
 
 
   void
@@ -180,7 +214,31 @@ namespace python
       .def("measure",
            &CellAccessorWrapper::measure,
            measure_docstring,
-           boost::python::args("self"));
+           boost::python::args("self"))
+      .def("active",
+           &CellAccessorWrapper::active,
+           active_docstring,
+           boost::python::args("self"))
+      .def("level",
+           &CellAccessorWrapper::level,
+           level_docstring,
+           boost::python::args("self"))
+      .def("index",
+           &CellAccessorWrapper::index,
+           index_docstring,
+           boost::python::args("self"))
+      .def("neighbor_is_coarser",
+           &CellAccessorWrapper::neighbor_is_coarser,
+           neighbor_is_coarser_docstring,
+           boost::python::args("self", "neighbor"))
+      .def("neighbor_of_neighbor",
+           &CellAccessorWrapper::neighbor_of_neighbor,
+           neighbor_of_neighbor_docstring,
+           boost::python::args("self", "neighbor"))
+      .def("vertex_index",
+           &CellAccessorWrapper::vertex_index,
+           vertex_index_docstring,
+           boost::python::args("self", "vertex"));
   }
 } // namespace python
 
