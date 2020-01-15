@@ -168,10 +168,23 @@ foreach $step (@ARGV)
         # Determine the style of the arrow that connects
         # the two nodes. If the two nodes are of the same
         # kind, use the same color as the nodes as this makes
-        # reading the flow of the graph a bit easier.
+        # reading the flow of the graph a bit easier. Furthermore,
+        # set the edge weight to 5 (instead of the default of 1)
+        # to try and keep programs of the same kind together. The
+        # exception is the "basic" tutorial programs: these are
+        # going to be connected by edges of weight 100, ensuring
+        # that they are all essentially aligned vertically.
         if ($kind_map{$source} eq $kind_map{$destination})
         {
             $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
+            if ($kind_map{$source} eq "basic")
+            {
+                $edge_attributes .= "weight=100,";
+            }
+            else
+            {
+                $edge_attributes .= "weight=5,";
+            }
         }
 
         # If the destination is a code gallery program, used a dashed line
