@@ -2407,7 +2407,11 @@ namespace TrilinosWrappers
 
         for (int i = 0; i < matrix->NumMyRows(); ++i)
           {
-            matrix->ExtractMyRowView(i, num_entries, values, indices);
+            const int ierr =
+              matrix->ExtractMyRowView(i, num_entries, values, indices);
+            (void)ierr;
+            Assert(ierr == 0, ExcTrilinosError(ierr));
+
             for (TrilinosWrappers::types::int_type j = 0; j < num_entries; ++j)
               out << "(" << TrilinosWrappers::global_row_index(*matrix, i)
                   << ","

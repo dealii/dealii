@@ -39,7 +39,10 @@ __declspec(selectany) // Weak extern binding due to multiple link error
 
 SparsityPatternBase::SparsityPatternBase()
   : max_dim(0)
+  , rows(0)
+  , cols(0)
   , max_vec_len(0)
+  , max_row_length(0)
   , rowstart(nullptr)
   , colnums(nullptr)
   , compressed(false)
