@@ -367,6 +367,23 @@ public:
    * object given as argument. A typical way to generate the argument
    * is via the make_filtered_iterator() function.
    *
+   * Alternatively, since FilteredIterator objects can be created from
+   * just a predicate (i.e., a function object that returns a `bool`), it is
+   * possible to call this function with just a lambda function, which will then
+   * automatically be converted to a FilteredIterator object. For example, the
+   * following piece of code works:
+   * @code
+   *   DataOut<dim> data_out;
+   *   data_out.set_cell_selection(
+   *          [](const typename Triangulation<dim>::cell_iterator &cell) {
+   *              return (!cell->has_children() && cell->subdomain_id() == 0);
+   *          });
+   * @endcode
+   * In this case, the lambda function selects all of those cells that are
+   * @ref GlossActive "active"
+   * and whose subdomain id is zero. These will then be the only cells on
+   * which output is generated.
+   *
    * @note Not all filters will result in subsets of cells for which
    *   output can actually be generated. For example, if you are working
    *   on parallel meshes where data is only available on some cells,
