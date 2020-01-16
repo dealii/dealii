@@ -83,12 +83,12 @@ get hexahedral meshes; 3D meshing of unstructured geometry into hexahedra is
 possible, though there are some issues with the quality of these meshes
 that imply that these meshes only sometimes work in deal.II.
 
-In Gmsh, a mesh is fundamentally described in a text-based 
+In Gmsh, a mesh is fundamentally described in a text-based
 <code>.geo</code> file whose format can
 contain computations, loops, variables, etc. This format is quite flexible
 in allowing the description of complex geometries. The mesh is then
-generated from a surface representation, which is build from a list of line
-loops, which is build from a list of lines, which are in turn built from
+generated from a surface representation, which is built from a list of line
+loops, which is built from a list of lines, which are in turn built from
 points. The <code>.geo</code> script can be written and edited by hand or it
 can be generated automatically by creating objects graphically inside Gmsh. In
 many cases it is best to combine both approaches. The file can be easily
@@ -141,7 +141,7 @@ of the current program):
   for which it is necessary to generate many meshes for geometries that
   differ in certain parameters. Another case where this is useful is if there
   is already a CAD geometry for which one only needs a mesh; indeed, this
-  can be done from within deal.II using the 
+  can be done from within deal.II using the
   Gmsh::create_triangulation_from_boundary_curve() function.
 
 
