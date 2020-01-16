@@ -1724,7 +1724,7 @@ namespace GridTools
                       GeometryInfo<dim>::vertex_to_face[v][vface];
 
                     if (!cell->at_boundary(face) &&
-                        cell->neighbor(face)->active())
+                        cell->neighbor(face)->is_active())
                       {
                         // there is a (possibly) coarser cell behind a
                         // face to which the vertex belongs. the
@@ -2048,7 +2048,7 @@ namespace GridTools
         bool has_predicate =
           false; // Start assuming there's no cells with predicate inside
         std::vector<typename MeshType::active_cell_iterator> active_cells;
-        if (parent_cell->active())
+        if (parent_cell->is_active())
           active_cells = {parent_cell};
         else
           // Finding all active cells descendants of the current one (or the
@@ -2359,7 +2359,7 @@ namespace GridTools
         for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
           {
             if ((cell->at_boundary(i) == false) &&
-                (cell->neighbor(i)->active()))
+                (cell->neighbor(i)->is_active()))
               {
                 typename Triangulation<dim, spacedim>::active_cell_iterator
                   adjacent_cell = cell->neighbor(i);
@@ -2507,7 +2507,7 @@ namespace GridTools
               {
                 if (cell->at_boundary(i) == false)
                   {
-                    if (cell->neighbor(i)->active())
+                    if (cell->neighbor(i)->is_active())
                       {
                         typename Triangulation<dim,
                                                spacedim>::active_cell_iterator
@@ -3068,7 +3068,7 @@ namespace GridTools
                                            const unsigned int n_active_cells,
                                            const unsigned int n_partitions)
     {
-      if (cell->active())
+      if (cell->is_active())
         {
           while (current_cell_idx >=
                  std::floor(static_cast<uint_least64_t>(n_active_cells) *
@@ -3163,12 +3163,12 @@ namespace GridTools
           endc = triangulation.end();
         for (; cell != endc; ++cell)
           {
-            if (cell->active())
+            if (cell->is_active())
               continue;
             bool                                 all_children_active = true;
             std::map<unsigned int, unsigned int> map_cpu_n_cells;
             for (unsigned int n = 0; n < cell->n_children(); ++n)
-              if (!cell->child(n)->active())
+              if (!cell->child(n)->is_active())
                 {
                   all_children_active = false;
                   break;
@@ -3855,7 +3855,7 @@ namespace GridTools
         const typename Triangulation<dim, spacedim>::cell_iterator cell =
           *cell_ptr;
 
-        Assert(!cell->active(),
+        Assert(!cell->is_active(),
                ExcMessage(
                  "This function is only valid for a list of cells that "
                  "have children (i.e., no cell in the list may be active)."));

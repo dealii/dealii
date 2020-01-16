@@ -75,7 +75,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
@@ -94,7 +94,7 @@ namespace dealii
         if (c1->manifold_id() != c2->manifold_id())
           return false;
 
-        if (c1->active() && c2->active())
+        if (c1->is_active() && c2->is_active())
           if (c1->active_cell_index() != c2->active_cell_index())
             return false;
 

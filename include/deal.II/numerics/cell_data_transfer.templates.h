@@ -105,7 +105,7 @@ CellDataTransfer<dim, spacedim, VectorType>::
                    ++child_index)
                 {
                   const auto sibling = parent->child(child_index);
-                  Assert(sibling->active() && sibling->coarsen_flag_set(),
+                  Assert(sibling->is_active() && sibling->coarsen_flag_set(),
                          typename dealii::Triangulation<
                            dim>::ExcInconsistentCoarseningFlags());
 
@@ -150,7 +150,7 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
   // Transfer data of persisting cells.
   for (const auto &persisting : persisting_cells_active_index)
     {
-      Assert(persisting.first->active(), ExcInternalError());
+      Assert(persisting.first->is_active(), ExcInternalError());
       out[persisting.first->active_cell_index()] = in[persisting.second];
     }
 
@@ -162,7 +162,7 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
          ++child_index)
       {
         const auto child = refined.first->child(child_index);
-        Assert(child->active(), ExcInternalError());
+        Assert(child->is_active(), ExcInternalError());
         out[child->active_cell_index()] = in[refined.second];
       }
 
@@ -184,7 +184,7 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
       const value_type parent_value = coarsening_strategy(children_values);
 
       // Set value for the parent cell.
-      Assert(coarsened.first->active(), ExcInternalError());
+      Assert(coarsened.first->is_active(), ExcInternalError());
       out[coarsened.first->active_cell_index()] = parent_value;
     }
 

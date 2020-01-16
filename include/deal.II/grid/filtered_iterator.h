@@ -402,7 +402,7 @@ namespace IteratorFilters
  *     template <class Iterator>
  *     bool operator () (const Iterator &i) const
  *     {
- *       return (i->active());
+ *       return (i->is_active());
  *     }
  *   };
  * @endcode
@@ -1164,7 +1164,7 @@ namespace IteratorFilters
   inline bool
   Active::operator()(const Iterator &i) const
   {
-    return (i->active());
+    return (i->is_active());
   }
 
 

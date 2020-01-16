@@ -166,7 +166,7 @@ namespace Step40
                    ++face)
                 {
                   if ((cell->face(face)->at_boundary()) ||
-                      (cell->neighbor(face)->active() &&
+                      (cell->neighbor(face)->is_active() &&
                        cell->neighbor(face)->is_ghost()))
                     {
                       fe_face_values.reinit(cell, face);

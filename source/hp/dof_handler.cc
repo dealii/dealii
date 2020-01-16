@@ -1139,7 +1139,7 @@ namespace internal
                              ++child_index)
                           {
                             const auto sibling = parent->child(child_index);
-                            Assert(sibling->active() &&
+                            Assert(sibling->is_active() &&
                                      sibling->coarsen_flag_set(),
                                    typename dealii::Triangulation<
                                      dim>::ExcInconsistentCoarseningFlags());
@@ -1194,7 +1194,7 @@ namespace internal
 
               if (cell->is_locally_owned())
                 {
-                  Assert(cell->active(), ExcInternalError());
+                  Assert(cell->is_active(), ExcInternalError());
                   cell->set_active_fe_index(persist.second);
                 }
             }
@@ -1210,7 +1210,7 @@ namespace internal
                    ++child_index)
                 {
                   const auto &child = parent->child(child_index);
-                  Assert(child->is_locally_owned() && child->active(),
+                  Assert(child->is_locally_owned() && child->is_active(),
                          ExcInternalError());
                   child->set_active_fe_index(refine.second);
                 }
@@ -1221,7 +1221,7 @@ namespace internal
           for (const auto &coarsen : fe_transfer->coarsened_cells_fe_index)
             {
               const auto &cell = coarsen.first;
-              Assert(cell->is_locally_owned() && cell->active(),
+              Assert(cell->is_locally_owned() && cell->is_active(),
                      ExcInternalError());
               cell->set_active_fe_index(coarsen.second);
             }

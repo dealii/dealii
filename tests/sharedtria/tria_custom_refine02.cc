@@ -55,7 +55,7 @@ mypartition(parallel::shared::Triangulation<dim> &tria)
                                                                        lvl);
       for (; cell != endc; ++cell)
         {
-          if (cell->active())
+          if (cell->is_active())
             cell->set_level_subdomain_id(cell->subdomain_id());
           else
             cell->set_level_subdomain_id(cell->child(0)->level_subdomain_id());

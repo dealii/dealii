@@ -272,7 +272,7 @@ namespace GridTools
                       GeometryInfo<dim>::vertex_to_face[v][vface];
 
                     if (!cell->at_boundary(face) &&
-                        cell->neighbor(face)->active())
+                        cell->neighbor(face)->is_active())
                       {
                         // there is a (possibly) coarser cell behind a
                         // face to which the vertex belongs. the
@@ -1190,9 +1190,9 @@ namespace GridTools
           {
             // at least one cell is active
             if (remove_ghost_cells &&
-                ((cell_pair->first->active() &&
+                ((cell_pair->first->is_active() &&
                   !cell_pair->first->is_locally_owned()) ||
-                 (cell_pair->second->active() &&
+                 (cell_pair->second->is_active() &&
                   !cell_pair->second->is_locally_owned())))
               {
                 // we only exclude ghost cells for distributed Triangulations
@@ -1209,7 +1209,7 @@ namespace GridTools
     // least one active iterator or have different refinement_cases
     for (cell_pair = cell_list.begin(); cell_pair != cell_list.end();
          ++cell_pair)
-      Assert(cell_pair->first->active() || cell_pair->second->active() ||
+      Assert(cell_pair->first->is_active() || cell_pair->second->is_active() ||
                (cell_pair->first->refinement_case() !=
                 cell_pair->second->refinement_case()),
              ExcInternalError());

@@ -697,7 +697,7 @@ namespace internal
       else if (subdomain_id == numbers::invalid_subdomain_id ||
                cell->subdomain_id() == subdomain_id)
         {
-          Assert(cell->active(), ExcInternalError());
+          Assert(cell->is_active(), ExcInternalError());
           cell_its.emplace_back(cell->level(), cell->index());
         }
     }

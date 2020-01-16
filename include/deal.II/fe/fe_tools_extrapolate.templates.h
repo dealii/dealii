@@ -534,7 +534,7 @@ namespace FETools
           // check if at least one child is locally owned on our process
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
                ++child_n)
-            if (dealii_cell->child(child_n)->active())
+            if (dealii_cell->child(child_n)->is_active())
               if (dealii_cell->child(child_n)->is_locally_owned())
                 {
                   locally_owned_children = true;
@@ -880,7 +880,7 @@ namespace FETools
 
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
                ++child_n)
-            if (dealii_cell->child(child_n)->active())
+            if (dealii_cell->child(child_n)->is_active())
               if (dealii_cell->child(child_n)->is_locally_owned())
                 {
                   locally_owned_children = true;
@@ -1730,7 +1730,7 @@ namespace FETools
                                                               dof2.end(level);
 
           for (; cell != endc; ++cell)
-            if (!cell->active())
+            if (!cell->is_active())
               {
                 // check whether this
                 // cell has active
@@ -1738,7 +1738,7 @@ namespace FETools
                 bool active_children = false;
                 for (unsigned int child_n = 0; child_n < cell->n_children();
                      ++child_n)
-                  if (cell->child(child_n)->active())
+                  if (cell->child(child_n)->is_active())
                     {
                       active_children = true;
                       break;

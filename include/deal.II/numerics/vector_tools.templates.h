@@ -821,7 +821,7 @@ namespace VectorTools
     bool
     is_locally_owned(const cell_iterator &cell)
     {
-      if (cell->active())
+      if (cell->is_active())
         return cell->is_locally_owned();
 
       for (unsigned int c = 0; c < cell->n_children(); ++c)
@@ -881,7 +881,7 @@ namespace VectorTools
         if (cell1->level() != cell2->level())
           continue;
         // .. or none of them is active.
-        if (!cell1->active() && !cell2->active())
+        if (!cell1->is_active() && !cell2->is_active())
           continue;
 
         Assert(
@@ -891,14 +891,14 @@ namespace VectorTools
             "The two Triangulations are required to have the same parallel partitioning."));
 
         // Skip foreign cells.
-        if (cell1->active() && !cell1->is_locally_owned())
+        if (cell1->is_active() && !cell1->is_locally_owned())
           continue;
-        if (cell2->active() && !cell2->is_locally_owned())
+        if (cell2->is_active() && !cell2->is_locally_owned())
           continue;
 
         // Get and set the corresponding
         // dof_values by interpolation.
-        if (cell1->active())
+        if (cell1->is_active())
           {
             cache.reinit(cell1->get_fe().dofs_per_cell);
             cell1->get_interpolated_dof_values(u1,

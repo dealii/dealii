@@ -173,11 +173,11 @@ namespace
   cell_is_patch_level_1(
     const TriaIterator<dealii::CellAccessor<dim, spacedim>> &cell)
   {
-    Assert(cell->active() == false, ExcInternalError());
+    Assert(cell->is_active() == false, ExcInternalError());
 
     unsigned int n_active_children = 0;
     for (unsigned int i = 0; i < cell->n_children(); ++i)
-      if (cell->child(i)->active())
+      if (cell->child(i)->is_active())
         ++n_active_children;
 
     return (n_active_children == 0) ||
@@ -205,13 +205,13 @@ namespace
         const unsigned int n_children          = cell->n_children();
 
         for (unsigned int c = 0; c < n_children; ++c)
-          if (cell->child(c)->active() && cell->child(c)->coarsen_flag_set())
+          if (cell->child(c)->is_active() && cell->child(c)->coarsen_flag_set())
             ++children_to_coarsen;
         if (children_to_coarsen == n_children)
           return true;
         else
           for (unsigned int c = 0; c < n_children; ++c)
-            if (cell->child(c)->active())
+            if (cell->child(c)->is_active())
               cell->child(c)->clear_coarsen_flag();
       }
     // no children, so no coarsening
@@ -874,7 +874,7 @@ namespace
           // the same.
           if (dim == 2)
             {
-              if (cell->active() && face->has_children())
+              if (cell->is_active() && face->has_children())
                 {
                   adjacent_cells[2 * face->child(0)->index() + offset] = cell;
                   adjacent_cells[2 * face->child(1)->index() + offset] = cell;
@@ -903,7 +903,7 @@ namespace
               // visit cells on finer levels, so no
               // harm will be done.
               if (face->has_children() &&
-                  (cell->active() ||
+                  (cell->is_active() ||
                    GeometryInfo<dim>::face_refinement_case(
                      cell->refinement_case(), f) ==
                      RefinementCase<dim - 1>::isotropic_refinement))
@@ -4866,7 +4866,7 @@ namespace internal
                   first_child->set_neighbor(1, second_child);
                   if (cell->neighbor(0).state() != IteratorState::valid)
                     first_child->set_neighbor(0, cell->neighbor(0));
-                  else if (cell->neighbor(0)->active())
+                  else if (cell->neighbor(0)->is_active())
                     {
                       // since the neighbors level is always <=level,
                       // if the cell is active, then there are no
@@ -4908,7 +4908,7 @@ namespace internal
 
                   if (cell->neighbor(1).state() != IteratorState::valid)
                     second_child->set_neighbor(1, cell->neighbor(1));
-                  else if (cell->neighbor(1)->active())
+                  else if (cell->neighbor(1)->is_active())
                     {
                       Assert(cell->neighbor(1)->level() <= cell->level(),
                              ExcInternalError());
@@ -11990,10 +11990,10 @@ Triangulation<dim, spacedim>::last_active() const
   if (cell != end())
     {
       // then move to the last active one
-      if (cell->active() == true)
+      if (cell->is_active() == true)
         return cell;
       while ((--cell).state() == IteratorState::valid)
-        if (cell->active() == true)
+        if (cell->is_active() == true)
           return cell;
     }
   return cell;
@@ -13506,7 +13506,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
 
   cell_iterator cell = begin(), endc = end();
   for (; cell != endc; ++cell)
-    if (!cell->active())
+    if (!cell->is_active())
       if (cell->child(0)->coarsen_flag_set())
         {
           cell->set_user_flag();
@@ -13693,13 +13693,13 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
       for (; cell != endc; ++cell)
         {
           // nothing to do if we are already on the finest level
-          if (cell->active())
+          if (cell->is_active())
             continue;
 
           const unsigned int n_children       = cell->n_children();
           unsigned int       flagged_children = 0;
           for (unsigned int child = 0; child < n_children; ++child)
-            if (cell->child(child)->active() &&
+            if (cell->child(child)->is_active() &&
                 cell->child(child)->coarsen_flag_set())
               {
                 ++flagged_children;
@@ -13867,7 +13867,8 @@ namespace
 
         for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
              ++face)
-          if (!cell->at_boundary(face) && (!cell->neighbor(face)->active()) &&
+          if (!cell->at_boundary(face) &&
+              (!cell->neighbor(face)->is_active()) &&
               (cell_will_be_coarsened(cell->neighbor(face))))
             possibly_do_not_produce_unrefined_islands<dim, spacedim>(
               cell->neighbor(face));
@@ -14141,7 +14142,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
             {
               // only do something if this
               // cell will be coarsened
-              if (!cell->active() && cell_will_be_coarsened(cell))
+              if (!cell->is_active() && cell_will_be_coarsened(cell))
                 possibly_do_not_produce_unrefined_islands<dim, spacedim>(cell);
             }
         }
@@ -14171,8 +14172,9 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           !(smooth_grid & patch_level_1))
         {
           for (const auto &cell : cell_iterators())
-            if (!cell->active() || (cell->active() && cell->refine_flag_set() &&
-                                    cell->is_locally_owned()))
+            if (!cell->is_active() ||
+                (cell->is_active() && cell->refine_flag_set() &&
+                 cell->is_locally_owned()))
               {
                 // check whether all children are active, i.e. not
                 // refined themselves. This is a precondition that the
@@ -14180,9 +14182,9 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 // flagged for refinement, then all future children
                 // will be active
                 bool all_children_active = true;
-                if (!cell->active())
+                if (!cell->is_active())
                   for (unsigned int c = 0; c < cell->n_children(); ++c)
-                    if (!cell->child(c)->active() ||
+                    if (!cell->child(c)->is_active() ||
                         cell->child(c)->is_ghost() ||
                         cell->child(c)->is_artificial())
                       {
@@ -14234,7 +14236,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                            eliminate_refined_boundary_islands))) &&
                         (total_neighbors != 0))
                       {
-                        if (!cell->active())
+                        if (!cell->is_active())
                           for (unsigned int c = 0; c < cell->n_children(); ++c)
                             {
                               cell->child(c)->clear_refine_flag();
@@ -14401,7 +14403,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           // children is set then set_refine_flag and
           // clear_coarsen_flag of all children.
           for (const auto &cell : cell_iterators())
-            if (!cell->active())
+            if (!cell->is_active())
               {
                 // ensure the invariant. we can then check whether all
                 // of its children are further refined or not by
@@ -14442,7 +14444,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
               // that we know that it is patch_level_1, i.e. if one of
               // its children is active then so are all, and it isn't
               // going to have any grandchildren at all:
-              if (cell->active() || cell->child(0)->active())
+              if (cell->is_active() || cell->child(0)->is_active())
                 continue;
 
               // cell is not active, and so are none of its
@@ -14453,7 +14455,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
               bool               has_active_grandchildren = false;
 
               for (unsigned int i = 0; i < n_children; ++i)
-                if (cell->child(i)->child(0)->active())
+                if (cell->child(i)->child(0)->is_active())
                   {
                     has_active_grandchildren = true;
                     break;
@@ -14486,7 +14488,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                   // if child is found to be a patch of active cells
                   // itself, then add up how many of its children are
                   // supposed to be coarsened
-                  if (child->child(0)->active())
+                  if (child->child(0)->is_active())
                     for (unsigned int cc = 0; cc < nn_children; ++cc)
                       if (child->child(cc)->coarsen_flag_set())
                         ++n_coarsen_flags;
@@ -14507,7 +14509,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 for (unsigned int c = 0; c < n_children; ++c)
                   {
                     const cell_iterator child = cell->child(c);
-                    if (child->child(0)->active())
+                    if (child->child(0)->is_active())
                       for (unsigned int cc = 0; cc < child->n_children(); ++cc)
                         child->child(cc)->clear_coarsen_flag();
                   }
@@ -14572,7 +14574,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                         // coarsen flag of our neighbor,
                         // fix_coarsen_flags() makes sure, that the
                         // mother cell will not be coarsened
-                        if (cell->neighbor_or_periodic_neighbor(i)->active())
+                        if (cell->neighbor_or_periodic_neighbor(i)->is_active())
                           {
                             if ((!has_periodic_neighbor &&
                                  cell->neighbor_is_coarser(i)) ||

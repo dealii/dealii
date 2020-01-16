@@ -367,7 +367,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, euler_dof_handler);
 
-  Assert(uses_level_dofs || dof_cell->active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
   AssertDimension(GeometryInfo<dim>::vertices_per_cell,
                   fe_values.n_quadrature_points);
   AssertDimension(fe_to_real.size(),
@@ -2429,7 +2429,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::update_internal_dofs(
          ExcMessage("euler_dof_handler is empty"));
 
   typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
-  Assert(uses_level_dofs || dof_cell->active() == true, ExcInactiveCell());
+  Assert(uses_level_dofs || dof_cell->is_active() == true, ExcInactiveCell());
   if (uses_level_dofs)
     {
       AssertIndexRange(cell->level(), euler_vector.size());

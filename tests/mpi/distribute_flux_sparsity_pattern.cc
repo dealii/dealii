@@ -268,7 +268,7 @@ namespace LinearAdvectionTest
                       }
                     // If the neighbor is not active, then it is at a higher
                     // refinement level (so we do not need to integrate now)
-                    if (neighbor_cell->active())
+                    if (neighbor_cell->is_active())
                       {
                         if (neighbor_cell->is_locally_owned())
                           {

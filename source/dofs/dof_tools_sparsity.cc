@@ -445,7 +445,7 @@ namespace DoFTools
             typename DoFHandlerType::level_cell_iterator cell = dof.begin(0);
             while (!cell->at_boundary(direction))
               cell = cell->neighbor(direction);
-            while (!cell->active())
+            while (!cell->is_active())
               cell = cell->child(direction);
 
             const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
@@ -665,7 +665,7 @@ namespace DoFTools
                       // face twice and hence put the indices the other way
                       // around
                       if (!cell->neighbor_or_periodic_neighbor(face)
-                             ->active() ||
+                             ->is_active() ||
                           (neighbor->subdomain_id() != cell->subdomain_id()))
                         {
                           constraints.add_entries_local_to_global(
@@ -854,7 +854,7 @@ namespace DoFTools
                       // the total ordering.
                       if (neighbor->level() == cell->level() &&
                           neighbor->index() > cell->index() &&
-                          neighbor->active() && neighbor->is_locally_owned())
+                          neighbor->is_active() && neighbor->is_locally_owned())
                         continue;
                       // If we are more refined then the neighbor, then we
                       // will automatically find the active neighbor cell when
@@ -1152,7 +1152,7 @@ namespace DoFTools
                       // is 'greater' in the total ordering.
                       if (neighbor->level() == cell->level() &&
                           neighbor->index() > cell->index() &&
-                          neighbor->active() && neighbor->is_locally_owned())
+                          neighbor->is_active() && neighbor->is_locally_owned())
                         continue;
                       // Again, like the non-hp case: If we are more refined
                       // then the neighbor, then we will automatically find

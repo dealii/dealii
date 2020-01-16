@@ -71,7 +71,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
@@ -84,15 +84,15 @@ namespace dealii
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->get_fe().get_name() != c2->get_fe().get_name())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->active_fe_index() != c2->active_fe_index())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->future_fe_index() != c2->future_fe_index())
           return false;
 

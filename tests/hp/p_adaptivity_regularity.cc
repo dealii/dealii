@@ -65,12 +65,12 @@ setup(Triangulation<dim> &         tria,
                                               endc = dh.end(1);
   for (unsigned int counter = 0; cell != endc; ++counter, ++cell)
     {
-      Assert(!cell->active(), ExcInternalError());
+      Assert(!cell->is_active(), ExcInternalError());
       for (unsigned int child_index = 0; child_index < cell->n_children();
            ++child_index)
         {
           const auto &child = cell->child(child_index);
-          Assert(child->active(), ExcInternalError());
+          Assert(child->is_active(), ExcInternalError());
 
           child->set_active_fe_index(1);
 

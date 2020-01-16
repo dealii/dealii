@@ -602,7 +602,7 @@ namespace hp
                      ++child_index)
                   {
                     const auto &child = parent->child(child_index);
-                    if (child->active())
+                    if (child->is_active())
                       {
                         if (child->coarsen_flag_set())
                           ++h_flagged_children;
@@ -623,7 +623,7 @@ namespace hp
                   // drop all h coarsening flags.
                   for (unsigned int child_index = 0; child_index < n_children;
                        ++child_index)
-                    if (parent->child(child_index)->active())
+                    if (parent->child(child_index)->is_active())
                       parent->child(child_index)->clear_coarsen_flag();
               }
           }
