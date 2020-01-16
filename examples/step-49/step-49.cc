@@ -226,12 +226,17 @@ void grid_4()
 // and returns a mapped point. In this case, we transform $(x,y) \mapsto
 // (x,y+\sin(\pi x/5))$.
 //
-// GridTools::transform takes a triangulation and any kind of object that can
-// be called like a function as arguments. This function-like argument can be
-// the address of a function that takes a point and returns a point, an object
-// that has an <code>operator()</code> like the code below, or for example, a
-// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can
-// get as a lambda function. Here we choose the latter option.
+// GridTools::transform() takes a triangulation and an argument that
+// can be called like a function taking a Point and returning a
+// Point. There are different ways of providing such an argument: It
+// could be a pointer to a function; it could be an object of a class
+// that has an `operator()`; it could be a lambda function; or it
+// could be anything that is described via a
+// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object.
+//
+// Decidedly the more modern way is to use a lambda function that
+// takes a Point and returns a Point, and that is what we do in the
+// following:
 void grid_5()
 {
   Triangulation<2>          triangulation;
@@ -244,8 +249,8 @@ void grid_5()
                                             Point<2>(10.0, 1.0));
 
   GridTools::transform(
-    [](const Point<2> &in) -> Point<2> {
-      return {in[0], in[1] + std::sin(numbers::PI * in[0] / 5.0)};
+    [](const Point<2> &in) {
+      return Point<2>(in[0], in[1] + std::sin(numbers::PI * in[0] / 5.0));
     },
     triangulation);
   print_mesh_info(triangulation, "grid-5.vtu");
