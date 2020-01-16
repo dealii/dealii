@@ -203,7 +203,7 @@ private:
    * If not in MT mode, then the class used here is empty, and we can as well
    * get away with it.
    */
-  Threads::Mutex lock;
+  std::mutex lock;
 
   /**
    * Flag by which the @p alert function signifies that the data has been

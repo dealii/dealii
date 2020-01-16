@@ -529,7 +529,13 @@ public:
   /**
    * Move constructor.
    */
-  FESystem(FESystem<dim, spacedim> &&) = default; // NOLINT
+  FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
+    : FiniteElement<dim, spacedim>(std::move(other_fe_system))
+  {
+    base_elements = std::move(other_fe_system.base_elements);
+    generalized_support_points_index_table =
+      std::move(other_fe_system.generalized_support_points_index_table);
+  }
 
   /**
    * Destructor.
@@ -1231,7 +1237,7 @@ private:
   /**
    * Mutex for protecting initialization of restriction and embedding matrix.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 
   friend class FE_Enriched<dim, spacedim>;
 };

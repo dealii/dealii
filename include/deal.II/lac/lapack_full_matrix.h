@@ -1003,7 +1003,7 @@ private:
   /**
    * Thread mutex.
    */
-  mutable Threads::Mutex mutex;
+  mutable std::mutex mutex;
 };
 
 

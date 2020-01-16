@@ -1040,11 +1040,11 @@ private:
      * A mutex variable used to guard access to the member variables of this
      * structure;
      */
-    Threads::Mutex mutex;
+    std::mutex mutex;
 
     /**
      * Copy operator. This is needed because the default copy operator of this
-     * class is deleted (since Threads::Mutex is not copyable) and hence the
+     * class is deleted (since std::mutex is not copyable) and hence the
      * default copy operator of the enclosing class is also deleted.
      *
      * The implementation here simply does nothing -- TemporaryData objects

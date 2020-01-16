@@ -773,7 +773,7 @@ namespace parallel
       /**
        * A mutex to guard the access to the in_use flag.
        */
-      dealii::Threads::Mutex mutex;
+      std::mutex mutex;
 #endif
     };
   } // namespace internal

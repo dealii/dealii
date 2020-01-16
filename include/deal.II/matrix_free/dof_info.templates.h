@@ -1442,11 +1442,11 @@ namespace internal
       static constexpr unsigned int bucket_size_threading = 256;
 
       void
-      compute_row_lengths(const unsigned int           begin,
-                          const unsigned int           end,
-                          const DoFInfo &              dof_info,
-                          std::vector<Threads::Mutex> &mutexes,
-                          std::vector<unsigned int> &  row_lengths)
+      compute_row_lengths(const unsigned int         begin,
+                          const unsigned int         end,
+                          const DoFInfo &            dof_info,
+                          std::vector<std::mutex> &  mutexes,
+                          std::vector<unsigned int> &row_lengths)
       {
         std::vector<unsigned int> scratch;
         const unsigned int n_components = dof_info.start_components.back();
@@ -1485,7 +1485,7 @@ namespace internal
                              const unsigned int               end,
                              const DoFInfo &                  dof_info,
                              const std::vector<unsigned int> &row_lengths,
-                             std::vector<Threads::Mutex> &    mutexes,
+                             std::vector<std::mutex> &        mutexes,
                              dealii::SparsityPattern &        connectivity_dof)
       {
         std::vector<unsigned int> scratch;
@@ -1568,9 +1568,9 @@ namespace internal
         ++n_rows;
 
       // first determine row lengths
-      std::vector<unsigned int>   row_lengths(n_rows);
-      std::vector<Threads::Mutex> mutexes(
-        n_rows / internal::bucket_size_threading + 1);
+      std::vector<unsigned int> row_lengths(n_rows);
+      std::vector<std::mutex> mutexes(n_rows / internal::bucket_size_threading +
+                                      1);
       parallel::apply_to_subranges(0,
                                    task_info.n_active_cells,
                                    [this,
