@@ -296,10 +296,12 @@ void grid_6()
 
 // In this last example, we create a mesh and then distort its (interior)
 // vertices by a random perturbation. This is not something you want to do for
-// production computations, but it is a useful tool for testing
+// production computations (because results are generally better on meshes
+// with "nicely shaped" cells than on the deformed cells produced by
+// GridTools::distort_random()), but it is a useful tool for testing
 // discretizations and codes to make sure they don't work just by accident
 // because the mesh happens to be uniformly structured and supporting
-// super-convergence properties.
+// superconvergence properties.
 void grid_7()
 {
   Triangulation<2>          triangulation;

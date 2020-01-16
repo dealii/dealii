@@ -209,9 +209,18 @@ demonstrated in <code>grid_7()</code> and the result is as follows:
 This function is primarily intended to negate some of the superconvergence
 effects one gets when studying convergence on regular meshes, as well as to
 suppress some optimizations in deal.II that can exploit the fact that cells
-are similar in shape. In practice, it is of course always better to
-work with a sequence of unstructured meshes (see possible extensions at the
-end of the this section).
+are similar in shape. (Superconvergence refers to the fact that if a mesh
+has certain symmetries -- for example, if the edges running into a vertex
+are symmetric to this vertex, and if this is so for all vertices of a cell
+-- that the solution is then often convergent with a higher order than one
+would have expected from the usual error analysis. In the end, this
+is a result of the fact that if one were to make a Taylor expansion of the
+error, the symmetry leads to the fact that the expected next term of the
+expansion happens to be zero, and the error order is determined by the
+*second next* term. A distorted mesh does not have these symmetries and
+consequently the error reflects what one will see when solving the equation
+on *any* kind of mesh, rather than showing something that is only reflective
+of a particular situation.)
 
 
 <h4>Merging Meshes</h4>
