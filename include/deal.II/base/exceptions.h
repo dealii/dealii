@@ -741,8 +741,8 @@ namespace StandardExceptions
   /**
    * An error occurred opening the named file.
    *
-   * The constructor takes a single argument of type <tt>char*</tt> naming the
-   * file.
+   * The constructor takes a single argument of type <tt>std::string</tt> naming
+   * the file.
    */
   DeclException1(ExcFileNotOpen,
                  std::string,
