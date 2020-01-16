@@ -163,6 +163,16 @@ format_file()
 export -f format_file
 
 #
+# Remove trailing whitespace
+#
+
+remove_trailing_whitespace()
+{
+  sed -i 's/\s\+$//g' $1
+}
+export -f remove_trailing_whitespace
+
+#
 # In order to format .inst.in files, we need to replace \{ and \} by a
 # sentinel because clang-format happily strips away the backslash. Further,
 # there is a minor caveat: clang-format automatically renames a comment
