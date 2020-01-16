@@ -3583,6 +3583,15 @@ CellAccessor<dim, spacedim>::active() const
 
 template <int dim, int spacedim>
 inline bool
+CellAccessor<dim, spacedim>::is_active() const
+{
+  return !this->has_children();
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
 CellAccessor<dim, spacedim>::is_locally_owned() const
 {
   Assert(this->active(),

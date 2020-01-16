@@ -3411,15 +3411,32 @@ public:
    */
 
   /**
-   * Test whether the cell has children (this is the criterion for activity of
-   * a cell).
+   * Test that the cell has no children (this is the criterion for whether a
+   * cell is called "active").
+   *
+   * See the
+   * @ref GlossActive "glossary"
+   * for more information.
+   *
+   * @deprecated This function is deprecated. Use the is_active()
+   *   function instead, which satisfies the naming scheme of other
+   *   functions inquiring about yes/no properties of cells (e.g.,
+   *   is_ghost(), is_locally_owned(), etc.).
+   */
+  DEAL_II_DEPRECATED
+  bool
+  active() const;
+
+  /**
+   * Test that the cell has no children (this is the criterion for whether a
+   * cell is called "active").
    *
    * See the
    * @ref GlossActive "glossary"
    * for more information.
    */
   bool
-  active() const;
+  is_active() const;
 
   /**
    * Return whether this cell is owned by the current processor or is owned by
