@@ -74,7 +74,7 @@ format. They are depicted in the following:
 Due to the variable coefficient (the curvature there is reduced by the
 same factor by which the coefficient is increased), the top region of
 the solution is flattened. The gradient of the solution is
-discontinuous along the interface, although this is not very clearly 
+discontinuous along the interface, although this is not very clearly
 visible in the pictures above. We will look at this in more detail in
 the next example.
 

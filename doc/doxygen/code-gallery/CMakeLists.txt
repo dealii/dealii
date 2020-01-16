@@ -71,7 +71,7 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       ${_code_gallery_h_deps}
     )
   ADD_CUSTOM_TARGET(build_code-gallery_h
-    DEPENDS 
+    DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
       ${_code_gallery_h_deps}
     COMMENT
@@ -120,10 +120,10 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       COMMAND ${PERL_EXECUTABLE}
       ARGS
         ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR} 
-        ${_step} 
+        ${CMAKE_SOURCE_DIR}
+        ${_step}
         ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
-        ${_relative_src_files} 
+        ${_relative_src_files}
         > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR}

@@ -86,7 +86,7 @@ describe how exactly this should work. Here are a couple of examples:
   would not produce reasonable new points. In fact, defining a
   manifold description for things that are supposed "to look round"
   but might have points at or close to the origin is surprisingly very
-  difficult. 
+  difficult.
 - A similar thing happens at the origin
   of the three-dimensional ball when one tries to attach a spherical manifold to
   the whole volume &ndash; in this case, the computation of new manifold points
@@ -195,7 +195,7 @@ when a higher order mapping (such as MappingQGeneric or MappingC1)
 is evaluated on a given cell
 subject to this manifold. Using this manifold on the shaded cells of the
 coarse grid of the disk (i.e., not only in the outer-most layer of
-cells) produces the following mesh upon four global 
+cells) produces the following mesh upon four global
 steps of refinement:
 
 @image html circular_mesh_transfinite_interpolation.png ""

@@ -597,7 +597,7 @@ module), for example because we use adaptively
 refined meshes and continuous pressure finite elements so that there
 are hanging nodes. Another cause for such constraints are Dirichlet
 boundary conditions on the pressure. Then the AffineConstraints
-class, upon copying the local contributions to the matrix into the 
+class, upon copying the local contributions to the matrix into the
 global linear system will zero out rows and columns corresponding
 to constrained degrees of freedom and put a positive entry on
 the diagonal. (You can think of this entry as being one for
@@ -854,10 +854,10 @@ comparison of their results.
 
 Apart from this, many other algorithms have been tested and improved during
 the creation of this program. For example, in building the sparsity pattern,
-we originally used a (now no longer existing) BlockCompressedSparsityPattern 
+we originally used a (now no longer existing) BlockCompressedSparsityPattern
 object that added one element at a time; however, its data structures were poorly
-adapted for the large numbers of nonzero entries per row created by our 
-discretization in 3d, leading to a quadratic behavior. Replacing the internal 
+adapted for the large numbers of nonzero entries per row created by our
+discretization in 3d, leading to a quadratic behavior. Replacing the internal
 algorithms in deal.II to set many elements at a time, and using a
 BlockCompressedSimpleSparsityPattern (which has, as of early 2015, been in turn
 replaced by BlockDynamicSparsityPattern) as a better adapted data structure,

@@ -116,8 +116,8 @@ CONFIGURE_FILE(
 # doxygen-generated HTML files.
 SET(_last_year "1997")
 FILE(GLOB _source_files
-     "${CMAKE_SOURCE_DIR}/source/*/*.cc" 
-     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h" 
+     "${CMAKE_SOURCE_DIR}/source/*/*.cc"
+     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h"
      "${CMAKE_SOURCE_DIR}/examples/*/*.cc")
 FOREACH (_source ${_source_files})
   FILE(READ "${_source}" contents)

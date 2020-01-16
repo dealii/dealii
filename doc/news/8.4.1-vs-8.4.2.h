@@ -53,7 +53,7 @@ author.
  (David Wells, 2016/07/07)
  </li>
 
- <li> Fixed: Fix various warnings introduced by GCC 6 
+ <li> Fixed: Fix various warnings introduced by GCC 6
  <br>
  (David Wells, 2016/05/07)
  </li>

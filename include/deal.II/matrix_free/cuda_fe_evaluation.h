@@ -288,7 +288,7 @@ namespace CUDAWrappers
      *   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval,
      *   const unsigned int                                                               q_point) const;
      * \endcode
-     * 
+     *
      * @deprecated Use apply_for_each_quad_point() instead.
      */
     // clang-format on
@@ -298,7 +298,7 @@ namespace CUDAWrappers
 
     // clang-format off
     /**
-     * Same as above, except that the functor @func only takes a single input 
+     * Same as above, except that the functor @func only takes a single input
      * argument (fe_eval) and computes the quadrature point from the thread id.
      *
      * @p func needs to define

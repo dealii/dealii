@@ -17,7 +17,7 @@
 
 /**
  * @defgroup SLEPcWrappers SLEPcWrappers
- * 
+ *
  * The classes in this module are wrappers around functionality
  * provided by the SLEPc library. All classes and functions in this
  * group reside in a namespace @p PETScWrappers.

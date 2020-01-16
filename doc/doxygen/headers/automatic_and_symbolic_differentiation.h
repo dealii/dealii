@@ -443,7 +443,7 @@
  * A summary of the files that implement the interface to the supported auto-differentiable
  * numbers is as follows:
  *
- * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported 
+ * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported
  *   automatic differentiation libraries. These are used internally as an intermediary to the
  *   helper classes that we provide.
  * - ad_helpers.h: Provides a set of classes to help perform automatic differentiation in a
@@ -485,7 +485,7 @@
  *
  * @subsubsection auto_diff_1_3 User interface to the automatic differentiation libraries
  *
- * The deal.II library offers a unified interface to the automatic differentiation libraries that 
+ * The deal.II library offers a unified interface to the automatic differentiation libraries that
  * we support. To date, the helper classes have been developed for the following contexts:
  *
  * - Classes designed to operate at the quadrature point level (or any general continuum point):
@@ -500,7 +500,7 @@
  *   - ResidualLinearization: Differentiation of a vector-valued finite element residual, leading to
  *                            its consistent linearization.
  *
- * Naturally, it is also possible for users to manage the initialization and derivative 
+ * Naturally, it is also possible for users to manage the initialization and derivative
  * computations themselves.
  *
  * The most up-to-date examples of how this is done using ADOL-C can be found in

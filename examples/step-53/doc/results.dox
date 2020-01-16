@@ -7,7 +7,7 @@ to see anything that doesn't just look like a perfectly round piece of a
 sphere (though if one modified the program so that it does produce a sphere and
 looked at them at the same time, the difference between the overall sphere and
 WGS 84 shape is quite apparent). Apparently, Earth is actually quite a flat place.
-Of course we already know this from satellite pictures. 
+Of course we already know this from satellite pictures.
 However, we can tease out something more by
 coloring cells by their volume. This both produces slight variations in hue
 along the top surface and something for the visualization programs to apply
@@ -25,7 +25,7 @@ this, with an incredible amount of detail:
 
 A zoom-in of this picture shows the vertical displacement quite clearly (here,
 looking from the West-Northwest over the rift valley, the triple peaks
-of 
+of
 <a href="http://en.wikipedia.org/wiki/Mount_Stanley">Mount Stanley</a>,
 <a href="http://en.wikipedia.org/wiki/Mount_Speke">Mount Speke</a>, and
 <a href="http://en.wikipedia.org/wiki/Mount_Baker_%28Uganda%29">Mount Baker</a>
@@ -39,7 +39,7 @@ and toward the great flatness of
 <img src="https://www.dealii.org/images/steps/developer/step-53.topozoom.png" alt="">
 
 
-These image were produced with three small modifications: 
+These image were produced with three small modifications:
 <ol>
   <li> An additional seventh mesh refinement towards the top surface for the
   first of these two pictures, and a total of nine for the second. In the
@@ -47,8 +47,8 @@ These image were produced with three small modifications:
   under 1km in vertical direction. (The picture was also created using a
   more resolved data set; however, it is too big to distribute as part of
   the tutorial.)
-  
-  <li> The addition of the following function that, given a point 
+
+  <li> The addition of the following function that, given a point
   <code>x</code> computes the elevation by converting the point to
   reference WGS 84 coordinates and only keeping the depth variable (the
   function is, consequently, a simplified version of the
@@ -93,7 +93,7 @@ double get_elevation (const Point<3> &x)
                                                  5,
                                                  ScalarFunctionFromFunctionObject<3>(get_elevation),
                                                  boundary_values);
-        for (std::map<unsigned int,double>::const_iterator p = boundary_values.begin(); 
+        for (std::map<unsigned int,double>::const_iterator p = boundary_values.begin();
              p!=boundary_values.end(); ++p)
           elevation[p->first] = p->second;
       }
@@ -115,7 +115,7 @@ ScalarFunctionFromFunctionObject class to make a regular C++ function look
 like an object of a class derived from the Function class that we want
 to use in VectorTools::interpolate_boundary_values(). Having so gotten a list
 of degrees of freedom located at the top boundary and corresponding elevation
-values, we just go down this list and set these elevations in the 
+values, we just go down this list and set these elevations in the
 <code>elevation</code> vector (leaving all interior degrees of freedom at
 their original zero value). This vector is then output using DataOut as
 usual and can be visualized as shown above.

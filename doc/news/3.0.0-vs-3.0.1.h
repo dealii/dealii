@@ -33,7 +33,7 @@ All entries are signed with the names of the author.
   <li> <p>
        Fix: getting the support points from system finite elements
        (class <code>FESystem</code>) resulted in an
-       exception. 
+       exception.
        <br>
        (WB 2000/05/10)
        </p>
@@ -46,7 +46,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: slight bug in 
+       Fix: slight bug in
        <code>DataOut::build_patches</code>
        in multithreaded mode fixed.
        <br>
@@ -54,7 +54,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: 
+       Fix:
        <code>SparsityPattern::print_gnuplot</code>
        wrote rows and columns exchanged. Since most matrices have
        symmetric sparsity patterns, this has gone unnoticed by now.
@@ -63,8 +63,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fixed: the 
-       <code class="program">common/scripts/make_dependencies.pl</code> 
+       Fixed: the
+       <code class="program">common/scripts/make_dependencies.pl</code>
        script that sets up the dependencies for the make files had a
        problem when the path to the library included special characters
        such as `+'. This is now fixed.

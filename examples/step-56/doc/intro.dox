@@ -13,7 +13,7 @@ undertaken. This work was supported by EPSRC grant no EP/K032208/1.
 
 @dealiiTutorialDOI{10.5281/zenodo.400995,https://zenodo.org/badge/DOI/10.5281/zenodo.400995.svg}
 
-<a name="Intro"></a> 
+<a name="Intro"></a>
 <h1>Introduction</h1>
 
 <h3> Stokes Problem </h3>
@@ -36,7 +36,7 @@ and $p \in L_*^2 = \{ p \in L^2(\Omega), \int_\Omega p = 0
 @f{eqnarray*}
  - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u})
  + (\nabla \textbf{u})^T\right] + \nabla p & =& f \\
- - \nabla \cdot u &=& 0 
+ - \nabla \cdot u &=& 0
 @f}
 
 Note that we are using the deformation tensor instead of $\Delta u$ (a
@@ -49,10 +49,10 @@ well as more expensive).
 The weak form of
 the discrete equations naturally leads to the following linear system
 for the nodal values of the velocity and pressure fields:
-@f{eqnarray*} 
+@f{eqnarray*}
 \left(\begin{array}{cc} A & B^T \\ B & 0
 \end{array}\right) \left(\begin{array}{c} U \\ P \end{array}\right) =
-\left(\begin{array}{c} F \\ 0 \end{array}\right). 
+\left(\begin{array}{c} F \\ 0 \end{array}\right).
 @f}
 
 Our goal is to compare several solution approaches.  While step-22
@@ -61,10 +61,10 @@ separate steps, we instead attack the
 block system at once using FMGRES with an efficient
 preconditioner, in the spirit of the approach outlined in the "Results"
 section of step-22. The idea is as follows: if we find a block
-preconditioner $P$ such that the matrix 
+preconditioner $P$ such that the matrix
 
 @f{eqnarray*}
-\left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right) P^{-1} 
+\left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right) P^{-1}
 @f}
 
 is simple, then an iterative solver with that preconditioner will
@@ -74,12 +74,12 @@ we find that
 
 @f{eqnarray*}
 P^{-1} = \left(\begin{array}{cc} A & B^T \\ 0 &
- S \end{array}\right)^{-1} 
+ S \end{array}\right)^{-1}
 @f}
 
 is a good choice. Let $\widetilde{A^{-1}}$ be an approximation of $A^{-1}$
 and $\widetilde{S^{-1}}$ of $S^{-1}$, we see
-@f{eqnarray*} 
+@f{eqnarray*}
 P^{-1} =
 \left(\begin{array}{cc} A^{-1} & 0 \\ 0 & I \end{array}\right)
 \left(\begin{array}{cc} I & B^T \\ 0 & -I \end{array}\right)
@@ -103,7 +103,7 @@ Multigrid as described in step-16) as a preconditioner, or just performing a sin
 of GMG.
 
 As a comparison, instead of FGMRES, we also use the direct solver
-UMFPACK on the whole system to compare our results with.  If you want to use 
+UMFPACK on the whole system to compare our results with.  If you want to use
 a direct solver (like UMFPACK), the system needs to be invertible. To avoid
 the one dimensional null space given by the constant pressures, we fix the first pressure unknown
  to zero. This is not necessary for the iterative solvers.
@@ -137,18 +137,18 @@ the "Method of Manufactured Solutions" of step-7, we need to find $\bf
 f$ such that:
 
 @f{align*}
-{\bf f} =   - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u}) + (\nabla \textbf{u})^T\right] + \nabla p. 
+{\bf f} =   - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u}) + (\nabla \textbf{u})^T\right] + \nabla p.
 @f}
 
 Using the reference solution above, we obtain:
 
-@f{eqnarray*} 
+@f{eqnarray*}
 {\bf f} &=& (2 \pi^2 \sin (\pi x),- \pi^3 y \cos(\pi
 x),- \pi^3 z \cos(\pi x))\\ & & + (\pi \cos(\pi x) \cos(\pi y)
 \sin(\pi z) ,- \pi \sin(\pi y) \sin(\pi x) \sin(\pi z), \pi \cos(\pi
 z) \sin(\pi x) \cos(\pi y)) @f}
 
-<h3> Computing Errors </h3> 
+<h3> Computing Errors </h3>
 
 Because we do not enforce the mean
 pressure to be zero for our numerical solution in the linear system,
@@ -183,7 +183,7 @@ the same sequence of DoFRenumbering operations on both.
 
 
 <h3> Differences from the Step 22 tutorial </h3>
- 
+
 The main difference between step-56 and step-22 is that we use block
 solvers instead of the Schur Complement approach used in
 step-22. Details of this approach can be found under the "Block Schur
