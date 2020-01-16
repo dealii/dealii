@@ -14,6 +14,16 @@
 // ---------------------------------------------------------------------
 
 
+// This test is an adaptation of the _08 test, but using the
+// DataOut::set_cell_selection() function with the FilteredIterator
+// argument instead of overloading member functions. Since
+// FilteredIterators can be created directly from lambda functions, we
+// check that passing a lambda function to set_cell_selection() as
+// argument works as well.
+//
+// Because the _08 test is eventually going away (as it uses
+// deprecated functions), here is the description of that test:
+// ....................
 // This test documents two unrelated bugs in DataOut when used with a Filter (by
 // deriving from DataOut):
 // 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or
@@ -47,7 +57,6 @@ sequence of the exception was: 466:     ExcInternalError()
 
 #include <deal.II/fe/fe_dgq.h>
 
-#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -58,44 +67,6 @@ sequence of the exception was: 466:     ExcInternalError()
 
 #include "../tests.h"
 
-
-template <int dim>
-class FilteredDataOut : public DataOut<dim>
-{
-public:
-  FilteredDataOut(const unsigned int subdomain_id)
-    : subdomain_id(subdomain_id)
-  {}
-
-  virtual typename DataOut<dim>::cell_iterator
-  first_cell()
-  {
-    auto cell = this->dofs->begin_active();
-    while ((cell != this->dofs->end()) &&
-           (cell->subdomain_id() != subdomain_id))
-      ++cell;
-
-    return cell;
-  }
-
-  virtual typename DataOut<dim>::cell_iterator
-  next_cell(const typename DataOut<dim>::cell_iterator &old_cell)
-  {
-    if (old_cell != this->dofs->end())
-      {
-        const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
-
-        return ++(
-          FilteredIterator<typename DataOut<dim>::cell_iterator>(predicate,
-                                                                 old_cell));
-      }
-    else
-      return old_cell;
-  }
-
-private:
-  const unsigned int subdomain_id;
-};
 
 
 template <int dim>
@@ -120,7 +91,13 @@ check()
 
   // we pick only subdomain==0 which will
   // skip the first of the four cells
-  FilteredDataOut<dim> data_out(0);
+  DataOut<dim> data_out;
+  data_out.set_cell_selection(
+    [](const typename Triangulation<dim>::cell_iterator &cell) {
+      return (!cell->has_children() && cell->subdomain_id() == 0);
+    });
+
+
   data_out.attach_dof_handler(dof_handler);
 
   data_out.add_data_vector(cell_data,

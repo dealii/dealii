@@ -786,7 +786,8 @@ private:
  * explicitly specify the type of the base iterator by hand -- it is deduced
  * automatically here.
  *
- * @author Wolfgang Bangerth @relatesalso FilteredIterator
+ * @author Wolfgang Bangerth
+ * @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>
