@@ -70,8 +70,7 @@ public:
   virtual typename DataOut<dim>::cell_iterator
   first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator cell =
-      this->dofs->begin_active();
+    auto cell = this->dofs->begin_active();
     while ((cell != this->dofs->end()) &&
            (cell->subdomain_id() != subdomain_id))
       ++cell;
@@ -86,8 +85,9 @@ public:
       {
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
-          predicate, old_cell));
+        return ++(
+          FilteredIterator<typename DataOut<dim>::cell_iterator>(predicate,
+                                                                 old_cell));
       }
     else
       return old_cell;

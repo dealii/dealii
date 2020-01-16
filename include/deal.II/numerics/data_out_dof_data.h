@@ -604,9 +604,6 @@ public:
   using cell_iterator =
     typename Triangulation<DoFHandlerType::dimension,
                            DoFHandlerType::space_dimension>::cell_iterator;
-  using active_cell_iterator = typename Triangulation<
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator;
 
 public:
   /**

@@ -170,10 +170,6 @@ public:
     typename DataOut_DoFData<DoFHandlerType,
                              DoFHandlerType::dimension,
                              DoFHandlerType::space_dimension>::cell_iterator;
-  using active_cell_iterator = typename DataOut_DoFData<
-    DoFHandlerType,
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator;
 
   /**
    * Enumeration describing the part of the domain in which cells
