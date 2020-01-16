@@ -16,9 +16,9 @@
 
 /**
  * @defgroup FE_vs_Mapping_vs_FEValues How Mapping, FiniteElement, and FEValues work together
- * 
+ *
  * <h2>Introduction</h2>
- * 
+ *
  * Most people create finite element (and, potentially, mapping) objects once
  * but then never actually call any member functions on them -- they simply
  * use them for assembly via the FEValues interface. The only other interaction
@@ -134,7 +134,7 @@
  * values and derivatives on actual cells (obviously with the help of a
  * mapping object). For the current discussion, only the latter role is
  * important.
- * 
+ *
  * As with mappings, all that is important for us here is that the finite
  * element classes can provide this information at given quadrature points,
  * and that they can put the computed information into structures provided
@@ -182,7 +182,7 @@
  * mapping class will indicate by adding update_contravariant_transformation
  * to the list.
  *
- * 
+ *
  * <h2>Pre-computing things</h2>
  *
  * At this point, the FEValues object has found out the complete

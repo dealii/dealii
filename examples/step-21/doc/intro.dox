@@ -78,7 +78,7 @@ of course is going to change as the fluids move around.
 
 The second part of the equations is the description of the
 dynamics of the saturation, i.e., how the relative concentration of the
-two fluids changes with time. The saturation equation for the displacing 
+two fluids changes with time. The saturation equation for the displacing
 fluid (water) is given by the following conservation law:
 @f{eqnarray*}
   S_{t} + \nabla \cdot (F(S) \mathbf{u}) = q_{w},
@@ -86,7 +86,7 @@ fluid (water) is given by the following conservation law:
 which can be rewritten by using the product rule of the divergence operator
 in the previous equation:
 @f{eqnarray*}
-  S_{t} + F(S) \left[\nabla \cdot \mathbf{u}\right] 
+  S_{t} + F(S) \left[\nabla \cdot \mathbf{u}\right]
         + \mathbf{u} \cdot \left[ \nabla F(S)\right]
   = S_{t} + F(S) q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
 @f}

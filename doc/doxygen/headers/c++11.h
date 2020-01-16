@@ -23,7 +23,7 @@
  * deal.II are now using features that were only introduced in C++11.
  * That said, deal.II also has functions and classes that make using
  * it with C++11 features easier.
- * 
+ *
  * One example is support for C++11
  * <a href="http://en.wikipedia.org/wiki/C++11#Range-based_for_loop">range-based
  * for loops</a>. deal.II-based codes often have many loops of the kind

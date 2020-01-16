@@ -249,7 +249,7 @@ with a circle of radius 0.3 centered at the
 origin removed. In addition, we use $\varepsilon=0.005$, $\boldsymbol{\beta} =
 [-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and Dirichlet boundary values
 @f{align*}{
-g = \left\{\begin{array}{ll} 1 & \text{if } x=-1 \text{ or } y=-1,\,x\geq 0.5 \\ 
+g = \left\{\begin{array}{ll} 1 & \text{if } x=-1 \text{ or } y=-1,\,x\geq 0.5 \\
 0 & \text{otherwise} \end{array}\right.
 @f}
 

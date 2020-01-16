@@ -554,8 +554,8 @@ inconvenience this causes.
 
 <ol>
   <li> New: VectorTools::get_position_vector now works with arbitrary
-  FESystems, provided that the geometrical components are primitive, 
-  and that you provide a component mask to select what components of 
+  FESystems, provided that the geometrical components are primitive,
+  and that you provide a component mask to select what components of
   the finite element to use for the geometrical interpolation.
   <br>
   (Luca Heltai, 2015/07/25)

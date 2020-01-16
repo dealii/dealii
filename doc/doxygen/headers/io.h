@@ -60,9 +60,9 @@
  * itself), and it can create output used for visualization of data. Finally,
  * it can output matrices in a graphical format.
  *
- * 
+ *
  * <h3>Visualization of data</h3>
- * 
+ *
  * deal.II supports, through the DataOutBase class, a large number of popular
  * visualization formats, such as those used by the OpenDX, gmv, or gnuplot
  * programs. A complete list of supported formats is listed in the
@@ -100,8 +100,8 @@
  * dependent simulations in the space-time domain: it collects the results
  * from each time step and at the end outputs all of this information at once
  * as a space-time file.
- * 
- * 
+ *
+ *
  * <h3>Grid output</h3>
  *
  * Meshes, without any data vectors associated with it, can be written in a

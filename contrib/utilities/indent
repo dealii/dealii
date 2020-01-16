@@ -68,3 +68,10 @@ process_changed "tests include source examples contrib/python-bindings" \
 
 process_changed "tests include source examples contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
+
+#
+# Removing trailing whitespace
+#
+
+process_changed "include source examples contrib/python-bindings doc" \
+  ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace

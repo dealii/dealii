@@ -101,7 +101,7 @@ DEAL_II_NAMESPACE_OPEN
  * not write any data at all, the process should call the function
  * DataSet::write_none() because the operation is *collective* and all the MPI
  * processes have to contribute to the call, even if they don't have data to
- * write. 
+ * write.
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);

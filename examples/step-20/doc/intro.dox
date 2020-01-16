@@ -45,11 +45,11 @@ if you have free flow in a large domain, say a pipe, a river, or in the air.
 On the other hand, if the fluid is confined in pores, then friction forces
 exerted by the pore walls on the fluid become more and more important and
 internal viscous friction becomes less and less important. Modeling this
-then first leads to the 
+then first leads to the
 <a href="https://en.wikipedia.org/wiki/Darcy%27s_law#Brinkman_form_of_Darcy's_law">Brinkman
 model</a> if both effects are important, and in the limit of very small pores
 to the <a href="https://en.wikipedia.org/wiki/Darcy%27s_law">Darcy equations</a>.
-The latter is just a different name for the Poisson or Laplace equation, 
+The latter is just a different name for the Poisson or Laplace equation,
 connotating it with the area to which one wants to apply it: slow flow
 in a porous medium. In essence it says that the velocity is proportional
 to the pressure gradient that drives the fluid through the porous medium.
@@ -363,7 +363,7 @@ it. The problem here is: the matrix has a zero block at the bottom right
 pressure test function $q$), and it is indefinite. At least it is
 symmetric. In other words: the Conjugate Gradient method is not going to
 work since it is only applicable to problems in which the matrix is
-symmetric and positive definite. 
+symmetric and positive definite.
 We would have to resort to other iterative solvers instead, such as
 MinRes, SymmLQ, or GMRES, that can deal with indefinite systems. However, then
 the next problem immediately surfaces: due to the zero block, there are zeros
@@ -419,8 +419,8 @@ second row from it):
   B^TM^{-1}B P &=& B^TM^{-1} F - G, \\
   MU &=& F - BP.
 @f}
-Here, the matrix $S=B^TM^{-1}B$ (called the 
-<a href="https://en.wikipedia.org/wiki/Schur_complement">Schur complement</a> 
+Here, the matrix $S=B^TM^{-1}B$ (called the
+<a href="https://en.wikipedia.org/wiki/Schur_complement">Schur complement</a>
 of $A$)
 is obviously symmetric and, owing to the positive definiteness of $M$ and the
 fact that $B$ has full column rank, $S$ is also positive
@@ -430,12 +430,12 @@ Consequently, if we could compute $S$, we could apply the Conjugate Gradient
 method to it. However, computing $S$ is expensive because it requires us
 to compute the inverse of the (possibly large) matrix $M$; and $S$ is in fact
 also a full matrix because even though $M$ is sparse, its inverse $M^{-1}$
-will generally be a dense matrix. 
+will generally be a dense matrix.
 On the other hand, the CG algorithm doesn't require
 us to actually have a representation of $S$: It is sufficient to form
 matrix-vector products with it. We can do so in steps, using the fact that
 matrix products are associative (i.e., we can set parentheses in such a
-way that the product is more convenient to compute): 
+way that the product is more convenient to compute):
 To compute $Sv=(B^TM^{-1}B)v=B^T(M^{-1}(Bv))$, we
 <ol>
  <li> compute $w = B v$;
@@ -448,10 +448,10 @@ avoid matrix-matrix products; this way, all we have to do is evaluate
 matrix-vector products.
 
 In the following, we will then have to come up with ways to represent the
-matrix $S$ so that it can be used in a Conjugate Gradient solver, 
+matrix $S$ so that it can be used in a Conjugate Gradient solver,
 as well as to define ways in which we can precondition the solution
 of the linear system involving $S$, and deal with solving linear systems
-with the matrix $M$ (the second step above). 
+with the matrix $M$ (the second step above).
 
 @note The key point in this consideration is to recognize that to implement
 an iterative solver such as CG or GMRES, we never actually need the actual

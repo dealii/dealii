@@ -30,9 +30,9 @@
  * coordinate direction than in another) through the QAnisotropic class, as
  * well as the definition of quadrature formulas that are not tensor products.
  *
- * 
+ *
  * <h3>Use</h3>
- * 
+ *
  * Quadrature formulas are used, among other uses, when integrating matrix
  * entries and the components of the right hand side vector. To this end, the
  * quadrature point defined on the unit cell have to be mapped to the
@@ -57,10 +57,10 @@
  * quadrature points as mapped to a real cell, for other uses as well. This
  * can then be used, for example, to evaluate a right hand side function at
  * these points.
- * 
+ *
  *
  * <h3>QIterated</h3>
- * 
+ *
  * The class QIterated is used to construct an iterated quadrature formula out
  * of an existing one, thereby increasing the accuracy of the formula without
  * increasing the order. For example, by iterating the trapezoidal rule with

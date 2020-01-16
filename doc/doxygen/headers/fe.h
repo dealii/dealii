@@ -61,7 +61,7 @@
  * an introduction into the use of this class in the context of the
  * vector-valued elasticity (Lam&eacute;) equations. step-20 discusses a mixed
  * Laplace discretization that also uses vector-valued elements.
- * 
+ *
  * @ingroup feall
  */
 
@@ -96,7 +96,7 @@
  * specify up front which information you are actually interested in. The
  * UpdateFlags enumeration is used to offer symbolic names denoting what you
  * want the FEValues class to compute.
- * 
+ *
  * All these classes are used in all
  * @ref Tutorial "tutorial programs"
  * from step-3 onward, and are described there in significant detail.
@@ -171,7 +171,7 @@
  * <li> scalar: FE_DGP, FE_DGQ
  * <li> scalar, different shape functions: FE_DGPMonomial, FE_DGPNonparametric, FE_DGQArbitraryNodes
  * <li> vector-valued:  FE_DGBDM, FE_DGNedelec, FE_DGRaviartThomas
- * </ul> 
+ * </ul>
  *
  * @note The implementation of vector valued DG elements is supported
  * by the class FE_DGVector, in the way, that only the vector
@@ -197,13 +197,13 @@
  * it accepts a vector that describes a displacement field for each position
  * of the domain. This is used in Eulerian computations without the need to
  * actually move vertices after each time step.
- * 
+ *
  * In addition, the MappingC1 class provides for a boundary of the
  * computational domain that is not only curved, but also has a continuous
  * derivative at the interface between two cells on the boundary.
- * 
+ *
  * Finally, the MappingCartesian class is an optimization for elements that
  * are brick-shaped and with edges parallel to the coordinate axes.
- * 
+ *
  * @ingroup feall
  */

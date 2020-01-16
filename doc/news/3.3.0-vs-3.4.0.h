@@ -55,14 +55,14 @@ All entries are signed with the names of the author.
        (BK 2002/05/22)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The step-14 example program demonstrates duality based
        error estimators and some more software design concepts.
        <br>
        (WB 2002/05/05)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: In all previous versions, deal.II used
        the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
        target="_top">ACE (Adaptive Communications Environment)</a>
@@ -72,13 +72,13 @@ All entries are signed with the names of the author.
        available on many systems. The relieves you from the need of
        installing a huge library of which the most part is not used
        anyway. However, if you use ACE for other reasons, then it is
-       still supported. For installation instructions, see the 
+       still supported. For installation instructions, see the
        <a href="../../readme.html" target="body">ReadMe</a> file.
        <br>
        (WB 2002/04/30)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The Makefiles for the library are now truly
        parallel. To this end, the automatic generation of the files
        <tt>forward_declarations.h</tt> in the various directories had
@@ -94,14 +94,14 @@ All entries are signed with the names of the author.
        (GK 2002/04/17)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The step-13 example program tells you something about
        software design things for finite element programs.
        <br>
        (WB 2002/04/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: Due to problems with undeclared functions and general
        compatibility concerns, <code>-ansi</code> is now no more part
        of the compile flags for gcc.
@@ -109,7 +109,7 @@ All entries are signed with the names of the author.
        (WB 2002/04/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: Explicit specializations of member templates are now
        conforming to the C++ standard. While most compilers accepted
        the previous form, Sun's Forte compiler wants a strictly
@@ -118,7 +118,7 @@ All entries are signed with the names of the author.
        (WB 2002/03/25)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: For gcc versions that used <code
        class="class">ostrstream</code> instead of <code
        class="class">ostringstream</code>, it was necessary to append
@@ -129,23 +129,23 @@ All entries are signed with the names of the author.
        (WB 2002/03/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The configure machinery has been revamped
        significantly.
        <br>
        (WB 2002/03/08)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Added: The top-level Makefile now supports "optimized" as a
        target that builds only optimized versions of the <code>base</code>,
        <code>lac</code>, <code>1d</code>, <code>2d</code>, and <code>3d</code>
-       libraries. 
+       libraries.
        <br>
        (BK 2002/02/19)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The build system was entirely revised. Object
        files in debug mode now have the suffix <code>.g.o</code>
        instead of <code>.go</code>. All object files from the
@@ -163,17 +163,17 @@ All entries are signed with the names of the author.
 <h3>base</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: The <code>vector2d</code> row accessor
        classes now have member functions <code
        class="member">begin</code> and <code>end</code>
        which allow iterating over the elements of a row of such an
-       object. 
+       object.
        <br>
        (WB 2002/05/30)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>Legendre</code> and
        <code>LagrangeEquidistant</code> classes now have
        static member functions <code
@@ -185,7 +185,7 @@ All entries are signed with the names of the author.
        (WB 2002/05/27)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The <code>Polynomial</code> and
        <code>LagrangeEquidistant</code> classes have lost
        their default constructor, as that did not make much sense
@@ -194,7 +194,7 @@ All entries are signed with the names of the author.
        (WB 2002/05/27)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: When forward declaring the <code
        class="class">Tensor</code> class, we now also forward declare
        its partial specialization for a rank one tensor. Not doing so
@@ -203,7 +203,7 @@ All entries are signed with the names of the author.
        (WB 2002/03/22)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The class <code>TensorFunction</code>
        now uses local types <code>value_type</code> and
        <code>gradient_type</code> as return values of
@@ -213,7 +213,7 @@ All entries are signed with the names of the author.
        (WB 2002/03/20)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Improved: The <code>AssertThrow</code> macro now
        uses <code>__builtin_expect</code> if the
        compiler supports this. This indicates to the compiler that we
@@ -234,7 +234,7 @@ All entries are signed with the names of the author.
        (i.e. like to a two-dimensional C-style array).
        <br>
        (WB 2002/03/08)
-       </p> 
+       </p>
 
   <li> <p>
        Changed: The function <code>MultithreadInfo</code>::
@@ -242,9 +242,9 @@ All entries are signed with the names of the author.
        of CPUs when running on Silicon Graphics.
        <br>
        (BK 2002/02/19)
-       </p> 
+       </p>
 
-  <li> <p> 
+  <li> <p>
        Changed: The quite logorrhoeic function name <code
        class="class">TensorProductPolynomials</code>::<code
        class="member">n_tensor_product_polynomials</code> was changed to
@@ -254,7 +254,7 @@ All entries are signed with the names of the author.
        (GK 2002/02/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The class <code>PolynomialSpace</code>
        implements the space of polynomials at most a certain degree in
        arbitrary space dimensions.
@@ -262,7 +262,7 @@ All entries are signed with the names of the author.
        (GK 2002/02/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The function <code>DataOutBase</code>::
        <code>write_tecplot_binary</code> has been
        added.  This function will write Tecplot binary files if the
@@ -296,7 +296,7 @@ All entries are signed with the names of the author.
        (GK 2002/05/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Function <code
        class="member">SparsityPattern::matrix_position</code> is the
        inverse function for <code
@@ -305,7 +305,7 @@ All entries are signed with the names of the author.
        (WB 2002/02/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Functions <code
        class="member">SparsityPattern::copy_from</code> and <code
        class="member">SparseMatrix::copy_from</code> allow to copy a full
@@ -321,7 +321,7 @@ All entries are signed with the names of the author.
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: The <code>GeometryInfo</code> class now
        provides two methods,
        <code>unit_cell_vertex</code> and <code
@@ -332,7 +332,7 @@ All entries are signed with the names of the author.
        (GK 2002/05/29)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>GridOut::</code>
        <code>write_dx</code> function is now implemented.
        It allows to write the mesh (cells and faces) with some additional
@@ -341,7 +341,7 @@ All entries are signed with the names of the author.
        (GK 2002/05/02)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: The <code>IteratorState::IteratorState</code>
        enum is now called <code
        class="class">IteratorState::IteratorStates</code>. This works
@@ -352,27 +352,27 @@ All entries are signed with the names of the author.
        (WB 2002/03/20)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: In 3d, the function <code
-       class="member">DoFTools::make_hanging_node_constraints</code> 
+       class="member">DoFTools::make_hanging_node_constraints</code>
        contained an assertion that failed erroneously for finite
        elements that do not have degrees of freedom on vertices. This
        is now fixed.
-       <br> 
+       <br>
        (WB 2002/02/21)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fixed: <code>TriaAccessor<3,3>::measure</code>
        sometimes computed a negative value. This is now fixed.
-       <br> 
+       <br>
        (WB 2002/02/21)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Finite element family with complete polynomial spaces
        for discontinuous Galerkin: <code>FE_DGP</code>
-       <br> 
+       <br>
        (GK 2002/02/11)
        </p>
 </ol>

@@ -475,7 +475,7 @@ would be one; bad cells have values much larger than one. An example of the
 latter kind would consider the gradient (the "Jacobian") of the mapping
 from the reference cell $\hat K=[0,1]^d$ to the real cell $K$; this
 gradient is a matrix, and a quantity that enters into error estimates
-is the maximum over all points on the reference cell of the ratio of the 
+is the maximum over all points on the reference cell of the ratio of the
 largest to the smallest eigenvalue of this matrix. It is again not difficult
 to see that this ratio is constant if the cell $K$ is an affine image of
 $\hat K$, and that it is one for squares and cubes.
@@ -530,7 +530,7 @@ solution will not go to infinity. That means, that the solution is at least
 still in the <a href="https://en.wikipedia.org/wiki/Sobolev_space">Sobolev space</a>
 $W^{1,\infty}$ (i.e., roughly speaking, in the
 space of functions whose derivatives are bounded). On the other hand,
-we know that in the most 
+we know that in the most
 extreme cases -- i.e., where the domain has reentrant corners, the
 right hand side only satisfies $f\in H^{-1}$, or the coefficient $a$ is only in
 $L^\infty$ -- all we can expect is that $u\in H^1$ (i.e., the

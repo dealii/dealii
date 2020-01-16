@@ -75,7 +75,7 @@
  *   for (unsigned int degree=1; degree<5; ++degree)
  *     fe_collection.push_back (FE_Q<dim>(degree));
  * @endverbatim
- * 
+ *
  * This way, one can add elements of polynomial degree 1 through 4 to the
  * collection. It is not necessary to retain the added object: the collection
  * makes a copy of it, it does not only store a pointer to the given finite

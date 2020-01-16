@@ -45,8 +45,8 @@
  * allocates and manages degrees of freedom on vertices, faces, or cells, as
  * described by the finite element class. This separation makes it possible to
  * have multiple DoFHandler classes work on the same mesh at the same time.
- * 
- * 
+ *
+ *
  * <h3>Grid generation</h3>
  *
  * There are three ways to create a mesh:
@@ -104,7 +104,7 @@
  * The GridRefinement class implements a number of mesh refinement algorithms,
  * based on refinement indicators given to its member functions.
  *
- * 
+ *
  * <h3>Internal classes</h3>
  *
  * In addition to the above, there are a significant number of classes in this
@@ -112,6 +112,6 @@
  * handling. They are generally in the internal namespace, and not meant for
  * use in application code.
  *
- * 
+ *
  * @author Wolfgang Bangerth, 1998-2006
  */

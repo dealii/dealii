@@ -13,7 +13,7 @@ This program shows how to use Runge-Kutta methods to solve a time-dependent
 problem. It solves a small variation of the heat equation discussed first in
 step-26 but, since the purpose of this program is only to demonstrate using
 more advanced ways to interface with deal.II's time stepping algorithms, only
-solves a simple problem on a uniformly refined mesh. 
+solves a simple problem on a uniformly refined mesh.
 
 
 <h3>Problem statement</h3>
@@ -32,10 +32,10 @@ fissible and therefore, the neutron flux satisfies the following equation:
 @f}
 augmented by appropriate boundary conditions. Here, $v$ is the velocity of
 neutrons (for simplicity we assume it is equal to 1 which can be achieved by
-simply scaling the time variable), $D$ is the diffusion coefficient, 
+simply scaling the time variable), $D$ is the diffusion coefficient,
 $\Sigma_a$ is the absorption cross section, and $S$ is a source. Because we are
 only interested in the time dependence, we assume that $D$ and $\Sigma_a$ are
-constant. 
+constant.
 
 Since this program only intends to demonstrate how to use advanced time
 stepping algorithms, we will only look for the solutions of relatively simple
@@ -84,7 +84,7 @@ of nodal coefficients $U(t)$ for a variable of the form
   u_h(x,t) = \sum_j U_j(t) \varphi_j(x)
 @f}
 with spatial shape functions $\varphi_j(x)$, then multiplying an equation of
-the form 
+the form
 @f{eqnarray*}
   \frac{\partial u(x,t)}{\partial t} = q(t,u(x,t))
 @f}
@@ -98,7 +98,7 @@ where $M$ is the mass matrix and $f(t,U)$ is the spatially discretized version
 of $q(t,u(x,t))$ (where $q$ is typically the place where spatial
 derivatives appear, but this is not of much concern for the moment given that
 we only consider time derivatives). In other words, this form fits the general
-scheme above if we write 
+scheme above if we write
 @f{eqnarray*}
 \frac{dy}{dt} = g(t,y) = M^{-1}f(t,y).
 @f}
@@ -131,14 +131,14 @@ $a_{ii}=0, i=1,\ldots,s$.
 <li> Implicit Runge-Kutta; this class of methods require the solution of a
 possibly nonlinear system the stages $k_i$ above, i.e., they have
 $a_{ii}\neq 0$ for at least one of the stages $i=1,\ldots,s$.
-</ol> 
+</ol>
 Many well known time stepping schemes that one does not typically associate
 with the names Runge or Kutta can in fact be written in a way so that they,
 too, can be expressed in these categories. They oftentimes represent the
 lowest-order members of these families.
 
 
-<h4>Explicit Runge-Kutta methods</h4> 
+<h4>Explicit Runge-Kutta methods</h4>
 
 These methods, only require a function to evaluate $M^{-1}f(t,y)$ but not
 (as implicit methods) to solve an equation that involves
@@ -163,7 +163,7 @@ This class of methods include Heun-Euler, Bogacki-Shampine, Dormand-Prince (ode4
 Matlab and often abbreviated as RK45 to indicate that the lower and higher order methods
 used here are 4th and 5th order Runge-Kutta methods, respectively), Fehlberg,
 and Cash-Karp.
- 
+
 At the time of the writing, only embedded explicit methods have been implemented.
 
 
@@ -174,8 +174,8 @@ form $\alpha y = f(t,y)$
 for $y$ in each (sub-)timestep. Internally, this is
 done using a Newton-type method and, consequently, they require that the user
 provide functions that can evaluate $M^{-1}f(t,y)$ and
-$\left(I-\tau M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently 
-$\left(M - \tau \frac{\partial f}{\partial y}\right)^{-1} M$. 
+$\left(I-\tau M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently
+$\left(M - \tau \frac{\partial f}{\partial y}\right)^{-1} M$.
 
 The particular form of this operator results from the fact that each Newton
 step requires the solution of an equation of the form
@@ -183,7 +183,7 @@ step requires the solution of an equation of the form
   \left(M - \tau \frac{\partial f}{\partial y}\right) \Delta y
   = -M h(t,y)
 @f}
-for some (given) $h(t,y)$. Implicit methods are 
+for some (given) $h(t,y)$. Implicit methods are
 always stable, regardless of the time step size, but too large time steps of
 course affect the <i>accuracy</i> of the solution, even if the numerical
 solution remains stable and bounded.
@@ -241,7 +241,7 @@ important to remember the following issues:
 
 <ol>
 <li> You will need to project the solution to the new mesh when the mesh is changed. Of course,
-     the mesh 
+     the mesh
      used should be the same from the beginning to the end of each time step,
      a question that arises because Runge-Kutta methods use multiple
      evaluations of the equations within each time step.

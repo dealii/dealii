@@ -52,7 +52,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Set up all executables:
     #
-    FILE(GLOB _steps 
+    FILE(GLOB _steps
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cc
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cu)
     FOREACH(_step ${_steps})

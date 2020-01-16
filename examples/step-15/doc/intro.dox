@@ -190,13 +190,13 @@ eigenvalue $a_n$. Since all eigenvalues are positive, $B$ is positive definite
 and so is $A$. We can thus use the CG method for solving the Newton steps.
 (The fact that the matrix $A$ is symmetric and positive definite should not come
 as a surprise. It results from taking the derivative of an operator that
-results from taking the derivative of an energy functional: the minimal 
+results from taking the derivative of an energy functional: the minimal
 surface equation simply minimizes some non-quadratic energy. Consequently,
 the Newton matrix, as the matrix of second derivatives of a scalar energy,
 must be symmetric since the derivative with regard to the $i$th and $j$th
 degree of freedom should clearly commute. Likewise, if the energy functional
 is convex, then the matrix of second derivatives must be positive definite,
-and the direct calculation above simply reaffirms this.) 
+and the direct calculation above simply reaffirms this.)
 
 It is worth noting, however, that the positive definiteness degenerates for
 problems where $\nabla u$ becomes large. In other words, if we simply multiply

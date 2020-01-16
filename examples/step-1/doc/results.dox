@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-Running the program produces graphics of two grids (grid-1.svg and grid-2.svg). 
+Running the program produces graphics of two grids (grid-1.svg and grid-2.svg).
 You can open these with most every web browser -- in the simplest case,
 just open the current directory in your file system explorer and click
 on the file. If you like working on the command line, you call your
@@ -94,7 +94,7 @@ Rather than postponing learning how to use a debugger till you really can't
 see any other way to find a bug, here's the one piece of
 advice we will provide in this program: learn how to use a debugger as soon as
 possible. It will be time well invested.
-(@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked 
+(@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked
 Questions (FAQ) page linked to from the top-level <a
 href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
 of hints on debugging deal.II programs.

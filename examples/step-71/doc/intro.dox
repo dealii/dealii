@@ -317,7 +317,7 @@ the following terms:
 -\sum_{e \in \mathbb{F}} \int_{e}
   \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
   \jump{\frac{\partial u_h}{\partial \mathbf n}}
-+ \sum_{e \in \mathbb{F}} 
++ \sum_{e \in \mathbb{F}}
   \frac{\sigma}{h_e}\int_e
   \jump{\frac{\partial v_h}{\partial \mathbf n}}
   \jump{\frac{\partial u_h}{\partial \mathbf n}}.
@@ -340,13 +340,13 @@ where
  \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
  \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
 \\
-&+ \sum_{e \in \mathbb{F}} 
+&+ \sum_{e \in \mathbb{F}}
  \frac{\gamma}{h_e}
  \int_e
  \jump{\frac{\partial v_h}{\partial \mathbf n}}
  \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds,
 @f}
-and 
+and
 @f{align*}{
 \mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx
 +
@@ -466,8 +466,8 @@ $\mathcal{O}(h^{p})$. There is probably a paper somewhere that proves
 this, but we also verify that this conjecture is experimentally true
 below.
 
- 
- 
+
+
 <h3>Other Boundary Conditions</h3>
 
 We remark that the derivation of the $C^0$ IP method for the

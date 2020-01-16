@@ -29,8 +29,8 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
 ENDIF()
 
 #
-# As of 1.67, boost requires specifying the suffix for the python 
-# component manually. 
+# As of 1.67, boost requires specifying the suffix for the python
+# component manually.
 #
 UNSET(Boost_FOUND)
 IF(${BOOST_VERSION} VERSION_LESS 1.67)
