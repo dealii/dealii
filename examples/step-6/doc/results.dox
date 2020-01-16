@@ -239,7 +239,8 @@ solving problems in 3d to high accuracy remains a challenge.
 If you look at the meshes above, you will see even though the domain is the
 unit disk, and the jump in the coefficient lies along a circle, the cells
 that make up the mesh do not track this geometry well. The reason, already hinted
-at in step-1, is that by default the Triangulation class only sees a bunch of
+at in step-1, is that in the absence of other information,
+the Triangulation class only sees a bunch of
 coarse grid cells but has, of course, no real idea what kind of geometry they
 might represent when looked at together. For this reason, we need to tell
 the Triangulation what to do when a cell is refined: where should the new
@@ -454,6 +455,39 @@ appropriate quadrature formula, or perform a combination of these
 steps. The key is that providing the best fit of the coefficient's
 spatial dependence with the quadrature polynomial will lead to a more
 accurate finite element solution of the PDE.
+
+As a final note: The discussion in the previous paragraphs shows, we here
+have a very concrete way of stating what we think of a good mesh -- it should
+be aligned with the jump in the coefficient. But one could also have asked
+this kind of question in a more general setting: Given some equation with
+a smooth solution and smooth coefficients, can we say what a good mesh
+would look like? This is a question for which the answer is easier to state
+in intuitive terms than mathematically: A good mesh has cells that all,
+by and large, look like squares (or cubes, in 3d). A bad mesh would contain
+cells that are very elongated in some directions or, more generally, for which
+there are cells that have both short and long edges. There are many ways
+in which one could assign a numerical quality index to each cell that measures
+whether the cell is "good" or "bad"; some of these are often chosen because
+they are cheap and easy to compute, whereas others are based on what enters
+into proofs of convergence. An example of the former would be the ratio of
+the longest to the shortest edge of a cell: In the ideal case, that ratio
+would be one; bad cells have values much larger than one. An example of the
+latter kind would consider the gradient (the "Jacobian") of the mapping
+from the reference cell $\hat K=[0,1]^d$ to the real cell $K$; this
+gradient is a matrix, and a quantity that enters into error estimates
+is the maximum over all points on the reference cell of the ratio of the 
+largest to the smallest eigenvalue of this matrix. It is again not difficult
+to see that this ratio is constant if the cell $K$ is an affine image of
+$\hat K$, and that it is one for squares and cubes.
+
+In practice, it might be interesting to visualize such quality measures.
+The function GridTools::compute_aspect_ratio_of_cells() provides one
+way to get this kind of information. Even better, visualization tools
+such as Visit often allow you to visualize this sort of information
+for a variety of measures from within the visualization software
+itself; in the case of Visit, just add a "pseudo-color" plot and select
+one of the mesh quality measures instead of the solution field.
+
 
 <h4>Playing with the regularity of the solution</h4>
 
