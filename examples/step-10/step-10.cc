@@ -66,7 +66,7 @@ namespace Step10
   // functions. We make these functions templates on the number of space
   // dimensions to conform to usual practice when using deal.II, although we
   // will only use them for two space dimensions and throw an exception when
-  // attempted to use for any other spatial dimension
+  // attempted to use for any other spatial dimension.
   //
   // The first of these functions just generates a triangulation of a circle
   // (hyperball) and outputs the $Q_p$ mapping of its cells for different values
