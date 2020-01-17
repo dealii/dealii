@@ -145,16 +145,13 @@ namespace Utilities
    * is identical to the input string.
    *
    * @param[in] input The string to compress
-   * @param[in] compression_level The compression level at which we compress
    *
    * @return A compressed version of the input string
    *
    * @authors Luca Heltai, Nicola Giuliani, 2020
    */
   std::string
-  compress(
-    const std::string &input,
-    const int compression_level = boost::iostreams::gzip::default_compression);
+  compress(const std::string &input);
 
   /**
    * If the library is configured with ZLIB, then this function assumes that the

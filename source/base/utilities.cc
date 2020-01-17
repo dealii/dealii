@@ -381,7 +381,7 @@ namespace Utilities
 
 
   std::string
-  compress(const std::string &input, const int compression_level)
+  compress(const std::string &input)
   {
 #ifdef DEAL_II_WITH_ZLIB
     namespace bio = boost::iostreams;
@@ -390,7 +390,8 @@ namespace Utilities
     std::stringstream origin(input);
 
     bio::filtering_streambuf<bio::input> out;
-    out.push(bio::gzip_compressor(bio::gzip_params(compression_level)));
+    out.push(bio::gzip_compressor(
+      bio::gzip_params(boost::iostreams::gzip::default_compression)));
     out.push(origin);
     bio::copy(out, compressed);
 
