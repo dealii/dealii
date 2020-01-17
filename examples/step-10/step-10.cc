@@ -405,7 +405,7 @@ int main()
     {
       std::cout.precision(16);
 
-      unsigned int dim = 2;
+      constexpr unsigned int dim = 2;
 
       Step10::gnuplot_output<dim>();
 
