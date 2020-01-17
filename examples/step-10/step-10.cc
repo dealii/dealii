@@ -30,10 +30,14 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
 
-// This is the only new one: in it, we declare the MappingQ class
+// This include file is new. Even if we are not solving a PDE in this tutorial,
+// we want to use a dummy finite element with zero degrees of freedoms provided
+// by the FE_Nothing class.
+#include <deal.II/fe/fe_nothing.h>
+
+// The following header file is also new: in it, we declare the MappingQ class
 // which we will use for polynomial mappings of arbitrary order:
 #include <deal.II/fe/mapping_q.h>
 
