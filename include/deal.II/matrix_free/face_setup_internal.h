@@ -623,8 +623,8 @@ namespace internal
                   // side). We process a face locally when we are more refined
                   // (in the active cell case) or when the face is listed in
                   // the `shared_faces` data structure that we built above.
-                  if ((id1 == id2 && (use_active_cells == false ||
-                                      neighbor->has_children() == false)) ||
+                  if ((id1 == id2 &&
+                       (use_active_cells == false || neighbor->is_active())) ||
                       dcell->level() > neighbor->level() ||
                       std::binary_search(
                         inner_faces_at_proc_boundary[id2].shared_faces.begin(),

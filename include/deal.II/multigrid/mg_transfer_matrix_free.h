@@ -561,7 +561,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
             // if we get to a cell without children (== active), we can
             // skip it as there values should be already set by the
             // equivalent of copy_to_mg()
-            if (!cell->has_children())
+            if (cell->is_active())
               continue;
 
             std::fill(dof_values_coarse.begin(), dof_values_coarse.end(), 0.);

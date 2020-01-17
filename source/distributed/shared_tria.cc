@@ -228,7 +228,7 @@ namespace parallel
                       // also keep its level subdomain id since it is either
                       // owned by this processor or in the ghost layer of the
                       // active mesh.
-                      if (!cell->has_children() &&
+                      if (cell->is_active() &&
                           cell->subdomain_id() !=
                             numbers::artificial_subdomain_id)
                         continue;

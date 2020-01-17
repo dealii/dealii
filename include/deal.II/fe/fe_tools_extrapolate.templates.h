@@ -590,7 +590,7 @@ namespace FETools
         Vector<value_type> &   interpolated_values,
         std::vector<CellData> &new_needs)
     {
-      if (!dealii_cell->has_children())
+      if (dealii_cell->is_active())
         {
           if (dealii_cell->is_locally_owned())
             {
@@ -730,7 +730,7 @@ namespace FETools
         dealii_cell->get_dof_handler().get_fe();
       const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-      if (!dealii_cell->has_children())
+      if (dealii_cell->is_active())
         {
           if (dealii_cell->is_locally_owned())
             {

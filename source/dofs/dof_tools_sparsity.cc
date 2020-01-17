@@ -278,7 +278,7 @@ namespace DoFTools
         const cell_iterator cell_row = cell_pair.first;
         const cell_iterator cell_col = cell_pair.second;
 
-        if (!cell_row->has_children() && !cell_col->has_children())
+        if (cell_row->is_active() && cell_col->is_active())
           {
             const unsigned int dofs_per_cell_row =
               cell_row->get_fe().dofs_per_cell;

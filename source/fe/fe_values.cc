@@ -2840,7 +2840,7 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
   const IndexSet &              in,
   Vector<IndexSet::value_type> &out) const
 {
-  Assert(cell->has_children() == false, ExcNotImplemented());
+  Assert(cell->is_active(), ExcNotImplemented());
 
   std::vector<types::global_dof_index> dof_indices(
     cell->get_fe().dofs_per_cell);

@@ -846,7 +846,7 @@ namespace internal
         // get an iterator pointing to the cell behind the present subface
         const typename DoFHandlerType::active_cell_iterator neighbor_child =
           cell->neighbor_child_on_subface(face_no, subface_no);
-        Assert(!neighbor_child->has_children(), ExcInternalError());
+        Assert(neighbor_child->is_active(), ExcInternalError());
 
         // restrict the finite element on the present cell to the subface
         fe_subface_values.reinit(cell,

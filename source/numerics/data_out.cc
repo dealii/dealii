@@ -1140,8 +1140,8 @@ DataOut<dim, DoFHandlerType>::first_locally_owned_cell()
 
   // skip cells if the current one has no children (is active) and is a ghost
   // or artificial cell
-  while ((cell != this->triangulation->end()) &&
-         (cell->has_children() == false) && !cell->is_locally_owned())
+  while ((cell != this->triangulation->end()) && cell->is_active() &&
+         !cell->is_locally_owned())
     cell = next_cell(cell);
 
   return cell;
@@ -1156,8 +1156,8 @@ DataOut<dim, DoFHandlerType>::next_locally_owned_cell(
 {
   typename DataOut<dim, DoFHandlerType>::cell_iterator cell =
     next_cell(old_cell);
-  while ((cell != this->triangulation->end()) &&
-         (cell->has_children() == false) && !cell->is_locally_owned())
+  while ((cell != this->triangulation->end()) && cell->is_active() &&
+         !cell->is_locally_owned())
     cell = next_cell(cell);
   return cell;
 }

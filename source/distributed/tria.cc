@@ -468,7 +468,7 @@ namespace
       {
         // yes, cell found in local part of p4est
         delete_all_children<dim, spacedim>(dealii_cell);
-        if (!dealii_cell->has_children())
+        if (dealii_cell->is_active())
           dealii_cell->set_subdomain_id(my_subdomain);
       }
     else
@@ -478,7 +478,7 @@ namespace
         // no children of its own, we need to refine it, and if it does
         // already have children then loop over all children and see if they
         // are locally available as well
-        if (dealii_cell->has_children() == false)
+        if (dealii_cell->is_active())
           dealii_cell->set_refine_flag();
         else
           {
@@ -549,7 +549,7 @@ namespace
         typename Triangulation<dim, spacedim>::cell_iterator cell(tria,
                                                                   i,
                                                                   dealii_index);
-        if (cell->has_children() == false)
+        if (cell->is_active())
           {
             cell->clear_coarsen_flag();
             cell->set_refine_flag();
@@ -721,7 +721,7 @@ namespace
     const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
     const types::subdomain_id                                   my_subdomain)
   {
-    if (!cell->has_children())
+    if (cell->is_active())
       {
         if (cell->subdomain_id() == my_subdomain)
           {
@@ -2521,7 +2521,7 @@ namespace parallel
                                                               quadrant))
             {
               Assert(!dealii_cell->is_artificial(), ExcInternalError());
-              Assert(!dealii_cell->has_children(), ExcInternalError());
+              Assert(dealii_cell->is_active(), ExcInternalError());
               Assert(!dealii_cell->is_locally_owned(), ExcInternalError());
 
               const unsigned int n_vertices = vertex_indices[0];
@@ -2533,7 +2533,7 @@ namespace parallel
               return;
             }
 
-          if (!dealii_cell->has_children())
+          if (dealii_cell->is_active())
             return;
 
           if (!dealii::internal::p4est::quadrant_is_ancestor<dim>(p4est_cell,
@@ -3548,7 +3548,7 @@ namespace parallel
                   false)
                 {
                   delete_all_children<dim, spacedim>(cell);
-                  if (!cell->has_children())
+                  if (cell->is_active())
                     cell->set_subdomain_id(numbers::artificial_subdomain_id);
                 }
 
@@ -3673,7 +3673,7 @@ namespace parallel
                 endc = this->end(lvl);
               for (cell = this->begin(lvl); cell != endc; ++cell)
                 {
-                  if ((!cell->has_children() &&
+                  if ((cell->is_active() &&
                        cell->subdomain_id() ==
                          this->locally_owned_subdomain()) ||
                       (cell->has_children() &&

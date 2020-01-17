@@ -13892,7 +13892,7 @@ namespace
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const bool allow_anisotropic_smoothing)
   {
-    Assert(cell->has_children() == false, ExcInternalError());
+    Assert(cell->is_active(), ExcInternalError());
     Assert(cell->refine_flag_set() == false, ExcInternalError());
 
 
