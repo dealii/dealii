@@ -253,7 +253,12 @@ foreach $kind (keys %style)
 }
 # now add connections to make sure they appear nicely next to each other
 # in the legend
-print "  basic -- techniques -- fluids -- solids -- time_dependent -- unfinished -- code_gallery;\n";
+print "  basic -- techniques [style=invis];\n";
+print "  techniques -- fluids [style=invis];\n";
+print "  fluids -- solids [style=invis];\n";
+print "  solids -- time_dependent [style=invis];\n";
+print "  time_dependent -- unfinished [style=invis];\n";
+print "  unfinished -- code_gallery [style=invis];\n";
 
 # we need to tell 'dot' that all of these are at the same
 # rank to ensure they appear next to (as opposed to atop)
