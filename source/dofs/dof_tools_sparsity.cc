@@ -880,6 +880,16 @@ namespace DoFTools
                           cell->periodic_neighbor_face_no(face_n) :
                           cell->neighbor_face_no(face_n);
 
+
+                      // In 1D, go straight to the cell behind this particular
+                      // cell's most terminal cell. This makes us skip the
+                      // if (neighbor->has_children()) section below. We need to
+                      // do this since we otherwise iterate over the children of
+                      // the face, which are always 0 in 1D.
+                      if (DoFHandlerType::dimension == 1)
+                        while (neighbor->has_children())
+                          neighbor = neighbor->child(face_n == 0 ? 1 : 0);
+
                       if (neighbor->has_children())
                         {
                           for (unsigned int sub_nr = 0;
@@ -1173,6 +1183,15 @@ namespace DoFTools
                             !cell->periodic_neighbor_is_coarser(face))) &&
                           neighbor->is_locally_owned())
                         continue; // (the neighbor is finer)
+
+                      // In 1D, go straight to the cell behind this particular
+                      // cell's most terminal cell. This makes us skip the
+                      // if (neighbor->has_children()) section below. We need to
+                      // do this since we otherwise iterate over the children of
+                      // the face, which are always 0 in 1D.
+                      if (dim == 1)
+                        while (neighbor->has_children())
+                          neighbor = neighbor->child(face == 0 ? 1 : 0);
 
                       if (neighbor->has_children())
                         {
