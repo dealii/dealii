@@ -236,9 +236,9 @@ namespace Utilities
       using T2 = int;
 
       virtual void
-      process_request(const unsigned int other_rank,
-                      const std::vector<T1> &,
-                      std::vector<T2> &) override
+      answer_request(const unsigned int other_rank,
+                     const std::vector<T1> &,
+                     std::vector<T2> &) override
       {
         this->sources.push_back(other_rank);
       }
@@ -961,9 +961,9 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithmProcess<T1, T2>::process_request(const unsigned int,
-                                                       const std::vector<T1> &,
-                                                       std::vector<T2> &)
+    ConsensusAlgorithmProcess<T1, T2>::answer_request(const unsigned int,
+                                                      const std::vector<T1> &,
+                                                      std::vector<T2> &)
     {
       // nothing to do
     }
@@ -972,8 +972,8 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithmProcess<T1, T2>::pack_recv_buffer(const int,
-                                                        std::vector<T1> &)
+    ConsensusAlgorithmProcess<T1, T2>::create_request(const int,
+                                                      std::vector<T1> &)
     {
       // nothing to do
     }
@@ -982,19 +982,19 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithmProcess<T1, T2>::prepare_recv_buffer(const int,
-                                                           std::vector<T2> &)
-    {
-      // nothing to do
-    }
-
-
-
-    template <typename T1, typename T2>
-    void
-    ConsensusAlgorithmProcess<T1, T2>::unpack_recv_buffer(
+    ConsensusAlgorithmProcess<T1, T2>::prepare_buffer_for_answer(
       const int,
-      const std::vector<T2> &)
+      std::vector<T2> &)
+    {
+      // nothing to do
+    }
+
+
+
+    template <typename T1, typename T2>
+    void
+    ConsensusAlgorithmProcess<T1, T2>::read_answer(const int,
+                                                   const std::vector<T2> &)
     {
       // nothing to do
     }
@@ -1035,7 +1035,7 @@ namespace Utilities
       // 2) answer requests and check if all requests of this process have been
       //    answered
       while (!check_own_state())
-        process_requests();
+        answer_requests();
 
       // 3) signal to all other processes that all requests of this process have
       //    been answered
@@ -1045,7 +1045,7 @@ namespace Utilities
       //    incoming requests until all processes have received the
       //    answer to all requests
       while (!check_global_state())
-        process_requests();
+        answer_requests();
 
       // 5) process the answer to all requests
       clean_up_and_end_communication();
@@ -1112,12 +1112,12 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithm_NBX<T1, T2>::process_requests()
+    ConsensusAlgorithm_NBX<T1, T2>::answer_requests()
     {
 #ifdef DEAL_II_WITH_MPI
 
       const int tag_request =
-        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_request;
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_answer_request;
       const int tag_deliver =
         Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_deliver;
 
@@ -1165,9 +1165,7 @@ namespace Utilities
 
           // process request
           auto &request_buffer = *request_buffers.back();
-          this->process.process_request(other_rank,
-                                        buffer_recv,
-                                        request_buffer);
+          this->process.answer_request(other_rank, buffer_recv, request_buffer);
 
           // start to send answer back
           ierr = MPI_Isend(request_buffer.data(),
@@ -1194,7 +1192,7 @@ namespace Utilities
       const auto n_targets = targets.size();
 
       const int tag_request =
-        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_request;
+        Utilities::MPI::internal::Tags::consensus_algorithm_nbx_answer_request;
       const int tag_deliver =
         Utilities::MPI::internal::Tags::consensus_algorithm_nbx_process_deliver;
 
@@ -1213,7 +1211,7 @@ namespace Utilities
 
             // translate index set to a list of pairs
             auto &send_buffer = send_buffers[index];
-            this->process.pack_recv_buffer(rank, send_buffer);
+            this->process.create_request(rank, send_buffer);
 
             // start to send data
             auto ierr = MPI_Isend(send_buffer.data(),
@@ -1227,7 +1225,7 @@ namespace Utilities
 
             // start to receive data
             auto &recv_buffer = recv_buffers[index];
-            this->process.prepare_recv_buffer(rank, recv_buffer);
+            this->process.prepare_buffer_for_answer(rank, recv_buffer);
             ierr = MPI_Irecv(recv_buffer.data(),
                              recv_buffer.size() * sizeof(T2),
                              MPI_BYTE,
@@ -1286,7 +1284,7 @@ namespace Utilities
       // unpack data
       {
         for (unsigned int i = 0; i < targets.size(); i++)
-          this->process.unpack_recv_buffer(targets[i], recv_buffers[i]);
+          this->process.read_answer(targets[i], recv_buffers[i]);
       }
 #endif
     }
@@ -1315,7 +1313,7 @@ namespace Utilities
 
       // 2) answer requests
       for (unsigned int request = 0; request < n_requests; request++)
-        process_requests(request);
+        answer_requests(request);
 
       // 3) process answers
       clean_up_and_end_communication();
@@ -1325,11 +1323,11 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithm_PEX<T1, T2>::process_requests(int index)
+    ConsensusAlgorithm_PEX<T1, T2>::answer_requests(int index)
     {
 #ifdef DEAL_II_WITH_MPI
       const int tag_request =
-        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_request;
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_answer_request;
       const int tag_deliver =
         Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_deliver;
 
@@ -1360,7 +1358,7 @@ namespace Utilities
 
       // process request
       auto &request_buffer = requests_buffers[index];
-      this->process.process_request(other_rank, buffer_recv, request_buffer);
+      this->process.answer_request(other_rank, buffer_recv, request_buffer);
 
       // start to send answer back
       ierr = MPI_Isend(request_buffer.data(),
@@ -1387,7 +1385,7 @@ namespace Utilities
       targets = this->process.compute_targets();
 
       const int tag_request =
-        Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_request;
+        Utilities::MPI::internal::Tags::consensus_algorithm_pex_answer_request;
       const int tag_deliver =
         Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_deliver;
 
@@ -1413,7 +1411,7 @@ namespace Utilities
 
           // pack data which should be sent
           auto &send_buffer = send_buffers[i];
-          this->process.pack_recv_buffer(rank, send_buffer);
+          this->process.create_request(rank, send_buffer);
 
           // start to send data
           auto ierr = MPI_Isend(send_buffer.data(),
@@ -1427,7 +1425,7 @@ namespace Utilities
 
           // start to receive data
           auto &recv_buffer = recv_buffers[i];
-          this->process.prepare_recv_buffer(rank, recv_buffer);
+          this->process.prepare_buffer_for_answer(rank, recv_buffer);
           ierr = MPI_Irecv(recv_buffer.data(),
                            recv_buffer.size() * sizeof(T2),
                            MPI_BYTE,
@@ -1470,7 +1468,7 @@ namespace Utilities
 
       // unpack received data
       for (unsigned int i = 0; i < targets.size(); i++)
-        this->process.unpack_recv_buffer(targets[i], recv_buffers[i]);
+        this->process.read_answer(targets[i], recv_buffers[i]);
 #endif
     }
 

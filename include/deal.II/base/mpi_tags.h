@@ -86,12 +86,12 @@ namespace Utilities
           fe_tools_extrapolate_end = fe_tools_extrapolate + 10,
 
           /// ConsensusAlgorithm_NBX::process
-          consensus_algorithm_nbx_process_request,
+          consensus_algorithm_nbx_answer_request,
           /// ConsensusAlgorithm_NBX::process
           consensus_algorithm_nbx_process_deliver,
 
           /// ConsensusAlgorithm_PEX::process
-          consensus_algorithm_pex_process_request,
+          consensus_algorithm_pex_answer_request,
           /// ConsensusAlgorithm_PEX::process
           consensus_algorithm_pex_process_deliver,
 
