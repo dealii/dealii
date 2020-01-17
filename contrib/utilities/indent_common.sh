@@ -163,12 +163,16 @@ format_file()
 export -f format_file
 
 #
-# Remove trailing whitespace
+# Remove trailiing whitespace. Mac OSX requires an extension for a backup file
+# for in-place replacements. So we need to provide something before the regex.
+# Using '-e' avoids creating these files on GNU platforms at least.
+# For Mac OSX, we still need to delete the created file.
 #
 
 remove_trailing_whitespace()
 {
-  sed -i 's/\s\+$//g' $1
+  sed -i -e 's/\s\+$//g' "$1"
+  rm -f "$1-e"
 }
 export -f remove_trailing_whitespace
 
