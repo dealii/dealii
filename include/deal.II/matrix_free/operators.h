@@ -642,7 +642,7 @@ namespace MatrixFreeOperators
     /**
      * Applies the inverse mass matrix operation on an input array. It is
      * assumed that the passed input and output arrays are of correct size,
-     * namely FEEval::dofs_per_cell * n_components long. The inverse of the
+     * namely FEEvaluation::dofs_per_cell long. The inverse of the
      * local coefficient (also containing the inverse JxW values) must be
      * passed as first argument. Passing more than one component in the
      * coefficient is allowed.
@@ -652,6 +652,21 @@ namespace MatrixFreeOperators
           const unsigned int                        n_actual_components,
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const;
+
+    /**
+     * Applies the inverse mass matrix operation on an input array, using the
+     * inverse of the JxW values provided by the `fe_eval` argument passed to
+     * the constructor of this class. Note that the user code must call
+     * FEEvaluation::reinit() on the underlying evaluator to make the
+     * FEEvaluationBase::JxW() method return the information of the correct
+     * cell. It is assumed that the pointers of the input and output arrays
+     * are valid over the length FEEvaluation::dofs_per_cell, which is the
+     * number of entries processed by this function. The `in_array` and
+     * `out_array` arguments may point to the same memory position.
+     */
+    void
+    apply(const VectorizedArrayType *in_array,
+          VectorizedArrayType *      out_array) const;
 
     /**
      * This operation performs a projection from the data given in quadrature
@@ -986,6 +1001,29 @@ namespace MatrixFreeOperators
     for (unsigned int q = dofs_per_component_on_cell; q < inverse_jxw.size();)
       for (unsigned int i = 0; i < dofs_per_component_on_cell; ++i, ++q)
         inverse_jxw[q] = inverse_jxw[i];
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  inline void
+  CellwiseInverseMassMatrix<
+    dim,
+    fe_degree,
+    n_components,
+    Number,
+    VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
+                                VectorizedArrayType *      out_array) const
+  {
+    internal::CellwiseInverseMassMatrixImpl<
+      dim,
+      fe_degree,
+      n_components,
+      VectorizedArrayType>::apply(fe_eval, in_array, out_array);
   }
 
 
