@@ -35,8 +35,8 @@ my %colors = (
  "fluids"         => 'yellow2',
  "solids"         => 'lightblue',
  "time dependent" => 'dodgerblue1',
- "unfinished"     => 'black',
- "code-gallery"   => 'black',
+ "unfinished"     => 'white',
+ "code-gallery"   => 'white',
     );
 
 my %style = (
@@ -122,7 +122,7 @@ foreach $step (@ARGV)
 
       printf "  code_gallery_$tag [label=\"\", URL=\"\\ref code_gallery_$tag\", tooltip=\"$tooltip\"";
       my $kind = "code-gallery";
-      print "$style{$kind}";
+      print "$style{$kind},fillcolor=\"$colors{$kind}\"";
     }
 
     print "];\n";
