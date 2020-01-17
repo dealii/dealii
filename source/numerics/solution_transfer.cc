@@ -308,7 +308,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
   for (typename DoFHandlerType::cell_iterator cell = dof_handler->begin();
        cell != dof_handler->end();
        ++cell)
-    if (!cell->active() && cell->child(0)->coarsen_flag_set())
+    if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
   Assert(n_cells_to_coarsen >= 2 * n_coarsen_fathers, ExcInternalError());
 
@@ -339,7 +339,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
        ++cell)
     {
       // CASE 1: active cell that remains as it is
-      if (cell->active() && !cell->coarsen_flag_set())
+      if (cell->is_active() && !cell->coarsen_flag_set())
         {
           const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
           indices_on_cell[n_sr].resize(dofs_per_cell);
@@ -367,7 +367,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
                ++child_index)
             {
               const auto child = cell->child(child_index);
-              Assert(child->active() && child->coarsen_flag_set(),
+              Assert(child->is_active() && child->coarsen_flag_set(),
                      typename dealii::Triangulation<
                        dim>::ExcInconsistentCoarseningFlags());
 

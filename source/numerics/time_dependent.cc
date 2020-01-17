@@ -581,9 +581,9 @@ namespace
     // no problem at all, if it is on a lower
     // level than the present one, then it
     // will be refined below anyway.
-    if (new_cell->active())
+    if (new_cell->is_active())
       {
-        if (new_cell->refine_flag_set() && old_cell->active())
+        if (new_cell->refine_flag_set() && old_cell->is_active())
           {
             if (old_cell->coarsen_flag_set())
               old_cell->clear_coarsen_flag();

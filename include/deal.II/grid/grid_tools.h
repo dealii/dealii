@@ -3259,7 +3259,7 @@ namespace GridTools
               // children bound to the present cell
               typename MeshType::cell_iterator neighbor_child =
                 cell->neighbor(n);
-              if (!neighbor_child->active())
+              if (!neighbor_child->is_active())
                 {
                   while (neighbor_child->has_children())
                     neighbor_child = neighbor_child->child(n == 0 ? 1 : 0);
@@ -3284,7 +3284,7 @@ namespace GridTools
                 {
                   // the neighbor must be active
                   // himself
-                  Assert(cell->neighbor(n)->active(), ExcInternalError());
+                  Assert(cell->neighbor(n)->is_active(), ExcInternalError());
                   active_neighbors.push_back(cell->neighbor(n));
                 }
             }

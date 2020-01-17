@@ -199,7 +199,7 @@ namespace parallel
             std::vector<bool> vertices_owned_by_locally_owned_cells(
               tria.n_vertices());
             for (auto cell : tria.cell_iterators())
-              if (cell->active() && cell->subdomain_id() == my_rank)
+              if (cell->is_active() && cell->subdomain_id() == my_rank)
                 add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                   cell, vertices_owned_by_locally_owned_cells);
 
@@ -224,7 +224,7 @@ namespace parallel
             construction_data.cell_infos.resize(1);
 
             for (auto cell : tria.cell_iterators())
-              if (cell->active() && is_locally_relevant(cell))
+              if (cell->is_active() && is_locally_relevant(cell))
                 {
                   // to be filled
                   CellData<dim> cell_info;
@@ -343,7 +343,7 @@ namespace parallel
                     tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
-                      (cell->active() && cell->subdomain_id() == my_rank))
+                      (cell->is_active() && cell->subdomain_id() == my_rank))
                     add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                       cell, vertices_owned_by_locally_owned_cells_on_level);
 
@@ -439,7 +439,7 @@ namespace parallel
             // on active level
             auto is_locally_relevant_on_active_level =
               [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-                if (cell->active())
+                if (cell->is_active())
                   for (unsigned int v = 0;
                        v < GeometryInfo<dim>::vertices_per_cell;
                        ++v)
@@ -459,7 +459,7 @@ namespace parallel
                     tria.n_vertices());
                 for (auto cell : tria.cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() == my_rank ||
-                      (cell->active() && cell->subdomain_id() == my_rank))
+                      (cell->is_active() && cell->subdomain_id() == my_rank))
                     add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                       cell, vertices_owned_by_locally_owned_cells_on_level);
 

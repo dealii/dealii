@@ -371,7 +371,7 @@ namespace
         // *---*---*
         // |   | M |
         // *---*---*
-        if (!used && dealii_cell->active() &&
+        if (!used && dealii_cell->is_active() &&
             dealii_cell->is_artificial() == false &&
             dealii_cell->level() + 1 < static_cast<int>(marked_vertices.size()))
           {
@@ -388,7 +388,7 @@ namespace
           }
 
         // Like above, but now the other way around
-        if (!used && dealii_cell->active() &&
+        if (!used && dealii_cell->is_active() &&
             dealii_cell->is_artificial() == false && dealii_cell->level() > 0)
           {
             for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
@@ -1209,7 +1209,7 @@ namespace parallel
                   CELL_REFINE:
                   // double check the condition that we will only ever attach
                   // data to active cells when we get here
-                  Assert(dealii_cell->active(), ExcInternalError());
+                  Assert(dealii_cell->is_active(), ExcInternalError());
                   break;
 
                 case parallel::distributed::Triangulation<dim, spacedim>::
@@ -1218,11 +1218,12 @@ namespace parallel
                   // data to cells with children when we get here. however, we
                   // can only tolerate one level of coarsening at a time, so
                   // check that the children are all active
-                  Assert(dealii_cell->active() == false, ExcInternalError());
+                  Assert(dealii_cell->is_active() == false, ExcInternalError());
                   for (unsigned int c = 0;
                        c < GeometryInfo<dim>::max_children_per_cell;
                        ++c)
-                    Assert(dealii_cell->child(c)->active(), ExcInternalError());
+                    Assert(dealii_cell->child(c)->is_active(),
+                           ExcInternalError());
                   break;
 
                 case parallel::distributed::Triangulation<dim, spacedim>::
@@ -3385,13 +3386,13 @@ namespace parallel
                  ++cell)
               {
                 // nothing to do if we are already on the finest level
-                if (cell->active())
+                if (cell->is_active())
                   continue;
 
                 const unsigned int n_children       = cell->n_children();
                 unsigned int       flagged_children = 0;
                 for (unsigned int child = 0; child < n_children; ++child)
-                  if (cell->child(child)->active() &&
+                  if (cell->child(child)->is_active() &&
                       cell->child(child)->coarsen_flag_set())
                     ++flagged_children;
 
@@ -3399,7 +3400,7 @@ namespace parallel
                 // coarsen flags
                 if (flagged_children < n_children)
                   for (unsigned int child = 0; child < n_children; ++child)
-                    if (cell->child(child)->active())
+                    if (cell->child(child)->is_active())
                       cell->child(child)->clear_coarsen_flag();
               }
           }
@@ -4029,7 +4030,7 @@ namespace parallel
                 cell = this->begin(maybe_coarser_lvl),
                 endc = this->end(lvl);
               for (; cell != endc; ++cell)
-                if (cell->level() == static_cast<int>(lvl) || cell->active())
+                if (cell->level() == static_cast<int>(lvl) || cell->is_active())
                   {
                     const bool is_level_artificial =
                       (cell->level_subdomain_id() ==

@@ -1386,7 +1386,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
   for (const auto &cell : tria.cell_iterators())
     {
       // If depth is not encoded, write finest level only
-      if (!xfig_flags.level_depth && !cell->active())
+      if (!xfig_flags.level_depth && !cell->is_active())
         continue;
       // Code for polygon
       out << "2 3  " << xfig_flags.line_style << ' '
@@ -1633,7 +1633,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
       materials.insert(cell->material_id());
       levels.insert(cell->level());
-      if (cell->active())
+      if (cell->is_active())
         subdomains.insert(cell->subdomain_id() + 2);
       level_subdomains.insert(cell->level_subdomain_id() + 2);
     }
@@ -2106,7 +2106,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
     {
       for (const auto &cell : tria.cell_iterators_on_level(level_index))
         {
-          if (!svg_flags.convert_level_number_to_height && !cell->active())
+          if (!svg_flags.convert_level_number_to_height && !cell->is_active())
             continue;
 
           // draw the current cell
@@ -2116,7 +2116,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
             {
               out << " class=\"p";
 
-              if (!cell->active() && svg_flags.convert_level_number_to_height)
+              if (!cell->is_active() &&
+                  svg_flags.convert_level_number_to_height)
                 out << 's';
 
               switch (svg_flags.coloring)
@@ -2128,7 +2129,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                     out << static_cast<unsigned int>(cell->level());
                     break;
                   case GridOutFlags::Svg::subdomain_id:
-                    if (cell->active())
+                    if (cell->is_active())
                       out << cell->subdomain_id() + 2;
                     else
                       out << 'X';
@@ -2353,7 +2354,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                   if (svg_flags.label_level_number ||
                       svg_flags.label_cell_index || svg_flags.label_material_id)
                     out << ',';
-                  if (cell->active())
+                  if (cell->is_active())
                     out << static_cast<
                       std::make_signed<types::subdomain_id>::type>(
                       cell->subdomain_id());

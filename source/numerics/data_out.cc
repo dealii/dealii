@@ -936,7 +936,7 @@ DataOut<dim, DoFHandlerType>::build_patches(
       {
         // move forward until active_cell points at the cell (cell) we are
         // looking at to compute the current active_index
-        while (active_cell != this->triangulation->end() && cell->active() &&
+        while (active_cell != this->triangulation->end() && cell->is_active() &&
                decltype(active_cell)(cell) != active_cell)
           {
             ++active_cell;

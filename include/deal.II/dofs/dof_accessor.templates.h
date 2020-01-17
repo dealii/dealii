@@ -3810,7 +3810,7 @@ inline void
 DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices) const
 {
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("get_dof_indices() only works on active cells."));
   Assert(this->is_artificial() == false,
          ExcMessage("Can't ask for DoF indices on artificial cells."));

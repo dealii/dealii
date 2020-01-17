@@ -223,7 +223,7 @@ namespace parallel
           //     (level_)subdomain_ids in the next step)
           for (auto cell = this->begin(); cell != this->end(); ++cell)
             {
-              if (cell->active())
+              if (cell->is_active())
                 cell->set_subdomain_id(
                   dealii::numbers::artificial_subdomain_id);
 
@@ -243,7 +243,7 @@ namespace parallel
                     ++cell;
 
                   // subdomain id
-                  if (cell->active())
+                  if (cell->is_active())
                     cell->set_subdomain_id(cell_info->subdomain_id);
 
                   // level subdomain id

@@ -295,7 +295,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
           Assert(
-            cell_and_face->first->active(),
+            cell_and_face->first->is_active(),
             ExcMessage(
               "The current function is trying to generate cell-data output "
               "for a face that does not belong to an active cell. This is "

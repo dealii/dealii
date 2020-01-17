@@ -275,7 +275,7 @@ namespace MeshWorker
               if (neighbor->is_level_cell())
                 neighbid = neighbor->level_subdomain_id();
               // subdomain id is only valid for active cells
-              else if (neighbor->active())
+              else if (neighbor->is_active())
                 neighbid = neighbor->subdomain_id();
 
               const bool own_neighbor =

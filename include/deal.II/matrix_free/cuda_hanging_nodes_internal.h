@@ -225,7 +225,7 @@ namespace CUDAWrappers
                ++line)
             {
               const unsigned int line_idx = cell->line(line)->index();
-              if (cell->active())
+              if (cell->is_active())
                 line_to_cells[line_idx].push_back(std::make_pair(cell, line));
               else
                 line_to_inactive_cells[line_idx].push_back(

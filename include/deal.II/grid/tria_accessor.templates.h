@@ -3299,8 +3299,8 @@ CellAccessor<dim, spacedim>::refine_flag_set() const
   // but activity may change when refinement is
   // executed and for some reason the refine
   // flag is not cleared).
-  Assert(this->active() || !this->tria->levels[this->present_level]
-                              ->refine_flags[this->present_index],
+  Assert(this->is_active() || !this->tria->levels[this->present_level]
+                                 ->refine_flags[this->present_index],
          ExcRefineCellNotActive());
   return RefinementCase<dim>(
     this->tria->levels[this->present_level]->refine_flags[this->present_index]);
@@ -3313,7 +3313,7 @@ inline void
 CellAccessor<dim, spacedim>::set_refine_flag(
   const RefinementCase<dim> refinement_case) const
 {
-  Assert(this->used() && this->active(), ExcRefineCellNotActive());
+  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   Assert(!coarsen_flag_set(), ExcCellFlaggedForCoarsening());
 
   this->tria->levels[this->present_level]->refine_flags[this->present_index] =
@@ -3326,7 +3326,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::clear_refine_flag() const
 {
-  Assert(this->used() && this->active(), ExcRefineCellNotActive());
+  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   this->tria->levels[this->present_level]->refine_flags[this->present_index] =
     RefinementCase<dim>::no_refinement;
 }
@@ -3523,8 +3523,8 @@ CellAccessor<dim, spacedim>::coarsen_flag_set() const
   // but activity may change when refinement is
   // executed and for some reason the refine
   // flag is not cleared).
-  Assert(this->active() || !this->tria->levels[this->present_level]
-                              ->coarsen_flags[this->present_index],
+  Assert(this->is_active() || !this->tria->levels[this->present_level]
+                                 ->coarsen_flags[this->present_index],
          ExcRefineCellNotActive());
   return this->tria->levels[this->present_level]
     ->coarsen_flags[this->present_index];
@@ -3536,7 +3536,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::set_coarsen_flag() const
 {
-  Assert(this->used() && this->active(), ExcRefineCellNotActive());
+  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   Assert(!refine_flag_set(), ExcCellFlaggedForRefinement());
 
   this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
@@ -3549,7 +3549,7 @@ template <int dim, int spacedim>
 inline void
 CellAccessor<dim, spacedim>::clear_coarsen_flag() const
 {
-  Assert(this->used() && this->active(), ExcRefineCellNotActive());
+  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
     false;
 }
@@ -3583,9 +3583,18 @@ CellAccessor<dim, spacedim>::active() const
 
 template <int dim, int spacedim>
 inline bool
+CellAccessor<dim, spacedim>::is_active() const
+{
+  return !this->has_children();
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
 CellAccessor<dim, spacedim>::is_locally_owned() const
 {
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("is_locally_owned() can only be called on active cells!"));
 #ifndef DEAL_II_WITH_MPI
   return true;
@@ -3627,7 +3636,7 @@ template <int dim, int spacedim>
 inline bool
 CellAccessor<dim, spacedim>::is_ghost() const
 {
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("is_ghost() can only be called on active cells!"));
   if (this->has_children())
     return false;
@@ -3655,7 +3664,7 @@ template <int dim, int spacedim>
 inline bool
 CellAccessor<dim, spacedim>::is_artificial() const
 {
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("is_artificial() can only be called on active cells!"));
 #ifndef DEAL_II_WITH_MPI
   return false;
@@ -3678,7 +3687,7 @@ inline types::subdomain_id
 CellAccessor<dim, spacedim>::subdomain_id() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("subdomain_id() can only be called on active cells!"));
   return this->tria->levels[this->present_level]
     ->subdomain_ids[this->present_index];

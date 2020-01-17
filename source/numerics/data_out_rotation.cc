@@ -413,7 +413,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
               // we need to get at the number of the cell to which this face
               // belongs in order to access the cell data. this is not readily
               // available, so choose the following rather inefficient way:
-              Assert((*cell)->active(),
+              Assert((*cell)->is_active(),
                      ExcMessage("Cell must be active for cell data"));
               const unsigned int cell_number = std::distance(
                 this->triangulation->begin_active(),

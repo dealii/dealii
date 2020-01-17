@@ -1973,7 +1973,7 @@ CellAccessor<dim, spacedim>::set_subdomain_id(
   const types::subdomain_id new_subdomain_id) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index] =
     new_subdomain_id;

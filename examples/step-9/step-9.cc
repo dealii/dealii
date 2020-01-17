@@ -1055,7 +1055,7 @@ namespace Step9
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
           // 1D), and we are interested in it in any case.
-          if (neighbor->active())
+          if (neighbor->is_active())
             scratch_data.active_neighbors.push_back(neighbor);
           else
             {
