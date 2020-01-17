@@ -43,10 +43,14 @@ test()
   std::vector<CellData<2>> cells;
   SubCellData              subcelldata;
 
-  double tol = 1e-15;
-  vertices.push_back(Point<3>{10, 56, 0});
-  vertices.push_back(Point<3>{22, 1, 0});
-  vertices.push_back(Point<3>{15, 44, 0});
+  double tol = 1e-12;
+  // vertices.push_back(Point<3>{10, 56, 0});
+  // vertices.push_back(Point<3>{22, 1, 0});
+  // vertices.push_back(Point<3>{15, 44, 0});
+  // vertices.push_back(Point<3>{1, 1, 1});
+  vertices.push_back(Point<3>{0, 0, 1});
+  vertices.push_back(Point<3>{1, 0, -10});
+  vertices.push_back(Point<3>{0, 1, -1});
   vertices.push_back(Point<3>{1, 1, 1});
 
   cells.resize(1);
@@ -62,7 +66,7 @@ test()
   DoFHandler<2, 3> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  QGauss<2>       quadrature_formula(1);
+  QGauss<2>       quadrature_formula(4);
   MappingQ1<2, 3> mapping;
   FEValues<2, 3>  fe_values(mapping, fe, quadrature_formula, update_JxW_values);
 
@@ -90,7 +94,7 @@ int
 main()
 {
   initlog();
-  deallog << std::setprecision(5);
+  deallog << std::setprecision(8);
 
 
   test();
