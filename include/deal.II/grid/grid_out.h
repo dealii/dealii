@@ -921,12 +921,23 @@ namespace GridOutFlags
 
   /**
    * Flags for grid output in Vtu format. These flags are the same as those
-   * declared in DataOutBase::VtkFlags.
+   * declared in DataOutBase::VtkFlags, with the addition of a flag that
+   * determines if you want to add a entry in the vtu file (which is really
+   * a xml file) containing the entire serialization of the triangulation.
    *
    * @ingroup output
    */
   struct Vtu : public DataOutBase::VtkFlags
-  {};
+  {
+    Vtu(const bool serialize_triangulation = false)
+      : serialize_triangulation(serialize_triangulation)
+    {}
+
+    /**
+     * Add to the vtu file also the serialized triangulation.
+     */
+    bool serialize_triangulation;
+  };
 } // namespace GridOutFlags
 
 

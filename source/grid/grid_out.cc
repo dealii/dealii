@@ -29,6 +29,9 @@
 
 #include <deal.II/numerics/data_out.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -37,7 +40,6 @@
 #include <iomanip>
 #include <list>
 #include <set>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -3369,7 +3371,9 @@ GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
   std::vector<DataOutBase::Patch<dim, spacedim>> patches;
   patches.reserve(tria.n_active_cells());
   generate_triangulation_patches(patches, tria.begin_active(), tria.end());
-  DataOutBase::write_vtu(
+
+  DataOutBase::write_vtu_header(out, vtu_flags);
+  DataOutBase::write_vtu_main(
     patches,
     triangulation_patch_data_names(),
     std::vector<
@@ -3379,7 +3383,22 @@ GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
                  DataComponentInterpretation::DataComponentInterpretation>>(),
     vtu_flags,
     out);
+  if (vtu_flags.serialize_triangulation)
+    {
+      out << " </UnstructuredGrid>\n";
+      out << "<dealiiData  encoding=\"base64\">";
+      std::stringstream               outstring;
+      boost::archive::binary_oarchive ia(outstring);
+      tria.save(ia, 0);
+      const auto compressed = Utilities::compress(outstring.str());
+      out << Utilities::encode_base64({compressed.begin(), compressed.end()});
+      out << "\n</dealiiData>\n";
+      out << "</VTKFile>\n";
+    }
+  else
+    DataOutBase::write_vtu_footer(out);
 
+  out << std::flush;
   AssertThrow(out, ExcIO());
 }
 
