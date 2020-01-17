@@ -26,13 +26,24 @@ while (my $line = <TUTORIAL>)
   print $line;
 }
 
-# List of additional node attributes to highlight purpose and state of the example
+# List of additional node and edge attributes to highlight purpose and state of
+# a tutorial or code gallery program
+my %colors = (
+ "basic"          => 'green',
+ "techniques"     => 'orange',
+ "fluids"         => 'yellow2',
+ "solids"         => 'lightblue',
+ "time dependent" => 'blue',
+ "unfinished"     => 'black',
+ "code-gallery"   => 'black',
+    );
+
 my %style = (
- "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
- "techniques"     => ',height=.35,width=.35,fillcolor="orange"',
- "fluids"         => ',height=.25,width=.25,fillcolor="yellow"',
- "solids"         => ',height=.25,width=.25,fillcolor="lightblue"',
- "time dependent" => ',height=.25,width=.25,fillcolor="blue"',
+ "basic"          => ',height=.8,width=.8,shape="octagon"',
+ "techniques"     => ',height=.35,width=.35',
+ "fluids"         => ',height=.25,width=.25',
+ "solids"         => ',height=.25,width=.25',
+ "time dependent" => ',height=.25,width=.25',
  "unfinished"     => ',height=.25,width=.25,style="dashed"',
  "code-gallery"   => ',height=.08,width=.125,shape="circle"',
     );
@@ -63,6 +74,7 @@ EOT
 # command line arguments denoting the tutorial programs
 
 my $step;
+my %kind_map;
 foreach $step (@ARGV)
 {
     # read first line of tooltip file
@@ -91,8 +103,10 @@ foreach $step (@ARGV)
       my $number = $step;
       $number =~ s/^.*-//;
 
+      $kind_map{"Step$number"} = $kind;
+
       printf "  Step$number [label=\"$number\", URL=\"\\ref step_$number\", tooltip=\"$tooltip\"";
-      print "$style{$kind}";
+      print "$style{$kind},fillcolor=\"$colors{$kind}\"";
     }
     else
     {
@@ -102,6 +116,8 @@ foreach $step (@ARGV)
       $name =~ s/^.*code-gallery\///;
       my $tag = $name;
       $tag =~ s/[^a-zA-Z]/_/g;
+
+      $kind_map{"code_gallery_$tag"} = "code-gallery";
 
       printf "  code_gallery_$tag [label=\"\", URL=\"\\ref code_gallery_$tag\", tooltip=\"$tooltip\"";
       my $kind = "code-gallery";
@@ -146,11 +162,24 @@ foreach $step (@ARGV)
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
         print "  $source -> $destination";
+
+        my $edge_attributes = "";
+
+        # Determine the style of the arrow that connects
+        # the two nodes. If the two nodes are of the same
+        # kind, use the same color as the nodes as this makes
+        # reading the flow of the graph a bit easier.
+        if ($kind_map{$source} eq $kind_map{$destination})
+        {
+            $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
+        }
+
+        # If the destination is a code gallery program, used a dashed line
         if ($destination =~ /code_gallery/)
         {
-            print " [style=\"dashed\", arrowhead=\"empty\"]";
+            $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\",";
         }
-        print "\n";
+        print " [$edge_attributes]\n";
     }
 }
 
@@ -204,7 +233,7 @@ foreach $kind (keys %style)
 {
     my $escaped_kind = $kind;
     $escaped_kind =~ s/[^a-zA-Z]/_/g;
-    printf "  $escaped_kind [label=\"\" $style{$kind}];\n";
+    printf "  $escaped_kind [label=\"\" $style{$kind}, fillcolor=\"$colors{$kind}\"];\n";
     printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", shape=plaintext];\n";
     printf "  $escaped_kind -- fake_$escaped_kind [style=dotted, arrowhead=odot, arrowsize=1];\n";
 }
