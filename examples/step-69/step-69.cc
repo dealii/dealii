@@ -472,7 +472,9 @@ namespace Step69
     vector_type output_vector;
   };
 
-  // @sect4{The <code>Discretization</code> class}
+  // @sect3{Implementation}
+
+  // @sect4{Grid generation, setup of data structures}
 
   // The first major task at hand is the typical triplet of grid
   // generation, setup of data structures, and assembly. A notable novelty
@@ -627,7 +629,7 @@ namespace Step69
     triangulation.refine_global(refinement);
   }
 
-  // @sect4{The <code>OfflineData</code> class}
+  // @sect4{Assembly of offline matrices}
 
   // Not much is done in the constructor of <code>OfflineData</code> other
   // than initializing the corresponding class members in the
@@ -763,60 +765,19 @@ namespace Step69
     }
   }
 
-  // In this last brace we finished with the implementation of the
-  // <code>OfflineData<dim>::setup()</code>.
-  //
-  // Now we define a collection of assembly utilities:
-  // - <code>CopyData</code>: This will only be used to compute the off-line
-  //   data using WorkStream. It acts as a container: it is just a
-  //   struct where WorkStream stores the local cell contributions. Note
-  //   it also contains a class member
-  //   <code>local_boundary_normal_map</code> used to store the local
-  //   contributions required to compute the normals at the boundary.
-  // - <code>get_entry</code>: it will be used to read the value stored at the 
-  //   entry pointed by the iterator <code>it</code> of <code>matrix</code>.
-  //   However, there is a context for the use of such function. If we are using 
-  //   CRS matrix format, a computationally inexpensive way to loop/traverse all 
-  //   is entries is to loop all it rows (top to bottom) and for each row loop 
-  //   all its nonzero columns (left to right). And that's the path that the 
-  //   iterator <code>it</code> is meant to follow.
-  // - <code>set_entry</code>: it sets <code>value</code> at the entry
-  //   pointed by the iterator <code>it</code> of <code>matrix</code>.
-  // - <code>gather_get_entry</code>: we note that
-  //   $\mathbf{c}_{ij} \in \mathbb{R}^d$. If $d=2$ then
-  //   $\mathbf{c}_{ij} = [\mathbf{c}_{ij}^1,\mathbf{c}_{ij}^2]^\top$.
-  //   Which basically implies
-  //   that we need one matrix per space dimension to store the
-  //   $\mathbf{c}_{ij}$ vectors. Similar observation follows for the matrix
-  //   $\mathbf{n}_{ij}$. The purpose of <code>gather_get_entry</code>
-  //   is to retrieve those entries a store them into a
-  //   <code>Tensor<1, dim></code> for our convenience. 
-  // - <code>gather</code> (first interface): this first function signature,
-  //   having three input arguments, will be used to retrieve the individual 
-  //   components <code>(i,l)</code> of a matrix. The functionality of 
-  //   <code>gather_get_entry</code> and <code>gather</code> is very much the 
-  //   same, but their context is different: the function <code>gather</code>
-  //   is meant to be used in exceptional/limited number of cases.
-  //   The reader should be aware that accessing an arbitrary 
-  //   <code>(i,l)</code> entry of a matrix (say for instance Trilinos or PETSc  
-  //   matrices) is very expensive. Here is where we might want to keep an eye 
-  //   on complexity: we want this operation to have constant complexity 
-  //   (and that's the case of this implementation using deal.ii matrices).
-  // - <code>gather</code> (second interface): this second function signature 
-  //   having two input arguments will be used to gather the state at a node 
-  //   <code>i</code> and return <code>Tensor<1, problem_dimension></code> for 
-  //   our convenience.
-  // - <code>scatter</code>: this function has three input arguments, the first 
-  //   one is meant to be a global object (say a locally owned vector), the 
-  //   second argument which could be a 
-  //   <code>Tensor<1,problem_dimension></code>,
-  //   and the last argument which represents a index of the global object. 
-  //   This function will be primarily used to write the updated nodal 
-  //   values, stored as <code>Tensor<1,problem_dimension></code>, into the 
-  //   globally owned vector.
+  // This concludes the setup of the DoFHandler and SparseMatrix objects
+  // Next, we have to assemble various matrices. We next define a number of
+  // helper functions and data structures in an anonymous namespace.
 
   namespace
   {
+    // <code>CopyData</code> class that will be used to assemble the
+    // offline data matrices using WorkStream. It acts as a container: it
+    // is just a struct where WorkStream stores the local cell
+    // contributions. Note that it also contains a class member
+    // <code>local_boundary_normal_map</code> used to store the local
+    // contributions required to compute the normals at the boundary.
+
     template <int dim>
     struct CopyData
     {
@@ -827,6 +788,24 @@ namespace Step69
       std::array<FullMatrix<double>, dim>          cell_cij_matrix;
     };
 
+    // Next we introduce a number of helper functions that are all
+    // concerned about reading and writing matrix and vector entries. They
+    // are mainly motivated by providing slightly more efficient code and
+    // <a href="https://en.wikipedia.org/wiki/Syntactic_sugar">syntactic
+    // sugar<a> for otherwise somewhat tedious code.
+
+    // The first function we introduce, <code>get_entry</code>, will be
+    // used to read the value stored at the entry pointed by a
+    // SparsityPattern iterator <code>it</code> of <code>matrix</code>. The
+    // function works around a small deficiency in the SparseMatrix
+    // interface: The SparsityPattern is concerned with all index
+    // operations of the sparse matrix stored in CRS format. As such the
+    // iterator already knows the global index of the corresponding matrix
+    // entry in the low-level vector stored in the SparseMatrix object. Due
+    // to the lack of an interface in the SparseMatrix for accessing the
+    // element directly with a SparsityPattern iterator, we unfortunately
+    // have to create a temporary SparseMatrix iterator. We simply hide
+    // this in the <code>get_entry</code> function.
 
     template <typename Matrix, typename Iterator>
     DEAL_II_ALWAYS_INLINE inline typename Matrix::value_type
@@ -838,6 +817,9 @@ namespace Step69
       return matrix_iterator->value();
     }
 
+    // The <code>set_entry</code> helper is the inverse operation of
+    // <code>get_value</code>: Given an iterator and a value, it sets the
+    // entry pointed to by the iterator in the matrix.
 
     template <typename Matrix, typename Iterator>
     DEAL_II_ALWAYS_INLINE inline void
@@ -850,6 +832,14 @@ namespace Step69
       matrix_iterator->value() = value;
     }
 
+    // <code>gather_get_entry</code>: we note that $\mathbf{c}_{ij} \in
+    // \mathbb{R}^d$. If $d=2$ then $\mathbf{c}_{ij} =
+    // [\mathbf{c}_{ij}^1,\mathbf{c}_{ij}^2]^\top$. Which basically implies
+    // that we need one matrix per space dimension to store the
+    // $\mathbf{c}_{ij}$ vectors. Similar observation follows for the
+    // matrix $\mathbf{n}_{ij}$. The purpose of
+    // <code>gather_get_entry</code> is to retrieve those entries a store
+    // them into a <code>Tensor<1, dim></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
@@ -861,6 +851,18 @@ namespace Step69
       return result;
     }
 
+    // <code>gather</code> (first interface): this first function
+    // signature, having three input arguments, will be used to retrieve
+    // the individual components <code>(i,l)</code> of a matrix. The
+    // functionality of <code>gather_get_entry</code> and
+    // <code>gather</code> is very much the same, but their context is
+    // different: the function <code>gather</code> is meant to be used in
+    // exceptional/limited number of cases. The reader should be aware that
+    // accessing an arbitrary <code>(i,l)</code> entry of a matrix (say for
+    // instance Trilinos or PETSc  matrices) is very expensive. Here is
+    // where we might want to keep an eye on complexity: we want this
+    // operation to have constant complexity (and that's the case of this
+    // implementation using deal.ii matrices).
 
     template <typename T1, std::size_t k, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
@@ -872,6 +874,10 @@ namespace Step69
       return result;
     }
 
+    // <code>gather</code> (second interface): this second function
+    // signature having two input arguments will be used to gather the
+    // state at a node <code>i</code> and return <code>Tensor<1,
+    // problem_dimension></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k> gather(const std::array<T1, k> &U,
@@ -883,6 +889,14 @@ namespace Step69
       return result;
     }
 
+    // <code>scatter</code>: this function has three input arguments, the
+    // first one is meant to be a global object (say a locally owned
+    // vector), the second argument which could be a
+    // <code>Tensor<1,problem_dimension></code>, and the last argument
+    // which represents a index of the global object. This function will be
+    // primarily used to write the updated nodal values, stored as
+    // <code>Tensor<1,problem_dimension></code>, into the globally owned
+    // vector.
 
     template <typename T1, std::size_t k1, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline void
@@ -891,13 +905,13 @@ namespace Step69
       for (unsigned int j = 0; j < k1; ++j)
         U[j].local_element(i) = result[j];
     }
-  } // end of namespace.
+  } // namespace
 
-  // The following piece of code implements the class member
-  // <code>OfflineData<dim>::assemble()</code> which (in short)
-  // computes the lumped mass entries $m_i$, the vectors $\mathbf{c}_{ij}$,
-  // the vector $\mathbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{|\mathbf{c}_{ij}|}$,
-  // and the boundary normals $\boldsymbol{\nu}_i$.
+  // We are now in a position to assemble all matrices stored in
+  // <code>OfflineData</code>: the lumped mass entries $m_i$, the
+  // vector-valued matrices $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij} =
+  // \frac{\mathbf{c}_{ij}}{|\mathbf{c}_{ij}|}$, and the boundary normals
+  // $\boldsymbol{\nu}_i$.
   //
   // In order to exploit thread parallelization we use WorkStream approach
   // detailed in the @ref threads "Parallel computing with multiple processors
@@ -1362,11 +1376,11 @@ namespace Step69
   // @sect3{The class <code>ProblemDescription</code> implementation.}
 
   // In this section we describe the implementation of the class members of
-  // <code>ProblemDescription</code>. All these class member only have meaning 
-  // in the context of Euler's equations using with ideal gas law. If we wanted 
-  // to re-purpose Step-69 for a different conservation law (say for instance 
-  // shallow water equations) the implementation of this entire class would 
-  // have to change. But most of the other classes, in particular those 
+  // <code>ProblemDescription</code>. All these class member only have meaning
+  // in the context of Euler's equations using with ideal gas law. If we wanted
+  // to re-purpose Step-69 for a different conservation law (say for instance
+  // shallow water equations) the implementation of this entire class would
+  // have to change. But most of the other classes, in particular those
   // defining loop structures, would remain unchanged.
   //
   // Now we define the implementation of the utility
@@ -1435,15 +1449,15 @@ namespace Step69
   }
 
   // Now we discuss the computation of $\lambda_{\text{max}}
-  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. The analysis 
-  // and derivation of sharp upper-bounds of maximum wavespeeds of Riemann 
+  // (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij})$. The analysis
+  // and derivation of sharp upper-bounds of maximum wavespeeds of Riemann
   // problems is a very technical endeavor and we cannot include an
-  // advanced discussion about it in this tutorial. In this portion 
-  // of the documentation we will limit ourselves to sketch the main 
-  // functionality of these auxiliary functions and point to specific 
+  // advanced discussion about it in this tutorial. In this portion
+  // of the documentation we will limit ourselves to sketch the main
+  // functionality of these auxiliary functions and point to specific
   // academic references in order to help the interested reader trace the
   // source (and proper mathematical justification) of these ideas.
-  // 
+  //
   // In general, obtaining a sharp guaranteed upper-bound on the maximum
   // wavespeed requires solving a quite expensive scalar nonlinear problem.
   // In order to simplify the presentation we decided not to include such
@@ -1455,14 +1469,14 @@ namespace Step69
   //
   // are enough to define a guaranteed upper bound on the maximum
   // wavespeed. This estimate is returned by the a call to the function
-  // <code>lambda_max_two_rarefaction</code>. At its core the construction 
+  // <code>lambda_max_two_rarefaction</code>. At its core the construction
   // of such upper bound uses the so-called two-rarefaction approximation
   // for the intermediate pressure $p^*$, see for instance
-  // 
+  //
   // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical
   //   Methods for Fluid Dynamics, 2009.
   //
-  // This estimate is in general very sharp and it would be enough for the 
+  // This estimate is in general very sharp and it would be enough for the
   // purposes of this code. However, for some specific situations (in
   // particular when one of states is close to vacuum conditions) such
   // estimate will be overly pessimistic. That's why we used a second
@@ -1587,7 +1601,7 @@ namespace Step69
       const auto &[rho_j, u_j, p_j, a_j] = riemann_data_j;
 
       /* Here the constant 5.0 multiplying the soundspeeds is NOT
-         an ad-hoc constant or tuning parameter. It defines a upper bound 
+         an ad-hoc constant or tuning parameter. It defines a upper bound
          for any $\gamma \in [0,5/3]$. Do not play with it! */
       return std::max(std::abs(u_i), std::abs(u_j)) + 5. * std::max(a_i, a_j);
     }
@@ -1733,15 +1747,15 @@ namespace Step69
   // Implementation of "step" (to be called be
   // <code>TimeLoop<dim>::run()</code>). We Start by computing the matrix
   // $d_{ij}$. Pretty much all the ideas used to compute/store the entries
-  // of the matrix <code>norm_matrix</code> and the normalization of 
-  // <code>nij_matrix</code> (described a few hundreds of lines above) are 
+  // of the matrix <code>norm_matrix</code> and the normalization of
+  // <code>nij_matrix</code> (described a few hundreds of lines above) are
   // used here again. We use thread-parallel node-loops (again) via
   // <code>parallel::apply_to_subranges</code>: therefore we have to
   // define a "worker" <code>on_subranges</code> for this new task.
   //
-  // We note here that 
-  // $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= - 
-  // \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$ 
+  // We note here that
+  // $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= -
+  // \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$
   // (or equivanlently $\mathbf{c}_{ij} =
   // - \mathbf{c}_{ji}$) provided either $\mathbf{x}_i$ or $\mathbf{x}_j$ is a
   // support point at the boundary. In such case we can check that:
@@ -1921,9 +1935,9 @@ namespace Step69
                              "do that. - We crashed."));
     } /* End of the computation of the diagonal entries of dij_matrix */
 
-    // At this point, we have computed all viscosity coefficients $d_{ij}$ and 
-    // we know what is the maximum time-step size we can use (which is, 
-    // strictly speaking, a consequence of the size of the viscosity 
+    // At this point, we have computed all viscosity coefficients $d_{ij}$ and
+    // we know what is the maximum time-step size we can use (which is,
+    // strictly speaking, a consequence of the size of the viscosity
     // coefficients). So we compute the update as:
     //
     // $\mathbf{U}_i^{n+1} = \mathbf{U}_i^{n} - \frac{\tau_{\text{max}} }{m_i}
@@ -1984,41 +1998,41 @@ namespace Step69
                                    4096);
     } /* End of the computation of the new solution */
 
-    // The vast majority of the updated values is right, except those at the 
+    // The vast majority of the updated values is right, except those at the
     // boundary which have to be corrected. This is known as
     // explicit treatment of the boundary conditions:
     // - You advance in time satisfying no boundary condition at all,
     // - At the end of the time step you enforce them (you post process
     //   your solution).
     //
-    // When solving parabolic and/or elliptic equations, we know that: in order 
-    // to enforce essential boundary conditions we should make them part 
-    // of the approximation space, while natural boundary conditions 
-    // should become part of the variational formulation. We also know 
-    // that explicit treatment of the boundary conditions (in the context of 
-    // parabolic PDE) almost surely leads to catastrophic consequences. 
-    // However, in the context of nonlinear hyperbolic equations there is enough 
-    // numerical evidence suggesting that explicit treatment of essential 
-    // boundary conditions is stable (at least in the eye-ball norm) and does 
+    // When solving parabolic and/or elliptic equations, we know that: in order
+    // to enforce essential boundary conditions we should make them part
+    // of the approximation space, while natural boundary conditions
+    // should become part of the variational formulation. We also know
+    // that explicit treatment of the boundary conditions (in the context of
+    // parabolic PDE) almost surely leads to catastrophic consequences.
+    // However, in the context of nonlinear hyperbolic equations there is enough
+    // numerical evidence suggesting that explicit treatment of essential
+    // boundary conditions is stable (at least in the eye-ball norm) and does
     // not introduce any loss in accuracy (convergence rates). In addition,
-    // it is relatively straightforward to prove that (for the case of 
-    // reflecting boundary conditions) explicit treatment of boundary 
-    // conditions is not only conservative but also guarantees preservation of  
+    // it is relatively straightforward to prove that (for the case of
+    // reflecting boundary conditions) explicit treatment of boundary
+    // conditions is not only conservative but also guarantees preservation of
     // the invariant set. We are not aware of any theoretical result showing
     // that it is possible to provide such invariant-set guarantees when
-    // using either direct enforcement of boundary conditions into the 
+    // using either direct enforcement of boundary conditions into the
     // approximation space and/or weak enforcement using Nitsche penalty
     // method (e.g. widely used in dG schemes).
-    // 
+    //
     // Here the worker <code>on_subranges</code> executes the correction
     //
     // $\mathbf{m}_i := \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
     //   \boldsymbol{\nu}_i$
     //
-    // which removes the normal component of $\mathbf{m}$. We note that 
-    // conservation is not just a consequence of this operation but also a 
-    // consequence of modification of the $\mathbf{c}_{ij}$ coefficients at the 
-    // boundary (see the third thread-parallel loop on nodes in 
+    // which removes the normal component of $\mathbf{m}$. We note that
+    // conservation is not just a consequence of this operation but also a
+    // consequence of modification of the $\mathbf{c}_{ij}$ coefficients at the
+    // boundary (see the third thread-parallel loop on nodes in
     // <code>OfflineData<dim>::assemble()</code>).
 
     {
@@ -2079,12 +2093,12 @@ namespace Step69
 
   // Constructor of <code>SchlierenPostprocessor</code>.
   // Here
-  // - schlieren_beta: is an ad-hoc amplification factor in order to 
-  //   enhance/exaggerate contrast in the visualization. Its actual value is a 
+  // - schlieren_beta: is an ad-hoc amplification factor in order to
+  //   enhance/exaggerate contrast in the visualization. Its actual value is a
   //   matter of taste.
-  // - schlieren_index: indicates which component of the state 
-  //   $[\rho, \mathbf{m},E]$ are we going to use in order generate the 
-  //   visualization. 
+  // - schlieren_index: indicates which component of the state
+  //   $[\rho, \mathbf{m},E]$ are we going to use in order generate the
+  //   visualization.
 
   template <int dim>
   SchlierenPostprocessor<dim>::SchlierenPostprocessor(
@@ -2110,7 +2124,7 @@ namespace Step69
   }
 
   // Here <code>prepare()</code> initializes the vector <code>r</code>
-  // and <code>schlieren</code> with proper sizes. 
+  // and <code>schlieren</code> with proper sizes.
 
   template <int dim>
   void SchlierenPostprocessor<dim>::prepare()
