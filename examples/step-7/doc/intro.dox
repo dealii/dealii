@@ -29,27 +29,8 @@ verification which is a very complicated problem. Rather we will demonstrate
 the tools which deal.II can offer in this respect. This is basically centered
 around the functionality of a single function, VectorTools::integrate_difference().
 This function computes the difference between a given continuous function and
-a finite element field in various norms on each cell. At the time of writing
-this tutorial program, the norms this function can compute are the following,
-where $u$ denotes the continuous function
-and $u_h$ the finite element field, and $K$ is an element of the
-triangulation:
-@f{eqnarray*}
-  {\| u-u_h \|}_{L_1(K)} &=& \int_K |u-u_h| \; dx,
-  \\
-  {\| u-u_h \|}_{L_2(K)} &=& \left( \int_K |u-u_h|^2 \; dx \right)^{1/2},
-  \\
-  {\| u-u_h \|}_{L_\infty(K)} &=& \max_{x  \in K} |u(x) - u_h(x)|,
-  \\
-  {| u-u_h |}_{H^1(K)} &=& \left( \int_K |\nabla(u-u_h)|^2 \; dx \right)^{1/2},
-  \\
-  {\| u-u_h \|}_{H^1(K)} &=& \left( {\| u-u_h \|}^2_{L_2(K)}
-                                   +{| u-u_h |}^2_{H^1(K)}    \right)^{1/2}.
-@f}
-(All these norms and semi-norms can also be evaluated with weighting functions,
-for example in order to exclude singularities from the determination of the
-global error, and the function also works for vector-valued functions.) Of
-course, like with any other integral, we can only evaluate these norms using quadrature formulas;
+a finite element field in various norms on each cell. 
+Of course, like with any other integral, we can only evaluate these norms using quadrature formulas;
 the choice of the right quadrature formula is therefore crucial to the
 accurate evaluation of the error. This holds in particular for the $L_\infty$
 norm, where we evaluate the maximal deviation of numerical and exact solution
