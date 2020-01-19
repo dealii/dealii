@@ -82,6 +82,8 @@ namespace parallel
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
             dealii::Triangulation<dim>::none));
 
+      this->set_mesh_smoothing(construction_data.smoothing);
+
       // clear internal data structures
       this->coarse_cell_id_to_coarse_cell_index_vector.clear();
       this->coarse_cell_index_to_coarse_cell_id_vector.clear();
@@ -241,10 +243,9 @@ namespace parallel
 
       // create construction data
       const auto construction_data = TriangulationDescription::Utilities::
-        create_description_from_triangulation(
-          *other_tria_ptr,
-          this->mpi_communicator,
-          this->is_multilevel_hierarchy_constructed());
+        create_description_from_triangulation(*other_tria_ptr,
+                                              this->mpi_communicator,
+                                              this->settings);
 
       // finally create triangulation
       this->create_triangulation(construction_data);
