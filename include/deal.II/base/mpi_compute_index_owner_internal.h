@@ -499,7 +499,10 @@ namespace Utilities
             const unsigned int n_procs = n_mpi_processes(comm);
             const unsigned int my_rank = this_mpi_process(comm);
 
-            size             = owned_indices.size();
+            size = owned_indices.size();
+
+            Assert(size > 0, ExcNotImplemented());
+
             dofs_per_process = (size + n_procs - 1) / n_procs;
             if (dofs_per_process < range_minimum_grain_size)
               {
