@@ -54,7 +54,7 @@ the choice of the right quadrature formula is therefore crucial to the
 accurate evaluation of the error. This holds in particular for the $L_\infty$
 norm, where we evaluate the maximal deviation of numerical and exact solution
 only at the quadrature points; one should then not try to use a quadrature
-rule with points only at points where super-convergence might occur, such as
+rule whose evaluation occurs only at points where super-convergence might occur, such as
 the Gauss points of the lowest-order Gauss quadrature formula for which the
 integrals in the assembly of the matrix is correct (e.g., for linear elements,
 do not use the QGauss(2) quadrature formula). In fact, this is generally good
