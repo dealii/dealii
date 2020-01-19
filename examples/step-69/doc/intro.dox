@@ -22,7 +22,7 @@ Euler's equations that is based on three ingredients: a
 <i>collocation</i>-type discretization of Euler's equations in context of
 finite elements; a graph-viscosity stabilization based on a
 <i>guaranteed</i> upper bound of the local wave speed; and explicit
-time-stepping. As such the ideas and techniques presented in this tutorial
+time-stepping. As such, the ideas and techniques presented in this tutorial
 step are drastically different from those used in Step-33, which focuses on
 the use of automatic differentiation. From a programming perspective this
 tutorial will focus on a number of techniques found in large-scale

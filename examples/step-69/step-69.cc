@@ -791,8 +791,8 @@ namespace Step69
     // Next we introduce a number of helper functions that are all
     // concerned about reading and writing matrix and vector entries. They
     // are mainly motivated by providing slightly more efficient code and
-    // <a href="https://en.wikipedia.org/wiki/Syntactic_sugar">syntactic
-    // sugar<a> for otherwise somewhat tedious code.
+    // <a href="https://en.wikipedia.org/wiki/Syntactic_sugar"> syntactic
+    // sugar</a> for otherwise somewhat tedious code.
 
     // The first function we introduce, <code>get_entry</code>, will be
     // used to read the value stored at the entry pointed by a
@@ -917,9 +917,11 @@ namespace Step69
   // detailed in the @ref threads "Parallel computing with multiple processors
   // accessing shared memory". As customary this requires
   // definition of
-  //  - Scratch data: in this case it is <code>scratch_data</code>.
+  //  - Scratch data (i.e. input info required to carry out computations): in 
+  //    this case it is <code>scratch_data</code>.
   //  - The worker: in the case it is <code>local_assemble_system</code> that
-  //    actually computes the local (i.e. current cell) contributions.
+  //    actually computes the local (i.e. current cell) contributions from the 
+  //    scratch data.
   //  - A copy data: a struct that contains all the local assembly
   //    contributions, in this case <code>CopyData<dim>()</code>.
   //  - A copy data routine: in this case it is
@@ -1148,62 +1150,61 @@ namespace Step69
     // $\mathbf{c}_{ij} \not \equiv 0$.
     //
     // From an algebraic point of view, this is equivalent to: visiting
-    // every row in the matrix (equivalently sparsity
-    // pattern) and for each one of these rows execute a loop on the columns.
-    // Node-loops is a core theme of this tutorial step (see the pseudo-code
-    // in the introduction) that will repeat over and over again. That's why
-    // this is the right time to introduce them.
+    // every row in the matrix and for each one of these rows execute a loop on 
+    // the columns. Node-loops is a core theme of this tutorial step (see 
+    // the pseudo-code in the introduction) that will repeat over and over 
+    // again. That's why this is the right time to introduce them.
     //
     // We have the thread paralellization capability
     // parallel::apply_to_subranges that is somehow more general than the
     // WorkStream framework. In particular, parallel::apply_to_subranges can
-    // be used for our node-loops.
-    // This functionality requires four input arguments:
-    // - A begin iterator: <code>indices.begin()</code>
-    // - An end iterator: <code>indices.end()</code>
-    // - A function f(i1,i2), where <code>i1</code> and <code>i2</code> define a
-    //   sub-range within the range spanned by the the end and begin iterators
-    //   of the previous two bullets. The function <code>f(i1,i2)</code> is
-    //   called <code>on_subranges</code> in this example. It applies an
-    //   operation for every "abstract element" in the subrange. In this case
-    //   each "element" is a row of the sparsity pattern.
-    // - Grainsize: minimum number of "elements" (in this case rows) processed
-    // by each thread. We decided for a minimum of 4096 rows.
+    // be used for our node-loops. This functionality requires four input 
+    // arguments which we explain in detail (for the specific case of our 
+    // thread-parallel node loops):
+    // - The iterator <code>indices.begin()</code> points to
+    //   to a row index.
+    // - The iterator <code>indices.end()</code> points to a numerically higher 
+    //   row index.
+    // - The function <code>on_subranges(i1,i2)</code> (where <code>i1</code>
+    //   and <code>i2</code> define sub-range within the range spanned by
+    //   the end and begin iterators defined in the two previous bullets)
+    //   applies operation for every iterator in such subrange. We may as well 
+    //   call <code>on_subranges</code> the worker.
+    // - Grainsize: minimum number of iterators (in this case representing 
+    //   rows) processed by each thread. We decided for a minimum of 4096 
+    //   rows.
     //
-    // Here the <code>indices.begin()</code> and <code>indices.end()</code>
-    // iterators will represent an interval of "rows"
-    // in the sparsity graph/matrix. A minor caveat here is that the
-    // iterators supplied to
+    // A minor caveat here is that the iterators <code>indices.begin()</code> 
+    // and <code>indices.end()</code> supplied to
     // parallel::apply_to_subranges have to be random access iterators:
     // internally, apply_to_subranges will break the range defined by the
-    // <code>indices.begin()</code> and <code>indices.end()</code>  iterators
+    // <code>indices.begin()</code> and <code>indices.end()</code> iterators
     // into subranges (we want to be able to read any entry in those
     // subranges with constant complexity). In order to provide such
     // iterators we resort to boost::irange.
     //
-    // We define the operation <code>on_subranges</code> to be
-    // applied at each row of the sub-range. Given a fixed
-    // <code>row_index</code> we want to visit every entry in such row. In order
-    // to execute such columns-loops we use <a
-    // href="http://www.cplusplus.com/reference/algorithm/for_each/">
+    // The bulk of the following piece of code is spent defining
+    // the "worker" <code>on_subranges</code>: i.e. the  operation applied at 
+    // each row of the sub-range. Given a fixed <code>row_index</code> 
+    // we want to visit every column/entry in such row. In order to execute 
+    // such columns-loops we use
+    // <a href="http://www.cplusplus.com/reference/algorithm/for_each/">
     // std::for_each</a>
     // from the standard library, where:
-    // <code>sparsity_pattern.begin(row_index)</code>
-    // gives us an iterator starting at the first column,
-    // <code>sparsity_pattern.end(row_index)</code> is an iterator pointing at
-    // the last column of the row. The last
-    // argument required by std::for_each is the operation applied at each
-    // column (a lambda expression in this case) of such row. We note that
-    // because of the nature of the data that we want to modify (we want to
-    // modify entries of a entire row at a time) threads cannot conflict
-    // attempting to read/write the same entry (we do not need a scheduler).
-    // This advantage appears to be a particular characteristic of
-    // edge-based finite element schemes when they are properly implemented.
+    //  - <code>sparsity_pattern.begin(row_index)</code>
+    //    gives us an iterator starting at the first column of the row,
+    //  - <code>sparsity_pattern.end(row_index)</code> is an iterator pointing
+    //    at the last column of the row,
+    //  - the last argument required by std::for_each is the operation
+    //    applied at each column (a lambda expression in this case) of
+    //    such row.
     //
-    // Finally, we normalize the vector stored in
-    // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
-    // not been thread paralellized as it would neither illustrate any important
-    // concept nor lead to any noticeable speed gain.
+    // We note that, parallel::apply_to_subranges will operate on disjoint sets
+    // of rows (the subranges) and our goal is to write into these rows.
+    // Because of the simple nature of the operations we want to carry out
+    // (computation and storage of normals, and normalization of the
+    // $\mathbf{c}_{ij}$ of entries) threads cannot conflict attempting to
+    // write the same entry (we do not need a scheduler).
 
     {
       TimerOutput::Scope t(computing_timer,
@@ -1249,9 +1250,11 @@ namespace Step69
                                    on_subranges,
                                    4096);
 
-      /* We normalize the normals at the boundary. This is not thread
-         parallelized. It just loops over the very few nodes that happen
-         to be at the boundary */
+    // Finally, we normalize the vector stored in
+    // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
+    // not been thread paralellized as it would neither illustrate any important
+    // concept nor lead to any noticeable speed gain.
+
       for (auto &it : boundary_normal_map)
         {
           auto &normal = std::get<0>(it.second);
@@ -1373,7 +1376,7 @@ namespace Step69
 
   // At this point we are very much done with anything related to offline data.
 
-  // @sect3{The class <code>ProblemDescription</code> implementation.}
+  // @sect4{The class <code>ProblemDescription</code> implementation.}
 
   // In this section we describe the implementation of the class members of
   // <code>ProblemDescription</code>. All these class member only have meaning
@@ -1455,7 +1458,7 @@ namespace Step69
   // advanced discussion about it in this tutorial. In this portion
   // of the documentation we will limit ourselves to sketch the main
   // functionality of these auxiliary functions and point to specific
-  // academic references in order to help the interested reader trace the
+  // academic references in order to help (the interested) reader trace the
   // source (and proper mathematical justification) of these ideas.
   //
   // In general, obtaining a sharp guaranteed upper-bound on the maximum
@@ -1476,16 +1479,15 @@ namespace Step69
   // - Formula (4.46), page 128 in: E.Toro, Riemann Solvers and Numerical
   //   Methods for Fluid Dynamics, 2009.
   //
-  // This estimate is in general very sharp and it would be enough for the
+  // The estimate <code>lambda_max_two_rarefaction</code>
+  // is in general very sharp and it would be enough for the
   // purposes of this code. However, for some specific situations (in
   // particular when one of states is close to vacuum conditions) such
   // estimate will be overly pessimistic. That's why we used a second
   // estimate to avoid this degeneracy that will be invoked by a call to
-  // the function <code>lambda_max_expansion</code>. Finally we take the minimum
-  // between both estimates inside the call to <code>compute_lambda_max</code>.
-  //
-  // The most important function here is <code>compute_lambda_max</code>
-  // which takes the minimum between the estimates
+  // the function <code>lambda_max_expansion</code>. The most important 
+  // function here is <code>compute_lambda_max</code> which takes the minimum 
+  // between the estimates
   // - <code>lambda_max_two_rarefaction</code>
   // - <code>lambda_max_expansion</code>
   //
@@ -1650,7 +1652,7 @@ namespace Step69
                                                                           "m_3",
                                                                           "E"};
 
-  // @sect3{Class <code>InitialValues</code> implementation}
+  // @sect4{Class <code>InitialValues</code> implementation}
 
   // Constructor for the class InitialValues.
 
@@ -1708,7 +1710,7 @@ namespace Step69
     };
   }
 
-  // @sect3{Class <code>TimeStep</code> implementation}
+  // @sect4{Class <code>TimeStep</code> implementation}
 
   template <int dim>
   TimeStep<dim>::TimeStep(const MPI_Comm &          mpi_communicator,
@@ -1744,41 +1746,54 @@ namespace Step69
     dij_matrix.reinit(sparsity);
   }
 
-  // Implementation of "step" (to be called be
-  // <code>TimeLoop<dim>::run()</code>). We Start by computing the matrix
-  // $d_{ij}$. Pretty much all the ideas used to compute/store the entries
-  // of the matrix <code>norm_matrix</code> and the normalization of
-  // <code>nij_matrix</code> (described a few hundreds of lines above) are
-  // used here again. We use thread-parallel node-loops (again) via
-  // <code>parallel::apply_to_subranges</code>: therefore we have to
-  // define a "worker" <code>on_subranges</code> for this new task.
+  // An efficient implementation of the class member
+  // <code>TimeStep<dim>::step</code>
+  // should only compute the quantities that evolve for
+  // every time-step (the fluxes  $\mathbb{f}(\mathbf{U}_j^{n})$ and
+  // the viscosities $d_{ij}$) and assemble the new solution 
+  // $\mathbf{U}_i^{n+1}$:
+  // - We execute thread-parallel node-loops using
+  //   <code>parallel::apply_to_subranges</code> for all the necessary tasks. 
+  //   Pretty much all the ideas used to compute/store the entries of the
+  //   matrix <code>norm_matrix</code> and the normalization of 
+  //   <code>nij_matrix</code> (described a few hundreds of lines above) 
+  //   are used here again. Most of the code intricacies lie around the 
+  //   definition of the new "workers" <code>on_subranges</code> required for 
+  //   the new tasks.
+  // - The first step is computing the matrix the viscosities of $d_{ij}$. 
+  //   It is important to highlight that viscosities are bound to the 
+  //   constraint $d_{ij} = d_{ji}$ and our algorithm should reflect that. 
+  //   In this regard we note here that
+  //   $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= -
+  //   \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$
+  //   (or equivanlently $\mathbf{c}_{ij} = - \mathbf{c}_{ji}$) provided 
+  //   either $\mathbf{x}_i$ or $\mathbf{x}_j$ is a support point at the 
+  //   boundary. In such case we can check that 
+  //   $\lambda_{\text{max}} (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
+  //   \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
+  //   \mathbf{U}_i^{n},\textbf{n}_{ji})$
+  //   by construction, which guarantees the property $d_{ij} = d_{ji}$.
+  //   However, if both support points $\mathbf{x}_i$ or $\mathbf{x}_j$ happen 
+  //   to lie on the boundary then the equalities $\mathbf{c}_{ij} = - 
+  //   \mathbf{c}_{ji}$ and $\lambda_{\text{max}}
+  //   (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
+  //   \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
+  //   \mathbf{U}_i^{n},
+  //   \textbf{n}_{ji})$ are not necessarily true. The only mathematically
+  //   safe solution for this dilemma is to compute both of them and take the
+  //   largest one.
   //
-  // We note here that
-  // $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= -
-  // \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$
-  // (or equivanlently $\mathbf{c}_{ij} =
-  // - \mathbf{c}_{ji}$) provided either $\mathbf{x}_i$ or $\mathbf{x}_j$ is a
-  // support point at the boundary. In such case we can check that:
+  // In order to increase the efficiency we only compute the
+  // upper-triangular entries of $d_{ij}$ and copy the corresponding
+  // entries to the lower-triangular part. Note that this strategy
+  // intrinsically makes the assumption that memory access to the lower
+  // triangular entries is inexpensive (they are cached, or somehow local 
+  // memorywise).
   //
-  // $\lambda_{\text{max}} (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
-  //  \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
-  //  \mathbf{U}_i^{n},
-  //  \textbf{n}_{ji})$
+  // *** IT: Clarify, why is this the case? I don't think CRS has anything to 
+  // do with it. Is the Cuthill_McKee inducing/creating data locality 
+  // here? ***
   //
-  // which is enough to guarantee that $d_{ij} = d_{ji}$.
-  //
-  // However, if both support points $\mathbf{x}_i$ or $\mathbf{x}_j$ happen to
-  // lie on the boundary then the equality $\lambda_{\text{max}}
-  // (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
-  //  \textbf{n}_{ij}) = \lambda_{\text{max}} (\mathbf{U}_j^{n},
-  //  \mathbf{U}_i^{n},
-  //  \textbf{n}_{ji})$ is not necessarily true. The only mathematically
-  // safe solution for this dilemma is to compute both of them and take the
-  // largest one.
-  //
-  // The matrix $d_{ij}$ has to be symmetric by construction. Exploiting this
-  // natural constraint of the scheme we only compute the upper-triangular
-  // portion of it and then copy the result to the lower-triangular side.
 
   template <int dim>
   double TimeStep<dim>::step(vector_type &U, double t)
@@ -1813,8 +1828,8 @@ namespace Step69
               {
                 const auto j = jt->column();
 
-                /* We compute only dij (i < j) and later we copy this
-                   entry into dji. */
+                /* We compute only dij if i < j (upper triangular entries) and 
+                   later we copy this entry into dji. */
                 if (j >= i)
                   continue;
 
@@ -1843,7 +1858,9 @@ namespace Step69
                     d = std::max(d, norm_2 * lambda_max_2);
                   }
 
+                /* We set the upper triangular entry */
                 set_entry(dij_matrix, jt, d);
+                /* We set the lower triangular entry */
                 dij_matrix(j, i) = d;
               } /* End of column-loop */
           }     /* End of row-loop */
@@ -1858,16 +1875,14 @@ namespace Step69
     // So far the matrix <code>dij_matrix</code> contains the off-diagonal
     // components. We still have to fill its diagonal entries defined as
     // $d_{ii}^n = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}^n$. We
-    // use <code>parallel::apply_to_subranges</code> again in order to speed-up
-    // its computation.
-
-    // While computing the $d_{ii}$'s we also record the largest admissible
+    // use <code>parallel::apply_to_subranges</code> for this purpose. While 
+    // computing the $d_{ii}$'s we also record the largest admissible 
     // time-step, which is defined as
     //
     // $\tau_n := c_{\text{cfl}}\,\min_{
     // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right)$ .
     //
-    // We note that the operation $\min_{i \in \mathcal{V}}$ is intrinsically
+    // Note that the operation $\min_{i \in \mathcal{V}}$ is intrinsically
     // global, it operates on all nodes: first we would have to first take the
     // $\min$ among all threads and finally take the $\min$ among all MPI
     // processes. In the current implementation:
@@ -1880,8 +1895,9 @@ namespace Step69
     // - In order to take the min among all MPI process we use the utility
     //   <code>Utilities::MPI::min</code>.
 
-    /* Atomic double in order to avoid any read/write conflict
-     * between threads */
+    /* We define tau_max as an atomic double in order to avoid any read/write 
+       conflict between threads and initialize it as the largest possible 
+       number that can be represented by the float-type double. */
     std::atomic<double> tau_max{std::numeric_limits<double>::infinity()};
 
     {
@@ -1895,7 +1911,7 @@ namespace Step69
           {
             double d_sum = 0.;
 
-            /* See the definition of dii */
+            /* See the definition of dii in the introduction. */
             for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
               {
                 const auto j = jt->column();
@@ -1943,7 +1959,7 @@ namespace Step69
     // $\mathbf{U}_i^{n+1} = \mathbf{U}_i^{n} - \frac{\tau_{\text{max}} }{m_i}
     //  \sum_{j \in \mathcal{I}(i)} (\mathbb{f}(\mathbf{U}_j^{n}) -
     //  \mathbb{f}(\mathbf{U}_i^{n})) \cdot \mathbf{c}_{ij} - d_{ij}
-    //  (\mathbf{U}_j^{n} - \mathbf{U}_i)^{n}$
+    //  (\mathbf{U}_j^{n} - \mathbf{U}_i^{n})$
     //
     // This update formula is different from that one used in the
     // pseudo-code. However, it can be shown that it is algebraically
@@ -2249,7 +2265,7 @@ namespace Step69
     schlieren.update_ghost_values();
   }
 
-  // @sect3{The Timeloop::run() function}
+  // @sect4{The Timeloop::run() function}
 
   template <int dim>
   TimeLoop<dim>::TimeLoop(const MPI_Comm &mpi_comm)
@@ -2514,7 +2530,7 @@ namespace Step69
 
 } // namespace Step69
 
-// @sect3{The main()}
+// @sect4{The main()}
 
 int main(int argc, char *argv[])
 {
