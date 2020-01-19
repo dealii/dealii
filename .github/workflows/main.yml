@@ -11,6 +11,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: setup
+      run: |
+        ./contrib/utilities/download_clang_format
     - name: info
       run: |
         g++ -v
@@ -25,6 +28,7 @@ jobs:
         path: detailed.log
     - name: build
       run: |
+        ./contrib/utilities/check_indentation.sh
         make -j 2
         make -j 2 test # quicktests
 
@@ -44,6 +48,7 @@ jobs:
         #export OMPI_CXX=g++-9
         #export OMPI_CC=gcc-9
         #export OMPI_FC=gfortran-9
+        ./contrib/utilities/download_clang_format
     - name: info
       run: |
         g++-9 -v
@@ -59,5 +64,6 @@ jobs:
         path: detailed.log
     - name: build
       run: |
+        ./contrib/utilities/check_indentation.sh
         make -j 2
         make -j 2 test #quicktests
