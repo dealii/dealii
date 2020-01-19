@@ -86,8 +86,8 @@ public:
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
         return ++(
-          FilteredIterator<typename DataOut<dim>::cell_iterator>(predicate,
-                                                                 old_cell));
+          FilteredIterator<typename Triangulation<dim>::active_cell_iterator>(
+            predicate, old_cell));
       }
     else
       return old_cell;
