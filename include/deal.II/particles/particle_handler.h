@@ -290,6 +290,9 @@ namespace Particles
      * Set the position of the particles by using the values contained in the
      * vector @p input_vector.
      *
+     * @tparam VectorType Any of the parallel distributed vectors supported by
+     * the library.
+     *
      * The vector @p input_vector should have read access to the indices
      * created by extracting the locally relevant ids with
      * locally_relevant_ids(), and taking its tensor
@@ -302,6 +305,10 @@ namespace Particles
      * The position of the particle with global index `id` is read from
      * spacedim consecutive entries starting from
      * `input_vector[id*spacedim]`.
+     *
+     * Notice that it is not necessary that the @p input_vector *owns* those
+     * indices, however it has to have read access to them (i.e., it can be a
+     * distributed vector with ghost entries).
      *
      * If the argument @p displace_particles is set to false, then the new
      * position taken from the values contained in
@@ -386,10 +393,19 @@ namespace Particles
      * @p output_vector is overwritten by this operation, but you can add to
      * its entries by setting @p add_to_output_vector to `true`.
      *
+     * @tparam VectorType Any of the parallel distributed vectors supported by
+     * the library.
+     *
      * This is the reverse operation of the set_particle_positions() function.
      * The position of the particle with global index `id` is written to
      * spacedim consecutive entries starting from
      * `output_vector[id*spacedim]`.
+     *
+     * Notice that, if you use a distributed vector type, it is not necessary
+     * for the @p output_vector to own the entries corresponding to the indices
+     * that will be written. However you should keep in mind that this requires
+     * a global communication to distribute the entries above to their
+     * respective owners.
      *
      * @param[in, out] output_vector A parallel distributed vector containing
      * the positions of the particles, or updated with the positions of the
@@ -411,7 +427,7 @@ namespace Particles
      * by iterating over all (local) particles, and querying their locations.
      *
      * @param [in,out] positions A vector preallocated at size
-     * (particle_handler.n_locally_owned_articles) and whose points will become
+     * `particle_handler.n_locally_owned_articles` and whose points will become
      * the positions of the locally owned particles
      *
      * @param [in] add_to_output_vector When true, the value of the point of
