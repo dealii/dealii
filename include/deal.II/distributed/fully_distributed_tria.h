@@ -21,6 +21,8 @@
 
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/grid/grid_tools.h>
+
 #include <vector>
 
 #ifdef DEAL_II_WITH_MPI
@@ -194,7 +196,7 @@ namespace parallel
        * to the communicator inside of parallel::fullydistributed::Triangulation
        * and an assert is thrown if they do not match.
        *
-       * @note Please note this is necessary since the communicator inside of
+       * @note This is necessary since the communicator inside of
        * parallel::TriangulationBase is const and cannot be changed after the
        * constructor has been called.
        *
@@ -206,6 +208,7 @@ namespace parallel
        */
       Settings settings;
     };
+
 
 
     /**
@@ -323,6 +326,43 @@ namespace parallel
                            const SubCellData &subcelldata) override;
 
       /**
+       * Implementation of the same function as in the base class.
+       *
+       * @param other_tria The triangulation to be copied. It can be a serial
+       *        Triangulation or a parallel::distributed::Triangulation. Both
+       *        can have been refined already.
+       *
+       * @note This function uses the partitioner registered with
+       *       set_partitioner().
+       */
+      void
+      copy_triangulation(
+        const dealii::Triangulation<dim, spacedim> &other_tria) override;
+
+      /**
+       * Register a partitioner, which is used within the method
+       * copy_triangulation.
+       *
+       * @param partitioner A partitioning function, which takes as input argument
+       *                    a reference to the triangulation to be partitioned
+       *                    and the number of partitions to be created.
+       *                    The function needs to set subdomain
+       *                    ids for each active cell of the given triangulation,
+       *                    with values between zero (inclusive)
+       *                    and the second argument to the function (exclusive).
+       * @param settings See the description of the Settings enumerator.
+       *
+       * @note As a default, GridTools::partition_triangulation_zorder() is used
+       *       as partitioner and data structures on multigrid levels are not
+       *       set up.
+       */
+      void
+      set_partitioner(
+        const std::function<void(dealii::Triangulation<dim, spacedim> &,
+                                 const unsigned int)> &partitioner,
+        const Settings &                               settings);
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -377,6 +417,13 @@ namespace parallel
        * store the Settings.
        */
       Settings settings;
+
+      /**
+       * Partitioner used in copy_triangulation().
+       */
+      std::function<void(dealii::Triangulation<dim, spacedim> &,
+                         const unsigned int)>
+        partitioner;
 
       /**
        * Sorted list of pairs of coarse-cell ids and their indices.
