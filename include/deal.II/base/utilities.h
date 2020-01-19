@@ -137,6 +137,41 @@ namespace Utilities
                 const int                             bits_per_dim);
 
   /**
+   * If the library is configured with ZLIB, then this function compresses the
+   * input string and returns a non-zero terminated string containing the
+   * compressed input.
+   *
+   * If the library was not configured with ZLIB enabled, the returned string
+   * is identical to the input string.
+   *
+   * @param[in] input The string to compress
+   *
+   * @return A compressed version of the input string
+   *
+   * @authors Luca Heltai, Nicola Giuliani, 2020
+   */
+  std::string
+  compress(const std::string &input);
+
+  /**
+   * If the library is configured with ZLIB, then this function assumes that the
+   * input string has been compressed using the compress() function, and returns
+   * the original decompresses string.
+   *
+   * If the library was not configured with ZLIB enabled, the returned string
+   * is identical to the input string.
+   *
+   * @param[in] compressed_input A compressed string, as returned by the
+   * function compress()
+   *
+   * @return The original uncompressed string.
+   *
+   * @authors Luca Heltai, Nicola Giuliani, 2020
+   */
+  std::string
+  decompress(const std::string &compressed_input);
+
+  /**
    * Convert a number @p value to a string, with as many digits as given to
    * fill with leading zeros.
    *

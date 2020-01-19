@@ -28,6 +28,7 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
+#include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 
@@ -375,6 +376,51 @@ namespace Utilities
         res |= v;
       }
     return res;
+  }
+
+
+
+  std::string
+  compress(const std::string &input)
+  {
+#ifdef DEAL_II_WITH_ZLIB
+    namespace bio = boost::iostreams;
+
+    std::stringstream compressed;
+    std::stringstream origin(input);
+
+    bio::filtering_streambuf<bio::input> out;
+    out.push(bio::gzip_compressor(
+      bio::gzip_params(boost::iostreams::gzip::default_compression)));
+    out.push(origin);
+    bio::copy(out, compressed);
+
+    return compressed.str();
+#else
+    return input;
+#endif
+  }
+
+
+
+  std::string
+  decompress(const std::string &compressed_input)
+  {
+#ifdef DEAL_II_WITH_ZLIB
+    namespace bio = boost::iostreams;
+
+    std::stringstream compressed(compressed_input);
+    std::stringstream decompressed;
+
+    bio::filtering_streambuf<bio::input> out;
+    out.push(bio::gzip_decompressor());
+    out.push(compressed);
+    bio::copy(out, decompressed);
+
+    return decompressed.str();
+#else
+    return compressed_input;
+#endif
   }
 
 
@@ -1283,6 +1329,8 @@ namespace Utilities
   pack_integers<2>(const std::array<std::uint64_t, 2> &, const int);
   template std::uint64_t
   pack_integers<3>(const std::array<std::uint64_t, 3> &, const int);
+
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
