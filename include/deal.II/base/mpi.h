@@ -993,7 +993,7 @@ namespace Utilities
        * @note The buffer is empty. Before using it, you have to set its size.
        */
       virtual void
-      pack_recv_buffer(const int other_rank, std::vector<T1> &send_buffer);
+      create_request(const int other_rank, std::vector<T1> &send_buffer);
 
       /**
        * Prepare the buffer where the payload of the answer of the request to
@@ -1004,7 +1004,8 @@ namespace Utilities
        * @param[out] recv_buffer data to be sent part of the request (optional)
        */
       virtual void
-      prepare_recv_buffer(const int other_rank, std::vector<T2> &recv_buffer);
+      prepare_buffer_for_answer(const int        other_rank,
+                                std::vector<T2> &recv_buffer);
 
       /**
        * Prepare the buffer where the payload of the answer of the request to
@@ -1019,9 +1020,9 @@ namespace Utilities
        *       its size.
        */
       virtual void
-      process_request(const unsigned int     other_rank,
-                      const std::vector<T1> &buffer_recv,
-                      std::vector<T2> &      request_buffer);
+      answer_request(const unsigned int     other_rank,
+                     const std::vector<T1> &buffer_recv,
+                     std::vector<T2> &      request_buffer);
 
       /**
        * Process the payload of the answer of the request to the process with
@@ -1031,8 +1032,7 @@ namespace Utilities
        * @param[in] recv_buffer data to be sent part of the request (optional)
        */
       virtual void
-      unpack_recv_buffer(const int              other_rank,
-                         const std::vector<T2> &recv_buffer);
+      read_answer(const int other_rank, const std::vector<T2> &recv_buffer);
     };
 
     /**
@@ -1222,7 +1222,7 @@ namespace Utilities
        * request and send an answer.
        */
       void
-      process_requests();
+      answer_requests();
 
       /**
        * Start to send all requests via ISend and post IRecvs for the incoming
@@ -1333,7 +1333,7 @@ namespace Utilities
        * the request and send an answer.
        */
       void
-      process_requests(int index);
+      answer_requests(int index);
 
       /**
        * Start to send all requests via ISend and post IRecvs for the incoming

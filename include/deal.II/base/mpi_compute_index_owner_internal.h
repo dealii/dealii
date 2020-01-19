@@ -81,23 +81,23 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::pack_recv_buffer().
+           * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
            */
           virtual void
-          pack_recv_buffer(const int other_rank,
-                           std::vector<std::pair<types::global_dof_index,
-                                                 types::global_dof_index>>
-                             &send_buffer) override
+          create_request(const int other_rank,
+                         std::vector<std::pair<types::global_dof_index,
+                                               types::global_dof_index>>
+                           &send_buffer) override
           {
             send_buffer = this->buffers.at(other_rank);
           }
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::process_request().
+           * Utilities::MPI::ConsensusAlgorithmProcess::answer_request().
            */
           virtual void
-          process_request(
+          answer_request(
             const unsigned int                                     other_rank,
             const std::vector<std::pair<types::global_dof_index,
                                         types::global_dof_index>> &buffer_recv,
@@ -632,13 +632,13 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::process_request(),
+           * Utilities::MPI::ConsensusAlgorithmProcess::answer_request(),
            * adding the owner of a particular index in request_buffer (and
            * keeping track of who requested a particular index in case that
            * information is also desired).
            */
           virtual void
-          process_request(
+          answer_request(
             const unsigned int                                     other_rank,
             const std::vector<std::pair<types::global_dof_index,
                                         types::global_dof_index>> &buffer_recv,
@@ -717,13 +717,13 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::pack_recv_buffer().
+           * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
            */
           virtual void
-          pack_recv_buffer(const int other_rank,
-                           std::vector<std::pair<types::global_dof_index,
-                                                 types::global_dof_index>>
-                             &send_buffer) override
+          create_request(const int other_rank,
+                         std::vector<std::pair<types::global_dof_index,
+                                               types::global_dof_index>>
+                           &send_buffer) override
           {
             // create index set and compress data to be sent
             auto &   indices_i = indices_to_look_up_by_dict_rank[other_rank];
@@ -740,23 +740,23 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::prepare_recv_buffer().
+           * Utilities::MPI::ConsensusAlgorithmProcess::prepare_buffer_for_answer().
            */
           virtual void
-          prepare_recv_buffer(const int                  other_rank,
-                              std::vector<unsigned int> &recv_buffer) override
+          prepare_buffer_for_answer(
+            const int                  other_rank,
+            std::vector<unsigned int> &recv_buffer) override
           {
             recv_buffer.resize(recv_indices[other_rank].size());
           }
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::unpack_recv_buffer().
+           * Utilities::MPI::ConsensusAlgorithmProcess::read_answer().
            */
           virtual void
-          unpack_recv_buffer(
-            const int                        other_rank,
-            const std::vector<unsigned int> &recv_buffer) override
+          read_answer(const int                        other_rank,
+                      const std::vector<unsigned int> &recv_buffer) override
           {
             Assert(recv_indices[other_rank].size() == recv_buffer.size(),
                    ExcMessage("Sizes do not match!"));
