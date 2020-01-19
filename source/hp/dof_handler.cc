@@ -304,7 +304,7 @@ namespace internal
                 cell = dof_handler.begin_active(level),
                 endc = dof_handler.end_active(level);
               for (; cell != endc; ++cell)
-                if (!cell->has_children() && !cell->is_artificial())
+                if (cell->is_active() && !cell->is_artificial())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] =
                       next_free_dof;
@@ -335,7 +335,7 @@ namespace internal
               types::global_dof_index counter = 0;
               for (const auto &cell :
                    dof_handler.active_cell_iterators_on_level(level))
-                if (!cell->has_children() && !cell->is_artificial())
+                if (cell->is_active() && !cell->is_artificial())
                   counter += cell->get_fe().template n_dofs_per_object<dim>();
 
               Assert(dof_handler.levels[level]->dof_indices.size() == counter,
@@ -348,7 +348,7 @@ namespace internal
               unsigned int n_active_non_artificial_cells = 0;
               for (const auto &cell :
                    dof_handler.active_cell_iterators_on_level(level))
-                if (!cell->has_children() && !cell->is_artificial())
+                if (cell->is_active() && !cell->is_artificial())
                   ++n_active_non_artificial_cells;
 
               Assert(static_cast<unsigned int>(std::count(

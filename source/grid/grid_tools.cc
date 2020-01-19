@@ -3206,7 +3206,7 @@ namespace GridTools
           endc = triangulation.end(lvl);
         for (; cell != endc; ++cell)
           {
-            if (!cell->has_children())
+            if (cell->is_active())
               cell->set_level_subdomain_id(cell->subdomain_id());
             else
               {

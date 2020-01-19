@@ -2897,7 +2897,7 @@ namespace
             patch.data(2, v) =
               static_cast<std::make_signed<types::material_id>::type>(
                 cell->material_id());
-            if (!cell->has_children())
+            if (cell->is_active())
               patch.data(3, v) =
                 static_cast<std::make_signed<types::subdomain_id>::type>(
                   cell->subdomain_id());
@@ -3330,7 +3330,7 @@ GridOut::write_mesh_per_processor_as_vtu(
           if (cell->has_children() &&
               cell->level_subdomain_id() == numbers::artificial_subdomain_id)
             continue;
-          else if (!cell->has_children() &&
+          else if (cell->is_active() &&
                    cell->level_subdomain_id() ==
                      numbers::artificial_subdomain_id &&
                    cell->subdomain_id() == numbers::artificial_subdomain_id)
@@ -3345,7 +3345,7 @@ GridOut::write_mesh_per_processor_as_vtu(
         {
           patch.vertices[vertex] = cell->vertex(vertex);
           patch.data(0, vertex)  = cell->level();
-          if (!cell->has_children())
+          if (cell->is_active())
             patch.data(1, vertex) = static_cast<double>(
               static_cast<std::make_signed<types::subdomain_id>::type>(
                 cell->subdomain_id()));

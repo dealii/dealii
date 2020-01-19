@@ -3887,7 +3887,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
   (void)local_values_end;
   Assert(this->is_artificial() == false,
          ExcMessage("Can't ask for DoF indices on artificial cells."));
-  Assert(!this->has_children(), ExcMessage("Cell must be active."));
+  Assert(this->is_active(), ExcMessage("Cell must be active."));
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
   Assert(static_cast<unsigned int>(local_values_end - local_values_begin) ==
@@ -3919,7 +3919,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
 {
   Assert(this->is_artificial() == false,
          ExcMessage("Can't ask for DoF indices on artificial cells."));
-  Assert(!this->has_children(), ExcMessage("Cell must be active."));
+  Assert(this->is_active(), ExcMessage("Cell must be active."));
 
   Assert(static_cast<unsigned int>(local_values_end - local_values_begin) ==
            this->get_fe().dofs_per_cell,
@@ -3949,7 +3949,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_dof_values(
 {
   Assert(this->is_artificial() == false,
          ExcMessage("Can't ask for DoF indices on artificial cells."));
-  Assert(!this->has_children(), ExcMessage("Cell must be active."));
+  Assert(this->is_active(), ExcMessage("Cell must be active."));
 
   Assert(static_cast<unsigned int>(local_values.size()) ==
            this->get_fe().dofs_per_cell,
@@ -3979,7 +3979,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_fe() const
     (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension> *>(
        this->dof_handler) != nullptr) ||
-      (this->has_children() == false),
+      this->is_active(),
     ExcMessage("In hp::DoFHandler objects, finite elements are only associated "
                "with active cells. Consequently, you can not ask for the "
                "active finite element on cells with children."));
@@ -3997,7 +3997,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::active_fe_index() const
     (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension> *>(
        this->dof_handler) != nullptr) ||
-      (this->has_children() == false),
+      this->is_active(),
     ExcMessage("You can not ask for the active_fe_index on a cell that has "
                "children because no degrees of freedom are assigned "
                "to this cell and, consequently, no finite element "
@@ -4026,7 +4026,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_active_fe_index(
     (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension> *>(
        this->dof_handler) != nullptr) ||
-      (this->has_children() == false),
+      this->is_active(),
     ExcMessage("You can not set the active_fe_index on a cell that has "
                "children because no degrees of freedom will be assigned "
                "to this cell."));
@@ -4058,7 +4058,7 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_future_fe() const
     (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
                                            DoFHandlerType::space_dimension> *>(
        this->dof_handler) != nullptr) ||
-      (this->has_children() == false),
+      this->is_active(),
     ExcMessage("In hp::DoFHandler objects, finite elements are only associated "
                "with active cells. Consequently, you can not ask for the "
                "future finite element on cells with children."));

@@ -50,8 +50,8 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
   Vector<number> &   interpolated_values,
   const unsigned int fe_index) const
 {
-  if (!this->has_children())
-    // if this cell has no children: simply return the exact values on this
+  if (this->is_active())
+    // If this cell is active: simply return the exact values on this
     // cell unless the finite element we need to interpolate to is different
     // than the one we have on the current cell
     {
@@ -89,7 +89,8 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
         }
     }
   else
-    // otherwise obtain them from the children
+    // The cell is not active; we need to obtain data them from
+    // children recursively.
     {
       // we are on a non-active cell. these do not have any finite
       // element associated with them in the hp context (in the non-hp

@@ -2620,7 +2620,7 @@ namespace DoFTools
 
     for (unsigned int block = 0; pcell != endc; ++pcell)
       {
-        if (!pcell->has_children())
+        if (pcell->is_active())
           continue;
 
         for (unsigned int child = 0; child < pcell->n_children(); ++child)

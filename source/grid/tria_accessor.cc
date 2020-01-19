@@ -2078,8 +2078,7 @@ template <int dim, int spacedim>
 unsigned int
 CellAccessor<dim, spacedim>::active_cell_index() const
 {
-  Assert(this->has_children() == false,
-         TriaAccessorExceptions::ExcCellNotActive());
+  Assert(this->is_active(), TriaAccessorExceptions::ExcCellNotActive());
   return this->tria->levels[this->present_level]
     ->active_cell_indices[this->present_index];
 }

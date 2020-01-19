@@ -351,8 +351,8 @@ namespace MeshWorker
                     (periodic_neighbor &&
                      cell->periodic_neighbor_is_coarser(face_no)))
                   {
-                    Assert(!cell->has_children(), ExcInternalError());
-                    Assert(!neighbor->has_children(), ExcInternalError());
+                    Assert(cell->is_active(), ExcInternalError());
+                    Assert(neighbor->is_active(), ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.

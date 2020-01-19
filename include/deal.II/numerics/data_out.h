@@ -376,7 +376,7 @@ public:
    *   DataOut<dim> data_out;
    *   data_out.set_cell_selection(
    *          [](const typename Triangulation<dim>::cell_iterator &cell) {
-   *              return (!cell->has_children() && cell->subdomain_id() == 0);
+   *              return (cell->is_active() && cell->subdomain_id() == 0);
    *          });
    * @endcode
    * In this case, the lambda function selects all of those cells that are

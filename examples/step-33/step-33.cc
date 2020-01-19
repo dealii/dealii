@@ -1555,8 +1555,7 @@ namespace Step33
                       Assert(neighbor_child->face(neighbor2) ==
                                cell->face(face_no)->child(subface_no),
                              ExcInternalError());
-                      Assert(neighbor_child->has_children() == false,
-                             ExcInternalError());
+                      Assert(neighbor_child->is_active(), ExcInternalError());
 
                       fe_v_subface.reinit(cell, face_no, subface_no);
                       fe_v_face_neighbor.reinit(neighbor_child, neighbor2);

@@ -4235,7 +4235,7 @@ namespace internal
               return; // we are done
             }
 
-          if (!dealii_cell->has_children())
+          if (dealii_cell->is_active())
             return;
 
           if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
@@ -4334,7 +4334,7 @@ namespace internal
               return;
             }
 
-          if (!dealii_cell->has_children())
+          if (dealii_cell->is_active())
             return;
 
           if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
