@@ -2231,15 +2231,10 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non Map-compatible types.");
-        return std_cxx14::make_unique<Patterns::Map>(
+        return std_cxx14::make_unique<Patterns::Tuple>(
+          internal::default_map_separator[internal::RankInfo<T>::map_rank - 1],
           *Convert<Key>::to_pattern(),
-          *Convert<Value>::to_pattern(),
-          1,
-          1,
-          // We keep the same list separator of the previous level, as this is
-          // a map with only 1 possible entry
-          internal::default_list_separator[internal::RankInfo<T>::list_rank],
-          internal::default_map_separator[internal::RankInfo<T>::map_rank - 1]);
+          *Convert<Value>::to_pattern());
       }
 
       static std::string
@@ -2247,9 +2242,8 @@ namespace Patterns
                 const std::unique_ptr<Patterns::PatternBase> &pattern =
                   Convert<T>::to_pattern())
       {
-        std::unordered_map<Key, Value> m;
-        m.insert(t);
-        std::string s = Convert<decltype(m)>::to_string(m, pattern);
+        std::tuple<Key, Value> m(t);
+        std::string            s = Convert<decltype(m)>::to_string(m, pattern);
         AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
         return s;
       }
@@ -2259,9 +2253,9 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        std::unordered_map<Key, Value> m;
+        std::tuple<Key, Value> m;
         m = Convert<decltype(m)>::to_value(s, pattern);
-        return *m.begin();
+        return m;
       }
     };
 

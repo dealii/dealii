@@ -163,6 +163,150 @@ template <typename IndexType = boost::geometry::index::linear<16>,
 RTree<typename ContainerType::value_type, IndexType>
 pack_rtree(const ContainerType &container);
 
+/**
+ * Helper structure that allows one to extract a level from an RTree as a vector
+ * of BoundingBox objects.
+ *
+ * This structure implements a boost::geometry::index::detail::rtree::visitor
+ * object, allowing one to visit any existing RTree object, and return the
+ * vector of bounding boxes associated to a specific target level of the tree.
+ *
+ * Although possible, direct usage of this structure is cumbersome. The
+ * suggested usage of this class is through the helper function
+ * extract_rtree_level().
+ *
+ * @author Luca Heltai, 2020.
+ */
+template <typename Value,
+          typename Options,
+          typename Translator,
+          typename Box,
+          typename Allocators>
+struct ExtractLevelVisitor
+  : public boost::geometry::index::detail::rtree::visitor<
+      Value,
+      typename Options::parameters_type,
+      Box,
+      Allocators,
+      typename Options::node_tag,
+      true>::type
+{
+  /**
+   * Construct a vector @p boxes of BoundingBox objects corresponding to the
+   * @p target_level of the tree.
+   */
+  inline ExtractLevelVisitor(
+    Translator const & translator,
+    const unsigned int target_level,
+    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes);
+
+  /**
+   * An alias that identifies an InternalNode of the tree.
+   */
+  using InternalNode =
+    typename boost::geometry::index::detail::rtree::internal_node<
+      Value,
+      typename Options::parameters_type,
+      Box,
+      Allocators,
+      typename Options::node_tag>::type;
+
+  /**
+   * An alias that identifies a Leaf of the tree.
+   */
+  using Leaf = typename boost::geometry::index::detail::rtree::leaf<
+    Value,
+    typename Options::parameters_type,
+    Box,
+    Allocators,
+    typename Options::node_tag>::type;
+
+  /**
+   * Implements the visitor interface for InternalNode objects. If the node
+   * belongs to the @p target_leve, then fill the bounding box vector.
+   */
+  inline void
+  operator()(InternalNode const &node);
+
+  /**
+   * Implements the visitor interface for Leaf objects.
+   */
+  inline void
+  operator()(Leaf const &);
+
+  /**
+   * Translator interface, required by the boost implementation of the rtree.
+   */
+  Translator const &translator;
+
+  /**
+   * Store the level we are currently visiting.
+   */
+  size_t level;
+
+  /**
+   * The level we want to extract from the RTree object.
+   */
+  const size_t target_level;
+
+  /**
+   * A reference to the input vector of BoundingBox objects.
+   */
+  std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes;
+};
+
+/**
+ * Given a RTree object @p rtree, and a target level @p level, return a vector
+ * of BoundingBox objects containing all the bounding boxes that make the given
+ * @p level of the @p rtree. This function is a convenient wrapper around the
+ * ExtractLevelVisitor class.
+ *
+ * Since an RTree object is a balanced tree, you can expect each entry of the
+ * resulting vector to contain roughly the same number of children, and
+ * ultimately, the same number of leaf objects. If you request for a level that
+ * is not present in the RTree, an empty vector is returned.
+ *
+ * A typical usage of this function is in the context of
+ * parallel::distributed::Triangulation objects, where one would like to
+ * construct a rough representation of the area which is covered by the locally
+ * owned cells of the active process, and exchange this information with other
+ * processes. The finest level of information is given by the leaves, which in
+ * this context would be the collection of all the bounding boxes associated
+ * to the locally owned cells of the triangulation. Exchanging this information
+ * with all participating processess would defeat the purpuse of parallel
+ * computations. If however one constructs an RTree containing these bounding
+ * boxes (for example, by calling
+ * GridTools::Cache::get_cell_bounding_boxes_rtree()), and then extracts one of
+ * the first levels of the RTree, only a handful of BoundingBoxes would be
+ * returned, allowing the user to have a very efficient description of the
+ * geometry of the domain, and of its distribution among processes.
+ *
+ * @author Luca Heltai, 2020.
+ */
+template <typename Rtree>
+inline std::vector<
+  BoundingBox<boost::geometry::dimension<typename Rtree::value_type>::value>>
+extract_rtree_level(Rtree const &tree, const unsigned int level)
+{
+  constexpr unsigned int dim =
+    boost::geometry::dimension<typename Rtree::value_type>::value;
+
+  using RtreeView =
+    boost::geometry::index::detail::rtree::utilities::view<Rtree>;
+  RtreeView rtv(tree);
+
+  std::vector<BoundingBox<dim>> boxes;
+
+  ExtractLevelVisitor<typename RtreeView::value_type,
+                      typename RtreeView::options_type,
+                      typename RtreeView::translator_type,
+                      typename RtreeView::box_type,
+                      typename RtreeView::allocators_type>
+    extract_level_visitor(rtv.translator(), level, boxes);
+  rtv.apply_visitor(extract_level_visitor);
+  return boxes;
+}
+
 
 
 // Inline and template functions
@@ -182,6 +326,80 @@ pack_rtree(const ContainerType &container)
 {
   return pack_rtree<IndexType>(container.begin(), container.end());
 }
+
+
+
+template <typename Value,
+          typename Options,
+          typename Translator,
+          typename Box,
+          typename Allocators>
+ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
+  ExtractLevelVisitor(
+    const Translator & translator,
+    const unsigned int target_level,
+    std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes)
+  : translator(translator)
+  , level(0)
+  , target_level(target_level)
+  , boxes(boxes)
+{}
+
+
+
+template <typename Value,
+          typename Options,
+          typename Translator,
+          typename Box,
+          typename Allocators>
+void
+ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
+operator()(const ExtractLevelVisitor::InternalNode &node)
+{
+  using ElmentsType =
+    typename boost::geometry::index::detail::rtree::elements_type<
+      InternalNode>::type;
+
+  const auto &elements = boost::geometry::index::detail::rtree::elements(node);
+
+  if (level == target_level)
+    {
+      const auto offset = boxes.size();
+      boxes.resize(offset + elements.size());
+
+      unsigned int i = offset;
+      for (typename ElmentsType::const_iterator it = elements.begin();
+           it != elements.end();
+           ++it)
+        {
+          boost::geometry::convert(it->first, boxes[i]);
+          ++i;
+        }
+      return;
+    }
+
+  const size_t level_backup = level;
+  ++level;
+
+  for (typename ElmentsType::const_iterator it = elements.begin();
+       it != elements.end();
+       ++it)
+    {
+      boost::geometry::index::detail::rtree::apply_visitor(*this, *it->second);
+    }
+
+  level = level_backup;
+}
+
+template <typename Value,
+          typename Options,
+          typename Translator,
+          typename Box,
+          typename Allocators>
+void
+ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
+operator()(const ExtractLevelVisitor::Leaf &)
+{}
 
 #endif
 
