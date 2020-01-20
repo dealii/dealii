@@ -71,7 +71,7 @@
 #include <cmath>
 
 
-namespace Step71
+namespace Step47
 {
   using namespace dealii;
 
@@ -892,7 +892,7 @@ namespace Step71
         std::cout << std::endl;
       }
   }
-} // namespace Step71
+} // namespace Step47
 
 
 
@@ -910,7 +910,7 @@ int main()
   try
     {
       using namespace dealii;
-      using namespace Step71;
+      using namespace Step47;
 
       const unsigned int fe_degree = 2;
       Assert(fe_degree >= 2,

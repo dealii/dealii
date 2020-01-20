@@ -413,6 +413,13 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-47</td>
+ *        <td> Solving the fourth-order biharmonic equation using the $C^0$
+ *        Interior Penalty (C0IP) method.
+ *        <br/> Keywords: FEInterfaceValues
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-48</td>
  *       <td> Explicit time stepping for the Sine&ndash;Gordon equation based on
  *       a diagonal mass matrix. Efficient implementation of (nonlinear) finite
@@ -509,13 +516,6 @@
  *       <td>step-65</td>
  *        <td> The TransfiniteInterpolationManifold and MappingQCache classes for
  *        advanced manifold operations.
- *       </td></tr>
- *
- *   <tr valign="top">
- *       <td>step-71</td>
- *        <td> Solving the fourth-order biharmonic equation using the $C^0$ 
- *        Interior Penalty (C0IP) method.
- *        <br/> Keywords: FEInterfaceValues
  *       </td></tr>
  *
  * </table>
@@ -737,10 +737,10 @@
  *       step-21,
  *       step-39,
  *       step-46,
+ *       step-47,
  *       step-51,
  *       step-59,
- *       step-61,
- *       step-71
+ *       step-61
  *     </td>
  *   </tr>
  *
@@ -853,9 +853,9 @@
  *     <td>
  *       step-29,
  *       step-44,
+ *       step-47,
  *       step-46,
- *       step-62,
- *       step-71
+ *       step-62
  *     </td>
  *   </tr>
  *
@@ -1069,7 +1069,7 @@
  *   <tr valign="top">
  *     <td> Fourth-order biharmonic equation
  *     </td>
- *     <td>step-71</td>
+ *     <td>step-47</td>
  *   </tr>
  *
  *   <tr valign="top">
