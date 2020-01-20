@@ -387,9 +387,9 @@ BlockIndices::to_string() const
     {
       if (i > 0)
         result += ',';
-      result += Utilities::to_string(block_size(i));
+      result += std::to_string(block_size(i));
     }
-  result += "|" + Utilities::to_string(total_size()) + ']';
+  result += "|" + std::to_string(total_size()) + ']';
   return result;
 }
 

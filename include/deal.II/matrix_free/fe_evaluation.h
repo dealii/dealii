@@ -3070,20 +3070,19 @@ inline FEEvaluationBase<dim,
           first_selected_component,
     ExcMessage(
       "You tried to construct a vector-valued evaluator with " +
-      Utilities::to_string(n_components) +
+      std::to_string(n_components) +
       " components. However, "
       "the current base element has only " +
-      Utilities::to_string(
+      std::to_string(
         dof_info->start_components
           [dof_info->component_to_base_index[first_selected_component] + 1] -
         first_selected_component) +
       " components left when starting from local element index " +
-      Utilities::to_string(
+      std::to_string(
         first_selected_component -
         dof_info->start_components
           [dof_info->component_to_base_index[first_selected_component]]) +
-      " (global index " + Utilities::to_string(first_selected_component) +
-      ")"));
+      " (global index " + std::to_string(first_selected_component) + ")"));
 
   // do not check for correct dimensions of data fields here, should be done
   // in derived classes

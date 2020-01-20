@@ -1183,10 +1183,10 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
   // might work also on single cells, grids
   // with both kind of cells are very likely to
   // be broken. Check for this here.
-  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
-              ExcMessage(
-                std::string(
-                  "This class assumes that either all cells have positive "
+  AssertThrow(
+    n_negative_cells == 0 || n_negative_cells == cells.size(),
+    ExcMessage(
+      std::string("This class assumes that either all cells have positive "
                   "volume, or that all cells have been specified in an "
                   "inverted vertex order so that their volume is negative. "
                   "(In the latter case, this class automatically inverts "
@@ -1195,9 +1195,8 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
                   "negative volume. You need to check your mesh which "
                   "cells these are and how they got there.\n"
                   "As a hint, of the total ") +
-                Utilities::to_string(cells.size()) + " cells in the mesh, " +
-                Utilities::to_string(n_negative_cells) +
-                " appear to have a negative volume."));
+      std::to_string(cells.size()) + " cells in the mesh, " +
+      std::to_string(n_negative_cells) + " appear to have a negative volume."));
 }
 
 

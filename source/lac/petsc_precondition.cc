@@ -482,7 +482,7 @@ namespace PETScWrappers
       }
 
     set_option_value("-pc_hypre_boomeramg_agg_nl",
-                     Utilities::to_string(
+                     std::to_string(
                        additional_data.aggressive_coarsening_num_levels));
 
     std::stringstream ssStream;
@@ -630,7 +630,7 @@ namespace PETScWrappers
     set_option_value("-pc_hypre_parasails_sym", ssStream.str());
 
     set_option_value("-pc_hypre_parasails_nlevels",
-                     Utilities::to_string(additional_data.n_levels));
+                     std::to_string(additional_data.n_levels));
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.threshold;
