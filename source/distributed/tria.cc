@@ -2215,6 +2215,20 @@ namespace parallel
     }
 
 
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::create_triangulation(
+      const TriangulationDescription::Description<dim, spacedim>
+        &construction_data)
+    {
+      (void)construction_data;
+
+      Assert(false, ExcInternalError());
+    }
+
+
+
     // This anonymous namespace contains utility for
     // the function Triangulation::communicate_locally_moved_vertices
     namespace CommunicateLocallyMovedVertices

@@ -17,12 +17,12 @@
 // check serialization for ConstructionData<dim, spacedim>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 
 #include <boost/serialization/vector.hpp>
 
@@ -43,8 +43,9 @@ test(MPI_Comm comm)
   GridTools::partition_triangulation_zorder(
     Utilities::MPI::n_mpi_processes(comm), basetria);
 
-  auto t1 = parallel::fullydistributed::Utilities::
-    create_construction_data_from_triangulation(basetria, comm);
+  auto t1 =
+    TriangulationDescription::Utilities::create_description_from_triangulation(
+      basetria, comm);
 
   // compare equal ConstructionDatas
   auto t2 = t1;
@@ -55,8 +56,9 @@ test(MPI_Comm comm)
   GridTools::partition_triangulation_zorder(
     Utilities::MPI::n_mpi_processes(comm), basetria);
 
-  auto t3 = parallel::fullydistributed::Utilities::
-    create_construction_data_from_triangulation(basetria, comm);
+  auto t3 =
+    TriangulationDescription::Utilities::create_description_from_triangulation(
+      basetria, comm);
 
   // compare different ConstructionDatas
   verify(t1, t3);

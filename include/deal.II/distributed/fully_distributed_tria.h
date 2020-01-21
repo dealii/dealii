@@ -51,167 +51,6 @@ namespace parallel
   namespace fullydistributed
   {
     /**
-     * Configuration flags for fully distributed Triangulations.
-     * Settings can be combined using bitwise OR.
-     *
-     * @author Peter Munch, 2019
-     */
-    enum Settings
-    {
-      /**
-       * Default settings, other options are disabled.
-       */
-      default_setting = 0x0,
-      /**
-       * This flags needs to be set to use the geometric multigrid
-       * functionality. This option requires additional computation and
-       * communication.
-       */
-      construct_multigrid_hierarchy = 0x1
-    };
-
-    /**
-     * Information needed for each locally relevant cell, stored in
-     * ConstructionData and used during construction of a
-     * parallel::fullydistributed::Triangulation. This struct stores
-     * the cell id, the subdomain_id and the level_subdomain_id as well as
-     * information related to manifold_id and boundary_id.
-     *
-     * @author Peter Munch, 2019
-     */
-    template <int dim>
-    struct CellData
-    {
-      /**
-       * Constructor.
-       */
-      CellData() = default;
-
-      /**
-       * Boost serialization function
-       */
-      template <class Archive>
-      void
-      serialize(Archive &ar, const unsigned int /*version*/);
-
-      /**
-       * Comparison operator.
-       */
-      bool
-      operator==(const CellData<dim> &other) const;
-
-      /**
-       * Unique CellID of the cell.
-       */
-      CellId::binary_type id;
-
-      /**
-       * subdomain_id of the cell.
-       */
-      types::subdomain_id subdomain_id;
-
-      /**
-       * level_subdomain_id of the cell.
-       */
-      types::subdomain_id level_subdomain_id;
-
-      /**
-       * Manifold id of the cell.
-       */
-      types::material_id manifold_id;
-
-      /**
-       * Manifold id of all lines of the cell.
-       *
-       * @note Only used for 2D and 3D.
-       */
-      std::array<types::manifold_id, GeometryInfo<dim>::lines_per_cell>
-        manifold_line_ids;
-
-      /**
-       * Manifold id of all face quads of the cell.
-       *
-       * @note Only used for 3D.
-       */
-      std::array<types::manifold_id,
-                 dim == 1 ? 1 : GeometryInfo<3>::quads_per_cell>
-        manifold_quad_ids;
-
-      /**
-       * List of face number and boundary id of all non-internal faces of the
-       * cell.
-       */
-      std::vector<std::pair<unsigned int, types::boundary_id>> boundary_ids;
-    };
-
-
-
-    /**
-     * Data used to construct a fully distributed triangulation in
-     * parallel::fullydistributed::Triangulation::create_triangulation().
-     *
-     * @author Peter Munch, 2019
-     */
-    template <int dim, int spacedim>
-    struct ConstructionData
-    {
-      /**
-       * Boost serialization function
-       */
-      template <class Archive>
-      void
-      serialize(Archive &ar, const unsigned int /*version*/);
-
-      /**
-       * Comparison operator.
-       */
-      bool
-      operator==(const ConstructionData<dim, spacedim> &other) const;
-
-      /**
-       * Cells of the locally-relevant coarse-grid triangulation.
-       */
-      std::vector<dealii::CellData<dim>> coarse_cells;
-
-      /**
-       * Vertices of the locally-relevant coarse-grid triangulation.
-       */
-      std::vector<Point<spacedim>> coarse_cell_vertices;
-
-      /**
-       * List that for each locally-relevant coarse cell provides the
-       * corresponding global @ref GlossCoarseCellId.
-       */
-      std::vector<types::coarse_cell_id> coarse_cell_index_to_coarse_cell_id;
-
-      /**
-       * CellData for each locally relevant cell on each level. cell_infos[i]
-       * contains the CellData for each locally relevant cell on the ith
-       * level.
-       */
-      std::vector<std::vector<CellData<dim>>> cell_infos;
-
-      /**
-       * The MPI communicator used to create this struct. It will be compared
-       * to the communicator inside of parallel::fullydistributed::Triangulation
-       * and an assert is thrown if they do not match.
-       *
-       * @note This is necessary since the communicator inside of
-       * parallel::TriangulationBase is const and cannot be changed after the
-       * constructor has been called.
-       *
-       */
-      MPI_Comm comm;
-
-      /**
-       * @note settings See the description of the Settings enumerator.
-       */
-      Settings settings;
-    };
-
-
-
-    /**
      * A distributed triangulation with a distributed coarse grid.
      *
      * The motivation for parallel::fullydistributed::Triangulation has its
@@ -299,26 +138,22 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * Create a triangulation from the provided ConstructionData.
-       *
-       * @note The namespace dealii::fullydistributed::Util contains functions
-       *       to create ConstructionData.
+       * @copydoc Triangulation::create_triangulation()
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other
        * triangulations of deal.II.
-       *
-       * @param construction_data The data needed for this process.
        */
       void
       create_triangulation(
-        const ConstructionData<dim, spacedim> &construction_data);
+        const TriangulationDescription::Description<dim, spacedim>
+          &construction_data) override;
 
       /**
        * @note This function is not implemented for this class  and throws
        *       an assertion. Instead, use
        *       the other create_triangulation() function to create the
-       * triangulation.
+       *       triangulation.
        */
       virtual void
       create_triangulation(const std::vector<Point<spacedim>> &      vertices,
@@ -360,7 +195,7 @@ namespace parallel
       set_partitioner(
         const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                  const unsigned int)> &partitioner,
-        const Settings &                               settings);
+        const TriangulationDescription::Settings &     settings);
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -416,7 +251,7 @@ namespace parallel
       /**
        * store the Settings.
        */
-      Settings settings;
+      TriangulationDescription::Settings settings;
 
       /**
        * Partitioner used in copy_triangulation().
@@ -451,87 +286,6 @@ namespace parallel
       bool
         currently_processing_prepare_coarsening_and_refinement_for_internal_usage;
     };
-
-
-#ifndef DOXYGEN
-
-    template <int dim>
-    template <class Archive>
-    void
-    CellData<dim>::serialize(Archive &ar, const unsigned int /*version*/)
-    {
-      ar &id;
-      ar &subdomain_id;
-      ar &level_subdomain_id;
-      ar &manifold_id;
-      if (dim >= 2)
-        ar &manifold_line_ids;
-      if (dim >= 3)
-        ar &manifold_quad_ids;
-      ar &boundary_ids;
-    }
-
-
-    template <int dim, int spacedim>
-    template <class Archive>
-    void
-    ConstructionData<dim, spacedim>::serialize(Archive &ar,
-                                               const unsigned int /*version*/)
-    {
-      ar &coarse_cells;
-      ar &coarse_cell_vertices;
-      ar &coarse_cell_index_to_coarse_cell_id;
-      ar &cell_infos;
-      ar &settings;
-    }
-
-
-
-    template <int dim>
-    bool
-    CellData<dim>::operator==(const CellData<dim> &other) const
-    {
-      if (this->id != other.id)
-        return false;
-      if (this->subdomain_id != other.subdomain_id)
-        return false;
-      if (this->level_subdomain_id != other.level_subdomain_id)
-        return false;
-      if (this->manifold_id != other.manifold_id)
-        return false;
-      if (dim >= 2 && this->manifold_line_ids != other.manifold_line_ids)
-        return false;
-      if (dim >= 3 && this->manifold_quad_ids != other.manifold_quad_ids)
-        return false;
-      if (this->boundary_ids != other.boundary_ids)
-        return false;
-
-      return true;
-    }
-
-
-
-    template <int dim, int spacedim>
-    bool
-    ConstructionData<dim, spacedim>::
-    operator==(const ConstructionData<dim, spacedim> &other) const
-    {
-      if (this->coarse_cells != other.coarse_cells)
-        return false;
-      if (this->coarse_cell_vertices != other.coarse_cell_vertices)
-        return false;
-      if (this->coarse_cell_index_to_coarse_cell_id !=
-          other.coarse_cell_index_to_coarse_cell_id)
-        return false;
-      if (this->cell_infos != other.cell_infos)
-        return false;
-      if (this->settings != other.settings)
-        return false;
-
-      return true;
-    }
-
-#endif
 
   } // namespace fullydistributed
 } // namespace parallel

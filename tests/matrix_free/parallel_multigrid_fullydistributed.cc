@@ -22,7 +22,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -32,6 +31,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -458,8 +458,8 @@ test()
       parallel::fullydistributed::Triangulation<dim> tria_pft(MPI_COMM_WORLD);
 
       // extract relevant information form pdt
-      auto construction_data = parallel::fullydistributed::Utilities::
-        create_construction_data_from_triangulation(tria, MPI_COMM_WORLD, true);
+      auto construction_data = TriangulationDescription::Utilities::
+        create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
 
       // actually create triangulation
       tria_pft.create_triangulation(construction_data);
@@ -486,10 +486,8 @@ test()
         parallel::fullydistributed::Triangulation<dim> tria_pft(MPI_COMM_WORLD);
 
         // extract relevant information form pdt
-        auto construction_data = parallel::fullydistributed::Utilities::
-          create_construction_data_from_triangulation(tria,
-                                                      MPI_COMM_WORLD,
-                                                      true);
+        auto construction_data = TriangulationDescription::Utilities::
+          create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
 
         // actually create triangulation
         tria_pft.create_triangulation(construction_data);

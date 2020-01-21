@@ -382,6 +382,19 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
+    Triangulation<dim, spacedim>::create_triangulation(
+      const TriangulationDescription::Description<dim, spacedim>
+        &construction_data)
+    {
+      (void)construction_data;
+
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {

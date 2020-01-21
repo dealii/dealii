@@ -15,13 +15,12 @@
 
 
 // Create the ConstructionData with
-// create_construction_data_from_triangulation_in_groups, i.e. by a set of
+// create_description_from_triangulation_in_groups, i.e. by a set of
 // master processes.
 
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -31,6 +30,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 
 #include <boost/archive/text_oarchive.hpp>
 
@@ -42,7 +42,7 @@ template <int dim, int spacedim = dim>
 void
 test(int n_refinements, MPI_Comm comm)
 {
-  // 1) create ConstructionData with create_construction_data_from_triangulation
+  // 1) create ConstructionData with create_description_from_triangulation
   Triangulation<dim> basetria(
     Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_L(basetria);
@@ -52,13 +52,14 @@ test(int n_refinements, MPI_Comm comm)
     Utilities::MPI::n_mpi_processes(comm), basetria);
   GridTools::partition_multigrid_levels(basetria);
 
-  auto construction_data_1 = parallel::fullydistributed::Utilities::
-    create_construction_data_from_triangulation(basetria, comm, true);
+  auto construction_data_1 =
+    TriangulationDescription::Utilities::create_description_from_triangulation(
+      basetria, comm, true);
 
   // 2) create ConstructionData with
-  // create_construction_data_from_triangulation_in_groups
-  auto construction_data_2 = parallel::fullydistributed::Utilities::
-    create_construction_data_from_triangulation_in_groups<dim, spacedim>(
+  // create_description_from_triangulation_in_groups
+  auto construction_data_2 = TriangulationDescription::Utilities::
+    create_description_from_triangulation_in_groups<dim, spacedim>(
       [n_refinements](dealii::Triangulation<dim, spacedim> &tria) {
         GridGenerator::hyper_L(tria);
         tria.refine_global(n_refinements);

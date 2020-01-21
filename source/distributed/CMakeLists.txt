@@ -20,7 +20,6 @@ SET(_unity_include_src
   cell_weights.cc
   cell_data_transfer.cc
   fully_distributed_tria.cc
-  fully_distributed_tria_util.cc
   solution_transfer.cc
   tria.cc
   tria_base.cc
@@ -45,7 +44,6 @@ SET(_inst
   cell_weights.inst.in
   cell_data_transfer.inst.in
   fully_distributed_tria.inst.in
-  fully_distributed_tria_util.inst.in
   solution_transfer.inst.in
   tria.inst.in
   shared_tria.inst.in

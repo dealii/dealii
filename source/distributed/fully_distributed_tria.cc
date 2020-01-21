@@ -19,7 +19,6 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 
 #include <deal.II/grid/grid_tools.h>
 
@@ -43,7 +42,7 @@ namespace parallel
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(MPI_Comm mpi_communicator)
       : parallel::DistributedTriangulationBase<dim, spacedim>(mpi_communicator)
-      , settings(Settings::default_setting)
+      , settings(TriangulationDescription::Settings::default_setting)
       , partitioner([](dealii::Triangulation<dim, spacedim> &tria,
                        const unsigned int                    n_partitions) {
         GridTools::partition_triangulation_zorder(n_partitions, tria);
@@ -58,7 +57,8 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::create_triangulation(
-      const ConstructionData<dim, spacedim> &construction_data)
+      const TriangulationDescription::Description<dim, spacedim>
+        &construction_data)
     {
       // check if the communicator of this parallel triangulation has been used
       // to construct the ConstructionData
@@ -69,7 +69,8 @@ namespace parallel
       settings = construction_data.settings;
 
       // set the smoothing properties
-      if (settings & construct_multigrid_hierarchy)
+      if (settings &
+          TriangulationDescription::Settings::construct_multigrid_hierarchy)
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
@@ -124,109 +125,18 @@ namespace parallel
           for (auto i : coarse_cell_id_to_coarse_cell_index_vector)
             this->coarse_cell_id_to_coarse_cell_index_vector.emplace_back(i);
 
-          // 3) create coarse grid
-          dealii::parallel::Triangulation<dim, spacedim>::create_triangulation(
-            construction_data.coarse_cell_vertices,
-            construction_data.coarse_cells,
-            SubCellData());
-
-          Assert(this->n_cells() ==
-                   this->coarse_cell_id_to_coarse_cell_index_vector.size(),
-                 ExcInternalError());
-          Assert(this->n_cells() ==
-                   this->coarse_cell_index_to_coarse_cell_id_vector.size(),
-                 ExcInternalError());
+          // create locally-relevant
+          currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
+            true;
+          currently_processing_create_triangulation_for_internal_usage = true;
+          dealii::Triangulation<dim, spacedim>::create_triangulation(
+            construction_data);
+          currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
+            false;
+          currently_processing_create_triangulation_for_internal_usage = false;
 
           // create a copy of cell_infos such that we can sort them
           auto cell_infos = construction_data.cell_infos;
-
-          // sort cell_infos on each level separately
-          for (auto &cell_info : cell_infos)
-            std::sort(cell_info.begin(),
-                      cell_info.end(),
-                      [&](CellData<dim> a, CellData<dim> b) {
-                        const CellId a_id(a.id);
-                        const CellId b_id(b.id);
-
-                        const auto a_coarse_cell_index =
-                          this->coarse_cell_id_to_coarse_cell_index(
-                            a_id.get_coarse_cell_id());
-                        const auto b_coarse_cell_index =
-                          this->coarse_cell_id_to_coarse_cell_index(
-                            b_id.get_coarse_cell_id());
-
-                        // according to their coarse-cell index and if that is
-                        // same according to their cell id (the result is that
-                        // cells on each level are sorted according to their
-                        // index on that level - what we need in the following
-                        // operations)
-                        if (a_coarse_cell_index != b_coarse_cell_index)
-                          return a_coarse_cell_index < b_coarse_cell_index;
-                        else
-                          return a_id < b_id;
-                      });
-
-          // 4) create all levels via a sequence of refinements
-          for (unsigned int level = 0; level < cell_infos.size(); ++level)
-            {
-              // a) set manifold ids here (because new vertices have to be
-              //    positioned correctly during each refinement step)
-              {
-                auto cell      = this->begin(level);
-                auto cell_info = cell_infos[level].begin();
-                for (; cell_info != cell_infos[level].end(); ++cell_info)
-                  {
-                    while (cell_info->id !=
-                           cell->id().template to_binary<dim>())
-                      ++cell;
-                    if (spacedim == 3)
-                      for (unsigned int quad = 0;
-                           quad < GeometryInfo<spacedim>::quads_per_cell;
-                           ++quad)
-                        cell->quad(quad)->set_manifold_id(
-                          cell_info->manifold_quad_ids[quad]);
-
-                    if (spacedim >= 2)
-                      for (unsigned int line = 0;
-                           line < GeometryInfo<spacedim>::lines_per_cell;
-                           ++line)
-                        cell->line(line)->set_manifold_id(
-                          cell_info->manifold_line_ids[line]);
-
-                    cell->set_manifold_id(cell_info->manifold_id);
-                  }
-              }
-
-              // b) perform refinement on all levels but on the finest
-              if (level + 1 != cell_infos.size())
-                {
-                  // find cells that should have children and mark them for
-                  // refinement
-                  auto coarse_cell    = this->begin(level);
-                  auto fine_cell_info = cell_infos[level + 1].begin();
-
-                  // loop over all cells on the next level
-                  for (; fine_cell_info != cell_infos[level + 1].end();
-                       ++fine_cell_info)
-                    {
-                      // find the parent of that cell
-                      while (!coarse_cell->id().is_parent_of(
-                        CellId(fine_cell_info->id)))
-                        ++coarse_cell;
-
-                      // set parent for refinement
-                      coarse_cell->set_refine_flag();
-                    }
-
-                  // execute refinement
-                  currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
-                    true;
-                  dealii::Triangulation<dim, spacedim>::
-                    execute_coarsening_and_refinement();
-                  currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
-                    false;
-                }
-            }
 
           // 4a) set all cells artificial (and set the actual
           //     (level_)subdomain_ids in the next step)
@@ -240,7 +150,7 @@ namespace parallel
                 dealii::numbers::artificial_subdomain_id);
             }
 
-          // 4b) set actual (level_)subdomain_ids as well as boundary ids
+          // 4b) set actual (level_)subdomain_ids
           for (unsigned int level = 0; level < cell_infos.size(); ++level)
             {
               auto cell      = this->begin(level);
@@ -256,16 +166,9 @@ namespace parallel
                     cell->set_subdomain_id(cell_info->subdomain_id);
 
                   // level subdomain id
-                  if (settings & construct_multigrid_hierarchy)
+                  if (settings & TriangulationDescription::Settings::
+                                   construct_multigrid_hierarchy)
                     cell->set_level_subdomain_id(cell_info->level_subdomain_id);
-
-                  // boundary ids
-                  for (auto pair : cell_info->boundary_ids)
-                    {
-                      Assert(cell->at_boundary(pair.first),
-                             ExcMessage("Cell face is not on the boundary!"));
-                      cell->face(pair.first)->set_boundary_id(pair.second);
-                    }
                 }
             }
         }
@@ -337,8 +240,8 @@ namespace parallel
         }
 
       // create construction data
-      const auto construction_data =
-        Utilities::create_construction_data_from_triangulation(
+      const auto construction_data = TriangulationDescription::Utilities::
+        create_description_from_triangulation(
           *other_tria_ptr,
           this->mpi_communicator,
           this->is_multilevel_hierarchy_constructed());
@@ -354,7 +257,7 @@ namespace parallel
     Triangulation<dim, spacedim>::set_partitioner(
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const unsigned int)> &partitioner,
-      const Settings &                               settings)
+      const TriangulationDescription::Settings &     settings)
     {
       this->partitioner = partitioner;
       this->settings    = settings;
@@ -368,7 +271,8 @@ namespace parallel
     {
       parallel::Triangulation<dim, spacedim>::update_number_cache();
 
-      if (settings & construct_multigrid_hierarchy)
+      if (settings &
+          TriangulationDescription::Settings::construct_multigrid_hierarchy)
         parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
     }
 
@@ -427,7 +331,9 @@ namespace parallel
     bool
     Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
     {
-      return (settings & construct_multigrid_hierarchy);
+      return (
+        settings &
+        TriangulationDescription::Settings::construct_multigrid_hierarchy);
     }
 
 
