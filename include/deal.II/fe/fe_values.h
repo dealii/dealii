@@ -3307,7 +3307,7 @@ public:
 
 protected:
   /**
-   * Objects of the FEValues class need to store a pointer (i.e. an iterator)
+   * Objects of the FEValues class need to store an iterator
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions. On the other hand, this class should also work for different
@@ -3331,6 +3331,10 @@ protected:
    *
    * This way, the use of virtual functions is restricted to only this class,
    * and other users of iterators do not have to bear the negative effects.
+   *
+   * @note This class is an example of the
+   * <a href="https://www.artima.com/cppsource/type_erasure.html">type
+   * erasure</a> design pattern.
    *
    * @author Wolfgang Bangerth, 2003
    */

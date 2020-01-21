@@ -211,6 +211,10 @@ namespace internal
      * Since the vectors all have the same interface, this is no big problem,
      * as they can all use the same general templatized code.
      *
+     * @note This class is an example of the
+     * <a href="https://www.artima.com/cppsource/type_erasure.html">type
+     * erasure</a> design pattern.
+     *
      * @author Wolfgang Bangerth, 2004
      */
     template <typename DoFHandlerType>
