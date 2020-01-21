@@ -524,7 +524,9 @@ namespace LinearAlgebra
        * compress_finish() is invoked, it is mandatory to specify a unique
        * communication channel to each such call, in order to avoid several
        * messages with the same ID that will corrupt this operation. Any
-       * communication channel less than 100 is a valid value.
+       * communication channel less than 100 is a valid value (in particular,
+       * the range $[100, 200)$ is reserved for
+       * LinearAlgebra::distributed::BlockVector).
        */
       void
       compress_start(
@@ -562,7 +564,9 @@ namespace LinearAlgebra
        * update_ghost_values_finish() is invoked, it is mandatory to specify a
        * unique communication channel to each such call, in order to avoid
        * several messages with the same ID that will corrupt this operation.
-       * Any communication channel less than 100 is a valid value.
+       * Any communication channel less than 100 is a valid value (in
+       * particular, the range $[100, 200)$ is reserved for
+       * LinearAlgebra::distributed::BlockVector).
        */
       void
       update_ghost_values_start(
