@@ -900,8 +900,7 @@ namespace LinearAlgebra
       const unsigned int                communication_channel,
       ::dealii::VectorOperation::values operation)
     {
-      (void)communication_channel;
-      (void)operation;
+      AssertIndexRange(communication_channel, 100);
       Assert(vector_is_ghosted == false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
@@ -993,6 +992,9 @@ namespace LinearAlgebra
               import_data.values.get(), partitioner->n_import_indices()),
             compress_requests);
         }
+#else
+      (void)communication_channel;
+      (void)operation;
 #endif
     }
 
@@ -1078,6 +1080,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::update_ghost_values_start(
       const unsigned int communication_channel) const
     {
+      AssertIndexRange(communication_channel, 100);
 #ifdef DEAL_II_WITH_MPI
       // nothing to do when we neither have import nor ghost indices.
       if (partitioner->n_ghost_indices() == 0 &&
