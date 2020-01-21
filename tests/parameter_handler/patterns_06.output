@@ -1,14 +1,14 @@
 
-DEAL:parameters::A Point<1>: 5.000000
-DEAL:parameters::A Point<2>: 6.000000, 7.000000
-DEAL:parameters::A Point<3>: 8.000000, 9.000000, 10.000000
-DEAL:parameters::A complex: 3.000000, 4.000000
-DEAL:parameters::A double: 2.000000
-DEAL:parameters::A list of Point<1>: 5.000000; 5.000000
-DEAL:parameters::A list of Point<2>: 6.000000, 7.000000; 6.000000, 7.000000
-DEAL:parameters::A list of Point<3>: 8.000000, 9.000000, 10.000000; 8.000000, 9.000000, 10.000000
-DEAL:parameters::A list of complexes: 3.000000, 4.000000; 3.000000, 4.000000
-DEAL:parameters::A list of doubles: 2.000000, 2.000000
+DEAL:parameters::A Point<1>: 5
+DEAL:parameters::A Point<2>: 6, 7
+DEAL:parameters::A Point<3>: 8, 9, 10
+DEAL:parameters::A complex: 3, 4
+DEAL:parameters::A double: 2
+DEAL:parameters::A list of Point<1>: 5; 5
+DEAL:parameters::A list of Point<2>: 6, 7; 6, 7
+DEAL:parameters::A list of Point<3>: 8, 9, 10; 8, 9, 10
+DEAL:parameters::A list of complexes: 3, 4; 3, 4
+DEAL:parameters::A list of doubles: 2, 2
 DEAL:parameters::A list of signed integers: -1, -1
 DEAL:parameters::A list of strings: foo, foo
 DEAL:parameters::A list of unsigned integers: 1, 1

@@ -1,0 +1,13 @@
+
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 1
+  set string list = a, b, c   # default: a
+  set int         = 3         # default: 1
+
+  # docs 3
+  set double      = 3.1415926
+end
+
+
