@@ -10,6 +10,7 @@ In this program, we will mainly consider two aspects:
 Besides these topics, again a variety of improvements and tricks will be
 shown.
 
+
 <h3>Verification of correctness</h3>
 
 There has probably never been a
@@ -101,9 +102,9 @@ Before we go into programming, let's have a brief look at the mathematical
 formulation. The equation that we want to solve here is the Helmholtz equation
 "with the nice sign":
 @f[
-  -\Delta u + u = f,
+  -\Delta u + \alpha u = f,
 @f]
-on the square $[-1,1]^2$, augmented by boundary conditions
+on the square $[-1,1]^2$ with $\alpha=1$, augmented by boundary conditions
 @f[
   u = g_1
 @f]
@@ -112,7 +113,16 @@ on some part $\Gamma_1$ of the boundary $\Gamma$, and
   {\mathbf n}\cdot \nabla u = g_2
 @f]
 on the rest $\Gamma_2 = \Gamma \backslash \Gamma_1$.
-In our particular testcase, we will use $\Gamma_1=\Gamma \cap\{\{x=1\} \cup \{y=1\}\}$.
+In our particular testcase, we will use $\Gamma_1=\Gamma \cap\{\{x=1\}
+\cup \{y=1\}\}$.
+(We say that this equation has the "nice sign" because the operator
+$-\Delta + \alpha I$ with the identity $I$ is a positive definite
+operator; the <a
+href="https://en.wikipedia.org/wiki/Helmholtz_equation">equation with
+the "bad sign"</a> is $-\Delta u - \alpha u$ and results from modeling
+time-harmonic processes. The operator is not necessarily positive
+definite, and this leads to all sorts of issues we need not discuss
+here.)
 
 Because we want to verify the convergence of our numerical solution $u_h$,
 we want a setup so that we know the exact solution $u$. This is where
