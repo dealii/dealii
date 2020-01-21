@@ -29,7 +29,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <boost/iostreams/copy.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 
 #include <algorithm>
@@ -45,6 +44,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <string>
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
 #  include <unistd.h>
@@ -437,7 +437,7 @@ namespace Utilities
   std::string
   to_string(const number value, const unsigned int digits)
   {
-    std::string lc_string = boost::lexical_cast<std::string>(value);
+    std::string lc_string = std::to_string(value);
 
     if (digits == numbers::invalid_unsigned_int)
       return lc_string;
