@@ -94,7 +94,7 @@ namespace Step10
       {
         std::cout << "Refinement level: " << refinement << std::endl;
 
-        std::string filename_base = "ball_" + Utilities::to_string(refinement);
+        std::string filename_base = "ball_" + std::to_string(refinement);
 
         for (unsigned int degree = 1; degree < 4; ++degree)
           {
@@ -134,8 +134,8 @@ namespace Step10
             grid_out.set_flags(gnuplot_flags);
 
             // Finally, generate a filename and a file for output:
-            std::string filename = filename_base + "_mapping_q_" +
-                                   Utilities::to_string(degree) + ".dat";
+            std::string filename =
+              filename_base + "_mapping_q_" + std::to_string(degree) + ".dat";
             std::ofstream gnuplot_file(filename);
 
             // Then write out the triangulation to this file. The last

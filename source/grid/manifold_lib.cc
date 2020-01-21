@@ -2172,7 +2172,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
   Assert(triangulation != nullptr, ExcNotInitialized());
   Assert(triangulation->begin_active()->level() >= level_coarse,
          ExcMessage("The manifold was initialized with level " +
-                    Utilities::to_string(level_coarse) + " but there are now" +
+                    std::to_string(level_coarse) + " but there are now" +
                     "active cells on a lower level. Coarsening the mesh is " +
                     "currently not supported"));
 

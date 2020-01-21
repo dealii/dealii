@@ -1149,7 +1149,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
         {
           for (unsigned int i = 0; i < n_components; ++i)
             {
-              deduced_names[i] = name + '_' + Utilities::to_string(i);
+              deduced_names[i] = name + '_' + std::to_string(i);
             }
         }
       else

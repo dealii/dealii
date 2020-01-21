@@ -309,9 +309,9 @@ namespace Particles
         std::string(
           "You are trying to assign properties with an incompatible length. ") +
         "The particle has space to store " +
-        Utilities::to_string(old_properties.size()) + " properties, " +
+        std::to_string(old_properties.size()) + " properties, " +
         "and this function tries to assign" +
-        Utilities::to_string(new_properties.size()) + " properties. " +
+        std::to_string(new_properties.size()) + " properties. " +
         "This is not allowed."));
 
     if (old_properties.size() > 0)

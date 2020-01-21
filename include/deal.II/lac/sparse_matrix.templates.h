@@ -1374,7 +1374,7 @@ namespace internal
                ExcMessage(
                  "There is a zero on the diagonal of this matrix "
                  "in row " +
-                 Utilities::to_string(row) +
+                 std::to_string(row) +
                  ". The preconditioner you selected cannot work if that "
                  "is the case because one of its steps requires "
                  "division by the diagonal elements of the matrix."

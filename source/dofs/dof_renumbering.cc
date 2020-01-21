@@ -456,7 +456,7 @@ namespace DoFRenumbering
                   locally_active_dofs.is_element(starting_index),
                   ExcMessage(
                     "You specified global degree of freedom " +
-                    Utilities::to_string(starting_index) +
+                    std::to_string(starting_index) +
                     " as a starting index, but this index is not among the "
                     "locally active ones on this processor, as required "
                     "for this function."));

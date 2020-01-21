@@ -1674,15 +1674,14 @@ namespace Differentiation
               AssertThrow(
                 n_live_variables == 0,
                 ExcMessage(
-                  "There are currently " +
-                  Utilities::to_string(n_live_variables) +
+                  "There are currently " + std::to_string(n_live_variables) +
                   " live "
                   "adtl::adouble variables in existence. They currently "
                   "assume " +
-                  Utilities::to_string(n_set_directional_derivatives) +
+                  std::to_string(n_set_directional_derivatives) +
                   " directional derivatives "
                   "but you wish to increase this to " +
-                  Utilities::to_string(n_directional_derivatives) +
+                  std::to_string(n_directional_derivatives) +
                   ". \n"
                   "To safely change (or more specifically in this case, "
                   "increase) the number of directional derivatives, there "
