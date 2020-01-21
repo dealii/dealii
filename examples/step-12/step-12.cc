@@ -235,8 +235,6 @@ namespace Step12
     FE_DGQ<dim>     fe;
     DoFHandler<dim> dof_handler;
 
-    AffineConstraints<> constraints;
-
     // The next four members represent the linear system to be solved.
     // <code>system_matrix</code> and <code>right_hand_side</code> are generated
     // by <code>assemble_system()</code>, the <code>solution</code> is computed
