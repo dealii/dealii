@@ -177,10 +177,15 @@ namespace Utilities
    *
    * If the second parameter is left at its default value, the number is not
    * padded with leading zeros. The result is then the same as if the standard
-   * C function <code>itoa()</code> had been called.
+   * C++ `std::to_string` (or the older C function `itoa()`) had been called.
    *
-   * When calling this function signed integers are implicitly converted to
-   * unsigned integers and long integers might experience an overflow.
+   * This function takes an `unsigned int` as argument. As a consequence,
+   * if you call it with a `signed int` (which is of course the same
+   * type as `int`), the argument is implicitly converted to
+   * unsigned integers and negative numbers may not be printed as you had
+   * hoped. Similarly, if you call the function with a `long int`, the
+   * printed result might show the effects of an overflow upon conversion
+   * to `unsigned int`.
    *
    * @note The use of this function is discouraged and users should use
    * <code>Utilities::to_string()</code> instead. In its current
@@ -198,8 +203,8 @@ namespace Utilities
    * decimal points and digits of @p value.
    *
    * If the second parameter is left at its default value, the number is not
-   * padded with leading zeros. The result is then the same as if the boost
-   * function <code>lexical_cast@<std::string@>()</code> had been called.
+   * padded with leading zeros. The result is then the same as if the C++
+   * function `std::to_string()` had been called.
    */
   template <typename number>
   std::string
