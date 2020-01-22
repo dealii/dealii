@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <boost/range/irange.hpp>
+
 #include <cstdint>
 
 
@@ -1836,6 +1838,23 @@ struct GeometryInfo
   static constexpr unsigned int faces_per_cell = 2 * dim;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `faces_per_cell`. This allows to write code
+   * using range-based for loops of the following kind:
+   * @code
+   *   for (auto &cell : triangulation.active_cell_iterators())
+   *     for (auto face_index : GeometryInfo<dim>::face_indices)
+   *       if (cell->face(face_index)->at_boundary())
+   *         ... do something ...
+   * @endcode
+   * Here, we are looping over all faces of all cells, with `face_index`
+   * taking on all valid indices for faces (zero and one in 1d, zero
+   * through three in 2d, and zero through 5 in 3d).
+   */
+  static boost::integer_range<unsigned int>
+  face_indices();
+
+  /**
    * Maximum number of children of a refined face, i.e. the number of children
    * of an isotropically refined face.
    *
@@ -2665,6 +2684,14 @@ GeometryInfo<3>::unit_cell_vertex(const unsigned int vertex)
           static_cast<double>(vertex / 4)};
 }
 
+
+
+template <int dim>
+boost::integer_range<unsigned int>
+GeometryInfo<dim>::face_indices()
+{
+  return boost::irange(0U, faces_per_cell);
+}
 
 
 template <int dim>
