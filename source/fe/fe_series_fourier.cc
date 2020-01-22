@@ -15,9 +15,8 @@
 
 
 
-#include <deal.II/base/config.h>
-
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe_series.h>
 
@@ -177,6 +176,38 @@ namespace FESeries
   {
     set_k_vectors(k_vectors, N);
     unrolled_coefficients.resize(k_vectors.n_elements());
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  Fourier<dim, spacedim>::
+  operator==(const Fourier<dim, spacedim> &fourier) const
+  {
+    return ((*fe_collection == *(fourier.fe_collection)) &&
+            (*q_collection == *(fourier.q_collection)) &&
+            (k_vectors == fourier.k_vectors) &&
+            (fourier_transform_matrices == fourier.fourier_transform_matrices));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  Fourier<dim, spacedim>::precalculate_all_transformation_matrices()
+  {
+    Threads::TaskGroup<> task_group;
+    for (unsigned int fe = 0; fe < fe_collection->size(); ++fe)
+      task_group += Threads::new_task([&, fe]() {
+        ensure_existence(*fe_collection,
+                         *q_collection,
+                         k_vectors,
+                         fe,
+                         fourier_transform_matrices);
+      });
+
+    task_group.join_all();
   }
 
 
