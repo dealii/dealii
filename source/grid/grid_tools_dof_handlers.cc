@@ -2235,7 +2235,7 @@ namespace GridTools
          cell != mesh.end(0);
          ++cell)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             const typename MeshType::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_id() == b_id1)

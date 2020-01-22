@@ -24,6 +24,7 @@
 
 #include <boost/range/irange.hpp>
 
+#include <array>
 #include <cstdint>
 
 
@@ -1203,6 +1204,25 @@ struct GeometryInfo<0>
    * Number of faces a cell has.
    */
   static constexpr unsigned int faces_per_cell = 0;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `faces_per_cell`. This allows to write code
+   * using range-based for loops of the following kind:
+   * @code
+   *   for (auto &cell : triangulation.active_cell_iterators())
+   *     for (auto face_index : GeometryInfo<dim>::face_indices)
+   *       if (cell->face(face_index)->at_boundary())
+   *         ... do something ...
+   * @endcode
+   * Here, we are looping over all faces of all cells, with `face_index`
+   * taking on all valid indices.
+   *
+   * Of course, since this class is for the case `dim==0`, the
+   * returned object is actually an empty array.
+   */
+  static std::array<unsigned int, 0>
+  face_indices();
 
   /**
    * Maximum number of children of a refined face, i.e. the number of children
@@ -2686,12 +2706,21 @@ GeometryInfo<3>::unit_cell_vertex(const unsigned int vertex)
 
 
 
+inline std::array<unsigned int, 0>
+GeometryInfo<0>::face_indices()
+{
+  return {};
+}
+
+
+
 template <int dim>
-boost::integer_range<unsigned int>
+inline boost::integer_range<unsigned int>
 GeometryInfo<dim>::face_indices()
 {
   return boost::irange(0U, faces_per_cell);
 }
+
 
 
 template <int dim>

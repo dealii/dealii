@@ -1448,7 +1448,7 @@ namespace hp
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned() && cell->at_boundary())
         {
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             if (cell->at_boundary(f))
               {
                 const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
@@ -1495,7 +1495,7 @@ namespace hp
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned() && cell->at_boundary())
         {
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             if (cell->at_boundary(f) &&
                 (boundary_ids.find(cell->face(f)->boundary_id()) !=
                  boundary_ids.end()))

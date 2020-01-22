@@ -1328,7 +1328,7 @@ QSplit<dim>::QSplit(const QSimplex<dim> &base, const Point<dim> &split_point)
   // face. In dimension three, we need to split the face in two triangles, so
   // we use once the first dim vertices of each face, and the second time the
   // the dim vertices of each face starting from 1.
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (auto f : GeometryInfo<dim>::face_indices())
     for (unsigned int start = 0; start < (dim > 2 ? 2 : 1); ++start)
       {
         for (unsigned int i = 0; i < dim; ++i)

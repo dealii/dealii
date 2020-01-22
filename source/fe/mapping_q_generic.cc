@@ -4087,7 +4087,7 @@ MappingQGeneric<dim, spacedim>::compute_mapping_support_points(
           dynamic_cast<const TransfiniteInterpolationManifold<dim, spacedim> *>(
             &cell->get_manifold()) == nullptr)
         {
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             if (&cell->face(f)->get_manifold() != &cell->get_manifold())
               all_manifold_ids_are_equal = false;
 

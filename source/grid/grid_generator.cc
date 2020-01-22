@@ -896,7 +896,7 @@ namespace GridGenerator
         static void set_boundary_ids(Triangulation<2> &tria)
         {
           for (auto cell : tria.active_cell_iterators())
-            for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+            for (unsigned int f : GeometryInfo<2>::face_indices())
               {
                 if (cell->face(f)->at_boundary() == false)
                   continue;
@@ -1235,7 +1235,7 @@ namespace GridGenerator
           // simple task
           const typename Triangulation<dim, spacedim>::cell_iterator cell =
             tria.begin();
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             cell->face(f)->set_boundary_id(f);
         }
     }
@@ -1443,7 +1443,7 @@ namespace GridGenerator
       Triangulation<3>::cell_iterator cell = tria.begin();
 
       for (; cell != tria.end(); ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+        for (unsigned int f : GeometryInfo<3>::face_indices())
           {
             if (!cell->face(f)->at_boundary())
               continue;
@@ -2020,7 +2020,7 @@ namespace GridGenerator
     for (auto &cell : tria.cell_iterators())
       {
         // identify faces on torus surface and set manifold to 1
-        for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+        for (unsigned int f : GeometryInfo<3>::face_indices())
           {
             // faces 4 and 5 are those with normal vector aligned with torus
             // centerline
@@ -2944,7 +2944,7 @@ namespace GridGenerator
         for (; cell != endc; ++cell)
           {
             Point<2> cell_center = cell->center();
-            for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+            for (unsigned int f : GeometryInfo<2>::face_indices())
               if (cell->face(f)->boundary_id() == 0)
                 {
                   Point<2> face_center = cell->face(f)->center();
@@ -3055,7 +3055,7 @@ namespace GridGenerator
         for (; cell != endc; ++cell)
           {
             Point<dim> cell_center = cell->center();
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               if (cell->face(f)->boundary_id() == 0)
                 {
                   Point<dim> face_center = cell->face(f)->center();
@@ -3778,7 +3778,7 @@ namespace GridGenerator
 
     std::vector<Point<spacedim>> points;
     unsigned int                 n_cells = 1;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       n_cells += sizes[i];
 
     std::vector<CellData<dim>> cells(n_cells);
@@ -4456,7 +4456,7 @@ namespace GridGenerator
 
     while (cell != end)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             if (cell->face(i)->boundary_id() ==
                 numbers::internal_face_boundary_id)
@@ -4522,7 +4522,7 @@ namespace GridGenerator
 
     while (cell != end)
       {
-        for (unsigned int i = 0; i < GeometryInfo<2>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<2>::face_indices())
           {
             if (cell->face(i)->boundary_id() ==
                 numbers::internal_face_boundary_id)
@@ -5100,7 +5100,7 @@ namespace GridGenerator
     tria.set_all_manifold_ids_on_boundary(0);
 
     for (; cell != end; ++cell)
-      for (unsigned int i = 0; i < GeometryInfo<3>::faces_per_cell; ++i)
+      for (unsigned int i : GeometryInfo<3>::face_indices())
         if (cell->at_boundary(i))
           {
             if (cell->face(i)->center()(0) > half_length - 1.e-5)
@@ -5193,7 +5193,7 @@ namespace GridGenerator
     tria.set_all_manifold_ids_on_boundary(0);
     while (cell != end)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             if (cell->face(i)->boundary_id() ==
                 numbers::internal_face_boundary_id)
@@ -5301,7 +5301,7 @@ namespace GridGenerator
     // set to one
     while (cell != end)
       {
-        for (unsigned int i = 0; i < GeometryInfo<3>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<3>::face_indices())
           {
             if (!cell->at_boundary(i))
               continue;
@@ -5551,7 +5551,7 @@ namespace GridGenerator
         // to all faces in a first step.
         Triangulation<3>::cell_iterator cell = tria.begin();
         for (; cell != tria.end(); ++cell)
-          for (unsigned int i = 0; i < GeometryInfo<3>::faces_per_cell; ++i)
+          for (unsigned int i : GeometryInfo<3>::face_indices())
             if (cell->at_boundary(i))
               cell->face(i)->set_all_boundary_ids(2);
 
@@ -5560,7 +5560,7 @@ namespace GridGenerator
         // boundary. Then decide whether the center is nearer to the inner
         // or outer boundary to set the correct boundary id.
         for (cell = tria.begin(); cell != tria.end(); ++cell)
-          for (unsigned int i = 0; i < GeometryInfo<3>::faces_per_cell; ++i)
+          for (unsigned int i : GeometryInfo<3>::face_indices())
             if (cell->at_boundary(i))
               {
                 const Triangulation<3>::face_iterator face = cell->face(i);
@@ -6256,7 +6256,7 @@ namespace GridGenerator
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
     for (; cell != endc; ++cell)
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
@@ -6295,7 +6295,7 @@ namespace GridGenerator
     cell       = triangulation.begin_active();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               double dx = cell->face(f)->center()(0) - center(0);
@@ -6474,7 +6474,7 @@ namespace GridGenerator
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
     for (; cell != endc; ++cell)
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
@@ -6517,7 +6517,7 @@ namespace GridGenerator
     cell       = triangulation.begin_active();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               double dx = cell->face(f)->center()(0);
@@ -6750,7 +6750,7 @@ namespace GridGenerator
            volume_mesh.begin(0);
          cell != volume_mesh.end(0);
          ++cell)
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      for (unsigned int i : GeometryInfo<dim>::face_indices())
         {
           const typename MeshType<dim, spacedim>::face_iterator face =
             cell->face(i);

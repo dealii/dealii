@@ -1038,7 +1038,7 @@ namespace DoFTools
 
         for (const auto &cell : dof_handler.active_cell_iterators())
           if (!cell->is_artificial())
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               {
                 const typename dealii::DoFHandler<dim, spacedim>::face_iterator
                   face = cell->face(f);

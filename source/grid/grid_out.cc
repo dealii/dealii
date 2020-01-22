@@ -910,7 +910,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       for (const auto &cell : tria.active_cell_iterators())
         {
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             {
               typename Triangulation<dim, spacedim>::face_iterator face =
                 cell->face(f);
@@ -940,7 +940,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
       for (const auto &cell : tria.active_cell_iterators())
         {
           // Little trick to get -1 for the interior
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             {
               out << ' '
                   << static_cast<std::make_signed<types::boundary_id>::type>(
@@ -3357,7 +3357,7 @@ GridOut::write_mesh_per_processor_as_vtu(
           patch.data(3, vertex) = tria.locally_owned_subdomain();
         }
 
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         patch.neighbors[f] = numbers::invalid_unsigned_int;
       patches.push_back(patch);
     }
