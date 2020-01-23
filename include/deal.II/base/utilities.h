@@ -204,7 +204,8 @@ namespace Utilities
    *
    * If the second parameter is left at its default value, the number is not
    * padded with leading zeros. The result is then the same as if the C++
-   * function `std::to_string()` had been called.
+   * function `std::to_string()` had been called (for integral types),
+   * or if `boost::lexical_cast()` had been called (for all other types).
    */
   template <typename number>
   std::string
