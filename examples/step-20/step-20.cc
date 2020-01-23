@@ -64,7 +64,8 @@
 // <code>TensorFunction</code> class that offers such functionality:
 #include <deal.II/base/tensor_function.h>
 
-// The last step is as in all previous programs:
+// The last step is as in all previous programs: We put all of the code relevant
+// to this program into a namespace. (This idea was first introduced in step-7.)
 namespace Step20
 {
   using namespace dealii;
