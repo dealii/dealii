@@ -38,7 +38,10 @@
  * </ol>
  * You can browse the available tutorial programs
  * <ol>
- *   <li> as <b><a href="#graph">a graph</a></b> that shows how tutorial programs build upon each other.
+ *   <li> as <b><a href="#graph">a graph</a></b> that shows how the major
+ *      concepts of each tutorial programs builds on previous ones (though each
+ *      program may also use minor pieces from other programs not specifically
+*       connected in the graph).
  *   <li> as <b><a href="#list">a list</a></b> that provides a short
  *     synopsis of each program.
  *   <li> or <b><a href="#topic">grouped by topic</a></b>.
@@ -66,7 +69,7 @@
  * <h3>Connections between tutorial programs</h3>
  *
  * The following graph shows the connections between tutorial programs and
- * how they build on each other.
+ * how their major components build on each other.
  * Click on any of the boxes to go to one of the programs. If you hover
  * your mouse pointer over a box, a brief description of the program
  * should appear.
