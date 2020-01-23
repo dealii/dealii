@@ -1312,7 +1312,12 @@ namespace
                  ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
       {
         // If the vectors are non planar we integrate the norm of the normal
-        // vector using a numerical Gauss scheme of order 4.
+        // vector using a numerical Gauss scheme of order 4. In particular we
+        // consider a bilinear quad x(u,v) = (1-v)((1-u)v_0 + u v_1) +
+        // v((1-u)v_2 + u v_3), consequently we compute the normal vector as
+        // n(u,v) = t_u x t_v = w_1 + u w_2 + v w_3. The integrand function is
+        // || n(u,v) || = sqrt(a + b u^2 + c v^2 + d u + e v + f uv).
+        // We integrate it using a QGauss<2> (4) computed explicitly.
         const Tensor<1, 3> w_1 =
           cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
                            accessor.vertex(2) - accessor.vertex(0));
