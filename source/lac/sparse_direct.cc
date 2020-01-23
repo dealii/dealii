@@ -384,6 +384,7 @@ void
 SparseDirectUMFPACK::solve(Vector<std::complex<double>> &rhs_and_solution,
                            const bool transpose /*=false*/) const
 {
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   // make sure that some kind of factorize() call has happened before
   Assert(Ap.size() != 0, ExcNotInitialized());
   Assert(Ai.size() != 0, ExcNotInitialized());
@@ -481,6 +482,16 @@ SparseDirectUMFPACK::solve(Vector<std::complex<double>> &rhs_and_solution,
       for (unsigned int i = 0; i < rhs.size(); ++i)
         rhs_and_solution(i).imag(rhs_real_or_imag(i));
     }
+
+#  else
+
+  (void)rhs_and_solution;
+  (void)transpose;
+  Assert(false,
+         ExcMessage(
+           "This function can't be called if deal.II has been configured "
+           "with DEAL_II_WITH_COMPLEX_VALUES=FALSE."));
+#  endif
 }
 
 
@@ -503,6 +514,7 @@ void
 SparseDirectUMFPACK::solve(BlockVector<std::complex<double>> &rhs_and_solution,
                            const bool transpose /*=false*/) const
 {
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   // the UMFPACK functions want a contiguous array of elements, so
   // there is no way around copying data around. thus, just copy the
   // data into a regular vector and back
@@ -510,6 +522,15 @@ SparseDirectUMFPACK::solve(BlockVector<std::complex<double>> &rhs_and_solution,
   tmp = rhs_and_solution;
   solve(tmp, transpose);
   rhs_and_solution = tmp;
+
+#  else
+  (void)rhs_and_solution;
+  (void)transpose;
+  Assert(false,
+         ExcMessage(
+           "This function can't be called if deal.II has been configured "
+           "with DEAL_II_WITH_COMPLEX_VALUES=FALSE."));
+#  endif
 }
 
 
@@ -532,8 +553,20 @@ SparseDirectUMFPACK::solve(const Matrix &                matrix,
                            Vector<std::complex<double>> &rhs_and_solution,
                            const bool                    transpose /*=false*/)
 {
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   factorize(matrix);
   solve(rhs_and_solution, transpose);
+
+#  else
+
+  (void)matrix;
+  (void)rhs_and_solution;
+  (void)transpose;
+  Assert(false,
+         ExcMessage(
+           "This function can't be called if deal.II has been configured "
+           "with DEAL_II_WITH_COMPLEX_VALUES=FALSE."));
+#  endif
 }
 
 
@@ -556,8 +589,20 @@ SparseDirectUMFPACK::solve(const Matrix &                     matrix,
                            BlockVector<std::complex<double>> &rhs_and_solution,
                            const bool transpose /*=false*/)
 {
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   factorize(matrix);
   solve(rhs_and_solution, transpose);
+
+#  else
+
+  (void)matrix;
+  (void)rhs_and_solution;
+  (void)transpose;
+  Assert(false,
+         ExcMessage(
+           "This function can't be called if deal.II has been configured "
+           "with DEAL_II_WITH_COMPLEX_VALUES=FALSE."));
+#  endif
 }
 
 
@@ -790,10 +835,11 @@ InstantiateUMFPACK(BlockSparseMatrix<double>);
 InstantiateUMFPACK(BlockSparseMatrix<float>);
 
 // Now also for complex-valued matrices
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
 InstantiateUMFPACK(SparseMatrix<std::complex<double>>);
 InstantiateUMFPACK(SparseMatrix<std::complex<float>>);
 InstantiateUMFPACK(BlockSparseMatrix<std::complex<double>>);
 InstantiateUMFPACK(BlockSparseMatrix<std::complex<float>>);
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
