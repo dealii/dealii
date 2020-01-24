@@ -348,9 +348,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
         }
     }
 
-  component_start.resize(
-    *std::max_element(target_component.begin(), target_component.end()) + 1);
-  DoFTools::count_dofs_per_block(mg_dof, component_start, target_component);
+  component_start = DoFTools::count_dofs_per_fe_block(mg_dof, target_component);
 
   types::global_dof_index k = 0;
   for (types::global_dof_index &first_index : component_start)
