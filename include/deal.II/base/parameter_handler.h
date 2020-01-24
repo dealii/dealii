@@ -1574,17 +1574,11 @@ public:
    * Exception for when an entry in an XML parameter file does not match the
    * provided pattern. The arguments are, in order, the entry value, entry
    * name, and a description of the pattern.
+   *
+   * @deprecated Use ExcValueDoesNotMatchPattern instead of ExcInvalidEntryForPatternXML.
    */
-  DeclException3(ExcInvalidEntryForPatternXML,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "    The entry value \n"
-                 << "        " << arg1 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg2 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg3);
+  using ExcInvalidEntryForPatternXML DEAL_II_DEPRECATED =
+    ExcValueDoesNotMatchPattern;
 
   /**
    * Exception for when the file given in an include statement cannot be
