@@ -413,6 +413,12 @@ namespace python
 
 
 
+  const char compute_aspect_ratio_of_cells_docstring[] =
+    "Computes an aspect ratio measure for all active cells and fills        \n"
+    "a vector with one entry per cell.                                      \n";
+
+
+
   const char find_cells_adjacent_to_vertex_docstring[] =
     "Find and return a list of active cells that surround a given           \n"
     "vertex with index vertex_index.                                        \n";
@@ -593,6 +599,10 @@ namespace python
            &TriangulationWrapper::find_cells_adjacent_to_vertex,
            find_cells_adjacent_to_vertex_docstring,
            boost::python::args("self", "vertex_index"))
+      .def("compute_aspect_ratio_of_cells",
+           &TriangulationWrapper::compute_aspect_ratio_of_cells,
+           compute_aspect_ratio_of_cells_docstring,
+           boost::python::args("self", "mapping", "quadrature"))
       .def("refine_global",
            &TriangulationWrapper::refine_global,
            refine_global_docstring,

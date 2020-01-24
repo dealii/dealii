@@ -560,6 +560,34 @@ namespace python
 
     template <int dim, int spacedim>
     boost::python::list
+    compute_aspect_ratio_of_cells(MappingQGenericWrapper &mapping_wrapper,
+                                  QuadratureWrapper &     quadrature_wrapper,
+                                  TriangulationWrapper &  triangulation_wrapper)
+    {
+      const Triangulation<dim, spacedim> *tria =
+        static_cast<const Triangulation<dim, spacedim> *>(
+          triangulation_wrapper.get_triangulation());
+
+      Quadrature<dim> *quad =
+        static_cast<Quadrature<dim> *>(quadrature_wrapper.get_quadrature());
+
+      const MappingQGeneric<dim, spacedim> *mapping =
+        static_cast<const MappingQGeneric<dim, spacedim> *>(
+          mapping_wrapper.get_mapping());
+
+      auto aspect_ratios =
+        GridTools::compute_aspect_ratio_of_cells(*tria, *mapping, *quad);
+
+      boost::python::list ratios;
+      for (size_t i = 0; i < aspect_ratios.size(); ++i)
+        ratios.append(aspect_ratios[i]);
+
+      return ratios;
+    }
+
+
+    template <int dim, int spacedim>
+    boost::python::list
     find_cells_adjacent_to_vertex(const unsigned int    vertex_index,
                                   TriangulationWrapper &triangulation_wrapper)
     {
@@ -1409,6 +1437,27 @@ namespace python
       return internal::find_cells_adjacent_to_vertex<2, 3>(vertex_index, *this);
     else
       return internal::find_cells_adjacent_to_vertex<3, 3>(vertex_index, *this);
+  }
+
+
+
+  boost::python::list
+  TriangulationWrapper::compute_aspect_ratio_of_cells(
+    MappingQGenericWrapper mapping,
+    QuadratureWrapper      quadrature)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::compute_aspect_ratio_of_cells<2, 2>(mapping,
+                                                           quadrature,
+                                                           *this);
+    else if ((dim == 3) && (spacedim == 3))
+      return internal::compute_aspect_ratio_of_cells<3, 3>(mapping,
+                                                           quadrature,
+                                                           *this);
+    else
+      AssertThrow(false,
+                  ExcMessage(
+                    "Thie combination of dim-spacedim is not supported."));
   }
 
 

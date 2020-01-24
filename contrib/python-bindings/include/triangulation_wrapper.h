@@ -23,6 +23,7 @@
 #include <manifold_wrapper.h>
 #include <mapping_wrapper.h>
 #include <point_wrapper.h>
+#include <quadrature_wrapper.h>
 
 #include <string>
 #include <vector>
@@ -414,6 +415,14 @@ namespace python
      */
     double
     maximal_cell_diameter() const;
+
+    /**
+     * Computes an aspect ratio measure for all active cells and fills a vector
+     * with one entry per cell.
+     */
+    boost::python::list
+    compute_aspect_ratio_of_cells(MappingQGenericWrapper mapping,
+                                  QuadratureWrapper      quadrature);
 
     /**
      * Write mesh to the output file @filename according to the given data
