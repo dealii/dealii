@@ -547,7 +547,7 @@ namespace Step12
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "u");
+    data_out.add_data_vector(solution, "u", DataOut<dim>::type_dof_data);
 
     data_out.build_patches();
 
