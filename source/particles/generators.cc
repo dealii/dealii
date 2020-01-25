@@ -304,13 +304,16 @@ namespace Particles
           }
 #endif
 
-        // Calculate start id and number of local particles
+        // Calculate start id
         start_particle_id =
           std::llround(static_cast<double>(n_particles_to_create) *
                        local_start_weight / global_weight_integral);
-        n_local_particles =
-          std::llround(static_cast<double>(n_particles_to_create) *
-                       local_weight_integral / global_weight_integral);
+
+        // Calcualate number of local particles
+        const types::particle_index end_particle_id =
+          llround(static_cast<double>(n_particles_to_create) *
+                  local_end_weight / global_weight_integral);
+        n_local_particles = end_particle_id - start_particle_id;
 
         if (random_cell_selection)
           {
