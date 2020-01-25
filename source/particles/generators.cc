@@ -311,9 +311,9 @@ namespace Particles
 
         // Calcualate number of local particles
         const types::particle_index end_particle_id =
-          llround(static_cast<double>(n_particles_to_create) *
-                  ((local_start_weight + local_weight_integral) /
-                   global_weight_integral));
+          std::llround(static_cast<double>(n_particles_to_create) *
+                       ((local_start_weight + local_weight_integral) /
+                        global_weight_integral));
         n_local_particles = end_particle_id - start_particle_id;
 
         if (random_cell_selection)
