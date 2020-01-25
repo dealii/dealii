@@ -149,7 +149,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   unsigned int dbase = 0;
   // The index of the first generalized support point on this face or the cell
   unsigned int pbase = 0;
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (auto f : GeometryInfo<dim>::face_indices())
     {
       // Old version with no moments in 2D. See comment below in
       // initialize_support_points()

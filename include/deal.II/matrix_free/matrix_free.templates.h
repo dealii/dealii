@@ -1855,7 +1855,7 @@ namespace internal
         new_indices.clear();
         typename dealii::Triangulation<dim>::cell_iterator dcell(
           &tria, cell_level_index[cell].first, cell_level_index[cell].second);
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           {
             // Only inner faces couple different cells
             if (dcell->at_boundary(f) == false &&

@@ -504,7 +504,7 @@ namespace
           cell = triangulation.begin(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int q = 0; q < GeometryInfo<dim>::faces_per_cell; ++q)
+          for (unsigned int q : GeometryInfo<dim>::face_indices())
             ++quad_cell_count[cell->quad_index(q)];
         return quad_cell_count;
       }
@@ -854,7 +854,7 @@ namespace
                                                          endc =
                                                            triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         {
           const typename Triangulation<dim, spacedim>::face_iterator face =
             cell->face(f);
@@ -934,7 +934,7 @@ namespace
     // left_right_offset in this case as we want
     // the offset of the neighbor, not our own.
     for (cell = triangulation.begin(); cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         {
           const unsigned int offset =
             (cell->direction_flag() ?
@@ -1938,7 +1938,7 @@ namespace internal
                triangulation.begin_active();
              cell != triangulation.end();
              ++cell)
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             {
               (*triangulation.vertex_to_manifold_id_map_1d)
                 [cell->face(f)->vertex_index()] = numbers::flat_manifold_id;
@@ -3661,7 +3661,7 @@ namespace internal
               cell->child(c);
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               --line_cell_count[child->line_index(l)];
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               --quad_cell_count[child->quad_index(f)];
           }
 
@@ -3752,7 +3752,7 @@ namespace internal
             cell->child(child)->clear_user_data();
             cell->child(child)->clear_user_flag();
 
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               {
                 // set flags denoting deviations from
                 // standard orientation of faces back
@@ -10061,7 +10061,7 @@ namespace internal
           return true;
 
         const RefinementCase<dim> ref_case = cell->refinement_case();
-        for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
+        for (unsigned int n : GeometryInfo<dim>::face_indices())
           {
             // if the cell is not refined along that face, coarsening
             // will not change anything, so do nothing. the same
@@ -10345,7 +10345,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     endc = this->end();
 
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (auto f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary())
         cell->face(f)->set_all_manifold_ids(m_number);
 }
@@ -10370,7 +10370,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
   for (; cell != endc; ++cell)
     {
       // loop on faces
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary() &&
             cell->face(f)->boundary_id() == b_id)
           {
@@ -13963,7 +13963,7 @@ namespace
     // count all neighbors that will be refined along the face of our
     // cell after the next step
     unsigned int count = 0;
-    for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
+    for (unsigned int n : GeometryInfo<dim>::face_indices())
       {
         const typename Triangulation<dim, spacedim>::cell_iterator neighbor =
           cell->neighbor(n);

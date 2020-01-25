@@ -160,7 +160,7 @@ namespace
 
         // neighborship information. if a cell is at a boundary, then enter
         // the index of the cell itself here
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary() == false)
             connectivity
               ->tree_to_tree[index * GeometryInfo<dim>::faces_per_cell + f] =
@@ -172,7 +172,7 @@ namespace
 
         // fill tree_to_face, which is essentially neighbor_to_neighbor;
         // however, we have to remap the resulting face number as well
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary() == false)
             {
               switch (dim)

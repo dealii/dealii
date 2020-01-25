@@ -785,7 +785,7 @@ namespace MGTools
         DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
 
     for (unsigned int i = 0; i < total_dofs; ++i)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         support_on_face(i, f) = fe.has_support_on_face(i, f);
 
     // Clear user flags because we will
@@ -974,7 +974,7 @@ namespace MGTools
       DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
 
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         support_on_face(i, f) = fe.has_support_on_face(i, f);
 
     for (; cell != endc; ++cell)

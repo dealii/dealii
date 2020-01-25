@@ -579,7 +579,7 @@ namespace internal
             &triangulation, cell_levels[i].first, cell_levels[i].second);
           if (use_active_cells)
             Assert(dcell->is_active(), ExcNotImplemented());
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (auto f : GeometryInfo<dim>::face_indices())
             {
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =

@@ -612,7 +612,7 @@ namespace OpenCASCADE
     unsigned int face_index;
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (unsigned int f : GeometryInfo<2>::face_indices())
         if (cell->face(f)->at_boundary())
           {
             // get global face and vertex indices

@@ -67,7 +67,7 @@ namespace
              triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<1>::faces_per_cell; ++f)
+        for (unsigned int f : GeometryInfo<1>::face_indices())
           if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
             {
               AssertThrow(

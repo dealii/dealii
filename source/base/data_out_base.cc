@@ -1757,7 +1757,7 @@ namespace DataOutBase
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       neighbors[i] = no_neighbor;
 
     AssertIndexRange(dim, spacedim + 1);
@@ -1776,7 +1776,7 @@ namespace DataOutBase
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       if (neighbors[i] != patch.neighbors[i])
         return false;
 
@@ -8856,7 +8856,7 @@ DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
 
   // adjust patch neighbors
   for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-    for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
+    for (unsigned int n : GeometryInfo<dim>::face_indices())
       if (patches[i].neighbors[n] !=
           dealii::DataOutBase::Patch<dim, spacedim>::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
@@ -9071,7 +9071,7 @@ namespace DataOutBase
       out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
     out << '\n';
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       out << patch.neighbors[i] << ' ';
     out << '\n';
 
@@ -9119,7 +9119,7 @@ namespace DataOutBase
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       in >> patch.neighbors[i];
 
     in >> patch.patch_index >> patch.n_subdivisions;

@@ -1250,7 +1250,7 @@ namespace GridTools
       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             const typename Triangulation<dim, spacedim>::face_iterator &face =
               cell->face(i);
@@ -2356,7 +2356,7 @@ namespace GridTools
     cell = triangulation.begin_active();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             if ((cell->at_boundary(i) == false) &&
                 (cell->neighbor(i)->is_active()))
@@ -2503,7 +2503,7 @@ namespace GridTools
         // received.
         if (cell->is_ghost())
           {
-            for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+            for (unsigned int i : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(i) == false)
                   {
@@ -2774,7 +2774,7 @@ namespace GridTools
       {
         const unsigned int index = cell->active_cell_index();
         cell_connectivity.add(index, index);
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if ((cell->at_boundary(f) == false) &&
               (cell->neighbor(f)->has_children() == false))
             {
@@ -3808,7 +3808,7 @@ namespace GridTools
         // distorted but the neighbor is even more refined, then the face had
         // been deformed before already, and had been ignored at the time; we
         // should then also be able to ignore it this time as well
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           {
             Assert(cell->face(f)->has_children(), ExcInternalError());
             Assert(cell->face(f)->refinement_case() ==
@@ -3922,7 +3922,7 @@ namespace GridTools
              tria.begin_active();
            cell != tria.end();
            ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_face; ++e)
               {
@@ -3941,7 +3941,7 @@ namespace GridTools
            tria.begin_active();
          cell != tria.end();
          ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (auto f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary())
           {
             const auto         bid = cell->face(f)->boundary_id();
@@ -3988,7 +3988,7 @@ namespace GridTools
         cell->set_manifold_id(cell->material_id());
         if (compute_face_ids == true)
           {
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(f) == false)
                   cell->face(f)->set_manifold_id(
@@ -4210,7 +4210,7 @@ namespace GridTools
         for (const auto &cell : tria.active_cell_iterators())
           {
             unsigned int boundary_face_counter = 0;
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               if (cell->face(f)->at_boundary())
                 boundary_face_counter++;
             if (boundary_face_counter > dim)

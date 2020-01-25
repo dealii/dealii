@@ -3232,7 +3232,7 @@ CellAccessor<dim, spacedim>::face_iterators() const
              GeometryInfo<dim>::faces_per_cell>
     face_iterators;
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (unsigned int i : GeometryInfo<dim>::face_indices())
     face_iterators[i] =
       dealii::internal::CellAccessorImplementation::get_face(*this, i);
 

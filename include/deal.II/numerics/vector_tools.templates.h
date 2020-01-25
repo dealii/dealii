@@ -745,7 +745,7 @@ namespace VectorTools
         endc = dof_handler.end();
       std::vector<types::global_dof_index> face_dof_indices;
       for (; cell != endc; ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f))
             {
               face_dof_indices.resize(cell->get_fe().dofs_per_face);
@@ -2504,8 +2504,7 @@ namespace VectorTools
         std::vector<double> rhs_values(n_q_points);
 
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -2536,8 +2535,7 @@ namespace VectorTools
                                                Vector<double>(n_components));
 
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -2651,8 +2649,7 @@ namespace VectorTools
         std::vector<double> rhs_values;
 
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -2690,8 +2687,7 @@ namespace VectorTools
         std::vector<Vector<double>> rhs_values;
 
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -3542,7 +3538,7 @@ namespace VectorTools
                  cell = dof.begin_active();
                cell != dof.end();
                ++cell)
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (auto f : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(f))
                   {
@@ -4895,8 +4891,7 @@ namespace VectorTools
     const hp::MappingCollection<dim> mapping_collection(mapping);
     hp::QCollection<dim>             face_quadrature_collection;
 
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (unsigned int face : GeometryInfo<dim>::face_indices())
       face_quadrature_collection.push_back(
         QProjector<dim>::project_to_face(reference_face_quadrature, face));
 
@@ -5131,8 +5126,7 @@ namespace VectorTools
         const QGauss<dim - 1> reference_face_quadrature(
           2 * fe_collection[i].degree);
 
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face : GeometryInfo<dim>::face_indices())
           face_quadrature_collection.push_back(
             QProjector<dim>::project_to_face(reference_face_quadrature, face));
       }
@@ -6656,8 +6650,7 @@ namespace VectorTools
     const hp::MappingCollection<dim> mapping_collection(mapping);
     hp::QCollection<dim>             quadrature_collection;
 
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (unsigned int face : GeometryInfo<dim>::face_indices())
       quadrature_collection.push_back(
         QProjector<dim>::project_to_face(face_quadrature, face));
 
@@ -6828,8 +6821,7 @@ namespace VectorTools
 
         face_quadrature_collection.push_back(quadrature);
 
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face : GeometryInfo<dim>::face_indices())
           quadrature_collection.push_back(
             QProjector<dim>::project_to_face(quadrature, face));
       }
