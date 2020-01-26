@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// test the umfpack sparse direct solver on a mass matrix that is slightly
-// modified to make it nonsymmetric test for the transpose as well
+// Like the _03_complex, but this time with nonzero real and imaginary
+// parts.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -70,38 +70,50 @@ test(const bool transpose = false)
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
-  SparseMatrix<double> B;
+  SparseMatrix<std::complex<double>> B;
   B.reinit(sparsity_pattern);
 
-  QGauss<dim> qr(2);
-  MatrixTools::create_mass_matrix(dof_handler, qr, B);
+  // Create a real sparse matrix and copy it onto B
+  {
+    SparseMatrix<double> BB;
+    BB.reinit(sparsity_pattern);
 
-  // scale lower left part of the matrix by
-  // 1/2 and upper right part by 2 to make
-  // matrix nonsymmetric
-  for (SparseMatrix<double>::iterator p = B.begin(); p != B.end(); ++p)
-    if (p->column() < p->row())
-      p->value() = p->value() / 2;
-    else if (p->column() > p->row())
-      p->value() = p->value() * 2;
+    QGauss<dim> qr(2);
+    MatrixTools::create_mass_matrix(dof_handler, qr, BB);
 
-  // check that we've done it right
-  for (SparseMatrix<double>::iterator p = B.begin(); p != B.end(); ++p)
-    if (p->column() != p->row())
-      AssertThrow(B(p->row(), p->column()) != B(p->column(), p->row()),
-                  ExcInternalError());
+    // scale lower left part of the matrix by
+    // 1/2 and upper right part by 2 to make
+    // matrix nonsymmetric
+    for (SparseMatrix<double>::iterator p = BB.begin(); p != BB.end(); ++p)
+      if (p->column() < p->row())
+        p->value() = p->value() / 2;
+      else if (p->column() > p->row())
+        p->value() = p->value() * 2;
+
+    // check that we've done it right
+    for (SparseMatrix<double>::iterator p = BB.begin(); p != BB.end(); ++p)
+      if (p->column() != p->row())
+        AssertThrow(B(p->row(), p->column()) != BB(p->column(), p->row()),
+                    ExcInternalError());
+
+    for (SparseMatrix<double>::iterator p = BB.begin(); p != BB.end(); ++p)
+      B.set(p->row(), p->column(), {p->value(), 2 * p->value()});
+  }
+
 
   // for a number of different solution
   // vectors, make up a matching rhs vector
   // and check what the UMFPACK solver finds
   for (unsigned int i = 0; i < 3; ++i)
     {
-      Vector<double> solution(dof_handler.n_dofs());
-      Vector<double> x(dof_handler.n_dofs());
-      Vector<double> b(dof_handler.n_dofs());
+      Vector<std::complex<double>> solution(dof_handler.n_dofs());
+      Vector<std::complex<double>> x(dof_handler.n_dofs());
+      Vector<std::complex<double>> b(dof_handler.n_dofs());
 
       for (unsigned int j = 0; j < dof_handler.n_dofs(); ++j)
-        solution(j) = j + j * (i + 1) * (i + 1);
+        solution(j) =
+          1. * (j + j * (i + 1) * (i + 1)) *
+          std::complex<double>(1. / std::sqrt(5.), 2. / std::sqrt(5.));
 
       if (transpose)
         B.Tvmult(b, solution);

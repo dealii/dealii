@@ -245,11 +245,33 @@ public:
   solve(Vector<double> &rhs_and_solution, const bool transpose = false) const;
 
   /**
+   * Like the previous function, but for a complex-valued right hand side
+   * and solution vector.
+   *
+   * If the matrix that was previously factorized had complex-valued entries,
+   * then the `rhs_and_solution` vector will, upon return from this function,
+   * simply contain the solution of the linear system $Ax=b$. If the matrix
+   * was real-valued, then this is also true, but the solution will simply
+   * be computed by applying the factorized $A^{-1}$ to both the
+   * real and imaginary parts of the right hand side vector.
+   */
+  void
+  solve(Vector<std::complex<double>> &rhs_and_solution,
+        const bool                    transpose = false) const;
+
+  /**
    * Same as before, but for block vectors.
    */
   void
   solve(BlockVector<double> &rhs_and_solution,
         const bool           transpose = false) const;
+
+  /**
+   * Same as before, but for complex-valued block vectors.
+   */
+  void
+  solve(BlockVector<std::complex<double>> &rhs_and_solution,
+        const bool                         transpose = false) const;
 
   /**
    * Call the two functions factorize() and solve() in that order, i.e.
@@ -264,6 +286,15 @@ public:
         const bool      transpose = false);
 
   /**
+   * Same as before, but for complex-valued solution vectors.
+   */
+  template <class Matrix>
+  void
+  solve(const Matrix &                matrix,
+        Vector<std::complex<double>> &rhs_and_solution,
+        const bool                    transpose = false);
+
+  /**
    * Same as before, but for block vectors.
    */
   template <class Matrix>
@@ -271,6 +302,15 @@ public:
   solve(const Matrix &       matrix,
         BlockVector<double> &rhs_and_solution,
         const bool           transpose = false);
+
+  /**
+   * Same as before, but for complex-valued block vectors.
+   */
+  template <class Matrix>
+  void
+  solve(const Matrix &                     matrix,
+        BlockVector<std::complex<double>> &rhs_and_solution,
+        const bool                         transpose = false);
 
   /**
    * @}
@@ -365,11 +405,20 @@ private:
   sort_arrays(const BlockSparseMatrix<number> &);
 
   /**
-   * The arrays in which we store the data for the solver.
+   * The arrays in which we store the data for the solver. These are documented
+   * in the descriptions of the umfpack_*_symbolic() and umfpack_*_numeric()
+   * functions, but in short:
+   * - `Ap` is the array saying which row starts where in `Ai`
+   * - `Ai` is the array that stores the column indices of nonzero entries
+   * - `Ax` is the array that stores the values of nonzero entries; if the
+   *   matrix is complex-valued, then it stores the real parts
+   * - `Az` is the array that stores the imaginary parts of nonzero entries,
+   *   and is used only if the matrix is complex-valued.
    */
   std::vector<types::suitesparse_index> Ap;
   std::vector<types::suitesparse_index> Ai;
   std::vector<double>                   Ax;
+  std::vector<double>                   Az;
 
   /**
    * Control and work arrays for the solver routines.
