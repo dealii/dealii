@@ -29,7 +29,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <boost/iostreams/copy.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 
 #include <algorithm>
@@ -45,6 +44,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <string>
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
 #  include <unistd.h>
@@ -437,11 +437,20 @@ namespace Utilities
   std::string
   to_string(const number value, const unsigned int digits)
   {
-    std::string lc_string = boost::lexical_cast<std::string>(value);
+    // For integer data types, use the standard std::to_string()
+    // function. On the other hand, that function is defined in terms
+    // of std::sprintf, which does not use the usual std::iostream
+    // interface and tries to render floating point numbers in awkward
+    // ways (see
+    // https://en.cppreference.com/w/cpp/string/basic_string/to_string). So
+    // resort to boost::lexical_cast for all other types (in
+    // particular for floating point types.
+    std::string lc_string = (std::is_integral<number>::value ?
+                               std::to_string(value) :
+                               boost::lexical_cast<std::string>(value));
 
-    if (digits == numbers::invalid_unsigned_int)
-      return lc_string;
-    else if (lc_string.size() < digits)
+    if ((digits != numbers::invalid_unsigned_int) &&
+        (lc_string.size() < digits))
       {
         // We have to add the padding zeroes in front of the number
         const unsigned int padding_position = (lc_string[0] == '-') ? 1 : 0;
@@ -449,8 +458,10 @@ namespace Utilities
         const std::string padding(digits - lc_string.size(), '0');
         lc_string.insert(padding_position, padding);
       }
+
     return lc_string;
   }
+
 
 
   std::string
