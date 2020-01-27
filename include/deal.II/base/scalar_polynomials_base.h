@@ -46,6 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Some classes that derive from this class include
  * <ul>
+ *   <li> <tt>PolynomialsAdini</tt>
  *   <li> <tt>PolynomialsRannacherTurek</tt>
  *   <li> <tt>PolynomialsP</tt>
  *   <li> <tt>PolynomialSpace</tt>
