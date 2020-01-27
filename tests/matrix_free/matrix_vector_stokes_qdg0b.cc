@@ -160,8 +160,8 @@ test(const unsigned int fe_degree)
 
   constraints.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(dim + 1);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_block);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // std::cout << "   Number of active cells: "
   //          << triangulation.n_active_cells()

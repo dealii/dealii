@@ -119,10 +119,8 @@ check(const FiniteElement<dim> &fe, const unsigned int selected_block)
                  block_component,
                  block_component);
 
-  std::vector<types::global_dof_index> dofs_per_block(3);
-  DoFTools::count_dofs_per_block(mg_dof_handler,
-                                 dofs_per_block,
-                                 block_component);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(mg_dof_handler, block_component);
   std::vector<std::vector<types::global_dof_index>> mg_dofs_per_block(
     tr.n_levels(), std::vector<types::global_dof_index>(3));
   MGTools::count_dofs_per_block(mg_dof_handler,

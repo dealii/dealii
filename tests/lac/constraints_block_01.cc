@@ -147,12 +147,8 @@ main()
         block_component[comp] = 2;
     } // comp
 
-  std::vector<types::global_dof_index> dofs_per_block(
-    3, 0); // 3 blocks, count dofs:
-  DoFTools::count_dofs_per_component(dh,
-                                     dofs_per_block,
-                                     false,
-                                     block_component);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dh, false, block_component);
 
   DoFRenumbering::component_wise(dh, block_component);
 

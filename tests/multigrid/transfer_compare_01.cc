@@ -144,8 +144,8 @@ check_block(const FiniteElement<dim> &fe)
     }
 
   // Store sizes
-  vector<types::global_dof_index> ndofs(fe.n_blocks());
-  DoFTools::count_dofs_per_block(mgdof, ndofs);
+  const vector<types::global_dof_index> ndofs =
+    DoFTools::count_dofs_per_fe_block(mgdof);
   std::vector<std::vector<types::global_dof_index>> mg_ndofs(
     mgdof.get_triangulation().n_levels(),
     std::vector<types::global_dof_index>(fe.n_blocks()));

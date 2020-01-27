@@ -1300,9 +1300,8 @@ namespace Step44
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref,
-                                   dofs_per_block,
-                                   block_component);
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler_ref, block_component);
     pcout << "Triangulation:"
           << "\n\t Number of active cells: " << triangulation.n_active_cells()
           << "\n\t Number of degrees of freedom: " << dof_handler_ref.n_dofs()
