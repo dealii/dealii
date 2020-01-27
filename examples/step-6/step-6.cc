@@ -23,7 +23,6 @@
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
