@@ -492,13 +492,11 @@ namespace Step22
     // In analogy to step-20, we count the dofs in the individual components.
     // We could do this in the same way as there, but we want to operate on
     // the block structure we used already for the renumbering: The function
-    // <code>DoFTools::count_dofs_per_block</code> does the same as
-    // <code>DoFTools::count_dofs_per_component</code>, but now grouped as
+    // <code>DoFTools::count_dofs_per_fe_block</code> does the same as
+    // <code>DoFTools::count_dofs_per_fe_component</code>, but now grouped as
     // velocity and pressure block via <code>block_component</code>.
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0];
     const unsigned int n_p = dofs_per_block[1];
 

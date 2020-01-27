@@ -53,8 +53,8 @@ int main()
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  std::vector<unsigned int> dofs_per_block(fe.n_blocks());
-  DoFTools::count_dofs_per_block(dof, dofs_per_block);
+  const std::vector<unsigned int> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof);
 
   BlockDynamicSparsityPattern dsp(fe.n_blocks(), fe.n_blocks());
   for (unsigned int i = 0; i < fe.n_blocks(); ++i)
