@@ -1552,6 +1552,59 @@ namespace GridGenerator
     const bool                    copy_manifold_ids           = false);
 
   /**
+   * \brief Replicate a given triangulation in multiple coordinate axes
+   *
+   * @param input The triangulation which will be replicated along the
+   * coordinate axes.
+   *
+   * @param extents A vector with <tt>dim</tt> entries specifying how many
+   * copies of a triangulation should be present along each coordinate axis.
+   *
+   * @param result The triangulation to be created. It needs to be empty upon
+   * calling this function.
+   *
+   * This function creates a new Triangulation equal to a
+   * <tt>dim</tt>-dimensional array of copies of @p input. Copies of @p input
+   * are created by translating @p input along the coordinate axes. Boundary
+   * ids of faces (but not lines in 3D) and all manifold ids are copied but
+   * Manifold objects are not since most Manifold objects do not work
+   * correctly when a Triangulation has been translated.
+   *
+   * To see how this works, consider the following code:
+   * @code
+   * Triangulation<2> input;
+   * GridGenerator::hyper_cube_with_cylindrical_hole(input);
+   * Triangulation<2> output;
+   * GridGenerator::replicate_triangulation(input, {3, 2}, output);
+   * @endcode
+   * results in
+   *
+   * @image html replicated_tria_2d.png
+   *
+   * And, similarly, in 3D:
+   * @code
+   * Triangulation<3> input;
+   * GridGenerator::hyper_cross(1, 1, 1, 2, 1, 2);
+   * Triangulation<3> output;
+   * GridGenerator::replicate_triangulation(input, {3, 2, 1}, output);
+   * @endcode
+   * results in
+   *
+   * @image html replicated_tria_3d.png
+   *
+   * @note This function determines the spacing of the copies of @p input
+   * based on the BoundingBox of @p input. If the boundary faces of @p input
+   * are not aligned with the coordinate axes then the copies might not share
+   * common faces; i.e., this function is intended for simple geometries with
+   * boundary faces aligned along the coordinate axes.
+   */
+  template <int dim, int spacedim = dim>
+  void
+  replicate_triangulation(const Triangulation<dim, spacedim> &input,
+                          const std::vector<unsigned int> &   extents,
+                          Triangulation<dim, spacedim> &      result);
+
+  /**
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the finest cells of both triangulation
    * and store it in the third parameter. Previous content of @p result will

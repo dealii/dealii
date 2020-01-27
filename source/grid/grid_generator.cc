@@ -5845,6 +5845,232 @@ namespace GridGenerator
 
 
 
+  namespace
+  {
+    /**
+     * Merging or replicating triangulations usually results in duplicated
+     * boundary objects - in particular, faces that used to be boundary faces
+     * will now be internal faces.
+     *
+     * This function modifies @p subcell_data by detecting duplicated objects,
+     * marking said duplicates as internal faces, and then deleting all but
+     * one of the duplicates.
+     *
+     * This function relies on some implementation details of
+     * create_triangulation to uniquify objects in SubCellData - in
+     * particular, quadrilaterals are only identified by their lines and not
+     * by their orientation or volume, so rotating and flipping a
+     * quadrilateral doesn't effect the way said quadrilateral is read by that
+     * function.
+     *
+     * @warning even though this function is implemented for structdim 1 and
+     * structdim 2, it will produce <em>wrong</em> results when called for
+     * boundary lines in 3D in most cases since a boundary line can be shared
+     * by an arbitrary number of cells in 3D.
+     */
+    template <int structdim>
+    void
+    delete_duplicated_objects(std::vector<CellData<structdim>> &subcell_data)
+    {
+      static_assert(structdim == 1 || structdim == 2,
+                    "This function is only implemented for lines and "
+                    "quadrilaterals.");
+      // start by making sure that all objects representing the same vertices
+      // are numbered in the same way by canonicalizing the numberings. This
+      // makes it possible to detect duplicates.
+      for (CellData<structdim> &cell_data : subcell_data)
+        {
+          if (structdim == 1)
+            std::sort(std::begin(cell_data.vertices),
+                      std::end(cell_data.vertices));
+          else if (structdim == 2)
+            {
+              // rotate the vertex numbers so that the lowest one is first
+              std::array<unsigned int, 4> renumbering;
+              std::copy(std::begin(cell_data.vertices),
+                        std::end(cell_data.vertices),
+                        renumbering.begin());
+
+              // convert to old style vertex numbering. This makes the
+              // permutations easy since the valid configurations are
+              //
+              // 3  2   2  1   1  0   0  3
+              // 0  1   3  0   2  3   1  2
+              // (0123) (3012) (2310) (1230)
+              //
+              // rather than the lexical ordering which is harder to permute
+              // by rotation.
+              std::swap(renumbering[2], renumbering[3]);
+              std::rotate(renumbering.begin(),
+                          std::min_element(renumbering.begin(),
+                                           renumbering.end()),
+                          renumbering.end());
+              // convert to new style
+              std::swap(renumbering[2], renumbering[3]);
+              // deal with cases where we might have
+              //
+              // 3 2   1 2
+              // 0 1   0 3
+              //
+              // by forcing the second vertex (in lexical ordering) to be
+              // smaller than the third
+              if (renumbering[1] > renumbering[2])
+                std::swap(renumbering[1], renumbering[2]);
+              std::copy(renumbering.begin(),
+                        renumbering.end(),
+                        std::begin(cell_data.vertices));
+            }
+        }
+
+      // Now that all cell objects have been canonicalized they can be sorted:
+      auto compare = [](const CellData<structdim> &a,
+                        const CellData<structdim> &b) {
+        return std::lexicographical_compare(std::begin(a.vertices),
+                                            std::end(a.vertices),
+                                            std::begin(b.vertices),
+                                            std::end(b.vertices));
+      };
+      std::sort(subcell_data.begin(), subcell_data.end(), compare);
+
+      // Finally, determine which objects are duplicates. Duplicates are
+      // assumed to be interior objects, so delete all but one and change the
+      // boundary id:
+      auto left = subcell_data.begin();
+      while (left != subcell_data.end())
+        {
+          const auto right =
+            std::upper_bound(left, subcell_data.end(), *left, compare);
+          // if the range has more than one item, then there are duplicates -
+          // set all boundary ids in the range to the internal boundary id
+          if (left + 1 != right)
+            for (auto it = left; it != right; ++it)
+              {
+                it->boundary_id = numbers::internal_face_boundary_id;
+                Assert(it->manifold_id == left->manifold_id,
+                       ExcMessage(
+                         "In the process of grid generation a single "
+                         "line or quadrilateral has been assigned two "
+                         "different manifold ids. This can happen when "
+                         "a Triangulation is copied, e.g., via "
+                         "GridGenerator::replicate_triangulation() and "
+                         "not all external boundary faces have the same "
+                         "manifold id. Double check that all faces "
+                         "which you expect to be merged together have "
+                         "the same manifold id."));
+              }
+          left = right;
+        }
+
+      subcell_data.erase(std::unique(subcell_data.begin(), subcell_data.end()),
+                         subcell_data.end());
+    }
+  } // namespace
+
+
+
+  template <int dim, int spacedim>
+  void
+  replicate_triangulation(const Triangulation<dim, spacedim> &input,
+                          const std::vector<unsigned int> &   extents,
+                          Triangulation<dim, spacedim> &      result)
+  {
+    AssertDimension(dim, extents.size());
+#ifdef DEBUG
+    for (const auto &extent : extents)
+      Assert(0 < extent,
+             ExcMessage("The Triangulation must be copied at least one time in "
+                        "each coordinate dimension."));
+#endif
+    const BoundingBox<spacedim> bbox(input.get_vertices());
+    const auto &                min = bbox.get_boundary_points().first;
+    const auto &                max = bbox.get_boundary_points().second;
+
+    std::array<Tensor<1, spacedim>, dim> offsets;
+    for (unsigned int d = 0; d < dim; ++d)
+      offsets[d][d] = max[d] - min[d];
+
+    Triangulation<dim, spacedim> tria_to_replicate;
+    tria_to_replicate.copy_triangulation(input);
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        std::vector<Point<spacedim>> input_vertices;
+        std::vector<CellData<dim>>   input_cell_data;
+        SubCellData                  input_subcell_data;
+        std::tie(input_vertices, input_cell_data, input_subcell_data) =
+          GridTools::get_coarse_mesh_description(tria_to_replicate);
+        std::vector<Point<spacedim>> output_vertices     = input_vertices;
+        std::vector<CellData<dim>>   output_cell_data    = input_cell_data;
+        SubCellData                  output_subcell_data = input_subcell_data;
+
+        for (unsigned int k = 1; k < extents[d]; ++k)
+          {
+            const std::size_t vertex_offset = k * input_vertices.size();
+            // vertices
+            for (const Point<spacedim> &point : input_vertices)
+              output_vertices.push_back(point + double(k) * offsets[d]);
+            // cell data
+            for (const CellData<dim> &cell_data : input_cell_data)
+              {
+                output_cell_data.push_back(cell_data);
+                for (unsigned int &vertex : output_cell_data.back().vertices)
+                  vertex += vertex_offset;
+              }
+            // subcell data
+            for (const CellData<1> &boundary_line :
+                 input_subcell_data.boundary_lines)
+              {
+                output_subcell_data.boundary_lines.push_back(boundary_line);
+                for (unsigned int &vertex :
+                     output_subcell_data.boundary_lines.back().vertices)
+                  vertex += vertex_offset;
+              }
+            for (const CellData<2> &boundary_quad :
+                 input_subcell_data.boundary_quads)
+              {
+                output_subcell_data.boundary_quads.push_back(boundary_quad);
+                for (unsigned int &vertex :
+                     output_subcell_data.boundary_quads.back().vertices)
+                  vertex += vertex_offset;
+              }
+          }
+        // check all vertices: since the grid is coarse, most will be on the
+        // boundary anyway
+        std::vector<unsigned int> boundary_vertices;
+        GridTools::delete_duplicated_vertices(
+          output_vertices,
+          output_cell_data,
+          output_subcell_data,
+          boundary_vertices,
+          1e-6 * input.begin_active()->diameter());
+        // delete_duplicated_vertices also deletes any unused vertices
+        // deal with any reordering issues created by delete_duplicated_vertices
+        GridReordering<dim>::reorder_cells(output_cell_data, true);
+        // clean up the boundary ids of the boundary objects: note that we
+        // have to do this after delete_duplicated_vertices so that boundary
+        // objects are actually duplicated at this point
+        if (dim == 2)
+          delete_duplicated_objects(output_subcell_data.boundary_lines);
+        else if (dim == 3)
+          {
+            delete_duplicated_objects(output_subcell_data.boundary_quads);
+            for (CellData<1> &boundary_line :
+                 output_subcell_data.boundary_lines)
+              // set boundary lines to the default value - let
+              // create_triangulation figure out the rest.
+              boundary_line.boundary_id = numbers::internal_face_boundary_id;
+          }
+
+        tria_to_replicate.clear();
+        tria_to_replicate.create_triangulation(output_vertices,
+                                               output_cell_data,
+                                               output_subcell_data);
+      }
+
+    result.copy_triangulation(tria_to_replicate);
+  }
+
+
+
   template <int dim, int spacedim>
   void
   create_union_triangulation(
