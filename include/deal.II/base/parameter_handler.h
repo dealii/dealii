@@ -1023,7 +1023,7 @@ public:
    * parameter GUI (see the general documentation of this class).
    */
   virtual void
-  parse_input_from_xml(std::istream &input);
+  parse_input_from_xml(std::istream &input, const bool skip_undefined = false);
 
   /**
    * Parse input from a JSON stream to populate known parameter fields. This
@@ -1033,7 +1033,7 @@ public:
    * input.
    */
   virtual void
-  parse_input_from_json(std::istream &input);
+  parse_input_from_json(std::istream &input, const bool skip_undefined = false);
 
   /**
    * Clear all contents.
