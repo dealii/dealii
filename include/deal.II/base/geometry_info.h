@@ -2709,7 +2709,7 @@ GeometryInfo<3>::unit_cell_vertex(const unsigned int vertex)
 inline std::array<unsigned int, 0>
 GeometryInfo<0>::face_indices()
 {
-  return {};
+  return {{}};
 }
 
 
