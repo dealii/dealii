@@ -61,15 +61,15 @@ public:
    */
 
   void
-  compute(const Point<2> &           unit_point,
-          std::vector<double> &      values,
-          std::vector<Tensor<1, 2>> &grads,
-          std::vector<Tensor<2, 2>> &grad_grads) const;
+  evaluate(const Point<2> &           unit_point,
+           std::vector<double> &      values,
+           std::vector<Tensor<1, 2>> &grads,
+           std::vector<Tensor<2, 2>> &grad_grads) const;
 
   /**
    * Compute the value of the <tt>i</tt>th polynomial at <tt>unit_point</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
 
   double
@@ -79,7 +79,7 @@ public:
    * Compute the gradient of the <tt>i</tt>th polynomial at
    * <tt>unit_point</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
 
   Tensor<1, 2>
@@ -88,7 +88,7 @@ public:
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
    * at <tt>unit_point</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
 
   Tensor<2, 2>

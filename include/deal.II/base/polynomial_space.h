@@ -154,7 +154,7 @@ public:
    * Compute the value of the <tt>i</tt>th polynomial at unit point
    * <tt>p</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const;
@@ -163,7 +163,7 @@ public:
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
    * at unit point <tt>p</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    *
    * @tparam order The order of the derivative.
    */
@@ -175,7 +175,7 @@ public:
    * Compute the gradient of the <tt>i</tt>th polynomial at unit point
    * <tt>p</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const;
@@ -184,7 +184,7 @@ public:
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
    * at unit point <tt>p</tt>.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
