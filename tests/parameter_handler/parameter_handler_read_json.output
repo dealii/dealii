@@ -6,7 +6,8 @@
         "default_value": "1",
         "documentation": "doc 1",
         "pattern": "0",
-        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
+        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+        "actions": "0"
     },
     "int2":
     {
@@ -14,7 +15,8 @@
         "default_value": "2",
         "documentation": "doc 2",
         "pattern": "1",
-        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
+        "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+        "actions": "1"
     },
     "ss1":
     {
@@ -24,7 +26,8 @@
             "default_value": "1.234",
             "documentation": "doc 3",
             "pattern": "2",
-            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "2"
         },
         "ss2":
         {
@@ -34,7 +37,8 @@
                 "default_value": "4.321",
                 "documentation": "doc 4",
                 "pattern": "3",
-                "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+                "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+                "actions": "3"
             }
         }
     },
@@ -46,7 +50,8 @@
             "default_value": "< & > ; \/",
             "documentation": "docs 1",
             "pattern": "4",
-            "pattern_description": "[Anything]"
+            "pattern_description": "[Anything]",
+            "actions": "4"
         },
         "int_2aint":
         {
@@ -54,15 +59,17 @@
             "default_value": "2",
             "documentation": "",
             "pattern": "5",
-            "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
+            "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
+            "actions": "5"
         },
         "double_2bdouble":
         {
             "value": "7.1415926",
-            "default_value": "6.1415926",
+            "default_value": "6.14159",
             "documentation": "docs 3",
             "pattern": "6",
-            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "6"
         }
     }
 }

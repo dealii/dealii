@@ -482,7 +482,7 @@ namespace
     const std::string &                current_path,
     const char                         path_separator,
     const std::vector<std::unique_ptr<const Patterns::PatternBase>> &patterns,
-    boost::property_tree::ptree &destination)
+    ParameterHandler &                                               prm)
   {
     for (boost::property_tree::ptree::const_iterator p = source.begin();
          p != source.end();
@@ -491,32 +491,8 @@ namespace
         // a sub-tree must either be a parameter node or a subsection
         if (p->second.get_optional<std::string>("value"))
           {
-            // make sure we have a corresponding entry in the destination
-            // object as well
-            const std::string full_path =
-              (current_path.empty() ? p->first :
-                                      current_path + path_separator + p->first);
-
-            const std::string new_value = p->second.get<std::string>("value");
-            AssertThrow(destination.get_optional<std::string>(full_path) &&
-                          destination.get_optional<std::string>(
-                            full_path + path_separator + "value"),
-                        ParameterHandler::ExcEntryUndeclared(p->first));
-
-            // first make sure that the new entry actually satisfies its
-            // constraints
-            const unsigned int pattern_index = destination.get<unsigned int>(
-              full_path + path_separator + "pattern");
-            AssertThrow(patterns[pattern_index]->match(new_value),
-                        ParameterHandler::ExcInvalidEntryForPatternXML
-                        // XML entries sometimes have extra surrounding
-                        // newlines
-                        (Utilities::trim(new_value),
-                         p->first,
-                         patterns[pattern_index]->description()));
-
             // set the found parameter in the destination argument
-            destination.put(full_path + path_separator + "value", new_value);
+            prm.set(demangle(p->first), p->second.get<std::string>("value"));
 
             // this node might have sub-nodes in addition to "value", such as
             // "default_value", "documentation", etc. we might at some point
@@ -532,13 +508,15 @@ namespace
         else
           {
             // it must be a subsection
+            prm.enter_subsection(demangle(p->first));
             read_xml_recursively(p->second,
                                  (current_path.empty() ?
                                     p->first :
                                     current_path + path_separator + p->first),
                                  path_separator,
                                  patterns,
-                                 destination);
+                                 prm);
+            prm.leave_subsection();
           }
       }
   }
@@ -596,7 +574,7 @@ ParameterHandler::parse_input_from_xml(std::istream &in)
   const boost::property_tree::ptree &my_entries =
     single_node_tree.get_child("ParameterHandler");
 
-  read_xml_recursively(my_entries, "", path_separator, patterns, *entries);
+  read_xml_recursively(my_entries, "", path_separator, patterns, *this);
 }
 
 
@@ -612,7 +590,7 @@ ParameterHandler::parse_input_from_json(std::istream &in)
 
   // The xml function is reused to read in the xml into the parameter file.
   // This means that only mangled files can be read.
-  read_xml_recursively(node_tree, "", path_separator, patterns, *entries);
+  read_xml_recursively(node_tree, "", path_separator, patterns, *this);
 }
 
 
