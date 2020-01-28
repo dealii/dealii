@@ -842,6 +842,7 @@ class MultipleParameterLoop;
  * @author Alberto Sartori, 2015
  * @author David Wells, 2016
  * @author Denis Davydov, 2018
+ * @author Pasquale Claudio Africa, 2020
  */
 class ParameterHandler : public Subscriptor
 {
@@ -1332,9 +1333,14 @@ public:
   void
   set(const std::string &entry_name, const bool new_value);
 
-
   /**
    * Print all parameters with the given style to <tt>out</tt>.
+   *
+   * Before printing, all current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the last parameter @p sort_alphabetical
+   * to @p false: in this case entries are printed in the same order
+   * as they have been declared.
    *
    * In <tt>Text</tt> format, the output is formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
@@ -1393,7 +1399,9 @@ public:
    * @endcode
    */
   std::ostream &
-  print_parameters(std::ostream &out, const OutputStyle style) const;
+  print_parameters(std::ostream &    out,
+                   const OutputStyle style,
+                   const bool        sort_alphabetical = true) const;
 
   /**
    * Print out the parameters of the present subsection as given by the
@@ -1406,6 +1414,12 @@ public:
    * to get a valid XML document and output starts with one root element
    * <tt>ParameterHandler</tt>.
    *
+   * Before printing, all parameters and subsections of the present subsection
+   * are sorted alphabetically by default.
+   * This behavior can be disabled setting the last parameter @p sort_alphabetical
+   * to @p false: in this case entries are printed in the same order
+   * as they have been declared.
+   *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    *
@@ -1417,15 +1431,22 @@ public:
   print_parameters_section(std::ostream &     out,
                            const OutputStyle  style,
                            const unsigned int indent_level,
-                           const bool include_top_level_elements = false);
+                           const bool include_top_level_elements = false,
+                           const bool sort_alphabetical          = true);
 
   /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
    * file style.
+   *
+   * All current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the last parameter @p sort_alphabetical
+   * to @p false: in this case entries are printed in the same order
+   * as they have been declared.
    */
   void
-  log_parameters(LogStream &out);
+  log_parameters(LogStream &out, const bool sort_alphabetical = true);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1433,11 +1454,17 @@ public:
    * by entering and leaving subsections through the enter_subsection() and
    * leave_subsection() functions.
    *
+   * All current parameters and subsections are sorted
+   * alphabetically by default.
+   * This behavior can be disabled setting the last parameter @p sort_alphabetical
+   * to @p false: in this case entries are printed in the same order
+   * as they have been declared.
+   *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
   void
-  log_parameters_section(LogStream &out);
+  log_parameters_section(LogStream &out, const bool sort_alphabetical = true);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1695,6 +1722,16 @@ private:
             const bool         skip_undefined);
 
   /**
+   * Sort all parameters of the subsection given by the
+   * @p target_subsection_path argument in alphabetical order,
+   * as well as all subsections within it recursively.
+   */
+  static void
+  recursively_sort_parameters(
+    const std::vector<std::string> &target_subsection_path,
+    boost::property_tree::ptree &   tree);
+
+  /**
    * Print out the parameters of the subsection given by the
    * @p target_subsection_path argument, as well as all subsections
    * within it recursively. This function is called from the
@@ -1707,10 +1744,11 @@ private:
    */
   void
   recursively_print_parameters(
-    const std::vector<std::string> &target_subsection_path,
-    const OutputStyle               style,
-    const unsigned int              indent_level,
-    std::ostream &                  out) const;
+    const boost::property_tree::ptree & tree,
+    const std::vector<std::string> &    target_subsection_path,
+    const ParameterHandler::OutputStyle style,
+    const unsigned int                  indent_level,
+    std::ostream &                      out) const;
 
   friend class MultipleParameterLoop;
 };
