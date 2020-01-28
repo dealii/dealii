@@ -95,8 +95,7 @@ namespace Utilities
           /// ConsensusAlgorithm_PEX::process
           consensus_algorithm_pex_process_deliver,
 
-          /// ConstructionData<dim,
-          /// spacedim>::create_construction_data_from_triangulation_in_groups()
+          /// TriangulationDescription::Utilities::create_description_from_triangulation()
           fully_distributed_create,
 
           /// TriangulationBase<dim, spacedim>::fill_level_ghost_owners()
