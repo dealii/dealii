@@ -20,7 +20,6 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/fully_distributed_tria_util.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -51,8 +50,9 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
   parallel::fullydistributed::Triangulation<dim> tria_pft(comm);
 
   // extract relevant information form pdt
-  auto construction_data = parallel::fullydistributed::Utilities::
-    create_construction_data_from_triangulation(tria_pdt, comm, true);
+  auto construction_data =
+    TriangulationDescription::Utilities::create_description_from_triangulation(
+      tria_pdt, comm, true);
 
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
