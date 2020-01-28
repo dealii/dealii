@@ -38,11 +38,12 @@ namespace TriangulationDescription
        */
       template <int dim, int spacedim>
       void
-      set_user_flag_reverse(TriaIterator<CellAccessor<dim, spacedim>> cell)
+      set_user_flag_and_of_its_parents(
+        const TriaIterator<CellAccessor<dim, spacedim>> &cell)
       {
         cell->set_user_flag();
         if (cell->level() != 0)
-          set_user_flag_reverse(cell->parent());
+          set_user_flag_and_of_its_parents(cell->parent());
       }
 
 
@@ -108,21 +109,20 @@ namespace TriangulationDescription
     {
       if (auto tria_pdt = dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
-        AssertThrow(comm == tria_pdt->get_communicator(),
-                    ExcMessage("MPI communicators do not match."));
+        Assert(comm == tria_pdt->get_communicator(),
+               ExcMessage("MPI communicators do not match."));
 
       // First, figure out for what rank we are supposed to build the
       // ConstructionData object
       unsigned int my_rank = my_rank_in;
-      AssertThrow(my_rank == numbers::invalid_unsigned_int ||
-                    my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
-                  ExcMessage(
-                    "Rank has to be smaller than available processes."));
+      Assert(my_rank == numbers::invalid_unsigned_int ||
+               my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
+             ExcMessage("Rank has to be smaller than available processes."));
 
       if (auto tria_pdt = dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
         {
-          AssertThrow(
+          Assert(
             my_rank == numbers::invalid_unsigned_int ||
               my_rank == dealii::Utilities::MPI::this_mpi_process(comm),
             ExcMessage(
@@ -139,8 +139,8 @@ namespace TriangulationDescription
         }
       else
         {
-          AssertThrow(
-            false, ExcMessage("This type of triangulation is not supported!"));
+          Assert(false,
+                 ExcMessage("This type of triangulation is not supported!"));
         }
 
       Description<dim, spacedim> construction_data;
@@ -182,7 +182,7 @@ namespace TriangulationDescription
       // check if multilevel hierarchy should be constructed
       if (construct_multilevel_hierarchy == false)
         {
-          AssertThrow(
+          Assert(
             tria.has_hanging_nodes() == false,
             ExcMessage(
               "Hanging nodes are only supported if multilevel hierarchy is constructed!"));
@@ -324,10 +324,9 @@ namespace TriangulationDescription
 
           // 1b) loop over levels (from fine to coarse) and mark on each level
           //     the locally relevant cells
-          for (unsigned int level =
-                 tria.get_triangulation().n_global_levels() - 1;
-               level != numbers::invalid_unsigned_int;
-               level--)
+          for (int level = tria.get_triangulation().n_global_levels() - 1;
+               level >= 0;
+               --level)
             {
               // collect vertices connected to a (on any level) locally owned
               // cell
@@ -361,7 +360,7 @@ namespace TriangulationDescription
               // mark all locally relevant cells
               for (auto cell : tria.cell_iterators_on_level(level))
                 if (is_locally_relevant_on_level(cell))
-                  set_user_flag_reverse(cell);
+                  set_user_flag_and_of_its_parents(cell);
             }
 
           // 2) set_up coarse-grid triangulation
@@ -589,9 +588,12 @@ namespace TriangulationDescription
             std::min(group_root + group_size,
                      dealii::Utilities::MPI::n_mpi_processes(comm));
 
-          // 3) create ConstructionData for the other processes in group
+          // 3) create Description for the other processes in group; since
+          // we expect that this function is called for huge meshes, one
+          // Description is created at a time and send away; only once the
+          // Description has been sent away, the next rank is processed.
           for (unsigned int other_rank = group_root + 1; other_rank < end_group;
-               other_rank++)
+               ++other_rank)
             {
               // 3a) create construction data for other ranks
               const auto construction_data =
@@ -631,7 +633,7 @@ namespace TriangulationDescription
                           len,
                           MPI_CHAR,
                           status.MPI_SOURCE,
-                          status.MPI_TAG,
+                          mpi_tag,
                           comm,
                           &status);
           AssertThrowMPI(ierr);

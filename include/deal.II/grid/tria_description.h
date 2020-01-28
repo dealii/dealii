@@ -271,16 +271,16 @@ namespace TriangulationDescription
    * the cell id, the subdomain_id and the level_subdomain_id as well as
    * information related to manifold_id and boundary_id.
    *
+   * @note Similarly to dealii::CellData, this structure stores information
+   * about a cell. However, in contrast to dealii::CellData, it also stores
+   * a unique id, partitioning information, and information related to cell
+   * faces and edges.
+   *
    * @author Peter Munch, 2019
    */
   template <int dim>
   struct CellData
   {
-    /**
-     * Constructor.
-     */
-    CellData() = default;
-
     /**
      * Boost serialization function
      */
@@ -312,7 +312,7 @@ namespace TriangulationDescription
     /**
      * Manifold id of the cell.
      */
-    types::material_id manifold_id;
+    types::manifold_id manifold_id;
 
     /**
      * Manifold id of all lines of the cell.
@@ -419,22 +419,22 @@ namespace TriangulationDescription
      *
      * @param tria Partitioned input triangulation.
      * @param comm MPI_Communicator to be used. In the case
-     *             of dealii::distributed::Triangulation, the communicators
-     *             have to match.
+     *   of dealii::distributed::Triangulation, the communicators have to match.
      * @param construct_multilevel_hierarchy Signal if the multigrid levels
      *        should be constructed.
-     * @param my_rank_in Construct Description for this rank (only
-     *                   working for serial triangulations).
-     * @return Description to be used to setup a Triangulation.
+     * @param my_rank_in Construct Description for the specified rank (only
+     *   working for serial triangulations that have been partitioned by
+     *   functions like GridToold::partition_triangulation()).
+     * @return Description to be used to set up a Triangulation.
      *
      * @note Multilevel hierarchies are supported if it is enabled in
-     *       parallel::fullydistributed::Triangulation.
+     *   parallel::fullydistributed::Triangulation.
      *
      * @note Hanging nodes in the input triangulation are supported. However,
-     *       to be able to use this
-     *       feature in the case of parallel::fullydistributed::Triangulation,
-     *       the user has to enable multilevel hierarchy support in
-     *       parallel::fullydistributed::Triangulation.
+     *   to be able to use this feature in the case of
+     *   parallel::fullydistributed::Triangulation, the user has to enable
+     *   multilevel hierarchy support in
+     *   parallel::fullydistributed::Triangulation.
      *
      * @author Peter Munch, 2019
      */
@@ -448,27 +448,27 @@ namespace TriangulationDescription
 
 
     /**
-     * Construct a construction::Description. In contrast
+     * Construct a TriangulationDescription::Description. In contrast
      * to the function above, this function is also responsible for creating
      * a serial triangulation and for its partitioning (by calling the
-     * provided std::functions). Internally only selected processes (every
-     * n-th/each root of a group of size group_size) create a serial
+     * provided `std::functions' objects). Internally only selected processes (
+     * every n-th/each root of a group of size group_size) create a serial
      * triangulation and the ConstructionData for all processes in its group,
      * which is communicated.
      *
      * @note A reasonable group size is the size of a NUMA domain or the
      * size of a compute node.
      *
-     * @param serial_grid_generator A function, which creates a serial triangulation.
-     * @param serial_grid_partitioner A function, which can partition a serial
-     *        triangulation, i.e., sets the sudomain_ids of the active cells.
-     *        The function takes as the first argument a serial triangulation,
-     *        as the second argument the MPI communicator, and as the third
-     *        argument the group size.
-     * @param comm MPI communicator
+     * @param serial_grid_generator A function which creates a serial triangulation.
+     * @param serial_grid_partitioner A function which can partition a serial
+     *   triangulation, i.e., sets the sudomain_ids of the active cells.
+     *   The function takes as the first argument a serial triangulation,
+     *   as the second argument the MPI communicator, and as the third
+     *   argument the group size.
+     * @param comm MPI communicator.
      * @param group_size The size of each group.
      * @param construct_multilevel_hierarchy Construct multigrid levels.
-     * @return Description to be used to setup a Triangulation.
+     * @return Description to be used to set up a Triangulation.
      *
      * @author Peter Munch, 2019
      */

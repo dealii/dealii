@@ -1836,7 +1836,7 @@ public:
    * Create a triangulation from the provided
    * TriangulationDescription::Description.
    *
-   * @note The namespace construction::Utilities contains functions
+   * @note The namespace TriangulationDescription::Utilities contains functions
    *       to create TriangulationDescription::Description.
    *
    * @param construction_data The data needed for this process.
