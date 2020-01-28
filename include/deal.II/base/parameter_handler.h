@@ -1192,6 +1192,14 @@ public:
   leave_subsection();
 
   /**
+   * Check whether a subsection or a subsection path exists in current tree.
+   * The input parameter @p sub_path is assumed to be relative to the
+   * currently selected path.
+   */
+  bool
+  subsection_path_exists(const std::vector<std::string> &sub_path) const;
+
+  /**
    * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
    * value of an undeclared entry is required, an @p Assert will fail.
