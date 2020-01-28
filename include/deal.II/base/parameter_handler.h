@@ -1625,6 +1625,7 @@ public:
     << arg3 << "> cannot be opened.");
 
   //@}
+
 private:
   /**
    * The separator used when accessing elements of a path into the parameter
@@ -1661,15 +1662,6 @@ private:
    * store indices into this array in order to reference specific actions.
    */
   std::vector<std::function<void(const std::string &)>> actions;
-
-  /**
-   * Given a list of directories and subdirectories that identify
-   * a particular place in the tree, return the string that identifies
-   * this place in the way the BOOST property tree libraries likes
-   * to identify things.
-   */
-  static std::string
-  collate_path_string(const std::vector<std::string> &subsection_path);
 
   /**
    * Return the string that identifies the current path into the property
@@ -1720,16 +1712,6 @@ private:
             const std::string &input_filename,
             const unsigned int current_line_n,
             const bool         skip_undefined);
-
-  /**
-   * Sort all parameters of the subsection given by the
-   * @p target_subsection_path argument in alphabetical order,
-   * as well as all subsections within it recursively.
-   */
-  static void
-  recursively_sort_parameters(
-    const std::vector<std::string> &target_subsection_path,
-    boost::property_tree::ptree &   tree);
 
   /**
    * Print out the parameters of the subsection given by the
