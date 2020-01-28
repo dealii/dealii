@@ -63,7 +63,7 @@ public:
   /**
    * <tt>order</tt>-th of basis function @p i at @p p.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
   template <int order>
   Tensor<order, dim>
