@@ -1,0 +1,4 @@
+New: ParameterHandler::declare_entry() can now optionally append
+the pattern description along with the entry documentation.
+<br>
+(Pasquale Claudio Africa, 2020/01/29)

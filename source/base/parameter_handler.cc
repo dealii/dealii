@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -605,14 +605,27 @@ void
 ParameterHandler::declare_entry(const std::string &          entry,
                                 const std::string &          default_value,
                                 const Patterns::PatternBase &pattern,
-                                const std::string &          documentation)
+                                const std::string &          documentation,
+                                const bool document_pattern_description)
 {
   entries->put(get_current_full_path(entry) + path_separator + "value",
                default_value);
   entries->put(get_current_full_path(entry) + path_separator + "default_value",
                default_value);
+
+  std::string doc(documentation);
+
+  // Append pattern description to documentation, if needed.
+  if (document_pattern_description)
+    {
+      if (!doc.empty())
+        doc += "\n";
+
+      doc += pattern.description(Patterns::PatternBase::Text);
+    }
+
   entries->put(get_current_full_path(entry) + path_separator + "documentation",
-               documentation);
+               doc);
 
   patterns.reserve(patterns.size() + 1);
   patterns.emplace_back(pattern.clone());

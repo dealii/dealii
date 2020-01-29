@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1046,10 +1046,15 @@ public:
    * Declare a new entry with name <tt>entry</tt>, default and for which any
    * input has to match the <tt>pattern</tt> (default: any pattern).
    *
-   * The last parameter defaulting to an empty string is used to add a
+   * The parameter @p documentation defaulting to an empty string is used to add a
    * documenting text to each entry which will be printed as a comment when
    * this class is asked to write out all declarations to a stream using the
    * print_parameters() function.
+   *
+   * The last optional argument allows to append the pattern description
+   * to the provided documentation. In this way, the print_parameters() method
+   * will print information on the admissible values along with the entry
+   * documentation.
    *
    * The function generates an exception of type ExcValueDoesNotMatchPattern
    * if the default value doesn't match the given pattern, using the C++ throw
@@ -1065,7 +1070,8 @@ public:
   declare_entry(const std::string &          entry,
                 const std::string &          default_value,
                 const Patterns::PatternBase &pattern = Patterns::Anything(),
-                const std::string &          documentation = "");
+                const std::string &          documentation = "",
+                const bool document_pattern_description    = false);
 
   /**
    * Attach an action to the parameter with name @p entry in the current
