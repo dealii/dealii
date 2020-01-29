@@ -247,33 +247,95 @@ namespace
   {
     return static_cast<bool>(p.get_optional<std::string>("alias"));
   }
+
+  /**
+   * Given a list of directories and subdirectories that identify
+   * a particular place in the tree, return the string that identifies
+   * this place in the way the BOOST property tree libraries likes
+   * to identify things.
+   */
+  std::string
+  collate_path_string(const char                      separator,
+                      const std::vector<std::string> &subsection_path)
+  {
+    if (subsection_path.size() > 0)
+      {
+        std::string p = mangle(subsection_path[0]);
+        for (unsigned int i = 1; i < subsection_path.size(); ++i)
+          {
+            p += separator;
+            p += mangle(subsection_path[i]);
+          }
+        return p;
+      }
+    else
+      return "";
+  }
+
+  /**
+   * Sort all parameters of the subsection given by the
+   * @p target_subsection_path argument in alphabetical order,
+   * as well as all subsections within it recursively.
+   */
+  void
+  recursively_sort_parameters(
+    const char                      separator,
+    const std::vector<std::string> &target_subsection_path,
+    boost::property_tree::ptree &   tree)
+  {
+    boost::property_tree::ptree &current_section =
+      tree.get_child(collate_path_string(separator, target_subsection_path));
+
+    // Custom comparator to ensure that the order of sorting is:
+    // - sorted parameters and aliases;
+    // - sorted subsections.
+    static auto compare =
+      [](const std::pair<std::string, boost::property_tree::ptree> &a,
+         const std::pair<std::string, boost::property_tree::ptree> &b) {
+        bool a_is_param =
+          (is_parameter_node(a.second) || is_alias_node(a.second));
+
+        bool b_is_param =
+          (is_parameter_node(b.second) || is_alias_node(b.second));
+
+        // If a is a parameter/alias and b is a subsection,
+        // a should go first, and viceversa.
+        if (a_is_param && !b_is_param)
+          return true;
+
+        if (!a_is_param && b_is_param)
+          return false;
+
+        // Otherwise, compare a and b.
+        return a.first < b.first;
+      };
+
+    current_section.sort(compare);
+
+    // Now transverse subsections tree recursively.
+    for (auto &p : current_section)
+      {
+        if ((is_parameter_node(p.second) == false) &&
+            (is_alias_node(p.second) == false))
+          {
+            const std::string subsection = demangle(p.first);
+
+            std::vector<std::string> subsection_path = target_subsection_path;
+            subsection_path.emplace_back(subsection);
+
+            recursively_sort_parameters(separator, subsection_path, tree);
+          }
+      }
+  }
+
 } // namespace
 
 
 
 std::string
-ParameterHandler::collate_path_string(
-  const std::vector<std::string> &subsection_path)
-{
-  if (subsection_path.size() > 0)
-    {
-      std::string p = mangle(subsection_path[0]);
-      for (unsigned int i = 1; i < subsection_path.size(); ++i)
-        {
-          p += path_separator;
-          p += mangle(subsection_path[i]);
-        }
-      return p;
-    }
-  else
-    return "";
-}
-
-
-std::string
 ParameterHandler::get_current_path() const
 {
-  return collate_path_string(subsection_path);
+  return collate_path_string(path_separator, subsection_path);
 }
 
 
@@ -302,7 +364,7 @@ ParameterHandler::get_current_full_path(
     path += path_separator;
 
   if (sub_path.empty() == false)
-    path += collate_path_string(sub_path) + path_separator;
+    path += collate_path_string(path_separator, sub_path) + path_separator;
 
   path += mangle(name);
 
@@ -1007,6 +1069,7 @@ ParameterHandler::set(const std::string &entry_string, const long int new_value)
 }
 
 
+
 void
 ParameterHandler::set(const std::string &entry_string, const bool new_value)
 {
@@ -1015,55 +1078,7 @@ ParameterHandler::set(const std::string &entry_string, const bool new_value)
   set(entry_string, (new_value ? "true" : "false"));
 }
 
-void
-ParameterHandler::recursively_sort_parameters(
-  const std::vector<std::string> &target_subsection_path,
-  boost::property_tree::ptree &   tree)
-{
-  boost::property_tree::ptree &current_section =
-    tree.get_child(collate_path_string(target_subsection_path));
 
-  // Custom comparator to ensure that the order of sorting is:
-  // - sorted parameters and aliases;
-  // - sorted subsections.
-  static auto compare =
-    [](const std::pair<std::string, boost::property_tree::ptree> &a,
-       const std::pair<std::string, boost::property_tree::ptree> &b) {
-      bool a_is_param =
-        (is_parameter_node(a.second) || is_alias_node(a.second));
-
-      bool b_is_param =
-        (is_parameter_node(b.second) || is_alias_node(b.second));
-
-      // If a is a parameter/alias and b is a subsection,
-      // a should go first, and viceversa.
-      if (a_is_param && !b_is_param)
-        return true;
-
-      if (!a_is_param && b_is_param)
-        return false;
-
-      // Otherwise, compare a and b.
-      return a.first < b.first;
-    };
-
-  current_section.sort(compare);
-
-  // Now transverse subsections tree recursively.
-  for (auto &p : current_section)
-    {
-      if ((is_parameter_node(p.second) == false) &&
-          (is_alias_node(p.second) == false))
-        {
-          const std::string subsection = demangle(p.first);
-
-          std::vector<std::string> subsection_path = target_subsection_path;
-          subsection_path.emplace_back(subsection);
-
-          recursively_sort_parameters(subsection_path, tree);
-        }
-    }
-}
 
 std::ostream &
 ParameterHandler::print_parameters(std::ostream &    out,
@@ -1086,7 +1101,9 @@ ParameterHandler::print_parameters(std::ostream &    out,
 
       // Dive recursively into the subsections,
       // starting from the top level.
-      recursively_sort_parameters(std::vector<std::string>(), sorted_entries);
+      recursively_sort_parameters(path_separator,
+                                  std::vector<std::string>(),
+                                  sorted_entries);
     }
 
   // we'll have to print some text that is padded with spaces;
@@ -1173,8 +1190,8 @@ ParameterHandler::recursively_print_parameters(
   // this function should not be necessary for XML or JSON output...
   Assert((style != XML) && (style != JSON), ExcInternalError());
 
-  const boost::property_tree::ptree &current_section = tree.get_child(
-    ParameterHandler::collate_path_string(target_subsection_path));
+  const boost::property_tree::ptree &current_section =
+    tree.get_child(collate_path_string(path_separator, target_subsection_path));
 
   unsigned int overall_indent_level = indent_level;
 
@@ -1585,7 +1602,9 @@ ParameterHandler::print_parameters_section(
 
       // Dive recursively into the subsections,
       // starting from current level.
-      recursively_sort_parameters(subsection_path, sorted_entries);
+      recursively_sort_parameters(path_separator,
+                                  subsection_path,
+                                  sorted_entries);
     }
 
   const boost::property_tree::ptree &current_section =
@@ -2047,7 +2066,9 @@ ParameterHandler::log_parameters_section(LogStream &out,
 
       // Dive recursively into the subsections,
       // starting from the current level.
-      recursively_sort_parameters(subsection_path, sorted_entries);
+      recursively_sort_parameters(path_separator,
+                                  subsection_path,
+                                  sorted_entries);
     }
 
   const boost::property_tree::ptree &current_section =
