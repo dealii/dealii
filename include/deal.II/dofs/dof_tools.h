@@ -68,6 +68,28 @@ namespace GridTools
   template <typename CellIterator>
   struct PeriodicFacePair;
 }
+
+namespace DoFTools
+{
+  namespace internal
+  {
+    /*
+     * Default value of the face_has_flux_coupling parameter of
+     * make_flux_sparsity_pattern. Defined here (instead of using a default
+     * lambda in the parameter list) to avoid a bug in gcc where the same lambda
+     * gets defined multiple times.
+     */
+    template <typename DoFHandlerType>
+    inline bool
+    always_couple_on_faces(
+      const typename DoFHandlerType::active_cell_iterator &,
+      const unsigned int)
+    {
+      return true;
+    }
+  } // namespace internal
+} // namespace DoFTools
+
 #endif
 
 /**
@@ -775,18 +797,40 @@ namespace DoFTools
    * components of a finite element are continuous and some discontinuous,
    * allowing constraints to be imposed on the continuous part while also
    * building the flux terms needed for the discontinuous part.
+   *
+   * The optional @param face_has_flux_coupling can be used to specify on which
+   * faces flux couplings occur. This allows for creating a sparser pattern when
+   * using a bilinear form where flux terms only appear on a subset of the faces
+   * in the triangulation. By default flux couplings are added over all internal
+   * faces. @param face_has_flux_coupling should be a function that takes an
+   * active_cell_iterator and a face index and should return true if there is a
+   * flux coupling over the face. When using the ::dealii::DoFHandler we could,
+   * for example, use
+   *
+   * @code
+   *  auto face_has_flux_coupling =
+   *    [](const typename DoFHandler<dim>::active_cell_iterator &cell,
+   *       const unsigned int                                    face_index) {
+   *      const Point<dim> &face_center = cell->face(face_index)->center();
+   *      return 0 < face_center[0];
+   *    };
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
             typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
-                             SparsityPatternType &            sparsity,
-                             const AffineConstraints<number> &constraints,
-                             const bool                keep_constrained_dofs,
-                             const Table<2, Coupling> &couplings,
-                             const Table<2, Coupling> &face_couplings,
-                             const types::subdomain_id subdomain_id);
+  make_flux_sparsity_pattern(
+    const DoFHandlerType &           dof,
+    SparsityPatternType &            sparsity,
+    const AffineConstraints<number> &constraints,
+    const bool                       keep_constrained_dofs,
+    const Table<2, Coupling> &       couplings,
+    const Table<2, Coupling> &       face_couplings,
+    const types::subdomain_id        subdomain_id,
+    const std::function<
+      bool(const typename DoFHandlerType::active_cell_iterator &,
+           const unsigned int)> &face_has_flux_coupling =
+      &internal::always_couple_on_faces<DoFHandlerType>);
 
   /**
    * Create the sparsity pattern for boundary matrices. See the general
