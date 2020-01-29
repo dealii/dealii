@@ -78,6 +78,7 @@ SET(_unity_include_src
   quadrature_selector.cc
   scalar_polynomials_base.cc
   subscriptor.cc
+  symbolic_function.cc
   table_handler.cc
   tensor_function.cc
   tensor_function_parser.cc
@@ -127,6 +128,7 @@ SET(_inst
   partitioner.cuda.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
+  symbolic_function.inst.in
   tensor_function.inst.in
   tensor_function_parser.inst.in
   time_stepping.inst.in
