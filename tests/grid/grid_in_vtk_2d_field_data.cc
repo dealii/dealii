@@ -34,46 +34,37 @@ template <int dim>
 void
 check_file(const std::string name, typename GridIn<dim>::Format format)
 {
-  Triangulation<dim> triangulation;
-  GridIn<dim> gridin;
-  GridOut gridout;
+    Triangulation<dim> triangulation;
+    GridIn<dim> gridin;
+    GridOut gridout;
 
-  gridin.attach_triangulation(triangulation);
-  gridin.read(name, format);
-  deallog << '\t' << triangulation.n_vertices() << '\t' << triangulation.n_cells() << std::endl;
-  std::map< std::string, std::map<int,double> > field_data;
+    gridin.attach_triangulation(triangulation);
+    gridin.read(name, format);
+    deallog << '\t' << triangulation.n_vertices() << '\t' << triangulation.n_cells() << std::endl;
+    std::map< std::string, std::vector<double> > field_data;
 
-  field_data=gridin.get_field_data(); 
-  if (field_data.size()>0)
-    // iterate over the cells   
-    for( typename Triangulation<dim>::active_cell_iterator cell  = triangulation.begin_active();
-      cell != triangulation.end();  ++cell )
-      {
-          // store cell ID as a string
-          std::string text = boost::lexical_cast<std::string>(cell->id());
-          // Convert the string containing cell ID to an integer  
-          boost::char_separator<char> sep{"_"};
-          boost::tokenizer<boost::char_separator<char>> tokens(text, sep);
-          unsigned int cell_id = boost::lexical_cast<int>(*(tokens.begin()));
+    field_data=gridin.get_field_data(); 
+    if (field_data.size()>0)
+    {
+        std::map< std::string, std::vector<double>>::const_iterator iter  = field_data.find("Density");
+        if (iter != field_data.end())
+        {
+            std::vector<double> cell_density = iter->second;
+            for( typename Triangulation<dim>::active_cell_iterator cell  = triangulation.begin_active();
+                cell != triangulation.end();  ++cell )
+            {
+                // store cell ID as a string
+                std::string text = boost::lexical_cast<std::string>(cell->id());
+                // Convert the string containing cell ID to an integer  
+                boost::char_separator<char> sep{"_"};
+                boost::tokenizer<boost::char_separator<char>> tokens(text, sep);
+                unsigned int cell_id = boost::lexical_cast<int>(*(tokens.begin()));
+                deallog << '\t' << cell_density[cell_id] << std::endl;
+            }
+        }      
+    }
 
-          std::map< std::string, std::map<int,double>>::const_iterator iter  = field_data.find("Density");
-
-          if (iter != field_data.end())
-          {
-              std::map<int,double>::const_iterator iter2 = iter->second.find(cell_id);
-              if (iter2 != iter->second.end())
-              {
-                  deallog << '\t' << iter2->second << std::endl;
-              }
-              else
-              {
-                  // std::cout<<"Index not found!"<<std::endl;
-                  AssertThrow(false, ExcInternalError());
-              }
-          }
-      }
-
-  gridout.write_gnuplot(triangulation, deallog.get_file_stream());
+    gridout.write_gnuplot(triangulation, deallog.get_file_stream());
 }
 
 void

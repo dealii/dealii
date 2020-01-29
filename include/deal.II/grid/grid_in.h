@@ -667,11 +667,11 @@ public:
   /**
    * Return a map containing field data. The format of the returned map is as follows: 
    * - std::string stores the name of the field data (identifier) as specified in the external mesh
-   * - std::map<int, double > stores cell_id and value for the given identifier
+   * - std::vector<double > stores value for the given identifier in each cell. To access the value use field_data[name_field][cell_id].
    */
-  std::map< std::string, std::map<int,double> > get_field_data() const
+  std::map< std::string, std::vector<double> >& get_field_data()
   {      
-      return this->field_data;
+      return field_data;
   }
 
 protected:
@@ -679,9 +679,9 @@ protected:
   /**
   * Data member that stores cell data. The format is as follows:
   * - std::string stores the name of the field data (identifier) as specified in the external mesh
-  * - std::map<int, double> stores cell_id and value for the given identifier
+  * - std::vector<double> stores value for the given identifier in each cell_id. To access the value use field_data[name_field][cell_id].
   */
-  std::map< std::string, std::map<int,double> > field_data;
+  std::map< std::string, std::vector<double> > field_data;
   
   /**
    * Store address of the triangulation to be fed with the data read in.
