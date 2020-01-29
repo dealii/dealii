@@ -1589,205 +1589,304 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               }
           }
 
-          // partitioner 1: values on faces
-          {
-            bool all_nodal = true;
-            for (unsigned int c = 0; c < di.n_base_elements; ++c)
-              if (!shape_info(di.global_base_element_offset + c, 0, 0, 0)
-                     .nodal_at_cell_boundaries)
-                all_nodal = false;
-            if (all_nodal == false)
-              di.vector_partitioner_face_variants[1] = di.vector_partitioner;
-            else
-              {
-                bool has_noncontiguous_cell = false;
-                for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
+          const auto loop_over_faces =
+            [&](const std::function<void(const unsigned int,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const bool,
+                                         const bool)> &fu) {
+              for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
+                for (unsigned int v = 0;
+                     v < VectorizedArrayType::n_array_elements &&
+                     face_info.faces[f].cells_interior[v] !=
+                       numbers::invalid_unsigned_int;
+                     ++v)
+                  {
+                    AssertIndexRange(face_info.faces[f].cells_interior[v],
+                                     n_macro_cells_before *
+                                       VectorizedArrayType::n_array_elements);
+                    const unsigned int p = face_info.faces[f].cells_exterior[v];
+                    const unsigned int face_no =
+                      face_info.faces[f].exterior_face_no;
+
+                    fu(p, face_no, f, v, true /*exterior*/, false /*flag*/);
+                  }
+            };
+
+          const auto loop_over_all_faces =
+            [&](const std::function<void(const unsigned int,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const bool,
+                                         const bool)> &fu) {
+              for (unsigned int c = 0; c < n_cell_batches(); ++c)
+                for (unsigned int d = 0; d < GeometryInfo<dim>::faces_per_cell;
+                     ++d)
                   for (unsigned int v = 0;
-                       v < VectorizedArrayType::n_array_elements &&
-                       face_info.faces[f].cells_interior[v] !=
-                         numbers::invalid_unsigned_int;
+                       v < VectorizedArrayType::n_array_elements;
                        ++v)
                     {
-                      AssertIndexRange(face_info.faces[f].cells_interior[v],
-                                       n_macro_cells_before *
-                                         VectorizedArrayType::n_array_elements);
-                      if (di.index_storage_variants
-                              [internal::MatrixFreeFunctions::DoFInfo::
-                                 dof_access_face_exterior][f] >=
-                            internal::MatrixFreeFunctions::DoFInfo::
-                              IndexStorageVariants::contiguous &&
-                          di.dof_indices_contiguous
-                              [internal::MatrixFreeFunctions::DoFInfo::
-                                 dof_access_cell]
-                              [face_info.faces[f].cells_exterior[v]] >=
-                            part.local_size())
-                        {
-                          const unsigned int p =
-                            face_info.faces[f].cells_exterior[v];
-                          const unsigned int stride =
-                            di.dof_indices_interleave_strides[2][p];
-                          unsigned int i = 0;
-                          for (unsigned int e = 0; e < di.n_base_elements; ++e)
-                            for (unsigned int c = 0; c < di.n_components[e];
-                                 ++c)
-                              {
-                                const internal::MatrixFreeFunctions::ShapeInfo<
-                                  VectorizedArrayType> &shape =
-                                  shape_info(di.global_base_element_offset + e,
-                                             0,
-                                             0,
-                                             0);
-                                for (unsigned int j = 0;
-                                     j < shape.dofs_per_component_on_face;
-                                     ++j)
-                                  ghost_indices.push_back(part.local_to_global(
-                                    di.dof_indices_contiguous
-                                      [internal::MatrixFreeFunctions::DoFInfo::
-                                         dof_access_cell][p] +
-                                    i +
-                                    shape.face_to_cell_index_nodal(
-                                      face_info.faces[f].exterior_face_no, j) *
-                                      stride));
-                                i += shape.dofs_per_component_on_cell * stride;
-                              }
-                          AssertDimension(i, di.dofs_per_cell[0] * stride);
-                        }
-                      else if (di.index_storage_variants
-                                 [internal::MatrixFreeFunctions::DoFInfo::
-                                    dof_access_face_exterior][f] <
-                               internal::MatrixFreeFunctions::DoFInfo::
-                                 IndexStorageVariants::contiguous)
-                        has_noncontiguous_cell = true;
-                    }
-                has_noncontiguous_cell =
-                  Utilities::MPI::min<int>(has_noncontiguous_cell,
-                                           task_info.communicator) != 0;
+                      unsigned int f =
+                        this->face_info.cell_and_face_to_plain_faces(c, d, v);
+                      if (f == numbers::invalid_unsigned_int)
+                        continue;
 
-                std::sort(ghost_indices.begin(), ghost_indices.end());
-                ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                                ghost_indices.end()),
-                                    ghost_indices.end());
-                IndexSet compressed_set(part.size());
-                compressed_set.add_indices(ghost_indices.begin(),
-                                           ghost_indices.end());
-                compressed_set.subtract_set(
-                  di.vector_partitioner->locally_owned_range());
-                const bool all_ghosts_equal =
-                  Utilities::MPI::min<int>(
-                    compressed_set.n_elements() ==
-                      di.vector_partitioner->ghost_indices().n_elements(),
-                    di.vector_partitioner->get_mpi_communicator()) != 0;
-                if (all_ghosts_equal || has_noncontiguous_cell)
-                  di.vector_partitioner_face_variants[1] =
-                    di.vector_partitioner;
-                else
-                  {
-                    di.vector_partitioner_face_variants[1].reset(
-                      new Utilities::MPI::Partitioner(
-                        part.locally_owned_range(),
-                        part.get_mpi_communicator()));
-                    const_cast<Utilities::MPI::Partitioner *>(
-                      di.vector_partitioner_face_variants[1].get())
-                      ->set_ghost_indices(compressed_set, part.ghost_indices());
-                  }
-              }
-          }
+                      const unsigned int v_len =
+                        VectorizedArrayType::n_array_elements;
+                      const unsigned int cell_this = c * v_len + v;
+
+                      const unsigned int cell_m = this->get_face_info(f / v_len)
+                                                    .cells_interior[f % v_len];
+                      const unsigned int cell_p = this->get_face_info(f / v_len)
+                                                    .cells_exterior[f % v_len];
+
+                      const bool ext = cell_this == cell_m;
+
+                      if (ext && cell_p == numbers::invalid_unsigned_int)
+                        continue;
+
+                      const unsigned int p = ext ? cell_p : cell_m;
+                      const unsigned int face_no =
+                        ext ? face_info.faces[f / v_len].exterior_face_no :
+                              face_info.faces[f / v_len].interior_face_no;
+
+                      fu(p, face_no, f / v_len, v, ext, true);
+                    }
+            };
+
+          const auto process_values =
+            [&](std::shared_ptr<const Utilities::MPI::Partitioner>
+                  &vector_partitioner_values,
+                const std::function<void(
+                  const std::function<void(const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const bool,
+                                           const bool)> &)> &loop) {
+              bool all_nodal = true;
+              for (unsigned int c = 0; c < di.n_base_elements; ++c)
+                if (!shape_info(di.global_base_element_offset + c, 0, 0, 0)
+                       .nodal_at_cell_boundaries)
+                  all_nodal = false;
+              if (all_nodal == false)
+                vector_partitioner_values = di.vector_partitioner;
+              else
+                {
+                  bool has_noncontiguous_cell = false;
+
+                  loop([&](const unsigned int p,
+                           const unsigned int face_no,
+                           const unsigned int f,
+                           const unsigned int /*v*/,
+                           const bool ext,
+                           const bool flag) {
+                    if (flag ||
+                        (di.index_storage_variants
+                             [ext ? internal::MatrixFreeFunctions::DoFInfo::
+                                      dof_access_face_exterior :
+                                    internal::MatrixFreeFunctions::DoFInfo::
+                                      dof_access_face_interior][f] >=
+                           internal::MatrixFreeFunctions::DoFInfo::
+                             IndexStorageVariants::contiguous &&
+                         di.dof_indices_contiguous
+                             [internal::MatrixFreeFunctions::DoFInfo::
+                                dof_access_cell][p] >= part.local_size()))
+                      {
+                        const unsigned int stride =
+                          di.dof_indices_interleave_strides[2][p];
+                        unsigned int i = 0;
+                        for (unsigned int e = 0; e < di.n_base_elements; ++e)
+                          for (unsigned int c = 0; c < di.n_components[e]; ++c)
+                            {
+                              const internal::MatrixFreeFunctions::ShapeInfo<
+                                VectorizedArrayType> &shape =
+                                shape_info(di.global_base_element_offset + e,
+                                           0,
+                                           0,
+                                           0);
+                              for (unsigned int j = 0;
+                                   j < shape.dofs_per_component_on_face;
+                                   ++j)
+                                ghost_indices.push_back(part.local_to_global(
+                                  di.dof_indices_contiguous
+                                    [internal::MatrixFreeFunctions::DoFInfo::
+                                       dof_access_cell][p] +
+                                  i +
+                                  shape.face_to_cell_index_nodal(face_no, j) *
+                                    stride));
+                              i += shape.dofs_per_component_on_cell * stride;
+                            }
+                        AssertDimension(i, di.dofs_per_cell[0] * stride);
+                      }
+                    else if (di.index_storage_variants
+                               [ext ? internal::MatrixFreeFunctions::DoFInfo::
+                                        dof_access_face_exterior :
+                                      internal::MatrixFreeFunctions::DoFInfo::
+                                        dof_access_face_interior][f] <
+                             internal::MatrixFreeFunctions::DoFInfo::
+                               IndexStorageVariants::contiguous)
+                      has_noncontiguous_cell = true;
+                  });
+                  has_noncontiguous_cell =
+                    Utilities::MPI::min<int>(has_noncontiguous_cell,
+                                             task_info.communicator) != 0;
+
+                  std::sort(ghost_indices.begin(), ghost_indices.end());
+                  ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                                  ghost_indices.end()),
+                                      ghost_indices.end());
+                  IndexSet compressed_set(part.size());
+                  compressed_set.add_indices(ghost_indices.begin(),
+                                             ghost_indices.end());
+                  compressed_set.subtract_set(
+                    di.vector_partitioner->locally_owned_range());
+                  const bool all_ghosts_equal =
+                    Utilities::MPI::min<int>(
+                      compressed_set.n_elements() ==
+                        di.vector_partitioner->ghost_indices().n_elements(),
+                      di.vector_partitioner->get_mpi_communicator()) != 0;
+                  if (all_ghosts_equal || has_noncontiguous_cell)
+                    vector_partitioner_values = di.vector_partitioner;
+                  else
+                    {
+                      vector_partitioner_values.reset(
+                        new Utilities::MPI::Partitioner(
+                          part.locally_owned_range(),
+                          part.get_mpi_communicator()));
+                      const_cast<Utilities::MPI::Partitioner *>(
+                        vector_partitioner_values.get())
+                        ->set_ghost_indices(compressed_set,
+                                            part.ghost_indices());
+                    }
+                }
+            };
+
+
+          const auto process_gradients =
+            [&](const std::shared_ptr<const Utilities::MPI::Partitioner>
+                  &vector_partitoner_values,
+                std::shared_ptr<const Utilities::MPI::Partitioner>
+                  &vector_partitioner_gradients,
+                const std::function<void(
+                  const std::function<void(const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const bool,
+                                           const bool)> &)> &loop) {
+              bool all_hermite = true;
+              for (unsigned int c = 0; c < di.n_base_elements; ++c)
+                if (shape_info(di.global_base_element_offset + c, 0, 0, 0)
+                      .element_type !=
+                    internal::MatrixFreeFunctions::tensor_symmetric_hermite)
+                  all_hermite = false;
+              if (all_hermite == false ||
+                  vector_partitoner_values.get() == di.vector_partitioner.get())
+                vector_partitioner_gradients = di.vector_partitioner;
+              else
+                {
+                  loop([&](const unsigned int p,
+                           const unsigned int face_no,
+                           const unsigned int f,
+                           const unsigned int v,
+                           const bool         ext,
+                           const bool         flag) {
+                    AssertIndexRange(face_info.faces[f].cells_interior[v],
+                                     n_macro_cells_before *
+                                       VectorizedArrayType::n_array_elements);
+                    if (flag ||
+                        (di.index_storage_variants
+                             [ext ? internal::MatrixFreeFunctions::DoFInfo::
+                                      dof_access_face_exterior :
+                                    internal::MatrixFreeFunctions::DoFInfo::
+                                      dof_access_face_interior][f] >=
+                           internal::MatrixFreeFunctions::DoFInfo::
+                             IndexStorageVariants::contiguous &&
+                         di.dof_indices_contiguous
+                             [internal::MatrixFreeFunctions::DoFInfo::
+                                dof_access_cell][p] >= part.local_size()))
+                      {
+                        const unsigned int stride =
+                          di.dof_indices_interleave_strides[2][p];
+                        unsigned int i = 0;
+                        for (unsigned int e = 0; e < di.n_base_elements; ++e)
+                          for (unsigned int c = 0; c < di.n_components[e]; ++c)
+                            {
+                              const internal::MatrixFreeFunctions::ShapeInfo<
+                                VectorizedArrayType> &shape =
+                                shape_info(di.global_base_element_offset + e,
+                                           0,
+                                           0,
+                                           0);
+                              for (unsigned int j = 0;
+                                   j < 2 * shape.dofs_per_component_on_face;
+                                   ++j)
+                                ghost_indices.push_back(part.local_to_global(
+                                  di.dof_indices_contiguous
+                                    [internal::MatrixFreeFunctions::DoFInfo::
+                                       dof_access_cell][p] +
+                                  i +
+                                  shape.face_to_cell_index_hermite(face_no, j) *
+                                    stride));
+                              i += shape.dofs_per_component_on_cell * stride;
+                            }
+                        AssertDimension(i, di.dofs_per_cell[0] * stride);
+                      }
+                  });
+                  std::sort(ghost_indices.begin(), ghost_indices.end());
+                  ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                                  ghost_indices.end()),
+                                      ghost_indices.end());
+                  IndexSet compressed_set(part.size());
+                  compressed_set.add_indices(ghost_indices.begin(),
+                                             ghost_indices.end());
+                  compressed_set.subtract_set(
+                    di.vector_partitioner->locally_owned_range());
+                  const bool all_ghosts_equal =
+                    Utilities::MPI::min<int>(
+                      compressed_set.n_elements() ==
+                        di.vector_partitioner->ghost_indices().n_elements(),
+                      di.vector_partitioner->get_mpi_communicator()) != 0;
+                  if (all_ghosts_equal)
+                    vector_partitioner_gradients = di.vector_partitioner;
+                  else
+                    {
+                      vector_partitioner_gradients.reset(
+                        new Utilities::MPI::Partitioner(
+                          part.locally_owned_range(),
+                          part.get_mpi_communicator()));
+                      const_cast<Utilities::MPI::Partitioner *>(
+                        vector_partitioner_gradients.get())
+                        ->set_ghost_indices(compressed_set,
+                                            part.ghost_indices());
+                    }
+                }
+            };
+
+          // partitioner 1: values on faces
+          process_values(di.vector_partitioner_face_variants[1],
+                         loop_over_faces);
 
           // partitioner 2: values and gradients on faces
-          {
-            bool all_hermite = true;
-            for (unsigned int c = 0; c < di.n_base_elements; ++c)
-              if (shape_info(di.global_base_element_offset + c, 0, 0, 0)
-                    .element_type !=
-                  internal::MatrixFreeFunctions::tensor_symmetric_hermite)
-                all_hermite = false;
-            if (all_hermite == false ||
-                di.vector_partitioner_face_variants[1].get() ==
-                  di.vector_partitioner.get())
-              di.vector_partitioner_face_variants[2] = di.vector_partitioner;
-            else
-              {
-                for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
-                  for (unsigned int v = 0;
-                       v < VectorizedArrayType::n_array_elements &&
-                       face_info.faces[f].cells_interior[v] !=
-                         numbers::invalid_unsigned_int;
-                       ++v)
-                    {
-                      AssertIndexRange(face_info.faces[f].cells_interior[v],
-                                       n_macro_cells_before *
-                                         VectorizedArrayType::n_array_elements);
-                      if (di.index_storage_variants
-                              [internal::MatrixFreeFunctions::DoFInfo::
-                                 dof_access_face_exterior][f] >=
-                            internal::MatrixFreeFunctions::DoFInfo::
-                              IndexStorageVariants::contiguous &&
-                          di.dof_indices_contiguous
-                              [internal::MatrixFreeFunctions::DoFInfo::
-                                 dof_access_cell]
-                              [face_info.faces[f].cells_exterior[v]] >=
-                            part.local_size())
-                        {
-                          const unsigned int p =
-                            face_info.faces[f].cells_exterior[v];
-                          const unsigned int stride =
-                            di.dof_indices_interleave_strides[2][p];
-                          unsigned int i = 0;
-                          for (unsigned int e = 0; e < di.n_base_elements; ++e)
-                            for (unsigned int c = 0; c < di.n_components[e];
-                                 ++c)
-                              {
-                                const internal::MatrixFreeFunctions::ShapeInfo<
-                                  VectorizedArrayType> &shape =
-                                  shape_info(di.global_base_element_offset + e,
-                                             0,
-                                             0,
-                                             0);
-                                for (unsigned int j = 0;
-                                     j < 2 * shape.dofs_per_component_on_face;
-                                     ++j)
-                                  ghost_indices.push_back(part.local_to_global(
-                                    di.dof_indices_contiguous
-                                      [internal::MatrixFreeFunctions::DoFInfo::
-                                         dof_access_cell][p] +
-                                    i +
-                                    shape.face_to_cell_index_hermite(
-                                      face_info.faces[f].exterior_face_no, j) *
-                                      stride));
-                                i += shape.dofs_per_component_on_cell * stride;
-                              }
-                          AssertDimension(i, di.dofs_per_cell[0] * stride);
-                        }
-                    }
-                std::sort(ghost_indices.begin(), ghost_indices.end());
-                ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                                ghost_indices.end()),
-                                    ghost_indices.end());
-                IndexSet compressed_set(part.size());
-                compressed_set.add_indices(ghost_indices.begin(),
-                                           ghost_indices.end());
-                compressed_set.subtract_set(
-                  di.vector_partitioner->locally_owned_range());
-                const bool all_ghosts_equal =
-                  Utilities::MPI::min<int>(
-                    compressed_set.n_elements() ==
-                      di.vector_partitioner->ghost_indices().n_elements(),
-                    di.vector_partitioner->get_mpi_communicator()) != 0;
-                if (all_ghosts_equal)
-                  di.vector_partitioner_face_variants[2] =
-                    di.vector_partitioner;
-                else
-                  {
-                    di.vector_partitioner_face_variants[2].reset(
-                      new Utilities::MPI::Partitioner(
-                        part.locally_owned_range(),
-                        part.get_mpi_communicator()));
-                    const_cast<Utilities::MPI::Partitioner *>(
-                      di.vector_partitioner_face_variants[2].get())
-                      ->set_ghost_indices(compressed_set, part.ghost_indices());
-                  }
-              }
-          }
+          process_gradients(di.vector_partitioner_face_variants[1],
+                            di.vector_partitioner_face_variants[2],
+                            loop_over_faces);
+
+
+          if (additional_data.hold_all_faces_to_owned_cells)
+            {
+              ghost_indices.clear();
+              // partitioner 3: values on all faces
+              process_values(di.vector_partitioner_face_variants[3],
+                             loop_over_all_faces);
+              // partitioner 4: values and gradients on faces
+              process_gradients(di.vector_partitioner_face_variants[3],
+                                di.vector_partitioner_face_variants[4],
+                                loop_over_all_faces);
+            }
         }
     }
 

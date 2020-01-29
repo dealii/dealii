@@ -726,6 +726,16 @@ public:
     values,
 
     /**
+     * Same as above. To be used if data has to be accessed from exterior faces
+     * if FEFaceEvaluation was reinitialized by providing the cell batch number
+     * and a face number. This configuration is useful in the context of
+     * cell-centric loops.
+     *
+     * @pre AdditionalData::hold_all_faces_to_owned_cells has to enabled.
+     */
+    values_all_faces,
+
+    /**
      * The loop does involve FEFaceEvaluation access into neighbors by
      * function values and gradients, but no second derivatives, such as
      * `FEFaceEvaluation::gather_evaluate(src, true, true)`. For
@@ -736,6 +746,16 @@ public:
      * property, the full neighboring data is sent anyway.
      */
     gradients,
+
+    /**
+     * Same as above. To be used if data has to be accessed from exterior faces
+     * if FEFaceEvaluation was reinitialized by providing the cell batch number
+     * and a face number. This configuration is useful in the context of
+     * cell-centric loops.
+     *
+     * @pre AdditionalData::hold_all_faces_to_owned_cells has to enabled.
+     */
+    gradients_all_faces,
 
     /**
      * General setup where the user does not want to make a restriction. This
@@ -2965,7 +2985,7 @@ namespace internal
         for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
           AssertDimension(
             matrix_free.get_dof_info(c).vector_partitioner_face_variants.size(),
-            3);
+            5);
     }
 
 
@@ -3022,7 +3042,7 @@ namespace internal
     {
       AssertDimension(matrix_free.get_dof_info(mf_component)
                         .vector_partitioner_face_variants.size(),
-                      3);
+                      5);
       if (vector_face_access ==
           dealii::MatrixFree<dim, Number, VectorizedArrayType>::
             DataAccessOnFaces::none)
@@ -3033,9 +3053,21 @@ namespace internal
                  DataAccessOnFaces::values)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[1];
-      else
+      else if (vector_face_access ==
+               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                 DataAccessOnFaces::gradients)
         return *matrix_free.get_dof_info(mf_component)
                   .vector_partitioner_face_variants[2];
+      else if (vector_face_access ==
+               dealii::MatrixFree<dim, Number, VectorizedArrayType>::
+                 DataAccessOnFaces::values_all_faces)
+        return *matrix_free.get_dof_info(mf_component)
+                  .vector_partitioner_face_variants[3];
+      else /*if (vector_face_access ==
+               dealii::MatrixFree<dim,
+              Number>::DataAccessOnFaces::gradients_all_faces)*/
+        return *matrix_free.get_dof_info(mf_component)
+                  .vector_partitioner_face_variants[4];
     }
 
 
