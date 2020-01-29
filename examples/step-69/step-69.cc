@@ -1879,8 +1879,8 @@ namespace Step69
     // computing the $d_{ii}$'s we also record the largest admissible 
     // time-step, which is defined as
     //
-    // $\tau_n := c_{\text{cfl}}\,\min_{
-    // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right)$ .
+    // \f[ \tau_n := c_{\text{cfl}}\,\min_{
+    // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right)\f] .
     //
     // Note that the operation $\min_{i \in \mathcal{V}}$ is intrinsically
     // global, it operates on all nodes: first we would have to first take the
@@ -1956,10 +1956,10 @@ namespace Step69
     // strictly speaking, a consequence of the size of the viscosity
     // coefficients). So we compute the update as:
     //
-    // $\mathbf{U}_i^{n+1} = \mathbf{U}_i^{n} - \frac{\tau_{\text{max}} }{m_i}
+    // \f[\mathbf{U}_i^{n+1} = \mathbf{U}_i^{n} - \frac{\tau_{\text{max}} }{m_i}
     //  \sum_{j \in \mathcal{I}(i)} (\mathbb{f}(\mathbf{U}_j^{n}) -
     //  \mathbb{f}(\mathbf{U}_i^{n})) \cdot \mathbf{c}_{ij} - d_{ij}
-    //  (\mathbf{U}_j^{n} - \mathbf{U}_i^{n})$
+    //  (\mathbf{U}_j^{n} - \mathbf{U}_i^{n})\f]
     //
     // This update formula is different from that one used in the
     // pseudo-code. However, it can be shown that it is algebraically
@@ -2155,8 +2155,69 @@ namespace Step69
     schlieren.reinit(partitioner);
   }
 
-  // Now <code>compute_schlieren(const vector_type &U)</code> takes a
-  // component of <code>U</code> and computes the Schlieren indicator.
+  // We now discuss the implementation of the class member 
+  // <code>SchlierenPostprocessor<dim>::compute_schlieren</code>, which 
+  // basically takes a component of the state vector <code>U</code> and 
+  // computes the Schlieren indicator for such component. We start by noting 
+  // that the formula for the Schlieren indicator
+  // requires the "nodal gradients" $\nabla r_j$. However, nodal values of 
+  // gradients are not defined for $\mathcal{C}^0$ finite
+  // element functions. More generally, pointwise values of gradients
+  // are not defined for $W^{1,p}(\Omega)$ functions (though weak 
+  // derivatives are). The simplest technique we can use to recover gradients 
+  // at nodes is weighted-averaging i.e.
+  //
+  // \f[ \nabla r_j := \frac{1}{\int_{S_i} \omega_i(\mathbf{x}) \, 
+  // \mathrm{d}\mathbf{x}}
+  //  \int_{S_i} r_h(\mathbf{x}) \omega_i(\mathbf{x}) \, \mathrm{d}\mathbf{x}
+  // \ \ \ \ \ \mathbf{(*)} \f]
+  //
+  // where $S_i$ is the support of the shape function $\phi_i$, and 
+  // $\omega_i(\mathbf{x})$ is the weight. The weight could be any 
+  // positive function such as 
+  // $\omega_i(\mathbf{x}) \equiv 1$ (that would allow us to recover the usual 
+  // notion of mean value). But as usual, the goal is to reuse the off-line 
+  // data as much as it could be possible. In sense this, the most natural  
+  // choice of weight is $\omega_i = \phi_i$. Inserting this choice of 
+  // weight and the expansion $r_h(\mathbf{x}) = \sum_{j \in \mathcal{V}} 
+  // r_j \phi_j(\mathbf{x})$ into $\mathbf{(*)}$ we get :
+  //
+  // \f[ \nabla r_j := \frac{1}{m_i} \sum_{j \in \mathcal{I}(i)} r_j
+  //  \mathbf{c}_{ij} \ \ \ \ \ \mathbf{(**)} \, . \f] 
+  //
+  // Using this last formula we can recover averaged nodal gradients without
+  // resorting to any form of quadrature. This idea aligns quite well with
+  // the whole spirit of edge-based schemes (or algebraic schemes) where
+  // we want to operate as directly/intimately on matrices and vectors as
+  // it could be possible avoiding by all means assembly of bilinear
+  // forms, cell-loops, quadrature, or any other
+  // intermediate construct/operation between the input arguments (the state
+  // from the previous time-step) and the actual matrices and vectors
+  // required to compute the update.
+  //
+  // The second thing to note is that we have to compute global minimum and
+  // maximums $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
+  // same ideas used to compute the time step size in the class member
+  // <code>TimeStep<dim>::step</code> : we define $\max_j |\nabla r_j|$ and
+  // $\min_j |\nabla r_j|$ as atomic doubles in order to
+  // resolve any conflicts between threads. As usual, we use
+  // <code>Utilities::MPI::max</code> and <code>Utilities::MPI::min</code> to
+  // find the global maximum/minimum among all MPI processes.
+  //
+  // Finally, it is not possible to compute the Schlieren indicator in a single
+  // loop over all nodes. The entire operation requires two loops over nodes:
+  //
+  // - The first loop computes $|\nabla r_i|$ for all $i \in \mathcal{V}$ in
+  //   the mesh, and the bounds $\max_j |\nabla r_j|$ and
+  //   $\min_j |\nabla r_j|$.
+  // - Second loop finally computes the Schlieren indicator using the formula
+  //
+  // \f[ \text{schlieren}[i] = e^{\beta \frac{ |\nabla r_i|
+  // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } }
+  // \, . \f]
+  //
+  // This means that we will have to define two workers
+  // <code>on_subranges</code> for each one of these stages.
 
   template <int dim>
   void SchlierenPostprocessor<dim>::compute_schlieren(const vector_type &U)
@@ -2172,9 +2233,13 @@ namespace Step69
     const auto &n_locally_owned = offline_data->n_locally_owned;
     const auto  indices = boost::irange<unsigned int>(0, n_locally_owned);
 
+    /* We define the r_i_max and r_i_min in the current MPI process as
+       atomic doubles in order to resolve conflicts among threads. */
     std::atomic<double> r_i_max{0.};
     std::atomic<double> r_i_min{std::numeric_limits<double>::infinity()};
 
+    /* Implementation of the worker that computes the averaged gradient at each
+       node and the global max and mins of such gradients */
     {
       const auto on_subranges = [&](auto i1, const auto i2) {
         double r_i_max_on_subrange = 0.;
@@ -2188,13 +2253,18 @@ namespace Step69
 
             Tensor<1, dim> r_i;
 
+            /* This is the loop on the columns */
+            /* We compute the numerator of expression (**) */
             for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
               {
                 const auto j = jt->column();
 
                 if (i == j)
                   continue;
-
+ 
+                /* Usual practice is that schlieren_index = 0 (density of the 
+                  system). In this tutorial step schlieren_index is set by the 
+                  constructor. */
                 const auto U_js = U[schlieren_index].local_element(j);
                 const auto c_ij = gather_get_entry(cij_matrix, jt);
 
@@ -2213,6 +2283,10 @@ namespace Step69
                   r_i = 0.;
               }
 
+            /* Here we remind the reader that we are not interested in the 
+               nodal gradients per se. We want their norms in order to 
+               compute the Schlieren indicator. Finally, we have to 
+               divide r[i] by m_i. */
             const double m_i = lumped_mass_matrix.diag_element(i);
             r[i]             = r_i.norm() / m_i;
 
@@ -2220,6 +2294,9 @@ namespace Step69
             r_i_min_on_subrange = std::min(r_i_min_on_subrange, r[i]);
           }
 
+        /* We compare the current_r_i_max and current_r_i_min (in the current 
+           subrange) with r_i_max and r_i_min (for the current MPI process) 
+           and update them if necessary */
         double current_r_i_max = r_i_max.load();
         while (
           current_r_i_max < r_i_max_on_subrange &&
@@ -2242,6 +2319,10 @@ namespace Step69
     r_i_max.store(Utilities::MPI::max(r_i_max.load(), mpi_communicator));
     r_i_min.store(Utilities::MPI::min(r_i_min.load(), mpi_communicator));
 
+    /* So far we have computed the vector r_i and the scalars r_i_max and
+       r_i_min. Now we are in position of actually computing the Schlieren
+       indicator, so we define the worker for this task */
+
     {
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (; i1 < i2; ++i1)
@@ -2250,6 +2331,8 @@ namespace Step69
 
             Assert(i < n_locally_owned, ExcInternalError());
 
+            /* It's just the Schlieren formula */
+            /* There is no loop on columns for this case, we don't need it */
             schlieren.local_element(i) =
               1. - std::exp(-schlieren_beta * (r[i] - r_i_min) /
                             (r_i_max - r_i_min));
