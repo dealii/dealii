@@ -334,8 +334,8 @@ where
 \\
 &
  -\sum_{e \in \mathbb{F}} \int_{e}
-  \jump{ \frac{\partial^2 v_h}{\partial \mathbf n^2}}
-  \average{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+  \jump{ \frac{\partial^2 u_h}{\partial \mathbf n^2}}
+  \average{\frac{\partial v_h}{\partial \mathbf n}} \ ds
  -\sum_{e \in \mathbb{F}} \int_{e}
  \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
  \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
