@@ -825,6 +825,27 @@ ParameterHandler::leave_subsection()
 
 
 
+bool
+ParameterHandler::subsection_path_exists(
+  const std::vector<std::string> &sub_path) const
+{
+  // Get full path to sub_path (i.e. prepend subsection_path to sub_path).
+  std::vector<std::string> full_path(subsection_path);
+  full_path.insert(full_path.end(), sub_path.begin(), sub_path.end());
+
+  boost::optional<const boost::property_tree::ptree &> subsection(
+    entries->get_child_optional(
+      collate_path_string(path_separator, full_path)));
+
+  // If subsection is boost::null (i.e. it does not exist)
+  // or it exists as a parameter/alias node, return false.
+  // Otherwise (i.e. it exists as a subsection node), return true.
+  return !(!subsection || is_parameter_node(subsection.get()) ||
+           is_alias_node(subsection.get()));
+}
+
+
+
 std::string
 ParameterHandler::get(const std::string &entry_string) const
 {

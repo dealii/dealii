@@ -1,0 +1,32 @@
+
+# Listing of Parameters
+# ---------------------
+subsection Section 1
+  # docs 1
+  set string list = a
+  set int         = 1
+
+  # docs 3
+  set double      = 3.1415926
+end
+
+
+subsection Section 2
+  set int    = 1
+  # docs 3
+  set double = 3.1415926
+
+
+  subsection string list
+    # docs 1
+    set string list = a
+  end
+
+end
+
+
+DEAL::Subsection "Section 3" of root exists: false
+DEAL::Subsection "Section 1.string list" of root exists: false
+DEAL::Subsection "Section 2.string list" of root exists: true
+DEAL::Subsection "string list" of "Section 2" exists: true
+DEAL::Subsection "Section 2.string list" still exists after coming back to root: true
