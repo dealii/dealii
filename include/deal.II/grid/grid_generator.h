@@ -1126,7 +1126,9 @@ namespace GridGenerator
    *
    * If colorize is set to <code>true</code>, the inner, outer, and the part
    * of the boundary where $x=0$, get indicator 0, 1, and 2,
-   * respectively. Otherwise all indicators are set to 0 (see
+   * respectively. Additionally, in 2d, the boundary indicator 3 is given to
+   * the vertical edge below the x-axis. Otherwise, if colorize is set to
+   * <code>false</code> all indicators are set to 0 (see
    * @ref GlossColorization "the glossary entry on colorization").
    *
    * All manifold ids are set to zero, and a SphericalManifold is attached
