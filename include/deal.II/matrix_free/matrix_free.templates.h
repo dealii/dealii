@@ -1794,6 +1794,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                            const unsigned int v,
                            const bool         ext,
                            const bool         flag) {
+                    (void)v;
                     Assert(
                       face_info.faces[f].cells_interior[v] <
                         n_macro_cells_before *
