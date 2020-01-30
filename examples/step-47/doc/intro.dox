@@ -349,6 +349,9 @@ where
 and
 @f{align*}{
 \mathcal{F}(v_h)&:=\sum_{K \in \mathbb{T}}\int_{K} v_h f \ dx
+-
+\sum_{e \in \mathbb{F}, e\subset\partial\Omega}
+\int_e \frac{\partial^2 v_h}{\partial \mathbf n^2}} j \ ds
 +
 \sum_{e \in \mathbb{F}, e\subset\partial\Omega}
 \frac{\gamma}{h_e}
