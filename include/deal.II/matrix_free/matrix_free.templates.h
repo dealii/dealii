@@ -1794,9 +1794,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                            const unsigned int v,
                            const bool         ext,
                            const bool         flag) {
-                    AssertIndexRange(face_info.faces[f].cells_interior[v],
-                                     n_macro_cells_before *
-                                       VectorizedArrayType::n_array_elements);
+                    Assert(
+                      face_info.faces[f].cells_interior[v] <
+                        n_macro_cells_before *
+                          VectorizedArrayType::n_array_elements,
+                      ExcIndexRange(face_info.faces[f].cells_interior[v],
+                                    0,
+                                    n_macro_cells_before *
+                                      VectorizedArrayType::n_array_elements));
                     if (flag ||
                         (di.index_storage_variants
                              [ext ? internal::MatrixFreeFunctions::DoFInfo::
