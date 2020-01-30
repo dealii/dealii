@@ -143,14 +143,18 @@ PolynomialsAdini<dim>::evaluate(
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   const unsigned int n_pols = this->n();
+  (void)n_pols;
+
   Assert(values.size() == n_pols || values.size() == 0,
          ExcDimensionMismatch(values.size(), n_pols));
   Assert(grads.size() == n_pols || grads.size() == 0,
          ExcDimensionMismatch(grads.size(), n_pols));
   Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
+  (void)third_derivatives;
   Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
          ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  (void)fourth_derivatives;
   Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
