@@ -544,15 +544,46 @@ namespace
     const std::string &                current_path,
     const char                         path_separator,
     const std::vector<std::unique_ptr<const Patterns::PatternBase>> &patterns,
-    ParameterHandler &                                               prm)
+    const bool        skip_undefined,
+    ParameterHandler &prm)
   {
     for (const auto &p : source)
       {
         // a sub-tree must either be a parameter node or a subsection
-        if (p.second.get_optional<std::string>("value"))
+        if (p.second.empty())
           {
             // set the found parameter in the destination argument
-            prm.set(demangle(p.first), p.second.get<std::string>("value"));
+            if (skip_undefined)
+              {
+                try
+                  {
+                    prm.set(demangle(p.first), p.second.data());
+                  }
+                catch (const ParameterHandler::ExcEntryUndeclared &)
+                  {
+                    // ignore undeclared entry assert
+                  }
+              }
+            else
+              prm.set(demangle(p.first), p.second.data());
+          }
+        else if (p.second.get_optional<std::string>("value"))
+          {
+            // set the found parameter in the destination argument
+            if (skip_undefined)
+              {
+                try
+                  {
+                    prm.set(demangle(p.first),
+                            p.second.get<std::string>("value"));
+                  }
+                catch (const ParameterHandler::ExcEntryUndeclared &)
+                  {
+                    // ignore undeclared entry assert
+                  }
+              }
+            else
+              prm.set(demangle(p.first), p.second.get<std::string>("value"));
 
             // this node might have sub-nodes in addition to "value", such as
             // "default_value", "documentation", etc. we might at some point
@@ -575,6 +606,7 @@ namespace
                                     current_path + path_separator + p.first),
                                  path_separator,
                                  patterns,
+                                 skip_undefined,
                                  prm);
             prm.leave_subsection();
           }
@@ -585,7 +617,8 @@ namespace
 
 
 void
-ParameterHandler::parse_input_from_xml(std::istream &in)
+ParameterHandler::parse_input_from_xml(std::istream &in,
+                                       const bool    skip_undefined)
 {
   AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
@@ -634,12 +667,14 @@ ParameterHandler::parse_input_from_xml(std::istream &in)
   const boost::property_tree::ptree &my_entries =
     single_node_tree.get_child("ParameterHandler");
 
-  read_xml_recursively(my_entries, "", path_separator, patterns, *this);
+  read_xml_recursively(
+    my_entries, "", path_separator, patterns, skip_undefined, *this);
 }
 
 
 void
-ParameterHandler::parse_input_from_json(std::istream &in)
+ParameterHandler::parse_input_from_json(std::istream &in,
+                                        const bool    skip_undefined)
 {
   AssertThrow(in, ExcIO());
 
@@ -650,7 +685,8 @@ ParameterHandler::parse_input_from_json(std::istream &in)
 
   // The xml function is reused to read in the xml into the parameter file.
   // This means that only mangled files can be read.
-  read_xml_recursively(node_tree, "", path_separator, patterns, *this);
+  read_xml_recursively(
+    node_tree, "", path_separator, patterns, skip_undefined, *this);
 }
 
 
