@@ -1795,6 +1795,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                            const bool         ext,
                            const bool         flag) {
                     (void)v;
+                    // The following statement could be simplified
+                    // using AssertIndexRange, but that leads to an
+                    // internal compiler error with GCC 7.4. Do things
+                    // by hand instead.
                     Assert(
                       face_info.faces[f].cells_interior[v] <
                         n_macro_cells_before *
