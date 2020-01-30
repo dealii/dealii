@@ -1,0 +1,47 @@
+
+DEAL:0:2d/2d::dim: 2, spacedim: 2
+DEAL:0:2d/2d::Total number of particles: 2
+DEAL:0:2d/2d::Space FE: FESystem<2>[FE_Q<2>(1)^3]
+DEAL:0:2d/2d::Space dofs: 75
+17 0
+26 0
+32 0
+41 0
+DEAL:0:2d/3d::dim: 2, spacedim: 3
+DEAL:0:2d/3d::Total number of particles: 2
+DEAL:0:2d/3d::Space FE: FESystem<2,3>[FE_Q<2,3>(1)^3]
+DEAL:0:2d/3d::Space dofs: 75
+17 0
+26 0
+32 0
+41 0
+DEAL:0:3d/3d::dim: 3, spacedim: 3
+DEAL:0:3d/3d::Total number of particles: 2
+DEAL:0:3d/3d::Space FE: FESystem<3>[FE_Q<3>(1)^3]
+DEAL:0:3d/3d::Space dofs: 375
+107 0
+110 0
+113 0
+116 0
+191 0
+194 0
+197 0
+200 0
+
+23 -1
+26 -1
+50 -1
+53 -1
+23 -1
+26 -1
+50 -1
+53 -1
+236 -1
+242 -1
+248 -1
+251 -1
+263 -1
+269 -1
+275 -1
+278 -1
+
