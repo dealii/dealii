@@ -1,0 +1,27 @@
+
+DEAL::half_hyper_shell<2>:: cell 0, face 0, id 3
+DEAL::half_hyper_shell<2>:: cell 0, face 2, id 1
+DEAL::half_hyper_shell<2>:: cell 0, face 3, id 0
+DEAL::half_hyper_shell<2>:: cell 1, face 2, id 1
+DEAL::half_hyper_shell<2>:: cell 1, face 3, id 0
+DEAL::half_hyper_shell<2>:: cell 2, face 2, id 1
+DEAL::half_hyper_shell<2>:: cell 2, face 3, id 0
+DEAL::half_hyper_shell<2>:: cell 3, face 2, id 1
+DEAL::half_hyper_shell<2>:: cell 3, face 3, id 0
+DEAL::half_hyper_shell<2>:: cell 4, face 1, id 2
+DEAL::half_hyper_shell<2>:: cell 4, face 2, id 1
+DEAL::half_hyper_shell<2>:: cell 4, face 3, id 0
+DEAL::half_hyper_shell<3>:: cell 0, face 2, id 2
+DEAL::half_hyper_shell<3>:: cell 0, face 4, id 0
+DEAL::half_hyper_shell<3>:: cell 0, face 5, id 0
+DEAL::half_hyper_shell<3>:: cell 1, face 0, id 0
+DEAL::half_hyper_shell<3>:: cell 1, face 1, id 0
+DEAL::half_hyper_shell<3>:: cell 1, face 2, id 2
+DEAL::half_hyper_shell<3>:: cell 2, face 2, id 2
+DEAL::half_hyper_shell<3>:: cell 2, face 4, id 0
+DEAL::half_hyper_shell<3>:: cell 2, face 5, id 0
+DEAL::half_hyper_shell<3>:: cell 3, face 0, id 0
+DEAL::half_hyper_shell<3>:: cell 3, face 1, id 0
+DEAL::half_hyper_shell<3>:: cell 3, face 2, id 2
+DEAL::half_hyper_shell<3>:: cell 4, face 0, id 1
+DEAL::half_hyper_shell<3>:: cell 4, face 1, id 0
