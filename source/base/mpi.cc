@@ -1332,7 +1332,8 @@ namespace Utilities
         Utilities::MPI::internal::Tags::consensus_algorithm_pex_process_deliver;
 
       MPI_Status status;
-      MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+      auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+      AssertThrowMPI(ierr);
 
       // get rank of incoming message
       const auto other_rank = status.MPI_SOURCE;
@@ -1340,8 +1341,8 @@ namespace Utilities
       std::vector<T1> buffer_recv;
 
       // get size of incoming message
-      int  number_amount;
-      auto ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
+      int number_amount;
+      ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
       AssertThrowMPI(ierr);
 
       // allocate memory for incoming message
