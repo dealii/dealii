@@ -288,6 +288,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         CHECK_CXX_SOURCE_COMPILES(
           "
           #include <Sacado_trad.hpp>
+          #include <complex>
           int main ()
           {
             Sacado::Rad::ADvar<double> sacado_rad_double; // Works
