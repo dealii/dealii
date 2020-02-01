@@ -180,30 +180,29 @@ public:
   enum CurvedCellRegion
   {
     /**
-     * The geometry or boundary description
-     * will never be queried for curved geometries. This means that even
-     * if you have more than one subdivision per cell (see
-     * DataOut::build_patches() for what exactly this means) and even
-     * if the geometry really is curved, each cell will still be
-     * subdivided as if it was just a bi- or trilinear cell.
+     * The geometry or boundary description will never be queried for
+     * curved geometries. This means that even if you have more than
+     * one subdivision per cell (see DataOut::build_patches() for what
+     * exactly this means) and even if the geometry really is curved,
+     * each cell will still be subdivided as if it was just a bi- or
+     * trilinear cell.
      */
     no_curved_cells,
 
     /**
-     * The geometry or boundary description
-     * will be queried for curved geometries for cells located
-     * at the boundary, i.e., for cells that have at least one
-     * face at the boundary. This is sufficient if you have not
-     * attached a manifold description to the interiors of cells
-     * but only to faces at the boundary.
+     * The geometry or boundary description will be queried for curved
+     * geometries for cells located at the boundary, i.e., for cells
+     * that have at least one face at the boundary. This is sufficient
+     * if you have not attached a manifold description to the
+     * interiors of cells but only to faces at the boundary.
      */
     curved_boundary,
 
     /**
-     * The geometry description will be
-     * queried for all cells and all faces, whether they are
-     * at the boundary or not. This option is appropriate if you
-     * have attached a manifold object to cells (not only to faces).
+     * The geometry description will be queried for all cells and all
+     * faces, whether they are at the boundary or not. This option is
+     * appropriate if you have attached a manifold object to cells
+     * (not only to faces).
      */
     curved_inner_cells
   };
