@@ -3587,7 +3587,7 @@ operator/(const SymmetricTensor<rank_, dim, Number> &t,
           const OtherNumber &                        factor)
 {
   using product_type = typename ProductType<Number, OtherNumber>::type;
-  SymmetricTensor<rank_, dim, product_type> tt = t;
+  SymmetricTensor<rank_, dim, product_type> tt(t);
   tt /= internal::NumberType<product_type>::value(factor);
   return tt;
 }
@@ -3604,7 +3604,7 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
                                                operator*(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt *= factor;
   return tt;
 }
@@ -3621,7 +3621,7 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
                                                operator*(const double factor, const SymmetricTensor<rank_, dim> &t)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt *= factor;
   return tt;
 }
@@ -3637,7 +3637,7 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim>
 operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt /= factor;
   return tt;
 }
