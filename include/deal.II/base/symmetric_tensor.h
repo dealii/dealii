@@ -3190,17 +3190,18 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
   switch (dim)
     {
       case 1:
-        tmp.data[0] = Number(1);
+        tmp.data[0] = internal::NumberType<Number>::value(1);
         break;
       case 2:
-        tmp.data[0] = tmp.data[1] = Number(1);
+        tmp.data[0] = tmp.data[1] = internal::NumberType<Number>::value(1);
         break;
       case 3:
-        tmp.data[0] = tmp.data[1] = tmp.data[2] = Number(1);
+        tmp.data[0] = tmp.data[1] = tmp.data[2] =
+          internal::NumberType<Number>::value(1);
         break;
       default:
         for (unsigned int d = 0; d < dim; ++d)
-          tmp.data[d] = Number(1);
+          tmp.data[d] = internal::NumberType<Number>::value(1);
     }
   return tmp;
 }
@@ -3247,7 +3248,8 @@ deviator_tensor()
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      tmp.data[i][j] = Number((i == j ? 1 : 0) - 1. / dim);
+      tmp.data[i][j] =
+        internal::NumberType<Number>::value((i == j ? 1 : 0) - 1. / dim);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
@@ -3258,7 +3260,7 @@ deviator_tensor()
        i < internal::SymmetricTensorAccessors::StorageType<4, dim, Number>::
              n_rank2_components;
        ++i)
-    tmp.data[i][i] = Number(0.5);
+    tmp.data[i][i] = internal::NumberType<Number>::value(0.5);
 
   return tmp;
 }
@@ -3318,7 +3320,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
 
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
-    tmp.data[i][i] = Number(1);
+    tmp.data[i][i] = internal::NumberType<Number>::value(1);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
@@ -3329,7 +3331,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
        i < internal::SymmetricTensorAccessors::StorageType<4, dim, Number>::
              n_rank2_components;
        ++i)
-    tmp.data[i][i] = Number(0.5);
+    tmp.data[i][i] = internal::NumberType<Number>::value(0.5);
 
   return tmp;
 }
@@ -3541,7 +3543,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
   // (as well as with switched arguments and double<->float).
   using product_type = typename ProductType<Number, OtherNumber>::type;
   SymmetricTensor<rank_, dim, product_type> tt(t);
-  tt *= product_type(factor);
+  tt *= internal::NumberType<product_type>::value(factor);
   return tt;
 }
 
@@ -3584,9 +3586,9 @@ DEAL_II_CONSTEXPR inline SymmetricTensor<
 operator/(const SymmetricTensor<rank_, dim, Number> &t,
           const OtherNumber &                        factor)
 {
-  SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-    tt = t;
-  tt /= factor;
+  using product_type = typename ProductType<Number, OtherNumber>::type;
+  SymmetricTensor<rank_, dim, product_type> tt = t;
+  tt /= internal::NumberType<product_type>::value(factor);
   return tt;
 }
 
