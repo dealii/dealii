@@ -171,7 +171,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       #
       # Check for modules.
       #
-      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra MueLu Zoltan)
+      FOREACH(_optional_module EpetraExt Mesquite MueLu ROL Sacado Tpetra Zoltan)
         ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
@@ -339,6 +339,39 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
 
     ENDIF()
+
+    IF(DEAL_II_TRILINOS_WITH_MESQUITE)
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
+      #
+      # Check if Mesquite has the capabilities to support distributed triangulations.
+      #
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Mesquite_all_headers.hpp>
+        int
+        main()
+        {
+          Mesquite2::Mesh* mesh = nullptr;
+          Mesquite2::ParallelMeshImpl parallel_mesh (mesh);
+          return 0;
+        }
+        "
+        TRILINOS_MESQUITE_SUPPORTS_PDT
+        )
+
+      RESET_CMAKE_REQUIRED()
+
+      IF(NOT TRILINOS_MESQUITE_SUPPORTS_PDT)
+        MESSAGE(
+          STATUS
+          "Mesquite does not support parallel distributed triangulations."
+          )
+      ENDIF()
+    ENDIF()
+
   ENDIF()
 ENDMACRO()
 
@@ -378,6 +411,11 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
 
     IF (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
       SET(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
+    ENDIF()
+  ENDIF()
+  IF(${DEAL_II_TRILINOS_WITH_MESQUITE})
+    IF (TRILINOS_MESQUITE_SUPPORTS_PDT)
+      SET(DEAL_II_TRILINOS_MESQUITE_SUPPORTS_PDT ${TRILINOS_MESQUITE_SUPPORTS_PDT})
     ENDIF()
   ENDIF()
 ENDMACRO()
