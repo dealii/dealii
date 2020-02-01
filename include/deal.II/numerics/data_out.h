@@ -202,7 +202,7 @@ public:
      * The geometry description will be queried for all cells and all
      * faces, whether they are at the boundary or not. This option is
      * appropriate if you have attached a manifold object to cells
-     * (not only to faces).
+     * (not only to boundary faces).
      */
     curved_inner_cells
   };
