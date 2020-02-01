@@ -72,6 +72,24 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 
 namespace internal
 {
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<SymmetricTensor<rank, dim, T>, std::complex<U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <typename T, int rank, int dim, typename U>
+  struct ProductTypeImpl<std::complex<T>, SymmetricTensor<rank, dim, U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
   /**
    * A namespace for functions and classes that are internal to how the
    * SymmetricTensor class (and its associate functions) works.
