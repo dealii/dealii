@@ -84,7 +84,7 @@ namespace Utilities
            * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
            */
           virtual void
-          create_request(const int other_rank,
+          create_request(const unsigned int other_rank,
                          std::vector<std::pair<types::global_dof_index,
                                                types::global_dof_index>>
                            &send_buffer) override
@@ -723,7 +723,7 @@ namespace Utilities
            * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
            */
           virtual void
-          create_request(const int other_rank,
+          create_request(const unsigned int other_rank,
                          std::vector<std::pair<types::global_dof_index,
                                                types::global_dof_index>>
                            &send_buffer) override
@@ -747,7 +747,7 @@ namespace Utilities
            */
           virtual void
           prepare_buffer_for_answer(
-            const int                  other_rank,
+            const unsigned int         other_rank,
             std::vector<unsigned int> &recv_buffer) override
           {
             recv_buffer.resize(recv_indices[other_rank].size());
@@ -758,7 +758,7 @@ namespace Utilities
            * Utilities::MPI::ConsensusAlgorithmProcess::read_answer().
            */
           virtual void
-          read_answer(const int                        other_rank,
+          read_answer(const unsigned int               other_rank,
                       const std::vector<unsigned int> &recv_buffer) override
           {
             Assert(recv_indices[other_rank].size() == recv_buffer.size(),
