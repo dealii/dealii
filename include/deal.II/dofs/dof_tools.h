@@ -814,6 +814,7 @@ namespace DoFTools
    *      const Point<dim> &face_center = cell->face(face_index)->center();
    *      return 0 < face_center[0];
    *    };
+   * @endcode
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
