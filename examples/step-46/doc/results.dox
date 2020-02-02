@@ -59,7 +59,6 @@ The results are easily visualized:
         Magnitude and vectors for the fluid velocity.
       </p>
     </td>
-
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.pressure-2d.png" alt="">
       <p align="center">
@@ -69,7 +68,6 @@ The results are easily visualized:
         into the fluid domain.
       </p>
     </td>
-
     <td valign="top" align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.displacement-2d.png" alt="">
       <p align="center">

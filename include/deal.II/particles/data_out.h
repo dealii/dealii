@@ -58,7 +58,7 @@ namespace Particles
     /**
      * Build the patches for a given particle handler.
      *
-     * @param [in] particle_handler A particle handler for which the patches will be built.
+     * @param [in] particles A particle handler for which the patches will be built.
      * A dim=0 patch is built for each particle. The position of the particle is
      * used to build the node position and the ID of the particle is added as a
      * single data element.

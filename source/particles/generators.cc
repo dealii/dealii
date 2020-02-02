@@ -440,7 +440,7 @@ namespace Particles
     template <int dim, int spacedim>
     void
     quadrature_points(
-      const Triangulation<dim, spacedim> &particle_tria,
+      const Triangulation<dim, spacedim> &triangulation,
       const Quadrature<dim> &             quadrature,
       // const std::vector<Point<dim>> &     particle_reference_locations,
       const std::vector<std::vector<BoundingBox<spacedim>>>
@@ -453,7 +453,7 @@ namespace Particles
       std::vector<Point<spacedim>> points_to_generate;
 
       //       Loop through cells and gather gauss points
-      for (const auto &cell : particle_tria.active_cell_iterators())
+      for (const auto &cell : triangulation.active_cell_iterators())
         {
           if (cell->is_locally_owned())
             {

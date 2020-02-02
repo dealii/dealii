@@ -252,21 +252,21 @@ namespace Particles
      * function on the calling mpi process, and that falls within the part of
      * triangulation owned by this mpi process.
      *
-     * @param[in] A vector of points that do not need to be on the local
-     * processor, but have to be in the triangulation that is associated with
-     * this ParticleHandler object.
+     * @param[in] position A vector of points that do not need to be on the
+     * local processor, but have to be in the triangulation that is associated
+     * with this ParticleHandler object.
      *
-     * @param[in] A vector of vectors of bounding boxes. The bounding boxes
-     * `global_bboxes[rk]` describe which part of the mesh is locally owned by
-     * the mpi process with rank `rk`. The local description can be obtained
-     * from GridTools::compute_mesh_predicate_bounding_box(), and the global one
-     * can be obtained by passing the local ones to
+     * @param[in] global_bounding_boxes A vector of vectors of bounding boxes.
+     * The bounding boxes `global_bboxes[rk]` describe which part of the mesh is
+     * locally owned by the mpi process with rank `rk`. The local description
+     * can be obtained from GridTools::compute_mesh_predicate_bounding_box(),
+     * and the global one can be obtained by passing the local ones to
      * Utilities::MPI::all_gather().
      *
-     * @param[in] (Optional) A vector of vector of properties associated with
-     * each local point. The size of the vector should be either zero (no
-     * properties will be transfered nor attached to the generated particles)
-     * or it should be a vector of `positions.size()` vectors of size
+     * @param[in] properties (Optional) A vector of vector of properties
+     * associated with each local point. The size of the vector should be either
+     * zero (no properties will be transfered nor attached to the generated
+     * particles) or it should be a vector of `positions.size()` vectors of size
      * `n_properties_per_particle()`. Notice that this function call will
      * transfer the properties from the local mpi process to the final mpi
      * process that will own each of the particles, and it may therefore be

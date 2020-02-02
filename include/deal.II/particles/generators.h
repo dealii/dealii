@@ -179,8 +179,8 @@ namespace Particles
      * @param[in] dof_handler A DOF handler that may live on another
      * triangulation that is used to establsh the positions of the particles.
      *
-     * @param[in] A vector that contains all the bounding boxes for all
-     * processors. This vector can be established by first using
+     * @param[in] global_bounding_boxes A vector that contains all the bounding
+     * boxes for all processors. This vector can be established by first using
      * 'GridTools::compute_mesh_predicate_bounding_box()' and gathering all the
      * bounding boxes using 'Utilities::MPI::all_gather().
      *
@@ -239,7 +239,7 @@ namespace Particles
      */
     template <int dim, int spacedim = dim>
     void
-    quadrature_points(const Triangulation<dim, spacedim> &particle_tria,
+    quadrature_points(const Triangulation<dim, spacedim> &triangulation,
                       const Quadrature<dim> &             quadrature,
                       const std::vector<std::vector<BoundingBox<spacedim>>>
                         &                             global_bounding_boxes,
