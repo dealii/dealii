@@ -533,8 +533,8 @@ namespace GridGenerator
    *
    * @param corners Second and third vertices of the parallelogram.
    *
-   * @param colorize Assign different boundary ids if true. (see @ref
-   * GlossColorization "the glossary entry on colorization").
+   * @param colorize Assign different boundary ids if true. (see
+   * @ref GlossColorization "the glossary entry on colorization").
    */
   template <int dim>
   void
