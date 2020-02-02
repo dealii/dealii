@@ -3190,18 +3190,18 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
   switch (dim)
     {
       case 1:
-        tmp.data[0] = internal::NumberType<Number>::value(1);
+        tmp.data[0] = internal::NumberType<Number>::value(1.);
         break;
       case 2:
-        tmp.data[0] = tmp.data[1] = internal::NumberType<Number>::value(1);
+        tmp.data[0] = tmp.data[1] = internal::NumberType<Number>::value(1.);
         break;
       case 3:
         tmp.data[0] = tmp.data[1] = tmp.data[2] =
-          internal::NumberType<Number>::value(1);
+          internal::NumberType<Number>::value(1.);
         break;
       default:
         for (unsigned int d = 0; d < dim; ++d)
-          tmp.data[d] = internal::NumberType<Number>::value(1);
+          tmp.data[d] = internal::NumberType<Number>::value(1.);
     }
   return tmp;
 }
@@ -3249,7 +3249,7 @@ deviator_tensor()
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
       tmp.data[i][j] =
-        internal::NumberType<Number>::value((i == j ? 1 : 0) - 1. / dim);
+        internal::NumberType<Number>::value((i == j ? 1. : 0.) - 1. / dim);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
@@ -3320,7 +3320,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
 
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
-    tmp.data[i][i] = internal::NumberType<Number>::value(1);
+    tmp.data[i][i] = internal::NumberType<Number>::value(1.);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
