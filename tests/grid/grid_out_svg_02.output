@@ -9,6 +9,7 @@
  text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
  line{stroke:rgb(25,25,25); stroke-width:4}
  path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ circle{fill:white; stroke:black; stroke-width:2}
 
  path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
  path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
@@ -3231,14 +3232,14 @@
   <line x1="1344" y1="247" x2="1342" y2="241"/>
 
  <!-- legend -->
- <rect x="2000" y="96" width="386" height="199"/>
+ <rect x="2000" y="96" width="386" height="259"/>
  <text x="2015" y="128" style="text-anchor:start; font-weight:bold; font-size:21px">cell label</text>
   <text x="2024" y="159" style="text-anchor:start; font-style:oblique; font-size:21px">cell_level.</text>
   <text x="2024" y="191" style="text-anchor:start; font-style:oblique; font-size:21px">cell_index,</text>
   <text x="2024" y="222" style="text-anchor:start; font-style:oblique; font-size:21px">material_id,</text>
   <text x= "2024" y="254" style="text-anchor:start; font-style:oblique; font-size:21px">subdomain_id,</text>
   <text x= "2024" y="285" style="text-anchor:start; font-style:oblique; font-size:21px">level_subdomain_id</text>
-  <text x="2000" y="322" style="text-anchor:start; font-size:21px">azimuth: 0°, polar: 60°</text>
+  <text x="2000" y="385" style="text-anchor:start; font-size:21px">azimuth: 0°, polar: 60°</text>
 
  <!-- colorbar -->
  <text x="2000" y="429" style="text-anchor:start; font-weight:bold; font-size:21px">level_number</text>

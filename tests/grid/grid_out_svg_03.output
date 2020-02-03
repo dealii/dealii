@@ -1,0 +1,82 @@
+
+<svg width="876" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+
+<!-- internal style sheet -->
+<style type="text/css"><![CDATA[
+ rect.background{fill:none}
+ rect{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
+ line{stroke:rgb(25,25,25); stroke-width:4}
+ path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ circle{fill:white; stroke:black; stroke-width:2}
+
+ path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+]]></style>
+
+ <rect class="background" width="476" height="1000"/>
+  <!-- cells -->
+  <path class="p0" d="M 38 920 L 285 840 L 162 670 L 38 710 L 38 920"/>
+  <text x="131" y="818" style="font-size:67px">0.0</text>
+  <line x1="38" y1="920" x2="38" y2="710"/>
+    <circle cx="38" cy="815" r="33" />
+    <text x="38" y="815" style="font-size:33px" dominant-baseline="middle">3</text>
+  <line x1="38" y1="920" x2="285" y2="840"/>
+    <circle cx="162" cy="880" r="33" />
+    <text x="162" y="880" style="font-size:33px" dominant-baseline="middle">1</text>
+  <line x1="38" y1="710" x2="162" y2="670"/>
+    <circle cx="100" cy="690" r="34" />
+    <text x="100" y="690" style="font-size:34px" dominant-baseline="middle">0</text>
+  <path class="p0" d="M 285 840 L 438 630 L 238 565 L 162 670 L 285 840"/>
+  <text x="281" y="710" style="font-size:68px">0.1</text>
+  <line x1="285" y1="840" x2="438" y2="630"/>
+    <circle cx="362" cy="735" r="34" />
+    <text x="362" y="735" style="font-size:34px" dominant-baseline="middle">1</text>
+  <line x1="162" y1="670" x2="238" y2="565"/>
+    <circle cx="200" cy="617" r="35" />
+    <text x="200" y="617" style="font-size:35px" dominant-baseline="middle">0</text>
+  <path class="p0" d="M 438 630 L 438 370 L 238 435 L 238 565 L 438 630"/>
+  <text x="338" y="535" style="font-size:69px">0.2</text>
+  <line x1="438" y1="630" x2="438" y2="370"/>
+    <circle cx="438" cy="500" r="34" />
+    <text x="438" y="500" style="font-size:34px" dominant-baseline="middle">1</text>
+  <line x1="238" y1="565" x2="238" y2="435"/>
+    <circle cx="238" cy="500" r="35" />
+    <text x="238" y="500" style="font-size:35px" dominant-baseline="middle">0</text>
+  <path class="p0" d="M 438 370 L 285 160 L 162 330 L 238 435 L 438 370"/>
+  <text x="281" y="358" style="font-size:68px">0.3</text>
+  <line x1="438" y1="370" x2="285" y2="160"/>
+    <circle cx="362" cy="265" r="33" />
+    <text x="362" y="265" style="font-size:33px" dominant-baseline="middle">1</text>
+  <line x1="238" y1="435" x2="162" y2="330"/>
+    <circle cx="200" cy="383" r="34" />
+    <text x="200" y="383" style="font-size:34px" dominant-baseline="middle">0</text>
+  <path class="p0" d="M 285 160 L 38 80 L 38 290 L 162 330 L 285 160"/>
+  <text x="131" y="249" style="font-size:67px">0.4</text>
+  <line x1="38" y1="80" x2="38" y2="290"/>
+    <circle cx="38" cy="185" r="33" />
+    <text x="38" y="185" style="font-size:33px" dominant-baseline="middle">2</text>
+  <line x1="285" y1="160" x2="38" y2="80"/>
+    <circle cx="162" cy="120" r="32" />
+    <text x="162" y="120" style="font-size:32px" dominant-baseline="middle">1</text>
+  <line x1="162" y1="330" x2="38" y2="290"/>
+    <circle cx="100" cy="310" r="33" />
+    <text x="100" y="310" style="font-size:33px" dominant-baseline="middle">0</text>
+
+ <!-- legend -->
+ <rect x="476" y="80" width="320" height="215"/>
+ <text x="489" y="107" style="text-anchor:start; font-weight:bold; font-size:18px">cell label</text>
+  <text x="496" y="134" style="text-anchor:start; font-style:oblique; font-size:18px">cell_level.</text>
+  <text x="496" y="161" style="text-anchor:start; font-style:oblique; font-size:18px">cell_index</text>
+ <text x="489" y="188" style="text-anchor:start; font-weight:bold; font-size:18px">edge label</text>
+  <text x= "496" y="215" style="text-anchor:start; font-style:oblique; font-size:18px">boundary_id</text>
+  <text x="476" y="328" style="text-anchor:start; font-size:18px">azimuth: 0°, polar: 0°</text>
+
+ <!-- colorbar -->
+ <text x="476" y="356" style="text-anchor:start; font-weight:bold; font-size:18px">level_number</text>
+  <rect class="r0" x="476" y="370" width="25" height="550"/>
+  <text x="513.500" y="651.000" style="text-anchor:start; font-size:18px; font-weight:bold">0 max min</text>
+
+</svg>
