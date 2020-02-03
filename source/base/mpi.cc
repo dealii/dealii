@@ -972,7 +972,7 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithmProcess<T1, T2>::create_request(const int,
+    ConsensusAlgorithmProcess<T1, T2>::create_request(const unsigned int,
                                                       std::vector<T1> &)
     {
       // nothing to do
@@ -983,7 +983,7 @@ namespace Utilities
     template <typename T1, typename T2>
     void
     ConsensusAlgorithmProcess<T1, T2>::prepare_buffer_for_answer(
-      const int,
+      const unsigned int,
       std::vector<T2> &)
     {
       // nothing to do
@@ -993,7 +993,7 @@ namespace Utilities
 
     template <typename T1, typename T2>
     void
-    ConsensusAlgorithmProcess<T1, T2>::read_answer(const int,
+    ConsensusAlgorithmProcess<T1, T2>::read_answer(const unsigned int,
                                                    const std::vector<T2> &)
     {
       // nothing to do
