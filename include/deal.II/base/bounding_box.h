@@ -32,25 +32,27 @@ DEAL_II_NAMESPACE_OPEN
 enum class NeighborType
 {
   /**
-   * not neighbours: the intersection is empty
+   * Not neighbors: the intersection is empty.
    */
   not_neighbors = 0,
 
   /**
-   * simple neighbors: the boxes intersect with an intersection of dimension at
-   * most spacedim - 2
+   * Simple neighbors: the boxes intersect with an intersection of dimension at
+   * most `spacedim - 2`. For example, in 2d this means that the two boxes
+   * touch at one corner of the each box.
    */
   simple_neighbors = 1,
 
   /**
-   * attached neighbors: neighbors with an intersection of dimension > spacedim
-   * - 2
+   * Attached neighbors: neighbors with an intersection of
+   * `dimension > spacedim - 2`. For example, in 2d this means that the two
+   * boxes touch along an edge.
    */
   attached_neighbors = 2,
 
   /**
-   * mergeable neighbors: neighbors which can be expressed with a single
-   * Bounding Box, e.g.
+   * Mergeable neighbors: neighbors which can be expressed with a single
+   * BoundingBox, e.g.
    *  @code
    *  .--V--W    .-----V
    *  |  |  | =  |     |
