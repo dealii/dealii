@@ -70,6 +70,31 @@ namespace Utilities
 {
   namespace MPI
   {
+    MinMaxAvg
+    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator)
+    {
+      MinMaxAvg result;
+      min_max_avg(ArrayView<const double>(my_value),
+                  ArrayView<MinMaxAvg>(result),
+                  mpi_communicator);
+
+      return result;
+    }
+
+
+
+    std::vector<MinMaxAvg>
+    min_max_avg(const std::vector<double> &my_values,
+                const MPI_Comm &           mpi_communicator)
+    {
+      std::vector<MinMaxAvg> results(my_values.size());
+      min_max_avg(my_values, results, mpi_communicator);
+
+      return results;
+    }
+
+
+
 #ifdef DEAL_II_WITH_MPI
     unsigned int
     n_mpi_processes(const MPI_Comm &mpi_communicator)
@@ -491,68 +516,80 @@ namespace Utilities
                  int *       len,
                  MPI_Datatype *)
       {
-        (void)len;
         const MinMaxAvg *in_lhs    = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *      inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
-        Assert(*len == 1, ExcInternalError());
+        for (int i = 0; i < *len; i++)
+          {
+            inout_rhs[i].sum += in_lhs[i].sum;
+            if (inout_rhs[i].min > in_lhs[i].min)
+              {
+                inout_rhs[i].min       = in_lhs[i].min;
+                inout_rhs[i].min_index = in_lhs[i].min_index;
+              }
+            else if (inout_rhs[i].min == in_lhs[i].min)
+              {
+                // choose lower cpu index when tied to make operator commutative
+                if (inout_rhs[i].min_index > in_lhs[i].min_index)
+                  inout_rhs[i].min_index = in_lhs[i].min_index;
+              }
 
-        inout_rhs->sum += in_lhs->sum;
-        if (inout_rhs->min > in_lhs->min)
-          {
-            inout_rhs->min       = in_lhs->min;
-            inout_rhs->min_index = in_lhs->min_index;
-          }
-        else if (inout_rhs->min == in_lhs->min)
-          {
-            // choose lower cpu index when tied to make operator commutative
-            if (inout_rhs->min_index > in_lhs->min_index)
-              inout_rhs->min_index = in_lhs->min_index;
-          }
-
-        if (inout_rhs->max < in_lhs->max)
-          {
-            inout_rhs->max       = in_lhs->max;
-            inout_rhs->max_index = in_lhs->max_index;
-          }
-        else if (inout_rhs->max == in_lhs->max)
-          {
-            // choose lower cpu index when tied to make operator commutative
-            if (inout_rhs->max_index > in_lhs->max_index)
-              inout_rhs->max_index = in_lhs->max_index;
+            if (inout_rhs[i].max < in_lhs[i].max)
+              {
+                inout_rhs[i].max       = in_lhs[i].max;
+                inout_rhs[i].max_index = in_lhs[i].max_index;
+              }
+            else if (inout_rhs[i].max == in_lhs[i].max)
+              {
+                // choose lower cpu index when tied to make operator commutative
+                if (inout_rhs[i].max_index > in_lhs[i].max_index)
+                  inout_rhs[i].max_index = in_lhs[i].max_index;
+              }
           }
       }
     } // namespace
 
 
 
-    MinMaxAvg
-    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator)
+    void
+    min_max_avg(const ArrayView<const double> &my_values,
+                const ArrayView<MinMaxAvg> &   result,
+                const MPI_Comm &               mpi_communicator)
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
       if (job_supports_mpi() == false ||
           Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
         {
-          MinMaxAvg result;
-          result.sum       = my_value;
-          result.avg       = my_value;
-          result.min       = my_value;
-          result.max       = my_value;
-          result.min_index = 0;
-          result.max_index = 0;
-
-          return result;
+          for (unsigned int i = 0; i < my_values.size(); i++)
+            {
+              result[i].sum       = my_values[i];
+              result[i].avg       = my_values[i];
+              result[i].min       = my_values[i];
+              result[i].max       = my_values[i];
+              result[i].min_index = 0;
+              result[i].max_index = 0;
+            }
         }
+
+      AssertDimension(Utilities::MPI::min(my_values.size(), mpi_communicator),
+                      Utilities::MPI::max(my_values.size(), mpi_communicator));
+
+      AssertDimension(my_values.size(), result.size());
+
+
 
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
-      MinMaxAvg result = {0.,
-                          std::numeric_limits<double>::max(),
-                          -std::numeric_limits<double>::max(),
-                          0,
-                          0,
-                          0.};
+      MinMaxAvg dummy = {0.,
+                         std::numeric_limits<double>::max(),
+                         -std::numeric_limits<double>::max(),
+                         0,
+                         0,
+                         0.};
+
+      for (auto &i : result)
+        i = dummy;
 
       const unsigned int my_id =
         dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -566,21 +603,28 @@ namespace Utilities
                       &op);
       AssertThrowMPI(ierr);
 
-      MinMaxAvg in;
-      in.sum = in.min = in.max = my_value;
-      in.min_index = in.max_index = my_id;
+      std::vector<MinMaxAvg> in(my_values.size());
+
+      for (unsigned int i = 0; i < my_values.size(); i++)
+        {
+          in[i].sum = in[i].min = in[i].max = my_values[i];
+          in[i].min_index = in[i].max_index = my_id;
+        }
 
       MPI_Datatype type;
-      int          lengths[]       = {3, 2};
-      MPI_Aint     displacements[] = {0, offsetof(MinMaxAvg, min_index)};
-      MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT};
+      int          lengths[]       = {3, 2, 1};
+      MPI_Aint     displacements[] = {0,
+                                  offsetof(MinMaxAvg, min_index),
+                                  offsetof(MinMaxAvg, avg)};
+      MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT, MPI_DOUBLE};
 
-      ierr = MPI_Type_create_struct(2, lengths, displacements, types, &type);
+      ierr = MPI_Type_create_struct(3, lengths, displacements, types, &type);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Type_commit(&type);
       AssertThrowMPI(ierr);
-      ierr = MPI_Allreduce(&in, &result, 1, type, op, mpi_communicator);
+      ierr = MPI_Allreduce(
+        in.data(), result.data(), my_values.size(), type, op, mpi_communicator);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Type_free(&type);
@@ -589,10 +633,10 @@ namespace Utilities
       ierr = MPI_Op_free(&op);
       AssertThrowMPI(ierr);
 
-      result.avg = result.sum / numproc;
-
-      return result;
+      for (auto &r : result)
+        r.avg = r.sum / numproc;
     }
+
 
 #else
 
@@ -635,19 +679,22 @@ namespace Utilities
 
 
 
-    MinMaxAvg
-    min_max_avg(const double my_value, const MPI_Comm &)
+    void
+    min_max_avg(const ArrayView<const double> &my_values,
+                const ArrayView<MinMaxAvg> &   result,
+                const MPI_Comm &)
     {
-      MinMaxAvg result;
+      AssertDimension(my_values.size(), result.size());
 
-      result.sum       = my_value;
-      result.avg       = my_value;
-      result.min       = my_value;
-      result.max       = my_value;
-      result.min_index = 0;
-      result.max_index = 0;
-
-      return result;
+      for (unsigned int i = 0; i < my_values.size(); i++)
+        {
+          result[i].sum       = my_values[i];
+          result[i].avg       = my_values[i];
+          result[i].min       = my_values[i];
+          result[i].max       = my_values[i];
+          result[i].min_index = 0;
+          result[i].max_index = 0;
+        }
     }
 
 #endif
