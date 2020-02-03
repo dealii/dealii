@@ -2273,9 +2273,7 @@ namespace Step14
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           // First, if this face is part of the boundary, then there is
           // nothing to do. However, to make things easier when summing up

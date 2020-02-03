@@ -1043,8 +1043,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     scratch_data.active_neighbors.clear();
-    for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-         ++face_n)
+    for (unsigned int face_n : GeometryInfo<dim>::face_indices())
       if (!cell->at_boundary(face_n))
         {
           // First define an abbreviation for the iterator to the face and
