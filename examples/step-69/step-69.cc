@@ -256,11 +256,27 @@ namespace Step69
   // used rarely and with caution in situations such as this one, where we
   // actually know (due to benchmarking) that inlining the function in
   // question actually improves performance.
+  // 
+  // Finally we note that:
+  //  - This is the only class in this tutorial step that is tied to a
+  //    particular "physics" or "hyperbolic conservation law" (in this
+  //    case Euler's equations). All the other classes are primarily
+  //    "discretization" classes, very much agnostic of the particular physics
+  //    being solved.
+  //  - This is a "pure static" class (the antithesis of a
+  //    "pure virtual" class). It's just a convenient way to wrap-up a
+  //    collection of related methods into a single object. Note that we will 
+  //    be able to invoke such methods without without creating an instance of 
+  //    the class. Similarly, we will not have to provide a constructor 
+  //    for this class.
 
   template <int dim>
   class ProblemDescription
   {
   public:
+
+    /* constexpr tells the compiler to evaluate "2 + dim" just once at compile 
+       time rather than everytime problem_dimension is invoked. */
     static constexpr unsigned int problem_dimension = 2 + dim;
 
     using rank1_type = Tensor<1, problem_dimension>;
@@ -298,10 +314,18 @@ namespace Step69
   // direction and a 1D primitive state (density, velocity, pressure) are
   // read from the parameter file.
   //
-  // Instead of implementing yet another <code>setup()</code> function we
-  // use a callback function <code>parse_parameters_callback</code> that
-  // can be hooked up to the corresponding signal
-  // ParameterAcceptor::parse_parameters_call_back.
+  // It would be desirable to initialize the class in a single shot:
+  // initialize/set the parameters and define the class members that 
+  // depend on these default parameters. However, since we do not know the 
+  // actual final values for the parameters, this would be sort of 
+  // meaningless an unsafe in general (we would like to have mechanisms to 
+  // check the consistency of the input parameters). Instead of defining 
+  // another <code>setup()</code> method to be called (by-hand) after the 
+  // call to <code> ParameterAcceptor::initialize() </code> we provide an 
+  // "implementation" for the class member 
+  // <code>parse_parameters_call_back</code> which is automatically called when
+  // invoking <code> ParameterAcceptor::initialize() </code> for every class 
+  // that inherits from ParameterAceptor.
 
   template <int dim>
   class InitialValues : public ParameterAcceptor
@@ -314,6 +338,9 @@ namespace Step69
     std::function<rank1_type(const Point<dim> &point, double t)> initial_state;
 
   private:
+
+    /* Auxiliary void function to be hooked to the inherited class member
+       ParameterAcceptor::parse_parameters_call_back. */
     void parse_parameters_callback();
 
     Tensor<1, dim> initial_direction;
@@ -327,8 +354,13 @@ namespace Step69
   // that was introduced in the discussion above. The main method of the
   // <code>TimeStep</code> class is <code>step(vector_type &U, double
   // t)</code>. That takes a reference to a state vector <code>U</code> and
-  // a time point <code>t</code> as arguments, updates the state vector in
-  // place and returns the chosen step-size $\tau$.
+  // a time point <code>t</code> as arguments, computes the updated solution, 
+  // stores it in the vector <code>temp</code>, swaps its contents with the
+  // vector <code>U</code>, and returns the chosen step-size $\tau$.
+  //
+  // The other important method is <code>prepare()</code> which primarily sets
+  // the proper partition and sparsity pattern for the auxiliary vector 
+  // <code>temp</code> and the matrix <code>dij_matrix</code>.
   //
 
   template <int dim>
@@ -1383,8 +1415,9 @@ namespace Step69
   // in the context of Euler's equations using with ideal gas law. If we wanted
   // to re-purpose Step-69 for a different conservation law (say for instance
   // shallow water equations) the implementation of this entire class would
-  // have to change. But most of the other classes, in particular those
-  // defining loop structures, would remain unchanged.
+  // have to change (or wiped out in its entirety). But most of the other 
+  // classes, in particular those defining loop structures, would remain 
+  // unchanged.
   //
   // Now we define the implementation of the utility
   // functions <code>momentum</code>,
@@ -1654,12 +1687,24 @@ namespace Step69
 
   // @sect4{Class <code>InitialValues</code> implementation}
 
-  // Constructor for the class InitialValues.
+  // Constructor for the class InitialValues. We add some parameters with 
+  // some default values. We also provide a non-empty an implementation 
+  // for the class member <code>parse_parameters_call_back</code>.
+  //
+  // The class member <code>parse_parameters_call_back</code> (inherited 
+  // ParameterAcceptor) has an empty implementation by default.
+  // This function will only be invoked for every class that is derived 
+  // from ParameterAceptor after the call to ParameterAcceptor::initialize. In 
+  // that regard, its use is appropriate for situations where the parameters 
+  // have to be postprocessed (in some sense) or some consistency 
+  // condition between the parameters has to be checked.
 
   template <int dim>
   InitialValues<dim>::InitialValues(const std::string &subsection)
     : ParameterAcceptor(subsection)
   {
+    /* We wire-up InitialValues<dim>::parse_parameters_callback (declared 
+       a few lines below) to ParameterAcceptor::parse_parameters_call_back */
     ParameterAcceptor::parse_parameters_call_back.connect(
       std::bind(&InitialValues<dim>::parse_parameters_callback, this));
 
@@ -1677,7 +1722,19 @@ namespace Step69
                   "Initial 1d state (rho, u, p) of the uniform flow field");
   }
 
-  // Placeholder here.
+  // So far the constructor of <code>InitialValues</code> has defined 
+  // default values for the two private members <code>initial_direction</code> 
+  // and <code>initial_1d_state</code> and added them to the parameter list. 
+  // But we have not defined an implementation for the only public member that 
+  // we really care about, which is <code>initial_state</code> (the 
+  // function that we are going to call to actually evaluate the initial 
+  // solution at the mesh nodes).
+  //
+  // As commented, we could have avoided using the method 
+  // <code>parse_parameters_call_back </code> and define a class member 
+  // <code>setup()</code> in order to define the implementation of 
+  // <code>initial_state</code>. But this illustrates a different way to use 
+  // inheritance of ParameterAceptor to our benefit.
 
   template <int dim>
   void InitialValues<dim>::parse_parameters_callback()
@@ -1689,6 +1746,9 @@ namespace Step69
 
     static constexpr auto gamma = ProblemDescription<dim>::gamma;
 
+    /* Function that translates primitive 1d states in to conserved 2d states.
+       Note that we have some room for freedom to change the direction of the 
+       flow. */
     const auto from_1d_state =
       [=](const Tensor<1, 3, double> &state_1d) -> rank1_type {
       const auto &rho = state_1d[0];
@@ -1730,7 +1790,12 @@ namespace Step69
                   "relative CFL constant used for update");
   }
 
-  // Placeholder here.
+  // In the class member <code>prepare()</code> we set the partition of the 
+  // auxiliary vector <code>temp</code> (locally owned + ghosted layer) and 
+  // set the sparsity pattern for <code>dij_matrix</code> (borrowed from 
+  // offline_data, a pointer to the unique OfflineData instance).
+  // The vector <code>temp</code> will be used to store temporarily the 
+  // solution update, to later swap its contents with the old vector.
 
   template <int dim>
   void TimeStep<dim>::prepare()
@@ -1875,12 +1940,12 @@ namespace Step69
     // So far the matrix <code>dij_matrix</code> contains the off-diagonal
     // components. We still have to fill its diagonal entries defined as
     // $d_{ii}^n = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}^n$. We
-    // use <code>parallel::apply_to_subranges</code> for this purpose. While 
-    // computing the $d_{ii}$'s we also record the largest admissible 
-    // time-step, which is defined as
+    // use again <code>parallel::apply_to_subranges</code> for this purpose. 
+    // While in the process of computing the $d_{ii}$'s we also record the 
+    // largest admissible time-step, which is defined as
     //
     // \f[ \tau_n := c_{\text{cfl}}\,\min_{
-    // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right)\f] .
+    // i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right) \, . \f]
     //
     // Note that the operation $\min_{i \in \mathcal{V}}$ is intrinsically
     // global, it operates on all nodes: first we would have to first take the
@@ -1896,7 +1961,7 @@ namespace Step69
     //   <code>Utilities::MPI::min</code>.
 
     /* We define tau_max as an atomic double in order to avoid any read/write 
-       conflict between threads and initialize it as the largest possible 
+       conflicts between threads and initialize it as the largest possible 
        number that can be represented by the float-type double. */
     std::atomic<double> tau_max{std::numeric_limits<double>::infinity()};
 
@@ -1935,7 +2000,7 @@ namespace Step69
           current_tau_max > tau_max_on_subrange &&
           !tau_max.compare_exchange_weak(current_tau_max, tau_max_on_subrange))
           ;
-      }; /* End of definition of on_subranges */
+      }; /* End of definition of the worker on_subranges */
 
       /* Thread-parallel loop on locally owned rows */
       parallel::apply_to_subranges(indices_relevant.begin(),
@@ -2046,7 +2111,7 @@ namespace Step69
     //   \boldsymbol{\nu}_i$
     //
     // which removes the normal component of $\mathbf{m}$. We note that
-    // conservation is not just a consequence of this operation but also a
+    // conservation is not just a consequence of this correction but also a
     // consequence of modification of the $\mathbf{c}_{ij}$ coefficients at the
     // boundary (see the third thread-parallel loop on nodes in
     // <code>OfflineData<dim>::assemble()</code>).
@@ -2107,14 +2172,13 @@ namespace Step69
 
   // @sect4{Class <code>SchlierenPostprocessor</code> implementation}
 
-  // Constructor of <code>SchlierenPostprocessor</code>.
   // Here
-  // - schlieren_beta: is an ad-hoc amplification factor in order to
+  // - schlieren_beta: is an ad-hoc positive amplification factor in order to
   //   enhance/exaggerate contrast in the visualization. Its actual value is a
   //   matter of taste.
-  // - schlieren_index: indicates which component of the state
-  //   $[\rho, \mathbf{m},E]$ are we going to use in order generate the
-  //   visualization.
+  // - schlieren_index: is a integer indicates which component of the 
+  //   state $[\rho, \mathbf{m},E]$ are we going to use in order generate 
+  //   the visualization.
 
   template <int dim>
   SchlierenPostprocessor<dim>::SchlierenPostprocessor(
@@ -2158,11 +2222,12 @@ namespace Step69
   // We now discuss the implementation of the class member 
   // <code>SchlierenPostprocessor<dim>::compute_schlieren</code>, which 
   // basically takes a component of the state vector <code>U</code> and 
-  // computes the Schlieren indicator for such component. We start by noting 
-  // that the formula for the Schlieren indicator
-  // requires the "nodal gradients" $\nabla r_j$. However, nodal values of 
-  // gradients are not defined for $\mathcal{C}^0$ finite
-  // element functions. More generally, pointwise values of gradients
+  // computes the Schlieren indicator for such component (the formula of the
+  // Schlieren indicator can be found just before the declaration of the class
+  // <code>SchlierenPostprocessor</code>). We start by noting 
+  // that this formula requires the "nodal gradients" $\nabla r_j$. 
+  // However, nodal values of gradients are not defined for $\mathcal{C}^0$ 
+  // finite element functions. More generally, pointwise values of gradients
   // are not defined for $W^{1,p}(\Omega)$ functions (though weak 
   // derivatives are). The simplest technique we can use to recover gradients 
   // at nodes is weighted-averaging i.e.
@@ -2188,7 +2253,7 @@ namespace Step69
   // Using this last formula we can recover averaged nodal gradients without
   // resorting to any form of quadrature. This idea aligns quite well with
   // the whole spirit of edge-based schemes (or algebraic schemes) where
-  // we want to operate as directly/intimately on matrices and vectors as
+  // we want to operate on matrices and vectors as directly as
   // it could be possible avoiding by all means assembly of bilinear
   // forms, cell-loops, quadrature, or any other
   // intermediate construct/operation between the input arguments (the state
@@ -2198,7 +2263,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximums $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>TimeStep<dim>::step</code> : we define $\max_j |\nabla r_j|$ and
+  // <code>TimeStep<dim>::step</code> we define $\max_j |\nabla r_j|$ and
   // $\min_j |\nabla r_j|$ as atomic doubles in order to
   // resolve any conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max</code> and <code>Utilities::MPI::min</code> to
@@ -2210,7 +2275,8 @@ namespace Step69
   // - The first loop computes $|\nabla r_i|$ for all $i \in \mathcal{V}$ in
   //   the mesh, and the bounds $\max_j |\nabla r_j|$ and
   //   $\min_j |\nabla r_j|$.
-  // - Second loop finally computes the Schlieren indicator using the formula
+  // - The second loop finally computes the Schlieren indicator using the 
+  //   formula
   //
   // \f[ \text{schlieren}[i] = e^{\beta \frac{ |\nabla r_i|
   // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } }
@@ -2238,8 +2304,8 @@ namespace Step69
     std::atomic<double> r_i_max{0.};
     std::atomic<double> r_i_min{std::numeric_limits<double>::infinity()};
 
-    /* Implementation of the worker that computes the averaged gradient at each
-       node and the global max and mins of such gradients */
+    /* Implementation of the first worker: computes the averaged gradient 
+       at each node and the global max and mins of such gradients. */
     {
       const auto on_subranges = [&](auto i1, const auto i2) {
         double r_i_max_on_subrange = 0.;
@@ -2319,9 +2385,9 @@ namespace Step69
     r_i_max.store(Utilities::MPI::max(r_i_max.load(), mpi_communicator));
     r_i_min.store(Utilities::MPI::min(r_i_min.load(), mpi_communicator));
 
-    /* So far we have computed the vector r_i and the scalars r_i_max and
-       r_i_min. Now we are in position of actually computing the Schlieren
-       indicator, so we define the worker for this task */
+    /* Implementation of the second worker: we have the vector r_i and the 
+       scalars r_i_max and r_i_min at our disposal. Now we are in position of 
+       actually computing the Schlieren indicator. */
 
     {
       const auto on_subranges = [&](auto i1, const auto i2) {
@@ -2348,7 +2414,27 @@ namespace Step69
     schlieren.update_ghost_values();
   }
 
-  // @sect4{The Timeloop::run() function}
+  // @sect4{The Timeloop class implementation.}
+
+  // Constructor of the class <code>Timeloop</code>. Note that this class wraps 
+  // up pretty much all the other classes that we have discussed so far. 
+  // More precisely the constructor has to initialize an instance of 
+  //   - <code>Discretization<dim> </code>
+  //   - <code>OfflineData<dim> </code>
+  //   - <code>InitialValues<dim> </code>
+  //   - <code>TimeStep<dim> </code>
+  //   - <code>SchlierenPostprocessor<dim> </code>
+  //
+  // Most of the functionality of the class
+  // <code>Timeloop</code> comes from the methods of those five classes. In
+  // itself, the class <code>TimeLoop<dim></code> only requires the 
+  // implementation of three new class members/methods:
+  //  - <code>TimeLoop<dim>::run </code>.
+  //  - <code>TimeLoop<dim>::interpolate_initial_values </code>
+  //  - <code>TimeLoop<dim>::output </code>
+  //
+  // Note that in the construction we also add the boolean parameter 
+  // "resume" which will be used to restart interrupted computations.
 
   template <int dim>
   TimeLoop<dim>::TimeLoop(const MPI_Comm &mpi_comm)
@@ -2390,7 +2476,10 @@ namespace Step69
     add_parameter("resume", resume, "Resume an interrupted computation.");
   }
 
-  // Placeholder here.
+  // We define an auxiliary namespace to be used in the implementation of
+  // the class member <code>TimeLoop<dim>::run()</code>. It's only content
+  // is the void function <code>print_head</code> used to output
+  // messages in the terminal with a "nice" format.
 
   namespace
   {
@@ -2421,14 +2510,25 @@ namespace Step69
     }
   } // namespace
 
-
-  // Implementation of the class member <code >interpolate_initial_values
-  // </code>.
+  // The class member <code>TimeLoop<dim>::run()</code> is one of only three 
+  // class member we actually have to implement. We initialize the 
+  // (global) parameter list, setup all the accessory classes (discretization, 
+  // offline_data, time_step, and schlieren_postprocessor), interpolate the 
+  // initial data, and run a forward-Euler time loop.
+  //
+  // We note here that the (unique) call to ParameterAcceptor::initialize
+  // initializes the global ParameterHandler with the
+  // parameters contained in the classes derived from ParameterAceptor. 
+  // This function enters the subsection returned by get_section_name() for 
+  // each derived class, and declares all parameters that were added using 
+  // add_parameter()
 
   template <int dim>
   void TimeLoop<dim>::run()
   {
     pcout << "Reading parameters and allocating objects... " << std::flush;
+
+    /* Initialization of the global ParameterHandler. */
     ParameterAcceptor::initialize("step-69.prm");
     pcout << "done" << std::endl;
 
@@ -2447,8 +2547,12 @@ namespace Step69
     unsigned int output_cycle = 0;
 
     print_head(pcout, "interpolate initial values");
+    /* The vector U and time_step.temp are the only ones in the entire code
+       storing the old and/or new state of the system. */
     auto U = interpolate_initial_values();
 
+    /* By default resume is false, but that could have changed after reading 
+       the input file when calling ParameterAcceptor::initialize */
     if (resume)
       {
         print_head(pcout, "restore interrupted computation");
@@ -2488,7 +2592,7 @@ namespace Step69
         if (t > output_cycle * output_granularity)
           output(U, base_name + "-solution", t, output_cycle++, true);
 
-      } /* end of loop */
+      } /* End of time loop */
 
     if (output_thread.joinable())
       output_thread.join();
@@ -2497,8 +2601,10 @@ namespace Step69
     pcout << timer_output.str() << std::endl;
   }
 
-  // Implementation of the class member <code >interpolate_initial_values
-  // </code>.
+  // Implementation of the class member <code>interpolate_initial_values</code>.
+  // This function takes an initial time "t" as input argument in order to
+  // evaluate an analytic expression (a function of space and time)
+  // and returns a <code>vector_type</code> containing the initial values.
 
   template <int dim>
   typename TimeLoop<dim>::vector_type
@@ -2532,7 +2638,28 @@ namespace Step69
     return U;
   }
 
-  // Implementation of the class member <code>output </code>.
+  // Implementation of the class member <code>output</code>. Most of the 
+  // following lines of code are invested in the implementation of the 
+  // <code>output_worker</code> in order to write the output. We note that:
+  //  - Before calling the <code>output_worker</code>, we create a copy of 
+  //    <code>U[i]</code> (the vector we want to output). This copy is stored in
+  //    <code>output_vector</code>.
+  //  - the task <code>output_worker</code> is assigned to a thread 
+  //  - this task is later moved to the thread <code>output_thread</code>.
+  //
+  // Since <code>output_vector</code> and <code>output_thread</code> are class 
+  // members of <code>TimeLoop</code>, their scope extends beyond that one of 
+  // anything defined inside <code>output_worker</code>. This allows the 
+  // output task to continue its execution even when we 
+  // <code>TimeLoop<dim>::output</code> releases its control to the function 
+  // that called it. This is how (ideally) writing to disk becomes a 
+  // background process and not a locking method.
+  //
+  // The only penalty is the copy of the vector we want to output. This 
+  // penalty could be minimized by defining a class member 
+  // TimeLoop<dim>::prepare() in order to allocate a priori the space for 
+  // <code>output_vector</code> as we did with the vector <code>temp</code> in 
+  // TimeStep<dim>::prepare().
 
   template <int dim>
   void TimeLoop<dim>::output(const typename TimeLoop<dim>::vector_type &U,
@@ -2544,6 +2671,8 @@ namespace Step69
     pcout << "TimeLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;
 
+    /* We check if the thread is still running */
+    /* If so, we wait to for it to join. */
     if (output_thread.joinable())
       {
         TimerOutput::Scope timer(computing_timer, "time_loop - stalled output");
@@ -2554,6 +2683,7 @@ namespace Step69
       ProblemDescription<dim>::problem_dimension;
     const auto &component_names = ProblemDescription<dim>::component_names;
 
+    /* We make a copy the vector we want to output */
     for (unsigned int i = 0; i < problem_dimension; ++i)
       {
         output_vector[i] = U[i];
@@ -2562,6 +2692,7 @@ namespace Step69
 
     schlieren_postprocessor.compute_schlieren(output_vector);
 
+    /* We define the lambda function "output_worker" */
     const auto output_worker = [this, name, t, cycle, checkpoint]() {
       constexpr auto problem_dimension =
         ProblemDescription<dim>::problem_dimension;
@@ -2606,12 +2737,18 @@ namespace Step69
       data_out.set_flags(flags);
 
       data_out.write_vtu_with_pvtu_record("", name, cycle, 6, mpi_communicator);
-    };
 
+       /* There is no return statement, we don't need it this is a void-like 
+          lambda expression */
+    }; 
+
+    /* We launch the thread that executing the output and abandon the 
+       function TimeLoop<dim>::output (returning the control to the 
+       function that called it). */
     output_thread = std::move(std::thread(output_worker));
-  }
+  } 
 
-} // namespace Step69
+} /* End of namespace Step69 */
 
 // @sect4{The main()}
 
