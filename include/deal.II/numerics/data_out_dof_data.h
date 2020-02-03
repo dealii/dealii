@@ -1125,19 +1125,32 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
                     "Either you called this function on objects that "
                     "are empty, or you may have forgotten to call "
                     "the 'build_patches()' function."));
-  // check equality of component
-  // names
+  // Check equality of component names
   Assert(get_dataset_names() == source.get_dataset_names(),
          Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
-  // make sure patches are compatible. we'll
-  // assume that if the first respective
-  // patches are ok that all the other ones
-  // are ok as well
+
+  // Make sure patches are compatible. Ideally, we would check that all input
+  // patches from both collections are all compatible, but we'll be content
+  // with checking that just the first ones from both sources are.
+  //
+  // We check compatibility by testing that both sets of patches result
+  // from the same number of subdivisions, and that they have the same
+  // number of source vectors (they really should, since we already checked
+  // that there are the same number of source components above, but you
+  // never know). This implies that the data should have the same number of
+  // columns. They should really have the same number of rows as well,
+  // but depending on whether a patch has points included or not, the
+  // number of rows may or may not include coordinates for the points,
+  // and the comparison has to account for that because in each source
+  // stream, the patches may include some that have points included.
   Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  Assert((patches[0].data.n_rows() +
+          (patches[0].points_are_available ? 0 : patch_space_dim)) ==
+           (source_patches[0].data.n_rows() +
+            (source_patches[0].points_are_available ? 0 : patch_space_dim)),
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
