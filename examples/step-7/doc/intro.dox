@@ -29,7 +29,7 @@ verification which is a very complicated problem. Rather we will demonstrate
 the tools which deal.II can offer in this respect. This is basically centered
 around the functionality of a single function, VectorTools::integrate_difference().
 This function computes the difference between a given continuous function and
-a finite element field in various norms on each cell. 
+a finite element field in various norms on each cell.
 Of course, like with any other integral, we can only evaluate these norms using quadrature formulas;
 the choice of the right quadrature formula is therefore crucial to the
 accurate evaluation of the error. This holds in particular for the $L_\infty$
