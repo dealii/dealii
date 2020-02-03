@@ -12,8 +12,7 @@ high-performance implementation of a second-order accurate scheme that uses
 <i>convex limiting</i> techniques, and strong stability-preserving (SSP)
 time integration, see @cite GuermondEtAl2018.
 
-@todo Add zenodo link
-
+@dealiiTutorialDOI{10.5281/zenodo.3634929,https://zenodo.org/badge/DOI/10.5281/zenodo.3634929.svg}
 
 <h1>Introduction</h1>
 
@@ -39,8 +38,6 @@ as elementary building blocks in higher-order schemes
 tutorial step to be a good starting point (in particular with respect to
 the programming techniques) before jumping into full research codes such as
 the second-order scheme @cite GuermondEtAl2018.
-
-@todo Add link to repository and project of the second order code.
 
 
 <a name="eulerequations"></a>
