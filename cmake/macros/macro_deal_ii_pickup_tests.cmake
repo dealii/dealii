@@ -188,8 +188,13 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # Respect TEST_PICKUP_REGEX:
     #
 
+    #
+    # Only retain the base name of the test, i.e., remove everything after
+    # (and including) the first period ("."):
+    #
+    STRING(REGEX REPLACE "\\..*$" "" _regex_name "${_category}/${_test}")
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
-        "${_category}/${_test}" MATCHES "${TEST_PICKUP_REGEX}" )
+        "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" )
       SET(_define_test TRUE)
     ELSE()
       SET(_define_test FALSE)
