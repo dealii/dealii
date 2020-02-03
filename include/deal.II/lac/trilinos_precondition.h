@@ -1725,6 +1725,9 @@ namespace TrilinosWrappers
    * except for the higher_order_elements parameter which does not exist in
    * PreconditionerAMGMueLu.
    *
+   * @note You need to configure Trilinos with MueLU support for this
+   * preconditioner to work.
+   *
    * @note At the moment 64bit-indices are not supported.
    *
    * @warning This interface should not be considered as stable.
