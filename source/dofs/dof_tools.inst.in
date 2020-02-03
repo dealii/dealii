@@ -56,6 +56,7 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
           &                  dof_handler,
         const ComponentMask &components);
 
+      // deprecated versions of the count_dofs_per_*() functions
       template void
       count_dofs_per_component<
         DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
@@ -70,6 +71,21 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &,
         const std::vector<unsigned int> &);
+
+      // new versions of the count_dofs_per_*() functions
+      template std::vector<types::global_dof_index>
+      count_dofs_per_fe_component<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const bool,
+        const std::vector<unsigned int> &);
+
+      template std::vector<types::global_dof_index>
+      count_dofs_per_fe_block<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<unsigned int> &);
+
 
       template unsigned int
       count_dofs_on_patch<
