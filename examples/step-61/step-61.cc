@@ -929,12 +929,10 @@ namespace Step61
         // calculate the $L_2$ flux error on the cell by appropriately scaling
         // with face and cell areas and add it to the global error.
         const double cell_area = cell_dgrt->measure();
-        for (unsigned int face_n = 0;
-             face_n < GeometryInfo<dim>::faces_per_cell;
-             ++face_n)
+        for (const auto &face_dgrt : cell_dgrt->face_iterators())
           {
-            const double face_length = cell_dgrt->face(face_n)->measure();
-            fe_face_values_dgrt.reinit(cell_dgrt, face_n);
+            const double face_length = face_dgrt->measure();
+            fe_face_values_dgrt.reinit(cell_dgrt, face_dgrt);
             fe_face_values_dgrt[velocities].get_function_values(
               darcy_velocity, velocity_face_values);
 

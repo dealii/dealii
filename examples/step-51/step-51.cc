@@ -547,20 +547,18 @@ namespace Step51
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , exact_solution()
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
           {
-            if (fe_local.has_support_on_face(i, face))
-              fe_local_support_on_face[face].push_back(i);
+            if (fe_local.has_support_on_face(i, face_no))
+              fe_local_support_on_face[face_no].push_back(i);
           }
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           {
-            if (fe.has_support_on_face(i, face))
-              fe_support_on_face[face].push_back(i);
+            if (fe.has_support_on_face(i, face_no))
+              fe_support_on_face[face_no].push_back(i);
           }
     }
 
@@ -759,11 +757,10 @@ namespace Step51
     // Face terms are assembled on all faces of all elements. This is in
     // contrast to more traditional DG methods, where each face is only visited
     // once in the assembly procedure.
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (unsigned int face_no : GeometryInfo<dim>::face_indices())
       {
-        scratch.fe_face_values_local.reinit(loc_cell, face);
-        scratch.fe_face_values.reinit(cell, face);
+        scratch.fe_face_values_local.reinit(loc_cell, face_no);
+        scratch.fe_face_values.reinit(cell, face_no);
 
         // The already obtained $\hat{u}$ values are needed when solving for the
         // local variables.
@@ -792,11 +789,11 @@ namespace Step51
             // We store the non-zero flux and scalar values, making use of the
             // support_on_face information we created in @p ScratchData.
             for (unsigned int k = 0;
-                 k < scratch.fe_local_support_on_face[face].size();
+                 k < scratch.fe_local_support_on_face[face_no].size();
                  ++k)
               {
                 const unsigned int kk =
-                  scratch.fe_local_support_on_face[face][k];
+                  scratch.fe_local_support_on_face[face_no][k];
                 scratch.q_phi[k] =
                   scratch.fe_face_values_local[fluxes].value(kk, q);
                 scratch.u_phi[k] =
@@ -813,29 +810,29 @@ namespace Step51
             if (!task_data.trace_reconstruct)
               {
                 for (unsigned int k = 0;
-                     k < scratch.fe_support_on_face[face].size();
+                     k < scratch.fe_support_on_face[face_no].size();
                      ++k)
                   scratch.tr_phi[k] = scratch.fe_face_values.shape_value(
-                    scratch.fe_support_on_face[face][k], q);
+                    scratch.fe_support_on_face[face_no][k], q);
                 for (unsigned int i = 0;
-                     i < scratch.fe_local_support_on_face[face].size();
+                     i < scratch.fe_local_support_on_face[face_no].size();
                      ++i)
                   for (unsigned int j = 0;
-                       j < scratch.fe_support_on_face[face].size();
+                       j < scratch.fe_support_on_face[face_no].size();
                        ++j)
                     {
                       const unsigned int ii =
-                        scratch.fe_local_support_on_face[face][i];
+                        scratch.fe_local_support_on_face[face_no][i];
                       const unsigned int jj =
-                        scratch.fe_support_on_face[face][j];
+                        scratch.fe_support_on_face[face_no][j];
                       scratch.lf_matrix(ii, jj) +=
                         ((scratch.q_phi[i] * normal +
                           (convection * normal - tau_stab) * scratch.u_phi[i]) *
                          scratch.tr_phi[j]) *
                         JxW;
 
-                      // Note the sign of the face-local matrix.  We negate the
-                      // sign during assembly here so that we can use the
+                      // Note the sign of the face_no-local matrix.  We negate
+                      // the sign during assembly here so that we can use the
                       // FullMatrix::mmult with addition when computing the
                       // Schur complement.
                       scratch.fl_matrix(jj, ii) -=
@@ -846,24 +843,24 @@ namespace Step51
                     }
 
                 for (unsigned int i = 0;
-                     i < scratch.fe_support_on_face[face].size();
+                     i < scratch.fe_support_on_face[face_no].size();
                      ++i)
                   for (unsigned int j = 0;
-                       j < scratch.fe_support_on_face[face].size();
+                       j < scratch.fe_support_on_face[face_no].size();
                        ++j)
                     {
                       const unsigned int ii =
-                        scratch.fe_support_on_face[face][i];
+                        scratch.fe_support_on_face[face_no][i];
                       const unsigned int jj =
-                        scratch.fe_support_on_face[face][j];
+                        scratch.fe_support_on_face[face_no][j];
                       task_data.cell_matrix(ii, jj) +=
                         ((convection * normal - tau_stab) * scratch.tr_phi[i] *
                          scratch.tr_phi[j]) *
                         JxW;
                     }
 
-                if (cell->face(face)->at_boundary() &&
-                    (cell->face(face)->boundary_id() == 1))
+                if (cell->face(face_no)->at_boundary() &&
+                    (cell->face(face_no)->boundary_id() == 1))
                   {
                     const double neumann_value =
                       -scratch.exact_solution.gradient(quadrature_point) *
@@ -871,11 +868,11 @@ namespace Step51
                       convection * normal *
                         scratch.exact_solution.value(quadrature_point);
                     for (unsigned int i = 0;
-                         i < scratch.fe_support_on_face[face].size();
+                         i < scratch.fe_support_on_face[face_no].size();
                          ++i)
                       {
                         const unsigned int ii =
-                          scratch.fe_support_on_face[face][i];
+                          scratch.fe_support_on_face[face_no][i];
                         task_data.cell_vector(ii) +=
                           scratch.tr_phi[i] * neumann_value * JxW;
                       }
@@ -886,16 +883,16 @@ namespace Step51
             // u_h\right>_{\partial \mathcal T}$ to the local matrix. As opposed
             // to the face matrices above, we need it in both assembly stages.
             for (unsigned int i = 0;
-                 i < scratch.fe_local_support_on_face[face].size();
+                 i < scratch.fe_local_support_on_face[face_no].size();
                  ++i)
               for (unsigned int j = 0;
-                   j < scratch.fe_local_support_on_face[face].size();
+                   j < scratch.fe_local_support_on_face[face_no].size();
                    ++j)
                 {
                   const unsigned int ii =
-                    scratch.fe_local_support_on_face[face][i];
+                    scratch.fe_local_support_on_face[face_no][i];
                   const unsigned int jj =
-                    scratch.fe_local_support_on_face[face][j];
+                    scratch.fe_local_support_on_face[face_no][j];
                   scratch.ll_matrix(ii, jj) +=
                     tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
                 }
@@ -908,11 +905,11 @@ namespace Step51
             // since we have moved everything to the other side of the equation.
             if (task_data.trace_reconstruct)
               for (unsigned int i = 0;
-                   i < scratch.fe_local_support_on_face[face].size();
+                   i < scratch.fe_local_support_on_face[face_no].size();
                    ++i)
                 {
                   const unsigned int ii =
-                    scratch.fe_local_support_on_face[face][i];
+                    scratch.fe_local_support_on_face[face_no][i];
                   scratch.l_rhs(ii) -=
                     (scratch.q_phi[i] * normal +
                      scratch.u_phi[i] * (convection * normal - tau_stab)) *

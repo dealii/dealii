@@ -331,24 +331,20 @@ to loop over all boundary faces and integrate there. The mechanism works in
 the same way as above, i.e. the extractor classes also work on FEFaceValues objects:
 
 @code
-      for (unsigned int face_no=0;
-           face_no<GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
-        if (cell->at_boundary(face_no))
-          {
-            fe_face_values.reinit (cell, face_no);
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
+            {
+              fe_face_values.reinit(cell, face);
 
-            pressure_boundary_values
-              .value_list (fe_face_values.get_quadrature_points(),
-                           boundary_values);
+              pressure_boundary_values.value_list(
+                fe_face_values.get_quadrature_points(), boundary_values);
 
-            for (unsigned int q=0; q<n_face_q_points; ++q)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
-                                  fe_face_values.normal_vector(q) *
-                                  boundary_values[q] *
-                                  fe_face_values.JxW(q));
-          }
+              for (unsigned int q = 0; q < n_face_q_points; ++q)
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  local_rhs(i) += -(fe_face_values[velocities].value(i, q) *
+                                    fe_face_values.normal_vector(q) *
+                                    boundary_values[q] *
+                                    fe_face_values.JxW(q));
 @endcode
 
 You will find the exact same code as above in the sources for the present

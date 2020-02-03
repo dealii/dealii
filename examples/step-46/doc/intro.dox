@@ -465,44 +465,38 @@ ensure that the velocity degrees of freedom on this face are
 zero. Some care is necessary to deal with the case that the adjacent
 solid cell is refined, yielding the following code:
 @code
-    std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
-    for (typename hp::DoFHandler<dim>::active_cell_iterator
-	   cell = dof_handler.begin_active();
-	 cell != dof_handler.end(); ++cell)
-      if (cell_is_in_fluid_domain (cell))
-	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (!cell->at_boundary(f))
-	    {
-	      bool face_is_on_interface = false;
+std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
+for (const auto &cell: dof_handler.active_cell_iterators())
+  if (cell_is_in_fluid_domain (cell))
+    for (unsigned int f : GeometryInfo<dim>::face_indices())
+      if (!cell->at_boundary(f))
+        {
+          bool face_is_on_interface = false;
 
-	      if ((cell->neighbor(f)->has_children() == false)
-		  &&
-		  (cell_is_in_solid_domain (cell->neighbor(f))))
-		face_is_on_interface = true;
-	      else if (cell->neighbor(f)->has_children() == true)
-		{
-						   // The neighbor does
-						   // have
-						   // children. See if
-						   // any of the cells
-						   // on the other
-						   // side are elastic
-		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
-		    if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
-		      {
-			face_is_on_interface = true;
-			break;
-		      }
-		}
+          if ((cell->neighbor(f)->has_children() == false)
+	          &&
+	          (cell_is_in_solid_domain (cell->neighbor(f))))
+	        face_is_on_interface = true;
+          else if (cell->neighbor(f)->has_children() == true)
+	        {
+              // The neighbor does have children. See if any of the cells
+              // on the other side are elastic
+	          for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
+	            if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
+	              {
+                   face_is_on_interface = true;
+		            break;
+	              }
+	        }
 
-	      if (face_is_on_interface)
-		{
-		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
-		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
-		    if (stokes_fe.face_system_to_component_index(i).first < dim)
- 		      constraints.add_line (local_face_dof_indices[i]);
-		}
-	    }
+          if (face_is_on_interface)
+           {
+             cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
+             for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
+             if (stokes_fe.face_system_to_component_index(i).first < dim)
+               constraints.add_line (local_face_dof_indices[i]);
+           }
+        }
 @endcode
 
 The call <code>constraints.add_line(t)</code> tells the
