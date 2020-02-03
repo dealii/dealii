@@ -862,6 +862,96 @@ TimerOutput::print_summary() const
 
 
 void
+TimerOutput::print_summary_of_wall_time_statistics(
+  const MPI_Comm mpi_comm) const
+{
+  // we are going to change the precision and width of output below. store the
+  // old values so we can restore it later on
+  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
+  const std::streamsize old_precision    = out_stream.get_stream().precision();
+  const std::streamsize old_width        = out_stream.get_stream().width();
+
+  AssertDimension(sections.size(),
+                  Utilities::MPI::max(sections.size(), mpi_comm));
+
+  // get the maximum width among all sections
+  unsigned int max_width = 0;
+  for (const auto &i : sections)
+    max_width =
+      std::max(max_width, static_cast<unsigned int>(i.first.length()));
+
+  // 20 is the default width until | character
+  max_width = std::max(max_width + 1, static_cast<unsigned int>(20));
+  const std::string extra_dash  = std::string(max_width - 20, '-');
+  const std::string extra_space = std::string(max_width - 20, ' ');
+
+  // in case we want to write out wallclock times
+  {
+    double total_wall_time = timer_all.wall_time();
+
+    Utilities::MPI::MinMaxAvg data =
+      Utilities::MPI::min_max_avg(total_wall_time, mpi_comm);
+    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+
+    // now generate a nice table
+    out_stream << "\n\n"
+               << "+---------------------------------" << extra_dash
+               << "+------------+------+------------+------------+------+\n"
+               << "| Total wallclock time elapsed    " << extra_space << "|";
+    out_stream << std::setw(10) << std::setprecision(4) << std::right;
+    out_stream << data.min << "s |";
+    out_stream << std::setw(5) << std::right;
+    out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
+    out_stream << std::setw(10) << std::setprecision(4) << std::right;
+    out_stream << data.avg << "s |";
+    out_stream << std::setw(10) << std::setprecision(4) << std::right;
+    out_stream << data.max << "s |";
+    out_stream << std::setw(5) << std::right;
+    out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
+    out_stream << "|                                 " << extra_space
+               << "|            |  min |            |            |  max |\n";
+    out_stream << "| Section             " << extra_space << "| no. calls "
+               << "|   min time | rank |   avg time |   max time | rank |\n";
+    out_stream << "+---------------------" << extra_dash << "+-----------+"
+               << "------------+------+------------+------------+------+\n";
+    for (const auto &i : sections)
+      {
+        std::string name_out = i.first;
+
+        // resize the array so that it is always of the same size
+        unsigned int pos_non_space = name_out.find_first_not_of(' ');
+        name_out.erase(0, pos_non_space);
+        name_out.resize(max_width, ' ');
+        out_stream << "| " << name_out;
+        out_stream << "| ";
+        out_stream << std::setw(9);
+        out_stream << i.second.n_calls << " |";
+        data = Utilities::MPI::min_max_avg(i.second.total_wall_time, mpi_comm);
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.min << "s |";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.avg << "s |";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.max << "s |";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
+      }
+    out_stream << "+---------------------" << extra_dash << "+-----------+"
+               << "------------+------+------------+------------+------+\n"
+               << std::endl;
+  }
+
+  // restore previous precision and width
+  out_stream.get_stream().precision(old_precision);
+  out_stream.get_stream().width(old_width);
+  out_stream.get_stream().flags(old_flags);
+}
+
+
+
+void
 TimerOutput::disable_output()
 {
   output_is_enabled = false;
