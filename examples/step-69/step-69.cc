@@ -1362,8 +1362,8 @@ namespace Step69
                                                                             f))
                       continue;
 
-                    const auto &[normal_j, _1, _2] =
-                      boundary_normal_map[local_dof_indices[j]];
+                    const auto &normal_j =
+                      std::get<0>(boundary_normal_map[local_dof_indices[j]]);
 
                     const auto value_JxW =
                       fe_face_values.shape_value(j, q) * JxW;
@@ -1650,7 +1650,7 @@ namespace Step69
       /* Formula (2.11) in Guermond-Popov-2016 */
 
       return std::max(positive_part(lambda3), negative_part(lambda1));
-    };
+    }
 
     // We compute a second upper bound of the maximal wavespeed that is in
     // general, not as sharp as the two-rarefaction estimate. But it will

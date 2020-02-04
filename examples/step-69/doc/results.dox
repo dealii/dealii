@@ -4,7 +4,7 @@
 Running the program with default parameters in release mode takes about 1
 minute on a 4 core machine (with hyperthreading):
 @verbatim
-$ mpirun -np 4 ./step-69 | tee output
+# mpirun -np 4 ./step-69 | tee output
 Reading parameters and allocating objects... done
 
     ####################################################
@@ -107,7 +107,7 @@ So, we give the first-order method a second chance and run it with about
 2.4M gridpoints on a small compute server:
 
 @verbatim
-$ mpirun -np 16 ./step-69 | tee output
+# mpirun -np 16 ./step-69 | tee output
 
 [...]
 
