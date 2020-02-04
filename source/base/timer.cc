@@ -862,8 +862,8 @@ TimerOutput::print_summary() const
 
 
 void
-TimerOutput::print_summary_of_wall_time_statistics(
-  const MPI_Comm mpi_comm) const
+TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
+                                        const double   quantile) const
 {
   // we are going to change the precision and width of output below. store the
   // old values so we can restore it later on
@@ -873,6 +873,8 @@ TimerOutput::print_summary_of_wall_time_statistics(
 
   AssertDimension(sections.size(),
                   Utilities::MPI::max(sections.size(), mpi_comm));
+  Assert(quantile >= 0. && quantile <= 0.5,
+         ExcMessage("The quantile must be between 0 and 0.5"));
 
   // get the maximum width among all sections
   unsigned int max_width = 0;
@@ -880,40 +882,138 @@ TimerOutput::print_summary_of_wall_time_statistics(
     max_width =
       std::max(max_width, static_cast<unsigned int>(i.first.length()));
 
-  // 20 is the default width until | character
-  max_width = std::max(max_width + 1, static_cast<unsigned int>(20));
-  const std::string extra_dash  = std::string(max_width - 20, '-');
-  const std::string extra_space = std::string(max_width - 20, ' ');
+  // 17 is the default width until | character
+  max_width = std::max(max_width + 1, static_cast<unsigned int>(17));
+  const std::string extra_dash  = std::string(max_width - 17, '-');
+  const std::string extra_space = std::string(max_width - 17, ' ');
+
+  // function to print data in a nice table
+  const auto print_statistics = [&](const double given_time) {
+    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+    if (n_ranks == 1 || quantile == 0.)
+      {
+        Utilities::MPI::MinMaxAvg data =
+          Utilities::MPI::min_max_avg(given_time, mpi_comm);
+
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.min << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.avg << "s |";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << data.max << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
+      }
+    else
+      {
+        const unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_comm);
+        std::vector<double> receive_data(my_rank == 0 ? n_ranks : 0);
+        std::vector<double> result(9);
+#ifdef DEAL_II_WITH_MPI
+        MPI_Gather(&given_time,
+                   1,
+                   MPI_DOUBLE,
+                   receive_data.data(),
+                   1,
+                   MPI_DOUBLE,
+                   0,
+                   mpi_comm);
+        if (my_rank == 0)
+          {
+            // fill the received data in a pair and sort; on the way, also
+            // compute the average
+            std::vector<std::pair<double, unsigned int>> data_rank;
+            data_rank.reserve(n_ranks);
+            for (unsigned int i = 0; i < n_ranks; ++i)
+              {
+                data_rank.emplace_back(receive_data[i], i);
+                result[4] += receive_data[i];
+              }
+            result[4] /= n_ranks;
+            std::sort(data_rank.begin(), data_rank.end());
+
+            const unsigned int quantile_index =
+              static_cast<unsigned int>(std::round(quantile * n_ranks));
+            AssertIndexRange(quantile_index, data_rank.size());
+            result[0] = data_rank[0].first;
+            result[1] = data_rank[0].second;
+            result[2] = data_rank[quantile_index].first;
+            result[3] = data_rank[quantile_index].second;
+            result[5] = data_rank[n_ranks - 1 - quantile_index].first;
+            result[6] = data_rank[n_ranks - 1 - quantile_index].second;
+            result[7] = data_rank[n_ranks - 1].first;
+            result[8] = data_rank[n_ranks - 1].second;
+          }
+        MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+#endif
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[0] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[1])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[2] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[3])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[4] << "s |";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[5] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[6])
+                   << (n_ranks > 99999 ? "" : " ") << "|";
+        out_stream << std::setw(10) << std::setprecision(4) << std::right;
+        out_stream << result[7] << "s ";
+        out_stream << std::setw(5) << std::right;
+        out_stream << static_cast<unsigned int>(result[8])
+                   << (n_ranks > 99999 ? "" : " ") << "|\n";
+      }
+  };
 
   // in case we want to write out wallclock times
   {
-    double total_wall_time = timer_all.wall_time();
-
-    Utilities::MPI::MinMaxAvg data =
-      Utilities::MPI::min_max_avg(total_wall_time, mpi_comm);
     const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+
+    const std::string time_rank_column = "------------------+";
+    const std::string time_rank_space  = "                  |";
 
     // now generate a nice table
     out_stream << "\n\n"
-               << "+---------------------------------" << extra_dash
-               << "+------------+------+------------+------------+------+\n"
-               << "| Total wallclock time elapsed    " << extra_space << "|";
-    out_stream << std::setw(10) << std::setprecision(4) << std::right;
-    out_stream << data.min << "s |";
-    out_stream << std::setw(5) << std::right;
-    out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
-    out_stream << std::setw(10) << std::setprecision(4) << std::right;
-    out_stream << data.avg << "s |";
-    out_stream << std::setw(10) << std::setprecision(4) << std::right;
-    out_stream << data.max << "s |";
-    out_stream << std::setw(5) << std::right;
-    out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
-    out_stream << "|                                 " << extra_space
-               << "|            |  min |            |            |  max |\n";
-    out_stream << "| Section             " << extra_space << "| no. calls "
-               << "|   min time | rank |   avg time |   max time | rank |\n";
-    out_stream << "+---------------------" << extra_dash << "+-----------+"
-               << "------------+------+------------+------------+------+\n";
+               << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n"
+               << "| Total wallclock time elapsed " << extra_space << "|";
+
+    print_statistics(timer_all.wall_time());
+
+    out_stream << "|                              " << extra_space << "|"
+               << time_rank_space
+               << (n_ranks > 1 && quantile > 0. ? time_rank_space : "")
+               << "             "
+               << (n_ranks > 1 && quantile > 0. ? time_rank_space : "")
+               << time_rank_space << "\n";
+    out_stream << "| Section          " << extra_space << "| no. calls "
+               << "|   min time  rank |";
+    if (n_ranks > 1 && quantile > 0.)
+      out_stream << " " << std::setw(5) << std::setprecision(2) << std::right
+                 << quantile << "-tile  rank |";
+    out_stream << "   avg time |";
+    if (n_ranks > 1 && quantile > 0.)
+      out_stream << " " << std::setw(5) << std::setprecision(2) << std::right
+                 << 1. - quantile << "-tile  rank |";
+    out_stream << "   max time  rank |\n";
+    out_stream << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n";
     for (const auto &i : sections)
       {
         std::string name_out = i.first;
@@ -926,21 +1026,15 @@ TimerOutput::print_summary_of_wall_time_statistics(
         out_stream << "| ";
         out_stream << std::setw(9);
         out_stream << i.second.n_calls << " |";
-        data = Utilities::MPI::min_max_avg(i.second.total_wall_time, mpi_comm);
-        out_stream << std::setw(10) << std::setprecision(4) << std::right;
-        out_stream << data.min << "s |";
-        out_stream << std::setw(5) << std::right;
-        out_stream << data.min_index << (n_ranks > 99999 ? "" : " ") << "|";
-        out_stream << std::setw(10) << std::setprecision(4) << std::right;
-        out_stream << data.avg << "s |";
-        out_stream << std::setw(10) << std::setprecision(4) << std::right;
-        out_stream << data.max << "s |";
-        out_stream << std::setw(5) << std::right;
-        out_stream << data.max_index << (n_ranks > 99999 ? "" : " ") << "|\n";
+
+        print_statistics(i.second.total_wall_time);
       }
-    out_stream << "+---------------------" << extra_dash << "+-----------+"
-               << "------------+------+------------+------------+------+\n"
-               << std::endl;
+    out_stream << "+------------------------------" << extra_dash << "+"
+               << time_rank_column
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << "------------+"
+               << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
+               << time_rank_column << "\n";
   }
 
   // restore previous precision and width

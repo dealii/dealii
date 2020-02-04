@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// test TimerOutput::print_wall_time_statistics()
+// test TimerOutput::print_wall_time_statistics() with optional
+// quantile argument
 
 #include <deal.II/base/timer.h>
 
@@ -48,7 +49,7 @@ test()
   burn(50);
   t.leave_subsection("hi");
 
-  t.print_wall_time_statistics(MPI_COMM_WORLD);
+  t.print_wall_time_statistics(MPI_COMM_WORLD, 0.1);
 
   t.enter_subsection(
     "this is a very long section name that previously did not work");
@@ -56,7 +57,7 @@ test()
   t.leave_subsection(
     "this is a very long section name that previously did not work");
 
-  t.print_wall_time_statistics(MPI_COMM_WORLD);
+  t.print_wall_time_statistics(MPI_COMM_WORLD, 0.1);
 
   std::string s = ss.str();
   std::replace_if(s.begin(), s.end(), ::isdigit, ' ');

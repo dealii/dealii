@@ -584,9 +584,10 @@ private:
  * approach allows to identify on which ranks certain slowdowns occur. In case
  * some imbalance between the MPI ranks from one section to the next can be
  * tolerated, this strategy can hence be advantageous over the barrier variant
- * as it does not synchronize the program in places where it is not
- * necessary. The usage of this variant is to initialize the output object
- * without any native print settings and without communicator,
+ * as it does not synchronize the program in places where it is not necessary,
+ * and rather tries to display the imbalance observed in various phases. In
+ * order to use this variant initialize the output object without any native
+ * print settings and without communicator,
  * @code
  *   TimerOutput timer (pcout,
  *                      TimerOutput::never,
@@ -594,11 +595,16 @@ private:
  * @endcode
  * and then call
  * @code
- *   timer.print_summary_statistics(MPI_COMM_WORLD);
+ *   timer.print_wall_time_statistics(MPI_COMM_WORLD);
  * @endcode
- * Here, the output is written to the <code>pcout</code> object of type
- * ConditionalOStream passed to the constructor, making sure the information
- * is only printed once. See step-67 for an example usage of this variant.
+ * where appropriate. Here, the output is written to the <code>pcout</code>
+ * object of type ConditionalOStream passed to the constructor, making sure
+ * the information is only printed once. See step-67 for an example usage of
+ * this variant. Besides the basic minimum, average, and maximum of times over
+ * all MPI ranks, the TimerOutput::print_wall_time_statistics() function also
+ * takes a second argument to specify output of quantiles, e.g., the time
+ * taken by the 10\% of the slowest and fastest ranks, respectively, to get
+ * additional insight into the statistical distribution.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.
@@ -858,9 +864,18 @@ public:
    * useful information when the TimerOutput object is constructed without an
    * MPI_Comm argument, to let individual sections run without being disturbed
    * by barriers.
+   *
+   * The optional argument `quantile` allows to add two additional columns to
+   * the output in terms of the distribution of run times. If quantile = 0.1,
+   * the value and rank of the 10% lowest data is printed as well as the value
+   * and rank at 90% of the distribution function, in addition to the minimum
+   * and the maximum. The value of `quantile` needs to be between 0 (no
+   * quantiles are printed besides the minimum and maximum) and 0.5 (when the
+   * median is given).
    */
   void
-  print_summary_of_wall_time_statistics(const MPI_Comm mpi_comm) const;
+  print_wall_time_statistics(const MPI_Comm mpi_comm,
+                             const double   print_quantile = 0.) const;
 
   /**
    * By calling this function, all output can be disabled. This function
