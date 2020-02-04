@@ -2605,11 +2605,17 @@ namespace Step69
     print_head(pcout, "create triangulation");
     discretization.setup();
 
+    pcout << "Number of active cells:       "
+          << discretization.triangulation.n_global_active_cells() << std::endl;
+
     // assemble all matrices
 
     print_head(pcout, "compute offline data");
     offline_data.setup();
     offline_data.assemble();
+
+    pcout << "Number of degrees of freedom: "
+          << offline_data.dof_handler.n_dofs() << std::endl;
 
     // and set up scratch space:
 

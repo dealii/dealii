@@ -12,7 +12,7 @@ high-performance implementation of a second-order accurate scheme that uses
 <i>convex limiting</i> techniques, and strong stability-preserving (SSP)
 time integration, see @cite GuermondEtAl2018.
 
-@dealiiTutorialDOI{10.5281/zenodo.3634929,https://zenodo.org/badge/DOI/10.5281/zenodo.3634929.svg}
+@dealiiTutorialDOI{10.5281/zenodo.3643899,https://zenodo.org/badge/DOI/10.5281/zenodo.3643899.svg}
 
 <h1>Introduction</h1>
 
@@ -362,7 +362,3 @@ application of this kind of schemes, also called <i>edge-based</i> or
 
 @todo Explain what to do for slip, dirichlet and do-nothing boundary
 conditions.
-
-<h3>Implementation of the scheme </h3>
-
-@todo Maybe comment on some key features of the implementation?!
