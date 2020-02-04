@@ -3798,8 +3798,7 @@ namespace GridGenerator
     // The index of the first cell of the leg.
     unsigned int cell_index = 1;
     // The legs of the cross
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         const unsigned int oface = GeometryInfo<dim>::opposite_face[face];
         const unsigned int dir = GeometryInfo<dim>::unit_normal_direction[face];

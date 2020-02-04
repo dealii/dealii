@@ -956,8 +956,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
               << n_faces << " data follows" << '\n';
           for (const auto &cell : tria.active_cell_iterators())
             {
-              for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                   ++f)
+              for (const unsigned int f : GeometryInfo<dim>::face_indices())
                 out << ' ' << cell->face(f)->measure();
               out << '\n';
             }
@@ -970,8 +969,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
               << n_faces << " data follows" << '\n';
           for (const auto &cell : tria.active_cell_iterators())
             {
-              for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                   ++f)
+              for (const unsigned int f : GeometryInfo<dim>::face_indices())
                 out << ' ' << cell->face(f)->diameter();
               out << '\n';
             }

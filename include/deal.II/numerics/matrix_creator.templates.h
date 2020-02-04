@@ -1056,8 +1056,7 @@ namespace MatrixCreator
       copy_data.cell_matrix.clear();
       copy_data.cell_vector.clear();
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         // check if this face is on that part of the boundary we are
         // interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1274,8 +1273,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in
@@ -1499,8 +1497,7 @@ namespace MatrixCreator
       copy_data.cell_vector.clear();
 
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         // check if this face is on that part of
         // the boundary we are interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1733,8 +1730,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in

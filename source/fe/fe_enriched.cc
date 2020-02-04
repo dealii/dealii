@@ -1293,8 +1293,7 @@ namespace ColorEnriched
         {
           const unsigned int           fe_index = cell->active_fe_index();
           const std::set<unsigned int> fe_set   = fe_sets.at(fe_index);
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
               // cell shouldn't be at the boundary and
               // neighboring cell is not already visited (to avoid visiting

@@ -285,8 +285,7 @@ namespace CUDAWrappers
         FETools::lexicographic_to_hierarchic_numbering<dim - 1>(
           FE_Q<dim - 1>(fe_degree));
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if ((!cell->at_boundary(face)) &&
               (cell->neighbor(face)->has_children() == false))

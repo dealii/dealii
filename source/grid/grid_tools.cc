@@ -103,8 +103,7 @@ namespace GridTools
     const typename Triangulation<dim, spacedim>::active_cell_iterator endc =
       tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
                ++i)
@@ -4138,7 +4137,7 @@ namespace GridTools
         continue_refinement = false;
 
         for (const auto &cell : tria.active_cell_iterators())
-          for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; j++)
+          for (const unsigned int j : GeometryInfo<dim>::face_indices())
             if (cell->at_boundary(j) == false &&
                 cell->neighbor(j)->has_children())
               {

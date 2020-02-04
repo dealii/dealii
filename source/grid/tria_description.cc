@@ -242,8 +242,7 @@ namespace TriangulationDescription
                     numbers::invalid_unsigned_int;
 
                 // c) save boundary_ids of each face of this cell
-                for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                     ++f)
+                for (const unsigned int f : GeometryInfo<dim>::face_indices())
                   {
                     types::boundary_id boundary_ind =
                       cell->face(f)->boundary_id();

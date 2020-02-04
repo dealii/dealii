@@ -3162,8 +3162,7 @@ namespace GridTools
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
@@ -3179,8 +3178,7 @@ namespace GridTools
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {

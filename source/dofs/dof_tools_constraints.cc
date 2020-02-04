@@ -663,8 +663,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // in any case, faces can have at most two active fe indices,
@@ -812,8 +811,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // first of all, make sure that we treat a case which is
@@ -1085,8 +1083,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // first of all, make sure that we treat a case which is

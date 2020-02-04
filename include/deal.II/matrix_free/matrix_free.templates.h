@@ -1622,8 +1622,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                          const bool,
                                          const bool)> &fu) {
               for (unsigned int c = 0; c < n_cell_batches(); ++c)
-                for (unsigned int d = 0; d < GeometryInfo<dim>::faces_per_cell;
-                     ++d)
+                for (const unsigned int d : GeometryInfo<dim>::face_indices())
                   for (unsigned int v = 0;
                        v < VectorizedArrayType::n_array_elements;
                        ++v)

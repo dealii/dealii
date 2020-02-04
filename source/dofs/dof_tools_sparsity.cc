@@ -790,7 +790,7 @@ namespace DoFTools
         Table<2, bool> support_on_face(fe.dofs_per_cell,
                                        GeometryInfo<dim>::faces_per_cell);
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
             support_on_face(i, f) = fe.has_support_on_face(i, f);
 
         // Convert the int_dof_mask to bool_int_dof_mask so we can pass it
