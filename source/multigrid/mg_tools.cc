@@ -208,8 +208,7 @@ namespace MGTools
         // and add the missing
         // contribution as well as the
         // flux contributions.
-        for (unsigned int iface = 0; iface < GeometryInfo<dim>::faces_per_cell;
-             ++iface)
+        for (const unsigned int iface : GeometryInfo<dim>::face_indices())
           {
             bool level_boundary = cell->at_boundary(iface);
             typename DoFHandler<dim, spacedim>::cell_iterator neighbor;
@@ -460,8 +459,7 @@ namespace MGTools
         // and add the missing
         // contribution as well as the
         // flux contributions.
-        for (unsigned int iface = 0; iface < GeometryInfo<dim>::faces_per_cell;
-             ++iface)
+        for (const unsigned int iface : GeometryInfo<dim>::face_indices())
           {
             bool level_boundary = cell->at_boundary(iface);
             typename DoFHandler<dim, spacedim>::cell_iterator neighbor;
@@ -627,8 +625,7 @@ namespace MGTools
             sparsity.add(dofs_on_this_cell[i], dofs_on_this_cell[j]);
 
         // Loop over all interior neighbors
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             bool use_face = false;
             if ((!cell->at_boundary(face)) &&
@@ -705,8 +702,7 @@ namespace MGTools
 
         cell->get_mg_dof_indices(dofs_on_this_cell);
         // Loop over all interior neighbors
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             // Neighbor is coarser
             bool use_face = false;
@@ -814,8 +810,7 @@ namespace MGTools
               sparsity.add(dofs_on_this_cell[i], dofs_on_this_cell[j]);
 
         // Loop over all interior neighbors
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             typename DoFHandler<dim, spacedim>::face_iterator cell_face =
               cell->face(face);
@@ -984,8 +979,7 @@ namespace MGTools
 
         cell->get_mg_dof_indices(dofs_on_this_cell);
         // Loop over all interior neighbors
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             // Neighbor is coarser
             bool use_face = false;

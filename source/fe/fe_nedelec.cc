@@ -442,8 +442,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
       const Quadrature<dim> &face_quadrature =
         QProjector<dim>::project_to_all_faces(reference_face_quadrature);
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int q_point = 0; q_point < n_face_points; ++q_point)
           {
             this->generalized_support_points[face * n_face_points + q_point +

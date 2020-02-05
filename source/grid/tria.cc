@@ -10440,8 +10440,7 @@ Triangulation<dim, spacedim>::get_boundary_ids() const
       std::set<types::boundary_id> b_ids;
       active_cell_iterator         cell = begin_active();
       for (; cell != end(); ++cell)
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(face))
             b_ids.insert(cell->face(face)->boundary_id());
       std::vector<types::boundary_id> boundary_ids(b_ids.begin(), b_ids.end());
@@ -10461,8 +10460,7 @@ Triangulation<dim, spacedim>::get_manifold_ids() const
     {
       m_ids.insert(cell->manifold_id());
       if (dim > 1)
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(face))
             m_ids.insert(cell->face(face)->manifold_id());
     }
@@ -10641,10 +10639,8 @@ Triangulation<dim, spacedim>::create_triangulation(
           case 1:
             {
               bool values[][2] = {{false, true}, {true, false}};
-              for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                   ++i)
-                for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell;
-                     ++j)
+              for (const unsigned int i : GeometryInfo<dim>::face_indices())
+                for (const unsigned int j : GeometryInfo<dim>::face_indices())
                   correct(i, j) = (values[i][j]);
               break;
             }
@@ -10654,10 +10650,8 @@ Triangulation<dim, spacedim>::create_triangulation(
                                   {true, false, false, true},
                                   {true, false, false, true},
                                   {false, true, true, false}};
-              for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                   ++i)
-                for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell;
-                     ++j)
+              for (const unsigned int i : GeometryInfo<dim>::face_indices())
+                for (const unsigned int j : GeometryInfo<dim>::face_indices())
                   correct(i, j) = (values[i][j]);
               break;
             }
@@ -10680,8 +10674,7 @@ Triangulation<dim, spacedim>::create_triangulation(
                cell != this_round.end();
                ++cell)
             {
-              for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                   ++i)
+              for (const unsigned int i : GeometryInfo<dim>::face_indices())
                 {
                   if (!((*cell)->face(i)->at_boundary()))
                     {
@@ -13984,8 +13977,7 @@ namespace
         for (unsigned int c = 0; c < cell->n_children(); ++c)
           cell->child(c)->clear_coarsen_flag();
 
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           if (!cell->at_boundary(face) &&
               (!cell->neighbor(face)->is_active()) &&
               (cell_will_be_coarsened(cell->neighbor(face))))
@@ -14028,8 +14020,7 @@ namespace
       {
         // use first algorithm
         unsigned int refined_neighbors = 0, unrefined_neighbors = 0;
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           if (!cell->at_boundary(face))
             {
               if (face_will_be_refined_by_neighbor(cell, face))
@@ -14668,8 +14659,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
             if (cell->refine_flag_set())
               {
                 // loop over neighbors of cell
-                for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                     ++i)
+                for (const unsigned int i : GeometryInfo<dim>::face_indices())
                   {
                     // only do something if the face is not at the
                     // boundary and if the face will be refined with

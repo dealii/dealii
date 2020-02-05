@@ -2014,8 +2014,7 @@ namespace internal
         fe_face_values_neigh[i].resize(face_data_by_cells[i].descriptor.size());
       for (unsigned int cell = 0; cell < cell_type.size(); ++cell)
         for (unsigned int my_q = 0; my_q < face_data_by_cells.size(); ++my_q)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
               if (fe_face_values[my_q][fe_index].get() == nullptr)
                 fe_face_values[my_q][fe_index].reset(

@@ -942,8 +942,7 @@ namespace internal
     local_face_integrals.clear();
 
     // loop over all faces of this cell
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
       {
         const typename DoFHandlerType::face_iterator face = cell->face(face_no);
 

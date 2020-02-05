@@ -3211,8 +3211,7 @@ inline unsigned int
 CellAccessor<dim, spacedim>::face_iterator_to_index(
   const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const
 {
-  for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
-       ++face_n)
+  for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
     if (this->face(face_n) == face)
       return face_n;
 

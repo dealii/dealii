@@ -1211,7 +1211,7 @@ struct GeometryInfo<0>
    * using range-based for loops of the following kind:
    * @code
    *   for (auto &cell : triangulation.active_cell_iterators())
-   *     for (auto face_index : GeometryInfo<dim>::face_indices)
+   *     for (auto face_index : GeometryInfo<dim>::face_indices())
    *       if (cell->face(face_index)->at_boundary())
    *         ... do something ...
    * @endcode
@@ -1863,7 +1863,7 @@ struct GeometryInfo
    * using range-based for loops of the following kind:
    * @code
    *   for (auto &cell : triangulation.active_cell_iterators())
-   *     for (auto face_index : GeometryInfo<dim>::face_indices)
+   *     for (auto face_index : GeometryInfo<dim>::face_indices())
    *       if (cell->face(face_index)->at_boundary())
    *         ... do something ...
    * @endcode
