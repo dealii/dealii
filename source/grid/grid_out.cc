@@ -2381,7 +2381,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           // the additional boundary line
           if (svg_flags.boundary_line_thickness)
             {
-              for (unsigned int faceIndex = 0; faceIndex < 4; faceIndex++)
+              for (const unsigned int faceIndex :
+                   GeometryInfo<2>::face_indices())
                 {
                   if (cell->at_boundary(faceIndex))
                     {
