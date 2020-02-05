@@ -58,8 +58,8 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dpc(3);
-  DoFTools::count_dofs_per_component(dof_handler, dpc);
+  const std::vector<types::global_dof_index> dpc =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   BlockDynamicSparsityPattern dsp(3, 3);
   for (unsigned int i = 0; i < 3; ++i)

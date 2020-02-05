@@ -16,7 +16,7 @@
 
 
 // check some things about Nedelec elements, here that
-// DoFTools::component_select and DoFTools::count_dofs_per_component
+// DoFTools::component_select and DoFTools::count_dofs_per_fe_component
 // works
 //
 // this program is a modified version of one by Anna Schneebeli,
@@ -91,17 +91,17 @@ SystemTest<dim>::check()
     {
       deallog << "Checking for component " << c << std::endl;
       std::vector<bool> x(fe.n_components(), false);
-      x[c]         = true;
-      IndexSet sel = DoFTools::extract_dofs(dof_handler, ComponentMask(x));
+      x[c] = true;
+      const IndexSet sel =
+        DoFTools::extract_dofs(dof_handler, ComponentMask(x));
 
       for (unsigned int i = 0; i < sel.size(); ++i)
         if (sel.is_element(i))
           deallog << "  DoF " << i << std::endl;
     };
 
-  std::vector<types::global_dof_index> dofs_per_component(
-    fe.n_components(), static_cast<types::global_dof_index>(0));
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
   deallog << "DoFs per component: ";
   for (unsigned int i = 0; i < fe.n_components(); ++i)
     deallog << dofs_per_component[i] << ' ';

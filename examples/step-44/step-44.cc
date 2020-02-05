@@ -1509,9 +1509,9 @@ namespace Step44
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler);
     DoFRenumbering::component_wise(dof_handler, block_component);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: "

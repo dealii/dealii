@@ -262,7 +262,7 @@ mapping the problem on to the hp framework makes sense:
   the same (here, <code>2*dim+1</code>). This makes all sorts of
   things possible since a uniform description allows for code
   re-use. For example, counting degrees of freedom per vector
-  component (DoFTools::count_dofs_per_component), sorting degrees of
+  component (DoFTools::count_dofs_per_fe_component), sorting degrees of
   freedom by component (DoFRenumbering::component_wise), subsequent
   partitioning of matrices and vectors into blocks and many other
   functions work as they always did without the need to add special

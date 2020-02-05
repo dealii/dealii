@@ -256,9 +256,8 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
         }
     }
 
-  block_start.resize(n_blocks);
-  DoFTools::count_dofs_per_block(
-    static_cast<const DoFHandler<dim, spacedim> &>(dof_handler), block_start);
+  block_start = DoFTools::count_dofs_per_fe_block(
+    static_cast<const DoFHandler<dim, spacedim> &>(dof_handler));
 
   types::global_dof_index k = 0;
   for (types::global_dof_index &first_index : block_start)

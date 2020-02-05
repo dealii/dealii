@@ -20,7 +20,7 @@
 //
 // this particular test checks the call path to
 // internal::extract_dofs_by_component from
-// DoFTools::count_dofs_per_component with argument only_once=true
+// DoFTools::count_dofs_per_fe_component with argument only_once=true
 
 
 #include <deal.II/dofs/dof_handler.h>
@@ -59,8 +59,8 @@ check()
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-  std::vector<types::global_dof_index> count(element.n_components());
-  DoFTools::count_dofs_per_component(dof, count, true);
+  const std::vector<types::global_dof_index> count =
+    DoFTools::count_dofs_per_fe_component(dof, true);
 
   for (unsigned int d = 0; d < count.size(); ++d)
     deallog << count[d] << std::endl;

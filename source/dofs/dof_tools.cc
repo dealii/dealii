@@ -1910,16 +1910,17 @@ namespace DoFTools
     const std::vector<unsigned int> &     target_component)
   {
     dofs_per_component =
-      count_dofs_per_component(dof_handler, only_once, target_component);
+      count_dofs_per_fe_component(dof_handler, only_once, target_component);
   }
 
 
 
   template <typename DoFHandlerType>
   std::vector<types::global_dof_index>
-  count_dofs_per_component(const DoFHandlerType &           dof_handler,
-                           const bool                       only_once,
-                           const std::vector<unsigned int> &target_component_)
+  count_dofs_per_fe_component(
+    const DoFHandlerType &           dof_handler,
+    const bool                       only_once,
+    const std::vector<unsigned int> &target_component_)
   {
     const unsigned int n_components = dof_handler.get_fe(0).n_components();
 
@@ -2015,15 +2016,15 @@ namespace DoFTools
                        std::vector<types::global_dof_index> &dofs_per_block,
                        const std::vector<unsigned int> &     target_block)
   {
-    dofs_per_block = count_dofs_per_block(dof_handler, target_block);
+    dofs_per_block = count_dofs_per_fe_block(dof_handler, target_block);
   }
 
 
 
   template <typename DoFHandlerType>
   std::vector<types::global_dof_index>
-  count_dofs_per_block(const DoFHandlerType &           dof_handler,
-                       const std::vector<unsigned int> &target_block_)
+  count_dofs_per_fe_block(const DoFHandlerType &           dof_handler,
+                          const std::vector<unsigned int> &target_block_)
   {
     const dealii::hp::FECollection<DoFHandlerType::dimension,
                                    DoFHandlerType::space_dimension>

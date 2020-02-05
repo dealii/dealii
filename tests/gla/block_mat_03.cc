@@ -70,10 +70,10 @@ test()
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::block_wise(dof_handler);
 
-  std::vector<types::global_dof_index> dofs_per_block(fe.n_blocks());
-  std::vector<unsigned int>            sub_blocks(fe.n_blocks(), 0);
+  std::vector<unsigned int> sub_blocks(fe.n_blocks(), 0);
   sub_blocks[1] = 1;
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
   deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
           << std::endl;
@@ -176,10 +176,10 @@ test_alt()
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::block_wise(dof_handler);
 
-  std::vector<types::global_dof_index> dofs_per_block(fe.n_blocks());
-  std::vector<unsigned int>            sub_blocks(fe.n_blocks(), 0);
+  std::vector<unsigned int> sub_blocks(fe.n_blocks(), 0);
   sub_blocks[1] = 1;
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
   deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
           << std::endl;

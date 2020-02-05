@@ -3186,15 +3186,15 @@ namespace DoFTools
 
     // get an array in which we store which dof on the coarse grid is a
     // parameter and which is not
-    std::vector<bool> coarse_dof_is_parameter(coarse_grid.n_dofs());
-    if (true)
-      {
-        std::vector<bool> mask(coarse_grid.get_fe(0).n_components(), false);
-        mask[coarse_component] = true;
+    IndexSet coarse_dof_is_parameter;
+    {
+      std::vector<bool> mask(coarse_grid.get_fe(0).n_components(), false);
+      mask[coarse_component] = true;
+
+      coarse_dof_is_parameter =
         extract_dofs<DoFHandler<dim, spacedim>>(coarse_grid,
-                                                ComponentMask(mask),
-                                                coarse_dof_is_parameter);
-      }
+                                                ComponentMask(mask));
+    }
 
     // now we know that the weights in each row constitute a constraint. enter
     // this into the constraints object
@@ -3210,7 +3210,7 @@ namespace DoFTools
     for (types::global_dof_index parameter_dof = 0;
          parameter_dof < n_coarse_dofs;
          ++parameter_dof)
-      if (coarse_dof_is_parameter[parameter_dof] == true)
+      if (coarse_dof_is_parameter.is_element(parameter_dof))
         {
           // if this is the line of a parameter dof on the coarse grid, then it
           // should have at least one dependent node on the fine grid

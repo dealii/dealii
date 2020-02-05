@@ -693,10 +693,9 @@ namespace Step43
     }
 
 
-    std::vector<types::global_dof_index> darcy_dofs_per_block(2);
-    DoFTools::count_dofs_per_block(darcy_dof_handler,
-                                   darcy_dofs_per_block,
-                                   darcy_block_component);
+    const std::vector<types::global_dof_index> darcy_dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(darcy_dof_handler,
+                                        darcy_block_component);
     const unsigned int n_u = darcy_dofs_per_block[0],
                        n_p = darcy_dofs_per_block[1],
                        n_s = saturation_dof_handler.n_dofs();

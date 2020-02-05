@@ -129,8 +129,8 @@ test()
 
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
 
-  std::vector<types::global_dof_index> size(dim);
-  DoFTools::count_dofs_per_component(dof_handler, size);
+  const std::vector<types::global_dof_index> size =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   BlockSparsityPattern b_sparsity_pattern;
   SparsityPattern      sparsity_pattern;

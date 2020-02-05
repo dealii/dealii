@@ -2303,7 +2303,7 @@ namespace DoFTools
    */
   template <typename DoFHandlerType>
   std::vector<types::global_dof_index>
-  count_dofs_per_component(
+  count_dofs_per_fe_component(
     const DoFHandlerType &           dof_handler,
     const bool                       vector_valued_once = false,
     const std::vector<unsigned int> &target_component   = {});
@@ -2338,9 +2338,9 @@ namespace DoFTools
    */
   template <typename DoFHandlerType>
   std::vector<types::global_dof_index>
-  count_dofs_per_block(const DoFHandlerType &           dof,
-                       const std::vector<unsigned int> &target_block =
-                         std::vector<unsigned int>());
+  count_dofs_per_fe_block(const DoFHandlerType &           dof,
+                          const std::vector<unsigned int> &target_block =
+                            std::vector<unsigned int>());
 
   /**
    * @deprecated A version of the previous function that returns its

@@ -33,9 +33,8 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
 {
   if (!levels_only && dof.has_active_dofs())
     {
-      const FiniteElement<dim, spacedim> & fe = dof.get_fe();
-      std::vector<types::global_dof_index> sizes(fe.n_blocks());
-      DoFTools::count_dofs_per_block(dof, sizes);
+      const std::vector<types::global_dof_index> sizes =
+        DoFTools::count_dofs_per_fe_block(dof);
       bi_global.reinit(sizes);
     }
 

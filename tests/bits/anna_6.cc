@@ -154,8 +154,8 @@ void
 ImposeBC<dim>::get_ready()
 {
   dof_handler.distribute_dofs(fe);
-  std::vector<types::global_dof_index> dofs_per_comp(fe.n_components());
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_comp);
+  const std::vector<types::global_dof_index> dofs_per_comp =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // For an FESystem with Nedelec-elements as
   // first component and bilinear elements as

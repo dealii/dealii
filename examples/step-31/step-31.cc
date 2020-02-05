@@ -866,10 +866,8 @@ namespace Step31
       temperature_constraints.close();
     }
 
-    std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-    DoFTools::count_dofs_per_block(stokes_dof_handler,
-                                   stokes_dofs_per_block,
-                                   stokes_sub_blocks);
+    const std::vector<types::global_dof_index> stokes_dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
     const unsigned int n_u = stokes_dofs_per_block[0],
                        n_p = stokes_dofs_per_block[1],

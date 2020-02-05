@@ -362,12 +362,11 @@ namespace Step55
     stokes_sub_blocks[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   stokes_sub_blocks);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, stokes_sub_blocks);
 
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0];
+    const unsigned int n_p = dofs_per_block[1];
 
     pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
           << n_u << '+' << n_p << ')' << std::endl;

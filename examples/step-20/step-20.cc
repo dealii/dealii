@@ -341,11 +341,11 @@ namespace Step20
 
     // The next thing is that we want to figure out the sizes of these blocks
     // so that we can allocate an appropriate amount of space. To this end, we
-    // call the DoFTools::count_dofs_per_component() function that
+    // call the DoFTools::count_dofs_per_fe_component() function that
     // counts how many shape functions are non-zero for a particular vector
     // component. We have <code>dim+1</code> vector components, and
-    // DoFTools::count_dofs_per_component() will count how many shape functions
-    // belong to each of these components.
+    // DoFTools::count_dofs_per_fe_component() will count how many shape
+    // functions belong to each of these components.
     //
     // There is one problem here. As described in the documentation of that
     // function, it <i>wants</i> to put the number of $x$-velocity shape
@@ -369,13 +369,13 @@ namespace Step20
     // the vector and matrix block sizes, as well as create output.
     //
     // @note If you find this concept difficult to understand, you may
-    // want to consider using the function DoFTools::count_dofs_per_block()
+    // want to consider using the function DoFTools::count_dofs_per_fe_block()
     // instead, as we do in the corresponding piece of code in step-22.
     // You might also want to read up on the difference between
     // @ref GlossBlock "blocks" and @ref GlossComponent "components"
     // in the glossary.
-    std::vector<types::global_dof_index> dofs_per_component(dim + 1);
-    DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+    const std::vector<types::global_dof_index> dofs_per_component =
+      DoFTools::count_dofs_per_fe_component(dof_handler);
     const unsigned int n_u = dofs_per_component[0],
                        n_p = dofs_per_component[dim];
 

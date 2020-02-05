@@ -79,7 +79,8 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   // Setup system
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::component_wise(dof_handler, block_component);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
   std::vector<IndexSet> partitioning(2);
   partitioning[0] = complete_index_set(dofs_per_block[0]);
   partitioning[1] = complete_index_set(dofs_per_block[1]);
