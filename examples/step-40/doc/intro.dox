@@ -114,7 +114,7 @@ discontinuous function,
   =
   \left\{
   \begin{array}{ll}
-    1 & \text{if}\ y < \frac 12 + \frac 14 \sin(4\pi x), \\
+    1 & \text{if}\ y > \frac 12 + \frac 14 \sin(4\pi x), \\
     -1 & \text{otherwise},
   \end{array}
   \right.
