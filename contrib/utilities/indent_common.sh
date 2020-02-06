@@ -82,7 +82,7 @@ checks() {
   # Finally, to stay sane, just go back until the beginning of 2019 for now.
   #
   # first user names:
-  git log --since "2019-01-01" --format="%aN" | sort -u | while read name ; do
+  git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
       words=($name)
       if [ "${#words[@]}" -lt "2" ]; then
 	  echo "invalid author '$name' without firstname and lastname"
@@ -94,7 +94,7 @@ checks() {
   done || exit 2
 
   # now emails:
-  git log --since "2019-01-01" --format="%aE" | sort -u | while read email ; do
+  git log --since "2019-01-01" --format="%aE" --no-merges | sort -u | while read email ; do
       words=($name)
       if ! echo "$email" | grep -q "\."; then
 	  echo "invalid email '$email'"
