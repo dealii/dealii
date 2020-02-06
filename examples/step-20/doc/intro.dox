@@ -37,7 +37,9 @@ right hand side) is generally considered a good model equation
 for fluid flow in porous media. Of course, one typically models fluid flow through
 the <a href="https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations">Navier-Stokes
 equations</a> or, if fluid velocities are slow or the viscosity is large, the
-<a href="https://en.wikipedia.org/wiki/Stokes_flow">Stokes equations</a>.
+<a href="https://en.wikipedia.org/wiki/Stokes_flow">Stokes
+equations</a>
+(which we cover in step-22).
 In the first of these two models, the forces that act are inertia and
 viscous friction, whereas in the second it is only viscous friction -- i.e.,
 forces that one fluid particle exerts on a nearby one. This is appropriate
@@ -52,7 +54,8 @@ to the <a href="https://en.wikipedia.org/wiki/Darcy%27s_law">Darcy equations</a>
 The latter is just a different name for the Poisson or Laplace equation,
 connotating it with the area to which one wants to apply it: slow flow
 in a porous medium. In essence it says that the velocity is proportional
-to the pressure gradient that drives the fluid through the porous medium.
+to the negative pressure gradient that drives the fluid through the
+porous medium.
 
 The Darcy equation models this pressure that drives the flow. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
@@ -60,30 +63,32 @@ name $u$ more commonly used for the solution of partial differential equations.)
 Typical applications of this view of the Laplace equation are then modeling
 groundwater flow, or the flow of hydrocarbons in oil reservoirs. In these
 applications, $K$ is the permeability tensor, i.e., a measure for how much
-resistance the soil or rock matrix asserts on the fluid flow. In the
-applications just named, a desirable feature is that the numerical scheme is
-locally conservative, i.e., that whatever flows into a cell also flows out of
-it (or the difference is equal to the integral over the source terms over each
-cell, if the sources are nonzero). However, as it turns out, the usual
-discretizations of the Laplace equation (such as those used in step-3, step-4,
-or step-6) do not satisfy this property. But, one can achieve this by choosing
-a different formulation of the problem and a particular combination of finite
-element spaces.
+resistance the soil or rock matrix asserts on the fluid flow.
+
+In the applications named above, a desirable feature for a numerical
+scheme is that it should be locally conservative, i.e., that whatever
+flows into a cell also flows out of it (or the difference is equal to
+the integral over the source terms over each cell, if the sources are
+nonzero). However, as it turns out, the usual discretizations of the
+Laplace equation (such as those used in step-3, step-4, or step-6) do
+not satisfy this property. But, one can achieve this by choosing a
+different formulation of the problem and a particular combination of
+finite element spaces.
 
 
 <h3>Formulation, weak form, and discrete problem</h3>
 
-To this end, one first introduces a second variable, called the flux,
-${\mathbf u}=-K\nabla p$. By its definition, the flux is a vector in the
+To this end, one first introduces a second variable, called the velocity,
+${\mathbf u}=-K\nabla p$. By its definition, the velocity is a vector in the
 negative
 direction of the pressure gradient, multiplied by the permeability tensor. If
 the permeability tensor is proportional to the unit matrix, this equation is
 easy to understand and intuitive: the higher the permeability, the higher the
-flux; and the flux is proportional to the gradient of the pressure, going from
+velocity; and the velocity is proportional to the gradient of the pressure, going from
 areas of high pressure to areas of low pressure (thus the negative sign).
 
 With this second variable, one then finds an alternative version of the
-Laplace equation, called the mixed formulation:
+Laplace equation, called the <i>mixed formulation</i>:
 @f{eqnarray*}
   K^{-1} {\mathbf u} + \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
   -{\textrm{div}}\ {\mathbf u} &=& -f \qquad {\textrm{in}\ }\Omega, \\
@@ -129,7 +134,62 @@ discontinuous elements of class $DQ(k)$ for the pressure $p$. For details
 about these spaces, we refer in particular to the book on mixed finite element
 methods by Brezzi and Fortin, but many other books on the theory of finite
 elements, for example the classic book by Brenner and Scott, also state the
-relevant results.
+relevant results. In any case, with appropriate choices of function
+spaces, the discrete formulation reads as follows: Find ${\mathbf
+u}_h,p_h$ so that
+@f{eqnarray*}
+  A(\{{\mathbf u}_h,p_h\},\{{\mathbf v}_h,q_h\}) = F(\{{\mathbf v}_h,q_h\})
+  \qquad\qquad \forall {\mathbf v}_h,q_h.
+@f}
+
+
+Before continuing, let us briefly pause and show that the choice of
+function spaces above provides us with the desired local conservation
+property. In particular, because the pressure space consists of
+discontinuous piecewise polynomials, we can choose the test function
+$q$ as the function that is equal to one on any given cell $K$ and
+zero everywhere else. If we also choose ${\mathbf v}=0$ everywhere
+(remember that the weak form above has to hold for <i>all</i> discrete
+test functions $q,v$), then putting these choices of test functions
+into the weak formulation above implies in particular that
+@f{eqnarray*}
+  - (1,{\textrm{div}}\ {\mathbf u}_h)_K
+  =
+  -(1,f)_K,
+@f}
+which we can of course write in more explicit form as
+@f{eqnarray*}
+  \int_K {\textrm{div}}\ {\mathbf u}_h
+ =
+  \int_K f.
+@f}
+Applying the divergence theorem results in the fact that ${\mathbf
+u}_h$ has to satisfy, for every choice of cell $K$, the relationship
+@f{eqnarray*}
+  \int_{\partial K} {\mathbf u}_h\cdot{\mathbf n}
+  =
+  \int_K f.
+@f}
+If you now recall that ${\mathbf u}$ was the velocity, then the
+integral on the left is exactly the (discrete) flux across the
+boundary of the cell $K$. The statement is then that the flux must be equal
+to the integral over the sources within $K$. In particular, if there
+are no sources (i.e., $f=0$ in $K$), then the statement is that
+<i>total</i> flux is zero, i.e., whatever flows into a cell must flow out
+of it through some other part of the cell boundary. This is what we call
+<i>local conservation</i> because it holds for every cell.
+
+On the other hand, the usual continuous $Q_k$ elements would not result in
+this kind of property when used for the pressure (as, for example, we
+do in step-43) because one can not choose a discrete test function
+$q_h$ that is one on a cell $K$ and zero everywhere else: It would be
+discontinuous and consequently not in the finite element
+space. (Strictly speaking, all we can say is that the proof above
+would not work for continuous elements. Whether these elements might
+still result in local conservation is a different question as one
+could think that a different kind of proof might still work; in
+reality, however, the property really does not hold.)
+
 
 
 <h3>Assembling the linear system</h3>
