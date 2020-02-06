@@ -668,6 +668,13 @@ namespace GridOutFlags
   /**
    * Flags controlling SVG output.
    *
+   * The figure below is a zoomed-in illustration of what the SVG flags are
+   * capable of producing. These exact settings are the same as those used
+   * in the test <code>tests/grid/grid_out_svg_02.cc</code> with the addition
+   * of the flag <code>svg_flags.label_boundary_id = true;</code> .
+   *
+   * @image html svg_flags.png
+   *
    * @ingroup output
    */
   struct Svg
