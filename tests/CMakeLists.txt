@@ -75,7 +75,7 @@ IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
   # CMAKE_BINARY_DIR/tests:
   #
-  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
+  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)\n")
 
   SET(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
 
