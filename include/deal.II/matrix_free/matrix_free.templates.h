@@ -72,6 +72,7 @@ namespace internal
     const unsigned int n_dof_handlers,
     const unsigned int dof_handler_index)
   {
+    (void)n_dof_handlers;
     AssertDimension(dof_handler.size(), n_dof_handlers);
     return *dof_handler[dof_handler_index];
   }
@@ -92,6 +93,7 @@ namespace internal
     const unsigned int n_dof_handlers,
     const unsigned int dof_handler_index)
   {
+    (void)n_dof_handlers;
     AssertDimension(hp_dof_handler.size(), n_dof_handlers);
     return *hp_dof_handler[dof_handler_index];
   }
