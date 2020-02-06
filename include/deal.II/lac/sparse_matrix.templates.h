@@ -541,6 +541,7 @@ SparseMatrix<number>::add(const size_type  row,
                           const bool       col_indices_are_sorted)
 {
   Assert(cols != nullptr, ExcNotInitialized());
+  AssertIndexRange(row, m());
 
   // if we have sufficiently many columns
   // and sorted indices it is faster to
