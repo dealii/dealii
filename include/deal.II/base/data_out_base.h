@@ -1625,20 +1625,6 @@ namespace DataOutBase
     hdf5
   };
 
-  /**
-   * Write the given list of patches to the output stream in OpenDX format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_dx(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            nonscalar_data_ranges,
-    const DXFlags &flags,
-    std::ostream & out);
 
   /**
    * Write the given list of patches to the output stream in OpenDX format.
@@ -1656,38 +1642,6 @@ namespace DataOutBase
       &            nonscalar_data_ranges,
     const DXFlags &flags,
     std::ostream & out);
-
-  /**
-   * Write the given list of patches to the output stream in eps format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This is the same function as above except for domains that are not two-
-   * dimensional. This function is not implemented (and will throw an error if
-   * called) but is declared to allow for dimension-independent programs.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in eps format.
@@ -1751,23 +1705,6 @@ namespace DataOutBase
    * This is the same function as above except for domains that are not two-
    * dimensional. This function is not implemented (and will throw an error if
    * called) but is declared to allow for dimension-independent programs.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This is the same function as above except for domains that are not two-
-   * dimensional. This function is not implemented (and will throw an error if
-   * called) but is declared to allow for dimension-independent programs.
    */
   template <int dim, int spacedim>
   void
@@ -1783,20 +1720,6 @@ namespace DataOutBase
     const EpsFlags &flags,
     std::ostream &  out);
 
-  /**
-   * Write the given list of patches to the output stream in GMV format.
-   *
-   *@deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_gmv(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const GmvFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in GMV format.
@@ -1820,21 +1743,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const GmvFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in gnuplot format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_gnuplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 nonscalar_data_ranges,
-    const GnuplotFlags &flags,
-    std::ostream &      out);
 
   /**
    * Write the given list of patches to the output stream in gnuplot format.
@@ -1910,22 +1818,6 @@ namespace DataOutBase
    * Write the given list of patches to the output stream for the Povray
    * raytracer.
    *
-   *@deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_povray(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                nonscalar_data_ranges,
-    const PovrayFlags &flags,
-    std::ostream &     out);
-
-  /**
-   * Write the given list of patches to the output stream for the Povray
-   * raytracer.
-   *
    * Output in this format creates a povray source file, include standard
    * camera and light source definition for rendering with povray 3.1 At
    * present, this format only supports output for two-dimensional data, with
@@ -1986,24 +1878,6 @@ namespace DataOutBase
    * format (FEBLOCK).
    *
    * For more information consult the Tecplot Users and Reference manuals.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_tecplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
-
-  /**
-   * Write the given list of patches to the output stream in Tecplot ASCII
-   * format (FEBLOCK).
-   *
-   * For more information consult the Tecplot Users and Reference manuals.
    */
   template <int dim, int spacedim>
   void
@@ -2015,22 +1889,6 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
-
-  /**
-   * Write the given list of patches to the output stream in Tecplot binary
-   * format.
-   *
-   * @deprecated Using Tecplot binary output is deprecated.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
       &                 nonscalar_data_ranges,
     const TecplotFlags &flags,
     std::ostream &      out);
@@ -2072,22 +1930,6 @@ namespace DataOutBase
 
   /**
    * Write the given list of patches to the output stream in UCD format
-   * described in the AVS developer's guide (now AVS).
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_ucd(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const UcdFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in UCD format
    * described in the AVS developer's guide (now AVS). Due to limitations in
    * the present format, only node based data can be output, which in one
    * reason why we invented the patch concept. In order to write higher order
@@ -2112,23 +1954,6 @@ namespace DataOutBase
                  DataComponentInterpretation::DataComponentInterpretation>>
       &             nonscalar_data_ranges,
     const UcdFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in VTK format. The
-   * data is written in the traditional VTK format as opposed to the XML-based
-   * format that write_vtu() produces.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtk(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
     std::ostream &  out);
 
   /**
@@ -2164,22 +1989,6 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out);
 
-  /**
-   * Write the given list of patches to the output stream in VTU format. The
-   * data is written in the XML-based VTK format as opposed to the traditional
-   * format that write_vtk() produces.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtu(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in VTU format. The
@@ -2240,24 +2049,6 @@ namespace DataOutBase
    * routine is used internally together with
    * DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtu_main(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This function writes the main part for the xml based vtu file format. This
-   * routine is used internally together with
-   * DataOutInterface::write_vtu_header() and
-   * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
    */
   template <int dim, int spacedim>
   void
@@ -2272,25 +2063,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Some visualization programs, such as ParaView, can read several separate
-   * VTU files that all form part of the same simulation, in order to
-   * parallelize visualization. In that case, you need a
-   * <code>.pvtu</code> file that describes which VTU files (written, for
-   * example, through the DataOutInterface::write_vtu() function) form a group.
-   * The current function can generate such a master record.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  write_pvtu_record(
-    std::ostream &                  out,
-    const std::vector<std::string> &piece_names,
-    const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &nonscalar_data_ranges);
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2487,21 +2259,6 @@ namespace DataOutBase
   /**
    * Write the given list of patches to the output stream in SVG format.
    *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int spacedim>
-  DEAL_II_DEPRECATED void
-  write_svg(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const SvgFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in SVG format.
-   *
    * SVG (Scalable Vector Graphics) is an XML-based vector image format
    * developed and maintained by the World Wide Web Consortium (W3C). This
    * function conforms to the latest specification SVG 1.1, released on August
@@ -2532,27 +2289,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const SvgFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in deal.II
-   * intermediate format. This is not a format understood by any other
-   * graphics program, but is rather a direct dump of the intermediate
-   * internal format used by deal.II. This internal format is generated by the
-   * various classes that can generate output using the DataOutBase class, for
-   * example from a finite element solution, and is then converted in the
-   * present class to the final graphics format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_deal_II_intermediate(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                              nonscalar_data_ranges,
-    const Deal_II_IntermediateFlags &flags,
-    std::ostream &                   out);
 
   /**
    * Write the given list of patches to the output stream in deal.II
@@ -2631,23 +2367,6 @@ namespace DataOutBase
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
                       MPI_Comm           comm);
-
-  /**
-   * DataOutFilter is an intermediate data format that reduces the amount of
-   * data that will be written to files. The object filled by this function
-   * can then later be used again to write data in a concrete file format;
-   * see, for example, DataOutBase::write_hdf5_parallel().
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_filtered_data(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            nonscalar_data_ranges,
-    DataOutFilter &filtered_data);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -3305,17 +3024,6 @@ protected:
    */
   virtual std::vector<std::string>
   get_dataset_names() const = 0;
-
-  /**
-   * This functions returns information about how the individual components of
-   * output files that consist of more than one data set are to be
-   * interpreted.
-   *
-   * @deprecated Use get_nonscalar_data_ranges instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const;
 
   /**
    * This functions returns information about how the individual components of
