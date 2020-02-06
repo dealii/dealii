@@ -16,6 +16,15 @@
  *
  * Authors: Matthias Maier, Texas A&M University;
  *          Ignacio Tomas, Texas A&M University, Sandia National Laboratories
+ *
+ * Sandia National Laboratories is a multimission laboratory managed and
+ * operated by National Technology & Engineering Solutions of Sandia, LLC, a
+ * wholly owned subsidiary of Honeywell International Inc., for the U.S.
+ * Department of Energy's National Nuclear Security Administration under
+ * contract DE-NA0003525. This document describes objective technical results
+ * and analysis. Any subjective views or opinions that might be expressed in
+ * the paper do not necessarily represent the views of the U.S. Department of
+ * Energy or the United States Government.
  */
 
 // @sect3{Include files}

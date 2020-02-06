@@ -1,7 +1,16 @@
 <i>
   This program was contributed by Matthias Maier (Texas A&M University),
-  and Ignacio Tomas (Sandia National Laboratories, Albuquerque).
+  and Ignacio Tomas (Sandia National Laboratories$^{\!\dagger}$).
 </i>
+
+$^\dagger$<em>Sandia National Laboratories is a multimission laboratory
+managed and operated by National Technology & Engineering Solutions of Sandia,
+LLC, a wholly owned subsidiary of Honeywell International Inc., for the U.S.
+Department of Energy's National Nuclear Security Administration under contract
+DE-NA0003525. This document describes objective technical results and analysis.
+Any subjective views or opinions that might be expressed in the paper do not
+necessarily represent the views of the U.S. Department of Energy or the United
+States Government.</em>
 
 @note This tutorial step implements a first-order accurate <i>guaranteed
 maximum wavespeed method</i> based on a first-order <i>graph viscosity</i>
@@ -300,7 +309,7 @@ $t_n$:
 &\ \ \ \ \texttt{scatter} (\textbf{U}^n, \mathcal{I}(i), \textbf{U}_i^n)) \\
 &\textbf{end}
 @f}
-<<<<<<< HEAD
+
 We note here that:
 - This "assembly" does not require any form of quadrature or cell-loops.
 - Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
