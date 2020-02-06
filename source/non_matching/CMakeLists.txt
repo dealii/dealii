@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   coupling.cc
   immersed_surface_quadrature.cc
+  quadrature_generator.cc
   )
 
 SET(_inst
