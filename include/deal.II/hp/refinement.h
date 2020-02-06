@@ -101,11 +101,12 @@ namespace hp
    * @code
    * // step 1: flag cells for refinement or coarsening
    * Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-   * KellyErrorEstimator<dim>::estimate(hp_dof_handler,
-   *                                    QGauss<dim-1> (quadrature_points),
-   *                                    typename FunctionMap<dim>::type(),
-   *                                    solution,
-   *                                    estimated_error_per_cell);
+   * KellyErrorEstimator<dim>::estimate(
+   *     hp_dof_handler,
+   *     QGauss<dim-1> (quadrature_points),
+   *     std::map<types::boundary_id, const Function<dim, Number> *>(),
+   *     solution,
+   *     estimated_error_per_cell);
    * GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
    *                                                   estimated_error_per_cell,
    *                                                   top_fraction,

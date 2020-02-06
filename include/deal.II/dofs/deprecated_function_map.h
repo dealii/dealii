@@ -79,7 +79,9 @@ struct DEAL_II_DEPRECATED FunctionMap
    * (as that would ambiguate a possible constructor of this class), name it
    * in the fashion of the standard container local alias.
    *
-   * @deprecated Use the alias type directly.
+   * @deprecated Directly use the type
+   * <tt>std::map<types::boundary_id, const Function<dim, Number> *></tt>
+   * in your code instead of this alias.
    */
   using type DEAL_II_DEPRECATED =
     std::map<types::boundary_id, const Function<dim, Number> *>;
