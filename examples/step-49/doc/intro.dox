@@ -279,7 +279,7 @@ GridGenerator::extrude_triangulation(). See the <code>grid_4()</code> function
 in this tutorial for an example. Note that for this particular case, the given
 result could also be achieved using the 3d version of
 GridGenerator::hyper_cube_with_cylindrical_hole(). The main usage is a 2d
-mesh, generated for example with Gmsh, that is read in from a
+mesh, generated for example with %Gmsh, that is read in from a
 <code>.msh</code> file as described above. This is the output from grid_4():
 
 <table width="60%" align="center">
