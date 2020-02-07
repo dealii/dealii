@@ -27,6 +27,9 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -451,10 +454,5 @@ MGLevelGlobalTransfer<
 
 // explicit instantiation
 #include "mg_level_global_transfer.inst"
-
-// create an additional instantiation currently not supported by the automatic
-// template instantiation scheme
-template class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>;
-
 
 DEAL_II_NAMESPACE_CLOSE

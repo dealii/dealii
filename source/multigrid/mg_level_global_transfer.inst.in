@@ -15,12 +15,12 @@
 
 
 
-for (V1 : VECTORS_WITH_MATRIX)
+for (V1 : VECTOR_TYPES)
   {
     template class MGLevelGlobalTransfer<V1>;
   }
 
-for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITH_MATRIX)
+for (deal_II_dimension : DIMENSIONS; V1 : VECTOR_TYPES)
   {
     template void MGLevelGlobalTransfer<V1>::
       fill_and_communicate_copy_indices<deal_II_dimension, deal_II_dimension>(
@@ -46,10 +46,6 @@ for (deal_II_dimension : DIMENSIONS; V1, V2 : DEAL_II_VEC_TEMPLATES;
 
 for (deal_II_dimension : DIMENSIONS)
   {
-    template void
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>::
-      fill_and_communicate_copy_indices<deal_II_dimension, deal_II_dimension>(
-        const DoFHandler<deal_II_dimension, deal_II_dimension> &mg_dof);
     template void
     MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>::
       copy_to_mg(const DoFHandler<deal_II_dimension> &,
