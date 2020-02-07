@@ -40,7 +40,7 @@ struct CellData;
 /**
  * This class implements an input mechanism for grid data. It allows to read a
  * grid structure into a triangulation object. At present, UCD (unstructured
- * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF, UNV, VTK, ASSIMP, and Cubit
+ * cell data), DB Mesh, XDA, %Gmsh, Tecplot, NetCDF, UNV, VTK, ASSIMP, and Cubit
  * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
  * faces, and edges) information is ignored, but the readers for the various
@@ -145,14 +145,14 @@ struct CellData;
  * several example files. If the reader does not grok your files, it should be
  * fairly simple to extend it.
  *
- * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p Gmsh mesh
- * generator (see http://gmsh.info/). The documentation in the @p Gmsh
+ * <li> <tt>%Gmsh 1.0 mesh</tt> format: this format is used by the @p %Gmsh mesh
+ * generator (see http://gmsh.info/). The documentation in the @p %Gmsh
  * manual explains how to generate meshes compatible with the deal.II library
- * (i.e. quads rather than triangles). In order to use this format, Gmsh has
+ * (i.e. quads rather than triangles). In order to use this format, %Gmsh has
  * to output the file in the old format 1.0. This is done adding the line
  * "Mesh.MshFileVersion = 1" to the input file.
  *
- * <li> <tt>Gmsh 2.0 mesh</tt> format: this is a variant of the above format.
+ * <li> <tt>%Gmsh 2.0 mesh</tt> format: this is a variant of the above format.
  * The read_msh() function automatically determines whether an input file is
  * version 1 or version 2.
  *
@@ -484,12 +484,12 @@ public:
 
   /**
    * Read grid data from an msh file, either version 1 or version 2 of that
-   * file format. The Gmsh formats are documented at
+   * file format. The %Gmsh formats are documented at
    * http://www.gmsh.info/.
    *
    * @note The input function of deal.II does not distinguish between newline
    * and other whitespace. Therefore, deal.II will be able to read files in a
-   * slightly more general format than Gmsh.
+   * slightly more general format than %Gmsh.
    */
   void
   read_msh(std::istream &in);
