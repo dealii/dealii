@@ -531,7 +531,8 @@ namespace Utilities
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
-      if (job_supports_mpi() == false)
+      if (job_supports_mpi() == false ||
+          Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
         {
           MinMaxAvg result;
           result.sum       = my_value;
