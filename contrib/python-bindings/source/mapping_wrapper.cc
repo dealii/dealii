@@ -295,7 +295,7 @@ namespace python
 
 
   void *
-  MappingQGenericWrapper::get_mapping()
+  MappingQGenericWrapper::get_mapping() const
   {
     return mapping_ptr;
   }

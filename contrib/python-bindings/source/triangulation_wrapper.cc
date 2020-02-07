@@ -560,16 +560,17 @@ namespace python
 
     template <int dim, int spacedim>
     boost::python::list
-    compute_aspect_ratio_of_cells(MappingQGenericWrapper &mapping_wrapper,
-                                  QuadratureWrapper &     quadrature_wrapper,
-                                  TriangulationWrapper &  triangulation_wrapper)
+    compute_aspect_ratio_of_cells(
+      const MappingQGenericWrapper &mapping_wrapper,
+      const QuadratureWrapper &     quadrature_wrapper,
+      const TriangulationWrapper &  triangulation_wrapper)
     {
       const Triangulation<dim, spacedim> *tria =
         static_cast<const Triangulation<dim, spacedim> *>(
           triangulation_wrapper.get_triangulation());
 
-      Quadrature<dim> *quad =
-        static_cast<Quadrature<dim> *>(quadrature_wrapper.get_quadrature());
+      const Quadrature<dim> *quad = static_cast<const Quadrature<dim> *>(
+        quadrature_wrapper.get_quadrature());
 
       const MappingQGeneric<dim, spacedim> *mapping =
         static_cast<const MappingQGeneric<dim, spacedim> *>(
@@ -1443,8 +1444,8 @@ namespace python
 
   boost::python::list
   TriangulationWrapper::compute_aspect_ratio_of_cells(
-    MappingQGenericWrapper mapping,
-    QuadratureWrapper      quadrature)
+    const MappingQGenericWrapper &mapping,
+    const QuadratureWrapper &     quadrature)
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::compute_aspect_ratio_of_cells<2, 2>(mapping,

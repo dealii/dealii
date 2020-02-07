@@ -421,8 +421,8 @@ namespace python
      * with one entry per cell.
      */
     boost::python::list
-    compute_aspect_ratio_of_cells(MappingQGenericWrapper mapping,
-                                  QuadratureWrapper      quadrature);
+    compute_aspect_ratio_of_cells(const MappingQGenericWrapper &mapping,
+                                  const QuadratureWrapper &     quadrature);
 
     /**
      * Write mesh to the output file @filename according to the given data
@@ -467,7 +467,7 @@ namespace python
      * object.
      */
     void *
-    get_triangulation();
+    get_triangulation() const;
 
   private:
     /**
@@ -514,7 +514,7 @@ namespace python
 
 
   inline void *
-  TriangulationWrapper::get_triangulation()
+  TriangulationWrapper::get_triangulation() const
   {
     return triangulation;
   }
