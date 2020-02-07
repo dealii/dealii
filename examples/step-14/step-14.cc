@@ -325,8 +325,8 @@ namespace Step14
                                      const Vector<double> & /*solution*/) const
     {
       std::ofstream out(output_name_base + "-" +
-                        std::to_string(this->refinement_cycle) + ".eps");
-      GridOut().write_eps(dof_handler.get_triangulation(), out);
+                        std::to_string(this->refinement_cycle) + ".svg");
+      GridOut().write_svg(dof_handler.get_triangulation(), out);
     }
   } // namespace Evaluation
 
@@ -750,8 +750,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
@@ -2100,8 +2100,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
