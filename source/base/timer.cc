@@ -19,6 +19,8 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
+#include <boost/io/ios_state.hpp>
+
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
@@ -549,10 +551,8 @@ void
 TimerOutput::print_summary() const
 {
   // we are going to change the precision and width of output below. store the
-  // old values so we can restore it later on
-  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
-  const std::streamsize old_precision    = out_stream.get_stream().precision();
-  const std::streamsize old_width        = out_stream.get_stream().width();
+  // old values so the get restored when exiting this function
+  const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
   // get the maximum width among all sections
   unsigned int max_width = 0;
@@ -852,11 +852,6 @@ TimerOutput::print_summary() const
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;
     }
-
-  // restore previous precision and width
-  out_stream.get_stream().precision(old_precision);
-  out_stream.get_stream().width(old_width);
-  out_stream.get_stream().flags(old_flags);
 }
 
 
@@ -866,10 +861,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                                         const double   quantile) const
 {
   // we are going to change the precision and width of output below. store the
-  // old values so we can restore it later on
-  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
-  const std::streamsize old_precision    = out_stream.get_stream().precision();
-  const std::streamsize old_width        = out_stream.get_stream().width();
+  // old values so the get restored when exiting this function
+  const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
   AssertDimension(sections.size(),
                   Utilities::MPI::max(sections.size(), mpi_comm));
@@ -1036,11 +1029,6 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
                << time_rank_column << "\n";
   }
-
-  // restore previous precision and width
-  out_stream.get_stream().precision(old_precision);
-  out_stream.get_stream().width(old_width);
-  out_stream.get_stream().flags(old_flags);
 }
 
 
