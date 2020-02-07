@@ -132,6 +132,11 @@ public:
                             MemorySpaceType> &view);
 
   /**
+   * A constructor that automatically creates a view from a value_type object.
+   */
+  explicit ArrayView(value_type &element);
+
+  /**
    * A constructor that automatically creates a view from a std::vector object.
    * The view encompasses all elements of the given vector.
    *
@@ -364,6 +369,14 @@ ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
 {
   *this = ArrayView(starting_element, n_elements);
 }
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(ElementType &element)
+  : starting_element(&element)
+  , n_elements(1)
+{}
 
 
 
