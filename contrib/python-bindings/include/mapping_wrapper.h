@@ -83,7 +83,7 @@ namespace python
      * Get the underlying mapping.
      */
     void *
-    get_mapping();
+    get_mapping() const;
 
   private:
     /**
