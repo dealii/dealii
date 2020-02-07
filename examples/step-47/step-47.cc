@@ -625,7 +625,7 @@ namespace Step47
       // {\mathbf n}}$. The term to be added to the right hand side
       // vector is then
       // $\frac{\gamma}{h_e}\int_e
-      // \frac{\partial v_h}{\partial \mathbf n} j \ ds$.
+      // \jump{\frac{\partial v_h}{\partial \mathbf n}} j \ ds$.
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
         {
           const auto &n = normals[qpoint];
