@@ -3233,12 +3233,12 @@ inline FEEvaluationBase<dim,
   // Create deep copy of mapped geometry for use in parallel...
   if (other.mapped_geometry.get() != nullptr)
     {
-      mapped_geometry.reset(
-        new internal::MatrixFreeFunctions::
-          MappingDataOnTheFly<dim, Number, VectorizedArrayType>(
-            other.mapped_geometry->get_fe_values().get_mapping(),
-            other.mapped_geometry->get_quadrature(),
-            other.mapped_geometry->get_fe_values().get_update_flags()));
+      mapped_geometry = std::make_shared<
+        internal::MatrixFreeFunctions::
+          MappingDataOnTheFly<dim, Number, VectorizedArrayType>>(
+        other.mapped_geometry->get_fe_values().get_mapping(),
+        other.mapped_geometry->get_quadrature(),
+        other.mapped_geometry->get_fe_values().get_update_flags());
       mapping_data = &mapped_geometry->get_data_storage();
       cell         = 0;
 
@@ -3311,12 +3311,12 @@ operator=(const FEEvaluationBase<dim,
   // Create deep copy of mapped geometry for use in parallel...
   if (other.mapped_geometry.get() != nullptr)
     {
-      mapped_geometry.reset(
-        new internal::MatrixFreeFunctions::
-          MappingDataOnTheFly<dim, Number, VectorizedArrayType>(
-            other.mapped_geometry->get_fe_values().get_mapping(),
-            other.mapped_geometry->get_quadrature(),
-            other.mapped_geometry->get_fe_values().get_update_flags()));
+      mapped_geometry = std::make_shared<
+        internal::MatrixFreeFunctions::
+          MappingDataOnTheFly<dim, Number, VectorizedArrayType>>(
+        other.mapped_geometry->get_fe_values().get_mapping(),
+        other.mapped_geometry->get_quadrature(),
+        other.mapped_geometry->get_fe_values().get_update_flags());
       cell         = 0;
       mapping_data = &mapped_geometry->get_data_storage();
       jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
