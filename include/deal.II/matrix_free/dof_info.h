@@ -480,11 +480,18 @@ namespace internal
        * vector partitioner stored in @p vector_partitioner. These
        * partitioners are used in specialized loops that only import parts of
        * the ghosted region for reducing the amount of communication. There
-       * are three variants of the partitioner initialized, one that queries
-       * only the cell values, one that additionally describes the indices for
-       * evaluating the function values on the faces, and one that describes
-       * the indices for evaluation both the function values and the gradients
-       * on the faces adjacent to the locally owned cells.
+       * are five variants of the partitioner initialized:
+       * - one that queries only the cell values,
+       * - one that additionally describes the indices for
+       *   evaluating the function values on relevant faces,
+       * - one that describes the indices for evaluation both the function
+       *   values and the gradients on relevant faces adjacent to the locally
+       *   owned cells,
+       * - one that additionally describes the indices for
+       *   evaluating the function values on all faces, and
+       * - one that describes the indices for evaluation both the function
+       *   values and the gradients on all faces adjacent to the locally owned
+       *   cells.
        */
       std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 5>
         vector_partitioner_face_variants;

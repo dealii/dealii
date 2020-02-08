@@ -1934,6 +1934,15 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                 di.vector_partitioner_face_variants[4],
                                 loop_over_all_faces);
             }
+          else
+            {
+              di.vector_partitioner_face_variants[3].reset(
+                new Utilities::MPI::Partitioner(part.locally_owned_range(),
+                                                part.get_mpi_communicator()));
+              di.vector_partitioner_face_variants[4].reset(
+                new Utilities::MPI::Partitioner(part.locally_owned_range(),
+                                                part.get_mpi_communicator()));
+            }
         }
     }
 
