@@ -1274,6 +1274,101 @@ public:
          DataAccessOnFaces::unspecified) const;
 
   /**
+   * This method runs the loop over all cells (in parallel) similarly as
+   * cell_loop() does. However, this function is intended to be used
+   * for the case if face and boundary integrals should be also
+   * evaluated. In contrast to loop(), the user provides only a single function
+   * that should contain the cell integral over a cell (or batch of cells when
+   * vectorizing) and the face and boundary integrals over all its faces. This
+   * is referred to in the literature as `element-centric loop` or `cell-centric
+   * loop`.
+   *
+   * To be able to evaluate all face integrals (with values or gradients
+   * from the neighboring cells), all ghost values from neighboring cells are
+   * updated. Use
+   * FEFaceEvalution::reinit(cell, face_no) to access quantities on arbitrary
+   * faces of a cell and the respective neighbors.
+   *
+   * @param cell_operation Pointer to member function of `CLASS` with the
+   * signature <tt>cell_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> where the first
+   * argument passes the data of the calling class and the last argument
+   * defines the range of cells which should be worked on (typically more than
+   * one cell is passed in from the loop in order to reduce overheads).
+   *
+   * @param owning_class The object which provides the `cell_operation`
+   * call. To be compatible with this interface, the class must allow to call
+   * `owning_class->cell_operation(...)`.
+   *
+   * @param dst Destination vector holding the result. If the vector is of
+   * type LinearAlgebra::distributed::Vector (or composite objects thereof
+   * such as LinearAlgebra::distributed::BlockVector), the loop calls
+   * LinearAlgebra::distributed::Vector::compress() at the end of the call
+   * internally.
+   *
+   * @param src Input vector. If the vector is of type
+   * LinearAlgebra::distributed::Vector (or composite objects thereof such as
+   * LinearAlgebra::distributed::BlockVector), the loop calls
+   * LinearAlgebra::distributed::Vector::update_ghost_values() at the start of
+   * the call internally to make sure all necessary data is locally
+   * available. Note, however, that the vector is reset to its original state
+   * at the end of the loop, i.e., if the vector was not ghosted upon entry of
+   * the loop, it will not be ghosted upon finishing the loop.
+   *
+   * @param zero_dst_vector If this flag is set to `true`, the vector `dst`
+   * will be set to zero inside the loop. Use this case in case you perform a
+   * typical `vmult()` operation on a matrix object, as it will typically be
+   * faster than calling `dst = 0;` before the loop separately. This is
+   * because the vector entries are set to zero only on subranges of the
+   * vector, making sure that the vector entries stay in caches as much as
+   * possible.
+   *
+   * @param src_vector_face_access Set the type of access into the vector
+   * `src` that will happen inside the body of the @p cell_operation function
+   * during face integrals.
+   * As explained in the description of the DataAccessOnFaces
+   * struct, the purpose of this selection is to reduce the amount of data
+   * that must be exchanged over the MPI network (or via `memcpy` if within
+   * the shared memory region of a node) to gain performance. Note that there
+   * is no way to communicate this setting with the FEFaceEvaluation class,
+   * therefore this selection must be made at this site in addition to what is
+   * implemented inside the `face_operation` function. As a consequence, there
+   * is also no way to check that the setting passed to this call is
+   * consistent with what is later done by `FEFaceEvaluation`, and it is the
+   * user's responsibility to ensure correctness of data.
+   */
+  template <typename CLASS, typename OutVector, typename InVector>
+  void
+  loop_cell_centric(void (CLASS::*cell_operation)(
+                      const MatrixFree &,
+                      OutVector &,
+                      const InVector &,
+                      const std::pair<unsigned int, unsigned int> &) const,
+                    const CLASS *           owning_class,
+                    OutVector &             dst,
+                    const InVector &        src,
+                    const bool              zero_dst_vector = false,
+                    const DataAccessOnFaces src_vector_face_access =
+                      DataAccessOnFaces::unspecified) const;
+
+  /**
+   * Same as above, but for the class member function which is non-const.
+   */
+  template <typename CLASS, typename OutVector, typename InVector>
+  void
+  loop_cell_centric(void (CLASS::*cell_operation)(
+                      const MatrixFree &,
+                      OutVector &,
+                      const InVector &,
+                      const std::pair<unsigned int, unsigned int> &),
+                    CLASS *                 owning_class,
+                    OutVector &             dst,
+                    const InVector &        src,
+                    const bool              zero_dst_vector = false,
+                    const DataAccessOnFaces src_vector_face_access =
+                      DataAccessOnFaces::unspecified) const;
+
+  /**
    * In the hp adaptive case, a subrange of cells as computed during the cell
    * loop might contain elements of different degrees. Use this function to
    * compute what the subrange for an individual finite element degree is. The
@@ -4949,6 +5044,88 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop(
            boundary_operation,
            src_vector_face_access,
            dst_vector_face_access);
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename CLASS, typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
+  void (CLASS::*function_pointer)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &) const,
+  const CLASS *           owning_class,
+  OutVector &             dst,
+  const InVector &        src,
+  const bool              zero_dst_vector,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  auto src_vector_face_access_temp = src_vector_face_access;
+  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::gradients_cell;
+  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::values_cell;
+
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           zero_dst_vector,
+           *owning_class,
+           function_pointer,
+           nullptr,
+           nullptr,
+           src_vector_face_access_temp,
+           DataAccessOnFaces::none);
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename CLASS, typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
+  void (CLASS::*function_pointer)(
+    const MatrixFree<dim, Number, VectorizedArrayType> &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &),
+  CLASS *                 owning_class,
+  OutVector &             dst,
+  const InVector &        src,
+  const bool              zero_dst_vector,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  auto src_vector_face_access_temp = src_vector_face_access;
+  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::gradients_cell;
+  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::values_cell;
+
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     false>
+    worker(*this,
+           src,
+           dst,
+           zero_dst_vector,
+           *owning_class,
+           function_pointer,
+           nullptr,
+           nullptr,
+           src_vector_face_access_temp,
+           DataAccessOnFaces::none);
   task_info.loop(worker);
 }
 
