@@ -274,15 +274,15 @@ do this by adding the following snippet (testing that the center of a cell is
 larger than a small multiple, say one tenth, of the cell diameter away from
 center of the mesh only fails for the central square of the mesh):
 @code
-          GridGenerator::hyper_ball (triangulation);
-          // after GridGenerator::hyper_ball is called the Triangulation has
-          // a SphericalManifold with id 0. We can use it again on the interior.
-          const Point<dim> mesh_center;
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) > cell->diameter()/10)
-              cell->set_all_manifold_ids (0);
+GridGenerator::hyper_ball(triangulation);
+// after GridGenerator::hyper_ball is called the Triangulation has
+// a SphericalManifold with id 0. We can use it again on the interior.
+const Point<dim> mesh_center;
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance (cell->center()) > cell->diameter()/10)
+    cell->set_all_manifold_ids(0);
 
-          triangulation.refine_global (1);
+triangulation.refine_global(1);
 @endcode
 
 After a few global refinement steps, this would lead to a mesh of the following
@@ -310,82 +310,82 @@ the cells in these corners become worse and worse under mesh refinement.
 So we need something smarter. To this end, consider the following solution
 originally developed by Konstantin Ladutenko. We will use the following code:
 @code
-          GridGenerator::hyper_ball (triangulation);
+GridGenerator::hyper_ball(triangulation);
 
-          const Point<dim> mesh_center;
-          const double core_radius  = 1.0/5.0,
-                       inner_radius = 1.0/3.0;
+const Point<dim> mesh_center;
+const double core_radius  = 1.0/5.0,
+             inner_radius = 1.0/3.0;
 
-          // Step 1: Shrink the inner cell
-          //
-          // We cannot get a circle out of the inner cell because of
-          // the degeneration problem mentioned above. Rather, shrink
-          // the inner cell to a core radius of 1/5 that stays
-          // sufficiently far away from the place where the
-          // coefficient will have a discontinuity and where we want
-          // to have cell interfaces that actually lie on a circle.
-          // We do this shrinking by just scaling the location of each
-          // of the vertices, given that the center of the circle is
-          // simply the origin of the coordinate system.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) < 1e-5)
-              {
-                for (unsigned int v=0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
-                  cell->vertex(v) *= core_radius/mesh_center.distance (cell->vertex(v));
-              }
+// Step 1: Shrink the inner cell
+//
+// We cannot get a circle out of the inner cell because of
+// the degeneration problem mentioned above. Rather, shrink
+// the inner cell to a core radius of 1/5 that stays
+// sufficiently far away from the place where the
+// coefficient will have a discontinuity and where we want
+// to have cell interfaces that actually lie on a circle.
+// We do this shrinking by just scaling the location of each
+// of the vertices, given that the center of the circle is
+// simply the origin of the coordinate system.
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance(cell->center()) < 1e-5)
+    {
+      for (unsigned int v=0;
+           v < GeometryInfo<dim>::vertices_per_cell;
+           ++v)
+        cell->vertex(v) *= core_radius/mesh_center.distance(cell->vertex(v));
+    }
 
-          // Step 2: Refine all cells except the central one
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (mesh_center.distance (cell->center()) >= 1e-5)
-              cell->set_refine_flag ();
-          triangulation.execute_coarsening_and_refinement ();
+// Step 2: Refine all cells except the central one
+for (const auto &cell : triangulation.active_cell_iterators())
+  if (mesh_center.distance(cell->center()) >= 1e-5)
+    cell->set_refine_flag();
+triangulation.execute_coarsening_and_refinement();
 
-          // Step 3: Resize the inner children of the outer cells
-          //
-          // The previous step replaced each of the four outer cells
-          // by its four children, but the radial distance at which we
-          // have intersected is not what we want to later refinement
-          // steps. Consequently, move the vertices that were just
-          // created in radial direction to a place where we need
-          // them.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-              {
-                const double dist = mesh_center.distance (cell->vertex(v));
-                if (dist > core_radius*1.0001 && dist < 0.9999)
-                  cell->vertex(v) *= inner_radius/dist;
-              }
+// Step 3: Resize the inner children of the outer cells
+//
+// The previous step replaced each of the four outer cells
+// by its four children, but the radial distance at which we
+// have intersected is not what we want to later refinement
+// steps. Consequently, move the vertices that were just
+// created in radial direction to a place where we need
+// them.
+for (const auto &cell : triangulation.active_cell_iterators())
+  for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    {
+      const double dist = mesh_center.distance(cell->vertex(v));
+      if (dist > core_radius*1.0001 && dist < 0.9999)
+        cell->vertex(v) *= inner_radius/dist;
+    }
 
-          // Step 4: Apply curved manifold description
-          //
-          // As discussed above, we can not expect to subdivide the
-          // inner four cells (or their faces) onto concentric rings,
-          // but we can do so for all other cells that are located
-          // outside the inner radius. To this end, we loop over all
-          // cells and determine whether it is in this zone. If it
-          // isn't, then we set the manifold description of the cell
-          // and all of its bounding faces to the one that describes
-          // the spherical manifold already introduced above and that
-          // will be used for all further mesh refinement.
-          for (const auto &cell : triangulation.active_cell_iterators())
-            {
-              bool is_in_inner_circle = false;
-              for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
-                if (mesh_center.distance (cell->vertex(v)) < inner_radius)
-                  {
-                    is_in_inner_circle = true;
-                    break;
-                  }
+// Step 4: Apply curved manifold description
+//
+// As discussed above, we can not expect to subdivide the
+// inner four cells (or their faces) onto concentric rings,
+// but we can do so for all other cells that are located
+// outside the inner radius. To this end, we loop over all
+// cells and determine whether it is in this zone. If it
+// isn't, then we set the manifold description of the cell
+// and all of its bounding faces to the one that describes
+// the spherical manifold already introduced above and that
+// will be used for all further mesh refinement.
+for (const auto &cell : triangulation.active_cell_iterators())
+  {
+    bool is_in_inner_circle = false;
+    for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      if (mesh_center.distance(cell->vertex(v)) < inner_radius)
+        {
+          is_in_inner_circle = true;
+          break;
+        }
 
-              if (is_in_inner_circle == false)
-              // The Triangulation already has a SphericalManifold with
-              // manifold id 0 (see the documentation of
-              // GridGenerator::hyper_ball) so we just attach it to the outer
-              // ring here:
-                cell->set_all_manifold_ids (0);
-            }
+    if (is_in_inner_circle == false)
+    // The Triangulation already has a SphericalManifold with
+    // manifold id 0 (see the documentation of
+    // GridGenerator::hyper_ball) so we just attach it to the outer
+    // ring here:
+      cell->set_all_manifold_ids(0);
+  }
 @endcode
 
 This code then generates the following, much better sequence of meshes:
@@ -583,7 +583,7 @@ double coefficient (const Point<dim> &p)
     return 1000;
   else
     {
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
       return 0;
     }
 }
