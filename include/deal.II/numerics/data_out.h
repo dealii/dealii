@@ -165,6 +165,21 @@ public:
                              DoFHandlerType::space_dimension>::cell_iterator;
 
   /**
+   * The type of the function object returning the first cell as used in
+   * set_cell_selection().
+   */
+  using FirstCellFunctionType =
+    typename std::function<cell_iterator(const Triangulation<dim, spacedim> &)>;
+
+  /**
+   * The type of the function object returning the next cell as used in
+   * set_cell_selection().
+   */
+  using NextCellFunctionType =
+    typename std::function<cell_iterator(const Triangulation<dim, spacedim> &,
+                                         const cell_iterator &)>;
+
+  /**
    * Enumeration describing the part of the domain in which cells
    * should be written with curved boundaries. In reality, no file
    * format we are aware of really supports curved boundaries, but
@@ -398,6 +413,13 @@ public:
    */
   void
   set_cell_selection(const FilteredIterator<cell_iterator> &filtered_iterator);
+
+  /**
+   * Return the two function objects that are in use for determining the first
+   * and the next cell as set by set_cell_selection().
+   */
+  const std::pair<FirstCellFunctionType, NextCellFunctionType>
+  get_cell_selection() const;
 
   /**
    * Return the first cell which we want output for. The default

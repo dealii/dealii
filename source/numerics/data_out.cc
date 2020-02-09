@@ -1108,6 +1108,16 @@ DataOut<dim, DoFHandlerType>::set_cell_selection(
 
 
 template <int dim, typename DoFHandlerType>
+const std::pair<typename DataOut<dim, DoFHandlerType>::FirstCellFunctionType,
+                typename DataOut<dim, DoFHandlerType>::NextCellFunctionType>
+DataOut<dim, DoFHandlerType>::get_cell_selection() const
+{
+  return std::make_pair(first_cell_function, next_cell_function);
+}
+
+
+
+template <int dim, typename DoFHandlerType>
 typename DataOut<dim, DoFHandlerType>::cell_iterator
 DataOut<dim, DoFHandlerType>::first_cell()
 {
