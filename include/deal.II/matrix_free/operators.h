@@ -1789,8 +1789,9 @@ namespace MatrixFreeOperators
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
 
-    this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
-    this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
+    this->inverse_diagonal_entries =
+      std::make_shared<DiagonalMatrix<VectorType>>();
+    this->diagonal_entries = std::make_shared<DiagonalMatrix<VectorType>>();
     VectorType &inverse_diagonal_vector =
       this->inverse_diagonal_entries->get_vector();
     VectorType &diagonal_vector = this->diagonal_entries->get_vector();
@@ -1977,8 +1978,9 @@ namespace MatrixFreeOperators
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
 
-    this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
-    this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
+    this->inverse_diagonal_entries =
+      std::make_shared<DiagonalMatrix<VectorType>>();
+    this->diagonal_entries = std::make_shared<DiagonalMatrix<VectorType>>();
     VectorType &inverse_diagonal_vector =
       this->inverse_diagonal_entries->get_vector();
     VectorType &diagonal_vector = this->diagonal_entries->get_vector();

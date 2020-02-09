@@ -674,11 +674,14 @@ namespace internal
               const unsigned int n_q_points =
                 mapping_info.cell_data[my_q].descriptor[fe_index].n_q_points;
               if (fe_values[my_q][fe_index].get() == nullptr)
-                fe_values[my_q][fe_index].reset(new dealii::FEValues<dim>(
-                  mapping,
-                  dummy_fe,
-                  mapping_info.cell_data[my_q].descriptor[fe_index].quadrature,
-                  update_flags_feval));
+                fe_values[my_q][fe_index] =
+                  std::make_shared<dealii::FEValues<dim>>(
+                    mapping,
+                    dummy_fe,
+                    mapping_info.cell_data[my_q]
+                      .descriptor[fe_index]
+                      .quadrature,
+                    update_flags_feval);
               dealii::FEValues<dim> &fe_val = *fe_values[my_q][fe_index];
               cell_data.resize(n_q_points);
 
@@ -1324,12 +1327,17 @@ namespace internal
 
               if (is_boundary_face &&
                   fe_boundary_face_values_container[my_q][0] == nullptr)
-                fe_boundary_face_values_container[my_q][0].reset(
-                  new FEFaceValues<dim>(
-                    mapping, dummy_fe, quadrature, update_flags_boundary));
+                fe_boundary_face_values_container[my_q][0] =
+                  std::make_shared<FEFaceValues<dim>>(mapping,
+                                                      dummy_fe,
+                                                      quadrature,
+                                                      update_flags_boundary);
               else if (fe_face_values_container[my_q][0] == nullptr)
-                fe_face_values_container[my_q][0].reset(new FEFaceValues<dim>(
-                  mapping, dummy_fe, quadrature, update_flags_inner));
+                fe_face_values_container[my_q][0] =
+                  std::make_shared<FEFaceValues<dim>>(mapping,
+                                                      dummy_fe,
+                                                      quadrature,
+                                                      update_flags_inner);
 
               FEFaceValues<dim> &fe_face_values =
                 is_boundary_face ? *fe_boundary_face_values_container[my_q][0] :
@@ -1471,11 +1479,12 @@ namespace internal
                       else
                         {
                           if (fe_subface_values_container[my_q][0] == nullptr)
-                            fe_subface_values_container[my_q][0].reset(
-                              new FESubfaceValues<dim>(mapping,
-                                                       dummy_fe,
-                                                       quadrature,
-                                                       update_flags_inner));
+                            fe_subface_values_container[my_q][0] =
+                              std::make_shared<FESubfaceValues<dim>>(
+                                mapping,
+                                dummy_fe,
+                                quadrature,
+                                update_flags_inner);
                           fe_subface_values_container[my_q][0]->reinit(
                             cell_it,
                             faces[face].exterior_face_no,
@@ -2017,19 +2026,19 @@ namespace internal
           for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
               if (fe_face_values[my_q][fe_index].get() == nullptr)
-                fe_face_values[my_q][fe_index].reset(
-                  new dealii::FEFaceValues<dim>(
+                fe_face_values[my_q][fe_index] =
+                  std::make_shared<dealii::FEFaceValues<dim>>(
                     mapping,
                     dummy_fe,
                     face_data_by_cells[my_q].descriptor[fe_index].quadrature,
-                    update_flags));
+                    update_flags);
               if (fe_face_values_neigh[my_q][fe_index].get() == nullptr)
-                fe_face_values_neigh[my_q][fe_index].reset(
-                  new dealii::FEFaceValues<dim>(
+                fe_face_values_neigh[my_q][fe_index] =
+                  std::make_shared<dealii::FEFaceValues<dim>>(
                     mapping,
                     dummy_fe,
                     face_data_by_cells[my_q].descriptor[fe_index].quadrature,
-                    update_flags));
+                    update_flags);
               dealii::FEFaceValues<dim> &fe_val =
                 *fe_face_values[my_q][fe_index];
               dealii::FEFaceValues<dim> &fe_val_neigh =

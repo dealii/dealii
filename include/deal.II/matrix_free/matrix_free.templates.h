@@ -988,9 +988,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
       // set locally owned range for each component
       Assert(locally_owned_set[no].is_contiguous(), ExcNotImplemented());
-      dof_info[no].vector_partitioner.reset(
-        new Utilities::MPI::Partitioner(locally_owned_set[no],
-                                        task_info.communicator));
+      dof_info[no].vector_partitioner =
+        std::make_shared<Utilities::MPI::Partitioner>(locally_owned_set[no],
+                                                      task_info.communicator);
 
       // initialize the arrays for indices
       const unsigned int n_components_total =
@@ -1618,9 +1618,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               di.vector_partitioner_face_variants[0] = di.vector_partitioner;
             else
               {
-                di.vector_partitioner_face_variants[0].reset(
-                  new Utilities::MPI::Partitioner(part.locally_owned_range(),
-                                                  part.get_mpi_communicator()));
+                di.vector_partitioner_face_variants[0] =
+                  std::make_shared<Utilities::MPI::Partitioner>(
+                    part.locally_owned_range(), part.get_mpi_communicator());
                 const_cast<Utilities::MPI::Partitioner *>(
                   di.vector_partitioner_face_variants[0].get())
                   ->set_ghost_indices(compressed_set, part.ghost_indices());
@@ -1789,10 +1789,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     vector_partitioner_values = di.vector_partitioner;
                   else
                     {
-                      vector_partitioner_values.reset(
-                        new Utilities::MPI::Partitioner(
+                      vector_partitioner_values =
+                        std::make_shared<Utilities::MPI::Partitioner>(
                           part.locally_owned_range(),
-                          part.get_mpi_communicator()));
+                          part.get_mpi_communicator());
                       const_cast<Utilities::MPI::Partitioner *>(
                         vector_partitioner_values.get())
                         ->set_ghost_indices(compressed_set,
@@ -1901,10 +1901,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     vector_partitioner_gradients = di.vector_partitioner;
                   else
                     {
-                      vector_partitioner_gradients.reset(
-                        new Utilities::MPI::Partitioner(
+                      vector_partitioner_gradients =
+                        std::make_shared<Utilities::MPI::Partitioner>(
                           part.locally_owned_range(),
-                          part.get_mpi_communicator()));
+                          part.get_mpi_communicator());
                       const_cast<Utilities::MPI::Partitioner *>(
                         vector_partitioner_gradients.get())
                         ->set_ghost_indices(compressed_set,
@@ -1936,12 +1936,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             }
           else
             {
-              di.vector_partitioner_face_variants[3].reset(
-                new Utilities::MPI::Partitioner(part.locally_owned_range(),
-                                                part.get_mpi_communicator()));
-              di.vector_partitioner_face_variants[4].reset(
-                new Utilities::MPI::Partitioner(part.locally_owned_range(),
-                                                part.get_mpi_communicator()));
+              di.vector_partitioner_face_variants[3] =
+                std::make_shared<Utilities::MPI::Partitioner>(
+                  part.locally_owned_range(), part.get_mpi_communicator());
+              di.vector_partitioner_face_variants[4] =
+                std::make_shared<Utilities::MPI::Partitioner>(
+                  part.locally_owned_range(), part.get_mpi_communicator());
             }
         }
     }
