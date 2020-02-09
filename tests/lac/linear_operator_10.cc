@@ -255,6 +255,7 @@ main(int argc, char *argv[])
       deallog.pop();
     }
 
+#ifdef DEAL_II_TRILINOS_WITH_MUELU
     {
       deallog.push("PreconditionAMGMueLu");
       typedef TrilinosWrappers::PreconditionAMGMueLu PREC;
@@ -262,6 +263,7 @@ main(int argc, char *argv[])
       test_preconditioner<PREC>(A, c);
       deallog.pop();
     }
+#endif
 
     {
       deallog.push("PreconditionChebyshev");

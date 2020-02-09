@@ -1716,7 +1716,7 @@ namespace TrilinosWrappers
 
 
 
-#    if defined(DOXYGEN) || DEAL_II_TRILINOS_VERSION_GTE(11, 14, 0)
+#    if defined(DOXYGEN) || defined(DEAL_II_TRILINOS_WITH_MUELU)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
@@ -1725,8 +1725,10 @@ namespace TrilinosWrappers
    * except for the higher_order_elements parameter which does not exist in
    * PreconditionerAMGMueLu.
    *
-   * @note This class requires Trilinos 11.14 or higher. At the moment 64bit-indices
-   * are not supported.
+   * @note You need to configure Trilinos with MueLU support for this
+   * preconditioner to work.
+   *
+   * @note At the moment 64bit-indices are not supported.
    *
    * @warning This interface should not be considered as stable.
    *
