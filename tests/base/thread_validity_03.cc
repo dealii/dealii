@@ -34,7 +34,7 @@ struct X
   void
   execute()
   {
-    Assert(i == 42, ExcInternalError());
+    AssertThrow(i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 

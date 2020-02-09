@@ -87,14 +87,15 @@ main()
   // Test an empty table
   {
     TransposeTable<double> transpose_table;
-    Assert(transpose_table.begin() == transpose_table.end(),
-           ExcMessage("The beginning and end iterators should be equal for an "
-                      "empty table."));
+    AssertThrow(transpose_table.begin() == transpose_table.end(),
+                ExcMessage(
+                  "The beginning and end iterators should be equal for an "
+                  "empty table."));
     TransposeTable<double>::const_iterator begin = transpose_table.begin();
     TransposeTable<double>::const_iterator end   = transpose_table.end();
-    Assert(begin == end,
-           ExcMessage("The beginning and end const iterators should"
-                      " be equal for an empty table."));
+    AssertThrow(begin == end,
+                ExcMessage("The beginning and end const iterators should"
+                           " be equal for an empty table."));
   }
 
   // test some things with accessors

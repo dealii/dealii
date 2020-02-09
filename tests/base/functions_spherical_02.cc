@@ -68,7 +68,7 @@ public:
   {
     Tensor<1, dim> dist = p - origin;
     const double   r    = dist.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    AssertThrow(r > 0.0, ExcMessage("r is not positive"));
     Tensor<1, dim> res;
     const double   x  = dist[0];
     const double   y  = dist[1];
@@ -89,7 +89,7 @@ public:
   {
     const Tensor<1, dim> dist = p - origin;
     const double         r    = dist.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    AssertThrow(r > 0.0, ExcMessage("r is not positive"));
     const double x  = dist[0];
     const double y  = dist[1];
     const double z  = dist[2];

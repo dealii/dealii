@@ -76,14 +76,14 @@ public:
   virtual void
   pack_values(std::vector<double> &scalars) const
   {
-    Assert(scalars.size() == 1, ExcInternalError());
+    AssertThrow(scalars.size() == 1, ExcInternalError());
     scalars[0] = value;
   }
 
   virtual void
   unpack_values(const std::vector<double> &scalars)
   {
-    Assert(scalars.size() == 1, ExcInternalError());
+    AssertThrow(scalars.size() == 1, ExcInternalError());
     value = scalars[0];
   }
 };

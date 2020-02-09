@@ -43,9 +43,11 @@ main()
 
           // assert that roots are increasing
           for (unsigned int i = 1; i < roots.size(); ++i)
-            Assert(roots[i] > roots[i - 1], ExcInternalError());
-          Assert(roots.size() == 0 || roots.front() > -1., ExcInternalError());
-          Assert(roots.size() == 0 || roots.back() < 1., ExcInternalError());
+            AssertThrow(roots[i] > roots[i - 1], ExcInternalError());
+          AssertThrow(roots.size() == 0 || roots.front() > -1.,
+                      ExcInternalError());
+          AssertThrow(roots.size() == 0 || roots.back() < 1.,
+                      ExcInternalError());
 
           for (unsigned int i = 0; i < roots.size(); ++i)
             deallog << roots[i] << " ";

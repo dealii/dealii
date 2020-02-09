@@ -87,9 +87,9 @@ main()
       test();
     }
   else
-    Assert(false,
-           ExcInternalError(
-             "did somebody mess with LimitConcurrency in tests.h?"));
+    AssertThrow(false,
+                ExcInternalError(
+                  "did somebody mess with LimitConcurrency in tests.h?"));
 
   deallog << "* now with thread limit 1:" << std::endl;
   MultithreadInfo::set_thread_limit(1);

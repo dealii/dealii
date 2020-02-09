@@ -46,7 +46,7 @@ test()
   deallog << std::endl;
 
   for (unsigned int i = 0; i < indices.size(); i++)
-    Assert(is1.index_within_set(indices[i]) == i, ExcInternalError());
+    AssertThrow(is1.index_within_set(indices[i]) == i, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

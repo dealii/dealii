@@ -31,7 +31,7 @@ public:
   double
   laplacian(const Point<dim> &p, const unsigned int c) const
   {
-    Assert(c == 0, ExcInternalError());
+    AssertThrow(c == 0, ExcInternalError());
     return p.norm();
   }
 };

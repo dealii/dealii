@@ -37,7 +37,7 @@ test()
                           array + sizeof(array) / sizeof(array[0]));
   }
 
-  Assert(index_set.is_contiguous() == false, ExcInternalError());
+  AssertThrow(index_set.is_contiguous() == false, ExcInternalError());
 
   for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
@@ -50,7 +50,7 @@ test()
                           array + sizeof(array) / sizeof(array[0]));
   }
 
-  Assert(index_set.is_contiguous() == true, ExcInternalError());
+  AssertThrow(index_set.is_contiguous() == true, ExcInternalError());
 
   for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")

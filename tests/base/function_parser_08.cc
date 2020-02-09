@@ -82,7 +82,7 @@ test2()
   // We can also only evaluate the 2nd component:
   double c = vector_function.value(point, 1);
 
-  Assert(c == result[1], ExcInternalError());
+  AssertThrow(c == result[1], ExcInternalError());
 
   // Output the evaluated function
   deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"

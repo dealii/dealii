@@ -32,8 +32,8 @@ test()
   is1.add_range(0, 10);
   is2.add_range(0, 20);
 
-  Assert((is1 == is2) == false, ExcInternalError());
-  Assert((is1 != is2) == true, ExcInternalError());
+  AssertThrow((is1 == is2) == false, ExcInternalError());
+  AssertThrow((is1 != is2) == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -31,15 +31,15 @@ test()
   a.reinit(&v[4], 3); // writable view
   a[2] = 42;
 
-  Assert(a[2] == 42, ExcInternalError());
-  Assert(v[6] == 42, ExcInternalError());
+  AssertThrow(a[2] == 42, ExcInternalError());
+  AssertThrow(v[6] == 42, ExcInternalError());
 
   ArrayView<const int> a2;
   a2.reinit(&v[4], 3); // readable view
-  Assert(a2[2] == 42, ExcInternalError());
+  AssertThrow(a2[2] == 42, ExcInternalError());
 
   ArrayView<const int> a3(a); // readable view, converted from 'a'
-  Assert(a3[2] == 42, ExcInternalError());
+  AssertThrow(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

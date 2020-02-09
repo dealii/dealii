@@ -47,7 +47,7 @@ struct X
 void
 execute_ref(const X &x)
 {
-  Assert(x.i == 0, ExcInternalError());
+  AssertThrow(x.i == 0, ExcInternalError());
   deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i
           << std::endl;
   deallog << "OK" << std::endl;
@@ -56,7 +56,7 @@ execute_ref(const X &x)
 void
 execute_value(X x)
 {
-  Assert(x.i > 0, ExcInternalError());
+  AssertThrow(x.i > 0, ExcInternalError());
   deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' '
           << (x.i > 0 ? "OK" : "not OK") << std::endl;
   deallog << "OK" << std::endl;

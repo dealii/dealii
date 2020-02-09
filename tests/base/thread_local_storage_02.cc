@@ -29,12 +29,12 @@ struct X
 {
   X()
   {
-    Assert(false, ExcInternalError());
+    AssertThrow(false, ExcInternalError());
   };
   X(int n)
   {
     deallog << "Creating" << std::endl;
-    Assert(n == 42, ExcInternalError());
+    AssertThrow(n == 42, ExcInternalError());
   };
   X(const X &)
   {

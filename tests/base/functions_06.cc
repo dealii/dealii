@@ -29,7 +29,7 @@ check1()
 {
   VectorFunctionFromScalarFunctionObject<dim> object(&Point<dim>::norm, 1, 3);
 
-  Assert(object.n_components == 3, ExcInternalError());
+  AssertThrow(object.n_components == 3, ExcInternalError());
 
   for (unsigned int i = 0; i < 10; ++i)
     {

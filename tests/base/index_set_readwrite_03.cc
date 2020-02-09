@@ -40,7 +40,7 @@ test()
   std::ifstream in("a.idxset");
   is2.block_read(in);
 
-  Assert(is1 == is2, ExcInternalError());
+  AssertThrow(is1 == is2, ExcInternalError());
 
   deallog << is1.is_element(4) << " " << is2.is_element(4) << std::endl;
 

@@ -50,7 +50,8 @@ assemble(const std::vector<int>::iterator &it,
 {
   double s     = *it;
   double value = fp.value(Point<2>(s, 2.5));
-  Assert(std::abs(1.0 + s * 2.5 - value) < 1e-10, ExcMessage("wrong value"));
+  AssertThrow(std::abs(1.0 + s * 2.5 - value) < 1e-10,
+              ExcMessage("wrong value"));
   std::cout << data.value << std::endl;
 
   data.value = (std::abs(1.0 + s * 2.5 - value) < 1e-10) ? 1 : 0;
@@ -83,7 +84,7 @@ test2()
                   copy_data());
   std::cout << "result: " << result << std::endl;
 
-  Assert((unsigned int)result == v.size(), ExcMessage("uhuh!"));
+  AssertThrow((unsigned int)result == v.size(), ExcMessage("uhuh!"));
 }
 
 

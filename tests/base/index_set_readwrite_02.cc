@@ -40,7 +40,7 @@ test()
   std::ifstream in("a.idxset");
   is2.block_read(in);
 
-  Assert(is1 == is2, ExcInternalError());
+  AssertThrow(is1 == is2, ExcInternalError());
 
 
   IndexSet is3(11);
@@ -48,7 +48,7 @@ test()
   std::ifstream in2("a.idxset");
   is3.block_read(in2);
 
-  Assert(is1 == is3, ExcInternalError());
+  AssertThrow(is1 == is3, ExcInternalError());
 
   deallog << "OK" << std::endl;
 

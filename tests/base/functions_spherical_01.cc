@@ -47,7 +47,7 @@ public:
   {
     Tensor<1, dim> dist = p - origin;
     const double   r    = dist.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    AssertThrow(r > 0.0, ExcMessage("r is not positive"));
     dist /= r;
     return -Z * std::exp(-Z * r) * dist;
   }
@@ -57,7 +57,7 @@ public:
   {
     Tensor<1, dim> dir = p - origin;
     const double   r   = dir.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    AssertThrow(r > 0.0, ExcMessage("r is not positive"));
     dir /= r;
     SymmetricTensor<2, dim> dir_x_dir;
     for (unsigned int i = 0; i < dim; i++)

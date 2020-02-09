@@ -28,17 +28,17 @@ test()
 
   ArrayView<int> a1(v); // writable view
 
-  Assert(a1.size() == 1, ExcInternalError());
-  Assert(a1[0] == 9, ExcInternalError());
+  AssertThrow(a1.size() == 1, ExcInternalError());
+  AssertThrow(a1[0] == 9, ExcInternalError());
   v = 10;
-  Assert(a1[0] == 10, ExcInternalError());
+  AssertThrow(a1[0] == 10, ExcInternalError());
   a1[0] = 11;
-  Assert(a1[0] == 11, ExcInternalError());
+  AssertThrow(a1[0] == 11, ExcInternalError());
 
   ArrayView<int> a2(v); // writable view
 
-  Assert(a2.size() == 1, ExcInternalError());
-  Assert(a2[0] == 11, ExcInternalError());
+  AssertThrow(a2.size() == 1, ExcInternalError());
+  AssertThrow(a2[0] == 11, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

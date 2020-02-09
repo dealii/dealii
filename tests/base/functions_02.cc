@@ -149,7 +149,7 @@ check_laplacian(const Function<dim> &f)
   Point<dim> p;
   for (unsigned int i = 0; i < dim; ++i)
     p[i] = i + 1;
-  Assert(std::fabs(f.laplacian(p)) < 1e-12, ExcInternalError());
+  AssertThrow(std::fabs(f.laplacian(p)) < 1e-12, ExcInternalError());
 }
 
 template <int dim>
@@ -168,7 +168,7 @@ check_laplacian_list(const Function<dim> &f)
   std::vector<double> values(max_points);
   f.laplacian_list(point_vector, values);
   for (unsigned int j = 0; j < max_points; ++j)
-    Assert(std::fabs(values[j]) < 1e-12, ExcInternalError());
+    AssertThrow(std::fabs(values[j]) < 1e-12, ExcInternalError());
 }
 
 int

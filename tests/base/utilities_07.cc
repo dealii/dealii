@@ -38,7 +38,7 @@ verify(const std::string &s)
     {
       exception_caught = true;
     }
-  Assert(exception_caught == true, ExcMessage("Function is broken!"));
+  AssertThrow(exception_caught == true, ExcMessage("Function is broken!"));
 
   deallog << "Done correctly: " << s << std::endl;
 }

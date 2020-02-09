@@ -78,7 +78,7 @@ struct MyQData : public TransferableQuadraturePointData
   virtual void
   pack_values(std::vector<double> &scalars) const
   {
-    Assert(scalars.size() == 2, ExcInternalError());
+    AssertThrow(scalars.size() == 2, ExcInternalError());
     scalars[0] = value1;
     scalars[1] = value2;
   }
@@ -86,7 +86,7 @@ struct MyQData : public TransferableQuadraturePointData
   virtual void
   unpack_values(const std::vector<double> &scalars)
   {
-    Assert(scalars.size() == 2, ExcInternalError());
+    AssertThrow(scalars.size() == 2, ExcInternalError());
     value1 = scalars[0];
     value2 = scalars[1];
   }

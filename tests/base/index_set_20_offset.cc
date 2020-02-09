@@ -41,10 +41,10 @@ testor(IndexSet &a, IndexSet &other, unsigned int offset, bool verbose)
 
   for (unsigned int i = 0; i < merged.size(); ++i)
     {
-      Assert(merged.is_element(i) ==
-               (a.is_element(i) ||
-                (i >= offset && other.is_element(i - offset))),
-             ExcInternalError());
+      AssertThrow(merged.is_element(i) ==
+                    (a.is_element(i) ||
+                     (i >= offset && other.is_element(i - offset))),
+                  ExcInternalError());
     }
 }
 

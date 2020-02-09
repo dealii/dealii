@@ -91,11 +91,11 @@ main(int argc, char **argv)
                   output.rend(),
                   '|')
           .base();
-      Assert(start_pipe != output.end(), ExcInternalError());
+      AssertThrow(start_pipe != output.end(), ExcInternalError());
       const std::string::iterator end_pipe =
         std::find(next_number, output.end(), '|');
-      Assert(end_pipe != output.end(), ExcInternalError());
-      Assert(end_pipe - start_pipe > 1, ExcInternalError());
+      AssertThrow(end_pipe != output.end(), ExcInternalError());
+      AssertThrow(end_pipe - start_pipe > 1, ExcInternalError());
 
       std::fill(start_pipe + 1, end_pipe - 1, 'x');
       next_number = std::find_if(next_number, output.end(), is_digit);

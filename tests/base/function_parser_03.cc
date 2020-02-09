@@ -43,12 +43,13 @@ main()
   fp.initialize("s,t", "s*t+1", constants);
 
   double value = fp.value(Point<2>(2.0, 2.5));
-  Assert(std::abs(1.0 + 2.0 * 2.5 - value) < 1e-10, ExcMessage("wrong value"));
+  AssertThrow(std::abs(1.0 + 2.0 * 2.5 - value) < 1e-10,
+              ExcMessage("wrong value"));
 
   std::vector<std::string> expressions;
   expressions.push_back("sin(2*mypi*x)+y");
   constants["mypi"] = numbers::PI;
   fp.initialize("x,y", expressions, constants);
   double value1 = fp.value(Point<2>(1.0, 2.5), 0);
-  Assert(std::abs(2.5 - value1) < 1e-10, ExcMessage("wrong value"));
+  AssertThrow(std::abs(2.5 - value1) < 1e-10, ExcMessage("wrong value"));
 }

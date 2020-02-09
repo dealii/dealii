@@ -49,13 +49,13 @@ test_function(const std::string &original_text,
   std::vector<std::string> should_be_vec = split_string(result);
 
 
-  Assert(res_vec.size() == should_be_vec.size(), ExcInternalError());
+  AssertThrow(res_vec.size() == should_be_vec.size(), ExcInternalError());
   for (unsigned int i = 0; i < res_vec.size(); ++i)
     {
       if (res_vec[i] != should_be_vec[i])
         std::cout << "'" << res_vec[i] << "!=" << should_be_vec[i] << "'"
                   << std::endl;
-      Assert(res_vec[i] == should_be_vec[i], ExcInternalError());
+      AssertThrow(res_vec[i] == should_be_vec[i], ExcInternalError());
     }
 }
 

@@ -180,7 +180,7 @@ do_project()
                       8,
                       1);
 
-      Assert(std::fabs(sum - 288.) < 1e-12, ExcInternalError());
+      AssertThrow(std::fabs(sum - 288.) < 1e-12, ExcInternalError());
       deallog << sum << std::endl;
     }
 }

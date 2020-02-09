@@ -39,7 +39,7 @@ main()
   const int N = 10000;
   const int s = parallel::accumulate_from_subranges<int>(&sum, 0, N, 10);
 
-  Assert(s == N * (N - 1) / 2, ExcInternalError());
+  AssertThrow(s == N * (N - 1) / 2, ExcInternalError());
 
   deallog << s << std::endl;
 }

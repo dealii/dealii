@@ -48,8 +48,8 @@ test()
   {
     deallog << "* complete:" << std::endl;
     IndexSet s = complete_index_set(N);
-    Assert(s.size() == N, ExcInternalError());
-    Assert(s.n_elements() == N, ExcInternalError());
+    AssertThrow(s.size() == N, ExcInternalError());
+    AssertThrow(s.n_elements() == N, ExcInternalError());
     print(s);
 
     IndexSet::size_type x = s.index_within_set(large2);
@@ -61,7 +61,7 @@ test()
     deallog << "* interval far in:" << std::endl;
     IndexSet s(N);
     s.add_range(large, large2);
-    Assert(s.size() == N, ExcInternalError());
+    AssertThrow(s.size() == N, ExcInternalError());
     print(s);
 
     IndexSet::size_type x = s.index_within_set(large + 1);
@@ -84,7 +84,7 @@ test()
     other.add_range(large, large2);
     s.subtract_set(other);
 
-    Assert(s.size() == N, ExcInternalError());
+    AssertThrow(s.size() == N, ExcInternalError());
     print(s);
 
     IndexSet::size_type x = s.index_within_set(large2 + 1);
@@ -101,7 +101,7 @@ test()
     other.add_index(1);
     other.add_range(4, 7);
     s.add_indices(other, large);
-    Assert(s.size() == N, ExcInternalError());
+    AssertThrow(s.size() == N, ExcInternalError());
     print(s);
   }
 

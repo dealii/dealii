@@ -116,25 +116,25 @@ test3()
   {
     const Number  v = 0.2;
     const Integer i = (Integer)(v * (Number)max);
-    Assert(i > 0 && i < max, ExcInternalError());
+    AssertThrow(i > 0 && i < max, ExcInternalError());
   }
 
   {
     const Number  v = 0.7;
     const Integer i = (Integer)(v * (Number)max);
-    Assert(i > 0 && i < max, ExcInternalError());
+    AssertThrow(i > 0 && i < max, ExcInternalError());
   }
 
   {
     const Number  v = 0.;
     const Integer i = (Integer)(v * (Number)max);
-    Assert(i == 0, ExcInternalError());
+    AssertThrow(i == 0, ExcInternalError());
   }
 
   {
     const Number  v = 1.;
     const Integer i = (Integer)(v * (Number)max);
-    Assert(i == max, ExcInternalError());
+    AssertThrow(i == max, ExcInternalError());
   }
 }
 

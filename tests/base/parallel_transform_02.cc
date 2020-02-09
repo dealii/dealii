@@ -46,7 +46,7 @@ main()
                       [](double i, double j) { return i + 2 * j; },
                       10);
 
-  Assert(z.l2_norm() == 0, ExcInternalError());
+  AssertThrow(z.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

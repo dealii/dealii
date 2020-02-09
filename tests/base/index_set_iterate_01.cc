@@ -25,12 +25,12 @@ test(IndexSet &index_set)
 {
   index_set.print(deallog);
 
-  Assert((int)index_set.n_intervals() ==
-           index_set.end_intervals() - index_set.begin_intervals(),
-         ExcInternalError());
+  AssertThrow((int)index_set.n_intervals() ==
+                index_set.end_intervals() - index_set.begin_intervals(),
+              ExcInternalError());
 
   IndexSet::IntervalIterator endit = index_set.end_intervals();
-  Assert(!endit->is_valid(), ExcInternalError());
+  AssertThrow(!endit->is_valid(), ExcInternalError());
 
   // print intervals
   for (IndexSet::IntervalIterator it = index_set.begin_intervals(); it != endit;
@@ -58,24 +58,26 @@ test(IndexSet &index_set)
        ++it, ++c)
     {
       IndexSet::IntervalIterator it2 = it;
-      Assert(it == it2, ExcInternalError());
-      Assert(it - it2 == 0, ExcInternalError());
-      Assert(endit != it, ExcInternalError());
-      Assert(it != endit, ExcInternalError());
+      AssertThrow(it == it2, ExcInternalError());
+      AssertThrow(it - it2 == 0, ExcInternalError());
+      AssertThrow(endit != it, ExcInternalError());
+      AssertThrow(it != endit, ExcInternalError());
 
       IndexSet::IntervalIterator it3 = it2++;
-      Assert(it == it3, ExcInternalError());
-      Assert(it2 - it3 == 1, ExcInternalError());
-      Assert(it3 < it2, ExcInternalError());
-      Assert(++it3 == it2, ExcInternalError());
+      AssertThrow(it == it3, ExcInternalError());
+      AssertThrow(it2 - it3 == 1, ExcInternalError());
+      AssertThrow(it3 < it2, ExcInternalError());
+      AssertThrow(++it3 == it2, ExcInternalError());
 
-      Assert(it->is_valid(), ExcInternalError());
+      AssertThrow(it->is_valid(), ExcInternalError());
 
-      Assert(it < endit, ExcInternalError());
-      Assert(!(it < it), ExcInternalError());
+      AssertThrow(it < endit, ExcInternalError());
+      AssertThrow(!(it < it), ExcInternalError());
 
-      Assert((it - index_set.begin_intervals()) == (int)c, ExcInternalError());
-      Assert((index_set.begin_intervals() - it) == -(int)c, ExcInternalError());
+      AssertThrow((it - index_set.begin_intervals()) == (int)c,
+                  ExcInternalError());
+      AssertThrow((index_set.begin_intervals() - it) == -(int)c,
+                  ExcInternalError());
 
       deallog << c << ": n_el: " << it->n_elements() << std::endl;
     }
@@ -87,18 +89,18 @@ test(IndexSet &index_set)
     unsigned int c = 0;
     for (; it != index_set.end(); ++it, ++c)
       {
-        Assert(it < index_set.end(), ExcInternalError());
+        AssertThrow(it < index_set.end(), ExcInternalError());
 
         IndexSet::ElementIterator it2 = it;
-        Assert(it == it2, ExcInternalError());
-        Assert(!(it < it2), ExcInternalError());
+        AssertThrow(it == it2, ExcInternalError());
+        AssertThrow(!(it < it2), ExcInternalError());
         IndexSet::ElementIterator it3 = it2++;
-        Assert(it == it3, ExcInternalError());
-        Assert(it < it2, ExcInternalError());
-        Assert(it != it2, ExcInternalError());
+        AssertThrow(it == it3, ExcInternalError());
+        AssertThrow(it < it2, ExcInternalError());
+        AssertThrow(it != it2, ExcInternalError());
 
-        Assert((it - index_set.begin()) == c, ExcInternalError());
-        Assert((index_set.begin() - it) == -(int)c, ExcInternalError());
+        AssertThrow((it - index_set.begin()) == c, ExcInternalError());
+        AssertThrow((index_set.begin() - it) == -(int)c, ExcInternalError());
       }
   }
 
@@ -109,7 +111,7 @@ test(IndexSet &index_set)
     IndexSet::ElementIterator it2 = index_set.begin();
 
     for (; it != index_set.end(); ++it, it2++)
-      Assert(it == it2, ExcInternalError());
+      AssertThrow(it == it2, ExcInternalError());
   }
 
   // pre vs post increment, part 2
@@ -118,23 +120,25 @@ test(IndexSet &index_set)
     IndexSet::IntervalIterator it2 = index_set.begin_intervals();
 
     for (; it != index_set.end_intervals(); ++it, it2++)
-      Assert(it == it2, ExcInternalError());
+      AssertThrow(it == it2, ExcInternalError());
   }
 
   // Assignment
   {
     IndexSet::IntervalIterator it = index_set.begin_intervals();
-    Assert(it->is_valid() || index_set.n_elements() == 0, ExcInternalError());
+    AssertThrow(it->is_valid() || index_set.n_elements() == 0,
+                ExcInternalError());
     it = index_set.end_intervals();
-    Assert(!it->is_valid(), ExcInternalError());
+    AssertThrow(!it->is_valid(), ExcInternalError());
   }
 
   // Construct empty iterator
   {
     IndexSet::IntervalIterator it;
-    Assert(!it->is_valid(), ExcInternalError());
+    AssertThrow(!it->is_valid(), ExcInternalError());
     it = index_set.begin_intervals();
-    Assert(it->is_valid() || index_set.n_elements() == 0, ExcInternalError());
+    AssertThrow(it->is_valid() || index_set.n_elements() == 0,
+                ExcInternalError());
   }
 }
 

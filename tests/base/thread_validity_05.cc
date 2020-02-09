@@ -34,13 +34,13 @@ struct X
   void
   execute()
   {
-    Assert(false, ExcInternalError());
+    AssertThrow(false, ExcInternalError());
   }
 
   void
   execute() const
   {
-    Assert(i == 42, ExcInternalError());
+    AssertThrow(i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 
@@ -70,14 +70,14 @@ struct Y
   void
   execute()
   {
-    Assert(i == 42, ExcInternalError());
+    AssertThrow(i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 
   void
   execute() const
   {
-    Assert(false, ExcInternalError());
+    AssertThrow(false, ExcInternalError());
   }
 
 private:

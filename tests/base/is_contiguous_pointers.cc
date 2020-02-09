@@ -31,7 +31,7 @@ test()
   // pointer overload which we know always returns true
   constexpr bool b = internal::ArrayViewHelper::is_contiguous(p, q);
 
-  Assert(b == true, ExcInternalError());
+  AssertThrow(b == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

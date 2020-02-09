@@ -38,7 +38,7 @@
 void
 test(const unsigned int plane = 1)
 {
-  Assert(plane < 3, ExcInternalError());
+  AssertThrow(plane < 3, ExcInternalError());
   const std::vector<Point<2>> points = {Point<2>(0, 0),
                                         Point<2>(1, 0),
                                         Point<2>(1, 1),

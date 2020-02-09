@@ -658,6 +658,15 @@ int main ()
     </p>
 
     <p>
+    In addition to creating meaningful test output using <code>deallog</code>,
+    you can check post-conditions and software guarantees
+    by using the <code>AssertThrow</code> macro within the test code. Note
+    that we make use of the <code>AssertThrow</code> macro instead of
+    <code>Assert</code> because we like to assert post-conditions in both
+    debug and release builds.
+    </p>
+
+    <p>
     There are a number of directories where you can put a new test.
     Extensive tests of individual classes or groups of classes
     have traditionally been into the <code>base/</code>,

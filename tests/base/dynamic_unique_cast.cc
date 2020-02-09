@@ -39,16 +39,16 @@ test()
   std::unique_ptr<B> b = Utilities::dynamic_unique_cast<B>(std::move(d));
 
   // Ownership now rests with b, but it's still a D. Verify this:
-  Assert(d.get() == nullptr, ExcInternalError());
-  Assert(b.get() != nullptr, ExcInternalError());
-  Assert(dynamic_cast<D *>(b.get()) != nullptr, ExcInternalError());
+  AssertThrow(d.get() == nullptr, ExcInternalError());
+  AssertThrow(b.get() != nullptr, ExcInternalError());
+  AssertThrow(dynamic_cast<D *>(b.get()) != nullptr, ExcInternalError());
 
   // Check that we can again upcast to D:
   std::unique_ptr<D> dd = Utilities::dynamic_unique_cast<D>(std::move(b));
 
   // Ownership now rests with b, but it's still a D. Verify this:
-  Assert(b.get() == nullptr, ExcInternalError());
-  Assert(dd.get() != nullptr, ExcInternalError());
+  AssertThrow(b.get() == nullptr, ExcInternalError());
+  AssertThrow(dd.get() != nullptr, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
