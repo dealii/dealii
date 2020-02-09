@@ -551,7 +551,7 @@ public:
                  << arg1 << " specifies a function with " << arg2
                  << " vector components. However, the finite "
                     "element in use has "
-                 << arg2
+                 << arg3
                  << " components, and these two numbers need to match.");
   /**
    * Exception
