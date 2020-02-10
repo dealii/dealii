@@ -559,7 +559,7 @@ namespace Step20
   }
 
 
-  // @sect3{Linear solvers and preconditioners}
+  // @sect3{Implementation of linear solvers and preconditioners}
 
   // The linear solvers and preconditioners we use in this example have
   // been discussed in significant detail already in the introduction. We

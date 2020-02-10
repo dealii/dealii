@@ -358,7 +358,7 @@ namespace step62
 
   // @sect3{Implementation of the auxiliary classes}
 
-  // @sect4{The `RightHandSide` class}
+  // @sect4{The `RightHandSide` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -420,7 +420,7 @@ namespace step62
 
 
 
-  // @sect4{The `PML` class}
+  // @sect4{The `PML` class implementation}
 
   // As before, the constructor reads all the parameters from the HDF5::Group
   // `data` using the HDF5::Group::get_attribute() function. As we have
@@ -483,7 +483,7 @@ namespace step62
 
 
 
-  // @sect4{The `Rho` class}
+  // @sect4{The `Rho` class implementation}
 
   // This class is used to define the mass density. As we have explaine before,
   // a phononic superlattice cavity is formed by two
@@ -646,7 +646,7 @@ namespace step62
 
 
 
-  // @sect4{The `Parameters` class}
+  // @sect4{The `Parameters` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -677,7 +677,7 @@ namespace step62
 
 
 
-  // @sect4{The `QuadratureCache` class}
+  // @sect4{The `QuadratureCache` class implementation}
 
   // We need to reserve enough space for the mass and stiffness matrices and the
   // right hand side vector.
