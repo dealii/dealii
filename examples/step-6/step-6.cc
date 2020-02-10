@@ -464,21 +464,24 @@ void Step6<dim>::refine_grid()
 // cycle.
 //
 // We have already seen in step-1 how this can be achieved for the
-// mesh itself. The only thing we have to change is the generation of
-// the file name, since it should contain the number of the present
-// refinement cycle provided to this function as an argument. To this
-// end, we simply append the number of the refinement cycle as a
-// string to the file name.
-//
-// We also output the solution in the same way as we did before, with
-// a similarly constructed file name.
+// mesh itself. Here, we change a few things:
+// <ol>
+//   <li>We use two different formats: gnuplot and VTU.</li>
+//   <li>We embed the cycle number in the output file name.</li>
+//   <li>For gnuplot output, we set up a GridOutFlags::Gnuplot object to
+//   provide a few extra visualization arguments so that edges appear
+//   curved. This is explained in further detail in step-10.</li>
+// </ol>
 template <int dim>
 void Step6<dim>::output_results(const unsigned int cycle) const
 {
   {
-    GridOut       grid_out;
-    std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
-    grid_out.write_eps(triangulation, output);
+    GridOut               grid_out;
+    std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
+    GridOutFlags::Gnuplot gnuplot_flags(false, 5);
+    grid_out.set_flags(gnuplot_flags);
+    MappingQGeneric<dim> mapping(3);
+    grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 
   {
@@ -487,8 +490,8 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
-    data_out.write_vtk(output);
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+    data_out.write_vtu(output);
   }
 }
 
