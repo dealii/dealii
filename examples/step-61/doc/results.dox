@@ -44,7 +44,7 @@ have symmetric solutions. From the 3d figures on the right,
 we can see that on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, the pressure is a constant
 in the interior of the cell, as expected.
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=0</i></h4>
 
 We run the code with differently refined meshes (chosen in the `make_grid()` function)
 and get the following convergence rates of pressure,
@@ -100,7 +100,7 @@ particular so close to being continuous at the interfaces that we can
 no longer distinguish the interface pressures $p^\partial$ from the
 interior pressures $p^\circ$ on the adjacent cells.
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=1</i></h4>
 
 The following are the convergence rates of pressure, velocity, and flux
 we obtain from using the $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ element combination:
@@ -148,7 +148,7 @@ visualization of the quadratic polynomials.
 </table>
 
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=2</i></h4>
 
 As before, we can generate convergence data for the
 $L_2$ errors of pressure, velocity, and flux
