@@ -17,7 +17,7 @@
 #include <deal.II/lac/trilinos_precondition.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  if DEAL_II_TRILINOS_VERSION_GTE(11, 14, 0)
+#  ifdef DEAL_II_TRILINOS_WITH_MUELU
 #    include <deal.II/lac/sparse_matrix.h>
 #    include <deal.II/lac/trilinos_sparse_matrix.h>
 
@@ -275,5 +275,5 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#  endif // DEAL_II_TRILINOS_WITH_MUELU
 #endif   // DEAL_II_WITH_TRILINOS

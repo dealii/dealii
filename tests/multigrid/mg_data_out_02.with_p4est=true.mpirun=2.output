@@ -1,0 +1,221 @@
+
+DEAL:0::dim= 2 cells=9
+DEAL:0::* default:
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0::* all cells:
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0::* LocallyOwnedLevelCell:
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0::* LevelEqualTo 0
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0::* owned on level 0
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0::* LevelEqualTo 1
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:0::* owned on level 1
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0::* LevelEqualTo 2
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0::* owned on level 2
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0::dim= 3 cells=17
+DEAL:0::* default:
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:0::* all cells:
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:0::* LocallyOwnedLevelCell:
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:0::* LevelEqualTo 0
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0::* owned on level 0
+DEAL:0:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:0::* LevelEqualTo 1
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:0:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:0::* owned on level 1
+DEAL:0:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:0::* LevelEqualTo 2
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:0::* owned on level 2
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:00
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:0:: cell lvl=2 active=1 owner=0 id=0_2:07
+
+DEAL:1::dim= 2 cells=9
+DEAL:1::* default:
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1::* all cells:
+DEAL:1:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:1:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=2 active=1 owner=-2 id=0_2:00
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:1::* LocallyOwnedLevelCell:
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1::* LevelEqualTo 0
+DEAL:1:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:1::* owned on level 0
+DEAL:1::* LevelEqualTo 1
+DEAL:1:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1::* owned on level 1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1::* LevelEqualTo 2
+DEAL:1:: cell lvl=2 active=1 owner=-2 id=0_2:00
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:1::* owned on level 2
+DEAL:1::dim= 3 cells=17
+DEAL:1::* default:
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:1::* all cells:
+DEAL:1:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:1:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:1:: cell lvl=2 active=1 owner=-2 id=0_2:00
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:1::* LocallyOwnedLevelCell:
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:1::* LevelEqualTo 0
+DEAL:1:: cell lvl=0 active=0 owner=0 id=0_0:
+DEAL:1::* owned on level 0
+DEAL:1::* LevelEqualTo 1
+DEAL:1:: cell lvl=1 active=0 owner=0 id=0_1:0
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:1::* owned on level 1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:1
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:2
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:3
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:4
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:5
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:6
+DEAL:1:: cell lvl=1 active=1 owner=1 id=0_1:7
+DEAL:1::* LevelEqualTo 2
+DEAL:1:: cell lvl=2 active=1 owner=-2 id=0_2:00
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:01
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:02
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:03
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:04
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:05
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:06
+DEAL:1:: cell lvl=2 active=1 owner=0 id=0_2:07
+DEAL:1::* owned on level 2
+
