@@ -2826,12 +2826,43 @@ namespace parallel
         &connectivity);
 
       if (numcpus != Utilities::MPI::n_mpi_processes(this->mpi_communicator))
-        // We are changing the number of CPUs so we need to repartition.
-        // Note that p4est actually distributes the cells between the changed
-        // number of CPUs and so everything works without this call, but
-        // this command changes the distribution for some reason, so we
-        // will leave it in here.
-        repartition();
+        {
+          // We are changing the number of CPUs so we need to repartition.
+          // Note that p4est actually distributes the cells between the changed
+          // number of CPUs and so everything works without this call, but
+          // this command changes the distribution for some reason, so we
+          // will leave it in here.
+          if (this->signals.cell_weight.num_slots() == 0)
+            {
+              // no cell weights given -- call p4est's 'partition' without a
+              // callback for cell weights
+              dealii::internal::p4est::functions<dim>::partition(
+                parallel_forest,
+                /* prepare coarsening */ 1,
+                /* weight_callback */ nullptr);
+            }
+          else
+            {
+              // get cell weights for a weighted repartitioning.
+              const std::vector<unsigned int> cell_weights = get_cell_weights();
+
+              PartitionWeights<dim, spacedim> partition_weights(cell_weights);
+
+              // attach (temporarily) a pointer to the cell weights through
+              // p4est's user_pointer object
+              Assert(parallel_forest->user_pointer == this, ExcInternalError());
+              parallel_forest->user_pointer = &partition_weights;
+
+              dealii::internal::p4est::functions<dim>::partition(
+                parallel_forest,
+                /* prepare coarsening */ 1,
+                /* weight_callback */
+                &PartitionWeights<dim, spacedim>::cell_weight);
+
+              // reset the user pointer to its previous state
+              parallel_forest->user_pointer = this;
+            }
+        }
 
       try
         {

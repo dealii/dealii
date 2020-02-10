@@ -2133,7 +2133,7 @@ namespace hp
 
         // Unpack active_fe_indices.
         active_fe_index_transfer->active_fe_indices.resize(
-          tria->n_active_cells(), numbers::invalid_unsigned_int);
+          get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
         active_fe_index_transfer->cell_data_transfer->unpack(
           active_fe_index_transfer->active_fe_indices);
 
@@ -2220,10 +2220,13 @@ namespace hp
              "if deal.II was configured to use p4est, but cmake did not find a "
              "valid p4est library."));
 #else
-    Assert(active_fe_index_transfer != nullptr, ExcInternalError());
+    if (fe_collection.size() > 0)
+      {
+        Assert(active_fe_index_transfer != nullptr, ExcInternalError());
 
-    // Free memory.
-    active_fe_index_transfer.reset();
+        // Free memory.
+        active_fe_index_transfer.reset();
+      }
 #endif
   }
 
@@ -2273,7 +2276,7 @@ namespace hp
 
         // Unpack active_fe_indices.
         active_fe_index_transfer->active_fe_indices.resize(
-          tria->n_active_cells(), numbers::invalid_unsigned_int);
+          get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
         active_fe_index_transfer->cell_data_transfer->deserialize(
           active_fe_index_transfer->active_fe_indices);
 
