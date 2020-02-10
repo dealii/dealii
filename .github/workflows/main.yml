@@ -24,7 +24,7 @@ jobs:
     - name: archive
       uses: actions/upload-artifact@v1
       with:
-        name: detailed.log
+        name: serial-detailed.log
         path: detailed.log
     - name: build
       run: |
@@ -60,7 +60,7 @@ jobs:
     - name: archive
       uses: actions/upload-artifact@v1
       with:
-        name: detailed.log
+        name: parallel-detailed.log
         path: detailed.log
     - name: build
       run: |
