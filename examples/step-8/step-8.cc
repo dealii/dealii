@@ -179,7 +179,7 @@ namespace Step8
 
   // @sect3{The <code>ElasticProblem</code> class implementation}
 
-  // @sect4{ElasticProblem::ElasticProblem}
+  // @sect4{ElasticProblem::ElasticProblem constructor}
 
   // Following is the constructor of the main class. As said before, we would
   // like to construct a vector-valued finite element that is composed of
@@ -204,7 +204,7 @@ namespace Step8
 
 
 
-  // @sect4{ElasticProblem::~ElasticProblem}
+  // @sect4{ElasticProblem::~ElasticProblem destructor}
 
   // The destructor, on the other hand, is exactly as in step-6:
   template <int dim>

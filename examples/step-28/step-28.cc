@@ -392,7 +392,7 @@ namespace Step28
   class EnergyGroup
   {
   public:
-    // @sect5{Public member functions}
+    // @sect5{<code>EnergyGroup</code> public member functions}
     //
     // The class has a good number of public member functions, since its the
     // way it operates is controlled from the outside, and therefore all
@@ -458,7 +458,7 @@ namespace Step28
                      const double         refine_threshold,
                      const double         coarsen_threshold);
 
-    // @sect5{Public data members}
+    // @sect5{<code>EnergyGroup</code> public data members}
     //
     // As is good practice in object oriented programming, we hide most data
     // members by making them private. However, we have to grant the class
@@ -471,7 +471,7 @@ namespace Step28
     Vector<double> solution_old;
 
 
-    // @sect5{Private data members}
+    // @sect5{<code>EnergyGroup</code> private data members}
     //
     // The rest of the data members are private. Compared to all the previous
     // tutorial programs, the only new data members are an integer storing
@@ -501,7 +501,7 @@ namespace Step28
     AffineConstraints<double>                 hanging_node_constraints;
 
 
-    // @sect5{Private member functions}
+    // @sect5{<code>EnergyGroup</code> private member functions}
     //
     // There is one private member function in this class. It recursively
     // walks over cells of two meshes to compute the cross-group right hand
@@ -1170,7 +1170,7 @@ namespace Step28
     void run();
 
   private:
-    // @sect5{Private member functions}
+    // @sect5{<code>NeutronDiffusionProblem</code> private member functions}
 
     // There are not that many member functions in this class since most of
     // the functionality has been moved into the <code>EnergyGroup</code>
@@ -1183,7 +1183,7 @@ namespace Step28
     double get_total_fission_source() const;
 
 
-    // @sect5{Private member variables}
+    // @sect5{<code>NeutronDiffusionProblem</code> private member variables}
 
     // Next, we have a few member variables. In particular, these are (i) a
     // reference to the parameter object (owned by the main function of this

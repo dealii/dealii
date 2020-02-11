@@ -451,7 +451,7 @@ namespace Step63
 
 
 
-  // @sect3{Streamline diffusion}
+  // @sect3{Streamline diffusion implementation}
 
   // The streamline diffusion method has a stabilization constant that
   // we need to be able to compute. The choice of how this parameter

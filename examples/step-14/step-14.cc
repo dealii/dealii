@@ -1388,7 +1388,7 @@ namespace Step14
     };
 
 
-    // @sect4{The PointValueEvaluation class}
+    // @sect4{The dual functional PointValueEvaluation class}
 
     // As a first application, we consider the functional corresponding to the
     // evaluation of the solution's value at a given point which again we
@@ -1465,7 +1465,7 @@ namespace Step14
     }
 
 
-    // @sect4{The PointXDerivativeEvaluation class}
+    // @sect4{The dual functional PointXDerivativeEvaluation class}
 
     // As second application, we again consider the evaluation of the
     // x-derivative of the solution at one point. Again, the declaration of

@@ -155,7 +155,7 @@ namespace Step27
 
   // @sect3{Implementation of the main class}
 
-  // @sect4{LaplaceProblem::LaplaceProblem}
+  // @sect4{LaplaceProblem::LaplaceProblem constructor}
 
   // The constructor of this class is fairly straightforward. It associates
   // the hp::DoFHandler object with the triangulation, and then sets the
@@ -240,7 +240,7 @@ namespace Step27
   }
 
 
-  // @sect4{LaplaceProblem::~LaplaceProblem}
+  // @sect4{LaplaceProblem::~LaplaceProblem destructor}
 
   // The destructor is unchanged from what we already did in step-6:
   template <int dim>

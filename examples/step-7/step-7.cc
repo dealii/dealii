@@ -441,7 +441,7 @@ namespace Step7
 
   // @sect3{The HelmholtzProblem class implementation}
 
-  // @sect4{HelmholtzProblem::HelmholtzProblem}
+  // @sect4{HelmholtzProblem::HelmholtzProblem constructor}
 
   // In the constructor of this class, we only set the variables passed as
   // arguments, and associate the DoF handler object with the triangulation
@@ -455,7 +455,7 @@ namespace Step7
   {}
 
 
-  // @sect4{HelmholtzProblem::~HelmholtzProblem}
+  // @sect4{HelmholtzProblem::~HelmholtzProblem destructor}
 
   // This is no different than before:
   template <int dim>
