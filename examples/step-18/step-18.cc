@@ -1279,7 +1279,7 @@ namespace Step18
     // this single time step:
     const std::string pvtu_master_filename =
       data_out.write_vtu_with_pvtu_record(
-        "./", "solution", timestep_no, 4, mpi_communicator);
+        "./", "solution", timestep_no, mpi_communicator, 4);
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:

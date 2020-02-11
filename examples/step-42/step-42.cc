@@ -2036,7 +2036,7 @@ namespace Step42
     // Paraview, the Visit visualization program, by creating a matching
     // <code>.visit</code> file.
     const std::string master_name = data_out.write_vtu_with_pvtu_record(
-      output_dir, "solution", current_refinement_cycle, 2, mpi_communicator);
+      output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
     pcout << master_name << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);

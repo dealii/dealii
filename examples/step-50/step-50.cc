@@ -851,7 +851,7 @@ namespace Step50
     data_out.build_patches(0);
 
     const auto filename = data_out.write_vtu_with_pvtu_record(
-      "", "solution", cycle, 5, mpi_communicator, 8);
+      "", "solution", cycle, mpi_communicator, 5, 8);
     pcout << "    wrote " << filename << std::endl;
   }
 
