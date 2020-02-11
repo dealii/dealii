@@ -29,7 +29,7 @@
 // have to be modified:
 // - <code>StokesProblem<dim>::setup_dofs()</code>:
 //   To populate an AffineConstraints object with periodicity constraints
-// - <code>StokesProblem<dim>::run()</code>:
+// - <code>StokesProblem<dim>::create_mesh()</code>:
 //   To supply a distributed triangulation with periodicity information.
 //
 // The rest of the program is identical to step-22, so let us skip this part
@@ -354,7 +354,6 @@ namespace Step45
   }
 
 
-  // @sect3{Setting up periodicity constraints on distributed triangulations}
   template <int dim>
   void StokesProblem<dim>::setup_dofs()
   {
