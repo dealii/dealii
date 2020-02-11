@@ -9,6 +9,7 @@
  text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
  line{stroke:rgb(25,25,25); stroke-width:4}
  path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ circle{fill:white; stroke:black; stroke-width:2}
 
  path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
  path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
@@ -233,12 +234,12 @@
   <line x1="695" y1="537" x2="710" y2="500"/>
 
  <!-- legend -->
- <rect x="1000" y="80" width="320" height="165"/>
+ <rect x="1000" y="80" width="320" height="215"/>
  <text x="1013" y="107" style="text-anchor:start; font-weight:bold; font-size:18px">cell label</text>
   <text x="1020" y="134" style="text-anchor:start; font-style:oblique; font-size:18px">cell_level.</text>
   <text x="1020" y="161" style="text-anchor:start; font-style:oblique; font-size:18px">cell_index,</text>
   <text x="1020" y="188" style="text-anchor:start; font-style:oblique; font-size:18px">material_id</text>
-  <text x="1000" y="274" style="text-anchor:start; font-size:18px">azimuth: 0°, polar: 0°</text>
+  <text x="1000" y="328" style="text-anchor:start; font-size:18px">azimuth: 0°, polar: 0°</text>
 
  <!-- colorbar -->
  <text x="1000" y="356" style="text-anchor:start; font-weight:bold; font-size:18px">level_number</text>

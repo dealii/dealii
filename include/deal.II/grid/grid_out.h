@@ -668,6 +668,13 @@ namespace GridOutFlags
   /**
    * Flags controlling SVG output.
    *
+   * The figure below is a zoomed-in illustration of what the SVG flags are
+   * capable of producing. These exact settings are the same as those used
+   * in the test <code>tests/grid/grid_out_svg_02.cc</code> with the addition
+   * of the flag <code>svg_flags.label_boundary_id = true;</code> .
+   *
+   * @image html svg_flags.png
+   *
    * @ingroup output
    */
   struct Svg
@@ -797,6 +804,15 @@ namespace GridOutFlags
     bool label_level_subdomain_id;
 
     /**
+     * Write boundary id of each boundary face in a circle on the
+     * corresponding boundary edge. Defaults to false.
+     *
+     * Note: Depending on the choice of image viewer, the boundary id
+     * labels may not appear to be centered in the circle.
+     */
+    bool label_boundary_id;
+
+    /**
      * Draw a colorbar next to the plotted grid with respect to the chosen
      * coloring of the cells.
      */
@@ -824,7 +840,8 @@ namespace GridOutFlags
         const bool         label_material_id              = false,
         const bool         label_subdomain_id             = false,
         const bool         draw_colorbar                  = false,
-        const bool         draw_legend                    = false);
+        const bool         draw_legend                    = false,
+        const bool         label_boundary_id              = false);
   };
 
   /**

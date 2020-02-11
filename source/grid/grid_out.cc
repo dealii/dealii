@@ -437,7 +437,8 @@ namespace GridOutFlags
            const bool         label_material_id,
            const bool         label_subdomain_id,
            const bool         draw_colorbar,
-           const bool         draw_legend)
+           const bool         draw_legend,
+           const bool         label_boundary_id)
     : height(1000)
     , width(0)
     , line_thickness(line_thickness)
@@ -455,6 +456,7 @@ namespace GridOutFlags
     , label_material_id(label_material_id)
     , label_subdomain_id(label_subdomain_id)
     , label_level_subdomain_id(false)
+    , label_boundary_id(label_boundary_id)
     , draw_colorbar(draw_colorbar)
     , draw_legend(draw_legend)
   {}
@@ -1963,6 +1965,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       << svg_flags.boundary_line_thickness << '}' << '\n'
       << " path{fill:none; stroke:rgb(25,25,25); stroke-width:"
       << svg_flags.line_thickness << '}' << '\n'
+      << " circle{fill:white; stroke:black; stroke-width:2}" << '\n'
       << '\n';
 
   // polygon styles with respect to the chosen cell coloring
@@ -2290,11 +2293,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                              std::max(x_dimension, y_dimension);
                 }
 
-              float distance_to_camera =
+              const double distance_to_camera =
                 std::sqrt(std::pow(point[0] - camera_position[0], 2.) +
                           std::pow(point[1] - camera_position[1], 2.) +
                           std::pow(point[2] - camera_position[2], 2.));
-              float distance_factor =
+              const double distance_factor =
                 distance_to_camera / (2. * std::max(x_dimension, y_dimension));
 
               projection_decomposition = svg_project_point(point,
@@ -2303,10 +2306,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                                            camera_horizontal,
                                                            camera_focus);
 
-              const auto font_size_this_cell = static_cast<unsigned int>(
-                .5 +
-                cell_label_font_size *
-                  std::pow(.5, cell->level() - 4. + 3.5 * distance_factor));
+              const unsigned int font_size_this_cell =
+                static_cast<unsigned int>(
+                  .5 +
+                  cell_label_font_size *
+                    std::pow(.5, cell->level() - 4. + 3.5 * distance_factor));
 
               out << "  <text"
                   << " x=\""
@@ -2460,11 +2464,75 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                  (height -
                                   (height / 100.) * 2. * margin_in_percent))
                           << "\"/>" << '\n';
+
+
+                      if (svg_flags.label_boundary_id)
+                        {
+                          const double distance_to_camera = std::sqrt(
+                            std::pow(point[0] - camera_position[0], 2.) +
+                            std::pow(point[1] - camera_position[1], 2.) +
+                            std::pow(point[2] - camera_position[2], 2.));
+                          const double distance_factor =
+                            distance_to_camera /
+                            (2. * std::max(x_dimension, y_dimension));
+
+                          const unsigned int font_size_this_edge =
+                            static_cast<unsigned int>(
+                              .5 + .5 * cell_label_font_size *
+                                     std::pow(.5,
+                                              cell->level() - 4. +
+                                                3.5 * distance_factor));
+
+                          point[0] = cell->face(faceIndex)->center()[0];
+                          point[1] = cell->face(faceIndex)->center()[1];
+                          point[2] = 0;
+
+                          if (svg_flags.convert_level_number_to_height)
+                            {
+                              point[2] = svg_flags.level_height_factor *
+                                         (static_cast<float>(cell->level()) /
+                                          static_cast<float>(n_levels)) *
+                                         std::max(x_dimension, y_dimension);
+                            }
+
+                          projection_decomposition =
+                            svg_project_point(point,
+                                              camera_position,
+                                              camera_direction,
+                                              camera_horizontal,
+                                              camera_focus);
+
+                          const unsigned int xc = static_cast<unsigned int>(
+                            .5 +
+                            ((projection_decomposition[0] - x_min_perspective) /
+                             x_dimension_perspective) *
+                              (width -
+                               (width / 100.) * 2. * margin_in_percent) +
+                            ((width / 100.) * margin_in_percent));
+                          const unsigned int yc = static_cast<unsigned int>(
+                            .5 + height - (height / 100.) * margin_in_percent -
+                            ((projection_decomposition[1] - y_min_perspective) /
+                             y_dimension_perspective) *
+                              (height -
+                               (height / 100.) * 2. * margin_in_percent));
+
+                          out << "    <circle cx=\"" << xc << "\" cy=\"" << yc
+                              << "\" r=\"" << font_size_this_edge << "\" />"
+                              << '\n';
+
+                          out << "    <text x=\"" << xc << "\" y=\"" << yc
+                              << "\" style=\"font-size:" << font_size_this_edge
+                              << "px\" dominant-baseline=\"middle\">"
+                              << static_cast<int>(
+                                   cell->face(faceIndex)->boundary_id())
+                              << "</text>" << '\n';
+                        }
                     }
                 }
             }
         }
     }
+
 
 
   // draw the legend
@@ -2479,7 +2547,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   if (svg_flags.draw_legend &&
       (svg_flags.label_level_number || svg_flags.label_cell_index ||
        svg_flags.label_material_id || svg_flags.label_subdomain_id ||
-       svg_flags.label_level_subdomain_id))
+       svg_flags.label_level_subdomain_id || svg_flags.label_boundary_id))
     {
       unsigned int line_offset = 0;
       out << " <rect x=\"" << width + additional_width << "\" y=\""
@@ -2487,7 +2555,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           << "\" width=\""
           << static_cast<unsigned int>(.5 + (height / 100.) *
                                               (40. - margin_in_percent))
-          << "\" height=\"" << static_cast<unsigned int>(.5 + height * .165)
+          << "\" height=\"" << static_cast<unsigned int>(.5 + height * .215)
           << "\"/>" << '\n';
 
       out << " <text x=\""
@@ -2596,6 +2664,33 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               << "level_subdomain_id"
               << "</text>" << '\n';
         }
+
+      if (svg_flags.label_boundary_id)
+        {
+          out << " <text x=\""
+              << width + additional_width +
+                   static_cast<unsigned int>(.5 + (height / 100.) * 1.25)
+              << "\" y=\""
+              << static_cast<unsigned int>(.5 +
+                                           (height / 100.) * margin_in_percent +
+                                           (++line_offset) * 1.5 * font_size)
+              << "\" style=\"text-anchor:start; font-weight:bold; font-size:"
+              << font_size << "px\">"
+              << "edge label"
+              << "</text>" << '\n';
+
+          out << "  <text x= \""
+              << width + additional_width +
+                   static_cast<unsigned int>(.5 + (height / 100.) * 2.)
+              << "\" y=\""
+              << static_cast<unsigned int>(.5 +
+                                           (height / 100.) * margin_in_percent +
+                                           (++line_offset) * 1.5 * font_size)
+              << "\" style=\"text-anchor:start; font-style:oblique; font-size:"
+              << font_size << "px\">"
+              << "boundary_id"
+              << "</text>" << '\n';
+        }
     }
 
   // show azimuth angle and polar angle as text below the explanation of the
@@ -2604,7 +2699,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
     {
       out << "  <text x=\"" << width + additional_width << "\" y=\""
           << static_cast<unsigned int>(
-               .5 + (height / 100.) * margin_in_percent + 10.75 * font_size)
+               .5 + (height / 100.) * margin_in_percent + 13.75 * font_size)
           << "\" style=\"text-anchor:start; font-size:" << font_size << "px\">"
           << "azimuth: " << svg_flags.azimuth_angle
           << "°, polar: " << svg_flags.polar_angle << "°</text>" << '\n';
