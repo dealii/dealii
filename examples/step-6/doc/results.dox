@@ -247,8 +247,10 @@ the Triangulation what to do when a cell is refined: where should the new
 vertices at the edge midpoints and the cell midpoint be located so that the
 child cells better represent the desired geometry than the parent cell.
 
-To visualize this output, we have to output more lines on <em>interior</em> line
-segments as well as boundary line segments so that the interior lines look
+To visualize what the triangulation actually knows about the geometry,
+it is not enough to just output the location of vertices and draw a
+straight line for each edge; instead, we have to output both interior
+and boundary lines as multiple segments so that they look
 curved. We can do this by making one change to the gnuplot part of
 <code>output_results</code>:
 @code
