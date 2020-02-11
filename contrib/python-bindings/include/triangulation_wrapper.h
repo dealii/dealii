@@ -59,6 +59,14 @@ namespace python
     ~TriangulationWrapper();
 
     /**
+     * Create a triangulation from a list of vertices and a list of indices,
+     * each of the latter being a list of 1<<dim vertex indices.
+     */
+    void
+    create_triangulation(const boost::python::list &vertices,
+                         const boost::python::list &cells_vertices);
+
+    /**
      * Return the number of active cells.
      */
     unsigned int
@@ -136,6 +144,16 @@ namespace python
       PointWrapper &       p,
       boost::python::list &material_id,
       const bool           colorize = false);
+
+    /*! @copydoc GridGenerator::hyper_cube_with_cylindrical_hole
+     */
+    void
+    generate_hyper_cube_with_cylindrical_hole(
+      const double       inner_radius = .25,
+      const double       outer_radius = .5,
+      const double       L            = .5,
+      const unsigned int repetitions  = 1,
+      const bool         colorize     = false);
 
     /**
      * Rectangular domain with rectangular pattern of holes. The domain itself
@@ -288,6 +306,13 @@ namespace python
      */
     void
     shift(boost::python::list &shift_list);
+
+    /**
+     * Scale the entire triangulation by the given factor. To preserve
+     * the orientation of the triangulation, the factor must be positive.
+     */
+    void
+    scale(const double scaling_factor);
 
     /**
      * Given two triangulations, create the triangulation that contains the
