@@ -720,6 +720,38 @@ namespace Utilities
     min_max_avg(const double my_value, const MPI_Comm &mpi_communicator);
 
     /**
+     * Same as above but returning the sum, average, minimum, maximum,
+     * process id of minimum and maximum as a collective operation on the
+     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
+     * for each entry of the vector.
+     *
+     * @note This function performs a single reduction sweep.
+     *
+     * @pre Size of the input vector has to be the same on all processes.
+     */
+    std::vector<MinMaxAvg>
+    min_max_avg(const std::vector<double> &my_value,
+                const MPI_Comm &           mpi_communicator);
+
+
+    /**
+     * Same as above but returning the sum, average, minimum, maximum,
+     * process id of minimum and maximum as a collective operation on the
+     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
+     * for each entry of the ArrayView.
+     *
+     * @note This function performs a single reduction sweep.
+     *
+     * @pre Size of the input ArrayView has to be the same on all processes
+     *   and the input and output ArrayVew have to have the same size.
+     */
+    void
+    min_max_avg(const ArrayView<const double> &my_values,
+                const ArrayView<MinMaxAvg> &   result,
+                const MPI_Comm &               mpi_communicator);
+
+
+    /**
      * A class that is used to initialize the MPI system at the beginning of a
      * program and to shut it down again at the end. It also allows you to
      * control the number of threads used within each MPI process.
