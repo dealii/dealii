@@ -82,7 +82,7 @@ namespace MeshWorker
      * all set to numbers::invalid_dof_index.
      */
     void
-    operator=(const double &number);
+    operator=(const double number);
 
     /**
      * An array of local matrices.
@@ -140,8 +140,7 @@ namespace MeshWorker
 
   template <int n_matrices, int n_vectors, int n_dof_indices>
   void
-  CopyData<n_matrices, n_vectors, n_dof_indices>::
-  operator=(const double &number)
+  CopyData<n_matrices, n_vectors, n_dof_indices>::operator=(const double number)
   {
     Assert(number == 0.0,
            ExcMessage("You should only call this method with "

@@ -194,7 +194,7 @@ namespace Differentiation
        * potential ambiguities related to implicit conversions in either user
        * code or math functions that are loaded into the standard namespace.
        */
-      explicit Expression(const bool &value);
+      explicit Expression(const bool value);
 
       /**
        * Constructor for arithmetic number types.

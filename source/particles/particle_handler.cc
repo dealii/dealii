@@ -525,9 +525,9 @@ namespace Particles
              i_particle < local_positions[i_cell].size();
              ++i_particle)
           {
-            const unsigned int &local_id_on_calling_process =
+            const unsigned int local_id_on_calling_process =
               original_indices_of_local_particles[i_cell][i_particle];
-            const unsigned int &calling_process =
+            const unsigned int calling_process =
               calling_process_indices[i_cell][i_particle];
 
             if (original_process_to_local_particle_indices.find(
@@ -600,9 +600,9 @@ namespace Particles
              i_particle < local_positions[i_cell].size();
              ++i_particle)
           {
-            const unsigned int &local_id_on_calling_process =
+            const unsigned int local_id_on_calling_process =
               original_indices_of_local_particles[i_cell][i_particle];
-            const unsigned int &calling_process =
+            const unsigned int calling_process =
               calling_process_indices[i_cell][i_particle];
 
             const unsigned int particle_id =
