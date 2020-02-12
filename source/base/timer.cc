@@ -974,7 +974,7 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
     const std::string time_rank_space  = "                  |";
 
     // now generate a nice table
-    out_stream << "\n\n"
+    out_stream << "\n"
                << "+------------------------------" << extra_dash << "+"
                << time_rank_column
                << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
