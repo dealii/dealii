@@ -50,7 +50,7 @@ namespace Differentiation
     {}
 
 
-    Expression::Expression(const bool &value)
+    Expression::Expression(const bool value)
       : expression(SE::boolean(value))
     {}
 

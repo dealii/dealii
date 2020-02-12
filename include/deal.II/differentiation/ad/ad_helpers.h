@@ -2438,9 +2438,9 @@ namespace Differentiation
        */
       template <typename TensorType, typename NumberType>
       inline void
-      set_tensor_entry(TensorType &        t,
-                       const unsigned int &unrolled_index,
-                       const NumberType &  value)
+      set_tensor_entry(TensorType &       t,
+                       const unsigned int unrolled_index,
+                       const NumberType & value)
       {
         // Where possible, set values using TableIndices
         AssertIndexRange(unrolled_index, t.n_independent_components);
@@ -2454,7 +2454,7 @@ namespace Differentiation
        */
       template <int dim, typename NumberType>
       inline void set_tensor_entry(Tensor<0, dim, NumberType> &t,
-                                   const unsigned int &        unrolled_index,
+                                   const unsigned int          unrolled_index,
                                    const NumberType &          value)
       {
         AssertIndexRange(unrolled_index, 1);
@@ -2470,9 +2470,9 @@ namespace Differentiation
        */
       template <typename NumberType>
       inline void
-      set_tensor_entry(NumberType &        t,
-                       const unsigned int &unrolled_index,
-                       const NumberType &  value)
+      set_tensor_entry(NumberType &       t,
+                       const unsigned int unrolled_index,
+                       const NumberType & value)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2487,9 +2487,9 @@ namespace Differentiation
        */
       template <int dim, typename NumberType>
       inline void set_tensor_entry(SymmetricTensor<4, dim, NumberType> &t,
-                                   const unsigned int &unrolled_index_row,
-                                   const unsigned int &unrolled_index_col,
-                                   const NumberType &  value)
+                                   const unsigned int unrolled_index_row,
+                                   const unsigned int unrolled_index_col,
+                                   const NumberType & value)
       {
         // Fourth order symmetric tensors require a specialized interface
         // to extract values.
@@ -2517,7 +2517,7 @@ namespace Differentiation
                 template <int, int, typename> class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<rank, dim, NumberType> &t,
-                       const unsigned int &                     unrolled_index)
+                       const unsigned int                       unrolled_index)
       {
         // Where possible, get values using TableIndices
         AssertIndexRange(unrolled_index, t.n_independent_components);
@@ -2535,7 +2535,7 @@ namespace Differentiation
                 template <int, int, typename> class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<0, dim, NumberType> &t,
-                       const unsigned int &                  unrolled_index)
+                       const unsigned int                    unrolled_index)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2550,7 +2550,7 @@ namespace Differentiation
        */
       template <typename NumberType>
       inline const NumberType &
-      get_tensor_entry(const NumberType &t, const unsigned int &unrolled_index)
+      get_tensor_entry(const NumberType &t, const unsigned int unrolled_index)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2568,7 +2568,7 @@ namespace Differentiation
                 template <int, int, typename> class TensorType>
       inline NumberType &
       get_tensor_entry(TensorType<rank, dim, NumberType> &t,
-                       const unsigned int &               unrolled_index)
+                       const unsigned int                 unrolled_index)
       {
         // Where possible, get values using TableIndices
         AssertIndexRange(unrolled_index, t.n_independent_components);
@@ -2585,7 +2585,7 @@ namespace Differentiation
                 typename NumberType,
                 template <int, int, typename> class TensorType>
       NumberType &get_tensor_entry(TensorType<0, dim, NumberType> &t,
-                                   const unsigned int &            index)
+                                   const unsigned int              index)
       {
         AssertIndexRange(index, 1);
         (void)index;
@@ -2600,7 +2600,7 @@ namespace Differentiation
        */
       template <typename NumberType>
       inline NumberType &
-      get_tensor_entry(NumberType &t, const unsigned int &index)
+      get_tensor_entry(NumberType &t, const unsigned int index)
       {
         AssertIndexRange(index, 1);
         (void)index;

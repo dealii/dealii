@@ -245,13 +245,13 @@ public:
   ParsedConvergenceTable(
     const std::vector<std::string> &                    component_names,
     const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms,
-    const double &                                      exponent,
+    const double                                        exponent,
     const std::set<std::string> &                       extra_columns,
     const std::string &                                 rate_key,
     const std::string &                                 rate_mode,
     const std::string &                                 error_file_name,
-    const unsigned int &                                precision,
-    const bool &                                        compute_error);
+    const unsigned int                                  precision,
+    const bool                                          compute_error);
 
   /**
    * Attach all the parameters in this class to entries of the parameter
@@ -362,7 +362,7 @@ public:
   void
   add_extra_column(const std::string &            column_name,
                    const std::function<double()> &custom_function,
-                   const bool &                   compute_rate = true);
+                   const bool                     compute_rate = true);
 
   /**
    * Difference between two solutions in the same vector space.

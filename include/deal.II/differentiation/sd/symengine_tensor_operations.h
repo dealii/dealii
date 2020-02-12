@@ -777,8 +777,8 @@ namespace Differentiation
     {
       template <int dim>
       TableIndices<4>
-      make_rank_4_tensor_indices(const unsigned int &idx_i,
-                                 const unsigned int &idx_j)
+      make_rank_4_tensor_indices(const unsigned int idx_i,
+                                 const unsigned int idx_j)
       {
         const TableIndices<2> indices_i(
           SymmetricTensor<2, dim>::unrolled_to_component_indices(idx_i));

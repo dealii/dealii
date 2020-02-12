@@ -113,11 +113,11 @@ public:
   template <class CellIteratorType>
   void
   reinit(const CellIteratorType &                         cell,
-         const unsigned int &                             face_no,
-         const unsigned int &                             sub_face_no,
+         const unsigned int                               face_no,
+         const unsigned int                               sub_face_no,
          const typename identity<CellIteratorType>::type &cell_neighbor,
-         const unsigned int &                             face_no_neighbor,
-         const unsigned int &                             sub_face_no_neighbor);
+         const unsigned int                               face_no_neighbor,
+         const unsigned int                               sub_face_no_neighbor);
 
   /**
    * Re-initialize this object to be used on an interface given by a single face
@@ -132,7 +132,7 @@ public:
    */
   template <class CellIteratorType>
   void
-  reinit(const CellIteratorType &cell, const unsigned int &face_no);
+  reinit(const CellIteratorType &cell, const unsigned int face_no);
 
   /**
    * Return a reference to the FEFaceValues or FESubfaceValues object
@@ -508,11 +508,11 @@ template <class CellIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
   const CellIteratorType &                         cell,
-  const unsigned int &                             face_no,
-  const unsigned int &                             sub_face_no,
+  const unsigned int                               face_no,
+  const unsigned int                               sub_face_no,
   const typename identity<CellIteratorType>::type &cell_neighbor,
-  const unsigned int &                             face_no_neighbor,
-  const unsigned int &                             sub_face_no_neighbor)
+  const unsigned int                               face_no_neighbor,
+  const unsigned int                               sub_face_no_neighbor)
 {
   if (sub_face_no == numbers::invalid_unsigned_int)
     {
@@ -587,7 +587,7 @@ template <int dim, int spacedim>
 template <class CellIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
-                                         const unsigned int &    face_no)
+                                         const unsigned int      face_no)
 {
   internal_fe_face_values.reinit(cell, face_no);
   fe_face_values          = &internal_fe_face_values;
