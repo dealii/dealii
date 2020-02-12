@@ -7149,8 +7149,8 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   const std::string &directory,
   const std::string &filename_without_extension,
   const unsigned int counter,
-  const unsigned int n_digits_for_counter,
   const MPI_Comm &   mpi_communicator,
+  const unsigned int n_digits_for_counter,
   const unsigned int n_groups) const
 {
   const unsigned int rank = Utilities::MPI::this_mpi_process(mpi_communicator);

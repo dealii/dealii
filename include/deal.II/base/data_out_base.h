@@ -2756,7 +2756,7 @@ public:
    * DataOutInterface::write_pvtu_record().
    *
    * For example, running
-   * <code> write_vtu_with_pvtu_record("output/", "solution", 3, 4, comm, 2)
+   * <code> write_vtu_with_pvtu_record("output/", "solution", 3, comm, 4, 2)
    * </code> on 10 processes generates the files
    * @code
    * output/solution_0003.0.vtu
@@ -2782,7 +2782,7 @@ public:
    * In a
    * parallel setting, several files are typically written per time step. The
    * number of files written in parallel depends on the number of MPI processes
-   * (see parameter @p mpi_communicator with default value MPI_COMM_WORLD), and a
+   * (see parameter @p mpi_communicator), and a
    * specified number of @p n_groups with default value 0. The background is that
    * VTU file output supports grouping files from several CPUs into a given
    * number of files using MPI I/O when writing on a parallel filesystem. The
@@ -2812,8 +2812,8 @@ public:
     const std::string &directory,
     const std::string &filename_without_extension,
     const unsigned int counter,
+    const MPI_Comm &   mpi_communicator,
     const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
-    const MPI_Comm &   mpi_communicator     = MPI_COMM_WORLD,
     const unsigned int n_groups             = 0) const;
 
   /**
