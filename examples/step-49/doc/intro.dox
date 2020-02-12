@@ -6,6 +6,10 @@ were contributed by Yuhan Zhou, Wolfgang Bangerth, and David Wells.</i>
 This tutorial is an extension to step-1 and demonstrates several ways to
 obtain more involved meshes than the ones shown there.
 
+@note This tutorial is also available as a Jupyter Python notebook that
+  uses the deal.II python interface. The notebook is available in the
+  same directory as the original C++ program.
+
 Generating complex geometries is a challenging task, especially in three space
 dimensions. We will discuss several ways to do this, but this list is not
 exhaustive. Additionally, there is not one approach that fits all problems.
