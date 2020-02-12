@@ -35,6 +35,9 @@ namespace python
   const char barycenter_docstring[] =
     "Return the barycenter of the current face                          \n";
 
+  const char center_docstring[] =
+    "Return the center of the current face taking into account manifold.\n";
+
   const char set_vertex_docstring[] =
     " Set the ith vertex of the face to point_wrapper                   \n";
 
@@ -63,6 +66,10 @@ namespace python
                     manifold_id_docstring)
       .def("barycenter",
            &TriaAccessorWrapper::get_barycenter,
+           barycenter_docstring,
+           boost::python::args("self"))
+      .def("center",
+           &TriaAccessorWrapper::get_center,
            barycenter_docstring,
            boost::python::args("self"))
       .def("set_vertex",

@@ -59,6 +59,24 @@ namespace python
 
     template <int dim, int spacedim>
     Manifold<dim, spacedim> *
+    create_cylindrical_manifold(const boost::python::list &direction_list,
+                                const boost::python::list &axial_point_list)
+    {
+      Tensor<1, spacedim> direction;
+      for (int d = 0; d < spacedim; ++d)
+        direction[d] = boost::python::extract<double>(direction_list[d]);
+
+      Point<spacedim> axial_point;
+      for (int d = 0; d < spacedim; ++d)
+        axial_point[d] = boost::python::extract<double>(axial_point_list[d]);
+
+      return new CylindricalManifold<dim, spacedim>(direction, axial_point);
+    }
+
+
+
+    template <int dim, int spacedim>
+    Manifold<dim, spacedim> *
     create_function_manifold(const std::string &push_forward,
                              const std::string &pull_back)
     {
@@ -246,6 +264,28 @@ namespace python
       {
         manifold_ptr =
           internal::create_cylindrical_manifold<3, 3>(axis, tolerance);
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage(
+                    "Given dim-spacedim combination is not implemented."));
+  }
+
+
+
+  void
+  ManifoldWrapper::create_cylindrical(const boost::python::list &direction,
+                                      const boost::python::list &axial_point)
+  {
+    if ((dim == 2) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_cylindrical_manifold<2, 3>(direction, axial_point);
+      }
+    else if ((dim == 3) && (spacedim == 3))
+      {
+        manifold_ptr =
+          internal::create_cylindrical_manifold<3, 3>(direction, axial_point);
       }
     else
       AssertThrow(false,
