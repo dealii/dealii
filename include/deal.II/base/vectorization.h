@@ -3324,6 +3324,11 @@ public:
   operator=(const double x)
   {
     data = vec_splats(x);
+
+    // Some compilers believe that vec_splats sets 'x', but that's not true.
+    // They then warn about setting a variable and not using it. Suppress the
+    // warning by "using" the variable:
+    (void)x;
     return *this;
   }
 
@@ -3558,6 +3563,11 @@ public:
   operator=(const float x)
   {
     data = vec_splats(x);
+
+    // Some compilers believe that vec_splats sets 'x', but that's not true.
+    // They then warn about setting a variable and not using it. Suppress the
+    // warning by "using" the variable:
+    (void)x;
     return *this;
   }
 
