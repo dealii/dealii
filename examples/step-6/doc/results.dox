@@ -43,17 +43,12 @@ refinement.
 
 
 
-The final solution, as written by the program at the end of the
-<code>%run()</code> function, looks as follows:
+The program outputs the solution and mesh in each cycle of the
+refinement loop. The solution looks as follows:
 
+<img src="https://www.dealii.org/images/steps/developer/step-6.solution.9.2.png" alt="">
 
-
-<img src="https://www.dealii.org/images/steps/developer/step-6.solution.png" alt="">
-
-
-
-In each cycle, the program furthermore writes the grid in EPS
-format. These are shown in the following:
+It is interesting to follow how the program arrives at the final mesh:
 
 <div class="twocolumn" style="width: 80%">
   <div>
