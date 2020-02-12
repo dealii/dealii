@@ -320,7 +320,7 @@ dominate the mesh refinement criterion, and lead to strongly
 concentrated meshes. The solution after the seventh refinement step looks
 like the following:
 
-<table width="80%" align="center">
+<table width="40%" align="center">
   <tr>
     <td><img src="https://www.dealii.org/images/steps/developer/step-14.step-13.solution-7.9.2.png" alt="" width="100%"></td>
   </tr>
