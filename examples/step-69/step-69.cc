@@ -101,10 +101,10 @@
 // functions</a>. For the sake of brevity, we refrain from that approach,
 // though.
 //
-// We also note that the vast majority of classes is derived from 
-// ParameterAcceptor. This facilitates the population of all the global 
-// parameters into a single (global) ParameterHandler. More explanations 
-// about the use inheritance from ParameterAcceptor as a global subscription 
+// We also note that the vast majority of classes is derived from
+// ParameterAcceptor. This facilitates the population of all the global
+// parameters into a single (global) ParameterHandler. More explanations
+// about the use inheritance from ParameterAcceptor as a global subscription
 // mechanism can be found in Step-59.
 
 namespace Step69
@@ -171,8 +171,8 @@ namespace Step69
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
-  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, 
-  // $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij}$ matrices. Here, the term 
+  // DoFHandler, SparsityPattern, boundary maps, the lumped mass,
+  // $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij}$ matrices. Here, the term
   // <i>offline</i> refers to the fact that all the class
   // members of <code>OfflineData</code> have well-defined values
   // independent of the current time step. This means that they can be
@@ -366,14 +366,14 @@ namespace Step69
   // that was introduced in the discussion above. The main method of the
   // <code>TimeStep</code> class is <code>step(vector_type &U, double
   // t)</code> that takes a reference to a state vector <code>U</code> and
-  // a time point <code>t</code> (as input arguments) computes the updated 
-  // solution, stores it in the vector <code>temp</code>, swaps its contents 
-  // with the vector <code>U</code>, and returns the chosen step-size 
+  // a time point <code>t</code> (as input arguments) computes the updated
+  // solution, stores it in the vector <code>temp</code>, swaps its contents
+  // with the vector <code>U</code>, and returns the chosen step-size
   // $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
-  // vector <code>temp</code> and the matrix <code>dij_matrix</code> 
+  // vector <code>temp</code> and the matrix <code>dij_matrix</code>
   // respectively.
 
   template <int dim>
@@ -747,19 +747,20 @@ namespace Step69
     // contiguous local index range. But this is the precisely the type of
     // index manipulation we want to avoid in our assembly loops.
     //
-    // The Utilities::MPI::Partitioner already implements the translation from
-    // a global index range to a contiguous local (per MPI rank) index
-    // range (we don't have to reinvent the wheel). We just need to use that 
-    // translation capability (once and only once) in order to create a 
-    // "local" sparsity pattern for 
-    // the contiguous index range $[0,$<code>n_locally_relevant</code>$)$. That 
-    // capability can be invoked by 
-    // Utilities::MPI::Partitioner::global_to_local()
-    // function. All that is left to do is to ensure that, when implementing 
-    // our scatter and gather auxiliary functions, we always access
-    // elements of a distributed vector by a call to
-    // LinearAlgebra::distributed::Vector::local_element(). That way we avoid 
-    // index translations altogether and operate exclusively with local indices.
+    // The Utilities::MPI::Partitioner already implements the translation
+    // from a global index range to a contiguous local (per MPI rank) index
+    // range: we don't have to reinvent the wheel. We just need to use that
+    // translation capability (once and only once) in order to create a
+    // "local" sparsity pattern for the contiguous index range
+    // $[0,$<code>n_locally_relevant</code>$)$. That capability can be
+    // invoked by Utilities::MPI::Partitioner::global_to_local() function.
+    // Once the sparsity pattern is created using local indices, all that
+    // is left to do is to ensure that (when implementing our scatter and
+    // gather auxiliary functions) we always access elements of a
+    // distributed vector by a call to
+    // LinearAlgebra::distributed::Vector::local_element(). This way we
+    // avoid index translations altogether and operate exclusively with
+    // local indices.
 
     {
       TimerOutput::Scope t(
@@ -903,13 +904,21 @@ namespace Step69
     // the individual components <code>(i,l)</code> of a matrix. The
     // functionality of <code>gather_get_entry</code> and
     // <code>gather</code> is very much the same, but their context is
-    // different: the function <code>gather</code> is meant to be used in
-    // exceptional/limited number of cases. The reader should be aware that
-    // accessing an arbitrary <code>(i,l)</code> entry of a matrix (say for
-    // instance Trilinos or PETSc  matrices) is very expensive. Here is
-    // where we might want to keep an eye on complexity: we want this
-    // operation to have constant complexity (and that's the case of this
-    // implementation using deal.ii matrices).
+    // different: the function <code>gather</code> does not rely on an
+    // iterator (that actually knows the value pointed) but rather on the
+    // indices <code>(i,l)</code> of the entry in order to retrieve its
+    // actual value. We should expect <code>gather</code> to be slightly
+    // more expensive than <code>gather_get_entry</code>. The use of
+    // <code>gather</code> will be limited to the task of computing the 
+    // algebraic viscosity $d_{ij}$ in the particular case that when 
+    // both $i$ and $j$ lie at the boundary.
+    //
+    // @note The reader should be aware that accessing an arbitrary 
+    // <code>(i,l)</code> entry of a matrix (say for instance Trilinos or PETSc  
+    // matrices) is in general unacceptably expensive. Here is where we might 
+    // want to keep an eye on complexity: we want this operation to have 
+    // constant complexity, which is the case of the current implementation 
+    // using deal.ii matrices.
 
     template <typename T1, std::size_t k, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
@@ -923,8 +932,8 @@ namespace Step69
 
     // <code>gather</code> (second interface): this second function
     // signature having two input arguments will be used to gather the
-    // state at a node <code>i</code> and return <code>Tensor<1,
-    // problem_dimension></code> for our convenience.
+    // state at a node <code>i</code> and return it as a 
+    // <code>Tensor<1,problem_dimension></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k> gather(const std::array<T1, k> &U,
@@ -937,13 +946,12 @@ namespace Step69
     }
 
     // <code>scatter</code>: this function has three input arguments, the
-    // first one is meant to be a global object (say a locally owned
-    // vector), the second argument which could be a
+    // first one is meant to be a "global object" (say a locally owned or 
+    // locally relevant vector), the second argument which could be a
     // <code>Tensor<1,problem_dimension></code>, and the last argument
     // which represents a index of the global object. This function will be
     // primarily used to write the updated nodal values, stored as
-    // <code>Tensor<1,problem_dimension></code>, into the globally owned
-    // vector.
+    // <code>Tensor<1,problem_dimension></code>, into the global object.
 
     template <typename T1, std::size_t k1, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline void
@@ -961,8 +969,8 @@ namespace Step69
   // $\boldsymbol{\nu}_i$.
   //
   // In order to exploit thread parallelization we use WorkStream approach
-  // detailed in the @ref threads "Parallel computing with multiple processors
-  // accessing shared memory". As customary this requires
+  // detailed in the @ref threads Parallel computing with multiple processors
+  // accessing shared memory. As customary this requires
   // definition of
   //  - Scratch data (i.e. input info required to carry out computations): in
   //    this case it is <code>scratch_data</code>.
@@ -982,11 +990,11 @@ namespace Step69
   // well-documented in Step-9, Step-13 and Step-32 among others.
   //
   // Finally, assuming that $\mathbf{x}_i$ is a support point at the boundary,
-  // the normals are defined as
+  // the (nodal) normals are defined using averaging:
   //
   // $\widehat{\boldsymbol{\nu}}_i :=
   // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|}$ where
-  // $\boldsymbol{\nu}_i := \sum_{T \in \text{supp}(\phi_i)}
+  // $\boldsymbol{\nu}_i := \sum_{T \subset \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
   // \phi_i(\mathbf{x}_{q,F})$
@@ -994,9 +1002,10 @@ namespace Step69
   // here $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
   // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
-  // are quadrature points on such face.
-  // Other more sophisticated definitions for $\nu_i$ are
-  // possible but none of them have much influence in theory or practice.
+  // are quadrature points on such face. Note that this formula for 
+  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of 
+  // weighted averaging. Other more sophisticated definitions for $\nu_i$ 
+  // are possible but none of them have much influence in theory or practice.
 
   template <int dim>
   void OfflineData<dim>::assemble()
@@ -1082,7 +1091,7 @@ namespace Step69
           }         /* q */
 
         /* Now we have to compute the boundary normals. Note that the
-           following loop does not actually do much unless the the element
+           following loop does not do much unless the element
            has faces on the boundary of the domain */
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
@@ -1208,15 +1217,14 @@ namespace Step69
     // be used for our node-loops. This functionality requires four input
     // arguments which we explain in detail (for the specific case of our
     // thread-parallel node loops):
-    // - The iterator <code>indices.begin()</code> points to
-    //   to a row index.
+    // - The iterator <code>indices.begin()</code> points to a row index.
     // - The iterator <code>indices.end()</code> points to a numerically higher
     //   row index.
     // - The function <code>on_subranges(i1,i2)</code> (where <code>i1</code>
     //   and <code>i2</code> define sub-range within the range spanned by
     //   the end and begin iterators defined in the two previous bullets)
     //   applies operation for every iterator in such subrange. We may as well
-    //   call <code>on_subranges</code> the worker.
+    //   call <code>on_subranges</code> the "worker".
     // - Grainsize: minimum number of iterators (in this case representing
     //   rows) processed by each thread. We decided for a minimum of 4096
     //   rows.
@@ -1426,11 +1434,10 @@ namespace Step69
 
   // In this section we describe the implementation of the class members of
   // the <code>ProblemDescription</code> class. Most of the code here is
-  // specific for compressible Euler's equations with an ideal gas law.
-  //
+  // specific for compressible Euler's equations with an ideal gas law. 
   // If we wanted to re-purpose Step-69 for a different conservation law
-  // (say for instance the shallow water equation) most of the
-  // implementation of this class would have to change. Most of the other
+  // (say for: instance the shallow water equation) most of the
+  // implementation of this class would have to change. But most of the other
   // classes, however, (in particular those defining loop structures) would
   // remain unchanged.
   //
@@ -1505,12 +1512,12 @@ namespace Step69
   // advanced discussion about it in this tutorial. In this portion of the
   // documentation we will limit ourselves to sketch the main functionality
   // of our implementation functions and point to specific academic
-  // references in order to help (the interested) reader to trace the
+  // references in order to help the (interested) reader trace the
   // source (and proper mathematical justification) of these ideas.
   //
   // In general, obtaining a sharp guaranteed upper-bound on the maximum
   // wavespeed requires solving a quite expensive scalar nonlinear problem.
-  // This is typically with an iterative solver. In order to simplify the
+  // This is typically done with an iterative solver. In order to simplify the
   // presentation in this example step we decided not to include such an
   // iterative scheme. Instead, we will just use an initial guess as a
   // guess for an upper bound on the maximum wavespeed. More precisely,
@@ -1522,17 +1529,15 @@ namespace Step69
   // approximation for the intermediate pressure $p^*$, see for instance
   // Equation (4.46), page 128 in @cite Toro2009.
   //
-  // The estimate returned by <code>lambda_max_two_rarefaction</code> is in
-  // general quite sharp and is generally sufficient as an upper bound for
-  // our purposes. However, for some specific situations (in particular
-  // when one of states is close to vacuum conditions) such an estimate
-  // will be overly pessimistic.
-  //
-  // That's why we used a second estimate to avoid this degeneracy that
-  // will be invoked by a call to the function
-  // <code>lambda_max_expansion</code>. The most important function here is
-  // <code>compute_lambda_max</code> which takes the minimum between the
-  // estimates returned by <code>lambda_max_two_rarefaction</code> and
+  // The estimate returned by <code>lambda_max_two_rarefaction</code> 
+  // is guaranteed to be an upper bound, it is in general quite sharp, and 
+  // overall sufficient for our purposes. However, for some specific situations 
+  // (in particular when one of states is close to vacuum conditions) such 
+  // an estimate will be overly pessimistic. That's why we used a second 
+  // estimate to avoid this degeneracy that will be invoked by a call to the 
+  // function <code>lambda_max_expansion</code>. The most important function 
+  // here is <code>compute_lambda_max</code> which takes the minimum between 
+  // the estimates returned by <code>lambda_max_two_rarefaction</code> and
   // <code>lambda_max_expansion</code>.
   //
   // We start again by defining a couple of helper functions:
@@ -1591,11 +1596,11 @@ namespace Step69
     // primitive state $[\rho, u, p, a]$ and a given pressure $p^\ast$
     // @cite GuermondPopov2016  Eqn. (3.7):
     // @f{align*}
-    //   \lambda^- = u - a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} *
+    //   \lambda^- = u - a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} 
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
-    // Here, the $+$ sign in the subscript of the parenthesis denotes the
-    // positive part of the given number.
+    // Here, the $(\cdot)_{+}$ denotes the positive part of the given 
+    // argument.
 
     DEAL_II_ALWAYS_INLINE inline double
     lambda1_minus(const std::array<double, 4> &riemann_data,
@@ -1615,7 +1620,7 @@ namespace Step69
 
     // Analougously @cite GuermondPopov2016 Eqn. (3.8):
     // @f{align*}
-    //   \lambda^+ = u + a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} *
+    //   \lambda^+ = u + a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} 
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
 
@@ -1669,7 +1674,7 @@ namespace Step69
       return std::max(positive_part(lambda3), negative_part(lambda1));
     }
 
-    // We compute a second upper bound of the maximal wavespeed that is in
+    // We compute the second upper bound of the maximal wavespeed that is, in
     // general, not as sharp as the two-rarefaction estimate. But it will
     // save the day in the context of near vacuum conditions when the
     // two-rarefaction approximation might attain extreme values:
@@ -1694,8 +1699,8 @@ namespace Step69
     }
   } // namespace
 
-  // The is the main function that we are going to call in order to compute
-  // $\lambda_{\text{max}} (\mathbf{U}_i^{n},\mathbf{U}_j^{n},
+  // The following is the main function that we are going to call in order to 
+  // compute $\lambda_{\text{max}} (\mathbf{U}_i^{n},\mathbf{U}_j^{n},
   // \textbf{n}_{ij})$. We simply compute both maximal wavespeed estimates
   // and return the minimum.
 
@@ -1742,8 +1747,8 @@ namespace Step69
 
   // @sect4{Initial values}
 
-  // As a last preparatory step before we discuss the implementation of the
-  // forward Euler scheme is to quickly implement the InitialValues class.
+  // As a last preparatory step, before we discuss the implementation of the
+  // forward Euler scheme, is to briefly implement the InitialValues class.
   //
   // In the constructor we initialize all parameters with default values,
   // declare all parameters for the ParameterAcceptor class and connect the
@@ -1782,7 +1787,7 @@ namespace Step69
   // default values for the two private members
   // <code>initial_direction</code> and <code>initial_1d_state</code> and
   // added them to the parameter list. But we have not defined an
-  // implementation for the only public member that we really care about,
+  // implementation of the only public member that we really care about,
   // which is <code>initial_state</code> (the function that we are going to
   // call to actually evaluate the initial solution at the mesh nodes).
   //
@@ -1806,9 +1811,9 @@ namespace Step69
     static constexpr auto gamma = ProblemDescription<dim>::gamma;
 
     // The following lambda function translates a given primitive 1d state
-    // (density $rho$, velocity $u$, and pressure $p$) into a conserved nD
-    // state (density $rho$, momentum $\textbf{m}$, and total energy $E$).
-    // Note that we
+    // (density $\rho$, velocity $u$, and pressure $p$) into a 
+    // conserved n-dimensional state (density $\rho$, momentum 
+    // $\mathbf{m}$, and total energy $E$). Note that we
     // <a href="https://en.cppreference.com/w/cpp/language/lambda">capture</a>
     // the <code>this</code> pointer and thus access to
     // <code>initial_direction</code> by value.
@@ -1930,41 +1935,41 @@ namespace Step69
     // \mathbf{U}_j^{n}, \textbf{n}_{ij}) = \lambda_{\text{max}}
     // (\mathbf{U}_j^{n}, \mathbf{U}_i^{n}, \textbf{n}_{ji})$ do not
     // necessarily hold true. The only mathematically safe solution for this
-    // dilemma is to compute both of them and take the maximum.
+    // dilemma is to compute both of them $d_{ij}$ and $d_{ji}$ and 
+    // take the maximum.
     //
-    // The computation of $\lambda_{\text{max}}$ is quite expensive. In
-    // order to save some computing time we exploit the fact that the
-    // computing local wavenumbers is symmetric (provided that not both
-    // $\mathbf{x}_i$ and $\mathbf{x}_j$ lie on the boundary) as outlined
-    // above: We only compute the upper-triangular entries of $d_{ij}$ and
-    // copy the corresponding entries to the lower-triangular counterpart.
+    // Overall, the computation of $d_{ij}$ is quite expensive. In
+    // order to save some computing time we exploit the fact that the viscosity
+    // matrix has to be symmetric (as mentioned above): we only compute 
+    // the upper-triangular entries of $d_{ij}$ and copy the
+    // corresponding entries to the lower-triangular counterpart.
     //
     // We use again parallel::apply_to_subranges for thread-parallel for
     // loops. Pretty much all the ideas for parallel traversal that we
     // introduced when discussing the assembly of the matrix
     // <code>norm_matrix</code> and the normalization of
-    // <code>nij_matrix</code> agove are used here again.
+    // <code>nij_matrix</code> above are used here again.
 
     {
       TimerOutput::Scope time(computing_timer, "time_step - 1 compute d_ij");
 
       // We define again a "worker" function <code>on_subranges</code> that
-      // computes the viscosity d_{ij} for a subrange [i1, i2) of column
+      // computes the viscosity $d_{ij}$ for a subrange [i1, i2) of column
       // indices:
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
           {
             const auto U_i = gather(U, i);
 
-            // For a given column index i we iterate over the column of the
+            // For a given column index i we iterate over the columns of the
             // sparsity pattern from <code>sparsity.begin(i)</code> to
             // <code>sparsity.end(i)</code>:
             for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
               {
                 const auto j = jt->column();
 
-                // We only compute d_ij if j < i (upper triangular entries)
-                // and later copy the values over to d_ji.
+                // We only compute $d_{ij}$ if $j < i$ (upper triangular 
+                // entries) and later copy the values over to $d_{ji}$.
                 if (j >= i)
                   continue;
 
@@ -1979,7 +1984,8 @@ namespace Step69
                 double d = norm * lambda_max;
 
                 // If both support points happen to be at the boundary we
-                // have to compute d_ji as well and then take max(d_ij,d_ji):
+                // have to compute $d_{ji}$ as well and then take 
+                // $max(d_{ij},d_{ji})$:
                 if (boundary_normal_map.count(i) != 0 &&
                     boundary_normal_map.count(j) != 0)
                   {
@@ -2119,7 +2125,7 @@ namespace Step69
     // both equations are algebraically equivalent (they will produce the
     // same numerical values). We favor this second formula since it has
     // natural cancellation properties that might help avoid numerical
-    // instabilities.
+    // artifacts.
 
     {
       TimerOutput::Scope time(computing_timer, "time_step - 3 perform update");

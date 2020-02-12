@@ -83,7 +83,7 @@ $\mathbb{f}(\mathbf{u})$ is defined as
 where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
 $\otimes$ denotes the tensor product. Here, we have introduced the pressure
 $p$ that, in general, is defined by an closed-form equation of state.
-In this tutorial we limit the discussion to the class of polytropic 
+In this tutorial we limit the discussion to the class of polytropic
 ideal gases for which the pressure is given by
 @f{align*}
 p = p(\textbf{u}) := (\gamma -1) \Big(E -
@@ -181,7 +181,7 @@ $s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
 instance @cite GuermondErn2004 Chapter 5 and references therein). Most
 time-dependent discretization approaches described in the deal.II tutorials
 are based on such a (semi-discrete) variational approach. Fundamentally,
-from an analysis perspective, variational discretizations are conceived 
+from an analysis perspective, variational discretizations are conceived
 to provide some notion of global (integral) stabiliy, meaning an
 estimate of the form
 
@@ -234,7 +234,7 @@ Let $\mathbb{V}_h$ be scalar-valued finite dimensional space spanned by a
 basis $\{\phi_i\}_{i \in \mathcal{V}}$ where: $\phi_i:\Omega \rightarrow
 \mathbb{R}$ and $\mathcal{V}$ is the set of all indices (nonnegative
 integers) identifying each scalar Degree of Freedom (DOF) in the mesh.
-Therefore a scalar finite element functiona $u_h \in \mathbb{V}_h$ it can
+Therefore a scalar finite element functional $u_h \in \mathbb{V}_h$ can
 be written as $u_h = \sum_{i \in \mathcal{V}} U_i \phi_i$ with $U_i \in
 \mathbb{R}$. We introduce the notation for vector-valued approximation
 spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
@@ -280,9 +280,9 @@ The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
 definition in order to focus first on some algorithmic and implementational
 questions. We note that
   - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time (provided we keep the
-    discretization fixed). It thus makes sense to assemble these 
-    matrices/vectors once in a so called <i>offline computation</i> and reuse 
-    them in every time step. They are part of what we are going to call 
+    discretization fixed). It thus makes sense to assemble these
+    matrices/vectors once in a so called <i>offline computation</i> and reuse
+    them in every time step. They are part of what we are going to call
     off-line data.
   - At every time step we have to evaluate $\mathbb{f}(\mathbf{U}_j^{n})$ and
     $d_{ij} := \max \{ \lambda_{\text{max}}
@@ -298,9 +298,9 @@ $t_n$:
 
 @f{align*}
 &\textbf{for } i \in \mathcal{V} \\
-&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow 
+&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow
 \texttt{gather_cij_vectors} (\textbf{c}, \mathcal{I}(i)) \\
-&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow 
+&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow
 \texttt{gather_state_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
 &\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
 &\ \ \ \ \textbf{for } j \in \mathcal{I}(i) \\
@@ -319,7 +319,7 @@ We note here that:
 containing all the vectors $\mathbf{c}_{ij}$ and all the states
 $\mathbf{U}_j^n$ respectively.
 - $\texttt{gather_cij_vectors}$, $\texttt{gather_state_vectors}$, and
-$\texttt{scatter_updated_state}$ are hypothetical implementations that 
+$\texttt{scatter_updated_state}$ are hypothetical implementations that
 either collect (from) or write (into) global matrices and vectors.
 - Note that: if we assume a cartesian mesh in two space
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
@@ -328,7 +328,7 @@ of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
 nine state-vectors (i.e. all the states in the patch/macro element associated to
 the shape function $\phi_i$). This is one of the major differences with the
 usual cell-based loop where the gather functionality (encoded in
-FEValuesBase<dim, spacedim>.get_function_values() in the case of deal.ii) only 
+FEValuesBase<dim, spacedim>.get_function_values() in the case of deal.ii) only
 collects values for the local cell (just a subset of the patch).
 
 The actual implementation will deviate from above code in one key aspect:
