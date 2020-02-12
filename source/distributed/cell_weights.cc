@@ -79,7 +79,7 @@ namespace parallel
   CellWeights<dim, spacedim>::ndofs_weighting(
     const std::pair<float, float> &coefficients)
   {
-    return [&coefficients](
+    return [coefficients](
              const typename hp::DoFHandler<dim, spacedim>::cell_iterator &,
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       const float result =
@@ -101,7 +101,7 @@ namespace parallel
   CellWeights<dim, spacedim>::ndofs_weighting(
     const std::vector<std::pair<float, float>> &coefficients)
   {
-    return [&coefficients](
+    return [coefficients](
              const typename hp::DoFHandler<dim, spacedim>::cell_iterator &,
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       float result = 0;
@@ -139,7 +139,7 @@ namespace parallel
       ExcMessage(
         "parallel::CellWeights requires a parallel::TriangulationBase object."));
 
-    return [&dof_handler, tria, &weighting_function](
+    return [&dof_handler, tria, weighting_function](
              const typename Triangulation<dim, spacedim>::cell_iterator &cell,
              const typename Triangulation<dim, spacedim>::CellStatus     status)
              -> unsigned int {
