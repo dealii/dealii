@@ -37,7 +37,7 @@
 // <code>lac/la_parallel_vector.h</code>. Instead of a Trilinos, or PETSc
 // specific matrix class, we will use a non-distributed
 // dealii::SparseMatrix (<code>lac/sparse_matrix.h</code>) to store the local
-// part of the $c_{ij}$, $n_{ij}$ and $d_{ij}$ matrices.
+// part of the $\mathbf{c}_{ij}$, $\mathbf{n}_{ij}$ and $d_{ij}$ matrices.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/parameter_acceptor.h>
@@ -95,11 +95,17 @@
 // and scratch data object private and make methods and data structures
 // used by other classes public.
 //
-// @note: A cleaner approach would be to guard access to all data
+// @note A cleaner approach would be to guard access to all data
 // structures by <a
 // href="https://en.wikipedia.org/wiki/Mutator_method">getter/setter
 // functions</a>. For the sake of brevity, we refrain from that approach,
 // though.
+//
+// We also note that the vast majority of classes is derived from 
+// ParameterAcceptor. This facilitates the population of all the global 
+// parameters into a single (global) ParameterHandler. More explanations 
+// about the use inheritance from ParameterAcceptor as a global subscription 
+// mechanism can be found in Step-59.
 
 namespace Step69
 {
@@ -120,7 +126,7 @@ namespace Step69
   //
   // The class <code>Discretization</code> contains all data structures
   // concerning the mesh (triangulation) and discretization (mapping,
-  // finite element, quadrature) of the problem. We use the
+  // finite element, quadrature) of the problem. As mentioned, we use
   // ParameterAcceptor class to automatically populate problem-specific
   // parameters, such as the geometry information
   // (<code>length</code>, etc.) or the refinement level
@@ -130,7 +136,7 @@ namespace Step69
   // constructor, and defer the creation of the mesh to the
   // <code>setup()</code> method that can be called once all parameters are
   // read-in via ParameterAcceptor::initialize().
-  //
+
   template <int dim>
   class Discretization : public ParameterAcceptor
   {
@@ -165,10 +171,9 @@ namespace Step69
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
-  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, $c_{ij}$,
-  // and $n_{ij}$ matrices.
-  //
-  // Here, the term <i>offline</i> refers to the fact that all the class
+  // DoFHandler, SparsityPattern, boundary maps, the lumped mass, 
+  // $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij}$ matrices. Here, the term 
+  // <i>offline</i> refers to the fact that all the class
   // members of <code>OfflineData</code> have well-defined values
   // independent of the current time step. This means that they can be
   // initialized ahead of time (at <i>time step zero</i>) and are not meant
@@ -347,7 +352,7 @@ namespace Step69
 
   private:
     // We declare a private callback function that will be wired up to the
-    // ParameterAcceptor::parse_parameters_call_back signal
+    // ParameterAcceptor::parse_parameters_call_back signal.
     void parse_parameters_callback();
 
     Tensor<1, dim> initial_direction;
@@ -360,15 +365,16 @@ namespace Step69
   // classes at hand we can now implement the explicit time-stepping scheme
   // that was introduced in the discussion above. The main method of the
   // <code>TimeStep</code> class is <code>step(vector_type &U, double
-  // t)</code>. That takes a reference to a state vector <code>U</code> and
-  // a time point <code>t</code> as arguments, computes the updated solution,
-  // stores it in the vector <code>temp</code>, swaps its contents with the
-  // vector <code>U</code>, and returns the chosen step-size $\tau$.
+  // t)</code> that takes a reference to a state vector <code>U</code> and
+  // a time point <code>t</code> (as input arguments) computes the updated 
+  // solution, stores it in the vector <code>temp</code>, swaps its contents 
+  // with the vector <code>U</code>, and returns the chosen step-size 
+  // $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
-  // vector <code>temp</code> and the matrix <code>dij_matrix</code>.
-  //
+  // vector <code>temp</code> and the matrix <code>dij_matrix</code> 
+  // respectively.
 
   template <int dim>
   class TimeStep : public ParameterAcceptor
@@ -518,7 +524,7 @@ namespace Step69
   // The first major task at hand is the typical triplet of grid
   // generation, setup of data structures, and assembly. A notable novelty
   // in this example step is the use of the ParameterAcceptor class that we
-  // use to populate parameter values: We first initialize the
+  // use to populate parameter values: we first initialize the
   // ParameterAcceptor class by calling its constructor with a string
   // <code>subsection</code> denoting the correct subsection in the
   // parameter file. Then, in the constructor body every parameter value is
@@ -566,7 +572,7 @@ namespace Step69
   }
 
   // Note that in the previous constructor we only passed the MPI
-  // communicator to the <code>triangulation</code>but we still have not
+  // communicator to the <code>triangulation</code> but we still have not
   // initialized the underlying geometry/mesh. As mentioned earlier, we
   // have to postpone this task to the <code>setup()</code> function that
   // gets called after the ParameterAcceptor::initialize() function has
@@ -739,19 +745,21 @@ namespace Step69
     // "holes" in the index range. The distributed matrices offered by
     // deal.II avoid this by translating from a global index range into a
     // contiguous local index range. But this is the precisely the type of
-    // index manipulation we want to avoid.
+    // index manipulation we want to avoid in our assembly loops.
     //
-    // Lucky enough, the Utilities::MPI::Partitioner used for distributed
-    // vectors provides exactly what we need: It manages a translation from
+    // The Utilities::MPI::Partitioner already implements the translation from
     // a global index range to a contiguous local (per MPI rank) index
-    // range. We therefore simply create a "local" sparsity pattern for the
-    // contiguous index range $[0,$<code>n_locally_relevant</code>$)$ and
-    // translate between global dof indices and the above local range with
-    // the help of the Utilities::MPI::Partitioner::global_to_local()
-    // function. All that is left to do is to ensure that we always access
+    // range (we don't have to reinvent the wheel). We just need to use that 
+    // translation capability (once and only once) in order to create a 
+    // "local" sparsity pattern for 
+    // the contiguous index range $[0,$<code>n_locally_relevant</code>$)$. That 
+    // capability can be invoked by 
+    // Utilities::MPI::Partitioner::global_to_local()
+    // function. All that is left to do is to ensure that, when implementing 
+    // our scatter and gather auxiliary functions, we always access
     // elements of a distributed vector by a call to
-    // LinearAlgebra::distributed::Vector::local_element(). That way we
-    // avoid index translations altogether.
+    // LinearAlgebra::distributed::Vector::local_element(). That way we avoid 
+    // index translations altogether and operate exclusively with local indices.
 
     {
       TimerOutput::Scope t(

@@ -34,7 +34,7 @@ time-stepping. As such, the ideas and techniques presented in this tutorial
 step are drastically different from those used in Step-33, which focuses on
 the use of automatic differentiation. From a programming perspective this
 tutorial will focus on a number of techniques found in large-scale
-computations: hybrid thread- and process- (MPI) parallelization; efficient
+computations: hybrid thread-MPI parallelization; efficient
 local numbering of degrees of freedom; concurrent post-processing and
 write-out of results using worker threads; as well as checkpointing and
 restart.
@@ -83,16 +83,17 @@ $\mathbb{f}(\mathbf{u})$ is defined as
 where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
 $\otimes$ denotes the tensor product. Here, we have introduced the pressure
 $p$ that, in general, is defined by an closed-form equation of state.
-For the tutorial we limit the discussion to the class of polytropic ideal gases
-for which the pressure is given by
+In this tutorial we limit the discussion to the class of polytropic 
+ideal gases for which the pressure is given by
 @f{align*}
-p = p(\textbf{u}) := (\gamma -1) \Big(E - \frac{\|\textbf{m}\|^2}{2\,\rho}
+p = p(\textbf{u}) := (\gamma -1) \Big(E -
+\tfrac{|\textbf{m}|_{\ell^2}^2}{2\,\rho}
 \Big),
 @f}
 
 where the factor $\gamma \in (1,5/3]$ denotes the
 <a href="https://en.wikipedia.org/wiki/Heat_capacity_ratio">ratio of
-specific heats</a>, and $\|\,.\|$ denotes the Euclidian norm.
+specific heats</a>, and $|\cdot|_{\ell^2}$ denotes the Euclidian norm.
 
 
 <h4>Solution theory</h4>
@@ -130,11 +131,11 @@ all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
 @f{align}
   \mathcal{B} = \big\{ \textbf{u} =
   [\rho, \textbf{m},E]^{\top} \in \mathbb{R}^{d+2} \, \big |
-  \quad
-  \rho > 0,
-  \quad
-  \ E - \tfrac{|\textbf{m}|_{\ell^2}^2}{2 \rho} > 0,
-  \quad
+  \
+  \rho > 0 \, ,
+  \
+  \ E - \tfrac{|\textbf{m}|_{\ell^2}^2}{2 \rho} > 0 \, ,
+  \
   s(\mathbf{u}) \geq \min_{x \in \Omega} s(\mathbf{u}_0(\mathbf{x}))
   \big\}.
 @f}
@@ -180,8 +181,8 @@ $s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
 instance @cite GuermondErn2004 Chapter 5 and references therein). Most
 time-dependent discretization approaches described in the deal.II tutorials
 are based on such a (semi-discrete) variational approach. Fundamentally,
-from an analysis perspective, variational discretizations are conceived in
-order to provide some notion of global (integral) stabiliy, meaning an
+from an analysis perspective, variational discretizations are conceived 
+to provide some notion of global (integral) stabiliy, meaning an
 estimate of the form
 
 @f{align*}
@@ -198,7 +199,6 @@ have proven to be some of the best approaches for simulations in the subsonic
 shockless regime and similarly benign regimes.
 
 However, in the transonic and supersonic regime, and shock-hydrodynamics
-
 applications the use of variational schemes might be questionable. In fact,
 at the time of this writing, most shock-hydrodynamics codes are still
 firmly grounded on finite volumes methods. The main reason for failure of
@@ -243,18 +243,18 @@ spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
 \mathbb{R}^{d+2}$ and $\phi_i$ is a scalar-valued shape function.
 
 @note For simplicity we will consider the usual Lagrange finite elements.
-In such this context we let $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ denote
-the set of all support points (see @ref GlossSupport "this glossary
-entry"), where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
+In such context, let $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ denote
+the set of all support points (see @ref GlossSupport "this glossary entry"),
+where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
 \mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as
 a scalar-valued shape function $\phi_i$.
 
-With this notation at hand we can define the scheme as
+With this notation at hand we can define the scheme as:
 
 @f{align*}
   m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
   + \sum_{j \in \mathcal{I}(i)} \mathbb{f}(\mathbf{U}_j^{n})\cdot
-  \mathbf{c}_{ij} - d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0}
+  \mathbf{c}_{ij} - d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0} \, ,
 @f}
 
 Where
@@ -280,9 +280,10 @@ The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
 definition in order to focus first on some algorithmic and implementational
 questions. We note that
   - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time (provided we keep the
-    discretization fixed). It thus makes sense to assemble the matrices
-    once in a so called <i>offline computation</i> and reuse them in every
-    time step. They are part of what we are going to call off-line data.
+    discretization fixed). It thus makes sense to assemble these 
+    matrices/vectors once in a so called <i>offline computation</i> and reuse 
+    them in every time step. They are part of what we are going to call 
+    off-line data.
   - At every time step we have to evaluate $\mathbb{f}(\mathbf{U}_j^{n})$ and
     $d_{ij} := \max \{ \lambda_{\text{max}}
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
@@ -297,8 +298,10 @@ $t_n$:
 
 @f{align*}
 &\textbf{for } i \in \mathcal{V} \\
-&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow \texttt{gather} (\textbf{c}, \mathcal{I}(i)) \\
-&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow \texttt{gather} (\textbf{U}^n, \mathcal{I}(i)) \\
+&\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow 
+\texttt{gather_cij_vectors} (\textbf{c}, \mathcal{I}(i)) \\
+&\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow 
+\texttt{gather_state_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
 &\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
 &\ \ \ \ \textbf{for } j \in \mathcal{I}(i) \\
 &\ \ \ \ \ \ \ \  \texttt{compute } d_{ij} \\
@@ -306,7 +309,7 @@ $t_n$:
 &\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} \leftarrow \textbf{U}_i^{n+1} - \frac{\tau_n}{m_i}
  \mathbb{f}(\mathbf{U}_j^{n})\cdot \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
 &\ \ \ \ \textbf{end} \\
-&\ \ \ \ \texttt{scatter} (\textbf{U}^n, \mathcal{I}(i), \textbf{U}_i^n)) \\
+&\ \ \ \ \texttt{scatter_updated_state} (\textbf{U}_i^{n+1}) \\
 &\textbf{end}
 @f}
 
@@ -315,9 +318,9 @@ We note here that:
 - Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
 containing all the vectors $\mathbf{c}_{ij}$ and all the states
 $\mathbf{U}_j^n$ respectively.
-- $\texttt{gather_cij_vectors}$ and $\texttt{gather_state_vectors}$ are
-hypothetical implementations that collect (from global matrices and vectors)
-only the quantities required to compute the update at the node $i$.
+- $\texttt{gather_cij_vectors}$, $\texttt{gather_state_vectors}$, and
+$\texttt{scatter_updated_state}$ are hypothetical implementations that 
+either collect (from) or write (into) global matrices and vectors.
 - Note that: if we assume a cartesian mesh in two space
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
 $\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary
@@ -325,34 +328,11 @@ of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
 nine state-vectors (i.e. all the states in the patch/macro element associated to
 the shape function $\phi_i$). This is one of the major differences with the
 usual cell-based loop where the gather functionality (encoded in
-FEValuesBase<dim, spacedim>.get_function_values() ) only collects values for the
-local cell (just a subset of the patch).
-
-It is worth noting that, from a practitioner's point of view
-fully-algebraic schemes (i.e. no bilinear forms, no cell-loops, and no
-quadratures) are not unusual at all in the CFD community. There is rich history
-of application of this kind of schemes, also called "edge-based" or
-"graph-based" finite element schemes (see for instance @cite Rainald2008 for
-more historical references).
-
-We note that:
-- This algorithm does not require any form of quadrature or cell-loops.
-- Here, $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
-  containing all the vectors $\mathbf{c}_{ij}$ and all the states
-  $\mathbf{U}_j^n$, respectively.
-- $\texttt{gather}$ and $\texttt{scatter}$ are helper functions
-  that collect from, or distribute values from global vectors and matrices.
-- For an interior node $\mathbf{x}_i$ on a regular mesh in two space
-  dimensions (assuming a first-order polynomial space $\mathbb{Q}^1$) the
-  stencil $\mathcal{I}(i)$ contains nine entries. The update for a single
-  state $\textbf{U}_i^n$ thus depends on nine state-vectors
-  $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ (i.e., all the states in the
-  patch formed by the support of the shape function $\phi_i$). This is one
-  of the major differences compared to cell-based loop, where an update
-  typically only operates on states associated with a single cell.
+FEValuesBase<dim, spacedim>.get_function_values() in the case of deal.ii) only 
+collects values for the local cell (just a subset of the patch).
 
 The actual implementation will deviate from above code in one key aspect:
-The time-step size $\tau$ has to be chosen subject to a CFL condition
+the time-step size $\tau$ has to be chosen subject to a CFL condition
 @f{align*}
   \tau_n = c_{\text{cfl}}\,\min_{
   i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right),
