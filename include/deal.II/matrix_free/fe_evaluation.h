@@ -3799,7 +3799,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(matrix_info->indices_initialized() == true, ExcNotInitialized());
   if (n_fe_components == 1)
     for (unsigned int comp = 0; comp < n_components; ++comp)
-      internal::check_vector_compatibility(*src[comp], *dof_info);
+      {
+        Assert(src[comp] != nullptr,
+               ExcMessage("The finite element underlying this FEEvaluation "
+                          "object is scalar, but you requested " +
+                          std::to_string(n_components) +
+                          " components via the template argument in "
+                          "FEEvaluation. In that case, you must pass an "
+                          "std::vector<VectorType> or a BlockVector to " +
+                          "read_dof_values and distribute_local_to_global."));
+        internal::check_vector_compatibility(*src[comp], *dof_info);
+      }
   else
     {
       internal::check_vector_compatibility(*src[0], *dof_info);
@@ -4049,17 +4059,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
       if (n_components == 1 || n_fe_components == 1)
         {
-          for (unsigned int c = 0; c < n_components; ++c)
-            Assert(src[c] != nullptr,
-                   ExcMessage(
-                     "The finite element underlying this FEEvaluation "
-                     "object is scalar, but you requested " +
-                     std::to_string(n_components) +
-                     " components via the template argument in "
-                     "FEEvaluation. In that case, you must pass an "
-                     "std::vector<VectorType> or a BlockVector to " +
-                     "read_dof_values and distribute_local_to_global."));
-
           unsigned int ind_local = 0;
           for (; index_indicators != next_index_indicators; ++index_indicators)
             {
