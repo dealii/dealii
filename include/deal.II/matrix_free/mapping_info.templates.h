@@ -1457,6 +1457,11 @@ namespace internal
                                 face_data.normal_vectors[q][d][v] =
                                   face_data.normal_vectors[q][d][0];
                               }
+                          if (fe_face_values.get_update_flags() &
+                              update_quadrature_points)
+                            for (unsigned int d = 0; d < dim; ++d)
+                              face_data.quadrature_points[q][d][v] =
+                                face_data.quadrature_points[q][d][0];
                         }
                     }
                   if (is_boundary_face == false &&
