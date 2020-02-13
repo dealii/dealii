@@ -1017,9 +1017,8 @@ namespace Step69
     for (auto &matrix : nij_matrix)
       matrix = 0.;
 
-    const unsigned int dofs_per_cell =
-      discretization->finite_element.dofs_per_cell;
-    const unsigned int n_q_points = discretization->quadrature.size();
+    unsigned int dofs_per_cell = discretization->finite_element.dofs_per_cell;
+    unsigned int n_q_points    = discretization->quadrature.size();
 
     /* This is the implementation of the scratch data required by WorkStream */
     MeshWorker::ScratchData<dim> scratch_data(
