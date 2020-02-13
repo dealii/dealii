@@ -27,17 +27,16 @@ time integration, see @cite GuermondEtAl2018.
 
 This tutorial presents a first-order scheme for solving compressible
 Euler's equations that is based on three ingredients: a
-<i>collocation</i>-type discretization of Euler's equations in context of
-finite elements; a graph-viscosity stabilization based on a
+<i>collocation</i>-type discretization of Euler's equations in the context
+of finite elements; a graph-viscosity stabilization based on a
 <i>guaranteed</i> upper bound of the local wave speed; and explicit
 time-stepping. As such, the ideas and techniques presented in this tutorial
 step are drastically different from those used in Step-33, which focuses on
 the use of automatic differentiation. From a programming perspective this
 tutorial will focus on a number of techniques found in large-scale
-computations: hybrid thread-MPI parallelization; efficient
-local numbering of degrees of freedom; concurrent post-processing and
-write-out of results using worker threads; as well as checkpointing and
-restart.
+computations: hybrid thread-MPI parallelization; efficient local numbering
+of degrees of freedom; concurrent post-processing and write-out of results
+using worker threads; as well as checkpointing and restart.
 
 It should be noted that first-order schemes in the context of hyperbolic
 conservation laws require prohibitively many degrees of freedom to resolve
@@ -54,11 +53,9 @@ the second-order scheme @cite GuermondEtAl2018.
 
 The compressible Euler's equations of gas dynamics are written in
 conservative form as follows:
-
 @f{align}
 \mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0} ,
 @f}
-
 where $\mathbf{u}(\textbf{x},t):\mathbb{R}^{d} \times \mathbb{R}
 \rightarrow \mathbb{R}^{d+2}$, and $\mathbb{f}(\mathbf{u}):\mathbb{R}^{d+2}
 \rightarrow \mathbb{R}^{(d+2) \times d}$, and $d \geq 1$ is the space
@@ -69,7 +66,6 @@ $\textbf{u} = [\rho, \textbf{m},E]^{\top}$: where $\rho \in \mathbb{R}^+$
 denotes the density, $\textbf{m} \in \mathbb{R}^d$ is the momentum, and $E
 \in \mathbb{R}^+$ is the total energy of the system. The flux of the system
 $\mathbb{f}(\mathbf{u})$ is defined as
-
 @f{align*}
 \mathbb{f}(\textbf{u})
 =
@@ -79,7 +75,6 @@ $\mathbb{f}(\mathbf{u})$ is defined as
   \tfrac{\textbf{m}^\top}{\rho} (E + p)
 \end{bmatrix},
 @f}
-
 where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
 $\otimes$ denotes the tensor product. Here, we have introduced the pressure
 $p$ that, in general, is defined by an closed-form equation of state.
@@ -90,7 +85,6 @@ p = p(\textbf{u}) := (\gamma -1) \Big(E -
 \tfrac{|\textbf{m}|_{\ell^2}^2}{2\,\rho}
 \Big),
 @f}
-
 where the factor $\gamma \in (1,5/3]$ denotes the
 <a href="https://en.wikipedia.org/wiki/Heat_capacity_ratio">ratio of
 specific heats</a>, and $|\cdot|_{\ell^2}$ denotes the Euclidian norm.
@@ -115,19 +109,16 @@ understanding of hyperbolic conservation laws was to assume that the
 solution is formally defined as $\mathbf{u} := \lim_{\epsilon \rightarrow
 0^+} \mathbf{u}^{\epsilon}$ where $\mathbf{u}^{\epsilon}$ is the solution
 of the parabolic regularization
-
 @f{align}
 \mathbf{u}_t^{\epsilon} + \text{div} \, \mathbb{f}(\mathbf{u}^{\epsilon})
 = {\epsilon} \Delta \mathbf{u}^{\epsilon}.
 @f}
-
 Such solutions, which are understood as the solution recovered in the
 zero-viscosity limit, are often refered to as <i>viscosity solutions</i>.
 Global existence and uniqueness of such solutions is a widely open issue.
 However, we know at least that if such viscosity solutions exists they have
 to satisfy the constraint $\textbf{u}(\mathbf{x},t) \in \mathcal{B}$ for
 all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
-
 @f{align}
   \mathcal{B} = \big\{ \textbf{u} =
   [\rho, \textbf{m},E]^{\top} \in \mathbb{R}^{d+2} \, \big |
@@ -139,9 +130,7 @@ all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
   s(\mathbf{u}) \geq \min_{x \in \Omega} s(\mathbf{u}_0(\mathbf{x}))
   \big\}.
 @f}
-
 Here, $s(\mathbf{u})$ denotes the specific entropy
-
 @f{align}
   s(\mathbf{u}) = \ln \Big(\frac{p(\mathbf{u})}{\rho^{\gamma}}\Big).
 @f}
@@ -167,14 +156,12 @@ $\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
 Following Step-9, Step-12, and Step-33, at this point it might look tempting
 to base a discretization of Euler's equations on a (semi-discrete) variational
 formulation:
-
 @f{align*}
   (\partial_t\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)}
   - ( \mathbb{f}(\mathbf{u}_{h}) ,\text{grad} \, \textbf{v}_{h})_{L^2(\Omega)}
   + s_h(\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)} = \boldsymbol{0}
   \quad\forall \textbf{v}_h \in \mathbb{V}_h.
 @f}
-
 Here, $\mathbb{V}_h$ is an appropriate finite element space, and
 $s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
 (possibly complemented with some ad-hoc shock-capturing technique, see for
@@ -184,11 +171,9 @@ are based on such a (semi-discrete) variational approach. Fundamentally,
 from an analysis perspective, variational discretizations are conceived
 to provide some notion of global (integral) stabiliy, meaning an
 estimate of the form
-
 @f{align*}
   |\!|\!| \mathbf{u}_{h}(t) |\!|\!| \leq |\!|\!| \mathbf{u}_{h}(0) |\!|\!|
 @f}
-
 holds true, where $|\!|\!| \cdot |\!|\!| $ could represent the
 $L^2(\Omega)$-norm or, more generally, some discrete (possibly mesh
 dependent) energy-norm. Variational discretizations of hyperbolic
@@ -213,12 +198,10 @@ have an edge in many regards.
 In this tutorial step we therefore depart from variational schemes. We will
 present a completely algebraic formulation (with the flavor of a
 collocation-type scheme) that preserves constraints pointwise, i.e.,
-
 @f{align*}
   \textbf{u}_h(\mathbf{x}_i,t) \in \mathcal{B}
   \;\text{at every node}\;\mathbf{x}_i\;\text{of the mesh}.
 @f}
-
 Contrary to finite difference/volume schemes, the scheme implemented in
 this step maximizes the use of finite element software infrastructure,
 works in any mesh, in any space dimension, and is theoretically guaranteed
@@ -250,14 +233,12 @@ where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
 a scalar-valued shape function $\phi_i$.
 
 With this notation at hand we can define the scheme as:
-
 @f{align*}
   m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
   + \sum_{j \in \mathcal{I}(i)} \mathbb{f}(\mathbf{U}_j^{n})\cdot
   \mathbf{c}_{ij} - d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0} \, ,
 @f}
-
-Where
+where
   - $m_i := \int_{\Omega} \phi_i \, \mathrm{d}\mathbf{x}$
   - $\tau$ is the time step size
   - $\mathbf{c}_{ij} := \int_{\Omega} \nabla\phi_j\phi_i \,
@@ -295,7 +276,6 @@ Consider the following pseudo-code, illustrating a possible straight
 forward strategy for computing the solution $\textbf{U}^{n+1}$ at a new
 time $t_{n+1} = t_n + \tau_n$ given a known state $\textbf{U}^{n}$ at time
 $t_n$:
-
 @f{align*}
 &\textbf{for } i \in \mathcal{V} \\
 &\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow
@@ -325,11 +305,12 @@ either collect (from) or write (into) global matrices and vectors.
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
 $\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary
 of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
-nine state-vectors (i.e. all the states in the patch/macro element associated to
-the shape function $\phi_i$). This is one of the major differences with the
-usual cell-based loop where the gather functionality (encoded in
-FEValuesBase<dim, spacedim>.get_function_values() in the case of deal.ii) only
-collects values for the local cell (just a subset of the patch).
+nine state vector elements (i.e. all the states in the patch/macro element
+associated to the shape function $\phi_i$). This is one of the major
+differences with the usual cell-based loop where the gather functionality
+(encoded in FEValuesBase<dim, spacedim>.get_function_values() in the case
+of deal.ii) only collects values for the local cell (just a subset of the
+patch).
 
 The actual implementation will deviate from above code in one key aspect:
 the time-step size $\tau$ has to be chosen subject to a CFL condition

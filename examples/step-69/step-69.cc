@@ -909,15 +909,15 @@ namespace Step69
     // indices <code>(i,l)</code> of the entry in order to retrieve its
     // actual value. We should expect <code>gather</code> to be slightly
     // more expensive than <code>gather_get_entry</code>. The use of
-    // <code>gather</code> will be limited to the task of computing the 
-    // algebraic viscosity $d_{ij}$ in the particular case that when 
+    // <code>gather</code> will be limited to the task of computing the
+    // algebraic viscosity $d_{ij}$ in the particular case that when
     // both $i$ and $j$ lie at the boundary.
     //
-    // @note The reader should be aware that accessing an arbitrary 
-    // <code>(i,l)</code> entry of a matrix (say for instance Trilinos or PETSc  
-    // matrices) is in general unacceptably expensive. Here is where we might 
-    // want to keep an eye on complexity: we want this operation to have 
-    // constant complexity, which is the case of the current implementation 
+    // @note The reader should be aware that accessing an arbitrary
+    // <code>(i,l)</code> entry of a matrix (say for instance Trilinos or PETSc
+    // matrices) is in general unacceptably expensive. Here is where we might
+    // want to keep an eye on complexity: we want this operation to have
+    // constant complexity, which is the case of the current implementation
     // using deal.ii matrices.
 
     template <typename T1, std::size_t k, typename T2, typename T3>
@@ -932,7 +932,7 @@ namespace Step69
 
     // <code>gather</code> (second interface): this second function
     // signature having two input arguments will be used to gather the
-    // state at a node <code>i</code> and return it as a 
+    // state at a node <code>i</code> and return it as a
     // <code>Tensor<1,problem_dimension></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
@@ -946,7 +946,7 @@ namespace Step69
     }
 
     // <code>scatter</code>: this function has three input arguments, the
-    // first one is meant to be a "global object" (say a locally owned or 
+    // first one is meant to be a "global object" (say a locally owned or
     // locally relevant vector), the second argument which could be a
     // <code>Tensor<1,problem_dimension></code>, and the last argument
     // which represents a index of the global object. This function will be
@@ -1002,9 +1002,9 @@ namespace Step69
   // here $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
   // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
-  // are quadrature points on such face. Note that this formula for 
-  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of 
-  // weighted averaging. Other more sophisticated definitions for $\nu_i$ 
+  // are quadrature points on such face. Note that this formula for
+  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of
+  // weighted averaging. Other more sophisticated definitions for $\nu_i$
   // are possible but none of them have much influence in theory or practice.
 
   template <int dim>
@@ -1434,7 +1434,7 @@ namespace Step69
 
   // In this section we describe the implementation of the class members of
   // the <code>ProblemDescription</code> class. Most of the code here is
-  // specific for compressible Euler's equations with an ideal gas law. 
+  // specific for compressible Euler's equations with an ideal gas law.
   // If we wanted to re-purpose Step-69 for a different conservation law
   // (say for: instance the shallow water equation) most of the
   // implementation of this class would have to change. But most of the other
@@ -1529,14 +1529,14 @@ namespace Step69
   // approximation for the intermediate pressure $p^*$, see for instance
   // Equation (4.46), page 128 in @cite Toro2009.
   //
-  // The estimate returned by <code>lambda_max_two_rarefaction</code> 
-  // is guaranteed to be an upper bound, it is in general quite sharp, and 
-  // overall sufficient for our purposes. However, for some specific situations 
-  // (in particular when one of states is close to vacuum conditions) such 
-  // an estimate will be overly pessimistic. That's why we used a second 
-  // estimate to avoid this degeneracy that will be invoked by a call to the 
-  // function <code>lambda_max_expansion</code>. The most important function 
-  // here is <code>compute_lambda_max</code> which takes the minimum between 
+  // The estimate returned by <code>lambda_max_two_rarefaction</code>
+  // is guaranteed to be an upper bound, it is in general quite sharp, and
+  // overall sufficient for our purposes. However, for some specific situations
+  // (in particular when one of states is close to vacuum conditions) such
+  // an estimate will be overly pessimistic. That's why we used a second
+  // estimate to avoid this degeneracy that will be invoked by a call to the
+  // function <code>lambda_max_expansion</code>. The most important function
+  // here is <code>compute_lambda_max</code> which takes the minimum between
   // the estimates returned by <code>lambda_max_two_rarefaction</code> and
   // <code>lambda_max_expansion</code>.
   //
@@ -1596,10 +1596,10 @@ namespace Step69
     // primitive state $[\rho, u, p, a]$ and a given pressure $p^\ast$
     // @cite GuermondPopov2016  Eqn. (3.7):
     // @f{align*}
-    //   \lambda^- = u - a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} 
+    //   \lambda^- = u - a\,\sqrt{1 + \frac{\gamma+1}{2\gamma}
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
-    // Here, the $(\cdot)_{+}$ denotes the positive part of the given 
+    // Here, the $(\cdot)_{+}$ denotes the positive part of the given
     // argument.
 
     DEAL_II_ALWAYS_INLINE inline double
@@ -1620,7 +1620,7 @@ namespace Step69
 
     // Analougously @cite GuermondPopov2016 Eqn. (3.8):
     // @f{align*}
-    //   \lambda^+ = u + a\,\sqrt{1 + \frac{\gamma+1}{2\gamma} 
+    //   \lambda^+ = u + a\,\sqrt{1 + \frac{\gamma+1}{2\gamma}
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
 
@@ -1699,7 +1699,7 @@ namespace Step69
     }
   } // namespace
 
-  // The following is the main function that we are going to call in order to 
+  // The following is the main function that we are going to call in order to
   // compute $\lambda_{\text{max}} (\mathbf{U}_i^{n},\mathbf{U}_j^{n},
   // \textbf{n}_{ij})$. We simply compute both maximal wavespeed estimates
   // and return the minimum.
@@ -1811,8 +1811,8 @@ namespace Step69
     static constexpr auto gamma = ProblemDescription<dim>::gamma;
 
     // The following lambda function translates a given primitive 1d state
-    // (density $\rho$, velocity $u$, and pressure $p$) into a 
-    // conserved n-dimensional state (density $\rho$, momentum 
+    // (density $\rho$, velocity $u$, and pressure $p$) into a
+    // conserved n-dimensional state (density $\rho$, momentum
     // $\mathbf{m}$, and total energy $E$). Note that we
     // <a href="https://en.cppreference.com/w/cpp/language/lambda">capture</a>
     // the <code>this</code> pointer and thus access to
@@ -1935,12 +1935,12 @@ namespace Step69
     // \mathbf{U}_j^{n}, \textbf{n}_{ij}) = \lambda_{\text{max}}
     // (\mathbf{U}_j^{n}, \mathbf{U}_i^{n}, \textbf{n}_{ji})$ do not
     // necessarily hold true. The only mathematically safe solution for this
-    // dilemma is to compute both of them $d_{ij}$ and $d_{ji}$ and 
+    // dilemma is to compute both of them $d_{ij}$ and $d_{ji}$ and
     // take the maximum.
     //
     // Overall, the computation of $d_{ij}$ is quite expensive. In
     // order to save some computing time we exploit the fact that the viscosity
-    // matrix has to be symmetric (as mentioned above): we only compute 
+    // matrix has to be symmetric (as mentioned above): we only compute
     // the upper-triangular entries of $d_{ij}$ and copy the
     // corresponding entries to the lower-triangular counterpart.
     //
@@ -1968,7 +1968,7 @@ namespace Step69
               {
                 const auto j = jt->column();
 
-                // We only compute $d_{ij}$ if $j < i$ (upper triangular 
+                // We only compute $d_{ij}$ if $j < i$ (upper triangular
                 // entries) and later copy the values over to $d_{ji}$.
                 if (j >= i)
                   continue;
@@ -1984,7 +1984,7 @@ namespace Step69
                 double d = norm * lambda_max;
 
                 // If both support points happen to be at the boundary we
-                // have to compute $d_{ji}$ as well and then take 
+                // have to compute $d_{ji}$ as well and then take
                 // $max(d_{ij},d_{ji})$:
                 if (boundary_normal_map.count(i) != 0 &&
                     boundary_normal_map.count(j) != 0)
