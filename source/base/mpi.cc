@@ -570,6 +570,7 @@ namespace Utilities
               result[i].min_index = 0;
               result[i].max_index = 0;
             }
+          return;
         }
 
       AssertDimension(Utilities::MPI::min(my_values.size(), mpi_communicator),
