@@ -268,11 +268,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        for (unsigned int i = 0; i < quadrature.size(); ++i)
-          output_data.shape_hessians[k][i] -=
-            output_data.shape_gradients[k][i] *
-            mapping_data.jacobian_pushed_forward_grads[i];
+      correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives &&
@@ -357,12 +353,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
           mapping_internal,
           make_array_view(output_data.shape_hessians, k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        for (unsigned int i = 0; i < quadrature.size(); ++i)
-          for (unsigned int j = 0; j < spacedim; ++j)
-            output_data.shape_hessians[k][i] -=
-              mapping_data.jacobian_pushed_forward_grads[i][j] *
-              output_data.shape_gradients[k][i][j];
+      correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives)
@@ -452,12 +443,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
           mapping_internal,
           make_array_view(output_data.shape_hessians, k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        for (unsigned int i = 0; i < quadrature.size(); ++i)
-          for (unsigned int j = 0; j < spacedim; ++j)
-            output_data.shape_hessians[k][i] -=
-              mapping_data.jacobian_pushed_forward_grads[i][j] *
-              output_data.shape_gradients[k][i][j];
+      correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives)
@@ -478,6 +464,25 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                                   quadrature.size(),
                                   k);
     }
+}
+
+
+
+template <class PolynomialType, int dim, int spacedim>
+inline void
+FE_Poly<PolynomialType, dim, spacedim>::correct_hessians(
+  internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+    &output_data,
+  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &                mapping_data,
+  const unsigned int n_q_points) const
+{
+  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+    for (unsigned int i = 0; i < n_q_points; ++i)
+      for (unsigned int j = 0; j < spacedim; ++j)
+        output_data.shape_hessians[dof][i] -=
+          mapping_data.jacobian_pushed_forward_grads[i][j] *
+          output_data.shape_gradients[dof][i][j];
 }
 
 

@@ -70,12 +70,7 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        for (unsigned int i = 0; i < quadrature.size(); ++i)
-          for (unsigned int j = 0; j < 2; ++j)
-            output_data.shape_hessians[k][i] -=
-              mapping_data.jacobian_pushed_forward_grads[i][j] *
-              output_data.shape_gradients[k][i][j];
+      correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (fe_data.update_each & update_3rd_derivatives &&
@@ -139,12 +134,7 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        for (unsigned int i = 0; i < quadrature.size(); ++i)
-          for (unsigned int j = 0; j < 3; ++j)
-            output_data.shape_hessians[k][i] -=
-              mapping_data.jacobian_pushed_forward_grads[i][j] *
-              output_data.shape_gradients[k][i][j];
+      correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (fe_data.update_each & update_3rd_derivatives &&
