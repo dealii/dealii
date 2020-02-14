@@ -1,0 +1,4 @@
+New: An IndexSet::split_by_block() function is added which partitions the set indices for example based on a block structure into blocks.
+IndexSet should be defined with respect to the global block structure. In particular, dofs_per_block should be defined consistently across MPI ranks.
+<br>
+(Katrin Mang, 2020/02/14)

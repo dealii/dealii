@@ -345,6 +345,14 @@ public:
   get_view(const size_type begin, const size_type end) const;
 
   /**
+   * Split the set indices represented by this object into blocks
+   * given by the @p dofs_per_block structure.
+   */
+  std::vector<IndexSet>
+  split_by_block(
+    const std::vector<types::global_dof_index> &dofs_per_block) const;
+
+  /**
    * Remove all elements contained in @p other from this set. In other words,
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
