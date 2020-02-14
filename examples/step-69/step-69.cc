@@ -1322,7 +1322,7 @@ namespace Step69
     // boundary have to be modified as:
     //
     // $\mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
-    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_j \, \mathrm{d}s$
+    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_i \phi_j \, \mathrm{d}s$
     //
     // Otherwise we will not be able to claim conservation. The ideas repeat
     // themselves: we use Workstream in order to compute this correction, most

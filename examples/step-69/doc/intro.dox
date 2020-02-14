@@ -330,5 +330,89 @@ application of this kind of schemes, also called <i>edge-based</i> or
 <i>graph-based</i> finite element schemes (see for instance
 @cite Rainald2008 for a historical overview).
 
-@todo Explain what to do for slip, dirichlet and do-nothing boundary
-conditions.
+<h3>Conservation properties and boundary conditions</h3>
+
+In the example considered in this tutorial step we use three different types of
+boundary conditions: essential-like boundary conditions (we prescribe a state in
+the left portion of our domain), outflow boundary conditions (also called
+"do-nothing" boundary conditions) in the right portion of the domain, and
+"reflecting boundary" conditions (also called "slip" boundary conditions)
+@f{align*}
+  \mathbf{m}_j \cdot \boldsymbol{\nu}_j \equiv 0  \ \
+  \mathbf{x}_j \in \partial\Omega \, .
+@f}
+in the top, bottom and surface of the obstacle. We will not discuss much about
+essential and do-nothing boundary conditions since their implementation is
+relatively easy and the reader will be able to pick-up the implementation
+directly from the code. In this portion of the documentation we will focus only
+the "reflecting" boundary conditions which are somewhat more challenging.
+
+@note At the time of this writing (early 2020) it is accurate to say that
+both analysis and implementation of boundary conditions for hyperbolic systems
+of conservation is a widely open issue. Discussions about analysis and/or
+implementation of boundary conditions in the academic literature is minimal to
+non-existent.
+
+In this tutorial example we use the so-called "explicit treatment of boundary
+conditions":
+- Advance in time satisfying no boundary condition at all,
+- At the end of the time step enforce boundary conditions strongly in a
+  post-processing step where we execute the projection
+    @f{align*}
+    \mathbf{m}_i := \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
+    \boldsymbol{\nu}_i \ \ \text{for all }\mathbf{x}_i \in \partial\Omega
+    @f}
+  which removes the normal component of $\mathbf{m}$. Here the definition of
+  nodal normal $\boldsymbol{\nu}_i$ is very much arbitrary, but it is usually
+  computed with some form of averaging.
+
+At this point in time, the average finite element person might find this
+approach questionable. Why would you want to do this? No doubt, when solving
+parabolic, or elliptic equations, we typically enforce essential
+(Dirichlet-like) boundary conditions by making them part of the approximation
+space $\mathbb{V}$, and treat natural (e.g. Neumann and Robin) boundary
+conditions as part of the variational formulation. We also know that explicit
+treatment of boundary conditions (in the context of parabolic PDE) almost surely
+leads to catastrophic consequences. However, in the context of nonlinear
+hyperbolic equations:
+- The most important reason: it is relatively easy to prove that (for the case
+of reflecting boundary conditions) explicit treatment of boundary conditions is
+not only conservative but also guarantees preservation of the property
+$\mathbf{U}_i \in \mathcal{B}$ for all $i \in \mathcal{V}$.
+- To the best of our knowledge: we are not aware of any mathematical result
+proving that it is possible to guarantee the property $\mathbf{U}_i \in
+\mathcal{B}$ for all $i \in \mathcal{V}$ when using either direct enforcement of
+boundary conditions into the approximation space, or weak enforcement using the
+Nitsche penalty method (which is for example widely used in discontinuous
+Galerkin schemes). In addition, some of these traditional ideas lead to quite
+restrictive time step constraints.
+- There is enough numerical evidence suggesting that explicit treatment of
+Dirichlet-like boundary conditions is stable under CFL conditions and does not
+introduce any loss in accuracy.
+
+If we where to implement reflecting boundary conditions in the entirety of
+the boundary, such implementation should be such that exact conservation of
+density $\rho$ and mechanical energy $E$
+@f{align*}
+\sum_{i \in \mathcal{V}} m_i \rho_i^{n+1}= \sum_{i \in \mathcal{V}} m_i
+\rho_i^{n} \ \ \text{and} \ \
+\sum_{i \in \mathcal{V}} m_i E_i^{n+1}= \sum_{i \in \mathcal{V}} m_i
+E_i^{n}
+@f}
+is achieved (note that conservation of momentum is not a natural property
+Euler's system with reflecting boundary conditions, that's why we did not
+include it). Even though we will not use reflecting boundary conditions in the
+entirety of the domain, we would like to know that our implementation of
+boundary conditions is consistent with the conservation properties mentioned
+above. In order to guarantee such conservation property it is necessary to
+modify the values of the vectors $\mathbf{c}_{ij}$ as follows
+@f{align*}
+\mathbf{c}_{ij} := \mathbf{c}_{ij} + \int_{\partial \Omega^r}
+(\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_i \phi_j \, \mathrm{d}s
+\ \ \text{whenever both }\mathbf{x}_i\text{ and }\mathbf{x}_j \text{ lie in the
+boundary}
+@f}
+where $\partial \Omega^r$ is the portion of the boundary where reflecting
+boundary conditions are meant to be enforced. This modification of the
+$\mathbf{c}_{ij}$ is a direct consequence of simple integration by parts
+arguments, see page 12 of @cite GuermondEtAl2018 for more details.
