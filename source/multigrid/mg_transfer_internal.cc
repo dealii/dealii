@@ -263,8 +263,8 @@ namespace internal
               const IndexSet &is_local =
                 dof_handler.locally_owned_mg_dofs(level);
 
-              std::vector<unsigned int> level_dof_indices;
-              std::vector<unsigned int> global_dof_indices;
+              std::vector<types::global_dof_index> level_dof_indices;
+              std::vector<types::global_dof_index> global_dof_indices;
               for (const auto &dofpair : send_data_temp)
                 if (dofpair.level == level)
                   {
