@@ -45,10 +45,15 @@ namespace python
     " forward and pull back functions.                          \n";
 
 
-  const char create_cylindrical_docstring[] =
-    " Create cylindrical manifold along a given axis            \n"
+  const char create_cylindrical_fixed_docstring[] =
+    " Create cylindrical manifold oriented along a given axis   \n"
     " (0 - x, 1 - y, 2 - z).                                    \n";
 
+
+  const char create_cylindrical_direction_docstring[] =
+    " Create cylindrical manifold with an axis that points in   \n"
+    " direction direction and goes through the given point on   \n"
+    " axis.                                                     \n";
 
 
   void
@@ -67,10 +72,17 @@ namespace python
            create_polar_docstring,
            boost::python::args("self", "center"))
       .def("create_cylindrical",
-           &ManifoldWrapper::create_cylindrical,
+           static_cast<void (ManifoldWrapper::*)(const int, const double)>(
+             &ManifoldWrapper::create_cylindrical),
            create_cylindrical_overloads(
              boost::python::args("self", "axis", "tolerance"),
-             create_cylindrical_docstring))
+             create_cylindrical_fixed_docstring))
+      .def("create_cylindrical",
+           static_cast<void (ManifoldWrapper::*)(const boost::python::list &,
+                                                 const boost::python::list &)>(
+             &ManifoldWrapper::create_cylindrical),
+           create_cylindrical_direction_docstring,
+           boost::python::args("self", "direction", "axial_point"))
       .def("create_function",
            &ManifoldWrapper::create_function,
            create_function_docstring,

@@ -37,6 +37,43 @@ namespace python
   {
     template <int dim, int spacedim>
     void
+    create_triangulation(const boost::python::list &vertices_list,
+                         const boost::python::list &cells_vertices,
+                         void *                     triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+      tria->clear();
+
+      const size_t n_vertices = boost::python::len(vertices_list);
+      std::vector<Point<spacedim>> vertices(n_vertices);
+      for (size_t i = 0; i < n_vertices; ++i)
+        {
+          boost::python::list vertex =
+            boost::python::extract<boost::python::list>(vertices_list[i]);
+          for (int d = 0; d < spacedim; ++d)
+            vertices[i][d] = boost::python::extract<double>(vertex[d]);
+        }
+
+      const size_t               n_cells = boost::python::len(cells_vertices);
+      std::vector<CellData<dim>> cell_data(n_cells);
+      for (size_t i = 0; i < n_cells; ++i)
+        {
+          boost::python::list vertex_indices =
+            boost::python::extract<boost::python::list>(cells_vertices[i]);
+
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+               ++v)
+            cell_data[i].vertices[v] =
+              boost::python::extract<unsigned int>(vertex_indices[v]);
+        }
+
+      tria->create_triangulation(vertices, cell_data, SubCellData());
+    }
+
+
+    template <int dim, int spacedim>
+    void
     generate_hyper_cube(const double left,
                         const double right,
                         const bool   colorize,
@@ -107,6 +144,23 @@ namespace python
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
       tria->clear();
       GridGenerator::hyper_rectangle(*tria, point_1, point_2, colorize);
+    }
+
+
+    template <int dim>
+    void
+    generate_hyper_cube_with_cylindrical_hole(const double       inner_radius,
+                                              const double       outer_radius,
+                                              const double       L,
+                                              const unsigned int repetitions,
+                                              const bool         colorize,
+                                              void *             triangulation)
+    {
+      Triangulation<dim> *tria =
+        static_cast<Triangulation<dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::hyper_cube_with_cylindrical_hole(
+        *tria, inner_radius, outer_radius, L, repetitions, colorize);
     }
 
 
@@ -427,6 +481,17 @@ namespace python
         static_cast<Triangulation<dim> *>(triangulation);
       tria->clear();
       GridGenerator::half_hyper_ball(*tria, center_point, radius);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    scale(const double scaling_factor, void *triangulation)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+      GridTools::scale(scaling_factor, *tria);
     }
 
 
@@ -789,6 +854,27 @@ namespace python
     else
       return (*static_cast<Triangulation<3, 3> *>(triangulation))
         .n_active_cells();
+  }
+
+
+
+  void
+  TriangulationWrapper::create_triangulation(
+    const boost::python::list &vertices,
+    const boost::python::list &cells_vertices)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::create_triangulation<2, 2>(vertices,
+                                           cells_vertices,
+                                           triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::create_triangulation<2, 3>(vertices,
+                                           cells_vertices,
+                                           triangulation);
+    else
+      internal::create_triangulation<3, 3>(vertices,
+                                           cells_vertices,
+                                           triangulation);
   }
 
 
@@ -1271,6 +1357,29 @@ namespace python
 
 
   void
+  TriangulationWrapper::generate_hyper_cube_with_cylindrical_hole(
+    const double       inner_radius,
+    const double       outer_radius,
+    const double       L,
+    const unsigned int repetitions,
+    const bool         colorize)
+  {
+    AssertThrow(
+      dim == spacedim,
+      ExcMessage(
+        "This function is only implemented for dim equal to spacedim."));
+
+    if (dim == 2)
+      internal::generate_hyper_cube_with_cylindrical_hole<2>(
+        inner_radius, outer_radius, L, repetitions, colorize, triangulation);
+    else
+      internal::generate_hyper_cube_with_cylindrical_hole<3>(
+        inner_radius, outer_radius, L, repetitions, colorize, triangulation);
+  }
+
+
+
+  void
   TriangulationWrapper::shift(boost::python::list &shift_list)
   {
     AssertThrow(boost::python::len(shift_list) == spacedim,
@@ -1282,6 +1391,19 @@ namespace python
       internal::shift<2, 3>(shift_list, triangulation);
     else
       internal::shift<3, 3>(shift_list, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::scale(const double scaling_factor)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      internal::scale<2, 2>(scaling_factor, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::scale<2, 3>(scaling_factor, triangulation);
+    else
+      internal::scale<3, 3>(scaling_factor, triangulation);
   }
 
 

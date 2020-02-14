@@ -22,6 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_center_overloads, get_center, 0, 2)
+
   const char manifold_id_docstring[] =
     "Get/Set the manifold_id of the face                                \n";
 
@@ -34,6 +36,9 @@ namespace python
 
   const char barycenter_docstring[] =
     "Return the barycenter of the current face                          \n";
+
+  const char center_docstring[] =
+    "Return the center of the current face taking into account manifold.\n";
 
   const char set_vertex_docstring[] =
     " Set the ith vertex of the face to point_wrapper                   \n";
@@ -65,6 +70,13 @@ namespace python
            &TriaAccessorWrapper::get_barycenter,
            barycenter_docstring,
            boost::python::args("self"))
+      .def("center",
+           &TriaAccessorWrapper::get_center,
+           get_center_overloads(
+             boost::python::args("self",
+                                 "respect_manifold",
+                                 "interpolate_from_surrounding"),
+             center_docstring))
       .def("set_vertex",
            &TriaAccessorWrapper::set_vertex,
            set_vertex_docstring,

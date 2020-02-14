@@ -77,6 +77,11 @@ namespace python
                                          generate_enclosed_hyper_cube,
                                          0,
                                          4)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(
+    generate_hyper_cube_with_cylindrical_hole_overloads,
+    generate_hyper_cube_with_cylindrical_hole,
+    0,
+    5)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_overloads,
                                          generate_hyper_ball,
                                          1,
@@ -119,6 +124,12 @@ namespace python
 
   const char spacedim_docstring[] =
     "Return the space dimension of the Triangulation.                       \n";
+
+
+
+  const char create_triangulation_docstring[] =
+    "Given a list of points and how vertices connect to cells, create a     \n"
+    "mesh.                                                                  \n";
 
 
 
@@ -291,8 +302,20 @@ namespace python
 
 
 
+  const char generate_hyper_cube_with_cylindrical_hole_docstring[] =
+    "This function produces a square in the xy-plane with a cylindrical     \n"
+    "hole in the middle. In 3d, this geometry is extruded in z direction    \n"
+    "to the interval [0,L].                                                 \n";
+
+
+
   const char shift_docstring[] =
     "Shift every vertex of the Triangulation by the given shift vector.     \n";
+
+
+
+  const char scale_docstring[] =
+    "Scale triangulation by a given scaling factor.                         \n";
 
 
 
@@ -438,8 +461,10 @@ namespace python
   export_triangulation()
   {
     boost::python::class_<TriangulationWrapper>(
-      "Triangulation", boost::python::init<const std::string &>())
-      .def(boost::python::init<const std::string &, const std::string &>())
+      "Triangulation",
+      boost::python::init<const std::string &>(boost::python::args("dim")))
+      .def(boost::python::init<const std::string &, const std::string &>(
+        boost::python::args("dim", "spacedim")))
       .def("n_active_cells",
            &TriangulationWrapper::n_active_cells,
            n_active_cells_docstring,
@@ -464,6 +489,10 @@ namespace python
            &TriangulationWrapper::maximal_cell_diameter,
            maximal_cell_diameter_docstring,
            boost::python::args("self"))
+      .def("create_triangulation",
+           &TriangulationWrapper::create_triangulation,
+           create_triangulation_docstring,
+           boost::python::args("self", "vertices", "cells_vertices"))
       .def("generate_hyper_cube",
            &TriangulationWrapper::generate_hyper_cube,
            generate_hyper_cube_overloads(
@@ -499,6 +528,16 @@ namespace python
              boost::python::args(
                "self", "spacing", "p", "material_id", "colorize"),
              generate_subdivided_material_hyper_rectangle_docstring))
+      .def("generate_hyper_cube_with_cylindrical_hole",
+           &TriangulationWrapper::generate_hyper_cube_with_cylindrical_hole,
+           generate_hyper_cube_with_cylindrical_hole_overloads(
+             boost::python::args("self",
+                                 "inner_radius",
+                                 "outer_radius",
+                                 "L",
+                                 "repetitions",
+                                 "colorize"),
+             generate_hyper_cube_with_cylindrical_hole_docstring))
       .def("generate_cheese",
            &TriangulationWrapper::generate_cheese,
            generate_cheese_docstring,
@@ -569,6 +608,10 @@ namespace python
            &TriangulationWrapper::shift,
            shift_docstring,
            boost::python::args("self", "shift"))
+      .def("scale",
+           &TriangulationWrapper::scale,
+           scale_docstring,
+           boost::python::args("self", "scaling_factor"))
       .def("merge_triangulations",
            &TriangulationWrapper::merge_triangulations,
            merge_docstring,

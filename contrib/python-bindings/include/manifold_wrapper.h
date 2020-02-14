@@ -62,10 +62,17 @@ namespace python
     create_polar(const PointWrapper center);
 
     /**
-     * Create CylindricalManifold.
+     * Create CylindricalManifold along the fixed axis.
      */
     void
     create_cylindrical(const int axis = 0, const double tolerance = 1e-10);
+
+    /**
+     * Create CylindricalManifold with the given orientation.
+     */
+    void
+    create_cylindrical(const boost::python::list &direction,
+                       const boost::python::list &axial_point);
 
     /**
      * Create FunctionManifold with string expressions for the push

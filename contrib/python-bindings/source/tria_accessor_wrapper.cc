@@ -43,6 +43,26 @@ namespace python
 
 
     template <int structdim, int dim, int spacedim>
+    PointWrapper
+    get_center(const bool  respect_manifold,
+               const bool  interpolate_from_surrounding,
+               const void *tria_accessor)
+    {
+      const TriaAccessor<structdim, dim, spacedim> *accessor =
+        static_cast<const TriaAccessor<structdim, dim, spacedim> *>(
+          tria_accessor);
+      Point<spacedim> center =
+        accessor->center(respect_manifold, interpolate_from_surrounding);
+      boost::python::list center_list;
+      for (int i = 0; i < spacedim; ++i)
+        center_list.append(center[i]);
+
+      return PointWrapper(center_list);
+    }
+
+
+
+    template <int structdim, int dim, int spacedim>
     void
     set_boundary_id(const int boundary_id, void *tria_accessor)
     {
@@ -237,6 +257,26 @@ namespace python
       return internal::get_barycenter<1, 2, 3>(tria_accessor);
     else
       return internal::get_barycenter<2, 3, 3>(tria_accessor);
+  }
+
+
+
+  PointWrapper
+  TriaAccessorWrapper::get_center(const bool respect_manifold,
+                                  const bool interpolate_from_surrounding) const
+  {
+    if ((dim == 2) && (spacedim == 2) && (structdim == 1))
+      return internal::get_center<1, 2, 2>(respect_manifold,
+                                           interpolate_from_surrounding,
+                                           tria_accessor);
+    else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
+      return internal::get_center<1, 2, 3>(respect_manifold,
+                                           interpolate_from_surrounding,
+                                           tria_accessor);
+    else
+      return internal::get_center<2, 3, 3>(respect_manifold,
+                                           interpolate_from_surrounding,
+                                           tria_accessor);
   }
 
 

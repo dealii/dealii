@@ -55,6 +55,13 @@ namespace python
     get_barycenter() const;
 
     /**
+     * Get the center of the cell.
+     */
+    PointWrapper
+    get_center(const bool respect_manifold             = false,
+               const bool interpolate_from_surrounding = false) const;
+
+    /**
      * Set the ith vertex of the cell to @p point_wrapper.
      */
     void
