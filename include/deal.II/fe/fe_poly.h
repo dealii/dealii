@@ -506,8 +506,7 @@ protected:
       &output_data,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                mapping_data,
-    const unsigned int n_q_points,
-    const unsigned int dof) const;
+    const unsigned int n_q_points) const;
 
 
   /**

@@ -83,11 +83,7 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(output_data,
-                                  mapping_data,
-                                  quadrature.size(),
-                                  k);
+      correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -147,11 +143,7 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(output_data,
-                                  mapping_data,
-                                  quadrature.size(),
-                                  k);
+      correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 

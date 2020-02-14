@@ -281,11 +281,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(output_data,
-                                  mapping_data,
-                                  quadrature.size(),
-                                  k);
+      correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -368,11 +364,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(output_data,
-                                  mapping_data,
-                                  quadrature.size(),
-                                  k);
+      correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -458,11 +450,7 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-        correct_third_derivatives(output_data,
-                                  mapping_data,
-                                  quadrature.size(),
-                                  k);
+      correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -494,26 +482,26 @@ FE_Poly<PolynomialType, dim, spacedim>::correct_third_derivatives(
     &output_data,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &                mapping_data,
-  const unsigned int n_q_points,
-  const unsigned int dof) const
+  const unsigned int n_q_points) const
 {
-  for (unsigned int i = 0; i < n_q_points; ++i)
-    for (unsigned int j = 0; j < spacedim; ++j)
-      for (unsigned int k = 0; k < spacedim; ++k)
-        for (unsigned int l = 0; l < spacedim; ++l)
-          for (unsigned int m = 0; m < spacedim; ++m)
-            {
-              output_data.shape_3rd_derivatives[dof][i][j][k][l] -=
-                (mapping_data.jacobian_pushed_forward_grads[i][m][j][l] *
-                 output_data.shape_hessians[dof][i][k][m]) +
-                (mapping_data.jacobian_pushed_forward_grads[i][m][k][l] *
-                 output_data.shape_hessians[dof][i][j][m]) +
-                (mapping_data.jacobian_pushed_forward_grads[i][m][j][k] *
-                 output_data.shape_hessians[dof][i][l][m]) +
-                (mapping_data
-                   .jacobian_pushed_forward_2nd_derivatives[i][m][j][k][l] *
-                 output_data.shape_gradients[dof][i][m]);
-            }
+  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+    for (unsigned int i = 0; i < n_q_points; ++i)
+      for (unsigned int j = 0; j < spacedim; ++j)
+        for (unsigned int k = 0; k < spacedim; ++k)
+          for (unsigned int l = 0; l < spacedim; ++l)
+            for (unsigned int m = 0; m < spacedim; ++m)
+              {
+                output_data.shape_3rd_derivatives[dof][i][j][k][l] -=
+                  (mapping_data.jacobian_pushed_forward_grads[i][m][j][l] *
+                   output_data.shape_hessians[dof][i][k][m]) +
+                  (mapping_data.jacobian_pushed_forward_grads[i][m][k][l] *
+                   output_data.shape_hessians[dof][i][j][m]) +
+                  (mapping_data.jacobian_pushed_forward_grads[i][m][j][k] *
+                   output_data.shape_hessians[dof][i][l][m]) +
+                  (mapping_data
+                     .jacobian_pushed_forward_2nd_derivatives[i][m][j][k][l] *
+                   output_data.shape_gradients[dof][i][m]);
+              }
 }
 
 namespace internal
