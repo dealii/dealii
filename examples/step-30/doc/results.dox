@@ -113,7 +113,6 @@ anisotropic ones (colors indicate the refinement level of cells):
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-0.aniso.9.2.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.iso.9.2.png" alt="">
@@ -122,7 +121,6 @@ anisotropic ones (colors indicate the refinement level of cells):
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.aniso.9.2.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.iso.9.2.png" alt="">
@@ -131,7 +129,6 @@ anisotropic ones (colors indicate the refinement level of cells):
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.aniso.9.2.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.iso.9.2.png" alt="">
@@ -140,7 +137,6 @@ anisotropic ones (colors indicate the refinement level of cells):
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.9.2.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.iso.9.2.png" alt="">
@@ -149,7 +145,6 @@ anisotropic ones (colors indicate the refinement level of cells):
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.aniso.9.2.png" alt="">
     </td>
   </tr>
-
   <tr>
     <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-30.grid-5.iso.9.2.png" alt="">
