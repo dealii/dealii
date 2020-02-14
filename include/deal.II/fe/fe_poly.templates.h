@@ -27,6 +27,7 @@
 
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -223,6 +224,46 @@ FE_Poly<PolynomialType, dim, spacedim>::requires_update_flags(
 //---------------------------------------------------------------------------
 
 
+
+/**
+ * Returns whether we need to correct the Hessians and third derivatives with
+ * the derivatives of the Jacobian. This is determined by checking if
+ * the jacobian_pushed_forward are zero.
+ *
+ * Especially for the third derivatives, the correction term is very expensive,
+ * which is why we check if the derivatives are zero before computing the
+ * correction.
+ */
+template <int dim, int spacedim>
+bool
+higher_derivatives_need_correcting(
+  const Mapping<dim, spacedim> &mapping,
+  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &                mapping_data,
+  const unsigned int n_q_points,
+  const UpdateFlags  update_flags)
+{
+  // If higher derivatives weren't requested we don't need to correct them.
+  const bool update_higher_derivatives =
+    (update_flags & update_hessians) || (update_flags & update_3rd_derivatives);
+  if (!update_higher_derivatives)
+    return false;
+
+  // If we have a Cartesian mapping, we know that jacoban_pushed_forward_grads
+  // are identically zero.
+  if (dynamic_cast<const MappingCartesian<dim> *>(&mapping))
+    return false;
+
+  // Here, we should check if jacobian_pushed_forward_grads are zero at the
+  // quadrature points. This is yet to be implemented.
+  (void)mapping_data;
+  (void)n_q_points;
+
+  return true;
+}
+
+
+
 template <class PolynomialType, int dim, int spacedim>
 void
 FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
@@ -249,6 +290,12 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
 
   const UpdateFlags flags(fe_data.update_each);
 
+  const bool need_to_correct_higher_derivatives =
+    higher_derivatives_need_correcting(mapping,
+                                       mapping_data,
+                                       quadrature.size(),
+                                       flags);
+
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
@@ -268,7 +315,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      correct_hessians(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives &&
@@ -281,7 +329,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      correct_third_derivatives(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -324,6 +373,12 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
 
   const UpdateFlags flags(fe_data.update_each);
 
+  const bool need_to_correct_higher_derivatives =
+    higher_derivatives_need_correcting(mapping,
+                                       mapping_data,
+                                       quadrature.size(),
+                                       flags);
+
   // transform gradients and higher derivatives. we also have to copy
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
@@ -349,7 +404,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
           mapping_internal,
           make_array_view(output_data.shape_hessians, k));
 
-      correct_hessians(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives)
@@ -364,7 +420,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_face_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      correct_third_derivatives(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -410,6 +467,12 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
 
   const UpdateFlags flags(fe_data.update_each);
 
+  const bool need_to_correct_higher_derivatives =
+    higher_derivatives_need_correcting(mapping,
+                                       mapping_data,
+                                       quadrature.size(),
+                                       flags);
+
   // transform gradients and higher derivatives. we also have to copy
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
@@ -435,7 +498,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
           mapping_internal,
           make_array_view(output_data.shape_hessians, k));
 
-      correct_hessians(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (flags & update_3rd_derivatives)
@@ -450,7 +514,8 @@ FE_Poly<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      correct_third_derivatives(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 

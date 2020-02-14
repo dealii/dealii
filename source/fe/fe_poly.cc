@@ -50,6 +50,12 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
   const InternalData &fe_data =
     static_cast<const InternalData &>(fe_internal); // NOLINT
 
+  const bool need_to_correct_higher_derivatives =
+    higher_derivatives_need_correcting(mapping,
+                                       mapping_data,
+                                       quadrature.size(),
+                                       fe_data.update_each);
+
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
@@ -70,7 +76,8 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      correct_hessians(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (fe_data.update_each & update_3rd_derivatives &&
@@ -83,7 +90,8 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      correct_third_derivatives(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
@@ -110,6 +118,12 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
   const InternalData &fe_data =
     static_cast<const InternalData &>(fe_internal); // NOLINT
 
+  const bool need_to_correct_higher_derivatives =
+    higher_derivatives_need_correcting(mapping,
+                                       mapping_data,
+                                       quadrature.size(),
+                                       fe_data.update_each);
+
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
@@ -130,7 +144,8 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
                           mapping_internal,
                           make_array_view(output_data.shape_hessians, k));
 
-      correct_hessians(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
   if (fe_data.update_each & update_3rd_derivatives &&
@@ -143,7 +158,8 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
                           make_array_view(output_data.shape_3rd_derivatives,
                                           k));
 
-      correct_third_derivatives(output_data, mapping_data, quadrature.size());
+      if (need_to_correct_higher_derivatives)
+        correct_third_derivatives(output_data, mapping_data, quadrature.size());
     }
 }
 
