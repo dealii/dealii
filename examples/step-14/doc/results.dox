@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h2>Point values</h2>
+<h3>Point values</h3>
 
 
 This program offers a lot of possibilities to play around. We can thus
@@ -136,7 +136,7 @@ value:
 </table>
 
 
-<h2>Comparing refinement criteria</h2>
+<h3>Comparing refinement criteria</h3>
 
 
 Since we have accepted quite some effort when using the mesh
@@ -172,7 +172,7 @@ smaller errors.
 
 
 
-<h2>Evaluation of point stresses</h2>
+<h3>Evaluation of point stresses</h3>
 
 
 Besides evaluating the values of the solution at a certain point, the
@@ -290,7 +290,7 @@ computed value of $J(u_h)$.
 
 
 
-<h2>Step-13 revisited</h2>
+<h3>Step-13 revisited</h3>
 
 
 If instead of the <code>Exercise_2_3</code> data set, we choose
@@ -357,7 +357,7 @@ would remain.
 
 
 
-<h2>Conclusions and outlook</h2>
+<h3>Conclusions and outlook</h3>
 
 
 The results here are not too clearly indicating the superiority of the

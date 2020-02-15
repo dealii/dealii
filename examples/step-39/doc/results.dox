@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h2>Logfile output</h2>
+<h3>Logfile output</h3>
 First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with omission of intermediate steps)
 
 @code
@@ -82,7 +82,7 @@ DEAL::
 This log for instance shows that the number of conjugate gradient
 iteration steps is constant at approximately 15.
 
-<h2>Postprocessing of the logfile</h2>
+<h3>Postprocessing of the logfile</h3>
 
 <img src="https://www.dealii.org/images/steps/developer/step-39-convergence.svg" alt="">
 Using the perl script <tt>postprocess.pl</tt>, we extract relevant

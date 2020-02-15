@@ -202,7 +202,7 @@ end
 
 and you would obtain exactly the same results as in test case 1 below.
 
-<h2> Test case 1: </h2>
+<h3> Test case 1: </h3>
 
 For the default problem the value of $u$ on $\Gamma$ is set to the constant $1$:
 this is like imposing a constant Dirichlet boundary condition on $\Gamma$, seen
@@ -283,7 +283,7 @@ representatio of your domain (a much cheaper and easier mesh to produce).
 To play around a little bit, we are going to complicate a little the fictitious
 domain as well as the boundary conditions we impose on it.
 
-<h2> Test case 2 and 3: </h2>
+<h3> Test case 2 and 3: </h3>
 
 If we use the following parameter file:
 @code

@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-<h2>Running the problem</h2>
+<h3>Running the problem</h3>
 
 The problem's input is parameterized by an input file <code>\step-36.prm</code>
 which could, for example, contain the following text:
