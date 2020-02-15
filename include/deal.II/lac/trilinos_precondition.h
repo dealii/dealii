@@ -1330,7 +1330,7 @@ namespace TrilinosWrappers
    * Since the Trilinos objects we want to use are heavily dependent on Epetra
    * objects, we recommend using this class in conjunction with Trilinos
    * (Epetra) sparse matrices and vectors. There is support for use with
-   * matrices of the deal.II::SparseMatrix class and corresponding vectors,
+   * matrices of the dealii::SparseMatrix class and corresponding vectors,
    * too, but this requires generating a copy of the matrix, which is slower
    * and takes (much) more memory. When doing such a copy operation, we can
    * still profit from the fact that some of the entries in the preconditioner
@@ -1668,7 +1668,7 @@ namespace TrilinosWrappers
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
-     * linear system with the given matrix. This function takes a deal.ii
+     * linear system with the given matrix. This function takes a deal.II
      * matrix and copies the content into a Trilinos matrix, so the function
      * can be considered rather inefficient.
      */

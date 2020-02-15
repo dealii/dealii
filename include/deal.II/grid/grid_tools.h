@@ -2314,7 +2314,7 @@ namespace GridTools
    * source triangulation to the triangulation that is built from the list of
    * patch cells.  This adds support for triangulations which have been
    * perturbed or smoothed in some manner which makes the triangulation
-   * deviate from the standard deal.ii refinement strategy of placing new
+   * deviate from the standard deal.II refinement strategy of placing new
    * vertices at midpoints of faces or edges.
    *
    * The operation implemented by this function is frequently used in the
