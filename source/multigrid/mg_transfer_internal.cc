@@ -167,27 +167,27 @@ namespace internal
                         globally_relevant.index_within_set(
                           global_dof_indices[i]);
 
-                      // skip if we did this global dof already (on this or a
+                      // Work on this dof if we haven't already (on this or a
                       // coarser level)
-                      if (dof_touched[relevant_idx])
-                        continue;
-
-                      if (global_mine)
+                      if (dof_touched[relevant_idx] == false)
                         {
-                          copy_indices_global_mine[level].emplace_back(
-                            global_dof_indices[i], level_dof_indices[i]);
+                          if (global_mine)
+                            {
+                              copy_indices_global_mine[level].emplace_back(
+                                global_dof_indices[i], level_dof_indices[i]);
 
-                          // send this to the owner of the level_dof:
-                          send_data_temp.emplace_back(level,
-                                                      global_dof_indices[i],
-                                                      level_dof_indices[i]);
-                        }
-                      else
-                        {
-                          // somebody will send those to me
-                        }
+                              // send this to the owner of the level_dof:
+                              send_data_temp.emplace_back(level,
+                                                          global_dof_indices[i],
+                                                          level_dof_indices[i]);
+                            }
+                          else
+                            {
+                              // somebody will send those to me
+                            }
 
-                      dof_touched[relevant_idx] = true;
+                          dof_touched[relevant_idx] = true;
+                        }
                     }
                 }
             }
