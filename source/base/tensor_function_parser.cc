@@ -354,7 +354,7 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   const std::map<std::string, double> &,
   const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 template <int rank, int dim, typename Number>
@@ -365,7 +365,7 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   const std::map<std::string, double> &,
   const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 
@@ -374,7 +374,7 @@ template <int rank, int dim, typename Number>
 Tensor<rank, dim, Number>
 TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
   return Tensor<rank, dim, Number>();
 }
 
@@ -386,7 +386,7 @@ TensorFunctionParser<rank, dim, Number>::value_list(
   const std::vector<Point<dim>> &,
   std::vector<Tensor<rank, dim, Number>> &) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 

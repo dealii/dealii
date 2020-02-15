@@ -3122,7 +3122,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   (void)remove_duplicates;
   (void)tol;
   (void)ignore_unsupported_types;
-  Assert(false, ExcNeedsAssimp());
+  AssertThrow(false, ExcNeedsAssimp());
 #endif
 }
 
