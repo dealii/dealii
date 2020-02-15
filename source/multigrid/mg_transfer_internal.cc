@@ -160,10 +160,10 @@ namespace internal
                     }
                   else
                     {
-                      // get the relevant dofs index - this might be more
+                      // Get the relevant dofs index - this might be more
                       // expensive to look up than the active indices, so we
-                      // only do it for the local-remote case within this loop
-                      const unsigned int relevant_idx =
+                      // only do it for the local-remote case within this loop.
+                      const types::global_dof_index relevant_idx =
                         globally_relevant.index_within_set(
                           global_dof_indices[i]);
 
