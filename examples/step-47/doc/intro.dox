@@ -58,7 +58,7 @@ conditions on one part of the boundary, and the other on the
 remainder.
 
 
-<h2> What's the issue? </h2>
+<h3> What's the issue? </h3>
 
 The fundamental issue with the equation is that it takes four
 derivatives of the solution. In the case of the Laplace equation
@@ -122,7 +122,7 @@ consequence, they have largely fallen out of favor and deal.II currently
 does not contain implementations of these shape functions.
 
 
-<h2> What to do instead? </h2>
+<h3> What to do instead? </h3>
 
 So how does one approach solving such problems then? That depends a
 bit on the boundary conditions. If one has the first set of boundary
@@ -482,7 +482,7 @@ $\mathcal{A}(\cdot,\cdot)$ and $\mathcal{F}(\cdot)$ described in
 the book chapter @cite Brenner2011 .
 
 
-<h2>The testcase</h2>
+<h3>The testcase</h3>
 
 The last step that remains to describe is what this program solves
 for. As always, a trigonometric function is both a good and a bad

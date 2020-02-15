@@ -51,7 +51,7 @@ deal.II Frequently Asked Questions page referenced from http://www.dealii.org/
 provides resources to mesh generators.
 
 
-<h2>Where geometry and meshes intersect</h2>
+<h3>Where geometry and meshes intersect</h3>
 
 Let us assume that you have a complex domain and that you already have a
 coarse mesh that somehow represents the general features of the domain. Then
@@ -108,7 +108,7 @@ means providing a class derived from ChartManifold, and this is precisely what
 we will do in this program.
 
 
-<h2>The example case</h2>
+<h3>The example case</h3>
 
 To illustrate how one describes geometries using charts in deal.II, we will
 consider a case that originates in an application of the <a
@@ -228,7 +228,7 @@ awkward. We won't show the formula here but instead only provide the implementat
 in the program.
 
 
-<h2>Implementation</h2>
+<h3>Implementation</h3>
 
 There are a number of issues we need to address in the program. At the largest scale,
 we need to write a class that implements the interface of ChartManifold. This involves

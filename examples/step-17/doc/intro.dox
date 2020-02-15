@@ -1,7 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-<h2>Overview</h2>
+<h3>Overview</h3>
 
 This program does not introduce any new mathematical ideas; in fact, all it
 does is to do the exact same computations that step-8
@@ -50,7 +50,7 @@ time, PETSc also provides dummy MPI stubs, so you can run this program on a
 single machine if PETSc was configured without MPI.
 
 
-<h2>Parallelizing software with MPI</h2>
+<h3>Parallelizing software with MPI</h3>
 
 Developing software to run in %parallel via MPI requires a bit of a change in
 mindset because one typically has to split up all data structures so that
@@ -172,7 +172,7 @@ function calls. That said, you do have to understand the general
 philosophy behind MPI as outlined above.
 
 
-<h2>What this program does</h2>
+<h3>What this program does</h3>
 
 The techniques this program then demonstrates are:
 - How to use the PETSc wrapper classes; this will already be visible in the
