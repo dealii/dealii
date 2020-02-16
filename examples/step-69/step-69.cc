@@ -31,7 +31,7 @@
 
 // The set of include files is quite standard. The most intriguing part is
 // the fact that we will rely solely on deal.II data structures for MPI
-// parallelization, in particular distributed::Triangulation and
+// parallelization, in particular parallel::distributed::Triangulation and
 // LinearAlgebra::distributed::Vector included through
 // <code>distributed/tria.h</code> and
 // <code>lac/la_parallel_vector.h</code>. Instead of a Trilinos, or PETSc
@@ -84,15 +84,15 @@
 
 // @sect3{Class template declarations}
 //
-// We begin our actual implementation by declaring all classes with its
+// We begin our actual implementation by declaring all classes with their
 // data structures and methods upfront. In contrast to previous example
 // steps we use a more fine-grained encapsulation of concepts, data
 // structures, and parameters into individual classes. A single class thus
-// usually centers around either a  single data structure (such as the
+// usually centers around either a single data structure (such as the
 // Triangulation) in the <code>Discretization</code> class, or a single
 // method (such as the <code>step()</code> function of the
 // <code>TimeStep</code> class). We typically declare parameter variables
-// and scratch data object private and make methods and data structures
+// and scratch data object `private` and make methods and data structures
 // used by other classes public.
 //
 // @note A cleaner approach would be to guard access to all data
@@ -105,8 +105,7 @@
 // ParameterAcceptor. This facilitates the population of all the global
 // parameters into a single (global) ParameterHandler. More explanations
 // about the use inheritance from ParameterAcceptor as a global subscription
-// mechanism can be found in Step-59.
-
+// mechanism can be found in step-59.
 namespace Step69
 {
   using namespace dealii;
@@ -127,7 +126,7 @@ namespace Step69
   // The class <code>Discretization</code> contains all data structures
   // concerning the mesh (triangulation) and discretization (mapping,
   // finite element, quadrature) of the problem. As mentioned, we use
-  // ParameterAcceptor class to automatically populate problem-specific
+  // the ParameterAcceptor class to automatically populate problem-specific
   // parameters, such as the geometry information
   // (<code>length</code>, etc.) or the refinement level
   // (<code>refinement</code>) from a parameter file. This requires us to
@@ -136,7 +135,6 @@ namespace Step69
   // constructor, and defer the creation of the mesh to the
   // <code>setup()</code> method that can be called once all parameters are
   // read-in via ParameterAcceptor::initialize().
-
   template <int dim>
   class Discretization : public ParameterAcceptor
   {
@@ -171,7 +169,7 @@ namespace Step69
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
-  // DoFHandler, SparsityPattern, boundary maps, the lumped mass,
+  // DoFHandler, SparsityPattern, boundary maps, the lumped mass matrix,
   // $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij}$ matrices. Here, the term
   // <i>offline</i> refers to the fact that all the class
   // members of <code>OfflineData</code> have well-defined values
@@ -184,7 +182,7 @@ namespace Step69
   // either.
   //
   // We also compute and store a <code>boundary_normal_map</code> that
-  // contains a map from a global index of type `types:global_dof_index` of
+  // contains a map from a global index of type types::global_dof_index of
   // a boundary degree of freedom to a tuple consisting of a normal vector,
   // the boundary id, and the position associated with the degree of
   // freedom. We actually have to compute and store this geometric
@@ -197,7 +195,6 @@ namespace Step69
   // from ParameterAcceptor and follow the same idiom of providing a
   // <code>setup()</code> (and <code>assemble()</code>) method as for the
   // class Discretization.
-
   template <int dim>
   class OfflineData : public ParameterAcceptor
   {
@@ -253,7 +250,7 @@ namespace Step69
   //   $[\rho,\textbf{m},E]$.
   //
   // The purpose of the class members <code>component_names</code>,
-  // <code>pressure</code>, and <code>speed_of_sound</code>, is evident
+  // <code>pressure</code>, and <code>speed_of_sound</code> is evident
   // from their names. We also provide a function
   // <code>compute_lambda_max</code>, that computes the wave speed estimate
   // mentioned above, $\lambda_{max}(\mathbf{U},\mathbf{V},\mathbf{n})$,
@@ -265,13 +262,13 @@ namespace Step69
   // body is put in place for every invocation of the function, and no call
   // (and code indirection) is generated. This is stronger than the
   // <code>inline</code> keyword, which is more or less a (mild) suggestion
-  // to the compiler that the programmer things it would be beneficial to
+  // to the compiler that the programmer thinks it would be beneficial to
   // inline the function. <code>DEAL_II_ALWAYS_INLINE</code> should only be
   // used rarely and with caution in situations such as this one, where we
   // actually know (due to benchmarking) that inlining the function in
-  // question actually improves performance.
+  // question improves performance.
   //
-  // Finally we note that:
+  // Finally, we observe that:
   //  - This is the only class in this tutorial step that is tied to a
   //    particular "physics" or "hyperbolic conservation law" (in this
   //    case Euler's equations). All the other classes are primarily
@@ -283,7 +280,6 @@ namespace Step69
   //    be able to invoke such methods without without creating an instance of
   //    the class. Similarly, we will not have to provide a constructor
   //    for this class.
-
   template <int dim>
   class ProblemDescription
   {
@@ -295,7 +291,7 @@ namespace Step69
     using rank1_type = Tensor<1, problem_dimension>;
     using rank2_type = Tensor<1, problem_dimension, Tensor<1, dim>>;
 
-    const static std::array<std::string, dim + 2> component_names;
+    const static std::array<std::string, problem_dimension> component_names;
 
     static constexpr double gamma = 7. / 5.;
 
@@ -330,16 +326,15 @@ namespace Step69
   // It would be desirable to initialize the class in a single shot:
   // initialize/set the parameters and define the class members that
   // depend on these default parameters. However, since we do not know the
-  // actual final values for the parameters, this would be sort of
-  // meaningless an unsafe in general (we would like to have mechanisms to
+  // actual values for the parameters, this would be sort of
+  // meaningless and unsafe in general (we would like to have mechanisms to
   // check the consistency of the input parameters). Instead of defining
   // another <code>setup()</code> method to be called (by-hand) after the
-  // call to <code> ParameterAcceptor::initialize() </code> we provide an
+  // call to ParameterAcceptor::initialize() we provide an
   // "implementation" for the class member
   // <code>parse_parameters_call_back</code> which is automatically called when
-  // invoking <code> ParameterAcceptor::initialize() </code> for every class
+  // invoking ParameterAcceptor::initialize() for every class
   // that inherits from ParameterAceptor.
-
   template <int dim>
   class InitialValues : public ParameterAcceptor
   {
@@ -375,7 +370,6 @@ namespace Step69
   // sets the proper partition and sparsity pattern for the temporary
   // vector <code>temp</code> and the matrix <code>dij_matrix</code>
   // respectively.
-
   template <int dim>
   class TimeStep : public ParameterAcceptor
   {
@@ -422,12 +416,12 @@ namespace Step69
   // <code>schlieren</code>, that is defined at each node by
   // \f[ \text{schlieren}[i] = e^{\beta \frac{ |\nabla r_i|
   // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } }, \f]
-  // where $r$ can in principle be any scalar quantitiy, in practice
+  // where $r$ can in principle be any scalar quantitiy. In practice
   // though, the density is a natural candidate, viz. $r := \rho$.
-  // Schlieren postprocessing is a standard method for enhancing the
-  // contrast of a visualization inspired by actual experimental X-ray and
-  // shadowgraphy techniques of visualization.
-
+  // <a href="https://en.wikipedia.org/wiki/Schlieren">Schlieren</a>
+  // postprocessing is a standard method for enhancing the contrast of a
+  // visualization inspired by actual experimental X-ray and shadowgraphy
+  // techniques of visualization.
   template <int dim>
   class SchlierenPostprocessor : public ParameterAcceptor
   {
@@ -472,7 +466,6 @@ namespace Step69
   // separate class <code>TimeLoop</code> that contains an object of every
   // class and again reads in a number of parameters with the help of the
   // ParameterAcceptor class.
-
   template <int dim>
   class TimeLoop : public ParameterAcceptor
   {
@@ -530,8 +523,7 @@ namespace Step69
   // parameter file. Then, in the constructor body every parameter value is
   // initialized to a sensible default value and registered with the
   // ParameterAcceptor class with a call to
-  // ParameterAcceptor::add_parameter.
-
+  // ParameterAcceptor::add_parameter().
   template <int dim>
   Discretization<dim>::Discretization(const MPI_Comm &   mpi_communicator,
                                       TimerOutput &      computing_timer,
@@ -584,9 +576,8 @@ namespace Step69
   // benchmark configuration consisting of a channel with a disc obstacle, see
   // @cite GuermondEtAl2018. We construct the geometry by modifying the
   // mesh generated by GridGenerator::hyper_cube_with_cylindrical_hole().
-  // We refer to Step-49, Step-53, and Step-54 for an overview how to
+  // We refer to step-49, step-53, and step-54 for an overview how to
   // create advanced meshes.
-
   template <int dim>
   void Discretization<dim>::setup()
   {
@@ -650,7 +641,6 @@ namespace Step69
     // <code>Boundary::dirichlet</code> on the left and
     // <code>Boundary::slip</code> on the upper and lower outer boundaries
     // and the obstacle:
-
     for (auto cell : triangulation.active_cell_iterators())
       {
         for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
@@ -679,7 +669,6 @@ namespace Step69
   // Not much is done in the constructor of <code>OfflineData</code> other
   // than initializing the corresponding class members in the
   // initialization list.
-
   template <int dim>
   OfflineData<dim>::OfflineData(const MPI_Comm &           mpi_communicator,
                                 TimerOutput &              computing_timer,
@@ -695,7 +684,6 @@ namespace Step69
   // locally owned and locally relevant DOFs, and initialize a
   // Utilities::MPI::Partitioner object that is needed for distributed
   // vectors.
-
   template <int dim>
   void OfflineData<dim>::setup()
   {
@@ -987,17 +975,19 @@ namespace Step69
   // <code>local_assemble_system</code> and the copy data routine
   // <code>copy_local_to_global</code>. There is not much to say about the
   // WorkStream framework since the vast majority of ideas are reasonably
-  // well-documented in Step-9, Step-13 and Step-32 among others.
+  // well-documented in step-9, step-13 and step-32 among others.
   //
   // Finally, assuming that $\mathbf{x}_i$ is a support point at the boundary,
-  // the (nodal) normals are defined using averaging:
+  // the (nodal) normals are defined as:
   //
-  // $\widehat{\boldsymbol{\nu}}_i :=
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|}$ where
-  // $\boldsymbol{\nu}_i := \sum_{T \subset \text{supp}(\phi_i)}
+  // @f{align*}
+  // \widehat{\boldsymbol{\nu}}_i :=
+  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{where} \
+  // \boldsymbol{\nu}_i := \sum_{T \subset \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})$
+  // \phi_i(\mathbf{x}_{q,F})
+  // @f}
   //
   // here $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
@@ -1303,7 +1293,7 @@ namespace Step69
                                    on_subranges,
                                    4096);
 
-      // Finally, we normalize the vector stored in
+      // Finally, we normalize the vectors stored in
       // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
       // not been thread paralellized as it would neither illustrate any
       // important concept nor lead to any noticeable speed gain.
@@ -1315,18 +1305,31 @@ namespace Step69
         }
     }
 
-    // In order to implement reflecting boundary conditions
-    // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ (or equivalently $\mathbf{v}
-    // \cdot \boldsymbol{\nu}_i =0$ ) the vectors $\mathbf{c}_{ij}$ at the
+    // As commented in the introduction (see section titled "Stable boundary
+    // conditions and conservation properties") we use three different types of
+    // boundary conditions: essential-like boundary conditions (we prescribe a
+    // state in the left portion of our domain), outflow boundary conditions
+    // (also called "do-nothing" boundary conditions) in the right portion of
+    // the domain, and "reflecting" boundary conditions (also called "slip"
+    // boundary conditions). With these boundary conditions we should not expect
+    // any form of conservation to hold.
+    //
+    // However, if we were to use reflecting boundary conditions
+    // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ in the entirety of the boundary
+    // we should preserve density and total mechanical energy. In order to be
+    // consistent which scenario the vectors $\mathbf{c}_{ij}$ at the
     // boundary have to be modified as:
     //
-    // $\mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
-    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_i \phi_j \, \mathrm{d}s$
+    // @f{align*}
+    // \mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
+    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(\mathbf{s})) \phi_i \phi_j \,
+    // \mathrm{d}\mathbf{s} \ \text{whenever} \ \mathbf{x}_i \text{ and }
+    // \mathbf{x}_j \text{ lie in the boundary.}
+    // @f}
     //
-    // Otherwise we will not be able to claim conservation. The ideas repeat
-    // themselves: we use Workstream in order to compute this correction, most
-    // of the following code is about the definition of the worker
-    // <code>local_assemble_system</code>.
+    // The ideas repeat themselves: we use Workstream in order to compute
+    // this correction, most of the following code is about the definition
+    // of the worker <code>local_assemble_system</code>.
 
     {
       TimerOutput::Scope t(computing_timer,
@@ -1434,7 +1437,7 @@ namespace Step69
   // In this section we describe the implementation of the class members of
   // the <code>ProblemDescription</code> class. Most of the code here is
   // specific for compressible Euler's equations with an ideal gas law.
-  // If we wanted to re-purpose Step-69 for a different conservation law
+  // If we wanted to re-purpose step-69 for a different conservation law
   // (say for: instance the shallow water equation) most of the
   // implementation of this class would have to change. But most of the other
   // classes, however, (in particular those defining loop structures) would
@@ -2172,30 +2175,10 @@ namespace Step69
     // <b>Step 4</b>: Fix up boundary states.
 
     // As a last step in the Forward Euler method, we have to fix up all
-    // boundary states. This approach is an example of the <i>explicit
-    // treatment of boundary conditions</i> strategy:
+    // boundary states. As discussed in the intro we
     // - advance in time satisfying no boundary condition at all,
     // - at the end of the time step enforce boundary conditions strongly
     //   in a post-processing step.
-    //
-    // When solving parabolic, or elliptic equations, we typically enforce
-    // essential boundary conditions by making them part of the
-    // approximation space, and treat natural boundary conditions as part
-    // of the variational formulation. We also know that explicit treatment
-    // of boundary conditions (in the context of parabolic PDE) almost
-    // surely leads to catastrophic consequences. However, in the context
-    // of nonlinear hyperbolic equations there is enough numerical evidence
-    // suggesting that explicit treatment of essential boundary conditions
-    // is stable and does not introduce any loss in accuracy and
-    // convergence rates. In addition, it is relatively straightforward to
-    // prove that (for the case of reflecting boundary conditions) explicit
-    // treatment of boundary conditions is not only conservative but also
-    // guarantees preservation of the invariant set. We are not aware of
-    // any theoretical result showing that it is possible to provide such
-    // invariant-set guarantees when using either direct enforcement of
-    // boundary conditions into the approximation space, or weak
-    // enforcement using the Nitsche penalty method (which is for example
-    // widely used in discontinuous Galerkin schemes).
     //
     // Here the worker <code>on_subranges</code> executes the correction
     //
@@ -2203,11 +2186,7 @@ namespace Step69
     //   \mathbf{m}_i := \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
     //   \boldsymbol{\nu}_i,
     // \f]
-    // which removes the normal component of $\mathbf{m}$. We note that
-    // conservation is not just a consequence of this correction but also a
-    // consequence of modification of the $\mathbf{c}_{ij}$ coefficients at
-    // the boundary that we employed in
-    // <code>OfflineData<dim>::assemble()</code>.
+    // which removes the normal component of $\mathbf{m}$.
 
     {
       TimerOutput::Scope time(computing_timer,

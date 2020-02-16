@@ -31,7 +31,7 @@ Euler's equations that is based on three ingredients: a
 of finite elements; a graph-viscosity stabilization based on a
 <i>guaranteed</i> upper bound of the local wave speed; and explicit
 time-stepping. As such, the ideas and techniques presented in this tutorial
-step are drastically different from those used in Step-33, which focuses on
+step are drastically different from those used in step-33, which focuses on
 the use of automatic differentiation. From a programming perspective this
 tutorial will focus on a number of techniques found in large-scale
 computations: hybrid thread-MPI parallelization; efficient local numbering
@@ -45,7 +45,7 @@ as elementary building blocks in higher-order schemes
 @cite GuermondEtAl2018. However, we hope that the reader still finds the
 tutorial step to be a good starting point (in particular with respect to
 the programming techniques) before jumping into full research codes such as
-the second-order scheme @cite GuermondEtAl2018.
+the second-order scheme discussed in @cite GuermondEtAl2018.
 
 
 <a name="eulerequations"></a>
@@ -77,7 +77,7 @@ $\mathbb{f}(\mathbf{u})$ is defined as
 @f}
 where $\mathbb{I} \in \mathbb{R}^{d \times d}$ is the identity matrix and
 $\otimes$ denotes the tensor product. Here, we have introduced the pressure
-$p$ that, in general, is defined by an closed-form equation of state.
+$p$ that, in general, is defined by a closed-form equation of state.
 In this tutorial we limit the discussion to the class of polytropic
 ideal gases for which the pressure is given by
 @f{align*}
@@ -115,7 +115,7 @@ of the parabolic regularization
 @f}
 Such solutions, which are understood as the solution recovered in the
 zero-viscosity limit, are often refered to as <i>viscosity solutions</i>.
-Global existence and uniqueness of such solutions is a widely open issue.
+Global existence and uniqueness of such solutions is an open issue.
 However, we know at least that if such viscosity solutions exists they have
 to satisfy the constraint $\textbf{u}(\mathbf{x},t) \in \mathcal{B}$ for
 all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
@@ -165,11 +165,11 @@ formulation:
 Here, $\mathbb{V}_h$ is an appropriate finite element space, and
 $s_h(\cdot,\cdot)_{L^2(\Omega)}$ is some linear stabilization method
 (possibly complemented with some ad-hoc shock-capturing technique, see for
-instance @cite GuermondErn2004 Chapter 5 and references therein). Most
+instance Chapter 5 of @cite GuermondErn2004 and references therein). Most
 time-dependent discretization approaches described in the deal.II tutorials
 are based on such a (semi-discrete) variational approach. Fundamentally,
 from an analysis perspective, variational discretizations are conceived
-to provide some notion of global (integral) stabiliy, meaning an
+to provide some notion of global (integral) stability, meaning an
 estimate of the form
 @f{align*}
   |\!|\!| \mathbf{u}_{h}(t) |\!|\!| \leq |\!|\!| \mathbf{u}_{h}(0) |\!|\!|
@@ -181,7 +181,7 @@ conservation laws have been very popular since the mid eighties, in
 particular combined with SUPG-type stabilization and/or upwinding
 techniques (see the early work of @cite Brooks1982 and @cite Johnson1986). They
 have proven to be some of the best approaches for simulations in the subsonic
-shockless regime and similarly benign regimes.
+shockless regime and similarly benign situations.
 
 However, in the transonic and supersonic regime, and shock-hydrodynamics
 applications the use of variational schemes might be questionable. In fact,
@@ -204,10 +204,10 @@ collocation-type scheme) that preserves constraints pointwise, i.e.,
 @f}
 Contrary to finite difference/volume schemes, the scheme implemented in
 this step maximizes the use of finite element software infrastructure,
-works in any mesh, in any space dimension, and is theoretically guaranteed
-to always work, all the time, no exception. This illustrates that deal.ii
+works on any mesh, in any space dimension, and is theoretically guaranteed
+to always work, all the time, no exception. This illustrates that deal.II
 can be used far beyond the context of variational schemes in Hilbert spaces
-and that a large number of classes, modules and namespaces from deal.ii can
+and that a large number of classes, modules and namespaces from deal.II can
 be adapted for such purpose.
 
 
@@ -301,15 +301,15 @@ $\mathbf{U}_j^n$ respectively.
 - $\texttt{gather_cij_vectors}$, $\texttt{gather_state_vectors}$, and
 $\texttt{scatter_updated_state}$ are hypothetical implementations that
 either collect (from) or write (into) global matrices and vectors.
-- Note that: if we assume a cartesian mesh in two space
+- Note that: if we assume a Cartesian mesh in two space
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
 $\mathbf{x}_i$ is an interior node (i.e. $\mathbf{x}_i$ is not on the boundary
-of the domain ) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
+of the domain) then: $\{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)}$ should contain
 nine state vector elements (i.e. all the states in the patch/macro element
 associated to the shape function $\phi_i$). This is one of the major
 differences with the usual cell-based loop where the gather functionality
 (encoded in FEValuesBase<dim, spacedim>.get_function_values() in the case
-of deal.ii) only collects values for the local cell (just a subset of the
+of deal.II) only collects values for the local cell (just a subset of the
 patch).
 
 The actual implementation will deviate from above code in one key aspect:
@@ -330,55 +330,60 @@ application of this kind of schemes, also called <i>edge-based</i> or
 <i>graph-based</i> finite element schemes (see for instance
 @cite Rainald2008 for a historical overview).
 
-<h3>Conservation properties and boundary conditions</h3>
+<h3>Stable boundary conditions and conservation properties.</h3>
 
 In the example considered in this tutorial step we use three different types of
 boundary conditions: essential-like boundary conditions (we prescribe a state in
 the left portion of our domain), outflow boundary conditions (also called
-"do-nothing" boundary conditions) in the right portion of the domain, and
-"reflecting boundary" conditions (also called "slip" boundary conditions)
-@f{align*}
-  \mathbf{m}_j \cdot \boldsymbol{\nu}_j \equiv 0  \ \
-  \mathbf{x}_j \in \partial\Omega \, .
-@f}
-in the top, bottom and surface of the obstacle. We will not discuss much about
-essential and do-nothing boundary conditions since their implementation is
-relatively easy and the reader will be able to pick-up the implementation
-directly from the code. In this portion of the documentation we will focus only
-the "reflecting" boundary conditions which are somewhat more challenging.
+"do-nothing" boundary conditions) at the right boundary of the domain, and
+"reflecting" boundary conditions $\mathbf{m} \cdot \boldsymbol{\nu} = 0$ (also
+called "slip" boundary conditions) at the top, bottom, and surface of the
+obstacle. We will not discuss much about essential and "do-nothing" boundary
+conditions since their implementation is relatively easy and the reader will be
+able to pick-up the implementation directly from the (documented) source code.
+In this portion of the introduction we will focus only on the "reflecting"
+boundary conditions which are somewhat more tricky.
 
-@note At the time of this writing (early 2020) it is accurate to say that
-both analysis and implementation of boundary conditions for hyperbolic systems
-of conservation is a widely open issue. Discussions about analysis and/or
-implementation of boundary conditions in the academic literature is minimal to
-non-existent.
+@note At the time of this writing (early 2020) it is not unreasonable to say
+that both analysis and implementation of stable boundary conditions for
+hyperbolic systems of conservation laws is an open issue. For the case of
+variational formulations, stable boundary conditions are those leading to a
+well-posed (coercive) bilinear form. But for general hyperbolic
+systems of conservation laws (and for the algebraic formulation used in this
+tutorial) coercivity has no applicability and/or meaning as a notion of
+stability. In this tutorial step we will use preservation of the invariant set
+as our main notion of stability which (at the very least) guarantees
+well-posedness of the discrete problem.
 
-In this tutorial example we use the so-called "explicit treatment of boundary
-conditions":
-- Advance in time satisfying no boundary condition at all,
-- At the end of the time step enforce boundary conditions strongly in a
-  post-processing step where we execute the projection
+For the case of the reflecting boundary conditions we will proceed as follows:
+- For every time step advance in time satisfying no boundary condition at all.
+- Let $\partial\Omega^r$ be the portion of the boundary where we want to
+  enforce reflecting boundary conditions. At the end of the time step we enforce
+  reflecting boundary conditions strongly in a post-processing step where we
+  execute the projection
     @f{align*}
     \mathbf{m}_i := \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
-    \boldsymbol{\nu}_i \ \ \text{for all }\mathbf{x}_i \in \partial\Omega
+    \boldsymbol{\nu}_i \ \ \text{for all }\mathbf{x}_i \in \partial\Omega^r
     @f}
-  which removes the normal component of $\mathbf{m}$. Here the definition of
-  nodal normal $\boldsymbol{\nu}_i$ is very much arbitrary, but it is usually
-  computed with some form of averaging.
+  that removes the normal component of $\mathbf{m}$. Here the definition of
+  nodal normal $\boldsymbol{\nu}_i$ is very much arbitrary (there is no
+  unique definition) but it should be consistent upon refinement with the
+  underlying geometry.
 
-At this point in time, the average finite element person might find this
-approach questionable. Why would you want to do this? No doubt, when solving
-parabolic, or elliptic equations, we typically enforce essential
-(Dirichlet-like) boundary conditions by making them part of the approximation
-space $\mathbb{V}$, and treat natural (e.g. Neumann and Robin) boundary
+This is approach is usually called "explicit treatment of boundary conditions".
+The well seasoned finite element person might find this approach questionable.
+No doubt, when solving parabolic, or elliptic equations, we typically enforce
+essential (Dirichlet-like) boundary conditions by making them part of the
+approximation space $\mathbb{V}$, and treat natural (e.g. Neumann) boundary
 conditions as part of the variational formulation. We also know that explicit
-treatment of boundary conditions (in the context of parabolic PDE) almost surely
-leads to catastrophic consequences. However, in the context of nonlinear
-hyperbolic equations:
-- The most important reason: it is relatively easy to prove that (for the case
-of reflecting boundary conditions) explicit treatment of boundary conditions is
-not only conservative but also guarantees preservation of the property
-$\mathbf{U}_i \in \mathcal{B}$ for all $i \in \mathcal{V}$.
+treatment of boundary conditions (in the context of parabolic PDEs) almost
+surely leads to catastrophic consequences. However, in the context of nonlinear
+hyperbolic equations we have that:
+- It is relatively easy to prove that (for the case of reflecting boundary
+conditions) explicit treatment of boundary conditions is not only conservative
+but also guarantees preservation of the property $\mathbf{U}_i \in \mathcal{B}$
+for all $i \in \mathcal{V}$ (well-posedness). This is perhaps the most
+important reason to use explicit enforcement of boundary conditions.
 - To the best of our knowledge: we are not aware of any mathematical result
 proving that it is possible to guarantee the property $\mathbf{U}_i \in
 \mathcal{B}$ for all $i \in \mathcal{V}$ when using either direct enforcement of
@@ -390,29 +395,35 @@ restrictive time step constraints.
 Dirichlet-like boundary conditions is stable under CFL conditions and does not
 introduce any loss in accuracy.
 
-If we where to implement reflecting boundary conditions in the entirety of
-the boundary, such implementation should be such that exact conservation of
-density $\rho$ and mechanical energy $E$
+If $\mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0}$
+represents Euler's equation with reflecting boundary conditions in the entirety
+of the boundary (i.e. $\partial\Omega^r \equiv \partial\Omega$) and we
+integrate in space and time $\int_{\Omega}\int_{t_1}^{t_2}$ we would obtain
 @f{align*}
-\sum_{i \in \mathcal{V}} m_i \rho_i^{n+1}= \sum_{i \in \mathcal{V}} m_i
-\rho_i^{n} \ \ \text{and} \ \
-\sum_{i \in \mathcal{V}} m_i E_i^{n+1}= \sum_{i \in \mathcal{V}} m_i
-E_i^{n}
+\int_{\Omega} \rho(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
+\int_{\Omega} \rho(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ , \ \
+\int_{\Omega} E(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
+\int_{\Omega} E(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ , \ \
+\int_{\Omega} \mathbf{m}(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
+\int_{\Omega} \mathbf{m}(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x}
++ \int_{t_1}^{t_2} \! \int_{\partial\Omega} p \boldsymbol{\nu} \,
+\mathrm{d}\mathbf{s} \mathrm{d}t\, .
 @f}
-is achieved (note that conservation of momentum is not a natural property
-Euler's system with reflecting boundary conditions, that's why we did not
-include it). Even though we will not use reflecting boundary conditions in the
-entirety of the domain, we would like to know that our implementation of
+Note that momentum is not a conserved quantity (interaction with walls leads to
+momentum gain/loss). Even though we will not use reflecting boundary conditions
+in the entirety of the domain, we would like to know that our implementation of
 boundary conditions is consistent with the conservation properties mentioned
 above. In order to guarantee such conservation property it is necessary to
 modify the values of the vectors $\mathbf{c}_{ij}$ as follows
 @f{align*}
-\mathbf{c}_{ij} := \mathbf{c}_{ij} + \int_{\partial \Omega^r}
-(\boldsymbol{\nu}_j - \boldsymbol{\nu}(s)) \phi_i \phi_j \, \mathrm{d}s
-\ \ \text{whenever both }\mathbf{x}_i\text{ and }\mathbf{x}_j \text{ lie in the
+\mathbf{c}_{ij} \dealcoloneq \mathbf{c}_{ij} + \int_{\partial \Omega^r}
+(\boldsymbol{\nu}_j - \boldsymbol{\nu}(\mathbf{s})) \phi_i \phi_j \,
+\mathrm{d}\mathbf{s}
+\ \ \text{whenever both }\mathbf{x}_i\text{ and }\mathbf{x}_j \text{ lie on the
 boundary}
 @f}
-where $\partial \Omega^r$ is the portion of the boundary where reflecting
-boundary conditions are meant to be enforced. This modification of the
-$\mathbf{c}_{ij}$ is a direct consequence of simple integration by parts
-arguments, see page 12 of @cite GuermondEtAl2018 for more details.
+This consistent modification of the $\mathbf{c}_{ij}$ is a direct consequence
+of simple integration by parts arguments, see page 12 of @cite GuermondEtAl2018
+for more details.
+
+
