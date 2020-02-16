@@ -64,6 +64,9 @@ struct DisableWindowsDebugRuntimeDialog
 } deal_II_windows_crt_dialog;
 #endif
 
+#undef Assert
+#define Assert AssertThrow
+
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
 using namespace dealii;
