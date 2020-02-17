@@ -119,7 +119,7 @@ if 'intro.dox' in args[0]:
     fstep.close()
 
     fres = open(resultsname)
-    lines.append(fres.readlines())
+    lines += fres.readlines()
     fres.close()
     
     # check the file group
