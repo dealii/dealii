@@ -18,8 +18,9 @@
 
 // Note: This is (almost) a clone of the tests/petsc/solver_03_mf.cc
 
-#include "../petsc/petsc_mf_testmatrix.h" // It is tempting to copy
 #include "../tests.h"
+
+#include "../petsc/petsc_mf_testmatrix.h" // It is tempting to copy
 // ../petsc/petsc_mf_testmatrix.h
 // into this directory and
 // play with it, but, by

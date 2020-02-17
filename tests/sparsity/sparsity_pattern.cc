@@ -20,8 +20,9 @@
 #include <list>
 #include <set>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 int

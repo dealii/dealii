@@ -25,8 +25,9 @@
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <typename MatrixType>
 class PreconditionOperator

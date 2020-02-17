@@ -24,6 +24,7 @@
 #include <string>
 
 #include "../tests.h"
+
 #include "shapes.h"
 
 #define PRECISION 8

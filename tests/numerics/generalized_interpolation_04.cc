@@ -22,6 +22,7 @@
 #include <deal.II/fe/fe_system.h>
 
 #include "../tests.h"
+
 #include "generalized_interpolation.h"
 
 int

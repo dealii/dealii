@@ -19,8 +19,9 @@
 
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 const unsigned int N = 15;
 

@@ -18,8 +18,9 @@
 //
 // AD number type: Sacado DFad-DFad
 
-#include "../ad_common_tests/step-44-helper_vector_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/step-44-helper_vector_01.h"
 
 int
 main(int argc, char **argv)

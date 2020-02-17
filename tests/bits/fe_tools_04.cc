@@ -17,6 +17,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 #include "../tests.h"
+
 #include "fe_tools_common.h"
 
 // check

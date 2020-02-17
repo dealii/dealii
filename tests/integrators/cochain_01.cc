@@ -47,8 +47,9 @@
 #include <deal.II/meshworker/integration_info.h>
 #include <deal.II/meshworker/loop.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators;
 

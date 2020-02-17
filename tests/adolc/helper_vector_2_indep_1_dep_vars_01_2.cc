@@ -19,8 +19,9 @@
 //
 // AD number type: ADOL-C tapeless
 
-#include "../ad_common_tests/helper_vector_2_indep_1_dep_vars_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_vector_2_indep_1_dep_vars_01.h"
 
 int
 main()

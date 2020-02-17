@@ -20,8 +20,9 @@
 //
 // AD number type: ADOL-C taped
 
-#include "../ad_common_tests/symmetric_tensor_functions_04.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/symmetric_tensor_functions_04.h"
 
 int
 main()

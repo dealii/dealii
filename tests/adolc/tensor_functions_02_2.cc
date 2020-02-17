@@ -20,8 +20,9 @@
 //
 // AD number type: ADOL-C tapeless
 
-#include "../ad_common_tests/tensor_functions_02.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/tensor_functions_02.h"
 
 int
 main()

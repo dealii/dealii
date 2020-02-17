@@ -30,8 +30,9 @@
 #include <set>
 #include <sstream>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 const unsigned int N = 15;

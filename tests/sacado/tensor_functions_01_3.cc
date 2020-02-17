@@ -19,8 +19,9 @@
 //
 // AD number type: Sacado Rad
 
-#include "../ad_common_tests/tensor_functions_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/tensor_functions_01.h"
 
 int
 main()

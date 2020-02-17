@@ -32,8 +32,9 @@
 #include <fstream>
 #include <iomanip>
 
-#include "../serialization/serialization.h"
 #include "../tests.h"
+
+#include "../serialization/serialization.h"
 
 using namespace dealii;
 namespace SD = Differentiation::SD;

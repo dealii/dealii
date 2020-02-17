@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 // A test for saving and loading of distributed ScaLAPACKMatrices.
 // By using a 1x1 grid a call to save_serial() and load_serial() is mimicked.

@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado DFad-DFad
 
-#include "../ad_common_tests/helper_scalar_coupled_4_components_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_coupled_4_components_01.h"
 
 int
 main(int argc, char **argv)

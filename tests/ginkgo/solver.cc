@@ -23,8 +23,9 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 int
 main(int argc, char **argv)

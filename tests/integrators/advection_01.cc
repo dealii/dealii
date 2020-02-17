@@ -24,8 +24,9 @@
 #include <deal.II/integrators/advection.h>
 #include <deal.II/integrators/laplace.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators::Advection;
 

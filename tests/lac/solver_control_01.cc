@@ -30,8 +30,9 @@
 
 #include <iostream>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <typename MatrixType, typename VectorType, class PRECONDITION>
 void

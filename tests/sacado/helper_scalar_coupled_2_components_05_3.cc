@@ -19,8 +19,9 @@
 //
 // AD number type: Sacado Rad
 
-#include "../ad_common_tests/helper_scalar_coupled_2_components_05.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_coupled_2_components_05.h"
 
 int
 main()

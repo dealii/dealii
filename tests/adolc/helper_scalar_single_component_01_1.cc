@@ -18,8 +18,9 @@
 //
 // AD number type: ADOL-C taped
 
-#include "../ad_common_tests/helper_scalar_single_component_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_single_component_01.h"
 
 int
 main()

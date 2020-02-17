@@ -27,8 +27,9 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void

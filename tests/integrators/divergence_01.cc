@@ -25,8 +25,9 @@
 
 #include <deal.II/integrators/divergence.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators::Divergence;
 

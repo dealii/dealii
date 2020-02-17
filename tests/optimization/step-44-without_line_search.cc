@@ -18,6 +18,7 @@
 // optimization/step-44-with_line_search.cc .
 
 #include "../tests.h"
+
 #include "step-44.h"
 
 int

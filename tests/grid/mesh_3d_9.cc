@@ -37,6 +37,7 @@
 #include <set>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 void check_this(Triangulation<3> &tria)

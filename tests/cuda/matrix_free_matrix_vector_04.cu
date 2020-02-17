@@ -20,6 +20,7 @@
 // type: 2)
 
 #include "../tests.h"
+
 #include "matrix_vector_common.h"
 
 

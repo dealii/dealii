@@ -27,8 +27,9 @@
 #include <deal.II/lac/sparse_matrix_ez.templates.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 

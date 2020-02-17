@@ -26,8 +26,9 @@
 
 #include <iostream>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 void
 output_double_number(double input, const std::string &text)

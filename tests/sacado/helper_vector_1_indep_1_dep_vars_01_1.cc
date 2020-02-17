@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado DFad
 
-#include "../ad_common_tests/helper_vector_1_indep_1_dep_vars_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_vector_1_indep_1_dep_vars_01.h"
 
 int
 main()

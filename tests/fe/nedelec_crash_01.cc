@@ -22,8 +22,9 @@
 
 #include <deal.II/fe/fe_nedelec.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 int

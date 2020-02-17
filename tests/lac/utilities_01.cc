@@ -29,9 +29,10 @@
 #include <iostream>
 #include <typeinfo>
 
+#include "../tests.h"
+
 #include "../slepc/testmatrix.h"
 #include "../testmatrix.h"
-#include "../tests.h"
 
 int
 main(int argc, char **argv)

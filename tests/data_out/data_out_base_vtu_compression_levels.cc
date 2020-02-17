@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "patches.h"
 
 // Check that the compression levels supported by VtkFlags are valid (that is,

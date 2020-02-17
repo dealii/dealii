@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 // test eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int,unsigned
 // int> &, const bool) for all eigenvalues without eigenvectors

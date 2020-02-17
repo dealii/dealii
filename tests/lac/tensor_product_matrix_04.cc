@@ -21,8 +21,9 @@
 #include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 template <int dim>

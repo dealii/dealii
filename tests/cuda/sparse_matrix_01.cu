@@ -22,8 +22,9 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 void

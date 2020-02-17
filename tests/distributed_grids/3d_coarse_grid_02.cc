@@ -29,6 +29,7 @@
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
+
 #include "coarse_grid_common.h"
 
 

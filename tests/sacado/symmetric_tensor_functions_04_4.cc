@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado Rad-DFad
 
-#include "../ad_common_tests/symmetric_tensor_functions_04.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/symmetric_tensor_functions_04.h"
 
 int
 main()
