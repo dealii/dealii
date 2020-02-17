@@ -123,6 +123,10 @@ pipeline
           timeout(time: 6, unit: 'HOURS')
           {
             sh "echo \"building on node ${env.NODE_NAME}\""
+	    sh '''#!/bin/bash
+	       cd $WORKSPACE/
+	       ./contrib/utilities/check_doxygen.sh
+	     '''
             sh '''#!/bin/bash
                set -e
                export NP=`grep -c ^processor /proc/cpuinfo`
