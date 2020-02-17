@@ -217,9 +217,12 @@ namespace parallel
         if (cell->subdomain_id() == my_subdomain)
           ++number_cache.n_locally_owned_active_cells;
 
+    // Potentially cast to a 64 bit type before accumulating to avoid overflow:
     number_cache.n_global_active_cells =
-      Utilities::MPI::sum(number_cache.n_locally_owned_active_cells,
+      Utilities::MPI::sum(static_cast<types::global_dof_index>(
+                            number_cache.n_locally_owned_active_cells),
                           this->mpi_communicator);
+
     number_cache.n_global_levels =
       Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
   }
