@@ -127,6 +127,8 @@ IncludeCategories:
 # should not be caught here
   - Regex: "<[a-z_]+>"
     Priority: 100000
+  - Regex: "\\.\\./tests\\.h"
+    Priority: 200000
 
 IndentCaseLabels: true
 IndentPPDirectives: AfterHash
