@@ -64,6 +64,10 @@ struct DisableWindowsDebugRuntimeDialog
 } deal_II_windows_crt_dialog;
 #endif
 
+// Redefine Assert as AssertThrow to make sure that the code is tested similarly
+// in Release mode and in Debug mode. clang-format makes sure that this file is
+// included after all regular header files but before all the other local header
+// files.
 #undef Assert
 #define Assert AssertThrow
 
