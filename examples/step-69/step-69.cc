@@ -90,10 +90,10 @@
 // structures, and parameters into individual classes. A single class thus
 // usually centers around either a single data structure (such as the
 // Triangulation) in the <code>Discretization</code> class, or a single
-// method (such as the <code>step()</code> function of the
+// method (such as the <code>make_one_step()</code> function of the
 // <code>TimeStep</code> class). We typically declare parameter variables
 // and scratch data object `private` and make methods and data structures
-// used by other classes public.
+// used by other classes `public`.
 //
 // @note A cleaner approach would be to guard access to all data
 // structures by <a
@@ -104,22 +104,20 @@
 // We also note that the vast majority of classes is derived from
 // ParameterAcceptor. This facilitates the population of all the global
 // parameters into a single (global) ParameterHandler. More explanations
-// about the use inheritance from ParameterAcceptor as a global subscription
-// mechanism can be found in step-59.
+// about the use of inheritance from ParameterAcceptor as a global
+// subscription mechanism can be found in step-59.
 namespace Step69
 {
   using namespace dealii;
 
-  // We start with an enum describing all possible boundary conditions
-  // encountered in this tutorial step. Such an enum allows us to refer to
-  // boundary types by a mnemonic (such as
-  // <code>Boundary::do_nothing</code>) rather than a numerical value.
-  enum Boundary : types::boundary_id
-  {
-    do_nothing = 0,
-    slip       = 1,
-    dirichlet  = 2,
-  };
+  // We start with defining a number of types::boundary_id constants used
+  // throughout the tutorial step. This allows us to refer to boundary
+  // types by a mnemonic (such as <code>do_nothing</code>) rather than a
+  // numerical value.
+
+  constexpr types::boundary_id do_nothing = 0;
+  constexpr types::boundary_id slip       = 1;
+  constexpr types::boundary_id dirichlet  = 2;
 
   // @sect4{The <code>Discretization</code> class}
   //
@@ -139,13 +137,13 @@ namespace Step69
   class Discretization : public ParameterAcceptor
   {
   public:
-    Discretization(const MPI_Comm &   mpi_communicator,
+    Discretization(const MPI_Comm     mpi_communicator,
                    TimerOutput &      computing_timer,
                    const std::string &subsection = "Discretization");
 
     void setup();
 
-    const MPI_Comm &mpi_communicator;
+    const MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
 
@@ -203,7 +201,7 @@ namespace Step69
       std::map<types::global_dof_index,
                std::tuple<Tensor<1, dim>, types::boundary_id, Point<dim>>>;
 
-    OfflineData(const MPI_Comm &           mpi_communicator,
+    OfflineData(const MPI_Comm             mpi_communicator,
                 TimerOutput &              computing_timer,
                 const Discretization<dim> &discretization,
                 const std::string &        subsection = "OfflineData");
@@ -228,16 +226,16 @@ namespace Step69
     SparseMatrix<double>                  norm_matrix;
 
   private:
-    const MPI_Comm &mpi_communicator;
-    TimerOutput &   computing_timer;
+    const MPI_Comm mpi_communicator;
+    TimerOutput &  computing_timer;
 
     SmartPointer<const Discretization<dim>> discretization;
   };
 
   // @sect4{The <code>ProblemDescription</code> class}
   //
-  // The member functions of this class are utility functions specific to
-  // Euler's equations:
+  // The member functions of this class are utility functions and data
+  // structures specific to Euler's equations:
   // - The type alias <code>rank1_type</code> is used for the states
   //   $\mathbf{U}_i^n$
   // - The type alias <code>rank2_type</code> is used for the fluxes
@@ -268,24 +266,15 @@ namespace Step69
   // actually know (due to benchmarking) that inlining the function in
   // question improves performance.
   //
-  // Finally, we observe that:
-  //  - This is the only class in this tutorial step that is tied to a
-  //    particular "physics" or "hyperbolic conservation law" (in this
-  //    case Euler's equations). All the other classes are primarily
-  //    "discretization" classes, very much agnostic of the particular physics
-  //    being solved.
-  //  - This is a "pure static" class (the antithesis of a
-  //    "pure virtual" class). It's just a convenient way to wrap-up a
-  //    collection of related methods into a single object. Note that we will
-  //    be able to invoke such methods without without creating an instance of
-  //    the class. Similarly, we will not have to provide a constructor
-  //    for this class.
+  // Finally, we observe that this is the only class in this tutorial step
+  // that is tied to a particular "physics" or "hyperbolic conservation
+  // law" (in this case Euler's equations). All the other classes are
+  // primarily "discretization" classes, very much agnostic of the
+  // particular physics being solved.
   template <int dim>
   class ProblemDescription
   {
   public:
-    /* constexpr tells the compiler to evaluate "2 + dim" just once at compile
-       time rather than everytime problem_dimension is invoked. */
     static constexpr unsigned int problem_dimension = 2 + dim;
 
     using rank1_type = Tensor<1, problem_dimension>;
@@ -332,8 +321,8 @@ namespace Step69
   // another <code>setup()</code> method to be called (by-hand) after the
   // call to ParameterAcceptor::initialize() we provide an
   // "implementation" for the class member
-  // <code>parse_parameters_call_back</code> which is automatically called when
-  // invoking ParameterAcceptor::initialize() for every class
+  // <code>parse_parameters_call_back()</code> which is automatically
+  // called when invoking ParameterAcceptor::initialize() for every class
   // that inherits from ParameterAceptor.
   template <int dim>
   class InitialValues : public ParameterAcceptor
@@ -359,12 +348,12 @@ namespace Step69
   // With the <code>OfflineData</code> and <code>ProblemDescription</code>
   // classes at hand we can now implement the explicit time-stepping scheme
   // that was introduced in the discussion above. The main method of the
-  // <code>TimeStep</code> class is <code>step(vector_type &U, double
-  // t)</code> that takes a reference to a state vector <code>U</code> and
-  // a time point <code>t</code> (as input arguments) computes the updated
-  // solution, stores it in the vector <code>temp</code>, swaps its contents
-  // with the vector <code>U</code>, and returns the chosen step-size
-  // $\tau$.
+  // <code>TimeStep</code> class is <code>make_one_step(vector_type &U,
+  // double t)</code> that takes a reference to a state vector
+  // <code>U</code> and a time point <code>t</code> (as input arguments)
+  // computes the updated solution, stores it in the vector
+  // <code>temp</code>, swaps its contents with the vector <code>U</code>,
+  // and returns the chosen step-size $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
@@ -380,11 +369,10 @@ namespace Step69
     using rank1_type = typename ProblemDescription<dim>::rank1_type;
     using rank2_type = typename ProblemDescription<dim>::rank2_type;
 
-    typedef std::array<LinearAlgebra::distributed::Vector<double>,
-                       problem_dimension>
-      vector_type;
+    using vector_type =
+      std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
 
-    TimeStep(const MPI_Comm &          mpi_communicator,
+    TimeStep(const MPI_Comm            mpi_communicator,
              TimerOutput &             computing_timer,
              const OfflineData<dim> &  offline_data,
              const InitialValues<dim> &initial_values,
@@ -392,11 +380,11 @@ namespace Step69
 
     void prepare();
 
-    double step(vector_type &U, double t);
+    double make_one_step(vector_type &U, double t);
 
   private:
-    const MPI_Comm &mpi_communicator;
-    TimerOutput &   computing_timer;
+    const MPI_Comm mpi_communicator;
+    TimerOutput &  computing_timer;
 
     SmartPointer<const OfflineData<dim>>   offline_data;
     SmartPointer<const InitialValues<dim>> initial_values;
@@ -411,12 +399,12 @@ namespace Step69
   // @sect4{The <code>SchlierenPostprocessor</code> class}
   //
   // At its core, the Schlieren class implements the class member
-  // <code>compute_schlieren</code>. The main purpose of this class member
+  // <code>compute_schlieren()</code>. The main purpose of this class member
   // is to compute an auxiliary finite element field
   // <code>schlieren</code>, that is defined at each node by
   // \f[ \text{schlieren}[i] = e^{\beta \frac{ |\nabla r_i|
   // - \min_j |\nabla r_j| }{\max_j |\nabla r_j| - \min_j |\nabla r_j| } }, \f]
-  // where $r$ can in principle be any scalar quantitiy. In practice
+  // where $r$ can in principle be any scalar quantity. In practice
   // though, the density is a natural candidate, viz. $r := \rho$.
   // <a href="https://en.wikipedia.org/wiki/Schlieren">Schlieren</a>
   // postprocessing is a standard method for enhancing the contrast of a
@@ -435,7 +423,7 @@ namespace Step69
       std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
 
     SchlierenPostprocessor(
-      const MPI_Comm &        mpi_communicator,
+      const MPI_Comm          mpi_communicator,
       TimerOutput &           computing_timer,
       const OfflineData<dim> &offline_data,
       const std::string &     subsection = "SchlierenPostprocessor");
@@ -447,8 +435,8 @@ namespace Step69
     LinearAlgebra::distributed::Vector<double> schlieren;
 
   private:
-    const MPI_Comm &mpi_communicator;
-    TimerOutput &   computing_timer;
+    const MPI_Comm mpi_communicator;
+    TimerOutput &  computing_timer;
 
     SmartPointer<const OfflineData<dim>> offline_data;
 
@@ -472,12 +460,12 @@ namespace Step69
   public:
     using vector_type = typename TimeStep<dim>::vector_type;
 
-    TimeLoop(const MPI_Comm &mpi_comm);
+    TimeLoop(const MPI_Comm mpi_communnicator);
 
     void run();
 
   private:
-    vector_type interpolate_initial_values(double t = 0);
+    vector_type interpolate_initial_values(const double t = 0);
 
     void output(const vector_type &U,
                 const std::string &name,
@@ -485,7 +473,7 @@ namespace Step69
                 unsigned int       cycle,
                 bool               checkpoint = false);
 
-    const MPI_Comm &   mpi_communicator;
+    const MPI_Comm     mpi_communicator;
     std::ostringstream timer_output;
     TimerOutput        computing_timer;
 
@@ -503,8 +491,6 @@ namespace Step69
     InitialValues<dim>          initial_values;
     TimeStep<dim>               time_step;
     SchlierenPostprocessor<dim> schlieren_postprocessor;
-
-    std::unique_ptr<std::ofstream> filestream;
 
     std::thread output_thread;
     vector_type output_vector;
@@ -525,7 +511,7 @@ namespace Step69
   // ParameterAcceptor class with a call to
   // ParameterAcceptor::add_parameter().
   template <int dim>
-  Discretization<dim>::Discretization(const MPI_Comm &   mpi_communicator,
+  Discretization<dim>::Discretization(const MPI_Comm     mpi_communicator,
                                       TimerOutput &      computing_timer,
                                       const std::string &subsection)
     : ParameterAcceptor(subsection)
@@ -538,29 +524,25 @@ namespace Step69
     , computing_timer(computing_timer)
   {
     length = 4.;
-    add_parameter("immersed disc - length",
-                  length,
-                  "Immersed disc: length of computational domain");
+    add_parameter("length", length, "length of computational domain");
 
     height = 2.;
-    add_parameter("immersed disc - height",
-                  height,
-                  "Immersed disc: height of computational domain");
+    add_parameter("height", height, "height of computational domain");
 
     disc_position = 0.6;
-    add_parameter("immersed disc - object position",
+    add_parameter("object position",
                   disc_position,
-                  "Immersed disc: x position of immersed disc center point");
+                  "x position of immersed disc center point");
 
     disc_diameter = 0.5;
-    add_parameter("immersed disc - object diameter",
+    add_parameter("object diameter",
                   disc_diameter,
-                  "Immersed disc: diameter of immersed disc");
+                  "diameter of immersed disc");
 
     refinement = 5;
-    add_parameter("initial refinement",
+    add_parameter("refinement",
                   refinement,
-                  "Initial refinement of the geometry");
+                  "number of refinement steps of the geometry");
   }
 
   // Note that in the previous constructor we only passed the MPI
@@ -578,21 +560,19 @@ namespace Step69
   // mesh generated by GridGenerator::hyper_cube_with_cylindrical_hole().
   // We refer to step-49, step-53, and step-54 for an overview how to
   // create advanced meshes.
+  // We first create 4 temporary (non distributed) coarse triangulations
+  // that we stitch together with the GridGenerator::merge_triangulation()
+  // function. We center the disc at $(0,0)$ with a diameter of
+  // <code>disc_diameter</code>. The lower left corner of the channel has
+  // coordinates (<code>-disc_position</code>, <code>-height/2</code>) and
+  // the upper right corner has (<code>length-disc_position</code>,
+  // <code>height/2</code>).
   template <int dim>
   void Discretization<dim>::setup()
   {
     TimerOutput::Scope t(computing_timer, "discretization - setup");
 
     triangulation.clear();
-
-    // We first create 4 temporary (non distributed) coarse triangulations
-    // that we stitch together with the
-    // GridGenerator::merge_triangulation() function. We center the disc at
-    // $(0,0)$ with a diameter of <code>disc_diameter</code>. The lower
-    // left corner of the channel has coordinates
-    // (<code>-disc_position</code>, <code>-height/2</code>) and the upper
-    // right corner has (<code>length-disc_position</code>,
-    // <code>height/2</code>).
 
     Triangulation<dim> tria1, tria2, tria3, tria4;
 
@@ -626,38 +606,38 @@ namespace Step69
 
     // We have to fix up the left edge that is currently located at
     // $x=-$<code>disc_diameter</code> and has to be shifted to
-    // $x=-$<code>disc_position</code>:
+    // $x=-$<code>disc_position</code>. As a last step the boundary has to
+    // be colorized with <code>do_nothing</code> on the right,
+    // <code>dirichlet</code> on the left and <code>slip</code> on the
+    // upper and lower outer boundaries and the obstacle.
 
-    for (auto cell : triangulation.active_cell_iterators())
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-        {
-          auto &vertex = cell->vertex(v);
-          if (vertex[0] <= -disc_diameter + 1.e-6)
-            vertex[0] = -disc_position;
-        }
+    for (const auto &cell : triangulation.active_cell_iterators())
+      {
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+          {
+            auto &vertex = cell->vertex(v);
+            if (vertex[0] <= -disc_diameter + 1.e-6)
+              vertex[0] = -disc_position;
+          }
+      }
 
-    // As a last step the boundary has to be colorized with
-    // <code>Boundary::do_nothing</code> on the right,
-    // <code>Boundary::dirichlet</code> on the left and
-    // <code>Boundary::slip</code> on the upper and lower outer boundaries
-    // and the obstacle:
-    for (auto cell : triangulation.active_cell_iterators())
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
           {
             const auto face = cell->face(f);
 
-            if (!face->at_boundary())
-              continue;
+            if (face->at_boundary())
+              {
+                const auto center = face->center();
 
-            const auto center = face->center();
-
-            if (center[0] > length - disc_position - 1.e-6)
-              face->set_boundary_id(Boundary::do_nothing);
-            else if (center[0] < -disc_position + 1.e-6)
-              face->set_boundary_id(Boundary::dirichlet);
-            else
-              face->set_boundary_id(Boundary::slip);
+                if (center[0] > length - disc_position - 1.e-6)
+                  face->set_boundary_id(do_nothing);
+                else if (center[0] < -disc_position + 1.e-6)
+                  face->set_boundary_id(dirichlet);
+                else
+                  face->set_boundary_id(slip);
+              }
           }
       }
 
@@ -670,7 +650,7 @@ namespace Step69
   // than initializing the corresponding class members in the
   // initialization list.
   template <int dim>
-  OfflineData<dim>::OfflineData(const MPI_Comm &           mpi_communicator,
+  OfflineData<dim>::OfflineData(const MPI_Comm             mpi_communicator,
                                 TimerOutput &              computing_timer,
                                 const Discretization<dim> &discretization,
                                 const std::string &        subsection)
@@ -704,9 +684,10 @@ namespace Step69
       DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant);
       n_locally_relevant = locally_relevant.n_elements();
 
-      partitioner.reset(new Utilities::MPI::Partitioner(locally_owned,
-                                                        locally_relevant,
-                                                        mpi_communicator));
+      partitioner =
+        std::make_shared<Utilities::MPI::Partitioner>(locally_owned,
+                                                      locally_relevant,
+                                                      mpi_communicator);
     }
 
     const auto dofs_per_cell = discretization->finite_element.dofs_per_cell;
@@ -773,7 +754,7 @@ namespace Step69
 
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
 
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           if (cell->is_artificial())
             continue;
@@ -830,7 +811,7 @@ namespace Step69
     // <a href="https://en.wikipedia.org/wiki/Syntactic_sugar"> syntactic
     // sugar</a> for otherwise somewhat tedious code.
 
-    // The first function we introduce, <code>get_entry</code>, will be
+    // The first function we introduce, <code>get_entry()</code>, will be
     // used to read the value stored at the entry pointed by a
     // SparsityPattern iterator <code>it</code> of <code>matrix</code>. The
     // function works around a small deficiency in the SparseMatrix
@@ -841,7 +822,7 @@ namespace Step69
     // to the lack of an interface in the SparseMatrix for accessing the
     // element directly with a SparsityPattern iterator, we unfortunately
     // have to create a temporary SparseMatrix iterator. We simply hide
-    // this in the <code>get_entry</code> function.
+    // this in the <code>get_entry()</code> function.
 
     template <typename Matrix, typename Iterator>
     DEAL_II_ALWAYS_INLINE inline typename Matrix::value_type
@@ -853,8 +834,8 @@ namespace Step69
       return matrix_iterator->value();
     }
 
-    // The <code>set_entry</code> helper is the inverse operation of
-    // <code>get_value</code>: Given an iterator and a value, it sets the
+    // The <code>set_entry()</code> helper is the inverse operation of
+    // <code>get_value()</code>: Given an iterator and a value, it sets the
     // entry pointed to by the iterator in the matrix.
 
     template <typename Matrix, typename Iterator>
@@ -868,13 +849,13 @@ namespace Step69
       matrix_iterator->value() = value;
     }
 
-    // <code>gather_get_entry</code>: we note that $\mathbf{c}_{ij} \in
+    // <code>gather_get_entry()</code>: we note that $\mathbf{c}_{ij} \in
     // \mathbb{R}^d$. If $d=2$ then $\mathbf{c}_{ij} =
     // [\mathbf{c}_{ij}^1,\mathbf{c}_{ij}^2]^\top$. Which basically implies
     // that we need one matrix per space dimension to store the
     // $\mathbf{c}_{ij}$ vectors. Similar observation follows for the
     // matrix $\mathbf{n}_{ij}$. The purpose of
-    // <code>gather_get_entry</code> is to retrieve those entries a store
+    // <code>gather_get_entry()</code> is to retrieve those entries a store
     // them into a <code>Tensor<1, dim></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
@@ -887,17 +868,17 @@ namespace Step69
       return result;
     }
 
-    // <code>gather</code> (first interface): this first function
+    // <code>gather()</code> (first interface): this first function
     // signature, having three input arguments, will be used to retrieve
     // the individual components <code>(i,l)</code> of a matrix. The
-    // functionality of <code>gather_get_entry</code> and
-    // <code>gather</code> is very much the same, but their context is
-    // different: the function <code>gather</code> does not rely on an
+    // functionality of <code>gather_get_entry()</code> and
+    // <code>gather()</code> is very much the same, but their context is
+    // different: the function <code>gather()</code> does not rely on an
     // iterator (that actually knows the value pointed) but rather on the
     // indices <code>(i,l)</code> of the entry in order to retrieve its
-    // actual value. We should expect <code>gather</code> to be slightly
-    // more expensive than <code>gather_get_entry</code>. The use of
-    // <code>gather</code> will be limited to the task of computing the
+    // actual value. We should expect <code>gather()</code> to be slightly
+    // more expensive than <code>gather_get_entry()</code>. The use of
+    // <code>gather()</code> will be limited to the task of computing the
     // algebraic viscosity $d_{ij}$ in the particular case that when
     // both $i$ and $j$ lie at the boundary.
     //
@@ -918,7 +899,7 @@ namespace Step69
       return result;
     }
 
-    // <code>gather</code> (second interface): this second function
+    // <code>gather()</code> (second interface): this second function
     // signature having two input arguments will be used to gather the
     // state at a node <code>i</code> and return it as a
     // <code>Tensor<1,problem_dimension></code> for our convenience.
@@ -933,7 +914,7 @@ namespace Step69
       return result;
     }
 
-    // <code>scatter</code>: this function has three input arguments, the
+    // <code>scatter()</code>: this function has three input arguments, the
     // first one is meant to be a "global object" (say a locally owned or
     // locally relevant vector), the second argument which could be a
     // <code>Tensor<1,problem_dimension></code>, and the last argument
@@ -962,18 +943,18 @@ namespace Step69
   // definition of
   //  - Scratch data (i.e. input info required to carry out computations): in
   //    this case it is <code>scratch_data</code>.
-  //  - The worker: in the case it is <code>local_assemble_system</code> that
+  //  - The worker: in the case it is <code>local_assemble_system()</code> that
   //    actually computes the local (i.e. current cell) contributions from the
   //    scratch data.
   //  - A copy data: a struct that contains all the local assembly
   //    contributions, in this case <code>CopyData<dim>()</code>.
   //  - A copy data routine: in this case it is
-  //    <code>copy_local_to_global</code> in charge of actually coping these
+  //    <code>copy_local_to_global()</code> in charge of actually coping these
   //    local contributions into the global objects (matrices and/or vectors)
   //
   // Most the following lines are spent in the definition of the worker
-  // <code>local_assemble_system</code> and the copy data routine
-  // <code>copy_local_to_global</code>. There is not much to say about the
+  // <code>local_assemble_system()</code> and the copy data routine
+  // <code>copy_local_to_global()</code>. There is not much to say about the
   // WorkStream framework since the vast majority of ideas are reasonably
   // well-documented in step-9, step-13 and step-32 among others.
   //
@@ -982,7 +963,7 @@ namespace Step69
   //
   // @f{align*}
   // \widehat{\boldsymbol{\nu}}_i :=
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{where} \
+  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{where}
   // \boldsymbol{\nu}_i := \sum_{T \subset \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
@@ -1010,7 +991,9 @@ namespace Step69
     unsigned int dofs_per_cell = discretization->finite_element.dofs_per_cell;
     unsigned int n_q_points    = discretization->quadrature.size();
 
-    /* This is the implementation of the scratch data required by WorkStream */
+    // What follows is the implementation of the scratch data required by
+    // WorkStream
+
     MeshWorker::ScratchData<dim> scratch_data(
       discretization->mapping,
       discretization->finite_element,
@@ -1025,7 +1008,6 @@ namespace Step69
         computing_timer,
         "offline_data - assemble lumped mass matrix, and c_ij");
 
-      /* This is the implementation of the "worker" required by WorkStream */
       const auto local_assemble_system = [&](const auto &cell,
                                              auto &      scratch,
                                              auto &      copy) {
@@ -1056,8 +1038,8 @@ namespace Step69
                          return partitioner->global_to_local(index);
                        });
 
-        /* We compute the local contributions for the lumped mass
-         matrix entries m_i and and vectors c_ij */
+        // We compute the local contributions for the lumped mass matrix
+        // entries m_i and and vectors c_ij in the usual fashion:
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const auto JxW = fe_values.JxW(q_point);
@@ -1079,9 +1061,9 @@ namespace Step69
               }     /* j */
           }         /* q */
 
-        /* Now we have to compute the boundary normals. Note that the
-           following loop does not do much unless the element
-           has faces on the boundary of the domain */
+        // Now we have to compute the boundary normals. Note that the
+        // following loop does not do much unless the element has faces on
+        // the boundary of the domain.
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
             const auto face = cell->face(f);
@@ -1100,14 +1082,15 @@ namespace Step69
                 if (!discretization->finite_element.has_support_on_face(j, f))
                   continue;
 
-                /* Note that "normal" will only represent the contributions
-                   from one of the faces in the support of the shape
-                   function phi_j. So we cannot normalize this local
-                   contribution right here, we have to take it "as is", store
-                   it and pass it to the copy data routine. The proper
-                   normalization requires an additional loop on nodes.*/
+                // Note that "normal" will only represent the contributions
+                // from one of the faces in the support of the shape
+                // function phi_j. So we cannot normalize this local
+                // contribution right here, we have to take it "as is",
+                // store it and pass it to the copy data routine. The
+                // proper normalization requires an additional loop on
+                // nodes.
                 Tensor<1, dim> normal;
-                if (id == Boundary::slip)
+                if (id == slip)
                   {
                     for (unsigned int q = 0; q < n_face_q_points; ++q)
                       normal += fe_face_values.normal_vector(q) *
@@ -1132,7 +1115,8 @@ namespace Step69
           }
       };
 
-      /* This is the copy data routine for WorkStream */
+      // Last, we provide a copy_local_to_global function as required for
+      // the WorkStream
       const auto copy_local_to_global = [&](const auto &copy) {
         const auto &is_artificial             = copy.is_artificial;
         const auto &local_dof_indices         = copy.local_dof_indices;
@@ -1165,7 +1149,7 @@ namespace Step69
             cij_matrix[k].add(local_dof_indices, cell_cij_matrix[k]);
             nij_matrix[k].add(local_dof_indices, cell_cij_matrix[k]);
           }
-      }; /* end of the copy data routine */
+      };
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
@@ -1329,7 +1313,7 @@ namespace Step69
     //
     // The ideas repeat themselves: we use Workstream in order to compute
     // this correction, most of the following code is about the definition
-    // of the worker <code>local_assemble_system</code>.
+    // of the worker <code>local_assemble_system()</code>.
 
     {
       TimerOutput::Scope t(computing_timer,
@@ -1370,7 +1354,7 @@ namespace Step69
             if (!face->at_boundary())
               continue;
 
-            if (id != Boundary::slip)
+            if (id != slip)
               continue;
 
             const auto &fe_face_values = scratch.reinit(cell, f);
@@ -1853,7 +1837,7 @@ namespace Step69
   // any surprising code:
 
   template <int dim>
-  TimeStep<dim>::TimeStep(const MPI_Comm &          mpi_communicator,
+  TimeStep<dim>::TimeStep(const MPI_Comm            mpi_communicator,
                           TimerOutput &             computing_timer,
                           const OfflineData<dim> &  offline_data,
                           const InitialValues<dim> &initial_values,
@@ -1894,7 +1878,7 @@ namespace Step69
   // state <code>U</code> in place and return the chosen time-step size.
 
   template <int dim>
-  double TimeStep<dim>::step(vector_type &U, double t)
+  double TimeStep<dim>::make_one_step(vector_type &U, double t)
   {
     // Declare a number of read-only references to various different
     // variables and data structures. We do this is mainly to have shorter
@@ -2209,7 +2193,7 @@ namespace Step69
 
             // On slip boundaries we remove the normal component of the
             // momentum:
-            if (id == Boundary::slip)
+            if (id == slip)
               {
                 auto m = ProblemDescription<dim>::momentum(U_i);
                 m -= 1. * (m * normal) * normal;
@@ -2219,7 +2203,7 @@ namespace Step69
 
             // On Dirichlet boundaries we enforce initial conditions
             // strongly:
-            else if (id == Boundary::dirichlet)
+            else if (id == dirichlet)
               {
                 U_i = initial_values->initial_state(position, t + tau_max);
               }
@@ -2261,7 +2245,7 @@ namespace Step69
 
   template <int dim>
   SchlierenPostprocessor<dim>::SchlierenPostprocessor(
-    const MPI_Comm &        mpi_communicator,
+    const MPI_Comm          mpi_communicator,
     TimerOutput &           computing_timer,
     const OfflineData<dim> &offline_data,
     const std::string &     subsection /*= "SchlierenPostprocessor"*/)
@@ -2321,7 +2305,7 @@ namespace Step69
   // positive function such as
   // $\omega_i(\mathbf{x}) \equiv 1$ (that would allow us to recover the usual
   // notion of mean value). But as usual, the goal is to reuse the off-line
-  // data as much as it could be possible. In sense this, the most natural
+  // data as much as possible. In this sense, the most natural
   // choice of weight is $\omega_i = \phi_i$. Inserting this choice of
   // weight and the expansion $r_h(\mathbf{x}) = \sum_{j \in \mathcal{V}}
   // r_j \phi_j(\mathbf{x})$ into $\mathbf{(*)}$ we get :
@@ -2420,7 +2404,7 @@ namespace Step69
                 const auto &normal = std::get<0>(bnm_it->second);
                 const auto &id     = std::get<1>(bnm_it->second);
 
-                if (id == Boundary::slip)
+                if (id == slip)
                   r_i -= 1. * (r_i * normal) * normal;
                 else
                   r_i = 0.;
@@ -2507,9 +2491,9 @@ namespace Step69
   // restart from an interrupted computation, or not.
 
   template <int dim>
-  TimeLoop<dim>::TimeLoop(const MPI_Comm &mpi_comm)
+  TimeLoop<dim>::TimeLoop(const MPI_Comm mpi_communicator)
     : ParameterAcceptor("A - TimeLoop")
-    , mpi_communicator(mpi_comm)
+    , mpi_communicator(mpi_communicator)
     , computing_timer(mpi_communicator,
                       timer_output,
                       TimerOutput::never,
@@ -2695,9 +2679,10 @@ namespace Step69
 
         // and then perform a single forward Euler step. Note that the
         // state vector <code>U</code> is updated in place and that
-        // <code>time_step.step()</code> return the chosen step size.
+        // <code>time_step.make_one_step()</code> returns the chosen step
+        // size.
 
-        t += time_step.step(U, t);
+        t += time_step.make_one_step(U, t);
 
         // Post processing, generating output and writing out the current
         // state is a CPU and IO intensive task that we cannot afford to do
@@ -2726,7 +2711,7 @@ namespace Step69
 
   template <int dim>
   typename TimeLoop<dim>::vector_type
-  TimeLoop<dim>::interpolate_initial_values(double t)
+  TimeLoop<dim>::interpolate_initial_values(const double t)
   {
     pcout << "TimeLoop<dim>::interpolate_initial_values(t = " << t << ")"
           << std::endl;
@@ -2782,9 +2767,9 @@ namespace Step69
   template <int dim>
   void TimeLoop<dim>::output(const typename TimeLoop<dim>::vector_type &U,
                              const std::string &                        name,
-                             double                                     t,
-                             unsigned int                               cycle,
-                             bool checkpoint)
+                             const double                               t,
+                             const unsigned int                         cycle,
+                             const bool checkpoint)
   {
     pcout << "TimeLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;

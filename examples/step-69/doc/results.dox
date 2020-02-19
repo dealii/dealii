@@ -146,3 +146,6 @@ TimeLoop<dim>::output(t = 4.00006, checkpoint = 1)
 And with the following result:
 
 <img src="https://www.dealii.org/images/steps/developer/step-69.fine.gif" alt="" height="300">
+
+That's substantially better, although of course at the price of having run
+the code for roughly 6 hours on 16 cores.
