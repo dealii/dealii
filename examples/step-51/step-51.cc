@@ -294,7 +294,7 @@ namespace Step51
     void assemble_system(const bool reconstruct_trace = false);
     void solve();
     void postprocess();
-    void refine_grid(const unsigned int cylce);
+    void refine_grid(const unsigned int cycle);
     void output_results(const unsigned int cycle);
 
     // Data for the assembly and solution of the primal variables.
