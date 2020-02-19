@@ -232,7 +232,25 @@ IndexSet::get_view(const size_type begin, const size_type end) const
   return result;
 }
 
+std::vector<IndexSet>
+IndexSet::split_by_block(
+  const std::vector<types::global_dof_index> &dofs_per_block) const
+{
+  std::vector<IndexSet> partitioned;
+  const unsigned int    n_block_dofs = dofs_per_block.size();
 
+  partitioned.reserve(n_block_dofs);
+  types::global_dof_index start = 0;
+  types::global_dof_index sum   = 0;
+  for (const auto n_block_dofs : dofs_per_block)
+    {
+      partitioned.push_back(this->get_view(start, start + n_block_dofs));
+      start += n_block_dofs;
+      sum += partitioned.back().size();
+    }
+  AssertDimension(sum, this->size());
+  return partitioned;
+}
 
 void
 IndexSet::subtract_set(const IndexSet &other)
