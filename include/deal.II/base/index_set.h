@@ -345,12 +345,14 @@ public:
   get_view(const size_type begin, const size_type end) const;
 
   /**
-   * Split the set indices represented by this object into blocks
-   * given by the @p dofs_per_block structure.
+   * Split the set indices represented by this object into blocks given by the
+   * @p n_indices_per_block structure. The sum of its entries must match the
+   * global size of the current object.
+   *
    */
   std::vector<IndexSet>
   split_by_block(
-    const std::vector<types::global_dof_index> &dofs_per_block) const;
+    const std::vector<types::global_dof_index> &n_indices_per_block) const;
 
   /**
    * Remove all elements contained in @p other from this set. In other words,
