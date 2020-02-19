@@ -273,7 +273,7 @@ namespace Step51
     void
     postprocess();
     void
-    refine_grid(const unsigned int cylce);
+    refine_grid(const unsigned int cycle);
     void
     output_results(const unsigned int cycle);
 
