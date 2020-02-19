@@ -57,7 +57,7 @@ namespace internal
           number
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
-                            const unsigned int               n_target_cells,
+                            const types::global_dof_index    n_target_cells,
                             MPI_Comm                         mpi_communicator);
         } // namespace RefineAndCoarsenFixedNumber
 

@@ -34,7 +34,7 @@ for (S : REAL_SCALARS)
               template S
               compute_threshold<S>(const dealii::Vector<S> &,
                                    const std::pair<double, double> &,
-                                   const unsigned int,
+                                   const types::global_dof_index,
                                    MPI_Comm);
             \}
             namespace RefineAndCoarsenFixedFraction

@@ -228,7 +228,7 @@ namespace internal
           number
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
-                            const unsigned int               n_target_cells,
+                            const types::global_dof_index    n_target_cells,
                             MPI_Comm                         mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
@@ -255,21 +255,22 @@ namespace internal
                      std::sqrt(interesting_range[0] * interesting_range[1]) :
                      (interesting_range[0] + interesting_range[1]) / 2);
 
-                // count how many of our own elements would be above this
-                // threshold and then add to it the number for all the others
-                unsigned int my_count =
+                // Count how many of our own elements would be above this
+                // threshold:
+                types::global_dof_index my_count =
                   std::count_if(criteria.begin(),
                                 criteria.end(),
                                 [test_threshold](const double c) {
                                   return c > test_threshold;
                                 });
 
-                unsigned int total_count = 0;
+                // Potentially accumulate in a 64bit int to avoid overflow:
+                types::global_dof_index total_count = 0;
 
                 ierr = MPI_Reduce(&my_count,
                                   &total_count,
                                   1,
-                                  MPI_UNSIGNED,
+                                  DEAL_II_DOF_INDEX_MPI_TYPE,
                                   MPI_SUM,
                                   master_mpi_rank,
                                   mpi_communicator);
@@ -477,8 +478,8 @@ namespace parallel
           GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
             locally_owned_indicators,
             global_min_and_max,
-            static_cast<unsigned int>(adjusted_fractions.first *
-                                      tria.n_global_active_cells()),
+            static_cast<types::global_dof_index>(adjusted_fractions.first *
+                                                 tria.n_global_active_cells()),
             mpi_communicator);
 
         // compute bottom threshold only if necessary. otherwise use a threshold
@@ -488,7 +489,7 @@ namespace parallel
             GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
               locally_owned_indicators,
               global_min_and_max,
-              static_cast<unsigned int>(
+              static_cast<types::global_dof_index>(
                 std::ceil((1 - adjusted_fractions.second) *
                           tria.n_global_active_cells())),
               mpi_communicator);
@@ -555,7 +556,7 @@ namespace parallel
             GridRefinement::RefineAndCoarsenFixedFraction::compute_threshold(
               locally_owned_indicators,
               global_min_and_max,
-              (1 - bottom_fraction_of_error) * total_error,
+              (1. - bottom_fraction_of_error) * total_error,
               mpi_communicator);
         else
           {
