@@ -43,7 +43,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
       FiniteElementData<dim>(get_dpo_vector(),
                              dim,
                              2,
-                             FiniteElementData<dim>::Hdiv),
+                             FiniteElementData<dim>::H1),
       std::vector<bool>(PolynomialsBernardiRaugel<dim>::n_polynomials(p), true),
       std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::n_polynomials(
                                    p),
@@ -193,30 +193,61 @@ FE_BernardiRaugel<dim>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     &output_data) const
 {
-  FE_PolyTensor<PolynomialsBernardiRaugel<dim>, dim, dim>::fill_fe_values(
-    cell,
-    cell_similarity,
-    quadrature,
-    mapping,
-    mapping_internal,
-    mapping_data,
-    fe_internal,
-    output_data);
-
   std::cout << "fill_fe_values called!" << std::endl;
-  std::cout << "Is the finite element primitive?" << this->is_primitive() << std::endl;
-  for(unsigned int k=0; k < this->dofs_per_cell; ++k)
+  std::cout << "Calling FE_PolyTensor<dim, dim>::fill_fe_values" << std::endl;
+
+  // Call the base implementation then we'll touch up the data slightly
+  FE_PolyTensor<dim, dim>::fill_fe_values(
+     cell,
+     cell_similarity,
+     quadrature,
+     mapping,
+     mapping_internal,
+     mapping_data,
+     fe_internal,
+     output_data);
+
+  // Convert to the correct internal data class for this FE class.
+  // Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+  //    ExcInternalError());
+  const typename FE_PolyTensor<dim>::InternalData &fe_data =
+    static_cast<const typename FE_PolyTensor<dim>::InternalData &>(fe_internal);
+
+  const unsigned int n_q_points = quadrature.size();
+
+  // convert the output data to use the outward normal from the physical cell
+  // i.e. if the original shape function is \hat{\psi} = \vec{\hat{n}}*phi,
+  // then we recover psi and compute
+  // \psi = \vec{n}*(\hat{\psi}_1^2 + \hat{\psi}_2^2 + \hat{\psi}_3^2)^(1/2)
+  std::cout << "FE_BR adjusting bubbles:" << std::endl;
+  for (unsigned int i = dim*GeometryInfo<dim>::vertices_per_cell; i < this->dofs_per_cell; ++i)
   {
-    std::cout << "dof " << k << std::endl;
-    for(unsigned int i=0; i < quadrature.size(); ++i)
-      std::cout << "qp " << i << ": " << output_data.shape_values[k][i] << std::endl;
+    const unsigned int first =
+            output_data.shape_function_to_row_table[i * this->n_components() +
+                                                    this->get_nonzero_components(i)
+                                                      .first_selected_component()];
+
+    for (unsigned int k = 0; k < n_q_points; ++k)
+    {
+      double psi = 0;
+      unsigned int f = i - dim*GeometryInfo<dim>::vertices_per_cell;
+      Tensor<1,dim> normal = (*cell)->face(f)->normal_vector(k);
+
+      for (unsigned int d = 0; d < dim; ++d)
+        psi += fe_data.shape_values[i][k][d]*fe_data.shape_values[i][k][d];
+
+      psi = sqrt(psi);
+
+      for (unsigned int d = 0; d < dim; ++d)
+      {
+        output_data.shape_values(first + d, k) =
+          normal[d]*psi;
+      }
+
+    }
   }
 
-  for(unsigned int i=0; i < this->dofs_per_cell; ++i)
-    for(unsigned int d=0; d < dim; ++d)
-      std::cout << "Result of fe.get_nonzero_components(" << i << ")[" << d << "] = " << this->get_nonzero_components(i)[d] << std::endl;
-
-  //this->n_nonzero_components(0);
+  std::cout << "Done!" << std::endl;
 }
 
 template class FE_BernardiRaugel<2>;
