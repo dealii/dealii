@@ -244,27 +244,46 @@ With this notation at hand we can define the (explicit time stepping)
 scheme as:
 @f{align*}{
   m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
-  + \sum_{j \in \mathcal{I}(i)} \mathbb{f}(\mathbf{U}_j^{n})\cdot
-  \mathbf{c}_{ij} - \sum_{j \in \mathcal{I}(i)}
+  + \sum_{j \in \mathcal{I}(i)\backslash\{i\}} \mathbb{f}(\mathbf{U}_j^{n})\cdot
+  \mathbf{c}_{ij} - \sum_{j \in \mathcal{I}(i)\backslash\{i\}}
   d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0} \, ,
 @f}
 where
   - $m_i \dealcoloneq \int_{\Omega} \phi_i \, \mathrm{d}\mathbf{x}$
+    is the lumped mass matrix
   - $\tau$ is the time step size
   - $\mathbf{c}_{ij} \dealcoloneq \int_{\Omega} \nabla\phi_j\phi_i \,
     \mathrm{d}\mathbf{x}$ (note that $\mathbf{c}_{ij}\in \mathbb{R}^d$)
-  - $\mathcal{I}(i) \dealcoloneq \{j \in \mathcal{V} \ | \ \mathbf{c}_{ij} \not \equiv
-    \boldsymbol{0}\} \cup \{i\}$. We will refer to $\mathcal{I}(i)$ as the
-    "stencil" (or adjacency list) at the support point $i$.
-  - $\mathbb{f}(\mathbf{U}_j^{n})$ is just the flux $\mathbb{f}$ of the
-    hyperbolic system evaluated at the state $\mathbf{U}_j^{n}$ stored at the
-    support point $j$.
+    is a vector-valued matrix that was used to approximate the divergence
+    of the flux in a weak sense.
+  - $\mathcal{I}(i) \dealcoloneq \{j \in \mathcal{V} \ | \ \mathbf{c}_{ij}
+    \not \equiv \boldsymbol{0}\} \cup \{i\}$ is the adjacency list
+    containing all degrees of freedom coupling to the index $i$. In other
+    words $\mathcal{I}(i)$ contains all nonzero column indices for row
+    index i. $\mathcal{I}(i)$ will also be called a "stencil".
+  - $\mathbb{f}(\mathbf{U}_j^{n})$ is the flux $\mathbb{f}$ of the
+    hyperbolic system evaluated for the state $\mathbf{U}_j^{n}$ associated
+    with support point $\mathbf{x}_j$.
   - $d_{ij} \dealcoloneq \max \{ \lambda_{\text{max}}
     (\mathbf{U}_i^{n},\mathbf{U}_j^{n}, \textbf{n}_{ij}),
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
-    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|$ if $i \not = j$
-  - $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$
-  - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\| }$
+    \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|$ if $i \not = j$ is the so
+    called <i>graph viscosity</i>. The graph viscosity serves as a
+    stabilization parameter (similarly to the linear stabilization term
+    $s_h$ we introduced in the previous section for a variational
+    approach). We will base our construction of $d_{ij}$ on an estimate of
+    the maximal local wavespeed $\lambda_{\text{max}}$ that will be
+    explained in detail in a moment.
+  - In above definition we do not use the diagonal element $d_{ii}$ and it
+    can thus be set arbitrarily. It is convenient to simply set
+    $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$
+    so that the sum over all elements of a row is zero,
+    $\sum_{j\in\mathcal{I}}d_{ij} = 0$.
+  - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\| }$ is a
+    normalization of the $\textbf{c}_{ij}$ matrix that enters the
+    approximate Riemann solver with which we compute an the approximations
+    $\lambda_{\text{max}}$ on the local wavespeed. (This will be explained
+    further down below).
 
 The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
 \textbf{n})$ is far from trivial and we will postpone the precise
@@ -293,7 +312,7 @@ $t_n$:
 &\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow
 \texttt{gather_state_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
 &\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
-&\ \ \ \ \textbf{for } j \in \mathcal{I}(i) \\
+&\ \ \ \ \textbf{for } j \in \mathcal{I}(i)\backslash\{i\} \\
 &\ \ \ \ \ \ \ \  \texttt{compute } d_{ij} \\
 &\ \ \ \ \ \ \ \  \texttt{compute } \mathbb{f}(\mathbf{U}_j^{n}) \\
 &\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} \leftarrow \textbf{U}_i^{n+1} - \frac{\tau_n}{m_i}

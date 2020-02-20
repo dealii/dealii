@@ -91,7 +91,7 @@
 // usually centers around either a single data structure (such as the
 // Triangulation) in the <code>Discretization</code> class, or a single
 // method (such as the <code>make_one_step()</code> function of the
-// <code>TimeStep</code> class). We typically declare parameter variables
+// <code>TimeStepping</code> class). We typically declare parameter variables
 // and scratch data object `private` and make methods and data structures
 // used by other classes `public`.
 //
@@ -116,7 +116,7 @@ namespace Step69
   // numerical value.
 
   constexpr types::boundary_id do_nothing = 0;
-  constexpr types::boundary_id slip       = 1;
+  constexpr types::boundary_id free_slip  = 1;
   constexpr types::boundary_id dirichlet  = 2;
 
   // @sect4{The <code>Discretization</code> class}
@@ -236,9 +236,9 @@ namespace Step69
   //
   // The member functions of this class are utility functions and data
   // structures specific to Euler's equations:
-  // - The type alias <code>rank1_type</code> is used for the states
+  // - The type alias <code>state_type</code> is used for the states
   //   $\mathbf{U}_i^n$
-  // - The type alias <code>rank2_type</code> is used for the fluxes
+  // - The type alias <code>flux_type</code> is used for the fluxes
   //   $\mathbb{f}(\mathbf{U}_j^n)$.
   // - The <code>momentum</code> function extracts $\textbf{m}$
   //   out of the state vector $[\rho,\textbf{m},E]$ and stores it in a
@@ -277,29 +277,29 @@ namespace Step69
   public:
     static constexpr unsigned int problem_dimension = 2 + dim;
 
-    using rank1_type = Tensor<1, problem_dimension>;
-    using rank2_type = Tensor<1, problem_dimension, Tensor<1, dim>>;
+    using state_type = Tensor<1, problem_dimension>;
+    using flux_type  = Tensor<1, problem_dimension, Tensor<1, dim>>;
 
     const static std::array<std::string, problem_dimension> component_names;
 
     static constexpr double gamma = 7. / 5.;
 
     static DEAL_II_ALWAYS_INLINE inline Tensor<1, dim>
-    momentum(const rank1_type &U);
+    momentum(const state_type &U);
 
     static DEAL_II_ALWAYS_INLINE inline double
-    internal_energy(const rank1_type &U);
+    internal_energy(const state_type &U);
 
-    static DEAL_II_ALWAYS_INLINE inline double pressure(const rank1_type &U);
-
-    static DEAL_II_ALWAYS_INLINE inline double
-    speed_of_sound(const rank1_type &U);
-
-    static DEAL_II_ALWAYS_INLINE inline rank2_type f(const rank1_type &U);
+    static DEAL_II_ALWAYS_INLINE inline double pressure(const state_type &U);
 
     static DEAL_II_ALWAYS_INLINE inline double
-    compute_lambda_max(const rank1_type &    U_i,
-                       const rank1_type &    U_j,
+    speed_of_sound(const state_type &U);
+
+    static DEAL_II_ALWAYS_INLINE inline flux_type f(const state_type &U);
+
+    static DEAL_II_ALWAYS_INLINE inline double
+    compute_lambda_max(const state_type &    U_i,
+                       const state_type &    U_j,
                        const Tensor<1, dim> &n_ij);
   };
 
@@ -328,11 +328,11 @@ namespace Step69
   class InitialValues : public ParameterAcceptor
   {
   public:
-    using rank1_type = typename ProblemDescription<dim>::rank1_type;
+    using state_type = typename ProblemDescription<dim>::state_type;
 
     InitialValues(const std::string &subsection = "InitialValues");
 
-    std::function<rank1_type(const Point<dim> &point, double t)> initial_state;
+    std::function<state_type(const Point<dim> &point, double t)> initial_state;
 
   private:
     // We declare a private callback function that will be wired up to the
@@ -343,12 +343,12 @@ namespace Step69
     Tensor<1, 3>   initial_1d_state;
   };
 
-  // @sect4{The <code>TimeStep</code> class}
+  // @sect4{The <code>TimeStepping</code> class}
   //
   // With the <code>OfflineData</code> and <code>ProblemDescription</code>
   // classes at hand we can now implement the explicit time-stepping scheme
   // that was introduced in the discussion above. The main method of the
-  // <code>TimeStep</code> class is <code>make_one_step(vector_type &U,
+  // <code>TimeStepping</code> class is <code>make_one_step(vector_type &U,
   // double t)</code> that takes a reference to a state vector
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
@@ -360,23 +360,23 @@ namespace Step69
   // vector <code>temp</code> and the matrix <code>dij_matrix</code>
   // respectively.
   template <int dim>
-  class TimeStep : public ParameterAcceptor
+  class TimeStepping : public ParameterAcceptor
   {
   public:
     static constexpr unsigned int problem_dimension =
       ProblemDescription<dim>::problem_dimension;
 
-    using rank1_type = typename ProblemDescription<dim>::rank1_type;
-    using rank2_type = typename ProblemDescription<dim>::rank2_type;
+    using state_type = typename ProblemDescription<dim>::state_type;
+    using flux_type  = typename ProblemDescription<dim>::flux_type;
 
     using vector_type =
       std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
 
-    TimeStep(const MPI_Comm            mpi_communicator,
-             TimerOutput &             computing_timer,
-             const OfflineData<dim> &  offline_data,
-             const InitialValues<dim> &initial_values,
-             const std::string &       subsection = "TimeStep");
+    TimeStepping(const MPI_Comm            mpi_communicator,
+                 TimerOutput &             computing_timer,
+                 const OfflineData<dim> &  offline_data,
+                 const InitialValues<dim> &initial_values,
+                 const std::string &       subsection = "TimeStepping");
 
     void prepare();
 
@@ -417,7 +417,7 @@ namespace Step69
     static constexpr unsigned int problem_dimension =
       ProblemDescription<dim>::problem_dimension;
 
-    using rank1_type = typename ProblemDescription<dim>::rank1_type;
+    using state_type = typename ProblemDescription<dim>::state_type;
 
     using vector_type =
       std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
@@ -446,21 +446,21 @@ namespace Step69
     double       schlieren_beta;
   };
 
-  // @sect4{The <code>TimeLoop</code> class}
+  // @sect4{The <code>MainLoop</code> class}
   //
   // Now, all that is left to do is to chain the methods implemented in the
-  // <code>TimeStep</code>, <code>InitialValues</code>, and
+  // <code>TimeStepping</code>, <code>InitialValues</code>, and
   // <code>SchlierenPostprocessor</code> classes together. We do this in a
-  // separate class <code>TimeLoop</code> that contains an object of every
+  // separate class <code>MainLoop</code> that contains an object of every
   // class and again reads in a number of parameters with the help of the
   // ParameterAcceptor class.
   template <int dim>
-  class TimeLoop : public ParameterAcceptor
+  class MainLoop : public ParameterAcceptor
   {
   public:
-    using vector_type = typename TimeStep<dim>::vector_type;
+    using vector_type = typename TimeStepping<dim>::vector_type;
 
-    TimeLoop(const MPI_Comm mpi_communnicator);
+    MainLoop(const MPI_Comm mpi_communnicator);
 
     void run();
 
@@ -489,7 +489,7 @@ namespace Step69
     Discretization<dim>         discretization;
     OfflineData<dim>            offline_data;
     InitialValues<dim>          initial_values;
-    TimeStep<dim>               time_step;
+    TimeStepping<dim>           time_stepping;
     SchlierenPostprocessor<dim> schlieren_postprocessor;
 
     std::thread output_thread;
@@ -608,7 +608,7 @@ namespace Step69
     // $x=-$<code>disc_diameter</code> and has to be shifted to
     // $x=-$<code>disc_position</code>. As a last step the boundary has to
     // be colorized with <code>do_nothing</code> on the right,
-    // <code>dirichlet</code> on the left and <code>slip</code> on the
+    // <code>dirichlet</code> on the left and <code>free_slip</code> on the
     // upper and lower outer boundaries and the obstacle.
 
     for (const auto &cell : triangulation.active_cell_iterators())
@@ -636,7 +636,7 @@ namespace Step69
                 else if (center[0] < -disc_position + 1.e-6)
                   face->set_boundary_id(dirichlet);
                 else
-                  face->set_boundary_id(slip);
+                  face->set_boundary_id(free_slip);
               }
           }
       }
@@ -782,7 +782,7 @@ namespace Step69
     }
   }
 
-  // This concludes the setup of the DoFHandler and SparseMatrix objects
+  // This concludes the setup of the DoFHandler and SparseMatrix objects.
   // Next, we have to assemble various matrices. We next define a number of
   // helper functions and data structures in an anonymous namespace.
 
@@ -1090,7 +1090,7 @@ namespace Step69
                 // proper normalization requires an additional loop on
                 // nodes.
                 Tensor<1, dim> normal;
-                if (id == slip)
+                if (id == free_slip)
                   {
                     for (unsigned int q = 0; q < n_face_q_points; ++q)
                       normal += fe_face_values.normal_vector(q) *
@@ -1294,9 +1294,9 @@ namespace Step69
     // boundary conditions: essential-like boundary conditions (we prescribe a
     // state in the left portion of our domain), outflow boundary conditions
     // (also called "do-nothing" boundary conditions) in the right portion of
-    // the domain, and "reflecting" boundary conditions (also called "slip"
-    // boundary conditions). With these boundary conditions we should not expect
-    // any form of conservation to hold.
+    // the domain, and "reflecting" boundary conditions (also called "free
+    // slip" boundary conditions). With these boundary conditions we should
+    // not expect any form of conservation to hold.
     //
     // However, if we were to use reflecting boundary conditions
     // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ in the entirety of the boundary
@@ -1354,7 +1354,7 @@ namespace Step69
             if (!face->at_boundary())
               continue;
 
-            if (id != slip)
+            if (id != free_slip)
               continue;
 
             const auto &fe_face_values = scratch.reinit(cell, f);
@@ -1435,7 +1435,7 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline Tensor<1, dim>
-  ProblemDescription<dim>::momentum(const rank1_type &U)
+  ProblemDescription<dim>::momentum(const state_type &U)
   {
     Tensor<1, dim> result;
     std::copy(&U[1], &U[1 + dim], &result[0]);
@@ -1444,7 +1444,7 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::internal_energy(const rank1_type &U)
+  ProblemDescription<dim>::internal_energy(const state_type &U)
   {
     const double &rho = U[0];
     const auto    m   = momentum(U);
@@ -1454,14 +1454,14 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::pressure(const rank1_type &U)
+  ProblemDescription<dim>::pressure(const state_type &U)
   {
     return (gamma - 1.) * internal_energy(U);
   }
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::speed_of_sound(const rank1_type &U)
+  ProblemDescription<dim>::speed_of_sound(const state_type &U)
   {
     const double &rho = U[0];
     const double  p   = pressure(U);
@@ -1470,15 +1470,15 @@ namespace Step69
   }
 
   template <int dim>
-  DEAL_II_ALWAYS_INLINE inline typename ProblemDescription<dim>::rank2_type
-  ProblemDescription<dim>::f(const rank1_type &U)
+  DEAL_II_ALWAYS_INLINE inline typename ProblemDescription<dim>::flux_type
+  ProblemDescription<dim>::f(const state_type &U)
   {
     const double &rho = U[0];
     const auto    m   = momentum(U);
     const auto    p   = pressure(U);
     const double &E   = U[dim + 1];
 
-    rank2_type result;
+    flux_type result;
 
     result[0] = m;
     for (unsigned int i = 0; i < dim; ++i)
@@ -1535,7 +1535,7 @@ namespace Step69
     // direction the unit vector.
     template <int dim>
     DEAL_II_ALWAYS_INLINE inline std::array<double, 4> riemann_data_from_state(
-      const typename ProblemDescription<dim>::rank1_type U,
+      const typename ProblemDescription<dim>::state_type U,
       const Tensor<1, dim> &                             n_ij)
     {
       Tensor<1, 3> projected_U;
@@ -1692,8 +1692,8 @@ namespace Step69
 
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline double
-  ProblemDescription<dim>::compute_lambda_max(const rank1_type &    U_i,
-                                              const rank1_type &    U_j,
+  ProblemDescription<dim>::compute_lambda_max(const state_type &    U_i,
+                                              const state_type &    U_j,
                                               const Tensor<1, dim> &n_ij)
   {
     const auto riemann_data_i = riemann_data_from_state(U_i, n_ij);
@@ -1805,12 +1805,12 @@ namespace Step69
     // <code>initial_direction</code> by value.
 
     const auto from_1d_state =
-      [=](const Tensor<1, 3, double> &state_1d) -> rank1_type {
+      [=](const Tensor<1, 3, double> &state_1d) -> state_type {
       const auto rho = state_1d[0];
       const auto u   = state_1d[1];
       const auto p   = state_1d[2];
 
-      rank1_type state;
+      state_type state;
 
       state[0] = rho;
       for (unsigned int i = 0; i < dim; ++i)
@@ -1833,15 +1833,16 @@ namespace Step69
 
   // @sect4{The Forward Euler step}
 
-  // The constructor of the <code>TimeStep</code> class does not contain
+  // The constructor of the <code>TimeStepping</code> class does not contain
   // any surprising code:
 
   template <int dim>
-  TimeStep<dim>::TimeStep(const MPI_Comm            mpi_communicator,
-                          TimerOutput &             computing_timer,
-                          const OfflineData<dim> &  offline_data,
-                          const InitialValues<dim> &initial_values,
-                          const std::string &       subsection /*= "TimeStep"*/)
+  TimeStepping<dim>::TimeStepping(
+    const MPI_Comm            mpi_communicator,
+    TimerOutput &             computing_timer,
+    const OfflineData<dim> &  offline_data,
+    const InitialValues<dim> &initial_values,
+    const std::string &       subsection /*= "TimeStepping"*/)
     : ParameterAcceptor(subsection)
     , mpi_communicator(mpi_communicator)
     , computing_timer(computing_timer)
@@ -1860,10 +1861,10 @@ namespace Step69
   // temporarily before its contents is swapped with the old vector.
 
   template <int dim>
-  void TimeStep<dim>::prepare()
+  void TimeStepping<dim>::prepare()
   {
     TimerOutput::Scope time(computing_timer,
-                            "time_step - prepare scratch space");
+                            "time_stepping - prepare scratch space");
 
     const auto &partitioner = offline_data->partitioner;
     for (auto &it : temp)
@@ -1878,7 +1879,7 @@ namespace Step69
   // state <code>U</code> in place and return the chosen time-step size.
 
   template <int dim>
-  double TimeStep<dim>::make_one_step(vector_type &U, double t)
+  double TimeStepping<dim>::make_one_step(vector_type &U, double t)
   {
     // Declare a number of read-only references to various different
     // variables and data structures. We do this is mainly to have shorter
@@ -1937,7 +1938,8 @@ namespace Step69
     // <code>nij_matrix</code> above are used here again.
 
     {
-      TimerOutput::Scope time(computing_timer, "time_step - 1 compute d_ij");
+      TimerOutput::Scope time(computing_timer,
+                              "time_stepping - 1 compute d_ij");
 
       // We define again a "worker" function <code>on_subranges</code> that
       // computes the viscosity $d_{ij}$ for a subrange [i1, i2) of column
@@ -2030,7 +2032,7 @@ namespace Step69
 
     {
       TimerOutput::Scope time(computing_timer,
-                              "time_step - 2 compute d_ii, and tau_max");
+                              "time_stepping - 2 compute d_ii, and tau_max");
 
       const auto on_subranges = [&](auto i1, const auto i2) {
         // On subrange will be executed on every thread individually. The
@@ -2114,7 +2116,8 @@ namespace Step69
     // artifacts.
 
     {
-      TimerOutput::Scope time(computing_timer, "time_step - 3 perform update");
+      TimerOutput::Scope time(computing_timer,
+                              "time_stepping - 3 perform update");
 
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
@@ -2174,7 +2177,7 @@ namespace Step69
 
     {
       TimerOutput::Scope time(computing_timer,
-                              "time_step - 4 fix boundary states");
+                              "time_stepping - 4 fix boundary states");
 
       const auto on_subranges = [&](const auto it1, const auto it2) {
         for (auto it = it1; it != it2; ++it)
@@ -2191,9 +2194,9 @@ namespace Step69
 
             auto U_i = gather(temp, i);
 
-            // On slip boundaries we remove the normal component of the
+            // On free slip boundaries we remove the normal component of the
             // momentum:
-            if (id == slip)
+            if (id == free_slip)
               {
                 auto m = ProblemDescription<dim>::momentum(U_i);
                 m -= 1. * (m * normal) * normal;
@@ -2326,7 +2329,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximums $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>TimeStep<dim>::step</code> we define $\max_j |\nabla r_j|$ and
+  // <code>TimeStepping<dim>::step</code> we define $\max_j |\nabla r_j|$ and
   // $\min_j |\nabla r_j|$ as atomic doubles in order to
   // resolve any conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max</code> and <code>Utilities::MPI::min</code> to
@@ -2393,10 +2396,10 @@ namespace Step69
                 r_i += c_ij * U_js;
               }
 
-            // We fix up the gradient r_i at slip boundaries similarly to
+            // We fix up the gradient r_i at free slip boundaries similarly to
             // how we fixed up boundary states in the forward Euler step.
             // This avoids sharp, artificial gradients in the Schlieren
-            // plot at slip boundaries and is a purely cosmetic choice.
+            // plot at free slip boundaries and is a purely cosmetic choice.
 
             const auto bnm_it = boundary_normal_map.find(i);
             if (bnm_it != boundary_normal_map.end())
@@ -2404,7 +2407,7 @@ namespace Step69
                 const auto &normal = std::get<0>(bnm_it->second);
                 const auto &id     = std::get<1>(bnm_it->second);
 
-                if (id == slip)
+                if (id == free_slip)
                   r_i -= 1. * (r_i * normal) * normal;
                 else
                   r_i = 0.;
@@ -2480,19 +2483,19 @@ namespace Step69
   //
   // With all classes implemented it is time to create an instance of
   // <code>Discretization<dim></code>, <code>OfflineData<dim></code>,
-  // <code>InitialValues<dim></code>, <code>TimeStep<dim></code>, and
+  // <code>InitialValues<dim></code>, <code>TimeStepping<dim></code>, and
   // <code>SchlierenPostprocessor<dim></code>, and run the forward Euler
   // step in a loop.
   //
-  // In the constructor of <code>TimeLoop<dim></code> we now initialize an
+  // In the constructor of <code>MainLoop<dim></code> we now initialize an
   // instance of all classes, and declare a number of parameters
   // controlling output. Most notable, we declare a boolean parameter
   // <code>resume</code> that will control whether the program attempts to
   // restart from an interrupted computation, or not.
 
   template <int dim>
-  TimeLoop<dim>::TimeLoop(const MPI_Comm mpi_communicator)
-    : ParameterAcceptor("A - TimeLoop")
+  MainLoop<dim>::MainLoop(const MPI_Comm mpi_communicator)
+    : ParameterAcceptor("A - MainLoop")
     , mpi_communicator(mpi_communicator)
     , computing_timer(mpi_communicator,
                       timer_output,
@@ -2505,11 +2508,11 @@ namespace Step69
                    discretization,
                    "C - OfflineData")
     , initial_values("D - InitialValues")
-    , time_step(mpi_communicator,
-                computing_timer,
-                offline_data,
-                initial_values,
-                "E - TimeStep")
+    , time_stepping(mpi_communicator,
+                    computing_timer,
+                    offline_data,
+                    initial_values,
+                    "E - TimeStepping")
     , schlieren_postprocessor(mpi_communicator,
                               computing_timer,
                               offline_data,
@@ -2564,11 +2567,11 @@ namespace Step69
   } // namespace
 
   // With <code>print_head</code> in place it is now time to implement the
-  // <code>TimeLoop<dim>::run()</code> that contains the main loop of our
+  // <code>MainLoop<dim>::run()</code> that contains the main loop of our
   // program.
 
   template <int dim>
-  void TimeLoop<dim>::run()
+  void MainLoop<dim>::run()
   {
     // We start by reading in parameters and initializing all objects. We
     // note here that the call to ParameterAcceptor::initialize reads in
@@ -2605,7 +2608,7 @@ namespace Step69
     // and set up scratch space:
 
     print_head(pcout, "set up time step");
-    time_step.prepare();
+    time_stepping.prepare();
     schlieren_postprocessor.prepare();
 
     // We will store the current time and state in the variable
@@ -2679,10 +2682,10 @@ namespace Step69
 
         // and then perform a single forward Euler step. Note that the
         // state vector <code>U</code> is updated in place and that
-        // <code>time_step.make_one_step()</code> returns the chosen step
+        // <code>time_stepping.make_one_step()</code> returns the chosen step
         // size.
 
-        t += time_step.make_one_step(U, t);
+        t += time_stepping.make_one_step(U, t);
 
         // Post processing, generating output and writing out the current
         // state is a CPU and IO intensive task that we cannot afford to do
@@ -2710,13 +2713,13 @@ namespace Step69
   // help of the <code>InitialValues<dim>::initial_state</code> object.
 
   template <int dim>
-  typename TimeLoop<dim>::vector_type
-  TimeLoop<dim>::interpolate_initial_values(const double t)
+  typename MainLoop<dim>::vector_type
+  MainLoop<dim>::interpolate_initial_values(const double t)
   {
-    pcout << "TimeLoop<dim>::interpolate_initial_values(t = " << t << ")"
+    pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ")"
           << std::endl;
     TimerOutput::Scope timer(computing_timer,
-                             "time_loop - setup scratch space");
+                             "main_loop - setup scratch space");
 
     vector_type U;
 
@@ -2765,13 +2768,13 @@ namespace Step69
   //    run the postprocessing outside of the worker thread.
 
   template <int dim>
-  void TimeLoop<dim>::output(const typename TimeLoop<dim>::vector_type &U,
+  void MainLoop<dim>::output(const typename MainLoop<dim>::vector_type &U,
                              const std::string &                        name,
                              const double                               t,
                              const unsigned int                         cycle,
                              const bool checkpoint)
   {
-    pcout << "TimeLoop<dim>::output(t = " << t
+    pcout << "MainLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;
 
     // We check if the output thread is still running. If so, we have to
@@ -2782,7 +2785,7 @@ namespace Step69
 
     if (output_thread.joinable())
       {
-        TimerOutput::Scope timer(computing_timer, "time_loop - stalled output");
+        TimerOutput::Scope timer(computing_timer, "main_loop - stalled output");
         output_thread.join();
       }
 
@@ -2884,7 +2887,7 @@ int main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   MPI_Comm      mpi_communicator(MPI_COMM_WORLD);
-  TimeLoop<dim> time_loop(mpi_communicator);
+  MainLoop<dim> main_loop(mpi_communicator);
 
-  time_loop.run();
+  main_loop.run();
 }
