@@ -623,7 +623,7 @@ namespace Step69
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           {
             const auto face = cell->face(f);
 
@@ -1064,7 +1064,7 @@ namespace Step69
         // Now we have to compute the boundary normals. Note that the
         // following loop does not do much unless the element has faces on
         // the boundary of the domain.
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           {
             const auto face = cell->face(f);
             const auto id   = face->boundary_id();
@@ -1346,7 +1346,7 @@ namespace Step69
         for (auto &matrix : cell_cij_matrix)
           matrix = 0.;
 
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (auto f : GeometryInfo<dim>::face_indices())
           {
             const auto face = cell->face(f);
             const auto id   = face->boundary_id();
