@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <array>
 #include <cmath>
 
 // Note:
@@ -677,6 +678,31 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 
 
 /**
+ * Load @p n_array_elements from memory into the the VectorizedArray @p out,
+ * starting at the given addresses and with given offset, each entry from the
+ * offset providing one element of the vectorized array.
+ *
+ * This operation corresponds to the following code:
+ * @code
+ * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+ *   out.data[v] = ptrs[v][offset];
+ * @endcode
+ */
+template <typename Number, int width, std::size_t width_>
+inline DEAL_II_ALWAYS_INLINE void
+gather(VectorizedArray<Number, width> &    out,
+       const std::array<Number *, width_> &ptrs,
+       const unsigned int                  offset)
+{
+  static_assert(width == width_, "Length of input vector do not match!");
+
+  for (unsigned int v = 0; v < width_; v++)
+    out.data[v] = ptrs[v][offset];
+}
+
+
+
+/**
  * This method loads VectorizedArray::n_array_elements data streams from the
  * given array @p in. The offsets to the input array are given by the array @p
  * offsets. From each stream, n_entries are read. The data is then transposed
@@ -713,6 +739,33 @@ vectorized_load_and_transpose(const unsigned int              n_entries,
          v < VectorizedArray<Number, width>::n_array_elements;
          ++v)
       out[i][v] = in[offsets[v] + i];
+}
+
+
+/**
+ * The same as above with the difference that an array of pointers are
+ * passed in as input argument @p in.
+ *
+ * In analogy to the function above, one can consider that
+ * `in+offset[v]` is precomputed and passed as input argument.
+ *
+ * However, this function can also be used if some function returns an array
+ * of pointers and no assumption can be made that they belong to the same array,
+ * i.e., they can have their origin in different memory allocations.
+ */
+template <typename Number, int width, std::size_t width_>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int                  n_entries,
+                              const std::array<Number *, width_> &in,
+                              VectorizedArray<Number, width> *    out)
+{
+  static_assert(width == width_, "Length of input vector do not match!");
+
+  for (unsigned int i = 0; i < n_entries; ++i)
+    for (unsigned int v = 0;
+         v < VectorizedArray<Number, width>::n_array_elements;
+         ++v)
+      out[i][v] = in[v][i];
 }
 
 
@@ -775,6 +828,41 @@ vectorized_transpose_and_store(const bool                            add_into,
            v < VectorizedArray<Number, width>::n_array_elements;
            ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+/**
+ * The same as above with the difference that an array of pointers are
+ * passed in as input argument @p out.
+ *
+ * In analogy to the function above, one can consider that
+ * `out+offset[v]` is precomputed and passed as input argument.
+ *
+ * However, this function can also be used if some function returns an array
+ * of pointers and no assumption can be made that they belong to the same array,
+ * i.e., they can have their origin in different memory allocations.
+ */
+template <typename Number, int width, std::size_t width_>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                            add_into,
+                               const unsigned int                    n_entries,
+                               const VectorizedArray<Number, width> *in,
+                               std::array<Number *, width_> &        out)
+{
+  static_assert(width == width_, "Length of input vector do not match!");
+
+  if (add_into)
+    for (unsigned int i = 0; i < n_entries; ++i)
+      for (unsigned int v = 0;
+           v < VectorizedArray<Number, width>::n_array_elements;
+           ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 0; i < n_entries; ++i)
+      for (unsigned int v = 0;
+           v < VectorizedArray<Number, width>::n_array_elements;
+           ++v)
+        out[v][i] = in[i][v];
 }
 
 
@@ -1144,6 +1232,45 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int             n_entries,
+                              const std::array<double *, 8> &in,
+                              VectorizedArray<double, 8> *   out)
+{
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m512d t0, t1, t2, t3 = {};
+
+      t0 = _mm512_insertf64x4(t3, _mm256_loadu_pd(in[0] + 4 * i), 0);
+      t0 = _mm512_insertf64x4(t0, _mm256_loadu_pd(in[2] + 4 * i), 1);
+      t1 = _mm512_insertf64x4(t3, _mm256_loadu_pd(in[1] + 4 * i), 0);
+      t1 = _mm512_insertf64x4(t1, _mm256_loadu_pd(in[3] + 4 * i), 1);
+      t2 = _mm512_insertf64x4(t3, _mm256_loadu_pd(in[4] + 4 * i), 0);
+      t2 = _mm512_insertf64x4(t2, _mm256_loadu_pd(in[6] + 4 * i), 1);
+      t3 = _mm512_insertf64x4(t3, _mm256_loadu_pd(in[5] + 4 * i), 0);
+      t3 = _mm512_insertf64x4(t3, _mm256_loadu_pd(in[7] + 4 * i), 1);
+
+      __m512d v0          = _mm512_shuffle_f64x2(t0, t2, 0x88);
+      __m512d v1          = _mm512_shuffle_f64x2(t0, t2, 0xdd);
+      __m512d v2          = _mm512_shuffle_f64x2(t1, t3, 0x88);
+      __m512d v3          = _mm512_shuffle_f64x2(t1, t3, 0xdd);
+      out[4 * i + 0].data = _mm512_unpacklo_pd(v0, v2);
+      out[4 * i + 1].data = _mm512_unpackhi_pd(v0, v2);
+      out[4 * i + 2].data = _mm512_unpacklo_pd(v1, v3);
+      out[4 * i + 3].data = _mm512_unpackhi_pd(v1, v3);
+    }
+
+  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+    gather(out[i], in, i);
+}
+
+
+
+/**
+ * Specialization for double and AVX-512.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 8> *in,
@@ -1218,6 +1345,84 @@ vectorized_transpose_and_store(const bool                        add_into,
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 8; ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+
+/**
+ * Specialization for double and AVX-512.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 8> *in,
+                               std::array<double *, 8> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 4;
+  __m512i mask1 = _mm512_set_epi64(0xd, 0xc, 0x5, 0x4, 0x9, 0x8, 0x1, 0x0);
+  __m512i mask2 = _mm512_set_epi64(0xf, 0xe, 0x7, 0x6, 0xb, 0xa, 0x3, 0x2);
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m512d t0   = _mm512_unpacklo_pd(in[i * 4].data, in[i * 4 + 1].data);
+      __m512d t1   = _mm512_unpackhi_pd(in[i * 4].data, in[i * 4 + 1].data);
+      __m512d t2   = _mm512_unpacklo_pd(in[i * 4 + 2].data, in[i * 4 + 3].data);
+      __m512d t3   = _mm512_unpackhi_pd(in[i * 4 + 2].data, in[i * 4 + 3].data);
+      __m512d v0   = _mm512_permutex2var_pd(t0, mask1, t2);
+      __m512d v1   = _mm512_permutex2var_pd(t0, mask2, t2);
+      __m512d v2   = _mm512_permutex2var_pd(t1, mask1, t3);
+      __m512d v3   = _mm512_permutex2var_pd(t1, mask2, t3);
+      __m256d res0 = _mm512_extractf64x4_pd(v0, 0);
+      __m256d res4 = _mm512_extractf64x4_pd(v0, 1);
+      __m256d res1 = _mm512_extractf64x4_pd(v2, 0);
+      __m256d res5 = _mm512_extractf64x4_pd(v2, 1);
+      __m256d res2 = _mm512_extractf64x4_pd(v1, 0);
+      __m256d res6 = _mm512_extractf64x4_pd(v1, 1);
+      __m256d res3 = _mm512_extractf64x4_pd(v3, 0);
+      __m256d res7 = _mm512_extractf64x4_pd(v3, 1);
+
+      if (add_into)
+        {
+          res0 = _mm256_add_pd(_mm256_loadu_pd(out[0] + 4 * i), res0);
+          _mm256_storeu_pd(out[0] + 4 * i, res0);
+          res1 = _mm256_add_pd(_mm256_loadu_pd(out[1] + 4 * i), res1);
+          _mm256_storeu_pd(out[1] + 4 * i, res1);
+          res2 = _mm256_add_pd(_mm256_loadu_pd(out[2] + 4 * i), res2);
+          _mm256_storeu_pd(out[2] + 4 * i, res2);
+          res3 = _mm256_add_pd(_mm256_loadu_pd(out[3] + 4 * i), res3);
+          _mm256_storeu_pd(out[3] + 4 * i, res3);
+          res4 = _mm256_add_pd(_mm256_loadu_pd(out[4] + 4 * i), res4);
+          _mm256_storeu_pd(out[4] + 4 * i, res4);
+          res5 = _mm256_add_pd(_mm256_loadu_pd(out[5] + 4 * i), res5);
+          _mm256_storeu_pd(out[5] + 4 * i, res5);
+          res6 = _mm256_add_pd(_mm256_loadu_pd(out[6] + 4 * i), res6);
+          _mm256_storeu_pd(out[6] + 4 * i, res6);
+          res7 = _mm256_add_pd(_mm256_loadu_pd(out[7] + 4 * i), res7);
+          _mm256_storeu_pd(out[7] + 4 * i, res7);
+        }
+      else
+        {
+          _mm256_storeu_pd(out[0] + 4 * i, res0);
+          _mm256_storeu_pd(out[1] + 4 * i, res1);
+          _mm256_storeu_pd(out[2] + 4 * i, res2);
+          _mm256_storeu_pd(out[3] + 4 * i, res3);
+          _mm256_storeu_pd(out[4] + 4 * i, res4);
+          _mm256_storeu_pd(out[5] + 4 * i, res5);
+          _mm256_storeu_pd(out[6] + 4 * i, res6);
+          _mm256_storeu_pd(out[7] + 4 * i, res7);
+        }
+    }
+
+  if (add_into)
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 8; ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 8; ++v)
+        out[v][i] = in[i][v];
 }
 
 
@@ -1548,7 +1753,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
   // To avoid warnings about uninitialized variables, need to initialize one
   // variable to a pre-exisiting value in out, which will never get used in
   // the end. Keep the initialization outside the loop because of a bug in
-  // gcc-9 which generates a "vmovapd" instruction instead of "vmovupd" in
+  // gcc-9.1 which generates a "vmovapd" instruction instead of "vmovupd" in
   // case t3 is initialized to zero (inside/outside of loop), see
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90991
   __m512 t0, t1, t2, t3;
@@ -1586,8 +1791,59 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
 
   // remainder loop of work that does not divide by 4
   for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    for (unsigned int v = 0; v < 8; ++v)
-      out[i].gather(in + i, offsets);
+    out[i].gather(in + i, offsets);
+}
+
+
+
+/**
+ * Specialization for float and AVX-512.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int             n_entries,
+                              const std::array<float *, 16> &in,
+                              VectorizedArray<float, 16> *   out)
+{
+  // see the comments in the vectorized_load_and_transpose above
+
+  const unsigned int n_chunks = n_entries / 4;
+
+  __m512 t0, t1, t2, t3;
+  if (n_chunks > 0)
+    t3 = out[0].data;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      t0 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[0] + 4 * i), 0);
+      t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[4] + 4 * i), 1);
+      t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[8] + 4 * i), 2);
+      t0 = _mm512_insertf32x4(t0, _mm_loadu_ps(in[12] + 4 * i), 3);
+      t1 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[1] + 4 * i), 0);
+      t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in[5] + 4 * i), 1);
+      t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in[9] + 4 * i), 2);
+      t1 = _mm512_insertf32x4(t1, _mm_loadu_ps(in[13] + 4 * i), 3);
+      t2 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[2] + 4 * i), 0);
+      t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in[6] + 4 * i), 1);
+      t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in[10] + 4 * i), 2);
+      t2 = _mm512_insertf32x4(t2, _mm_loadu_ps(in[14] + 4 * i), 3);
+      t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[3] + 4 * i), 0);
+      t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[7] + 4 * i), 1);
+      t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[11] + 4 * i), 2);
+      t3 = _mm512_insertf32x4(t3, _mm_loadu_ps(in[15] + 4 * i), 3);
+
+      __m512 v0 = _mm512_shuffle_ps(t0, t1, 0x44);
+      __m512 v1 = _mm512_shuffle_ps(t0, t1, 0xee);
+      __m512 v2 = _mm512_shuffle_ps(t2, t3, 0x44);
+      __m512 v3 = _mm512_shuffle_ps(t2, t3, 0xee);
+
+      out[4 * i + 0].data = _mm512_shuffle_ps(v0, v2, 0x88);
+      out[4 * i + 1].data = _mm512_shuffle_ps(v0, v2, 0xdd);
+      out[4 * i + 2].data = _mm512_shuffle_ps(v1, v3, 0x88);
+      out[4 * i + 3].data = _mm512_shuffle_ps(v1, v3, 0xdd);
+    }
+
+  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+    gather(out[i], in, i);
 }
 
 
@@ -1702,6 +1958,117 @@ vectorized_transpose_and_store(const bool                        add_into,
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 16; ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+
+/**
+ * Specialization for float and AVX-512.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<float, 16> *in,
+                               std::array<float *, 16> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m512 t0 = _mm512_shuffle_ps(in[4 * i].data, in[1 + 4 * i].data, 0x44);
+      __m512 t1 = _mm512_shuffle_ps(in[4 * i].data, in[1 + 4 * i].data, 0xee);
+      __m512 t2 =
+        _mm512_shuffle_ps(in[2 + 4 * i].data, in[3 + 4 * i].data, 0x44);
+      __m512 t3 =
+        _mm512_shuffle_ps(in[2 + 4 * i].data, in[3 + 4 * i].data, 0xee);
+      __m512 u0 = _mm512_shuffle_ps(t0, t2, 0x88);
+      __m512 u1 = _mm512_shuffle_ps(t0, t2, 0xdd);
+      __m512 u2 = _mm512_shuffle_ps(t1, t3, 0x88);
+      __m512 u3 = _mm512_shuffle_ps(t1, t3, 0xdd);
+
+      __m128 res0  = _mm512_extractf32x4_ps(u0, 0);
+      __m128 res4  = _mm512_extractf32x4_ps(u0, 1);
+      __m128 res8  = _mm512_extractf32x4_ps(u0, 2);
+      __m128 res12 = _mm512_extractf32x4_ps(u0, 3);
+      __m128 res1  = _mm512_extractf32x4_ps(u1, 0);
+      __m128 res5  = _mm512_extractf32x4_ps(u1, 1);
+      __m128 res9  = _mm512_extractf32x4_ps(u1, 2);
+      __m128 res13 = _mm512_extractf32x4_ps(u1, 3);
+      __m128 res2  = _mm512_extractf32x4_ps(u2, 0);
+      __m128 res6  = _mm512_extractf32x4_ps(u2, 1);
+      __m128 res10 = _mm512_extractf32x4_ps(u2, 2);
+      __m128 res14 = _mm512_extractf32x4_ps(u2, 3);
+      __m128 res3  = _mm512_extractf32x4_ps(u3, 0);
+      __m128 res7  = _mm512_extractf32x4_ps(u3, 1);
+      __m128 res11 = _mm512_extractf32x4_ps(u3, 2);
+      __m128 res15 = _mm512_extractf32x4_ps(u3, 3);
+
+      if (add_into)
+        {
+          res0 = _mm_add_ps(_mm_loadu_ps(out[0] + 4 * i), res0);
+          _mm_storeu_ps(out[0] + 4 * i, res0);
+          res1 = _mm_add_ps(_mm_loadu_ps(out[1] + 4 * i), res1);
+          _mm_storeu_ps(out[1] + 4 * i, res1);
+          res2 = _mm_add_ps(_mm_loadu_ps(out[2] + 4 * i), res2);
+          _mm_storeu_ps(out[2] + 4 * i, res2);
+          res3 = _mm_add_ps(_mm_loadu_ps(out[3] + 4 * i), res3);
+          _mm_storeu_ps(out[3] + 4 * i, res3);
+          res4 = _mm_add_ps(_mm_loadu_ps(out[4] + 4 * i), res4);
+          _mm_storeu_ps(out[4] + 4 * i, res4);
+          res5 = _mm_add_ps(_mm_loadu_ps(out[5] + 4 * i), res5);
+          _mm_storeu_ps(out[5] + 4 * i, res5);
+          res6 = _mm_add_ps(_mm_loadu_ps(out[6] + 4 * i), res6);
+          _mm_storeu_ps(out[6] + 4 * i, res6);
+          res7 = _mm_add_ps(_mm_loadu_ps(out[7] + 4 * i), res7);
+          _mm_storeu_ps(out[7] + 4 * i, res7);
+          res8 = _mm_add_ps(_mm_loadu_ps(out[8] + 4 * i), res8);
+          _mm_storeu_ps(out[8] + 4 * i, res8);
+          res9 = _mm_add_ps(_mm_loadu_ps(out[9] + 4 * i), res9);
+          _mm_storeu_ps(out[9] + 4 * i, res9);
+          res10 = _mm_add_ps(_mm_loadu_ps(out[10] + 4 * i), res10);
+          _mm_storeu_ps(out[10] + 4 * i, res10);
+          res11 = _mm_add_ps(_mm_loadu_ps(out[11] + 4 * i), res11);
+          _mm_storeu_ps(out[11] + 4 * i, res11);
+          res12 = _mm_add_ps(_mm_loadu_ps(out[12] + 4 * i), res12);
+          _mm_storeu_ps(out[12] + 4 * i, res12);
+          res13 = _mm_add_ps(_mm_loadu_ps(out[13] + 4 * i), res13);
+          _mm_storeu_ps(out[13] + 4 * i, res13);
+          res14 = _mm_add_ps(_mm_loadu_ps(out[14] + 4 * i), res14);
+          _mm_storeu_ps(out[14] + 4 * i, res14);
+          res15 = _mm_add_ps(_mm_loadu_ps(out[15] + 4 * i), res15);
+          _mm_storeu_ps(out[15] + 4 * i, res15);
+        }
+      else
+        {
+          _mm_storeu_ps(out[0] + 4 * i, res0);
+          _mm_storeu_ps(out[1] + 4 * i, res1);
+          _mm_storeu_ps(out[2] + 4 * i, res2);
+          _mm_storeu_ps(out[3] + 4 * i, res3);
+          _mm_storeu_ps(out[4] + 4 * i, res4);
+          _mm_storeu_ps(out[5] + 4 * i, res5);
+          _mm_storeu_ps(out[6] + 4 * i, res6);
+          _mm_storeu_ps(out[7] + 4 * i, res7);
+          _mm_storeu_ps(out[8] + 4 * i, res8);
+          _mm_storeu_ps(out[9] + 4 * i, res9);
+          _mm_storeu_ps(out[10] + 4 * i, res10);
+          _mm_storeu_ps(out[11] + 4 * i, res11);
+          _mm_storeu_ps(out[12] + 4 * i, res12);
+          _mm_storeu_ps(out[13] + 4 * i, res13);
+          _mm_storeu_ps(out[14] + 4 * i, res14);
+          _mm_storeu_ps(out[15] + 4 * i, res15);
+        }
+    }
+
+  if (add_into)
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 16; ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 16; ++v)
+        out[v][i] = in[i][v];
 }
 
 #  endif
@@ -2050,6 +2417,45 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int             n_entries,
+                              const std::array<double *, 4> &in,
+                              VectorizedArray<double, 4> *   out)
+{
+  // see the comments in the vectorized_load_and_transpose above
+
+  const unsigned int n_chunks = n_entries / 4;
+  const double *     in0      = in[0];
+  const double *     in1      = in[1];
+  const double *     in2      = in[2];
+  const double *     in3      = in[3];
+
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m256d u0          = _mm256_loadu_pd(in0 + 4 * i);
+      __m256d u1          = _mm256_loadu_pd(in1 + 4 * i);
+      __m256d u2          = _mm256_loadu_pd(in2 + 4 * i);
+      __m256d u3          = _mm256_loadu_pd(in3 + 4 * i);
+      __m256d t0          = _mm256_permute2f128_pd(u0, u2, 0x20);
+      __m256d t1          = _mm256_permute2f128_pd(u1, u3, 0x20);
+      __m256d t2          = _mm256_permute2f128_pd(u0, u2, 0x31);
+      __m256d t3          = _mm256_permute2f128_pd(u1, u3, 0x31);
+      out[4 * i + 0].data = _mm256_unpacklo_pd(t0, t1);
+      out[4 * i + 1].data = _mm256_unpackhi_pd(t0, t1);
+      out[4 * i + 2].data = _mm256_unpacklo_pd(t2, t3);
+      out[4 * i + 3].data = _mm256_unpackhi_pd(t2, t3);
+    }
+
+  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+    gather(out[i], in, i);
+}
+
+
+
+/**
+ * Specialization for double and AVX.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 4> *in,
@@ -2108,6 +2514,74 @@ vectorized_transpose_and_store(const bool                        add_into,
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 4; ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+
+/**
+ * Specialization for double and AVX.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 4> *in,
+                               std::array<double *, 4> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 4;
+  double *           out0     = out[0];
+  double *           out1     = out[1];
+  double *           out2     = out[2];
+  double *           out3     = out[3];
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m256d u0   = in[4 * i + 0].data;
+      __m256d u1   = in[4 * i + 1].data;
+      __m256d u2   = in[4 * i + 2].data;
+      __m256d u3   = in[4 * i + 3].data;
+      __m256d t0   = _mm256_permute2f128_pd(u0, u2, 0x20);
+      __m256d t1   = _mm256_permute2f128_pd(u1, u3, 0x20);
+      __m256d t2   = _mm256_permute2f128_pd(u0, u2, 0x31);
+      __m256d t3   = _mm256_permute2f128_pd(u1, u3, 0x31);
+      __m256d res0 = _mm256_unpacklo_pd(t0, t1);
+      __m256d res1 = _mm256_unpackhi_pd(t0, t1);
+      __m256d res2 = _mm256_unpacklo_pd(t2, t3);
+      __m256d res3 = _mm256_unpackhi_pd(t2, t3);
+
+      // Cannot use the same store instructions in both paths of the 'if'
+      // because the compiler cannot know that there is no aliasing between
+      // pointers
+      if (add_into)
+        {
+          res0 = _mm256_add_pd(_mm256_loadu_pd(out0 + 4 * i), res0);
+          _mm256_storeu_pd(out0 + 4 * i, res0);
+          res1 = _mm256_add_pd(_mm256_loadu_pd(out1 + 4 * i), res1);
+          _mm256_storeu_pd(out1 + 4 * i, res1);
+          res2 = _mm256_add_pd(_mm256_loadu_pd(out2 + 4 * i), res2);
+          _mm256_storeu_pd(out2 + 4 * i, res2);
+          res3 = _mm256_add_pd(_mm256_loadu_pd(out3 + 4 * i), res3);
+          _mm256_storeu_pd(out3 + 4 * i, res3);
+        }
+      else
+        {
+          _mm256_storeu_pd(out0 + 4 * i, res0);
+          _mm256_storeu_pd(out1 + 4 * i, res1);
+          _mm256_storeu_pd(out2 + 4 * i, res2);
+          _mm256_storeu_pd(out3 + 4 * i, res3);
+        }
+    }
+
+  // remainder loop of work that does not divide by 4
+  if (add_into)
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 4; ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 4; ++v)
+        out[v][i] = in[i][v];
 }
 
 
@@ -2457,6 +2931,46 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int            n_entries,
+                              const std::array<float *, 8> &in,
+                              VectorizedArray<float, 8> *   out)
+{
+  // see the comments in the vectorized_load_and_transpose above
+
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m256 t0, t1, t2, t3 = {};
+      t0 = _mm256_insertf128_ps(t3, _mm_loadu_ps(in[0] + 4 * i), 0);
+      t0 = _mm256_insertf128_ps(t0, _mm_loadu_ps(in[4] + 4 * i), 1);
+      t1 = _mm256_insertf128_ps(t3, _mm_loadu_ps(in[1] + 4 * i), 0);
+      t1 = _mm256_insertf128_ps(t1, _mm_loadu_ps(in[5] + 4 * i), 1);
+      t2 = _mm256_insertf128_ps(t3, _mm_loadu_ps(in[2] + 4 * i), 0);
+      t2 = _mm256_insertf128_ps(t2, _mm_loadu_ps(in[6] + 4 * i), 1);
+      t3 = _mm256_insertf128_ps(t3, _mm_loadu_ps(in[3] + 4 * i), 0);
+      t3 = _mm256_insertf128_ps(t3, _mm_loadu_ps(in[7] + 4 * i), 1);
+
+      __m256 v0           = _mm256_shuffle_ps(t0, t1, 0x44);
+      __m256 v1           = _mm256_shuffle_ps(t0, t1, 0xee);
+      __m256 v2           = _mm256_shuffle_ps(t2, t3, 0x44);
+      __m256 v3           = _mm256_shuffle_ps(t2, t3, 0xee);
+      out[4 * i + 0].data = _mm256_shuffle_ps(v0, v2, 0x88);
+      out[4 * i + 1].data = _mm256_shuffle_ps(v0, v2, 0xdd);
+      out[4 * i + 2].data = _mm256_shuffle_ps(v1, v3, 0x88);
+      out[4 * i + 3].data = _mm256_shuffle_ps(v1, v3, 0xdd);
+    }
+
+  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+    gather(out[i], in, i);
+}
+
+
+
+/**
+ * Specialization for float and AVX.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 8> *in,
@@ -2531,6 +3045,86 @@ vectorized_transpose_and_store(const bool                       add_into,
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 8; ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+
+/**
+ * Specialization for float and AVX.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                       add_into,
+                               const unsigned int               n_entries,
+                               const VectorizedArray<float, 8> *in,
+                               std::array<float *, 8> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m256 u0   = in[4 * i + 0].data;
+      __m256 u1   = in[4 * i + 1].data;
+      __m256 u2   = in[4 * i + 2].data;
+      __m256 u3   = in[4 * i + 3].data;
+      __m256 t0   = _mm256_shuffle_ps(u0, u1, 0x44);
+      __m256 t1   = _mm256_shuffle_ps(u0, u1, 0xee);
+      __m256 t2   = _mm256_shuffle_ps(u2, u3, 0x44);
+      __m256 t3   = _mm256_shuffle_ps(u2, u3, 0xee);
+      u0          = _mm256_shuffle_ps(t0, t2, 0x88);
+      u1          = _mm256_shuffle_ps(t0, t2, 0xdd);
+      u2          = _mm256_shuffle_ps(t1, t3, 0x88);
+      u3          = _mm256_shuffle_ps(t1, t3, 0xdd);
+      __m128 res0 = _mm256_extractf128_ps(u0, 0);
+      __m128 res4 = _mm256_extractf128_ps(u0, 1);
+      __m128 res1 = _mm256_extractf128_ps(u1, 0);
+      __m128 res5 = _mm256_extractf128_ps(u1, 1);
+      __m128 res2 = _mm256_extractf128_ps(u2, 0);
+      __m128 res6 = _mm256_extractf128_ps(u2, 1);
+      __m128 res3 = _mm256_extractf128_ps(u3, 0);
+      __m128 res7 = _mm256_extractf128_ps(u3, 1);
+
+      if (add_into)
+        {
+          res0 = _mm_add_ps(_mm_loadu_ps(out[0] + 4 * i), res0);
+          _mm_storeu_ps(out[0] + 4 * i, res0);
+          res1 = _mm_add_ps(_mm_loadu_ps(out[1] + 4 * i), res1);
+          _mm_storeu_ps(out[1] + 4 * i, res1);
+          res2 = _mm_add_ps(_mm_loadu_ps(out[2] + 4 * i), res2);
+          _mm_storeu_ps(out[2] + 4 * i, res2);
+          res3 = _mm_add_ps(_mm_loadu_ps(out[3] + 4 * i), res3);
+          _mm_storeu_ps(out[3] + 4 * i, res3);
+          res4 = _mm_add_ps(_mm_loadu_ps(out[4] + 4 * i), res4);
+          _mm_storeu_ps(out[4] + 4 * i, res4);
+          res5 = _mm_add_ps(_mm_loadu_ps(out[5] + 4 * i), res5);
+          _mm_storeu_ps(out[5] + 4 * i, res5);
+          res6 = _mm_add_ps(_mm_loadu_ps(out[6] + 4 * i), res6);
+          _mm_storeu_ps(out[6] + 4 * i, res6);
+          res7 = _mm_add_ps(_mm_loadu_ps(out[7] + 4 * i), res7);
+          _mm_storeu_ps(out[7] + 4 * i, res7);
+        }
+      else
+        {
+          _mm_storeu_ps(out[0] + 4 * i, res0);
+          _mm_storeu_ps(out[1] + 4 * i, res1);
+          _mm_storeu_ps(out[2] + 4 * i, res2);
+          _mm_storeu_ps(out[3] + 4 * i, res3);
+          _mm_storeu_ps(out[4] + 4 * i, res4);
+          _mm_storeu_ps(out[5] + 4 * i, res5);
+          _mm_storeu_ps(out[6] + 4 * i, res6);
+          _mm_storeu_ps(out[7] + 4 * i, res7);
+        }
+    }
+
+  if (add_into)
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 8; ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 8; ++v)
+        out[v][i] = in[i][v];
 }
 
 #  endif
@@ -2853,6 +3447,33 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int             n_entries,
+                              const std::array<double *, 2> &in,
+                              VectorizedArray<double, 2> *   out)
+{
+  // see the comments in the vectorized_load_and_transpose above
+
+  const unsigned int n_chunks = n_entries / 2;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m128d u0          = _mm_loadu_pd(in[0] + 2 * i);
+      __m128d u1          = _mm_loadu_pd(in[1] + 2 * i);
+      out[2 * i + 0].data = _mm_unpacklo_pd(u0, u1);
+      out[2 * i + 1].data = _mm_unpackhi_pd(u0, u1);
+    }
+
+  for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
+    for (unsigned int v = 0; v < 2; ++v)
+      out[i][v] = in[v][i];
+}
+
+
+
+/**
+ * Specialization for double and SSE2.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 2> *in,
@@ -2895,6 +3516,57 @@ vectorized_transpose_and_store(const bool                        add_into,
       for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 2; ++v)
           out[offsets[v] + i] = in[i][v];
+    }
+}
+
+
+
+/**
+ * Specialization for double and SSE2.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                        add_into,
+                               const unsigned int                n_entries,
+                               const VectorizedArray<double, 2> *in,
+                               std::array<double *, 2> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 2;
+  if (add_into)
+    {
+      for (unsigned int i = 0; i < n_chunks; ++i)
+        {
+          __m128d u0   = in[2 * i + 0].data;
+          __m128d u1   = in[2 * i + 1].data;
+          __m128d res0 = _mm_unpacklo_pd(u0, u1);
+          __m128d res1 = _mm_unpackhi_pd(u0, u1);
+          _mm_storeu_pd(out[0] + 2 * i,
+                        _mm_add_pd(_mm_loadu_pd(out[0] + 2 * i), res0));
+          _mm_storeu_pd(out[1] + 2 * i,
+                        _mm_add_pd(_mm_loadu_pd(out[1] + 2 * i), res1));
+        }
+
+      for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
+        for (unsigned int v = 0; v < 2; ++v)
+          out[v][i] += in[i][v];
+    }
+  else
+    {
+      for (unsigned int i = 0; i < n_chunks; ++i)
+        {
+          __m128d u0   = in[2 * i + 0].data;
+          __m128d u1   = in[2 * i + 1].data;
+          __m128d res0 = _mm_unpacklo_pd(u0, u1);
+          __m128d res1 = _mm_unpackhi_pd(u0, u1);
+          _mm_storeu_pd(out[0] + 2 * i, res0);
+          _mm_storeu_pd(out[1] + 2 * i, res1);
+        }
+
+      for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
+        for (unsigned int v = 0; v < 2; ++v)
+          out[v][i] = in[i][v];
     }
 }
 
@@ -3224,6 +3896,41 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
+vectorized_load_and_transpose(const unsigned int            n_entries,
+                              const std::array<float *, 4> &in,
+                              VectorizedArray<float, 4> *   out)
+{
+  // see the comments in the vectorized_load_and_transpose above
+
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m128 u0           = _mm_loadu_ps(in[0] + 4 * i);
+      __m128 u1           = _mm_loadu_ps(in[1] + 4 * i);
+      __m128 u2           = _mm_loadu_ps(in[2] + 4 * i);
+      __m128 u3           = _mm_loadu_ps(in[3] + 4 * i);
+      __m128 v0           = _mm_shuffle_ps(u0, u1, 0x44);
+      __m128 v1           = _mm_shuffle_ps(u0, u1, 0xee);
+      __m128 v2           = _mm_shuffle_ps(u2, u3, 0x44);
+      __m128 v3           = _mm_shuffle_ps(u2, u3, 0xee);
+      out[4 * i + 0].data = _mm_shuffle_ps(v0, v2, 0x88);
+      out[4 * i + 1].data = _mm_shuffle_ps(v0, v2, 0xdd);
+      out[4 * i + 2].data = _mm_shuffle_ps(v1, v3, 0x88);
+      out[4 * i + 3].data = _mm_shuffle_ps(v1, v3, 0xdd);
+    }
+
+  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+    for (unsigned int v = 0; v < 4; ++v)
+      out[i][v] = in[v][i];
+}
+
+
+
+/**
+ * Specialization for float and SSE2.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 4> *in,
@@ -3278,6 +3985,66 @@ vectorized_transpose_and_store(const bool                       add_into,
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
       for (unsigned int v = 0; v < 4; ++v)
         out[offsets[v] + i] = in[i][v];
+}
+
+
+
+/**
+ * Specialization for float and SSE2.
+ */
+template <>
+inline DEAL_II_ALWAYS_INLINE void
+vectorized_transpose_and_store(const bool                       add_into,
+                               const unsigned int               n_entries,
+                               const VectorizedArray<float, 4> *in,
+                               std::array<float *, 4> &         out)
+{
+  // see the comments in the vectorized_transpose_and_store above
+
+  const unsigned int n_chunks = n_entries / 4;
+  for (unsigned int i = 0; i < n_chunks; ++i)
+    {
+      __m128 u0 = in[4 * i + 0].data;
+      __m128 u1 = in[4 * i + 1].data;
+      __m128 u2 = in[4 * i + 2].data;
+      __m128 u3 = in[4 * i + 3].data;
+      __m128 t0 = _mm_shuffle_ps(u0, u1, 0x44);
+      __m128 t1 = _mm_shuffle_ps(u0, u1, 0xee);
+      __m128 t2 = _mm_shuffle_ps(u2, u3, 0x44);
+      __m128 t3 = _mm_shuffle_ps(u2, u3, 0xee);
+      u0        = _mm_shuffle_ps(t0, t2, 0x88);
+      u1        = _mm_shuffle_ps(t0, t2, 0xdd);
+      u2        = _mm_shuffle_ps(t1, t3, 0x88);
+      u3        = _mm_shuffle_ps(t1, t3, 0xdd);
+
+      if (add_into)
+        {
+          u0 = _mm_add_ps(_mm_loadu_ps(out[0] + 4 * i), u0);
+          _mm_storeu_ps(out[0] + 4 * i, u0);
+          u1 = _mm_add_ps(_mm_loadu_ps(out[1] + 4 * i), u1);
+          _mm_storeu_ps(out[1] + 4 * i, u1);
+          u2 = _mm_add_ps(_mm_loadu_ps(out[2] + 4 * i), u2);
+          _mm_storeu_ps(out[2] + 4 * i, u2);
+          u3 = _mm_add_ps(_mm_loadu_ps(out[3] + 4 * i), u3);
+          _mm_storeu_ps(out[3] + 4 * i, u3);
+        }
+      else
+        {
+          _mm_storeu_ps(out[0] + 4 * i, u0);
+          _mm_storeu_ps(out[1] + 4 * i, u1);
+          _mm_storeu_ps(out[2] + 4 * i, u2);
+          _mm_storeu_ps(out[3] + 4 * i, u3);
+        }
+    }
+
+  if (add_into)
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 4; ++v)
+        out[v][i] += in[i][v];
+  else
+    for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
+      for (unsigned int v = 0; v < 4; ++v)
+        out[v][i] = in[i][v];
 }
 
 
