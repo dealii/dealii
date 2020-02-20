@@ -234,18 +234,18 @@ IndexSet::get_view(const size_type begin, const size_type end) const
 
 std::vector<IndexSet>
 IndexSet::split_by_block(
-  const std::vector<types::global_dof_index> &dofs_per_block) const
+  const std::vector<types::global_dof_index> &n_indices_per_block) const
 {
   std::vector<IndexSet> partitioned;
-  const unsigned int    n_block_dofs = dofs_per_block.size();
+  const unsigned int    n_blocks = n_indices_per_block.size();
 
-  partitioned.reserve(n_block_dofs);
+  partitioned.reserve(n_blocks);
   types::global_dof_index start = 0;
   types::global_dof_index sum   = 0;
-  for (const auto n_block_dofs : dofs_per_block)
+  for (const auto n_block_indices : n_indices_per_block)
     {
-      partitioned.push_back(this->get_view(start, start + n_block_dofs));
-      start += n_block_dofs;
+      partitioned.push_back(this->get_view(start, start + n_block_indices));
+      start += n_block_indices;
       sum += partitioned.back().size();
     }
   AssertDimension(sum, this->size());
