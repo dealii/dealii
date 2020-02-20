@@ -2892,7 +2892,7 @@ namespace Step69
                                   DataOutBase::VtkFlags::best_speed);
       data_out.set_flags(flags);
 
-      data_out.write_vtu_with_pvtu_record("", name, cycle, 6, mpi_communicator);
+      data_out.write_vtu_with_pvtu_record("", name, cycle, mpi_communicator, 6);
     };
 
     // We launch the thread by creating a
