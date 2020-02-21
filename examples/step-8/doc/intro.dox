@@ -20,15 +20,21 @@ vector-valued, meaning that in each point it has a direction and an
 absolute value. The elastic equations are the following:
 @f[
   -
-  \partial_j (c_{ijkl} \partial_k u_l)
+  \partial_j (c_{ijkl} \varepsilon_{kl})
   =
   f_i,
   \qquad
   i=1\ldots d,
 @f]
-where the values $c_{ijkl}$ are the stiffness coefficients and
-will usually depend on the space coordinates. In
-many cases, one knows that the material under consideration is
+where the values $c_{ijkl}$ are the stiffness coefficients that
+usually depend on the space coordinates and the strain $\varepsilon_{kl}$ is
+the symmetrized gradient of the displacement,
+given by
+@f[
+\varepsilon_{kl} =\frac{1}{2}(\partial_k u_l + \partial_l u_k)
+@f]
+
+In many cases, one knows that the material under consideration is
 isotropic, in which case by introduction of the two coefficients
 $\lambda$ and $\mu$ the coefficient tensor reduces to
 @f[
