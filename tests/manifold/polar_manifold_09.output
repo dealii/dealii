@@ -1,0 +1,241 @@
+
+DEAL::Position: 0.450000 0.00000
+DEAL::Polar normal: 0.00000 1.00000
+DEAL::Spherical normal: 0.00000 1.00000
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.389711 0.225000
+DEAL::Polar normal: -0.500000 0.866025
+DEAL::Spherical normal: -0.500000 0.866025
+DEAL::Relative difference: 5.55112e-17
+DEAL::
+DEAL::Position: 0.559808 0.150000
+DEAL::Polar normal: 0.965926 0.258819
+DEAL::Spherical normal: 0.965926 0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.279904 0.0750000
+DEAL::Polar normal: 0.965926 0.258819
+DEAL::Spherical normal: 0.965926 0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.389711 0.225000
+DEAL::Polar normal: -0.500000 0.866025
+DEAL::Spherical normal: -0.500000 0.866025
+DEAL::Relative difference: 5.55112e-17
+DEAL::
+DEAL::Position: 0.225000 0.389711
+DEAL::Polar normal: -0.866025 0.500000
+DEAL::Spherical normal: -0.866025 0.500000
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 0.409808 0.409808
+DEAL::Polar normal: 0.707107 0.707107
+DEAL::Spherical normal: 0.707107 0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.204904 0.204904
+DEAL::Polar normal: 0.707107 0.707107
+DEAL::Spherical normal: 0.707107 0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.225000 0.389711
+DEAL::Polar normal: -0.866025 0.500000
+DEAL::Spherical normal: -0.866025 0.500000
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 2.75546e-17 0.450000
+DEAL::Polar normal: -1.00000 6.12323e-17
+DEAL::Spherical normal: -1.00000 6.12323e-17
+DEAL::Relative difference: 1.23260e-32
+DEAL::
+DEAL::Position: 0.150000 0.559808
+DEAL::Polar normal: 0.258819 0.965926
+DEAL::Spherical normal: 0.258819 0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.0750000 0.279904
+DEAL::Polar normal: 0.258819 0.965926
+DEAL::Spherical normal: 0.258819 0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 2.75546e-17 0.450000
+DEAL::Polar normal: -1.00000 6.12323e-17
+DEAL::Spherical normal: -1.00000 6.12323e-17
+DEAL::Relative difference: 1.23260e-32
+DEAL::
+DEAL::Position: -0.225000 0.389711
+DEAL::Polar normal: -0.866025 -0.500000
+DEAL::Spherical normal: -0.866025 -0.500000
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.150000 0.559808
+DEAL::Polar normal: -0.258819 0.965926
+DEAL::Spherical normal: -0.258819 0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.0750000 0.279904
+DEAL::Polar normal: -0.258819 0.965926
+DEAL::Spherical normal: -0.258819 0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.225000 0.389711
+DEAL::Polar normal: -0.866025 -0.500000
+DEAL::Spherical normal: -0.866025 -0.500000
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.389711 0.225000
+DEAL::Polar normal: -0.500000 -0.866025
+DEAL::Spherical normal: -0.500000 -0.866025
+DEAL::Relative difference: 5.55112e-17
+DEAL::
+DEAL::Position: -0.409808 0.409808
+DEAL::Polar normal: -0.707107 0.707107
+DEAL::Spherical normal: -0.707107 0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.204904 0.204904
+DEAL::Polar normal: -0.707107 0.707107
+DEAL::Spherical normal: -0.707107 0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.389711 0.225000
+DEAL::Polar normal: -0.500000 -0.866025
+DEAL::Spherical normal: -0.500000 -0.866025
+DEAL::Relative difference: 5.55112e-17
+DEAL::
+DEAL::Position: -0.450000 5.51091e-17
+DEAL::Polar normal: -1.22465e-16 -1.00000
+DEAL::Spherical normal: -1.22465e-16 -1.00000
+DEAL::Relative difference: 2.46519e-32
+DEAL::
+DEAL::Position: -0.559808 0.150000
+DEAL::Polar normal: -0.965926 0.258819
+DEAL::Spherical normal: -0.965926 0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.279904 0.0750000
+DEAL::Polar normal: -0.965926 0.258819
+DEAL::Spherical normal: -0.965926 0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.450000 5.51091e-17
+DEAL::Polar normal: -1.22465e-16 -1.00000
+DEAL::Spherical normal: -1.22465e-16 -1.00000
+DEAL::Relative difference: 2.46519e-32
+DEAL::
+DEAL::Position: -0.389711 -0.225000
+DEAL::Polar normal: 0.500000 -0.866025
+DEAL::Spherical normal: 0.500000 -0.866025
+DEAL::Relative difference: 4.00297e-16
+DEAL::
+DEAL::Position: -0.559808 -0.150000
+DEAL::Polar normal: -0.965926 -0.258819
+DEAL::Spherical normal: -0.965926 -0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.279904 -0.0750000
+DEAL::Polar normal: -0.965926 -0.258819
+DEAL::Spherical normal: -0.965926 -0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.389711 -0.225000
+DEAL::Polar normal: 0.500000 -0.866025
+DEAL::Spherical normal: 0.500000 -0.866025
+DEAL::Relative difference: 4.00297e-16
+DEAL::
+DEAL::Position: -0.225000 -0.389711
+DEAL::Polar normal: 0.866025 -0.500000
+DEAL::Spherical normal: 0.866025 -0.500000
+DEAL::Relative difference: 8.95090e-16
+DEAL::
+DEAL::Position: -0.409808 -0.409808
+DEAL::Polar normal: -0.707107 -0.707107
+DEAL::Spherical normal: -0.707107 -0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.204904 -0.204904
+DEAL::Polar normal: -0.707107 -0.707107
+DEAL::Spherical normal: -0.707107 -0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.225000 -0.389711
+DEAL::Polar normal: 0.866025 -0.500000
+DEAL::Spherical normal: 0.866025 -0.500000
+DEAL::Relative difference: 8.95090e-16
+DEAL::
+DEAL::Position: -8.26637e-17 -0.450000
+DEAL::Polar normal: 1.00000 -1.83697e-16
+DEAL::Spherical normal: 1.00000 -1.83697e-16
+DEAL::Relative difference: 2.46519e-32
+DEAL::
+DEAL::Position: -0.150000 -0.559808
+DEAL::Polar normal: -0.258819 -0.965926
+DEAL::Spherical normal: -0.258819 -0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -0.0750000 -0.279904
+DEAL::Polar normal: -0.258819 -0.965926
+DEAL::Spherical normal: -0.258819 -0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: -8.26637e-17 -0.450000
+DEAL::Polar normal: 1.00000 -1.83697e-16
+DEAL::Spherical normal: 1.00000 -1.83697e-16
+DEAL::Relative difference: 2.46519e-32
+DEAL::
+DEAL::Position: 0.225000 -0.389711
+DEAL::Polar normal: 0.866025 0.500000
+DEAL::Spherical normal: 0.866025 0.500000
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 0.150000 -0.559808
+DEAL::Polar normal: 0.258819 -0.965926
+DEAL::Spherical normal: 0.258819 -0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.0750000 -0.279904
+DEAL::Polar normal: 0.258819 -0.965926
+DEAL::Spherical normal: 0.258819 -0.965926
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.225000 -0.389711
+DEAL::Polar normal: 0.866025 0.500000
+DEAL::Spherical normal: 0.866025 0.500000
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 0.389711 -0.225000
+DEAL::Polar normal: 0.500000 0.866025
+DEAL::Spherical normal: 0.500000 0.866025
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 0.409808 -0.409808
+DEAL::Polar normal: 0.707107 -0.707107
+DEAL::Spherical normal: 0.707107 -0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.204904 -0.204904
+DEAL::Polar normal: 0.707107 -0.707107
+DEAL::Spherical normal: 0.707107 -0.707107
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.389711 -0.225000
+DEAL::Polar normal: 0.500000 0.866025
+DEAL::Spherical normal: 0.500000 0.866025
+DEAL::Relative difference: 1.11022e-16
+DEAL::
+DEAL::Position: 0.450000 0.00000
+DEAL::Polar normal: 0.00000 1.00000
+DEAL::Spherical normal: 0.00000 1.00000
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.559808 -0.150000
+DEAL::Polar normal: 0.965926 -0.258819
+DEAL::Spherical normal: 0.965926 -0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
+DEAL::Position: 0.279904 -0.0750000
+DEAL::Polar normal: 0.965926 -0.258819
+DEAL::Spherical normal: 0.965926 -0.258819
+DEAL::Relative difference: 0.00000
+DEAL::
