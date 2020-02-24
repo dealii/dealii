@@ -419,35 +419,49 @@ SphericalManifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   const Point<spacedim> &                                     p) const
 {
-  // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return p-center. otherwise, we compute the normal using
-  // get_normal_vector
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  //
+  // We test whether that is the case by checking that the vertices
+  // all have roughly the same distance from the center: If the
+  // maximum deviation for the distances from the vertices to the
+  // center is less than 1.e-5 of the distance between vertices (as
+  // measured by the minimum distance from any of the other vertices
+  // to the first vertex), then we call this a horizontal face.
   constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     distances_to_center;
-  std::array<double, n_vertices - 1> distances_to_first_vertex;
-  distances_to_center[0] = (face->vertex(0) - center).norm_square();
+  std::array<double, n_vertices>     sqr_distances_to_center;
+  std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
+  sqr_distances_to_center[0] = (face->vertex(0) - center).norm_square();
   for (unsigned int i = 1; i < n_vertices; ++i)
     {
-      distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      distances_to_first_vertex[i - 1] =
+      sqr_distances_to_center[i] = (face->vertex(i) - center).norm_square();
+      sqr_distances_to_first_vertex[i - 1] =
         (face->vertex(i) - face->vertex(0)).norm_square();
     }
-  const auto minmax_distance =
-    std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex =
-    std::min_element(distances_to_first_vertex.begin(),
-                     distances_to_first_vertex.end());
+  const auto minmax_sqr_distance =
+    std::minmax_element(sqr_distances_to_center.begin(),
+                        sqr_distances_to_center.end());
+  const auto min_sqr_distance_to_first_vertex =
+    std::min_element(sqr_distances_to_first_vertex.begin(),
+                     sqr_distances_to_first_vertex.end());
 
-  if (*minmax_distance.second - *minmax_distance.first <
-      1.e-10 * *min_distance_to_first_vertex)
+  // So, if this is a "horizontal" face, then just compute the normal
+  // vector as the one from the center to the point 'p', adequately
+  // scaled.
+  if (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
+      1.e-10 * *min_sqr_distance_to_first_vertex)
     {
       const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
     }
-  return Manifold<dim, spacedim>::normal_vector(face, p);
+  else
+    // If it is not a horizontal face, just use the machinery of the
+    // base class.
+    return Manifold<dim, spacedim>::normal_vector(face, p);
 }
 
 
@@ -481,28 +495,39 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   typename Manifold<dim, spacedim>::FaceVertexNormals &face_vertex_normals)
   const
 {
-  // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return vertex-center. otherwise, we compute the normal using
-  // get_normal_vector
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  //
+  // We test whether that is the case by checking that the vertices
+  // all have roughly the same distance from the center: If the
+  // maximum deviation for the distances from the vertices to the
+  // center is less than 1.e-5 of the distance between vertices (as
+  // measured by the minimum distance from any of the other vertices
+  // to the first vertex), then we call this a horizontal face.
   constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     distances_to_center;
-  std::array<double, n_vertices - 1> distances_to_first_vertex;
-  distances_to_center[0] = (face->vertex(0) - center).norm_square();
+  std::array<double, n_vertices>     sqr_distances_to_center;
+  std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
+  sqr_distances_to_center[0] = (face->vertex(0) - center).norm_square();
   for (unsigned int i = 1; i < n_vertices; ++i)
     {
-      distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      distances_to_first_vertex[i - 1] =
+      sqr_distances_to_center[i] = (face->vertex(i) - center).norm_square();
+      sqr_distances_to_first_vertex[i - 1] =
         (face->vertex(i) - face->vertex(0)).norm_square();
     }
-  const auto minmax_distance =
-    std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex =
-    std::min_element(distances_to_first_vertex.begin(),
-                     distances_to_first_vertex.end());
+  const auto minmax_sqr_distance =
+    std::minmax_element(sqr_distances_to_center.begin(),
+                        sqr_distances_to_center.end());
+  const auto min_sqr_distance_to_first_vertex =
+    std::min_element(sqr_distances_to_first_vertex.begin(),
+                     sqr_distances_to_first_vertex.end());
 
-  if (*minmax_distance.second - *minmax_distance.first <
-      1.e-10 * *min_distance_to_first_vertex)
+  // So, if this is a "horizontal" face, then just compute the normal
+  // vector as the one from the center to the point 'p', adequately
+  // scaled.
+  if (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
+      1.e-10 * *min_sqr_distance_to_first_vertex)
     {
       for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
         face_vertex_normals[vertex] = face->vertex(vertex) - center;
