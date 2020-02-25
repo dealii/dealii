@@ -215,7 +215,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
   internal::MGTransfer::reinit_vector(dof_handler, component_to_block_map, dst);
 #ifdef DEBUG_OUTPUT
-  std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
+  std::cout << "copy_to_mg src " << src.l2_norm() << '\n';
   int ierr = MPI_Barrier(MPI_COMM_WORLD);
   AssertThrowMPI(ierr);
 #endif
@@ -264,7 +264,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
       std::cout << "copy_to_mg dst " << level << " " << dst_level.l2_norm()
-                << std::endl;
+                << '\n';
 #endif
     }
 }
@@ -302,7 +302,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
       int ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
       std::cout << "copy_from_mg src " << level << " " << src[level].l2_norm()
-                << std::endl;
+                << '\n';
       ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
 #endif
@@ -331,7 +331,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
         ierr = MPI_Barrier(MPI_COMM_WORLD);
         AssertThrowMPI(ierr);
         std::cout << "copy_from_mg level=" << level << " " << dst.l2_norm()
-                  << std::endl;
+                  << '\n';
       }
 #endif
     }
@@ -339,7 +339,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
 #ifdef DEBUG_OUTPUT
   const int ierr = MPI_Barrier(MPI_COMM_WORLD);
   AssertThrowMPI(ierr);
-  std::cout << "copy_from_mg " << dst.l2_norm() << std::endl;
+  std::cout << "copy_from_mg " << dst.l2_norm() << '\n';
 #endif
 }
 

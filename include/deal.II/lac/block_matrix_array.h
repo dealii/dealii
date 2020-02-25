@@ -579,8 +579,7 @@ template <class StreamType>
 inline void
 BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
 {
-  out << "\\begin{array}{" << std::string(n_block_cols(), 'c') << "}"
-      << std::endl;
+  out << "\\begin{array}{" << std::string(n_block_cols(), 'c') << "}" << '\n';
 
   Table<2, std::string> array(n_block_rows(), n_block_cols());
 
@@ -627,14 +626,14 @@ BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
         if (j == n_block_cols() - 1)
           {
             if (i != n_block_rows() - 1)
-              out << "\\\\" << std::endl;
+              out << "\\\\" << '\n';
             else
-              out << std::endl;
+              out << '\n';
           }
         else
           out << " &";
       }
-  out << "\\end{array}" << std::endl;
+  out << "\\end{array}" << '\n';
 }
 
 template <typename number, typename BlockVectorType>

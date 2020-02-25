@@ -1508,7 +1508,7 @@ ChunkSparseMatrix<number>::print_formatted(std::ostream &     out,
               << val[cols->sparsity_pattern(i, j)] * denominator << ' ';
         else
           out << std::setw(width) << zero_string << ' ';
-      out << std::endl;
+      out << '\n';
     };
   AssertThrow(out, ExcIO());
 
@@ -1552,7 +1552,7 @@ ChunkSparseMatrix<number>::print_pattern(std::ostream &out,
               for (size_type e = 0; e < chunk_size; ++e)
                 out << ':';
             }
-      out << std::endl;
+      out << '\n';
     }
 
   AssertThrow(out, ExcIO());

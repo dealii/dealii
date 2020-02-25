@@ -1045,8 +1045,8 @@ GridIn<dim, spacedim>::read_abaqus(std::istream &in,
     }
   catch (std::exception &exc)
     {
-      std::cerr << "Exception on processing internal UCD data: " << std::endl
-                << exc.what() << std::endl;
+      std::cerr << "Exception on processing internal UCD data: " << '\n'
+                << exc.what() << '\n';
 
       AssertThrow(
         false,
@@ -3222,36 +3222,36 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
             max_y = p(1);
         }
 
-      out << "# cell " << i << std::endl;
+      out << "# cell " << i << '\n';
       Point<2> center;
       for (const auto vertex : cells[i].vertices)
         center += vertices[vertex];
       center /= 4;
 
       out << "set label \"" << i << "\" at " << center(0) << ',' << center(1)
-          << " center" << std::endl;
+          << " center" << '\n';
 
       // first two line right direction
       for (unsigned int f = 0; f < 2; ++f)
         out << "set arrow from " << vertices[cells[i].vertices[f]](0) << ','
             << vertices[cells[i].vertices[f]](1) << " to "
             << vertices[cells[i].vertices[(f + 1) % 4]](0) << ','
-            << vertices[cells[i].vertices[(f + 1) % 4]](1) << std::endl;
+            << vertices[cells[i].vertices[(f + 1) % 4]](1) << '\n';
       // other two lines reverse direction
       for (unsigned int f = 2; f < 4; ++f)
         out << "set arrow from " << vertices[cells[i].vertices[(f + 1) % 4]](0)
             << ',' << vertices[cells[i].vertices[(f + 1) % 4]](1) << " to "
             << vertices[cells[i].vertices[f]](0) << ','
-            << vertices[cells[i].vertices[f]](1) << std::endl;
-      out << std::endl;
+            << vertices[cells[i].vertices[f]](1) << '\n';
+      out << '\n';
     }
 
 
-  out << std::endl
-      << "set nokey" << std::endl
+  out << '\n'
+      << "set nokey" << '\n'
       << "pl [" << min_x << ':' << max_x << "][" << min_y << ':' << max_y
-      << "] " << min_y << std::endl
-      << "pause -1" << std::endl;
+      << "] " << min_y << '\n'
+      << "pause -1" << '\n';
 }
 
 
@@ -3265,65 +3265,65 @@ GridIn<3>::debug_output_grid(const std::vector<CellData<3>> &cells,
   for (const auto &cell : cells)
     {
       // line 0
-      out << vertices[cell.vertices[0]] << std::endl
-          << vertices[cell.vertices[1]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[0]] << '\n'
+          << vertices[cell.vertices[1]] << '\n'
+          << '\n'
+          << '\n';
       // line 1
-      out << vertices[cell.vertices[1]] << std::endl
-          << vertices[cell.vertices[2]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[1]] << '\n'
+          << vertices[cell.vertices[2]] << '\n'
+          << '\n'
+          << '\n';
       // line 2
-      out << vertices[cell.vertices[3]] << std::endl
-          << vertices[cell.vertices[2]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[3]] << '\n'
+          << vertices[cell.vertices[2]] << '\n'
+          << '\n'
+          << '\n';
       // line 3
-      out << vertices[cell.vertices[0]] << std::endl
-          << vertices[cell.vertices[3]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[0]] << '\n'
+          << vertices[cell.vertices[3]] << '\n'
+          << '\n'
+          << '\n';
       // line 4
-      out << vertices[cell.vertices[4]] << std::endl
-          << vertices[cell.vertices[5]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[4]] << '\n'
+          << vertices[cell.vertices[5]] << '\n'
+          << '\n'
+          << '\n';
       // line 5
-      out << vertices[cell.vertices[5]] << std::endl
-          << vertices[cell.vertices[6]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[5]] << '\n'
+          << vertices[cell.vertices[6]] << '\n'
+          << '\n'
+          << '\n';
       // line 6
-      out << vertices[cell.vertices[7]] << std::endl
-          << vertices[cell.vertices[6]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[7]] << '\n'
+          << vertices[cell.vertices[6]] << '\n'
+          << '\n'
+          << '\n';
       // line 7
-      out << vertices[cell.vertices[4]] << std::endl
-          << vertices[cell.vertices[7]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[4]] << '\n'
+          << vertices[cell.vertices[7]] << '\n'
+          << '\n'
+          << '\n';
       // line 8
-      out << vertices[cell.vertices[0]] << std::endl
-          << vertices[cell.vertices[4]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[0]] << '\n'
+          << vertices[cell.vertices[4]] << '\n'
+          << '\n'
+          << '\n';
       // line 9
-      out << vertices[cell.vertices[1]] << std::endl
-          << vertices[cell.vertices[5]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[1]] << '\n'
+          << vertices[cell.vertices[5]] << '\n'
+          << '\n'
+          << '\n';
       // line 10
-      out << vertices[cell.vertices[2]] << std::endl
-          << vertices[cell.vertices[6]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[2]] << '\n'
+          << vertices[cell.vertices[6]] << '\n'
+          << '\n'
+          << '\n';
       // line 11
-      out << vertices[cell.vertices[3]] << std::endl
-          << vertices[cell.vertices[7]] << std::endl
-          << std::endl
-          << std::endl;
+      out << vertices[cell.vertices[3]] << '\n'
+          << vertices[cell.vertices[7]] << '\n'
+          << '\n'
+          << '\n';
     }
 }
 
@@ -4010,8 +4010,8 @@ namespace
 
     // Write out title - Note: No other commented text can be inserted below the
     // title in a UCD file
-    output << "# Abaqus to UCD mesh conversion" << std::endl;
-    output << "# Mesh type: AVS UCD" << std::endl;
+    output << "# Abaqus to UCD mesh conversion" << '\n';
+    output << "# Mesh type: AVS UCD" << '\n';
 
     // ========================================================
     // ASCII UCD File Format
@@ -4037,7 +4037,7 @@ namespace
 
     // Write out header
     output << node_list.size() << "\t" << (cell_list.size() + face_list.size())
-           << "\t0\t0\t0" << std::endl;
+           << "\t0\t0\t0" << '\n';
 
     output.width(16);
     output.precision(8);
@@ -4062,7 +4062,7 @@ namespace
         if (spacedim == 2)
           output << 0.0 << "\t";
 
-        output << std::endl;
+        output << '\n';
         output.unsetf(std::ios::floatfield);
       }
 
@@ -4075,7 +4075,7 @@ namespace
              ++jj)
           output << cell_list[ii][jj] << "\t";
 
-        output << std::endl;
+        output << '\n';
       }
 
     // Write out quad node numbers
@@ -4087,7 +4087,7 @@ namespace
              ++jj)
           output << face_list[ii][jj] << "\t";
 
-        output << std::endl;
+        output << '\n';
       }
   }
 } // namespace

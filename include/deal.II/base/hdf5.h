@@ -206,12 +206,12 @@ DEAL_II_NAMESPACE_OPEN
  *   }
  *
  * if(dataset.get_query_io_mode()){
- *   pcout << "IO mode: " << dataset.io_mode() << std::endl;
+ *   pcout << "IO mode: " << dataset.io_mode() << '\n';
  *   pcout << "Local no collective cause: "
- *         << dataset.local_no_collective_cause() << std::endl;
+ *         << dataset.local_no_collective_cause() << '\n';
  *   pcout << "Global no collective cause: "
  *         << dataset.get_global_no_collective_cause() <<
- * std::endl;
+ * '\n';
  * }
  * @endcode
  *

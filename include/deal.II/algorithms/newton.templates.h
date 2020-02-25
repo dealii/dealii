@@ -108,7 +108,7 @@ namespace Algorithms
     VectorType &u = *out.entry<VectorType *>(0);
 
     if (debug > 2)
-      deallog << "u: " << u.l2_norm() << std::endl;
+      deallog << "u: " << u.l2_norm() << '\n';
 
     GrowingVectorMemory<VectorType>            mem;
     typename VectorMemory<VectorType>::Pointer Du(mem);
@@ -160,7 +160,7 @@ namespace Algorithms
         catch (SolverControl::NoConvergence &e)
           {
             deallog << "Inner iteration failed after " << e.last_step
-                    << " steps with residual " << e.last_residual << std::endl;
+                    << " steps with residual " << e.last_residual << '\n';
           }
 
         if (debug_vectors)
@@ -193,7 +193,7 @@ namespace Algorithms
               }
             if (control.log_history())
               deallog << "Trying step size: 1/" << (1 << step_size)
-                      << " since residual was " << resnorm << std::endl;
+                      << " since residual was " << resnorm << '\n';
             u.add(1. / (1 << step_size), *Du);
             (*residual)(out1, src1);
             resnorm = res->l2_norm();

@@ -2481,17 +2481,17 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
               typename Triangulation<dim, spacedim>::cell_iterator cell(
                 triangulation, level_coarse, nearby_cells[b]);
               message << "Looking at cell " << cell->id()
-                      << " with vertices: " << std::endl;
+                      << " with vertices: " << '\n';
               for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                    ++v)
                 message << cell->vertex(v) << "    ";
-              message << std::endl;
-              message << "Transformation to chart coordinates: " << std::endl;
+              message << '\n';
+              message << "Transformation to chart coordinates: " << '\n';
               for (unsigned int i = 0; i < surrounding_points.size(); ++i)
                 {
                   compute_chart_point(cell, i);
                   message << surrounding_points[i] << " -> " << chart_points[i]
-                          << std::endl;
+                          << '\n';
                 }
             }
 

@@ -472,7 +472,7 @@ SparseMatrixEZ<number>::print(std::ostream &out) const
   const const_iterator e = end();
   while (i != e)
     {
-      out << i->row() << '\t' << i->column() << '\t' << i->value() << std::endl;
+      out << i->row() << '\t' << i->column() << '\t' << i->value() << '\n';
       ++i;
     }
 }
@@ -520,7 +520,7 @@ SparseMatrixEZ<number>::print_formatted(std::ostream &     out,
           else
             out << std::setw(width) << zero_string << ' ';
         }
-      out << std::endl;
+      out << '\n';
     };
 
   // reset output format

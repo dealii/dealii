@@ -272,10 +272,10 @@ PathSearch::show(StreamType &out) const
       out << p;
       first = false;
     }
-  out << '"' << std::endl << " Suffixes";
+  out << '"' << '\n' << " Suffixes";
   for (const auto &s : my_suffix_list)
     out << " \"" << s << '"';
-  out << std::endl;
+  out << '\n';
 }
 
 DEAL_II_NAMESPACE_CLOSE

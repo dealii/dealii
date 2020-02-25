@@ -95,12 +95,12 @@ namespace Exceptions
       ExcInvalidCharacter,
       std::string,
       size_t,
-      << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+      << "Please use only the characters [a-zA-Z0-9_<>()] for" << '\n'
       << "description strings since some graphics formats will only accept these."
-      << std::endl
+      << '\n'
       << "The string you gave was <" << arg1
       << ">, within which the invalid character is <" << arg1[arg2] << ">."
-      << std::endl);
+      << '\n');
     /**
      * Exception
      */

@@ -650,7 +650,7 @@ PreconditionBlockBase<number>::log_statistics() const
         }
       deallog << "dim ker [" << kermin << ':' << kermax << "] sigma [" << sigmin
               << ':' << sigmax << "] kappa [" << kappamin << ':' << kappamax
-              << ']' << std::endl;
+              << ']' << '\n';
     }
   else if (inversion == householder)
     {}

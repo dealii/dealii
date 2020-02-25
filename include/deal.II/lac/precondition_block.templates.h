@@ -261,7 +261,7 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
       const size_type    permuted_block_start =
         permuted ? permutation[block_start] : block_start;
 
-      //       deallog << std::endl << cell << '-' << block_start
+      //       deallog << '\n' << cell << '-' << block_start
       //            << '-' << permuted_block_start << (permuted ? 't' : 'f') <<
       //            '\t';
 

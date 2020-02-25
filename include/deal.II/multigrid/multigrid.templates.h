@@ -111,16 +111,15 @@ void
 Multigrid<VectorType>::level_v_step(const unsigned int level)
 {
   if (debug > 0)
-    deallog << "V-cycle entering level " << level << std::endl;
+    deallog << "V-cycle entering level " << level << '\n';
   if (debug > 2)
-    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
-            << std::endl;
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm() << '\n';
 
   if (level == minlevel)
     {
       this->signals.coarse_solve(true, level);
       if (debug > 0)
-        deallog << "Coarse level           " << level << std::endl;
+        deallog << "Coarse level           " << level << '\n';
       (*coarse)(level, solution[level], defect[level]);
       this->signals.coarse_solve(false, level);
       return;
@@ -128,31 +127,29 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
 
   // smoothing of the residual
   if (debug > 1)
-    deallog << "Smoothing on     level " << level << std::endl;
+    deallog << "Smoothing on     level " << level << '\n';
 
   this->signals.pre_smoother_step(true, level);
   pre_smooth->apply(level, solution[level], defect[level]);
   this->signals.pre_smoother_step(false, level);
 
   if (debug > 2)
-    deallog << "Solution norm          " << solution[level].l2_norm()
-            << std::endl;
+    deallog << "Solution norm          " << solution[level].l2_norm() << '\n';
 
   // compute residual on level, which includes the (CG) edge matrix
   if (debug > 1)
-    deallog << "Residual on      level " << level << std::endl;
+    deallog << "Residual on      level " << level << '\n';
   matrix->vmult(level, t[level], solution[level]);
   if (edge_out != nullptr)
     {
       edge_out->vmult_add(level, t[level], solution[level]);
       if (debug > 2)
-        deallog << "Norm     t[" << level << "] " << t[level].l2_norm()
-                << std::endl;
+        deallog << "Norm     t[" << level << "] " << t[level].l2_norm() << '\n';
     }
   t[level].sadd(-1.0, 1.0, defect[level]);
 
   if (debug > 2)
-    deallog << "Residual norm          " << t[level].l2_norm() << std::endl;
+    deallog << "Residual norm          " << t[level].l2_norm() << '\n';
 
   // Get the defect on the next coarser level as part of the (DG) edge matrix
   // and then the main part by the restriction of the transfer
@@ -175,7 +172,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
   this->signals.prolongation(false, level);
 
   if (debug > 2)
-    deallog << "Prolongate norm        " << t[level].l2_norm() << std::endl;
+    deallog << "Prolongate norm        " << t[level].l2_norm() << '\n';
   solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
@@ -191,22 +188,20 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
     }
 
   if (debug > 2)
-    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
-            << std::endl;
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm() << '\n';
 
   // post-smoothing
   if (debug > 1)
-    deallog << "Smoothing on     level " << level << std::endl;
+    deallog << "Smoothing on     level " << level << '\n';
   this->signals.post_smoother_step(true, level);
   post_smooth->smooth(level, solution[level], defect[level]);
   this->signals.post_smoother_step(false, level);
 
   if (debug > 2)
-    deallog << "Solution norm          " << solution[level].l2_norm()
-            << std::endl;
+    deallog << "Solution norm          " << solution[level].l2_norm() << '\n';
 
   if (debug > 1)
-    deallog << "V-cycle leaving  level " << level << std::endl;
+    deallog << "V-cycle leaving  level " << level << '\n';
 }
 
 
@@ -232,7 +227,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     }
 
   if (debug > 0)
-    deallog << cychar << "-cycle entering level  " << level << std::endl;
+    deallog << cychar << "-cycle entering level  " << level << '\n';
 
   // Combine the defect from the initial copy_to_mg with the one that has come
   // from the finer level by the transfer
@@ -241,12 +236,12 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   if (debug > 2)
     deallog << cychar << "-cycle defect norm     " << defect2[level].l2_norm()
-            << std::endl;
+            << '\n';
 
   if (level == minlevel)
     {
       if (debug > 0)
-        deallog << cychar << "-cycle coarse level    " << level << std::endl;
+        deallog << cychar << "-cycle coarse level    " << level << '\n';
 
       (*coarse)(level, solution[level], defect2[level]);
       return;
@@ -254,16 +249,16 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   // smoothing of the residual
   if (debug > 1)
-    deallog << cychar << "-cycle smoothing level " << level << std::endl;
+    deallog << cychar << "-cycle smoothing level " << level << '\n';
   pre_smooth->apply(level, solution[level], defect2[level]);
 
   if (debug > 2)
     deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm()
-            << std::endl;
+            << '\n';
 
   // compute residual on level, which includes the (CG) edge matrix
   if (debug > 1)
-    deallog << cychar << "-cycle residual level  " << level << std::endl;
+    deallog << cychar << "-cycle residual level  " << level << '\n';
   matrix->vmult(level, t[level], solution[level]);
   if (edge_out != nullptr)
     edge_out->vmult_add(level, t[level], solution[level]);
@@ -271,7 +266,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   if (debug > 2)
     deallog << cychar << "-cycle residual norm   " << t[level].l2_norm()
-            << std::endl;
+            << '\n';
 
   // Get the defect on the next coarser level as part of the (DG) edge matrix
   // and then the main part by the restriction of the transfer
@@ -317,19 +312,19 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   if (debug > 2)
     deallog << cychar << "-cycle  Defect norm    " << defect2[level].l2_norm()
-            << std::endl;
+            << '\n';
 
   // post-smoothing
   if (debug > 1)
-    deallog << cychar << "-cycle smoothing level " << level << std::endl;
+    deallog << cychar << "-cycle smoothing level " << level << '\n';
   post_smooth->smooth(level, solution[level], defect2[level]);
 
   if (debug > 2)
     deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm()
-            << std::endl;
+            << '\n';
 
   if (debug > 1)
-    deallog << cychar << "-cycle leaving level   " << level << std::endl;
+    deallog << cychar << "-cycle leaving level   " << level << '\n';
 }
 
 

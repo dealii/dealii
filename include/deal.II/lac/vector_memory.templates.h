@@ -104,9 +104,9 @@ inline GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
   if (log_statistics)
     {
       deallog << "GrowingVectorMemory:Overall allocated vectors: "
-              << total_alloc << std::endl;
+              << total_alloc << '\n';
       deallog << "GrowingVectorMemory:Maximum allocated vectors: "
-              << get_pool().data->size() << std::endl;
+              << get_pool().data->size() << '\n';
     }
 }
 

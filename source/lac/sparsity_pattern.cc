@@ -884,7 +884,7 @@ SparsityPatternBase::print(std::ostream &out) const
       for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
         if (colnums[j] != invalid_entry)
           out << ',' << colnums[j];
-      out << ']' << std::endl;
+      out << ']' << '\n';
     }
 
   AssertThrow(out, ExcIO());
@@ -905,7 +905,7 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
         // while matrix entries are usually written (i,j), with i vertical and
         // j horizontal, gnuplot output is x-y, that is we have to exchange
         // the order of output
-        out << colnums[j] << " " << -static_cast<signed int>(i) << std::endl;
+        out << colnums[j] << " " << -static_cast<signed int>(i) << '\n';
 
   AssertThrow(out, ExcIO());
 }
@@ -939,7 +939,7 @@ SparsityPatternBase::print_svg(std::ostream &out) const
       out << "  <rect class=\"pixel\" x=\"" << it->column() + 1 << "\" y=\""
           << it->row() + 1 << "\" width=\".9\" height=\".9\"/>\n";
     }
-  out << "</svg>" << std::endl;
+  out << "</svg>" << '\n';
 }
 
 

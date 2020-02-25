@@ -474,7 +474,7 @@ ChunkSparsityPattern::print(std::ostream &out) const
                   (sparsity_pattern.colnums[j] * chunk_size + e < n_cols()));
                  ++e)
               out << ',' << sparsity_pattern.colnums[j] * chunk_size + e;
-        out << ']' << std::endl;
+        out << ']' << '\n';
       }
 
   AssertThrow(out, ExcIO());
@@ -509,7 +509,7 @@ ChunkSparsityPattern::print_gnuplot(std::ostream &out) const
             // and j horizontal, gnuplot output is x-y, that is we have to
             // exchange the order of output
             out << sparsity_pattern.colnums[j] * chunk_size + d << " "
-                << -static_cast<signed int>(i * chunk_size + e) << std::endl;
+                << -static_cast<signed int>(i * chunk_size + e) << '\n';
 
   AssertThrow(out, ExcIO());
 }

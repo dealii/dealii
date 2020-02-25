@@ -1934,7 +1934,7 @@ SparseMatrix<number>::print_formatted(std::ostream &     out,
               << val[cols->operator()(i, j)] * number(denominator) << ' ';
         else
           out << std::setw(width) << zero_string << ' ';
-      out << std::endl;
+      out << '\n';
     };
   AssertThrow(out, ExcIO());
 
@@ -1962,7 +1962,7 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
           out << '*';
         else
           out << ':';
-      out << std::endl;
+      out << '\n';
     };
   AssertThrow(out, ExcIO());
 }

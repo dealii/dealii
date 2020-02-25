@@ -193,8 +193,7 @@ public:
    */
   DeclException1(ExcSolverDoesNotExist,
                  std::string,
-                 << "Solver " << arg1 << " does not exist. Use one of "
-                 << std::endl
+                 << "Solver " << arg1 << " does not exist. Use one of " << '\n'
                  << get_solver_names());
 
 

@@ -416,7 +416,7 @@ square for (unsigned int j=0;j<moment_weight.size();++j)
                 A(moment_weight.size()*face+j,i)
                   += w * values[i][1-face%2] * moment_weight[j].value(x);
             }
-//      std::cerr << std::endl;
+//      std::cerr << '\n';
         }
     }
 

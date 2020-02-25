@@ -179,10 +179,10 @@ ExceptionBase::print_exc_data(std::ostream &out) const
 {
   // print a header for the exception
   out << "An error occurred in line <" << line << "> of file <" << file
-      << "> in function" << std::endl
-      << "    " << function << std::endl
-      << "The violated condition was: " << std::endl
-      << "    " << cond << std::endl;
+      << "> in function" << '\n'
+      << "    " << function << '\n'
+      << "The violated condition was: " << '\n'
+      << "    " << cond << '\n';
 
   // print the way the additional information message was generated.
   // this is useful if the names of local variables appear in the
@@ -197,11 +197,11 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // collates into a single string, making it awkward to read. Consequently,
   // elide this text if the message was generated via an ExcMessage object
   if (std::strstr(cond, "dealii::ExcMessage") != nullptr)
-    out << "The name and call sequence of the exception was:" << std::endl
-        << "    " << exc << std::endl;
+    out << "The name and call sequence of the exception was:" << '\n'
+        << "    " << exc << '\n';
 
   // finally print the additional information the exception provides:
-  out << "Additional information: " << std::endl;
+  out << "Additional information: " << '\n';
 }
 
 
@@ -209,7 +209,7 @@ ExceptionBase::print_exc_data(std::ostream &out) const
 void
 ExceptionBase::print_info(std::ostream &out) const
 {
-  out << "    (none)" << std::endl;
+  out << "    (none)" << '\n';
 }
 
 
@@ -224,8 +224,8 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
     return;
 
   // if there is a stackframe stored, print it
-  out << std::endl;
-  out << "Stacktrace:" << std::endl << "-----------" << std::endl;
+  out << '\n';
+  out << "Stacktrace:" << '\n' << "-----------" << '\n';
 
   // print the stacktrace. first omit all those frames that have
   // ExceptionBase or deal_II_exceptions in their names, as these
@@ -293,7 +293,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
 #endif
 
       // then output what we have
-      out << stacktrace_entry << std::endl;
+      out << stacktrace_entry << '\n';
 
       // stop if we're in main()
       if (functionname == "main")
@@ -313,9 +313,9 @@ ExceptionBase::generate_message() const
     {
       std::ostringstream converter;
 
-      converter << std::endl
+      converter << '\n'
                 << "--------------------------------------------------------"
-                << std::endl;
+                << '\n';
 
       // print out general data
       print_exc_data(converter);
@@ -328,13 +328,13 @@ ExceptionBase::generate_message() const
         {
           converter
             << "--------------------------------------------------------"
-            << std::endl
+            << '\n'
             << deal_II_exceptions::internals::get_additional_assert_output()
-            << std::endl;
+            << '\n';
         }
 
       converter << "--------------------------------------------------------"
-                << std::endl;
+                << '\n';
 
       what_str = converter.str();
     }
@@ -382,20 +382,20 @@ namespace StandardExceptions
       }
 
     out << "deal.II encountered an error while calling an MPI function."
-        << std::endl;
+        << '\n';
     if (error_name_known)
       {
         out << "The description of the error provided by MPI is \""
-            << error_name << "\"." << std::endl;
+            << error_name << "\"." << '\n';
       }
     else
       {
         out
           << "This error code is not equal to any of the standard MPI error codes."
-          << std::endl;
+          << '\n';
       }
     out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+        << "." << '\n';
   }
 } // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
@@ -408,7 +408,7 @@ namespace deal_II_exceptions
     abort(const ExceptionBase &exc) noexcept
     {
       // first print the error
-      std::cerr << exc.what() << std::endl;
+      std::cerr << exc.what() << '\n';
 
       // then bail out. if in MPI mode, bring down the entire
       // house by asking the MPI system to do a best-effort
@@ -438,7 +438,7 @@ namespace deal_II_exceptions
                 << "running. You can also put the following into your ~/.gdbinit:\n"
                 << "  set breakpoint pending on\n"
                 << "  break MPI_Abort\n"
-                << "  set breakpoint pending auto" << std::endl;
+                << "  set breakpoint pending auto" << '\n';
 
               MPI_Abort(MPI_COMM_WORLD,
                         /* return code = */ 255);
@@ -459,8 +459,8 @@ namespace deal_II_exceptions
         {
           // We are not allowed to throw, and not allowed to abort.
           // Just print the exception name to deallog and continue normally:
-          deallog << "Exception: " << exc.get_exc_name() << std::endl;
-          deallog << exc.what() << std::endl;
+          deallog << "Exception: " << exc.get_exc_name() << '\n';
+          deallog << exc.what() << '\n';
         }
     }
 

@@ -979,8 +979,7 @@ namespace Utilities
               std::cerr
                 << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
                 << this_mpi_process(MPI_COMM_WORLD)
-                << ". Skipping MPI_Finalize() to avoid a deadlock."
-                << std::endl;
+                << ". Skipping MPI_Finalize() to avoid a deadlock." << '\n';
             }
           else
             {

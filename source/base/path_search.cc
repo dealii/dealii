@@ -120,7 +120,7 @@ PathSearch::find(const std::string &filename,
 
   if (debug > 2)
     deallog << "PathSearch[" << cls << "] " << my_path_list.size()
-            << " directories " << std::endl;
+            << " directories " << '\n';
 
   // Try to open file in the various directories we have
   for (path = my_path_list.begin(); path != endp; ++path)
@@ -131,14 +131,13 @@ PathSearch::find(const std::string &filename,
       {
         real_name = *path + filename;
         if (debug > 1)
-          deallog << "PathSearch[" << cls << "] trying " << real_name
-                  << std::endl;
+          deallog << "PathSearch[" << cls << "] trying " << real_name << '\n';
         FILE *fp = fopen(real_name.c_str(), open_mode);
         if (fp != nullptr)
           {
             if (debug > 0)
               deallog << "PathSearch[" << cls << "] opened " << real_name
-                      << std::endl;
+                      << '\n';
             fclose(fp);
             return real_name;
           }
@@ -150,14 +149,13 @@ PathSearch::find(const std::string &filename,
         {
           real_name = *path + filename + suffix;
           if (debug > 1)
-            deallog << "PathSearch[" << cls << "] trying " << real_name
-                    << std::endl;
+            deallog << "PathSearch[" << cls << "] trying " << real_name << '\n';
           FILE *fp = fopen(real_name.c_str(), open_mode);
           if (fp != nullptr)
             {
               if (debug > 0)
                 deallog << "PathSearch[" << cls << "] opened " << real_name
-                        << std::endl;
+                        << '\n';
               fclose(fp);
               return real_name;
             }
@@ -175,8 +173,7 @@ PathSearch::find(const std::string &filename, const char *open_mode)
 
   if (debug > 2)
     deallog << "PathSearch[" << cls << "] " << my_path_list.size()
-            << " directories " << my_suffix_list.size() << " suffixes"
-            << std::endl;
+            << " directories " << my_suffix_list.size() << " suffixes" << '\n';
 
   for (suffix = my_suffix_list.begin(); suffix != ends; ++suffix)
     {

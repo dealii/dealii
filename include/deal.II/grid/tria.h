@@ -884,7 +884,7 @@ namespace internal
  *   @code
  *     void f()
  *     {
- *       std::cout << "Triangulation has been refined." << std::endl;
+ *       std::cout << "Triangulation has been refined." << '\n';
  *     }
  *
  *     void run ()

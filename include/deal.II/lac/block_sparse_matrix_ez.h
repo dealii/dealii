@@ -460,13 +460,13 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
     for (size_type j = 0; j < n_block_cols(); ++j)
       {
         used_by_line.clear();
-        out << "block:\t" << i << '\t' << j << std::endl;
+        out << "block:\t" << i << '\t' << j << '\n';
         block(i, j).compute_statistics(
           used, allocated, reserved, used_by_line, full);
 
-        out << "used:" << used << std::endl
-            << "allocated:" << allocated << std::endl
-            << "reserved:" << reserved << std::endl;
+        out << "used:" << used << '\n'
+            << "allocated:" << allocated << '\n'
+            << "reserved:" << reserved << '\n';
 
         used_total += used;
         allocated_total += allocated;
@@ -479,20 +479,20 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
               if (used_by_line[i] != 0)
                 {
                   out << "row-entries\t" << i << "\trows\t" << used_by_line[i]
-                      << std::endl;
+                      << '\n';
                   used_by_line_total[i] += used_by_line[i];
                 }
           }
       }
-  out << "Total" << std::endl
-      << "used:" << used_total << std::endl
-      << "allocated:" << allocated_total << std::endl
-      << "reserved:" << reserved_total << std::endl;
+  out << "Total" << '\n'
+      << "used:" << used_total << '\n'
+      << "allocated:" << allocated_total << '\n'
+      << "reserved:" << reserved_total << '\n';
   for (size_type i = 0; i < used_by_line_total.size(); ++i)
     if (used_by_line_total[i] != 0)
       {
         out << "row-entries\t" << i << "\trows\t" << used_by_line_total[i]
-            << std::endl;
+            << '\n';
       }
 }
 

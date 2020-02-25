@@ -454,7 +454,7 @@ AnyData::list(StreamType &os) const
 {
   for (unsigned int i = 0; i < names.size(); ++i)
     {
-      os << i << '\t' << names[i] << '\t' << data[i].type().name() << std::endl;
+      os << i << '\t' << names[i] << '\t' << data[i].type().name() << '\n';
     }
 }
 

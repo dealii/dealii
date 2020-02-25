@@ -402,7 +402,7 @@ TimerOutput::~TimerOutput()
           << "synchronization (and subsequent output) will be skipped\n"
           << "to avoid a possible deadlock.\n"
           << "---------------------------------------------------------"
-          << std::endl;
+          << '\n';
     }
   else
     {
@@ -509,7 +509,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
         output_time =
           ", CPU/wall time: " + cpu.str() + " / " + wall.str() + ".";
 
-      out_stream << actual_section_name << output_time << std::endl;
+      out_stream << actual_section_name << output_time << '\n';
     }
 
   // delete the index from the list of
@@ -613,7 +613,7 @@ TimerOutput::print_summary() const
               unsigned int pos_non_space = name_out.find_first_not_of(' ');
               name_out.erase(0, pos_non_space);
               name_out.resize(max_width, ' ');
-              out_stream << std::endl;
+              out_stream << '\n';
               out_stream << "| " << name_out;
               out_stream << "| ";
               out_stream << std::setw(9);
@@ -642,19 +642,19 @@ TimerOutput::print_summary() const
               else
                 out_stream << 0.0 << "% |";
             }
-          out_stream << std::endl
+          out_stream << '\n'
                      << "+---------------------------------" << extra_dash
                      << "+-----------+"
                      << "------------+------------+\n"
-                     << std::endl;
+                     << '\n';
 
           if (time_gap > 0.0)
             out_stream
-              << std::endl
+              << '\n'
               << "Note: The sum of counted times is " << time_gap
               << " seconds larger than the total time.\n"
               << "(Timer function may have introduced too much overhead, or different\n"
-              << "section timers may have run at the same time.)" << std::endl;
+              << "section timers may have run at the same time.)" << '\n';
         }
 
       // in case we want to write out wallclock times
@@ -690,7 +690,7 @@ TimerOutput::print_summary() const
               unsigned int pos_non_space = name_out.find_first_not_of(' ');
               name_out.erase(0, pos_non_space);
               name_out.resize(max_width, ' ');
-              out_stream << std::endl;
+              out_stream << '\n';
               out_stream << "| " << name_out;
               out_stream << "| ";
               out_stream << std::setw(9);
@@ -720,11 +720,11 @@ TimerOutput::print_summary() const
               else
                 out_stream << 0.0 << "% |";
             }
-          out_stream << std::endl
+          out_stream << '\n'
                      << "+---------------------------------" << extra_dash
                      << "+-----------+"
                      << "------------+------------+\n"
-                     << std::endl;
+                     << '\n';
         }
     }
   else
@@ -766,7 +766,7 @@ TimerOutput::print_summary() const
                  << "\n+---------------------------------" << extra_dash
                  << "+-----------+"
                  << "------------+------------+"
-                 << "------------+------------+" << std::endl;
+                 << "------------+------------+" << '\n';
 
       for (const auto &i : sections)
         {
@@ -835,22 +835,22 @@ TimerOutput::print_summary() const
               else
                 out_stream << 0.0 << "% |";
             }
-          out_stream << std::endl;
+          out_stream << '\n';
         }
 
       out_stream << "+---------------------------------" << extra_dash
                  << "+-----------+"
                  << "------------+------------+"
-                 << "------------+------------+" << std::endl
-                 << std::endl;
+                 << "------------+------------+" << '\n'
+                 << '\n';
 
       if (output_type != wall_times && time_gap > 0.0)
         out_stream
-          << std::endl
+          << '\n'
           << "Note: The sum of counted times is " << time_gap
           << " seconds larger than the total time.\n"
           << "(Timer function may have introduced too much overhead, or different\n"
-          << "section timers may have run at the same time.)" << std::endl;
+          << "section timers may have run at the same time.)" << '\n';
     }
 }
 

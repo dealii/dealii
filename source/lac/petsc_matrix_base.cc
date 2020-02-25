@@ -670,7 +670,7 @@ namespace PETScWrappers
         for (PetscInt col = 0; col < ncols; ++col)
           {
             out << "(" << row << "," << colnums[col] << ") " << values[col]
-                << std::endl;
+                << '\n';
           }
 
         ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);

@@ -115,9 +115,9 @@ ParameterAcceptor::initialize(
 
       if (extension == "prm")
         {
-          outfile << "# Parameter file generated with " << std::endl
+          outfile << "# Parameter file generated with " << '\n'
                   << "# DEAL_II_PACKAGE_VERSION = " << DEAL_II_PACKAGE_VERSION
-                  << std::endl;
+                  << '\n';
           Assert(
             output_style_for_prm_format == ParameterHandler::Text ||
               output_style_for_prm_format == ParameterHandler::ShortText,

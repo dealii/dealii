@@ -279,7 +279,7 @@ namespace Algorithms
   Event::print_assigned(OS &os)
   {
     for (unsigned int i = 0; i < names.size(); ++i)
-      os << i << '\t' << names[i] << std::endl;
+      os << i << '\t' << names[i] << '\n';
   }
 
 

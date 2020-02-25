@@ -51,12 +51,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * // all processes print the following information to standard output
  * std::cout << "Reading parameter file on process "
- *           << this_mpi_process << std::endl;
+ *           << this_mpi_process << '\n';
  *
  * // following is printed by process 0 only
- * pout << "Solving ..." << std::endl;
+ * pout << "Solving ..." << '\n';
  * solve();
- * pout << "done" << std::endl;
+ * pout << "done" << '\n';
  * @endcode
  *
  * Here, `Reading parameter file on process xy' is printed by each process
@@ -123,7 +123,7 @@ public:
    * the surrounding class.
    *
    * Note that compilers want to see this treated differently from the general
-   * template above since functions like @p std::endl are actually overloaded
+   * template above since functions like @p '\n' are actually overloaded
    * and can't be bound directly to a template type.
    */
   const ConditionalOStream &

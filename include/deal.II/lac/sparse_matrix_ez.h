@@ -1576,16 +1576,16 @@ SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 
   compute_statistics(used, allocated, reserved, used_by_line, full);
 
-  out << "SparseMatrixEZ:used      entries:" << used << std::endl
-      << "SparseMatrixEZ:allocated entries:" << allocated << std::endl
-      << "SparseMatrixEZ:reserved  entries:" << reserved << std::endl;
+  out << "SparseMatrixEZ:used      entries:" << used << '\n'
+      << "SparseMatrixEZ:allocated entries:" << allocated << '\n'
+      << "SparseMatrixEZ:reserved  entries:" << reserved << '\n';
 
   if (full)
     {
       for (size_type i = 0; i < used_by_line.size(); ++i)
         if (used_by_line[i] != 0)
           out << "SparseMatrixEZ:entries\t" << i << "\trows\t"
-              << used_by_line[i] << std::endl;
+              << used_by_line[i] << '\n';
     }
 }
 

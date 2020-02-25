@@ -100,18 +100,16 @@ Subscriptor::check_no_subscribers() const noexcept
         {
           std::cerr
             << "---------------------------------------------------------"
-            << std::endl
+            << '\n'
             << "An object pointed to by a SmartPointer is being destroyed."
-            << std::endl
+            << '\n'
             << "Under normal circumstances, this would abort the program."
-            << std::endl
-            << "However, another exception is being processed at the"
-            << std::endl
-            << "moment, so the program will continue to run to allow"
-            << std::endl
-            << "this exception to be processed." << std::endl
+            << '\n'
+            << "However, another exception is being processed at the" << '\n'
+            << "moment, so the program will continue to run to allow" << '\n'
+            << "this exception to be processed." << '\n'
             << "---------------------------------------------------------"
-            << std::endl;
+            << '\n';
         }
     }
 #endif

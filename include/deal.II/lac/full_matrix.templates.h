@@ -1801,7 +1801,7 @@ FullMatrix<number>::print_formatted(std::ostream &     out,
           out << std::setw(width) << (*this)(i, j) * number(denominator) << ' ';
         else
           out << std::setw(width) << zero_string << ' ';
-      out << std::endl;
+      out << '\n';
     };
 
   AssertThrow(out, ExcIO());

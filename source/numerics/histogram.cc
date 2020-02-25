@@ -234,8 +234,8 @@ Histogram::write_gnuplot(std::ostream &out) const
   if (intervals.size() == 1)
     {
       for (const auto &interval : intervals[0])
-        out << interval.left_point << ' ' << interval.content << std::endl
-            << interval.right_point << ' ' << interval.content << std::endl;
+        out << interval.left_point << ' ' << interval.content << '\n'
+            << interval.right_point << ' ' << interval.content << '\n';
     }
   else
     // otherwise create a whole 3d plot
@@ -253,21 +253,21 @@ Histogram::write_gnuplot(std::ostream &out) const
               << (i < static_cast<int>(intervals.size()) - 1 ?
                     y_values[i + 1] :
                     y_values[i] + (y_values[i] - y_values[i - 1]))
-              << ' ' << intervals[i][n].content << std::endl
+              << ' ' << intervals[i][n].content << '\n'
               << intervals[i][n].right_point << ' '
               << (i < static_cast<int>(intervals.size()) - 1 ?
                     y_values[i + 1] :
                     y_values[i] + (y_values[i] - y_values[i - 1]))
-              << ' ' << intervals[i][n].content << std::endl;
+              << ' ' << intervals[i][n].content << '\n';
 
-        out << std::endl;
+        out << '\n';
         for (unsigned int n = 0; n < intervals[i].size(); ++n)
           out << intervals[i][n].left_point << ' ' << y_values[i] << ' '
-              << intervals[i][n].content << std::endl
+              << intervals[i][n].content << '\n'
               << intervals[i][n].right_point << ' ' << y_values[i] << ' '
-              << intervals[i][n].content << std::endl;
+              << intervals[i][n].content << '\n';
 
-        out << std::endl;
+        out << '\n';
       }
 
   AssertThrow(out, ExcIO());

@@ -60,7 +60,7 @@ SolverControl::check(const unsigned int step, const double check_value)
     }
 
   if (m_log_history && ((step % m_log_frequency) == 0))
-    deallog << "Check " << step << "\t" << check_value << std::endl;
+    deallog << "Check " << step << "\t" << check_value << '\n';
 
   lstep  = step;
   lvalue = check_value;
@@ -71,7 +71,7 @@ SolverControl::check(const unsigned int step, const double check_value)
         failure_residual = relative_failure_residual * check_value;
 
       if (m_log_result)
-        deallog << "Starting value " << check_value << std::endl;
+        deallog << "Starting value " << check_value << '\n';
     }
 
   if (history_data_enabled)
@@ -81,7 +81,7 @@ SolverControl::check(const unsigned int step, const double check_value)
     {
       if (m_log_result)
         deallog << "Convergence step " << step << " value " << check_value
-                << std::endl;
+                << '\n';
       lcheck = success;
       return success;
     }
@@ -90,8 +90,7 @@ SolverControl::check(const unsigned int step, const double check_value)
       (check_failure && (check_value > failure_residual)))
     {
       if (m_log_result)
-        deallog << "Failure step " << step << " value " << check_value
-                << std::endl;
+        deallog << "Failure step " << step << " value " << check_value << '\n';
       lcheck = failure;
       return failure;
     }
@@ -274,7 +273,7 @@ ReductionControl::check(const unsigned int step, const double check_value)
     {
       if (m_log_result)
         deallog << "Convergence step " << step << " value " << check_value
-                << std::endl;
+                << '\n';
       lstep  = step;
       lvalue = check_value;
       lcheck = success;
@@ -327,7 +326,7 @@ IterationNumberControl::check(const unsigned int step, const double check_value)
     {
       if (m_log_result)
         deallog << "Convergence step " << step << " value " << check_value
-                << std::endl;
+                << '\n';
       lstep  = step;
       lvalue = check_value;
 

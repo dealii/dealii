@@ -632,8 +632,8 @@ namespace LinearAlgebra
           out << val[i] << ' ';
       else
         for (int i = 0; i < vector->MyLength(); ++i)
-          out << val[i] << std::endl;
-      out << std::endl;
+          out << val[i] << '\n';
+      out << '\n';
 
       // restore the representation
       // of the vector

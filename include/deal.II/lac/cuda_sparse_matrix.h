@@ -435,8 +435,7 @@ namespace CUDAWrappers
                     if (across)
                       out << ' ' << i << ',' << i << ':' << diagonal;
                     else
-                      out << '(' << i << ',' << i << ") " << diagonal
-                          << std::endl;
+                      out << '(' << i << ',' << i << ") " << diagonal << '\n';
                     break;
                   }
               }
@@ -448,11 +447,11 @@ namespace CUDAWrappers
             if (across)
               out << ' ' << i << ',' << cols[j] << ':' << val[j];
             else
-              out << "(" << i << "," << cols[j] << ") " << val[j] << std::endl;
+              out << "(" << i << "," << cols[j] << ") " << val[j] << '\n';
           }
       }
     if (across)
-      out << std::endl;
+      out << '\n';
   }
 
 
@@ -508,7 +507,7 @@ namespace CUDAWrappers
             else
               out << std::setw(width) << zero_string << ' ';
           }
-        out << std::endl;
+        out << '\n';
       };
     AssertThrow(out, ExcIO());
 

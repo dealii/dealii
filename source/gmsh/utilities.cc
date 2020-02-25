@@ -78,13 +78,13 @@ namespace Gmsh
 
     std::ofstream geofile;
     geofile.open(geo_file_name);
-    geofile << "Merge \"" << iges_file_name << "\";" << std::endl
-            << "Line Loop (2) = {1};" << std::endl
-            << "Plane Surface (3) = {2};" << std::endl
+    geofile << "Merge \"" << iges_file_name << "\";" << '\n'
+            << "Line Loop (2) = {1};" << '\n'
+            << "Plane Surface (3) = {2};" << '\n'
             << "Characteristic Length { 1 } = " << prm.characteristic_length
-            << ";" << std::endl
-            << "Mesh.RecombineAll = 1;" << std::endl
-            << "Mesh.SubdivisionAlgorithm = 1;" << std::endl;
+            << ";" << '\n'
+            << "Mesh.RecombineAll = 1;" << '\n'
+            << "Mesh.SubdivisionAlgorithm = 1;" << '\n';
     geofile.close();
 
     std::stringstream command;

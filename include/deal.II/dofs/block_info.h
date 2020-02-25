@@ -275,11 +275,11 @@ BlockInfo::print(OS &os) const
   os << "global   dofs " << std::setw(5) << global().total_size() << " blocks";
   for (unsigned int i = 0; i < global().size(); ++i)
     os << ' ' << std::setw(5) << global().block_size(i);
-  os << std::endl;
+  os << '\n';
 
   if (local().size() == 0)
     {
-      os << "local dofs not initialized" << std::endl;
+      os << "local dofs not initialized" << '\n';
     }
   else
     {
@@ -287,7 +287,7 @@ BlockInfo::print(OS &os) const
          << " blocks";
       for (unsigned int i = 0; i < local().size(); ++i)
         os << ' ' << std::setw(5) << local().block_size(i);
-      os << std::endl;
+      os << '\n';
     }
 
   for (unsigned int l = 0; l < levels.size(); ++l)
@@ -296,7 +296,7 @@ BlockInfo::print(OS &os) const
          << level(l).total_size() << " blocks";
       for (unsigned int i = 0; i < level(l).size(); ++i)
         os << ' ' << std::setw(5) << level(l).block_size(i);
-      os << std::endl;
+      os << '\n';
     }
 }
 

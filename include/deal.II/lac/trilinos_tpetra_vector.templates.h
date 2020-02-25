@@ -640,8 +640,8 @@ namespace LinearAlgebra
           out << vector_1d(i) << ' ';
       else
         for (unsigned int i = 0; i < local_length; ++i)
-          out << vector_1d(i) << std::endl;
-      out << std::endl;
+          out << vector_1d(i) << '\n';
+      out << '\n';
 
       // restore the representation
       // of the vector

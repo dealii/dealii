@@ -7187,11 +7187,11 @@ namespace VectorTools
                       std::make_pair(vector_dofs, b_values));
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-                    std::cout << "Adding normal vector:" << std::endl
-                              << "   dofs=" << vector_dofs << std::endl
+                    std::cout << "Adding normal vector:" << '\n'
+                              << "   dofs=" << vector_dofs << '\n'
                               << "   cell=" << cell << " at " << cell->center()
-                              << std::endl
-                              << "   normal=" << normal_vector << std::endl;
+                              << '\n'
+                              << "   normal=" << normal_vector << '\n';
 #endif
                   }
             }
@@ -7220,12 +7220,12 @@ namespace VectorTools
 
 #ifdef DEBUG_NO_NORMAL_FLUX
         std::cout << "For dof indices <" << p->first
-                  << ">, found the following normals" << std::endl;
+                  << ">, found the following normals" << '\n';
         for (typename DoFToNormalsMap::const_iterator q = same_dof_range[0];
              q != same_dof_range[1];
              ++q)
           std::cout << "   " << q->second.first << " from cell "
-                    << q->second.second << std::endl;
+                    << q->second.second << '\n';
 #endif
 
 
@@ -7264,13 +7264,13 @@ namespace VectorTools
         Assert(cell_to_normals_map.size() >= 1, ExcInternalError());
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-        std::cout << "   cell_to_normals_map:" << std::endl;
+        std::cout << "   cell_to_normals_map:" << '\n';
         for (typename CellToNormalsMap::const_iterator x =
                cell_to_normals_map.begin();
              x != cell_to_normals_map.end();
              ++x)
           std::cout << "      " << x->first << " -> (" << x->second.first << ','
-                    << x->second.second << ')' << std::endl;
+                    << x->second.second << ')' << '\n';
 #endif
 
         // count the maximum number of contributions from each cell
@@ -7454,15 +7454,14 @@ namespace VectorTools
 #ifdef DEBUG_NO_NORMAL_FLUX
                     std::cout
                       << "   Treating edge case with dim-1 contributions."
-                      << std::endl
+                      << '\n'
                       << "   Looking at cell " << contribution->first
-                      << " which has contributed these normal vectors:"
-                      << std::endl;
+                      << " which has contributed these normal vectors:" << '\n';
                     for (typename std::list<Tensor<1, dim>>::const_iterator t =
                            contribution->second.begin();
                          t != contribution->second.end();
                          ++t)
-                      std::cout << "      " << *t << std::endl;
+                      std::cout << "      " << *t << '\n';
 #endif
 
                     // as mentioned above, simply ignore cells that only

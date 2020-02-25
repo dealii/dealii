@@ -2702,12 +2702,12 @@ namespace parallel
           std::string   fname = std::string(filename) + ".info";
           std::ofstream f(fname.c_str());
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
-            << std::endl
+            << '\n'
             << 4 << " "
             << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
             << cell_attached_data.pack_callbacks_fixed.size() << " "
             << cell_attached_data.pack_callbacks_variable.size() << " "
-            << this->n_cells(0) << std::endl;
+            << this->n_cells(0) << '\n';
         }
 
       // each cell should have been flagged `CELL_PERSIST`

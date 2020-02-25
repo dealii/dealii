@@ -361,7 +361,7 @@ TridiagonalMatrix<number>::print(OutputStream &     s,
       if (i < n() - 1)
         s << std::setw(width) << (*this)(i, i + 1);
 
-      s << std::endl;
+      s << '\n';
     }
 }
 

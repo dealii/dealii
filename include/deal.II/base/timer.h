@@ -1029,7 +1029,7 @@ Timer::print_last_lap_wall_time_data(StreamType &stream) const
   const Utilities::MPI::MinMaxAvg &statistic = get_last_lap_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
-         << statistic.min_index << ", avg=" << statistic.avg << std::endl;
+         << statistic.min_index << ", avg=" << statistic.avg << '\n';
 }
 
 
@@ -1050,7 +1050,7 @@ Timer::print_accumulated_wall_time_data(StreamType &stream) const
   const Utilities::MPI::MinMaxAvg statistic = get_accumulated_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
-         << statistic.min_index << ", avg=" << statistic.avg << std::endl;
+         << statistic.min_index << ", avg=" << statistic.avg << '\n';
 }
 
 

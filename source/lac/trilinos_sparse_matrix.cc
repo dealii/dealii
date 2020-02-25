@@ -1862,20 +1862,20 @@ namespace TrilinosWrappers
 #  ifdef DEBUG
     if (ierr > 0)
       {
-        std::cout << "------------------------------------------" << std::endl;
+        std::cout << "------------------------------------------" << '\n';
         std::cout << "Got error " << ierr << " in row " << row << " of proc "
                   << matrix->RowMap().Comm().MyPID()
-                  << " when trying to add the columns:" << std::endl;
+                  << " when trying to add the columns:" << '\n';
         for (TrilinosWrappers::types::int_type i = 0; i < n_columns; ++i)
           std::cout << col_index_ptr[i] << " ";
-        std::cout << std::endl << std::endl;
+        std::cout << '\n' << '\n';
         std::cout << "Matrix row "
                   << (matrix->RowMap().MyGID(
                         static_cast<TrilinosWrappers::types::int_type>(row)) ==
                           false ?
                         "(nonlocal part)" :
                         "")
-                  << " has the following indices:" << std::endl;
+                  << " has the following indices:" << '\n';
         std::vector<TrilinosWrappers::types::int_type> indices;
         const Epetra_CrsGraph *                        graph =
           (nonlocal_matrix.get() != nullptr &&
@@ -1894,7 +1894,7 @@ namespace TrilinosWrappers
 
         for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
           std::cout << indices[i] << " ";
-        std::cout << std::endl << std::endl;
+        std::cout << '\n' << '\n';
         Assert(ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
       }
 #  endif
@@ -2416,7 +2416,7 @@ namespace TrilinosWrappers
               out << "(" << TrilinosWrappers::global_row_index(*matrix, i)
                   << ","
                   << TrilinosWrappers::global_column_index(*matrix, indices[j])
-                  << ") " << values[j] << std::endl;
+                  << ") " << values[j] << '\n';
           }
       }
 

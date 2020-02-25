@@ -122,7 +122,7 @@ public:
         << "try to apply the wrong solver to a matrix (e.g., using CG for a "
         << "matrix that is not symmetric or not positive definite). In these "
         << "cases, the residual in the last iteration is likely going to be large."
-        << std::endl;
+        << '\n';
     }
 
     /**

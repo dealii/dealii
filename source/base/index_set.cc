@@ -435,11 +435,11 @@ IndexSet::write(std::ostream &out) const
 {
   compress();
   out << size() << " ";
-  out << ranges.size() << std::endl;
+  out << ranges.size() << '\n';
   std::vector<Range>::const_iterator r = ranges.begin();
   for (; r != ranges.end(); ++r)
     {
-      out << r->begin << " " << r->end << std::endl;
+      out << r->begin << " " << r->end << '\n';
     }
 }
 

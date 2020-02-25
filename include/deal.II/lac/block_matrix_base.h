@@ -2513,7 +2513,7 @@ BlockMatrixBase<MatrixType>::print(std::ostream &out,
     for (unsigned int col = 0; col < n_block_cols(); ++col)
       {
         if (!alternative_output)
-          out << "Block (" << row << ", " << col << ")" << std::endl;
+          out << "Block (" << row << ", " << col << ")" << '\n';
 
         block(row, col).print(out, alternative_output);
       }

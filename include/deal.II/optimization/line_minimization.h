@@ -597,15 +597,15 @@ namespace LineMinimization
           i++;
 
           if (debug_output)
-            deallog << "Bracketing phase: " << i << std::endl
+            deallog << "Bracketing phase: " << i << '\n'
                     << ai << " " << fi << " " << gi << " " << w1(ai, fi) << " "
-                    << w2(gi) << " " << f_min << std::endl;
+                    << w2(gi) << " " << f_min << '\n';
 
           // first check if we can stop bracketing or the whole line search:
           if (fi <= f_min || ai == a_max)
             {
               if (debug_output)
-                deallog << "Reached the maximum step size." << std::endl;
+                deallog << "Reached the maximum step size." << '\n';
               return std::make_pair(ai, i);
             }
 
@@ -626,7 +626,7 @@ namespace LineMinimization
             {
               if (debug_output)
                 deallog << "Satisfied both Wolfe conditions during Bracketing."
-                        << std::endl;
+                        << '\n';
 
               Assert(w1(ai, fi), ExcInternalError());
               return std::make_pair(ai, i);
@@ -705,13 +705,13 @@ namespace LineMinimization
         i++;
 
         if (debug_output)
-          deallog << "Sectioning phase: " << i << std::endl
+          deallog << "Sectioning phase: " << i << '\n'
                   << a_lo << " " << f_lo << " " << g_lo << " " << w1(a_lo, f_lo)
-                  << " " << w2(g_lo) << std::endl
+                  << " " << w2(g_lo) << '\n'
                   << a_hi << " " << f_hi << " " << g_hi << " " << w1(a_hi, f_hi)
-                  << " " << w2(g_hi) << std::endl
+                  << " " << w2(g_hi) << '\n'
                   << ai << " " << fi << " " << gi << " " << w1(ai, fi) << " "
-                  << w2(gi) << std::endl;
+                  << w2(gi) << '\n';
 
         if (!w1(ai, fi) || fi >= f_lo)
           // take [a_lo, ai]
@@ -729,7 +729,7 @@ namespace LineMinimization
             if (w2(gi)) // satisfies both wolf
               {
                 if (debug_output)
-                  deallog << "Satisfied both Wolfe conditions." << std::endl;
+                  deallog << "Satisfied both Wolfe conditions." << '\n';
                 Assert(w1(ai, fi), ExcInternalError());
                 return std::make_pair(ai, i);
               }

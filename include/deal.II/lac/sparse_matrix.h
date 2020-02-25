@@ -2486,15 +2486,14 @@ SparseMatrix<number>::print(StreamType &out,
                   if (across)
                     out << ' ' << i << ',' << i << ':' << diagonal;
                   else
-                    out << '(' << i << ',' << i << ") " << diagonal
-                        << std::endl;
+                    out << '(' << i << ',' << i << ") " << diagonal << '\n';
                   hanging_diagonal = false;
                 }
               if (across)
                 out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
               else
                 out << "(" << i << "," << cols->colnums[j] << ") " << val[j]
-                    << std::endl;
+                    << '\n';
             }
         }
       if (hanging_diagonal)
@@ -2502,12 +2501,12 @@ SparseMatrix<number>::print(StreamType &out,
           if (across)
             out << ' ' << i << ',' << i << ':' << diagonal;
           else
-            out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+            out << '(' << i << ',' << i << ") " << diagonal << '\n';
           hanging_diagonal = false;
         }
     }
   if (across)
-    out << std::endl;
+    out << '\n';
 }
 
 

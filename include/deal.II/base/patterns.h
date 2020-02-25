@@ -759,7 +759,7 @@ namespace Patterns
    * prm.log_parameters(deallog);
    * // DEAL:parameters::A tuple: Mondo : 2.0, 3.0, 4.0 : 34
    *
-   * deallog << Patterns::Tools::Convert<T>::to_string(a) << std::endl;
+   * deallog << Patterns::Tools::Convert<T>::to_string(a) << '\n';
    * // DEAL::Mondo : 2.000000, 3.000000, 4.000000 : 34
    * @endcode
    *
@@ -1225,18 +1225,18 @@ namespace Patterns
    *
    * auto pattern = Patterns::Tools::Convert<T>::to_pattern();
    *
-   * std::cout << pattern->description() << std::endl;
+   * std::cout << pattern->description() << '\n';
    * // [List of <[Integer]> of length 0...4294967295 (inclusive)]
    *
    * auto s = Patterns::Tools::Convert<T>::to_string(vec);
-   * std::cout << s << std::endl;
+   * std::cout << s << '\n';
    * // 1, 2, 3
    *
    * auto vec = Patterns::Tools::Convert<T>::to_value("2,3,4,5");
    * // now vec has size 4, and contains the elements 2,3,4,5
    *
-   * std::cout << internal::RankInfo<T>::list_rank << std::endl; // Outputs 1
-   * std::cout << internal::RankInfo<T>::map_rank  << std::endl; // Outputs 0
+   * std::cout << internal::RankInfo<T>::list_rank << '\n'; // Outputs 1
+   * std::cout << internal::RankInfo<T>::map_rank  << '\n'; // Outputs 0
    * @endcode
    *
    * Convert<T> is used by the function Patterns::Tools::add_parameter() in this

@@ -111,11 +111,11 @@ LogStream::~LogStream()
                        "but not flushed to the screen or a file while the "
                        "program is being terminated. This would lead to a "
                        "segmentation fault. Make sure you flush the "
-                       "content of the 'deallog' object using 'std::endl' "
+                       "content of the 'deallog' object using ''\n'' "
                        "before the end of the program.")
-                   << std::endl;
+                   << '\n';
         else
-          *this << std::endl;
+          *this << '\n';
       }
   }
 }
@@ -134,7 +134,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
   // child of std::streambuf (or similar).
   //
   // The problem is that at this point we would like to know whether an
-  // std::flush or std::endl has called us, however, there is no way to
+  // std::flush or '\n' has called us, however, there is no way to
   // detect this in a sane manner.
   //
   // The obvious idea to compare function pointers,
@@ -142,7 +142,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
   //   p == p_flush ? ...,
   // is wrong as there doesn't has to be a _single_ std::flush instance...
   // there could be multiple of it. And in fact, LLVM's libc++ implements
-  // std::flush and std::endl in a way that every shared library and
+  // std::flush and '\n' in a way that every shared library and
   // executable has its local copy... fun...
   //
   // - Maier, 2013

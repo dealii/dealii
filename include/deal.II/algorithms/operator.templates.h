@@ -48,7 +48,7 @@ namespace Algorithms
   {
     if (os == nullptr)
       {
-        deallog << "Step " << step << std::endl;
+        deallog << "Step " << step << '\n';
         for (unsigned int i = 0; i < vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
@@ -59,9 +59,9 @@ namespace Algorithms
               deallog << ' '
                       << ::dealii::internal::ElementAccess<VectorType>::get(*v,
                                                                             j);
-            deallog << std::endl;
+            deallog << '\n';
           }
-        deallog << std::endl;
+        deallog << '\n';
       }
     else
       {
@@ -76,7 +76,7 @@ namespace Algorithms
                     << ::dealii::internal::ElementAccess<VectorType>::get(*v,
                                                                           j);
           }
-        (*os) << std::endl;
+        (*os) << '\n';
       }
     return *this;
   }

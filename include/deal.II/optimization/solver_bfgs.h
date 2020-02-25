@@ -335,8 +335,8 @@ SolverBFGS<VectorType>::solve(
   while (conv == SolverControl::iterate)
     {
       if (additional_data.debug_output)
-        deallog << "Iteration " << k << " history " << m << std::endl
-                << "f=" << f << std::endl;
+        deallog << "Iteration " << k << " history " << m << '\n'
+                << "f=" << f << '\n';
 
       // 1. Two loop recursion to calculate p = - H*g
       c1.resize(m);
@@ -369,7 +369,7 @@ SolverBFGS<VectorType>::solve(
       y_k.sadd(-1, 1, g);
 
       if (additional_data.debug_output)
-        deallog << "Line search a=" << alpha << " f=" << f << std::endl;
+        deallog << "Line search a=" << alpha << " f=" << f << '\n';
 
       // 3. Check convergence
       k++;
@@ -381,7 +381,7 @@ SolverBFGS<VectorType>::solve(
       // 4. Store s, y, rho
       const Number curvature = s_k * y_k;
       if (additional_data.debug_output)
-        deallog << "Curvature " << curvature << std::endl;
+        deallog << "Curvature " << curvature << '\n';
 
       if (curvature > 0. && additional_data.max_history_size > 0)
         {

@@ -831,10 +831,9 @@ namespace TrilinosWrappers
             return gid(vector->Map(), index);
           };
           out << "size:" << size() << " local_size:" << local_size() << " :"
-              << std::endl;
+              << '\n';
           for (size_type i = 0; i < local_size(); ++i)
-            out << "[" << global_id(i) << "]: " << (*(vector))[0][i]
-                << std::endl;
+            out << "[" << global_id(i) << "]: " << (*(vector))[0][i] << '\n';
         }
       else
         {
@@ -848,8 +847,8 @@ namespace TrilinosWrappers
               out << static_cast<double>(val[i]) << ' ';
           else
             for (size_type i = 0; i < size(); ++i)
-              out << static_cast<double>(val[i]) << std::endl;
-          out << std::endl;
+              out << static_cast<double>(val[i]) << '\n';
+          out << '\n';
         }
 
       AssertThrow(out, ExcIO());

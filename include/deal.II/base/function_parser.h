@@ -108,7 +108,7 @@ class Vector;
  *
  * deallog << "Function '" << expression << "'"
  *         << " @ " << point
- *         << " is " << result << std::endl;
+ *         << " is " << result << '\n';
  * @endcode
  * The second example is a bit more complex:
  * @code
@@ -148,7 +148,7 @@ class Vector;
  * // Output the evaluated function
  * deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
  *         << " at " << point
- *         << " is " << result << std::endl;
+ *         << " is " << result << '\n';
  * @endcode
  *
  * This class overloads the virtual methods value() and vector_value() of the

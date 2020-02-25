@@ -266,7 +266,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream &out) const
                   out << ',' << l + j;
               l += b.n_cols();
             }
-          out << ']' << std::endl;
+          out << ']' << '\n';
         }
       k += block(ib, 0).n_rows();
     }
@@ -294,7 +294,7 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
                     out << ',' << l + j;
               l += b.n_cols();
             }
-          out << ']' << std::endl;
+          out << ']' << '\n';
         }
       k += block(ib, 0).n_rows();
     }
@@ -318,7 +318,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
               for (size_type j = 0; j < b.n_cols(); ++j)
                 if (b.exists(i, j))
                   out << l + j << " " << -static_cast<signed int>(i + k)
-                      << std::endl;
+                      << '\n';
               l += b.n_cols();
             }
         }

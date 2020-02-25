@@ -1144,7 +1144,7 @@ namespace TrilinosWrappers
               out << "(" << TrilinosWrappers::global_index(graph->RowMap(), i)
                   << ","
                   << TrilinosWrappers::global_index(graph->ColMap(), indices[j])
-                  << ") " << std::endl;
+                  << ") " << '\n';
           }
       }
 
@@ -1177,7 +1177,7 @@ namespace TrilinosWrappers
               << " "
               << -static_cast<int>(
                    TrilinosWrappers::global_index(graph->RowMap(), row))
-              << std::endl;
+              << '\n';
       }
 
     AssertThrow(out, ExcIO());

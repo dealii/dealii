@@ -158,9 +158,9 @@ namespace MeshWorker
     GnuplotPatch::write_endl() const
     {
       if (os == nullptr)
-        deallog << std::endl;
+        deallog << '\n';
       else
-        (*os) << std::endl;
+        (*os) << '\n';
     }
 
 

@@ -190,7 +190,7 @@ namespace Differentiation
       // We write each expression on a new line.
       // Note: SymEngine outputs a non-terminating string
       os << *this;
-      os << std::endl;
+      os << '\n';
     }
 
 

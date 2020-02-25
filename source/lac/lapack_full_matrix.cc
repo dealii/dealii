@@ -1970,7 +1970,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
   Assert(info >= 0, ExcInternalError());
   // TODO:[GK] What if the QR method fails?
   if (info != 0)
-    std::cerr << "LAPACK error in geev" << std::endl;
+    std::cerr << "LAPACK error in geev" << '\n';
 
   state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
@@ -2068,7 +2068,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
   if (info != 0)
-    std::cerr << "LAPACK error in syevx" << std::endl;
+    std::cerr << "LAPACK error in syevx" << '\n';
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.reinit(nn, n_eigenpairs, true);
@@ -2192,7 +2192,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
   if (info != 0)
-    std::cerr << "LAPACK error in sygvx" << std::endl;
+    std::cerr << "LAPACK error in sygvx" << '\n';
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.resize(n_eigenpairs);
@@ -2289,7 +2289,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   Assert(info >= 0, ExcInternalError());
   if (info != 0)
-    std::cerr << "LAPACK error in sygv" << std::endl;
+    std::cerr << "LAPACK error in sygv" << '\n';
 
   for (size_type i = 0; i < eigenvectors.size(); ++i)
     {
@@ -2353,7 +2353,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
           out << std::setw(width) << this->el(i, j) * denominator << ' ';
         else
           out << std::setw(width) << zero_string << ' ';
-      out << std::endl;
+      out << '\n';
     }
 
   AssertThrow(out, ExcIO());

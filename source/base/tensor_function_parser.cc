@@ -259,7 +259,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
           std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
           std::cerr << "Token:    <" << e.GetToken() << ">\n";
           std::cerr << "Position: <" << e.GetPos() << ">\n";
-          std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
+          std::cerr << "Errc:     <" << e.GetCode() << ">" << '\n';
           AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
         }
     }
@@ -317,7 +317,7 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
       std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
       std::cerr << "Token:    <" << e.GetToken() << ">\n";
       std::cerr << "Position: <" << e.GetPos() << ">\n";
-      std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
+      std::cerr << "Errc:     <" << e.GetCode() << ">" << '\n';
       AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
 
       return Tensor<rank, dim, Number>();

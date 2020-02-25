@@ -125,7 +125,7 @@ namespace Algorithms
         d_implicit.time        = control.now();
         d_explicit.step        = (1. - vtheta) * control.step();
         d_implicit.step        = vtheta * control.step();
-        deallog << "Time step:" << d_implicit.time << std::endl;
+        deallog << "Time step:" << d_implicit.time << '\n';
 
         op_explicit->notify(Events::new_time);
         op_implicit->notify(Events::new_time);

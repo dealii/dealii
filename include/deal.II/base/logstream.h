@@ -58,7 +58,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Write via the <tt>&lt;&lt;</tt> operator, <tt> deallog << "This is a log
  * notice";</tt> will be buffered thread locally until a <tt>std::flush</tt>
- * or <tt>std::endl</tt> is encountered, which will trigger a writeout to the
+ * or <tt>'\n'</tt> is encountered, which will trigger a writeout to the
  * console and, if set up, the log file.
  *
  * <h3>LogStream and thread safety</h3>
@@ -68,7 +68,7 @@ DEAL_II_NAMESPACE_OPEN
  * <ul>
  * <li> Every write to a Logstream with operator <tt>&lt;&lt;</tt> (or with
  * one of the special member functions) is buffered in a thread-local storage.
- * <li> An <tt>std::flush</tt> or <tt>std::endl</tt> will trigger a writeout
+ * <li> An <tt>std::flush</tt> or <tt>'\n'</tt> will trigger a writeout
  * to the console and (if attached) to the file stream. This writeout is
  * sequentialized so that output from concurrent threads don't interleave.
  * <li> On a new thread, invoking a writeout, as well as a call to #push or
@@ -280,15 +280,15 @@ public:
 
   /**
    * Treat ostream manipulators. This passes on the whole thing to the
-   * template function with the exception of the <tt>std::endl</tt>
+   * template function with the exception of the <tt>'\n'</tt>
    * manipulator, for which special action is performed: write the temporary
    * stream buffer including a header to the file and <tt>std::cout</tt> and
    * empty the buffer.
    *
    * An overload of this function is needed anyway, since the compiler can't
-   * bind manipulators like @p std::endl directly to template arguments @p T
+   * bind manipulators like @p '\n' directly to template arguments @p T
    * like in the previous general template. This is due to the fact that @p
-   * std::endl is actually an overloaded set of functions for @p std::ostream,
+   * '\n' is actually an overloaded set of functions for @p std::ostream,
    * @p std::wostream, and potentially more of this kind. This function is
    * therefore necessary to pick one element from this overload set.
    */

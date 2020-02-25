@@ -2231,7 +2231,7 @@ namespace internal
                                           sizeof(GeometryType));
       for (unsigned int j = 0; j < cell_data.size(); ++j)
         {
-          out << "    Data component " << j << std::endl;
+          out << "    Data component " << j << '\n';
           cell_data[j].print_memory_consumption(out, task_info);
           face_data[j].print_memory_consumption(out, task_info);
         }

@@ -1363,7 +1363,7 @@ FullMatrix<number>::print(StreamType &       s,
           s.precision(p);
           s << this->el(i, j);
         }
-      s << std::endl;
+      s << '\n';
     }
 
   // reset output format

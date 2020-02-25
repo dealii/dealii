@@ -106,7 +106,7 @@ TensorProductPolynomials<dim, PolynomialType>::output_indices(
       out << i << "\t";
       for (unsigned int d = 0; d < dim; ++d)
         out << ix[d] << " ";
-      out << std::endl;
+      out << '\n';
     }
 }
 

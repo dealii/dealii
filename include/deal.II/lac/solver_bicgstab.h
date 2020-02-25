@@ -497,7 +497,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   do
     {
       if (step != 0)
-        deallog << "Restart step " << step << std::endl;
+        deallog << "Restart step " << step << '\n';
       if (start(A) == SolverControl::success)
         {
           state.state = SolverControl::success;

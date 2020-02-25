@@ -482,7 +482,7 @@ namespace PETScWrappers
           if (across)
             out << 'C' << i << ':';
           else
-            out << "Component " << i << std::endl;
+            out << "Component " << i << '\n';
           this->components[i].print(out, precision, scientific, across);
         }
     }

@@ -34,7 +34,7 @@ namespace LACExceptions
   ExcPETScError::print_info(std::ostream &out) const
   {
     out << "deal.II encountered an error while calling a PETSc function."
-        << std::endl;
+        << '\n';
 #ifdef DEAL_II_WITH_PETSC
     // PetscErrorMessage changes the value in a pointer to refer to a
     // statically allocated description of the current error message.
@@ -45,17 +45,17 @@ namespace LACExceptions
     if (ierr == 0 && petsc_message != nullptr)
       {
         out << "The description of the error provided by PETSc is \""
-            << petsc_message << "\"." << std::endl;
+            << petsc_message << "\"." << '\n';
       }
     else
       {
         out
           << "PETSc was not able to determine a description for this particular error code."
-          << std::endl;
+          << '\n';
       }
 #endif // DEAL_II_WITH_PETSC
     out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+        << "." << '\n';
   }
 } // namespace LACExceptions
 

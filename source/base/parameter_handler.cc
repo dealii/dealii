@@ -1202,18 +1202,18 @@ ParameterHandler::print_parameters(std::ostream &    out,
   switch (style)
     {
       case Text:
-        out << "# Listing of Parameters" << std::endl
-            << "# ---------------------" << std::endl;
+        out << "# Listing of Parameters" << '\n'
+            << "# ---------------------" << '\n';
         break;
 
       case LaTeX:
-        out << "\\subsection{Global parameters}" << std::endl;
-        out << "\\label{parameters:global}" << std::endl;
-        out << std::endl << std::endl;
+        out << "\\subsection{Global parameters}" << '\n';
+        out << "\\label{parameters:global}" << '\n';
+        out << '\n' << '\n';
         break;
 
       case Description:
-        out << "Listing of Parameters:" << std::endl << std::endl;
+        out << "Listing of Parameters:" << '\n' << '\n';
         break;
 
       case ShortText:
@@ -1720,7 +1720,7 @@ ParameterHandler::print_parameters_section(
             for (const auto &path : subsection_path)
               {
                 out << std::setw(overall_indent_level * 2) << ""
-                    << "subsection " << demangle(path) << std::endl;
+                    << "subsection " << demangle(path) << '\n';
                 overall_indent_level += 1;
               }
 
@@ -1759,7 +1759,7 @@ ParameterHandler::print_parameters_section(
                     !p.second.get<std::string>("documentation").empty())
                   {
                     if (first_entry == false)
-                      out << std::endl;
+                      out << '\n';
                     else
                       first_entry = false;
 
@@ -1770,7 +1770,7 @@ ParameterHandler::print_parameters_section(
 
                     for (const auto &doc_line : doc_lines)
                       out << std::setw(overall_indent_level * 2) << ""
-                          << "# " << doc_line << std::endl;
+                          << "# " << doc_line << '\n';
                   }
 
 
@@ -1793,7 +1793,7 @@ ParameterHandler::print_parameters_section(
                         << p.second.get<std::string>("default_value");
                   }
 
-                out << std::endl;
+                out << '\n';
               }
 
           break;
@@ -1819,7 +1819,7 @@ ParameterHandler::print_parameters_section(
 
           if (parameters_exist_here)
             {
-              out << "\\begin{itemize}" << std::endl;
+              out << "\\begin{itemize}" << '\n';
 
               // print entries one by one
               for (const auto &p : current_section)
@@ -1835,7 +1835,7 @@ ParameterHandler::print_parameters_section(
                     for (const auto &path : subsection_path)
                       out << mangle(path) << "/";
                     out << p.first;
-                    out << "}\n\n" << std::endl;
+                    out << "}\n\n" << '\n';
 
                     out << "\\index[prmindex]{" << escape(demangle(p.first))
                         << "}\n";
@@ -1846,18 +1846,18 @@ ParameterHandler::print_parameters_section(
 
                     // finally print value and default
                     out << "{\\it Value:} " << escape(value) << "\n\n"
-                        << std::endl
+                        << '\n'
                         << "{\\it Default:} "
                         << escape(p.second.get<std::string>("default_value"))
                         << "\n\n"
-                        << std::endl;
+                        << '\n';
 
                     // if there is a documenting string, print it as well
                     if (!p.second.get<std::string>("documentation").empty())
                       out << "{\\it Description:} "
                           << p.second.get<std::string>("documentation")
                           << "\n\n"
-                          << std::endl;
+                          << '\n';
 
                     // also output possible values
                     const unsigned int pattern_index =
@@ -1865,7 +1865,7 @@ ParameterHandler::print_parameters_section(
                     const std::string desc_str =
                       patterns[pattern_index]->description(
                         Patterns::PatternBase::LaTeX);
-                    out << "{\\it Possible values:} " << desc_str << std::endl;
+                    out << "{\\it Possible values:} " << desc_str << '\n';
                   }
                 else if (is_alias_node(p.second) == true)
                   {
@@ -1879,7 +1879,7 @@ ParameterHandler::print_parameters_section(
                     for (const auto &path : subsection_path)
                       out << mangle(path) << "/";
                     out << p.first;
-                    out << "}\n\n" << std::endl;
+                    out << "}\n\n" << '\n';
 
                     out << "\\index[prmindex]{" << escape(demangle(p.first))
                         << "}\n";
@@ -1897,9 +1897,9 @@ ParameterHandler::print_parameters_section(
                             " Its use is deprecated." :
                             "")
                       << "\n\n"
-                      << std::endl;
+                      << '\n';
                   }
-              out << "\\end{itemize}" << std::endl;
+              out << "\\end{itemize}" << '\n';
             }
 
           break;
@@ -1912,7 +1912,7 @@ ParameterHandler::print_parameters_section(
             for (const auto &path : subsection_path)
               {
                 out << std::setw(overall_indent_level * 2) << ""
-                    << "subsection " << demangle(path) << std::endl;
+                    << "subsection " << demangle(path) << '\n';
                 overall_indent_level += 1;
               };
 
@@ -1945,22 +1945,22 @@ ParameterHandler::print_parameters_section(
                     full_desc_str, 78 - overall_indent_level * 2 - 2, '|');
                 if (description_str.size() > 1)
                   {
-                    out << std::endl;
+                    out << '\n';
                     for (const auto &description : description_str)
                       out << std::setw(overall_indent_level * 2 + 6) << ""
-                          << description << std::endl;
+                          << description << '\n';
                   }
                 else if (description_str.empty() == false)
-                  out << "  " << description_str[0] << std::endl;
+                  out << "  " << description_str[0] << '\n';
                 else
-                  out << std::endl;
+                  out << '\n';
 
                 // if there is a documenting string, print it as well
                 if (p.second.get<std::string>("documentation").length() != 0)
                   out << std::setw(overall_indent_level * 2 + longest_name + 10)
                       << ""
                       << "(" << p.second.get<std::string>("documentation")
-                      << ")" << std::endl;
+                      << ")" << '\n';
               }
 
           break;
@@ -1985,7 +1985,7 @@ ParameterHandler::print_parameters_section(
 
       if ((style != Description) && (!(style & 128)) && (n_parameters != 0) &&
           (n_sections != 0))
-        out << std::endl << std::endl;
+        out << '\n' << '\n';
 
       // now transverse subsections tree
       for (const auto &p : current_section)
@@ -1999,7 +1999,7 @@ ParameterHandler::print_parameters_section(
                 case Description:
                 case ShortText:
                   out << std::setw(overall_indent_level * 2) << ""
-                      << "subsection " << demangle(p.first) << std::endl;
+                      << "subsection " << demangle(p.first) << '\n';
                   break;
                 case LaTeX:
                   {
@@ -2008,8 +2008,7 @@ ParameterHandler::print_parameters_section(
                         input, Patterns::PatternBase::LaTeX);
                     };
 
-                    out << std::endl
-                        << "\\subsection{Parameters in section \\tt ";
+                    out << '\n' << "\\subsection{Parameters in section \\tt ";
 
                     // find the path to the current section so that we can
                     // print it in the \subsection{...} heading
@@ -2017,14 +2016,14 @@ ParameterHandler::print_parameters_section(
                       out << escape(path) << "/";
                     out << escape(demangle(p.first));
 
-                    out << "}" << std::endl;
+                    out << "}" << '\n';
                     out << "\\label{parameters:";
                     for (const auto &path : subsection_path)
                       out << mangle(path) << "/";
                     out << p.first << "}";
-                    out << std::endl;
+                    out << '\n';
 
-                    out << std::endl;
+                    out << '\n';
                     break;
                   }
 
@@ -2042,13 +2041,13 @@ ParameterHandler::print_parameters_section(
                   // write end of subsection. one blank line after each
                   // subsection
                   out << std::setw(overall_indent_level * 2) << ""
-                      << "end" << std::endl
-                      << std::endl;
+                      << "end" << '\n'
+                      << '\n';
 
                   // if this is a toplevel subsection, then have two
                   // newlines
                   if (overall_indent_level == 0)
-                    out << std::endl;
+                    out << '\n';
 
                   break;
                 case Description:
@@ -2056,7 +2055,7 @@ ParameterHandler::print_parameters_section(
                 case ShortText:
                   // write end of subsection.
                   out << std::setw(overall_indent_level * 2) << ""
-                      << "end" << std::endl;
+                      << "end" << '\n';
                   break;
                 case LaTeX:
                   break;
@@ -2081,7 +2080,7 @@ ParameterHandler::print_parameters_section(
               {
                 overall_indent_level -= 1;
                 out << std::setw(overall_indent_level * 2) << ""
-                    << "end" << std::endl;
+                    << "end" << '\n';
               }
 
           break;
@@ -2135,7 +2134,7 @@ ParameterHandler::log_parameters_section(LogStream &out,
   for (const auto &p : current_section)
     if (is_parameter_node(p.second) == true)
       out << demangle(p.first) << ": " << p.second.get<std::string>("value")
-          << std::endl;
+          << '\n';
 
   // now transverse subsections tree
   for (const auto &p : current_section)
@@ -2247,7 +2246,7 @@ ParameterHandler::scan_line(std::string        line,
                         << entry_name << "> of the parameter <"
                         << entries->get<std::string>(path + path_separator +
                                                      "alias")
-                        << ">." << std::endl;
+                        << ">." << '\n';
             }
           path = get_current_full_path(
             entries->get<std::string>(path + path_separator + "alias"));
@@ -2438,14 +2437,14 @@ MultipleParameterLoop::init_branches()
   for (const auto &multiple_choice : multiple_choices)
     if (multiple_choice.type == Entry::array)
       if (multiple_choice.different_values.size() != n_branches)
-        std::cerr << "    The entry value" << std::endl
-                  << "        " << multiple_choice.entry_value << std::endl
-                  << "    for the entry named" << std::endl
-                  << "        " << multiple_choice.entry_name << std::endl
+        std::cerr << "    The entry value" << '\n'
+                  << "        " << multiple_choice.entry_value << '\n'
+                  << "    for the entry named" << '\n'
+                  << "        " << multiple_choice.entry_name << '\n'
                   << "    does not have the right number of entries for the "
-                  << std::endl
+                  << '\n'
                   << "        " << n_branches
-                  << " variant runs that will be performed." << std::endl;
+                  << " variant runs that will be performed." << '\n';
 
 
   // do a first run on filling the values to
@@ -2510,7 +2509,7 @@ MultipleParameterLoop::fill_entry_values(const unsigned int run_no)
               std::cerr
                 << "The given array for entry <" << choice->entry_name
                 << "> does not contain enough elements! Taking empty string instead."
-                << std::endl;
+                << '\n';
               entry_value = "";
             }
           else

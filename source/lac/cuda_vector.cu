@@ -710,13 +710,13 @@ namespace LinearAlgebra
 
       out << "IndexSet: ";
       complete_index_set(n_elements).print(out);
-      out << std::endl;
+      out << '\n';
 
       // Copy the vector to the host
       std::vector<Number> cpu_val(n_elements);
       Utilities::CUDA::copy_to_host(val.get(), cpu_val);
       for (unsigned int i = 0; i < n_elements; ++i)
-        out << cpu_val[i] << std::endl;
+        out << cpu_val[i] << '\n';
       out << std::flush;
 
       AssertThrow(out, ExcIO());

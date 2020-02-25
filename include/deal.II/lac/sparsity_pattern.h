@@ -705,7 +705,7 @@ public:
                  int,
                  int,
                  << "Upon entering a new entry to row " << arg1
-                 << ": there was no free entry any more. " << std::endl
+                 << ": there was no free entry any more. " << '\n'
                  << "(Maximum number of entries for this row: " << arg2
                  << "; maybe the matrix is already compressed?)");
 

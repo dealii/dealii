@@ -907,7 +907,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
         }
       else
         {
-          deallog << "default_res=" << rho << std::endl;
+          deallog << "default_res=" << rho << '\n';
 
           if (left_precondition)
             {
@@ -993,7 +993,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
             }
           else
             {
-              deallog << "default_res=" << rho << std::endl;
+              deallog << "default_res=" << rho << '\n';
 
               dealii::Vector<double> h_(dim);
               *x_     = x;

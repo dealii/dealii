@@ -80,7 +80,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
                                  std::vector<bool>(dim, true)))
 {
 #ifdef DEBUG_NEDELEC
-  deallog << get_name() << std::endl;
+  deallog << get_name() << '\n';
 #endif
 
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -104,7 +104,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
   // get_prolongation_matrix
 
 #ifdef DEBUG_NEDELEC
-  deallog << "Face Embedding" << std::endl;
+  deallog << "Face Embedding" << '\n';
 #endif
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
 
@@ -2983,7 +2983,7 @@ FE_Nedelec<dim>::get_prolongation_matrix(
       // Restriction only for isotropic
       // refinement
 #ifdef DEBUG_NEDELEC
-      deallog << "Embedding" << std::endl;
+      deallog << "Embedding" << '\n';
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices();
       // Fill prolongation matrices with embedding operators
@@ -2994,7 +2994,7 @@ FE_Nedelec<dim>::get_prolongation_matrix(
         internal::FE_Nedelec::get_embedding_computation_tolerance(
           this->degree));
 #ifdef DEBUG_NEDELEC
-      deallog << "Restriction" << std::endl;
+      deallog << "Restriction" << '\n';
 #endif
       this_nonconst.initialize_restriction();
     }
@@ -3039,7 +3039,7 @@ FE_Nedelec<dim>::get_restriction_matrix(
       // Restriction only for isotropic
       // refinement
 #ifdef DEBUG_NEDELEC
-      deallog << "Embedding" << std::endl;
+      deallog << "Embedding" << '\n';
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices();
       // Fill prolongation matrices with embedding operators
@@ -3050,7 +3050,7 @@ FE_Nedelec<dim>::get_restriction_matrix(
         internal::FE_Nedelec::get_embedding_computation_tolerance(
           this->degree));
 #ifdef DEBUG_NEDELEC
-      deallog << "Restriction" << std::endl;
+      deallog << "Restriction" << '\n';
 #endif
       this_nonconst.initialize_restriction();
     }

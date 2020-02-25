@@ -591,7 +591,7 @@ namespace LinearAlgebra
     AssertThrow(out, ExcIO());
 
     // Other version of the following
-    //  out << size() << std::endl << '[';
+    //  out << size() << '\n' << '[';
     // Reason: operator<< seems to use some resources  that lead to problems in
     // a multithreaded environment.
     const size_type sz = this->size();

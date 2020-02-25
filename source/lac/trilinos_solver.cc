@@ -731,11 +731,11 @@ namespace TrilinosWrappers
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
-    verbose_cout << "Starting symbolic factorization" << std::endl;
+    verbose_cout << "Starting symbolic factorization" << '\n';
     ierr = solver->SymbolicFactorization();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-    verbose_cout << "Starting numeric factorization" << std::endl;
+    verbose_cout << "Starting numeric factorization" << '\n';
     ierr = solver->NumericFactorization();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
@@ -757,7 +757,7 @@ namespace TrilinosWrappers
                                     additional_data.output_solver_details);
 
 
-    verbose_cout << "Starting solve" << std::endl;
+    verbose_cout << "Starting solve" << '\n';
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
@@ -792,7 +792,7 @@ namespace TrilinosWrappers
     ConditionalOStream verbose_cout(std::cout,
                                     additional_data.output_solver_details);
 
-    verbose_cout << "Starting solve" << std::endl;
+    verbose_cout << "Starting solve" << '\n';
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
@@ -831,15 +831,15 @@ namespace TrilinosWrappers
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
-    verbose_cout << "Starting symbolic factorization" << std::endl;
+    verbose_cout << "Starting symbolic factorization" << '\n';
     ierr = solver->SymbolicFactorization();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-    verbose_cout << "Starting numeric factorization" << std::endl;
+    verbose_cout << "Starting numeric factorization" << '\n';
     ierr = solver->NumericFactorization();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-    verbose_cout << "Starting solve" << std::endl;
+    verbose_cout << "Starting solve" << '\n';
     ierr = solver->Solve();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 

@@ -2168,11 +2168,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::print_memory_consumption(
     }
   for (unsigned int j = 0; j < dof_info.size(); ++j)
     {
-      out << "   Memory DoFInfo component " << j << std::endl;
+      out << "   Memory DoFInfo component " << j << '\n';
       dof_info[j].print_memory_consumption(out, task_info);
     }
 
-  out << "   Memory mapping info" << std::endl;
+  out << "   Memory mapping info" << '\n';
   mapping_info.print_memory_consumption(out, task_info);
 
   out << "   Memory unit cell shape data:      ";
@@ -2195,9 +2195,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::print(std::ostream &out) const
   // print indices local to global
   for (unsigned int no = 0; no < dof_info.size(); ++no)
     {
-      out << "\n-- Index data for component " << no << " --" << std::endl;
+      out << "\n-- Index data for component " << no << " --" << '\n';
       dof_info[no].print(constraint_pool_data, constraint_pool_row_index, out);
-      out << std::endl;
+      out << '\n';
     }
 }
 

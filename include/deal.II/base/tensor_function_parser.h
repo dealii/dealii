@@ -81,10 +81,10 @@ class Vector;
  * deallog << "Function '" << expression << "'"
  *         << " @ " << point
  *         << " is: "
- *         << std::endl
- *         << result[0][0] << " " << result[0][1] << std::endl
+ *         << '\n'
+ *         << result[0][0] << " " << result[0][1] << '\n'
  *         << result[1][0] << " " << result[1][1]
- *         << std::endl;
+ *         << '\n';
  * @endcode
  *
  * See also the documentation of the FunctionParser class.

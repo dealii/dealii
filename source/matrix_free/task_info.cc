@@ -670,7 +670,7 @@ namespace internal
         out << memory_c.min;
       else
         out << memory_c.min << "/" << memory_c.avg << "/" << memory_c.max;
-      out << " MB" << std::endl;
+      out << " MB" << '\n';
     }
 
 

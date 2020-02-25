@@ -404,9 +404,9 @@ MGTransferPrebuilt<VectorType>::print_matrices(std::ostream &os) const
 {
   for (unsigned int level = 0; level < prolongation_matrices.size(); ++level)
     {
-      os << "Level " << level << std::endl;
+      os << "Level " << level << '\n';
       prolongation_matrices[level]->print(os);
-      os << std::endl;
+      os << '\n';
     }
 }
 

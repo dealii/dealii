@@ -37,7 +37,7 @@ TensorProductPolynomialsBubbles<dim>::output_indices(std::ostream &out) const
       out << i << "\t";
       for (unsigned int d = 0; d < dim; ++d)
         out << ix[d] << " ";
-      out << std::endl;
+      out << '\n';
     }
 }
 

@@ -651,12 +651,12 @@ namespace Polynomials
         out << lagrange_weight;
         for (unsigned int i = 0; i < lagrange_support_points.size(); ++i)
           out << " (x-" << lagrange_support_points[i] << ")";
-        out << std::endl;
+        out << '\n';
       }
     else
       for (int i = degree(); i >= 0; --i)
         {
-          out << coefficients[i] << " x^" << i << std::endl;
+          out << coefficients[i] << " x^" << i << '\n';
         }
   }
 

@@ -881,8 +881,8 @@ namespace PETScWrappers
         out << val[i] << ' ';
     else
       for (size_type i = 0; i < local_size(); ++i)
-        out << val[i] << std::endl;
-    out << std::endl;
+        out << val[i] << '\n';
+    out << '\n';
 
     // reset output format
     out.flags(old_flags);

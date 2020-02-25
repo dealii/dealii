@@ -2028,7 +2028,7 @@ IndexSet::print(StreamType &out) const
       if (p != --ranges.end())
         out << ", ";
     }
-  out << "}" << std::endl;
+  out << "}" << '\n';
 }
 
 

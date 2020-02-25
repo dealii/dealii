@@ -1304,7 +1304,7 @@ namespace internal
         do
           {
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-            std::cout << "Newton iteration " << newton_iteration << std::endl;
+            std::cout << "Newton iteration " << newton_iteration << '\n';
 #endif
 
             // f'(x)
@@ -1328,7 +1328,7 @@ namespace internal
               df_inverse * static_cast<const Tensor<1, spacedim> &>(f);
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-            std::cout << "   delta=" << delta << std::endl;
+            std::cout << "   delta=" << delta << '\n';
 #endif
 
             // do a line search
@@ -1355,11 +1355,11 @@ namespace internal
                 const Tensor<1, spacedim> f_trial = p_real_trial - p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-                std::cout << "     step_length=" << step_length << std::endl
-                          << "       ||f ||   =" << f.norm() << std::endl
-                          << "       ||f*||   =" << f_trial.norm() << std::endl
+                std::cout << "     step_length=" << step_length << '\n'
+                          << "       ||f ||   =" << f.norm() << '\n'
+                          << "       ||f*||   =" << f_trial.norm() << '\n'
                           << "       ||f*||_A ="
-                          << (df_inverse * f_trial).norm() << std::endl;
+                          << (df_inverse * f_trial).norm() << '\n';
 #endif
 
                 // see if we are making progress with the current step length

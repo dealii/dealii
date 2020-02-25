@@ -666,16 +666,16 @@ namespace MeshWorker
   void
   LocalResults<number>::print_debug(StreamType &os) const
   {
-    os << "J: " << J.size() << std::endl;
-    os << "R: " << R.size() << std::endl;
+    os << "J: " << J.size() << '\n';
+    os << "R: " << R.size() << '\n';
     for (unsigned int i = 0; i < R.size(); ++i)
       {
         os << "  " << R[i].n_blocks() << " -";
         for (unsigned int j = 0; j < R[i].n_blocks(); ++j)
           os << ' ' << R[i].block(j).size();
-        os << std::endl;
+        os << '\n';
       }
-    os << "M: " << M1.size() << " face " << M2.size() << std::endl;
+    os << "M: " << M1.size() << " face " << M2.size() << '\n';
     for (unsigned int i = 0; i < M1.size(); ++i)
       {
         os << "  " << M1[i].row << "," << M1[i].column << " "
@@ -683,7 +683,7 @@ namespace MeshWorker
         if (i < M2.size())
           os << " face " << M2[i].row << "," << M2[i].column << " "
              << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
-        os << std::endl;
+        os << '\n';
       }
   }
 

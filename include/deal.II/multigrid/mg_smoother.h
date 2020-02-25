@@ -1187,7 +1187,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::smooth(
         T = !T;
     }
   if (this->debug > 0)
-    deallog << std::endl;
+    deallog << '\n';
 }
 
 
@@ -1265,7 +1265,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::apply(
         T = !T;
     }
   if (this->debug > 0)
-    deallog << std::endl;
+    deallog << '\n';
 }
 
 

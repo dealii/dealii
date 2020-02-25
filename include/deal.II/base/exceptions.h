@@ -230,7 +230,7 @@ private:
       virtual void                                    \
       print_info(std::ostream &out) const override    \
       {                                               \
-        out << "    " << arg << std::endl;            \
+        out << "    " << arg << '\n';                 \
       }                                               \
                                                       \
     private:                                          \
@@ -266,7 +266,7 @@ private:
       virtual void                                       \
       print_info(std::ostream &out) const override       \
       {                                                  \
-        out << "    " outsequence << std::endl;          \
+        out << "    " outsequence << '\n';               \
       }                                                  \
                                                          \
     private:                                             \
@@ -304,7 +304,7 @@ private:
       virtual void                                              \
       print_info(std::ostream &out) const override              \
       {                                                         \
-        out << "    " outsequence << std::endl;                 \
+        out << "    " outsequence << '\n';                      \
       }                                                         \
                                                                 \
     private:                                                    \
@@ -344,7 +344,7 @@ private:
       virtual void                                                     \
       print_info(std::ostream &out) const override                     \
       {                                                                \
-        out << "    " outsequence << std::endl;                        \
+        out << "    " outsequence << '\n';                             \
       }                                                                \
                                                                        \
     private:                                                           \
@@ -389,7 +389,7 @@ private:
       virtual void                                                            \
       print_info(std::ostream &out) const override                            \
       {                                                                       \
-        out << "    " outsequence << std::endl;                               \
+        out << "    " outsequence << '\n';                                    \
       }                                                                       \
                                                                               \
     private:                                                                  \
@@ -438,7 +438,7 @@ private:
       virtual void                                              \
       print_info(std::ostream &out) const override              \
       {                                                         \
-        out << "    " outsequence << std::endl;                 \
+        out << "    " outsequence << '\n';                      \
       }                                                         \
                                                                 \
     private:                                                    \

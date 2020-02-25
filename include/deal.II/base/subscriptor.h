@@ -312,7 +312,7 @@ Subscriptor::list_subscribers(StreamType &stream) const
 
   for (const auto &it : counter_map)
     stream << it.second << '/' << counter << " subscriptions from \""
-           << it.first << '\"' << std::endl;
+           << it.first << '\"' << '\n';
 }
 
 DEAL_II_NAMESPACE_CLOSE

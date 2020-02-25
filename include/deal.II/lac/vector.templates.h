@@ -883,8 +883,8 @@ Vector<Number>::print(std::ostream &     out,
       out << values[i] << ' ';
   else
     for (size_type i = 0; i < size(); ++i)
-      out << values[i] << std::endl;
-  out << std::endl;
+      out << values[i] << '\n';
+  out << '\n';
 
   AssertThrow(out, ExcIO());
   // reset output format
@@ -907,8 +907,8 @@ Vector<Number>::print(LogStream &        out,
       out << std::setw(width) << values[i] << ' ';
   else
     for (size_type i = 0; i < size(); ++i)
-      out << values[i] << std::endl;
-  out << std::endl;
+      out << values[i] << '\n';
+  out << '\n';
 }
 
 
@@ -919,7 +919,7 @@ Vector<Number>::block_write(std::ostream &out) const
   AssertThrow(out, ExcIO());
 
   // other version of the following
-  //  out << size() << std::endl << '[';
+  //  out << size() << '\n' << '[';
   // reason: operator<< seems to use
   // some resources that lead to
   // problems in a multithreaded

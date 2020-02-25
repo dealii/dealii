@@ -407,11 +407,11 @@ namespace PETScWrappers
               else
                 {
                   out << "[Proc " << i << " " << istart << "-" << iend - 1
-                      << "]" << std::endl;
+                      << "]" << '\n';
                   for (PetscInt i = 0; i < nlocal; ++i)
-                    out << val[i] << std::endl;
+                    out << val[i] << '\n';
                 }
-              out << std::endl;
+              out << '\n';
             }
         }
       // reset output format

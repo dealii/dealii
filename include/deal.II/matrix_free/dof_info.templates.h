@@ -1772,7 +1772,7 @@ namespace internal
           glob_indices += index;
           for (; glob_indices != end_row; ++glob_indices)
             out << *glob_indices << " ";
-          out << std::endl;
+          out << '\n';
         }
     }
 

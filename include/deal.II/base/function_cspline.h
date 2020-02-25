@@ -47,7 +47,7 @@ namespace Functions
                  double,
                  double,
                  << "The input interpolation points are not strictly ordered : "
-                 << std::endl
+                 << '\n'
                  << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
                  << "] = " << arg3 << ".");
 
@@ -57,7 +57,7 @@ namespace Functions
     double,
     double,
     << "Spline function can not be evaluated outside of the interpolation range: "
-    << std::endl
+    << '\n'
     << arg1 << " is not in [" << arg2 << ";" << arg3 << "].");
 
   /**

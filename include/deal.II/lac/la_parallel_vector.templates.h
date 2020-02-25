@@ -2090,22 +2090,22 @@ namespace LinearAlgebra
       std::vector<Number> stored_elements(allocated_size);
       data.copy_to(stored_elements.data(), allocated_size);
 
-      out << "Process #" << partitioner->this_mpi_process() << std::endl
+      out << "Process #" << partitioner->this_mpi_process() << '\n'
           << "Local range: [" << partitioner->local_range().first << ", "
           << partitioner->local_range().second
-          << "), global size: " << partitioner->size() << std::endl
-          << "Vector data:" << std::endl;
+          << "), global size: " << partitioner->size() << '\n'
+          << "Vector data:" << '\n';
       if (across)
         for (size_type i = 0; i < partitioner->local_size(); ++i)
           out << stored_elements[i] << ' ';
       else
         for (size_type i = 0; i < partitioner->local_size(); ++i)
-          out << stored_elements[i] << std::endl;
-      out << std::endl;
+          out << stored_elements[i] << '\n';
+      out << '\n';
 
       if (vector_is_ghosted)
         {
-          out << "Ghost entries (global index / value):" << std::endl;
+          out << "Ghost entries (global index / value):" << '\n';
           if (across)
             for (size_type i = 0; i < partitioner->n_ghost_indices(); ++i)
               out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
@@ -2115,8 +2115,8 @@ namespace LinearAlgebra
             for (size_type i = 0; i < partitioner->n_ghost_indices(); ++i)
               out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
                   << '/' << stored_elements[partitioner->local_size() + i]
-                  << ")" << std::endl;
-          out << std::endl;
+                  << ")" << '\n';
+          out << '\n';
         }
       out << std::flush;
 

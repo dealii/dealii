@@ -65,24 +65,23 @@ namespace Threads
         Mutex::ScopedLock lock(mutex);
 
         std::cerr
-          << std::endl
-          << std::endl
-          << "---------------------------------------------------------"
-          << std::endl
+          << '\n'
+          << '\n'
+          << "---------------------------------------------------------" << '\n'
           << "In one of the sub-threads of this program, an exception\n"
           << "was thrown and not caught. Since exceptions do not\n"
           << "propagate to the main thread, the library has caught it.\n"
           << "The information carried by this exception is given below.\n"
-          << std::endl
+          << '\n'
           << "---------------------------------------------------------"
-          << std::endl;
-        std::cerr << "Exception message: " << std::endl
-                  << "  " << exc.what() << std::endl
-                  << "Exception type: " << std::endl
-                  << "  " << typeid(exc).name() << std::endl;
-        std::cerr << "Aborting!" << std::endl
+          << '\n';
+        std::cerr << "Exception message: " << '\n'
+                  << "  " << exc.what() << '\n'
+                  << "Exception type: " << '\n'
+                  << "  " << typeid(exc).name() << '\n';
+        std::cerr << "Aborting!" << '\n'
                   << "---------------------------------------------------------"
-                  << std::endl;
+                  << '\n';
       }
 
       std::abort();
@@ -104,20 +103,19 @@ namespace Threads
         Mutex::ScopedLock lock(mutex);
 
         std::cerr
-          << std::endl
-          << std::endl
-          << "---------------------------------------------------------"
-          << std::endl
+          << '\n'
+          << '\n'
+          << "---------------------------------------------------------" << '\n'
           << "In one of the sub-threads of this program, an exception\n"
           << "was thrown and not caught. Since exceptions do not\n"
           << "propagate to the main thread, the library has caught it.\n"
-          << std::endl
+          << '\n'
           << "---------------------------------------------------------"
-          << std::endl;
+          << '\n';
         std::cerr << "Type of exception is unknown, but not std::exception.\n"
                   << "No additional information is available.\n"
                   << "---------------------------------------------------------"
-                  << std::endl;
+                  << '\n';
       }
       std::abort();
     }

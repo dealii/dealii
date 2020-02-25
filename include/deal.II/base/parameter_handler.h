@@ -519,7 +519,7 @@ class MultipleParameterLoop;
  *     prm.leave_subsection ();
  *     std::cout << "  LinearEquation: method=" << method
  *               << ", max_iterations=" << max_iterations
- *               << std::endl;
+ *               << '\n';
  *   }
  *
  *
@@ -590,7 +590,7 @@ class MultipleParameterLoop;
  *       << "  Problem: outfile=" << outfile << '\n'
  *       << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
  *       << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
- *       << std::endl;
+ *       << '\n';
  *   }
  *
  *
@@ -615,7 +615,7 @@ class MultipleParameterLoop;
  *     std::cout << "\n\n";
  *     prm.print_parameters (std::cout, ParameterHandler::Text);
  *     // get parameters into the program
- *     std::cout << "\n\n" << "Getting parameters:" << std::endl;
+ *     std::cout << "\n\n" << "Getting parameters:" << '\n';
  *     p.get_parameters (prm);
  *     // now run the program with these input parameters
  *     p.do_something ();
@@ -983,13 +983,13 @@ public:
    *     std::cerr << "ParameterHandler::parse_input: could not open file <"
    *               << filename
    *               << "> for reading."
-   *               << std::endl;
+   *               << '\n';
    *     if (print_default_prm_file)
    *       {
    *         std::cerr << "Trying to make file <"
    *                   << filename
    *                   << "> with default values for you."
-   *                   << std::endl;
+   *                   << '\n';
    *         std::ofstream output (filename);
    *         parameter_handler.print_parameters(
    *           output, ParameterHandler::OutputStyle::Text);

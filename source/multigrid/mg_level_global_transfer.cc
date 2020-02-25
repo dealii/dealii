@@ -117,7 +117,7 @@ MGLevelGlobalTransfer<VectorType>::print_indices(std::ostream &os) const
     {
       for (unsigned int i = 0; i < copy_indices[level].size(); ++i)
         os << "copy_indices[" << level << "]\t" << copy_indices[level][i].first
-           << '\t' << copy_indices[level][i].second << std::endl;
+           << '\t' << copy_indices[level][i].second << '\n';
     }
 
   for (unsigned int level = 0; level < copy_indices_level_mine.size(); ++level)
@@ -125,14 +125,14 @@ MGLevelGlobalTransfer<VectorType>::print_indices(std::ostream &os) const
       for (unsigned int i = 0; i < copy_indices_level_mine[level].size(); ++i)
         os << "copy_ifrom  [" << level << "]\t"
            << copy_indices_level_mine[level][i].first << '\t'
-           << copy_indices_level_mine[level][i].second << std::endl;
+           << copy_indices_level_mine[level][i].second << '\n';
     }
   for (unsigned int level = 0; level < copy_indices_global_mine.size(); ++level)
     {
       for (unsigned int i = 0; i < copy_indices_global_mine[level].size(); ++i)
         os << "copy_ito    [" << level << "]\t"
            << copy_indices_global_mine[level][i].first << '\t'
-           << copy_indices_global_mine[level][i].second << std::endl;
+           << copy_indices_global_mine[level][i].second << '\n';
     }
 }
 
@@ -406,7 +406,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
     {
       for (unsigned int i = 0; i < copy_indices[level].n_cols(); ++i)
         os << "copy_indices[" << level << "]\t" << copy_indices[level](0, i)
-           << '\t' << copy_indices[level](1, i) << std::endl;
+           << '\t' << copy_indices[level](1, i) << '\n';
     }
 
   for (unsigned int level = 0; level < copy_indices_level_mine.size(); ++level)
@@ -414,7 +414,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
       for (unsigned int i = 0; i < copy_indices_level_mine[level].n_cols(); ++i)
         os << "copy_ifrom  [" << level << "]\t"
            << copy_indices_level_mine[level](0, i) << '\t'
-           << copy_indices_level_mine[level](1, i) << std::endl;
+           << copy_indices_level_mine[level](1, i) << '\n';
     }
   for (unsigned int level = 0; level < copy_indices_global_mine.size(); ++level)
     {
@@ -422,7 +422,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
            ++i)
         os << "copy_ito    [" << level << "]\t"
            << copy_indices_global_mine[level](0, i) << '\t'
-           << copy_indices_global_mine[level](1, i) << std::endl;
+           << copy_indices_global_mine[level](1, i) << '\n';
     }
 }
 

@@ -354,7 +354,7 @@ GeneralDataStorage::print_info(Stream &os)
   for (const auto &it : any_data)
     {
       os << it.first << '\t' << '\t'
-         << boost::core::demangle(it.second.type().name()) << std::endl;
+         << boost::core::demangle(it.second.type().name()) << '\n';
     }
 }
 

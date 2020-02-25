@@ -123,7 +123,7 @@ DoFPrintSolverStep<dim, SolverType, VectorType>::print_vectors(
 
   const std::string fname = filename.str();
 
-  deallog << "Writing file:" << fname << std::endl;
+  deallog << "Writing file:" << fname << '\n';
 
   out.build_patches();
   std::ofstream of(fname.c_str());

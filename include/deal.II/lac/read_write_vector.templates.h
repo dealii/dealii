@@ -957,7 +957,7 @@ namespace LinearAlgebra
 
     out << "IndexSet: ";
     stored_elements.print(out);
-    out << std::endl;
+    out << '\n';
     unsigned int i = 0;
     for (const auto idx : this->stored_elements)
       out << "[" << idx << "]: " << values[i++] << '\n';

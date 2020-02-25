@@ -530,7 +530,7 @@ namespace MeshWorker
   VectorSelector::print(StreamType &s) const
   {
     s << "values: " << n_values() << " gradients: " << n_gradients()
-      << " hessians: " << n_hessians() << std::endl;
+      << " hessians: " << n_hessians() << '\n';
   }
 
 
@@ -541,13 +541,13 @@ namespace MeshWorker
     s << "values:   ";
     for (unsigned int i = 0; i < n_values(); ++i)
       s << " '" << v.name(value_selection(i)) << '\'';
-    s << std::endl << "gradients:";
+    s << '\n' << "gradients:";
     for (unsigned int i = 0; i < n_gradients(); ++i)
       s << " '" << v.name(gradient_selection(i)) << '\'';
-    s << std::endl << "hessians: ";
+    s << '\n' << "hessians: ";
     for (unsigned int i = 0; i < n_hessians(); ++i)
       s << " '" << v.name(hessian_selection(i)) << '\'';
-    s << std::endl;
+    s << '\n';
   }
 
 

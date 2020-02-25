@@ -181,7 +181,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
                 std::cout << "Proc " << myid << " got line " << lineit.index
                           << " from " << kv.first << " inhomogeneity "
                           << lineit.inhomogeneity
-                          << " != " << reference.inhomogeneity << std::endl;
+                          << " != " << reference.inhomogeneity << '\n';
             }
           else if (lineit.entries != reference.entries)
             {
@@ -189,7 +189,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
               if (verbose)
                 std::cout << "Proc " << myid << " got line " << lineit.index
                           << " from " << kv.first << " with wrong values!"
-                          << std::endl;
+                          << '\n';
             }
         }
     }
@@ -197,7 +197,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
   const unsigned int total =
     Utilities::MPI::sum(inconsistent, mpi_communicator);
   if (verbose && total > 0 && myid == 0)
-    std::cout << total << " inconsistent lines discovered!" << std::endl;
+    std::cout << total << " inconsistent lines discovered!" << '\n';
   return total == 0;
 }
 
@@ -923,7 +923,7 @@ template <typename number>
 void
 AffineConstraints<number>::write_dot(std::ostream &out) const
 {
-  out << "digraph constraints {" << std::endl;
+  out << "digraph constraints {" << '\n';
   for (size_type i = 0; i != lines.size(); ++i)
     {
       // same concept as in the previous function
@@ -934,7 +934,7 @@ AffineConstraints<number>::write_dot(std::ostream &out) const
       else
         out << "  " << lines[i].index << "\n";
     }
-  out << "}" << std::endl;
+  out << "}" << '\n';
 }
 
 
@@ -2535,19 +2535,19 @@ namespace internals
     void
     print(std::ostream &os)
     {
-      os << "Active rows " << n_active_rows << std::endl
-         << "Constr rows " << n_constraints() << std::endl
-         << "Inhom  rows " << n_inhomogeneous_rows << std::endl
+      os << "Active rows " << n_active_rows << '\n'
+         << "Constr rows " << n_constraints() << '\n'
+         << "Inhom  rows " << n_inhomogeneous_rows << '\n'
          << "Local: ";
       for (size_type i = 0; i < total_row_indices.size(); ++i)
         os << ' ' << std::setw(4) << total_row_indices[i].local_row;
-      os << std::endl << "Global:";
+      os << '\n' << "Global:";
       for (size_type i = 0; i < total_row_indices.size(); ++i)
         os << ' ' << std::setw(4) << total_row_indices[i].global_row;
-      os << std::endl << "ConPos:";
+      os << '\n' << "ConPos:";
       for (size_type i = 0; i < total_row_indices.size(); ++i)
         os << ' ' << std::setw(4) << total_row_indices[i].constraint_position;
-      os << std::endl;
+      os << '\n';
     }
 
     // return all kind of information on the constraints

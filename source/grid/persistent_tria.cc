@@ -177,7 +177,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 
   AssertThrow(out, ExcIO());
 
-  out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << std::endl;
+  out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << '\n';
 
   for (unsigned int i = 0; i < n_flag_levels; ++i)
     {
@@ -191,7 +191,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
                               out);
     }
 
-  out << mn_persistent_tria_flags_end << std::endl;
+  out << mn_persistent_tria_flags_end << '\n';
 
   AssertThrow(out, ExcIO());
 }

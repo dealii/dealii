@@ -531,7 +531,7 @@ DynamicSparsityPattern::print(std::ostream &out) const
       for (const auto entry : lines[row].entries)
         out << ',' << entry;
 
-      out << ']' << std::endl;
+      out << ']' << '\n';
     }
 
   AssertThrow(out, ExcIO());
@@ -553,7 +553,7 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
         // j horizontal, gnuplot output is
         // x-y, that is we have to exchange
         // the order of output
-        out << entry << " " << -static_cast<signed int>(rowindex) << std::endl;
+        out << entry << " " << -static_cast<signed int>(rowindex) << '\n';
     }
 
 

@@ -329,7 +329,7 @@ namespace Differentiation
       for (unsigned int i = 0; i < n_independent_variables(); i++)
         stream << registered_independent_variable_values[i]
                << (i < (n_independent_variables() - 1) ? "," : "");
-      stream << std::endl;
+      stream << '\n';
 
       stream << "Independent variable values: "
              << "\n";
@@ -341,21 +341,21 @@ namespace Differentiation
         stream << registered_marked_independent_variables[i]
                << (i < (n_independent_variables() - 1) ? "," : "")
                << std::flush;
-      stream << std::endl;
+      stream << '\n';
 
       stream << "Dependent variable values: "
              << "\n";
       for (unsigned int i = 0; i < n_dependent_variables(); i++)
         stream << dependent_variables[i]
                << (i < (n_dependent_variables() - 1) ? "," : "");
-      stream << std::endl;
+      stream << '\n';
 
       stream << "Registered dependent variables: "
              << "\n";
       for (unsigned int i = 0; i < n_dependent_variables(); i++)
         stream << registered_marked_dependent_variables[i]
                << (i < (n_dependent_variables() - 1) ? "," : "");
-      stream << std::endl;
+      stream << '\n';
 
       // Restore stream flags
       stream.flags(stream_flags);
@@ -372,7 +372,7 @@ namespace Differentiation
         stream << independent_variable_values[i]
                << (i < (n_independent_variables() - 1) ? "," : "")
                << std::flush;
-      stream << std::endl;
+      stream << '\n';
     }
 
 

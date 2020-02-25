@@ -312,7 +312,7 @@ SolverQMRS<VectorType>::solve(const MatrixType &        A,
   do
     {
       if (step > 0)
-        deallog << "Restart step " << step << std::endl;
+        deallog << "Restart step " << step << '\n';
       state = iterate(A, x, b, preconditioner, *Vr, *Vu, *Vq, *Vt, *Vd);
     }
   while (state.state == SolverControl::iterate);

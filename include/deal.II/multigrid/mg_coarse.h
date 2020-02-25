@@ -622,7 +622,7 @@ MGCoarseGridSVD<number, VectorType>::log() const
 
   for (unsigned int i = 0; i < n; ++i)
     deallog << ' ' << matrix.singular_value(i);
-  deallog << std::endl;
+  deallog << '\n';
 }
 
 

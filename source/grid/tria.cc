@@ -1267,13 +1267,12 @@ namespace internal
       << " that is described to have boundary indicator "
       << static_cast<int>(arg3)
       << ". However, this is an internal line not located on the "
-      << "boundary. You cannot assign a boundary indicator to it." << std::endl
-      << std::endl
+      << "boundary. You cannot assign a boundary indicator to it." << '\n'
+      << '\n'
       << "If this happened at a place where you call "
       << "Triangulation::create_triangulation() yourself, you need "
-      << "to check the SubCellData object you pass to this function."
-      << std::endl
-      << std::endl
+      << "to check the SubCellData object you pass to this function." << '\n'
+      << '\n'
       << "If this happened in a place where you are reading a mesh "
       << "from a file, then you need to investigate why such a line "
       << "ended up in the input file. A typical case is a geometry "
@@ -1301,13 +1300,12 @@ namespace internal
       << " that is described to have boundary indicator "
       << static_cast<int>(arg5)
       << ". However, this is an internal quad not located on the "
-      << "boundary. You cannot assign a boundary indicator to it." << std::endl
-      << std::endl
+      << "boundary. You cannot assign a boundary indicator to it." << '\n'
+      << '\n'
       << "If this happened at a place where you call "
       << "Triangulation::create_triangulation() yourself, you need "
-      << "to check the SubCellData object you pass to this function."
-      << std::endl
-      << std::endl
+      << "to check the SubCellData object you pass to this function." << '\n'
+      << '\n'
       << "If this happened in a place where you are reading a mesh "
       << "from a file, then you need to investigate why such a quad "
       << "ended up in the input file. A typical case is a geometry "
@@ -15156,11 +15154,11 @@ Triangulation<dim, spacedim>::write_bool_vector(
   // 1. number of flags
   // 2. the flags
   // 3. magic number
-  out << magic_number1 << ' ' << N << std::endl;
+  out << magic_number1 << ' ' << N << '\n';
   for (unsigned int i = 0; i < N / 8 + 1; ++i)
     out << static_cast<unsigned int>(flags[i]) << ' ';
 
-  out << std::endl << magic_number2 << std::endl;
+  out << '\n' << magic_number2 << '\n';
 
   delete[] flags;
 
