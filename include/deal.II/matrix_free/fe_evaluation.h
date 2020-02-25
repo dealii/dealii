@@ -4551,8 +4551,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const unsigned int                                        first_index,
     const std::bitset<VectorizedArrayType::n_array_elements> &mask) const
 {
+#  ifdef DEBUG
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
 
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
@@ -4585,8 +4587,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const unsigned int                                        first_index,
     const std::bitset<VectorizedArrayType::n_array_elements> &mask) const
 {
+#  ifdef DEBUG
   Assert(dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
 
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
@@ -4677,7 +4681,9 @@ inline const VectorizedArrayType *
 FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   begin_values() const
 {
+#  ifdef DEBUG
   Assert(values_quad_initialized || values_quad_submitted, ExcNotInitialized());
+#  endif
   return &values_quad[0][0];
 }
 
@@ -4710,8 +4716,10 @@ inline const VectorizedArrayType *
 FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   begin_gradients() const
 {
+#  ifdef DEBUG
   Assert(gradients_quad_initialized || gradients_quad_submitted,
          ExcNotInitialized());
+#  endif
   return &gradients_quad[0][0][0];
 }
 
@@ -4744,7 +4752,9 @@ inline const VectorizedArrayType *
 FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   begin_hessians() const
 {
+#  ifdef DEBUG
   Assert(hessians_quad_initialized, ExcNotInitialized());
+#  endif
   return &hessians_quad[0][0][0];
 }
 
@@ -4794,8 +4804,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, n_components_, VectorizedArrayType>
                              FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_value(const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->values_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
   Tensor<1, n_components_, VectorizedArrayType> return_value;
   for (unsigned int comp = 0; comp < n_components; comp++)
@@ -4815,8 +4827,10 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_gradient(const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(jacobian != nullptr, ExcNotInitialized());
@@ -4863,8 +4877,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, n_components_, VectorizedArrayType>
   get_normal_derivative(const unsigned int q_point) const
 {
   AssertIndexRange(q_point, this->n_quadrature_points);
+#  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
 
   Assert(normal_x_jacobian != nullptr, ExcNotInitialized());
 
@@ -4955,8 +4971,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian(const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
+#  ifdef DEBUG
   Assert(this->hessians_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(jacobian != nullptr, ExcNotImplemented());
@@ -5095,8 +5113,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian_diagonal(const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
+#  ifdef DEBUG
   Assert(this->hessians_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(jacobian != nullptr, ExcNotImplemented());
@@ -5185,8 +5205,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_laplacian(const unsigned int q_point) const
 {
   Assert(is_face == false, ExcNotImplemented());
+#  ifdef DEBUG
   Assert(this->hessians_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Tensor<1, n_components_, VectorizedArrayType> laplacian_out;
@@ -5233,10 +5255,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const Tensor<1, n_components_, VectorizedArrayType> val_in,
                const unsigned int                                  q_point)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
   this->values_quad_submitted = true;
 #  endif
 
@@ -5267,12 +5289,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>> grad_in,
     const unsigned int                                                  q_point)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  this->gradients_quad_submitted = true;
   Assert(this->J_value != nullptr, ExcNotInitialized());
   Assert(this->jacobian != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
+  this->gradients_quad_submitted = true;
 #  endif
 
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -5317,10 +5339,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const Tensor<1, n_components_, VectorizedArrayType> grad_in,
     const unsigned int                                  q_point)
 {
-#  ifdef DEBUG
   AssertIndexRange(q_point, this->n_quadrature_points);
-  this->gradients_quad_submitted = true;
   Assert(this->normal_x_jacobian != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
+  this->gradients_quad_submitted = true;
 #  endif
 
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -5360,8 +5382,8 @@ inline Tensor<1, n_components_, VectorizedArrayType>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   integrate_value() const
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+#  ifdef DEBUG
   Assert(this->values_quad_submitted == true,
          internal::ExcAccessToUninitializedField());
 #  endif
@@ -5577,8 +5599,10 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::get_value(
   const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->values_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
   return this->values_quad[0][q_point];
 }
@@ -5603,8 +5627,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
   // could use the base class gradient, but that involves too many expensive
   // initialization operations on tensors
 
+#  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(this->jacobian != nullptr, ExcNotInitialized());
@@ -5686,12 +5712,13 @@ inline void DEAL_II_ALWAYS_INLINE
   const VectorizedArrayType val_in,
   const unsigned int        q_index)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_index, this->n_quadrature_points);
   Assert(this->J_value != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
   this->values_quad_submitted = true;
 #  endif
+
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       const VectorizedArrayType JxW =
@@ -5736,12 +5763,12 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   submit_gradient(const Tensor<1, dim, VectorizedArrayType> grad_in,
                   const unsigned int                        q_index)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_index, this->n_quadrature_points);
-  this->gradients_quad_submitted = true;
   Assert(this->J_value != nullptr, ExcNotInitialized());
   Assert(this->jacobian != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
+  this->gradients_quad_submitted = true;
 #  endif
 
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -5872,8 +5899,10 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   get_divergence(const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->jacobian != nullptr, ExcNotInitialized());
 
@@ -5989,8 +6018,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<3, dim, VectorizedArrayType>
                              FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_hessian(
   const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->hessians_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
   return BaseClass::get_hessian(q_point);
 }
@@ -6026,12 +6057,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   submit_divergence(const VectorizedArrayType div_in,
                     const unsigned int        q_point)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  this->gradients_quad_submitted = true;
   Assert(this->J_value != nullptr, ExcNotInitialized());
   Assert(this->jacobian != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
+  this->gradients_quad_submitted = true;
 #  endif
 
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -6079,12 +6110,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   // could have used base class operator, but that involves some overhead
   // which is inefficient. it is nice to have the symmetric tensor because
   // that saves some operations
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
-  this->gradients_quad_submitted = true;
   Assert(this->J_value != nullptr, ExcNotInitialized());
   Assert(this->jacobian != nullptr, ExcNotInitialized());
+#  ifdef DEBUG
+  this->gradients_quad_submitted = true;
 #  endif
 
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -6258,8 +6289,10 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::get_value(
   const unsigned int q_point) const
 {
+#  ifdef DEBUG
   Assert(this->values_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
   return this->values_quad[0][q_point];
 }
@@ -6274,8 +6307,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, 1, VectorizedArrayType>
   // could use the base class gradient, but that involves too many inefficient
   // initialization operations on tensors
 
+#  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   const Tensor<2, 1, VectorizedArrayType> &jac =
@@ -6351,11 +6386,12 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_value(
   const VectorizedArrayType val_in,
   const unsigned int        q_point)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
+#  ifdef DEBUG
   this->values_quad_submitted = true;
 #  endif
+
   if (this->cell_type == internal::MatrixFreeFunctions::general)
     {
       const VectorizedArrayType JxW = this->J_value[q_point];
@@ -6399,9 +6435,9 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient(
   const VectorizedArrayType grad_in,
   const unsigned int        q_point)
 {
-#  ifdef DEBUG
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange(q_point, this->n_quadrature_points);
+#  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
 
@@ -6984,8 +7020,10 @@ FEEvaluation<dim,
                                             const bool evaluate_gradients,
                                             const bool evaluate_hessians)
 {
+#  ifdef DEBUG
   Assert(this->dof_values_initialized == true,
          internal::ExcAccessToUninitializedField());
+#  endif
   evaluate(this->values_dofs[0],
            evaluate_values,
            evaluate_gradients,
@@ -7144,12 +7182,14 @@ FEEvaluation<dim,
                                              const bool integrate_gradients,
                                              VectorizedArrayType *values_array)
 {
+#  ifdef DEBUG
   if (integrate_values == true)
     Assert(this->values_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
   if (integrate_gradients == true)
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
+#  endif
   Assert(this->matrix_info != nullptr ||
            this->mapped_geometry->is_initialized(),
          ExcNotInitialized());
@@ -7335,8 +7375,6 @@ FEFaceEvaluation<dim,
         this->face_orientation = 0;
     }
 
-  this->values_quad_submitted = false;
-
   this->cell_type = this->matrix_info->get_mapping_info().face_type[face_index];
   const unsigned int offsets =
     this->mapping_data->data_index_offsets[face_index];
@@ -7444,7 +7482,9 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::evaluate(const bool evaluate_values,
                                                 const bool evaluate_gradients)
 {
+#  ifdef DEBUG
   Assert(this->dof_values_initialized, ExcNotInitialized());
+#  endif
 
   evaluate(this->values_dofs[0], evaluate_values, evaluate_gradients);
 }
