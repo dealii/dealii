@@ -1,0 +1,6 @@
+New: There is now a new function MatrixFree::update_mapping() that allows to
+refresh the stored geometry data when the mapping has changed, for example
+through a Eulerian mesh motion, while keeping all other data structures such
+as vector exchange pattern or dof indices alive.
+<br>
+(Martin Kronbichler, 2020/02/25)
