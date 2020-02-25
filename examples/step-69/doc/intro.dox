@@ -233,19 +233,31 @@ spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
 \in \mathcal{V}} \mathbf{U}_i \phi_i$ where $\mathbf{U}_i \in
 \mathbb{R}^{d+2}$ and $\phi_i$ is a scalar-valued shape function.
 
-@note For simplicity we will consider the usual Lagrange finite elements.
-In such context, let $\{\mathbf{x}_i\}_{i \in \mathcal{V}}$ denote
-the set of all support points (see @ref GlossSupport "this glossary entry"),
-where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
-\mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as
-a scalar-valued shape function $\phi_i$.
+@note We purposely refrain from using vector-valued finite element
+spaces in our notation. Vector-valued finite element spaces
+are natural for variational formulations of PDE systems (e.g. Navier-Stokes).
+In such context, the interactions that have to be computed describe
+"interactions between DOFs": with proper renumbering of the
+vector-valued DoFHandler (i.e. initialized with an FESystem) it is possible to
+compute the block-matrices (required in order to advance the solution) with
+relative ease. However, in the context of time-explicit collocation-like
+schemes (such as finite differences and/or the scheme presented in this
+tutorial): the interactions that have to be computed can be informally described
+as "interactions between nodes" (not between DOFs). In addition we don't need
+to compute matrices in order to advance the solution. This leaves very
+little reasons to use vector-valued finite element spaces both in
+theory and/or practice.
 
-With this notation at hand we can define the (explicit time stepping)
-scheme as:
+We will use the usual Lagrange finite elements: let $\{\mathbf{x}_i\}_{i \in
+\mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this
+glossary entry"), where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
+\mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as a
+scalar-valued shape function $\phi_i$. With this notation at hand we can define
+the (explicit time stepping) scheme as:
 @f{align*}{
   m_i \frac{\mathbf{U}_i^{n+1} - \mathbf{U}_i^{n}}{\tau}
-  + \sum_{j \in \mathcal{I}(i)\backslash\{i\}} \mathbb{f}(\mathbf{U}_j^{n})\cdot
-  \mathbf{c}_{ij} - \sum_{j \in \mathcal{I}(i)\backslash\{i\}}
+  + \sum_{j \in \mathcal{I}(i)} \mathbb{f}(\mathbf{U}_j^{n})\cdot
+  \mathbf{c}_{ij} - \sum_{j \in \mathcal{I}(i)}
   d_{ij} \mathbf{U}_j^{n} = \boldsymbol{0} \, ,
 @f}
 where
@@ -269,16 +281,13 @@ where
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
     \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|$ if $i \not = j$ is the so
     called <i>graph viscosity</i>. The graph viscosity serves as a
-    stabilization parameter (similarly to the linear stabilization term
-    $s_h$ we introduced in the previous section for a variational
-    approach). We will base our construction of $d_{ij}$ on an estimate of
-    the maximal local wavespeed $\lambda_{\text{max}}$ that will be
-    explained in detail in a moment.
-  - In above definition we do not use the diagonal element $d_{ii}$ and it
-    can thus be set arbitrarily. It is convenient to simply set
-    $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$
-    so that the sum over all elements of a row is zero,
-    $\sum_{j\in\mathcal{I}}d_{ij} = 0$.
+    stabilization term, it is omewhat the discrete counterpart of
+    $\epsilon \Delta \mathbf{u}$ that appears in the notion of viscosity
+    solution described above. We will base our construction of $d_{ij}$ on
+    an estimate of the maximal local wavespeed $\lambda_{\text{max}}$ that
+    will be explained in detail in a moment.
+  - the diagonal entres of the viscosity matrix are defined as
+    $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$.
   - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\| }$ is a
     normalization of the $\textbf{c}_{ij}$ matrix that enters the
     approximate Riemann solver with which we compute an the approximations
@@ -352,12 +361,20 @@ compute all $d_{ij}$ in a separte step prior to actually performing above
 update. The core principle remains unchanged, though: we do not loop over
 cells but rather over all edges of the sparsity graph.
 
-@note It is not uncommon to encounter such fully algebraic schemes (i.e.,
+@note It is not uncommon to encounter such fully algebraic schemes (i.e.
 no bilinear forms, no cell loops, and no quadrature) outside of the finite
 element community in the wider CFD community. There is a rich history of
 application of this kind of schemes, also called <i>edge-based</i> or
 <i>graph-based</i> finite element schemes (see for instance
-@cite Rainald2008 for a historical overview).
+@cite Rainald2008 for a historical overview). However, it is important to
+highlight that the algebraic structure of the scheme (presented in this
+tutorial) and the node-loops are not just performance gimmick. Actually, the
+structure of this scheme was born out of theoretical necessity: the proof of
+pointwise stability of the scheme hinges on the specific algebraic structure of
+the scheme. In addition, it is not possible to compute the algebraic
+viscosities $d_{ij}$ using cell-loops since they depend nonlinearly on
+information that spans more than one cell (superposition does not hold: adding
+contributions from separate cells does not lead to the right result).
 
 <h3>Stable boundary conditions and conservation properties.</h3>
 
@@ -392,12 +409,13 @@ For the case of the reflecting boundary conditions we will proceed as follows:
   reflecting boundary conditions strongly in a post-processing step where we
   execute the projection
     @f{align*}
-    \mathbf{m}_i \dealcoloneq \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot \mathbf{m}_i)
-    \boldsymbol{\nu}_i \ \ \text{for all }\mathbf{x}_i \in \partial\Omega^r
+    \mathbf{m}_i \dealcoloneq \mathbf{m}_i - (\widehat{\boldsymbol{\nu}}_i
+    \cdot \mathbf{m}_i)  \widehat{\boldsymbol{\nu}}_i \ \
+    \text{for all }\mathbf{x}_i \in \partial\Omega^r
     @f}
   that removes the normal component of $\mathbf{m}$. Here the definition of
-  nodal normal $\boldsymbol{\nu}_i$ is very much arbitrary (there is no
-  unique definition) but it should be consistent upon refinement with the
+  nodal normal $\widehat{\boldsymbol{\nu}}_i$ is very much arbitrary (there is
+  no unique definition) but it should be consistent upon refinement with the
   underlying geometry.
 
 This is approach is usually called "explicit treatment of boundary conditions".
