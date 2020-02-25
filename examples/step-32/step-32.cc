@@ -1883,16 +1883,16 @@ namespace Step32
     // that actually set up the matrices, and at the end also resize the
     // various vectors we keep around in this program.
     std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
-    IndexSet              temperature_partitioning(n_T),
-      temperature_relevant_partitioning(n_T);
-    IndexSet stokes_relevant_set;
+    IndexSet              temperature_partitioning(n_T);
+    IndexSet              temperature_relevant_partitioning(n_T);
+
+    const IndexSet stokes_relevant_set =
+      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
     {
-      IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
+      const IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
       stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
       stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
-      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                              stokes_relevant_set);
       stokes_relevant_partitioning.push_back(
         stokes_relevant_set.get_view(0, n_u));
       stokes_relevant_partitioning.push_back(
@@ -3224,9 +3224,8 @@ namespace Step32
 
     joint_solution.compress(VectorOperation::insert);
 
-    IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());
-    DoFTools::extract_locally_relevant_dofs(joint_dof_handler,
-                                            locally_relevant_joint_dofs);
+    const IndexSet locally_relevant_joint_dofs =
+      DoFTools::extract_locally_relevant_dofs(joint_dof_handler);
     TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
     locally_relevant_joint_solution.reinit(locally_relevant_joint_dofs,
                                            MPI_COMM_WORLD);
