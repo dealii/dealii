@@ -1,0 +1,6 @@
+Deprecated: The DoFTools::extract_locally_relevant_dofs() function
+returned an IndexSet object through a reference argument. This version
+of the function has now been deprecated and replaced by one that
+returns the IndexSet object as a regular function return value.
+<br>
+(Wolfgang Bangerth, 2020/02/25)
