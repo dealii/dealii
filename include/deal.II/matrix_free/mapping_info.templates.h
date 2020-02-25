@@ -63,8 +63,9 @@ namespace internal
       Assert(structdim + 1 <= spacedim ||
                update_flags_inner_faces == update_default,
              ExcMessage("Volume cells do not allow for setting inner faces"));
-      quadrature = Quadrature<structdim>(quadrature_1d);
-      n_q_points = quadrature.size();
+      this->quadrature_1d = quadrature_1d;
+      quadrature          = Quadrature<structdim>(quadrature_1d);
+      n_q_points          = quadrature.size();
       quadrature_weights.resize(n_q_points);
       for (unsigned int i = 0; i < n_q_points; ++i)
         quadrature_weights[i] = quadrature.weight(i);
@@ -129,6 +130,29 @@ namespace internal
               int spacedim,
               typename Number,
               typename VectorizedArrayType>
+    void
+    MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
+      clear_data_fields()
+    {
+      data_index_offsets.clear();
+      JxW_values.clear();
+      normal_vectors.clear();
+      for (unsigned int i = 0; i < 2; ++i)
+        {
+          jacobians[i].clear();
+          jacobian_gradients[i].clear();
+          normals_times_jacobians[i].clear();
+        }
+      quadrature_point_offsets.clear();
+      quadrature_points.clear();
+    }
+
+
+
+    template <int structdim,
+              int spacedim,
+              typename Number,
+              typename VectorizedArrayType>
     std::size_t
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
       memory_consumption() const
@@ -156,7 +180,7 @@ namespace internal
     template <typename StreamType>
     void
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      print_memory_consumption(StreamType &out, const SizeInfo &task_info) const
+      print_memory_consumption(StreamType &out, const TaskInfo &task_info) const
     {
       // print_memory_statistics involves global communication, so we can
       // disable the check here only if no processor has any such data
@@ -287,19 +311,79 @@ namespace internal
       clear();
       this->mapping = &mapping;
 
+      cell_data.resize(quad.size());
+      face_data.resize(quad.size());
+      face_data_by_cells.resize(quad.size());
+
+      // dummy FE that is used to set up an FEValues object. Do not need the
+      // actual finite element because we will only evaluate quantities for
+      // the mapping that are independent of the FE
+      this->update_flags_cells = compute_update_flags(update_flags_cells, quad);
+
+      this->update_flags_boundary_faces =
+        ((update_flags_inner_faces | update_flags_boundary_faces) &
+             update_quadrature_points ?
+           update_quadrature_points :
+           update_default) |
+        update_normal_vectors | update_JxW_values | update_jacobians;
+      this->update_flags_inner_faces    = this->update_flags_boundary_faces;
+      this->update_flags_faces_by_cells = update_flags_faces_by_cells;
+
+      for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
+        {
+          const unsigned int n_hp_quads = quad[my_q].size();
+          AssertIndexRange(0, n_hp_quads);
+          cell_data[my_q].descriptor.resize(n_hp_quads);
+          for (unsigned int q = 0; q < n_hp_quads; ++q)
+            cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
+                                                     update_default);
+
+          face_data[my_q].descriptor.resize(n_hp_quads);
+          for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
+            face_data[my_q].descriptor[hpq].initialize(
+              quad[my_q][hpq], update_flags_boundary_faces);
+
+          face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
+          for (unsigned int hpq = 0; hpq < n_hp_quads; ++hpq)
+            face_data_by_cells[my_q].descriptor[hpq].initialize(quad[my_q][hpq],
+                                                                update_default);
+        }
+
       // Could call these functions in parallel, but not useful because the
       // work inside is nicely split up already
-      initialize_cells(
-        tria, cells, active_fe_index, mapping, quad, update_flags_cells);
-      initialize_faces(tria,
-                       cells,
-                       face_info.faces,
-                       mapping,
-                       quad,
-                       update_flags_boundary_faces,
-                       update_flags_inner_faces);
-      initialize_faces_by_cells(
-        tria, cells, mapping, quad, update_flags_faces_by_cells);
+      initialize_cells(tria, cells, active_fe_index, mapping);
+      initialize_faces(tria, cells, face_info.faces, mapping);
+      initialize_faces_by_cells(tria, cells, mapping);
+    }
+
+
+
+    template <int dim, typename Number, typename VectorizedArrayType>
+    void
+    MappingInfo<dim, Number, VectorizedArrayType>::update_mapping(
+      const dealii::Triangulation<dim> &                        tria,
+      const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+      const FaceInfo<VectorizedArrayType::n_array_elements> &   face_info,
+      const std::vector<unsigned int> &                         active_fe_index,
+      const Mapping<dim> &                                      mapping)
+    {
+      AssertDimension(cells.size() / VectorizedArrayType::n_array_elements,
+                      cell_type.size());
+
+      for (auto &data : cell_data)
+        data.clear_data_fields();
+      for (auto &data : face_data)
+        data.clear_data_fields();
+      for (auto &data : face_data_by_cells)
+        data.clear_data_fields();
+
+      this->mapping = &mapping;
+
+      // Could call these functions in parallel, but not useful because the
+      // work inside is nicely split up already
+      initialize_cells(tria, cells, active_fe_index, mapping);
+      initialize_faces(tria, cells, face_info.faces, mapping);
+      initialize_faces_by_cells(tria, cells, mapping);
     }
 
 
@@ -583,8 +667,6 @@ namespace internal
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<unsigned int> &              active_fe_index,
         const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<std::vector<
                     MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>,
@@ -626,7 +708,8 @@ namespace internal
           fe_values(mapping_info.cell_data.size());
         for (unsigned int i = 0; i < fe_values.size(); ++i)
           fe_values[i].resize(mapping_info.cell_data[i].descriptor.size());
-        UpdateFlags update_flags_feval =
+        const UpdateFlags update_flags = mapping_info.update_flags_cells;
+        const UpdateFlags update_flags_feval =
           (update_flags & update_jacobians ? update_jacobians :
                                              update_default) |
           (update_flags & update_jacobian_grads ? update_jacobian_grads :
@@ -634,15 +717,18 @@ namespace internal
           (update_flags & update_quadrature_points ? update_quadrature_points :
                                                      update_default);
 
-        std::vector<std::vector<unsigned int>> n_q_points_1d(quad.size()),
-          step_size_cartesian(quad.size());
-        for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
+        std::vector<std::vector<unsigned int>> n_q_points_1d(fe_values.size()),
+          step_size_cartesian(fe_values.size());
+        for (unsigned int my_q = 0; my_q < fe_values.size(); ++my_q)
           {
-            n_q_points_1d[my_q].resize(quad[my_q].size());
-            step_size_cartesian[my_q].resize(quad[my_q].size());
-            for (unsigned int hpq = 0; hpq < quad[my_q].size(); ++hpq)
+            n_q_points_1d[my_q].resize(
+              mapping_info.cell_data[my_q].descriptor.size());
+            step_size_cartesian[my_q].resize(n_q_points_1d[my_q].size());
+            for (unsigned int hpq = 0; hpq < n_q_points_1d[my_q].size(); ++hpq)
               {
-                n_q_points_1d[my_q][hpq] = quad[my_q][hpq].size();
+                n_q_points_1d[my_q][hpq] = mapping_info.cell_data[my_q]
+                                             .descriptor[hpq]
+                                             .quadrature_1d.size();
 
                 // To walk on the diagonal for lexicographic ordering, we have
                 // to jump one index ahead in each direction. For direction 0,
@@ -1024,33 +1110,14 @@ namespace internal
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<unsigned int> &                         active_fe_index,
-      const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<1>> &           quad,
-      const UpdateFlags update_flags_input)
+      const Mapping<dim> &                                      mapping)
     {
-      const unsigned int n_quads = quad.size();
       const unsigned int n_cells = cells.size();
       const unsigned int vectorization_width =
         VectorizedArrayType::n_array_elements;
       Assert(n_cells % vectorization_width == 0, ExcInternalError());
       const unsigned int n_macro_cells = n_cells / vectorization_width;
-      cell_data.resize(n_quads);
       cell_type.resize(n_macro_cells);
-
-      // dummy FE that is used to set up an FEValues object. Do not need the
-      // actual finite element because we will only evaluate quantities for
-      // the mapping that are independent of the FE
-      UpdateFlags update_flags = compute_update_flags(update_flags_input, quad);
-
-      for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
-        {
-          const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
-          cell_data[my_q].descriptor.resize(n_hp_quads);
-          for (unsigned int q = 0; q < n_hp_quads; ++q)
-            cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                     update_default);
-        }
 
       if (n_macro_cells == 0)
         return;
@@ -1078,7 +1145,7 @@ namespace internal
             data_cells_local.push_back(std::make_pair(
               std::vector<
                 MappingInfoStorage<dim, dim, Number, VectorizedArrayType>>(
-                n_quads),
+                cell_data.size()),
               ExtractCellHelper::
                 CompressedCellData<dim, Number, VectorizedArrayType>(
                   ExtractCellHelper::get_jacobian_size(tria))));
@@ -1090,8 +1157,6 @@ namespace internal
               cells,
               active_fe_index,
               mapping,
-              quad,
-              update_flags,
               *this,
               data_cells_local.back());
             cell_range.first = cell_range.second;
@@ -1135,10 +1200,10 @@ namespace internal
             data_cells_local.back().first[my_q].JxW_values.size());
           cell_data[my_q].jacobians[0].resize_fast(
             cell_data[my_q].JxW_values.size());
-          if (update_flags & update_jacobian_grads)
+          if (update_flags_cells & update_jacobian_grads)
             cell_data[my_q].jacobian_gradients[0].resize_fast(
               cell_data[my_q].JxW_values.size());
-          if (update_flags & update_quadrature_points)
+          if (update_flags_cells & update_quadrature_points)
             {
               cell_data[my_q].quadrature_point_offsets.resize(cell_type.size());
               cell_data[my_q].quadrature_points.resize_fast(
@@ -1276,8 +1341,6 @@ namespace internal
         const std::vector<
           FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
         const Mapping<dim> &                                          mapping,
-        const UpdateFlags                              update_flags_boundary,
-        const UpdateFlags                              update_flags_inner,
         MappingInfo<dim, Number, VectorizedArrayType> &mapping_info,
         std::pair<
           std::vector<
@@ -1328,16 +1391,18 @@ namespace internal
               if (is_boundary_face &&
                   fe_boundary_face_values_container[my_q][0] == nullptr)
                 fe_boundary_face_values_container[my_q][0] =
-                  std::make_shared<FEFaceValues<dim>>(mapping,
-                                                      dummy_fe,
-                                                      quadrature,
-                                                      update_flags_boundary);
+                  std::make_shared<FEFaceValues<dim>>(
+                    mapping,
+                    dummy_fe,
+                    quadrature,
+                    mapping_info.update_flags_boundary_faces);
               else if (fe_face_values_container[my_q][0] == nullptr)
                 fe_face_values_container[my_q][0] =
-                  std::make_shared<FEFaceValues<dim>>(mapping,
-                                                      dummy_fe,
-                                                      quadrature,
-                                                      update_flags_inner);
+                  std::make_shared<FEFaceValues<dim>>(
+                    mapping,
+                    dummy_fe,
+                    quadrature,
+                    mapping_info.update_flags_inner_faces);
 
               FEFaceValues<dim> &fe_face_values =
                 is_boundary_face ? *fe_boundary_face_values_container[my_q][0] :
@@ -1489,7 +1554,7 @@ namespace internal
                                 mapping,
                                 dummy_fe,
                                 quadrature,
-                                update_flags_inner);
+                                mapping_info.update_flags_inner_faces);
                           fe_subface_values_container[my_q][0]->reinit(
                             cell_it,
                             faces[face].exterior_face_no,
@@ -1700,39 +1765,9 @@ namespace internal
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
       const std::vector<
         FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
-      const Mapping<dim> &                                          mapping,
-      const std::vector<dealii::hp::QCollection<1>> &               quad,
-      const UpdateFlags update_flags_boundary_faces,
-      const UpdateFlags update_flags_inner_faces)
+      const Mapping<dim> &                                          mapping)
     {
       face_type.resize(faces.size(), general);
-      face_data.resize(quad.size());
-
-      // We currently always set the same flags on both inner and boundary
-      // faces to the same value. At some point, we might want to separate the
-      // two.
-      UpdateFlags update_flags_compute_boundary =
-        ((update_flags_inner_faces | update_flags_boundary_faces) &
-             update_quadrature_points ?
-           update_quadrature_points :
-           update_default) |
-        update_normal_vectors | update_JxW_values | update_jacobians;
-      UpdateFlags update_flags_compute_inner =
-        ((update_flags_inner_faces | update_flags_boundary_faces) &
-             update_quadrature_points ?
-           update_quadrature_points :
-           update_default) |
-        update_normal_vectors | update_JxW_values | update_jacobians;
-      UpdateFlags update_flags_common =
-        update_flags_inner_faces | update_flags_boundary_faces;
-
-      for (unsigned int my_q = 0; my_q < quad.size(); ++my_q)
-        {
-          face_data[my_q].descriptor.resize(quad[my_q].size());
-          for (unsigned int hpq = 0; hpq < quad[my_q].size(); ++hpq)
-            face_data[my_q].descriptor[hpq].initialize(
-              quad[my_q][hpq], update_flags_compute_inner);
-        }
 
       if (faces.size() == 0)
         return;
@@ -1761,7 +1796,7 @@ namespace internal
             data_faces_local.push_back(std::make_pair(
               std::vector<
                 MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType>>(
-                quad.size()),
+                face_data.size()),
               ExtractFaceHelper::
                 CompressedFaceData<dim, Number, VectorizedArrayType>(
                   ExtractCellHelper::get_jacobian_size(tria))));
@@ -1773,8 +1808,6 @@ namespace internal
               cells,
               faces,
               mapping,
-              update_flags_compute_boundary,
-              update_flags_compute_inner,
               *this,
               data_faces_local.back());
             face_range.first = face_range.second;
@@ -1793,6 +1826,9 @@ namespace internal
           data_faces_local[i].second.data,
           data_faces_local[0].second.data,
           indices_compressed[i]);
+
+      const UpdateFlags update_flags_common =
+        update_flags_boundary_faces | update_flags_inner_faces;
 
       // Collect all data in the final data fields.
       // First allocate the memory
@@ -1926,15 +1962,12 @@ namespace internal
     MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces_by_cells(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-      const Mapping<dim> &                                      mapping,
-      const std::vector<dealii::hp::QCollection<1>> &           quad,
-      const UpdateFlags update_flags_faces_by_cells)
+      const Mapping<dim> &                                      mapping)
     {
       if (update_flags_faces_by_cells == update_default)
         return;
 
-      face_data_by_cells.resize(quad.size());
-      const unsigned int n_quads = quad.size();
+      const unsigned int n_quads = face_data_by_cells.size();
       const unsigned int vectorization_width =
         VectorizedArrayType::n_array_elements;
       UpdateFlags update_flags =
@@ -1945,13 +1978,6 @@ namespace internal
 
       for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
         {
-          const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
-          face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
-          for (unsigned int q = 0; q < n_hp_quads; ++q)
-            face_data_by_cells[my_q].descriptor[q].initialize(quad[my_q][q],
-                                                              update_default);
-
           // since we already know the cell type, we can pre-allocate the right
           // amount of data straight away and we just need to do some basic
           // counting
@@ -2217,7 +2243,7 @@ namespace internal
     void
     MappingInfo<dim, Number, VectorizedArrayType>::print_memory_consumption(
       StreamType &    out,
-      const SizeInfo &task_info) const
+      const TaskInfo &task_info) const
     {
       out << "    Cell types:                      ";
       task_info.print_memory_statistics(out,

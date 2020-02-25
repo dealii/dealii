@@ -681,6 +681,25 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 }
 
 
+
+template <int dim, typename Number, typename VectorizedArrayType>
+void
+MatrixFree<dim, Number, VectorizedArrayType>::update_mapping(
+  const Mapping<dim> &mapping)
+{
+  AssertDimension(shape_info.size(1), mapping_info.cell_data.size());
+  mapping_info.update_mapping(
+    dof_handlers.active_dof_handler == DoFHandlers::hp ?
+      dof_handlers.hp_dof_handler[0]->get_triangulation() :
+      dof_handlers.dof_handler[0]->get_triangulation(),
+    cell_level_index,
+    face_info,
+    dof_info[0].cell_active_fe_index,
+    mapping);
+}
+
+
+
 template <int dim, typename Number, typename VectorizedArrayType>
 template <int spacedim>
 bool
