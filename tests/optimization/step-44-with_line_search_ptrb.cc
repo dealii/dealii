@@ -20,6 +20,7 @@
 // be minimized.
 
 #include "../tests.h"
+
 #include "step-44.h"
 
 int

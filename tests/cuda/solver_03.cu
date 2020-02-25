@@ -25,8 +25,9 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 void
 test(Utilities::CUDA::Handle &cuda_handle)

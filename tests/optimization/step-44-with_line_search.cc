@@ -19,6 +19,7 @@
 // for the function to be minimized is computed.
 
 #include "../tests.h"
+
 #include "step-44.h"
 
 int

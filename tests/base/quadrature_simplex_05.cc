@@ -22,6 +22,7 @@
 #include <numeric>
 
 #include "../tests.h"
+
 #include "simplex.h"
 
 template <int dim, typename stream_type>

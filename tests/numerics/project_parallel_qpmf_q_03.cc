@@ -18,6 +18,7 @@
 // FE_Q on a mesh with hanging nodes and specified fe_component
 
 #include "../tests.h"
+
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>

@@ -35,8 +35,9 @@
 
 #include <deal.II/numerics/data_out.h>
 
-#include "../grid/mesh_3d.h"
 #include "../tests.h"
+
+#include "../grid/mesh_3d.h"
 
 
 void check_this(Triangulation<3> &tria)

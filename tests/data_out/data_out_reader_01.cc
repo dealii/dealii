@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "patches.h"
 
 // test DataOutReader::merge

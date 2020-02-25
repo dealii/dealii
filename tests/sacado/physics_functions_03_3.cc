@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado Rad
 
-#include "../ad_common_tests/physics_functions_03.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/physics_functions_03.h"
 
 int
 main()

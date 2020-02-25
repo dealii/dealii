@@ -28,6 +28,7 @@
 #include <sstream>
 
 #include "../tests.h"
+
 #include "dof_tools_periodic.h"
 
 // A simple test for

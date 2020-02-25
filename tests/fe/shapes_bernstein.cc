@@ -20,6 +20,7 @@
 #include <string>
 
 #include "../tests.h"
+
 #include "shapes.h"
 //#include "../../include/fe_bernstein.h"
 

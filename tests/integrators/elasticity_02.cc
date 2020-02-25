@@ -25,8 +25,9 @@
 
 #include <deal.II/integrators/elasticity.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators::Elasticity;
 

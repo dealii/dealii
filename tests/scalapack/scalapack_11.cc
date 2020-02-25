@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 // test copying submatrices of distributed ScaLAPACKMatrices using ScaLAPACK
 // routine p_gemr2d

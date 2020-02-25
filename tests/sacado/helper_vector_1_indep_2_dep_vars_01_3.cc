@@ -19,8 +19,9 @@
 //
 // AD number type: Sacado Rad
 
-#include "../ad_common_tests/helper_vector_1_indep_2_dep_vars_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_vector_1_indep_2_dep_vars_01.h"
 
 int
 main()

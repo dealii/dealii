@@ -35,8 +35,9 @@
 
 #include <deal.II/lac/vector.h>
 
-#include "../grid/mesh_3d.h"
 #include "../tests.h"
+
+#include "../grid/mesh_3d.h"
 
 
 // declare these global in order to reduce time needed upon construction of

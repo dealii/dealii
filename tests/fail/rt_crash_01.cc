@@ -25,8 +25,9 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include "../bits/dof_tools_common.h"
 #include "../tests.h"
+
+#include "../bits/dof_tools_common.h"
 
 // check an abort in FEPolyTensor when used with RaviartThomas
 // elements, when computing some sort of edge directions. This is the

@@ -19,6 +19,7 @@
 
 
 #include "../tests.h"
+
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>

@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "patches.h"
 
 // Output data on repetitions of the unit hypercube

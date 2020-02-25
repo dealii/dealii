@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "functions.h"
 
 template <int dim>

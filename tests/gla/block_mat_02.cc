@@ -46,6 +46,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "gla.h"
 
 template <class LA, int dim>

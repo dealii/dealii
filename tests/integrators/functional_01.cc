@@ -28,6 +28,7 @@
 #include <functional>
 
 #include "../tests.h"
+
 #include "empty_info.h"
 
 using namespace dealii;

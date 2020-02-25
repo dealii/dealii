@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 /*
  * test inverse of triangular matrix using pXtrtri in ScaLAPACK vs FullMatrix

@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "functions.h"
 
 template <typename FunctionType, typename... Args>

@@ -41,8 +41,9 @@
 
 #include <vector>
 
-#include "../grid/mesh_3d.h"
 #include "../tests.h"
+
+#include "../grid/mesh_3d.h"
 
 using namespace dealii;
 using namespace std;

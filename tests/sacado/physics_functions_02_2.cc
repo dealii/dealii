@@ -20,8 +20,9 @@
 //
 // AD number type: Sacado DFad-DFad
 
-#include "../ad_common_tests/physics_functions_02.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/physics_functions_02.h"
 
 int
 main()

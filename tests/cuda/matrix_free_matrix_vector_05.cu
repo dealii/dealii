@@ -21,6 +21,7 @@
 // type: 1 = linear).
 
 #include "../tests.h"
+
 #include "matrix_vector_common.h"
 
 

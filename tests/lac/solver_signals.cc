@@ -29,8 +29,9 @@
 #include <complex>
 #include <string>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 void

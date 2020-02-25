@@ -20,8 +20,9 @@
 
 #include <deal.II/lac/sparse_matrix.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 

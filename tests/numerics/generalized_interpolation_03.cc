@@ -20,6 +20,7 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 
 #include "../tests.h"
+
 #include "generalized_interpolation.h"
 
 int

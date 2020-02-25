@@ -20,8 +20,9 @@
 //
 // AD number type: ADOL-C tapeless
 
-#include "../ad_common_tests/physics_functions_01.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/physics_functions_01.h"
 
 int
 main()

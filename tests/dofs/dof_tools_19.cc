@@ -25,6 +25,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
+
 #include "dof_tools_common.h"
 #include "dof_tools_common_fake_hp.h"
 

@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 // test ScaLAPACKMatrix::operator = (const LAPACKFullMatrix<NumberType> &)
 

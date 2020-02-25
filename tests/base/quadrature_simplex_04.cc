@@ -22,6 +22,7 @@
 #include <numeric>
 
 #include "../tests.h"
+
 #include "simplex.h"
 
 void

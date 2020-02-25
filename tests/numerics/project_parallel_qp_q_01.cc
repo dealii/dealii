@@ -18,6 +18,7 @@
 // FE_Q on a mesh without hanging nodes.
 
 #include "../tests.h"
+
 #include "project_parallel_qp_common.h"
 
 namespace LA
