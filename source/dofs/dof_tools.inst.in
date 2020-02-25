@@ -20,12 +20,20 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
     \{
+      // Deprecated function:
       template void
       extract_locally_relevant_dofs<
         DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &       dof_handler,
         IndexSet &dof_set);
+
+      // Non-deprecated function:
+      template IndexSet
+      extract_locally_relevant_dofs<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &dof_handler);
 
       template void
       extract_locally_relevant_level_dofs<

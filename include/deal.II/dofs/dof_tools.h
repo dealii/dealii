@@ -1791,7 +1791,7 @@ namespace DoFTools
   /**
    * Extract the set of global DoF indices that are active on the current
    * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
-   * DoFHandler objects built on parallel::distributed::Triangulation this set
+   * DoFHandler objects built on parallel::Triangulation this set
    * is a superset of DoFHandler::locally_owned_dofs() and contains all DoF
    * indices that live on all locally owned cells (including on the interface
    * to ghost cells). However, it does not contain the DoF indices that are
@@ -1808,19 +1808,26 @@ namespace DoFTools
                               IndexSet &            dof_set);
 
   /**
-   * Extract the set of global DoF indices that are active on the current
-   * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
-   * DoFHandler objects built on parallel::distributed::Triangulation this set
-   * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
-   * all ghost cells. In essence, it is the DoF indices on all cells that are
-   * not artificial (see
+   * Extract the set of global DoF indices that are locally relevant to the
+   * current DoFHandler. For regular DoFHandlers, these are all DoF indices, but
+   * for DoFHandler objects built on parallel::Triangulation, this set is the
+   * union of DoFHandler::locally_owned_dofs() and the DoF indices on all ghost
+   * cells. In essence, it is the DoF indices on all cells that are not
+   * artificial (see
    * @ref GlossArtificialCell "the glossary").
    */
   template <typename DoFHandlerType>
-  void
+  IndexSet
+  extract_locally_relevant_dofs(const DoFHandlerType &dof_handler);
+
+  /**
+   * Same as the previous function, but return the set of locally
+   * relevant DoF indices through the second argument.
+   */
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_dofs(const DoFHandlerType &dof_handler,
                                 IndexSet &            dof_set);
-
 
   /**
    * Extract the set of locally owned DoF indices for each component within the

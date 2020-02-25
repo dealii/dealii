@@ -1183,8 +1183,18 @@ namespace DoFTools
   extract_locally_relevant_dofs(const DoFHandlerType &dof_handler,
                                 IndexSet &            dof_set)
   {
-    // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_dofs();
+    // Just call the non-deprecated function:
+    dof_set = extract_locally_relevant_dofs(dof_handler);
+  }
+
+
+
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_locally_relevant_dofs(const DoFHandlerType &dof_handler)
+  {
+    // Start by collecting all the locally owned dofs
+    IndexSet dof_set = dof_handler.locally_owned_dofs();
 
     // now add the DoF on the adjacent ghost cells to the IndexSet
 
@@ -1197,10 +1207,7 @@ namespace DoFTools
     std::vector<types::global_dof_index> dof_indices;
     std::vector<types::global_dof_index> dofs_on_ghosts;
 
-    typename DoFHandlerType::active_cell_iterator cell =
-                                                    dof_handler.begin_active(),
-                                                  endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_ghost())
         {
           dof_indices.resize(cell->get_fe().dofs_per_cell);
@@ -1216,6 +1223,8 @@ namespace DoFTools
                         std::unique(dofs_on_ghosts.begin(),
                                     dofs_on_ghosts.end()));
     dof_set.compress();
+
+    return dof_set;
   }
 
 
