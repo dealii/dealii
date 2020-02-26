@@ -110,10 +110,10 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
 template <int dim>
 std::pair<double, double>
 GridRefinement::adjust_refine_and_coarsen_number_fraction(
-  const unsigned int current_n_cells,
-  const unsigned int max_n_cells,
-  const double       top_fraction,
-  const double       bottom_fraction)
+  const types::global_dof_index current_n_cells,
+  const types::global_dof_index max_n_cells,
+  const double                  top_fraction,
+  const double                  bottom_fraction)
 {
   Assert(top_fraction >= 0, ExcInvalidParameterValue());
   Assert(top_fraction <= 1, ExcInvalidParameterValue());
@@ -166,7 +166,7 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   // again, this is true for isotropically
   // refined cells. we take this as an
   // approximation of a mixed refinement.
-  else if (static_cast<unsigned int>(
+  else if (static_cast<types::global_dof_index>(
              current_n_cells + refine_cells * cell_increase_on_refine -
              coarsen_cells * cell_decrease_on_coarsen) > max_n_cells)
     {
