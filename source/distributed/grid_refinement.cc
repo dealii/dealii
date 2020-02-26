@@ -434,9 +434,9 @@ namespace parallel
       refine_and_coarsen_fixed_number(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double       top_fraction_of_cells,
-        const double       bottom_fraction_of_cells,
-        const unsigned int max_n_cells)
+        const double                  top_fraction_of_cells,
+        const double                  bottom_fraction_of_cells,
+        const types::global_dof_index max_n_cells)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));

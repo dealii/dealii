@@ -87,10 +87,10 @@ namespace GridRefinement
   template <int dim>
   std::pair<double, double>
   adjust_refine_and_coarsen_number_fraction(
-    const unsigned int current_n_cells,
-    const unsigned int max_n_cells,
-    const double       top_fraction_of_cells,
-    const double       bottom_fraction_of_cells);
+    const types::global_dof_index current_n_cells,
+    const types::global_dof_index max_n_cells,
+    const double                  top_fraction_of_cells,
+    const double                  bottom_fraction_of_cells);
 
   /**
    * This function provides a strategy to mark cells for refinement and
