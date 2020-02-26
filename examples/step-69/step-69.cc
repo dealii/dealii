@@ -676,8 +676,6 @@ namespace Step69
       dof_handler.initialize(discretization->triangulation,
                              discretization->finite_element);
 
-      DoFRenumbering::Cuthill_McKee(dof_handler);
-
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
 
@@ -699,11 +697,12 @@ namespace Step69
     // explanation. We avoid using a distributed matrix class (as for
     // example provided by Trilinos or PETSc) and instead rely on deal.II's
     // own SparseMatrix object to store the local part of all matrices.
-    // This design decision is motivated by the fact that we actually never
-    // perform a matrix-vector multiplication. Instead, we will have to
-    // perform nonlinear updates while iterating over (the local part) of a
-    // connectivity stencil; a task for which deal.II own SparsityPattern
-    // is specificially optimized for.
+    // This design decision is motivated by the fact that (a) we actually
+    // never perform a matrix-vector multiplication, and (b) we can always
+    // assemble the local part of a matrix exclusively on a given MPI
+    // rank. Instead, we will compute nonlinear updates while iterating
+    // over (the local part) of a connectivity stencil; a task for which
+    // deal.II's own SparsityPattern is specificially optimized for.
     //
     // This design consideration has a caveat, though. What makes the
     // deal.II SparseMatrix class fast is the <a
@@ -713,16 +712,17 @@ namespace Step69
     // index range because a sparsity pattern with CSR cannot contain
     // "holes" in the index range. The distributed matrices offered by
     // deal.II avoid this by translating from a global index range into a
-    // contiguous local index range. But this is the precisely the type of
-    // index manipulation we want to avoid in our assembly loops.
+    // contiguous local index range. But this is precisely the type of
+    // index manipulation we want to avoid in our iteration over the
+    // stencil because it creates a measurable overhead.
     //
-    // The Utilities::MPI::Partitioner already implements the translation
+    // The Utilities::MPI::Partitioner class already implements the translation
     // from a global index range to a contiguous local (per MPI rank) index
     // range: we don't have to reinvent the wheel. We just need to use that
     // translation capability (once and only once) in order to create a
     // "local" sparsity pattern for the contiguous index range
     // $[0,$<code>n_locally_relevant</code>$)$. That capability can be
-    // invoked by Utilities::MPI::Partitioner::global_to_local() function.
+    // invoked by the Utilities::MPI::Partitioner::global_to_local() function.
     // Once the sparsity pattern is created using local indices, all that
     // is left to do is to ensure that (when implementing our scatter and
     // gather auxiliary functions) we always access elements of a
@@ -739,7 +739,7 @@ namespace Step69
       // We have to create the "local" sparsity pattern by hand. We
       // therefore loop over all locally owned and ghosted cells (see @ref
       // GlossArtificialCell) and extract the (global)
-      // <code>dof_indices</code> associated to the cell DOFs and renumber
+      // <code>dof_indices</code> associated with the cell DOFs and renumber
       // them using <code>partitioner->global_to_local(index)</code>.
       //
       // @note In the case of a locally owned dof, such renumbering consist
@@ -747,7 +747,7 @@ namespace Step69
       // will become a number in the integer interval
       // $[0,$<code>n_locally_owned</code>$)$. However, in the case of a
       // ghosted dof (i.e. not locally owned) the situation is quite
-      // different, since the global indices associated to ghosted DOFs will
+      // different, since the global indices associated with ghosted DOFs will
       // not be (in general) a contiguous set of integers.
 
       DynamicSparsityPattern dsp(n_locally_relevant, n_locally_relevant);
@@ -759,6 +759,8 @@ namespace Step69
           if (cell->is_artificial())
             continue;
 
+          /* We transform the set of global dof indices on the cell to the
+           * corresponding "local" index range on the MPI process: */
           cell->get_dof_indices(dof_indices);
           std::transform(dof_indices.begin(),
                          dof_indices.end(),
@@ -767,6 +769,8 @@ namespace Step69
                            return partitioner->global_to_local(index);
                          });
 
+          /* And simply add, for each dof, a coupling to all other "local"
+           * dofs on the cell: */
           for (const auto dof : dof_indices)
             dsp.add_entries(dof, dof_indices.begin(), dof_indices.end());
         }
@@ -783,7 +787,7 @@ namespace Step69
   }
 
   // This concludes the setup of the DoFHandler and SparseMatrix objects.
-  // Next, we have to assemble various matrices. We next define a number of
+  // Next, we have to assemble various matrices. We define a number of
   // helper functions and data structures in an anonymous namespace.
 
   namespace
@@ -855,7 +859,7 @@ namespace Step69
     // that we need one matrix per space dimension to store the
     // $\mathbf{c}_{ij}$ vectors. Similar observation follows for the
     // matrix $\mathbf{n}_{ij}$. The purpose of
-    // <code>gather_get_entry()</code> is to retrieve those entries a store
+    // <code>gather_get_entry()</code> is to retrieve those entries and store
     // them into a <code>Tensor<1, dim></code> for our convenience.
 
     template <typename T1, std::size_t k, typename T2>
@@ -874,7 +878,7 @@ namespace Step69
     // functionality of <code>gather_get_entry()</code> and
     // <code>gather()</code> is very much the same, but their context is
     // different: the function <code>gather()</code> does not rely on an
-    // iterator (that actually knows the value pointed) but rather on the
+    // iterator (that actually knows the value pointed to) but rather on the
     // indices <code>(i,l)</code> of the entry in order to retrieve its
     // actual value. We should expect <code>gather()</code> to be slightly
     // more expensive than <code>gather_get_entry()</code>. The use of
@@ -887,7 +891,7 @@ namespace Step69
     // matrices) is in general unacceptably expensive. Here is where we might
     // want to keep an eye on complexity: we want this operation to have
     // constant complexity, which is the case of the current implementation
-    // using deal.ii matrices.
+    // using deal.II matrices.
 
     template <typename T1, std::size_t k, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
@@ -920,7 +924,7 @@ namespace Step69
     // <code>Tensor<1,problem_dimension></code>, and the last argument
     // which represents a index of the global object. This function will be
     // primarily used to write the updated nodal values, stored as
-    // <code>Tensor<1,problem_dimension></code>, into the global object.
+    // <code>Tensor<1,problem_dimension></code>, into the global objects.
 
     template <typename T1, std::size_t k1, typename T2, typename T3>
     DEAL_II_ALWAYS_INLINE inline void
@@ -937,13 +941,14 @@ namespace Step69
   // \frac{\mathbf{c}_{ij}}{|\mathbf{c}_{ij}|}$, and the boundary normals
   // $\boldsymbol{\nu}_i$.
   //
-  // In order to exploit thread parallelization we use WorkStream approach
-  // detailed in the @ref threads Parallel computing with multiple processors
+  // In order to exploit thread parallelization we use the WorkStream approach
+  // detailed in the @ref threads "Parallel computing with multiple processors"
   // accessing shared memory. As customary this requires
   // definition of
   //  - Scratch data (i.e. input info required to carry out computations): in
   //    this case it is <code>scratch_data</code>.
-  //  - The worker: in the case it is <code>local_assemble_system()</code> that
+  //  - The worker: in our case this is the <code>local_assemble_system()</code>
+  //  function that
   //    actually computes the local (i.e. current cell) contributions from the
   //    scratch data.
   //  - A copy data: a struct that contains all the local assembly
@@ -952,7 +957,7 @@ namespace Step69
   //    <code>copy_local_to_global()</code> in charge of actually coping these
   //    local contributions into the global objects (matrices and/or vectors)
   //
-  // Most the following lines are spent in the definition of the worker
+  // Most of the following lines are spent in the definition of the worker
   // <code>local_assemble_system()</code> and the copy data routine
   // <code>copy_local_to_global()</code>. There is not much to say about the
   // WorkStream framework since the vast majority of ideas are reasonably
@@ -963,14 +968,14 @@ namespace Step69
   //
   // @f{align*}
   // \widehat{\boldsymbol{\nu}}_i :=
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{where}
+  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{ where }
   // \boldsymbol{\nu}_i := \sum_{T \subset \text{supp}(\phi_i)}
   // \sum_{F \subset \partial T \cap \partial \Omega}
   // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F})
+  // \phi_i(\mathbf{x}_{q,F}).
   // @f}
   //
-  // here $T$ denotes elements,
+  // Here $T$ denotes elements,
   // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
   // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
   // are quadrature points on such face. Note that this formula for
@@ -1011,35 +1016,29 @@ namespace Step69
       const auto local_assemble_system = [&](const auto &cell,
                                              auto &      scratch,
                                              auto &      copy) {
-        auto &is_artificial             = copy.is_artificial;
-        auto &local_dof_indices         = copy.local_dof_indices;
-        auto &local_boundary_normal_map = copy.local_boundary_normal_map;
-        auto &cell_lumped_mass_matrix   = copy.cell_lumped_mass_matrix;
-        auto &cell_cij_matrix           = copy.cell_cij_matrix;
-
-        is_artificial = cell->is_artificial();
-        if (is_artificial)
+        copy.is_artificial = cell->is_artificial();
+        if (copy.is_artificial)
           return;
 
-        local_boundary_normal_map.clear();
-        cell_lumped_mass_matrix.reinit(dofs_per_cell, dofs_per_cell);
-        for (auto &matrix : cell_cij_matrix)
+        copy.local_boundary_normal_map.clear();
+        copy.cell_lumped_mass_matrix.reinit(dofs_per_cell, dofs_per_cell);
+        for (auto &matrix : copy.cell_cij_matrix)
           matrix.reinit(dofs_per_cell, dofs_per_cell);
 
         const auto &fe_values = scratch.reinit(cell);
 
-        local_dof_indices.resize(dofs_per_cell);
-        cell->get_dof_indices(local_dof_indices);
+        copy.local_dof_indices.resize(dofs_per_cell);
+        cell->get_dof_indices(copy.local_dof_indices);
 
-        std::transform(local_dof_indices.begin(),
-                       local_dof_indices.end(),
-                       local_dof_indices.begin(),
+        std::transform(copy.local_dof_indices.begin(),
+                       copy.local_dof_indices.end(),
+                       copy.local_dof_indices.begin(),
                        [&](auto index) {
                          return partitioner->global_to_local(index);
                        });
 
         // We compute the local contributions for the lumped mass matrix
-        // entries m_i and and vectors c_ij in the usual fashion:
+        // entries $m_i$ and and vectors $c_{ij}$ in the usual fashion:
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const auto JxW = fe_values.JxW(q_point);
@@ -1049,13 +1048,13 @@ namespace Step69
                 const auto value_JxW = fe_values.shape_value(j, q_point) * JxW;
                 const auto grad_JxW  = fe_values.shape_grad(j, q_point) * JxW;
 
-                cell_lumped_mass_matrix(j, j) += value_JxW;
+                copy.cell_lumped_mass_matrix(j, j) += value_JxW;
 
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   {
                     const auto value = fe_values.shape_value(i, q_point);
                     for (unsigned int d = 0; d < dim; ++d)
-                      cell_cij_matrix[d](i, j) += (value * grad_JxW)[d];
+                      copy.cell_cij_matrix[d](i, j) += value * grad_JxW[d];
 
                   } /* i */
               }     /* j */
@@ -1088,7 +1087,7 @@ namespace Step69
                 // contribution right here, we have to take it "as is",
                 // store it and pass it to the copy data routine. The
                 // proper normalization requires an additional loop on
-                // nodes.
+                // nodes. This is done in the copy function below.
                 Tensor<1, dim> normal;
                 if (id == free_slip)
                   {
@@ -1097,7 +1096,7 @@ namespace Step69
                                 fe_face_values.shape_value(j, q);
                   }
 
-                const auto index = local_dof_indices[j];
+                const auto index = copy.local_dof_indices[j];
 
                 Point<dim> position;
                 const auto global_index = partitioner->local_to_global(index);
@@ -1105,11 +1104,14 @@ namespace Step69
                      v < GeometryInfo<dim>::vertices_per_cell;
                      ++v)
                   if (cell->vertex_dof_index(v, 0) == global_index)
-                    position = cell->vertex(v);
+                    {
+                      position = cell->vertex(v);
+                      break;
+                    }
 
                 const auto old_id =
-                  std::get<1>(local_boundary_normal_map[index]);
-                local_boundary_normal_map[index] =
+                  std::get<1>(copy.local_boundary_normal_map[index]);
+                copy.local_boundary_normal_map[index] =
                   std::make_tuple(normal, std::max(old_id, id), position);
               }
           }
@@ -1118,36 +1120,26 @@ namespace Step69
       // Last, we provide a copy_local_to_global function as required for
       // the WorkStream
       const auto copy_local_to_global = [&](const auto &copy) {
-        const auto &is_artificial             = copy.is_artificial;
-        const auto &local_dof_indices         = copy.local_dof_indices;
-        const auto &local_boundary_normal_map = copy.local_boundary_normal_map;
-        const auto &cell_lumped_mass_matrix   = copy.cell_lumped_mass_matrix;
-        const auto &cell_cij_matrix           = copy.cell_cij_matrix;
-
-        if (is_artificial)
+        if (copy.is_artificial)
           return;
 
-        for (const auto &it : local_boundary_normal_map)
+        for (const auto &it : copy.local_boundary_normal_map)
           {
-            auto &normal   = std::get<0>(boundary_normal_map[it.first]);
-            auto &id       = std::get<1>(boundary_normal_map[it.first]);
-            auto &position = std::get<2>(boundary_normal_map[it.first]);
-
-            const auto &new_normal   = std::get<0>(it.second);
-            const auto &new_id       = std::get<1>(it.second);
-            const auto &new_position = std::get<2>(it.second);
-
-            normal += new_normal;
-            id       = std::max(id, new_id);
-            position = new_position;
+            std::get<0>(boundary_normal_map[it.first]) +=
+              std::get<0>(it.second);
+            std::get<1>(boundary_normal_map[it.first]) =
+              std::max(std::get<1>(boundary_normal_map[it.first]),
+                       std::get<1>(it.second));
+            std::get<2>(boundary_normal_map[it.first]) = std::get<2>(it.second);
           }
 
-        lumped_mass_matrix.add(local_dof_indices, cell_lumped_mass_matrix);
+        lumped_mass_matrix.add(copy.local_dof_indices,
+                               copy.cell_lumped_mass_matrix);
 
         for (int k = 0; k < dim; ++k)
           {
-            cij_matrix[k].add(local_dof_indices, cell_cij_matrix[k]);
-            nij_matrix[k].add(local_dof_indices, cell_cij_matrix[k]);
+            cij_matrix[k].add(copy.local_dof_indices, copy.cell_cij_matrix[k]);
+            nij_matrix[k].add(copy.local_dof_indices, copy.cell_cij_matrix[k]);
           }
       };
 
@@ -1322,28 +1314,23 @@ namespace Step69
       const auto local_assemble_system = [&](const auto &cell,
                                              auto &      scratch,
                                              auto &      copy) {
-        auto &is_artificial     = copy.is_artificial;
-        auto &local_dof_indices = copy.local_dof_indices;
-
-        auto &cell_cij_matrix = copy.cell_cij_matrix;
-
-        is_artificial = cell->is_artificial();
-        if (is_artificial)
+        copy.is_artificial = cell->is_artificial();
+        if (copy.is_artificial)
           return;
 
-        for (auto &matrix : cell_cij_matrix)
+        for (auto &matrix : copy.cell_cij_matrix)
           matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-        local_dof_indices.resize(dofs_per_cell);
-        cell->get_dof_indices(local_dof_indices);
-        std::transform(local_dof_indices.begin(),
-                       local_dof_indices.end(),
-                       local_dof_indices.begin(),
+        copy.local_dof_indices.resize(dofs_per_cell);
+        cell->get_dof_indices(copy.local_dof_indices);
+        std::transform(copy.local_dof_indices.begin(),
+                       copy.local_dof_indices.end(),
+                       copy.local_dof_indices.begin(),
                        [&](auto index) {
                          return partitioner->global_to_local(index);
                        });
 
-        for (auto &matrix : cell_cij_matrix)
+        for (auto &matrix : copy.cell_cij_matrix)
           matrix = 0.;
 
         for (auto f : GeometryInfo<dim>::face_indices())
@@ -1373,8 +1360,8 @@ namespace Step69
                                                                             f))
                       continue;
 
-                    const auto &normal_j =
-                      std::get<0>(boundary_normal_map[local_dof_indices[j]]);
+                    const auto &normal_j = std::get<0>(
+                      boundary_normal_map[copy.local_dof_indices[j]]);
 
                     const auto value_JxW =
                       fe_face_values.shape_value(j, q) * JxW;
@@ -1385,7 +1372,7 @@ namespace Step69
 
                         /* This is the correction of the boundary c_ij */
                         for (unsigned int d = 0; d < dim; ++d)
-                          cell_cij_matrix[d](i, j) +=
+                          copy.cell_cij_matrix[d](i, j) +=
                             (normal_j[d] - normal_q[d]) * (value * value_JxW);
                       } /* i */
                   }     /* j */
@@ -1394,15 +1381,11 @@ namespace Step69
       };
 
       const auto copy_local_to_global = [&](const auto &copy) {
-        const auto &is_artificial     = copy.is_artificial;
-        const auto &local_dof_indices = copy.local_dof_indices;
-        const auto &cell_cij_matrix   = copy.cell_cij_matrix;
-
-        if (is_artificial)
+        if (copy.is_artificial)
           return;
 
         for (int k = 0; k < dim; ++k)
-          cij_matrix[k].add(local_dof_indices, cell_cij_matrix[k]);
+          cij_matrix[k].add(copy.local_dof_indices, copy.cell_cij_matrix[k]);
       };
 
       WorkStream::run(dof_handler.begin_active(),

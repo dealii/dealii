@@ -120,26 +120,28 @@ So, we give the first-order method a second chance and run it with about
 
 TimeLoop<dim>::output(t = 4.00006, checkpoint = 1)
 
+[...]
+
 +------------------------------------------------------------------------+------------+------------+
-| Total CPU time elapsed since start                                     |  3.34e+05s |            |
+| Total wallclock time elapsed since start                               |  6.75e+03s |            |
 |                                                                        |            |            |
-| Section                                                    | no. calls |  CPU time  | % of total |
+| Section                                                    | no. calls |  wall time | % of total |
 +------------------------------------------------------------+-----------+------------+------------+
-| discretization - setup                                     |         1 |      1.96s |         0% |
-| offline_data - assemble lumped mass matrix, and c_ij       |         1 |      10.6s |         0% |
-| offline_data - compute |c_ij|, and n_ij                    |         1 |     0.208s |         0% |
-| offline_data - create sparsity pattern and set up matrices |         1 |      0.38s |         0% |
-| offline_data - distribute dofs                             |         1 |      1.36s |         0% |
-| offline_data - fix slip boundary c_ij                      |         1 |      2.52s |         0% |
-| schlieren_postprocessor - compute schlieren plot           |       201 |      24.3s |         0% |
-| schlieren_postprocessor - prepare scratch space            |         1 |     0.008s |         0% |
-| time_loop - setup scratch space                            |         1 |      1.48s |         0% |
-| time_loop - stalled output                                 |       200 |     0.004s |         0% |
-| time_step - 1 compute d_ij                                 |     70216 |  5.79e+04s |        17% |
-| time_step - 2 compute d_ii, and tau_max                    |     70216 |  5.78e+03s |       1.7% |
-| time_step - 3 perform update                               |     70216 |  2.51e+04s |       7.5% |
-| time_step - 4 fix boundary states                          |     70216 |      56.8s |         0% |
-| time_step - prepare scratch space                          |         1 |     0.028s |         0% |
+| discretization - setup                                     |         1 |      1.97s |         0% |
+| offline_data - assemble lumped mass matrix, and c_ij       |         1 |      1.19s |         0% |
+| offline_data - compute |c_ij|, and n_ij                    |         1 |    0.0172s |         0% |
+| offline_data - create sparsity pattern and set up matrices |         1 |     0.413s |         0% |
+| offline_data - distribute dofs                             |         1 |      1.05s |         0% |
+| offline_data - fix slip boundary c_ij                      |         1 |     0.252s |         0% |
+| schlieren_postprocessor - compute schlieren plot           |       201 |      1.82s |         0% |
+| schlieren_postprocessor - prepare scratch space            |         1 |  0.000497s |         0% |
+| time_loop - setup scratch space                            |         1 |      1.45s |         0% |
+| time_loop - stalled output                                 |       200 |   0.00342s |         0% |
+| time_step - 1 compute d_ij                                 |     70216 |  4.38e+03s |        65% |
+| time_step - 2 compute d_ii, and tau_max                    |     70216 |       419s |       6.2% |
+| time_step - 3 perform update                               |     70216 |  1.87e+03s |        28% |
+| time_step - 4 fix boundary states                          |     70216 |        24s |      0.36% |
+| time_step - prepare scratch space                          |         1 |    0.0227s |         0% |
 +------------------------------------------------------------+-----------+------------+------------+
 @endverbatim
 
@@ -148,4 +150,4 @@ And with the following result:
 <img src="https://www.dealii.org/images/steps/developer/step-69.fine.gif" alt="" height="300">
 
 That's substantially better, although of course at the price of having run
-the code for roughly 6 hours on 16 cores.
+the code for roughly 2 hours on 16 cores.

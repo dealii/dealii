@@ -237,16 +237,16 @@ spaces $\pmb{\mathbb{V}}_h := \{\mathbb{V}_h\}^{d+2}$. Let $\mathbf{u}_h
 spaces in our notation. Vector-valued finite element spaces
 are natural for variational formulations of PDE systems (e.g. Navier-Stokes).
 In such context, the interactions that have to be computed describe
-"interactions between DOFs": with proper renumbering of the
-vector-valued DoFHandler (i.e. initialized with an FESystem) it is possible to
-compute the block-matrices (required in order to advance the solution) with
-relative ease. However, in the context of time-explicit collocation-like
-schemes (such as finite differences and/or the scheme presented in this
-tutorial): the interactions that have to be computed can be informally described
-as "interactions between nodes" (not between DOFs). In addition we don't need
-to compute matrices in order to advance the solution. This leaves very
-little reasons to use vector-valued finite element spaces both in
-theory and/or practice.
+<i>interactions between DOFs</i>: with proper renumbering of the
+vector-valued DoFHandler (i.e. initialized with an FESystem) it is possible
+to compute the block-matrices (required in order to advance the solution)
+with relative ease. However, the interactions that have to be computed in
+the context of time-explicit collocation-type schemes (such as finite
+differences and/or the scheme presented in this tutorial)  can be are
+better described as <i>interactions between nodes</i> (not between DOFs).
+In addition, in our case we do not solve a linear equation in order to
+advance the solution. This leaves very little reason to use vector-valued
+finite element spaces both in theory and/or practice.
 
 We will use the usual Lagrange finite elements: let $\{\mathbf{x}_i\}_{i \in
 \mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this
