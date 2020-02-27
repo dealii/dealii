@@ -39,11 +39,6 @@ print " * \n";
 
 do {
 
-    # Make sure that we don't output comment end markers that might confuse
-    # doxygen.
-    s!/\*!/ \*!g;
-    s!\*/!\* /!g;
-
     # substitute tabs
     s/\t/        /g;
 
