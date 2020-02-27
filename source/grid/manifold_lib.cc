@@ -274,54 +274,73 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
 
 
 
+namespace
+{
+  template <int dim, int spacedim>
+  bool
+  spherical_face_is_horizontal(
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const Point<spacedim> &                                     manifold_center)
+  {
+    // We test whether a face is horizontal by checking that the vertices
+    // all have roughly the same distance from the center: If the
+    // maximum deviation for the distances from the vertices to the
+    // center is less than 1.e-5 of the distance between vertices (as
+    // measured by the minimum distance from any of the other vertices
+    // to the first vertex), then we call this a horizontal face.
+    constexpr unsigned int n_vertices =
+      GeometryInfo<spacedim>::vertices_per_face;
+    std::array<double, n_vertices>     sqr_distances_to_center;
+    std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
+    sqr_distances_to_center[0] =
+      (face->vertex(0) - manifold_center).norm_square();
+    for (unsigned int i = 1; i < n_vertices; ++i)
+      {
+        sqr_distances_to_center[i] =
+          (face->vertex(i) - manifold_center).norm_square();
+        sqr_distances_to_first_vertex[i - 1] =
+          (face->vertex(i) - face->vertex(0)).norm_square();
+      }
+    const auto minmax_sqr_distance =
+      std::minmax_element(sqr_distances_to_center.begin(),
+                          sqr_distances_to_center.end());
+    const auto min_sqr_distance_to_first_vertex =
+      std::min_element(sqr_distances_to_first_vertex.begin(),
+                       sqr_distances_to_first_vertex.end());
+
+    return (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
+            1.e-10 * *min_sqr_distance_to_first_vertex);
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 Tensor<1, spacedim>
 PolarManifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   const Point<spacedim> &                                     p) const
 {
-  // Let us first test whether we are on a "horizontal" face.
-  // In that case, the normal vector is easy to compute
-  // since it is proportional to the vector from the center to the
-  // point 'p'.
-  //
-  // We test whether that is the case by checking that the vertices
-  // all have roughly the same distance from the center: If the
-  // maximum deviation for the distances from the vertices to the
-  // center is less than 1.e-5 of the distance between vertices (as
-  // measured by the minimum distance from any of the other vertices
-  // to the first vertex), then we call this a horizontal face.
-  constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     distances_to_center;
-  std::array<double, n_vertices - 1> distances_to_first_vertex;
-  distances_to_center[0] = (face->vertex(0) - center).norm_square();
-  for (unsigned int i = 1; i < n_vertices; ++i)
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  if (spherical_face_is_horizontal<dim,spacedim>(face, center))
     {
-      distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      distances_to_first_vertex[i - 1] =
-        (face->vertex(i) - face->vertex(0)).norm_square();
-    }
-  const auto minmax_distance =
-    std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex =
-    std::min_element(distances_to_first_vertex.begin(),
-                     distances_to_first_vertex.end());
-
-  // So, if this is a horizontal face, then just compute the normal
-  // vector as the one from the center to the point 'p', adequately
-  // scaled.
-  if (*minmax_distance.second - *minmax_distance.first <
-      1.e-10 * *min_distance_to_first_vertex)
-    {
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
       const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
     }
+  else
+    // If it is not a horizontal face, just use the machinery of the
+    // base class.
+    return Manifold<dim, spacedim>::normal_vector(face, p);
 
-  // If it is not a horizontal face, just use the machinery of the
-  // base class.
-  return Manifold<dim, spacedim>::normal_vector(face, p);
+  return Tensor<1,spacedim>();
 }
 
 
@@ -475,36 +494,11 @@ SphericalManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  //
-  // We test whether that is the case by checking that the vertices
-  // all have roughly the same distance from the center: If the
-  // maximum deviation for the distances from the vertices to the
-  // center is less than 1.e-5 of the distance between vertices (as
-  // measured by the minimum distance from any of the other vertices
-  // to the first vertex), then we call this a horizontal face.
-  constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     sqr_distances_to_center;
-  std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
-  sqr_distances_to_center[0] = (face->vertex(0) - center).norm_square();
-  for (unsigned int i = 1; i < n_vertices; ++i)
+  if (spherical_face_is_horizontal<dim,spacedim>(face, center))
     {
-      sqr_distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      sqr_distances_to_first_vertex[i - 1] =
-        (face->vertex(i) - face->vertex(0)).norm_square();
-    }
-  const auto minmax_sqr_distance =
-    std::minmax_element(sqr_distances_to_center.begin(),
-                        sqr_distances_to_center.end());
-  const auto min_sqr_distance_to_first_vertex =
-    std::min_element(sqr_distances_to_first_vertex.begin(),
-                     sqr_distances_to_first_vertex.end());
-
-  // So, if this is a "horizontal" face, then just compute the normal
-  // vector as the one from the center to the point 'p', adequately
-  // scaled.
-  if (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
-      1.e-10 * *min_sqr_distance_to_first_vertex)
-    {
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
       const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
@@ -514,6 +508,8 @@ SphericalManifold<dim, spacedim>::normal_vector(
     // If it is not a horizontal face, just use the machinery of the
     // base class.
     return Manifold<dim, spacedim>::normal_vector(face, p);
+
+  return Tensor<1,spacedim>();
 }
 
 
@@ -551,37 +547,12 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  //
-  // We test whether that is the case by checking that the vertices
-  // all have roughly the same distance from the center: If the
-  // maximum deviation for the distances from the vertices to the
-  // center is less than 1.e-5 of the distance between vertices (as
-  // measured by the minimum distance from any of the other vertices
-  // to the first vertex), then we call this a horizontal face.
-  constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     sqr_distances_to_center;
-  std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
-  sqr_distances_to_center[0] = (face->vertex(0) - center).norm_square();
-  for (unsigned int i = 1; i < n_vertices; ++i)
+  if (spherical_face_is_horizontal<dim,spacedim>(face,center))
     {
-      sqr_distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      sqr_distances_to_first_vertex[i - 1] =
-        (face->vertex(i) - face->vertex(0)).norm_square();
-    }
-  const auto minmax_sqr_distance =
-    std::minmax_element(sqr_distances_to_center.begin(),
-                        sqr_distances_to_center.end());
-  const auto min_sqr_distance_to_first_vertex =
-    std::min_element(sqr_distances_to_first_vertex.begin(),
-                     sqr_distances_to_first_vertex.end());
-
-  // So, if this is a "horizontal" face, then just compute the normal
-  // vector as the one from the center to the point 'p', adequately
-  // scaled.
-  if (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
-      1.e-10 * *min_sqr_distance_to_first_vertex)
-    {
-      for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
+      for (unsigned int vertex = 0; vertex < GeometryInfo<spacedim>::vertices_per_face; ++vertex)
         face_vertex_normals[vertex] = face->vertex(vertex) - center;
     }
   else
