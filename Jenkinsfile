@@ -180,6 +180,7 @@ pipeline
             sh "echo \"building on node ${env.NODE_NAME}\""
             sh '''#!/bin/bash
                 set -e
+                set -x
                 export NP=`grep -c ^processor /proc/cpuinfo`
                 mkdir -p /home/dealii/build
                 cd /home/dealii/build
@@ -192,7 +193,7 @@ pipeline
                 time ninja -j $NP
                 time ninja test # quicktests
                 time ninja setup_tests
-                time ctest -R "all-headers|multigrid/transfer|matrix_free" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
+                time ctest -R "all-headers|multigrid/transfer|matrix_free/matrix_" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
             '''
           }
           }
