@@ -210,6 +210,9 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   MGLevelObject<VectorType> &      dst,
   const InVector &                 src) const
 {
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   AssertIndexRange(dst.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
@@ -280,6 +283,9 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
   const MGLevelObject<VectorType> &src) const
 {
   (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   AssertIndexRange(src.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
@@ -349,10 +355,14 @@ template <typename VectorType>
 template <int dim, class OutVector, int spacedim>
 void
 MGLevelGlobalTransfer<VectorType>::copy_from_mg_add(
-  const DoFHandler<dim, spacedim> & /*dof_handler*/,
+  const DoFHandler<dim, spacedim> &dof_handler,
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
+  (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   // For non-DG: degrees of freedom in the refinement face may need special
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
@@ -402,6 +412,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
   const LinearAlgebra::distributed::Vector<Number2> &        src) const
 {
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   copy_to_mg(dof_handler, dst, src, false);
 }
 
@@ -415,6 +428,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   const LinearAlgebra::distributed::Vector<Number2> &        src,
   const bool solution_transfer) const
 {
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   LinearAlgebra::distributed::Vector<Number> &this_ghosted_global_vector =
     solution_transfer ? solution_ghosted_global_vector : ghosted_global_vector;
   const std::vector<Table<2, unsigned int>> &this_copy_indices =
@@ -521,6 +537,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
   const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {
   (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   AssertIndexRange(src.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
@@ -591,10 +610,14 @@ template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim> & /*dof_handler*/,
-    LinearAlgebra::distributed::Vector<Number2> &                    dst,
+    const DoFHandler<dim, spacedim> &            dof_handler,
+    LinearAlgebra::distributed::Vector<Number2> &dst,
     const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {
+  (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
   // For non-DG: degrees of freedom in the refinement face may need special
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
