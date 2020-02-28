@@ -156,6 +156,62 @@ int main(int /*argc*/, char **/*argv*/) {
     }
   }
   {
+    //Test 1b: Only FE_Nedelec
+    std::cout<<"Testing FE_Nedelec(1): ";
+    FE_Nedelec<dim> fe(1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe);
+    test_vec2.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,3,0,mapping,test_vec2);
+    if(test_boundary_values(dof_handler,mapping,fe,3,0,test_vec2))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+  {
+    //Test 2b: FESystem(FE_Nedelec(1))
+    std::cout<<"Testing FESystem(FE_Nedelec(1)): ";
+    FESystem<dim> fe_system(FE_Nedelec<dim>(1),1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe_system);
+    test_vec.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,3,0,mapping,test_vec);
+    if(test_boundary_values(dof_handler,mapping,fe_system,3,0,test_vec))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+    //Now, in the case of only one element both initializations should give
+    //identical vectors
+    std::cout<<"Checking Consistency: ";
+    bool equal=(test_vec.size() == test_vec2.size());
+    if(equal)
+    {
+      for(unsigned int i = 0; i < test_vec.size(); i++)
+      {
+	equal = equal && (test_vec(i)==test_vec2(i));
+      }
+    }
+    if(equal)
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+  {
     //Test 3: FESystem(FE_Nedelec(0), FE_Nedelec(0))
     std::cout<<"Testing FESystem(FE_Nedelec(0), FE_Nedelec(0)): ";
     FESystem<dim> fe_system(FE_Nedelec<dim>(0),1,FE_Nedelec<dim>(0),1);
@@ -231,6 +287,78 @@ int main(int /*argc*/, char **/*argv*/) {
     //Test 7: FESystem(FE_Q(1), FE_Nedelec(0))
     std::cout<<"Testing FESystem(FE_Q(1), FE_Nedelec(0)): ";
     FESystem<dim> fe_system(FE_Q<dim>(1),1,FE_Nedelec<dim>(0),1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe_system);
+    test_vec.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,4,1,mapping,test_vec);
+    if(test_boundary_values(dof_handler,mapping,fe_system,4,1,test_vec))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+  {
+    //Test 8: FESystem(FE_Nedelec(0), FE_Q(2))
+    std::cout<<"Testing FESystem(FE_Nedelec(0), FE_Q(2)): ";
+    FESystem<dim> fe_system(FE_Nedelec<dim>(0),1,FE_Q<dim>(2),1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe_system);
+    test_vec.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,4,0,mapping,test_vec);
+    if(test_boundary_values(dof_handler,mapping,fe_system,4,0,test_vec))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+  {
+    //Test 9: FESystem(FE_Q(2), FE_Nedelec(0))
+    std::cout<<"Testing FESystem(FE_Q(2), FE_Nedelec(0)): ";
+    FESystem<dim> fe_system(FE_Q<dim>(2),1,FE_Nedelec<dim>(0),1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe_system);
+    test_vec.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,4,1,mapping,test_vec);
+    if(test_boundary_values(dof_handler,mapping,fe_system,4,1,test_vec))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+    {
+    //Test 10: FESystem(FE_Nedelec(1), FE_Q(1))
+    std::cout<<"Testing FESystem(FE_Nedelec(1), FE_Q(1)): ";
+    FESystem<dim> fe_system(FE_Nedelec<dim>(1),1,FE_Q<dim>(1),1);
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(fe_system);
+    test_vec.reinit(dof_handler.n_dofs());
+    apply_boundary_values(dof_handler,constraints,4,0,mapping,test_vec);
+    if(test_boundary_values(dof_handler,mapping,fe_system,4,0,test_vec))
+    {
+      std::cout<<"OK"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"Failed"<<std::endl;
+      abort();
+    }
+  }
+  {
+    //Test 11: FESystem(FE_Q(1), FE_Nedelec(1))
+    std::cout<<"Testing FESystem(FE_Q(1), FE_Nedelec(1)): ";
+    FESystem<dim> fe_system(FE_Q<dim>(1),1,FE_Nedelec<dim>(1),1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
     test_vec.reinit(dof_handler.n_dofs());

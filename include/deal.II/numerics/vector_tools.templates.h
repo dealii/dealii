@@ -5405,6 +5405,16 @@ namespace VectorTools
           base_indices.second = (first_vector_component - fe_index_old) /
                                 fe.base_element(i).n_components();
         }
+      else
+      {
+	//Assert that the FE is in fact an FE_Nedelec, so that the default
+	//base_indices == (0,0) is correct.
+	Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
+		nullptr) ||
+	       (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
+		nullptr),
+	       ExcNotImplemented());
+      }
       // Store degree as fe.degree-1
       // For nedelec elements FE_Nedelec<dim> (0) returns fe.degree = 1.
       // For FESystem get the degree from the base_element
@@ -5428,7 +5438,7 @@ namespace VectorTools
       // element and the index within this ordering.
       //
       // We call the map associated_edge_dof_to_face_dof
-      std::vector<unsigned int> associated_edge_dof_to_face_dof(degree + 1);
+      std::vector<unsigned int> associated_edge_dof_to_face_dof(degree + 1, numbers::invalid_dof_index);
 
       // Lowest DoF in the base element allowed for this edge:
       const unsigned int lower_bound =
@@ -5440,38 +5450,68 @@ namespace VectorTools
           .face_to_cell_index((line + 1) * (degree + 1) - 1, face);
 
       unsigned int associated_edge_dof_index = 0;
-      //       for (unsigned int face_idx = 0; face_idx < fe.dofs_per_face;
-      //       ++face_idx)
-      for (unsigned int line_idx = 0; line_idx < fe.dofs_per_line; ++line_idx)
+      for (unsigned int line_dof_idx = 0; line_dof_idx < fe.dofs_per_line; ++line_dof_idx)
         {
-          // Assuming DoFs on a face are numbered in order by lines then faces.
+          // For each DoF associated with the (interior of) the line, we need
+	  // to figure out which base element it belongs to and then if
+	  // that's the correct base element. This is complicated by the
+	  // fact that the FiniteElement class has functions that translate
+	  // from face to cell, but not from edge to cell index systems. So
+	  // we have to do that step by step.
+	  //
+	  // DoFs on a face in 3d are numbered in order by vertices then lines
+	  // then faces.
           // i.e. line 0 has degree+1 dofs numbered 0,..,degree
           //      line 1 has degree+1 dofs numbered (degree+1),..,2*(degree+1)
           //      and so on.
-          const unsigned int face_idx = line * fe.dofs_per_line + line_idx;
+
+	  const unsigned int face_dof_idx =
+	    GeometryInfo<dim>::vertices_per_face * fe.dofs_per_vertex +
+	    line * fe.dofs_per_line + line_dof_idx;
+
           // Note, assuming that the edge orientations are "standard"
           //       i.e. cell->line_orientation(line) = true.
-          const unsigned int cell_idx = fe.face_to_cell_index(face_idx, face);
+	  Assert(cell->line_orientation(line),
+		 ExcMessage("Edge orientation doesnot meet expectation."));
+	  // Next, translate from face to cell. Note, this might be assuming
+          // that the edge orientations are "standard" (not sure any more at
+          // this time), i.e.
+          //       cell->line_orientation(line) = true.
+          const unsigned int cell_dof_idx =
+            fe.face_to_cell_index(face_dof_idx, face);
 
-          // Check this cell_idx belongs to the correct base_element, component
-          // and line:
-          if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
-               (fe.system_to_base_index(cell_idx).first == base_indices) &&
-               (lower_bound <= fe.system_to_base_index(cell_idx).second) &&
-               (fe.system_to_base_index(cell_idx).second <= upper_bound)) ||
-              (((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
-                (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr)) &&
-               (line * (degree + 1) <= face_idx) &&
-               (face_idx <= (line + 1) * (degree + 1) - 1)))
-            {
-              associated_edge_dof_to_face_dof[associated_edge_dof_index] =
-                face_idx;
-              ++associated_edge_dof_index;
-            }
+          // Check this cell_dof_idx belongs to the correct base_element, component
+          // and line: We do this for each of the supported elements
+	  // separately
+	  bool dof_is_of_interest = false;
+          if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+           {
+             dof_is_of_interest =
+               (fe.system_to_base_index(cell_dof_idx).first == base_indices) &&
+               (lower_bound <= fe.system_to_base_index(cell_dof_idx).second) &&
+               (fe.system_to_base_index(cell_dof_idx).second <= upper_bound);
+           }
+         else if ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
+                  (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr))
+           {
+             Assert((line * (degree + 1) <= face_dof_idx) &&
+                      (face_dof_idx < (line + 1) * (degree + 1)),
+                    ExcInternalError());
+             dof_is_of_interest = true;
+           }
+         else
+           Assert(false, ExcNotImplemented());
+
+	  if (dof_is_of_interest)
+	  {
+	    associated_edge_dof_to_face_dof[associated_edge_dof_index] =
+	      face_dof_idx;
+	    ++associated_edge_dof_index;
+	  }
         }
       // Sanity check:
-      const unsigned int associated_edge_dofs = associated_edge_dof_index;
-      Assert(associated_edge_dofs == degree + 1,
+      const unsigned int n_associated_edge_dofs = associated_edge_dof_index;
+      Assert(n_associated_edge_dofs == degree + 1,
              ExcMessage("Error: Unexpected number of 3D edge DoFs"));
 
       // Matrix and RHS vectors to store linear system:
@@ -5539,13 +5579,13 @@ namespace VectorTools
           // The RHS entries are:
           // \int_{edge}
           // (tangential*boundary_value)*(tangential*edge_shape_function_i) dS.
-          for (unsigned int j = 0; j < associated_edge_dofs; ++j)
+          for (unsigned int j = 0; j < n_associated_edge_dofs; ++j)
             {
               const unsigned int j_face_idx =
                 associated_edge_dof_to_face_dof[j];
               const unsigned int j_cell_idx =
                 fe.face_to_cell_index(j_face_idx, face);
-              for (unsigned int i = 0; i < associated_edge_dofs; ++i)
+              for (unsigned int i = 0; i < n_associated_edge_dofs; ++i)
                 {
                   const unsigned int i_face_idx =
                     associated_edge_dof_to_face_dof[i];
@@ -5572,7 +5612,7 @@ namespace VectorTools
       edge_matrix_inv.vmult(edge_solution, edge_rhs);
 
       // Store computed DoFs
-      for (unsigned int i = 0; i < associated_edge_dofs; ++i)
+      for (unsigned int i = 0; i < n_associated_edge_dofs; ++i)
         {
           dof_values[associated_edge_dof_to_face_dof[i]]     = edge_solution(i);
           dofs_processed[associated_edge_dof_to_face_dof[i]] = true;
@@ -5665,6 +5705,16 @@ namespace VectorTools
           base_indices.second = (first_vector_component - fe_index_old) /
                                 fe.base_element(i).n_components();
         }
+      else
+      {
+	//Assert that the FE is in fact an FE_Nedelec, so that the default
+	//base_indices == (0,0) is correct.
+	Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
+		nullptr) ||
+	       (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
+		nullptr),
+	       ExcNotImplemented());
+      }
       const unsigned int degree =
         fe.base_element(base_indices.first).degree - 1;
 
@@ -5831,32 +5881,60 @@ namespace VectorTools
                     fe.base_element(base_indices.first)
                       .face_to_cell_index((line + 1) * (degree + 1) - 1, face);
                   unsigned int associated_edge_dof_index = 0;
-                  for (unsigned int line_idx = 0; line_idx < fe.dofs_per_line;
-                       ++line_idx)
+                  for (unsigned int line_dof_idx = 0; line_dof_idx < fe.dofs_per_line;
+                       ++line_dof_idx)
                     {
-                      const unsigned int face_idx =
-                        line * fe.dofs_per_line + line_idx;
-                      const unsigned int cell_idx =
-                        fe.face_to_cell_index(face_idx, face);
-                      // Check this cell_idx belongs to the correct
-                      // base_element, component and line:
-                      if (((dynamic_cast<const FESystem<dim> *>(&fe) !=
-                            nullptr) &&
-                           (fe.system_to_base_index(cell_idx).first ==
-                            base_indices) &&
-                           (lower_bound <=
-                            fe.system_to_base_index(cell_idx).second) &&
-                           (fe.system_to_base_index(cell_idx).second <=
-                            upper_bound)) ||
-                          (((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
-                             nullptr) ||
-                            (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) !=
-                             nullptr)) &&
-                           (line * (degree + 1) <= face_idx) &&
-                           (face_idx <= (line + 1) * (degree + 1) - 1)))
+		      // For each DoF associated with the (interior of) the
+                      // line, we need to figure out which base element it
+                      // belongs to and then if that's the correct base element.
+                      // This is complicated by the fact that the FiniteElement
+                      // class has functions that translate from face to cell,
+                      // but not from edge to cell index systems. So we have to
+                      // do that step by step.
+                      //
+                      // DoFs on a face in 3d are numbered in order by vertices
+                      // then lines then faces. i.e. line 0 has degree+1 dofs
+                      // numbered 0,..,degree
+                      //      line 1 has degree+1 dofs numbered
+                      //      (degree+1),..,2*(degree+1) and so on.
+                      const unsigned int face_dof_idx =
+                        GeometryInfo<dim>::vertices_per_face *
+                          fe.dofs_per_vertex +
+                        line * fe.dofs_per_line + line_dof_idx;
+
+                     const unsigned int cell_dof_idx =
+                        fe.face_to_cell_index(face_dof_idx, face);
+		     // Check that this cell_idx belongs to the correct
+                      // base_element, component and line. We do this for each
+                      // of the supported elements separately
+                      bool dof_is_of_interest = false;
+                      if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
+                        {
+                          dof_is_of_interest =
+                            (fe.system_to_base_index(cell_dof_idx).first ==
+                             base_indices) &&
+                            (lower_bound <=
+                             fe.system_to_base_index(cell_dof_idx).second) &&
+                            (fe.system_to_base_index(cell_dof_idx).second <=
+                             upper_bound);
+                        }
+                      else if ((dynamic_cast<const FE_Nedelec<dim> *>(&fe) !=
+                                nullptr) ||
+                               (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) !=
+                                nullptr))
+                        {
+                          Assert((line * (degree + 1) <= face_dof_idx) &&
+                                   (face_dof_idx < (line + 1) * (degree + 1)),
+                                 ExcInternalError());
+                          dof_is_of_interest = true;
+                        }
+                      else
+                        Assert(false, ExcNotImplemented());
+
+		      if (dof_is_of_interest)
                         {
                           associated_edge_dof_to_face_dof
-                            [line][associated_edge_dof_index] = face_idx;
+                            [line][associated_edge_dof_index] = face_dof_idx;
                           ++associated_edge_dof_index;
                         }
                     }
@@ -5884,13 +5962,15 @@ namespace VectorTools
               std::vector<unsigned int> associated_face_dof_to_face_dof(
                 2 * degree * (degree + 1));
 
-              // Skip the edge DoFs, so we start at
-              // lines_per_face*(fe.dofs_per_line).
+              // Loop over the quad-interior dofs.
               unsigned int associated_face_dof_index = 0;
-              for (unsigned int face_idx = lines_per_face * (fe.dofs_per_line);
-                   face_idx < fe.dofs_per_face;
-                   ++face_idx)
+              for (unsigned int quad_dof_idx = 0;
+		   quad_dof_idx < fe.dofs_per_quad;
+		   ++quad_dof_idx)
                 {
+		  const unsigned int face_idx =
+		    GeometryInfo<dim>::vertices_per_face * fe.dofs_per_vertex +
+		    lines_per_face * fe.dofs_per_line + quad_dof_idx;
                   const unsigned int cell_idx =
                     fe.face_to_cell_index(face_idx, face);
                   if (((dynamic_cast<const FESystem<dim> *>(&fe) != nullptr) &&
@@ -5899,6 +5979,8 @@ namespace VectorTools
                       (dynamic_cast<const FE_Nedelec<dim> *>(&fe) != nullptr) ||
                       (dynamic_cast<const FE_NedelecSZ<dim> *>(&fe) != nullptr))
                     {
+		      AssertIndexRange(associated_face_dof_index,
+				       associated_face_dof_to_face_dof.size());
                       associated_face_dof_to_face_dof
                         [associated_face_dof_index] = face_idx;
                       ++associated_face_dof_index;
