@@ -58,6 +58,11 @@ constexpr std::array<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_vector;
 
 template <int dim>
+constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
+                     GeometryInfo<dim>::faces_per_cell>
+  GeometryInfo<dim>::unit_tangential_vectors;
+
+template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
   GeometryInfo<dim>::dx_to_deal;
 
