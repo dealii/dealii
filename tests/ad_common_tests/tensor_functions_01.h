@@ -61,7 +61,8 @@ test_tensor()
   const Tensor<2, dim, ADNumberType> A_T         = transpose(A);
   const Tensor<2, dim, ADNumberType> A_adj       = adjugate(A);
   const Tensor<2, dim, ADNumberType> A_cof       = cofactor(A);
-  const ADNumberType                 A_l1_norm   = l1_norm(A);
+  const Tensor<2, dim, ADNumberType> A_orth      = orthogonalize(A);
+  const ADNumberType                 A_l1_norm   = l1_norm(A, 1e-8);
   const ADNumberType                 A_linf_norm = linfty_norm(A);
 
   const ADNumberType A_ddot_B = double_contract<0, 0, 1, 1>(A, B);
