@@ -5372,11 +5372,9 @@ namespace VectorTools
       // at quadrature points.
       boundary_function.vector_value_list(quadrature_points, values);
 
-      // Find the group of vector components (dim of them,
-      // starting at first_vector_component) are within an FESystem.
-      //
-      // If not using FESystem then must be using FE_Nedelec,
-      // which has one base element and one copy of it (with 3 components).
+      // Find the group of vector components we want to project onto
+      // (dim of them, starting at first_vector_component) within the
+      // overall finite element (which may be an FESystem).
       std::pair<unsigned int, unsigned int> base_indices(0, 0);
       if (dynamic_cast<const FESystem<dim> *>(&cell->get_fe()) != nullptr)
         {
@@ -5406,27 +5404,32 @@ namespace VectorTools
                                 fe.base_element(i).n_components();
         }
       else
-        {
-          // Assert that the FE is in fact an FE_Nedelec, so that the default
-          // base_indices == (0,0) is correct.
-          Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
-                  nullptr) ||
-                   (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
-                    nullptr),
-                 ExcNotImplemented());
-        }
-      // Store degree as fe.degree-1
-      // For nedelec elements FE_Nedelec<dim> (0) returns fe.degree = 1.
-      // For FESystem get the degree from the base_element
-      // indicated by the first_vector_component
+        // The only other element we know how to deal with (so far) is
+        // FE_Nedelec, which has one base element and one copy of it
+        // (with 3 components). In that case, the values of
+        // 'base_indices' as initialized above are correct.
+        Assert((dynamic_cast<const FE_Nedelec<dim> *>(&cell->get_fe()) !=
+                nullptr) ||
+                 (dynamic_cast<const FE_NedelecSZ<dim> *>(&cell->get_fe()) !=
+                  nullptr),
+               ExcNotImplemented());
+
+
+      // Store the 'degree' of the Nedelec element as fe.degree-1. For
+      // Nedelec elements, FE_Nedelec<dim>(0) returns fe.degree = 1
+      // because fe.degree stores the *polynomial* degree, not the
+      // degree of the element (which is typically defined based on
+      // the largest polynomial space that is *complete* within the
+      // finite element).
       const unsigned int degree =
         fe.base_element(base_indices.first).degree - 1;
 
-      // Find DoFs we want to constrain:
-      // There are fe.dofs_per_line DoFs associated with the
-      // given line on the given face on the given cell.
+      // Find DoFs we want to constrain: There are
+      // fe.base_element(base_indices.first).dofs_per_line DoFs
+      // associated with the given line on the given face on the given
+      // cell.
       //
-      // Want to know which of these DoFs (there are degree+1 of interest)
+      // We need to know which of these DoFs (there are degree+1 of interest)
       // are associated with the components given by first_vector_component.
       // Then we can make a map from the associated line DoFs to the face DoFs.
       //
@@ -5482,8 +5485,8 @@ namespace VectorTools
           const unsigned int cell_dof_idx =
             fe.face_to_cell_index(face_dof_idx, face);
 
-          // Check this cell_dof_idx belongs to the correct base_element,
-          // component and line: We do this for each of the supported elements
+          // Check that this cell_idx belongs to the correct base_element,
+          // component and line. We do this for each of the supported elements
           // separately
           bool dof_is_of_interest = false;
           if (dynamic_cast<const FESystem<dim> *>(&fe) != nullptr)
@@ -5883,6 +5886,7 @@ namespace VectorTools
                     fe.base_element(base_indices.first)
                       .face_to_cell_index((line + 1) * (degree + 1) - 1, face);
                   unsigned int associated_edge_dof_index = 0;
+
                   for (unsigned int line_dof_idx = 0;
                        line_dof_idx < fe.dofs_per_line;
                        ++line_dof_idx)
@@ -5905,8 +5909,13 @@ namespace VectorTools
                           fe.dofs_per_vertex +
                         line * fe.dofs_per_line + line_dof_idx;
 
+                      // Next, translate from face to cell. Note, this might be
+                      // assuming that the edge orientations are "standard" (not
+                      // sure any more at this time), i.e.
+                      //       cell->line_orientation(line) = true.
                       const unsigned int cell_dof_idx =
                         fe.face_to_cell_index(face_dof_idx, face);
+
                       // Check that this cell_idx belongs to the correct
                       // base_element, component and line. We do this for each
                       // of the supported elements separately
@@ -5944,13 +5953,13 @@ namespace VectorTools
                   // Sanity check:
                   associated_edge_dofs[line] = associated_edge_dof_index;
                   Assert(associated_edge_dofs[line] == degree + 1,
-                         ExcMessage(
-                           "Error: Unexpected number of 3D edge DoFs"));
+                         ExcInternalError());
                 }
 
               // Next find the face DoFs associated with the vector components
               // we're interested in. There are 2*degree*(degree+1) DoFs
-              // associated with each face (not including edges!).
+              // associated with the interior of each face (not including
+              // edges!).
               //
               // Create a map mapping from the consecutively numbered
               // associated_dofs to the face DoF (which can be transferred to a
@@ -5965,7 +5974,7 @@ namespace VectorTools
               std::vector<unsigned int> associated_face_dof_to_face_dof(
                 2 * degree * (degree + 1));
 
-              // Loop over the quad-interior dofs.
+              // Loop over these quad-interior dofs.
               unsigned int associated_face_dof_index = 0;
               for (unsigned int quad_dof_idx = 0;
                    quad_dof_idx < fe.dofs_per_quad;
@@ -5985,7 +5994,7 @@ namespace VectorTools
                       AssertIndexRange(associated_face_dof_index,
                                        associated_face_dof_to_face_dof.size());
                       associated_face_dof_to_face_dof
-                        [associated_face_dof_index] = face_idx;
+                        [associated_face_dof_index] = quad_dof_idx;
                       ++associated_face_dof_index;
                     }
                 }
