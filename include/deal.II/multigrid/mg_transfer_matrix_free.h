@@ -156,8 +156,11 @@ public:
    * Restrict fine-mesh field @p src to each multigrid level in @p dof_handler and
    * store the result in @p dst.
    *
-   * If @p dst is empty or has incorrect locally owned size, it will be
-   * resized to locally relevant vectors on each level.
+   * The argument @p dst has to be initialized with the correct size according
+   * to the number of levels of the triangulation.
+   *
+   * If an inner vector of @p dst is empty or has incorrect locally owned size,
+   * it will be resized to locally relevant degrees of freedom on each level.
    */
   template <typename Number2, int spacedim>
   void
