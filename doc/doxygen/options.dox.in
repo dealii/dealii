@@ -210,6 +210,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_TRILINOS_WITH_ROL=1 \
                          DEAL_II_WITH_UMFPACK=1 \
                          DEAL_II_WITH_ZLIB=1 \
+                         DEAL_II_CONSTEXPR=constexpr \
                          DEAL_II_NAMESPACE_OPEN= \
                          DEAL_II_NAMESPACE_CLOSE= \
                          DEAL_II_ENABLE_EXTRA_DIAGNOSTICS= \
