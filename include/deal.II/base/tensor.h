@@ -2618,31 +2618,29 @@ cofactor(const Tensor<2, dim, Number> &t)
 
 
 /**
- * Return the nearest orthogonal matrix using a SVD if the
- * deteriminant is more than a tolerance away from one.
- * The orthogonalization is done by combining the products
- * of the SVD decomposition: $((U*I)*V^T)^T$, where I is the
- * idententy matrix and $U$ and $V$ are computed from the SVD
- * decomposition: $\mathbf U \cdot \mathbf S \cdot \mathbf V^T$
+ * Return the nearest orthogonal matrix using a SVD if the determinant is
+ * more than a tolerance away from one. The orthogonalization is done by
+ * combining the products of the SVD decomposition: $U V^T$, where
+ * $U$ and $V$ are computed from the SVD decomposition: $\mathbf U  \mathbf S
+ * \mathbf V^T$, effectively replacing $\mathbf S$ with the identity matrix.
+ * @param tensor The tensor which to find the closest orthogonal
+ * tensor to.
+ * @param tolerance If the $\text{determinant} - 1$ is smaller than
+ * this value, it will just return the current tensor.
+ * Otherwise it will return the nearest orthogonal tensor.
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
 constexpr Tensor<2, dim, Number>
-orthogonalize(const Tensor<2, dim, Number> &tensor, const double tolerance)
+project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor,
+                                const double                  tolerance)
 {
   if (std::abs(determinant(tensor) - 1.0) > tolerance)
     {
-      LAPACKFullMatrix<Number> identity_matrix(dim);
-      for (size_t i = 0; i < dim; i++)
-        {
-          identity_matrix.set(i, i, 1.);
-        }
-
       Tensor<2, dim, Number>   output_tensor;
       FullMatrix<Number>       matrix(dim);
       LAPACKFullMatrix<Number> lapack_matrix(dim);
       LAPACKFullMatrix<Number> result(dim);
-      LAPACKFullMatrix<Number> result2(dim);
 
       // todo: find or add dealii functionallity to copy in one step.
       matrix.copy_from(tensor);
@@ -2651,12 +2649,11 @@ orthogonalize(const Tensor<2, dim, Number> &tensor, const double tolerance)
       // now compute the svd of the matrices
       lapack_matrix.compute_svd();
 
-      // Use the SVD results to orthogonalize: ((U*I)*V^T)^T
-      lapack_matrix.get_svd_u().mmult(result, identity_matrix);
-      result.mmult(result2, (lapack_matrix.get_svd_vt()));
+      // Use the SVD results to orthogonalize: $U V^T$
+      lapack_matrix.get_svd_u().mmult(result, lapack_matrix.get_svd_vt());
 
       // todo: find or add dealii functionallity to copy in one step.
-      matrix = result2;
+      matrix = result;
       matrix.copy_to(output_tensor);
       return output_tensor;
     }

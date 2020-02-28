@@ -55,15 +55,16 @@ test_tensor()
   const Tensor<2, dim, ADNumberType> C5 = A * a;
   const Tensor<2, dim, ADNumberType> C6 = A / a;
 
-  const ADNumberType                 det_A       = determinant(A);
-  const ADNumberType                 tr_A        = trace(A);
-  const Tensor<2, dim, ADNumberType> A_inv       = invert(A);
-  const Tensor<2, dim, ADNumberType> A_T         = transpose(A);
-  const Tensor<2, dim, ADNumberType> A_adj       = adjugate(A);
-  const Tensor<2, dim, ADNumberType> A_cof       = cofactor(A);
-  const Tensor<2, dim, ADNumberType> A_orth      = orthogonalize(A);
-  const ADNumberType                 A_l1_norm   = l1_norm(A, 1e-8);
-  const ADNumberType                 A_linf_norm = linfty_norm(A);
+  const ADNumberType                 det_A = determinant(A);
+  const ADNumberType                 tr_A  = trace(A);
+  const Tensor<2, dim, ADNumberType> A_inv = invert(A);
+  const Tensor<2, dim, ADNumberType> A_T   = transpose(A);
+  const Tensor<2, dim, ADNumberType> A_adj = adjugate(A);
+  const Tensor<2, dim, ADNumberType> A_cof = cofactor(A);
+  const Tensor<2, dim, ADNumberType> A_orth =
+    project_onto_orthogonal_tensors(A);
+  const ADNumberType A_l1_norm   = l1_norm(A, 1e-8);
+  const ADNumberType A_linf_norm = linfty_norm(A);
 
   const ADNumberType A_ddot_B = double_contract<0, 0, 1, 1>(A, B);
   const Tensor<2, dim, ADNumberType> A_dot_B = contract<1, 0>(A, B);
