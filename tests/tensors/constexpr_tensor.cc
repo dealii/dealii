@@ -186,6 +186,19 @@ main()
             << std::endl;
     Assert(determinant(dummy_9) - 1. < 1e-8, ExcInternalError());
 
+    // check wheter the output is the same as the input. For example, it could
+    // have been transposed.
+    Vector<double> unrolled_a(9);
+    a.unroll<double>(unrolled_a);
+    Vector<double> unrolled_dummy_9(9);
+    dummy_9.unroll<double>(unrolled_dummy_9);
+    for (size_t i = 0; i < unrolled_a.size(); i++)
+      {
+        Assert(std::fabs(unrolled_a[i] - unrolled_dummy_9[i]) < 1e-8,
+               ExcInternalError());
+      }
+
+
 
     constexpr double       non_orthogonal_init[3][3] = {{1., 2., 3.},
                                                   {1., 1.5, 2.},
