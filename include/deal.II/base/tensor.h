@@ -26,6 +26,8 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/lapack_full_matrix.h>
+
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
 #endif
@@ -45,6 +47,8 @@ template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
 class Vector;
+template <typename number>
+class FullMatrix;
 namespace Differentiation
 {
   namespace SD
@@ -2610,6 +2614,53 @@ constexpr Tensor<2, dim, Number>
 cofactor(const Tensor<2, dim, Number> &t)
 {
   return transpose(adjugate(t));
+}
+
+
+/**
+ * Return the nearest orthogonal matrix using a SVD if the
+ * deteriminant is more than a tolerance away from one.
+ * The orthogonalization is done by combining the products
+ * of the SVD decomposition: $((U*I)*V^T)^T$, where I is the
+ * idententy matrix and $U$ and $V$ are computed from the SVD
+ * decomposition: $\mathbf U \cdot \mathbf S \cdot \mathbf V^T$
+ * @relatesalso Tensor
+ */
+template <int dim, typename Number>
+constexpr Tensor<2, dim, Number>
+orthogonalize(const Tensor<2, dim, Number> &tensor, const double tolerance)
+{
+  if (std::abs(determinant(tensor) - 1.0) > tolerance)
+    {
+      LAPACKFullMatrix<Number> identity_matrix(dim);
+      for (size_t i = 0; i < dim; i++)
+        {
+          identity_matrix.set(i, i, 1.);
+        }
+
+      Tensor<2, dim, Number>   output_tensor;
+      FullMatrix<Number>       matrix(dim);
+      LAPACKFullMatrix<Number> lapack_matrix(dim);
+      LAPACKFullMatrix<Number> result(dim);
+      LAPACKFullMatrix<Number> result2(dim);
+
+      // todo: find or add dealii functionallity to copy in one step.
+      matrix.copy_from(tensor);
+      lapack_matrix.copy_from(matrix);
+
+      // now compute the svd of the matrices
+      lapack_matrix.compute_svd();
+
+      // Use the SVD results to orthogonalize: ((U*I)*V^T)^T
+      lapack_matrix.get_svd_u().mmult(result, identity_matrix);
+      result.mmult(result2, (lapack_matrix.get_svd_vt()));
+
+      // todo: find or add dealii functionallity to copy in one step.
+      matrix = result2;
+      matrix.copy_to(output_tensor);
+      return output_tensor;
+    }
+  return tensor;
 }
 
 
