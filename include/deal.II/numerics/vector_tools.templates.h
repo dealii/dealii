@@ -5994,7 +5994,7 @@ namespace VectorTools
                       AssertIndexRange(associated_face_dof_index,
                                        associated_face_dof_to_face_dof.size());
                       associated_face_dof_to_face_dof
-                        [associated_face_dof_index] = quad_dof_idx;
+                        [associated_face_dof_index] = face_idx;
                       ++associated_face_dof_index;
                     }
                 }
