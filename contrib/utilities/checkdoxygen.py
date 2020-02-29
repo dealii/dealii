@@ -18,11 +18,11 @@ def check_doxygen_groups(lines):
         elif "@}" in l:
             count = count -1
         if count < 0:
-            sys.exit("Error in file '%s' in line %d"%(args[0], lineno))
+            sys.exit("Error in file '%s' in line %d"%(filename, lineno))
         lineno = lineno + 1
 
     if count != 0:
-        sys.exit("Error: missing closing braces in file '%s'"%(args[0]))
+        sys.exit("Error: missing closing braces in file '%s'"%(filename))
 
     return
 
@@ -36,16 +36,16 @@ def check_empty_lines_in_tables(lines):
         elif "</table>" in l:
             count = count -1
         if count < 0:
-            sys.exit("Error in file '%s' in line %d"%(args[0], lineno))
+            sys.exit("Error in file '%s' in line %d"%(filename, lineno))
 
         if count == 1:
             if l.strip() == "":
-                sys.exit("Error: empty line inside html table in file '%s' in line %d"%(args[0], lineno))
+                sys.exit("Error: empty line inside html table in file '%s' in line %d"%(filename, lineno))
 
         lineno = lineno + 1
 
     if count != 0:
-        sys.exit("Error: mismatched html table tags in file '%s'"%(args[0]))
+        sys.exit("Error: mismatched html table tags in file '%s'"%(filename))
 
     return
 
@@ -65,11 +65,11 @@ def check_multiple_defined_headers(lines):
                     thisheader = thisheader.split('</h')[0]    # remove close header tag
                     thisheader = ''.join(ch for ch in thisheader if ch.isalnum()) # remove nonalphanumeric
                     if thisheader in headers:
-                        sys.exit("Error: repeated header title '%s' in file group '%s'"%(thisheader,args[0]))
+                        sys.exit("Error: repeated header title '%s' in file group '%s'"%(thisheader,filename))
                     else:
                         headers.append(thisheader)
                 else:
-                    sys.exit("Error: mismatched html header flags in file group '%s'"%(args[0]))
+                    sys.exit("Error: mismatched html header flags in file group '%s'"%(filename))
             # do not check else here because it may match with template arguments like '<hsize_t>'
         
         # detect @sect[1-5]{ ... }
@@ -82,7 +82,7 @@ def check_multiple_defined_headers(lines):
                 thisheader = ''.join(ch for ch in thisheader if ch.isalnum()) # remove nonalphanumeric
 
                 if thisheader in headers:
-                    sys.exit("Error: repeated header title '%s' in file group '%s'"%(thisheader,args[0]))
+                    sys.exit("Error: repeated header title '%s' in file group '%s'"%(thisheader,filename))
                 else:
                     headers.append(thisheader)
 
@@ -90,9 +90,13 @@ def check_multiple_defined_headers(lines):
 
 
 args = sys.argv
-args.pop(0)
+if len(args)!=2:
+    print("Usage: %s <filename>"%(sys.argv[0]))
+    sys.exit("Error: please pass exactly one filename to this script")
 
-f = open(args[0])
+filename = args[1]
+
+f = open(filename)
 lines = f.readlines()
 f.close()
 
@@ -100,13 +104,13 @@ check_doxygen_groups(lines)
 check_empty_lines_in_tables(lines)
 
 # if it's intro.dox, combine it with step-**.cc and results.dox and check headers
-if 'intro.dox' in args[0]:
+if 'intro.dox' in filename:
     # get stepname.cc
-    stepname = args[0].split('/doc',1)[0]
+    stepname = filename.split('/doc',1)[0]
     stepname = stepname + '/' + stepname.split('/',1)[1] + '.cc'
 
     # get results.dox
-    resultsname = args[0].split('intro.dox',1)[0] + 'results.dox'
+    resultsname = filename.split('intro.dox',1)[0] + 'results.dox'
     
     # try to open the '.cc' file, otherwise try to open a '.cu' file
     try:
