@@ -581,56 +581,22 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::compute_face_data(
             dim - 1, std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < data.unit_tangentials.size(); ++i)
-            data.unit_tangentials[i].resize(n_original_q_points);
-
-          if (dim == 2)
+          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
             {
-              // ensure a counterclockwise
-              // orientation of tangentials
-              static const int tangential_orientation[4] = {-1, 1, 1, -1};
-              for (const unsigned int i : GeometryInfo<dim>::face_indices())
+              data.unit_tangentials[i].resize(n_original_q_points);
+              std::fill(data.unit_tangentials[i].begin(),
+                        data.unit_tangentials[i].end(),
+                        GeometryInfo<dim>::unit_tangential_vectors[i][0]);
+              if (dim > 2)
                 {
-                  Tensor<1, dim> tang;
-                  tang[1 - i / 2] = tangential_orientation[i];
-                  std::fill(data.unit_tangentials[i].begin(),
-                            data.unit_tangentials[i].end(),
-                            tang);
-                }
-            }
-          else if (dim == 3)
-            {
-              for (const unsigned int i : GeometryInfo<dim>::face_indices())
-                {
-                  Tensor<1, dim> tang1, tang2;
-
-                  const unsigned int nd =
-                    GeometryInfo<dim>::unit_normal_direction[i];
-
-                  // first tangential
-                  // vector in direction
-                  // of the (nd+1)%3 axis
-                  // and inverted in case
-                  // of unit inward normal
-                  tang1[(nd + 1) % dim] =
-                    GeometryInfo<dim>::unit_normal_orientation[i];
-                  // second tangential
-                  // vector in direction
-                  // of the (nd+2)%3 axis
-                  tang2[(nd + 2) % dim] = 1.;
-
-                  // same unit tangents
-                  // for all quadrature
-                  // points on this face
-                  std::fill(data.unit_tangentials[i].begin(),
-                            data.unit_tangentials[i].end(),
-                            tang1);
+                  data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                    .resize(n_original_q_points);
                   std::fill(
                     data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
                       .begin(),
                     data.unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
                       .end(),
-                    tang2);
+                    GeometryInfo<dim>::unit_tangential_vectors[i][1]);
                 }
             }
         }

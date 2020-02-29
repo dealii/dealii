@@ -68,6 +68,12 @@ namespace internal
         return {{Tensor<1, 1>{{-1}}, Tensor<1, 1>{{1}}}};
       }
 
+      static constexpr std::array<std::array<Tensor<1, 1>, 0>, 2>
+      unit_tangential_vectors()
+      {
+        return {{{}, {}}};
+      }
+
       static constexpr std::array<unsigned int, 2>
       opposite_face()
       {
@@ -115,6 +121,15 @@ namespace internal
                  Tensor<1, 2>{{1., 0.}},
                  Tensor<1, 2>{{0., -1.}},
                  Tensor<1, 2>{{0., 1.}}}};
+      }
+
+      static constexpr std::array<std::array<Tensor<1, 2>, 1>, 4>
+      unit_tangential_vectors()
+      {
+        return {{{Tensor<1, 2>{{0, -1}}},
+                 {Tensor<1, 2>{{0, 1}}},
+                 {Tensor<1, 2>{{1, 0}}},
+                 {Tensor<1, 2>{{-1, 0}}}}};
       }
 
       static constexpr std::array<unsigned int, 4>
@@ -166,6 +181,17 @@ namespace internal
                  Tensor<1, 3>{{0, 1, 0}},
                  Tensor<1, 3>{{0, 0, -1}},
                  Tensor<1, 3>{{0, 0, 1}}}};
+      }
+
+      static constexpr std::array<std::array<Tensor<1, 3>, 2>, 6>
+      unit_tangential_vectors()
+      {
+        return {{{Tensor<1, 3>{{0, -1, 0}}, Tensor<1, 3>{{0, 0, 1}}},
+                 {Tensor<1, 3>{{0, 1, 0}}, Tensor<1, 3>{{0, 0, 1}}},
+                 {Tensor<1, 3>{{0, 0, -1}}, Tensor<1, 3>{{1, 0, 0}}},
+                 {Tensor<1, 3>{{0, 0, 1}}, Tensor<1, 3>{{1, 0, 0}}},
+                 {Tensor<1, 3>{{-1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}},
+                 {Tensor<1, 3>{{1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}}}};
       }
 
       static constexpr std::array<unsigned int, 6>
@@ -241,6 +267,35 @@ namespace internal
                  Tensor<1, 4>{{0, 0, 1, 0}},
                  Tensor<1, 4>{{0, 0, 0, -1}},
                  Tensor<1, 4>{{0, 0, 0, 1}}}};
+      }
+
+      static constexpr std::array<std::array<Tensor<1, 4>, 3>, 8>
+      unit_tangential_vectors()
+      {
+        return {{{Tensor<1, 4>{{0, -1, 0, 0}},
+                  Tensor<1, 4>{{0, 0, 1, 0}},
+                  Tensor<1, 4>{{0, 0, 0, 1}}},
+                 {Tensor<1, 4>{{0, 1, 0, 0}},
+                  Tensor<1, 4>{{0, 0, 1, 0}},
+                  Tensor<1, 4>{{0, 0, 0, 1}}},
+                 {Tensor<1, 4>{{0, 0, -1, 0}},
+                  Tensor<1, 4>{{0, 0, 0, 1}},
+                  Tensor<1, 4>{{1, 0, 0, 0}}},
+                 {Tensor<1, 4>{{0, 0, 1, 0}},
+                  Tensor<1, 4>{{0, 0, 0, 1}},
+                  Tensor<1, 4>{{1, 0, 0, 0}}},
+                 {Tensor<1, 4>{{0, 0, 0, -1}},
+                  Tensor<1, 4>{{1, 0, 0, 0}},
+                  Tensor<1, 4>{{0, 1, 0, 0}}},
+                 {Tensor<1, 4>{{0, 0, 0, 1}},
+                  Tensor<1, 4>{{1, 0, 0, 0}},
+                  Tensor<1, 4>{{0, 1, 0, 0}}},
+                 {Tensor<1, 4>{{-1, 0, 0, 0}},
+                  Tensor<1, 4>{{0, 1, 0, 0}},
+                  Tensor<1, 4>{{0, 0, 1, 0}}},
+                 {Tensor<1, 4>{{1, 0, 0, 0}},
+                  Tensor<1, 4>{{0, 1, 0, 0}},
+                  Tensor<1, 4>{{0, 0, 1, 0}}}}};
       }
 
       static constexpr std::array<unsigned int, 8>
@@ -2432,6 +2487,24 @@ struct GeometryInfo
   static constexpr std::array<Tensor<1, dim>, faces_per_cell>
     unit_normal_vector =
       internal::GeometryInfoHelper::Initializers<dim>::unit_normal_vector();
+
+  /**
+   * Unit tangential vectors (array of `dim-1` elements of Point<dim>) of a
+   * face of the reference cell, arranged in a right-hand coordinate system
+   * such that the cross product between the two vectors return the unit
+   * normal vector.
+   *
+   * Note that this is only the <em>standard orientation</em> of faces. At
+   * least in 3d, actual faces of cells in a triangulation can also have the
+   * opposite orientation, depending on a flag that one can query from the
+   * cell it belongs to. For more information, see the
+   * @ref GlossFaceOrientation "glossary"
+   * entry on face orientation.
+   */
+  static constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
+                              faces_per_cell>
+    unit_tangential_vectors = internal::GeometryInfoHelper::Initializers<
+      dim>::unit_tangential_vectors();
 
   /**
    * List of numbers which denotes which face is opposite to a given face. Its

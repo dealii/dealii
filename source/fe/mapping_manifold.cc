@@ -117,67 +117,23 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                      std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < unit_tangentials.size(); ++i)
-            unit_tangentials[i].resize(n_original_q_points);
-          switch (dim)
+          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
             {
-              case 2:
+              unit_tangentials[i].resize(n_original_q_points);
+              std::fill(unit_tangentials[i].begin(),
+                        unit_tangentials[i].end(),
+                        GeometryInfo<dim>::unit_tangential_vectors[i][0]);
+              if (dim > 2)
                 {
-                  // ensure a counterclockwise
-                  // orientation of tangentials
-                  static const int tangential_orientation[4] = {-1, 1, 1, -1};
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang;
-                      tang[1 - i / 2] = tangential_orientation[i];
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang);
-                    }
-                  break;
+                  unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                    .resize(n_original_q_points);
+                  std::fill(
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .begin(),
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .end(),
+                    GeometryInfo<dim>::unit_tangential_vectors[i][1]);
                 }
-              case 3:
-                {
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang1, tang2;
-
-                      const unsigned int nd =
-                        GeometryInfo<dim>::unit_normal_direction[i];
-
-                      // first tangential
-                      // vector in direction
-                      // of the (nd+1)%3 axis
-                      // and inverted in case
-                      // of unit inward normal
-                      tang1[(nd + 1) % dim] =
-                        GeometryInfo<dim>::unit_normal_orientation[i];
-                      // second tangential
-                      // vector in direction
-                      // of the (nd+2)%3 axis
-                      tang2[(nd + 2) % dim] = 1.;
-
-                      // same unit tangents
-                      // for all quadrature
-                      // points on this face
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang1);
-                      std::fill(
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .begin(),
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .end(),
-                        tang2);
-                    }
-                  break;
-                }
-              default:
-                Assert(false, ExcNotImplemented());
             }
         }
     }
