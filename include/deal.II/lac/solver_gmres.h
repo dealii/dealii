@@ -440,19 +440,23 @@ protected:
 
 /**
  * Implementation of the Generalized minimal residual method with flexible
- * preconditioning method.
+ * preconditioning (flexible GMRES or FGMRES).
  *
- * This version of the GMRES method allows for the use of a different
+ * This flexible version of the GMRES method allows for the use of a different
  * preconditioner in each iteration step. Therefore, it is also more robust
  * with respect to inaccurate evaluation of the preconditioner. An important
- * application is also the use of a Krylov space method inside the
+ * application is the use of a Krylov space method inside the
  * preconditioner. As opposed to SolverGMRES which allows one to choose
  * between left and right preconditioning, this solver always applies the
  * preconditioner from the right.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
  * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
- * vectors.
+ * vectors. Otherwise, FGMRES requires roughly the same number of operations
+ * per iteration compared to GMRES, except one application of the
+ * preconditioner less at each restart and at the end of solve().
+ *
+ * For more details see @cite Saad1991.
  *
  * @author Guido Kanschat, 2003
  */
