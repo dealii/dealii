@@ -3006,7 +3006,7 @@ public:
    * may return a value greater than the number of active cells reported by
    * the triangulation object on the current processor.
    */
-  virtual types::global_dof_index
+  virtual types::global_cell_index
   n_global_active_cells() const;
 
 

@@ -228,7 +228,7 @@ namespace internal
           number
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
-                            const types::global_dof_index    n_target_cells,
+                            const types::global_cell_index   n_target_cells,
                             MPI_Comm                         mpi_communicator)
           {
             double interesting_range[2] = {global_min_and_max.first,
@@ -257,7 +257,7 @@ namespace internal
 
                 // Count how many of our own elements would be above this
                 // threshold:
-                types::global_dof_index my_count =
+                types::global_cell_index my_count =
                   std::count_if(criteria.begin(),
                                 criteria.end(),
                                 [test_threshold](const double c) {
@@ -265,16 +265,8 @@ namespace internal
                                 });
 
                 // Potentially accumulate in a 64bit int to avoid overflow:
-                types::global_dof_index total_count = 0;
-
-                ierr = MPI_Reduce(&my_count,
-                                  &total_count,
-                                  1,
-                                  DEAL_II_DOF_INDEX_MPI_TYPE,
-                                  MPI_SUM,
-                                  master_mpi_rank,
-                                  mpi_communicator);
-                AssertThrowMPI(ierr);
+                types::global_cell_index total_count =
+                  Utilities::MPI::sum(my_count, mpi_communicator);
 
                 // now adjust the range. if we have too many cells, we take the
                 // upper half of the previous range, otherwise the lower half.
@@ -434,9 +426,9 @@ namespace parallel
       refine_and_coarsen_fixed_number(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double                  top_fraction_of_cells,
-        const double                  bottom_fraction_of_cells,
-        const types::global_dof_index max_n_cells)
+        const double                   top_fraction_of_cells,
+        const double                   bottom_fraction_of_cells,
+        const types::global_cell_index max_n_cells)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -478,8 +470,8 @@ namespace parallel
           GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
             locally_owned_indicators,
             global_min_and_max,
-            static_cast<types::global_dof_index>(adjusted_fractions.first *
-                                                 tria.n_global_active_cells()),
+            static_cast<types::global_cell_index>(adjusted_fractions.first *
+                                                  tria.n_global_active_cells()),
             mpi_communicator);
 
         // compute bottom threshold only if necessary. otherwise use a threshold
@@ -489,8 +481,8 @@ namespace parallel
             GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
               locally_owned_indicators,
               global_min_and_max,
-              static_cast<types::global_dof_index>(
-                std::ceil((1 - adjusted_fractions.second) *
+              static_cast<types::global_cell_index>(
+                std::ceil((1. - adjusted_fractions.second) *
                           tria.n_global_active_cells())),
               mpi_communicator);
         else

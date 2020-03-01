@@ -145,7 +145,7 @@ namespace parallel
      * by each processor. This equals the overall number of active cells in
      * the triangulation.
      */
-    virtual types::global_dof_index
+    virtual types::global_cell_index
     n_global_active_cells() const override;
 
     /**
@@ -244,7 +244,7 @@ namespace parallel
        * The total number of active cells (sum of @p
        * n_locally_owned_active_cells).
        */
-      types::global_dof_index n_global_active_cells;
+      types::global_cell_index n_global_active_cells;
       /**
        * The global number of levels computed as the maximum number of levels
        * taken over all MPI ranks, so <tt>n_levels()<=n_global_levels =
