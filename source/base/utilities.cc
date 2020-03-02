@@ -868,87 +868,14 @@ namespace Utilities
 
 
 
-  std::vector<unsigned int>
-  reverse_permutation(const std::vector<unsigned int> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<unsigned int> out(n);
-    for (unsigned int i = 0; i < n; ++i)
-      out[i] = n - 1 - permutation[i];
-
-    return out;
-  }
-
-
-
-  std::vector<unsigned int>
-  invert_permutation(const std::vector<unsigned int> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<unsigned int> out(n, numbers::invalid_unsigned_int);
-
-    for (unsigned int i = 0; i < n; ++i)
-      {
-        AssertIndexRange(permutation[i], n);
-        out[permutation[i]] = i;
-      }
-
-    // check that we have actually reached
-    // all indices
-    for (unsigned int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
-
-    return out;
-  }
-
-  std::vector<unsigned long long int>
-  reverse_permutation(const std::vector<unsigned long long int> &permutation)
-  {
-    const unsigned long long int n = permutation.size();
-
-    std::vector<unsigned long long int> out(n);
-    for (unsigned long long int i = 0; i < n; ++i)
-      out[i] = n - 1 - permutation[i];
-
-    return out;
-  }
-
-
-
-  std::vector<unsigned long long int>
-  invert_permutation(const std::vector<unsigned long long int> &permutation)
-  {
-    const unsigned long long int n = permutation.size();
-
-    std::vector<unsigned long long int> out(n, numbers::invalid_unsigned_int);
-
-    for (unsigned long long int i = 0; i < n; ++i)
-      {
-        AssertIndexRange(permutation[i], n);
-        out[permutation[i]] = i;
-      }
-
-    // check that we have actually reached
-    // all indices
-    for (unsigned long long int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
-
-    return out;
-  }
-
-
   template <typename Integer>
   std::vector<Integer>
   reverse_permutation(const std::vector<Integer> &permutation)
   {
-    const unsigned int n = permutation.size();
+    const std::size_t n = permutation.size();
 
     std::vector<Integer> out(n);
-    for (unsigned int i = 0; i < n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
       out[i] = n - 1 - permutation[i];
 
     return out;
@@ -960,11 +887,11 @@ namespace Utilities
   std::vector<Integer>
   invert_permutation(const std::vector<Integer> &permutation)
   {
-    const unsigned int n = permutation.size();
+    const std::size_t n = permutation.size();
 
     std::vector<Integer> out(n, numbers::invalid_unsigned_int);
 
-    for (unsigned int i = 0; i < n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
       {
         AssertIndexRange(permutation[i], n);
         out[permutation[i]] = i;
@@ -977,6 +904,38 @@ namespace Utilities
              ExcMessage("The given input permutation had duplicate entries!"));
 
     return out;
+  }
+
+
+
+  std::vector<unsigned int>
+  reverse_permutation(const std::vector<unsigned int> &permutation)
+  {
+    return reverse_permutation<unsigned int>(permutation);
+  }
+
+
+
+  std::vector<unsigned int>
+  invert_permutation(const std::vector<unsigned int> &permutation)
+  {
+    return invert_permutation<unsigned int>(permutation);
+  }
+
+
+
+  std::vector<std::uint64_t>
+  reverse_permutation(const std::vector<std::uint64_t> &permutation)
+  {
+    return reverse_permutation<std::uint64_t>(permutation);
+  }
+
+
+
+  std::vector<std::uint64_t>
+  invert_permutation(const std::vector<std::uint64_t> &permutation)
+  {
+    return invert_permutation<std::uint64_t>(permutation);
   }
 
 

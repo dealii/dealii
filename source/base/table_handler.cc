@@ -55,10 +55,10 @@ namespace internal
     catch (...)
       {}
 
-    // ... then with unsigned long long int...
+    // ... then with std::uint64_t...
     try
       {
-        return boost::get<unsigned long long int>(value);
+        return boost::get<std::uint64_t>(value);
       }
     catch (...)
       {}

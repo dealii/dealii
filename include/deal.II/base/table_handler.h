@@ -133,8 +133,8 @@ namespace internal
     /**
      * Abbreviation for the data type stored by this object.
      */
-    using value_type = boost::
-      variant<int, unsigned int, unsigned long long int, double, std::string>;
+    using value_type =
+      boost::variant<int, unsigned int, std::uint64_t, double, std::string>;
 
     /**
      * Stored value.
@@ -829,8 +829,7 @@ namespace internal
         char c = 's';
         ar &c &*p;
       }
-    else if (const unsigned long long int *p =
-               boost::get<unsigned long long int>(&value))
+    else if (const std::uint64_t *p = boost::get<std::uint64_t>(&value))
       {
         char c = 'l';
         ar &c &*p;
@@ -888,8 +887,8 @@ namespace internal
 
         case 'l':
           {
-            unsigned long long int val;
-            ar &                   val;
+            std::uint64_t val;
+            ar &          val;
             value = val;
             break;
           }
