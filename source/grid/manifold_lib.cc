@@ -325,7 +325,7 @@ PolarManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim,spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
@@ -340,7 +340,7 @@ PolarManifold<dim, spacedim>::normal_vector(
     // base class.
     return Manifold<dim, spacedim>::normal_vector(face, p);
 
-  return Tensor<1,spacedim>();
+  return Tensor<1, spacedim>();
 }
 
 
@@ -494,7 +494,7 @@ SphericalManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim,spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
@@ -509,7 +509,7 @@ SphericalManifold<dim, spacedim>::normal_vector(
     // base class.
     return Manifold<dim, spacedim>::normal_vector(face, p);
 
-  return Tensor<1,spacedim>();
+  return Tensor<1, spacedim>();
 }
 
 
@@ -547,12 +547,14 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim,spacedim>(face,center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
       // scaled.
-      for (unsigned int vertex = 0; vertex < GeometryInfo<spacedim>::vertices_per_face; ++vertex)
+      for (unsigned int vertex = 0;
+           vertex < GeometryInfo<spacedim>::vertices_per_face;
+           ++vertex)
         face_vertex_normals[vertex] = face->vertex(vertex) - center;
     }
   else

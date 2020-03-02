@@ -111,7 +111,7 @@ public:
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
   /**
-   * Return the (normalized) normal vector at the point @p p.
+   * @copydoc Manifold::normal_vector()
    */
   virtual Tensor<1, spacedim>
   normal_vector(
@@ -263,7 +263,7 @@ public:
                      const Point<spacedim> &x2) const override;
 
   /**
-   * Return the (normalized) normal vector at the point @p p.
+   * @copydoc Manifold::normal_vector()
    */
   virtual Tensor<1, spacedim>
   normal_vector(
