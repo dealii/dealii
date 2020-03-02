@@ -71,7 +71,7 @@ namespace internal
       static constexpr std::array<std::array<Tensor<1, 1>, 0>, 2>
       unit_tangential_vectors()
       {
-        return {{{}, {}}};
+        return {{{{}}, {{}}}};
       }
 
       static constexpr std::array<unsigned int, 2>
@@ -126,10 +126,10 @@ namespace internal
       static constexpr std::array<std::array<Tensor<1, 2>, 1>, 4>
       unit_tangential_vectors()
       {
-        return {{{Tensor<1, 2>{{0, -1}}},
-                 {Tensor<1, 2>{{0, 1}}},
-                 {Tensor<1, 2>{{1, 0}}},
-                 {Tensor<1, 2>{{-1, 0}}}}};
+        return {{{{Tensor<1, 2>{{0, -1}}}},
+                 {{Tensor<1, 2>{{0, 1}}}},
+                 {{Tensor<1, 2>{{1, 0}}}},
+                 {{Tensor<1, 2>{{-1, 0}}}}}};
       }
 
       static constexpr std::array<unsigned int, 4>
@@ -186,12 +186,12 @@ namespace internal
       static constexpr std::array<std::array<Tensor<1, 3>, 2>, 6>
       unit_tangential_vectors()
       {
-        return {{{Tensor<1, 3>{{0, -1, 0}}, Tensor<1, 3>{{0, 0, 1}}},
-                 {Tensor<1, 3>{{0, 1, 0}}, Tensor<1, 3>{{0, 0, 1}}},
-                 {Tensor<1, 3>{{0, 0, -1}}, Tensor<1, 3>{{1, 0, 0}}},
-                 {Tensor<1, 3>{{0, 0, 1}}, Tensor<1, 3>{{1, 0, 0}}},
-                 {Tensor<1, 3>{{-1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}},
-                 {Tensor<1, 3>{{1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}}}};
+        return {{{{Tensor<1, 3>{{0, -1, 0}}, Tensor<1, 3>{{0, 0, 1}}}},
+                 {{Tensor<1, 3>{{0, 1, 0}}, Tensor<1, 3>{{0, 0, 1}}}},
+                 {{Tensor<1, 3>{{0, 0, -1}}, Tensor<1, 3>{{1, 0, 0}}}},
+                 {{Tensor<1, 3>{{0, 0, 1}}, Tensor<1, 3>{{1, 0, 0}}}},
+                 {{Tensor<1, 3>{{-1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}}},
+                 {{Tensor<1, 3>{{1, 0, 0}}, Tensor<1, 3>{{0, 1, 0}}}}}};
       }
 
       static constexpr std::array<unsigned int, 6>
@@ -272,30 +272,30 @@ namespace internal
       static constexpr std::array<std::array<Tensor<1, 4>, 3>, 8>
       unit_tangential_vectors()
       {
-        return {{{Tensor<1, 4>{{0, -1, 0, 0}},
-                  Tensor<1, 4>{{0, 0, 1, 0}},
-                  Tensor<1, 4>{{0, 0, 0, 1}}},
-                 {Tensor<1, 4>{{0, 1, 0, 0}},
-                  Tensor<1, 4>{{0, 0, 1, 0}},
-                  Tensor<1, 4>{{0, 0, 0, 1}}},
-                 {Tensor<1, 4>{{0, 0, -1, 0}},
-                  Tensor<1, 4>{{0, 0, 0, 1}},
-                  Tensor<1, 4>{{1, 0, 0, 0}}},
-                 {Tensor<1, 4>{{0, 0, 1, 0}},
-                  Tensor<1, 4>{{0, 0, 0, 1}},
-                  Tensor<1, 4>{{1, 0, 0, 0}}},
-                 {Tensor<1, 4>{{0, 0, 0, -1}},
-                  Tensor<1, 4>{{1, 0, 0, 0}},
-                  Tensor<1, 4>{{0, 1, 0, 0}}},
-                 {Tensor<1, 4>{{0, 0, 0, 1}},
-                  Tensor<1, 4>{{1, 0, 0, 0}},
-                  Tensor<1, 4>{{0, 1, 0, 0}}},
-                 {Tensor<1, 4>{{-1, 0, 0, 0}},
-                  Tensor<1, 4>{{0, 1, 0, 0}},
-                  Tensor<1, 4>{{0, 0, 1, 0}}},
-                 {Tensor<1, 4>{{1, 0, 0, 0}},
-                  Tensor<1, 4>{{0, 1, 0, 0}},
-                  Tensor<1, 4>{{0, 0, 1, 0}}}}};
+        return {{{{Tensor<1, 4>{{0, -1, 0, 0}},
+                   Tensor<1, 4>{{0, 0, 1, 0}},
+                   Tensor<1, 4>{{0, 0, 0, 1}}}},
+                 {{Tensor<1, 4>{{0, 1, 0, 0}},
+                   Tensor<1, 4>{{0, 0, 1, 0}},
+                   Tensor<1, 4>{{0, 0, 0, 1}}}},
+                 {{Tensor<1, 4>{{0, 0, -1, 0}},
+                   Tensor<1, 4>{{0, 0, 0, 1}},
+                   Tensor<1, 4>{{1, 0, 0, 0}}}},
+                 {{Tensor<1, 4>{{0, 0, 1, 0}},
+                   Tensor<1, 4>{{0, 0, 0, 1}},
+                   Tensor<1, 4>{{1, 0, 0, 0}}}},
+                 {{Tensor<1, 4>{{0, 0, 0, -1}},
+                   Tensor<1, 4>{{1, 0, 0, 0}},
+                   Tensor<1, 4>{{0, 1, 0, 0}}}},
+                 {{Tensor<1, 4>{{0, 0, 0, 1}},
+                   Tensor<1, 4>{{1, 0, 0, 0}},
+                   Tensor<1, 4>{{0, 1, 0, 0}}}},
+                 {{Tensor<1, 4>{{-1, 0, 0, 0}},
+                   Tensor<1, 4>{{0, 1, 0, 0}},
+                   Tensor<1, 4>{{0, 0, 1, 0}}}},
+                 {{Tensor<1, 4>{{1, 0, 0, 0}},
+                   Tensor<1, 4>{{0, 1, 0, 0}},
+                   Tensor<1, 4>{{0, 0, 1, 0}}}}}};
       }
 
       static constexpr std::array<unsigned int, 8>
