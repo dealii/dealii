@@ -54,56 +54,36 @@ namespace types
    */
 #define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
+  /**
+   * The type used to denote the global index of degrees of freedom. This
+   * type is then also used for querying the global *number* of degrees
+   * of freedom, since the number is simply the largest index plus one.
+   *
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
+   *
+   * See the
+   * @ref GlobalDoFIndex
+   * page for guidance on when this type should or should not be used.
+   */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  /**
-   * The type used to denote the global index of degrees of freedom. This
-   * type is then also used for querying the global *number* of degrees
-   * of freedom, since the number is simply the largest index plus one.
-   *
-   * While in sequential computations the 4 billion indices of 32-bit unsigned
-   * integers is plenty, parallel computations using (for example) the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * consequently, deal.II chooses a larger integer type when
-   * configured to use 64-bit indices.
-   *
-   * The data type always corresponds to an unsigned integer type.
-   *
-   * See the
-   * @ref GlobalDoFIndex
-   * page for guidance on when this type should or should not be used.
-   */
   using global_dof_index = uint64_t;
-
-  /**
-   * An identifier that denotes the MPI type associated with
-   * types::global_dof_index.
-   */
-#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
-
 #else
-  /**
-   * The type used to denote the global index of degrees of freedom. This
-   * type is then also used for querying the global *number* of degrees
-   * of freedom, since the number is simply the largest index plus one.
-   *
-   * While in sequential computations the 4 billion indices of 32-bit unsigned
-   * integers is plenty, parallel computations using (for example) the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * consequently, deal.II chooses a larger integer type when
-   * configured to use 64-bit indices.
-   *
-   * The data type always corresponds to an unsigned integer type.
-   *
-   * See the
-   * @ref GlobalDoFIndex
-   * page for guidance on when this type should or should not be used.
-   */
-  using global_dof_index = unsigned int;
+  using global_dof_index  = unsigned int;
+#endif
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
+#ifdef DEAL_II_WITH_64BIT_INDICES
+#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
+#else
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 
