@@ -920,18 +920,15 @@ Vector<Number>::block_write(std::ostream &out) const
 
   // other version of the following
   //  out << size() << std::endl << '[';
-  // reason: operator<< seems to use
-  // some resources that lead to
-  // problems in a multithreaded
-  // environment
-  const size_type sz = size();
-  char            buf[16];
 
-#ifdef DEAL_II_WITH_64BIT_INDICES
+  // reason: operator<< seems to use some resources that lead to problems in a
+  // multithreaded environment. We convert the size index to
+  // unsigned long long int that is at least 64 bits to be able to output it on
+  // all platforms, since std::uint64_t is not in C.
+  const unsigned long long int sz = size();
+  char                         buf[16];
+
   std::sprintf(buf, "%llu", sz);
-#else
-  std::sprintf(buf, "%u", sz);
-#endif
   std::strcat(buf, "\n[");
 
   out.write(buf, std::strlen(buf));
