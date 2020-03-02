@@ -336,10 +336,16 @@
 
         <li>
             <p>
-                <i>64bit indices</i>: By default, deal.II use unsigned int (32bit) indices for degrees of freedom, using the <code>types::global_dof_index</code> type. This limits the number of unknowns to approximately four billions. If larger problem
-                must be solved, pass the
+                <i>64bit indices</i>: By default, deal.II uses
+                unsigned int (32bit) indices for degrees of freedom,
+                using the <code>types::global_dof_index</code> type.
+                (The same is true for a few other index types such as the
+                global number of cells.) This limits the number of
+                cells or unknowns to approximately four billions. If
+                larger problem must be solved, pass the
                 <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> argument to
-                <code>cmake</code>. You will not be able to solve problems of this size on a single machine, but only when using clusters of computers and linear algebra packages PETSc or Trilinos. To use this option with PETSc, PETSc must be compiled
+                <code>cmake</code>. To use this option with
+                PETSc, PETSc must be compiled
                 with the option <code>--with-64-bit-indices</code>.
             </p>
         </li>
