@@ -210,9 +210,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   MGLevelObject<VectorType> &      dst,
   const InVector &                 src) const
 {
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   AssertIndexRange(dst.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
@@ -282,10 +280,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
-  (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   AssertIndexRange(src.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
@@ -359,10 +354,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg_add(
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
-  (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   // For non-DG: degrees of freedom in the refinement face may need special
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
@@ -399,6 +391,17 @@ MGLevelGlobalTransfer<VectorType>::set_component_to_block_map(
   component_to_block_map = map;
 }
 
+template <typename VectorType>
+template <int dim, int spacedim>
+void
+MGLevelGlobalTransfer<VectorType>::assert_built(
+  const DoFHandler<dim, spacedim> &dof_handler) const
+{
+  (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
+}
 
 
 /* --------- MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector> -------
@@ -412,9 +415,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
   const LinearAlgebra::distributed::Vector<Number2> &        src) const
 {
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   copy_to_mg(dof_handler, dst, src, false);
 }
 
@@ -428,9 +429,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   const LinearAlgebra::distributed::Vector<Number2> &        src,
   const bool solution_transfer) const
 {
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   LinearAlgebra::distributed::Vector<Number> &this_ghosted_global_vector =
     solution_transfer ? solution_ghosted_global_vector : ghosted_global_vector;
   const std::vector<Table<2, unsigned int>> &this_copy_indices =
@@ -438,8 +437,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   const std::vector<Table<2, unsigned int>> &this_copy_indices_level_mine =
     solution_transfer ? solution_copy_indices_level_mine :
                         copy_indices_level_mine;
-
-  (void)dof_handler;
 
   AssertIndexRange(dst.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
@@ -536,10 +533,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
   LinearAlgebra::distributed::Vector<Number2> &                    dst,
   const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {
-  (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   AssertIndexRange(src.max_level(),
                    dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(src.min_level(), src.max_level() + 1);
@@ -614,10 +608,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
     LinearAlgebra::distributed::Vector<Number2> &dst,
     const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
 {
-  (void)dof_handler;
-  Assert(copy_indices.size() ==
-           dof_handler.get_triangulation().n_global_levels(),
-         ExcMessage("MGTransfer::build() has not been called!"));
+  assert_built(dof_handler);
   // For non-DG: degrees of freedom in the refinement face may need special
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
@@ -661,6 +652,18 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   set_component_to_block_map(const std::vector<unsigned int> &map)
 {
   component_to_block_map = map;
+}
+
+template <typename Number>
+template <int dim, int spacedim>
+void
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::assert_built(
+  const DoFHandler<dim, spacedim> &dof_handler) const
+{
+  (void)dof_handler;
+  Assert(copy_indices.size() ==
+           dof_handler.get_triangulation().n_global_levels(),
+         ExcMessage("MGTransfer::build() has not been called!"));
 }
 
 
