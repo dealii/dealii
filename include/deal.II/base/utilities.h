@@ -562,32 +562,18 @@ namespace Utilities
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the reverse
    * permutation $q_i=N-1-p_i$.
    */
-  std::vector<unsigned int>
-  reverse_permutation(const std::vector<unsigned int> &permutation);
+  template <typename Integer>
+  std::vector<Integer>
+  reverse_permutation(const std::vector<Integer> &permutation);
 
   /**
    * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the inverse
    * permutation $q_0\ldots q_{N-1}$ so that $q_{p_i}=p_{q_i}=i$.
    */
-  std::vector<unsigned int>
-  invert_permutation(const std::vector<unsigned int> &permutation);
-
-  /**
-   * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
-   * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the reverse
-   * permutation $q_i=N-1-p_i$.
-   */
-  std::vector<std::uint64_t>
-  reverse_permutation(const std::vector<std::uint64_t> &permutation);
-
-  /**
-   * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
-   * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the inverse
-   * permutation $q_0\ldots q_{N-1}$ so that $q_{p_i}=p_{q_i}=i$.
-   */
-  std::vector<std::uint64_t>
-  invert_permutation(const std::vector<std::uint64_t> &permutation);
+  template <typename Integer>
+  std::vector<Integer>
+  invert_permutation(const std::vector<Integer> &permutation);
 
   /**
    * Given an arbitrary object of type T, use boost::serialization utilities
@@ -1442,6 +1428,45 @@ namespace Utilities
                  allow_compression);
   }
 
+
+
+  template <typename Integer>
+  std::vector<Integer>
+  reverse_permutation(const std::vector<Integer> &permutation)
+  {
+    const std::size_t n = permutation.size();
+
+    std::vector<Integer> out(n);
+    for (std::size_t i = 0; i < n; ++i)
+      out[i] = n - 1 - permutation[i];
+
+    return out;
+  }
+
+
+
+  template <typename Integer>
+  std::vector<Integer>
+  invert_permutation(const std::vector<Integer> &permutation)
+  {
+    const std::size_t n = permutation.size();
+
+    std::vector<Integer> out(n, numbers::invalid_unsigned_int);
+
+    for (std::size_t i = 0; i < n; ++i)
+      {
+        AssertIndexRange(permutation[i], n);
+        out[permutation[i]] = i;
+      }
+
+    // check that we have actually reached
+    // all indices
+    for (unsigned int i = 0; i < n; ++i)
+      Assert(out[i] != numbers::invalid_unsigned_int,
+             ExcMessage("The given input permutation had duplicate entries!"));
+
+    return out;
+  }
 } // namespace Utilities
 
 
