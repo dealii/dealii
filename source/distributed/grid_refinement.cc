@@ -256,16 +256,16 @@ namespace internal
                      (interesting_range[0] + interesting_range[1]) / 2);
 
                 // Count how many of our own elements would be above this
-                // threshold:
-                types::global_cell_index my_count =
+                // threshold. Use a 64bit result type if we are compiling with
+                // 64bit indices to avoid an overflow when computing the sum
+                // below.
+                const types::global_cell_index my_count =
                   std::count_if(criteria.begin(),
                                 criteria.end(),
                                 [test_threshold](const double c) {
                                   return c > test_threshold;
                                 });
-
-                // Potentially accumulate in a 64bit int to avoid overflow:
-                types::global_cell_index total_count =
+                const types::global_cell_index total_count =
                   Utilities::MPI::sum(my_count, mpi_communicator);
 
                 // now adjust the range. if we have too many cells, we take the
