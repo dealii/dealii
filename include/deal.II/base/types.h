@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <cstddef>
+#include <cstdint>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -45,13 +46,13 @@ namespace types
   /**
    * The type used for global indices of vertices.
    */
-  using global_vertex_index = unsigned long long int;
+  using global_vertex_index = uint64_t;
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
    */
-#define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
@@ -67,15 +68,14 @@ namespace types
    * @ref GlobalDoFIndex
    * page for guidance on when this type should or should not be used.
    */
-  // TODO: we should check that unsigned long long int
-  // has the same size as uint64_t
-  using global_dof_index = unsigned long long int;
+  using global_dof_index = uint64_t;
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
+
 #else
   /**
    * The type used for global indices of degrees of freedom. While in
@@ -100,7 +100,7 @@ namespace types
    * The type used for coarse-cell ids. See the glossary
    * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    */
-  using coarse_cell_id = unsigned long long int;
+  using coarse_cell_id = uint64_t;
 #else
   /**
    * The type used for coarse-cell ids. See the glossary
@@ -162,7 +162,7 @@ namespace TrilinosWrappers
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    using int_type = long long;
+    using int_type = long long int;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.

@@ -24,6 +24,8 @@
 
 #include <deal.II/particles/property_pool.h>
 
+#include <cstdint>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace types
@@ -42,15 +44,16 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  using particle_index = unsigned long long int;
+  using particle_index = uint64_t;
 
 #  ifdef DEAL_II_WITH_MPI
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UINT64_T
 #  endif
+
 #else
   /**
    * The type used for indices of particles. While in
