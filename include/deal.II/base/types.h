@@ -56,13 +56,17 @@ namespace types
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
-   * The type used for global indices of degrees of freedom. While in
-   * sequential computations the 4 billion indices of 32-bit unsigned integers
-   * is plenty, parallel computations using the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * we need a bigger index space.
+   * The type used to denote the global index of degrees of freedom. This
+   * type is then also used for querying the global *number* of degrees
+   * of freedom, since the number is simply the largest index plus one.
    *
-   * The data type always indicates an unsigned integer type.
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
    *
    * See the
    * @ref GlobalDoFIndex
@@ -78,13 +82,21 @@ namespace types
 
 #else
   /**
-   * The type used for global indices of degrees of freedom. While in
-   * sequential computations the 4 billion indices of 32-bit unsigned integers
-   * is plenty, parallel computations using the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * we need a bigger index space.
+   * The type used to denote the global index of degrees of freedom. This
+   * type is then also used for querying the global *number* of degrees
+   * of freedom, since the number is simply the largest index plus one.
    *
-   * The data type always indicates an unsigned integer type.
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
+   *
+   * See the
+   * @ref GlobalDoFIndex
+   * page for guidance on when this type should or should not be used.
    */
   using global_dof_index = unsigned int;
 
@@ -95,19 +107,30 @@ namespace types
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 
+  /**
+   * The type used to denote the global index of a cell. This type
+   * is then also used for querying the global *number* of cells in
+   * a triangulation since the number is simply the largest index plus one.
+   *
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
+   */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  /**
-   * The type used for coarse-cell ids. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
-   */
-  using coarse_cell_id = uint64_t;
+  using global_cell_index = uint64_t;
 #else
+  using global_cell_index = unsigned int;
+#endif
+
   /**
    * The type used for coarse-cell ids. See the glossary
    * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
    */
-  using coarse_cell_id = unsigned int;
-#endif
+  using coarse_cell_id = global_cell_index;
 
   /**
    * The type used to denote boundary indicators associated with every piece
