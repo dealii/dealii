@@ -1461,7 +1461,7 @@ namespace Utilities
 
     // check that we have actually reached
     // all indices
-    for (unsigned int i = 0; i < n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
       Assert(out[i] != numbers::invalid_unsigned_int,
              ExcMessage("The given input permutation had duplicate entries!"));
 
