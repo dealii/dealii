@@ -124,10 +124,6 @@ pipeline
             {
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
-                 cd $WORKSPACE/
-                 ./contrib/utilities/check_doxygen.sh
-              '''
-              sh '''#!/bin/bash
                  set -e
                  export NP=`grep -c ^processor /proc/cpuinfo`
                  export TEST_TIME_LIMIT=1200
