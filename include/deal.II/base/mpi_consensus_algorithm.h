@@ -29,6 +29,461 @@ namespace Utilities
   namespace MPI
   {
     /**
+     * An interface to be able to use the ConsensusAlgorithm classes. The main
+     * functionality of the implementations is to return a list of process ranks
+     * this process wants data from and to deal with the optional payload of the
+     * messages sent/received by the ConsensusAlgorithm classes.
+     *
+     * There are two kinds of messages:
+     * - send/request message: A message consisting of a data request
+     *   which should be answered by another process. This message is
+     *   considered as a request message by the receiving rank.
+     * - recv message: The answer to a send/request message.
+     *
+     * @tparam T1 the type of the elements of the vector to sent
+     * @tparam T2 the type of the elements of the vector to received
+     *
+     * @note Since the payloads of the messages are optional, users have
+     *       to deal with buffers themselves. The ConsensusAlgorithm classes 1)
+     *       deliver only references to empty vectors (of size 0)
+     *       the data to be sent can be inserted to or read from, and
+     *       2) communicate these vectors blindly.
+     *
+     * @author Peter Munch, 2019
+     */
+    template <typename T1, typename T2>
+    class ConsensusAlgorithmProcess
+    {
+    public:
+      /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithmProcess() = default;
+
+      /**
+       * @return A vector of ranks this process wants to send a request to.
+       *
+       * @note This is the only method which has to be implemented since the
+       *       payloads of the messages are optional.
+       */
+      virtual std::vector<unsigned int>
+      compute_targets() = 0;
+
+      /**
+       * Add to the request to the process with the specified rank a payload.
+       *
+       * @param[in]  other_rank rank of the process
+       * @param[out] send_buffer data to be sent part of the request (optional)
+       *
+       * @note The buffer is empty. Before using it, you have to set its size.
+       */
+      virtual void
+      create_request(const unsigned int other_rank,
+                     std::vector<T1> &  send_buffer);
+
+      /**
+       * Prepare the buffer where the payload of the answer of the request to
+       * the process with the specified rank is saved in. The most obvious task
+       * is to resize the buffer, since it is empty when the function is called.
+       *
+       * @param[in]  other_rank rank of the process
+       * @param[out] recv_buffer data to be sent part of the request (optional)
+       */
+      virtual void
+      prepare_buffer_for_answer(const unsigned int other_rank,
+                                std::vector<T2> &  recv_buffer);
+
+      /**
+       * Prepare the buffer where the payload of the answer of the request to
+       * the process with the specified rank is saved in.
+       *
+       * @param[in]  other_rank rank of the process
+       * @param[in]  buffer_recv received payload (optional)
+       * @param[out] request_buffer payload to be sent as part of the request
+       *             (optional)
+       *
+       * @note The request_buffer is empty. Before using it, you have to set
+       *       its size.
+       */
+      virtual void
+      answer_request(const unsigned int     other_rank,
+                     const std::vector<T1> &buffer_recv,
+                     std::vector<T2> &      request_buffer);
+
+      /**
+       * Process the payload of the answer of the request to the process with
+       * the specified rank.
+       *
+       * @param[in] other_rank rank of the process
+       * @param[in] recv_buffer data to be sent part of the request (optional)
+       */
+      virtual void
+      read_answer(const unsigned int     other_rank,
+                  const std::vector<T2> &recv_buffer);
+    };
+
+
+
+    /**
+     * A base class for algorithms that implement the task of coming up with
+     * communication patterns to retrieve data from other processes in a
+     * dynamic-sparse way. In computer science, this is often called a
+     * <a href="https://en.wikipedia.org/wiki/Consensus_algorithm">consensus
+     * problem</a>.
+     *
+     * Dynamic-sparse means in this context:
+     * - By the time this function is called, the other processes do
+     *   not know yet that they have to answer requests.
+     * - Each process only has to communicate with a small subset of
+     *   processes of the MPI communicator.
+     *
+     * Naturally, the user has to provide:
+     * - A communicator.
+     * - For each rank a list of ranks of processes this process should
+     *   communicate to.
+     * - Functionality to pack/unpack data to be sent/received.
+     *
+     * This base class only introduces a basic interface to achieve
+     * these goals, while derived classes implement different algorithms
+     * to actually compute such communication patterns.
+     * The last two features of the list above this paragraph are implemented
+     * in classes derived from ConsensusAlgorithmProcess.
+     *
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
+     *
+     * @author Peter Munch, 2019
+     */
+    template <typename T1, typename T2>
+    class ConsensusAlgorithm
+    {
+    public:
+      ConsensusAlgorithm(ConsensusAlgorithmProcess<T1, T2> &process,
+                         const MPI_Comm &                   comm);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithm() = default;
+
+      /**
+       * Run consensus algorithm.
+       */
+      virtual void
+      run() = 0;
+
+    protected:
+      /**
+       * Reference to the process provided by the user.
+       */
+      ConsensusAlgorithmProcess<T1, T2> &process;
+
+      /**
+       * MPI communicator.
+       */
+      const MPI_Comm &comm;
+
+      /**
+       * Rank of this process.
+       */
+      const unsigned int my_rank;
+
+      /**
+       * Number of processes in the communicator.
+       */
+      const unsigned int n_procs;
+    };
+
+
+    /**
+     * This class implements a concrete algorithm for the ConsensusAlgorithm
+     * base class, using only point-to-point communications and a single
+     * IBarrier.
+     *
+     * @note This class closely follows the paper Hoefler, Siebert, Lumsdaine
+     *       "Scalable Communication Protocols for Dynamic Sparse Data
+     *       Exchange". Since the algorithm shown there is not considering
+     *       payloads, the algorithm has been modified here in such a way that
+     *       synchronous sends (Issend) have been replaced by equivalent
+     *       Isend/Irecv, where Irecv receives the answer to a request (with
+     *       payload).
+     *
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
+     *
+     * @author Peter Munch, 2019
+     */
+    template <typename T1, typename T2>
+    class ConsensusAlgorithm_NBX : public ConsensusAlgorithm<T1, T2>
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * @param process Process to be run during consensus algorithm.
+       * @param comm MPI Communicator
+       */
+      ConsensusAlgorithm_NBX(ConsensusAlgorithmProcess<T1, T2> &process,
+                             const MPI_Comm &                   comm);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithm_NBX() = default;
+
+      /**
+       * @copydoc ConsensusAlgorithm::run()
+       */
+      virtual void
+      run() override;
+
+    private:
+#ifdef DEAL_II_WITH_MPI
+      /**
+       * List of processes this process wants to send requests to.
+       */
+      std::vector<unsigned int> targets;
+
+      /**
+       * Buffers for sending requests.
+       */
+      std::vector<std::vector<T1>> send_buffers;
+
+      /**
+       * Requests for sending requests.
+       */
+      std::vector<MPI_Request> send_requests;
+
+      /**
+       * Buffers for receiving answers to requests.
+       */
+      std::vector<std::vector<T2>> recv_buffers;
+
+
+      /**
+       * Requests for receiving answers to requests.
+       */
+      std::vector<MPI_Request> recv_requests;
+
+      /**
+       * Buffers for sending answers to requests.
+       */
+      std::vector<std::unique_ptr<std::vector<T2>>> request_buffers;
+
+      /**
+       * Requests for sending answers to requests.
+       */
+      std::vector<std::unique_ptr<MPI_Request>> request_requests;
+
+      // request for barrier
+      MPI_Request barrier_request;
+#endif
+
+#ifdef DEBUG
+      /**
+       * List of processes who have made a request to this process.
+       */
+      std::set<unsigned int> requesting_processes;
+#endif
+
+      /**
+       * Check if all request answers have been received by this rank.
+       */
+      bool
+      check_own_state();
+
+      /**
+       * Signal to all other ranks that this rank has received all request
+       * answers via entering IBarrier.
+       */
+      void
+      signal_finish();
+
+      /**
+       * Check if all ranks have received all their request answers, i.e.
+       * all ranks have reached the IBarrier.
+       */
+      bool
+      check_global_state();
+
+      /**
+       * A request message from another rank has been received: process the
+       * request and send an answer.
+       */
+      void
+      answer_requests();
+
+      /**
+       * Start to send all requests via ISend and post IRecvs for the incoming
+       * answer messages.
+       */
+      void
+      start_communication();
+
+      /**
+       * After all rank has received all answers, the MPI data structures can be
+       * freed and the received answers can be processed.
+       */
+      void
+      clean_up_and_end_communication();
+    };
+
+    /**
+     * This class implements a concrete algorithm for the ConsensusAlgorithm
+     * base class, using a two step approach. In
+     * the first step the source ranks are determined and in the second step
+     * a static sparse data exchange is performed.
+     *
+     * @note In contrast to ConsensusAlgorithm_NBX, this class splits the same
+     *       task into two distinct steps. In the first step, all processes are
+     *       identified who want to send a request to this process. In the
+     *       second step, the data is exchanged. However, since - in the second
+     *       step - now it is clear how many requests have to be answered, i.e.
+     *       when this process can stop waiting for requests, no IBarrier is
+     *       needed.
+     *
+     * @note The function
+     *       Utilities::MPI::compute_point_to_point_communication_pattern() is
+     *       used to determine the source processes, which implements a
+     *       PEX-algorithm from Hoefner et al., "Scalable Communication
+     *       Protocols for Dynamic Sparse Data Exchange".
+     *
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
+     *
+     * @author Peter Munch, 2019
+     */
+    template <typename T1, typename T2>
+    class ConsensusAlgorithm_PEX : public ConsensusAlgorithm<T1, T2>
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * @param process Process to be run during consensus algorithm.
+       * @param comm MPI Communicator
+       */
+      ConsensusAlgorithm_PEX(ConsensusAlgorithmProcess<T1, T2> &process,
+                             const MPI_Comm &                   comm);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithm_PEX() = default;
+
+      /**
+       * @copydoc ConsensusAlgorithm::run()
+       */
+      virtual void
+      run() override;
+
+    private:
+#ifdef DEAL_II_WITH_MPI
+      /**
+       * List of ranks of processes this processes wants to send a request to.
+       */
+      std::vector<unsigned int> targets;
+
+      /**
+       * List of ranks of processes wanting to send a request to this process.
+       */
+      std::vector<unsigned int> sources;
+
+      // data structures to send and receive requests
+
+      /**
+       * Buffers for sending requests.
+       */
+      std::vector<std::vector<T1>> send_buffers;
+
+      /**
+       * Buffers for receiving answers to requests.
+       */
+      std::vector<std::vector<T2>> recv_buffers;
+
+      /**
+       * Requests for sending requests and receiving answers to requests.
+       */
+      std::vector<MPI_Request> send_and_recv_buffers;
+
+      /**
+       * Buffers for sending answers to requests.
+       */
+      std::vector<std::vector<T2>> requests_buffers;
+
+      /**
+       * Requests for sending answers to requests.
+       */
+      std::vector<MPI_Request> requests_answers;
+#endif
+
+      /**
+       * The ith request message from another rank has been received: process
+       * the request and send an answer.
+       */
+      void
+      answer_requests(int index);
+
+      /**
+       * Start to send all requests via ISend and post IRecvs for the incoming
+       * answer messages.
+       */
+      unsigned int
+      start_communication();
+
+      /**
+       * After all answers have been exchanged, the MPI data structures can be
+       * freed and the received answers can be processed.
+       */
+      void
+      clean_up_and_end_communication();
+    };
+
+    /**
+     * A class which delegates its task to other ConsensusAlgorithm
+     * implementations depending on the number of processes in the
+     * MPI communicator. For a small number of processes it uses
+     * ConsensusAlgorithm_PEX and for a large number of processes
+     * ConsensusAlgorithm_NBX. The threshold depends if the program is
+     * compiled in debug or release mode.
+     *
+     * @tparam T1 The type of the elements of the vector to be sent.
+     * @tparam T2 The type of the elements of the vector to be received.
+     *
+     * @author Peter Munch, 2019
+     */
+    template <typename T1, typename T2>
+    class ConsensusAlgorithmSelector : public ConsensusAlgorithm<T1, T2>
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * @param process Process to be run during consensus algorithm.
+       * @param comm MPI Communicator.
+       */
+      ConsensusAlgorithmSelector(ConsensusAlgorithmProcess<T1, T2> &process,
+                                 const MPI_Comm &                   comm);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ConsensusAlgorithmSelector() = default;
+
+      /**
+       * @copydoc ConsensusAlgorithm::run()
+       *
+       * @note The function call is delegated to another ConsensusAlgorithm implementation.
+       */
+      virtual void
+      run() override;
+
+    private:
+      // Pointer to the actual ConsensusAlgorithm implementation.
+      std::shared_ptr<ConsensusAlgorithm<T1, T2>> consensus_algo;
+    };
+
+    /**
      * This class implements Utilities::MPI::ConsensusAlgorithmProcess,
      * using user-provided function wrappers.
      * The advantage of this class is that users do not have to write their

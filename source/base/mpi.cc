@@ -1045,10 +1045,6 @@ namespace Utilities
       return owning_ranks;
     }
 
-    template class ConsensusAlgorithmSelector<
-      std::pair<types::global_dof_index, types::global_dof_index>,
-      unsigned int>;
-
 
 
     CollectiveMutex::CollectiveMutex()
