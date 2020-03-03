@@ -65,7 +65,7 @@ test()
              triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               fe_v.reinit(cell, f);

@@ -69,7 +69,7 @@ check_support(const FiniteElement<dim> &finel, const char *name)
 
   Quadrature<dim - 1> q(face_points, dummy_weights);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       std::vector<Point<dim>> q_points(q.get_points().size());
       QProjector<dim>::project_to_face(q, i, q_points);
@@ -96,7 +96,7 @@ check_support(const FiniteElement<dim> &finel, const char *name)
 
   Quadrature<dim - 1> qg(face_g_points, dummy_g_weights);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       std::vector<Point<dim>> q_points(qg.get_points().size());
       QProjector<dim>::project_to_face(qg, i, q_points);

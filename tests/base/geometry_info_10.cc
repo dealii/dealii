@@ -24,7 +24,7 @@ template <int dim>
 void
 test()
 {
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       const Tensor<1, dim> unit_normal_vector =
         GeometryInfo<dim>::unit_normal_vector[i];

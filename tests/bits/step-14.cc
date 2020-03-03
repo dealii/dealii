@@ -1638,9 +1638,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell)
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         face_integrals[cell->face(face_no)] = -1e20;
 
     error_indicators.reinit(
@@ -1661,9 +1659,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell, ++present_cell)
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           Assert(face_integrals.find(cell->face(face_no)) !=
                    face_integrals.end(),
@@ -1717,9 +1713,7 @@ namespace LaplaceSolver
                             cell_data,
                             error_indicators);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             if (cell->face(face_no)->at_boundary())
               {

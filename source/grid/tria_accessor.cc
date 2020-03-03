@@ -2232,9 +2232,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
     // neighbors and find the number
     // the hard way
     {
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         if (neighbor_cell->face_index(face_no) == this_face_index)
           return face_no;
 
@@ -2325,9 +2323,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // we need to loop over all faces
           // and subfaces and find the
           // number the hard way
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<2>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<2>::face_indices())
             {
               if (face_no != face_no_guess)
                 {
@@ -2398,9 +2394,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
 
           // if the guess was false, then we need to loop over all faces and
           // subfaces and find the number the hard way
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<3>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<3>::face_indices())
             {
               if (face_no == face_no_guess)
                 continue;

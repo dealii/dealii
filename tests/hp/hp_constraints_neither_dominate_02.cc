@@ -243,7 +243,7 @@ test2cells(const FiniteElement<dim> &fe_0,
     {
       const unsigned int fe_index = cell->active_fe_index();
       local_face_dof_indices.resize(fe_collection[fe_index].dofs_per_face);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (std::abs(cell->face(f)->center()[0]) < 0.1)
           {
             // deallog << "cell="<<cell<<" face="<<f<<std::endl;

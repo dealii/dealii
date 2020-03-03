@@ -38,7 +38,7 @@ test()
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         Point<dim> face_vertices[GeometryInfo<dim>::vertices_per_face];
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
@@ -67,7 +67,7 @@ test()
         vertices[v][0] /= 10;
       }
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         Point<dim> face_vertices[GeometryInfo<dim>::vertices_per_face];
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
@@ -117,7 +117,7 @@ test()
           }
       }
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         Point<dim> face_vertices[GeometryInfo<dim>::vertices_per_face];
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
@@ -156,7 +156,7 @@ test()
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     vertices[1] /= 10;
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         Point<dim> face_vertices[GeometryInfo<dim>::vertices_per_face];
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
@@ -179,7 +179,7 @@ test()
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     std::swap(vertices[0], vertices[1]);
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         Point<dim> face_vertices[GeometryInfo<dim>::vertices_per_face];
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)

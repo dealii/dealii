@@ -60,7 +60,7 @@ main()
   cell = tria.begin_active();
   for (; cell != endc; ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<2>::face_indices())
         if (cell->face(f)->manifold_id() != numbers::flat_manifold_id)
           deallog << cell << " (" << f << ")  "
                   << int(cell->face(f)->manifold_id()) << std::endl;

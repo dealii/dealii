@@ -96,9 +96,7 @@ check()
       for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
-          for (unsigned int i_face = 0;
-               i_face < GeometryInfo<dim>::faces_per_cell;
-               ++i_face)
+          for (const unsigned int i_face : GeometryInfo<dim>::face_indices())
             {
               if ((level_cell->at_boundary(i_face) &&
                    !level_cell->has_periodic_neighbor(i_face)) ||
@@ -131,9 +129,7 @@ check()
       for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
-          for (unsigned int i_face = 0;
-               i_face < GeometryInfo<dim>::faces_per_cell;
-               ++i_face)
+          for (const unsigned int i_face : GeometryInfo<dim>::face_indices())
             {
               if (!level_cell->has_periodic_neighbor(i_face) ||
                   level_cell->periodic_neighbor(i_face)->level() !=

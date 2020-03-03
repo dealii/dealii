@@ -1114,9 +1114,8 @@ DoFHandler<dim, spacedim>::n_boundary_dofs() const
     {
       if (cell->is_locally_owned() && cell->at_boundary())
         {
-          for (unsigned int iface = 0;
-               iface < dealii::GeometryInfo<dim>::faces_per_cell;
-               ++iface)
+          for (const unsigned int iface :
+               dealii::GeometryInfo<dim>::face_indices())
             {
               const auto face = cell->face(iface);
               if (face->at_boundary())
@@ -1172,9 +1171,8 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
     {
       if (cell->is_locally_owned() && cell->at_boundary())
         {
-          for (unsigned int iface = 0;
-               iface < dealii::GeometryInfo<dim>::faces_per_cell;
-               ++iface)
+          for (const unsigned int iface :
+               dealii::GeometryInfo<dim>::face_indices())
             {
               const auto         face        = cell->face(iface);
               const unsigned int boundary_id = face->boundary_id();

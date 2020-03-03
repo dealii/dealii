@@ -72,7 +72,7 @@ template <int dim>
 void
 set_boundary_ids(Triangulation<dim> &tria)
 {
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     tria.begin_active()->face(f)->set_boundary_id(f);
 }
 

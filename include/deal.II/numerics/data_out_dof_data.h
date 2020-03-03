@@ -1195,7 +1195,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
 
   // adjust patch neighbors
   for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-    for (unsigned int n = 0; n < GeometryInfo<patch_dim>::faces_per_cell; ++n)
+    for (const unsigned int n : GeometryInfo<patch_dim>::face_indices())
       if (patches[i].neighbors[n] != Patch::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
 }

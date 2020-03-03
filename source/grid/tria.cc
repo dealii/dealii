@@ -2020,9 +2020,7 @@ namespace internal
                                                 vertex,
                                                 triangulation.vertices.size()));
 
-            for (unsigned int line = 0;
-                 line < GeometryInfo<dim>::faces_per_cell;
-                 ++line)
+            for (const unsigned int line : GeometryInfo<dim>::face_indices())
               {
                 // given a line vertex number (0,1) on a specific line
                 // we get the cell vertex number (0-4) through the
@@ -2568,9 +2566,7 @@ namespace internal
                                                                          0)]);
               }
 
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
                 // set up a list of the lines to be
                 // used for this face. check the
@@ -2794,9 +2790,7 @@ namespace internal
               bool face_orientation[GeometryInfo<dim>::faces_per_cell];
               bool face_flip[GeometryInfo<dim>::faces_per_cell];
               bool face_rotation[GeometryInfo<dim>::faces_per_cell];
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   for (unsigned int l = 0;
                        l < GeometryInfo<dim>::lines_per_face;
@@ -2970,9 +2964,7 @@ namespace internal
 
               // set orientation flag for
               // each of the faces
-              for (unsigned int quad = 0;
-                   quad < GeometryInfo<dim>::faces_per_cell;
-                   ++quad)
+              for (const unsigned int quad : GeometryInfo<dim>::face_indices())
                 {
                   cell->set_face_orientation(quad, face_orientation[quad]);
                   cell->set_face_flip(quad, face_flip[quad]);
@@ -3003,9 +2995,7 @@ namespace internal
               // coinciding lines once)
               std::multimap<unsigned int, std::pair<unsigned int, unsigned int>>
                 cell_to_face_lines;
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 for (unsigned int line = 0;
                      line < GeometryInfo<dim>::lines_per_face;
                      ++line)
@@ -3779,9 +3769,7 @@ namespace internal
         // can delete them. first for quads (and
         // their inner lines).
 
-        for (unsigned int quad_no = 0;
-             quad_no < GeometryInfo<dim>::faces_per_cell;
-             ++quad_no)
+        for (const unsigned int quad_no : GeometryInfo<dim>::face_indices())
           {
             typename Triangulation<dim, spacedim>::quad_iterator quad =
               cell->face(quad_no);
@@ -3976,9 +3964,8 @@ namespace internal
                                      h < triangulation.levels[l]
                                            ->cells.cells.size();
                                      ++h)
-                                  for (unsigned int q = 0;
-                                       q < GeometryInfo<dim>::faces_per_cell;
-                                       ++q)
+                                  for (const unsigned int q :
+                                       GeometryInfo<dim>::face_indices())
                                     {
                                       const int index = triangulation.levels[l]
                                                           ->cells.cells[h]
@@ -4473,9 +4460,7 @@ namespace internal
             // lines 0-7 already exist, create only the four interior
             // lines 8-11
             unsigned int l = 0;
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               for (unsigned int c = 0; c < 2; ++c, ++l)
                 new_lines[l] = cell->line(face_no)->child(c);
             Assert(l == 8, ExcInternalError());
@@ -5036,9 +5021,8 @@ namespace internal
                   // refine them is rather difficult for lines so we
                   // only flag them and after visiting all cells, we
                   // decide which lines need refinement;
-                  for (unsigned int line_no = 0;
-                       line_no < GeometryInfo<dim>::faces_per_cell;
-                       ++line_no)
+                  for (const unsigned int line_no :
+                       GeometryInfo<dim>::face_indices())
                     {
                       if (GeometryInfo<dim>::face_refinement_case(
                             cell->refine_flag_set(), line_no) ==
@@ -5396,9 +5380,8 @@ namespace internal
                   // these is difficult so we only flag them and after
                   // visiting all cells, we decide which faces need
                   // which refinement;
-                  for (unsigned int face = 0;
-                       face < GeometryInfo<dim>::faces_per_cell;
-                       ++face)
+                  for (const unsigned int face :
+                       GeometryInfo<dim>::face_indices())
                     {
                       typename Triangulation<dim, spacedim>::face_iterator
                         aface = acell->face(face);
@@ -6088,9 +6071,8 @@ namespace internal
                                    h <
                                    triangulation.levels[l]->cells.cells.size();
                                    ++h)
-                                for (unsigned int q = 0;
-                                     q < GeometryInfo<dim>::faces_per_cell;
-                                     ++q)
+                                for (const unsigned int q :
+                                     GeometryInfo<dim>::face_indices())
                                   {
                                     const int face_index =
                                       triangulation.levels[l]
@@ -6806,9 +6788,8 @@ namespace internal
                       // face_rotation flags. however, the latter two
                       // are set to false by default as this is the
                       // standard value
-                      for (unsigned int f = 0;
-                           f < GeometryInfo<dim>::faces_per_cell;
-                           ++f)
+                      for (const unsigned int f :
+                           GeometryInfo<dim>::face_indices())
                         {
                           new_hexes[i]->set_face_orientation(f, true);
                           new_hexes[i]->set_face_flip(f, false);
@@ -9684,9 +9665,7 @@ namespace internal
                   // face_orientation, face_flip and face_rotation,
                   // which are inherited from the corresponding face
                   // of the mother cube
-                  for (unsigned int f = 0;
-                       f < GeometryInfo<dim>::faces_per_cell;
-                       ++f)
+                  for (const unsigned int f : GeometryInfo<dim>::face_indices())
                     for (unsigned int s = 0;
                          s < std::max(GeometryInfo<dim - 1>::n_children(
                                         GeometryInfo<dim>::face_refinement_case(
@@ -9779,9 +9758,8 @@ namespace internal
               // anisotropic refinement. Therefore, we have a closer
               // look
               const RefinementCase<dim> ref_case = cell->refine_flag_set();
-              for (unsigned int face_no = 0;
-                   face_no < GeometryInfo<dim>::faces_per_cell;
-                   ++face_no)
+              for (const unsigned int face_no :
+                   GeometryInfo<dim>::face_indices())
                 if (cell->face(face_no)->at_boundary())
                   {
                     // this is the critical face at the boundary.
@@ -14038,9 +14016,7 @@ namespace
             // there were any unrefined neighbors at all, see if any
             // of those will have to be refined as well
             if (unrefined_neighbors > 0)
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 if (!cell->at_boundary(face) &&
                     (face_will_be_refined_by_neighbor(cell, face) == false) &&
                     (cell->neighbor(face)->has_children() == false) &&
@@ -14311,9 +14287,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // cycle
                     unsigned int unrefined_neighbors = 0, total_neighbors = 0;
 
-                    for (unsigned int n = 0;
-                         n < GeometryInfo<dim>::faces_per_cell;
-                         ++n)
+                    for (const unsigned int n :
+                         GeometryInfo<dim>::face_indices())
                       {
                         const cell_iterator neighbor = cell->neighbor(n);
                         if (neighbor.state() == IteratorState::valid)

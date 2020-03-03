@@ -4069,9 +4069,8 @@ namespace internal
             // cell is at boundary and we are to treat curved boundaries. so
             // loop over all faces and draw them as small pieces of lines
             {
-              for (unsigned int face_no = 0;
-                   face_no < GeometryInfo<dim>::faces_per_cell;
-                   ++face_no)
+              for (const unsigned int face_no :
+                   GeometryInfo<dim>::face_indices())
                 {
                   const typename dealii::Triangulation<dim,
                                                        spacedim>::face_iterator
@@ -4221,9 +4220,8 @@ namespace internal
             }
           else
             {
-              for (unsigned int face_no = 0;
-                   face_no < GeometryInfo<dim>::faces_per_cell;
-                   ++face_no)
+              for (const unsigned int face_no :
+                   GeometryInfo<dim>::face_indices())
                 {
                   const typename dealii::Triangulation<dim,
                                                        spacedim>::face_iterator
@@ -4541,9 +4539,8 @@ namespace internal
                   // generate the info from
                   // them
                   for (const auto &cell : tria.active_cell_iterators())
-                    for (unsigned int face_no = 0;
-                         face_no < GeometryInfo<dim>::faces_per_cell;
-                         ++face_no)
+                    for (const unsigned int face_no :
+                         GeometryInfo<dim>::face_indices())
                       {
                         const typename dealii::Triangulation<dim, spacedim>::
                           face_iterator face = cell->face(face_no);

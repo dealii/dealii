@@ -36,7 +36,7 @@ print_triangulation(const Triangulation<dim, dim> &tria)
     {
       deallog << cell.material_id() << " ";
 
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         deallog << (cell.face(f)->at_boundary() ? cell.face(f)->boundary_id() :
                                                   -1)
                 << " ";

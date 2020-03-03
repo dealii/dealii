@@ -75,7 +75,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -113,7 +113,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -151,7 +151,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -194,7 +194,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -240,7 +240,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -286,7 +286,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -336,7 +336,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 
@@ -385,7 +385,7 @@ test()
                                                         tria.begin_active(),
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_val.reinit(cell, f);
 

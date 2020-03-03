@@ -399,9 +399,8 @@ namespace DoFTools
     typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
                                                   endc = dof.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0;
-           f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-           ++f)
+      for (const unsigned int f :
+           GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (cell->at_boundary(f))
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
@@ -494,9 +493,8 @@ namespace DoFTools
     typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
                                                   endc = dof.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0;
-           f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-           ++f)
+      for (const unsigned int f :
+           GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
@@ -578,9 +576,8 @@ namespace DoFTools
                                                   sparsity,
                                                   keep_constrained_dofs);
 
-          for (unsigned int face = 0;
-               face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-               ++face)
+          for (const unsigned int face :
+               GeometryInfo<DoFHandlerType::dimension>::face_indices())
             {
               typename DoFHandlerType::face_iterator cell_face =
                 cell->face(face);
@@ -817,9 +814,8 @@ namespace DoFTools
                                                       keep_constrained_dofs,
                                                       bool_int_dof_mask);
               // Loop over all interior neighbors
-              for (unsigned int face_n = 0;
-                   face_n < GeometryInfo<dim>::faces_per_cell;
-                   ++face_n)
+              for (const unsigned int face_n :
+                   GeometryInfo<dim>::face_indices())
                 {
                   const typename DoFHandler<dim, spacedim>::face_iterator
                     cell_face = cell->face(face_n);
@@ -1147,9 +1143,7 @@ namespace DoFTools
                 bool_int_and_flux_dof_mask[cell->active_fe_index()]);
 
               // Loop over interior faces
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   const typename dealii::hp::DoFHandler<dim,
                                                         spacedim>::face_iterator

@@ -536,9 +536,7 @@ DGMethod<dim>::assemble_system1()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename hp::DoFHandler<dim>::face_iterator face =
             cell->face(face_no);
@@ -715,9 +713,7 @@ DGMethod<dim>::assemble_system2()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename hp::DoFHandler<dim>::face_iterator face =
             cell->face(face_no);

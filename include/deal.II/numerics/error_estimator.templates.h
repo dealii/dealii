@@ -1350,9 +1350,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
          (cell->material_id() == material_id)))
       {
         // loop over all faces of this cell
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             Assert(face_integrals.find(cell->face(face_no)) !=
                      face_integrals.end(),

@@ -61,8 +61,7 @@ void check(Triangulation<3> &tria)
   // active cells on the refined side don't
   // have any children)
   for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
       {
         const Triangulation<dim>::face_iterator face = cell->face(face_no);
 

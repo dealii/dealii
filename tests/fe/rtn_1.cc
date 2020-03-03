@@ -103,7 +103,7 @@ check_face_support_points(const FiniteElement<dim> &fe)
   UpdateFlags       flags = update_values | update_gradients;
   FEFaceValues<dim> vals(mapping, fe, sub_quadrature, flags);
 
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     {
       QProjector<dim>::project_to_face(sub_quadrature, face, points);
       vals.reinit(dof.begin_active(), face);

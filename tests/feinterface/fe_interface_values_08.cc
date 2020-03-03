@@ -116,7 +116,7 @@ test(const FiniteElement<dim> &fe)
   }
 
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     if (!cell->at_boundary(f))
       {
         fiv.reinit(cell,

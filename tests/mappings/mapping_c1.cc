@@ -91,7 +91,7 @@ main()
   for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<2>::face_indices())
       if (cell->face(f)->at_boundary())
         {
           c1_values.reinit(cell, f);

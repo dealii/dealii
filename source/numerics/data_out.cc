@@ -791,9 +791,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     }
 
 
-  for (unsigned int f = 0;
-       f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-       ++f)
+  for (const unsigned int f :
+       GeometryInfo<DoFHandlerType::dimension>::face_indices())
     {
       // let's look up whether the neighbor behind that face is noted in the
       // table of cells which we treat. this can only happen if the neighbor

@@ -55,7 +55,7 @@ namespace dealii
               return false;
           }
 
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -128,7 +128,7 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 {
   typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (c1->at_boundary(f))
         c1->face(f)->set_boundary_id(42);
 }

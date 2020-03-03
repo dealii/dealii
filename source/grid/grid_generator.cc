@@ -2402,9 +2402,7 @@ namespace GridGenerator
                                                           endc = tria.end();
         for (; cell != endc; ++cell)
           {
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
                 if (cell->face(face)->at_boundary())
                   cell->face(face)->set_boundary_id(face);
@@ -3372,9 +3370,7 @@ namespace GridGenerator
         // grid around the cylinder to the new TFI manifold id.
         if (cell->manifold_id() == tfi_manifold_id)
           {
-            for (unsigned int face_n = 0;
-                 face_n < GeometryInfo<2>::faces_per_cell;
-                 ++face_n)
+            for (const unsigned int face_n : GeometryInfo<2>::face_indices())
               {
                 const auto &face = cell->face(face_n);
                 if (face->at_boundary() &&
@@ -3398,8 +3394,7 @@ namespace GridGenerator
       std::numeric_limits<double>::epsilon() * 10000;
     if (colorize)
       for (const auto &cell : tria.active_cell_iterators())
-        for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
           {
             const auto face = cell->face(face_n);
             if (face->at_boundary())
@@ -3582,8 +3577,7 @@ namespace GridGenerator
     for (const auto &cell : cylinder_tria.active_cell_iterators())
       {
         cell->set_manifold_id(tfi_manifold_id);
-        for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
           if (!cell->face(face_n)->at_boundary())
             cell->face(face_n)->set_manifold_id(tfi_manifold_id);
       }
@@ -6649,9 +6643,7 @@ namespace GridGenerator
       };
     if (colorize)
       for (const auto &cell : triangulation.active_cell_iterators())
-        for (unsigned int face_n = 0;
-             face_n < GeometryInfo<dim>::faces_per_cell;
-             ++face_n)
+        for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
           {
             auto face = cell->face(face_n);
             if (face->at_boundary())

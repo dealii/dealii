@@ -590,9 +590,7 @@ namespace Step22
           for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
             local_matrix(i, j) = local_matrix(j, i);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
             if (face->at_boundary() == false)

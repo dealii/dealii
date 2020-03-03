@@ -42,7 +42,7 @@ test(unsigned int ref = 1)
 
 
   tria.begin_active()->set_manifold_id(3);
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     tria.begin_active()->face(f)->set_manifold_id(2);
 
   tria.refine_global(1);
@@ -51,7 +51,7 @@ test(unsigned int ref = 1)
     {
       deallog << "C: " << cell << ", mid: " << (int)cell->manifold_id()
               << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         deallog << "f: " << cell->face(f)
                 << ", mid: " << (int)cell->face(f)->manifold_id() << std::endl;
     }

@@ -682,9 +682,7 @@ namespace GridTools
         // Save face data
         if (dim > 1)
           {
-            for (unsigned int face_n = 0;
-                 face_n < GeometryInfo<dim>::faces_per_cell;
-                 ++face_n)
+            for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
               face_data.insert_face_data(cell->face(face_n));
           }
         // Save line data
@@ -1482,9 +1480,7 @@ namespace GridTools
           endc = triangulation.end();
         for (; cell != endc; ++cell)
           if (!cell->is_artificial())
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               if (cell->face(face)->has_children() &&
                   !cell->face(face)->at_boundary())
                 {
@@ -3566,8 +3562,7 @@ namespace GridTools
           Iterator::AccessorType::structure_dimension;
 
         double diameter = object->diameter();
-        for (unsigned int f = 0; f < GeometryInfo<structdim>::faces_per_cell;
-             ++f)
+        for (const unsigned int f : GeometryInfo<structdim>::face_indices())
           for (unsigned int e = f + 1;
                e < GeometryInfo<structdim>::faces_per_cell;
                ++e)

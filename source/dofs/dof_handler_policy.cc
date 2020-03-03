@@ -289,8 +289,7 @@ namespace internal
 
           // for the four sides
           if (dof_handler.get_fe().dofs_per_line > 0)
-            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell;
-                 ++side)
+            for (const unsigned int side : GeometryInfo<2>::face_indices())
               {
                 const typename DoFHandler<2, spacedim>::line_iterator line =
                   cell->line(side);
@@ -2208,8 +2207,7 @@ namespace internal
 
           // for the four sides
           if (cell->get_fe().dofs_per_line > 0)
-            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell;
-                 ++side)
+            for (const unsigned int side : GeometryInfo<2>::face_indices())
               {
                 typename DoFHandler<dim, spacedim>::line_iterator line =
                   cell->line(side);
@@ -3211,9 +3209,8 @@ namespace internal
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<2>::faces_per_cell;
-                       ++line)
+                  for (const unsigned int line :
+                       GeometryInfo<2>::face_indices())
                     cell->face(line)->set_user_flag();
 
               for (typename DoFHandler<2, spacedim>::cell_iterator cell =

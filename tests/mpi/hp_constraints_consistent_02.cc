@@ -91,7 +91,7 @@ test(const unsigned int degree_center,
         // verify that our scenario is initialized correctly
         // by checking the number of neighbors of the center cell
         unsigned int n_neighbors = 0;
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::face_indices())
           if (static_cast<unsigned int>(cell->neighbor_index(i)) !=
               numbers::invalid_unsigned_int)
             ++n_neighbors;

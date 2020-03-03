@@ -293,10 +293,9 @@ namespace MeshWorker
         cell_worker(cell, scratch, copy);
 
       if (flags & (work_on_faces | work_on_boundary))
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<CellIteratorBaseType::AccessorType::
-                                      Container::dimension>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no :
+             GeometryInfo<CellIteratorBaseType::AccessorType::Container::
+                            dimension>::face_indices())
           {
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))

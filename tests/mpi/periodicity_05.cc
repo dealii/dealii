@@ -44,7 +44,7 @@ main(int argc, char *argv[])
     endc = triangulation.end();
   for (; cell != endc; ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
           const Point<3> face_center = cell->face(f)->center();
           if (cell->face(f)->at_boundary())

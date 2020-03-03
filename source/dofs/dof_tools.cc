@@ -705,9 +705,8 @@ namespace DoFTools
       // only work on cells that are either locally owned or at least ghost
       // cells
       if (cell->is_artificial() == false)
-        for (unsigned int face = 0;
-             face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-             ++face)
+        for (const unsigned int face :
+             GeometryInfo<DoFHandlerType::dimension>::face_indices())
           if (cell->at_boundary(face))
             if (!check_boundary_id ||
                 (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -810,9 +809,8 @@ namespace DoFTools
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
-      for (unsigned int face = 0;
-           face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-           ++face)
+      for (const unsigned int face :
+           GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (cell->at_boundary(face))
           if (!check_boundary_id ||
               (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -993,9 +991,7 @@ namespace DoFTools
         for (const auto &cell : dof_handler.active_cell_iterators())
           if (!cell->is_artificial())
             {
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 if (cell->face(face)->has_children())
                   {
                     const typename dealii::DoFHandler<dim,
@@ -2140,9 +2136,8 @@ namespace DoFTools
                                                     dof_handler.begin_active(),
                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0;
-           f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-           ++f)
+      for (const unsigned int f :
+           GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (cell->at_boundary(f))
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
@@ -2186,9 +2181,8 @@ namespace DoFTools
                                                     dof_handler.begin_active(),
                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (unsigned int f = 0;
-           f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-           ++f)
+      for (const unsigned int f :
+           GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
@@ -2580,9 +2574,8 @@ namespace DoFTools
             std::fill(exclude.begin(), exclude.end(), false);
             const unsigned int dpf = fe.dofs_per_face;
 
-            for (unsigned int face = 0;
-                 face < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face :
+                 GeometryInfo<DoFHandlerType::dimension>::face_indices())
               if (cell->at_boundary(face) ||
                   cell->neighbor(face)->level() != cell->level())
                 for (unsigned int i = 0; i < dpf; ++i)
@@ -2655,10 +2648,8 @@ namespace DoFTools
                 // Now remove all degrees of freedom on the domain boundary
                 // from the exclusion list
                 if (boundary_dofs)
-                  for (unsigned int face = 0;
-                       face <
-                       GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-                       ++face)
+                  for (const unsigned int face :
+                       GeometryInfo<DoFHandlerType::dimension>::face_indices())
                     if (cell->at_boundary(face))
                       for (unsigned int i = 0; i < dpf; ++i)
                         exclude[fe.face_to_cell_index(i, face)] = false;

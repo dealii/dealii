@@ -98,7 +98,7 @@ void generate_grid(Triangulation<2> &triangulation)
   Triangulation<2>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (unsigned int j = 0; j < GeometryInfo<2>::faces_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
       if (cell_1->face(j)->center()(1) > 2.9)
         face_1 = cell_1->face(j);

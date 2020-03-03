@@ -74,7 +74,7 @@ test()
 
   cell = dof_handler.begin_active();
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         deallog << "cell=" << cell << ", face=" << f
                 << ", fe_index=" << cell->active_fe_index() << ", dofs=";

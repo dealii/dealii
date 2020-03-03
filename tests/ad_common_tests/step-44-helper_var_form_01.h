@@ -800,8 +800,7 @@ namespace Step44
                                                       endc =
                                                         triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
@@ -1206,8 +1205,7 @@ namespace Step44
               lqph[q_point]->get_Psi(F, p_tilde[q_point], J_tilde[q_point]) *
               JxW;
           }
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->boundary_id() == 6)
             {

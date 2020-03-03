@@ -192,7 +192,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     {
       const unsigned int fe_index = cell->active_fe_index();
       local_face_dof_indices.resize(fe_collection[fe_index].dofs_per_face);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (!cell->at_boundary(f)) // that's enough for our simple mesh
           {
             deallog << "cell=" << cell << " face=" << f << std::endl;

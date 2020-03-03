@@ -3243,9 +3243,8 @@ namespace GridTools
     std::vector<typename MeshType::active_cell_iterator> &active_neighbors)
   {
     active_neighbors.clear();
-    for (unsigned int n = 0;
-         n < GeometryInfo<MeshType::dimension>::faces_per_cell;
-         ++n)
+    for (const unsigned int n :
+         GeometryInfo<MeshType::dimension>::face_indices())
       if (!cell->at_boundary(n))
         {
           if (MeshType::dimension == 1)

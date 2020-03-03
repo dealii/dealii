@@ -390,7 +390,7 @@ namespace Step36
          cell != dof_handler.end();
          ++cell)
       if (cell_is_pou(cell))
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (!cell->at_boundary(f))
             {
               bool face_is_on_interface = false;

@@ -443,8 +443,7 @@ namespace Step51
       , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
           {
             if (fe_local.has_support_on_face(i, face))
@@ -453,8 +452,7 @@ namespace Step51
               }
           }
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           {
             if (fe.has_support_on_face(i, face))
@@ -635,8 +633,7 @@ namespace Step51
           }
       }
 
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         scratch.fe_face_values_local.reinit(loc_cell, face);
         scratch.fe_face_values.reinit(cell, face);
@@ -974,8 +971,7 @@ namespace Step51
     typename Triangulation<dim>::cell_iterator cell = triangulation.begin(),
                                                endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           for (unsigned int d = 0; d < dim; ++d)
             if ((std::fabs(cell->face(face)->center()(d) - (1)) < 1e-12))

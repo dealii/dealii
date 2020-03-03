@@ -3528,9 +3528,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                                                 {2, 3, 0, 1},
                                                 {6, 7, 4, 5}};
 
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   // Set up the right hand side
                   // for the horizontal shape

@@ -1325,9 +1325,7 @@ namespace MGTools
             const unsigned int        level = cell->level();
             local_dofs.resize(fe.dofs_per_face);
 
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(face_no) == true)
                 {
                   const typename DoFHandler<dim, spacedim>::face_iterator face =
@@ -1354,9 +1352,7 @@ namespace MGTools
           if (dof.get_triangulation().locally_owned_subdomain() ==
                 numbers::invalid_subdomain_id ||
               cell->level_subdomain_id() != numbers::artificial_subdomain_id)
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(face_no) == false)
                   continue;
@@ -1487,9 +1483,7 @@ namespace MGTools
                   cell_dofs_interface.end(),
                   false);
 
-        for (unsigned int face_nr = 0;
-             face_nr < GeometryInfo<dim>::faces_per_cell;
-             ++face_nr)
+        for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
           {
             const typename DoFHandler<dim, spacedim>::face_iterator face =
               cell->face(face_nr);
@@ -1568,9 +1562,7 @@ namespace MGTools
 
         std::fill(cell_dofs.begin(), cell_dofs.end(), false);
 
-        for (unsigned int face_nr = 0;
-             face_nr < GeometryInfo<dim>::faces_per_cell;
-             ++face_nr)
+        for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
           {
             const typename DoFHandler<dim, spacedim>::face_iterator face =
               cell->face(face_nr);

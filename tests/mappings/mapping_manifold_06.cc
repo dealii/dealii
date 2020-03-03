@@ -66,7 +66,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         const double xc = cell->face(f)->center()[0] - 1.5;
         const double yc = cell->face(f)->center()[1] - 2.5;
@@ -100,7 +100,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         const double xc = cell->face(f)->center()[0] - 1.5;
         const double yc = cell->face(f)->center()[1] - 2.5;

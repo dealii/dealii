@@ -795,7 +795,7 @@ LaplaceProblem<3>::create_coarse_grid()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if ((cell->face(f)->center()[2] != -4) &&
           (cell->face(f)->center()[2] != 7) && (cell->face(f)->at_boundary()))
         cell->face(f)->set_boundary_id(1);

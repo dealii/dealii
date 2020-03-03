@@ -106,9 +106,7 @@ main()
       if (cell->material_id() == 2)
         {
           cell->set_manifold_id(tfi_id);
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<2>::faces_per_cell;
-               ++face_n)
+          for (const unsigned int face_n : GeometryInfo<2>::face_indices())
             {
               if (cell->face(face_n)->at_boundary())
                 cell->face(face_n)->set_manifold_id(polar_id);
@@ -127,8 +125,7 @@ main()
   std::vector<Point<2> *> inner_pointers;
   for (const auto &cell : result_2.active_cell_iterators())
     {
-      for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
-           ++face_n)
+      for (const unsigned int face_n : GeometryInfo<2>::face_indices())
         {
           if (cell->face(face_n)->manifold_id() == polar_id)
             {
@@ -157,9 +154,7 @@ main()
     {
       if (cell->at_boundary())
         {
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<2>::faces_per_cell;
-               ++face_n)
+          for (const unsigned int face_n : GeometryInfo<2>::face_indices())
             {
               auto face = cell->face(face_n);
               if (face->at_boundary())

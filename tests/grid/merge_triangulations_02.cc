@@ -46,8 +46,7 @@ mesh_info(const Triangulation<dim> &tria)
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;

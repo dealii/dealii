@@ -50,7 +50,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
          tria.begin_active();
        cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         deallog << cell << ' ' << f << ": " << (int)cell->face(f)->boundary_id()
                 << std::endl;
