@@ -815,6 +815,11 @@ do_test(const DoFHandler<dim> &          dof,
 
   matrix.vmult(out, in);
 
+  // zero constrained dofs
+  for (unsigned int i = 0; i < dof.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      out(i) = 0;
+
   MatrixFree<dim, number, VectorizedArrayType> mf_data;
   const QGauss<1> quad(n_q_points_1d > 0 ? n_q_points_1d :
                                            dof.get_fe().degree + 1);
