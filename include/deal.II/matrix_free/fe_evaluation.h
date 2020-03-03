@@ -3899,7 +3899,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           Assert(cells[v] < dof_info->row_starts.size() - 1,
                  ExcInternalError());
           has_constraints =
-            has_constraints &&
+            has_constraints ||
             dof_info
                 ->row_starts[cells[v] * n_fe_components +
                              first_selected_component + n_components]
