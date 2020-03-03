@@ -105,8 +105,7 @@ check(Triangulation<dim> &tria)
   Tensor<1, dim> n;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           {
             fe_face_values.reinit(cell, face);

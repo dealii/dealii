@@ -331,8 +331,7 @@ test(const FiniteElement<dim> & fe_base,
             fe_values_system.shape_grad_component(i, q_point, 3),
             fe_values_system.shape_hessian_component(i, q_point, 3));
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           fe_face_values_enriched.reinit(cell_enriched, face);
           fe_face_values_system.reinit(cell_system, face);

@@ -3444,9 +3444,7 @@ namespace DoFTools
           cell_dofs.resize(fe.dofs_per_cell);
           cell->get_dof_indices(cell_dofs);
 
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
             {
               const typename DoFHandlerType<dim, spacedim>::face_iterator face =
                 cell->face(face_no);

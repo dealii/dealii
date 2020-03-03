@@ -530,7 +530,7 @@ project(const Mapping<dim> &             mapping,
                                                      endc = dof.end();
       std::vector<types::global_dof_index> face_dof_indices(fe.dofs_per_face);
       for (; cell != endc; ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
               cell->face(f)->get_dof_indices(face_dof_indices);
@@ -665,7 +665,7 @@ void plot_shapes(DoFHandler<2> &dof_handler)
   std::vector<types::global_dof_index> face_dof_indices(
     dof_handler.get_fe().dofs_per_face);
   for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<2>::face_indices())
       {
         cell->face(f)->get_dof_indices(face_dof_indices);
         for (unsigned int i = 0; i < dof_handler.get_fe().dofs_per_face; ++i)

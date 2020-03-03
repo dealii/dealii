@@ -1403,9 +1403,8 @@ namespace GridTools
 
     std::vector<typename MeshType::active_cell_iterator> patch;
     patch.push_back(cell);
-    for (unsigned int face_number = 0;
-         face_number < GeometryInfo<MeshType::dimension>::faces_per_cell;
-         ++face_number)
+    for (const unsigned int face_number :
+         GeometryInfo<MeshType::dimension>::face_indices())
       if (cell->face(face_number)->at_boundary() == false)
         {
           if (cell->neighbor(face_number)->has_children() == false)
@@ -1816,9 +1815,8 @@ namespace GridTools
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (unsigned int f = 0;
-                 f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-                 ++f)
+            for (const unsigned int f :
+                 GeometryInfo<DoFHandlerType::dimension>::face_indices())
               {
                 if (cell->face(f)->has_children())
                   {

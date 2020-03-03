@@ -36,7 +36,7 @@ print_info(Triangulation<dim, spacedim> &tria)
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary())
           deallog << "face: " << cell->face(f)
                   << ", boundary_id: " << (int)cell->face(f)->boundary_id()

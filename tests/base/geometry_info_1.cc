@@ -34,7 +34,7 @@ void
 test()
 {
   // Output normal directions for each face
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "Face " << f << ": n = ( ";
       for (unsigned int d = 0; d < dim; ++d)

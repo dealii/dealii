@@ -101,7 +101,7 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
       cell->get_dof_indices(local_dof_indices);
       fe_v.reinit(cell);
 
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<2>::face_indices())
         {
           if (!cell->face(f)->at_boundary())
             {
@@ -199,7 +199,7 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
     {
       cell->get_dof_indices(local_dof_indices);
 
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<2>::face_indices())
         {
           if (!cell->face(f)->at_boundary())
             {

@@ -36,7 +36,7 @@ void check_this(Triangulation<3> &tria)
   // active ones
   for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       if (cell->has_children())
         for (unsigned int c = 0; c < GeometryInfo<3>::max_children_per_face;
              ++c)

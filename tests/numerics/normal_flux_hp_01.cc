@@ -47,7 +47,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
     cell->set_active_fe_index(cell->index() % 2);
   dof.distribute_dofs(fe);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "FE=" << fe[0].get_name() << ", case=" << i << std::endl;
 
@@ -70,7 +70,7 @@ test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     tr.begin_active()->face(i)->set_boundary_id(i);
 
   tr.refine_global(2);

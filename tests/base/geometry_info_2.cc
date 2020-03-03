@@ -48,12 +48,12 @@ test()
   deallog << "quads_per_face    " << GeometryInfo<dim>::quads_per_face
           << std::endl;
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     deallog << "face normal" << f << ' '
             << (GeometryInfo<dim>::unit_normal_orientation[f] > 0. ? '+' : '-')
             << "x" << GeometryInfo<dim>::unit_normal_direction[f] << std::endl;
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "face_children" << f << "[true ]";
       for (unsigned int v = 0; v < GeometryInfo<dim>::max_children_per_face;
@@ -71,7 +71,7 @@ test()
       deallog << std::endl;
     }
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "face_vertices" << f << "[true ]";
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
@@ -83,7 +83,7 @@ test()
       deallog << std::endl;
     }
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "face_lines" << f << "[true ]";
       for (unsigned int v = 1; v <= GeometryInfo<dim>::lines_per_face; ++v)

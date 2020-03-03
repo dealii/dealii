@@ -57,8 +57,7 @@ check<2>()
 
   const typename Triangulation<dim>::active_cell_iterator cell =
     triangulation.begin_active();
-  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-       ++face_no)
+  for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
     {
       const typename Triangulation<dim>::face_iterator face =
         cell->face(face_no);
@@ -88,8 +87,7 @@ check<3>()
 
   const typename Triangulation<dim>::active_cell_iterator cell =
     triangulation.begin_active();
-  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-       ++face_no)
+  for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
     {
       const typename Triangulation<dim>::face_iterator face =
         cell->face(face_no);

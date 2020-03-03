@@ -56,7 +56,7 @@ plot_derivatives(Mapping<dim> &      mapping,
                        finel,
                        q,
                        UpdateFlags(update_gradients | update_hessians));
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     {
       fe.reinit(c, face);
 

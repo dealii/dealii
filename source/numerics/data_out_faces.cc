@@ -424,7 +424,7 @@ DataOutFaces<dim, DoFHandlerType>::first_face()
     cell = this->triangulation->begin_active();
   for (; cell != this->triangulation->end(); ++cell)
     if (cell->is_locally_owned())
-      for (unsigned int f = 0; f < GeometryInfo<dimension>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dimension>::face_indices())
         if (!surface_only || cell->face(f)->at_boundary())
           return FaceDescriptor(cell, f);
 
@@ -471,8 +471,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
       // check all the faces of this active cell. but skip it altogether
       // if it isn't locally owned
       if (active_cell->is_locally_owned())
-        for (unsigned int f = 0; f < GeometryInfo<dimension>::faces_per_cell;
-             ++f)
+        for (const unsigned int f : GeometryInfo<dimension>::face_indices())
           if (!surface_only || active_cell->face(f)->at_boundary())
             {
               face.first  = active_cell;

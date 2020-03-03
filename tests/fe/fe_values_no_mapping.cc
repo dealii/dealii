@@ -110,7 +110,7 @@ test()
         fe_val_m.get_function_values(interpolant, values_m);
         Assert(values[0] == values_m[0], ExcInternalError())
 
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_f_val.reinit(cell, f);
           fe_f_val_m.reinit(cell, f);

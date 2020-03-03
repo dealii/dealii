@@ -97,8 +97,7 @@ test2()
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         fe_face_values.reinit(cell, face);
         const unsigned int                     n_q_points = quadrature.size();

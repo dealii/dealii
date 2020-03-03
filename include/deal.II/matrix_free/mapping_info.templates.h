@@ -1963,9 +1963,7 @@ namespace internal
               cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           std::size_t storage_length = 0;
           for (unsigned int i = 0; i < cell_type.size(); ++i)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
                 if (cell_type[i] <= affine)
                   {

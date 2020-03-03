@@ -114,7 +114,7 @@ test()
 
   for (Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary() &&
           std::abs(cell->face(f)->center()[0] + 1.) < 1e-12 &&
           std::abs(cell->face(f)->center()[1]) < 1e-12)

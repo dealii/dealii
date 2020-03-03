@@ -1147,9 +1147,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                    cell != dof_handler.end(additional_data.mg_level + 1);
                    ++cell)
                 if (cell->level_subdomain_id() == task_info.my_pid)
-                  for (unsigned int f = 0;
-                       f < GeometryInfo<dim>::faces_per_cell;
-                       ++f)
+                  for (const unsigned int f : GeometryInfo<dim>::face_indices())
                     if ((cell->at_boundary(f) == false ||
                          cell->has_periodic_neighbor(f) == true) &&
                         cell->level() >

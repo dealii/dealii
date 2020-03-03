@@ -61,9 +61,7 @@ run()
       {
         if (cell->is_locally_owned())
           {
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
                 if (cell->face(face)->at_boundary())
                   {

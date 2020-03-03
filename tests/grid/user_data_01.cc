@@ -55,7 +55,7 @@ check_user_pointers(Triangulation<dim> &tr)
     for (typename Triangulation<dim>::cell_iterator it = tr.begin();
          it != tr.end();
          ++it)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (it->face(f)->user_flag_set() == false)
           {
             deallog << '.';
@@ -107,7 +107,7 @@ check_user_indices(Triangulation<dim> &tr)
     for (typename Triangulation<dim>::cell_iterator it = tr.begin();
          it != tr.end();
          ++it)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (it->face(f)->user_flag_set() == false)
           {
             deallog << '.';
@@ -156,7 +156,7 @@ user_pointers(Triangulation<dim> &tr)
     for (typename Triangulation<dim>::cell_iterator it = tr.begin();
          it != tr.end();
          ++it)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (it->face(f)->user_flag_set() == false)
           {
             it->face(f)->set_user_pointer(p++);
@@ -213,7 +213,7 @@ user_indices(Triangulation<dim> &tr)
       it->clear_user_index();
 
       if (dim > 1)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           it->face(f)->clear_user_index();
 
       if (dim > 2)
@@ -236,7 +236,7 @@ user_indices(Triangulation<dim> &tr)
     for (typename Triangulation<dim>::cell_iterator it = tr.begin();
          it != tr.end();
          ++it)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (it->face(f)->user_flag_set() == false)
           {
             it->face(f)->set_user_index(p++);

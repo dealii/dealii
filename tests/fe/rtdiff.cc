@@ -61,7 +61,7 @@ initialize_node_matrix(const FiniteElement<dim> &other,
   // the normal component of the
   // shape function, possibly
   // pointing in negative direction.
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     for (unsigned int k = 0; k < other.dofs_per_face; ++k)
       {
         for (unsigned int i = 0; i < n_dofs; ++i)

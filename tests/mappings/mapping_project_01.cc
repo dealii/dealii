@@ -49,7 +49,7 @@ dim2_grid()
           << ", and unit coordinates: "
           << mapping.transform_real_to_unit_cell(cell, testp) << std::endl;
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<2>::faces_per_cell; ++face)
+    for (const unsigned int face : GeometryInfo<2>::face_indices())
       {
         deallog << "For face: " << face << ", the test point projects to: "
                 << mapping.project_real_point_to_unit_point_on_face(cell,
@@ -80,7 +80,7 @@ dim3_grid()
           << ", and unit coordinates: "
           << mapping.transform_real_to_unit_cell(cell, testp) << std::endl;
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell; ++face)
+    for (const unsigned int face : GeometryInfo<3>::face_indices())
       {
         deallog << "For face: " << face << ", the test point projects to: "
                 << mapping.project_real_point_to_unit_point_on_face(cell,
@@ -115,7 +115,7 @@ dim3_parallelepiped_grid()
           << mapping.transform_real_to_unit_cell(cell, testp) << std::endl;
 
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell; ++face)
+    for (const unsigned int face : GeometryInfo<3>::face_indices())
       {
         deallog << "For face: " << face << ", the test point projects to: "
                 << mapping.project_real_point_to_unit_point_on_face(cell,

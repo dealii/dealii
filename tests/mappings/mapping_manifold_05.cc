@@ -72,7 +72,7 @@ test()
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell =
     triangulation.begin_active();
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       fe_values_mapping.reinit(cell, f);
       fe_values_q.reinit(cell, f);

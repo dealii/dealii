@@ -46,7 +46,7 @@ void check_this(Triangulation<3> &tria)
        ++cell)
     {
       std::set<unsigned int> vertices;
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
           vertices.insert(cell->face(f)->vertex_index(0));
           vertices.insert(cell->face(f)->vertex_index(1));

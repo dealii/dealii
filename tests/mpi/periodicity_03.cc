@@ -566,9 +566,7 @@ namespace Step22
     // first collect all points locally
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned() && cell->at_boundary())
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             const typename DoFHandler<dim>::face_iterator face =
               cell->face(face_no);

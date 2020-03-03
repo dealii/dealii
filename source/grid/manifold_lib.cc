@@ -1889,8 +1889,7 @@ namespace
           make_array_view(weights.begin(), weights.end());
         const auto points_view = make_array_view(points.begin(), points.end());
 
-        for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<3>::face_indices())
           {
             const double       my_weight = linear_shapes[face];
             const unsigned int face_even = face - face % 2;

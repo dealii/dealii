@@ -100,9 +100,7 @@ public:
             const FiniteElement<dim> &fe = cell->get_fe();
             local_dofs.resize(fe.dofs_per_face);
 
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(face_no) == true)
                 {
                   const typename DoFHandler<dim>::face_iterator face =

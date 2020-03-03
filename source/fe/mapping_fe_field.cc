@@ -581,7 +581,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::compute_face_data(
             dim - 1, std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+          for (const unsigned int i : GeometryInfo<dim>::face_indices())
             {
               data.unit_tangentials[i].resize(n_original_q_points);
               std::fill(data.unit_tangentials[i].begin(),

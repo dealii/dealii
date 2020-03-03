@@ -447,9 +447,8 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int face = 0;
-                     face < GeometryInfo<dim>::faces_per_cell;
-                     ++face)
+                for (const unsigned int face :
+                     GeometryInfo<dim>::face_indices())
                   if (cell->face(face)->user_flag_set() == false)
                     {
                       // Ok, face has not been visited. So we need to
@@ -539,9 +538,8 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int face = 0;
-                     face < GeometryInfo<dim>::faces_per_cell;
-                     ++face)
+                for (const unsigned int face :
+                     GeometryInfo<dim>::face_indices())
                   if (!cell->face(face)->user_flag_set())
                     {
                       // Same decision tree as before

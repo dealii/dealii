@@ -45,7 +45,7 @@ test(unsigned int ref = 1)
     {
       deallog << "C: " << cell << ", mid: " << (int)cell->manifold_id()
               << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         deallog << "f: " << cell->face(f)
                 << ", mid: " << (int)cell->face(f)->manifold_id() << std::endl;
     }

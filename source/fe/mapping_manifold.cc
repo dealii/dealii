@@ -117,7 +117,7 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                      std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+          for (const unsigned int i : GeometryInfo<dim>::face_indices())
             {
               unit_tangentials[i].resize(n_original_q_points);
               std::fill(unit_tangentials[i].begin(),

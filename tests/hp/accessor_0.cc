@@ -107,9 +107,7 @@ main()
           deallog << "cell uses fe index " << fe_index << ": "
                   << index_is_active << std::endl;
 
-          for (unsigned int face_n = 0;
-               face_n < GeometryInfo<1>::faces_per_cell;
-               ++face_n)
+          for (const unsigned int face_n : GeometryInfo<1>::face_indices())
             {
               AssertThrow(&cell->face(face_n)->get_fe(fe_index) ==
                             &fe_collection[fe_index],
