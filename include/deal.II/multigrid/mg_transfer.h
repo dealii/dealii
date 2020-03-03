@@ -417,6 +417,14 @@ protected:
    */
   SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<VectorType>>
     mg_constrained_dofs;
+
+private:
+  /**
+   * This function is called to make sure that build() has been invoked.
+   */
+  template <int dim, int spacedim>
+  void
+  assert_built(const DoFHandler<dim, spacedim> &dof_handler) const;
 };
 
 
@@ -634,6 +642,14 @@ protected:
    */
   mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
     solution_ghosted_level_vector;
+
+private:
+  /**
+   * This function is called to make sure that build() has been invoked.
+   */
+  template <int dim, int spacedim>
+  void
+  assert_built(const DoFHandler<dim, spacedim> &dof_handler) const;
 };
 
 
