@@ -252,7 +252,7 @@ namespace Particles
      * function on the calling mpi process, and that falls within the part of
      * triangulation owned by this mpi process.
      *
-     * @param[in] position A vector of points that do not need to be on the
+     * @param[in] positions A vector of points that do not need to be on the
      * local processor, but have to be in the triangulation that is associated
      * with this ParticleHandler object.
      *
