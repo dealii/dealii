@@ -435,10 +435,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
-  for (typename DoFHandlerType::active_cell_iterator cell =
-         dof_handler.begin_active();
-       cell != dof_handler.end();
-       ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (((subdomain_id == numbers::invalid_subdomain_id) ||
          (cell->subdomain_id() == subdomain_id)) &&
         ((material_id == numbers::invalid_material_id) ||

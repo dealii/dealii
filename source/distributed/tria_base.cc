@@ -193,10 +193,7 @@ namespace parallel
 
     {
       // find ghost owners
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         if (cell->is_ghost())
           number_cache.ghost_owners.insert(cell->subdomain_id());
 
@@ -206,10 +203,7 @@ namespace parallel
     }
 
     if (this->n_levels() > 0)
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         if (cell->subdomain_id() == my_subdomain)
           ++number_cache.n_locally_owned_active_cells;
 

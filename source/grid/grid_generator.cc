@@ -6100,10 +6100,7 @@ namespace GridGenerator
         intergrid_map.make_mapping(result, triangulation_2);
 
         bool any_cell_flagged = false;
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator
-               result_cell = result.begin_active();
-             result_cell != result.end();
-             ++result_cell)
+        for (const auto &result_cell : result.active_cell_iterators())
           if (intergrid_map[result_cell]->has_children())
             {
               any_cell_flagged = true;
@@ -6134,10 +6131,7 @@ namespace GridGenerator
     // the loop through the cells and copy stuff, excluding
     // the ones we are to remove
     std::vector<CellData<dim>> cells;
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           input_triangulation.begin_active();
-         cell != input_triangulation.end();
-         ++cell)
+    for (const auto &cell : input_triangulation.active_cell_iterators())
       if (cells_to_remove.find(cell) == cells_to_remove.end())
         {
           Assert(static_cast<unsigned int>(cell->level()) ==

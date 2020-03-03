@@ -173,10 +173,7 @@ namespace internal
           // first
           std::vector<bool> locally_used_vertices(
             dof_handler.tria->n_vertices(), false);
-          for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator cell =
-                 dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
               for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 locally_used_vertices[cell->vertex_index(v)] = true;
@@ -185,10 +182,7 @@ namespace internal
             dof_handler.fe_collection.size(),
             std::vector<bool>(dof_handler.tria->n_vertices(), false));
 
-          for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator cell =
-                 dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
               for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 vertex_fe_association[cell->active_fe_index()]
@@ -771,10 +765,7 @@ namespace internal
               dof_handler.fe_collection.size(),
               std::vector<bool>(dof_handler.tria->n_raw_lines(), false));
 
-            for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
                      ++l)

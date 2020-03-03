@@ -54,10 +54,7 @@ namespace
     vertex_touch_count.resize(triangulation.n_vertices());
     vertex_to_cell.resize(triangulation.n_vertices());
 
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           ++vertex_touch_count[cell->vertex_index(v)];
@@ -81,10 +78,7 @@ namespace
     edge_touch_count.resize(triangulation.n_active_lines());
     edge_to_cell.resize(triangulation.n_active_lines());
 
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         {
           ++edge_touch_count[cell->line(l)->index()];
@@ -652,10 +646,7 @@ namespace
   {
     // count how many flags are set and allocate that much memory
     unsigned int n_refine_flags = 0, n_coarsen_flags = 0;
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         // skip cells that are not local
         if (cell->subdomain_id() != my_subdomain)
@@ -3488,10 +3479,7 @@ namespace parallel
       if (settings & mesh_reconstruction_after_repartitioning)
         while (this->begin_active()->level() > 0)
           {
-            for (typename Triangulation<dim, spacedim>::active_cell_iterator
-                   cell = this->begin_active();
-                 cell != this->end();
-                 ++cell)
+            for (const auto &cell : this->active_cell_iterators())
               {
                 cell->set_coarsen_flag();
               }
@@ -3614,10 +3602,7 @@ namespace parallel
 
           // see if any flags are still set
           mesh_changed = false;
-          for (typename Triangulation<dim, spacedim>::active_cell_iterator
-                 cell = this->begin_active();
-               cell != this->end();
-               ++cell)
+          for (const auto &cell : this->active_cell_iterators())
             if (cell->refine_flag_set() || cell->coarsen_flag_set())
               {
                 mesh_changed = true;
@@ -3645,10 +3630,7 @@ namespace parallel
       // check if correct number of ghosts is created
       unsigned int num_ghosts = 0;
 
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         {
           if (cell->subdomain_id() != this->my_subdomain &&
               cell->subdomain_id() != numbers::artificial_subdomain_id)
@@ -3783,10 +3765,7 @@ namespace parallel
 
         // count the number of owned, active cells and compare with p4est.
         unsigned int n_owned = 0;
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-               this->begin_active();
-             cell != this->end();
-             ++cell)
+        for (const auto &cell : this->active_cell_iterators())
           {
             if (cell->subdomain_id() == this->my_subdomain)
               ++n_owned;
@@ -3814,10 +3793,7 @@ namespace parallel
     {
       // do not allow anisotropic refinement
 #  ifdef DEBUG
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         if (cell->is_locally_owned() && cell->refine_flag_set())
           Assert(cell->refine_flag_set() ==
                    RefinementPossibilities<dim>::isotropic_refinement,
@@ -3853,10 +3829,7 @@ namespace parallel
       // now do the work we're supposed to do when we are in charge
       // make sure all flags are cleared on cells we don't own, since nothing
       // good can come of that if they are still around
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         if (cell->is_ghost() || cell->is_artificial())
           {
             cell->clear_refine_flag();
@@ -3974,10 +3947,7 @@ namespace parallel
       // finally copy back from local part of tree to deal.II
       // triangulation. before doing so, make sure there are no refine or
       // coarsen flags pending
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         {
           cell->clear_refine_flag();
           cell->clear_coarsen_flag();
@@ -4074,10 +4044,7 @@ namespace parallel
     Triangulation<dim, spacedim>::repartition()
     {
 #  ifdef DEBUG
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         if (cell->is_locally_owned())
           Assert(
             !cell->refine_flag_set() && !cell->coarsen_flag_set(),

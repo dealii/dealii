@@ -110,10 +110,7 @@ namespace
            ExcInternalError());
 
     unsigned int owned_index = 0;
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           tria.begin_active();
-         cell != tria.end();
-         ++cell)
+    for (const auto &cell : tria.active_cell_iterators())
       if (cell->subdomain_id() == tria.locally_owned_subdomain())
         {
           locally_owned_indicators(owned_index) =
@@ -170,10 +167,7 @@ namespace
 
     // as a final good measure, delete all flags again from cells that we don't
     // locally own
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           tria.begin_active();
-         cell != tria.end();
-         ++cell)
+    for (const auto &cell : tria.active_cell_iterators())
       if (cell->subdomain_id() != tria.locally_owned_subdomain())
         {
           cell->clear_refine_flag();

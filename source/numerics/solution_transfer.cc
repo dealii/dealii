@@ -291,10 +291,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
   // and that'll stay or be refined
   unsigned int n_cells_to_coarsen        = 0;
   unsigned int n_cells_to_stay_or_refine = 0;
-  for (typename DoFHandlerType::active_cell_iterator act_cell =
-         dof_handler->begin_active();
-       act_cell != dof_handler->end();
-       ++act_cell)
+  for (const auto &act_cell : dof_handler->active_cell_iterators())
     {
       if (act_cell->coarsen_flag_set())
         ++n_cells_to_coarsen;

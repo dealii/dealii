@@ -697,10 +697,7 @@ namespace DoFTools
     // do not support boundaries of dimension dim-2, and so every isolated
     // boundary line is also part of a boundary face which we will be
     // visiting sooner or later
-    for (typename DoFHandlerType::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
 
       // only work on cells that are either locally owned or at least ghost
       // cells
@@ -805,10 +802,7 @@ namespace DoFTools
     // do not support boundaries of dimension dim-2, and so every isolated
     // boundary line is also part of a boundary face which we will be
     // visiting sooner or later
-    for (typename DoFHandlerType::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       for (const unsigned int face :
            GeometryInfo<DoFHandlerType::dimension>::face_indices())
         if (cell->at_boundary(face))
