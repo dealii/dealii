@@ -298,7 +298,7 @@ namespace CUDAWrappers
 
     // clang-format off
     /**
-     * Same as above, except that the functor @func only takes a single input
+     * Same as above, except that the functor @p func only takes a single input
      * argument (fe_eval) and computes the quadrature point from the thread id.
      *
      * @p func needs to define

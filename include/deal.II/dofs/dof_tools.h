@@ -2523,7 +2523,7 @@ namespace DoFTools
    * @param[in,out] support_points A map that for every locally relevant DoF
    * index contains the corresponding location in real space coordinates.
    * Previous content of this object is deleted in this function.
-   * @param[in] component_mask An optional component mask that restricts the
+   * @param[in] mask An optional component mask that restricts the
    * components from which the support points are extracted.
    */
   template <int dim, int spacedim>

@@ -330,7 +330,7 @@ private:
   unsigned int n_vars;
 
   /**
-   * Number of components is equal dim<sup>rank<\sup>.
+   * Number of components is equal dim<sup>rank</sup>.
    */
   unsigned int n_components;
 };
