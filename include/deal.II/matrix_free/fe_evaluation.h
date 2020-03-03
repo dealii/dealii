@@ -3877,6 +3877,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   VectorizedArrayType **values_dofs =
     const_cast<VectorizedArrayType **>(&this->values_dofs[0]);
 
+  // Assign the appropriate cell ids for face/cell case and get the pointers
+  // to the dof indices of the cells on all lanes
   unsigned int        cells_copied[n_vectorization];
   const unsigned int *cells;
   unsigned int        n_vectorization_actual =
@@ -3898,20 +3900,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           Assert(cells[v] < dof_info->row_starts.size() - 1,
                  ExcInternalError());
-          has_constraints =
-            has_constraints ||
-            dof_info
-                ->row_starts[cells[v] * n_fe_components +
-                             first_selected_component + n_components]
-                .second != dof_info
-                             ->row_starts[cells[v] * n_fe_components +
-                                          first_selected_component]
-                             .second;
-          dof_indices[v] = dof_info->dof_indices.data() +
-                           dof_info
-                             ->row_starts[cells[v] * n_fe_components +
-                                          first_selected_component]
-                             .first;
+          const std::pair<unsigned int, unsigned int> *my_index_start =
+            &dof_info->row_starts[cells[v] * n_fe_components +
+                                  first_selected_component];
+
+          // check whether any of the SIMD lanes has constraints, i.e., the
+          // constraint indicator which is the second entry of row_starts
+          // increments on this cell
+          if (my_index_start[n_components].second != my_index_start[0].second)
+            has_constraints = true;
+
+          dof_indices[v] =
+            dof_info->dof_indices.data() + my_index_start[0].first;
         }
       for (unsigned int v = n_vectorization_actual; v < n_vectorization; ++v)
         dof_indices[v] = nullptr;
@@ -3924,41 +3924,21 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         n_fe_components > 1 ? n_components : 1;
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         {
-          if (dof_info
-                ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                             first_selected_component + n_components_read]
-                .second !=
-              dof_info
-                ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                             first_selected_component]
-                .second)
+          const std::pair<unsigned int, unsigned int> *my_index_start =
+            &dof_info
+               ->row_starts[(cell * n_vectorization + v) * n_fe_components +
+                            first_selected_component];
+          if (my_index_start[n_components_read].second !=
+              my_index_start[0].second)
             has_constraints = true;
-          Assert(
-            dof_info
-                  ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                               first_selected_component + n_components_read]
-                  .first ==
-                dof_info
-                  ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                               first_selected_component]
-                  .first ||
-              dof_info
-                  ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                               first_selected_component]
-                  .first < dof_info->dof_indices.size(),
-            ExcIndexRange(
-              0,
-              dof_info
-                ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                             first_selected_component]
-                .first,
-              dof_info->dof_indices.size()));
+          Assert(my_index_start[n_components_read].first ==
+                     my_index_start[0].first ||
+                   my_index_start[0].first < dof_info->dof_indices.size(),
+                 ExcIndexRange(0,
+                               my_index_start[0].first,
+                               dof_info->dof_indices.size()));
           dof_indices[v] =
-            dof_info->dof_indices.data() +
-            dof_info
-              ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                           first_selected_component]
-              .first;
+            dof_info->dof_indices.data() + my_index_start[0].first;
         }
       for (unsigned int v = n_vectorization_actual; v < n_vectorization; ++v)
         dof_indices[v] = nullptr;
