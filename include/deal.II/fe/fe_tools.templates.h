@@ -1820,14 +1820,10 @@ namespace FETools
               A(k * nd + d, j) = fine.shape_value_component(j, k, d);
 
         Householder<double> H(A);
-        unsigned int        cell_number = 0;
 
         Threads::TaskGroup<void> task_group;
 
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator
-               fine_cell = tria.begin_active();
-             fine_cell != tria.end();
-             ++fine_cell, ++cell_number)
+        for (const auto &fine_cell : tria.active_cell_iterators())
           {
             fine.reinit(fine_cell);
 
@@ -1847,7 +1843,8 @@ namespace FETools
 
             coarse.reinit(tria.begin(0));
 
-            FullMatrix<double> &this_matrix = matrices[cell_number];
+            FullMatrix<double> &this_matrix =
+              matrices[fine_cell->active_cell_index()];
 
             // Compute this once for each
             // coarse grid basis function. can
@@ -1890,10 +1887,6 @@ namespace FETools
                 if (std::fabs(this_matrix(i, j)) < 1e-12)
                   this_matrix(i, j) = 0.;
           }
-
-        Assert(cell_number ==
-                 GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
-               ExcInternalError());
       }
     } // namespace FEToolsComputeEmbeddingMatricesHelper
   }   // namespace internal
