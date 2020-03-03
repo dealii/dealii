@@ -250,15 +250,15 @@ namespace Utilities
      * using the ConsensusAlgorithm.
      */
     class ConsensusAlgorithmProcessTargets
-      : public ConsensusAlgorithmProcess<int, int>
+      : public ConsensusAlgorithmProcess<unsigned int, unsigned int>
     {
     public:
       ConsensusAlgorithmProcessTargets(const std::vector<unsigned int> &target)
         : target(target)
       {}
 
-      using T1 = int;
-      using T2 = int;
+      using T1 = unsigned int;
+      using T2 = unsigned int;
 
       virtual void
       answer_request(const unsigned int other_rank,
