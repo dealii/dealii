@@ -111,6 +111,14 @@ public:
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
   /**
+   * @copydoc Manifold::normal_vector()
+   */
+  virtual Tensor<1, spacedim>
+  normal_vector(
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const Point<spacedim> &p) const override;
+
+  /**
    * The center of the spherical coordinate system.
    */
   const Point<spacedim> center;
@@ -255,7 +263,7 @@ public:
                      const Point<spacedim> &x2) const override;
 
   /**
-   * Return the (normalized) normal vector at the point @p p.
+   * @copydoc Manifold::normal_vector()
    */
   virtual Tensor<1, spacedim>
   normal_vector(
