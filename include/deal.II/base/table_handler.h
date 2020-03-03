@@ -45,11 +45,11 @@ namespace internal
 {
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry. It can either be
-   * of type int, unsigned int, double or std::string. In essence, this
-   * structure is the same as <code>boost::variant@<int,unsigned
-   * int,double,std::string@></code> but we wrap this object in a structure
-   * for which we can write a function that can serialize it. This is also why
-   * the function is not in fact of type boost::any.
+   * of type int, unsigned int, std::uint64_t, double or std::string. In
+   * essence, this structure is the same as <code>boost::variant@<int,unsigned
+   * int,std::uint64_t,double,std::string@></code> but we wrap this object in a
+   * structure for which we can write a function that can serialize it. This is
+   * also why the function is not in fact of type boost::any.
    */
   struct TableEntry
   {
@@ -68,9 +68,9 @@ namespace internal
 
     /**
      * Return the value stored by this object. The template type T must be one
-     * of <code>int,unsigned int,double,std::string</code> and it must match
-     * the data type of the object originally stored in this TableEntry
-     * object.
+     * of <code>int,unsigned int,std::uint64_t,double,std::string</code> and it
+     * must match the data type of the object originally stored in this
+     * TableEntry object.
      */
     template <typename T>
     T
@@ -78,7 +78,7 @@ namespace internal
 
     /**
      * Return the numeric value of this object if data has been stored in it
-     * either as an integer, an unsigned integer, or a double.
+     * either as an integer, an unsigned integer,std::uint64_t, or a double.
      *
      * @return double
      */
@@ -393,7 +393,7 @@ public:
    * Adds a column (if not yet existent) with the key <tt>key</tt> and adds
    * the value of type <tt>T</tt> to the column. Values of type <tt>T</tt>
    * must be convertible to one of <code>int, unsigned int, double,
-   * std::string</code> or a compiler error will result.
+   * std::uint64_t, std::string</code> or a compiler error will result.
    */
   template <typename T>
   void
