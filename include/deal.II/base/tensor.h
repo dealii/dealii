@@ -2631,7 +2631,7 @@ cofactor(const Tensor<2, dim, Number> &t)
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
-constexpr Tensor<2, dim, Number>
+Tensor<2, dim, Number>
 project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor,
                                 const double                  tolerance)
 {

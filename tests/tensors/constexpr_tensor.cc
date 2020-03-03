@@ -181,7 +181,7 @@ main()
     DEAL_II_CONSTEXPR const auto dummy_8 = cofactor(a);
     deallog << "Deteriminant before orthogonalization: " << determinant(a)
             << std::endl;
-    const auto dummy_9 = project_onto_orthogonal_tensors(a, 1e-8);
+    const auto dummy_9 = project_onto_orthogonal_tensors(a, 0);
     deallog << "Deteriminant after  orthogonalization: " << determinant(dummy_9)
             << std::endl;
     Assert(determinant(dummy_9) - 1. < 1e-8, ExcInternalError());
