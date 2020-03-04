@@ -36,6 +36,6 @@ fi
 
 ./contrib/utilities/indent-all || exit $?
 git diff
-git diff-files --quiet 
+git diff-files --quiet || exit $?
 
 ./contrib/utilities/check_doxygen.sh || exit $?
