@@ -80,10 +80,7 @@ test()
       deallog << std::endl;
 
       deallog << "local_triangulation " << cell << ": ";
-      for (typename Triangulation<dim>::active_cell_iterator tria_cell =
-             local_triangulation.begin_active();
-           tria_cell != local_triangulation.end();
-           ++tria_cell)
+      for (const auto &tria_cell : local_triangulation.active_cell_iterators())
         {
           deallog << "   " << tria_cell << " user flag check:  "
                   << (tria_cell->user_flag_set() ? " (+) " : " (-) ")
