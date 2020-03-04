@@ -6,4 +6,4 @@ if [ ! -f contrib/utilities/checkdoxygen.py ]; then
 fi
 
 
-find doc examples include \( -name "*.h" -o -name "*.dox" \) -print | xargs -n 1 contrib/utilities/checkdoxygen.py
+find doc examples include \( -name "*.h" -o -name "*.dox" \) -print0 | xargs -0 -n 1 contrib/utilities/checkdoxygen.py

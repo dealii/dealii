@@ -42,7 +42,7 @@ checks() {
   CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
-  if ! [ -x "$(command -v ${DEAL_II_CLANG_FORMAT})" ]; then
+  if ! [ -x "$(command -v "${DEAL_II_CLANG_FORMAT}")" ]; then
     echo "***   No clang-format program found."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"
@@ -272,13 +272,14 @@ export -f fix_permissions
 
 process()
 {
+  directories=$1
   case "${OSTYPE}" in
     darwin*)
-      find -E ${1} -regex "${2}" -print0 |
+      find -E ${directories} -regex "${2}" -print0 |
         xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
       ;;
     *)
-      find ${1} -regextype egrep -regex "${2}" -print0 |
+      find ${directories} -regextype egrep -regex "${2}" -print0 |
         xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
       ;;
   esac
@@ -295,7 +296,7 @@ process()
 process_changed()
 {
   LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
-  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base ${LAST_MERGE_COMMIT} HEAD)"
+  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base "${LAST_MERGE_COMMIT}" HEAD)"
 
   case "${OSTYPE}" in
     darwin*)
