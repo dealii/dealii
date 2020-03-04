@@ -1302,6 +1302,27 @@ struct GeometryInfo<0>
   static constexpr unsigned int vertices_per_cell = 1;
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `vertices_per_cell`. This allows to write code
+   * using range-based for loops of the following kind:
+   * @code
+   *   for (auto &cell : triangulation.active_cell_iterators())
+   *     for (auto vertex_index : GeometryInfo<dim>::vertex_indices())
+   *       if (cell->vertex(vertex_index) satisfies some condition)
+   *         ... do something ...
+   * @endcode
+   * Here, we are looping over all vertices of all cells, with `vertex_index`
+   * taking on all valid indices.
+   *
+   * Of course, since this class is for the case `dim==0`, the
+   * returned object is a array with just one entry: zero. That's
+   * because an of dimension zero is really just a single point,
+   * corresponding to a vertex itself.
+   */
+  static std::array<unsigned int, vertices_per_cell>
+  vertex_indices();
+
+  /**
    * Number of vertices each face has. Since this is not useful in one
    * dimension, we provide a useless number (in the hope that a compiler may
    * warn when it sees constructs like <tt>for (i=0; i<vertices_per_face;
@@ -1943,6 +1964,22 @@ struct GeometryInfo
    * Number of vertices of a cell.
    */
   static constexpr unsigned int vertices_per_cell = 1 << dim;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `vertices_per_cell`. This allows to write code
+   * using range-based for loops of the following kind:
+   * @code
+   *   for (auto &cell : triangulation.active_cell_iterators())
+   *     for (auto vertex_index : GeometryInfo<dim>::vertex_indices())
+   *       if (cell->vertex(vertex_index) satisfies some condition)
+   *         ... do something ...
+   * @endcode
+   * Here, we are looping over all vertices of all cells, with `vertex_index`
+   * taking on all valid indices.
+   */
+  static boost::integer_range<unsigned int>
+  vertex_indices();
 
   /**
    * Number of vertices on each face.
@@ -2787,11 +2824,28 @@ GeometryInfo<0>::face_indices()
 
 
 
+inline std::array<unsigned int, 1>
+GeometryInfo<0>::vertex_indices()
+{
+  return {{0}};
+}
+
+
+
 template <int dim>
 inline boost::integer_range<unsigned int>
 GeometryInfo<dim>::face_indices()
 {
   return boost::irange(0U, faces_per_cell);
+}
+
+
+
+template <int dim>
+inline boost::integer_range<unsigned int>
+GeometryInfo<dim>::vertex_indices()
+{
+  return boost::irange(0U, vertices_per_cell);
 }
 
 
