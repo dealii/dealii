@@ -1,6 +1,6 @@
 # Listing of Parameters
 # ---------------------
-subsection A - TimeLoop
+subsection A - MainLoop
   # Base name for all output files
   set basename           = test
 
@@ -16,20 +16,20 @@ end
 
 
 subsection B - Discretization
-  # Immersed disc: height of computational domain
-  set immersed disc - height          = 2
+  # height of computational domain
+  set height          = 2
 
-  # Immersed disc: length of computational domain
-  set immersed disc - length          = 4
+  # length of computational domain
+  set length          = 4
 
-  # Immersed disc: diameter of immersed disc
-  set immersed disc - object diameter = 0.5
+  # diameter of immersed disc
+  set object diameter = 0.5
 
-  # Immersed disc: x position of immersed disc center point
-  set immersed disc - object position = 0.6
+  # x position of immersed disc center point
+  set object position = 0.6
 
-  # Initial refinement of the geometry
-  set initial refinement              = 5
+  # number of refinement steps of the geometry
+  set refinement      = 5
 end
 
 
@@ -46,7 +46,7 @@ subsection D - InitialValues
 end
 
 
-subsection E - TimeStep
+subsection E - TimeStepping
   # relative CFL constant used for update
   set cfl update = 0.8
 end
