@@ -125,6 +125,7 @@ pipeline
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
                  set -e
+                 set -x
                  export NP=`grep -c ^processor /proc/cpuinfo`
                  export TEST_TIME_LIMIT=1200
                  mkdir -p /home/dealii/build
@@ -180,6 +181,7 @@ pipeline
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
                   set -e
+                  set -x
                   export NP=`grep -c ^processor /proc/cpuinfo`
                   mkdir -p /home/dealii/build
                   cd /home/dealii/build
