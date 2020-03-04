@@ -828,13 +828,13 @@ namespace Step69
     // have to create a temporary SparseMatrix iterator. We simply hide
     // this in the <code>get_entry()</code> function.
 
-    template <typename Matrix, typename Iterator>
-    DEAL_II_ALWAYS_INLINE inline typename Matrix::value_type
-    get_entry(const Matrix &matrix, const Iterator &it)
+    template <typename IteratorType>
+    DEAL_II_ALWAYS_INLINE inline SparseMatrix<double>::value_type
+    get_entry(const SparseMatrix<double> &matrix, const IteratorType &it)
     {
-      const auto                            global_index = it->global_index();
-      const typename Matrix::const_iterator matrix_iterator(&matrix,
-                                                            global_index);
+      const auto global_index = it->global_index();
+      const SparseMatrix<double>::const_iterator matrix_iterator(&matrix,
+                                                                 global_index);
       return matrix_iterator->value();
     }
 
@@ -842,14 +842,14 @@ namespace Step69
     // <code>get_value()</code>: Given an iterator and a value, it sets the
     // entry pointed to by the iterator in the matrix.
 
-    template <typename Matrix, typename Iterator>
+    template <typename IteratorType>
     DEAL_II_ALWAYS_INLINE inline void
-    set_entry(Matrix &                    matrix,
-              const Iterator &            it,
-              typename Matrix::value_type value)
+    set_entry(SparseMatrix<double> &           matrix,
+              const IteratorType &             it,
+              SparseMatrix<double>::value_type value)
     {
-      const auto                global_index = it->global_index();
-      typename Matrix::iterator matrix_iterator(&matrix, global_index);
+      const auto                     global_index = it->global_index();
+      SparseMatrix<double>::iterator matrix_iterator(&matrix, global_index);
       matrix_iterator->value() = value;
     }
 
@@ -862,13 +862,14 @@ namespace Step69
     // <code>gather_get_entry()</code> is to retrieve those entries and store
     // them into a <code>Tensor<1, dim></code> for our convenience.
 
-    template <typename T1, std::size_t k, typename T2>
+    template <std::size_t k, typename IteratorType>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
-    gather_get_entry(const std::array<T1, k> &U, const T2 it)
+    gather_get_entry(const std::array<SparseMatrix<double>, k> &c_ij,
+                     const IteratorType                         it)
     {
       Tensor<1, k> result;
       for (unsigned int j = 0; j < k; ++j)
-        result[j] = get_entry(U[j], it);
+        result[j] = get_entry(c_ij[j], it);
       return result;
     }
 
@@ -893,13 +894,15 @@ namespace Step69
     // constant complexity, which is the case of the current implementation
     // using deal.II matrices.
 
-    template <typename T1, std::size_t k, typename T2, typename T3>
+    template <std::size_t k>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
-    gather(const std::array<T1, k> &U, const T2 i, const T3 l)
+    gather(const std::array<SparseMatrix<double>, k> &n_ij,
+           const unsigned int                         i,
+           const unsigned int                         j)
     {
       Tensor<1, k> result;
-      for (unsigned int j = 0; j < k; ++j)
-        result[j] = U[j](i, l);
+      for (unsigned int l = 0; l < k; ++l)
+        result[l] = n_ij[l](i, j);
       return result;
     }
 
@@ -908,9 +911,10 @@ namespace Step69
     // state at a node <code>i</code> and return it as a
     // <code>Tensor<1,problem_dimension></code> for our convenience.
 
-    template <typename T1, std::size_t k, typename T2>
-    DEAL_II_ALWAYS_INLINE inline Tensor<1, k> gather(const std::array<T1, k> &U,
-                                                     const T2                 i)
+    template <std::size_t k>
+    DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
+    gather(const std::array<LinearAlgebra::distributed::Vector<double>, k> &U,
+           const unsigned int                                               i)
     {
       Tensor<1, k> result;
       for (unsigned int j = 0; j < k; ++j)
@@ -926,12 +930,14 @@ namespace Step69
     // primarily used to write the updated nodal values, stored as
     // <code>Tensor<1,problem_dimension></code>, into the global objects.
 
-    template <typename T1, std::size_t k1, typename T2, typename T3>
+    template <std::size_t k>
     DEAL_II_ALWAYS_INLINE inline void
-    scatter(std::array<T1, k1> &U, const T2 &result, const T3 i)
+    scatter(std::array<LinearAlgebra::distributed::Vector<double>, k> &U,
+            const Tensor<1, ((identity<std::size_t>::type)k)> &        tensor,
+            const unsigned int                                         i)
     {
-      for (unsigned int j = 0; j < k1; ++j)
-        U[j].local_element(i) = result[j];
+      for (unsigned int j = 0; j < k; ++j)
+        U[j].local_element(i) = tensor[j];
     }
   } // namespace
 
