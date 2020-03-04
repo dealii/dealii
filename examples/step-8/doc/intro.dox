@@ -12,13 +12,13 @@ understood as well.
 
 @dealiiVideoLecture{19}
 
-In this tutorial program we will want to solve the 
+In this tutorial program we will want to solve the
 <a href="https://en.wikipedia.org/wiki/Linear_elasticity">elastic equations</a>.
 They are an extension to Laplace's equation with a vector-valued solution that
 describes the displacement in each space direction of a rigid body
 which is subject to a force. Of course, the force is also
 vector-valued, meaning that in each point it has a direction and an
-absolute value. 
+absolute value.
 
 One can write the elasticity equations in a number of ways. The one that shows
 the symmetry with the Laplace equation in the most obvious way is to write it
@@ -33,7 +33,7 @@ as
 where $\mathbf u$ is the vector-valued displacement at each point,
 $\mathbf f$ the force, and ${\mathbf C}$ is a rank-4 tensor (i.e., it has four
 indices) that encodes the stress-strain relationship -- in essence,
-it represents the 
+it represents the
 <a href="https://en.wikipedia.org/wiki/Hooke%27s_law">"spring constant"</a> in
 Hookes law that relates the displacement to the forces. ${\mathbf C}$ will, in many
 cases, depend on $\mathbf x$ if the body whose deformation we want to
