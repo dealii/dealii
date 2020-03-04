@@ -26,16 +26,16 @@ as
 @f[
   -
   \text{div}\,
-  (C \nabla \mathbf{u})
+  ({\mathbf C} \nabla \mathbf{u})
   =
   \mathbf f,
 @f]
 where $\mathbf u$ is the vector-valued displacement at each point,
-$\mathbf f$ the force, and $C$ is a rank-4 tensor (i.e., it has four
+$\mathbf f$ the force, and ${\mathbf C}$ is a rank-4 tensor (i.e., it has four
 indices) that encodes the stress-strain relationship -- in essence,
 it represents the 
 <a href="https://en.wikipedia.org/wiki/Hooke%27s_law">"spring constant"</a> in
-Hookes law that relates the displacement to the forces. $C$ will, in many
+Hookes law that relates the displacement to the forces. ${\mathbf C}$ will, in many
 cases, depend on $\mathbf x$ if the body whose deformation we want to
 simulate is composed of different materials.
 
@@ -57,15 +57,15 @@ then read as
 @f[
   -
   \text{div}\,
-  (C \varepsilon(\mathbf u))
+  ({\mathbf C} \varepsilon(\mathbf u))
   =
   \mathbf f,
 @f]
 which you can think of as the more natural generalization of the Laplace
 equation to vector-valued problems. (The form shown first is equivalent to
-this form because the tensor $C$ has certain symmetries, namely that
-$C_{ijkl}=C_{ijlk}$, and consequently $C \varepsilon(\mathbf u)_{kl}
-= C \nabla\mathbf u$.)
+this form because the tensor ${\mathbf C}$ has certain symmetries, namely that
+$C_{ijkl}=C_{ijlk}$, and consequently ${\mathbf C} \varepsilon(\mathbf u)_{kl}
+= {\mathbf C} \nabla\mathbf u$.)
 
 One can of course alternatively write these equations in component form:
 @f[
