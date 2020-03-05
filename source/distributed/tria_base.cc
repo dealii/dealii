@@ -52,9 +52,7 @@ namespace parallel
     , n_subdomains(Utilities::MPI::n_mpi_processes(this->mpi_communicator))
   {
 #ifndef DEAL_II_WITH_MPI
-    Assert(false,
-           ExcMessage("You compiled deal.II without MPI support, for "
-                      "which parallel::TriangulationBase is not available."));
+    Assert(false, ExcNeedsMPI());
 #endif
   }
 
@@ -67,9 +65,7 @@ namespace parallel
   {
 #ifndef DEAL_II_WITH_MPI
     (void)other_tria;
-    Assert(false,
-           ExcMessage("You compiled deal.II without MPI support, for "
-                      "which parallel::TriangulationBase is not available."));
+    Assert(false, ExcNeedsMPI());
 #else
     dealii::Triangulation<dim, spacedim>::copy_triangulation(other_tria);
 
