@@ -57,10 +57,10 @@ test()
     std::vector<unsigned int> owning_ranks_of_ghosts(
       local_relevant.n_elements());
 
-    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmPayload
+    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
       process(local_owned, local_relevant, comm, owning_ranks_of_ghosts, true);
 
-    Utilities::MPI::ConsensusAlgorithmSelector<
+    Utilities::MPI::ConsensusAlgorithms::Selector<
       std::pair<types::global_dof_index, types::global_dof_index>,
       unsigned int>
       consensus_algorithm(process, comm);

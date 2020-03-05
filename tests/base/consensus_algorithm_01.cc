@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Test AnonymousConsensusAlgorithmProcess.
+// Test ConsensusAlgorithms::AnonymousProcess.
 
-#include <deal.II/base/mpi_consensus_algorithm.h>
+#include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include "../tests.h"
 
@@ -31,7 +31,7 @@ test(const MPI_Comm &comm)
   using T1 = unsigned int;
   using T2 = unsigned int;
 
-  dealii::Utilities::MPI::AnonymousConsensusAlgorithmProcess<T1, T2> process(
+  dealii::Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<T1, T2> process(
     [&]() {
       std::vector<unsigned int> result{(my_rank + 1) % n_rank};
       return result;
@@ -55,7 +55,7 @@ test(const MPI_Comm &comm)
       deallog << "ConsensusAlgorithmProcess::function_read_answer() passed!"
               << std::endl;
     });
-  dealii::Utilities::MPI::ConsensusAlgorithmSelector<T1, T2>(process, comm)
+  dealii::Utilities::MPI::ConsensusAlgorithms::Selector<T1, T2>(process, comm)
     .run();
 }
 
