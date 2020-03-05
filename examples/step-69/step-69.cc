@@ -575,7 +575,7 @@ namespace Step69
   template <int dim>
   void Discretization<dim>::setup()
   {
-    TimerOutput::Scope t(computing_timer, "discretization - setup");
+    TimerOutput::Scope scope(computing_timer, "discretization - setup");
 
     triangulation.clear();
 
@@ -675,7 +675,8 @@ namespace Step69
     IndexSet locally_relevant;
 
     {
-      TimerOutput::Scope t(computing_timer, "offline_data - distribute dofs");
+      TimerOutput::Scope scope(computing_timer,
+                               "offline_data - distribute dofs");
 
       dof_handler.initialize(discretization->triangulation,
                              discretization->finite_element);
@@ -734,7 +735,7 @@ namespace Step69
     // local indices.
 
     {
-      TimerOutput::Scope t(
+      TimerOutput::Scope scope(
         computing_timer,
         "offline_data - create sparsity pattern and set up matrices");
 
@@ -1017,7 +1018,7 @@ namespace Step69
       update_normal_vectors | update_values | update_JxW_values);
 
     {
-      TimerOutput::Scope t(
+      TimerOutput::Scope scope(
         computing_timer,
         "offline_data - assemble lumped mass matrix, and c_ij");
 
@@ -1233,8 +1234,8 @@ namespace Step69
     // of the $\mathbf{c}_{ij}$ of entries) threads cannot conflict
     // attempting to write the same entry (we do not need a scheduler).
     {
-      TimerOutput::Scope t(computing_timer,
-                           "offline_data - compute |c_ij|, and n_ij");
+      TimerOutput::Scope scope(computing_timer,
+                               "offline_data - compute |c_ij|, and n_ij");
 
       // Here [i1,i2) represents a subrange of rows:
       const auto on_subranges = [&](auto i1, const auto i2) {
@@ -1301,8 +1302,8 @@ namespace Step69
     // this correction, most of the following code is about the definition
     // of the worker <code>local_assemble_system()</code>.
     {
-      TimerOutput::Scope t(computing_timer,
-                           "offline_data - fix slip boundary c_ij");
+      TimerOutput::Scope scope(computing_timer,
+                               "offline_data - fix slip boundary c_ij");
 
       const auto local_assemble_system = [&](const auto &cell,
                                              auto &      scratch,
@@ -1824,8 +1825,8 @@ namespace Step69
   template <int dim>
   void TimeStepping<dim>::prepare()
   {
-    TimerOutput::Scope time(computing_timer,
-                            "time_stepping - prepare scratch space");
+    TimerOutput::Scope scopeime(computing_timer,
+                                "time_stepping - prepare scratch space");
 
     for (auto &it : temporary_vector)
       it.reinit(offline_data->partitioner);
@@ -1899,8 +1900,8 @@ namespace Step69
     // computes the viscosity $d_{ij}$ for a subrange [i1, i2) of column
     // indices:
     {
-      TimerOutput::Scope time(computing_timer,
-                              "time_stepping - 1 compute d_ij");
+      TimerOutput::Scope scopeime(computing_timer,
+                                  "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
@@ -1988,8 +1989,8 @@ namespace Step69
     std::atomic<double> tau_max{std::numeric_limits<double>::infinity()};
 
     {
-      TimerOutput::Scope time(computing_timer,
-                              "time_stepping - 2 compute d_ii, and tau_max");
+      TimerOutput::Scope scopeime(
+        computing_timer, "time_stepping - 2 compute d_ii, and tau_max");
 
       // on_subranges() will be executed on every thread individually. The
       // variable <code>tau_max_on_subrange</code> is thus stored thread
@@ -2072,8 +2073,8 @@ namespace Step69
     // artifacts.
 
     {
-      TimerOutput::Scope time(computing_timer,
-                              "time_stepping - 3 perform update");
+      TimerOutput::Scope scopeime(computing_timer,
+                                  "time_stepping - 3 perform update");
 
       const auto on_subranges = [&](auto i1, const auto i2) {
         for (const auto i : boost::make_iterator_range(i1, i2))
@@ -2132,8 +2133,8 @@ namespace Step69
     // which removes the normal component of $\mathbf{m}$.
 
     {
-      TimerOutput::Scope time(computing_timer,
-                              "time_stepping - 4 fix boundary states");
+      TimerOutput::Scope scope(computing_timer,
+                               "time_stepping - 4 fix boundary states");
 
       for (auto it : boundary_normal_map)
         {
@@ -2227,8 +2228,8 @@ namespace Step69
   template <int dim>
   void SchlierenPostprocessor<dim>::prepare()
   {
-    TimerOutput::Scope t(computing_timer,
-                         "schlieren_postprocessor - prepare scratch space");
+    TimerOutput::Scope scope(computing_timer,
+                             "schlieren_postprocessor - prepare scratch space");
 
     r.reinit(offline_data->n_locally_relevant);
     schlieren.reinit(offline_data->partitioner);
@@ -2304,8 +2305,8 @@ namespace Step69
   template <int dim>
   void SchlierenPostprocessor<dim>::compute_schlieren(const vector_type &U)
   {
-    TimerOutput::Scope t(computing_timer,
-                         "schlieren_postprocessor - compute schlieren plot");
+    TimerOutput::Scope scope(
+      computing_timer, "schlieren_postprocessor - compute schlieren plot");
 
     const auto &sparsity            = offline_data->sparsity_pattern;
     const auto &lumped_mass_matrix  = offline_data->lumped_mass_matrix;
@@ -2665,7 +2666,7 @@ namespace Step69
   {
     pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ")"
           << std::endl;
-    TimerOutput::Scope timer(computing_timer,
+    TimerOutput::Scope scope(computing_timer,
                              "main_loop - setup scratch space");
 
     vector_type U;
