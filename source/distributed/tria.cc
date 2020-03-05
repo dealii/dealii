@@ -58,7 +58,7 @@ namespace
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           ++vertex_touch_count[cell->vertex_index(v)];
           vertex_to_cell[cell->vertex_index(v)].emplace_back(cell, v);
@@ -147,7 +147,7 @@ namespace
         const unsigned int index =
           coarse_cell_to_p4est_tree_permutation[cell->index()];
 
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (set_vertex_info == true)
               connectivity
@@ -349,7 +349,7 @@ namespace
         // important: only assign the level_subdomain_id if it is a ghost cell
         // even though we could fill in all.
         bool used = false;
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (marked_vertices[dealii_cell->level()]
                                [dealii_cell->vertex_index(v)])
@@ -375,8 +375,7 @@ namespace
             dealii_cell->is_artificial() == false &&
             dealii_cell->level() + 1 < static_cast<int>(marked_vertices.size()))
           {
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               {
                 if (marked_vertices[dealii_cell->level() + 1]
                                    [dealii_cell->vertex_index(v)])
@@ -391,8 +390,7 @@ namespace
         if (!used && dealii_cell->is_active() &&
             dealii_cell->is_artificial() == false && dealii_cell->level() > 0)
           {
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               {
                 if (marked_vertices[dealii_cell->level() - 1]
                                    [dealii_cell->vertex_index(v)])
@@ -2442,8 +2440,7 @@ namespace parallel
           if (dealii_cell->is_locally_owned())
             {
               std::set<dealii::types::subdomain_id> send_to;
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 {
                   const std::map<unsigned int,
                                  std::set<dealii::types::subdomain_id>>::
@@ -2466,9 +2463,8 @@ namespace parallel
                 {
                   std::vector<unsigned int>            vertex_indices;
                   std::vector<dealii::Point<spacedim>> local_vertices;
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_cell;
-                       ++v)
+                  for (const unsigned int v :
+                       GeometryInfo<dim>::vertex_indices())
                     if (vertex_locally_moved[dealii_cell->vertex_index(v)])
                       {
                         vertex_indices.push_back(v);
@@ -3305,18 +3301,16 @@ namespace parallel
             for (; cell != endc; ++cell)
               {
                 if (cell->refine_flag_set())
-                  for (unsigned int vertex = 0;
-                       vertex < GeometryInfo<dim>::vertices_per_cell;
-                       ++vertex)
+                  for (const unsigned int vertex :
+                       GeometryInfo<dim>::vertex_indices())
                     vertex_level[topological_vertex_numbering
                                    [cell->vertex_index(vertex)]] =
                       std::max(vertex_level[topological_vertex_numbering
                                               [cell->vertex_index(vertex)]],
                                cell->level() + 1);
                 else if (!cell->coarsen_flag_set())
-                  for (unsigned int vertex = 0;
-                       vertex < GeometryInfo<dim>::vertices_per_cell;
-                       ++vertex)
+                  for (const unsigned int vertex :
+                       GeometryInfo<dim>::vertex_indices())
                     vertex_level[topological_vertex_numbering
                                    [cell->vertex_index(vertex)]] =
                       std::max(vertex_level[topological_vertex_numbering
@@ -3331,9 +3325,8 @@ namespace parallel
                     // to correct this by iterating over the entire
                     // process until we are converged
                     Assert(cell->coarsen_flag_set(), ExcInternalError());
-                    for (unsigned int vertex = 0;
-                         vertex < GeometryInfo<dim>::vertices_per_cell;
-                         ++vertex)
+                    for (const unsigned int vertex :
+                         GeometryInfo<dim>::vertex_indices())
                       vertex_level[topological_vertex_numbering
                                      [cell->vertex_index(vertex)]] =
                         std::max(vertex_level[topological_vertex_numbering
@@ -3356,9 +3349,8 @@ namespace parallel
             for (cell = tria.last_active(); cell != endc; --cell)
               if (cell->refine_flag_set() == false)
                 {
-                  for (unsigned int vertex = 0;
-                       vertex < GeometryInfo<dim>::vertices_per_cell;
-                       ++vertex)
+                  for (const unsigned int vertex :
+                       GeometryInfo<dim>::vertex_indices())
                     if (vertex_level[topological_vertex_numbering
                                        [cell->vertex_index(vertex)]] >=
                         cell->level() + 1)
@@ -3376,9 +3368,8 @@ namespace parallel
                             cell->set_refine_flag();
                             continue_iterating = true;
 
-                            for (unsigned int v = 0;
-                                 v < GeometryInfo<dim>::vertices_per_cell;
-                                 ++v)
+                            for (const unsigned int v :
+                                 GeometryInfo<dim>::vertex_indices())
                               vertex_level[topological_vertex_numbering
                                              [cell->vertex_index(v)]] =
                                 std::max(
@@ -4050,9 +4041,8 @@ namespace parallel
                       (cell->level_subdomain_id() ==
                        numbers::artificial_subdomain_id);
                     bool need_to_know = false;
-                    for (unsigned int vertex = 0;
-                         vertex < GeometryInfo<dim>::vertices_per_cell;
-                         ++vertex)
+                    for (const unsigned int vertex :
+                         GeometryInfo<dim>::vertex_indices())
                       if (active_verts[cell->vertex_index(vertex)])
                         {
                           need_to_know = true;
@@ -4509,8 +4499,7 @@ namespace parallel
       cell_iterator     cell = this->begin(level), endc = this->end(level);
       for (; cell != endc; ++cell)
         if (cell->level_subdomain_id() == this->locally_owned_subdomain())
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             marked_vertices[cell->vertex_index(v)] = true;
 
       /**

@@ -849,8 +849,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       for (const auto &cell : tria.active_cell_iterators())
         {
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             out
               << '\t'
               << renumber[cell->vertex_index(GeometryInfo<dim>::dx_to_deal[v])];
@@ -1147,9 +1146,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
 
       // Vertex numbering follows UCD conventions.
 
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) + 1
             << ' ';
       out << '\n';
@@ -1268,9 +1265,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
       // May, 1992, p. E6
       //
       // note: vertex numbers are 1-base
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) + 1
             << ' ';
       out << '\n';
@@ -2924,8 +2919,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
           //   out << "\nfalse";
 
           out << "\nlist " << axes[i] << cell->active_cell_index() << " ";
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell;
-               ++j)
+          for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
             out << cell->vertex(j)[i] << " ";
         }
       out << '\n';
@@ -2981,7 +2975,7 @@ namespace
         patch.n_subdivisions = 1;
         patch.data.reinit(5, GeometryInfo<dim>::vertices_per_cell);
 
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             patch.vertices[v] = cell->vertex(v);
             patch.data(0, v)  = cell->level();
@@ -3231,7 +3225,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     for (const auto &cell : tria.active_cell_iterators())
       {
         out << GeometryInfo<dim>::vertices_per_cell;
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           {
             out << ' ' << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
           }
@@ -4055,8 +4049,7 @@ namespace internal
               // write out the four sides of this cell by putting the four
               // points (+ the initial point again) in a row and lifting the
               // drawing pencil at the end
-              for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-                   ++i)
+              for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                 out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i]) << ' '
                     << cell->level() << ' '
                     << static_cast<unsigned int>(cell->material_id()) << '\n';
@@ -4830,9 +4823,8 @@ namespace internal
           // doing this multiply
           std::set<unsigned int> treated_vertices;
           for (const auto &cell : tria.active_cell_iterators())
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<dim>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex :
+                 GeometryInfo<dim>::vertex_indices())
               if (treated_vertices.find(cell->vertex_index(vertex)) ==
                   treated_vertices.end())
                 {

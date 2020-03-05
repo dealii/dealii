@@ -227,9 +227,8 @@ namespace FETools
       // for each shape function, copy the flags from the base element to this
       // one, taking into account multiplicities, and other complications
       unsigned int total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -419,9 +418,8 @@ namespace FETools
       // to this one, taking into account multiplicities, multiple components in
       // base elements, and other complications
       unsigned int total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -663,9 +661,8 @@ namespace FETools
       // the first vertex in the order of the base elements, then of the second
       // vertex, etc
       total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)

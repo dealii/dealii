@@ -1185,8 +1185,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   // perform shift, if so desired
   if (shift != Point<patch_space_dim>())
     for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-      for (unsigned int v = 0; v < GeometryInfo<patch_dim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<patch_dim>::vertex_indices())
         patches[i].vertices[v] += shift;
 
   // adjust patch numbers

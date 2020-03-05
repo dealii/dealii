@@ -2261,7 +2261,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
     {
       std::vector<unsigned int> embedding_dofs(
         GeometryInfo<dim>::vertices_per_cell);
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         embedding_dofs[i] = i;
 
       return embedding_dofs;
@@ -2386,7 +2386,7 @@ std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Q_Hierarchical<dim>::get_constant_modes() const
 {
   Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     constant_modes(0, i) = true;
   for (unsigned int i = GeometryInfo<dim>::vertices_per_cell;
        i < this->dofs_per_cell;

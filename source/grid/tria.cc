@@ -60,7 +60,7 @@ template <int structdim>
 bool
 CellData<structdim>::operator==(const CellData<structdim> &other) const
 {
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; i++)
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
     if (vertices[i] != other.vertices[i])
       return false;
 
@@ -439,7 +439,7 @@ namespace
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           min_adjacent_cell_level[cell->vertex_index(v)] =
             std::min<unsigned int>(
@@ -547,9 +547,9 @@ namespace
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
       {
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           tmp[i] = cell.vertices[i];
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
       }
 
@@ -691,13 +691,13 @@ namespace
          ++cell)
       {
         Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           vertices[i] = cell->vertex(i);
 
         Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
         GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
 
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           if (determinants[i] <= 1e-9 * std::pow(cell->diameter(), 1. * dim))
             {
               distorted_cells.distorted_cells.push_back(cell);
@@ -727,13 +727,13 @@ namespace
     for (unsigned int c = 0; c < cell->n_children(); ++c)
       {
         Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           vertices[i] = cell->child(c)->vertex(i);
 
         Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
         GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
 
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           if (determinants[i] <=
               1e-9 * std::pow(cell->child(c)->diameter(), 1. * dim))
             return true;
@@ -1894,9 +1894,7 @@ namespace internal
         // for all lines
         for (; line != triangulation.end(); ++line)
           // for each of the two vertices
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
             // if first cell adjacent to
             // this vertex is the present
             // one, then the neighbor is
@@ -13318,8 +13316,7 @@ Triangulation<dim, spacedim>::max_adjacent_cells() const
   // vertices used on level 0
   unsigned int max_vertex_index = 0;
   for (; cell != endc; ++cell)
-    for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell;
-         ++vertex)
+    for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
       if (cell->vertex_index(vertex) > max_vertex_index)
         max_vertex_index = cell->vertex_index(vertex);
 
@@ -13332,8 +13329,7 @@ Triangulation<dim, spacedim>::max_adjacent_cells() const
   // every time we find an adjacent
   // element
   for (cell = begin(); cell != endc; ++cell)
-    for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell;
-         ++vertex)
+    for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
       ++usage_count[cell->vertex_index(vertex)];
 
   return std::max(GeometryInfo<dim>::vertices_per_cell,
@@ -13684,16 +13680,14 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           for (; cell != endc; ++cell)
             {
               if (cell->refine_flag_set())
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level() + 1);
               else if (!cell->coarsen_flag_set())
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level());
@@ -13706,9 +13700,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                   // to correct this by iterating over the entire
                   // process until we are converged
                   Assert(cell->coarsen_flag_set(), ExcInternalError());
-                  for (unsigned int vertex = 0;
-                       vertex < GeometryInfo<dim>::vertices_per_cell;
-                       ++vertex)
+                  for (const unsigned int vertex :
+                       GeometryInfo<dim>::vertex_indices())
                     vertex_level[cell->vertex_index(vertex)] =
                       std::max(vertex_level[cell->vertex_index(vertex)],
                                cell->level() - 1);
@@ -13728,9 +13721,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           for (cell = last_active(); cell != endc; --cell)
             if (cell->refine_flag_set() == false)
               {
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   if (vertex_level[cell->vertex_index(vertex)] >=
                       cell->level() + 1)
                     {
@@ -13745,9 +13737,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                         {
                           cell->set_refine_flag();
 
-                          for (unsigned int v = 0;
-                               v < GeometryInfo<dim>::vertices_per_cell;
-                               ++v)
+                          for (const unsigned int v :
+                               GeometryInfo<dim>::vertex_indices())
                             vertex_level[cell->vertex_index(v)] =
                               std::max(vertex_level[cell->vertex_index(v)],
                                        cell->level() + 1);
@@ -14356,16 +14347,14 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           for (const auto &cell : active_cell_iterators())
             {
               if (cell->refine_flag_set())
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level() + 1);
               else if (!cell->coarsen_flag_set())
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level());
@@ -14376,9 +14365,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                   // always true (the coarsen flag could be removed
                   // again) and so we may make an error here
                   Assert(cell->coarsen_flag_set(), ExcInternalError());
-                  for (unsigned int vertex = 0;
-                       vertex < GeometryInfo<dim>::vertices_per_cell;
-                       ++vertex)
+                  for (const unsigned int vertex :
+                       GeometryInfo<dim>::vertex_indices())
                     vertex_level[cell->vertex_index(vertex)] =
                       std::max(vertex_level[cell->vertex_index(vertex)],
                                cell->level() - 1);
@@ -14398,9 +14386,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           for (active_cell_iterator cell = last_active(); cell != end(); --cell)
             if (cell->refine_flag_set() == false)
               {
-                for (unsigned int vertex = 0;
-                     vertex < GeometryInfo<dim>::vertices_per_cell;
-                     ++vertex)
+                for (const unsigned int vertex :
+                     GeometryInfo<dim>::vertex_indices())
                   if (vertex_level[cell->vertex_index(vertex)] >=
                       cell->level() + 1)
                     {
@@ -14415,9 +14402,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                         {
                           cell->set_refine_flag();
 
-                          for (unsigned int v = 0;
-                               v < GeometryInfo<dim>::vertices_per_cell;
-                               ++v)
+                          for (const unsigned int v :
+                               GeometryInfo<dim>::vertex_indices())
                             vertex_level[cell->vertex_index(v)] =
                               std::max(vertex_level[cell->vertex_index(v)],
                                        cell->level() + 1);

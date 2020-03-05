@@ -961,8 +961,7 @@ namespace GridGenerator
 
           // loop over vertices of all cells
           for (auto &cell : tria)
-            for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<2>::vertex_indices())
               {
                 // vertex has been already processed: nothing to do
                 if (vertex_processed[cell.vertex_index(v)])
@@ -1567,7 +1566,7 @@ namespace GridGenerator
 
     // Prepare cell data
     std::vector<CellData<dim>> cells(1);
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       cells[0].vertices[i] = i;
     cells[0].material_id = 0;
 
@@ -2064,7 +2063,7 @@ namespace GridGenerator
 
     typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tria.begin_active();
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       cell->vertex(i) = vertices[i];
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
@@ -3535,9 +3534,8 @@ namespace GridGenerator
 
         if (cylinder_triangulation_offset == Tensor<1, 2>())
           {
-            for (unsigned int vertex_n = 0;
-                 vertex_n < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex_n)
+            for (const unsigned int vertex_n :
+                 GeometryInfo<2>::vertex_indices())
               if (cell->vertex(vertex_n) == Point<2>())
                 {
                   // cylinder_tria is centered at zero, so we need to
@@ -3563,9 +3561,7 @@ namespace GridGenerator
     // and right sides of cylinder_tria inwards so that it fits in
     // bulk_tria:
     for (const auto &cell : cylinder_tria.active_cell_iterators())
-      for (unsigned int vertex_n = 0;
-           vertex_n < GeometryInfo<2>::vertices_per_cell;
-           ++vertex_n)
+      for (const unsigned int vertex_n : GeometryInfo<2>::vertex_indices())
         {
           if (std::abs(cell->vertex(vertex_n)[0] - -0.41 / 4.0) < 1e-10)
             cell->vertex(vertex_n)[0] = -0.1;
@@ -3633,7 +3629,7 @@ namespace GridGenerator
       const double shift =
         std::min(0.125 + shell_region_width * 0.5, 0.1 * 4. / 3.);
       for (const auto &cell : tria.active_cell_iterators())
-        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<2>::vertex_indices())
           if (cell->vertex(v).distance(Point<2>(0.1, 0.205)) < 1e-10)
             cell->vertex(v) = Point<2>(0.2 - shift, 0.205);
           else if (cell->vertex(v).distance(Point<2>(0.3, 0.205)) < 1e-10)
@@ -3777,7 +3773,7 @@ namespace GridGenerator
 
     std::vector<CellData<dim>> cells(n_cells);
     // Vertices of the center cell
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       {
         Point<spacedim> p;
         for (unsigned int d = 0; d < dim; ++d)
@@ -4048,12 +4044,12 @@ namespace GridGenerator
                                          std::end(vertices_tmp));
     unsigned int cell_vertices[1][GeometryInfo<2>::vertices_per_cell];
 
-    for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<2>::vertex_indices())
       cell_vertices[0][i] = i;
 
     std::vector<CellData<2>> cells(1, CellData<2>());
 
-    for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<2>::vertex_indices())
       cells[0].vertices[i] = cell_vertices[0][i];
 
     cells[0].material_id = 0;
@@ -4976,7 +4972,7 @@ namespace GridGenerator
 
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+        for (const unsigned int j : GeometryInfo<3>::vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
         cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
@@ -5380,8 +5376,7 @@ namespace GridGenerator
 
         for (unsigned int i = 0; i < n_cells; ++i)
           {
-            for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell;
-                 ++j)
+            for (const unsigned int j : GeometryInfo<3>::vertex_indices())
               cells[i].vertices[j] = cell_vertices[i][j];
             cells[i].material_id = 0;
           }
@@ -5454,8 +5449,7 @@ namespace GridGenerator
         for (const auto &cell : tmp.active_cell_iterators())
           {
             const unsigned int cell_index = cell->active_cell_index();
-            for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<3>::vertex_indices())
               cells[cell_index].vertices[v] = cell->vertex_index(v);
             cells[cell_index].material_id = 0;
           }
@@ -6155,8 +6149,7 @@ namespace GridGenerator
                    "all cells are on the same refinement level."));
 
           CellData<dim> this_cell;
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             this_cell.vertices[v] = cell->vertex_index(v);
           this_cell.material_id = cell->material_id();
           cells.push_back(this_cell);
@@ -6313,9 +6306,8 @@ namespace GridGenerator
         for (std::size_t slice_n = 0; slice_n < n_slices - 1; ++slice_n)
           {
             CellData<3> this_cell;
-            for (unsigned int vertex_n = 0;
-                 vertex_n < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex_n)
+            for (const unsigned int vertex_n :
+                 GeometryInfo<2>::vertex_indices())
               {
                 this_cell.vertices[vertex_n] =
                   cell->vertex_index(vertex_n) + slice_n * input.n_vertices();
@@ -6819,7 +6811,7 @@ namespace GridGenerator
 
     for (unsigned int id = 0; cell != endc; ++cell, ++id)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           cells[id].vertices[i] = cell->vertex_index(i);
         cells[id].material_id = cell->material_id();
         cells[id].manifold_id = cell->manifold_id();
@@ -6978,9 +6970,8 @@ namespace GridGenerator
             {
               CellData<boundary_dim> c_data;
 
-              for (unsigned int j = 0;
-                   j < GeometryInfo<boundary_dim>::vertices_per_cell;
-                   ++j)
+              for (const unsigned int j :
+                   GeometryInfo<boundary_dim>::vertex_indices())
                 {
                   const unsigned int v_index = face->vertex_index(j);
 

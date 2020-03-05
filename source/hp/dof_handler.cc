@@ -178,8 +178,7 @@ namespace internal
                cell != dof_handler.end();
                ++cell)
             if (!cell->is_artificial())
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 locally_used_vertices[cell->vertex_index(v)] = true;
 
           std::vector<std::vector<bool>> vertex_fe_association(
@@ -191,8 +190,7 @@ namespace internal
                cell != dof_handler.end();
                ++cell)
             if (!cell->is_artificial())
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 vertex_fe_association[cell->active_fe_index()]
                                      [cell->vertex_index(v)] = true;
 

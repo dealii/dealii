@@ -3145,7 +3145,7 @@ namespace GridTools
       cell = triangulation.begin_active(),
       endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (treated_vertices[cell->vertex_index(v)] == false)
           {
             // transform this vertex
@@ -3464,29 +3464,25 @@ namespace GridTools
           xi[d] = 0.5;
 
         Point<spacedim> x_k;
-        for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell;
-             ++i)
+        for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
           x_k += object->vertex(i) *
                  GeometryInfo<structdim>::d_linear_shape_function(xi, i);
 
         do
           {
             Tensor<1, structdim> F_k;
-            for (unsigned int i = 0;
-                 i < GeometryInfo<structdim>::vertices_per_cell;
-                 ++i)
+            for (const unsigned int i :
+                 GeometryInfo<structdim>::vertex_indices())
               F_k +=
                 (x_k - trial_point) * object->vertex(i) *
                 GeometryInfo<structdim>::d_linear_shape_function_gradient(xi,
                                                                           i);
 
             Tensor<2, structdim> H_k;
-            for (unsigned int i = 0;
-                 i < GeometryInfo<structdim>::vertices_per_cell;
-                 ++i)
-              for (unsigned int j = 0;
-                   j < GeometryInfo<structdim>::vertices_per_cell;
-                   ++j)
+            for (const unsigned int i :
+                 GeometryInfo<structdim>::vertex_indices())
+              for (const unsigned int j :
+                   GeometryInfo<structdim>::vertex_indices())
                 {
                   Tensor<2, structdim> tmp = outer_product(
                     GeometryInfo<structdim>::d_linear_shape_function_gradient(
@@ -3500,9 +3496,8 @@ namespace GridTools
             xi += delta_xi;
 
             x_k = Point<spacedim>();
-            for (unsigned int i = 0;
-                 i < GeometryInfo<structdim>::vertices_per_cell;
-                 ++i)
+            for (const unsigned int i :
+                 GeometryInfo<structdim>::vertex_indices())
               x_k += object->vertex(i) *
                      GeometryInfo<structdim>::d_linear_shape_function(xi, i);
 
@@ -3920,8 +3915,7 @@ namespace GridTools
       if (cell->is_locally_owned())
         {
           std::set<dealii::types::subdomain_id> send_to;
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             {
               const std::map<unsigned int,
                              std::set<dealii::types::subdomain_id>>::

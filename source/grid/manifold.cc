@@ -902,16 +902,14 @@ FlatManifold<dim, spacedim>::normal_vector(
   while (true)
     {
       Point<spacedim> F;
-      for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
         F += face->vertex(v) *
              GeometryInfo<facedim>::d_linear_shape_function(xi, v);
 
       for (unsigned int i = 0; i < facedim; ++i)
         {
           grad_F[i] = 0;
-          for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
             grad_F[i] +=
               face->vertex(v) *
               GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];

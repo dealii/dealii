@@ -386,7 +386,7 @@ namespace
      */
     Cell(const CellData<dim> &c, const std::vector<Edge<dim>> &edge_list)
     {
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         vertex_indices[i] = c.vertices[i];
 
       // now for each of the edges of this cell, find the location inside the
@@ -922,13 +922,11 @@ namespace
 
             unsigned int
               temp_vertex_indices[GeometryInfo<dim>::vertices_per_cell];
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               temp_vertex_indices[v] =
                 raw_cells[cell_index]
                   .vertices[cube_permutations[origin_vertex_of_cell][v]];
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               raw_cells[cell_index].vertices[v] = temp_vertex_indices[v];
 
             break;
@@ -1037,9 +1035,9 @@ namespace
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
       {
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           tmp[i] = cell.vertices[i];
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           cell.vertices[i] = tmp[GeometryInfo<3>::ucd_to_deal[i]];
       }
   }
@@ -1065,9 +1063,9 @@ namespace
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
       {
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           tmp[i] = cell.vertices[i];
-        for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
       }
   }
@@ -1159,7 +1157,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
       // GridTools::cell_measure
       // requires the vertices to be
       // in lexicographic ordering
-      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<2>::vertex_indices())
         vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
       if (GridTools::cell_measure<2>(all_vertices, vertices_lex) < 0)
         {
@@ -1169,7 +1167,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
           // Check whether the resulting cell is now ok.
           // If not, then the grid is seriously broken and
           // we just give up.
-          for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+          for (const unsigned int i : GeometryInfo<2>::vertex_indices())
             vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] = cell.vertices[i];
           AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) >
                         0,
@@ -1225,7 +1223,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
       // GridTools::cell_measure
       // requires the vertices to be
       // in lexicographic ordering
-      for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<3>::vertex_indices())
         vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
       if (GridTools::cell_measure<3>(all_vertices, vertices_lex) < 0)
         {
@@ -1237,7 +1235,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
           // Check whether the resulting cell is now ok.
           // If not, then the grid is seriously broken and
           // we just give up.
-          for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
             vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] = cell.vertices[i];
           AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) >
                         0,

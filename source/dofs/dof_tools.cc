@@ -2720,9 +2720,8 @@ namespace DoFTools
     // Identify all vertices active on this level and remember some data
     // about them
     for (cell = dof_handler.begin(level); cell != endc; ++cell)
-      for (unsigned int v = 0;
-           v < GeometryInfo<DoFHandlerType::dimension>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v :
+           GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
         {
           const unsigned int vg = cell->vertex_index(v);
           vertex_dof_count[vg] += cell->get_fe().dofs_per_cell;
@@ -2777,9 +2776,8 @@ namespace DoFTools
         indices.resize(fe.dofs_per_cell);
         cell->get_mg_dof_indices(indices);
 
-        for (unsigned int v = 0;
-             v < GeometryInfo<DoFHandlerType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
           {
             const unsigned int vg    = cell->vertex_index(v);
             const unsigned int block = vertex_mapping[vg];

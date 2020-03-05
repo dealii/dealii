@@ -159,9 +159,8 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
 
           case 2:
             {
-              for (unsigned int vertex = 0;
-                   vertex < GeometryInfo<dimension>::vertices_per_cell;
-                   ++vertex)
+              for (const unsigned int vertex :
+                   GeometryInfo<dimension>::vertex_indices())
                 {
                   const Point<dimension> v = (*cell)->vertex(vertex);
 

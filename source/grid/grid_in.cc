@@ -595,14 +595,12 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           cells.emplace_back();
 
           AssertThrow(in, ExcIO());
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             in >> cells.back().vertices[v];
 
           cells.back().material_id = 0;
 
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             cells.back().vertices[v] = vertex_indices[cells.back().vertices[v]];
 
           cell_indices[no] = no_cell;
@@ -820,8 +818,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
         {
           // allocate and read indices
           cells.emplace_back();
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
             in >> cells.back().vertices[i];
 
           // to make sure that the cast won't fail
@@ -841,8 +838,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
 
           // transform from ucd to
           // consecutive numbering
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
             if (vertex_indices.find(cells.back().vertices[i]) !=
                 vertex_indices.end())
               // vertex with this index exists
@@ -1188,7 +1184,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read in vertex numbers. they
       // are 1-based, so subtract one
       cells.emplace_back();
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           in >> cells.back().vertices[i];
 
@@ -1832,9 +1828,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 // allocate and read indices
                 cells.emplace_back();
-                for (unsigned int i = 0;
-                     i < GeometryInfo<dim>::vertices_per_cell;
-                     ++i)
+                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                   in >> cells.back().vertices[i];
 
                 // to make sure that the cast won't fail
@@ -1853,9 +1847,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 // transform from ucd to
                 // consecutive numbering
-                for (unsigned int i = 0;
-                     i < GeometryInfo<dim>::vertices_per_cell;
-                     ++i)
+                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                   {
                     AssertThrow(
                       vertex_indices.find(cells.back().vertices[i]) !=
@@ -3058,8 +3050,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
         {
           if (mFaces[i].mNumIndices == GeometryInfo<dim>::vertices_per_cell)
             {
-              for (unsigned int f = 0; f < GeometryInfo<dim>::vertices_per_cell;
-                   ++f)
+              for (const unsigned int f : GeometryInfo<dim>::vertex_indices())
                 {
                   cells[valid_cell].vertices[f] =
                     mFaces[i].mIndices[f] + v_offset;

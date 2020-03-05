@@ -164,8 +164,7 @@ namespace TriangulationDescription
           TriaIterator<CellAccessor<dim, spacedim>> &cell,
           std::vector<bool> &vertices_owned_by_locally_owned_cells) {
           // add local vertices
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             {
               vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
                 true;
@@ -204,8 +203,7 @@ namespace TriangulationDescription
           auto is_locally_relevant = [&](
                                        TriaIterator<CellAccessor<dim, spacedim>>
                                          &cell) {
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               if (vertices_owned_by_locally_owned_cells[cell->vertex_index(v)])
                 return true;
             return false;
@@ -228,16 +226,12 @@ namespace TriangulationDescription
                 dealii::CellData<dim> cell_data;
                 cell_data.material_id = cell->material_id();
                 cell_data.manifold_id = cell->manifold_id();
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   cell_data.vertices[v] = cell->vertex_index(v);
                 construction_data.coarse_cells.push_back(cell_data);
 
                 // b) save indices of each vertex of this cell
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   vertices_locally_relevant[cell->vertex_index(v)] =
                     numbers::invalid_unsigned_int;
 
@@ -304,8 +298,7 @@ namespace TriangulationDescription
 
           // 4) correct vertices of cells (make them local)
           for (auto &cell : construction_data.coarse_cells)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               cell.vertices[v] = vertices_locally_relevant[cell.vertices[v]];
         }
       else
@@ -347,9 +340,8 @@ namespace TriangulationDescription
               // owned cell)
               auto is_locally_relevant_on_level =
                 [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_cell;
-                       ++v)
+                  for (const unsigned int v :
+                       GeometryInfo<dim>::vertex_indices())
                     if (vertices_owned_by_locally_owned_cells_on_level
                           [cell->vertex_index(v)])
                       return true;
@@ -376,16 +368,12 @@ namespace TriangulationDescription
                 dealii::CellData<dim> cell_data;
                 cell_data.material_id = cell->material_id();
                 cell_data.manifold_id = cell->manifold_id();
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   cell_data.vertices[v] = cell->vertex_index(v);
                 construction_data.coarse_cells.push_back(cell_data);
 
                 // save indices of each vertex of this cell
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   vertices_locally_relevant[cell->vertex_index(v)] =
                     numbers::invalid_unsigned_int;
 
@@ -405,8 +393,7 @@ namespace TriangulationDescription
 
             // c) correct vertices of cells (make them local)
             for (auto &cell : construction_data.coarse_cells)
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 cell.vertices[v] = vertices_locally_relevant[cell.vertices[v]];
           }
 
@@ -428,9 +415,7 @@ namespace TriangulationDescription
           auto is_locally_relevant_on_active_level =
             [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
               if (cell->active())
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   if (vertices_owned_by_locally_owned_active_cells
                         [cell->vertex_index(v)])
                     return true;
@@ -454,9 +439,8 @@ namespace TriangulationDescription
               // on level
               auto is_locally_relevant_on_level =
                 [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_cell;
-                       ++v)
+                  for (const unsigned int v :
+                       GeometryInfo<dim>::vertex_indices())
                     if (vertices_owned_by_locally_owned_cells_on_level
                           [cell->vertex_index(v)])
                       return true;

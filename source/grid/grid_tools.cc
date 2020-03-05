@@ -650,9 +650,8 @@ namespace GridTools
 
     unsigned int max_level_0_vertex_n = 0;
     for (const auto &cell : tria.cell_iterators_on_level(0))
-      for (unsigned int cell_vertex_n = 0;
-           cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
-           ++cell_vertex_n)
+      for (const unsigned int cell_vertex_n :
+           GeometryInfo<dim>::vertex_indices())
         max_level_0_vertex_n =
           std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
     vertices.resize(max_level_0_vertex_n + 1);
@@ -664,9 +663,8 @@ namespace GridTools
       {
         // Save cell data
         CellData<dim> cell_data;
-        for (unsigned int cell_vertex_n = 0;
-             cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
-             ++cell_vertex_n)
+        for (const unsigned int cell_vertex_n :
+             GeometryInfo<dim>::vertex_indices())
           {
             Assert(cell->vertex_index(cell_vertex_n) < vertices.size(),
                    ExcInternalError());
@@ -712,9 +710,8 @@ namespace GridTools
     {
       std::vector<bool> used_vertices(vertices.size());
       for (const CellData<dim> &cell_data : cells)
-        for (unsigned int cell_vertex_n = 0;
-             cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
-             ++cell_vertex_n)
+        for (const unsigned int cell_vertex_n :
+             GeometryInfo<dim>::vertex_indices())
           used_vertices[cell_data.vertices[cell_vertex_n]] = true;
       Assert(std::find(used_vertices.begin(), used_vertices.end(), false) ==
                used_vertices.end(),
@@ -753,7 +750,7 @@ namespace GridTools
     // first check which vertices are actually used
     std::vector<bool> vertex_used(vertices.size(), false);
     for (unsigned int c = 0; c < cells.size(); ++c)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           Assert(cells[c].vertices[v] < vertices.size(),
                  ExcMessage("Invalid vertex index encountered! cells[" +
@@ -782,13 +779,13 @@ namespace GridTools
 
     // next replace old vertex numbers by the new ones
     for (unsigned int c = 0; c < cells.size(); ++c)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
 
     // same for boundary data
     for (unsigned int c = 0; c < subcelldata.boundary_lines.size(); // NOLINT
          ++c)
-      for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<1>::vertex_indices())
         {
           Assert(subcelldata.boundary_lines[c].vertices[v] <
                    new_vertex_numbers.size(),
@@ -808,7 +805,7 @@ namespace GridTools
 
     for (unsigned int c = 0; c < subcelldata.boundary_quads.size(); // NOLINT
          ++c)
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         {
           Assert(subcelldata.boundary_quads[c].vertices[v] <
                    new_vertex_numbers.size(),
@@ -1183,9 +1180,7 @@ namespace GridTools
       {
         // loop over all vertices of the cell and see if it is listed in the map
         // given as first argument of the function
-        for (unsigned int vertex_no = 0;
-             vertex_no < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex_no)
+        for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
           {
             const unsigned int vertex_index = cell->vertex_index(vertex_no);
             const Point<dim> & vertex_point = cell->vertex(vertex_no);
@@ -1218,9 +1213,7 @@ namespace GridTools
     // according to the computed values
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
     for (const auto &cell : dof_handler.active_cell_iterators())
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         if (vertex_touched[cell->vertex_index(vertex_no)] == false)
           {
             Point<dim> &v = cell->vertex(vertex_no);
@@ -1382,9 +1375,8 @@ namespace GridTools
              ++cell)
           if (cell->is_locally_owned())
             {
-              for (unsigned int vertex_no = 0;
-                   vertex_no < GeometryInfo<dim>::vertices_per_cell;
-                   ++vertex_no)
+              for (const unsigned int vertex_no :
+                   GeometryInfo<dim>::vertex_indices())
                 {
                   const unsigned global_vertex_no =
                     cell->vertex_index(vertex_no);
@@ -1458,9 +1450,8 @@ namespace GridTools
                triangulation.begin_active();
              cell != triangulation.end();
              ++cell)
-          for (unsigned int vertex_no = 0;
-               vertex_no < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex_no)
+          for (const unsigned int vertex_no :
+               GeometryInfo<dim>::vertex_indices())
             cell->vertex(vertex_no) =
               new_vertex_locations[cell->vertex_index(vertex_no)];
       }
@@ -1700,7 +1691,7 @@ namespace GridTools
     // list, but std::set throws out those cells already entered
     for (const auto &cell : mesh.active_cell_iterators())
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           if (cell->vertex_index(v) == vertex)
             {
               // OK, we found a cell that contains
@@ -2070,9 +2061,8 @@ namespace GridTools
 
         for (; i < active_cells.size(); ++i)
           if (predicate(active_cells[i]))
-            for (unsigned int v = 0;
-                 v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v :
+                 GeometryInfo<MeshType::dimension>::vertex_indices())
               for (unsigned int d = 0; d < spacedim; ++d)
                 {
                   minp[d] = std::min(minp[d], active_cells[i]->vertex(v)[d]);
@@ -2344,7 +2334,7 @@ namespace GridTools
       cell = triangulation.begin_active(),
       endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         vertex_to_cell_map[cell->vertex_index(i)].insert(cell);
 
     // Take care of hanging nodes
@@ -2429,8 +2419,7 @@ namespace GridTools
       {
         if (cell->is_locally_owned())
           {
-            for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-                 ++i)
+            for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
               {
                 types::subdomain_id lowest_subdomain_id = cell->subdomain_id();
                 typename std::set<active_cell_iterator>::iterator
@@ -2799,7 +2788,7 @@ namespace GridTools
          cell != triangulation.end();
          ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           vertex_to_cell[cell->vertex_index(v)].push_back(
             cell->active_cell_index());
       }
@@ -2811,7 +2800,7 @@ namespace GridTools
          cell != triangulation.end();
          ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           for (unsigned int n = 0;
                n < vertex_to_cell[cell->vertex_index(v)].size();
                ++n)
@@ -2835,7 +2824,7 @@ namespace GridTools
          cell != triangulation.end(level);
          ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           vertex_to_cell[cell->vertex_index(v)].push_back(cell->index());
       }
 
@@ -2846,7 +2835,7 @@ namespace GridTools
          cell != triangulation.end(level);
          ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           for (unsigned int n = 0;
                n < vertex_to_cell[cell->vertex_index(v)].size();
                ++n)
@@ -3271,8 +3260,7 @@ namespace GridTools
         if (cell->is_artificial() ||
             (cell->is_ghost() &&
              (cell->subdomain_id() < tr->locally_owned_subdomain())))
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             locally_owned_vertices[cell->vertex_index(v)] = false;
 
     return locally_owned_vertices;
@@ -3412,8 +3400,7 @@ namespace GridTools
         Tensor<spacedim - structdim, spacedim>
           parent_alternating_forms[GeometryInfo<structdim>::vertices_per_cell];
 
-        for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell;
-             ++i)
+        for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
           parent_vertices[i] = object->vertex(i);
 
         GeometryInfo<structdim>::alternating_form_at_vertices(
@@ -3441,9 +3428,7 @@ namespace GridTools
           [GeometryInfo<structdim>::vertices_per_cell];
 
         for (unsigned int c = 0; c < object->n_children(); ++c)
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
             child_vertices[c][i] = object->child(c)->vertex(i);
 
         // replace mid-object
@@ -3472,9 +3457,7 @@ namespace GridTools
         // objective function
         double objective = 0;
         for (unsigned int c = 0; c < object->n_children(); ++c)
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
             objective +=
               (child_alternating_forms[c][i] -
                average_parent_alternating_form / std::pow(2., 1. * structdim))
@@ -3689,8 +3672,7 @@ namespace GridTools
 
         Point<spacedim>
           parent_vertices[GeometryInfo<structdim>::vertices_per_cell];
-        for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell;
-             ++i)
+        for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
           parent_vertices[i] = object->vertex(i);
 
         Tensor<spacedim - structdim, spacedim>
@@ -3703,9 +3685,7 @@ namespace GridTools
                         [GeometryInfo<structdim>::vertices_per_cell];
 
         for (unsigned int c = 0; c < object->n_children(); ++c)
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
             child_vertices[c][i] = object->child(c)->vertex(i);
 
         Tensor<spacedim - structdim, spacedim> child_alternating_forms
@@ -3719,12 +3699,9 @@ namespace GridTools
         old_min_product =
           child_alternating_forms[0][0] * parent_alternating_forms[0];
         for (unsigned int c = 0; c < object->n_children(); ++c)
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
-            for (unsigned int j = 0;
-                 j < GeometryInfo<structdim>::vertices_per_cell;
-                 ++j)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+            for (const unsigned int j :
+                 GeometryInfo<structdim>::vertex_indices())
               old_min_product = std::min<double>(old_min_product,
                                                  child_alternating_forms[c][i] *
                                                    parent_alternating_forms[j]);
@@ -3746,12 +3723,9 @@ namespace GridTools
         new_min_product =
           child_alternating_forms[0][0] * parent_alternating_forms[0];
         for (unsigned int c = 0; c < object->n_children(); ++c)
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
-            for (unsigned int j = 0;
-                 j < GeometryInfo<structdim>::vertices_per_cell;
-                 ++j)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+            for (const unsigned int j :
+                 GeometryInfo<structdim>::vertex_indices())
               new_min_product = std::min<double>(new_min_product,
                                                  child_alternating_forms[c][i] *
                                                    parent_alternating_forms[j]);
@@ -4414,8 +4388,7 @@ namespace GridTools
         if (cells_to_remove[cell->active_cell_index()] == false)
           {
             CellData<dim> c;
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               c.vertices[v] = cell->vertex_index(v);
             c.manifold_id = cell->manifold_id();
             c.material_id = cell->material_id();
@@ -4437,18 +4410,14 @@ namespace GridTools
               CellData<1> line;
               if (dim == 2)
                 {
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<1>::vertices_per_cell;
-                       ++v)
+                  for (const unsigned int v : GeometryInfo<1>::vertex_indices())
                     line.vertices[v] = face->vertex_index(v);
                   line.boundary_id = face->boundary_id();
                   line.manifold_id = face->manifold_id();
                 }
               else
                 {
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<1>::vertices_per_cell;
-                       ++v)
+                  for (const unsigned int v : GeometryInfo<1>::vertex_indices())
                     line.vertices[v] = face->line(l)->vertex_index(v);
                   line.boundary_id = face->line(l)->boundary_id();
                   line.manifold_id = face->line(l)->manifold_id();
@@ -4458,8 +4427,7 @@ namespace GridTools
           if (dim == 3)
             {
               CellData<2> quad;
-              for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<2>::vertex_indices())
                 quad.vertices[v] = face->vertex_index(v);
               quad.boundary_id = face->boundary_id();
               quad.manifold_id = face->manifold_id();

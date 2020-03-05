@@ -253,7 +253,7 @@ namespace GridTools
     // list, but std::set throws out those cells already entered
     for (; cell != endc; ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           if (cell->vertex_index(v) == vertex)
             {
               // OK, we found a cell that contains
@@ -748,9 +748,8 @@ namespace GridTools
     // the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
 
     // Find the cells that do not conform to the predicate
@@ -758,9 +757,8 @@ namespace GridTools
     // These comprise the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               true)
             {
@@ -792,9 +790,8 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] =
             true;
 
@@ -805,9 +802,8 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_level_subdomain[cell->vertex_index(
                 v)] == true)
             {
@@ -906,9 +902,8 @@ namespace GridTools
     for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // Negation of predicate --> Not Part of subdomain
         {
-          for (unsigned int v = 0;
-               v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v :
+               GeometryInfo<MeshType::dimension>::vertex_indices())
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
           n_non_predicate_cells++;
         }
@@ -926,9 +921,8 @@ namespace GridTools
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Potential boundary cell of the
                            // subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (vertices_outside_subdomain[cell->vertex_index(v)] == true)
             {
               subdomain_boundary_cells.push_back(cell);
@@ -1093,9 +1087,8 @@ namespace GridTools
     // if it belongs to the predicate domain, extend the bounding box.
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               false)
             {
@@ -1238,7 +1231,7 @@ namespace GridTools
                                                            mesh_2.begin(0),
                                                          endc = mesh_1.end(0);
     for (; cell_1 != endc; ++cell_1, ++cell_2)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (cell_1->vertex(v) != cell_2->vertex(v))
           return false;
 
@@ -1513,9 +1506,8 @@ namespace GridTools
          uniform_cell != uniform_cells.end();
          ++uniform_cell)
       {
-        for (unsigned int v = 0;
-             v < GeometryInfo<Container::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<Container::dimension>::vertex_indices())
           {
             Point<Container::space_dimension> position =
               (*uniform_cell)->vertex(v);
@@ -1594,10 +1586,8 @@ namespace GridTools
                     {
                       // adjust the cell vertices of the local_triangulation to
                       // match cell vertices of the global triangulation
-                      for (unsigned int v = 0;
-                           v < GeometryInfo<
-                                 Container::dimension>::vertices_per_cell;
-                           ++v)
+                      for (const unsigned int v :
+                           GeometryInfo<Container::dimension>::vertex_indices())
                         active_tria_cell->vertex(v) = patch[i]->vertex(v);
 
                       Assert(active_tria_cell->center().distance(
