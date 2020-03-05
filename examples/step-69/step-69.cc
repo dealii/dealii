@@ -769,7 +769,7 @@ namespace Step69
           std::transform(dof_indices.begin(),
                          dof_indices.end(),
                          dof_indices.begin(),
-                         [&](auto index) {
+                         [&](types::global_dof_index index) {
                            return partitioner->global_to_local(index);
                          });
 
@@ -1022,113 +1022,115 @@ namespace Step69
         computing_timer,
         "offline_data - assemble lumped mass matrix, and c_ij");
 
-      const auto local_assemble_system = [&](const auto &cell,
-                                             auto &      scratch,
-                                             auto &      copy) {
-        copy.is_artificial = cell->is_artificial();
-        if (copy.is_artificial)
-          return;
+      const auto local_assemble_system = //
+        [&](const typename DoFHandler<dim>::cell_iterator &cell,
+            MeshWorker::ScratchData<dim> &                 scratch,
+            CopyData<dim> &                                copy) {
+          copy.is_artificial = cell->is_artificial();
+          if (copy.is_artificial)
+            return;
 
-        copy.local_boundary_normal_map.clear();
-        copy.cell_lumped_mass_matrix.reinit(dofs_per_cell, dofs_per_cell);
-        for (auto &matrix : copy.cell_cij_matrix)
-          matrix.reinit(dofs_per_cell, dofs_per_cell);
+          copy.local_boundary_normal_map.clear();
+          copy.cell_lumped_mass_matrix.reinit(dofs_per_cell, dofs_per_cell);
+          for (auto &matrix : copy.cell_cij_matrix)
+            matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-        const auto &fe_values = scratch.reinit(cell);
+          const auto &fe_values = scratch.reinit(cell);
 
-        copy.local_dof_indices.resize(dofs_per_cell);
-        cell->get_dof_indices(copy.local_dof_indices);
+          copy.local_dof_indices.resize(dofs_per_cell);
+          cell->get_dof_indices(copy.local_dof_indices);
 
-        std::transform(copy.local_dof_indices.begin(),
-                       copy.local_dof_indices.end(),
-                       copy.local_dof_indices.begin(),
-                       [&](auto index) {
-                         return partitioner->global_to_local(index);
-                       });
+          std::transform(copy.local_dof_indices.begin(),
+                         copy.local_dof_indices.end(),
+                         copy.local_dof_indices.begin(),
+                         [&](types::global_dof_index index) {
+                           return partitioner->global_to_local(index);
+                         });
 
-        // We compute the local contributions for the lumped mass matrix
-        // entries $m_i$ and and vectors $c_{ij}$ in the usual fashion:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          {
-            const auto JxW = fe_values.JxW(q_point);
+          // We compute the local contributions for the lumped mass matrix
+          // entries $m_i$ and and vectors $c_{ij}$ in the usual fashion:
+          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            {
+              const auto JxW = fe_values.JxW(q_point);
 
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              {
-                const auto value_JxW = fe_values.shape_value(j, q_point) * JxW;
-                const auto grad_JxW  = fe_values.shape_grad(j, q_point) * JxW;
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                {
+                  const auto value_JxW =
+                    fe_values.shape_value(j, q_point) * JxW;
+                  const auto grad_JxW = fe_values.shape_grad(j, q_point) * JxW;
 
-                copy.cell_lumped_mass_matrix(j, j) += value_JxW;
+                  copy.cell_lumped_mass_matrix(j, j) += value_JxW;
 
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  {
-                    const auto value = fe_values.shape_value(i, q_point);
-                    for (unsigned int d = 0; d < dim; ++d)
-                      copy.cell_cij_matrix[d](i, j) += value * grad_JxW[d];
-
-                  } /* i */
-              }     /* j */
-          }         /* q */
-
-        // Now we have to compute the boundary normals. Note that the
-        // following loop does not do much unless the element has faces on
-        // the boundary of the domain.
-        for (auto f : GeometryInfo<dim>::face_indices())
-          {
-            const auto face = cell->face(f);
-            const auto id   = face->boundary_id();
-
-            if (!face->at_boundary())
-              continue;
-
-            const auto &fe_face_values = scratch.reinit(cell, f);
-
-            const unsigned int n_face_q_points =
-              fe_face_values.get_quadrature().size();
-
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              {
-                if (!discretization->finite_element.has_support_on_face(j, f))
-                  continue;
-
-                // Note that "normal" will only represent the contributions
-                // from one of the faces in the support of the shape
-                // function phi_j. So we cannot normalize this local
-                // contribution right here, we have to take it "as is",
-                // store it and pass it to the copy data routine. The
-                // proper normalization requires an additional loop on
-                // nodes. This is done in the copy function below.
-                Tensor<1, dim> normal;
-                if (id == Boundaries::free_slip)
-                  {
-                    for (unsigned int q = 0; q < n_face_q_points; ++q)
-                      normal += fe_face_values.normal_vector(q) *
-                                fe_face_values.shape_value(j, q);
-                  }
-
-                const auto index = copy.local_dof_indices[j];
-
-                Point<dim> position;
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
-                  if (cell->vertex_dof_index(v, 0) ==
-                      partitioner->local_to_global(index))
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
-                      position = cell->vertex(v);
-                      break;
+                      const auto value = fe_values.shape_value(i, q_point);
+                      for (unsigned int d = 0; d < dim; ++d)
+                        copy.cell_cij_matrix[d](i, j) += value * grad_JxW[d];
+
+                    } /* i */
+                }     /* j */
+            }         /* q */
+
+          // Now we have to compute the boundary normals. Note that the
+          // following loop does not do much unless the element has faces on
+          // the boundary of the domain.
+          for (auto f : GeometryInfo<dim>::face_indices())
+            {
+              const auto face = cell->face(f);
+              const auto id   = face->boundary_id();
+
+              if (!face->at_boundary())
+                continue;
+
+              const auto &fe_face_values = scratch.reinit(cell, f);
+
+              const unsigned int n_face_q_points =
+                fe_face_values.get_quadrature().size();
+
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                {
+                  if (!discretization->finite_element.has_support_on_face(j, f))
+                    continue;
+
+                  // Note that "normal" will only represent the contributions
+                  // from one of the faces in the support of the shape
+                  // function phi_j. So we cannot normalize this local
+                  // contribution right here, we have to take it "as is",
+                  // store it and pass it to the copy data routine. The
+                  // proper normalization requires an additional loop on
+                  // nodes. This is done in the copy function below.
+                  Tensor<1, dim> normal;
+                  if (id == Boundaries::free_slip)
+                    {
+                      for (unsigned int q = 0; q < n_face_q_points; ++q)
+                        normal += fe_face_values.normal_vector(q) *
+                                  fe_face_values.shape_value(j, q);
                     }
 
-                const auto old_id =
-                  std::get<1>(copy.local_boundary_normal_map[index]);
-                copy.local_boundary_normal_map[index] =
-                  std::make_tuple(normal, std::max(old_id, id), position);
-              }
-          }
-      };
+                  const auto index = copy.local_dof_indices[j];
+
+                  Point<dim> position;
+                  for (unsigned int v = 0;
+                       v < GeometryInfo<dim>::vertices_per_cell;
+                       ++v)
+                    if (cell->vertex_dof_index(v, 0) ==
+                        partitioner->local_to_global(index))
+                      {
+                        position = cell->vertex(v);
+                        break;
+                      }
+
+                  const auto old_id =
+                    std::get<1>(copy.local_boundary_normal_map[index]);
+                  copy.local_boundary_normal_map[index] =
+                    std::make_tuple(normal, std::max(old_id, id), position);
+                }
+            }
+        };
 
       // Last, we provide a copy_local_to_global function as required for
       // the WorkStream
-      const auto copy_local_to_global = [&](const auto &copy) {
+      const auto copy_local_to_global = [&](const CopyData<dim> &copy) {
         if (copy.is_artificial)
           return;
 
@@ -1233,33 +1235,44 @@ namespace Step69
     // to carry out (computation and storage of normals, and normalization
     // of the $\mathbf{c}_{ij}$ of entries) threads cannot conflict
     // attempting to write the same entry (we do not need a scheduler).
+    //
+    // We have one more difficulty to overcome: In order to implement the
+    // <code>on_subranges</code> lambda we need to name the iterator type
+    // of the object returned by <code>boost::irange<unsigned
+    // int>()</code>. This is unfortunately a very convoluted name exposing
+    // implementational details about <code>boost::irange</code>. For this
+    // reason we resort to the <a
+    // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
+    // specifier, a C++11 feature that returns the type of an entity, or
+    // expression.
     {
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - compute |c_ij|, and n_ij");
 
-      // Here [i1,i2) represents a subrange of rows:
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        for (; i1 < i2; ++i1)
-          {
-            const auto row_index = *i1;
-
-            // First column-loop: we compute and store the entries of the
-            // matrix norm_matrix and write normalized entries into the
-            // matrix nij_matrix:
-            std::for_each(sparsity_pattern.begin(row_index),
-                          sparsity_pattern.end(row_index),
-                          [&](const auto &jt) {
-                            const auto c_ij = gather_get_entry(cij_matrix, &jt);
-                            const double norm = c_ij.norm();
-
-                            set_entry(norm_matrix, &jt, norm);
-                            for (unsigned int j = 0; j < dim; ++j)
-                              set_entry(nij_matrix[j], &jt, c_ij[j] / norm);
-                          });
-          }
-      };
-
       const auto indices = boost::irange<unsigned int>(0, n_locally_relevant);
+
+      const auto on_subranges = //
+        [&](typename decltype(indices)::iterator       i1,
+            const typename decltype(indices)::iterator i2) {
+          for (const auto row_index : boost::make_iterator_range(i1, i2))
+            {
+              // First column-loop: we compute and store the entries of the
+              // matrix norm_matrix and write normalized entries into the
+              // matrix nij_matrix:
+              std::for_each(
+                sparsity_pattern.begin(row_index),
+                sparsity_pattern.end(row_index),
+                [&](const dealii::SparsityPatternIterators::Accessor &jt) {
+                  const auto   c_ij = gather_get_entry(cij_matrix, &jt);
+                  const double norm = c_ij.norm();
+
+                  set_entry(norm_matrix, &jt, norm);
+                  for (unsigned int j = 0; j < dim; ++j)
+                    set_entry(nij_matrix[j], &jt, c_ij[j] / norm);
+                });
+            }
+        };
+
       parallel::apply_to_subranges(indices.begin(),
                                    indices.end(),
                                    on_subranges,
@@ -1305,77 +1318,78 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - fix slip boundary c_ij");
 
-      const auto local_assemble_system = [&](const auto &cell,
-                                             auto &      scratch,
-                                             auto &      copy) {
-        copy.is_artificial = cell->is_artificial();
+      const auto local_assemble_system = //
+        [&](const typename DoFHandler<dim>::cell_iterator &cell,
+            MeshWorker::ScratchData<dim> &                 scratch,
+            CopyData<dim> &                                copy) {
+          copy.is_artificial = cell->is_artificial();
 
-        if (copy.is_artificial)
-          return;
+          if (copy.is_artificial)
+            return;
 
-        for (auto &matrix : copy.cell_cij_matrix)
-          matrix.reinit(dofs_per_cell, dofs_per_cell);
+          for (auto &matrix : copy.cell_cij_matrix)
+            matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-        copy.local_dof_indices.resize(dofs_per_cell);
-        cell->get_dof_indices(copy.local_dof_indices);
-        std::transform(copy.local_dof_indices.begin(),
-                       copy.local_dof_indices.end(),
-                       copy.local_dof_indices.begin(),
-                       [&](auto index) {
-                         return partitioner->global_to_local(index);
-                       });
+          copy.local_dof_indices.resize(dofs_per_cell);
+          cell->get_dof_indices(copy.local_dof_indices);
+          std::transform(copy.local_dof_indices.begin(),
+                         copy.local_dof_indices.end(),
+                         copy.local_dof_indices.begin(),
+                         [&](types::global_dof_index index) {
+                           return partitioner->global_to_local(index);
+                         });
 
-        for (auto &matrix : copy.cell_cij_matrix)
-          matrix = 0.;
+          for (auto &matrix : copy.cell_cij_matrix)
+            matrix = 0.;
 
-        for (auto f : GeometryInfo<dim>::face_indices())
-          {
-            const auto face = cell->face(f);
-            const auto id   = face->boundary_id();
+          for (auto f : GeometryInfo<dim>::face_indices())
+            {
+              const auto face = cell->face(f);
+              const auto id   = face->boundary_id();
 
-            if (!face->at_boundary())
-              continue;
+              if (!face->at_boundary())
+                continue;
 
-            if (id != Boundaries::free_slip)
-              continue;
+              if (id != Boundaries::free_slip)
+                continue;
 
-            const auto &fe_face_values = scratch.reinit(cell, f);
+              const auto &fe_face_values = scratch.reinit(cell, f);
 
-            const unsigned int n_face_q_points =
-              fe_face_values.get_quadrature().size();
+              const unsigned int n_face_q_points =
+                fe_face_values.get_quadrature().size();
 
-            for (unsigned int q = 0; q < n_face_q_points; ++q)
-              {
-                const auto JxW      = fe_face_values.JxW(q);
-                const auto normal_q = fe_face_values.normal_vector(q);
+              for (unsigned int q = 0; q < n_face_q_points; ++q)
+                {
+                  const auto JxW      = fe_face_values.JxW(q);
+                  const auto normal_q = fe_face_values.normal_vector(q);
 
-                for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  {
-                    if (!discretization->finite_element.has_support_on_face(j,
-                                                                            f))
-                      continue;
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      if (!discretization->finite_element.has_support_on_face(
+                            j, f))
+                        continue;
 
-                    const auto &normal_j = std::get<0>(
-                      boundary_normal_map[copy.local_dof_indices[j]]);
+                      const auto &normal_j = std::get<0>(
+                        boundary_normal_map[copy.local_dof_indices[j]]);
 
-                    const auto value_JxW =
-                      fe_face_values.shape_value(j, q) * JxW;
+                      const auto value_JxW =
+                        fe_face_values.shape_value(j, q) * JxW;
 
-                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                      {
-                        const auto value = fe_face_values.shape_value(i, q);
+                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        {
+                          const auto value = fe_face_values.shape_value(i, q);
 
-                        /* This is the correction of the boundary c_ij */
-                        for (unsigned int d = 0; d < dim; ++d)
-                          copy.cell_cij_matrix[d](i, j) +=
-                            (normal_j[d] - normal_q[d]) * (value * value_JxW);
-                      } /* i */
-                  }     /* j */
-              }         /* q */
-          }             /* f */
-      };
+                          /* This is the correction of the boundary c_ij */
+                          for (unsigned int d = 0; d < dim; ++d)
+                            copy.cell_cij_matrix[d](i, j) +=
+                              (normal_j[d] - normal_q[d]) * (value * value_JxW);
+                        } /* i */
+                    }     /* j */
+                }         /* q */
+            }             /* f */
+        };
 
-      const auto copy_local_to_global = [&](const auto &copy) {
+      const auto copy_local_to_global = [&](const CopyData<dim> &copy) {
         if (copy.is_artificial)
           return;
 
@@ -1903,55 +1917,57 @@ namespace Step69
       TimerOutput::Scope scopeime(computing_timer,
                                   "time_stepping - 1 compute d_ij");
 
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        for (const auto i : boost::make_iterator_range(i1, i2))
-          {
-            const auto U_i = gather(U, i);
+      const auto on_subranges = //
+        [&](typename decltype(indices_relevant)::iterator       i1,
+            const typename decltype(indices_relevant)::iterator i2) {
+          for (const auto i : boost::make_iterator_range(i1, i2))
+            {
+              const auto U_i = gather(U, i);
 
-            // For a given column index i we iterate over the columns of the
-            // sparsity pattern from <code>sparsity.begin(i)</code> to
-            // <code>sparsity.end(i)</code>:
-            for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
-              {
-                const auto j = jt->column();
+              // For a given column index i we iterate over the columns of the
+              // sparsity pattern from <code>sparsity.begin(i)</code> to
+              // <code>sparsity.end(i)</code>:
+              for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
+                {
+                  const auto j = jt->column();
 
-                // We only compute $d_{ij}$ if $j < i$ (upper triangular
-                // entries) and later copy the values over to $d_{ji}$.
-                if (j >= i)
-                  continue;
+                  // We only compute $d_{ij}$ if $j < i$ (upper triangular
+                  // entries) and later copy the values over to $d_{ji}$.
+                  if (j >= i)
+                    continue;
 
-                const auto U_j = gather(U, j);
+                  const auto U_j = gather(U, j);
 
-                const auto   n_ij = gather_get_entry(nij_matrix, jt);
-                const double norm = get_entry(norm_matrix, jt);
+                  const auto   n_ij = gather_get_entry(nij_matrix, jt);
+                  const double norm = get_entry(norm_matrix, jt);
 
-                const auto lambda_max =
-                  ProblemDescription<dim>::compute_lambda_max(U_i, U_j, n_ij);
+                  const auto lambda_max =
+                    ProblemDescription<dim>::compute_lambda_max(U_i, U_j, n_ij);
 
-                double d = norm * lambda_max;
+                  double d = norm * lambda_max;
 
-                // If both support points happen to be at the boundary we
-                // have to compute $d_{ji}$ as well and then take
-                // $\max(d_{ij},d_{ji})$. After this we can finally set the
-                // upper triangular and lower triangular entries.
-                if (boundary_normal_map.count(i) != 0 &&
-                    boundary_normal_map.count(j) != 0)
-                  {
-                    const auto n_ji = gather(nij_matrix, j, i);
-                    const auto lambda_max_2 =
-                      ProblemDescription<dim>::compute_lambda_max(U_j,
-                                                                  U_i,
-                                                                  n_ji);
-                    const double norm_2 = norm_matrix(j, i);
+                  // If both support points happen to be at the boundary we
+                  // have to compute $d_{ji}$ as well and then take
+                  // $\max(d_{ij},d_{ji})$. After this we can finally set the
+                  // upper triangular and lower triangular entries.
+                  if (boundary_normal_map.count(i) != 0 &&
+                      boundary_normal_map.count(j) != 0)
+                    {
+                      const auto n_ji = gather(nij_matrix, j, i);
+                      const auto lambda_max_2 =
+                        ProblemDescription<dim>::compute_lambda_max(U_j,
+                                                                    U_i,
+                                                                    n_ji);
+                      const double norm_2 = norm_matrix(j, i);
 
-                    d = std::max(d, norm_2 * lambda_max_2);
-                  }
+                      d = std::max(d, norm_2 * lambda_max_2);
+                    }
 
-                set_entry(dij_matrix, jt, d);
-                dij_matrix(j, i) = d;
-              }
-          }
-      };
+                  set_entry(dij_matrix, jt, d);
+                  dij_matrix(j, i) = d;
+                }
+            }
+        };
 
       parallel::apply_to_subranges(indices_relevant.begin(),
                                    indices_relevant.end(),
@@ -1995,45 +2011,48 @@ namespace Step69
       // on_subranges() will be executed on every thread individually. The
       // variable <code>tau_max_on_subrange</code> is thus stored thread
       // locally.
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
-        for (const auto i : boost::make_iterator_range(i1, i2))
-          {
-            double d_sum = 0.;
+      const auto on_subranges = //
+        [&](typename decltype(indices_relevant)::iterator       i1,
+            const typename decltype(indices_relevant)::iterator i2) {
+          double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
-            for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
-              {
-                const auto j = jt->column();
+          for (const auto i : boost::make_iterator_range(i1, i2))
+            {
+              double d_sum = 0.;
 
-                if (j == i)
-                  continue;
+              for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
+                {
+                  const auto j = jt->column();
 
-                d_sum -= get_entry(dij_matrix, jt);
-              }
+                  if (j == i)
+                    continue;
 
-            // We store the negative sum of the d_ij entries at the
-            // diagonal position
-            dij_matrix.diag_element(i) = d_sum;
-            // and compute the maximal local time-step size
-            // <code>tau</code>:
-            const double mass   = lumped_mass_matrix.diag_element(i);
-            const double tau    = cfl_update * mass / (-2. * d_sum);
-            tau_max_on_subrange = std::min(tau_max_on_subrange, tau);
-          }
+                  d_sum -= get_entry(dij_matrix, jt);
+                }
 
-        // <code>tau_max_on_subrange</code> contains the largest possible
-        // time-step size computed for the (thread local) subrange. At this
-        // point we have to synchronize the value over all threads. This is
-        // were we use the <a
-        // href="http://www.cplusplus.com/reference/atomic/atomic/"><code>std::atomic<double></code></a>
-        // <i>compare exchange</i> update mechanism:
-        double current_tau_max = tau_max.load();
-        while (
-          current_tau_max > tau_max_on_subrange &&
-          !tau_max.compare_exchange_weak(current_tau_max, tau_max_on_subrange))
-          ;
-      };
+              // We store the negative sum of the d_ij entries at the
+              // diagonal position
+              dij_matrix.diag_element(i) = d_sum;
+              // and compute the maximal local time-step size
+              // <code>tau</code>:
+              const double mass   = lumped_mass_matrix.diag_element(i);
+              const double tau    = cfl_update * mass / (-2. * d_sum);
+              tau_max_on_subrange = std::min(tau_max_on_subrange, tau);
+            }
+
+          // <code>tau_max_on_subrange</code> contains the largest possible
+          // time-step size computed for the (thread local) subrange. At this
+          // point we have to synchronize the value over all threads. This is
+          // were we use the <a
+          // href="http://www.cplusplus.com/reference/atomic/atomic/"><code>std::atomic<double></code></a>
+          // <i>compare exchange</i> update mechanism:
+          double current_tau_max = tau_max.load();
+          while (current_tau_max > tau_max_on_subrange &&
+                 !tau_max.compare_exchange_weak(current_tau_max,
+                                                tau_max_on_subrange))
+            ;
+        };
 
       parallel::apply_to_subranges(indices_relevant.begin(),
                                    indices_relevant.end(),
@@ -2076,39 +2095,41 @@ namespace Step69
       TimerOutput::Scope scopeime(computing_timer,
                                   "time_stepping - 3 perform update");
 
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        for (const auto i : boost::make_iterator_range(i1, i2))
-          {
-            Assert(i < n_locally_owned, ExcInternalError());
+      const auto on_subranges =
+        [&](typename decltype(indices_owned)::iterator       i1,
+            const typename decltype(indices_owned)::iterator i2) {
+          for (const auto i : boost::make_iterator_range(i1, i2))
+            {
+              Assert(i < n_locally_owned, ExcInternalError());
 
-            const auto U_i = gather(U, i);
+              const auto U_i = gather(U, i);
 
-            const auto   f_i = ProblemDescription<dim>::flux(U_i);
-            const double m_i = lumped_mass_matrix.diag_element(i);
+              const auto   f_i = ProblemDescription<dim>::flux(U_i);
+              const double m_i = lumped_mass_matrix.diag_element(i);
 
-            auto U_i_new = U_i;
+              auto U_i_new = U_i;
 
-            for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
-              {
-                const auto j = jt->column();
+              for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
+                {
+                  const auto j = jt->column();
 
-                const auto U_j = gather(U, j);
-                const auto f_j = ProblemDescription<dim>::flux(U_j);
+                  const auto U_j = gather(U, j);
+                  const auto f_j = ProblemDescription<dim>::flux(U_j);
 
-                const auto c_ij = gather_get_entry(cij_matrix, jt);
-                const auto d_ij = get_entry(dij_matrix, jt);
+                  const auto c_ij = gather_get_entry(cij_matrix, jt);
+                  const auto d_ij = get_entry(dij_matrix, jt);
 
-                for (unsigned int k = 0; k < problem_dimension; ++k)
-                  {
-                    U_i_new[k] +=
-                      tau_max / m_i *
-                      (-(f_j[k] - f_i[k]) * c_ij + d_ij * (U_j[k] - U_i[k]));
-                  }
-              }
+                  for (unsigned int k = 0; k < problem_dimension; ++k)
+                    {
+                      U_i_new[k] +=
+                        tau_max / m_i *
+                        (-(f_j[k] - f_i[k]) * c_ij + d_ij * (U_j[k] - U_i[k]));
+                    }
+                }
 
-            scatter(temporary_vector, U_i_new, i);
-          }
-      };
+              scatter(temporary_vector, U_i_new, i);
+            }
+        };
 
       parallel::apply_to_subranges(indices_owned.begin(),
                                    indices_owned.end(),
@@ -2124,8 +2145,7 @@ namespace Step69
     // - at the end of the time step enforce boundary conditions strongly
     //   in a post-processing step.
     //
-    // Here the worker <code>on_subranges</code> executes the correction
-    //
+    // Here, we compute the correction
     // \f[
     //   \mathbf{m}_i \dealcoloneq \mathbf{m}_i - (\boldsymbol{\nu}_i \cdot
     //   \mathbf{m}_i) \boldsymbol{\nu}_i,
@@ -2324,72 +2344,73 @@ namespace Step69
     // First loop: compute the averaged gradient at each node and the
     // global maxima and minima of the gradients.
     {
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        double r_i_max_on_subrange = 0.;
-        double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
+      const auto on_subranges = //
+        [&](typename decltype(indices)::iterator       i1,
+            const typename decltype(indices)::iterator i2) {
+          double r_i_max_on_subrange = 0.;
+          double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
-        for (; i1 < i2; ++i1)
-          {
-            const auto i = *i1;
-            Assert(i < n_locally_owned, ExcInternalError());
+          for (const auto i : boost::make_iterator_range(i1, i2))
+            {
+              Assert(i < n_locally_owned, ExcInternalError());
 
-            Tensor<1, dim> r_i;
+              Tensor<1, dim> r_i;
 
-            for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
-              {
-                const auto j = jt->column();
+              for (auto jt = sparsity.begin(i); jt != sparsity.end(i); ++jt)
+                {
+                  const auto j = jt->column();
 
-                if (i == j)
-                  continue;
+                  if (i == j)
+                    continue;
 
-                const auto U_js = U[schlieren_index].local_element(j);
-                const auto c_ij = gather_get_entry(cij_matrix, jt);
-                r_i += c_ij * U_js;
-              }
+                  const auto U_js = U[schlieren_index].local_element(j);
+                  const auto c_ij = gather_get_entry(cij_matrix, jt);
+                  r_i += c_ij * U_js;
+                }
 
-            // We fix up the gradient r_i at free slip boundaries similarly to
-            // how we fixed up boundary states in the forward Euler step.
-            // This avoids sharp, artificial gradients in the Schlieren
-            // plot at free slip boundaries and is a purely cosmetic choice.
+              // We fix up the gradient r_i at free slip boundaries similarly to
+              // how we fixed up boundary states in the forward Euler step.
+              // This avoids sharp, artificial gradients in the Schlieren
+              // plot at free slip boundaries and is a purely cosmetic choice.
 
-            const auto bnm_it = boundary_normal_map.find(i);
-            if (bnm_it != boundary_normal_map.end())
-              {
-                const auto &normal = std::get<0>(bnm_it->second);
-                const auto &id     = std::get<1>(bnm_it->second);
+              const auto bnm_it = boundary_normal_map.find(i);
+              if (bnm_it != boundary_normal_map.end())
+                {
+                  const auto &normal = std::get<0>(bnm_it->second);
+                  const auto &id     = std::get<1>(bnm_it->second);
 
-                if (id == Boundaries::free_slip)
-                  r_i -= 1. * (r_i * normal) * normal;
-                else
-                  r_i = 0.;
-              }
+                  if (id == Boundaries::free_slip)
+                    r_i -= 1. * (r_i * normal) * normal;
+                  else
+                    r_i = 0.;
+                }
 
-            // We remind the reader that we are not interested in the nodal
-            // gradients per se. We only want their norms in order to
-            // compute the Schlieren indicator (weighted with the lumped
-            // mass matrix $m_i$):
-            const double m_i    = lumped_mass_matrix.diag_element(i);
-            r[i]                = r_i.norm() / m_i;
-            r_i_max_on_subrange = std::max(r_i_max_on_subrange, r[i]);
-            r_i_min_on_subrange = std::min(r_i_min_on_subrange, r[i]);
-          }
+              // We remind the reader that we are not interested in the nodal
+              // gradients per se. We only want their norms in order to
+              // compute the Schlieren indicator (weighted with the lumped
+              // mass matrix $m_i$):
+              const double m_i    = lumped_mass_matrix.diag_element(i);
+              r[i]                = r_i.norm() / m_i;
+              r_i_max_on_subrange = std::max(r_i_max_on_subrange, r[i]);
+              r_i_min_on_subrange = std::min(r_i_min_on_subrange, r[i]);
+            }
 
-        // We compare the current_r_i_max and current_r_i_min (in the
-        // current subrange) with r_i_max and r_i_min (for the current MPI
-        // process) and update them if necessary: */
+          // We compare the current_r_i_max and current_r_i_min (in the
+          // current subrange) with r_i_max and r_i_min (for the current MPI
+          // process) and update them if necessary: */
 
-        double current_r_i_max = r_i_max.load();
-        while (
-          current_r_i_max < r_i_max_on_subrange &&
-          !r_i_max.compare_exchange_weak(current_r_i_max, r_i_max_on_subrange))
-          ;
+          double current_r_i_max = r_i_max.load();
+          while (current_r_i_max < r_i_max_on_subrange &&
+                 !r_i_max.compare_exchange_weak(current_r_i_max,
+                                                r_i_max_on_subrange))
+            ;
 
-        double current_r_i_min = r_i_min.load();
-        while (
-          current_r_i_min > r_i_min_on_subrange &&
-          !r_i_min.compare_exchange_weak(current_r_i_min, r_i_min_on_subrange))
-          ;
-      };
+          double current_r_i_min = r_i_min.load();
+          while (current_r_i_min > r_i_min_on_subrange &&
+                 !r_i_min.compare_exchange_weak(current_r_i_min,
+                                                r_i_min_on_subrange))
+            ;
+        };
 
       parallel::apply_to_subranges(indices.begin(),
                                    indices.end(),
@@ -2408,17 +2429,18 @@ namespace Step69
     // are thus in a position to actually compute the Schlieren indicator.
 
     {
-      const auto on_subranges = [&](auto i1, const auto i2) {
-        for (; i1 < i2; ++i1)
-          {
-            const auto i = *i1;
-            Assert(i < n_locally_owned, ExcInternalError());
+      const auto on_subranges = //
+        [&](typename decltype(indices)::iterator       i1,
+            const typename decltype(indices)::iterator i2) {
+          for (const auto i : boost::make_iterator_range(i1, i2))
+            {
+              Assert(i < n_locally_owned, ExcInternalError());
 
-            schlieren.local_element(i) =
-              1. - std::exp(-schlieren_beta * (r[i] - r_i_min) /
-                            (r_i_max - r_i_min));
-          }
-      };
+              schlieren.local_element(i) =
+                1. - std::exp(-schlieren_beta * (r[i] - r_i_min) /
+                              (r_i_max - r_i_min));
+            }
+        };
 
       parallel::apply_to_subranges(indices.begin(),
                                    indices.end(),
@@ -2688,7 +2710,7 @@ namespace Step69
     for (unsigned int i = 0; i < problem_dimension; ++i)
       VectorTools::interpolate(offline_data.dof_handler,
                                ScalarFunctionFromFunctionObject<dim, double>(
-                                 [&](const auto &x) {
+                                 [&](const Point<dim> &x) {
                                    return initial_values.initial_state(x, t)[i];
                                  }),
                                U[i]);
