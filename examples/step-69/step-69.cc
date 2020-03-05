@@ -2397,7 +2397,7 @@ namespace Step69
 
           // We compare the current_r_i_max and current_r_i_min (in the
           // current subrange) with r_i_max and r_i_min (for the current MPI
-          // process) and update them if necessary: */
+          // process) and update them if necessary:
 
           double current_r_i_max = r_i_max.load();
           while (current_r_i_max < r_i_max_on_subrange &&
