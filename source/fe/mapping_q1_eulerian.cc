@@ -81,7 +81,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
     shiftmap_dof_handler->get_fe().dofs_per_cell);
   dof_cell->get_dof_values(*euler_transform_vectors, mapping_values);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     {
       Point<spacedim> shift_vector;
 
@@ -109,7 +109,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
     vertices = this->get_vertices(cell);
 
   std::vector<Point<spacedim>> a(GeometryInfo<dim>::vertices_per_cell);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     a[i] = vertices[i];
 
   return a;

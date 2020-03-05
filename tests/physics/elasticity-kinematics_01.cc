@@ -65,7 +65,7 @@ test_kinematic_tensors()
        cell != dof_handler.end();
        ++cell)
     {
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (std::abs(cell->vertex(v)[0] - 1.0) < 1e-9)
           soln_t[cell->vertex_dof_index(v, 0)] = 1.0;
     }

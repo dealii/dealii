@@ -1076,15 +1076,13 @@ namespace ColorEnriched
       // Mark vertices that belong to cells in subdomain 1
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (predicate_1(cell)) // True ==> part of subdomain 1
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             vertices_subdomain_1[cell->vertex_index(v)] = true;
 
       // Find if cells in subdomain 2 and subdomain 1 share vertices.
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (predicate_2(cell)) // True ==> part of subdomain 2
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             if (vertices_subdomain_1[cell->vertex_index(v)] == true)
               {
                 return true;

@@ -154,7 +154,7 @@ void create_tria(Triangulation<2> &triangulation,
   std::vector<CellData<2>> cells(n_cells, CellData<2>());
   for (unsigned i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<2>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

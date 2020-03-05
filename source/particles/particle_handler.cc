@@ -1106,8 +1106,7 @@ namespace Particles
     for (const auto &cell : triangulation->active_cell_iterators())
       {
         if (cell->is_ghost())
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
               cell->subdomain_id());
       }
@@ -1117,8 +1116,7 @@ namespace Particles
         if (!cell->is_ghost())
           {
             std::set<unsigned int> cell_to_neighbor_subdomain;
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               {
                 cell_to_neighbor_subdomain.insert(
                   vertex_to_neighbor_subdomain[cell->vertex_index(v)].begin(),

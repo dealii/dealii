@@ -1407,9 +1407,7 @@ namespace internal
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<1>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
           for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
             accessor.set_mg_vertex_dof_index(
               level, vertex, dof, *next++, fe_index);
@@ -1435,9 +1433,7 @@ namespace internal
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<2>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
           for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
             accessor.set_mg_vertex_dof_index(
               level, vertex, dof, *next++, fe_index);
@@ -1470,9 +1466,7 @@ namespace internal
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<3>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
           for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
             accessor.set_mg_vertex_dof_index(
               level, vertex, dof, *next++, fe_index);
@@ -1950,8 +1944,7 @@ namespace internal
         handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
-      for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
         for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
@@ -1978,8 +1971,7 @@ namespace internal
         handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
-      for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
         for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
@@ -2011,8 +2003,7 @@ namespace internal
         handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
-      for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
         for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
@@ -2990,9 +2981,7 @@ namespace internal
 
         unsigned int index = 0;
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
           for (unsigned int d = 0; d < dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,
                                           d,

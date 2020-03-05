@@ -46,9 +46,7 @@ main()
                std::cos(weights[2]);
       };
     Tensor<1, GeometryInfo<structdim>::vertices_per_cell> c0;
-    for (unsigned int row_n = 0;
-         row_n < GeometryInfo<structdim>::vertices_per_cell;
-         ++row_n)
+    for (const unsigned int row_n : GeometryInfo<structdim>::vertex_indices())
       c0[row_n] = 1.0;
 
     const std::array<double, 3> exact{

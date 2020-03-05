@@ -427,9 +427,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<1>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -503,9 +501,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -580,9 +576,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 

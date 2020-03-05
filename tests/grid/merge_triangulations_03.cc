@@ -61,7 +61,7 @@ flatten_triangulation(Triangulation<dim> &tria_in, Triangulation<dim> &tria_out)
   unsigned int cell_counter = 0;
   for (; cell != endc; ++cell)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         {
           cells[cell_counter].vertices[j] = cell->vertex_index(j);
         }

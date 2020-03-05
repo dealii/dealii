@@ -517,7 +517,7 @@ namespace Step50
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(v)[0] <= 0.5 && cell->vertex(v)[1] <= 0.5)
           cell->set_refine_flag();
     triangulation.execute_coarsening_and_refinement();

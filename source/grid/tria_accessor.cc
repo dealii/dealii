@@ -1265,7 +1265,7 @@ namespace
   measure(const TriaAccessor<2, 2, 2> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<2>::vertices_per_cell];
-    for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<2>::vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<2>(
@@ -1277,7 +1277,7 @@ namespace
   measure(const TriaAccessor<3, 3, 3> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
-    for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<3>::vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<3>(
@@ -1570,7 +1570,7 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point(
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> p;
   std::array<double, GeometryInfo<structdim>::vertices_per_cell>          w;
 
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
     {
       p[i] = this->vertex(i);
       w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
@@ -1690,17 +1690,16 @@ TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   // copy vertices to avoid expensive resolution of vertex index inside loop
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     vertices[v] = this->vertex(v);
   for (unsigned int d = 0; d < spacedim; ++d)
-    for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell;
-         ++v)
+    for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
       for (unsigned int e = 0; e < structdim; ++e)
         A[d][e] += vertices[v][d] * TransformR2UAffine<structdim>::KA[v][e];
 
   // b = vertex * Kb
   Tensor<1, spacedim> b = point;
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     b -= vertices[v] * TransformR2UAffine<structdim>::Kb[v];
 
   DerivativeForm<1, spacedim, structdim> A_inv = A.covariant_form().transpose();
@@ -1718,8 +1717,7 @@ TriaAccessor<structdim, dim, spacedim>::center(
     {
       Assert(use_interpolation == false, ExcNotImplemented());
       Point<spacedim> p;
-      for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
         p += vertex(v);
       return p / GeometryInfo<structdim>::vertices_per_cell;
     }

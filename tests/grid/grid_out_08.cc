@@ -63,7 +63,7 @@ test()
 
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

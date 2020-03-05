@@ -178,7 +178,7 @@ MappingManifold<dim, spacedim>::transform_unit_to_real_cell(
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
   std::array<double, GeometryInfo<dim>::vertices_per_cell>          weights;
 
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
     {
       vertices[v] = cell->vertex(v);
       weights[v]  = GeometryInfo<dim>::d_linear_shape_function(p, v);
@@ -416,9 +416,8 @@ namespace internal
                     const Point<dim> np(p + L * ei);
 
                     // Get the weights to compute the np point in real space
-                    for (unsigned int j = 0;
-                         j < GeometryInfo<dim>::vertices_per_cell;
-                         ++j)
+                    for (const unsigned int j :
+                         GeometryInfo<dim>::vertex_indices())
                       data.vertex_weights[j] =
                         GeometryInfo<dim>::d_linear_shape_function(np, j);
 

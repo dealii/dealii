@@ -41,7 +41,7 @@ print_triangulation(const Triangulation<dim, dim> &tria)
                                                   -1)
                 << " ";
 
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         deallog << cell.vertex(v) << " ";
 
       deallog << std::endl;

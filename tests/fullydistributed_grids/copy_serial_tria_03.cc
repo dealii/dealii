@@ -54,7 +54,7 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
       for (auto &cell : basetria.active_cell_iterators())
         {
           // if(cell->is_locally_owned ())
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          for (const unsigned int v : GeometryInfo<2>::vertex_indices())
             {
               const double distance_from_center =
                 center.distance(cell->vertex(v));

@@ -2166,7 +2166,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
   // For each vertex that is found to be geometrically outside the ball
   // enlarge the ball  so that the new ball contains both the previous ball
   // and the given vertex.
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     if (!is_initial_guess_vertex[v])
       {
         const double distance = center.distance(this->vertex(v));
@@ -2188,7 +2188,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
 
   // Set all_vertices_within_ball false if any of the vertices of the object
   // are geometrically outside the ball
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     if (center.distance(this->vertex(v)) >
         radius + 100. * std::numeric_limits<double>::epsilon())
       {
@@ -2214,9 +2214,7 @@ TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance() const
       case 3:
         {
           double min = std::numeric_limits<double>::max();
-          for (unsigned int i = 0;
-               i < GeometryInfo<structdim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
             for (unsigned int j = i + 1;
                  j < GeometryInfo<structdim>::vertices_per_cell;
                  ++j)

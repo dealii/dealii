@@ -89,7 +89,7 @@ test(const Triangulation<dim> &tr,
       fe_values.reinit(cell);
 
       deallog << "Cell nodes:" << std::endl;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         deallog << i << ": ( " << cell->vertex(i) << " )" << std::endl;
 
       bool cell_ok = true;

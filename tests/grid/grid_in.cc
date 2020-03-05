@@ -89,7 +89,7 @@ test2()
          tria.begin_active();
        c != tria.end();
        ++c, ++index)
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells() + 1);
   deallog << hash << std::endl;
 }

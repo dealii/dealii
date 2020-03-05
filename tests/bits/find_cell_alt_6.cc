@@ -52,7 +52,7 @@ void check(Triangulation<2> &tria)
         GridTools::find_active_cell_around_point(map, tria, v[i]);
 
       deallog << "Vertex <" << v[i] << "> found in cell ";
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         deallog << "<" << cell.first->vertex(v) << "> ";
       deallog << " [local: " << cell.second << "]" << std::endl;
     }

@@ -376,7 +376,7 @@ namespace parallel
     std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);
     for (const auto &cell : this->active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           vertex_of_own_cell[cell->vertex_index(v)] = true;
 
     // 3) for each vertex belonging to a locally owned cell all ghost
@@ -390,8 +390,7 @@ namespace parallel
           const types::subdomain_id owner = cell->subdomain_id();
 
           // loop over all its vertices
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             {
               // set owner if vertex belongs to a local cell
               if (vertex_of_own_cell[cell->vertex_index(v)])

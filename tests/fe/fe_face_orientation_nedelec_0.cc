@@ -93,7 +93,7 @@ void create_triangulation(Triangulation<3> &triangulation)
   std::vector<CellData<3>> cells(n_cells, CellData<3>());
   for (unsigned i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<3>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

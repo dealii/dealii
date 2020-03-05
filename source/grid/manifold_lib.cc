@@ -1740,7 +1740,7 @@ namespace
 
     Point<spacedim> new_point;
     if (cell_is_flat)
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         new_point += weights_vertices[v] * vertices[v];
     else
       {
@@ -1798,7 +1798,7 @@ namespace
           }
 
         // subtract contribution from the vertices (second line in formula)
-        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<2>::vertex_indices())
           new_point -= weights_vertices[v] * vertices[v];
       }
 
@@ -1932,8 +1932,7 @@ namespace
               }
             else
               {
-                for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<2>::vertex_indices())
                   points[v] = vertices[face_to_cell_vertices_3d[face][v]];
                 weights[0] =
                   linear_shapes[face_even + 2] * linear_shapes[face_even + 4];
@@ -2000,7 +1999,7 @@ namespace
           }
 
         // finally add the contribution of the
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           new_point += weights_vertices[v] * vertices[v];
       }
     return new_point;
@@ -2243,9 +2242,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
 
       std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
         vertices;
-      for (unsigned int vertex_n = 0;
-           vertex_n < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_n)
+      for (const unsigned int vertex_n : GeometryInfo<dim>::vertex_indices())
         {
           vertices[vertex_n] = cell->vertex(vertex_n);
         }
@@ -2254,11 +2251,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::
       // center of the loop, we can skip the expensive part below (this assumes
       // that the manifold does not deform the grid too much)
       Point<spacedim> center;
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         center += vertices[v];
       center *= 1. / GeometryInfo<dim>::vertices_per_cell;
       double radius_square = 0.;
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         radius_square =
           std::max(radius_square, (center - vertices[v]).norm_square());
       bool inside_circle = true;
@@ -2531,8 +2528,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
                 triangulation, level_coarse, nearby_cells[b]);
               message << "Looking at cell " << cell->id()
                       << " with vertices: " << std::endl;
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 message << cell->vertex(v) << "    ";
               message << std::endl;
               message << "Transformation to chart coordinates: " << std::endl;

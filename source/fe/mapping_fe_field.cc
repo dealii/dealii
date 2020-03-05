@@ -201,7 +201,7 @@ namespace
     if (quad.size() == 0)
       {
         std::vector<Point<dim>> points(GeometryInfo<dim>::vertices_per_cell);
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           points[i] = GeometryInfo<dim>::unit_cell_vertex(i);
         quad = Quadrature<dim>(points);
       }
@@ -405,8 +405,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
           typename VectorType::value_type value =
             internal::ElementAccess<VectorType>::get(vector, dof_indices[i]);
           if (euler_dof_handler->get_fe().is_primitive(i))
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               vertices[v][comp] += fe_values.shape_value(i, v) * value;
           else
             Assert(false, ExcNotImplemented());

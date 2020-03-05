@@ -102,9 +102,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   // set the vertices of the patch. if the mapping does not preserve locations
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
-  for (unsigned int vertex = 0;
-       vertex < GeometryInfo<DoFHandlerType::dimension>::vertices_per_cell;
-       ++vertex)
+  for (const unsigned int vertex :
+       GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
     if (scratch_data.mapping_collection[0].preserves_vertex_locations())
       patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
     else

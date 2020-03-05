@@ -235,8 +235,7 @@ namespace internal
         {
           // distribute dofs of vertices
           if (dof_handler.get_fe().dofs_per_vertex > 0)
-            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<1>::vertex_indices())
               {
                 if (cell->vertex_dof_index(v, 0) == numbers::invalid_dof_index)
                   for (unsigned int d = 0;
@@ -275,9 +274,7 @@ namespace internal
         {
           if (dof_handler.get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
               if (cell->vertex_dof_index(vertex, 0) ==
@@ -326,9 +323,7 @@ namespace internal
         {
           if (dof_handler.get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
               if (cell->vertex_dof_index(vertex, 0) ==
@@ -404,9 +399,7 @@ namespace internal
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<1>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
                   numbers::invalid_dof_index)
                 for (unsigned int d = 0; d < fe.dofs_per_vertex;
@@ -454,9 +447,7 @@ namespace internal
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
                   numbers::invalid_dof_index)
                 for (unsigned int d = 0; d < fe.dofs_per_vertex;
@@ -520,9 +511,7 @@ namespace internal
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
                   numbers::invalid_dof_index)
                 for (unsigned int d = 0; d < fe.dofs_per_vertex;
@@ -1439,9 +1428,7 @@ namespace internal
                 &dof_handler.get_triangulation()) != nullptr)
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->is_ghost())
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   include_vertex[cell->vertex_index(v)] = true;
 
           // loop over all vertices and see which one we need to work on
@@ -2117,8 +2104,7 @@ namespace internal
         {
           // distribute dofs of vertices
           if (cell->get_fe().dofs_per_vertex > 0)
-            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<1>::vertex_indices())
               {
                 typename DoFHandler<dim, spacedim>::level_cell_iterator
                   neighbor = cell->neighbor(v);
@@ -2190,9 +2176,7 @@ namespace internal
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
               // check whether dofs for this
               // vertex have been distributed
               // (only check the first dof)
@@ -2246,9 +2230,7 @@ namespace internal
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
               // check whether dofs for this vertex have been distributed
               // (only check the first dof)
               if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) ==
@@ -4932,9 +4914,7 @@ namespace internal
           for (const auto &cell : dof_handler->active_cell_iterators())
             if (cell->is_locally_owned())
               {
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                   if (vertices_with_ghost_neighbors.find(cell->vertex_index(
                         v)) != vertices_with_ghost_neighbors.end())
                     {

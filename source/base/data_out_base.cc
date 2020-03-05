@@ -1772,7 +1772,7 @@ namespace DataOutBase
   {
     // TODO: make tolerance relative
     const double epsilon = 3e-16;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
@@ -1868,7 +1868,7 @@ namespace DataOutBase
 
     // TODO: make tolerance relative
     const double epsilon = 3e-16;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
@@ -8594,7 +8594,7 @@ namespace DataOutBase
         << '\n';
 
     // then write all the data that is in this patch
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
     out << '\n';
 
@@ -8643,7 +8643,7 @@ namespace DataOutBase
 
 
     // then read all the data that is in this patch
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
     for (unsigned int i : GeometryInfo<dim>::face_indices())

@@ -444,9 +444,7 @@ LaplaceProblem<dim>::refine_local()
        cell != triangulation.end();
        ++cell)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =

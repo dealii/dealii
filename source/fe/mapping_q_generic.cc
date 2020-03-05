@@ -1101,7 +1101,7 @@ namespace internal
         output[0].reinit(polynomial_degree - 1,
                          GeometryInfo<1>::vertices_per_cell);
         for (unsigned int q = 0; q < polynomial_degree - 1; ++q)
-          for (unsigned int i = 0; i < GeometryInfo<1>::vertices_per_cell; ++i)
+          for (const unsigned int i : GeometryInfo<1>::vertex_indices())
             output[0](q, i) =
               GeometryInfo<1>::d_linear_shape_function(quadrature.point(q + 1),
                                                        i);
@@ -1135,8 +1135,7 @@ namespace internal
                                           GeometryInfo<dim>::vertices_per_cell,
                                         GeometryInfo<dim>::vertices_per_cell);
         for (unsigned int q = 0; q < output.size(0); ++q)
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
             output(q, i) = GeometryInfo<dim>::d_linear_shape_function(
               quadrature.point(h2l[q + GeometryInfo<dim>::vertices_per_cell]),
               i);
@@ -2598,7 +2597,7 @@ MappingQGeneric<dim, spacedim>::transform_real_to_unit_cell(
         this->compute_mapping_support_points(cell);
       a.resize(GeometryInfo<dim>::vertices_per_cell);
       std::vector<CellData<dim>> cells(1);
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         cells[0].vertices[i] = i;
       Triangulation<dim, spacedim> tria;
       tria.create_triangulation(a, cells, SubCellData());
@@ -3951,7 +3950,7 @@ MappingQGeneric<3, 3>::add_quad_support_points(
       boost::container::small_vector<Point<3>, 200> tmp_points(
         GeometryInfo<2>::vertices_per_cell +
         GeometryInfo<2>::lines_per_cell * (polynomial_degree - 1));
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         tmp_points[v] = a[GeometryInfo<3>::face_to_cell_vertices(face_no, v)];
       if (polynomial_degree > 1)
         for (unsigned int line = 0; line < GeometryInfo<2>::lines_per_cell;
@@ -3983,7 +3982,7 @@ MappingQGeneric<2, 3>::add_quad_support_points(
   std::vector<Point<3>> &                   a) const
 {
   std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
-  for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<2>::vertex_indices())
     vertices[i] = cell->vertex(i);
 
   Table<2, double> weights(Utilities::fixed_power<2>(polynomial_degree - 1),
@@ -3993,7 +3992,7 @@ MappingQGeneric<2, 3>::add_quad_support_points(
       {
         Point<2> point(line_support_points.point(q1 + 1)[0],
                        line_support_points.point(q2 + 1)[0]);
-        for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+        for (const unsigned int i : GeometryInfo<2>::vertex_indices())
           weights(q, i) = GeometryInfo<2>::d_linear_shape_function(point, i);
       }
 
@@ -4025,7 +4024,7 @@ MappingQGeneric<dim, spacedim>::compute_mapping_support_points(
   // get the vertices first
   std::vector<Point<spacedim>> a;
   a.reserve(Utilities::fixed_power<dim>(polynomial_degree + 1));
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     a.push_back(cell->vertex(i));
 
   if (this->polynomial_degree > 1)

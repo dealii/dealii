@@ -35,7 +35,7 @@ test()
   // that case
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
 
     for (const unsigned int f : GeometryInfo<dim>::face_indices())
@@ -61,7 +61,7 @@ test()
   // in the x-direction by a factor of 10
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
         vertices[v][0] /= 10;
@@ -105,7 +105,7 @@ test()
   // 1d)
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
         vertices[v][0] /= 10;
@@ -152,7 +152,7 @@ test()
   // pinched cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     vertices[1] /= 10;
 
@@ -175,7 +175,7 @@ test()
   // inverted cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     std::swap(vertices[0], vertices[1]);
 
