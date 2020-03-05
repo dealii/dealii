@@ -373,7 +373,8 @@ namespace parallel
 
   /**
    * This function applies the given function argument @p f to all elements in
-   * the range <code>[begin,end)</code> and may do so in parallel.
+   * the range <code>[begin,end)</code> and may do so in parallel. An example
+   * of its use is given in step-69.
    *
    * However, in many cases it is not efficient to call a function on each
    * element, so this function calls the given function object on sub-ranges.

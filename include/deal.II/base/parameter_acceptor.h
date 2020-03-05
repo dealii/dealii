@@ -72,7 +72,7 @@ DEAL_II_NAMESPACE_OPEN
  * attach a signal to ParameterAcceptor::declare_parameters_call_back and
  * ParameterAcceptor::parse_parameters_call_back, that are called just after
  * the declare_parameters() and parse_parameters() functions of each derived
- * class.
+ * class. step-69 has an example of doing this.
  *
  * A typical usage of this class is the following:
  *
