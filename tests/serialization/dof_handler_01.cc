@@ -43,7 +43,7 @@ namespace dealii
                                                       c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;

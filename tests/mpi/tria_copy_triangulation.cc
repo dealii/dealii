@@ -85,9 +85,7 @@ test()
           Assert(cell1->subdomain_id() == cell2->subdomain_id(),
                  ExcInternalError());
 
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
             {
               Assert(cell1->vertex(vertex).distance(cell2->vertex(vertex)) <
                        1.e-14,

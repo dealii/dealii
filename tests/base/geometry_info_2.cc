@@ -99,7 +99,7 @@ test()
   for (unsigned int f = 0; f < GeometryInfo<dim>::lines_per_cell; ++f)
     {
       deallog << "line_vertices" << f;
-      for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<1>::vertex_indices())
         deallog << ' ' << GeometryInfo<dim>::line_to_cell_vertices(f, v);
       deallog << std::endl;
     }

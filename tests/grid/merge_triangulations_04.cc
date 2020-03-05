@@ -43,9 +43,7 @@ main()
 
       if (cylinder_triangulation_offset == Point<2>())
         {
-          for (unsigned int vertex_n = 0;
-               vertex_n < GeometryInfo<2>::vertices_per_cell;
-               ++vertex_n)
+          for (const unsigned int vertex_n : GeometryInfo<2>::vertex_indices())
             if (cell->vertex(vertex_n) == Point<2>())
               {
                 // skip two cells in the bottom left corner

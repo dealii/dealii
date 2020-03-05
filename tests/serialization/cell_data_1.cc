@@ -29,7 +29,7 @@ test()
 {
   dealii::CellData<structdim> t1;
 
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; i++)
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
     t1.vertices[i] = i;
   t1.material_id = 0;
   t1.boundary_id = 1;
@@ -41,7 +41,7 @@ test()
   }
 
   // test vertices
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; i++)
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
     {
       dealii::CellData<structdim> t2 = t1;
       t2.vertices[i]++;

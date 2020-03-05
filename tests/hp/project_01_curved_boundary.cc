@@ -163,7 +163,7 @@ test()
            dh.begin_active();
          cell != dh.end();
          ++cell)
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         deallog << cell->vertex(i) << ' '
                 << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
                 << std::endl;
@@ -189,7 +189,7 @@ test()
            dh.begin_active();
          cell != dh.end();
          ++cell)
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         deallog << cell->vertex(i) << ' '
                 << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
                 << std::endl;

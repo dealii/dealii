@@ -162,9 +162,7 @@ curved_grid(std::ofstream &out)
   for (; cell != endc; ++cell)
     {
       // fix all vertices
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<2>::vertices_per_cell;
-           ++vertex_no)
+      for (const unsigned int vertex_no : GeometryInfo<2>::vertex_indices())
         {
           for (unsigned int i = 0; i < 2; ++i)
             m[i][cell->vertex_dof_index(vertex_no, 0)] = 0.;

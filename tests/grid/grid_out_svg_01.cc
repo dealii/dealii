@@ -48,7 +48,7 @@ create_grid()
 
   for (; cell != endc; ++cell)
     {
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         {
           const double distance_from_center = center.distance(cell->vertex(v));
 

@@ -55,11 +55,11 @@ test_vertices_orientation(
       face = surface_to_volume_mapping[cell];
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         deallog << "  " << cell->vertex(k) << std::endl;
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         deallog << "  " << face->vertex(k) << std::endl;
 
       Point<spacedim> diff(face->center());

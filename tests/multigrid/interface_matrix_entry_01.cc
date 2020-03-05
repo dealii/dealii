@@ -63,7 +63,7 @@ test()
          cell = tria.begin_active();
        cell != tria.end();
        ++cell)
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         if (dim == 2)
           if (cell->vertex(v)[0] < 0.5 && cell->vertex(v)[1] < 0.5)

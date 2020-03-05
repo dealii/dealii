@@ -66,7 +66,7 @@ test()
     }
 
   std::vector<CellData<dim>> cells(1);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
 

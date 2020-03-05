@@ -66,7 +66,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
     {10, 11, 8, 9, 6, 7, 4, 5},
     {11, 9, 10, 8, 7, 5, 6, 4}};
 
-  for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];

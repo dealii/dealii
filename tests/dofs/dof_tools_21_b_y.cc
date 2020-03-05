@@ -80,7 +80,7 @@ void generate_grid(Triangulation<2> &triangulation)
   /* cell 1 */
   int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
 
-  for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];

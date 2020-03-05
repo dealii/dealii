@@ -135,9 +135,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {
@@ -201,9 +199,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     unsigned int evaluation_point_hits                  = 0;
     for (; cell != endc; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             fe_values.reinit(cell);
@@ -1087,7 +1083,7 @@ namespace Data
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+        for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       };
@@ -1150,9 +1146,7 @@ namespace DualFunctional
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {

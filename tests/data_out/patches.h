@@ -35,7 +35,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       const unsigned int nsubp = nsub + 1;
 
       patch.n_subdivisions = nsub;
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
           patch.vertices[v](d) =
             p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);

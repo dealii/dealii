@@ -99,7 +99,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
                   ExcInternalError());
       std::set<unsigned int> vertices_v2;
       std::set<unsigned int> vertices_v4;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           AssertThrow((tria_v2.get_vertices()[cell_v2->vertex_index(i)] -
                        tria_v4.get_vertices()[cell_v2->vertex_index(i)])

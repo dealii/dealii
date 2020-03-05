@@ -85,7 +85,7 @@ test(const Triangulation<dim> &tr,
       fe_values.reinit(cell);
 
       deallog << "Cell nodes:" << std::endl;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -159,7 +159,7 @@ test_hyper_cube(const double tolerance)
   GridGenerator::hyper_cube(tr);
 
   typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     {
       Point<dim> &point = cell->vertex(i);
       if (std::abs(point(dim - 1) - 1.0) < 1e-5)

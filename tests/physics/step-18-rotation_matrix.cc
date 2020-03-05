@@ -615,8 +615,7 @@ namespace Step18
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6)
                 {
                   monitored_vertex_first_dof = cell->vertex_dof_index(v, 0);
@@ -694,7 +693,7 @@ namespace Step18
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
             vertex_touched[cell->vertex_index(v)] = true;
