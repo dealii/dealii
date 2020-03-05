@@ -45,6 +45,7 @@ SET(_unity_include_src
   logstream.cc
   hdf5.cc
   mpi.cc
+  mpi_consensus_algorithm.cc
   mu_parser_internal.cc
   multithread_info.cc
   named_selection.cc
