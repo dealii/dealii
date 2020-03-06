@@ -24,6 +24,10 @@ namespace Utilities
   {
     template class ConsensusAlgorithmProcess<unsigned int, unsigned int>;
 
+    template class ConsensusAlgorithm_NBX<unsigned int, unsigned int>;
+
+    template class ConsensusAlgorithm_PEX<unsigned int, unsigned int>;
+
     template class ConsensusAlgorithmSelector<unsigned int, unsigned int>;
 
 
@@ -32,6 +36,14 @@ namespace Utilities
       unsigned int>;
 
     template class ConsensusAlgorithmSelector<
+      std::pair<types::global_dof_index, types::global_dof_index>,
+      unsigned int>;
+
+    template class ConsensusAlgorithm_NBX<
+      std::pair<types::global_dof_index, types::global_dof_index>,
+      unsigned int>;
+
+    template class ConsensusAlgorithm_PEX<
       std::pair<types::global_dof_index, types::global_dof_index>,
       unsigned int>;
 
