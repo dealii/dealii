@@ -129,6 +129,8 @@ namespace Utilities
           partitioner_export_start,
           partitioner_export_end = partitioner_export_start + 200,
 
+          /// NoncontiguousPartitioner::update_values
+          noncontiguous_partitioner_update_values,
 
         };
       } // namespace Tags
