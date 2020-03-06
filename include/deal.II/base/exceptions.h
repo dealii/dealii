@@ -1087,6 +1087,14 @@ namespace StandardExceptions
     "find a valid LAPACK library.");
 
   /**
+   * This function requires support for the MPI library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsMPI,
+    "You are attempting to use functionality that is only available "
+    "if deal.II was configured to use MPI.");
+
+  /**
    * This function requires support for the NetCDF library.
    *
    * @deprecated Support for NetCDF in deal.II is deprecated.
