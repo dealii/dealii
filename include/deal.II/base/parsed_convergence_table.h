@@ -566,7 +566,7 @@ ParsedConvergenceTable::error_from_exact(
       AssertDimension(exact.n_components, n_components);
       AssertDimension(dh.get_fe().n_components(), n_components);
 
-      const unsigned int n_active_cells =
+      const types::global_cell_index n_active_cells =
         dh.get_triangulation().n_global_active_cells();
       const unsigned int n_dofs = dh.n_dofs();
 

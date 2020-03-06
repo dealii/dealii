@@ -12693,7 +12693,7 @@ Triangulation<dim, spacedim>::n_active_cells() const
 }
 
 template <int dim, int spacedim>
-types::global_dof_index
+types::global_cell_index
 Triangulation<dim, spacedim>::n_global_active_cells() const
 {
   return n_active_cells();

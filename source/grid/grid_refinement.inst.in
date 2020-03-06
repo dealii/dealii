@@ -99,8 +99,8 @@ for (deal_II_dimension : DIMENSIONS)
   {
     template std::pair<double, double>
     GridRefinement::adjust_refine_and_coarsen_number_fraction<
-      deal_II_dimension>(const types::global_dof_index,
-                         const types::global_dof_index,
+      deal_II_dimension>(const types::global_cell_index,
+                         const types::global_cell_index,
                          const double,
                          const double);
   }

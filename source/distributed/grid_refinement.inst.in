@@ -34,7 +34,7 @@ for (S : REAL_SCALARS)
               template S
               compute_threshold<S>(const dealii::Vector<S> &,
                                    const std::pair<double, double> &,
-                                   const types::global_dof_index,
+                                   const types::global_cell_index,
                                    MPI_Comm);
             \}
             namespace RefineAndCoarsenFixedFraction
@@ -69,7 +69,7 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             const dealii::Vector<S> &,
             const double,
             const double,
-            const types::global_dof_index);
+            const types::global_cell_index);
 
           template void
           refine_and_coarsen_fixed_fraction<deal_II_dimension,
@@ -100,7 +100,7 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             const dealii::Vector<S> &,
             const double,
             const double,
-            const types::global_dof_index);
+            const types::global_cell_index);
 
           template void refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
                                                           S,

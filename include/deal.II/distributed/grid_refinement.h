@@ -57,7 +57,7 @@ namespace internal
           number
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
-                            const types::global_dof_index    n_target_cells,
+                            const types::global_cell_index   n_target_cells,
                             MPI_Comm                         mpi_communicator);
         } // namespace RefineAndCoarsenFixedNumber
 
@@ -131,10 +131,10 @@ namespace parallel
       refine_and_coarsen_fixed_number(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double                  top_fraction_of_cells,
-        const double                  bottom_fraction_of_cells,
-        const types::global_dof_index max_n_cells =
-          std::numeric_limits<types::global_dof_index>::max());
+        const double                   top_fraction_of_cells,
+        const double                   bottom_fraction_of_cells,
+        const types::global_cell_index max_n_cells =
+          std::numeric_limits<types::global_cell_index>::max());
 
       /**
        * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but

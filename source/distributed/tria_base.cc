@@ -131,7 +131,7 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  types::global_dof_index
+  types::global_cell_index
   TriangulationBase<dim, spacedim>::n_global_active_cells() const
   {
     return number_cache.n_global_active_cells;
@@ -219,7 +219,7 @@ namespace parallel
 
     // Potentially cast to a 64 bit type before accumulating to avoid overflow:
     number_cache.n_global_active_cells =
-      Utilities::MPI::sum(static_cast<types::global_dof_index>(
+      Utilities::MPI::sum(static_cast<types::global_cell_index>(
                             number_cache.n_locally_owned_active_cells),
                           this->mpi_communicator);
 
