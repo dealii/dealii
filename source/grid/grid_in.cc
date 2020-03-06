@@ -63,10 +63,7 @@ namespace
     Triangulation<1, spacedim> &                      triangulation)
   {
     if (boundary_ids.size() > 0)
-      for (typename Triangulation<1, spacedim>::active_cell_iterator cell =
-             triangulation.begin_active();
-           cell != triangulation.end();
-           ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         for (unsigned int f : GeometryInfo<1>::face_indices())
           if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
             {

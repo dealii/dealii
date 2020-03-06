@@ -435,10 +435,7 @@ namespace
     std::vector<unsigned int> max_adjacent_cell_level(
       triangulation.n_vertices(), 0);
 
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         {
           min_adjacent_cell_level[cell->vertex_index(v)] =
@@ -1932,10 +1929,7 @@ namespace internal
         // maps
         triangulation.vertex_to_boundary_id_map_1d->clear();
         triangulation.vertex_to_manifold_id_map_1d->clear();
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (auto f : GeometryInfo<dim>::face_indices())
             {
               (*triangulation.vertex_to_manifold_id_map_1d)
@@ -5550,10 +5544,7 @@ namespace internal
           // this check is very simple to implement here, since we have
           // all lines flagged if they shall be refined
 #ifdef DEBUG
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           if (!cell->refine_flag_set())
             for (unsigned int line = 0;
                  line < GeometryInfo<dim>::lines_per_cell;

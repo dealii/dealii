@@ -70,10 +70,7 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
     }
 
   unsigned int marked = 0;
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
-       cell != tria.end();
-       ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     if (std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
       {
         if (max_to_mark != numbers::invalid_unsigned_int &&
@@ -96,10 +93,7 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
          ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
-       cell != tria.end();
-       ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     if (std::fabs(criteria(cell->active_cell_index())) <= threshold)
       if (!cell->refine_flag_set())
         cell->set_coarsen_flag();

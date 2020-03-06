@@ -1303,10 +1303,7 @@ namespace GridTools
     const bool is_parallel_shared =
       (dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
          &triangulation) != nullptr);
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (is_parallel_shared || cell->is_locally_owned())
         {
           if (dim > 1)
@@ -1369,10 +1366,7 @@ namespace GridTools
         std::vector<bool> vertex_moved(triangulation.n_vertices(), false);
 
         // Next move vertices on locally owned cells
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               for (const unsigned int vertex_no :
@@ -1446,10 +1440,7 @@ namespace GridTools
           }
 
         // now do the actual move of the vertices
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           for (const unsigned int vertex_no :
                GeometryInfo<dim>::vertex_indices())
             cell->vertex(vertex_no) =
@@ -2783,10 +2774,7 @@ namespace GridTools
   {
     std::vector<std::vector<unsigned int>> vertex_to_cell(
       triangulation.n_vertices());
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           vertex_to_cell[cell->vertex_index(v)].push_back(
@@ -2795,10 +2783,7 @@ namespace GridTools
 
     cell_connectivity.reinit(triangulation.n_active_cells(),
                              triangulation.n_active_cells());
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           for (unsigned int n = 0;
@@ -3213,10 +3198,7 @@ namespace GridTools
     Assert(subdomain.size() == triangulation.n_active_cells(),
            ExcDimensionMismatch(subdomain.size(),
                                 triangulation.n_active_cells()));
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       subdomain[cell->active_cell_index()] = cell->subdomain_id();
   }
 
@@ -3229,10 +3211,7 @@ namespace GridTools
     const types::subdomain_id           subdomain)
   {
     unsigned int count = 0;
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->subdomain_id() == subdomain)
         ++count;
 
@@ -3886,10 +3865,7 @@ namespace GridTools
     // we cannot immediately reset their boundary ids. thus, copy first
     // and reset later
     if (dim >= 3)
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             tria.begin_active();
-           cell != tria.end();
-           ++cell)
+      for (const auto &cell : tria.active_cell_iterators())
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_face; ++e)
@@ -3905,10 +3881,7 @@ namespace GridTools
               }
 
     // now do cells
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           tria.begin_active();
-         cell != tria.end();
-         ++cell)
+    for (const auto &cell : tria.active_cell_iterators())
       for (auto f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary())
           {

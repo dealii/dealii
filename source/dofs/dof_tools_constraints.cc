@@ -2964,10 +2964,7 @@ namespace DoFTools
 #ifdef DEBUG
         // if in debug mode, check whether the coarse grid is indeed coarser
         // everywhere than the fine grid
-        for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-               cell = coarse_grid.begin_active();
-             cell != coarse_grid.end();
-             ++cell)
+        for (const auto &cell : coarse_grid.active_cell_iterators())
           Assert(cell->level() <= coarse_to_fine_grid_map[cell]->level(),
                  ExcGridNotCoarser());
 #endif
@@ -3022,10 +3019,7 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.dofs_per_cell);
 
-          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = fine_grid.begin_active();
-               cell != fine_grid.end();
-               ++cell)
+          for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);
@@ -3052,10 +3046,7 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.dofs_per_cell);
           unsigned int next_free_index = 0;
-          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = fine_grid.begin_active();
-               cell != fine_grid.end();
-               ++cell)
+          for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);

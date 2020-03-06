@@ -764,10 +764,7 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> line_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               if (cell->line(l)->user_flag_set() == false)
                 {
@@ -1128,10 +1125,7 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> quad_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
               if ((cell->quad(q)->user_flag_set() == false) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
@@ -1596,10 +1590,7 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> line_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               if ((cell->is_locally_owned()) &&
                   (cell->line(l)->user_flag_set() == true))
@@ -1867,10 +1858,7 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> quad_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
               if ((cell->is_locally_owned()) &&
                   (cell->quad(q)->user_flag_set() == true) &&
@@ -2649,10 +2637,7 @@ namespace internal
           const IndexSet &                            indices_we_care_about,
           hp::DoFHandler<dim, spacedim> &             dof_handler)
         {
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
-               cell != dof_handler.end();
-               ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
               {
                 const unsigned int fe_index = cell->active_fe_index();
@@ -2738,10 +2723,7 @@ namespace internal
               dof_handler.get_triangulation())
               .clear_user_flags_line();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
                      ++l)
@@ -2840,10 +2822,7 @@ namespace internal
               dof_handler.get_triangulation())
               .clear_user_flags_line();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
                      ++l)
@@ -2923,10 +2902,7 @@ namespace internal
               dof_handler.get_triangulation())
               .clear_user_flags_quad();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell;
                      ++q)

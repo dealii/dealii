@@ -2824,10 +2824,7 @@ namespace VectorTools
       // individual vertices
       if (dim == 1)
         {
-          for (typename DoFHandlerType<dim, spacedim>::active_cell_iterator
-                 cell = dof.begin_active();
-               cell != dof.end();
-               ++cell)
+          for (const auto &cell : dof.active_cell_iterators())
             for (const unsigned int direction :
                  GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(direction) &&
@@ -3532,10 +3529,7 @@ namespace VectorTools
 #ifdef DEBUG
           // Assert that there are no hanging nodes at the boundary
           int level = -1;
-          for (typename DoFHandlerType<dim, spacedim>::active_cell_iterator
-                 cell = dof.begin_active();
-               cell != dof.end();
-               ++cell)
+          for (const auto &cell : dof.active_cell_iterators())
             for (auto f : GeometryInfo<dim>::face_indices())
               {
                 if (cell->at_boundary(f))
@@ -6651,10 +6645,7 @@ namespace VectorTools
       {
         case 2:
           {
-            for (typename DoFHandler<dim>::active_cell_iterator cell =
-                   dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
                 for (const unsigned int face :
                      GeometryInfo<dim>::face_indices())
@@ -6723,10 +6714,7 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               projected_dofs[dof] = 0;
 
-            for (typename DoFHandler<dim>::active_cell_iterator cell =
-                   dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
                 for (const unsigned int face :
                      GeometryInfo<dim>::face_indices())
@@ -6828,10 +6816,7 @@ namespace VectorTools
       {
         case 2:
           {
-            for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                   dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
                 for (const unsigned int face :
                      GeometryInfo<dim>::face_indices())
@@ -6885,10 +6870,7 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               projected_dofs[dof] = 0;
 
-            for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                   dof_handler.begin_active();
-                 cell != dof_handler.end();
-                 ++cell)
+            for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
                 for (const unsigned int face :
                      GeometryInfo<dim>::face_indices())
@@ -7641,10 +7623,7 @@ namespace VectorTools
 
     std::set<types::boundary_id>::iterator                b_id;
     std::vector<std::array<types::global_dof_index, dim>> cell_vector_dofs;
-    for (typename DoFHandlerType<dim, spacedim>::active_cell_iterator cell =
-           dof_handler.begin_active();
-         cell != dof_handler.end();
-         ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
         for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
@@ -8639,10 +8618,7 @@ namespace VectorTools
                                                 update_flags);
 
       // loop over all cells
-      for (typename DoFHandlerType::active_cell_iterator cell =
-             dof.begin_active();
-           cell != dof.end();
-           ++cell)
+      for (const auto &cell : dof.active_cell_iterators())
         if (cell->is_locally_owned())
           {
             // initialize for this cell
@@ -8764,10 +8740,7 @@ namespace VectorTools
                                                           update_flags);
 
       // loop over all cells
-      for (typename DoFHandlerType::active_cell_iterator cell =
-             dof.begin_active();
-           cell != dof.end();
-           ++cell)
+      for (const auto &cell : dof.active_cell_iterators())
         if (cell->is_locally_owned())
           {
             // initialize for this cell
