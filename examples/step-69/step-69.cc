@@ -504,6 +504,9 @@ namespace Step69
     InitialValues<dim>          initial_values;
     TimeStepping<dim>           time_stepping;
     SchlierenPostprocessor<dim> schlieren_postprocessor;
+
+    std::thread output_thread;
+    vector_type output_vector;
   };
 
   // @sect3{Implementation}
@@ -2675,6 +2678,12 @@ namespace Step69
           }
       }
 
+    // We wait for any remaining background output thread to finish before
+    // printing a summary and exiting.
+
+    if (output_thread.joinable())
+      output_thread.join();
+
     computing_timer.print_summary();
     pcout << timer_output.str() << std::endl;
   }
@@ -2723,6 +2732,19 @@ namespace Step69
   }
 
   // @sect5{Output and checkpointing}
+  //
+  // Writing out the final vtk files is a quite IO intensive task that can
+  // stall the main loop quite a bit. In order to avoid this we use an <a
+  // href="https://en.wikipedia.org/wiki/Asynchronous_I/O">asynchronous
+  // IO</a> strategy by creating a background thread that will perform IO
+  // while the main loop is allowed to continue. In order for this to work
+  // we have to be mindful of two things:
+  //  - Before running the <code>output_worker</code> thread, we have to create
+  //    a copy of the state vector <code>U</code>. We store it in the
+  //    vector <code>output_vector</code>.
+  //  - We have to avoid any MPI communication in the background thread,
+  //    otherwise the program might deadlock. This implies that we have to
+  //    run the postprocessing outside of the worker thread.
 
   template <int dim>
   void MainLoop<dim>::output(const typename MainLoop<dim>::vector_type &U,
@@ -2734,57 +2756,98 @@ namespace Step69
     pcout << "MainLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;
 
-    TimerOutput::Scope scope(computing_timer, "main_loop - output");
+    // We check whether the output thread is still running. If so, we have
+    // to wait to for it to finish because we would otherwise overwrite
+    // <code>output_vector</code> and rerun the
+    // <code>schlieren_postprocessor</code> before the output of the
+    // previous output cycle has been fully written back to disk.
 
-    if (checkpoint)
+    if (output_thread.joinable())
       {
-        // We checkpoint the current state by doing the precise inverse
-        // operation to what we discussed for the <a href="Resume">resume
-        // logic</a>:
-
-        const unsigned int i =
-          discretization.triangulation.locally_owned_subdomain();
-        std::string name = base_name + "-checkpoint-" +
-                           Utilities::int_to_string(i, 4) + ".archive";
-
-        std::ofstream file(name, std::ios::binary | std::ios::trunc);
-
-        boost::archive::binary_oarchive oa(file);
-        oa << t << cycle;
-        for (const auto &it1 : U)
-          for (const auto &it2 : it1)
-            oa << it2;
+        TimerOutput::Scope timer(computing_timer, "main_loop - stalled output");
+        output_thread.join();
       }
-
-    schlieren_postprocessor.compute_schlieren(U);
-
-    // The actual output code is standard. We create a (local) DataOut
-    // instance, attach all data vectors we want to output and finally
-    // call to DataOut<dim>::write_vtu_with_pvtu_record
-
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(offline_data.dof_handler);
 
     constexpr auto problem_dimension =
       ProblemDescription<dim>::problem_dimension;
-    const auto &component_names = ProblemDescription<dim>::component_names;
+
+    // At this point we make a copy of the state vector and run the
+    // schlieren postprocessor.
 
     for (unsigned int i = 0; i < problem_dimension; ++i)
-      data_out.add_data_vector(U[i], component_names[i]);
+      {
+        output_vector[i] = U[i];
+        output_vector[i].update_ghost_values();
+      }
 
-    data_out.add_data_vector(schlieren_postprocessor.schlieren,
-                             "schlieren_plot");
+    schlieren_postprocessor.compute_schlieren(output_vector);
 
-    data_out.build_patches(discretization.mapping,
-                           discretization.finite_element.degree - 1);
+    // Next we create a lambda function for the background thread. We <a
+    // href="https://en.cppreference.com/w/cpp/language/lambda">capture</a>
+    // the <code>this</code> pointer as well as most of the arguments of
+    // the output function by value so that we have access to them inside
+    // the lambda function.
 
-    DataOutBase::VtkFlags flags(t,
-                                cycle,
-                                true,
-                                DataOutBase::VtkFlags::best_speed);
-    data_out.set_flags(flags);
+    const auto output_worker = [this, name, t, cycle, checkpoint]() {
+      if (checkpoint)
+        {
+          // We checkpoint the current state by doing the precise inverse
+          // operation to what we discussed for the <a href="Resume">resume
+          // logic</a>:
 
-    data_out.write_vtu_with_pvtu_record("", name, cycle, mpi_communicator, 6);
+          const unsigned int i =
+            discretization.triangulation.locally_owned_subdomain();
+          std::string name = base_name + "-checkpoint-" +
+                             Utilities::int_to_string(i, 4) + ".archive";
+
+          std::ofstream file(name, std::ios::binary | std::ios::trunc);
+
+          boost::archive::binary_oarchive oa(file);
+          oa << t << cycle;
+          for (const auto &it1 : output_vector)
+            for (const auto &it2 : it1)
+              oa << it2;
+        }
+
+      // The actual output code is standard. We create a (local) DataOut
+      // instance, attach all data vectors we want to output and finally
+      // call to DataOut<dim>::write_vtu_with_pvtu_record
+
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler(offline_data.dof_handler);
+
+      constexpr auto problem_dimension =
+        ProblemDescription<dim>::problem_dimension;
+      const auto &component_names = ProblemDescription<dim>::component_names;
+
+      for (unsigned int i = 0; i < problem_dimension; ++i)
+        data_out.add_data_vector(output_vector[i], component_names[i]);
+
+      data_out.add_data_vector(schlieren_postprocessor.schlieren,
+                               "schlieren_plot");
+
+      data_out.build_patches(discretization.mapping,
+                             discretization.finite_element.degree - 1);
+
+      DataOutBase::VtkFlags flags(t,
+                                  cycle,
+                                  true,
+                                  DataOutBase::VtkFlags::best_speed);
+      data_out.set_flags(flags);
+
+      data_out.write_vtu_with_pvtu_record("", name, cycle, mpi_communicator, 6);
+    };
+
+    // We launch the thread by creating a
+    // <a
+    // href="https://en.cppreference.com/w/cpp/thread/thread"><code>std::thread</code></a>
+    // object from the lambda function and moving it into the
+    // <code>output_thread</code> thread object. At this point we can
+    // return from the <code>output()</code> function and resume with the
+    // time stepping in the main loop - the thread will run in the
+    // background.
+
+    output_thread = std::move(std::thread(output_worker));
   }
 
 } // namespace Step69
