@@ -233,7 +233,7 @@ namespace Utilities
         ghost_indices_data.n_elements());
 
       // set up dictionary
-      internal::ComputeIndexOwner::ConsensusAlgorithmPayload process(
+      internal::ComputeIndexOwner::ConsensusAlgorithmsPayload process(
         locally_owned_range_data,
         ghost_indices_data,
         communicator,
@@ -243,7 +243,7 @@ namespace Utilities
       // read dictionary by communicating with the process who owns the index
       // in the static partition (i.e. in the dictionary). This process
       // returns the actual owner of the index.
-      ConsensusAlgorithmSelector<
+      ConsensusAlgorithms::Selector<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>
         consensus_algorithm(process, communicator);
@@ -259,7 +259,7 @@ namespace Utilities
               {
                 Assert(i >= ghost_targets_data.back().first,
                        ExcInternalError(
-                         "Expect result of ConsensusAlgorithmProcess to be "
+                         "Expect result of ConsensusAlgorithmsProcess to be "
                          "sorted"));
                 if (i == ghost_targets_data.back().first)
                   ghost_targets_data.back().second++;

@@ -77,7 +77,7 @@ namespace Utilities
           /// Dictionary::reinit()
           dictionary_reinit,
 
-          /// ConsensusAlgorithmPayload::get_requesters()
+          /// ConsensusAlgorithms::Payload::get_requesters()
           consensus_algorithm_payload_get_requesters,
 
           /// FETools::extrapolate()
@@ -85,14 +85,14 @@ namespace Utilities
           /// FETools::extrapolate(), allocate space for 10 rounds:
           fe_tools_extrapolate_end = fe_tools_extrapolate + 10,
 
-          /// ConsensusAlgorithm_NBX::process
+          /// ConsensusAlgorithms::NBX::process
           consensus_algorithm_nbx_answer_request,
-          /// ConsensusAlgorithm_NBX::process
+          /// ConsensusAlgorithms::NBX::process
           consensus_algorithm_nbx_process_deliver,
 
-          /// ConsensusAlgorithm_PEX::process
+          /// ConsensusAlgorithms::PEX::process
           consensus_algorithm_pex_answer_request,
-          /// ConsensusAlgorithm_PEX::process
+          /// ConsensusAlgorithms::PEX::process
           consensus_algorithm_pex_process_deliver,
 
           /// TriangulationDescription::Utilities::create_description_from_triangulation()

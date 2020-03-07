@@ -152,14 +152,14 @@ namespace Utilities
         indexset_want.n_elements());
 
       // set up dictionary
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmPayload
+      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
         process(indexset_has,
                 indexset_want,
                 communicator,
                 owning_ranks_of_ghosts,
                 true);
 
-      Utilities::MPI::ConsensusAlgorithmSelector<
+      Utilities::MPI::ConsensusAlgorithms::Selector<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>
         consensus_algorithm(process, communicator);

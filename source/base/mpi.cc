@@ -247,13 +247,13 @@ namespace Utilities
 
     /**
      * A re-implementation of compute_point_to_point_communication_pattern
-     * using the ConsensusAlgorithm.
+     * using a ConsensusAlgorithm.
      */
-    class ConsensusAlgorithmProcessTargets
-      : public ConsensusAlgorithmProcess<unsigned int, unsigned int>
+    class ConsensusAlgorithmsProcessTargets
+      : public ConsensusAlgorithms::Process<unsigned int, unsigned int>
     {
     public:
-      ConsensusAlgorithmProcessTargets(const std::vector<unsigned int> &target)
+      ConsensusAlgorithmsProcessTargets(const std::vector<unsigned int> &target)
         : target(target)
       {}
 
@@ -326,9 +326,9 @@ namespace Utilities
 
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 
-      ConsensusAlgorithmProcessTargets process(destinations);
-      ConsensusAlgorithm_NBX<ConsensusAlgorithmProcessTargets::T1,
-                             ConsensusAlgorithmProcessTargets::T2>
+      ConsensusAlgorithmsProcessTargets process(destinations);
+      ConsensusAlgorithms::NBX<ConsensusAlgorithmsProcessTargets::T1,
+                               ConsensusAlgorithmsProcessTargets::T2>
         consensus_algorithm(process, mpi_comm);
       consensus_algorithm.run();
       return process.get_result();
@@ -1029,14 +1029,14 @@ namespace Utilities
       // dictionary, the index set is statically repartitioned among the
       // processes again and extended with information with the actual owner
       // of that the index.
-      internal::ComputeIndexOwner::ConsensusAlgorithmPayload process(
+      internal::ComputeIndexOwner::ConsensusAlgorithmsPayload process(
         owned_indices, indices_to_look_up, comm, owning_ranks);
 
       // Step 2: read dictionary
       // Communicate with the process who owns the index in the static
       // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
-      ConsensusAlgorithmSelector<
+      ConsensusAlgorithms::Selector<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>
         consensus_algorithm(process, comm);

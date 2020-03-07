@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/mpi_consensus_algorithm.h>
+#include <deal.II/base/mpi_consensus_algorithms.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,14 +36,14 @@ namespace Utilities
       namespace ComputeIndexOwner
       {
         /**
-         * Specialization of ConsensusAlgorithmProcess for setting up the
+         * Specialization of ConsensusAlgorithms::Process for setting up the
          * Dictionary even if there are ranges in the IndexSet space not owned
          * by any processes.
          *
          * @note Only for internal usage.
          */
         class DictionaryPayLoad
-          : public ConsensusAlgorithmProcess<
+          : public ConsensusAlgorithms::Process<
               std::pair<types::global_dof_index, types::global_dof_index>,
               unsigned int>
         {
@@ -68,7 +68,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::compute_targets().
+           * Utilities::MPI::ConsensusAlgorithms::Process::compute_targets().
            */
           virtual std::vector<unsigned int>
           compute_targets() override
@@ -82,7 +82,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
+           * Utilities::MPI::ConsensusAlgorithms::Process::create_request().
            */
           virtual void
           create_request(const unsigned int other_rank,
@@ -95,7 +95,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::answer_request().
+           * Utilities::MPI::ConsensusAlgorithms::Process::answer_request().
            */
           virtual void
           answer_request(
@@ -397,17 +397,17 @@ namespace Utilities
               }
             else
               {
-                // with gap: use ConsensusAlgorithm to determine when all
+                // with gap: use a ConsensusAlgorithm to determine when all
                 // dictionaries have been set up.
 
-                // 3/4) use ConsensusAlgorithm to send messages with local dofs
-                // to the right dict process
+                // 3/4) use a ConsensusAlgorithm to send messages with local
+                // dofs to the right dict process
                 DictionaryPayLoad temp(buffers,
                                        actually_owning_ranks,
                                        local_range,
                                        actually_owning_rank_list);
 
-                ConsensusAlgorithmSelector<
+                ConsensusAlgorithms::Selector<
                   std::pair<types::global_dof_index, types::global_dof_index>,
                   unsigned int>
                   consensus_algo(temp, comm);
@@ -530,13 +530,13 @@ namespace Utilities
 
 
         /**
-         * Specialization of ConsensusAlgorithmProcess for the context of
+         * Specialization of ConsensusAlgorithms::Process for the context of
          * Utilities::MPI::compute_index_owner() and
          * Utilities::MPI::Partitioner::set_ghost_indices() with additional
          * payload.
          */
-        class ConsensusAlgorithmPayload
-          : public ConsensusAlgorithmProcess<
+        class ConsensusAlgorithmsPayload
+          : public ConsensusAlgorithms::Process<
               std::pair<types::global_dof_index, types::global_dof_index>,
               unsigned int>
         {
@@ -544,11 +544,11 @@ namespace Utilities
           /**
            * Constructor.
            */
-          ConsensusAlgorithmPayload(const IndexSet &owned_indices,
-                                    const IndexSet &indices_to_look_up,
-                                    const MPI_Comm &comm,
-                                    std::vector<unsigned int> &owning_ranks,
-                                    const bool track_index_requests = false)
+          ConsensusAlgorithmsPayload(const IndexSet &owned_indices,
+                                     const IndexSet &indices_to_look_up,
+                                     const MPI_Comm &comm,
+                                     std::vector<unsigned int> &owning_ranks,
+                                     const bool track_index_requests = false)
             : owned_indices(owned_indices)
             , indices_to_look_up(indices_to_look_up)
             , comm(comm)
@@ -636,7 +636,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::answer_request(),
+           * Utilities::MPI::ConsensusAlgorithms::Process::answer_request(),
            * adding the owner of a particular index in request_buffer (and
            * keeping track of who requested a particular index in case that
            * information is also desired).
@@ -663,7 +663,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::compute_targets().
+           * Utilities::MPI::ConsensusAlgorithms::Process::compute_targets().
            */
           virtual std::vector<unsigned int>
           compute_targets() override
@@ -721,7 +721,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::create_request().
+           * Utilities::MPI::ConsensusAlgorithms::Process::create_request().
            */
           virtual void
           create_request(const unsigned int other_rank,
@@ -744,7 +744,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::prepare_buffer_for_answer().
+           * Utilities::MPI::ConsensusAlgorithms::Process::prepare_buffer_for_answer().
            */
           virtual void
           prepare_buffer_for_answer(
@@ -756,7 +756,7 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithmProcess::read_answer().
+           * Utilities::MPI::ConsensusAlgorithms::Process::read_answer().
            */
           virtual void
           read_answer(const unsigned int               other_rank,
