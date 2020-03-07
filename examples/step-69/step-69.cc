@@ -1839,8 +1839,8 @@ namespace Step69
   template <int dim>
   void TimeStepping<dim>::prepare()
   {
-    TimerOutput::Scope scopeime(computing_timer,
-                                "time_stepping - prepare scratch space");
+    TimerOutput::Scope scope(computing_timer,
+                             "time_stepping - prepare scratch space");
 
     for (auto &it : temporary_vector)
       it.reinit(offline_data->partitioner);
@@ -1914,8 +1914,8 @@ namespace Step69
     // computes the viscosity $d_{ij}$ for a subrange [i1, i2) of column
     // indices:
     {
-      TimerOutput::Scope scopeime(computing_timer,
-                                  "time_stepping - 1 compute d_ij");
+      TimerOutput::Scope scope(computing_timer,
+                               "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
         [&](typename decltype(indices_relevant)::iterator       i1,
@@ -2005,8 +2005,8 @@ namespace Step69
     std::atomic<double> tau_max{std::numeric_limits<double>::infinity()};
 
     {
-      TimerOutput::Scope scopeime(
-        computing_timer, "time_stepping - 2 compute d_ii, and tau_max");
+      TimerOutput::Scope scope(computing_timer,
+                               "time_stepping - 2 compute d_ii, and tau_max");
 
       // on_subranges() will be executed on every thread individually. The
       // variable <code>tau_max_on_subrange</code> is thus stored thread
@@ -2092,8 +2092,8 @@ namespace Step69
     // artifacts.
 
     {
-      TimerOutput::Scope scopeime(computing_timer,
-                                  "time_stepping - 3 perform update");
+      TimerOutput::Scope scope(computing_timer,
+                               "time_stepping - 3 perform update");
 
       const auto on_subranges =
         [&](typename decltype(indices_owned)::iterator       i1,
