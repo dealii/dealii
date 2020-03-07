@@ -91,7 +91,7 @@
 // usually centers around either a single data structure (such as the
 // Triangulation) in the <code>Discretization</code> class, or a single
 // method (such as the <code>make_one_step()</code> function of the
-// <code>TimeStepping</code> class). We typically declare parameter variables
+// <code>%TimeStepping</code> class). We typically declare parameter variables
 // and scratch data object `private` and make methods and data structures
 // used by other classes `public`.
 //
@@ -351,12 +351,12 @@ namespace Step69
     Tensor<1, 3>   initial_1d_state;
   };
 
-  // @sect4{The <code>TimeStepping</code> class}
+  // @sect4{The <code>%TimeStepping</code> class}
   //
   // With the <code>OfflineData</code> and <code>ProblemDescription</code>
   // classes at hand we can now implement the explicit time-stepping scheme
   // that was introduced in the discussion above. The main method of the
-  // <code>TimeStepping</code> class is <code>make_one_step(vector_type &U,
+  // <code>%TimeStepping</code> class is <code>make_one_step(vector_type &U,
   // double t)</code> that takes a reference to a state vector
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
@@ -457,7 +457,7 @@ namespace Step69
   // @sect4{The <code>MainLoop</code> class}
   //
   // Now, all that is left to do is to chain the methods implemented in the
-  // <code>TimeStepping</code>, <code>InitialValues</code>, and
+  // <code>%TimeStepping</code>, <code>InitialValues</code>, and
   // <code>SchlierenPostprocessor</code> classes together. We do this in a
   // separate class <code>MainLoop</code> that contains an object of every
   // class and again reads in a number of parameters with the help of the
@@ -705,7 +705,7 @@ namespace Step69
     // assemble the local part of a matrix exclusively on a given MPI
     // rank. Instead, we will compute nonlinear updates while iterating
     // over (the local part) of a connectivity stencil; a task for which
-    // deal.II's own SparsityPattern is specificially optimized for.
+    // deal.II's own SparsityPattern is specifically optimized for.
     //
     // This design consideration has a caveat, though. What makes the
     // deal.II SparseMatrix class fast is the <a
@@ -1186,7 +1186,7 @@ namespace Step69
     // the pseudo-code in the introduction) that will repeat over and over
     // again. That's why this is the right time to introduce them.
     //
-    // We have the thread paralellization capability
+    // We have the thread parallelization capability
     // parallel::apply_to_subranges() that is somehow more general than the
     // WorkStream framework. In particular, parallel::apply_to_subranges() can
     // be used for our node-loops. This functionality requires four input
@@ -1240,7 +1240,7 @@ namespace Step69
     // <code>on_subranges</code> lambda we need to name the iterator type
     // of the object returned by <code>boost::irange<unsigned
     // int>()</code>. This is unfortunately a very convoluted name exposing
-    // implementational details about <code>boost::irange</code>. For this
+    // implementation details about <code>boost::irange</code>. For this
     // reason we resort to the <a
     // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
     // specifier, a C++11 feature that returns the type of an entity, or
@@ -1280,7 +1280,7 @@ namespace Step69
 
       // Finally, we normalize the vectors stored in
       // <code>OfflineData<dim>::BoundaryNormalMap</code>. This operation has
-      // not been thread paralellized as it would neither illustrate any
+      // not been thread parallelized as it would neither illustrate any
       // important concept nor lead to any noticeable speed gain.
       for (auto &it : boundary_normal_map)
         {
@@ -1809,7 +1809,7 @@ namespace Step69
 
   // @sect4{The Forward Euler step}
 
-  // The constructor of the <code>TimeStepping</code> class does not contain
+  // The constructor of the <code>%TimeStepping</code> class does not contain
   // any surprising code:
 
   template <int dim>
@@ -1881,7 +1881,7 @@ namespace Step69
     // symmetric, i.e., $d_{ij} = d_{ji}$. In this regard we note here that
     // $\int_{\Omega} \nabla \phi_j \phi_i \, \mathrm{d}\mathbf{x}= -
     // \int_{\Omega} \nabla \phi_i \phi_j \, \mathrm{d}\mathbf{x}$ (or
-    // equivanlently $\mathbf{c}_{ij} = - \mathbf{c}_{ji}$) provided either
+    // equivalently $\mathbf{c}_{ij} = - \mathbf{c}_{ji}$) provided either
     // $\mathbf{x}_i$ or $\mathbf{x}_j$ is a support point located away
     // from the boundary. In this case we can check that
     // $\lambda_{\text{max}} (\mathbf{U}_i^{n}, \mathbf{U}_j^{n},
@@ -2299,7 +2299,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximum $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>TimeStepping<dim>::step()</code> we define $\max_j |\nabla r_j|$
+  // <code>%TimeStepping<dim>::step()</code> we define $\max_j |\nabla r_j|$
   // and $\min_j |\nabla r_j|$ as atomic doubles in order to resolve any
   // conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max()</code> and
