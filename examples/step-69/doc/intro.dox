@@ -23,7 +23,7 @@ time integration, see @cite GuermondEtAl2018.
 
 @dealiiTutorialDOI{10.5281/zenodo.3698223,https://zenodo.org/badge/DOI/10.5281/zenodo.3698223.svg}
 
-<a name="Intro></a>
+<a name="Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial presents a first-order scheme for solving compressible
@@ -103,7 +103,7 @@ the solution itself does not lead to an energy estimate because the pairing
 $\langle \text{div} \, \mathbb{f}(\mathbf{u}), \mathbf{u}\rangle$ (understood as
 the $L^2(\Omega)$ inner product or duality pairing) is not guaranteed to be
 non-negative. Notions such as energy-stability or $L^2(\Omega)$-stability are
-(in general) meaningles in this context.
+(in general) meaningless in this context.
 
 Historically, the most fruitful step taken in order to deepen the
 understanding of hyperbolic conservation laws was to assume that the
@@ -115,7 +115,7 @@ of the parabolic regularization
 - {\epsilon} \Delta \mathbf{u}^{\epsilon} = 0.
 @f}
 Such solutions, which are understood as the solution recovered in the
-zero-viscosity limit, are often refered to as <i>viscosity solutions</i>.
+zero-viscosity limit, are often referred to as <i>viscosity solutions</i>.
 (This is, because physically $\epsilon$ can be understood as related to the viscosity of the
 fluid, i.e., a quantity that indicates the amount of friction neighboring gas particles moving at
 different speeds exert on each other. The Euler equations themselves are derived under
@@ -150,7 +150,7 @@ be satisfied at every point of the domain, not just in an averaged
 (integral, or high order moments) sense.
 
 In context of a numerical approximation, a violation of such a constraint
-has dire consequences: it almost surely leads to catrastrophic failure of
+has dire consequences: it almost surely leads to catastrophic failure of
 the numerical scheme, loss of hyperbolicity, and overall, loss of
 well-posedness of the (discrete) problem. It would also mean that we have computed
 something that can not be interpreted physically. (For example, what are we to make
@@ -281,12 +281,12 @@ where
     \lambda_{\text{max}} (\mathbf{U}_j^{n}, \mathbf{U}_i^{n},
     \textbf{n}_{ji}) \} \|\mathbf{c}_{ij}\|$ if $i \not = j$ is the so
     called <i>graph viscosity</i>. The graph viscosity serves as a
-    stabilization term, it is omewhat the discrete counterpart of
+    stabilization term, it is somewhat the discrete counterpart of
     $\epsilon \Delta \mathbf{u}$ that appears in the notion of viscosity
     solution described above. We will base our construction of $d_{ij}$ on
     an estimate of the maximal local wavespeed $\lambda_{\text{max}}$ that
     will be explained in detail in a moment.
-  - the diagonal entres of the viscosity matrix are defined as
+  - the diagonal entries of the viscosity matrix are defined as
     $d_{ii} = - \sum_{j \in \mathcal{I}(i)\backslash \{i\}} d_{ij}$.
   - $\textbf{n}_{ij} = \frac{\mathbf{c}_{ij}}{ \|\mathbf{c}_{ij}\| }$ is a
     normalization of the $\textbf{c}_{ij}$ matrix that enters the
@@ -296,7 +296,7 @@ where
 
 The definition of $\lambda_{\text{max}} (\mathbf{U},\mathbf{V},
 \textbf{n})$ is far from trivial and we will postpone the precise
-definition in order to focus first on some algorithmic and implementational
+definition in order to focus first on some algorithmic and implementation
 questions. We note that
   - $m_i$ and $\mathbf{c}_{ij}$ do not evolve in time (provided we keep the
     discretization fixed). It thus makes sense to assemble these
@@ -357,7 +357,7 @@ the time-step size $\tau$ has to be chosen subject to a CFL condition
   i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right),
 @f}
 where $0<c_{\text{cfl}}\le1$ is a chosen constant. This will require to
-compute all $d_{ij}$ in a separte step prior to actually performing above
+compute all $d_{ij}$ in a separate step prior to actually performing above
 update. The core principle remains unchanged, though: we do not loop over
 cells but rather over all edges of the sparsity graph.
 
