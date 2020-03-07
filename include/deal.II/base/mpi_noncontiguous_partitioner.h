@@ -44,6 +44,12 @@ namespace Utilities
     {
     public:
       /**
+       * Default constructor. Requires calling one of the reinit() functions
+       * to create a valid object.
+       */
+      NoncontiguousPartitioner() = default;
+
+      /**
        * Constructor. Set up point-to-point communication pattern based on the
        * IndexSets arguments @p indexset_has and @p indexset_want for the MPI
        * communicator @p communicator.
@@ -123,6 +129,14 @@ namespace Utilities
       reinit(const IndexSet &indexset_has,
              const IndexSet &indexset_want,
              const MPI_Comm &communicator) override;
+
+      /**
+       * Initialize the inner data structures.
+       */
+      void
+      reinit(const std::vector<types::global_dof_index> &indices_has,
+             const std::vector<types::global_dof_index> &indices_want,
+             const MPI_Comm &                            communicator);
 
     private:
       /// MPI communicator

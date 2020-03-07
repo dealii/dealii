@@ -42,60 +42,18 @@ namespace Utilities
       this->reinit(indexset_has, indexset_want, communicator);
     }
 
+
+
     template <typename Number>
     NoncontiguousPartitioner<Number>::NoncontiguousPartitioner(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
       const MPI_Comm &                            communicator)
     {
-      // step 0) determine "number of degrees of freedom" needed for IndexSet
-      const types::global_dof_index n_dofs = Utilities::MPI::max(
-        std::max(
-          [&indices_has]() {
-            const auto it = max_element(indices_has.begin(), indices_has.end());
-            return it == indices_has.end() ? 0 : (*it + 1);
-          }(),
-          [&indices_want]() {
-            const auto it =
-              max_element(indices_want.begin(), indices_want.end());
-            return it == indices_want.end() ? 0 : (*it + 1);
-          }()),
-        communicator);
-
-      // step 1) convert vectors to indexsets (sorted!)
-      IndexSet index_set_has(n_dofs);
-      index_set_has.add_indices(indices_has.begin(), indices_has.end());
-
-      IndexSet index_set_want(n_dofs);
-      index_set_want.add_indices(indices_want.begin(), indices_want.end());
-
-      // step 2) setup internal data structures with indexset
-      this->reinit(index_set_has, index_set_want, communicator);
-
-      // step 3) fix inner data structures so that it is sorted as
-      //         in the original vector
-      {
-        std::vector<types::global_dof_index> temp_map_send(
-          index_set_has.n_elements());
-
-        for (types::global_dof_index i = 0; i < indices_has.size(); i++)
-          temp_map_send[index_set_has.index_within_set(indices_has[i])] = i;
-
-        for (auto &i : send_indices)
-          i = temp_map_send[i];
-      }
-
-      {
-        std::vector<types::global_dof_index> temp_map_recv(
-          index_set_want.n_elements());
-
-        for (types::global_dof_index i = 0; i < indices_want.size(); i++)
-          temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
-
-        for (auto &i : recv_indices)
-          i = temp_map_recv[i];
-      }
+      this->reinit(indices_has, indices_want, communicator);
     }
+
+
 
     template <typename Number>
     std::pair<unsigned int, unsigned int>
@@ -103,6 +61,8 @@ namespace Utilities
     {
       return {send_ranks.size(), recv_ranks.size()};
     }
+
+
 
     template <typename Number>
     types::global_dof_index
@@ -120,12 +80,16 @@ namespace Utilities
              MemoryConsumption::memory_consumption(recv_requests);
     }
 
+
+
     template <typename Number>
     const MPI_Comm &
     NoncontiguousPartitioner<Number>::get_mpi_communicator() const
     {
       return communicator;
     }
+
+
 
     template <typename Number>
     void
@@ -210,6 +174,63 @@ namespace Utilities
       }
     }
 
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner<Number>::reinit(
+      const std::vector<types::global_dof_index> &indices_has,
+      const std::vector<types::global_dof_index> &indices_want,
+      const MPI_Comm &                            communicator)
+    {
+      // step 0) determine "number of degrees of freedom" needed for IndexSet
+      const types::global_dof_index n_dofs = Utilities::MPI::max(
+        std::max(
+          [&indices_has]() {
+            const auto it = max_element(indices_has.begin(), indices_has.end());
+            return it == indices_has.end() ? 0 : (*it + 1);
+          }(),
+          [&indices_want]() {
+            const auto it =
+              max_element(indices_want.begin(), indices_want.end());
+            return it == indices_want.end() ? 0 : (*it + 1);
+          }()),
+        communicator);
+
+      // step 1) convert vectors to indexsets (sorted!)
+      IndexSet index_set_has(n_dofs);
+      index_set_has.add_indices(indices_has.begin(), indices_has.end());
+
+      IndexSet index_set_want(n_dofs);
+      index_set_want.add_indices(indices_want.begin(), indices_want.end());
+
+      // step 2) setup internal data structures with indexset
+      this->reinit(index_set_has, index_set_want, communicator);
+
+      // step 3) fix inner data structures so that it is sorted as
+      //         in the original vector
+      {
+        std::vector<types::global_dof_index> temp_map_send(
+          index_set_has.n_elements());
+
+        for (types::global_dof_index i = 0; i < indices_has.size(); i++)
+          temp_map_send[index_set_has.index_within_set(indices_has[i])] = i;
+
+        for (auto &i : send_indices)
+          i = temp_map_send[i];
+      }
+
+      {
+        std::vector<types::global_dof_index> temp_map_recv(
+          index_set_want.n_elements());
+
+        for (types::global_dof_index i = 0; i < indices_want.size(); i++)
+          temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
+
+        for (auto &i : recv_indices)
+          i = temp_map_recv[i];
+      }
+    }
 
 
     template <typename Number>
