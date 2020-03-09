@@ -82,8 +82,9 @@
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 
-// For std::isnan and std::isinf.
+// For std::isnan, std::isinf, and std::ifstream
 #include <cmath>
+#include <fstream>
 
 // @sect3{Class template declarations}
 //
