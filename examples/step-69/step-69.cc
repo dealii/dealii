@@ -1547,10 +1547,10 @@ namespace Step69
       // conserved quantities. The return array consists of density $\rho$,
       // velocity $u$, pressure $p$ and local speed of sound $a$:
 
-      return {projected_U[0],
-              projected_U[1] / projected_U[0],
-              ProblemDescription<1>::pressure(projected_U),
-              ProblemDescription<1>::speed_of_sound(projected_U)};
+      return {{projected_U[0],
+               projected_U[1] / projected_U[0],
+               ProblemDescription<1>::pressure(projected_U),
+               ProblemDescription<1>::speed_of_sound(projected_U)}};
     }
 
     // At this point we also define two small functions that return the
@@ -1704,22 +1704,16 @@ namespace Step69
   // naming the corresponding components:
 
   template <>
-  const std::array<std::string, 3> ProblemDescription<1>::component_names{"rho",
-                                                                          "m",
-                                                                          "E"};
+  const std::array<std::string, 3> ProblemDescription<1>::component_names{
+    {"rho", "m", "E"}};
 
   template <>
-  const std::array<std::string, 4> ProblemDescription<2>::component_names{"rho",
-                                                                          "m_1",
-                                                                          "m_2",
-                                                                          "E"};
+  const std::array<std::string, 4> ProblemDescription<2>::component_names{
+    {"rho", "m_1", "m_2", "E"}};
 
   template <>
-  const std::array<std::string, 5> ProblemDescription<3>::component_names{"rho",
-                                                                          "m_1",
-                                                                          "m_2",
-                                                                          "m_3",
-                                                                          "E"};
+  const std::array<std::string, 5> ProblemDescription<3>::component_names{
+    {"rho", "m_1", "m_2", "m_3", "E"}};
 
   // @sect4{Initial values}
 
