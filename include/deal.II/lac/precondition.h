@@ -1161,6 +1161,30 @@ public:
   n() const;
 
   /**
+   * Struct that contains information about the eigenvalue estimation performed
+   * by this class.
+   */
+  struct EigenvalueInformation
+  {
+    /**
+     * Estimate for the smallest eigenvalue.
+     */
+    double min_eigenvalue;
+    /**
+     * Estimate for the largest eigenvalue.
+     */
+    double max_eigenvalue;
+    /**
+     * Number of CG iterations performed or 0.
+     */
+    unsigned int cg_iterations;
+    /**
+     * The degree (either as set or estimated).
+     */
+    unsigned int degree;
+  };
+
+  /**
    * Compute eigenvalue estimates required for the preconditioner.
    *
    * This function is called automatically on first use of the preconditioner
@@ -1172,7 +1196,7 @@ public:
    * in AdditionalData, no computation is performed and the information given
    * by the user is used.
    */
-  void
+  EigenvalueInformation
   estimate_eigenvalues(const VectorType &src) const;
 
 private:
@@ -2242,12 +2266,17 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::clear()
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline void
+inline typename PreconditionChebyshev<MatrixType,
+                                      VectorType,
+                                      PreconditionerType>::EigenvalueInformation
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   estimate_eigenvalues(const VectorType &src) const
 {
   Assert(eigenvalues_are_initialized == false, ExcInternalError());
   Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
+
+  PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
+    EigenvalueInformation info{};
 
   solution_old.reinit(src);
   temp_vector1.reinit(src, true);
@@ -2255,7 +2284,6 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // calculate largest eigenvalue using a hand-tuned CG iteration on the
   // matrix weighted by its diagonal. we start with a vector that consists of
   // ones only, weighted by the length.
-  double max_eigenvalue, min_eigenvalue;
   if (data.eig_cg_n_iterations > 0)
     {
       Assert(data.eig_cg_n_iterations > 2,
@@ -2297,25 +2325,28 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
       // read the eigenvalues from the attached eigenvalue tracker
       if (eigenvalue_tracker.values.empty())
-        min_eigenvalue = max_eigenvalue = 1;
+        info.min_eigenvalue = info.max_eigenvalue = 1.;
       else
         {
-          min_eigenvalue = eigenvalue_tracker.values.front();
+          info.min_eigenvalue = eigenvalue_tracker.values.front();
 
           // include a safety factor since the CG method will in general not
           // be converged
-          max_eigenvalue = 1.2 * eigenvalue_tracker.values.back();
+          info.max_eigenvalue = 1.2 * eigenvalue_tracker.values.back();
         }
+
+      info.cg_iterations = control.last_step();
     }
   else
     {
-      max_eigenvalue = data.max_eigenvalue;
-      min_eigenvalue = data.max_eigenvalue / data.smoothing_range;
+      info.max_eigenvalue = data.max_eigenvalue;
+      info.min_eigenvalue = data.max_eigenvalue / data.smoothing_range;
     }
 
-  const double alpha = (data.smoothing_range > 1. ?
-                          max_eigenvalue / data.smoothing_range :
-                          std::min(0.9 * max_eigenvalue, min_eigenvalue));
+  const double alpha =
+    (data.smoothing_range > 1. ?
+       info.max_eigenvalue / data.smoothing_range :
+       std::min(0.9 * info.max_eigenvalue, info.min_eigenvalue));
 
   // in case the user set the degree to invalid unsigned int, we have to
   // determine the number of necessary iterations from the Chebyshev error
@@ -2324,7 +2355,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // R. S. Varga, Matrix iterative analysis, 2nd ed., Springer, 2009
   if (data.degree == numbers::invalid_unsigned_int)
     {
-      const double actual_range = max_eigenvalue / alpha;
+      const double actual_range = info.max_eigenvalue / alpha;
       const double sigma        = (1. - std::sqrt(1. / actual_range)) /
                            (1. + std::sqrt(1. / actual_range));
       const double eps = data.smoothing_range;
@@ -2333,16 +2364,18 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
         this)
         ->data.degree =
         1 + static_cast<unsigned int>(
-              std::log(1. / eps + std::sqrt(1. / eps / eps - 1)) /
+              std::log(1. / eps + std::sqrt(1. / eps / eps - 1.)) /
               std::log(1. / sigma));
+
+      info.degree = data.degree;
     }
 
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
-    ->delta = (max_eigenvalue - alpha) * 0.5;
+    ->delta = (info.max_eigenvalue - alpha) * 0.5;
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
-    ->theta = (max_eigenvalue + alpha) * 0.5;
+    ->theta = (info.max_eigenvalue + alpha) * 0.5;
 
   // We do not need the second temporary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
@@ -2368,6 +2401,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
     ->eigenvalues_are_initialized = true;
+
+  return info;
 }
 
 
