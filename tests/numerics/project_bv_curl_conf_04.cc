@@ -1,3 +1,23 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2014 - 2019 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+// Checks that project_boundary_values_curl_conforming
+// works for FESystems with FE_Nedelec and FE_Q mixed
+
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_nedelec.h>
@@ -11,7 +31,9 @@
 #include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/numerics/vector_tools.h>
-using namespace dealii;
+
+#include "../tests.h"
+
 
 const unsigned int dim = 3;
 
@@ -24,7 +46,7 @@ apply_boundary_values(DoFHandler<dim> &          dof_handler,
                       Vector<double> &           dst)
 {
   constraints.clear();
-  for (unsigned int i = 0; i < 6; i++)
+  for (unsigned int i = 0; i < 6; ++i)
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
       start_comp,
@@ -37,6 +59,8 @@ apply_boundary_values(DoFHandler<dim> &          dof_handler,
   constraints.distribute(dst);
 }
 
+
+
 bool
 test_boundary_values(DoFHandler<dim> &   dof_handler,
                      Mapping<dim> &      mapping,
@@ -47,24 +71,24 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
 {
   double ret = true;
   // Initialize
-  QGaussLobatto<dim - 1>                         quadrature(3);
-  FEFaceValues<dim>                              fe_values(mapping,
+  QGaussLobatto<dim - 1> quadrature(3);
+  FEFaceValues<dim>      fe_values(mapping,
                               fe,
                               quadrature,
                               update_values | update_normal_vectors |
                                 update_quadrature_points | update_JxW_values);
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
-                                                 endc = dof_handler.end();
-  unsigned                    num_cells               = 0;
+
+  unsigned                    num_cells = 0;
   std::vector<Vector<double>> local_averages(
     6, Vector<double>(dof_handler.n_dofs()));
   const FEValuesExtractors::Vector nedelec(start_comp);
 
   // For testing we take only one cell!
-  assert(dof_handler.n_dofs() == cell->get_fe().dofs_per_cell);
+  Assert(dof_handler.n_dofs() ==
+           dof_handler.begin_active()->get_fe().dofs_per_cell,
+         ExcInternalError());
 
-  for (; cell != endc; ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       // For testing we take only one cell! Otherwise, local to global is
       // missing
@@ -114,15 +138,15 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
       num_cells++;
     }
   // Test if ok
-  for (unsigned int bc = 0; bc < 6; bc++)
+  for (unsigned int bc = 0; bc < 6; ++bc)
     {
       for (unsigned int basis = 0; basis < dof_handler.n_dofs(); basis++)
         {
           if (fabs(local_averages[bc](basis)) > 1.e-10)
             {
-              std::cout << "Wrong values on boundary " << bc
-                        << " in basis function " << basis << " of size "
-                        << fabs(local_averages[bc](basis)) << std::endl;
+              deallog << "Wrong values on boundary " << bc
+                      << " in basis function " << basis << " of size "
+                      << fabs(local_averages[bc](basis)) << std::endl;
               ret = false;
             }
         }
@@ -130,9 +154,12 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
   return ret;
 }
 
+
 int
 main(int /*argc*/, char ** /*argv*/)
 {
+  initlog();
+
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, 0, 1, true);
   MappingQ<dim>             mapping(1);
@@ -142,7 +169,7 @@ main(int /*argc*/, char ** /*argv*/)
 
   {
     // Test 1: Only FE_Nedelec
-    std::cout << "Testing FE_Nedelec(0): ";
+    deallog << "Testing FE_Nedelec(0): ";
     FE_Nedelec<dim> fe(0);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe);
@@ -150,17 +177,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 3, 0, mapping, test_vec2);
     if (test_boundary_values(dof_handler, mapping, fe, 3, 0, test_vec2))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 2: FESystem(FE_Nedelec(0))
-    std::cout << "Testing FESystem(FE_Nedelec(0)): ";
+    deallog << "Testing FESystem(FE_Nedelec(0)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(0), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -168,16 +195,16 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 3, 0, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 3, 0, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
     // Now, in the case of only one element both initializations should give
     // identical vectors
-    std::cout << "Checking Consistency: ";
+    deallog << "Checking Consistency: ";
     bool equal = (test_vec.size() == test_vec2.size());
     if (equal)
       {
@@ -188,17 +215,17 @@ main(int /*argc*/, char ** /*argv*/)
       }
     if (equal)
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 1b: Only FE_Nedelec
-    std::cout << "Testing FE_Nedelec(1): ";
+    deallog << "Testing FE_Nedelec(1): ";
     FE_Nedelec<dim> fe(1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe);
@@ -206,17 +233,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 3, 0, mapping, test_vec2);
     if (test_boundary_values(dof_handler, mapping, fe, 3, 0, test_vec2))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 2b: FESystem(FE_Nedelec(1))
-    std::cout << "Testing FESystem(FE_Nedelec(1)): ";
+    deallog << "Testing FESystem(FE_Nedelec(1)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(1), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -224,16 +251,16 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 3, 0, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 3, 0, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
     // Now, in the case of only one element both initializations should give
     // identical vectors
-    std::cout << "Checking Consistency: ";
+    deallog << "Checking Consistency: ";
     bool equal = (test_vec.size() == test_vec2.size());
     if (equal)
       {
@@ -244,17 +271,17 @@ main(int /*argc*/, char ** /*argv*/)
       }
     if (equal)
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 3: FESystem(FE_Nedelec(0), FE_Nedelec(0))
-    std::cout << "Testing FESystem(FE_Nedelec(0), FE_Nedelec(0)): ";
+    deallog << "Testing FESystem(FE_Nedelec(0), FE_Nedelec(0)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(0), 1, FE_Nedelec<dim>(0), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -262,17 +289,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 6, 3, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 6, 3, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 4: FESystem(FE_Nedelec(1), FE_Nedelec(0))
-    std::cout << "Testing FESystem(FE_Nedelec(1), FE_Nedelec(0)): ";
+    deallog << "Testing FESystem(FE_Nedelec(1), FE_Nedelec(0)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(1), 1, FE_Nedelec<dim>(0), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -280,17 +307,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 6, 3, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 6, 3, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 5: FESystem(FE_Nedelec(0), FE_Nedelec(1))
-    std::cout << "Testing FESystem(FE_Nedelec(0), FE_Nedelec(1)): ";
+    deallog << "Testing FESystem(FE_Nedelec(0), FE_Nedelec(1)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(0), 1, FE_Nedelec<dim>(1), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -298,17 +325,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 6, 3, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 6, 3, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 6: FESystem(FE_Nedelec(0), FE_Q(1))
-    std::cout << "Testing FESystem(FE_Nedelec(0), FE_Q(1)): ";
+    deallog << "Testing FESystem(FE_Nedelec(0), FE_Q(1)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -316,17 +343,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 0, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 0, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 7: FESystem(FE_Q(1), FE_Nedelec(0))
-    std::cout << "Testing FESystem(FE_Q(1), FE_Nedelec(0)): ";
+    deallog << "Testing FESystem(FE_Q(1), FE_Nedelec(0)): ";
     FESystem<dim>   fe_system(FE_Q<dim>(1), 1, FE_Nedelec<dim>(0), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -334,17 +361,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 1, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 1, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 8: FESystem(FE_Nedelec(0), FE_Q(2))
-    std::cout << "Testing FESystem(FE_Nedelec(0), FE_Q(2)): ";
+    deallog << "Testing FESystem(FE_Nedelec(0), FE_Q(2)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(0), 1, FE_Q<dim>(2), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -352,17 +379,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 0, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 0, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 9: FESystem(FE_Q(2), FE_Nedelec(0))
-    std::cout << "Testing FESystem(FE_Q(2), FE_Nedelec(0)): ";
+    deallog << "Testing FESystem(FE_Q(2), FE_Nedelec(0)): ";
     FESystem<dim>   fe_system(FE_Q<dim>(2), 1, FE_Nedelec<dim>(0), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -370,17 +397,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 1, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 1, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 10: FESystem(FE_Nedelec(1), FE_Q(1))
-    std::cout << "Testing FESystem(FE_Nedelec(1), FE_Q(1)): ";
+    deallog << "Testing FESystem(FE_Nedelec(1), FE_Q(1)): ";
     FESystem<dim>   fe_system(FE_Nedelec<dim>(1), 1, FE_Q<dim>(1), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -388,17 +415,17 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 0, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 0, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }
   {
     // Test 11: FESystem(FE_Q(1), FE_Nedelec(1))
-    std::cout << "Testing FESystem(FE_Q(1), FE_Nedelec(1)): ";
+    deallog << "Testing FESystem(FE_Q(1), FE_Nedelec(1)): ";
     FESystem<dim>   fe_system(FE_Q<dim>(1), 1, FE_Nedelec<dim>(1), 1);
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_system);
@@ -406,11 +433,11 @@ main(int /*argc*/, char ** /*argv*/)
     apply_boundary_values(dof_handler, constraints, 4, 1, mapping, test_vec);
     if (test_boundary_values(dof_handler, mapping, fe_system, 4, 1, test_vec))
       {
-        std::cout << "OK" << std::endl;
+        deallog << "OK" << std::endl;
       }
     else
       {
-        std::cout << "Failed" << std::endl;
+        deallog << "Failed" << std::endl;
         abort();
       }
   }

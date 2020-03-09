@@ -5442,7 +5442,7 @@ namespace VectorTools
       //
       // We call the map associated_edge_dof_to_face_dof
       std::vector<unsigned int> associated_edge_dof_to_face_dof(
-        degree + 1, numbers::invalid_dof_index);
+        degree + 1, numbers::invalid_unsigned_int);
 
       // Lowest DoF in the base element allowed for this edge:
       const unsigned int lower_bound =
@@ -5477,7 +5477,7 @@ namespace VectorTools
           // Note, assuming that the edge orientations are "standard"
           //       i.e. cell->line_orientation(line) = true.
           Assert(cell->line_orientation(line),
-                 ExcMessage("Edge orientation doesnot meet expectation."));
+                 ExcMessage("Edge orientation does not meet expectation."));
           // Next, translate from face to cell. Note, this might be assuming
           // that the edge orientations are "standard" (not sure any more at
           // this time), i.e.
@@ -5994,7 +5994,7 @@ namespace VectorTools
                       AssertIndexRange(associated_face_dof_index,
                                        associated_face_dof_to_face_dof.size());
                       associated_face_dof_to_face_dof
-                        [associated_face_dof_index] = quad_dof_idx;
+                        [associated_face_dof_index] = face_idx;
                       ++associated_face_dof_index;
                     }
                 }
