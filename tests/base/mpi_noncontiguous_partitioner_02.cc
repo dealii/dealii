@@ -65,7 +65,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   std::vector<types::global_dof_index> indices_has, indices_want;
 
-  auto norm_point_to_lex = [&](const auto c) {
+  auto norm_point_to_lex = [&](const Point<dim> &c) {
     // convert normalized point [0, 1] to lex
     if (dim == 2)
       return std::floor(c[0]) + n_cells_1D * std::floor(c[1]);
