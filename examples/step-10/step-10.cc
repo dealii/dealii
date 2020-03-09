@@ -31,7 +31,6 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/base/exceptions.h>
 
 // This include file is new. Even if we are not solving a PDE in this tutorial,
 // we want to use a dummy finite element with zero degrees of freedoms provided
@@ -59,7 +58,7 @@ namespace Step10
   // computed approximation to $\pi$ being in the range of the number of
   // digits which a double variable can hold, we rather declare the reference
   // value as a <code>long double</code> and give it a number of extra digits:
-  constexpr long double pi = 3.141592653589793238462643L;
+  const long double pi = 3.141592653589793238462643L;
 
 
 
@@ -78,10 +77,6 @@ namespace Step10
   template <int dim>
   void gnuplot_output()
   {
-    Assert(
-      dim == 2,
-      ExcMessage(
-        "This tutorial is currently implemented only for two spatial dimensions "));
     std::cout << "Output of grids into gnuplot files:" << std::endl
               << "===================================" << std::endl;
 
