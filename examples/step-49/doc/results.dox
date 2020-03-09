@@ -12,8 +12,7 @@ Triangulation needs to know where to put new vertices on the mid-points of
 edges, faces, and cells. By default, these new points will be placed at the
 arithmetic mean of the surrounding points, but this isn't what you want if you
 need curved boundaries that aren't already adequately resolved by the coarse
-mesh. Several of the meshes shown in the introduction section fall into this
-category. For example, for this mesh the central hole is supposed to be round:
+mesh. For example, for this mesh the central hole is supposed to be round:
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt="" height="200px">
 
@@ -55,6 +54,12 @@ to use a curved geometry. The way to do this requires three steps:
   @endcode
   Now, when the grid is refined, all cell splitting calculations will be done in
   polar coordinates.
+
+All functions in the GridGenerator namespace which create a mesh where some
+cells should be curved also attach the correct Manifold object to the provided
+Triangulation: i.e., for those functions we get the correct behavior by
+default. For a hand-generated mesh, however, the situation is much more
+interesting.
 
 To illustrate this process in more detail, let us consider an example created
 by Yuhan Zhou as part of a 2013 semester project at Texas A&amp;M University.
