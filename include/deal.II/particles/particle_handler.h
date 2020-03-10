@@ -86,7 +86,10 @@ namespace Particles
     /**
      * Destructor.
      */
-    virtual ~ParticleHandler() override = default;
+    virtual ~ParticleHandler() override
+    {
+      connection.disconnect();
+    }
 
     /**
      * Initialize the particle handler. This function does not clear the
@@ -595,6 +598,16 @@ namespace Particles
     void
     serialize(Archive &ar, const unsigned int version);
 
+    /**
+     * Updates the structures that were generated to search in which cells the
+     * particles belong to. The call to this function updates the
+     * vertex_to_cells and the vertex_to_cell_centers data structure. This
+     * function is called every time the triangulation is altered.
+     *
+     */
+    void
+    update_triangulation_cache();
+
   private:
     /**
      * Address of the triangulation to work on.
@@ -695,6 +708,31 @@ namespace Particles
      * triangulation object.
      */
     unsigned int handle;
+
+    /**
+     * A connection to the corresponding any_changes signal of the Triangulation
+     * which is attached to the particle_handler
+     */
+    boost::signals2::connection connection;
+
+    /** This variable stores a set from vertices to adjacent cells. It is used
+     * to locate the cells in which the particle reside. This structured is kept
+     * in memory to prevent its recalculation every time we
+     * sort_into_subdomain_and_cells(). This structure is updated everytime
+     * we call update_triangulation_cache.
+     */
+    std::vector<
+      std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      vertex_to_cells;
+
+
+    /** This variable stores a vector of vectors to cell centers. It is used
+     * to locate the cells in which the particle reside. This structured is kept
+     * in memory to prevent its recalculation every time we
+     * sort_into_subdomain_and_cells(). This structure is updated everytime
+     * we call update_triangulation_cache.
+     */
+    std::vector<std::vector<Tensor<1, spacedim>>> vertex_to_cell_centers;
 
 #ifdef DEAL_II_WITH_MPI
     /**

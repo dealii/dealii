@@ -119,7 +119,15 @@ namespace Particles
     , store_callback()
     , load_callback()
     , handle(numbers::invalid_unsigned_int)
-  {}
+  {
+    // Update the triangulation cache to ensure that you can sort the particles
+    // correctly
+    update_triangulation_cache();
+
+    connection = triangulation.signals.any_change.connect(
+      std::bind(&ParticleHandler<dim, spacedim>::update_triangulation_cache,
+                std::ref(*this)));
+  }
 
 
 
@@ -135,6 +143,14 @@ namespace Particles
 
     // Create the memory pool that will store all particle properties
     property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
+
+    // Update the triangulation cache to ensure that you can sort the particles
+    // correctly
+    update_triangulation_cache();
+
+    connection = triangulation->signals.any_change.connect(
+      std::bind(&ParticleHandler<dim, spacedim>::update_triangulation_cache,
+                std::ref(*this)));
   }
 
 
@@ -910,17 +926,7 @@ namespace Particles
         static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
 
     {
-      // Create a map from vertices to adjacent cells
-      const std::vector<
-        std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-        vertex_to_cells(GridTools::vertex_to_cell_map(*triangulation));
-
-      // Create a corresponding map of vectors from vertex to cell center
-      const std::vector<std::vector<Tensor<1, spacedim>>>
-        vertex_to_cell_centers(
-          GridTools::vertex_to_cell_centers_directions(*triangulation,
-                                                       vertex_to_cells));
-
+      // update_triangulation_cache();
       std::vector<unsigned int> neighbor_permutation;
 
       // Find the cells that the particles moved to.
@@ -1745,6 +1751,21 @@ namespace Particles
           break;
       }
   }
+
+  template <int dim, int spacedim>
+  void
+  ParticleHandler<dim, spacedim>::update_triangulation_cache()
+  {
+    // Create a map from vertices to adjacent cells
+    vertex_to_cells = GridTools::vertex_to_cell_map(*triangulation);
+
+    // Create a corresponding map of vectors from vertex to cell center
+    vertex_to_cell_centers =
+      GridTools::vertex_to_cell_centers_directions(*triangulation,
+                                                   vertex_to_cells);
+  }
+
+
 } // namespace Particles
 
 #include "particle_handler.inst"
