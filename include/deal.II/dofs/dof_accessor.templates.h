@@ -1814,8 +1814,7 @@ namespace internal
                          dofs_per_line =
                            accessor.get_fe(fe_index).dofs_per_line;
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell;
-           ++vertex)
+      for (unsigned int vertex : GeometryInfo<1>::vertex_indices())
         for (unsigned int d = 0; d < dofs_per_vertex; ++d)
           *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
       for (unsigned int d = 0; d < dofs_per_line; ++d)
@@ -1838,8 +1837,7 @@ namespace internal
                          dofs_per_quad =
                            accessor.get_fe(fe_index).dofs_per_quad;
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell;
-           ++vertex)
+      for (unsigned int vertex : GeometryInfo<2>::vertex_indices())
         for (unsigned int d = 0; d < dofs_per_vertex; ++d)
           *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
       // now copy dof numbers from the line. for
@@ -1853,7 +1851,7 @@ namespace internal
       // to adjust the shape function indices that
       // we see to correspond to the correct
       // (face-local) ordering.
-      for (unsigned int line = 0; line < GeometryInfo<2>::vertices_per_cell;
+      for (unsigned int line = 0; line < GeometryInfo<2>::lines_per_cell;
            ++line)
         for (unsigned int d = 0; d < dofs_per_line; ++d)
           *next++ = accessor.line(line)->dof_index(
@@ -1882,8 +1880,7 @@ namespace internal
                            accessor.get_fe(fe_index).dofs_per_quad,
                          dofs_per_hex = accessor.get_fe(fe_index).dofs_per_hex;
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell;
-           ++vertex)
+      for (unsigned int vertex : GeometryInfo<3>::vertex_indices())
         for (unsigned int d = 0; d < dofs_per_vertex; ++d)
           *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
       // now copy dof numbers from the line. for
@@ -2788,9 +2785,7 @@ namespace internal
              ->cell_dof_indices_cache.begin() +
            accessor.present_index * dofs_per_cell);
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<1>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int vertex : GeometryInfo<1>::vertex_indices())
           for (unsigned int d = 0; d < dofs_per_vertex; ++d)
             *next++ = accessor.vertex_dof_index(vertex, d);
         for (unsigned int d = 0; d < dofs_per_line; ++d)
@@ -2836,9 +2831,7 @@ namespace internal
              ->cell_dof_indices_cache.begin() +
            accessor.present_index * dofs_per_cell);
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<2>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int vertex : GeometryInfo<2>::vertex_indices())
           for (unsigned int d = 0; d < dofs_per_vertex; ++d)
             *next++ = accessor.vertex_dof_index(vertex, d);
         for (unsigned int line = 0; line < GeometryInfo<2>::lines_per_cell;
@@ -2888,9 +2881,7 @@ namespace internal
              ->cell_dof_indices_cache.begin() +
            accessor.present_index * dofs_per_cell);
 
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<3>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int vertex : GeometryInfo<3>::vertex_indices())
           for (unsigned int d = 0; d < dofs_per_vertex; ++d)
             *next++ = accessor.vertex_dof_index(vertex, d);
         // now copy dof numbers from the line. for
