@@ -206,6 +206,7 @@ FE_BernardiRaugel<dim>::fill_fe_values(
      mapping_data,
      fe_internal,
      output_data);
+  std::cout << "Length of mapping_data.normal_vectors" << normal_vectors.size() << std::endl;
 
   // Convert to the correct internal data class for this FE class.
   // Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
