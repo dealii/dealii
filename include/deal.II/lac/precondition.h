@@ -1159,6 +1159,21 @@ public:
   size_type
   n() const;
 
+  /**
+   * Compute eigenvalue estimates required for the preconditioner.
+   *
+   * This function is called automatically on first use of the preconditioner
+   * if it is not called by the user. The layout of the vector @p src is used
+   * to create internal temporary vectors and its content does not matter.
+   *
+   * Initializes the factors theta and delta based on an eigenvalue
+   * computation. If the user set provided values for the largest eigenvalue
+   * in AdditionalData, no computation is performed and the information given
+   * by the user is used.
+   */
+  void
+  estimate_eigenvalues(const VectorType &src) const;
+
 private:
   /**
    * A pointer to the underlying matrix.
@@ -1211,15 +1226,6 @@ private:
    * overwrite the temporary vectors.
    */
   mutable Threads::Mutex mutex;
-
-  /**
-   * Initializes the factors theta and delta based on an eigenvalue
-   * computation. If the user set provided values for the largest eigenvalue
-   * in AdditionalData, no computation is performed and the information given
-   * by the user is used.
-   */
-  void
-  estimate_eigenvalues(const VectorType &src) const;
 };
 
 
