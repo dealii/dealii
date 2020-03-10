@@ -1013,8 +1013,6 @@ public:
    */
   using size_type = types::global_dof_index;
 
-  // avoid warning about use of deprecated variables
-
   /**
    * Standardized data struct to pipe additional parameters to the
    * preconditioner.
@@ -1096,6 +1094,9 @@ public:
   };
 
 
+  /**
+   * Constructor.
+   */
   PreconditionChebyshev();
 
   /**
