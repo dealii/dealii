@@ -206,7 +206,7 @@ FE_BernardiRaugel<dim>::fill_fe_values(
      mapping_data,
      fe_internal,
      output_data);
-  std::cout << "Length of mapping_data.normal_vectors" << mapping_data.normal_vectors.size() << std::endl;
+  std::cout << "Length of mapping_data.normal_vectors: " << mapping_data.normal_vectors.size() << std::endl;
 
   // Convert to the correct internal data class for this FE class.
   // Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
@@ -232,7 +232,7 @@ FE_BernardiRaugel<dim>::fill_fe_values(
     {
       double psi = 0;
       unsigned int f = i - dim*GeometryInfo<dim>::vertices_per_cell;
-      Tensor<1,dim> normal = (*cell)->face(f)->normal_vector(k);
+      //Tensor<1,dim> normal = (*cell)->face(f)->normal_vector(k);
 
       for (unsigned int d = 0; d < dim; ++d)
         psi += fe_data.shape_values[i][k][d]*fe_data.shape_values[i][k][d];
@@ -241,8 +241,8 @@ FE_BernardiRaugel<dim>::fill_fe_values(
 
       for (unsigned int d = 0; d < dim; ++d)
       {
-        output_data.shape_values(first + d, k) =
-          normal[d]*psi;
+//        output_data.shape_values(first + d, k) =
+//          normal[d]*psi;
       }
 
     }
