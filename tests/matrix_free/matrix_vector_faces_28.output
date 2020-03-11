@@ -1,0 +1,17 @@
+
+DEAL:2d::Degree of element: 1
+DEAL:2d::Norm of difference:           4.87e-16
+DEAL:2d::Norm of difference no update: 0.0179
+DEAL:2d::Norm of difference w update:  4.87e-16
+DEAL:2d::Degree of element: 2
+DEAL:2d::Norm of difference:           1.92e-15
+DEAL:2d::Norm of difference no update: 0.00672
+DEAL:2d::Norm of difference w update:  2.50e-15
+DEAL:3d::Degree of element: 1
+DEAL:3d::Norm of difference:           1.88e-16
+DEAL:3d::Norm of difference no update: 5.11e-05
+DEAL:3d::Norm of difference w update:  1.88e-16
+DEAL:3d::Degree of element: 2
+DEAL:3d::Norm of difference:           1.06e-16
+DEAL:3d::Norm of difference no update: 5.82e-05
+DEAL:3d::Norm of difference w update:  1.06e-16

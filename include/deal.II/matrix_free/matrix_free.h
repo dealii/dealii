@@ -685,6 +685,18 @@ public:
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free_base);
 
   /**
+   * Refreshes the geometry data stored in the MappingInfo fields when the
+   * underlying geometry has changed (e.g. by a mapping that can deform
+   * through a change in the spatial configuration like MappingFEField)
+   * whereas the topology of the mesh and unknowns have remained the
+   * same. Compared to reinit(), this operation only has to re-generate the
+   * geometry arrays and can thus be significantly cheaper (depending on the
+   * cost to evaluate the geometry).
+   */
+  void
+  update_mapping(const Mapping<dim> &mapping);
+
+  /**
    * Clear all data fields and brings the class into a condition similar to
    * after having called the default constructor.
    */

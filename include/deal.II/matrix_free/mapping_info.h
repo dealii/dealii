@@ -146,6 +146,12 @@ namespace internal
         unsigned int n_q_points;
 
         /**
+         * Original one-dimensional quadrature formula applied on the given
+         * cell or face.
+         */
+        Quadrature<1> quadrature_1d;
+
+        /**
          * Quadrature formula applied on the given cell or face.
          */
         Quadrature<structdim> quadrature;
@@ -266,6 +272,12 @@ namespace internal
       AlignedVector<Point<spacedim, VectorizedArrayType>> quadrature_points;
 
       /**
+       * Clears all data fields except the descriptor vector.
+       */
+      void
+      clear_data_fields();
+
+      /**
        * Returns the quadrature index for a given number of quadrature
        * points. If not in hp mode or if the index is not found, this
        * function always returns index 0. Hence, this function does not
@@ -281,7 +293,7 @@ namespace internal
       template <typename StreamType>
       void
       print_memory_consumption(StreamType &    out,
-                               const SizeInfo &task_info) const;
+                               const TaskInfo &task_info) const;
 
       /**
        * Returns the memory consumption in bytes.
@@ -325,6 +337,20 @@ namespace internal
         const UpdateFlags update_flags_faces_by_cells);
 
       /**
+       * Update the information in the given cells and faces that is the
+       * result of a change in the given `mapping` class, keeping the cells,
+       * quadrature formulas and other unknowns unchanged. This call is only
+       * valid if MappingInfo::initialize() has been called before.
+       */
+      void
+      update_mapping(
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+        const FaceInfo<VectorizedArrayType::n_array_elements> &   faces,
+        const std::vector<unsigned int> &active_fe_index,
+        const Mapping<dim> &             mapping);
+
+      /**
        * Return the type of a given cell as detected during initialization.
        */
       GeometryType
@@ -350,6 +376,29 @@ namespace internal
       void
       print_memory_consumption(StreamType &    out,
                                const TaskInfo &task_info) const;
+
+      /**
+       * The given update flags for computing the geometry on the cells.
+       */
+      UpdateFlags update_flags_cells;
+
+      /**
+       * The given update flags for computing the geometry on the boundary
+       * faces.
+       */
+      UpdateFlags update_flags_boundary_faces;
+
+      /**
+       * The given update flags for computing the geometry on the interior
+       * faces.
+       */
+      UpdateFlags update_flags_inner_faces;
+
+      /**
+       * The given update flags for computing the geometry on the faces for
+       * cell-centric loops.
+       */
+      UpdateFlags update_flags_faces_by_cells;
 
       /**
        * Stores whether a cell is Cartesian (cell type 0), has constant
@@ -400,10 +449,8 @@ namespace internal
       initialize_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags_cells);
+        const std::vector<unsigned int> &active_fe_index,
+        const Mapping<dim> &             mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -415,10 +462,7 @@ namespace internal
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<
           FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
-        const Mapping<dim> &                                          mapping,
-        const std::vector<dealii::hp::QCollection<1>> &               quad,
-        const UpdateFlags update_flags_boundary_faces,
-        const UpdateFlags update_flags_inner_faces);
+        const Mapping<dim> &                                          mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -428,9 +472,7 @@ namespace internal
       initialize_faces_by_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const Mapping<dim> &                                      mapping,
-        const std::vector<dealii::hp::QCollection<1>> &           quad,
-        const UpdateFlags update_flags_faces_by_cells);
+        const Mapping<dim> &                                      mapping);
 
       /**
        * Helper function to determine which update flags must be set in the
