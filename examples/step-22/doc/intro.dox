@@ -118,8 +118,19 @@ over the domain $\Omega$, yielding the following set of equations:
 which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 \\ q\end{pmatrix}$.
 
-In practice, one wants to impose as little regularity on the pressure
-variable as possible; consequently, we integrate by parts the second term:
+A generally good rule of thumb is that if one <i>can</i> reduce how
+many derivatives are taken on any variable in the formulation, then
+one <i>should</i> in fact do that using integration by parts. (This is
+motivated by the theory of <a
+href="https://en.wikipedia.org/wiki/Partial_differential_equation">partial
+differential equations</a>, and in particular the difference between
+strong and <a href="https://en.wikipedia.org/wiki/Weak_solution">weak
+solutions</a>.) We have already done that for the Laplace equation,
+where we have integrated the second derivative by parts to obtain the
+weak formulation that has only one derivative on both test and trial
+function.
+
+In the current context, we integrate by parts the second term:
 @f{eqnarray*}
   (\textbf{v}, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
@@ -149,6 +160,10 @@ defined as
   2 \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
   \varepsilon(\textbf{u})_{ij} \ dx.
 @f}
+Using this, we have now reduced the requirements on our variables to
+first derivatives for $\mathbf u,\mathbf v$ and no derivatives at all
+for $p,q$.
+
 Because the scalar product between a general tensor like
 $\nabla\textbf{v}$ and a symmetric tensor like
 $\varepsilon(\textbf{u})$ equals the scalar product between the
