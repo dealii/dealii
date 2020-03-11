@@ -32,8 +32,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, 0, 1);

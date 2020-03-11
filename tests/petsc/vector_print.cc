@@ -29,8 +29,7 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   try
     {

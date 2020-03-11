@@ -30,8 +30,7 @@ using namespace OpenCASCADE;
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/goteborg.step");
   std::vector<TopoDS_Compound>  compounds;

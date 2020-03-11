@@ -43,8 +43,7 @@ test_fe(const char *name)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // These names are all correct.
   test_fe<1>("FE_Q(1)");

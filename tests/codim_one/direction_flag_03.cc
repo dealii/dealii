@@ -50,8 +50,7 @@ test()
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<1>();
   test<2>();

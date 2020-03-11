@@ -47,8 +47,7 @@ save_mesh(const Triangulation<dim, spacedim> &tria)
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     // Extract the whole boundary of a hyper-cube

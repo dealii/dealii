@@ -91,10 +91,8 @@ test_hyper_sphere()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();

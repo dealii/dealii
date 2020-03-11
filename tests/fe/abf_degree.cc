@@ -26,8 +26,7 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog << "dim=2:" << std::endl;
   for (unsigned int degree = 0; degree < 2; ++degree)

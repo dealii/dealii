@@ -69,8 +69,7 @@ check3(const Function<dim> &f,
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Q1WedgeFunction<1, 1, 2> w1;
   check1(w1, 1, 2);

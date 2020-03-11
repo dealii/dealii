@@ -39,9 +39,8 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {

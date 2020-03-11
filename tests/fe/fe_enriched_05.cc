@@ -147,10 +147,8 @@ test4()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
 

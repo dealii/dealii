@@ -281,10 +281,8 @@ check_conjugate(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile << std::setprecision(3);
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const unsigned int size       = 5;
   const unsigned int row_length = 3;

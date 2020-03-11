@@ -57,9 +57,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog << "check rank 2 tensors" << std::endl;
   check<2, 1>();

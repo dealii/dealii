@@ -71,10 +71,8 @@ main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-
-  deallog.attach(logfile);
 
   test();
 }

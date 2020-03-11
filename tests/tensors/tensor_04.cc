@@ -25,9 +25,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
 

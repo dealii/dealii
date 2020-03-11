@@ -71,10 +71,8 @@ check_vmult()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(0);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(0) << std::fixed;
 
   check_vmult<double>();
   check_vmult<float>();

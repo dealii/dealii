@@ -43,8 +43,7 @@ check1(const Function<dim> &f, const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   {
     Q1WedgeFunction<2, 0, 2> w20;

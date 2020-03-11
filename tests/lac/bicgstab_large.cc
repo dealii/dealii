@@ -28,9 +28,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   SparsityPattern sparsity_pattern(4, 4);
   sparsity_pattern.compress();

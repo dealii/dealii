@@ -44,8 +44,7 @@ using namespace OpenCASCADE;
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // The curve passing through the vertices of the unit square.
   std::vector<Point<3>> vertices;

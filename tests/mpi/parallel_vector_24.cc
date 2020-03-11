@@ -132,8 +132,7 @@ main(int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog << std::setprecision(4);
 
       test();

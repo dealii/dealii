@@ -26,9 +26,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   const int                                        dim = 3;
   SymmetricTensor<2, dim, VectorizedArray<float>>  s1;

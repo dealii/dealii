@@ -154,8 +154,7 @@ test(unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<2>(0);
   test<2>(1);

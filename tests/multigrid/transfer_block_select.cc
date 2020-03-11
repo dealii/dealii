@@ -171,9 +171,8 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   FE_DGQ<2>                q0(0);
   FE_DGQ<2>                q1(1);

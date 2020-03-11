@@ -144,10 +144,8 @@ check1<FE_RaviartThomasNodal>(const unsigned int min_degree,
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   check<FE_Q>(1, 4);
   check1<FE_Q_Hierarchical>(1, 4);

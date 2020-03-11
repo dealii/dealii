@@ -75,10 +75,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(5);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(5) << std::fixed;
   deallog.depth_console(0);
 
   check<2>();

@@ -166,9 +166,8 @@ check(const int          degree,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(6);
-  deallog.attach(logfile);
 
   deallog << "No scaling:" << std::endl;
   // no scaling:

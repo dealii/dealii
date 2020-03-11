@@ -58,9 +58,7 @@ private:
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   FullMatrix<double> matrix(2);
   matrix(0, 0) = 0.;

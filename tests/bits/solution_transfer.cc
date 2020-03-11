@@ -194,8 +194,7 @@ transfer(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog << "   1D solution transfer" << std::endl;
   transfer<1>(logfile);

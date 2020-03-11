@@ -127,8 +127,7 @@ main(int argc, char *argv[])
 
     if (myid == 0)
       {
-        std::ofstream logfile("output");
-        deallog.attach(logfile);
+        initlog();
 
         test(max_n_cell_ratio);
       }

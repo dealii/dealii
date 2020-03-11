@@ -23,9 +23,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   SymmetricTensor<4, 2> t;
   t[0][0][0][0] = 1;

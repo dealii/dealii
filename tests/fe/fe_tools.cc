@@ -200,8 +200,7 @@ test_renumbering()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test_projection<1>(logfile);
   test_projection<2>(logfile);

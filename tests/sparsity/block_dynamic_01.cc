@@ -26,10 +26,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   BlockDynamicSparsityPattern csp(2, 2);
   csp.block(0, 0).reinit(2, 2);

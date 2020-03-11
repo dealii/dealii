@@ -116,8 +116,7 @@ public:
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
 
   // build test-case trias
