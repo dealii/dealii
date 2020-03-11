@@ -36,8 +36,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 
 const unsigned int degree_p = 1;
 
@@ -215,7 +213,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

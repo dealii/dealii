@@ -21,10 +21,6 @@
 // problem (stokes equations). Same as matrix_vector_stokes_qdg0 but now
 // without the template on the degree of the element.
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -52,6 +48,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 #include "create_mesh.h"
 
@@ -316,8 +314,7 @@ test(const unsigned int fe_degree)
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

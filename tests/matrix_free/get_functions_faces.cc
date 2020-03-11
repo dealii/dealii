@@ -33,8 +33,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 
 
 template <int dim, int fe_degree, typename number>

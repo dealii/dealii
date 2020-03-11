@@ -19,10 +19,6 @@
 // the heap (using AlignedVector) instead of allocating it on the stack. Tests
 // also copy constructors of FEEvaluation.
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/utilities.h>
 
@@ -51,6 +47,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -336,7 +334,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

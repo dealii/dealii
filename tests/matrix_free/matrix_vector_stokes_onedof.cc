@@ -20,10 +20,6 @@
 // putting all degrees of freedom into a single DoFHandler, where the
 // selection is done through FEEvaluation
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
@@ -53,6 +49,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 

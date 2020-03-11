@@ -20,14 +20,12 @@
 // matrix for MG DoFHandler on a hyperball mesh with no hanging nodes but
 // homogeneous Dirichlet conditions
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 
 #include <deal.II/multigrid/mg_matrix.h>
 #include <deal.II/multigrid/mg_tools.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_common.h"
 

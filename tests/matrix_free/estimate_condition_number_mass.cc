@@ -19,10 +19,6 @@
 // different polynomial degrees. The mesh uses a hypercube mesh with no
 // hanging nodes and no other constraints
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -39,6 +35,8 @@ std::ofstream logfile("output");
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 void
@@ -156,7 +154,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(2);
 

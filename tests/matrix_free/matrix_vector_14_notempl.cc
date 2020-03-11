@@ -22,9 +22,6 @@
 
 #include "../tests.h"
 
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_common.h"
 
 

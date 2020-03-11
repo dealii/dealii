@@ -53,7 +53,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,

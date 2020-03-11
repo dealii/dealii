@@ -56,7 +56,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 

@@ -39,8 +39,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 
 namespace Assembly
 {
@@ -198,7 +196,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

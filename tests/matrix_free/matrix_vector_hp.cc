@@ -20,14 +20,12 @@
 // matrix for hp DoFHandler on a hyperball mesh with hanging nodes and finite
 // elements orders distributed randomly.
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_common.h"
 

@@ -46,8 +46,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 
 template <int dim,
           int fe_degree,
@@ -342,11 +340,8 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-  // need to set quite a loose tolerance because
-  // FEValues approximates Hessians with finite
-  // differences, which are not so accurate
-  deallog << std::setprecision(3);
+  initlog();
+  deallog << std::setprecision(7);
 
   {
     deallog.push("2d");

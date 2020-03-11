@@ -22,10 +22,6 @@
 // the Stokes equations. Like matrix_vector_stokes_onedof except for
 // different constraints
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
@@ -55,6 +51,8 @@ std::ofstream logfile("output");
 #include <complex>
 #include <fstream>
 #include <iostream>
+
+#include "../tests.h"
 
 
 

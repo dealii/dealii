@@ -21,7 +21,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 template <typename T>
 bool

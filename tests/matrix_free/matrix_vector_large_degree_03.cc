@@ -20,10 +20,6 @@
 // have a constant-coefficient Laplacian, we can verify the implementation by
 // comparing to the result with 21 quadrature points.
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -35,6 +31,8 @@ std::ofstream logfile("output");
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_mf.h"
 

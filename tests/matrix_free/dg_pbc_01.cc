@@ -32,7 +32,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 // We want to use the matrix-vector product provided by this function (which
