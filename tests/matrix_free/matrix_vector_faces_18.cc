@@ -30,8 +30,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 #include "matrix_vector_faces_common.h"
 
 

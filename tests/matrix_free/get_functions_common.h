@@ -274,8 +274,7 @@ do_test(const DoFHandler<dim> &          dof,
 int
 main()
 {
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog();
 
   deallog << std::setprecision(3);
   {

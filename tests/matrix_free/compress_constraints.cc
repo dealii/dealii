@@ -38,8 +38,6 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
-
 
 
 template <int dim>
@@ -97,7 +95,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

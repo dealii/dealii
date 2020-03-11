@@ -22,10 +22,6 @@
 // matrix-based results in this case, this test simply checks that the
 // matrix-vector product runs without error
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -37,6 +33,8 @@ std::ofstream logfile("output");
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 #include "matrix_vector_mf.h"
 

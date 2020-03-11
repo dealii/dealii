@@ -21,10 +21,6 @@
 // vector-valued problem (curl-curl operator which does not really make a lot
 // of sense from a problem point of view, though).
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -51,6 +47,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 const double global_coefficient = 0.1;
 
@@ -283,8 +281,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

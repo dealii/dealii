@@ -25,9 +25,6 @@
 #include "../tests.h"
 
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "matrix_vector_faces_common.h"
 
 

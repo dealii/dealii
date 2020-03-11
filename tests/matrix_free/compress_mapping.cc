@@ -37,8 +37,6 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
-
 
 
 template <int dim>
@@ -182,7 +180,7 @@ test_parallelogram()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

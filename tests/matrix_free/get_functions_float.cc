@@ -25,9 +25,6 @@
 #include "../tests.h"
 
 #include "create_mesh.h"
-
-std::ofstream logfile("output");
-
 #include "get_functions_common.h"
 
 

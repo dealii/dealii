@@ -18,11 +18,6 @@
 // check that FEEvaluation can be evaluated without indices initialized (and
 // throws an exception when trying to read/write from/to vectors)
 
-#include "../tests.h"
-
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -44,6 +39,8 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 // forward declare this function
@@ -173,7 +170,7 @@ int
 main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
   test<2, 1>();

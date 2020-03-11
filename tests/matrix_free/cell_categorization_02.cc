@@ -39,7 +39,6 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 template <int dim>
 void

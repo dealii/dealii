@@ -18,10 +18,6 @@
 // same as matrix_vector_stokes_noflux but no template parameter on the
 // polynomial degree
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -49,6 +45,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -327,8 +325,7 @@ test(const unsigned int fe_degree)
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

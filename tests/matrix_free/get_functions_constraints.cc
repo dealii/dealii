@@ -21,8 +21,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 #include "get_functions_common.h"
 
 

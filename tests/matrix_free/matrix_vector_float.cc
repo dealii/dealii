@@ -22,8 +22,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 #include "create_mesh.h"
 #include "matrix_vector_common.h"
 
