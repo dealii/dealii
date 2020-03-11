@@ -124,8 +124,12 @@ space $H({\textrm{div}})=\{{\mathbf w}\in L^2(\Omega)^d:\ {\textrm{div}}\ {\math
 for $\mathbf u$,$\mathbf v$, and $L^2$ for $p,q$. It is a well-known fact stated in
 almost every book on finite element theory that if one chooses discrete finite
 element spaces for the approximation of ${\mathbf u},p$ inappropriately, then the
-resulting discrete saddle-point problem is instable and the discrete solution
-will not converge to the exact solution.
+resulting discrete problem is instable and the discrete solution
+will not converge to the exact solution. (Some details on the problem
+considered here -- which falls in the class of "saddle-point problems"
+-- can be found on the Wikipedia page on the <a
+href="https://en.wikipedia.org/wiki/Ladyzhenskaya%E2%80%93Babu%C5%A1ka%E2%80%93Brezzi_condition">Ladyzhenskaya-Babuska-Brezzi
+(LBB) condition</a>.)
 
 To overcome this, a number of different finite element pairs for ${\mathbf u},p$
 have been developed that lead to a stable discrete problem. One such pair is
