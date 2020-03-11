@@ -53,7 +53,5 @@ check()
 int
 main()
 {
-  initlog();
-
   check<1>();
 }
