@@ -1704,6 +1704,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               bool all_nodal = true;
               for (unsigned int c = 0; c < di.n_base_elements; ++c)
                 if (!shape_info(di.global_base_element_offset + c, 0, 0, 0)
+                       .data.front()
                        .nodal_at_cell_boundaries)
                   all_nodal = false;
               if (all_nodal == false)
