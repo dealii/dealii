@@ -1381,6 +1381,23 @@ public:
                       DataAccessOnFaces::unspecified) const;
 
   /**
+   * Same as above, but with std::function.
+   */
+  template <typename OutVector, typename InVector>
+  void
+  loop_cell_centric(
+    const std::function<void(const MatrixFree &,
+                             OutVector &,
+                             const InVector &,
+                             const std::pair<unsigned int, unsigned int> &)>
+      &                     cell_operation,
+    OutVector &             dst,
+    const InVector &        src,
+    const bool              zero_dst_vector = false,
+    const DataAccessOnFaces src_vector_face_access =
+      DataAccessOnFaces::unspecified) const;
+
+  /**
    * In the hp adaptive case, a subrange of cells as computed during the cell
    * loop might contain elements of different degrees. Use this function to
    * compute what the subrange for an individual finite element degree is. The
@@ -5078,9 +5095,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
 {
   auto src_vector_face_access_temp = src_vector_face_access;
   if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
-    src_vector_face_access_temp = DataAccessOnFaces::gradients_cell;
+    src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
   else if (DataAccessOnFaces::values == src_vector_face_access_temp)
-    src_vector_face_access_temp = DataAccessOnFaces::values_cell;
+    src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
 
   internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
                      InVector,
@@ -5119,9 +5136,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
 {
   auto src_vector_face_access_temp = src_vector_face_access;
   if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
-    src_vector_face_access_temp = DataAccessOnFaces::gradients_cell;
+    src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
   else if (DataAccessOnFaces::values == src_vector_face_access_temp)
-    src_vector_face_access_temp = DataAccessOnFaces::values_cell;
+    src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
 
   internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
                      InVector,
@@ -5136,6 +5153,52 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
            function_pointer,
            nullptr,
            nullptr,
+           src_vector_face_access_temp,
+           DataAccessOnFaces::none);
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop_cell_centric(
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                           OutVector &,
+                           const InVector &,
+                           const std::pair<unsigned int, unsigned int> &)>
+    &                     cell_operation,
+  OutVector &             dst,
+  const InVector &        src,
+  const bool              zero_dst_vector,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  auto src_vector_face_access_temp = src_vector_face_access;
+  if (DataAccessOnFaces::gradients == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::gradients_all_faces;
+  else if (DataAccessOnFaces::values == src_vector_face_access_temp)
+    src_vector_face_access_temp = DataAccessOnFaces::values_all_faces;
+
+  using Wrapper =
+    internal::MFClassWrapper<MatrixFree<dim, Number, VectorizedArrayType>,
+                             InVector,
+                             OutVector>;
+  Wrapper wrap(cell_operation, nullptr, nullptr);
+
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     Wrapper,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           zero_dst_vector,
+           wrap,
+           &Wrapper::cell_integrator,
+           &Wrapper::face_integrator,
+           &Wrapper::boundary_integrator,
            src_vector_face_access_temp,
            DataAccessOnFaces::none);
   task_info.loop(worker);
