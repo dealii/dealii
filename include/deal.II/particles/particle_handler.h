@@ -29,6 +29,8 @@
 
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/grid_tools_cache.h>
+
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
 #include <deal.II/particles/property_pool.h>
@@ -86,15 +88,12 @@ namespace Particles
     /**
      * Destructor.
      */
-    virtual ~ParticleHandler() override
-    {
-      connection.disconnect();
-    }
+    virtual ~ParticleHandler() override = default;
 
     /**
      * Initialize the particle handler. This function does not clear the
-     * internal data structures, it just sets the triangulation and the mapping
-     * to be used.
+     * internal data structures, it just sets the triangulation and the
+     * mapping to be used.
      */
     void
     initialize(const Triangulation<dim, spacedim> &tria,
@@ -598,16 +597,6 @@ namespace Particles
     void
     serialize(Archive &ar, const unsigned int version);
 
-    /**
-     * Updates the structures that were generated to search in which cells the
-     * particles belong to. The call to this function updates the
-     * vertex_to_cells and the vertex_to_cell_centers data structure. This
-     * function is called every time the triangulation is altered.
-     *
-     */
-    void
-    update_triangulation_cache();
-
   private:
     /**
      * Address of the triangulation to work on.
@@ -709,30 +698,15 @@ namespace Particles
      */
     unsigned int handle;
 
-    /**
-     * A connection to the corresponding any_changes signal of the Triangulation
-     * which is attached to the particle_handler
+    /** The GridTools::Cache is used to store the information about the
+     * vertex_to_cells set and the vertex_to_cell_centers vectors to prevent
+     * recomputing them every time we sort_into_subdomain_and_cells()
+     * This cache is automatically updated when the triangulation has
+     * changed. This cache is stored within a unique pointer because the
+     * particle handler has a constructor that enables it to be constructed
+     * without a triangulation. The cache does not have such a constructor.
      */
-    boost::signals2::connection connection;
-
-    /** This variable stores a set from vertices to adjacent cells. It is used
-     * to locate the cells in which the particle reside. This structured is kept
-     * in memory to prevent its recalculation every time we
-     * sort_into_subdomain_and_cells(). This structure is updated everytime
-     * we call update_triangulation_cache.
-     */
-    std::vector<
-      std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      vertex_to_cells;
-
-
-    /** This variable stores a vector of vectors to cell centers. It is used
-     * to locate the cells in which the particle reside. This structured is kept
-     * in memory to prevent its recalculation every time we
-     * sort_into_subdomain_and_cells(). This structure is updated everytime
-     * we call update_triangulation_cache.
-     */
-    std::vector<std::vector<Tensor<1, spacedim>>> vertex_to_cell_centers;
+    std::unique_ptr<GridTools::Cache<dim, spacedim>> triangulation_cache;
 
 #ifdef DEAL_II_WITH_MPI
     /**
