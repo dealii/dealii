@@ -700,7 +700,7 @@ namespace Particles
 
     /** The GridTools::Cache is used to store the information about the
      * vertex_to_cells set and the vertex_to_cell_centers vectors to prevent
-     * recomputing them every time we sort_into_subdomain_and_cells()
+     * recomputing them every time we sort_into_subdomain_and_cells().
      * This cache is automatically updated when the triangulation has
      * changed. This cache is stored within a unique pointer because the
      * particle handler has a constructor that enables it to be constructed
