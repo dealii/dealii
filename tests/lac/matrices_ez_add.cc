@@ -49,5 +49,5 @@ main()
           << std::endl;
   SparseMatrixEZ<float> ff(ez.m(), ez.n());
   ff.add(2, ez);
-  ff.print_formatted(logfile, 0, false, 5, "~");
+  ff.print_formatted(deallog.get_file_stream(), 0, false, 5, "~");
 }

@@ -47,7 +47,8 @@ test_select(double f1, double f2)
 int
 main()
 {
-  initlog() deallog << std::setprecision(3);
+  initlog();
+  deallog << std::setprecision(3);
 
   test_select<2>(1., 1.);
   test_select<3>(1., 1.);

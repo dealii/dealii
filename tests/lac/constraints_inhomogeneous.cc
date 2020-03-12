@@ -59,7 +59,7 @@ int
 main()
 {
   initlog();
-  deallog << std::setprecision(2);
+  deallog.get_file_stream() << std::setprecision(2);
 
   test();
 

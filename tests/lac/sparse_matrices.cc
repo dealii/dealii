@@ -288,7 +288,7 @@ main()
   const unsigned int row_length = 3;
 
   check_ez_iterator();
-  check_conjugate(logfile);
+  check_conjugate(deallog.get_file_stream());
 
   FDMatrix     testproblem(size, size);
   unsigned int dim = (size - 1) * (size - 1);

@@ -103,5 +103,4 @@ main()
           deallog << "Not OK" << std::endl;
 
   deallog << "OK" << std::endl;
-  logfile.close();
 }

@@ -76,7 +76,7 @@ main()
 
   // You can open the generated file with gmsh.
   GridOut gridout;
-  gridout.write_msh(tria, logfile);
+  gridout.write_msh(tria, deallog.get_file_stream());
 
   return 0;
 }

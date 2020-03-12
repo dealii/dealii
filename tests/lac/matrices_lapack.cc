@@ -49,5 +49,5 @@ main()
           << std::endl;
   LAPACKFullMatrix<float> ff;
   ff.copy_from(ez);
-  ff.print_formatted(logfile, 0, false, 5, "~");
+  ff.print_formatted(deallog.get_file_stream(), 0, false, 5, "~");
 }

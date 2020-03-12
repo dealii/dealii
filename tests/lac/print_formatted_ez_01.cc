@@ -42,5 +42,5 @@ main()
   ez.set(4, 2, 13.);
   ez.set(4, 3, 14.);
 
-  ez.print_formatted(logfile, 0, false, 5, "~");
+  ez.print_formatted(deallog.get_file_stream(), 0, false, 5, "~");
 }

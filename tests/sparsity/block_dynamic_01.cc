@@ -47,7 +47,7 @@ main()
   deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x"
           << csp.block(1, 0).n_cols() << std::endl;
 
-  csp.print(logfile);
+  csp.print(deallog.get_file_stream());
 
   deallog << std::endl;
   for (unsigned int i = 0; i < 3; ++i)

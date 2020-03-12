@@ -64,7 +64,7 @@ main()
         }
     }
 
-  csp.print(logfile);
+  csp.print(deallog.get_file_stream());
 
   return 0;
 }

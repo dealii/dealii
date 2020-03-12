@@ -89,7 +89,7 @@ main()
   // You can open the generated file
   // with paraview.
   GridOut gridout;
-  gridout.write_ucd(tria, logfile);
+  gridout.write_ucd(tria, deallog.get_file_stream());
 
   return 0;
 }

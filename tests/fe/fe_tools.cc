@@ -202,9 +202,9 @@ main()
 {
   initlog();
 
-  test_projection<1>(logfile);
-  test_projection<2>(logfile);
-  test_projection<3>(logfile);
+  test_projection<1>(deallog.get_file_stream());
+  test_projection<2>(deallog.get_file_stream());
+  test_projection<3>(deallog.get_file_stream());
 
   test_renumbering<1>();
   test_renumbering<2>();

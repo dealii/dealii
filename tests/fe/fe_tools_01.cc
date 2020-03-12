@@ -82,7 +82,7 @@ main()
         }
       catch (ExceptionBase &e)
         {
-          logfile << e.what();
+          deallog << e.what();
         }
     }
 }

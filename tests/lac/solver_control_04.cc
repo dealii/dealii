@@ -68,7 +68,7 @@ int
 main(int argc, char **argv)
 {
   initlog();
-  deallog << std::setprecision(4);
+  deallog.get_file_stream() << std::setprecision(4);
 
   {
     const unsigned int size = 32;

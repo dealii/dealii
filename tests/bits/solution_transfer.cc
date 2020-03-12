@@ -197,11 +197,11 @@ main()
   initlog();
 
   deallog << "   1D solution transfer" << std::endl;
-  transfer<1>(logfile);
+  transfer<1>(deallog.get_file_stream());
 
   deallog << "   2D solution transfer" << std::endl;
-  transfer<2>(logfile);
+  transfer<2>(deallog.get_file_stream());
 
   deallog << "   3D solution transfer" << std::endl;
-  transfer<3>(logfile);
+  transfer<3>(deallog.get_file_stream());
 }

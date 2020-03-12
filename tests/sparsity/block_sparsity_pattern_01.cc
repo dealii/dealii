@@ -69,7 +69,7 @@ main()
             sparsity.add(ii, cols.local_to_global(jb, j));
       }
 
-  sparsity.print(logfile);
+  sparsity.print(deallog.get_file_stream());
 
   return 0;
 }
