@@ -123,10 +123,9 @@ test_cube()
   for (unsigned int i = 0; i < n_macro_cells; ++i)
     n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
-  // should have one Cartesian cell and no other
-  // cell type
+  // should have one Cartesian cell and no other cell type
   AssertDimension(n_cell_types[0], n_macro_cells);
-  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
+  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 2);
   Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
@@ -170,7 +169,7 @@ test_parallelogram()
   // should have one affine cell and no other
   // cell type
   AssertDimension(n_cell_types[1], n_macro_cells);
-  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
+  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 2);
   Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }

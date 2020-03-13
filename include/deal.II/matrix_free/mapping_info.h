@@ -442,6 +442,34 @@ namespace internal
       SmartPointer<const Mapping<dim>> mapping;
 
       /**
+       * Internal function to compute the geometry for the case the mapping is
+       * a MappingQ and a single quadrature formula per slot (non-hp case) is
+       * used. This method computes all data from the underlying cell
+       * quadrature points using the fast operator evaluation techniques from
+       * the matrix-free framework itself, i.e., it uses a polynomial
+       * description of the cell geometry (that is computed in a first step)
+       * and then computes all Jacobians and normal vectors based on this
+       * information. This optimized approach is much faster than going
+       * through FEValues and FEFaceValues, especially when several different
+       * quadrature formulas are involved, and consumes less memory.
+       *
+       * @param tria The triangulation to be used for setup
+       *
+       * @param cells The actual cells of the triangulation to be worked on,
+       * given as a tuple of the level and index within the level as used in
+       * the main initialization of the class
+       *
+       * @param faces The description of the connectivity from faces to cells
+       * as filled in the MatrixFree class
+       */
+      void
+      compute_mapping_q(
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+        const std::vector<
+          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces);
+
+      /**
        * Computes the information in the given cells, called within
        * initialize.
        */
@@ -529,7 +557,7 @@ namespace internal
      * comparator class within a std::map<> of the given arrays. Note that this
      * comparison operator does not satisfy all the mathematical properties one
      * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
-     * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is
+     * tolerance 0.15; the operator gives a<c, but neither a<b? nor b<c? is
      * satisfied). This is not a problem in the use cases for this class, but be
      * careful when using it in other contexts.
      */
@@ -539,15 +567,26 @@ namespace internal
     {
       FPArrayComparator(const Number scaling);
 
+      /**
+       * Compare two vectors of numbers (not necessarily of the same length)
+       */
       bool
       operator()(const std::vector<Number> &v1,
                  const std::vector<Number> &v2) const;
 
+      /**
+       * Compare two vectorized arrays (stored as tensors to avoid alignment
+       * issues).
+       */
       bool
       operator()(
         const Tensor<1, VectorizedArrayType::size(), Number> &t1,
         const Tensor<1, VectorizedArrayType::size(), Number> &t2) const;
 
+      /**
+       * Compare two rank-1 tensors of vectorized arrays (stored as tensors to
+       * avoid alignment issues).
+       */
       template <int dim>
       bool
       operator()(
@@ -556,6 +595,10 @@ namespace internal
         const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t2) const;
 
+      /**
+       * Compare two rank-2 tensors of vectorized arrays (stored as tensors to
+       * avoid alignment issues).
+       */
       template <int dim>
       bool
       operator()(
@@ -563,6 +606,14 @@ namespace internal
           &t1,
         const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t2) const;
+
+      /**
+       * Compare two arrays of tensors.
+       */
+      template <int dim>
+      bool
+      operator()(const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
+                 const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const;
 
       Number tolerance;
     };

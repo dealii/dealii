@@ -6928,39 +6928,34 @@ FEEvaluation<dim,
 
   AssertIndexRange(q, n_q_points);
 
-  const unsigned int n_q_points_1d_actual =
-    fe_degree == -1 ? this->data->data.front().n_q_points_1d : n_q_points_1d;
-
-  // Cartesian mesh: not all quadrature points are stored, only the
-  // diagonal. Hence, need to find the tensor product index and retrieve the
-  // value from that
   const Point<dim, VectorizedArrayType> *quadrature_points =
     &this->mapping_data->quadrature_points
        [this->mapping_data->quadrature_point_offsets[this->cell]];
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+
+  // Cartesian/affine mesh: only first vertex of cell is stored, we must
+  // compute it through the Jacobian (which is stored in non-inverted and
+  // non-transposed form as index '1' in the jacobian field)
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      Point<dim, VectorizedArrayType> point;
-      switch (dim)
-        {
-          case 1:
-            return quadrature_points[q];
-          case 2:
-            point[0] = quadrature_points[q % n_q_points_1d_actual][0];
-            point[1] = quadrature_points[q / n_q_points_1d_actual][1];
-            return point;
-          case 3:
-            point[0] = quadrature_points[q % n_q_points_1d_actual][0];
-            point[1] = quadrature_points[(q / n_q_points_1d_actual) %
-                                         n_q_points_1d_actual][1];
-            point[2] = quadrature_points[q / (n_q_points_1d_actual *
-                                              n_q_points_1d_actual)][2];
-            return point;
-          default:
-            Assert(false, ExcNotImplemented());
-            return point;
-        }
+      Assert(this->jacobian != nullptr, ExcNotInitialized());
+      Point<dim, VectorizedArrayType> point = quadrature_points[0];
+
+      const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
+      if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        for (unsigned int d = 0; d < dim; ++d)
+          point[d] += jac[d][d] *
+                      static_cast<Number>(
+                        this->mapping_data->descriptor[this->active_quad_index]
+                          .quadrature.point(q)[d]);
+      else
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            point[d] += jac[d][e] * static_cast<Number>(
+                                      this->mapping_data
+                                        ->descriptor[this->active_quad_index]
+                                        .quadrature.point(q)[e]);
+      return point;
     }
-  // all other cases: just return the respective data as it is fully stored
   else
     return quadrature_points[q];
 }
