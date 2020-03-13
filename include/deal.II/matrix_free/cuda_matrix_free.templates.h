@@ -893,7 +893,7 @@ namespace CUDAWrappers
 
         cuda_error =
           cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(),
-                             shape_info_co.shape_gradients.data(),
+                             shape_info_co.data.front().shape_gradients.data(),
                              size_co_shape_values,
                              0,
                              cudaMemcpyHostToDevice);
