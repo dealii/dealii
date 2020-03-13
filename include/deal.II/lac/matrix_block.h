@@ -133,6 +133,12 @@ public:
   MatrixBlock(const MatrixBlock<MatrixType> &M);
 
   /**
+   * Assignment operator.
+   */
+  MatrixBlock<MatrixType> &
+  operator=(const MatrixBlock<MatrixType> &) = default;
+
+  /**
    * Constructor setting block coordinates, but not initializing the matrix.
    */
 

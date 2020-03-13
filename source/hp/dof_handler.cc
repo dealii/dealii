@@ -2327,8 +2327,8 @@ namespace hp
     levels.clear();
     faces.reset();
 
-    vertex_dofs        = std::move(std::vector<types::global_dof_index>());
-    vertex_dof_offsets = std::move(std::vector<unsigned int>());
+    vertex_dofs        = std::vector<types::global_dof_index>();
+    vertex_dof_offsets = std::vector<unsigned int>();
   }
 } // namespace hp
 
