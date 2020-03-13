@@ -42,6 +42,18 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    // ----------------- actual UnivariateShapeData functions
+    // --------------------
+
+    template <typename Number>
+    UnivariateShapeData<Number>::UnivariateShapeData()
+      : element_type(tensor_general)
+      , fe_degree(0)
+      , n_q_points_1d(0)
+      , nodal_at_cell_boundaries(false)
+    {}
+
+
     // ----------------- actual ShapeInfo functions --------------------
 
     template <typename Number>
@@ -87,31 +99,30 @@ namespace internal
 
       // assuming isotropy of dimensions and components
       data.resize(1);
-      UnivariateShapeData<Number> *univariate_shape_data = &data.front();
+      UnivariateShapeData<Number> &univariate_shape_data = data.front();
       data_access.reinit(n_dimensions, n_components);
-      data_access.fill(univariate_shape_data);
-      univariate_shape_data->quadrature    = quad;
-      univariate_shape_data->fe_degree     = fe->degree;
-      univariate_shape_data->n_q_points_1d = quad.size();
+      data_access.fill(&univariate_shape_data);
+      univariate_shape_data.quadrature    = quad;
+      univariate_shape_data.fe_degree     = fe->degree;
+      univariate_shape_data.n_q_points_1d = quad.size();
 
       // grant write access to common univariate shape data
-      auto &shape_values    = univariate_shape_data->shape_values;
-      auto &shape_gradients = univariate_shape_data->shape_gradients;
-      auto &shape_hessians  = univariate_shape_data->shape_hessians;
+      auto &shape_values    = univariate_shape_data.shape_values;
+      auto &shape_gradients = univariate_shape_data.shape_gradients;
+      auto &shape_hessians  = univariate_shape_data.shape_hessians;
       auto &shape_gradients_collocation =
-        univariate_shape_data->shape_gradients_collocation;
+        univariate_shape_data.shape_gradients_collocation;
       auto &shape_hessians_collocation =
-        univariate_shape_data->shape_hessians_collocation;
-      auto &inverse_shape_values = univariate_shape_data->inverse_shape_values;
-      auto &shape_data_on_face   = univariate_shape_data->shape_data_on_face;
-      auto &values_within_subface =
-        univariate_shape_data->values_within_subface;
+        univariate_shape_data.shape_hessians_collocation;
+      auto &inverse_shape_values  = univariate_shape_data.inverse_shape_values;
+      auto &shape_data_on_face    = univariate_shape_data.shape_data_on_face;
+      auto &values_within_subface = univariate_shape_data.values_within_subface;
       auto &gradients_within_subface =
-        univariate_shape_data->gradients_within_subface;
+        univariate_shape_data.gradients_within_subface;
       auto &hessians_within_subface =
-        univariate_shape_data->hessians_within_subface;
+        univariate_shape_data.hessians_within_subface;
       auto &nodal_at_cell_boundaries =
-        univariate_shape_data->nodal_at_cell_boundaries;
+        univariate_shape_data.nodal_at_cell_boundaries;
 
       const unsigned int fe_degree     = fe->degree;
       const unsigned int n_q_points_1d = quad.size();
@@ -418,9 +429,9 @@ namespace internal
         }
 
       if (element_type == tensor_general &&
-          check_1d_shapes_symmetric(*univariate_shape_data))
+          check_1d_shapes_symmetric(univariate_shape_data))
         {
-          if (check_1d_shapes_collocation(*univariate_shape_data))
+          if (check_1d_shapes_collocation(univariate_shape_data))
             element_type = tensor_symmetric_collocation;
           else
             element_type = tensor_symmetric;
@@ -439,7 +450,7 @@ namespace internal
             }
         }
       else if (element_type == tensor_symmetric_plus_dg0)
-        check_1d_shapes_symmetric(*univariate_shape_data);
+        check_1d_shapes_symmetric(univariate_shape_data);
 
       nodal_at_cell_boundaries = true;
       for (unsigned int i = 1; i < n_dofs_1d; ++i)
@@ -522,8 +533,7 @@ namespace internal
             }
         }
 
-      // TODO !!!
-      univariate_shape_data->element_type = this->element_type;
+      univariate_shape_data.element_type = this->element_type;
     }
 
 

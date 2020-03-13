@@ -97,6 +97,8 @@ namespace internal
     template <typename Number>
     struct UnivariateShapeData
     {
+      UnivariateShapeData();
+
       /**
        * Return the memory consumption of this class in bytes.
        */
@@ -108,7 +110,7 @@ namespace internal
        * will select the most efficient algorithm based on the given element
        * type.
        */
-      ElementType element_type = ElementType::tensor_general;
+      ElementType element_type;
 
       /**
        * Stores the shape values of the 1D finite element evaluated on all 1D
@@ -241,18 +243,18 @@ namespace internal
       /**
        * Stores the degree of the element.
        */
-      unsigned int fe_degree = 0;
+      unsigned int fe_degree;
 
       /**
        * Stores the number of quadrature points per dimension.
        */
-      unsigned int n_q_points_1d = 0;
+      unsigned int n_q_points_1d;
 
       /**
        * Indicates whether the basis functions are nodal in 0 and 1, i.e., the
        * end points of the unit cell.
        */
-      bool nodal_at_cell_boundaries = false;
+      bool nodal_at_cell_boundaries;
     };
 
 
