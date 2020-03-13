@@ -29,6 +29,8 @@
 
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/grid_tools_cache.h>
+
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
 #include <deal.II/particles/property_pool.h>
@@ -90,8 +92,8 @@ namespace Particles
 
     /**
      * Initialize the particle handler. This function does not clear the
-     * internal data structures, it just sets the triangulation and the mapping
-     * to be used.
+     * internal data structures, it just sets the triangulation and the
+     * mapping to be used.
      */
     void
     initialize(const Triangulation<dim, spacedim> &tria,
@@ -695,6 +697,17 @@ namespace Particles
      * triangulation object.
      */
     unsigned int handle;
+
+    /**
+     * The GridTools::Cache is used to store the information about the
+     * vertex_to_cells set and the vertex_to_cell_centers vectors to prevent
+     * recomputing them every time we sort_into_subdomain_and_cells().
+     * This cache is automatically updated when the triangulation has
+     * changed. This cache is stored within a unique pointer because the
+     * particle handler has a constructor that enables it to be constructed
+     * without a triangulation. The cache does not have such a constructor.
+     */
+    std::unique_ptr<GridTools::Cache<dim, spacedim>> triangulation_cache;
 
 #ifdef DEAL_II_WITH_MPI
     /**

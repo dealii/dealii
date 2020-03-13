@@ -119,7 +119,11 @@ namespace Particles
     , store_callback()
     , load_callback()
     , handle(numbers::invalid_unsigned_int)
-  {}
+  {
+    triangulation_cache =
+      std_cxx14::make_unique<GridTools::Cache<dim, spacedim>>(triangulation,
+                                                              mapping);
+  }
 
 
 
@@ -135,6 +139,12 @@ namespace Particles
 
     // Create the memory pool that will store all particle properties
     property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
+
+    // Create the grid cache to cache the informations about the triangulation
+    // that is used to locate the particles into subdomains and cells
+    triangulation_cache =
+      std_cxx14::make_unique<GridTools::Cache<dim, spacedim>>(new_triangulation,
+                                                              new_mapping);
   }
 
 
@@ -910,16 +920,15 @@ namespace Particles
         static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
 
     {
-      // Create a map from vertices to adjacent cells
-      const std::vector<
+      // Create a map from vertices to adjacent cells using grid cache
+      std::vector<
         std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-        vertex_to_cells(GridTools::vertex_to_cell_map(*triangulation));
+        vertex_to_cells = triangulation_cache->get_vertex_to_cell_map();
 
-      // Create a corresponding map of vectors from vertex to cell center
-      const std::vector<std::vector<Tensor<1, spacedim>>>
-        vertex_to_cell_centers(
-          GridTools::vertex_to_cell_centers_directions(*triangulation,
-                                                       vertex_to_cells));
+      // Create a corresponding map of vectors from vertex to cell center using
+      // grid cache
+      std::vector<std::vector<Tensor<1, spacedim>>> vertex_to_cell_centers =
+        triangulation_cache->get_vertex_to_cell_centers_directions();
 
       std::vector<unsigned int> neighbor_permutation;
 
