@@ -123,7 +123,7 @@ DEAL:cg::Smoothing on     level 2
 DEAL:cg::V-cycle leaving  level 2
 DEAL:cg::Smoothing on     level 3
 DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Convergence step 7 value 2.00480e-14
+DEAL:cg::Convergence step 7 value 0
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       256
 DEAL::Number of degrees of freedom: 289   L0: 4   L1: 9   L2: 25   L3: 81   L4: 289
@@ -305,7 +305,7 @@ DEAL:cg::Smoothing on     level 3
 DEAL:cg::V-cycle leaving  level 3
 DEAL:cg::Smoothing on     level 4
 DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::Convergence step 8 value 4.39876e-14
+DEAL:cg::Convergence step 8 value 0
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       1024
 DEAL::Number of degrees of freedom: 1089   L0: 4   L1: 9   L2: 25   L3: 81   L4: 289   L5: 1089
@@ -554,4 +554,4 @@ DEAL:cg::Smoothing on     level 4
 DEAL:cg::V-cycle leaving  level 4
 DEAL:cg::Smoothing on     level 5
 DEAL:cg::V-cycle leaving  level 5
-DEAL:cg::Convergence step 9 value 6.07087e-14
+DEAL:cg::Convergence step 9 value 0

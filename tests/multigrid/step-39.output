@@ -8,7 +8,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 23.0730
-DEAL:cg::Convergence step 11 value 5.78162e-14
+DEAL:cg::Convergence step 11 value 0
 DEAL::energy-error: 0.439211
 DEAL::L2-error:     0.0109342
 DEAL::Estimate 0.979555
@@ -20,7 +20,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 23.0730
-DEAL:cg::Convergence step 11 value 9.09099e-13
+DEAL:cg::Convergence step 11 value 0
 DEAL::energy-error: 0.332582
 DEAL::L2-error:     0.00548996
 DEAL::Estimate 0.838060
@@ -32,7 +32,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 23.0730
-DEAL:cg::Convergence step 12 value 1.66147e-13
+DEAL:cg::Convergence step 12 value 0
 DEAL::energy-error: 0.237705
 DEAL::L2-error:     0.00250869
 DEAL::Estimate 0.611449
@@ -44,7 +44,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 24.1546
-DEAL:cg::Convergence step 13 value 2.19190e-13
+DEAL:cg::Convergence step 13 value 0
 DEAL::energy-error: 0.170175
 DEAL::L2-error:     0.00120328
 DEAL::Estimate 0.448676
@@ -56,7 +56,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 26.5522
-DEAL:cg::Convergence step 13 value 2.44978e-13
+DEAL:cg::Convergence step 13 value 0
 DEAL::energy-error: 0.121878
 DEAL::L2-error:     0.000591777
 DEAL::Estimate 0.327296
@@ -68,7 +68,7 @@ DEAL::Assemble multilevel matrix
 DEAL::Assemble right hand side
 DEAL::Solve
 DEAL:cg::Starting value 27.1421
-DEAL:cg::Convergence step 13 value 3.08737e-13
+DEAL:cg::Convergence step 13 value 0
 DEAL::energy-error: 0.0863235
 DEAL::L2-error:     0.000292807
 DEAL::Estimate 0.232279

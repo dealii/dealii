@@ -10,7 +10,7 @@ Refinement cycle 0
 	Total number of iterations used for approximation of A inverse: 69
 	Total number of iterations used for approximation of S inverse: 23
 
-   Note: The mean value was adjusted by -3.36485e-15
+   Note: The mean value was adjusted by -0
 
    Velocity L2 Error: 0.00539774
    Pressure L2 Error: 0.019341
@@ -26,7 +26,7 @@ Refinement cycle 1
 	Total number of iterations used for approximation of A inverse: 67
 	Total number of iterations used for approximation of S inverse: 22
 
-   Note: The mean value was adjusted by -1.51964e-13
+   Note: The mean value was adjusted by -0
 
    Velocity L2 Error: 0.000670888
    Pressure L2 Error: 0.0036533
@@ -43,7 +43,7 @@ Refinement cycle 0
 	Total number of iterations used for approximation of A inverse: 113
 	Total number of iterations used for approximation of S inverse: 23
 
-   Note: The mean value was adjusted by 1.55695e-14
+   Note: The mean value was adjusted by 0
 
    Velocity L2 Error: 0.00539774
    Pressure L2 Error: 0.019341
@@ -59,7 +59,7 @@ Refinement cycle 1
 	Total number of iterations used for approximation of A inverse: 180
 	Total number of iterations used for approximation of S inverse: 22
 
-   Note: The mean value was adjusted by -1.52194e-13
+   Note: The mean value was adjusted by -0
 
    Velocity L2 Error: 0.000670888
    Pressure L2 Error: 0.0036533

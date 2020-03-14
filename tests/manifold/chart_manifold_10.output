@@ -12,8 +12,8 @@ DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.
 DEAL::Intermediate point: 1.00179457081 0.0800477225761
 DEAL::get_new_point:      1.00179457081 0.0800477225761
 DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.500
-DEAL::Intermediate point: 1.00498756211 9.06555268871e-17
-DEAL::get_new_point:      1.00498756211 9.06555268871e-17
+DEAL::Intermediate point: 1.00498756211 0
+DEAL::get_new_point:      1.00498756211 0
 DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.900
 DEAL::Intermediate point: 1.00179457081 -0.0800477225761
 DEAL::get_new_point:      1.00179457081 -0.0800477225761

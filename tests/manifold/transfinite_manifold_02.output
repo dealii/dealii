@@ -5,7 +5,7 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
-DEAL::-1.83697e-16 -1.00000
+DEAL::-0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 -0.292893
 DEAL::Manifold id: 4294967295
@@ -14,16 +14,16 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
-DEAL::-1.83697e-16 -1.00000
+DEAL::-0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 -0.292893
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -9.71445e-17 -0.646447
+DEAL::Center with manifold: -0 -0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
-DEAL::Lines on cell with center: -0.500000 -1.38778e-17
-DEAL::-1.00000 1.22465e-16
+DEAL::Lines on cell with center: -0.500000 -0
+DEAL::-1.00000 0
 DEAL::Manifold id: 0
 DEAL::-0.292893 0.00000
 DEAL::Manifold id: 4294967295
@@ -31,8 +31,8 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: -0.500000 -1.38778e-17
-DEAL::-1.00000 1.22465e-16
+DEAL::Faces on cell with center: -0.500000 -0
+DEAL::-1.00000 0
 DEAL::Manifold id: 0
 DEAL::-0.292893 0.00000
 DEAL::Manifold id: 4294967295
@@ -40,7 +40,7 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -0.646447 5.55112e-17
+DEAL::Center with manifold: -0.646447 0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
@@ -86,8 +86,8 @@ DEAL::Center with manifold: 0.646447 0.00000
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
-DEAL::Lines on cell with center: -1.38778e-17 0.500000
-DEAL::6.12323e-17 1.00000
+DEAL::Lines on cell with center: -0 0.500000
+DEAL::0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.292893
 DEAL::Manifold id: 4294967295
@@ -95,8 +95,8 @@ DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: -1.38778e-17 0.500000
-DEAL::6.12323e-17 1.00000
+DEAL::Faces on cell with center: -0 0.500000
+DEAL::0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.292893
 DEAL::Manifold id: 4294967295
@@ -104,7 +104,7 @@ DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 2.77556e-17 0.646447
+DEAL::Center with manifold: 0 0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
@@ -115,7 +115,7 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
-DEAL::-1.11022e-16 -1.00000
+DEAL::-0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 -0.292893
 DEAL::Manifold id: 4294967295
@@ -124,16 +124,16 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
-DEAL::-1.11022e-16 -1.00000
+DEAL::-0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 -0.292893
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -5.55112e-17 -0.646447
+DEAL::Center with manifold: -0 -0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
-DEAL::Lines on cell with center: -0.500000 -1.38778e-17
-DEAL::-1.00000 -1.11022e-16
+DEAL::Lines on cell with center: -0.500000 -0
+DEAL::-1.00000 -0
 DEAL::Manifold id: 0
 DEAL::-0.292893 0.00000
 DEAL::Manifold id: 4294967295
@@ -141,8 +141,8 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: -0.500000 -1.38778e-17
-DEAL::-1.00000 -1.11022e-16
+DEAL::Faces on cell with center: -0.500000 -0
+DEAL::-1.00000 -0
 DEAL::Manifold id: 0
 DEAL::-0.292893 0.00000
 DEAL::Manifold id: 4294967295
@@ -150,7 +150,7 @@ DEAL::-0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -0.646447 -5.55112e-17
+DEAL::Center with manifold: -0.646447 -0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
@@ -179,7 +179,7 @@ DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::1.00000 -1.11022e-16
+DEAL::1.00000 -0
 DEAL::Manifold id: 0
 DEAL::0.292893 0.00000
 DEAL::Manifold id: 4294967295
@@ -188,16 +188,16 @@ DEAL::0.500000 -0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::1.00000 -1.11022e-16
+DEAL::1.00000 -0
 DEAL::Manifold id: 0
 DEAL::0.292893 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 0.646447 -5.55112e-17
+DEAL::Center with manifold: 0.646447 -0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
-DEAL::Lines on cell with center: -1.38778e-17 0.500000
-DEAL::-1.11022e-16 1.00000
+DEAL::Lines on cell with center: -0 0.500000
+DEAL::-0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.292893
 DEAL::Manifold id: 4294967295
@@ -205,8 +205,8 @@ DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: -1.38778e-17 0.500000
-DEAL::-1.11022e-16 1.00000
+DEAL::Faces on cell with center: -0 0.500000
+DEAL::-0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.292893
 DEAL::Manifold id: 4294967295
@@ -214,13 +214,13 @@ DEAL::-0.500000 0.500000
 DEAL::Manifold id: 4294967295
 DEAL::0.500000 0.500000
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -5.55112e-17 0.646447
+DEAL::Center with manifold: -0 0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000
 DEAL::
 DEAL::Testing with SphericalManifold dim=3, spacedim=3
-DEAL::Lines on cell with center: 0.00000 0.00000 -6.93889e-18
+DEAL::Lines on cell with center: 0.00000 0.00000 -0
 DEAL::-0.211325 0.00000 -0.211325
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 0.00000 -0.211325
@@ -245,7 +245,7 @@ DEAL::-0.211325 0.211325 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: 0.00000 0.00000 -6.93889e-18
+DEAL::Faces on cell with center: 0.00000 0.00000 -0
 DEAL::-0.211325 0.00000 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 0.00000 0.00000
@@ -258,7 +258,7 @@ DEAL::0.00000 0.00000 -0.211325
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 0.00000 0.211325
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 0.00000 0.00000 -1.38778e-17
+DEAL::Center with manifold: 0.00000 0.00000 -0
 DEAL::Manifold id: 4294967295
 DEAL::Lines on cell with center: 0.00000 0.00000 -0.394338
 DEAL::-0.707107 0.00000 -0.707107
@@ -290,19 +290,19 @@ DEAL::-0.410557 0.00000 -0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.410557 0.00000 -0.410557
 DEAL::Manifold id: 4294967295
-DEAL::6.93889e-18 -0.410557 -0.410557
+DEAL::0 -0.410557 -0.410557
 DEAL::Manifold id: 4294967295
-DEAL::6.93889e-18 0.410557 -0.410557
+DEAL::0 0.410557 -0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 0.00000 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.00000 -0.211325
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -1.94289e-16 2.37914e-13 -0.450853
+DEAL::Center with manifold: -0 0 -0.450853
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -5.55112e-17 0.00000 0.00000
-DEAL::Distance between cell manifold and face manifold: 1.38778e-17 0.00000 0.00000
-DEAL::Lines on cell with center: 0.394338 0.00000 2.08167e-17
+DEAL::Distance between cell manifold and face manifold: -0 0.00000 0.00000
+DEAL::Distance between cell manifold and face manifold: 0 0.00000 0.00000
+DEAL::Lines on cell with center: 0.394338 0.00000 0
 DEAL::0.394338 -0.394338 -0.394338
 DEAL::Manifold id: 4294967295
 DEAL::0.394338 0.394338 -0.394338
@@ -327,10 +327,10 @@ DEAL::0.211325 -0.211325 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: 0.394338 0.00000 2.08167e-17
-DEAL::0.410557 -0.410557 6.93889e-18
+DEAL::Faces on cell with center: 0.394338 0.00000 0
+DEAL::0.410557 -0.410557 0
 DEAL::Manifold id: 4294967295
-DEAL::0.410557 0.410557 6.93889e-18
+DEAL::0.410557 0.410557 0
 DEAL::Manifold id: 4294967295
 DEAL::1.00000 0.00000 0.00000
 DEAL::Manifold id: 0
@@ -340,11 +340,11 @@ DEAL::0.410557 0.00000 -0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.410557 0.00000 0.410557
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 0.450853 1.19127e-13 0.00000
+DEAL::Center with manifold: 0.450853 0 0.00000
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: 1.11022e-16 -1.11022e-16 5.55112e-17
-DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 6.24500e-17
-DEAL::Lines on cell with center: 0.00000 2.08167e-17 0.394338
+DEAL::Distance between cell manifold and face manifold: 0 -0 0
+DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0
+DEAL::Lines on cell with center: 0.00000 0 0.394338
 DEAL::-0.394338 -0.394338 0.394338
 DEAL::Manifold id: 4294967295
 DEAL::0.394338 -0.394338 0.394338
@@ -369,8 +369,8 @@ DEAL::-0.211325 0.00000 0.211325
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 0.00000 0.211325
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: 0.00000 2.08167e-17 0.394338
-DEAL::-0.410557 6.93889e-18 0.410557
+DEAL::Faces on cell with center: 0.00000 0 0.394338
+DEAL::-0.410557 0 0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.410557 0.00000 0.410557
 DEAL::Manifold id: 4294967295
@@ -382,11 +382,11 @@ DEAL::0.00000 -0.410557 0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 0.410557 0.410557
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 1.19127e-13 0.00000 0.450853
+DEAL::Center with manifold: 0 0.00000 0.450853
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -1.11022e-16 5.55112e-17 1.11022e-16
-DEAL::Distance between cell manifold and face manifold: 0.00000 6.93889e-17 0.00000
-DEAL::Lines on cell with center: -0.394338 3.46945e-18 1.73472e-17
+DEAL::Distance between cell manifold and face manifold: -0 0 0
+DEAL::Distance between cell manifold and face manifold: 0.00000 0 0.00000
+DEAL::Lines on cell with center: -0.394338 0 0
 DEAL::-0.707107 0.00000 -0.707107
 DEAL::Manifold id: 0
 DEAL::-0.211325 0.00000 -0.211325
@@ -411,7 +411,7 @@ DEAL::-0.707107 0.707107 0.00000
 DEAL::Manifold id: 0
 DEAL::-0.211325 0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: -0.394338 3.46945e-18 1.73472e-17
+DEAL::Faces on cell with center: -0.394338 0 0
 DEAL::-1.00000 0.00000 0.00000
 DEAL::Manifold id: 0
 DEAL::-0.211325 0.00000 0.00000
@@ -422,13 +422,13 @@ DEAL::-0.410557 0.410557 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::-0.410557 0.00000 -0.410557
 DEAL::Manifold id: 4294967295
-DEAL::-0.410557 6.93889e-18 0.410557
+DEAL::-0.410557 0 0.410557
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: -0.450853 1.19113e-13 -6.93889e-18
+DEAL::Center with manifold: -0.450853 0 -0
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: 0.00000 -5.55112e-17 0.00000
-DEAL::Distance between cell manifold and face manifold: 0.00000 1.38778e-17 0.00000
-DEAL::Lines on cell with center: 0.00000 -0.394338 2.08167e-17
+DEAL::Distance between cell manifold and face manifold: 0.00000 -0 0.00000
+DEAL::Distance between cell manifold and face manifold: 0.00000 0 0.00000
+DEAL::Lines on cell with center: 0.00000 -0.394338 0
 DEAL::-0.394338 -0.394338 -0.394338
 DEAL::Manifold id: 4294967295
 DEAL::0.394338 -0.394338 -0.394338
@@ -453,24 +453,24 @@ DEAL::-0.211325 -0.211325 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::0.211325 -0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: 0.00000 -0.394338 2.08167e-17
+DEAL::Faces on cell with center: 0.00000 -0.394338 0
 DEAL::-0.410557 -0.410557 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::0.410557 -0.410557 6.93889e-18
+DEAL::0.410557 -0.410557 0
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 -1.00000 0.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 -0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::6.93889e-18 -0.410557 -0.410557
+DEAL::0 -0.410557 -0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 -0.410557 0.410557
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 1.19127e-13 -0.450853 0.00000
+DEAL::Center with manifold: 0 -0.450853 0.00000
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -1.11022e-16 -1.11022e-16 5.55112e-17
-DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 6.24500e-17
-DEAL::Lines on cell with center: 3.46945e-18 0.394338 1.73472e-17
+DEAL::Distance between cell manifold and face manifold: -0 -0 0
+DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0
+DEAL::Lines on cell with center: 0 0.394338 0
 DEAL::0.00000 0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::0.00000 0.211325 -0.211325
@@ -495,23 +495,23 @@ DEAL::0.707107 0.707107 0.00000
 DEAL::Manifold id: 0
 DEAL::0.211325 0.211325 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::Faces on cell with center: 3.46945e-18 0.394338 1.73472e-17
+DEAL::Faces on cell with center: 0 0.394338 0
 DEAL::0.00000 1.00000 0.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.211325 0.00000
 DEAL::Manifold id: 4294967295
 DEAL::-0.410557 0.410557 0.00000
 DEAL::Manifold id: 4294967295
-DEAL::0.410557 0.410557 6.93889e-18
+DEAL::0.410557 0.410557 0
 DEAL::Manifold id: 4294967295
-DEAL::6.93889e-18 0.410557 -0.410557
+DEAL::0 0.410557 -0.410557
 DEAL::Manifold id: 4294967295
 DEAL::0.00000 0.410557 0.410557
 DEAL::Manifold id: 4294967295
-DEAL::Center with manifold: 1.19113e-13 0.450853 -6.93889e-18
+DEAL::Center with manifold: 0 0.450853 -0
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -5.55112e-17 0.00000 0.00000
-DEAL::Distance between cell manifold and face manifold: 1.38778e-17 0.00000 0.00000
+DEAL::Distance between cell manifold and face manifold: -0 0.00000 0.00000
+DEAL::Distance between cell manifold and face manifold: 0 0.00000 0.00000
 DEAL::
 DEAL::Testing with CylindricalManifold in 3d
 DEAL::Lines on cell with center: -0.500000 0.00000 -0.500000
@@ -519,9 +519,9 @@ DEAL::-0.500000 0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::-0.500000 -0.707107 -0.707107
 DEAL::Manifold id: 0
-DEAL::-1.00000 -5.55112e-17 -1.00000
+DEAL::-1.00000 -0 -1.00000
 DEAL::Manifold id: 0
-DEAL::0.00000 -5.55112e-17 -1.00000
+DEAL::0.00000 -0 -1.00000
 DEAL::Manifold id: 0
 DEAL::-0.500000 0.292893 -0.292893
 DEAL::Manifold id: 1
@@ -544,21 +544,21 @@ DEAL::-0.500000 0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::-0.500000 -0.500000 -0.500000
 DEAL::Manifold id: 1
-DEAL::-1.00000 3.28904e-15 -0.646447
+DEAL::-1.00000 0 -0.646447
 DEAL::Manifold id: 1
-DEAL::0.00000 3.28904e-15 -0.646447
+DEAL::0.00000 0 -0.646447
 DEAL::Manifold id: 1
-DEAL::-0.500000 -5.55112e-17 -1.00000
+DEAL::-0.500000 -0 -1.00000
 DEAL::Manifold id: 0
 DEAL::-0.500000 0.00000 -0.292893
 DEAL::Manifold id: 1
-DEAL::Center with manifold: -0.500000 3.26822e-15 -0.646447
+DEAL::Center with manifold: -0.500000 0 -0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Distance between cell manifold and face manifold: 0.00000 1.11022e-16 -1.11022e-16
+DEAL::Distance between cell manifold and face manifold: 0.00000 0 -0
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: -0.500000 0.500000 -6.93889e-18
+DEAL::Lines on cell with center: -0.500000 0.500000 -0
 DEAL::-0.500000 0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::-0.500000 0.292893 -0.292893
@@ -575,34 +575,34 @@ DEAL::-1.00000 0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::0.00000 0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::-1.00000 1.00000 -5.55112e-17
+DEAL::-1.00000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::-1.00000 0.292893 6.93889e-18
+DEAL::-1.00000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::0.00000 1.00000 -5.55112e-17
+DEAL::0.00000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::0.00000 0.292893 6.93889e-18
+DEAL::0.00000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: -0.500000 0.500000 -6.93889e-18
-DEAL::-0.500000 1.00000 -5.55112e-17
+DEAL::Faces on cell with center: -0.500000 0.500000 -0
+DEAL::-0.500000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::-0.500000 0.292893 3.46945e-18
+DEAL::-0.500000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::-1.00000 0.646447 -2.77556e-17
+DEAL::-1.00000 0.646447 -0
 DEAL::Manifold id: 1
-DEAL::0.00000 0.646447 -2.77556e-17
+DEAL::0.00000 0.646447 -0
 DEAL::Manifold id: 1
 DEAL::-0.500000 0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::-0.500000 0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: -0.500000 0.646447 -2.77556e-17
+DEAL::Center with manifold: -0.500000 0.646447 -0
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -2.77556e-17 0.00000 0.00000
+DEAL::Distance between cell manifold and face manifold: -0 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: -0.500000 0.00000 1.38778e-17
+DEAL::Lines on cell with center: -0.500000 0.00000 0
 DEAL::-0.500000 0.292893 -0.292893
 DEAL::Manifold id: 1
 DEAL::-0.500000 -0.292893 -0.292893
@@ -619,16 +619,16 @@ DEAL::-1.00000 0.00000 0.292893
 DEAL::Manifold id: 1
 DEAL::0.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::-1.00000 0.292893 6.93889e-18
+DEAL::-1.00000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::-1.00000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::0.00000 0.292893 6.93889e-18
+DEAL::0.00000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::0.00000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: -0.500000 0.00000 1.38778e-17
-DEAL::-0.500000 0.292893 3.46945e-18
+DEAL::Faces on cell with center: -0.500000 0.00000 0
+DEAL::-0.500000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::-0.500000 -0.292893 0.00000
 DEAL::Manifold id: 1
@@ -640,7 +640,7 @@ DEAL::-0.500000 0.00000 -0.292893
 DEAL::Manifold id: 1
 DEAL::-0.500000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::Center with manifold: -0.500000 0.00000 1.38778e-17
+DEAL::Center with manifold: -0.500000 0.00000 0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
@@ -649,9 +649,9 @@ DEAL::-0.500000 -0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::-0.500000 -0.707107 0.707107
 DEAL::Manifold id: 0
-DEAL::-1.00000 -1.00000 2.22045e-16
+DEAL::-1.00000 -1.00000 0
 DEAL::Manifold id: 0
-DEAL::0.00000 -1.00000 2.22045e-16
+DEAL::0.00000 -1.00000 0
 DEAL::Manifold id: 0
 DEAL::-0.500000 -0.292893 -0.292893
 DEAL::Manifold id: 1
@@ -674,21 +674,21 @@ DEAL::-0.500000 -0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::-0.500000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::-1.00000 -0.646447 -3.02536e-15
+DEAL::-1.00000 -0.646447 -0
 DEAL::Manifold id: 1
-DEAL::0.00000 -0.646447 -3.02536e-15
+DEAL::0.00000 -0.646447 -0
 DEAL::Manifold id: 1
-DEAL::-0.500000 -1.00000 2.22045e-16
+DEAL::-0.500000 -1.00000 0
 DEAL::Manifold id: 0
 DEAL::-0.500000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: -0.500000 -0.646447 -2.92127e-15
+DEAL::Center with manifold: -0.500000 -0.646447 -0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: -0.500000 6.93889e-18 0.500000
+DEAL::Lines on cell with center: -0.500000 0 0.500000
 DEAL::-0.500000 0.707107 0.707107
 DEAL::Manifold id: 0
 DEAL::-0.500000 0.292893 0.292893
@@ -705,30 +705,30 @@ DEAL::-1.00000 -0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::0.00000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::-1.00000 1.66533e-16 1.00000
+DEAL::-1.00000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::-1.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::0.00000 1.66533e-16 1.00000
+DEAL::0.00000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: -0.500000 6.93889e-18 0.500000
-DEAL::-0.500000 4.99600e-16 1.00000
+DEAL::Faces on cell with center: -0.500000 0 0.500000
+DEAL::-0.500000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::-0.500000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::-1.00000 8.32667e-17 0.646447
+DEAL::-1.00000 0 0.646447
 DEAL::Manifold id: 1
-DEAL::0.00000 8.32667e-17 0.646447
+DEAL::0.00000 0 0.646447
 DEAL::Manifold id: 1
 DEAL::-0.500000 0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::-0.500000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: -0.500000 2.84495e-16 0.646447
+DEAL::Center with manifold: -0.500000 0 0.646447
 DEAL::Manifold id: 1
-DEAL::Distance between cell manifold and face manifold: -2.77556e-17 0.00000 0.00000
+DEAL::Distance between cell manifold and face manifold: -0 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
@@ -737,9 +737,9 @@ DEAL::0.500000 0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::0.500000 -0.707107 -0.707107
 DEAL::Manifold id: 0
-DEAL::0.00000 -5.55112e-17 -1.00000
+DEAL::0.00000 -0 -1.00000
 DEAL::Manifold id: 0
-DEAL::1.00000 -5.55112e-17 -1.00000
+DEAL::1.00000 -0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.500000 0.292893 -0.292893
 DEAL::Manifold id: 1
@@ -762,21 +762,21 @@ DEAL::0.500000 0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::0.500000 -0.500000 -0.500000
 DEAL::Manifold id: 1
-DEAL::0.00000 3.28904e-15 -0.646447
+DEAL::0.00000 0 -0.646447
 DEAL::Manifold id: 1
-DEAL::1.00000 3.28904e-15 -0.646447
+DEAL::1.00000 0 -0.646447
 DEAL::Manifold id: 1
-DEAL::0.500000 -5.55112e-17 -1.00000
+DEAL::0.500000 -0 -1.00000
 DEAL::Manifold id: 0
 DEAL::0.500000 0.00000 -0.292893
 DEAL::Manifold id: 1
-DEAL::Center with manifold: 0.500000 3.26822e-15 -0.646447
+DEAL::Center with manifold: 0.500000 0 -0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Distance between cell manifold and face manifold: 0.00000 1.11022e-16 -1.11022e-16
+DEAL::Distance between cell manifold and face manifold: 0.00000 0 -0
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: 0.500000 0.500000 -6.93889e-18
+DEAL::Lines on cell with center: 0.500000 0.500000 -0
 DEAL::0.500000 0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::0.500000 0.292893 -0.292893
@@ -793,34 +793,34 @@ DEAL::0.00000 0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::1.00000 0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::0.00000 1.00000 -5.55112e-17
+DEAL::0.00000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::0.00000 0.292893 6.93889e-18
+DEAL::0.00000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::1.00000 1.00000 -5.55112e-17
+DEAL::1.00000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::1.00000 0.292893 6.93889e-18
+DEAL::1.00000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: 0.500000 0.500000 -6.93889e-18
-DEAL::0.500000 1.00000 -5.55112e-17
+DEAL::Faces on cell with center: 0.500000 0.500000 -0
+DEAL::0.500000 1.00000 -0
 DEAL::Manifold id: 0
-DEAL::0.500000 0.292893 3.46945e-18
+DEAL::0.500000 0.292893 0
 DEAL::Manifold id: 1
-DEAL::0.00000 0.646447 -2.77556e-17
+DEAL::0.00000 0.646447 -0
 DEAL::Manifold id: 1
-DEAL::1.00000 0.646447 -2.77556e-17
+DEAL::1.00000 0.646447 -0
 DEAL::Manifold id: 1
 DEAL::0.500000 0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::0.500000 0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: 0.500000 0.646447 -2.77556e-17
+DEAL::Center with manifold: 0.500000 0.646447 -0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: 0.500000 0.00000 1.38778e-17
+DEAL::Lines on cell with center: 0.500000 0.00000 0
 DEAL::0.500000 0.292893 -0.292893
 DEAL::Manifold id: 1
 DEAL::0.500000 -0.292893 -0.292893
@@ -837,16 +837,16 @@ DEAL::0.00000 0.00000 0.292893
 DEAL::Manifold id: 1
 DEAL::1.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::0.00000 0.292893 6.93889e-18
+DEAL::0.00000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::0.00000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::1.00000 0.292893 6.93889e-18
+DEAL::1.00000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::1.00000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: 0.500000 0.00000 1.38778e-17
-DEAL::0.500000 0.292893 3.46945e-18
+DEAL::Faces on cell with center: 0.500000 0.00000 0
+DEAL::0.500000 0.292893 0
 DEAL::Manifold id: 1
 DEAL::0.500000 -0.292893 0.00000
 DEAL::Manifold id: 1
@@ -858,7 +858,7 @@ DEAL::0.500000 0.00000 -0.292893
 DEAL::Manifold id: 1
 DEAL::0.500000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::Center with manifold: 0.500000 0.00000 1.38778e-17
+DEAL::Center with manifold: 0.500000 0.00000 0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
@@ -867,9 +867,9 @@ DEAL::0.500000 -0.707107 -0.707107
 DEAL::Manifold id: 0
 DEAL::0.500000 -0.707107 0.707107
 DEAL::Manifold id: 0
-DEAL::0.00000 -1.00000 2.22045e-16
+DEAL::0.00000 -1.00000 0
 DEAL::Manifold id: 0
-DEAL::1.00000 -1.00000 2.22045e-16
+DEAL::1.00000 -1.00000 0
 DEAL::Manifold id: 0
 DEAL::0.500000 -0.292893 -0.292893
 DEAL::Manifold id: 1
@@ -892,21 +892,21 @@ DEAL::0.500000 -0.500000 -0.500000
 DEAL::Manifold id: 1
 DEAL::0.500000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::0.00000 -0.646447 -3.02536e-15
+DEAL::0.00000 -0.646447 -0
 DEAL::Manifold id: 1
-DEAL::1.00000 -0.646447 -3.02536e-15
+DEAL::1.00000 -0.646447 -0
 DEAL::Manifold id: 1
-DEAL::0.500000 -1.00000 2.22045e-16
+DEAL::0.500000 -1.00000 0
 DEAL::Manifold id: 0
 DEAL::0.500000 -0.292893 0.00000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: 0.500000 -0.646447 -2.92127e-15
+DEAL::Center with manifold: 0.500000 -0.646447 -0
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
-DEAL::Lines on cell with center: 0.500000 6.93889e-18 0.500000
+DEAL::Lines on cell with center: 0.500000 0 0.500000
 DEAL::0.500000 0.707107 0.707107
 DEAL::Manifold id: 0
 DEAL::0.500000 0.292893 0.292893
@@ -923,28 +923,28 @@ DEAL::0.00000 -0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::1.00000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::0.00000 1.66533e-16 1.00000
+DEAL::0.00000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::1.00000 1.66533e-16 1.00000
+DEAL::1.00000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::1.00000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::Faces on cell with center: 0.500000 6.93889e-18 0.500000
-DEAL::0.500000 4.99600e-16 1.00000
+DEAL::Faces on cell with center: 0.500000 0 0.500000
+DEAL::0.500000 0 1.00000
 DEAL::Manifold id: 0
 DEAL::0.500000 0.00000 0.292893
 DEAL::Manifold id: 1
-DEAL::0.00000 8.32667e-17 0.646447
+DEAL::0.00000 0 0.646447
 DEAL::Manifold id: 1
-DEAL::1.00000 8.32667e-17 0.646447
+DEAL::1.00000 0 0.646447
 DEAL::Manifold id: 1
 DEAL::0.500000 0.500000 0.500000
 DEAL::Manifold id: 1
 DEAL::0.500000 -0.500000 0.500000
 DEAL::Manifold id: 1
-DEAL::Center with manifold: 0.500000 2.77556e-16 0.646447
+DEAL::Center with manifold: 0.500000 0 0.646447
 DEAL::Manifold id: 1
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000
 DEAL::Distance between cell manifold and face manifold: 0.00000 0.00000 0.00000

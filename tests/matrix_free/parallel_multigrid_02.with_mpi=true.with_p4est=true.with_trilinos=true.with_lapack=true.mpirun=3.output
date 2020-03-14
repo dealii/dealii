@@ -61,7 +61,7 @@ DEAL:3d:cg:cg::Starting value 0.0006066
 DEAL:3d:cg:cg::Convergence step 1 value 0.000
 DEAL:3d:cg:cg::Starting value 3.469e-07
 DEAL:3d:cg:cg::Convergence step 1 value 0.000
-DEAL:3d:cg:cg::Starting value 5.798e-10
+DEAL:3d:cg:cg::Starting value 0
 DEAL:3d:cg:cg::Convergence step 1 value 0.000
 DEAL:3d:cg::Convergence step 4 value 5.998e-09
 DEAL:3d::Testing FE_Q<3>(2)

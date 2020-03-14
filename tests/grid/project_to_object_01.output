@@ -19,7 +19,7 @@ DEAL::
 DEAL::Project the convex combination of two vertices:
 DEAL::projected point:          1.98114 0.274025
 DEAL::Convex combination point: 1.98114 0.274025
-DEAL::Distance:                 5.55112e-17
+DEAL::Distance:                 0
 DEAL::
 DEAL::Check that projecting with spacedim == structdim
 DEAL::is the identity map:
@@ -71,7 +71,7 @@ DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point: -1.15464 -1.15473 -1.15473
 DEAL::trial point:     -1.15464 -1.15473 -1.15473
-DEAL::distance:        2.51280e-13
+DEAL::distance:        0
 DEAL::
 DEAL::Project a weighed face point onto the same face in 3D:
 DEAL::
@@ -127,7 +127,7 @@ DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point: -1.15467 -1.15472 -1.15472
 DEAL::trial point:     -1.15467 -1.15472 -1.15472
-DEAL::distance:        2.42045e-11
+DEAL::distance:        0
 DEAL::
 DEAL::Project a weighed face point onto the same face in 3D:
 DEAL::
@@ -183,7 +183,7 @@ DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point: -1.15469 -1.15471 -1.15471
 DEAL::trial point:     -1.15469 -1.15471 -1.15471
-DEAL::distance:        1.53899e-10
+DEAL::distance:        0
 DEAL::
 DEAL::Project a weighed face point onto the same face in 3D:
 DEAL::

@@ -5,18 +5,18 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::1.414 -0.2630 -1.110e-16 
-DEAL::-0.2630 1.877 2.220e-16 
-DEAL::-1.110e-16 2.220e-16 2.303 
+DEAL::1.414 -0.2630 -0 
+DEAL::-0.2630 1.877 0 
+DEAL::-0 0 2.303 
 DEAL::laplace_matrix:
 DEAL::0.000 0.000 0.000 
 DEAL::0.000 16.97 0.000 
 DEAL::0.000 0.000 16.97 
 DEAL::cell=1
 DEAL::mass_matrix:
-DEAL::1.000 3.464 -2.776e-17 
+DEAL::1.000 3.464 -0 
 DEAL::3.464 13.00 0.000 
-DEAL::-2.776e-17 0.000 1.000 
+DEAL::-0 0.000 1.000 
 DEAL::laplace_matrix:
 DEAL::0.000 0.000 0.000 
 DEAL::0.000 12.00 0.000 
@@ -27,10 +27,10 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::1.107 -0.03754 8.327e-17 -2.776e-17 
-DEAL::-0.03754 1.156 -1.665e-16 2.776e-17 
-DEAL::8.327e-17 -1.665e-16 1.204 1.388e-16 
-DEAL::-2.776e-17 2.776e-17 1.388e-16 1.204 
+DEAL::1.107 -0.03754 0 -0 
+DEAL::-0.03754 1.156 -0 0 
+DEAL::0 -0 1.204 0 
+DEAL::-0 0 0 1.204 
 DEAL::laplace_matrix:
 DEAL::0.000 0.000 0.000 0.000 
 DEAL::0.000 13.28 0.000 0.000 
@@ -38,10 +38,10 @@ DEAL::0.000 0.000 13.28 0.000
 DEAL::0.000 0.000 0.000 13.28 
 DEAL::cell=1
 DEAL::mass_matrix:
-DEAL::1.000 3.464 8.327e-17 -1.804e-16 
-DEAL::3.464 13.00 7.772e-16 -3.331e-16 
-DEAL::8.327e-17 7.772e-16 1.000 9.714e-17 
-DEAL::-1.804e-16 -3.331e-16 9.714e-17 1.000 
+DEAL::1.000 3.464 0 -0 
+DEAL::3.464 13.00 0 -0 
+DEAL::0 0 1.000 0 
+DEAL::-0 -0 0 1.000 
 DEAL::laplace_matrix:
 DEAL::0.000 0.000 0.000 0.000 
 DEAL::0.000 12.00 0.000 0.000 

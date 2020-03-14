@@ -22,7 +22,7 @@ DEAL::cell 0_1:0: -1.30000 vs reference -1.30000
 DEAL::cell 0_1:0: -1.00000 vs reference -1.00000
 DEAL::cell 0_1:0 pull-back: 0.500000
 DEAL::cell 0_1:1: -0.300000 vs reference -0.300000
-DEAL::cell 0_1:1: -2.08167e-17 vs reference 0.00000
+DEAL::cell 0_1:1: -0 vs reference 0.00000
 DEAL::cell 0_1:1 pull-back: 0.500000
 DEAL::
 DEAL::Testing degree 1 in 2D
@@ -36,7 +36,7 @@ DEAL::cell 2_0:: -0.675736 -0.487868 vs reference -0.675736 -0.487868
 DEAL::cell 2_0:: -0.500000 -0.400000 vs reference -0.500000 -0.400000
 DEAL::cell 2_0: pull-back: 0.500000 0.500000
 DEAL::cell 3_0:: 0.0621320 -0.737279 vs reference 0.0621320 -0.737279
-DEAL::cell 3_0:: -2.77556e-17 -0.400000 vs reference 0.00000 -0.400000
+DEAL::cell 3_0:: -0 -0.400000 vs reference 0.00000 -0.400000
 DEAL::cell 3_0: pull-back: 0.500000 0.500000
 DEAL::cell 4_0:: -0.687279 0.224264 vs reference -0.687279 0.224264
 DEAL::cell 4_0:: -0.500000 0.100000 vs reference -0.500000 0.100000

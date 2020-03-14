@@ -2,10 +2,10 @@
 DEAL::Preconditioners
 DEAL:Preconditioners::PreconditionChebyshev
 DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
-DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 9.930136613e-16
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0
 DEAL:Preconditioners::PreconditionIdentity
 DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
-DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 3.903187958e-15
+DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0
 DEAL:Preconditioners::PreconditionJacobi
 DEAL:Preconditioners:Exact inverse:cg::Starting value 16.88194302
 DEAL:Preconditioners:Exact inverse:cg::Convergence step 1 value 0.000000000
@@ -47,19 +47,19 @@ DEAL:Solvers:Linear operator:cg::Starting value 16.88194302
 DEAL:Solvers:Linear operator:cg::Convergence step 1 value 0.000000000
 DEAL:Solvers::SolverFGMRES
 DEAL:Solvers:Standard solver:FGMRES::Starting value 16.88194302
-DEAL:Solvers:Standard solver:FGMRES::Convergence step 1 value 3.696939525e-15
+DEAL:Solvers:Standard solver:FGMRES::Convergence step 1 value 0
 DEAL:Solvers:Linear operator:FGMRES::Starting value 16.88194302
-DEAL:Solvers:Linear operator:FGMRES::Convergence step 1 value 3.696939525e-15
+DEAL:Solvers:Linear operator:FGMRES::Convergence step 1 value 0
 DEAL:Solvers::SolverGMRES
 DEAL:Solvers:Standard solver:GMRES::Starting value 8.440971508
-DEAL:Solvers:Standard solver:GMRES::Convergence step 1 value 1.848469762e-15
+DEAL:Solvers:Standard solver:GMRES::Convergence step 1 value 0
 DEAL:Solvers:Linear operator:GMRES::Starting value 8.440971508
-DEAL:Solvers:Linear operator:GMRES::Convergence step 1 value 1.848469762e-15
+DEAL:Solvers:Linear operator:GMRES::Convergence step 1 value 0
 DEAL:Solvers::SolverMinRes
 DEAL:Solvers:Standard solver:minres::Starting value 11.93733639
-DEAL:Solvers:Standard solver:minres::Convergence step 1 value 2.059168646e-15
+DEAL:Solvers:Standard solver:minres::Convergence step 1 value 0
 DEAL:Solvers:Linear operator:minres::Starting value 11.93733639
-DEAL:Solvers:Linear operator:minres::Convergence step 1 value 2.059168646e-15
+DEAL:Solvers:Linear operator:minres::Convergence step 1 value 0
 DEAL:Solvers::SolverQMRS
 DEAL:Solvers:Standard solver:SQMR::Starting value 16.88194302
 DEAL:Solvers:Standard solver:SQMR::Convergence step 1 value 0.000000000

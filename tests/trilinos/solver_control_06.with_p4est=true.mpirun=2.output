@@ -1,16 +1,16 @@
 
-DEAL::Convergence step 1 value 2.94713e-13
-DEAL::Convergence step 1 value 2.94713e-13
-DEAL::Convergence step 1 value 2.43039e-16
-DEAL::Convergence step 1 value 2.37961e-13
-DEAL::Convergence step 1 value 1.29333e-16
-DEAL::Convergence step 1 value 2.59603e-16
-DEAL::Convergence step 12 value 8.50039e-13
-DEAL::Convergence step 12 value 8.50039e-13
-DEAL::Convergence step 7 value 1.94830e-14
-DEAL::Convergence step 12 value 8.42698e-13
-DEAL::Convergence step 7 value 5.55656e-13
-DEAL::Convergence step 7 value 2.07782e-14
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 1 value 0
+DEAL::Convergence step 12 value 0
+DEAL::Convergence step 12 value 0
+DEAL::Convergence step 7 value 0
+DEAL::Convergence step 12 value 0
+DEAL::Convergence step 7 value 0
+DEAL::Convergence step 7 value 0
 DEAL::		*******************************************************
 DEAL::		***** Problem: Epetra::CrsMatrix
 DEAL::		***** Preconditioned CG solution

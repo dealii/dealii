@@ -224,8 +224,8 @@ DEAL::Diff restrict     l1: 0.00000
 DEAL::Diff restrict add l1: 0.00000
 DEAL::Diff restrict     l2: 0.00000
 DEAL::Diff restrict add l2: 0.00000
-DEAL::Diff restrict     l3: 2.49702e-13
-DEAL::Diff restrict add l3: 2.50034e-13
+DEAL::Diff restrict     l3: 0
+DEAL::Diff restrict add l3: 0
 DEAL::
 DEAL::FE: FE_DGQ<2>(2)
 DEAL::no. cells: 16

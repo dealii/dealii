@@ -40,7 +40,7 @@ DEAL:BFGS::Gradient:
 DEAL:BFGS::Function value: -54.667 stepsize: 1.0000 new value: -55.000
 DEAL:BFGS::Change:
 -0.33333 -0.33333 0.00000 0.33333 0.33333 0.33333 0.33333 0.00000 -0.33333 -0.33333 
-DEAL:BFGS::Check 5	3.5572e-14
-DEAL:BFGS::Convergence step 5 value 3.5572e-14
+DEAL:BFGS::Check 5	0
+DEAL:BFGS::Convergence step 5 value 0
 DEAL::Limited memory BFGS solution:
 DEAL::5.0000 9.0000 12.000 14.000 15.000 15.000 14.000 12.000 9.0000 5.0000 

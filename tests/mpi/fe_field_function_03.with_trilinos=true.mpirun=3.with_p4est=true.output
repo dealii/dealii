@@ -8,13 +8,13 @@ DEAL:0::  OK: 2.10000
 DEAL:0::vector_value_list:
 DEAL:0::  OK: 2.10000
 DEAL:0::vector_gradient:
-DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::  OK: 1.00000 -0
 DEAL:0::gradient:
 DEAL:0::  OK: 1.00000
 DEAL:0::vector_gradient_list:
-DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::  OK: 1.00000 -0
 DEAL:0::gradient_list:
-DEAL:0::  OK: 1.00000 -3.55271e-15
+DEAL:0::  OK: 1.00000 -0
 DEAL:0::laplacian:
 DEAL:0::  OK: 0.00000
 DEAL:0::vector_laplacian:

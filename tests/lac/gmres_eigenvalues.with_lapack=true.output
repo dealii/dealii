@@ -9,7 +9,7 @@ DEAL:double:1:GMRES::Starting value 8.000000000
 DEAL:double:1:GMRES::Convergence step 5 value 5.324618648e-31
 DEAL:double:1:GMRES::Eigenvalue estimate:  (3.003000000,0.000000000) (4.004000000,0.000000000) (5.005000000,0.000000000) (6.006000000,0.000000000) (7.007000000,0.000000000)
 DEAL:double:1:cg::Starting value 8.000000000
-DEAL:double:1:cg::Convergence step 6 value 1.444358529e-17
+DEAL:double:1:cg::Convergence step 6 value 0
 DEAL:double:1:cg::Eigenvalue estimate:  3.003000000 4.004000000 5.005000000 6.006000000 7.007000000
 DEAL:double:2:GMRES::Starting value 8.000000000
 DEAL:double:2:GMRES::Convergence step 20 value 0.3551107715
