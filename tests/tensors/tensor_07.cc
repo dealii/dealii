@@ -76,9 +76,7 @@ test_unequal()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test_constant<2>();
   test_constant<3>();

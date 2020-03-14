@@ -68,9 +68,8 @@ inv(t2)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   deallog << "Symmetric Tensor dim 1" << std::endl;
   SymmetricTensor<2, 1> t1;

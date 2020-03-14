@@ -70,10 +70,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(2);
-      logfile << std::setprecision(2);
-      deallog.attach(logfile);
 
       test<1>();
       test<2>();

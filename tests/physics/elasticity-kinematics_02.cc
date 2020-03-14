@@ -32,9 +32,8 @@ using namespace dealii::Physics::Elasticity;
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const int dim = 3;
 
@@ -104,5 +103,4 @@ main()
           deallog << "Not OK" << std::endl;
 
   deallog << "OK" << std::endl;
-  logfile.close();
 }

@@ -27,10 +27,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(3) << std::fixed;
 
   SparseMatrixEZ<double> ez(5, 4);
   ez.set(0, 0, 2.);
@@ -51,5 +49,5 @@ main()
           << std::endl;
   FullMatrix<float> ff;
   ff.copy_transposed(ez);
-  ff.print_formatted(logfile, 0, false, 5, "~");
+  ff.print_formatted(deallog.get_file_stream(), 0, false, 5, "~");
 }

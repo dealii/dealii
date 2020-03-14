@@ -35,10 +35,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
 
   const unsigned int dim = 2;
   Triangulation<dim> tria;

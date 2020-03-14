@@ -40,8 +40,7 @@ check_q_dg0(const Function<dim> &f, const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   Q1WedgeFunction<1, 1> w1;
   check_q_dg0(w1, 1);

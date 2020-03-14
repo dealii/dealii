@@ -134,9 +134,8 @@ check(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 2));

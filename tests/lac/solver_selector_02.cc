@@ -73,9 +73,8 @@ check(const MatrixType &A, const VectorType &f)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   unsigned int size = 37;
   unsigned int dim  = (size - 1) * (size - 1);

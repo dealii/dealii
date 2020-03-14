@@ -112,9 +112,8 @@ check_solve(SolverType &        solver,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   SolverControl solver_control(100, 1.e-3);
 

@@ -411,9 +411,8 @@ main(int argc, char **argv)
 
   static const int dim = 2;
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(10);
-  deallog.attach(logfile);
   for (unsigned int n_global_refines = 3; n_global_refines < 6;
        ++n_global_refines)
     {

@@ -130,10 +130,8 @@ test_hyper_cube(const double tolerance)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   test_hyper_cube<2>(1e-6);
   test_hyper_cube<3>(1e-6);

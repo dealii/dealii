@@ -78,8 +78,7 @@ main(int argc, char *argv[])
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      static std::ofstream logfile("output");
-      deallog.attach(logfile);
+      static initlog();
     }
 
   parallel::distributed::Triangulation<2, 3> triangulation(

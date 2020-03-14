@@ -106,10 +106,8 @@ plot_FE_Bernstein_shape_functions()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(8);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(8) << std::fixed;
 
   deallog.push("1d");
   plot_FE_Bernstein_shape_functions<1>();

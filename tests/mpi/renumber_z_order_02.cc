@@ -140,8 +140,7 @@ main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
 
       deallog.push("2d");
       test<2>();

@@ -51,8 +51,7 @@ save_mesh(const Triangulation<dim, spacedim> &tria)
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // Extract the boundary of 3/4 of a sphere
   {

@@ -201,9 +201,8 @@ check_block(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   std::vector<double> factors;
 

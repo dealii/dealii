@@ -37,9 +37,8 @@ test_tensor()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   test_tensor<1>();
   test_tensor<2>();

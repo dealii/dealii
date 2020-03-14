@@ -25,9 +25,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const unsigned int      dim = 3;
   SymmetricTensor<2, dim> t;

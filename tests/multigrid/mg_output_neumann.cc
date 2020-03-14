@@ -288,9 +288,8 @@ check_simple(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // check_simple (FESystem<2>(FE_Q<2>(1), 2));
   check_simple(FESystem<2>(FE_Q<2>(1), 4));

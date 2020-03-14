@@ -65,9 +65,8 @@ test(const NumberType a, const NumberType b)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(6);
-  deallog.attach(logfile);
 
   deallog << "Residuals:" << std::endl;
   // check all combinations with real solutions: |f| > |g|

@@ -780,9 +780,8 @@ namespace Step18
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   try
     {

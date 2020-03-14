@@ -64,8 +64,7 @@ test()
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test();
 }

@@ -205,9 +205,8 @@ test_kinematic_tensors()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   test_kinematic_tensors<2>();
   test_kinematic_tensors<3>();

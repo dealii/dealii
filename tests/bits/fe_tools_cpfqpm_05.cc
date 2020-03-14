@@ -177,9 +177,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(8);
-      deallog.attach(logfile);
       deallog.depth_console(0);
 
       CHECK_ALL(Q, 1, Q, 1);

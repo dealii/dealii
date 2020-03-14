@@ -95,9 +95,8 @@ normalise(const Point<3> &p)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const double deg_to_rad = numbers::PI / 180.0;
 

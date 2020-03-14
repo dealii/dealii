@@ -43,9 +43,8 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());

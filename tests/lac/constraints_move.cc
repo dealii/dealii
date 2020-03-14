@@ -22,10 +22,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2);
 
   AffineConstraints<double> constraints;
   unsigned int              IDs[]  = {1, 2, 3, 5, 8, 13, 21};

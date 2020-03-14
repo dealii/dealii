@@ -84,7 +84,7 @@ laplace_solve(const SparseMatrix<double> &          S,
 // create a rinf grid and compute a MappingQEuler to represent the inner
 // boundary
 void
-curved_grid(std::ofstream &out)
+curved_grid(std::ostream &out)
 {
   // number of cells in radial and
   // circumferential direction
@@ -251,10 +251,8 @@ curved_grid(std::ofstream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
-  curved_grid(logfile);
+  curved_grid(deallog.get_file_stream());
 }

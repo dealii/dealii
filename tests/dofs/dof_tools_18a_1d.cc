@@ -119,10 +119,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
-      logfile << std::setprecision(2);
+      initlog();
       deallog << std::setprecision(2);
-      deallog.attach(logfile);
 
       check_this();
       return 0;

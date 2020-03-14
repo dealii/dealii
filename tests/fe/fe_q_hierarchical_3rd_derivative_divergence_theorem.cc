@@ -180,10 +180,8 @@ test_hyper_ball(const double tolerance)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(8);
-
-  deallog.attach(logfile);
 
   test_hyper_ball<2>(1e-6);
   test_hyper_ball<3>(1e-6);
