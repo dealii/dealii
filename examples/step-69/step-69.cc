@@ -2064,9 +2064,11 @@ namespace Step69
 
       // This is a good point to verify that the computed
       // <code>tau_max</code> is indeed a valid floating point number.
-      AssertThrow(!std::isnan(tau_max) && !std::isinf(tau_max) && tau_max > 0.,
-                  ExcMessage("I'm sorry, Dave. I'm afraid I can't "
-                             "do that. - We crashed."));
+      AssertThrow(
+        !std::isnan(tau_max.load()) && !std::isinf(tau_max.load()) &&
+          tau_max.load() > 0.,
+        ExcMessage(
+          "I'm sorry, Dave. I'm afraid I can't do that. - We crashed."));
     }
 
     // <b>Step 3</b>: Perform update.
