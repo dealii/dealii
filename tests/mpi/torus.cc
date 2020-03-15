@@ -76,11 +76,6 @@ main(int argc, char *argv[])
     argc, argv, testing_max_num_threads());
   MPILogInitAll log;
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      static initlog();
-    }
-
   parallel::distributed::Triangulation<2, 3> triangulation(
     MPI_COMM_WORLD,
     typename Triangulation<2, 3>::MeshSmoothing(
