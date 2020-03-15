@@ -41,7 +41,7 @@ namespace internal
     //    n_q_points=fe_degree+1.
     // 4. If the current assumption on n_q_points_1d doesn't match the runtime
     //    parameter, increase n_q_points_1d by one and try again.
-    //    If n_q_points_1d==degree+3 use the class Default which serves as a
+    //    If n_q_points_1d==degree+5 use the class Default which serves as a
     //    fallback.
 
     /**
@@ -148,7 +148,7 @@ namespace internal
                    1,
                    degree,
                    n_q_points_1d,
-                   typename std::enable_if<n_q_points_1d == degree + 3>::type>
+                   typename std::enable_if<n_q_points_1d == degree + 5>::type>
       : Default<dim, n_components, Number>
     {};
 
@@ -251,7 +251,7 @@ namespace internal
                    1,
                    degree,
                    n_q_points_1d,
-                   typename std::enable_if<(n_q_points_1d < degree + 3)>::type>
+                   typename std::enable_if<(n_q_points_1d < degree + 5)>::type>
     {
       /**
        * We enable a transformation to collocation for derivatives if it gives
@@ -485,7 +485,7 @@ namespace internal
  * Otherwise, we perform a runtime matching of the runtime parameters to find
  * the correct specialization. This matching currently supports
  * $0\leq fe\_degree \leq 9$ and $degree+1\leq n\_q\_points\_1d\leq
- * fe\_degree+2$.
+ * fe\_degree+4$.
  */
 template <int dim,
           int fe_degree,
@@ -548,7 +548,7 @@ struct SelectEvaluator
  * the relevant runtime parameters.
  * In case these parameters do not satisfy
  * $0\leq fe\_degree \leq 9$ and
- * $degree+1\leq n\_q\_points\_1d\leq fe\_degree+2$, a non-optimized fallback
+ * $degree+1\leq n\_q\_points\_1d\leq fe\_degree+4$, a non-optimized fallback
  * is used.
  */
 template <int dim, int n_q_points_1d, int n_components, typename Number>
