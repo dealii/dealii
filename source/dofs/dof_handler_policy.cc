@@ -366,7 +366,14 @@ namespace internal
                   for (unsigned int d = 0;
                        d < dof_handler.get_fe().dofs_per_quad;
                        ++d)
-                    quad->set_dof_index(d, next_free_dof++);
+                    quad->set_dof_index(
+                      dof_handler.get_fe()
+                        .adjust_quad_dof_index_for_face_orientation(
+                          d,
+                          cell->face_orientation(q),
+                          cell->face_flip(q),
+                          cell->face_rotation(q)),
+                      next_free_dof++);
               }
 
 
@@ -546,7 +553,14 @@ namespace internal
                 if (quad->dof_index(0, fe_index) == numbers::invalid_dof_index)
                   for (unsigned int d = 0; d < fe.dofs_per_quad;
                        ++d, ++next_free_dof)
-                    quad->set_dof_index(d, next_free_dof, fe_index);
+                    quad->set_dof_index(
+                      fe.adjust_quad_dof_index_for_face_orientation(
+                        d,
+                        cell->face_orientation(q),
+                        cell->face_flip(q),
+                        cell->face_rotation(q)),
+                      next_free_dof,
+                      fe_index);
               }
 
 
