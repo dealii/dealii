@@ -780,6 +780,14 @@ operator<<(LogStream &out, const std::vector<std::uint64_t> &v)
 }
 
 LogStream &
+operator<<(LogStream &out, const std::vector<unsigned long long> &v)
+{
+  for (std::size_t i = 0; i < v.size(); ++i)
+    out << v[i] << (i == v.size() - 1 ? "" : " ");
+  return out;
+}
+
+LogStream &
 operator<<(LogStream &out, const std::vector<double> &v)
 {
   for (std::size_t i = 0; i < v.size(); ++i)
