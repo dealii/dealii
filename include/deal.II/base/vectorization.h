@@ -101,9 +101,21 @@ public:
    * @param lane A pointer to the current lane.
    */
   VectorizedArrayIterator(T &data, const unsigned int lane)
-    : data(data)
+    : data(&data)
     , lane(lane)
   {}
+
+  /**
+   * Compare for equality.
+   */
+  bool
+  operator==(const VectorizedArrayIterator<T> &other) const
+  {
+    Assert(this->data == other.data,
+           ExcMessage(
+             "You are trying to compare iterators into different arrays."));
+    return this->lane == other.lane;
+  }
 
   /**
    * Compare for inequality.
@@ -111,8 +123,17 @@ public:
   bool
   operator!=(const VectorizedArrayIterator<T> &other) const
   {
+    Assert(this->data == other.data,
+           ExcMessage(
+             "You are trying to compare iterators into different arrays."));
     return this->lane != other.lane;
   }
+
+  /**
+   * Copy assignment.
+   */
+  VectorizedArrayIterator<T> &
+  operator=(const VectorizedArrayIterator<T> &other) = default;
 
   /**
    * Dereferencing operator (const version): returns the value of the current
@@ -120,7 +141,7 @@ public:
    */
   const typename T::value_type &operator*() const
   {
-    return data[lane];
+    return (*data)[lane];
   }
 
 
@@ -133,7 +154,7 @@ public:
                           typename T::value_type>::type &
   operator*()
   {
-    return data[lane];
+    return (*data)[lane];
   }
 
   /**
@@ -150,9 +171,9 @@ public:
 
 private:
   /**
-   * Reference to the actual VectorizedArray.
+   * Pointer to the actual VectorizedArray.
    */
-  T &data;
+  T *data;
 
   /**
    * Pointer to the current lane.
