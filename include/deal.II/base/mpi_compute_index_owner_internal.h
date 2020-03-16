@@ -649,7 +649,7 @@ namespace Utilities
             std::vector<unsigned int> &request_buffer) override
           {
             unsigned int owner_index = 0;
-            for (const auto interval : buffer_recv)
+            for (const auto &interval : buffer_recv)
               for (auto i = interval.first; i < interval.second; ++i)
                 {
                   const unsigned int actual_owner =
