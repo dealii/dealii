@@ -94,9 +94,24 @@ namespace internal
       tensor_symmetric_plus_dg0 = 5
     };
 
+
+
+    /**
+     * This struct stores the shape functions, their gradients and Hessians
+     * evaluated for a one-dimensional section of a tensor product finite
+     * element and tensor product quadrature formula in reference
+     * coordinates. This data structure also includes the evaluation of
+     * quantities at the cell boundary and on the sub-interval $(0, 0.5)$ and
+     * $(0.5, 1)$ for face integrals.
+     *
+     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
+     */
     template <typename Number>
     struct UnivariateShapeData
     {
+      /**
+       * Empty constructor. Sets default configuration.
+       */
       UnivariateShapeData();
 
       /**
@@ -260,14 +275,16 @@ namespace internal
 
 
     /**
-     * The class that stores the shape functions, gradients and Hessians
-     * evaluated for a tensor product finite element and tensor product
-     * quadrature formula on the unit cell. Because of this structure, only
-     * one-dimensional data is stored.
+     * This struct stores a tensor (Kronecker) product view of the finite
+     * element and quadrature formula used for evaluation. It is based on a
+     * single or a collection of UnivariateShapeData object(s) that describe
+     * one-dimensional ingredients, plus some additional information about how
+     * these are combined and how indices are laid out in the multi-dimensional
+     * case such as the hierarchical -> lexicographic ordering of FE_Q.
      *
      * @ingroup matrixfree
      *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
+     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
     struct ShapeInfo

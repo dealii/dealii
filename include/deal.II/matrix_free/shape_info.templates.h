@@ -42,9 +42,6 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    // ----------------- actual UnivariateShapeData functions
-    // --------------------
-
     template <typename Number>
     UnivariateShapeData<Number>::UnivariateShapeData()
       : element_type(tensor_general)
@@ -52,6 +49,7 @@ namespace internal
       , n_q_points_1d(0)
       , nodal_at_cell_boundaries(false)
     {}
+
 
 
     // ----------------- actual ShapeInfo functions --------------------
