@@ -6835,7 +6835,7 @@ namespace DataOutBase
 
     // first write tokens indicating the template parameters. we need this in
     // here because we may want to read in data again even if we don't know in
-    // advance the template parameters, see step-19
+    // advance the template parameters:
     out << dim << ' ' << spacedim << '\n';
 
     // then write a header

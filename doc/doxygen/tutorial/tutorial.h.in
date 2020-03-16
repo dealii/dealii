@@ -241,12 +241,6 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-19</td>
- *       <td> Input parameter file handling. Merging
- *       output of a parallel program.
- *       </td></tr>
- *
- *   <tr valign="top">
  *       <td>step-20</td>
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
@@ -630,7 +624,6 @@
  *     <td>
  *       step-17,
  *       step-18,
- *       step-19,
  *       step-40,
  *       step-55
  *     </td>
@@ -679,7 +672,6 @@
  *     <td> Input parameter handling
  *     </td>
  *     <td>
- *       step-19,
  *       step-28,
  *       step-29,
  *       step-32,
