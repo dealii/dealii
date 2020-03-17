@@ -757,35 +757,13 @@ struct SetGrainSizes
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*
- * Do not use a template here to work around an overload resolution issue with
- * clang and enabled  C++11 mode.
- *
- * - Maier 2013
- */
+template <class T>
 LogStream &
-operator<<(LogStream &out, const std::vector<unsigned int> &v)
+operator<<(LogStream &out, const std::vector<T> &v)
 {
   for (std::size_t i = 0; i < v.size(); ++i)
     out << v[i] << (i == v.size() - 1 ? "" : " ");
   return out;
 }
-
-LogStream &
-operator<<(LogStream &out, const std::vector<std::uint64_t> &v)
-{
-  for (std::size_t i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
-LogStream &
-operator<<(LogStream &out, const std::vector<double> &v)
-{
-  for (std::size_t i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
 
 #endif // dealii_tests_h
