@@ -729,13 +729,17 @@ CHECK_CXX_SOURCE_COMPILES(
 # As long as there exists an argument value such that an invocation of the
 # function or constructor could be an evaluated subexpression of a core constant
 # expression, C++14 allows to call non-constexpr functions from constexpr
-# functions. Unfortunately, not all compilers obey the standard in this regard.
+# functions.
 #
-# In some cases, MSVC 2019 crashes with an internal compiler error when we
+# Only run this check if we have CXX14 support, otherwise the use of constexpr
+# is limited (non-const constexp functions for example).
+#
+# Unfortunately, not all compilers obey the standard in this regard. In some
+# cases, MSVC 2019 crashes with an internal compiler error when we
 # declare the respective functions as 'constexpr' even though the test below
 # passes, see #9080.
 #
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #define Assert(x,y) if (!(x)) throw y;
