@@ -486,8 +486,7 @@ namespace Utilities
   constexpr unsigned int
   pow(const unsigned int base, const int iexp)
   {
-#if defined(DEBUG) && defined(DEAL_II_WITH_CXX14) && \
-  defined(DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_CXX14_CONSTEXPR)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))

@@ -70,7 +70,7 @@ namespace Physics
        * matrix, then this simply corresponds to the identity matrix.
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<2, dim> I
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = unit_symmetric_tensor<dim>()
 #endif
         ;
@@ -103,7 +103,7 @@ namespace Physics
        * operator.
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> S
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = identity_tensor<dim>()
 #endif
         ;
@@ -119,7 +119,7 @@ namespace Physics
        * @f]
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> IxI
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = outer_product(unit_symmetric_tensor<dim>(),
                         unit_symmetric_tensor<dim>())
 #endif
@@ -169,7 +169,7 @@ namespace Physics
        * @dealiiHolzapfelA{232,6.105}
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> dev_P
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = deviator_tensor<dim>()
 #endif
         ;
