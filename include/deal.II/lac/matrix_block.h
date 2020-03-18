@@ -130,7 +130,7 @@ public:
   /**
    * Copy constructor.
    */
-  MatrixBlock(const MatrixBlock<MatrixType> &M);
+  MatrixBlock(const MatrixBlock<MatrixType> &M) = default;
 
   /**
    * Assignment operator.
@@ -641,17 +641,6 @@ template <typename MatrixType>
 inline MatrixBlock<MatrixType>::MatrixBlock()
   : row(numbers::invalid_size_type)
   , column(numbers::invalid_size_type)
-{}
-
-
-template <typename MatrixType>
-inline MatrixBlock<MatrixType>::MatrixBlock(const MatrixBlock<MatrixType> &M)
-  : Subscriptor()
-  , row(M.row)
-  , column(M.column)
-  , matrix(M.matrix)
-  , row_indices(M.row_indices)
-  , column_indices(M.column_indices)
 {}
 
 
