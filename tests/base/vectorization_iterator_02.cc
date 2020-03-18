@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test for std::max_element on VectorizedArray
+// test for std::max_element and std::distance on VectorizedArray
 
 #include <deal.II/base/vectorization.h>
 
@@ -27,6 +27,14 @@ test_const(const VectorizedArray<Number> &vector)
 {
   AssertDimension(*std::max_element(vector.begin(), vector.end()),
                   VectorizedArray<Number>::n_array_elements - 1);
+  AssertDimension(std::distance(vector.begin(),
+                                std::max_element(vector.begin(), vector.end())),
+                  VectorizedArray<Number>::n_array_elements - 1);
+  AssertDimension(std::distance(vector.begin(),
+                                vector.begin() +
+                                  (VectorizedArray<Number>::n_array_elements -
+                                   1)),
+                  VectorizedArray<Number>::n_array_elements - 1);
 }
 
 template <typename Number>
@@ -34,6 +42,14 @@ void
 test_nonconst(VectorizedArray<Number> &vector)
 {
   AssertDimension(*std::max_element(vector.begin(), vector.end()),
+                  VectorizedArray<Number>::n_array_elements - 1);
+  AssertDimension(std::distance(vector.begin(),
+                                std::max_element(vector.begin(), vector.end())),
+                  VectorizedArray<Number>::n_array_elements - 1);
+  AssertDimension(std::distance(vector.begin(),
+                                vector.begin() +
+                                  (VectorizedArray<Number>::n_array_elements -
+                                   1)),
                   VectorizedArray<Number>::n_array_elements - 1);
 }
 
