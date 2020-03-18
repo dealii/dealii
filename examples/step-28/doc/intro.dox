@@ -633,7 +633,7 @@ cheaper than if we omitted this step. After doing so, we resume our eigenvalue
 iterations on the next set of meshes.
 
 The program is controlled by a parameter file, using the ParameterHandler
-class already mentioned in the step-19 example program. We will show a
+class. We will show a
 parameter file in the results section of this tutorial. For the moment suffice
 it to say that it controls the polynomial degree of the finite elements used,
 the number of energy groups (even though all that is presently implemented are

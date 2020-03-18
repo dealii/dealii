@@ -24,10 +24,10 @@ element fields for discretizing each one of them. Basically this amounts to
 viewing a single complex valued equation as a system of two real valued
 equations. This short example demonstrates how this can be implemented in
 deal.II by using an <code>FE_system</code> object to stack two finite element
-fields representing real and imaginary parts. We also revisit the
-ParameterHandler class first used in step-19, which provides a
-convenient way for reading parameters from a configuration file at runtime
-without the need to recompile the program code.
+fields representing real and imaginary parts. We also discuss the
+ParameterHandler class, which provides a convenient way for reading parameters
+from a configuration file at runtime without the need to recompile the
+program code.
 
 The equations covered here fall into the class of vector-valued problems. A
 top level overview of this topic can be found in the @ref vector_valued module.

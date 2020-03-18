@@ -126,7 +126,7 @@ namespace Step35
 
     // In the constructor of this class we declare all the parameters. The
     // details of how this works have been discussed elsewhere, for example in
-    // step-19 and step-29.
+    // step-29.
     Data_Storage::Data_Storage()
       : form(Method::rotational)
       , dt(5e-4)
