@@ -3216,8 +3216,6 @@ public:
    *
    * This function will fail if either this or the other object did not yet
    * set up any patches.
-   *
-   * The use of this function is demonstrated in step-19.
    */
   void
   merge(const DataOutReader<dim, spacedim> &other);
