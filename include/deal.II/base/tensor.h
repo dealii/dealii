@@ -93,6 +93,9 @@ template <int dim, typename Number>
 class Tensor<0, dim, Number>
 {
 public:
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
+
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -414,6 +417,10 @@ template <int rank_, int dim, typename Number>
 class Tensor
 {
 public:
+  static_assert(rank_ >= 0,
+                "Tensors must have a rank greater than or equal to one.");
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
