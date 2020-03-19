@@ -774,7 +774,6 @@ namespace internal
     void
     TaskInfo ::create_blocks_serial(
       const std::vector<unsigned int> &boundary_cells,
-      const std::vector<unsigned int> &cells_close_to_boundary,
       const unsigned int               dofs_per_cell,
       const std::vector<unsigned int> &cell_vectorization_categories,
       const bool                       cell_vectorization_categories_strict,
@@ -813,14 +812,7 @@ namespace internal
             ((n_active_cells - n_boundary_cells) / 2 / vectorization_length) *
             vectorization_length;
           unsigned int count = 0;
-          for (const unsigned int cell : cells_close_to_boundary)
-            if (cell_marked[cell] == 0)
-              {
-                cell_marked[cell] = count < n_second_slot ? 1 : 3;
-                ++count;
-              }
-
-          unsigned int c = 0;
+          unsigned int c     = 0;
           for (; c < n_active_cells && count < n_second_slot; ++c)
             if (cell_marked[c] == 0)
               {
@@ -877,15 +869,8 @@ namespace internal
           incompletely_filled_vectorization.resize(
             incompletely_filled_vectorization.size() + 4 * n_categories);
         }
-      else if (cells_close_to_boundary.empty())
-        tight_category_map.resize(n_active_cells + n_ghost_cells, 0);
       else
-        {
-          n_categories = 2;
-          tight_category_map.resize(n_active_cells + n_ghost_cells, 1);
-          for (const unsigned int cell : cells_close_to_boundary)
-            tight_category_map[cell] = 0;
-        }
+        tight_category_map.resize(n_active_cells + n_ghost_cells, 0);
 
       cell_partition_data.clear();
       cell_partition_data.resize(1, 0);
