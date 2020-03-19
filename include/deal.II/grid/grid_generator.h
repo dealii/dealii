@@ -1547,11 +1547,10 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   merge_triangulations(
-    const std::initializer_list<const Triangulation<dim, spacedim> *const>
-      &                           triangulations,
-    Triangulation<dim, spacedim> &result,
-    const double                  duplicated_vertex_tolerance = 1.0e-12,
-    const bool                    copy_manifold_ids           = false);
+    const std::vector<const Triangulation<dim, spacedim> *> &triangulations,
+    Triangulation<dim, spacedim> &                           result,
+    const double duplicated_vertex_tolerance = 1.0e-12,
+    const bool   copy_manifold_ids           = false);
 
   /**
    * \brief Replicate a given triangulation in multiple coordinate axes

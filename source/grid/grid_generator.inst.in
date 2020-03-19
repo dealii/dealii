@@ -80,9 +80,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
       template void
       merge_triangulations(
-        const std::initializer_list<
-          const Triangulation<deal_II_dimension, deal_II_space_dimension>
-            *const> &,
+        const std::vector<
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> *> &,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const double,
         const bool);
