@@ -63,11 +63,17 @@ namespace Differentiation
 // overload resolution of operator* and related contraction variants.
 template <int dim, typename Number>
 class Tensor<-2, dim, Number>
-{};
+{
+public:
+  Tensor() = delete;
+};
 
 template <int dim, typename Number>
 class Tensor<-1, dim, Number>
-{};
+{
+public:
+  Tensor() = delete;
+};
 #endif /* DOXYGEN */
 
 
