@@ -51,7 +51,7 @@ namespace internal
       return a;
     }
 
-    template <typename Number, int width>
+    template <typename Number, std::size_t width>
     Number
     get_first_array_element(const VectorizedArray<Number, width> a)
     {
