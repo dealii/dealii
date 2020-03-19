@@ -23,7 +23,7 @@
 #
 #   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#   DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#   DEAL_II_HAVE_CXX14_CONSTEXPR
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
@@ -580,7 +580,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+  DEAL_II_HAVE_CXX14_CONSTEXPR
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   )
@@ -726,6 +726,8 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 
 #
+# Check for correct c++14 constexpr support.
+#
 # As long as there exists an argument value such that an invocation of the
 # function or constructor could be an evaluated subexpression of a core constant
 # expression, C++14 allows to call non-constexpr functions from constexpr
@@ -738,7 +740,6 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # We only run this check if we have CXX14 support, otherwise the use of constexpr
 # is limited (non-const constexpr functions for example).
-#
 #
 IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   CHECK_CXX_SOURCE_COMPILES(
@@ -762,7 +763,7 @@ IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       return n;
     }
     "
-    DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+    DEAL_II_HAVE_CXX14_CONSTEXPR)
 ENDIF()
 
 #
@@ -771,7 +772,7 @@ ENDIF()
 # functions. This requirement is probabely very conservative in most cases, but
 # it will prevent breaking builds with certain compilers.
 #
-IF (DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+IF (DEAL_II_HAVE_CXX14_CONSTEXPR)
   SET(DEAL_II_CONSTEXPR "constexpr")
 ELSE()
   SET(DEAL_II_CONSTEXPR " ")
