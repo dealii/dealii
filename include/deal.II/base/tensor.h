@@ -58,18 +58,6 @@ namespace Differentiation
 } // namespace Differentiation
 #endif
 
-#ifndef DOXYGEN
-// Overload invalid tensor types of negative rank that come up during
-// overload resolution of operator* and related contraction variants.
-template <int dim, typename Number>
-class Tensor<-2, dim, Number>
-{};
-
-template <int dim, typename Number>
-class Tensor<-1, dim, Number>
-{};
-#endif /* DOXYGEN */
-
 
 /**
  * This class is a specialized version of the <tt>Tensor<rank,dim,Number></tt>
@@ -2010,7 +1998,8 @@ template <int rank_1,
           int rank_2,
           int dim,
           typename Number,
-          typename OtherNumber>
+          typename OtherNumber,
+          typename = typename std::enable_if<rank_1 >= 1 && rank_2 >= 1>::type>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
