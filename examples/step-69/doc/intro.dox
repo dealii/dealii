@@ -194,7 +194,7 @@ shockless regime and similarly benign situations.
 However, in the transonic and supersonic regime, and shock-hydrodynamics
 applications the use of variational schemes might be questionable. In fact,
 at the time of this writing, most shock-hydrodynamics codes are still
-firmly grounded on finite volumes methods. The main reason for failure of
+firmly grounded on finite volume methods. The main reason for failure of
 variational schemes in such extreme regimes is the lack of pointwise
 stability. This stems from the fact that <i>a priori</i> bounds on
 integrated quantities (e.g. integrals of moments) have in general no
@@ -216,7 +216,7 @@ works on any mesh, in any space dimension, and is theoretically guaranteed
 to always work, all the time, no exception. This illustrates that deal.II
 can be used far beyond the context of variational schemes in Hilbert spaces
 and that a large number of classes, modules and namespaces from deal.II can
-be adapted for such purpose.
+be adapted for such a purpose.
 
 
 <h3>Description of the scheme </h3>
@@ -368,7 +368,7 @@ application of this kind of schemes, also called <i>edge-based</i> or
 <i>graph-based</i> finite element schemes (see for instance
 @cite Rainald2008 for a historical overview). However, it is important to
 highlight that the algebraic structure of the scheme (presented in this
-tutorial) and the node-loops are not just performance gimmick. Actually, the
+tutorial) and the node-loops are not just a performance gimmick. Actually, the
 structure of this scheme was born out of theoretical necessity: the proof of
 pointwise stability of the scheme hinges on the specific algebraic structure of
 the scheme. In addition, it is not possible to compute the algebraic
