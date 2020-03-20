@@ -51,6 +51,10 @@ test_nonconst(VectorizedArray<Number> &vector)
                                   (VectorizedArray<Number>::n_array_elements -
                                    1)),
                   VectorizedArray<Number>::n_array_elements - 1);
+
+  auto it = vector.begin();
+  std::advance(it, VectorizedArray<Number>::n_array_elements - 1);
+  AssertDimension(*it, VectorizedArray<Number>::n_array_elements - 1);
 }
 
 template <typename Number>

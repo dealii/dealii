@@ -141,6 +141,7 @@ public:
    */
   const typename T::value_type &operator*() const
   {
+    AssertIndexRange(lane, T::size());
     return (*data)[lane];
   }
 
@@ -154,6 +155,7 @@ public:
                           typename T::value_type>::type &
   operator*()
   {
+    AssertIndexRange(lane, T::size());
     return (*data)[lane];
   }
 
@@ -165,7 +167,36 @@ public:
   VectorizedArrayIterator<T> &
   operator++()
   {
+    AssertIndexRange(lane + 1, T::size() + 1);
     lane++;
+    return *this;
+  }
+
+  /**
+   * This operator advances the iterator by @p offet lanes and returns a
+   * reference to <tt>*this</tt>.
+   */
+  VectorizedArrayIterator<T> &
+  operator+=(const unsigned int offset)
+  {
+    AssertIndexRange(lane + offset, T::size() + 1);
+    lane += offset;
+    return *this;
+  }
+
+  /**
+   * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator advances
+   * the iterator to the previous lane and returns a reference to
+   * <tt>*this</tt>.
+   */
+  VectorizedArrayIterator<T> &
+  operator--()
+  {
+    Assert(
+      lane > 0,
+      ExcMessage(
+        "You can't decrement an iterator that is already at the beginning of the range."));
+    --lane;
     return *this;
   }
 
@@ -173,8 +204,9 @@ public:
    * Create new iterator, which is shifted by @p offset.
    */
   VectorizedArrayIterator<T>
-  operator+(const unsigned int &offset) const
+  operator+(const unsigned int offset) const
   {
+    AssertIndexRange(lane + offset, T::size() + 1);
     return VectorizedArrayIterator<T>(*data, lane + offset);
   }
 
