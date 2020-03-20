@@ -139,7 +139,7 @@ namespace Step69
   // initialize everything that does not depend on parameters in the
   // constructor, and defer the creation of the mesh to the
   // <code>setup()</code> method that can be called once all parameters are
-  // read-in via ParameterAcceptor::initialize().
+  // read in via ParameterAcceptor::initialize().
   template <int dim>
   class Discretization : public ParameterAcceptor
   {
@@ -180,7 +180,7 @@ namespace Step69
   // members of <code>OfflineData</code> have well-defined values
   // independent of the current time step. This means that they can be
   // initialized ahead of time (at <i>time step zero</i>) and are not meant
-  // to be modified at any other later time step. For instance, the
+  // to be modified at any later time step. For instance, the
   // sparsity pattern should not change as we advance in time (we are not
   // doing any form of adaptivity in space). Similarly, the entries of the
   // lumped mass matrix should not be modified as we advance in time
@@ -190,7 +190,7 @@ namespace Step69
   // contains a map from a global index of type types::global_dof_index of
   // a boundary degree of freedom to a tuple consisting of a normal vector,
   // the boundary id, and the position associated with the degree of
-  // freedom. We actually have to compute and store this geometric
+  // freedom. We have to compute and store this geometric
   // information in this class because we won't have access to geometric
   // (or cell-based) information later on in the algebraic loops over the
   // sparsity pattern.
@@ -1505,7 +1505,7 @@ namespace Step69
   // guess for an upper bound on the maximum wavespeed. More precisely,
   // equations (2.11) (3.7), (3.8) and (4.3) of @cite GuermondPopov2016b
   // are enough to define a guaranteed upper bound on the maximum
-  // wavespeed. This estimate is returned by the a call to the function
+  // wavespeed. This estimate is returned by a call to the function
   // <code>lambda_max_two_rarefaction()</code>. At its core the
   // construction of such an upper bound uses the so-called two-rarefaction
   // approximation for the intermediate pressure $p^*$, see for instance
