@@ -89,12 +89,12 @@ do_test(const DoFHandler<dim> &dof)
 
         fe_eval.reinit(cell);
         for (unsigned int i = 0; i < dofs_per_cell;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell ?
+              i + VectorizedArray<double>::size() > dofs_per_cell ?
                 (dofs_per_cell - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               fe_eval.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)

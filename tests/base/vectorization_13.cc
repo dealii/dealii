@@ -26,12 +26,12 @@ void
 do_test(const VectorizedArrayType                      array,
         const typename VectorizedArrayType::value_type number)
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
 
   auto exponentiated_array = std::pow(array, number);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
 }

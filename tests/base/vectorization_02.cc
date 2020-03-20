@@ -25,7 +25,7 @@ void
 test()
 {
   typedef VectorizedArray<double> vector_t;
-  const unsigned int n_vectors = VectorizedArray<double>::n_array_elements;
+  const unsigned int              n_vectors = VectorizedArray<double>::size();
   typedef AlignedVector<vector_t> VEC;
   std::vector<double>             a_ref(4), b_ref;
   VEC                             a(4);

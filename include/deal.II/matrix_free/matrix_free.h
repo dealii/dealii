@@ -1570,7 +1570,7 @@ public:
    * general. The cell range in @p cell_loop runs from zero to n_cell_batches()
    * (exclusive), so this is the appropriate size if you want to store arrays
    * of data for all cells to be worked on. This number is approximately
-   * `n_physical_cells()/VectorizedArray::n_array_elements` (depending on how
+   * `n_physical_cells()/VectorizedArray::size()` (depending on how
    * many cell chunks that do not get filled up completely).
    */
   unsigned int
@@ -1582,7 +1582,7 @@ public:
    * general. The cell range in @p cell_loop runs from zero to
    * n_cell_batches() (exclusive), so this is the appropriate size if you want
    * to store arrays of data for all cells to be worked on. This number is
-   * approximately `n_physical_cells()/VectorizedArray::n_array_elements`
+   * approximately `n_physical_cells()/VectorizedArray::size()`
    * (depending on how many cell chunks that do not get filled up completely).
    */
   unsigned int
@@ -1638,7 +1638,7 @@ public:
    * Return the boundary ids for the faces within a cell, using the cells'
    * sorting by lanes in the VectorizedArray.
    */
-  std::array<types::boundary_id, VectorizedArrayType::n_array_elements>
+  std::array<types::boundary_id, VectorizedArrayType::size()>
   get_faces_by_cells_boundary_id(const unsigned int macro_cell,
                                  const unsigned int face_number) const;
 
@@ -1924,7 +1924,7 @@ public:
    * Return the connectivity information of a face.
    */
   const internal::MatrixFreeFunctions::FaceToCellTopology<
-    VectorizedArrayType::n_array_elements> &
+    VectorizedArrayType::size()> &
   get_face_info(const unsigned int face_batch_number) const;
 
 
@@ -2139,7 +2139,7 @@ private:
    * Vector holding face information. Only initialized if
    * build_face_info=true.
    */
-  internal::MatrixFreeFunctions::FaceInfo<VectorizedArrayType::n_array_elements>
+  internal::MatrixFreeFunctions::FaceInfo<VectorizedArrayType::size()>
     face_info;
 
   /**
@@ -2350,7 +2350,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-inline std::array<types::boundary_id, VectorizedArrayType::n_array_elements>
+inline std::array<types::boundary_id, VectorizedArrayType::size()>
 MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
   const unsigned int macro_cell,
   const unsigned int face_number) const
@@ -2359,7 +2359,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
   AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
   Assert(face_info.cell_and_face_boundary_id.size(0) >= n_macro_cells(),
          ExcNotInitialized());
-  std::array<types::boundary_id, VectorizedArrayType::n_array_elements> result;
+  std::array<types::boundary_id, VectorizedArrayType::size()> result;
   result.fill(numbers::invalid_boundary_id);
   for (unsigned int v = 0; v < n_active_entries_per_cell_batch(macro_cell); ++v)
     result[v] = face_info.cell_and_face_boundary_id(macro_cell, face_number, v);
@@ -2461,13 +2461,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::at_irregular_cell(
   const unsigned int macro_cell) const
 {
   AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
-  return VectorizedArrayType::n_array_elements > 1 &&
-         cell_level_index[(macro_cell + 1) *
-                            VectorizedArrayType::n_array_elements -
-                          1] ==
-           cell_level_index[(macro_cell + 1) *
-                              VectorizedArrayType::n_array_elements -
-                            2];
+  return VectorizedArrayType::size() > 1 &&
+         cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 1] ==
+           cell_level_index[(macro_cell + 1) * VectorizedArrayType::size() - 2];
 }
 
 
@@ -2488,16 +2484,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
   const unsigned int cell_batch_number) const
 {
   AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
-  unsigned int n_components = VectorizedArrayType::n_array_elements;
-  while (
-    n_components > 1 &&
-    cell_level_index[cell_batch_number * VectorizedArrayType::n_array_elements +
-                     n_components - 1] ==
-      cell_level_index[cell_batch_number *
-                         VectorizedArrayType::n_array_elements +
-                       n_components - 2])
+  unsigned int n_components = VectorizedArrayType::size();
+  while (n_components > 1 &&
+         cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+                          n_components - 1] ==
+           cell_level_index[cell_batch_number * VectorizedArrayType::size() +
+                            n_components - 2])
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArrayType::n_array_elements);
+  AssertIndexRange(n_components - 1, VectorizedArrayType::size());
   return n_components;
 }
 
@@ -2509,12 +2503,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
   const unsigned int face_batch_number) const
 {
   AssertIndexRange(face_batch_number, face_info.faces.size());
-  unsigned int n_components = VectorizedArrayType::n_array_elements;
+  unsigned int n_components = VectorizedArrayType::size();
   while (n_components > 1 &&
          face_info.faces[face_batch_number].cells_interior[n_components - 1] ==
            numbers::invalid_unsigned_int)
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArrayType::n_array_elements);
+  AssertIndexRange(n_components - 1, VectorizedArrayType::size());
   return n_components;
 }
 
@@ -2613,7 +2607,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_shape_info(
 
 template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::FaceToCellTopology<
-  VectorizedArrayType::n_array_elements> &
+  VectorizedArrayType::size()> &
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_info(
   const unsigned int macro_face) const
 {
@@ -2686,7 +2680,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result;
-  for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
+  for (unsigned int v = 0; v < VectorizedArrayType::size() &&
                            face_info.faces[macro_face].cells_interior[v] !=
                              numbers::invalid_unsigned_int;
        ++v)
@@ -2696,7 +2690,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
         .cell_active_fe_index[face_info.faces[macro_face].cells_interior[v]]);
   if (face_info.faces[macro_face].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
+    for (unsigned int v = 0; v < VectorizedArrayType::size() &&
                              face_info.faces[macro_face].cells_exterior[v] !=
                                numbers::invalid_unsigned_int;
          ++v)

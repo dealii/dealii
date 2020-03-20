@@ -26,15 +26,14 @@ void
 test_const(const VectorizedArray<Number> &vector)
 {
   AssertDimension(*std::max_element(vector.begin(), vector.end()),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                  VectorizedArray<Number>::size() - 1);
   AssertDimension(std::distance(vector.begin(),
                                 std::max_element(vector.begin(), vector.end())),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                  VectorizedArray<Number>::size() - 1);
   AssertDimension(std::distance(vector.begin(),
                                 vector.begin() +
-                                  (VectorizedArray<Number>::n_array_elements -
-                                   1)),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                                  (VectorizedArray<Number>::size() - 1)),
+                  VectorizedArray<Number>::size() - 1);
 }
 
 template <typename Number>
@@ -42,19 +41,18 @@ void
 test_nonconst(VectorizedArray<Number> &vector)
 {
   AssertDimension(*std::max_element(vector.begin(), vector.end()),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                  VectorizedArray<Number>::size() - 1);
   AssertDimension(std::distance(vector.begin(),
                                 std::max_element(vector.begin(), vector.end())),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                  VectorizedArray<Number>::size() - 1);
   AssertDimension(std::distance(vector.begin(),
                                 vector.begin() +
-                                  (VectorizedArray<Number>::n_array_elements -
-                                   1)),
-                  VectorizedArray<Number>::n_array_elements - 1);
+                                  (VectorizedArray<Number>::size() - 1)),
+                  VectorizedArray<Number>::size() - 1);
 
   auto it = vector.begin();
-  std::advance(it, VectorizedArray<Number>::n_array_elements - 1);
-  AssertDimension(*it, VectorizedArray<Number>::n_array_elements - 1);
+  std::advance(it, VectorizedArray<Number>::size() - 1);
+  AssertDimension(*it, VectorizedArray<Number>::size() - 1);
 }
 
 template <typename Number>

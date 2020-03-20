@@ -43,7 +43,7 @@ void
 compare_indices(const MatrixFree<dim, number> *mf_data)
 {
   const unsigned int     n_batches  = mf_data->n_macro_cells();
-  constexpr unsigned int batch_size = VectorizedArray<number>::n_array_elements;
+  constexpr unsigned int batch_size = VectorizedArray<number>::size();
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =

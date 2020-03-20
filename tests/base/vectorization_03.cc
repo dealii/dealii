@@ -74,7 +74,7 @@ test()
   weight = random_value<double>();
 
   VectorizedArray<double> vec;
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
     vec[v] = random_value<double>();
 
   current.values[0] = vec;
@@ -91,7 +91,7 @@ test()
   vector *= 2. * current.get_value(0)[0];
 
   double error = 0;
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
     error += std::abs(current.get_value(0)[v] / (current.cartesian_weight[v] *
                                                  current.jac_weight[0][0]) -
                       (2. * vec[v] - ol[v] - weight[v] * std::sin(vec[v])));

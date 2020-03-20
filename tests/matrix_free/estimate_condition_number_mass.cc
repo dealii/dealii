@@ -119,7 +119,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
-    data.tasks_block_size = 8 / VectorizedArray<number>::n_array_elements;
+    data.tasks_block_size = 8 / VectorizedArray<number>::size();
     mf_data.reinit(dof, constraints, quad, data);
   }
 

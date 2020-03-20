@@ -29,7 +29,7 @@ check()
   VectorizedArray<number>             distance_vec;
   Point<dim, VectorizedArray<number>> p1_vec, p2_vec;
 
-  for (unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
+  for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
     {
       Point<dim, number> p1, p2;
       for (unsigned int i = 0; i < dim; ++i)
@@ -48,12 +48,12 @@ check()
   distance_vec -= distance_vec2;
   number diff = 0.;
 
-  for (unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
+  for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
     diff += std::abs(distance_vec[v]);
 
   AssertThrow(diff < 2 * std::numeric_limits<number>::epsilon() *
-                       VectorizedArray<number>::n_array_elements *
-                       VectorizedArray<number>::n_array_elements,
+                       VectorizedArray<number>::size() *
+                       VectorizedArray<number>::size(),
               ExcMessage("diff is " + std::to_string(diff)));
 
   deallog << "Ok" << std::endl;

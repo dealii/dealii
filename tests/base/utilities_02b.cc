@@ -25,18 +25,18 @@ template <typename VectorizedArrayType>
 void
 do_test(const VectorizedArrayType array)
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
 
   auto exponentiated_array = Utilities::fixed_power<3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
 
   exponentiated_array = Utilities::fixed_power<-3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     deallog << exponentiated_array[i] << " ";
   deallog << std::endl;
 }
