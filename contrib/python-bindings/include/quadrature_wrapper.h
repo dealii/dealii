@@ -56,14 +56,12 @@ namespace python
     void
     create_gauss_lobatto(const unsigned int n);
 
-    /**
-     * Return list of quadrature points.
+    /*! @copydoc Quadrature::get_points
      */
     boost::python::list
     get_points() const;
 
-    /**
-     * Return list of quadrature weights.
+    /*! @copydoc Quadrature::get_weights
      */
     boost::python::list
     get_weights() const;
