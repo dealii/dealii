@@ -128,7 +128,7 @@ namespace MemoryConsumption
    * Determine the amount of memory in bytes consumed by a
    * <tt>VectorizedArray</tt> variable.
    */
-  template <typename T, int width>
+  template <typename T, std::size_t width>
   inline std::size_t
   memory_consumption(const VectorizedArray<T, width> &);
 
@@ -296,7 +296,7 @@ namespace MemoryConsumption
 
 
 
-  template <typename T, int width>
+  template <typename T, std::size_t width>
   inline std::size_t
   memory_consumption(const VectorizedArray<T, width> &)
   {
