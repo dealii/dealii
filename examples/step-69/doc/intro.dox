@@ -369,7 +369,7 @@ application of this kind of schemes, also called <i>edge-based</i> or
 @cite Rainald2008 for a historical overview). However, it is important to
 highlight that the algebraic structure of the scheme (presented in this
 tutorial) and the node-loops are not just a performance gimmick. Actually, the
-structure of this scheme was born out of theoretical necessity: the proof of
+structure of this scheme was borne out of theoretical necessity: the proof of
 pointwise stability of the scheme hinges on the specific algebraic structure of
 the scheme. In addition, it is not possible to compute the algebraic
 viscosities $d_{ij}$ using cell-loops since they depend nonlinearly on
