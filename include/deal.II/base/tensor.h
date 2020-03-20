@@ -58,18 +58,6 @@ namespace Differentiation
 } // namespace Differentiation
 #endif
 
-#ifndef DOXYGEN
-// Overload invalid tensor types of negative rank that come up during
-// overload resolution of operator* and related contraction variants.
-template <int dim, typename Number>
-class Tensor<-2, dim, Number>
-{};
-
-template <int dim, typename Number>
-class Tensor<-1, dim, Number>
-{};
-#endif /* DOXYGEN */
-
 
 /**
  * This class is a specialized version of the <tt>Tensor<rank,dim,Number></tt>
@@ -105,6 +93,9 @@ template <int dim, typename Number>
 class Tensor<0, dim, Number>
 {
 public:
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
+
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -426,6 +417,10 @@ template <int rank_, int dim, typename Number>
 class Tensor
 {
 public:
+  static_assert(rank_ >= 0,
+                "Tensors must have a rank greater than or equal to one.");
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -1946,25 +1941,6 @@ inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
 }
 
 /**
- * Entrywise multiplication of two tensor objects of rank 1.
- *
- * @relatesalso Tensor
- */
-template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
-                         Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
-                         schur_product(const Tensor<1, dim, Number> &     src1,
-                                       const Tensor<1, dim, OtherNumber> &src2)
-{
-  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] *= src2[i];
-
-  return tmp;
-}
-
-/**
  * Entrywise multiplication of two tensor objects of general rank.
  *
  * This multiplication is also called "Hadamard-product" (c.f.
@@ -1986,10 +1962,11 @@ inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
                          schur_product(const Tensor<rank, dim, Number> &     src1,
                                        const Tensor<rank, dim, OtherNumber> &src2)
 {
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp;
 
   for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = schur_product(src1[i], src2[i]);
+    tmp[i] = schur_product(Tensor<rank - 1, dim, Number>(src1[i]),
+                           Tensor<rank - 1, dim, OtherNumber>(src2[i]));
 
   return tmp;
 }
@@ -2028,7 +2005,8 @@ template <int rank_1,
           int rank_2,
           int dim,
           typename Number,
-          typename OtherNumber>
+          typename OtherNumber,
+          typename = typename std::enable_if<rank_1 >= 1 && rank_2 >= 1>::type>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
