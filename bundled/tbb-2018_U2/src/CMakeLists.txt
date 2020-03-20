@@ -38,6 +38,13 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wimplicit-fallthrough=0")
 
+#
+# Disable string overflow warnings (strncpy, ...):
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wstringop-overflow=0")
+
+
+
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 INCLUDE_DIRECTORIES(
   ${THREADS_BUNDLED_INCLUDE_DIRS}
