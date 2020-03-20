@@ -125,154 +125,158 @@ namespace Step20
   // class. For the exact solution, we only declare the function that actually
   // returns the entire solution vector (i.e. all components of it) at
   // once. Here are the respective declarations:
-  template <int dim>
-  class RightHandSide : public Function<dim>
+  namespace PrescribedSolution
   {
-  public:
-    RightHandSide()
-      : Function<dim>(1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-  };
+    constexpr double alpha = 0.3;
+    constexpr double beta  = 1;
 
 
+    template <int dim>
+    class RightHandSide : public Function<dim>
+    {
+    public:
+      RightHandSide()
+        : Function<dim>(1)
+      {}
 
-  template <int dim>
-  class PressureBoundaryValues : public Function<dim>
-  {
-  public:
-    PressureBoundaryValues()
-      : Function<dim>(1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-  };
-
-
-  template <int dim>
-  class ExactSolution : public Function<dim>
-  {
-  public:
-    ExactSolution()
-      : Function<dim>(dim + 1)
-    {}
-
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
-  };
-
-
-  // And then we also have to define these respective functions, of
-  // course. Given our discussion in the introduction of how the solution
-  // should look, the following computations should be straightforward:
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int /*component*/) const
-  {
-    return 0;
-  }
+      virtual double value(const Point<dim> & p,
+                           const unsigned int component = 0) const override;
+    };
 
 
 
-  template <int dim>
-  double
-  PressureBoundaryValues<dim>::value(const Point<dim> &p,
+    template <int dim>
+    class PressureBoundaryValues : public Function<dim>
+    {
+    public:
+      PressureBoundaryValues()
+        : Function<dim>(1)
+      {}
+
+      virtual double value(const Point<dim> & p,
+                           const unsigned int component = 0) const override;
+    };
+
+
+    template <int dim>
+    class ExactSolution : public Function<dim>
+    {
+    public:
+      ExactSolution()
+        : Function<dim>(dim + 1)
+      {}
+
+      virtual void vector_value(const Point<dim> &p,
+                                Vector<double> &  value) const override;
+    };
+
+
+    // And then we also have to define these respective functions, of
+    // course. Given our discussion in the introduction of how the solution
+    // should look, the following computations should be straightforward:
+    template <int dim>
+    double RightHandSide<dim>::value(const Point<dim> & /*p*/,
                                      const unsigned int /*component*/) const
-  {
-    const double alpha = 0.3;
-    const double beta  = 1;
-    return -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
-             alpha * p[0] * p[0] * p[0] / 6);
-  }
+    {
+      return 0;
+    }
 
 
 
-  template <int dim>
-  void ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
-  {
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
-
-    const double alpha = 0.3;
-    const double beta  = 1;
-
-    values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
-    values(1) = alpha * p[0] * p[1];
-    values(2) = -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
-                  alpha * p[0] * p[0] * p[0] / 6);
-  }
+    template <int dim>
+    double
+    PressureBoundaryValues<dim>::value(const Point<dim> &p,
+                                       const unsigned int /*component*/) const
+    {
+      return -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
+               alpha * p[0] * p[0] * p[0] / 6);
+    }
 
 
 
-  // @sect3{The inverse permeability tensor}
+    template <int dim>
+    void ExactSolution<dim>::vector_value(const Point<dim> &p,
+                                          Vector<double> &  values) const
+    {
+      Assert(values.size() == dim + 1,
+             ExcDimensionMismatch(values.size(), dim + 1));
 
-  // In addition to the other equation data, we also want to use a
-  // permeability tensor, or better -- because this is all that appears in the
-  // weak form -- the inverse of the permeability tensor,
-  // <code>KInverse</code>. For the purpose of verifying the exactness of the
-  // solution and determining convergence orders, this tensor is more in the
-  // way than helpful. We will therefore simply set it to the identity matrix.
-  //
-  // However, a spatially varying permeability tensor is indispensable in
-  // real-life porous media flow simulations, and we would like to use the
-  // opportunity to demonstrate the technique to use tensor valued functions.
-  //
-  // Possibly unsurprisingly, deal.II also has a base class not only for scalar
-  // and generally vector-valued functions (the <code>Function</code> base
-  // class) but also for functions that return tensors of fixed dimension and
-  // rank, the <code>TensorFunction</code> template. Here, the function under
-  // consideration returns a dim-by-dim matrix, i.e. a tensor of rank 2 and
-  // dimension <code>dim</code>. We then choose the template arguments of the
-  // base class appropriately.
-  //
-  // The interface that the <code>TensorFunction</code> class provides is
-  // essentially equivalent to the <code>Function</code> class. In particular,
-  // there exists a <code>value_list</code> function that takes a list of
-  // points at which to evaluate the function, and returns the values of the
-  // function in the second argument, a list of tensors:
-  template <int dim>
-  class KInverse : public TensorFunction<2, dim>
-  {
-  public:
-    KInverse()
-      : TensorFunction<2, dim>()
-    {}
-
-    virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<2, dim>> &values) const override;
-  };
+      values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
+      values(1) = alpha * p[0] * p[1];
+      values(2) = -(alpha * p[0] * p[1] * p[1] / 2 + beta * p[0] -
+                    alpha * p[0] * p[0] * p[0] / 6);
+    }
 
 
-  // The implementation is less interesting. As in previous examples, we add a
-  // check to the beginning of the class to make sure that the sizes of input
-  // and output parameters are the same (see step-5 for a discussion of this
-  // technique). Then we loop over all evaluation points, and for each one
-  // first clear the output tensor and then set all its diagonal elements to
-  // one (i.e. fill the tensor with the identity matrix):
-  template <int dim>
-  void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
-                                 std::vector<Tensor<2, dim>> &  values) const
-  {
-    // The value we are going to store for a given point does not depend on its
-    // coordinates, and we use the `points` object only for checking that the
-    // `values` object has the correct size. In release mode, `AssertDimension`
-    // is defined empty, and the compiler will complain that the `points` object
-    // is unused. The following line silences this warning.
-    (void)points;
-    AssertDimension(points.size(), values.size());
 
-    for (auto &value : values)
-      {
-        value.clear();
+    // @sect3{The inverse permeability tensor}
 
-        for (unsigned int d = 0; d < dim; ++d)
-          value[d][d] = 1.;
-      }
-  }
+    // In addition to the other equation data, we also want to use a
+    // permeability tensor, or better -- because this is all that appears in the
+    // weak form -- the inverse of the permeability tensor,
+    // <code>KInverse</code>. For the purpose of verifying the exactness of the
+    // solution and determining convergence orders, this tensor is more in the
+    // way than helpful. We will therefore simply set it to the identity matrix.
+    //
+    // However, a spatially varying permeability tensor is indispensable in
+    // real-life porous media flow simulations, and we would like to use the
+    // opportunity to demonstrate the technique to use tensor valued functions.
+    //
+    // Possibly unsurprisingly, deal.II also has a base class not only for
+    // scalar and generally vector-valued functions (the <code>Function</code>
+    // base class) but also for functions that return tensors of fixed dimension
+    // and rank, the <code>TensorFunction</code> template. Here, the function
+    // under consideration returns a dim-by-dim matrix, i.e. a tensor of rank 2
+    // and dimension <code>dim</code>. We then choose the template arguments of
+    // the base class appropriately.
+    //
+    // The interface that the <code>TensorFunction</code> class provides is
+    // essentially equivalent to the <code>Function</code> class. In particular,
+    // there exists a <code>value_list</code> function that takes a list of
+    // points at which to evaluate the function, and returns the values of the
+    // function in the second argument, a list of tensors:
+    template <int dim>
+    class KInverse : public TensorFunction<2, dim>
+    {
+    public:
+      KInverse()
+        : TensorFunction<2, dim>()
+      {}
+
+      virtual void
+      value_list(const std::vector<Point<dim>> &points,
+                 std::vector<Tensor<2, dim>> &  values) const override;
+    };
+
+
+    // The implementation is less interesting. As in previous examples, we add a
+    // check to the beginning of the class to make sure that the sizes of input
+    // and output parameters are the same (see step-5 for a discussion of this
+    // technique). Then we loop over all evaluation points, and for each one
+    // first clear the output tensor and then set all its diagonal elements to
+    // one (i.e. fill the tensor with the identity matrix):
+    template <int dim>
+    void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
+                                   std::vector<Tensor<2, dim>> &  values) const
+    {
+      // The value we are going to store for a given point does not depend on
+      // its coordinates, and we use the `points` object only for checking that
+      // the `values` object has the correct size. In release mode,
+      // `AssertDimension` is defined empty, and the compiler will complain that
+      // the `points` object is unused. The following line silences this
+      // warning.
+      (void)points;
+      AssertDimension(points.size(), values.size());
+
+      for (auto &value : values)
+        {
+          value.clear();
+
+          for (unsigned int d = 0; d < dim; ++d)
+            value[d][d] = 1.;
+        }
+    }
+  } // namespace PrescribedSolution
 
 
 
@@ -465,9 +469,10 @@ namespace Step20
     // arrays to hold their values at the quadrature points of individual
     // cells (or faces, for the boundary values). Note that in the case of the
     // coefficient, the array has to be one of matrices.
-    const RightHandSide<dim>          right_hand_side;
-    const PressureBoundaryValues<dim> pressure_boundary_values;
-    const KInverse<dim>               k_inverse;
+    const PrescribedSolution::RightHandSide<dim> right_hand_side;
+    const PrescribedSolution::PressureBoundaryValues<dim>
+                                            pressure_boundary_values;
+    const PrescribedSolution::KInverse<dim> k_inverse;
 
     std::vector<double>         rhs_values(n_q_points);
     std::vector<double>         boundary_values(n_face_q_points);
@@ -684,8 +689,8 @@ namespace Step20
     const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
                                                      dim + 1);
 
-    ExactSolution<dim> exact_solution;
-    Vector<double>     cellwise_errors(triangulation.n_active_cells());
+    PrescribedSolution::ExactSolution<dim> exact_solution;
+    Vector<double> cellwise_errors(triangulation.n_active_cells());
 
     // As already discussed in step-7, we have to realize that it is
     // impossible to integrate the errors exactly. All we can do is
