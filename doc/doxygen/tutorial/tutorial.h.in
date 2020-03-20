@@ -515,6 +515,12 @@
  *        advanced manifold operations.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-69</td>
+ *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
+ *        wavespeed method for the compressible Euler equations
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -583,7 +589,8 @@
  *       step-32,
  *       step-44,
  *       step-48,
- *       step-51
+ *       step-51,
+ *       step-69
  *     </td>
  *   </tr>
  *
@@ -664,7 +671,8 @@
  *       step-40,
  *       step-42,
  *       step-55,
- *       step-59
+ *       step-59,
+ *       step-69
  *     </td>
  *   </tr>
  *
@@ -682,7 +690,8 @@
  *       step-42,
  *       step-44,
  *       step-60,
- *       step-62
+ *       step-62,
+ *       step-69
  *     </td>
  *   </tr>
  *
@@ -1004,7 +1013,10 @@
  *   <tr valign="top">
  *     <td> The nonlinear hyperbolic Euler system of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-69
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1131,7 +1143,10 @@
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-69
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1190,7 +1205,10 @@
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-69
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
