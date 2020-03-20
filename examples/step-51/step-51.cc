@@ -1081,9 +1081,18 @@ namespace Step51
 
     convergence_table.add_value("cells", triangulation.n_active_cells());
     convergence_table.add_value("dofs", dof_handler.n_dofs());
+
     convergence_table.add_value("val L2", L2_error);
+    convergence_table.set_scientific("val L2", true);
+    convergence_table.set_precision("val L2", 3);
+
     convergence_table.add_value("grad L2", grad_error);
+    convergence_table.set_scientific("grad L2", true);
+    convergence_table.set_precision("grad L2", 3);
+
     convergence_table.add_value("val L2-post", post_error);
+    convergence_table.set_scientific("val L2-post", true);
+    convergence_table.set_precision("val L2-post", 3);
   }
 
 
@@ -1357,15 +1366,6 @@ namespace Step51
         postprocess();
         output_results(cycle);
       }
-
-
-
-    convergence_table.set_precision("val L2", 3);
-    convergence_table.set_scientific("val L2", true);
-    convergence_table.set_precision("grad L2", 3);
-    convergence_table.set_scientific("grad L2", true);
-    convergence_table.set_precision("val L2-post", 3);
-    convergence_table.set_scientific("val L2-post", true);
 
     // There is one minor change for the convergence table compared to step-7:
     // Since we did not refine our mesh by a factor two in each cycle (but
