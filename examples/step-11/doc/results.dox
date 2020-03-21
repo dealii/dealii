@@ -43,7 +43,7 @@ order. On the other hand, using a cubic mapping only improves the
 result further insignificantly, except for the case of very coarse
 grids.
 
-We can also visualize the underlying meshes by using, for instance
+We can also visualize the underlying meshes by using, for instance,
 ParaView. The image below shows initial meshes for different mapping
 degrees:
 
@@ -52,7 +52,7 @@ degrees:
 Clearly, the effect is most pronounced when we go from the linear to
 quadratic mapping. This is also reflected in the error values given
 in the table above. The effect of going from quadratic to cubic degree
-is less dramatic, but still tangible owning to a more accurace
+is less dramatic, but still tangible owing to a more accurate
 description of the circular boundary.
 
 Next, let's look at the meshes after three global refinements
@@ -61,5 +61,5 @@ Next, let's look at the meshes after three global refinements
 
 Here, the differences are much less visible, especially for higher order
 mappings. Indeed, at this refinement level the error values reported
-in the table are essentially identical between mappings of degree two
+in the table are essentially identical between mappings of degrees two
 and three.
