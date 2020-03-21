@@ -40,6 +40,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_sm_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <deal.II/matrix_free/dof_info.h>
@@ -1500,6 +1501,11 @@ public:
   initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
                         const unsigned int dof_handler_index = 0) const;
 
+  template <typename Number2>
+  void
+  initialize_dof_vector(LinearAlgebra::SharedMPI::Vector<Number2> &vec,
+                        const unsigned int dof_handler_index = 0) const;
+
   /**
    * Return the partitioner that represents the locally owned data and the
    * ghost indices where access is needed to for the cell loop. The
@@ -2168,6 +2174,19 @@ inline void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   LinearAlgebra::distributed::Vector<Number2> &vec,
   const unsigned int                           comp) const
+{
+  AssertIndexRange(comp, n_components());
+  vec.reinit(dof_info[comp].vector_partitioner);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename Number2>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
+  LinearAlgebra::SharedMPI::Vector<Number2> &vec,
+  const unsigned int                         comp) const
 {
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner);

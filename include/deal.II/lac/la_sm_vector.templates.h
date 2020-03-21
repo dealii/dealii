@@ -126,9 +126,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::Vector()
       : partitioner(new Utilities::MPI::Partitioner())
       , allocated_size(0)
-    {
-      Assert(false, ExcNotImplemented());
-    }
+    {}
 
 
 
