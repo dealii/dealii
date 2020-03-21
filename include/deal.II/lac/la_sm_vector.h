@@ -98,6 +98,8 @@ namespace LinearAlgebra
       std::unique_ptr<Number[], std::function<void(Number *&)>> values;
       MPI_Win *values_win = nullptr;
 
+      std::vector<Number *> others;
+
       std::unique_ptr<Number[]> values_dev;
     };
 
@@ -539,8 +541,7 @@ namespace LinearAlgebra
     inline bool
     Vector<Number, MemorySpace>::has_ghost_elements() const
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      return vector_is_ghosted;
     }
 
 

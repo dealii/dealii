@@ -232,34 +232,227 @@ namespace LinearAlgebra
         buffer.resize(send_remote_ptr.back());
       }
 
+      void
+      update_ghost_values_start(
+        Number *               data_this,
+        std::vector<Number *> &data_others,
+        const unsigned int     communication_channel = 0) const
+      {
+        (void)data_others;
+
+        int dummy;
+        for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
+          MPI_Irecv(&dummy,
+                    0,
+                    MPI_INT,
+                    recv_sm_ranks[i],
+                    communication_channel + 1,
+                    comm_sm,
+                    recv_sm_req.data() + i);
+
+        for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
+          MPI_Isend(&dummy,
+                    0,
+                    MPI_INT,
+                    send_sm_ranks[i],
+                    communication_channel + 1,
+                    comm_sm,
+                    send_sm_req.data() + i);
+
+        for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
+          MPI_Irecv(data_this + recv_remote_ptr[i] + n_local_elements,
+                    recv_remote_ptr[i + 1] - recv_remote_ptr[i],
+                    Utilities::MPI::internal::mpi_type_id(data_this),
+                    recv_remote_ranks[i],
+                    communication_channel + 0,
+                    comm,
+                    recv_remote_req.data() + i);
+
+        for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
+          {
+            for (unsigned int j = send_remote_ptr[i];
+                 j < send_remote_ptr[i + 1];
+                 j++)
+              buffer[j] = data_this[send_remote_indices[j]];
+
+            MPI_Isend(buffer.data() + send_remote_ptr[i],
+                      send_remote_ptr[i + 1] - send_remote_ptr[i],
+                      Utilities::MPI::internal::mpi_type_id(data_this),
+                      send_remote_ranks[i],
+                      communication_channel + 0,
+                      comm,
+                      send_remote_req.data() + i);
+          }
+      }
+
+      void
+      update_ghost_values_finish(Number *               data_this,
+                                 std::vector<Number *> &data_others) const
+      {
+        for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
+          {
+            int i;
+            MPI_Waitany(recv_sm_req.size(),
+                        recv_sm_req.data(),
+                        &i,
+                        MPI_STATUS_IGNORE);
+
+            const Number *__restrict__ data_others_ptr =
+              data_others[recv_sm_ranks[i]];
+            Number *__restrict__ data_this_ptr = data_this;
+
+            for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
+                 j < recv_sm_ptr[i + 1];
+                 j++, k++)
+              data_this_ptr[k] = data_others_ptr[recv_sm_indices[j]];
+          }
+
+        MPI_Waitall(send_sm_req.size(),
+                    send_sm_req.data(),
+                    MPI_STATUSES_IGNORE);
+        MPI_Waitall(send_remote_req.size(),
+                    send_remote_req.data(),
+                    MPI_STATUSES_IGNORE);
+        MPI_Waitall(recv_remote_req.size(),
+                    recv_remote_req.data(),
+                    MPI_STATUSES_IGNORE);
+      }
+
+      void
+      update_ghost_values(Number *               data_this,
+                          std::vector<Number *> &data_others) const
+      {
+        update_ghost_values_start(data_this, data_others);
+        update_ghost_values_finish(data_this, data_others);
+      }
+
+      void
+      compress_start(Number *               data_this,
+                     std::vector<Number *> &data_others,
+                     const unsigned int     communication_channel = 0) const
+      {
+        (void)data_others;
+
+        int dummy;
+        for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
+          MPI_Isend(&dummy,
+                    0,
+                    MPI_INT,
+                    recv_sm_ranks[i],
+                    communication_channel + 1,
+                    comm_sm,
+                    recv_sm_req.data() + i);
+
+        for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
+          MPI_Irecv(&dummy,
+                    0,
+                    MPI_INT,
+                    send_sm_ranks[i],
+                    communication_channel + 1,
+                    comm_sm,
+                    send_sm_req.data() + i);
+
+        for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
+          MPI_Isend(data_this + recv_remote_ptr[i] + n_local_elements,
+                    recv_remote_ptr[i + 1] - recv_remote_ptr[i],
+                    Utilities::MPI::internal::mpi_type_id(data_this),
+                    recv_remote_ranks[i],
+                    communication_channel + 0,
+                    comm,
+                    recv_remote_req.data() + i);
+
+        for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
+          MPI_Irecv(buffer.data() + send_remote_ptr[i],
+                    send_remote_ptr[i + 1] - send_remote_ptr[i],
+                    Utilities::MPI::internal::mpi_type_id(data_this),
+                    send_remote_ranks[i],
+                    communication_channel + 0,
+                    comm,
+                    send_remote_req.data() + i);
+      }
+
+      void
+      compress_finish(Number *               data_this,
+                      std::vector<Number *> &data_others) const
+      {
+        for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
+          {
+            int i;
+            MPI_Waitany(send_sm_req.size(),
+                        send_sm_req.data(),
+                        &i,
+                        MPI_STATUS_IGNORE);
+
+            const Number *__restrict__ data_others_ptr =
+              data_others[send_sm_ranks[i]];
+            Number *__restrict__ data_this_ptr = data_this;
+
+            for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
+                 j < send_sm_ptr[i + 1];
+                 j++, k++)
+              {
+                data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
+              }
+          }
+
+        for (unsigned int c = 0; c < send_remote_ranks.size(); c++)
+          {
+            int i;
+            MPI_Waitany(send_remote_req.size(),
+                        send_remote_req.data(),
+                        &i,
+                        MPI_STATUS_IGNORE);
+
+            for (unsigned int j = send_remote_ptr[i];
+                 j < send_remote_ptr[i + 1];
+                 j++)
+              data_this[send_remote_indices[j]] += buffer[j];
+          }
+
+        MPI_Waitall(recv_sm_req.size(),
+                    recv_sm_req.data(),
+                    MPI_STATUSES_IGNORE);
+
+        MPI_Waitall(recv_remote_req.size(),
+                    recv_remote_req.data(),
+                    MPI_STATUSES_IGNORE);
+      }
+
+      void
+      compress(Number *data_this, std::vector<Number *> &data_others) const
+      {
+        compress_start(data_this, data_others);
+        compress_finish(data_this, data_others);
+      }
+
     private:
       const MPI_Comm &comm;
       const MPI_Comm &comm_sm;
 
       unsigned int n_local_elements;
 
-      AlignedVector<Number> buffer;
+      mutable AlignedVector<Number> buffer;
 
       std::vector<unsigned int>            recv_remote_ranks;
       std::vector<types::global_dof_index> recv_remote_ptr = {0};
-      std::vector<MPI_Request>             recv_remote_req;
+      mutable std::vector<MPI_Request>     recv_remote_req;
 
-      std::vector<unsigned int> recv_sm_ranks;
-      std::vector<unsigned int> recv_sm_ptr = {0};
-      std::vector<MPI_Request>  recv_sm_req;
-      std::vector<unsigned int> recv_sm_indices;
-      std::vector<unsigned int> recv_sm_offset;
+      std::vector<unsigned int>        recv_sm_ranks;
+      std::vector<unsigned int>        recv_sm_ptr = {0};
+      mutable std::vector<MPI_Request> recv_sm_req;
+      std::vector<unsigned int>        recv_sm_indices;
+      std::vector<unsigned int>        recv_sm_offset;
 
-      std::vector<unsigned int> send_remote_ranks;
-      std::vector<unsigned int> send_remote_ptr = {0};
-      std::vector<unsigned int> send_remote_indices;
-      std::vector<MPI_Request>  send_remote_req;
+      std::vector<unsigned int>        send_remote_ranks;
+      std::vector<unsigned int>        send_remote_ptr = {0};
+      std::vector<unsigned int>        send_remote_indices;
+      mutable std::vector<MPI_Request> send_remote_req;
 
-      std::vector<unsigned int> send_sm_ranks;
-      std::vector<unsigned int> send_sm_ptr = {0};
-      std::vector<unsigned int> send_sm_indices;
-      std::vector<MPI_Request>  send_sm_req;
-      std::vector<unsigned int> send_sm_offset;
+      std::vector<unsigned int>        send_sm_ranks;
+      std::vector<unsigned int>        send_sm_ptr = {0};
+      std::vector<unsigned int>        send_sm_indices;
+      mutable std::vector<MPI_Request> send_sm_req;
+      std::vector<unsigned int>        send_sm_offset;
     };
 
   } // end of namespace SharedMPI

@@ -56,12 +56,9 @@ namespace LinearAlgebra
 
           allocated_size = new_alloc_size;
 
-          // TODO
-          std::vector<Number *> data_others;
-
           data.values_win   = new MPI_Win;
           Number *data_this = (Number *)malloc(0);
-          data_others.resize(Utilities::MPI::n_mpi_processes(comm_shared));
+          data.others.resize(Utilities::MPI::n_mpi_processes(comm_shared));
 
 
           MPI_Info info;
@@ -82,11 +79,11 @@ namespace LinearAlgebra
               int      disp_unit;
               MPI_Aint ssize;
               MPI_Win_shared_query(
-                *data.values_win, i, &ssize, &disp_unit, &data_others[i]);
+                *data.values_win, i, &ssize, &disp_unit, &data.others[i]);
             }
 
           data.values = {
-            data_others[Utilities::MPI::this_mpi_process(comm_shared)],
+            data.others[Utilities::MPI::this_mpi_process(comm_shared)],
             [&data](Number *&) { MPI_Win_free(data.values_win); }};
         }
       };
@@ -380,9 +377,10 @@ namespace LinearAlgebra
       const unsigned int                communication_channel,
       ::dealii::VectorOperation::values operation)
     {
-      Assert(false, ExcNotImplemented());
-      (void)communication_channel;
       (void)operation;
+      partitioner_sm->compress_start(data.values.get(),
+                                     data.others,
+                                     communication_channel);
     }
 
 
@@ -392,8 +390,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::compress_finish(
       ::dealii::VectorOperation::values operation)
     {
-      Assert(false, ExcNotImplemented());
       (void)operation;
+      partitioner_sm->compress_finish(data.values.get(), data.others);
     }
 
 
@@ -403,8 +401,9 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::update_ghost_values_start(
       const unsigned int communication_channel) const
     {
-      Assert(false, ExcNotImplemented());
-      (void)communication_channel;
+      partitioner_sm->update_ghost_values_start(data.values.get(),
+                                                data.others,
+                                                communication_channel);
     }
 
 
@@ -413,7 +412,8 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::update_ghost_values_finish() const
     {
-      Assert(false, ExcNotImplemented());
+      partitioner_sm->update_ghost_values_finish(data.values.get(),
+                                                 data.others);
     }
 
 

@@ -67,8 +67,14 @@ test(const int n_refinements, const int degree, const int group_size)
   MPI_Comm comm_sm;
   MPI_Comm_split(comm, rank / group_size, rank, &comm_sm);
 
-  LinearAlgebra::SharedMPI::Vector<Number> vec;
-  matrix_free.initialize_dof_vector(vec, comm_sm);
+  using VectorType = LinearAlgebra::SharedMPI::Vector<Number>;
+
+  LinearAlgebra::SharedMPI::Vector<Number> dst, src;
+  matrix_free.initialize_dof_vector(dst, comm_sm);
+  matrix_free.initialize_dof_vector(src, comm_sm);
+
+  matrix_free.template cell_loop<VectorType, VectorType>(
+    [](const auto &, auto &, const auto &, const auto) {}, dst, src);
 }
 
 int
