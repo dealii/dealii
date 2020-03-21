@@ -77,7 +77,7 @@ do_test()
     v3(w1.size());
   convert_to_vectorized(w1, v1);
 
-  constexpr unsigned int macro_size = VectorizedArray<float>::n_array_elements;
+  constexpr unsigned int macro_size = VectorizedArray<float>::size();
   Vector<float>          vec_flat(v1.size() * macro_size);
   std::array<unsigned int, macro_size> offsets;
   for (unsigned int i = 0; i < macro_size; ++i)

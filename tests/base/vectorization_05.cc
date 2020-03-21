@@ -30,7 +30,7 @@ test()
 {
   // since the number of array elements is system dependent, it is not a good
   // idea to print them to an output file. Instead, check the values manually
-  const unsigned int      n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int      n_vectors = VectorizedArray<Number>::size();
   VectorizedArray<Number> arr[n_numbers];
   Number                  other[n_vectors * n_numbers];
   unsigned int            offsets[n_vectors];

@@ -55,7 +55,7 @@ main()
 
   // Scale the gradients along the vectorization-index so that each grad_u[v] is
   // unique.
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
         grad_u[i][j][v] *= (v + 1);
@@ -69,7 +69,7 @@ main()
 
   // You can't use .norm() on some difference-tensor of the two so we compare
   // element-wise!
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
         if (F_solution[i][j][v] - F_test[i][j][v] != 0.0)
@@ -84,7 +84,7 @@ main()
   SymmetricTensor<2, dim, VectorizedArray<double>> E_test =
     Kinematics::E(F_test);
 
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
         if (E_test[i][j][v] - E_solution[i][j][v] != 0.0)
@@ -96,7 +96,7 @@ main()
   Tensor<2, dim, VectorizedArray<double>> F_iso_test;
   F_iso_test = Kinematics::F_iso(F_test);
 
-  for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
+  for (unsigned int v = 0; v < VectorizedArray<double>::size(); v++)
     for (unsigned int i = 0; i < dim; i++)
       for (unsigned int j = 0; j < dim; j++)
         if (F_iso_test[i][j][v] - F_iso_solution[i][j][v] != 0.0)

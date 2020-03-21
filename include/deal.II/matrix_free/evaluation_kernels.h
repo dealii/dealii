@@ -1739,7 +1739,7 @@ namespace internal
   void
   do_vectorized_read(const Number2 *src_ptr, VectorizedArrayType &dst)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst[v] = src_ptr[v];
   }
 
@@ -1763,7 +1763,7 @@ namespace internal
                        const unsigned int * indices,
                        VectorizedArrayType &dst)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst[v] = src_ptr[indices[v]];
   }
 
@@ -1787,7 +1787,7 @@ namespace internal
   void
   do_vectorized_add(const VectorizedArrayType src, Number2 *dst_ptr)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst_ptr[v] += src[v];
   }
 
@@ -1813,7 +1813,7 @@ namespace internal
                             const unsigned int *      indices,
                             Number2 *                 dst_ptr)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst_ptr[indices[v]] += src[v];
   }
 
@@ -2089,13 +2089,14 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int dof_index =
-            dof_info.dof_indices_contiguous
-              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info
+              .dof_indices_contiguous[dof_access_index]
+                                     [cell * VectorizedArrayType::size()] +
             dof_info.component_dof_indices_offset[active_fe_index]
                                                  [first_selected_component] *
-              VectorizedArrayType::n_array_elements;
+              VectorizedArrayType::size();
 
           if (fe_degree > 1 && evaluate_gradients == true)
             {
@@ -2116,15 +2117,15 @@ namespace internal
                   AssertIndexRange(ind2, data.dofs_per_component_on_cell);
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
-                      do_vectorized_read(
-                        src_ptr + dof_index +
-                          (ind1 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements,
-                        temp1[i + 2 * comp * dofs_per_face]);
+                      do_vectorized_read(src_ptr + dof_index +
+                                           (ind1 +
+                                            comp * static_dofs_per_component) *
+                                             VectorizedArrayType::size(),
+                                         temp1[i + 2 * comp * dofs_per_face]);
                       do_vectorized_read(
                         src_ptr + dof_index +
                           (ind2 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         temp1[dofs_per_face + i + 2 * comp * dofs_per_face]);
                       temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
                         grad_weight *
@@ -2143,11 +2144,11 @@ namespace internal
                 {
                   const unsigned int ind = index_array[i];
                   for (unsigned int comp = 0; comp < n_components; ++comp)
-                    do_vectorized_read(
-                      src_ptr + dof_index +
-                        (ind + comp * static_dofs_per_component) *
-                          VectorizedArrayType::n_array_elements,
-                      temp1[i + 2 * comp * dofs_per_face]);
+                    do_vectorized_read(src_ptr + dof_index +
+                                         (ind +
+                                          comp * static_dofs_per_component) *
+                                           VectorizedArrayType::size(),
+                                       temp1[i + 2 * comp * dofs_per_face]);
                 }
             }
         }
@@ -2164,10 +2165,11 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (fe_degree > 1 && evaluate_gradients == true)
             {
               // we know that the gradient weights for the Hermite case on the
@@ -2183,29 +2185,28 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind1 =
-                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                    index_array[2 * i] * VectorizedArrayType::size();
                   const unsigned int ind2 =
-                    index_array[2 * i + 1] *
-                    VectorizedArrayType::n_array_elements;
+                    index_array[2 * i + 1] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
                       do_vectorized_gather(
                         src_ptr + ind1 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         indices,
                         temp1[i + 2 * comp * dofs_per_face]);
                       VectorizedArrayType grad;
                       do_vectorized_gather(
                         src_ptr + ind2 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         indices,
                         grad);
                       temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
@@ -2223,15 +2224,15 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind =
-                    index_array[i] * VectorizedArrayType::n_array_elements;
+                    index_array[i] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     do_vectorized_gather(
                       src_ptr + ind +
                         comp * static_dofs_per_component *
-                          VectorizedArrayType::n_array_elements +
+                          VectorizedArrayType::size() +
                         dof_info.component_dof_indices_offset
                             [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::n_array_elements,
+                          VectorizedArrayType::size(),
                       indices,
                       temp1[i + 2 * comp * dofs_per_face]);
                 }
@@ -2250,14 +2251,12 @@ namespace internal
         {
           const unsigned int *strides =
             &dof_info.dof_indices_interleave_strides
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
-          unsigned int indices[VectorizedArrayType::n_array_elements];
-          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
-               ++v)
+               [dof_access_index][cell * VectorizedArrayType::size()];
+          unsigned int indices[VectorizedArrayType::size()];
+          for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             indices[v] =
               dof_info.dof_indices_contiguous
-                [dof_access_index]
-                [cell * VectorizedArrayType::n_array_elements + v] +
+                [dof_access_index][cell * VectorizedArrayType::size() + v] +
               dof_info.component_dof_indices_offset[active_fe_index]
                                                    [first_selected_component] *
                 strides[v];
@@ -2276,23 +2275,21 @@ namespace internal
 
               const unsigned int *index_array =
                 &data.face_to_cell_index_hermite(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      unsigned int ind1[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind1[v] =
                           indices[v] + (comp * static_dofs_per_component +
                                         index_array[2 * i]) *
                                          strides[v];
-                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      unsigned int ind2[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind2[v] =
                           indices[v] + (comp * static_dofs_per_component +
@@ -2340,14 +2337,13 @@ namespace internal
                               dofs_per_face);
               const unsigned int *index_array =
                 &data.face_to_cell_index_nodal(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      unsigned int ind[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind[v] =
                           indices[v] +
@@ -2387,11 +2383,12 @@ namespace internal
                  MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                    contiguous &&
                dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
-                 VectorizedArrayType::n_array_elements)
+                 VectorizedArrayType::size())
         {
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (evaluate_gradients == true &&
               data.element_type ==
                 MatrixFreeFunctions::tensor_symmetric_hermite)
@@ -2607,13 +2604,14 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int dof_index =
-            dof_info.dof_indices_contiguous
-              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info
+              .dof_indices_contiguous[dof_access_index]
+                                     [cell * VectorizedArrayType::size()] +
             dof_info.component_dof_indices_offset[active_fe_index]
                                                  [first_selected_component] *
-              VectorizedArrayType::n_array_elements;
+              VectorizedArrayType::size();
 
           if (fe_degree > 1 && integrate_gradients == true)
             {
@@ -2641,16 +2639,16 @@ namespace internal
                       VectorizedArrayType grad =
                         grad_weight *
                         temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
-                      do_vectorized_add(
-                        val,
-                        dst_ptr + dof_index +
-                          (ind1 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements);
-                      do_vectorized_add(
-                        grad,
-                        dst_ptr + dof_index +
-                          (ind2 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements);
+                      do_vectorized_add(val,
+                                        dst_ptr + dof_index +
+                                          (ind1 +
+                                           comp * static_dofs_per_component) *
+                                            VectorizedArrayType::size());
+                      do_vectorized_add(grad,
+                                        dst_ptr + dof_index +
+                                          (ind2 +
+                                           comp * static_dofs_per_component) *
+                                            VectorizedArrayType::size());
                     }
                 }
             }
@@ -2664,11 +2662,11 @@ namespace internal
                 {
                   const unsigned int ind = index_array[i];
                   for (unsigned int comp = 0; comp < n_components; ++comp)
-                    do_vectorized_add(
-                      temp1[i + 2 * comp * dofs_per_face],
-                      dst_ptr + dof_index +
-                        (ind + comp * static_dofs_per_component) *
-                          VectorizedArrayType::n_array_elements);
+                    do_vectorized_add(temp1[i + 2 * comp * dofs_per_face],
+                                      dst_ptr + dof_index +
+                                        (ind +
+                                         comp * static_dofs_per_component) *
+                                          VectorizedArrayType::size());
                 }
             }
         }
@@ -2685,10 +2683,11 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (fe_degree > 1 && integrate_gradients == true)
             {
               // we know that the gradient weights for the Hermite case on the
@@ -2704,10 +2703,9 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind1 =
-                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                    index_array[2 * i] * VectorizedArrayType::size();
                   const unsigned int ind2 =
-                    index_array[2 * i + 1] *
-                    VectorizedArrayType::n_array_elements;
+                    index_array[2 * i + 1] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
                       VectorizedArrayType val =
@@ -2722,19 +2720,19 @@ namespace internal
                         indices,
                         dst_ptr + ind1 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements);
+                            VectorizedArrayType::size());
                       do_vectorized_scatter_add(
                         grad,
                         indices,
                         dst_ptr + ind2 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements);
+                            VectorizedArrayType::size());
                     }
                 }
             }
@@ -2747,17 +2745,17 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind =
-                    index_array[i] * VectorizedArrayType::n_array_elements;
+                    index_array[i] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     do_vectorized_scatter_add(
                       temp1[i + 2 * comp * dofs_per_face],
                       indices,
                       dst_ptr + ind +
                         comp * static_dofs_per_component *
-                          VectorizedArrayType::n_array_elements +
+                          VectorizedArrayType::size() +
                         dof_info.component_dof_indices_offset
                             [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::n_array_elements);
+                          VectorizedArrayType::size());
                 }
             }
         }
@@ -2774,14 +2772,12 @@ namespace internal
         {
           const unsigned int *strides =
             &dof_info.dof_indices_interleave_strides
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
-          unsigned int indices[VectorizedArrayType::n_array_elements];
-          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
-               ++v)
+               [dof_access_index][cell * VectorizedArrayType::size()];
+          unsigned int indices[VectorizedArrayType::size()];
+          for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             indices[v] =
               dof_info.dof_indices_contiguous
-                [dof_access_index]
-                [cell * VectorizedArrayType::n_array_elements + v] +
+                [dof_access_index][cell * VectorizedArrayType::size() + v] +
               dof_info.component_dof_indices_offset[active_fe_index]
                                                    [first_selected_component] *
                 strides[v];
@@ -2800,23 +2796,21 @@ namespace internal
 
               const unsigned int *index_array =
                 &data.face_to_cell_index_hermite(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      unsigned int ind1[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind1[v] =
                           indices[v] + (comp * static_dofs_per_component +
                                         index_array[2 * i]) *
                                          strides[v];
-                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      unsigned int ind2[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind2[v] =
                           indices[v] + (comp * static_dofs_per_component +
@@ -2864,14 +2858,13 @@ namespace internal
                               dofs_per_face);
               const unsigned int *index_array =
                 &data.face_to_cell_index_nodal(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      unsigned int ind[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind[v] =
                           indices[v] +
@@ -2907,11 +2900,12 @@ namespace internal
                  internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                    contiguous &&
                dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
-                 VectorizedArrayType::n_array_elements)
+                 VectorizedArrayType::size())
         {
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
 
           if (integrate_gradients == true &&
               data.element_type ==

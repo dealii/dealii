@@ -25,11 +25,11 @@ template <typename VectorizedArrayType>
 void
 do_test()
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
 
   VectorizedArrayType left;
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     left[i] = i + 1.;
 
   VectorizedArrayType right(3.);

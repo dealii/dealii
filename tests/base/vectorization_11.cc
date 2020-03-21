@@ -29,9 +29,9 @@ void
 do_test(const VectorizedArrayType                      array,
         const typename VectorizedArrayType::value_type number)
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     if (array[i] != number)
       deallog << "  problem in element " << i << std::endl;
 }

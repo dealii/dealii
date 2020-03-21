@@ -30,7 +30,7 @@ test()
   // since the number of array elements is system dependent, it is not a good
   // idea to print them to an output file. Instead, check the values manually
   VectorizedArray<Number> a, b, c;
-  const unsigned int      n_vectors = VectorizedArray<Number>::n_array_elements;
+  const unsigned int      n_vectors = VectorizedArray<Number>::size();
   a                                 = Number(2.);
   b                                 = Number(-1.);
   for (unsigned int i = 0; i < n_vectors; ++i)

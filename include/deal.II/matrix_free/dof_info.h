@@ -381,7 +381,7 @@ namespace internal
        * cells batched together. As opposed to the other classes which are
        * templated on the number type, this class as a pure index container is
        * not templated, so we need to keep the information otherwise contained
-       * in VectorizedArrayType::n_array_elements.
+       * in VectorizedArrayType::size().
        */
       unsigned int vectorization_length;
 

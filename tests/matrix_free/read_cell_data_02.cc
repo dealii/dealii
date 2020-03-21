@@ -151,8 +151,7 @@ private:
       }
   }
 
-  AlignedVector<std::array<CellId, VectorizedArrayType::n_array_elements>>
-    cell_ids;
+  AlignedVector<std::array<CellId, VectorizedArrayType::size()>> cell_ids;
 };
 
 

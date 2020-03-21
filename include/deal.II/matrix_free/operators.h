@@ -2034,7 +2034,7 @@ namespace MatrixFreeOperators
     bool
     non_negative(const VectorizedArrayType &n)
     {
-      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         if (n[v] < 0.)
           return false;
 
