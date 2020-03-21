@@ -533,8 +533,7 @@ namespace Step48
       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl
             << std::endl;
     }

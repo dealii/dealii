@@ -116,7 +116,40 @@
  */
 
 #cmakedefine DEAL_II_WORDS_BIGENDIAN
-#define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+/*
+ * This sets the largest number of vectorization bits detected for the given
+ * compiler flags and hardware (e.g. 256 for AVX on x86-64 architectures) for
+ * use in deal.II's instrinsics-based VectorizedArray class.
+ */
+#define DEAL_II_VECTORIZATION_WIDTH_IN_BITS @DEAL_II_VECTORIZATION_WIDTH_IN_BITS@
+
+/*
+ * Backward compatibility setting
+ */
+#ifdef DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 512
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL _Pragma ("GCC warning \"The DEAL_II_COMPILER_VECTORIZATION_LEVEL macro is deprecated\"") 3
+#  elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 256
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL _Pragma ("GCC warning \"The DEAL_II_COMPILER_VECTORIZATION_LEVEL macro is deprecated\"") 2
+#  elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 128
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL _Pragma ("GCC warning \"The DEAL_II_COMPILER_VECTORIZATION_LEVEL macro is deprecated\"") 1
+#  else
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL _Pragma ("GCC warning \"The DEAL_II_COMPILER_VECTORIZATION_LEVEL macro is deprecated\"")\
+ 0
+#  endif
+#else
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 512
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
+#  elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 256
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL 2
+#  elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 128
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL 1
+#  else
+#  define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
+#  endif
+#endif
+
 #define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 

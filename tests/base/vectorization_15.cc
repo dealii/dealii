@@ -129,15 +129,15 @@ struct Tester<double, n_numbers>
   static void
   test()
   {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
     do_test<double, n_numbers, 8>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
     do_test<double, n_numbers, 4>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
     do_test<double, n_numbers, 2>();
 #endif
 
@@ -151,15 +151,15 @@ struct Tester<float, n_numbers>
   static void
   test()
   {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
     do_test<float, n_numbers, 16>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
     do_test<float, n_numbers, 8>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
     do_test<float, n_numbers, 4>();
 #endif
 

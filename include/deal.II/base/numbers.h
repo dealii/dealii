@@ -81,13 +81,11 @@ namespace internal
      * Maximal vector length of VectorizedArray for double.
      */
     constexpr static unsigned int max_width =
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
-      2;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
       8;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
       4;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
       2;
 #else
       1;
@@ -109,13 +107,13 @@ namespace internal
      * Maximal vector length of VectorizedArray for float.
      */
     constexpr static unsigned int max_width =
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__)
       4;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
       16;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
       8;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
       4;
 #else
       1;

@@ -899,24 +899,24 @@ namespace Utilities
     const std::string
     get_current_vectorization_level()
     {
-      switch (DEAL_II_COMPILER_VECTORIZATION_LEVEL)
+      switch (DEAL_II_VECTORIZATION_WIDTH_IN_BITS)
         {
           case 0:
             return "disabled";
-          case 1:
+          case 128:
 #ifdef __ALTIVEC__
             return "AltiVec";
 #else
             return "SSE2";
 #endif
-          case 2:
+          case 256:
             return "AVX";
-          case 3:
+          case 512:
             return "AVX512";
           default:
             AssertThrow(false,
                         ExcInternalError(
-                          "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+                          "Invalid DEAL_II_VECTORIZATION_WIDTH_IN_BITS."));
             return "ERROR";
         }
     }
