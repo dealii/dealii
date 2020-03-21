@@ -36,10 +36,6 @@ namespace LinearAlgebra
 
     TEMPL_COPY_CONSTRUCTOR(double, float);
     TEMPL_COPY_CONSTRUCTOR(float, double);
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
-    TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
-    TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
-#endif
 
 #undef TEMPL_COPY_CONSTRUCTOR
   } // namespace SharedMPI
