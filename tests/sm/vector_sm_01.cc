@@ -60,7 +60,7 @@ test(const int n_refinements, const int degree, const int group_size)
   dealii::MatrixFree<dim, Number> matrix_free;
   matrix_free.reinit(mapping, dof_handler, constraint, quad, additional_data);
 
-  MPI_Comm comm = MPI_COMM_WORLD;
+  const MPI_Comm comm = MPI_COMM_WORLD;
 
   const unsigned int rank = Utilities::MPI::this_mpi_process(comm);
 

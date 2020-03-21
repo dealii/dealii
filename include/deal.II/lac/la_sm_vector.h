@@ -715,7 +715,16 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::local_element(
       const size_type local_index) const
     {
-      Assert(false, ExcNotImplemented());
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
+      AssertIndexRange(local_index,
+                       partitioner->local_size() +
+                         partitioner->n_ghost_indices());
+      // do not allow reading a vector which is not in ghost mode
+      Assert(local_index < local_size() || vector_is_ghosted == true,
+             ExcMessage("You tried to read a ghost element of this vector, "
+                        "but it has not imported its ghost values."));
 
       return data.values[local_index];
     }
@@ -726,7 +735,13 @@ namespace LinearAlgebra
     inline Number &
     Vector<Number, MemorySpace>::local_element(const size_type local_index)
     {
-      Assert(false, ExcNotImplemented());
+      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+             ExcMessage(
+               "This function is only implemented for the Host memory space"));
+
+      AssertIndexRange(local_index,
+                       partitioner->local_size() +
+                         partitioner->n_ghost_indices());
 
       return data.values[local_index];
     }

@@ -134,9 +134,34 @@ namespace LinearAlgebra
       const Vector<Number2, MemorySpaceType> &v,
       const bool                              omit_zeroing_entries)
     {
-      Assert(false, ExcNotImplemented());
-      (void)v;
-      (void)omit_zeroing_entries;
+      clear_mpi_requests();
+      Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
+
+      // check whether the partitioners are
+      // different (check only if the are allocated
+      // differently, not if the actual data is
+      // different)
+      if (partitioner.get() != v.partitioner.get())
+        {
+          partitioner    = v.partitioner;
+          partitioner_sm = v.partitioner_sm;
+          const size_type new_allocated_size =
+            partitioner->local_size() + partitioner->n_ghost_indices();
+          resize_val(new_allocated_size,
+                     partitioner_sm->get_sm_mpi_communicator());
+        }
+
+      if (omit_zeroing_entries == false)
+        this->operator=(Number());
+      else
+        zero_out_ghosts();
+
+      // do not reallocate import_data directly, but only upon request. It
+      // is only used as temporary storage for compress() and
+      // update_ghost_values, and we might have vectors where we never
+      // call these methods and hence do not need to have the storage.
+      import_data.values.reset();
+      import_data.values_dev.reset();
     }
 
 
@@ -215,8 +240,11 @@ namespace LinearAlgebra
       , allocated_size(0)
       , vector_is_ghosted(false)
     {
-      Assert(false, ExcNotImplemented());
-      (void)v;
+      reinit(v, true);
+
+      const size_type this_size = local_size();
+      if (this_size > 0)
+        std::memcpy(this->begin(), v.begin(), this_size * sizeof(Number));
     }
 
 
@@ -489,8 +517,22 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::
     operator-=(const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)vv;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      AssertDimension(local_size(), v.local_size());
+
+      auto       values       = this->begin();
+      const auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        values[i] -= values_other[i];
+
+      if (vector_is_ghosted)
+        update_ghost_values();
 
       return *this;
     }
@@ -513,9 +555,24 @@ namespace LinearAlgebra
       const Number                     a,
       const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)a;
-      (void)vv;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      AssertIsFinite(a);
+      AssertDimension(local_size(), v.local_size());
+
+      // nothing to do if a is zero
+      if (a == Number(0.))
+        return;
+
+      auto       values       = this->begin();
+      const auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        values[i] += a * values_other[i];
     }
 
 
@@ -525,9 +582,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::add(const Number                     a,
                                          const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)a;
-      (void)vv;
+      add_local(a, vv);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -580,10 +638,24 @@ namespace LinearAlgebra
       const Number                     a,
       const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)x;
-      (void)a;
-      (void)vv;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      AssertIsFinite(a);
+      AssertDimension(local_size(), v.local_size());
+
+      // nothing to do if a is zero
+      if (a == Number(0.))
+        return;
+
+      auto       values       = this->begin();
+      const auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        values[i] = x * values[i] + a * values_other[i];
     }
 
 
@@ -594,10 +666,10 @@ namespace LinearAlgebra
                                           const Number                     a,
                                           const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)x;
-      (void)a;
-      (void)vv;
+      sadd_local(x, a, vv);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -813,8 +885,14 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::linfty_norm_local() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      real_type max = 0.;
+
+      auto values = this->begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        max = std::max(std::abs(values[i]), max);
+
+      return max;
     }
 
 
@@ -823,8 +901,12 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::linfty_norm() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      const real_type local_result = linfty_norm_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::max(local_result,
+                                   partitioner->get_mpi_communicator());
+      else
+        return local_result;
     }
 
 
@@ -867,7 +949,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::partitioners_are_compatible(
       const Utilities::MPI::Partitioner &part) const
     {
-      Assert(false, ExcNotImplemented());
       return partitioner->is_compatible(part);
     }
 

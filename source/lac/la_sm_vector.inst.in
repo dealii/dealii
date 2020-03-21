@@ -27,26 +27,17 @@ for (SCALAR : REAL_SCALARS)
           ::dealii::MemorySpace::Host>(
           const Vector<SCALAR, ::dealii::MemorySpace::Host> &,
           VectorOperation::values);
-      \}
-    \}
-  }
-
-for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
-  {
-    namespace LinearAlgebra
-    \{
-      namespace SharedMPI
-      \{
         template void
-        Vector<S1, ::dealii::MemorySpace::Host>::reinit<S2>(
-          const Vector<S2, ::dealii::MemorySpace::Host> &,
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::reinit<SCALAR>(
+          const Vector<SCALAR, ::dealii::MemorySpace::Host> &,
           const bool);
-        template S1
-        Vector<S1, ::dealii::MemorySpace::Host>::inner_product_local<S2>(
-          const Vector<S2, ::dealii::MemorySpace::Host> &) const;
+        template SCALAR
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::inner_product_local<
+          SCALAR>(const Vector<SCALAR, ::dealii::MemorySpace::Host> &) const;
         template void
-        Vector<S1, ::dealii::MemorySpace::Host>::copy_locally_owned_data_from<
-          S2>(const Vector<S2, ::dealii::MemorySpace::Host> &);
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::
+          copy_locally_owned_data_from<SCALAR>(
+            const Vector<SCALAR, ::dealii::MemorySpace::Host> &);
       \}
     \}
   }
