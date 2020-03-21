@@ -253,28 +253,38 @@ namespace Step20
     // check to the beginning of the class to make sure that the sizes of input
     // and output parameters are the same (see step-5 for a discussion of this
     // technique). Then we loop over all evaluation points, and for each one
-    // first clear the output tensor and then set all its diagonal elements to
-    // one (i.e. fill the tensor with the identity matrix):
+    // set the output tensor to the identity matrix.
+    //
+    // There is an oddity at the top of the function (the
+    // `(void)points;` statement) that is worth discussing. The values
+    // we put into the output `values` array does not actually depend
+    // on the `points` arrays of coordinates at which the function is
+    // evaluated. In other words, the `points` argument is in fact
+    // unused, and we could have just not given it a name if we had
+    // wanted. But we want to use the `points` object for checking
+    // that the `values` object has the correct size. The problem is
+    // that in release mode, `AssertDimension` is defined as a macro
+    // that expands to nothing; the compiler will then complain that
+    // the `points` object is unused. The idiomatic approach to
+    // silencing this warning is to have a statement that evaluates
+    // (reads) variable but doesn't actually do anything: That's what
+    // `(void)points;` does: It reads from `points`, and then casts
+    // the result of the read to `void`, i.e., nothing. This statement
+    // is, in other words, completely pointless and implies no actual
+    // action except to explain to the compiler that yes, this
+    // variable is in fact used even in release mode. (In debug mode,
+    // the `AssertDimension` macro expands to something that reads
+    // from the variable, and so the funny statement would not be
+    // necessary in debug mode.)
     template <int dim>
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      // The value we are going to store for a given point does not depend on
-      // its coordinates, and we use the `points` object only for checking that
-      // the `values` object has the correct size. In release mode,
-      // `AssertDimension` is defined empty, and the compiler will complain that
-      // the `points` object is unused. The following line silences this
-      // warning.
       (void)points;
       AssertDimension(points.size(), values.size());
 
       for (auto &value : values)
-        {
-          value.clear();
-
-          for (unsigned int d = 0; d < dim; ++d)
-            value[d][d] = 1.;
-        }
+        value = unit_symmetric_tensor<dim>();
     }
   } // namespace PrescribedSolution
 
