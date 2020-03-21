@@ -97,7 +97,8 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
-      Assert(false, ExcNotImplemented());
+      // TODO: what is the use of this?
+      // it should probably delegated to partitioner
     }
 
 

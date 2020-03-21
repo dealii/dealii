@@ -36,7 +36,7 @@ using namespace dealii;
 
 template <typename Number, int dim>
 void
-test(const int n_refinements, const int degree)
+test(const int n_refinements, const int degree, const int group_size)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -60,16 +60,22 @@ test(const int n_refinements, const int degree)
   dealii::MatrixFree<dim, Number> matrix_free;
   matrix_free.reinit(mapping, dof_handler, constraint, quad, additional_data);
 
+  MPI_Comm comm = MPI_COMM_WORLD;
+  
+  const unsigned int rank = Utilities::MPI::this_mpi_process(comm);
+  
   MPI_Comm comm_sm;
+  MPI_Comm_split(comm, rank / group_size, rank, &comm_sm);
 
   LinearAlgebra::SharedMPI::Vector<Number> vec;
   matrix_free.initialize_dof_vector(vec, comm_sm);
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
-  initlog();
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    all;
 
-  test<double, 2>(1, 1);
+  test<double, 2>(1, 1, 1);
 }
