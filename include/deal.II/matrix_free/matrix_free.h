@@ -40,6 +40,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_sm_partitioner.h>
 #include <deal.II/lac/la_sm_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
@@ -1504,6 +1505,7 @@ public:
   template <typename Number2>
   void
   initialize_dof_vector(LinearAlgebra::SharedMPI::Vector<Number2> &vec,
+                        const MPI_Comm                             comm_sm,
                         const unsigned int dof_handler_index = 0) const;
 
   /**
@@ -2055,6 +2057,14 @@ private:
    */
   std::vector<internal::MatrixFreeFunctions::DoFInfo> dof_info;
 
+  // TODO: move it to DoFInfo
+  mutable std::map<
+    unsigned int,
+    std::map<
+      const MPI_Comm,
+      std::shared_ptr<const LinearAlgebra::SharedMPI::Partitioner<Number>>>>
+    partitioner_sm;
+
   /**
    * Contains the weights for constraints stored in DoFInfo. Filled into a
    * separate field since several vector components might share similar
@@ -2186,10 +2196,17 @@ template <typename Number2>
 inline void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   LinearAlgebra::SharedMPI::Vector<Number2> &vec,
+  const MPI_Comm                             comm_sm,
   const unsigned int                         comp) const
 {
   AssertIndexRange(comp, n_components());
-  vec.reinit(dof_info[comp].vector_partitioner);
+
+  if (partitioner_sm[comp][comm_sm] == nullptr)
+    partitioner_sm[comp][comm_sm] =
+      std::make_shared<LinearAlgebra::SharedMPI::Partitioner<Number>>(
+        dof_info[comp].vector_partitioner->get_communicator(), comm_sm);
+
+  vec.reinit(dof_info[comp].vector_partitioner, partitioner_sm[comp][comm_sm]);
 }
 
 

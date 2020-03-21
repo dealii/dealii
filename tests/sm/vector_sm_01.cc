@@ -60,8 +60,10 @@ test(const int n_refinements, const int degree)
   dealii::MatrixFree<dim, Number> matrix_free;
   matrix_free.reinit(mapping, dof_handler, constraint, quad, additional_data);
 
+  MPI_Comm comm_sm;
+
   LinearAlgebra::SharedMPI::Vector<Number> vec;
-  matrix_free.initialize_dof_vector(vec);
+  matrix_free.initialize_dof_vector(vec, comm_sm);
 }
 
 int

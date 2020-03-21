@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_la_parallel_vector_templates_h
-#define dealii_la_parallel_vector_templates_h
+#ifndef dealii_la_sm_vector_templates_h
+#define dealii_la_sm_vector_templates_h
 
 
 #include <deal.II/base/config.h>
@@ -170,14 +170,16 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::reinit(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const std::shared_ptr<const Partitioner<Number>> &        partitioner_sm)
     {
       clear_mpi_requests();
-      partitioner = partitioner_in;
+      this->partitioner    = partitioner;
+      this->partitioner_sm = partitioner_sm;
 
       // set vector size and allocate memory
       const size_type new_allocated_size =
-        partitioner->local_size() + partitioner->n_ghost_indices();
+        this->partitioner->local_size() + this->partitioner->n_ghost_indices();
       resize_val(new_allocated_size);
 
       // initialize to zero

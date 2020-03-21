@@ -24,6 +24,7 @@
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/lac/la_sm_partitioner.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_type_traits.h>
@@ -157,7 +158,8 @@ namespace LinearAlgebra
 
       void
       reinit(
-        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const std::shared_ptr<const Partitioner<Number>> &partitioner_sm);
 
       void
       swap(Vector<Number, MemorySpace> &v);
@@ -474,6 +476,8 @@ namespace LinearAlgebra
                         const Vector<Number, MemorySpace> &W);
 
       std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+
+      std::shared_ptr<const Partitioner<Number>> partitioner_sm;
 
       size_type allocated_size;
 
