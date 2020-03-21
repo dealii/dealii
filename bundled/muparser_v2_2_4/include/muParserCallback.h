@@ -81,6 +81,9 @@ public:
     ParserCallback(strfun_type3 a_pFun, bool a_bAllowOpti);
     ParserCallback();
     ParserCallback(const ParserCallback &a_Fun);
+
+    // deall.II: added the following line to remove Wdeprecated-copy warnings:
+    ParserCallback& operator=(const ParserCallback&)=default;
     
     ParserCallback* Clone() const;
 
