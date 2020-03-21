@@ -470,9 +470,10 @@ namespace Step65
   // interpret the subdivisions of the elements as a high-order Lagrange
   // polynomial rather than a collection of bilinear patches.
   // Recent visualization programs, like ParaView version 5.5
-  // or newer, can then render a high-order solution (one typically needs to
-  // adjust a parameter called "nonlinear subdivision level"). Secondly, we
-  // need to make sure that the mapping is passed to the
+  // or newer, can then render a high-order solution (see a <a
+  // href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">wiki
+  // page</a> for more details).
+  // Secondly, we need to make sure that the mapping is passed to the
   // DataOut::build_patches() method. Finally, the DataOut class only prints
   // curved faces for <i>boundary</i> cells by default, so we need to ensure
   // that also inner cells are printed in a curved representation via the
