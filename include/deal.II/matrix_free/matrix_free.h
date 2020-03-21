@@ -1505,7 +1505,7 @@ public:
   template <typename Number2>
   void
   initialize_dof_vector(LinearAlgebra::SharedMPI::Vector<Number2> &vec,
-                        const MPI_Comm &                            comm_sm,
+                        const MPI_Comm &                           comm_sm,
                         const unsigned int dof_handler_index = 0) const;
 
   /**
@@ -2196,17 +2196,20 @@ template <typename Number2>
 inline void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   LinearAlgebra::SharedMPI::Vector<Number2> &vec,
-  const MPI_Comm  &                           comm_sm,
+  const MPI_Comm &                           comm_sm,
   const unsigned int                         comp) const
 {
   AssertIndexRange(comp, n_components());
 
-  const auto & part = dof_info[comp].vector_partitioner;
-  
+  const auto &part = dof_info[comp].vector_partitioner;
+
   if (partitioner_sm[comp][comm_sm] == nullptr)
     partitioner_sm[comp][comm_sm] =
       std::make_shared<LinearAlgebra::SharedMPI::Partitioner<Number>>(
-        part->get_communicator(), comm_sm, part->locally_owned_range(), part->ghost_indices());
+        part->get_communicator(),
+        comm_sm,
+        part->locally_owned_range(),
+        part->ghost_indices());
 
   vec.reinit(part, partitioner_sm[comp][comm_sm]);
 }

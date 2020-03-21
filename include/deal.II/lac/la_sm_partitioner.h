@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 
 #include <deal.II/lac/communication_pattern_base.h>
@@ -33,7 +34,10 @@ namespace LinearAlgebra
     class Partitioner : public LinearAlgebra::CommunicationPatternBase
     {
     public:
-      Partitioner(const MPI_Comm &comm, const MPI_Comm &comm_sm, const IndexSet &is_locally_owned, const IndexSet &is_locally_ghost)
+      Partitioner(const MPI_Comm &comm,
+                  const MPI_Comm &comm_sm,
+                  const IndexSet &is_locally_owned,
+                  const IndexSet &is_locally_ghost)
         : comm(comm)
         , comm_sm(comm_sm)
       {
@@ -44,6 +48,12 @@ namespace LinearAlgebra
       get_mpi_communicator() const override
       {
         return comm;
+      }
+
+      const MPI_Comm &
+      get_sm_mpi_communicator() const
+      {
+        return comm_sm;
       }
 
       void
@@ -58,8 +68,7 @@ namespace LinearAlgebra
       }
 
       void
-      reinit(const IndexSet &is_locally_owned,
-             const IndexSet &is_locally_ghost)
+      reinit(const IndexSet &is_locally_owned, const IndexSet &is_locally_ghost)
       {
         this->n_local_elements = is_locally_owned.n_elements();
 
@@ -226,7 +235,7 @@ namespace LinearAlgebra
     private:
       const MPI_Comm &comm;
       const MPI_Comm &comm_sm;
-      
+
       unsigned int n_local_elements;
 
       AlignedVector<Number> buffer;

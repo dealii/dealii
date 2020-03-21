@@ -494,7 +494,7 @@ namespace LinearAlgebra
       clear_mpi_requests();
 
       void
-      resize_val(const size_type new_allocated_size);
+      resize_val(const size_type new_allocated_size, const MPI_Comm &comm_sm);
 
       template <typename Number2, typename MemorySpace2>
       friend class Vector;
@@ -514,17 +514,15 @@ namespace LinearAlgebra
       struct Policy
       {
         static inline typename Vector<Number, MemorySpace>::iterator
-        begin(MemorySpaceData<Number> &)
+        begin(MemorySpaceData<Number> &data)
         {
-          Assert(false, ExcNotImplemented());
-          return nullptr;
+          return data.values.get();
         }
 
         static inline typename Vector<Number, MemorySpace>::const_iterator
-        begin(const MemorySpaceData<Number> &)
+        begin(const MemorySpaceData<Number> &data)
         {
-          Assert(false, ExcNotImplemented());
-          return nullptr;
+          return data.values.get();
         }
 
         static inline Number *
@@ -561,8 +559,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::local_size() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      return partitioner->local_size();
     }
 
 
@@ -638,7 +635,6 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::iterator
     Vector<Number, MemorySpace>::begin()
     {
-      Assert(false, ExcNotImplemented());
       return internal::Policy<Number, MemorySpace>::begin(data);
     }
 
@@ -648,7 +644,6 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::const_iterator
     Vector<Number, MemorySpace>::begin() const
     {
-      Assert(false, ExcNotImplemented());
       return internal::Policy<Number, MemorySpace>::begin(data);
     }
 
@@ -658,7 +653,6 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::iterator
     Vector<Number, MemorySpace>::end()
     {
-      Assert(false, ExcNotImplemented());
       return internal::Policy<Number, MemorySpace>::begin(data) +
              partitioner->local_size();
     }
@@ -669,7 +663,6 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::const_iterator
     Vector<Number, MemorySpace>::end() const
     {
-      Assert(false, ExcNotImplemented());
       return internal::Policy<Number, MemorySpace>::begin(data) +
              partitioner->local_size();
     }

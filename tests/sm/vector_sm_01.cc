@@ -61,9 +61,9 @@ test(const int n_refinements, const int degree, const int group_size)
   matrix_free.reinit(mapping, dof_handler, constraint, quad, additional_data);
 
   MPI_Comm comm = MPI_COMM_WORLD;
-  
+
   const unsigned int rank = Utilities::MPI::this_mpi_process(comm);
-  
+
   MPI_Comm comm_sm;
   MPI_Comm_split(comm, rank / group_size, rank, &comm_sm);
 

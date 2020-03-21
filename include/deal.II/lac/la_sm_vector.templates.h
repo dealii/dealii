@@ -48,7 +48,8 @@ namespace LinearAlgebra
         static void
         resize_val(const types::global_dof_index new_alloc_size,
                    types::global_dof_index &     allocated_size,
-                   MemorySpaceData<Number> &     data)
+                   MemorySpaceData<Number> &     data,
+                   const MPI_Comm &              comm_shared)
         {
           Assert(allocated_size == 0, ExcNotImplemented());
           Assert(data.values == nullptr, ExcNotImplemented());
@@ -57,7 +58,6 @@ namespace LinearAlgebra
 
           // TODO
           std::vector<Number *> data_others;
-          MPI_Comm              comm_shared;
 
           data.values_win   = new MPI_Win;
           Number *data_this = (Number *)malloc(0);
@@ -105,11 +105,15 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size)
+    Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size,
+                                                const MPI_Comm &comm_sm)
     {
       internal::la_parallel_vector_templates_functions<
         Number,
-        MemorySpaceType>::resize_val(new_alloc_size, allocated_size, data);
+        MemorySpaceType>::resize_val(new_alloc_size,
+                                     allocated_size,
+                                     data,
+                                     comm_sm);
     }
 
 
@@ -181,7 +185,7 @@ namespace LinearAlgebra
       // set vector size and allocate memory
       const size_type new_allocated_size =
         this->partitioner->local_size() + this->partitioner->n_ghost_indices();
-      resize_val(new_allocated_size);
+      resize_val(new_allocated_size, partitioner_sm->get_sm_mpi_communicator());
 
       // initialize to zero
       this->operator=(Number());
@@ -274,7 +278,6 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     inline Vector<Number, MemorySpaceType>::~Vector()
     {
-      Assert(false, ExcNotImplemented());
       try
         {
           clear_mpi_requests();
@@ -363,7 +366,10 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghosts() const
     {
-      Assert(false, ExcNotImplemented());
+      if (data.values != nullptr)
+        std::fill_n(data.values.get() + partitioner->local_size(),
+                    partitioner->n_ghost_indices(),
+                    Number());
     }
 
 
@@ -439,8 +445,12 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator=(const Number s)
     {
-      Assert(false, ExcNotImplemented());
-      (void)s;
+      const size_type this_size = local_size();
+      if (this_size > 0)
+        std::fill_n(data.values.get(), this_size, s);
+
+      if (s == Number())
+        zero_out_ghosts();
 
       return *this;
     }
