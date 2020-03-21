@@ -75,6 +75,32 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
+    template <typename Number>
+    struct MemorySpaceData
+    {
+      void
+      copy_to(Number *begin, std::size_t n_elements)
+      {
+        Assert(false, ExcNotImplemented());
+        (void)begin;
+        (void)n_elements;
+      }
+
+      void
+      copy_from(Number *begin, std::size_t n_elements)
+      {
+        Assert(false, ExcNotImplemented());
+        (void)begin;
+        (void)n_elements;
+      }
+
+      std::unique_ptr<Number[], std::function<void(Number *&)>> values;
+      MPI_Win *values_win = nullptr;
+
+      std::unique_ptr<Number[]> values_dev;
+    };
+
+
     template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
                    public Subscriptor
@@ -451,13 +477,10 @@ namespace LinearAlgebra
 
       size_type allocated_size;
 
-      mutable ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> data;
+      mutable MemorySpaceData<Number> data;
 
-      mutable std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-        thread_loop_partitioner;
-
-      mutable ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-        import_data;
+      // needed?
+      mutable MemorySpaceData<Number> import_data;
 
       mutable bool vector_is_ghosted;
 
@@ -487,90 +510,24 @@ namespace LinearAlgebra
       struct Policy
       {
         static inline typename Vector<Number, MemorySpace>::iterator
-        begin(::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        begin(MemorySpaceData<Number> &)
         {
           Assert(false, ExcNotImplemented());
           return nullptr;
         }
 
         static inline typename Vector<Number, MemorySpace>::const_iterator
-        begin(
-          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        begin(const MemorySpaceData<Number> &)
         {
           Assert(false, ExcNotImplemented());
           return nullptr;
         }
 
         static inline Number *
-        get_values(
-          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
+        get_values(MemorySpaceData<Number> &)
         {
           Assert(false, ExcNotImplemented());
           return nullptr;
-        }
-      };
-
-
-
-      template <typename Number>
-      struct Policy<Number, ::dealii::MemorySpace::Host>
-      {
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::Host>::iterator
-          begin(::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values.get();
-        }
-
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::Host>::const_iterator
-          begin(const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values.get();
-        }
-
-        static inline Number *
-        get_values(::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values.get();
-        }
-      };
-
-
-
-      template <typename Number>
-      struct Policy<Number, ::dealii::MemorySpace::CUDA>
-      {
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::CUDA>::iterator
-          begin(::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values_dev.get();
-        }
-
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::CUDA>::const_iterator
-          begin(const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values_dev.get();
-        }
-
-        static inline Number *
-        get_values(::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          Assert(false, ExcNotImplemented());
-          return data.values_dev.get();
         }
       };
     } // namespace internal

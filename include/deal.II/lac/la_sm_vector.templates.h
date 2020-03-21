@@ -38,6 +38,61 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
+    namespace internal
+    {
+      template <typename Number, typename MemorySpaceType>
+      struct la_parallel_vector_templates_functions
+      {
+        using size_type = types::global_dof_index;
+
+        static void
+        resize_val(const types::global_dof_index new_alloc_size,
+                   types::global_dof_index &     allocated_size,
+                   MemorySpaceData<Number> &     data)
+        {
+          Assert(allocated_size == 0, ExcNotImplemented());
+          Assert(data.values == nullptr, ExcNotImplemented());
+
+          allocated_size = new_alloc_size;
+
+          // TODO
+          std::vector<Number *> data_others;
+          MPI_Comm              comm_shared;
+
+          data.values_win   = new MPI_Win;
+          Number *data_this = (Number *)malloc(0);
+          data_others.resize(Utilities::MPI::n_mpi_processes(comm_shared));
+
+
+          MPI_Info info;
+          MPI_Info_create(&info);
+          MPI_Info_set(info, "alloc_shared_noncontig", "true");
+
+          MPI_Win_allocate_shared(new_alloc_size * sizeof(Number),
+                                  sizeof(Number),
+                                  info,
+                                  comm_shared,
+                                  data_this,
+                                  data.values_win);
+
+          for (unsigned int i = 0;
+               i < Utilities::MPI::n_mpi_processes(comm_shared);
+               i++)
+            {
+              int      disp_unit;
+              MPI_Aint ssize;
+              MPI_Win_shared_query(
+                *data.values_win, i, &ssize, &disp_unit, &data_others[i]);
+            }
+
+          data.values = {
+            data_others[Utilities::MPI::this_mpi_process(comm_shared)],
+            [&data](Number *&) { MPI_Win_free(data.values_win); }};
+        }
+      };
+    } // namespace internal
+
+
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
@@ -51,8 +106,9 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size)
     {
-      Assert(false, ExcNotImplemented());
-      (void)new_alloc_size;
+      internal::la_parallel_vector_templates_functions<
+        Number,
+        MemorySpaceType>::resize_val(new_alloc_size, allocated_size, data);
     }
 
 
@@ -116,8 +172,26 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
     {
-      Assert(false, ExcNotImplemented());
-      (void)partitioner_in;
+      clear_mpi_requests();
+      partitioner = partitioner_in;
+
+      // set vector size and allocate memory
+      const size_type new_allocated_size =
+        partitioner->local_size() + partitioner->n_ghost_indices();
+      resize_val(new_allocated_size);
+
+      // initialize to zero
+      this->operator=(Number());
+
+
+      // do not reallocate import_data directly, but only upon request. It
+      // is only used as temporary storage for compress() and
+      // update_ghost_values, and we might have vectors where we never
+      // call these methods and hence do not need to have the storage.
+      import_data.values.reset();
+      import_data.values_dev.reset();
+
+      vector_is_ghosted = false;
     }
 
 
