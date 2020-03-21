@@ -121,6 +121,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
 }
 
 
+
 template <int dim, int spacedim>
 std::unique_ptr<typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
 FE_NedelecSZ<dim, spacedim>::get_data(
@@ -1100,6 +1101,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   return data_ptr;
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_edge_values(
@@ -1525,6 +1528,8 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_face_values(
@@ -1899,6 +1904,8 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_fe_values(
@@ -2010,6 +2017,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
         }
     }
 }
+
+
 
 template <int dim, int spacedim>
 void
@@ -2140,6 +2149,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
@@ -2158,6 +2169,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   Assert(false, ExcNotImplemented());
 }
 
+
+
 template <int dim, int spacedim>
 UpdateFlags
 FE_NedelecSZ<dim, spacedim>::requires_update_flags(
@@ -2165,6 +2178,8 @@ FE_NedelecSZ<dim, spacedim>::requires_update_flags(
 {
   return update_once(flags) | update_each(flags);
 }
+
+
 
 template <int dim, int spacedim>
 UpdateFlags
@@ -2178,6 +2193,8 @@ FE_NedelecSZ<dim, spacedim>::update_once(const UpdateFlags flags) const
 
   return out;
 }
+
+
 
 template <int dim, int spacedim>
 UpdateFlags
@@ -2203,6 +2220,8 @@ FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
   return out;
 }
 
+
+
 template <int dim, int spacedim>
 std::string
 FE_NedelecSZ<dim, spacedim>::get_name() const
@@ -2220,12 +2239,16 @@ FE_NedelecSZ<dim, spacedim>::get_name() const
   return namebuf.str();
 }
 
+
+
 template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_NedelecSZ<dim, spacedim>::clone() const
 {
   return std_cxx14::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
 }
+
+
 
 template <int dim, int spacedim>
 std::vector<unsigned int>
@@ -2247,6 +2270,8 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
     }
   return dpo;
 }
+
+
 
 template <int dim, int spacedim>
 unsigned int
@@ -2270,6 +2295,8 @@ FE_NedelecSZ<dim, spacedim>::compute_num_dofs(const unsigned int degree) const
     }
 }
 
+
+
 template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
@@ -2278,6 +2305,8 @@ FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
   IntegratedLegendrePolynomials =
     IntegratedLegendreSZ::generate_complete_basis(degree + 1);
 }
+
+
 
 // explicit instantiations
 #include "fe_nedelec_sz.inst"
