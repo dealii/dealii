@@ -442,6 +442,22 @@ namespace internal
 
 
 
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+    template <typename Number>
+    inline void
+    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<Number>>::extract(
+      const LinearAlgebra::TpetraWrappers::Vector<Number> & /*vector*/,
+      const std::vector<types::global_dof_index> & /*indices*/,
+      const ComponentExtractor /*extract_component*/,
+      std::vector<double> & /*values*/)
+    {
+      // TODO: we don't have element access
+      Assert(false, ExcNotImplemented());
+    }
+#endif
+
+
+
     template <typename DoFHandlerType>
     DataEntryBase<DoFHandlerType>::DataEntryBase(
       const DoFHandlerType *          dofs,
