@@ -2484,15 +2484,15 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
   const unsigned int cell_batch_number) const
 {
   AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
-  unsigned int n_components = VectorizedArrayType::size();
-  while (n_components > 1 &&
+  unsigned int n_lanes = VectorizedArrayType::size();
+  while (n_lanes > 1 &&
          cell_level_index[cell_batch_number * VectorizedArrayType::size() +
-                          n_components - 1] ==
+                          n_lanes - 1] ==
            cell_level_index[cell_batch_number * VectorizedArrayType::size() +
-                            n_components - 2])
-    --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArrayType::size());
-  return n_components;
+                            n_lanes - 2])
+    --n_lanes;
+  AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
+  return n_lanes;
 }
 
 
@@ -2503,13 +2503,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
   const unsigned int face_batch_number) const
 {
   AssertIndexRange(face_batch_number, face_info.faces.size());
-  unsigned int n_components = VectorizedArrayType::size();
-  while (n_components > 1 &&
-         face_info.faces[face_batch_number].cells_interior[n_components - 1] ==
+  unsigned int n_lanes = VectorizedArrayType::size();
+  while (n_lanes > 1 &&
+         face_info.faces[face_batch_number].cells_interior[n_lanes - 1] ==
            numbers::invalid_unsigned_int)
-    --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArrayType::size());
-  return n_components;
+    --n_lanes;
+  AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
+  return n_lanes;
 }
 
 

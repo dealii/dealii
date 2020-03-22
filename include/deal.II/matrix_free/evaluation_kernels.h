@@ -2781,7 +2781,7 @@ namespace internal
               dof_info.component_dof_indices_offset[active_fe_index]
                                                    [first_selected_component] *
                 strides[v];
-          const unsigned int nvec =
+          const unsigned int n_filled_lanes =
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
 
           if (fe_degree > 1 && integrate_gradients == true)
@@ -2796,7 +2796,7 @@ namespace internal
 
               const unsigned int *index_array =
                 &data.face_to_cell_index_hermite(face_no, 0);
-              if (nvec == VectorizedArrayType::size())
+              if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
@@ -2828,7 +2828,7 @@ namespace internal
                     }
               else
                 {
-                  for (unsigned int v = 0; v < nvec; ++v)
+                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
@@ -2858,7 +2858,7 @@ namespace internal
                               dofs_per_face);
               const unsigned int *index_array =
                 &data.face_to_cell_index_nodal(face_no, 0);
-              if (nvec == VectorizedArrayType::size())
+              if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
@@ -2875,7 +2875,7 @@ namespace internal
                     }
               else
                 {
-                  for (unsigned int v = 0; v < nvec; ++v)
+                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
