@@ -72,3 +72,15 @@ OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
   OFF)
 
 SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_4/")
+
+
+#
+# Mesquite
+#
+SET(FEATURE_MESQUITE_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_MESQUITE
+  "Always use the bundled Mesquite library instead of an external one."
+  OFF)
+
+SET(MESQUITE_FOLDER "${CMAKE_SOURCE_DIR}/bundled/mesquite-2.99/")

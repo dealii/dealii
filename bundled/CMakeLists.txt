@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -64,6 +64,17 @@ ENDIF()
 
 IF(FEATURE_MUPARSER_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${MUPARSER_FOLDER})
+ENDIF()
+
+
+IF(FEATURE_MESQUITE_BUNDLED_CONFIGURED)
+  ADD_SUBDIRECTORY(${MESQUITE_FOLDER}) # /src
+  
+  INSTALL(DIRECTORY ${MESQUITE_FOLDER}/include
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+    )
 ENDIF()
 
 
