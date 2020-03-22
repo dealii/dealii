@@ -1103,10 +1103,10 @@ namespace internal
       const std::vector<unsigned int> &                         active_fe_index,
       const Mapping<dim> &                                      mapping)
     {
-      const unsigned int n_cells             = cells.size();
-      const unsigned int vectorization_width = VectorizedArrayType::size();
-      Assert(n_cells % vectorization_width == 0, ExcInternalError());
-      const unsigned int n_macro_cells = n_cells / vectorization_width;
+      const unsigned int n_cells = cells.size();
+      const unsigned int n_lanes = VectorizedArrayType::size();
+      Assert(n_cells % n_lanes == 0, ExcInternalError());
+      const unsigned int n_macro_cells = n_cells / n_lanes;
       cell_type.resize(n_macro_cells);
 
       if (n_macro_cells == 0)
@@ -1947,8 +1947,8 @@ namespace internal
       if (update_flags_faces_by_cells == update_default)
         return;
 
-      const unsigned int n_quads             = face_data_by_cells.size();
-      const unsigned int vectorization_width = VectorizedArrayType::size();
+      const unsigned int n_quads = face_data_by_cells.size();
+      const unsigned int n_lanes = VectorizedArrayType::size();
       UpdateFlags        update_flags =
         (update_flags_faces_by_cells & update_quadrature_points ?
            update_quadrature_points :
@@ -1960,7 +1960,7 @@ namespace internal
           // since we already know the cell type, we can pre-allocate the right
           // amount of data straight away and we just need to do some basic
           // counting
-          AssertDimension(cell_type.size(), cells.size() / vectorization_width);
+          AssertDimension(cell_type.size(), cells.size() / n_lanes);
           face_data_by_cells[my_q].data_index_offsets.resize(
             cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_quadrature_points)
@@ -2056,12 +2056,12 @@ namespace internal
                   .data_index_offsets[cell * GeometryInfo<dim>::faces_per_cell +
                                       face];
 
-              for (unsigned int v = 0; v < vectorization_width; ++v)
+              for (unsigned int v = 0; v < n_lanes; ++v)
                 {
                   typename dealii::Triangulation<dim>::cell_iterator cell_it(
                     &tria,
-                    cells[cell * vectorization_width + v].first,
-                    cells[cell * vectorization_width + v].second);
+                    cells[cell * n_lanes + v].first,
+                    cells[cell * n_lanes + v].second);
                   fe_val.reinit(cell_it, face);
 
                   const bool is_local =
