@@ -182,6 +182,7 @@
  *       <td> Higher order mappings. Do not
  *       solve equations, but rather compute the value of pi to high
  *       accuracy.
+ *       <br/> Keywords: MappingQ, FE_Nothing, ConvergenceTable, GridOut, FEFaceValues
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -189,11 +190,15 @@
  *       <td> Solving a Laplace problem with
  *       higher order mappings. Using mean value constraints and
  *       intermediate representations of sparsity patterns.
+ *       <br/> Keywords: AffineConstraints, DoFTools::extract_boundary_dofs(),
+ *       TableHandler
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-12</td>
  *       <td> Discontinuous Galerkin methods for linear advection problems.
+ *       <br/> Keywords: FEInterfaceValues, MeshWorker::mesh_loop(),
+ *       DoFTools::make_flux_sparsity_pattern
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -207,18 +212,23 @@
  *       <td> Duality based error estimators,
  *       more strategies to write a modular, extensible finite element
  *       program.
+ *       <br/> Keywords: KellyErrorEstimator
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-15</td>
  *       <td> A nonlinear elliptic problem: The minimal surface equation.
  *       Newton's method. Transferring a solution across mesh refinement.
+ *       <br/> Keywords: SolutionTransfer
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-16</td>
  *       <td> Multigrid preconditioning of the Laplace equation on adaptive
  *       meshes.
+ *       <br/> Keywords: Multigrid, PreconditionMG, mg::Matrix,
+ *       MGTransferPrebuilt, MeshWorker::mesh_loop, MGLevelObject,
+ *       MGConstrainedDofs
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -231,6 +241,8 @@
  *       <td>step-17</td>
  *       <td> Using PETSc for linear algebra; running
  *       in parallel on clusters of computers linked together by MPI.
+ *       <br/> Keywords: PETScWrappers::MPI::SparseMatrix, ConditionalOStream,
+ *       PETScWrappers::PreconditionBlockJacobi
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -238,6 +250,8 @@
  *       <td> A time dependent problem; using a much
  *       simplified version of implementing elasticity; moving meshes; handling
  *       large scale output of parallel programs.
+ *       <br/> Keywords: parallel::shared::Triangulation,
+ *       DataOutInterface::write_vtu_with_pvtu_record()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -245,6 +259,8 @@
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
  *       preconditioners working on the Schur complement.
+ *       <br/> Keywords: FEValuesExtractors, LinearOperator, TensorFunction,
+ *       FE_RaviartThomas
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -252,6 +268,8 @@
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
  *       complicated block solvers. Simple time stepping.
+ *       <br/> Keywords: TensorFunction, InverseMatrix, FE_RaviartThomas,
+ *       VectorTools::project()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -259,17 +277,22 @@
  *       <td> Solving the Stokes equations of slow fluid flow on adaptive
  *       meshes. More on Schur complement solvers. Advanced use of the
  *       AffineConstraints class.
+ *       <br/> Keywords: AffineConstraints,
+ *       VectorTools::compute_no_normal_flux_constraints(), SparseILU,
+ *       SparseDirectUMFPACK, BlockDynamicSparsityPattern
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
+ *       <br/> Keywords: MatrixCreator, VectorTools::project
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-24</td>
  *       <td> A variant of step-23 with absorbing
  *       boundary conditions, and extracting practically useful data.
+ *       <br/> Keywords: VectorTools::point_value
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -277,17 +300,22 @@
  *       <td> The sine-Gordon
  *       soliton equation, which is a nonlinear variant of the time
  *       dependent wave equation covered in step-23 and step-24.
+ *       <br/> Keywords: FunctionTime, VectorTools::integrate_difference
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-26</td>
  *       <td> The heat equation, solved on a mesh that is adapted
  *       every few time steps.
+ *       <br/> Keywords: KellyErrorEstimator, SolutionTransfer,
+ *       VectorTools::interpolate(), VectorTools::create_right_hand_side()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-27</td>
  *       <td> The hp finite element method.
+ *       <br/> Keywords: hp::DoFHandler, hp::FECollection, hp::QCollection,
+ *       FESeries::Fourier, Triangulation::create_triangulation()
  *       </td></tr>
  *
  *   <tr valign="top">
