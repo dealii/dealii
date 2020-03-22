@@ -429,7 +429,7 @@ namespace Step55
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.compute_locally_owned_dofs_per_processor(),
+        dof_handler.locally_owned_dofs(),
         mpi_communicator,
         locally_relevant_dofs);
 

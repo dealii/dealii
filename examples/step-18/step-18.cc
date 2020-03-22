@@ -495,19 +495,9 @@ namespace Step18
 
     ConditionalOStream pcout;
 
-    // Here is a vector where each entry denotes the numbers of degrees of
-    // freedom that are stored on the processor with that particular number:
-    std::vector<types::global_dof_index> local_dofs_per_process;
-
     // We are storing the locally owned and the locally relevant indices:
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
-
-    // In the same direction, also cache how many cells the present processor
-    // owns. Note that the cells that belong to a processor are not
-    // necessarily contiguously numbered (when iterating over them using
-    // <code>active_cell_iterator</code>).
-    unsigned int n_local_cells;
 
     // Finally, we have a static variable that denotes the linear relationship
     // between the stress and strain. Since it is a constant object that does
@@ -720,7 +710,6 @@ namespace Step18
     , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
     , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
     , pcout(std::cout, this_mpi_process == 0)
-    , n_local_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -818,15 +807,6 @@ namespace Step18
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-    // The next thing is to store some information for later use on how many
-    // cells or degrees of freedom the present processor, or any of the
-    // processors has to work on. First the cells local to this processor...
-    n_local_cells = GridTools::count_cells_with_subdomain_association(
-      triangulation, triangulation.locally_owned_subdomain());
-
-    local_dofs_per_process =
-      dof_handler.compute_n_locally_owned_dofs_per_processor();
-
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
     hanging_node_constraints.clear();
@@ -856,7 +836,7 @@ namespace Step18
                                     hanging_node_constraints,
                                     /*keep constrained dofs*/ false);
     SparsityTools::distribute_sparsity_pattern(sparsity_pattern,
-                                               local_dofs_per_process,
+                                               locally_owned_dofs,
                                                mpi_communicator,
                                                locally_relevant_dofs);
     // Note that we have used the <code>DynamicSparsityPattern</code> class
