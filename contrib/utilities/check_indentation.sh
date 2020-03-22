@@ -43,5 +43,8 @@ git diff-files --quiet || exit $?
 # Run various checks involving doxygen documentation:
 ./contrib/utilities/check_doxygen.sh || exit $?
 
+# Check for utf8 encoding:
+./contrib/utilities/check_encoding.py || exit $?
+
 # Success!
 exit 0
