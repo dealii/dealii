@@ -1,0 +1,9 @@
+New: Variants of SparsityTools::distribute_sparsity_pattern() and
+SparsityTools::gather_sparsity_pattern() taking only the locally owned index
+set of the calling MPI process have been added. They avoid the previously
+necessary MPI all-to-all communication to compute the owned dofs on all
+processes and instead go through Utilities::MPI::compute_index_owned with
+sparse communication. On more than around 1,000 MPI ranks, the new functions
+should be considerably faster.
+<br>
+(Martin Kronbichler, 2020/03/22)
