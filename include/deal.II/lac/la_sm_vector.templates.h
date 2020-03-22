@@ -51,8 +51,10 @@ namespace LinearAlgebra
                    MemorySpaceData<Number> &     data,
                    const MPI_Comm &              comm_shared)
         {
-          Assert(allocated_size == 0, ExcNotImplemented());
-          Assert(data.values == nullptr, ExcNotImplemented());
+          // TODO: is assert fine?
+          Assert(((allocated_size > 0 && data.values != nullptr) ||
+                  data.values == nullptr),
+                 ExcInternalError());
 
           allocated_size = new_alloc_size;
 
