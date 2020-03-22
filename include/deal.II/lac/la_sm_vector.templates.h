@@ -56,25 +56,29 @@ namespace LinearAlgebra
 
           allocated_size = new_alloc_size;
 
+          const unsigned int size_sm =
+            Utilities::MPI::n_mpi_processes(comm_shared);
+          const unsigned int rank_sm =
+            Utilities::MPI::this_mpi_process(comm_shared);
+
           data.values_win   = new MPI_Win;
           Number *data_this = (Number *)malloc(0);
-          data.others.resize(Utilities::MPI::n_mpi_processes(comm_shared));
-
+          data.others.resize(size_sm);
 
           MPI_Info info;
           MPI_Info_create(&info);
           MPI_Info_set(info, "alloc_shared_noncontig", "true");
 
-          MPI_Win_allocate_shared(new_alloc_size * sizeof(Number),
+          const std::size_t align_by = 64;
+
+          MPI_Win_allocate_shared(new_alloc_size * sizeof(Number) + align_by,
                                   sizeof(Number),
                                   info,
                                   comm_shared,
                                   data_this,
                                   data.values_win);
 
-          for (unsigned int i = 0;
-               i < Utilities::MPI::n_mpi_processes(comm_shared);
-               i++)
+          for (unsigned int i = 0; i < size_sm; i++)
             {
               int      disp_unit;
               MPI_Aint ssize;
@@ -82,9 +86,32 @@ namespace LinearAlgebra
                 *data.values_win, i, &ssize, &disp_unit, &data.others[i]);
             }
 
-          data.values = {
-            data.others[Utilities::MPI::this_mpi_process(comm_shared)],
-            [&data](Number *&) { MPI_Win_free(data.values_win); }};
+          Number *    ptr_unaligned = data.others[rank_sm];
+          Number *    ptr_aligned   = ptr_unaligned;
+          std::size_t s = new_alloc_size * sizeof(Number) + align_by;
+
+          AssertThrow(std::align(align_by,
+                                 new_alloc_size * sizeof(Number),
+                                 reinterpret_cast<void *&>(ptr_aligned),
+                                 s) != nullptr,
+                      ExcNotImplemented());
+
+          unsigned int              n_align_local = ptr_aligned - ptr_unaligned;
+          std::vector<unsigned int> n_align_sm(size_sm);
+
+          MPI_Allgather(&n_align_local,
+                        1,
+                        MPI_UNSIGNED,
+                        n_align_sm.data(),
+                        1,
+                        MPI_UNSIGNED,
+                        comm_shared);
+
+          for (unsigned int i = 0; i < size_sm; i++)
+            data.others[i] += n_align_sm[i];
+
+          data.values = {ptr_aligned,
+                         [&data](Number *&) { MPI_Win_free(data.values_win); }};
         }
       };
     } // namespace internal
