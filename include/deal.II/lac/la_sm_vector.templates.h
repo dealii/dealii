@@ -63,8 +63,8 @@ namespace LinearAlgebra
           const unsigned int rank_sm =
             Utilities::MPI::this_mpi_process(comm_shared);
 
-          data.values_win   = new MPI_Win;
-          Number *data_this = (Number *)malloc(0);
+          MPI_Win *win       = new MPI_Win;
+          Number * data_this = (Number *)malloc(0);
           data.others.resize(size_sm);
 
           MPI_Info info;
@@ -78,14 +78,14 @@ namespace LinearAlgebra
                                   info,
                                   comm_shared,
                                   data_this,
-                                  data.values_win);
+                                  win);
 
           for (unsigned int i = 0; i < size_sm; i++)
             {
               int      disp_unit;
               MPI_Aint ssize;
               MPI_Win_shared_query(
-                *data.values_win, i, &ssize, &disp_unit, &data.others[i]);
+                *win, i, &ssize, &disp_unit, &data.others[i]);
             }
 
           Number *    ptr_unaligned = data.others[rank_sm];
@@ -112,8 +112,9 @@ namespace LinearAlgebra
           for (unsigned int i = 0; i < size_sm; i++)
             data.others[i] += n_align_sm[i];
 
-          data.values = {ptr_aligned,
+          data.values     = {ptr_aligned,
                          [&data](Number *&) { MPI_Win_free(data.values_win); }};
+          data.values_win = win;
         }
       };
     } // namespace internal
