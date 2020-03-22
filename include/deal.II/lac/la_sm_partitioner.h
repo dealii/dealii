@@ -246,7 +246,7 @@ namespace LinearAlgebra
                     0,
                     MPI_INT,
                     recv_sm_ranks[i],
-                    communication_channel + 1,
+                    communication_channel + 2,
                     comm_sm,
                     recv_sm_req.data() + i);
 
@@ -255,7 +255,7 @@ namespace LinearAlgebra
                     0,
                     MPI_INT,
                     send_sm_ranks[i],
-                    communication_channel + 1,
+                    communication_channel + 2,
                     comm_sm,
                     send_sm_req.data() + i);
 
@@ -264,7 +264,7 @@ namespace LinearAlgebra
                     recv_remote_ptr[i + 1] - recv_remote_ptr[i],
                     Utilities::MPI::internal::mpi_type_id(data_this),
                     recv_remote_ranks[i],
-                    communication_channel + 0,
+                    communication_channel + 3,
                     comm,
                     recv_remote_req.data() + i);
 
@@ -279,7 +279,7 @@ namespace LinearAlgebra
                       send_remote_ptr[i + 1] - send_remote_ptr[i],
                       Utilities::MPI::internal::mpi_type_id(data_this),
                       send_remote_ranks[i],
-                      communication_channel + 0,
+                      communication_channel + 3,
                       comm,
                       send_remote_req.data() + i);
           }
@@ -383,7 +383,7 @@ namespace LinearAlgebra
                         &i,
                         MPI_STATUS_IGNORE);
 
-            const Number *__restrict__ data_others_ptr =
+            Number *__restrict__ data_others_ptr =
               data_others[send_sm_ranks[i]];
             Number *__restrict__ data_this_ptr = data_this;
 
@@ -392,6 +392,7 @@ namespace LinearAlgebra
                  j++, k++)
               {
                 data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
+                data_others_ptr[k] = 0.0;
               }
           }
 

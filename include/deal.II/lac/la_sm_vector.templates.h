@@ -1030,7 +1030,7 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::linfty_norm_local() const
     {
-      real_type max = 0.;
+      real_type max = Number();
 
       auto values = this->begin();
 
