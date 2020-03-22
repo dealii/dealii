@@ -89,9 +89,9 @@
  *   <tr valign="top">
  *       <td width="100px">step-1</td>
  *       <td> Creating a grid. A simple way to write it to a file.
- *       <br/> Keywords: Triangulation, GridGenerator::hyper_cube,
- *       GridGenerator::hyper_shell, GridOut,
- *       Triangulation::execute_coarsening_and_refinement
+ *       <br/> Keywords: Triangulation, GridGenerator::hyper_cube(),
+ *       GridGenerator::hyper_shell(), GridOut,
+ *       Triangulation::execute_coarsening_and_refinement()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -102,7 +102,7 @@
  *       matrices significantly, i.e. clusters nonzero entries around the
  *       diagonal.
  *       <br/> Keywords: FE_Q, DynamicSparsityPattern,
- *       DoFTools::make_sparsity_pattern, DoFHandler::distribute_dofs,
+ *       DoFTools::make_sparsity_pattern(), DoFHandler::distribute_dofs(),
  *       DoFRenumbering, SparsityPattern
  *       </td></tr>
  *
@@ -111,8 +111,8 @@
  *       <td> Actually solve Laplace's
  *       problem. Object-orientation. Assembling matrices and
  *       vectors. Boundary values.
- *       <br/> Keywords: FEValues, VectorTools::interpolate_boundary_values,
- *       MatrixTools::apply_boundary_values, SolverCG, Vector<double>,
+ *       <br/> Keywords: FEValues, VectorTools::interpolate_boundary_values(),
+ *       MatrixTools::apply_boundary_values(), SolverCG, Vector<double>,
  *       SparseMatrix<double>, DataOut
  *       </td></tr>
  *
@@ -123,8 +123,8 @@
  *       solve Laplace's equation; we will solve the equation in 2D and
  *       3D, although the program is exactly the same. Non-constant right
  *       hand side function. Non-homogeneous boundary values.
- *       <br/> Keywords: VectorTools::point_value,
- *       VectorTools::compute_mean_value
+ *       <br/> Keywords: VectorTools::point_value(),
+ *       VectorTools::compute_mean_value()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -143,9 +143,9 @@
  *       <td> Adaptive local
  *       refinement. Handling of hanging nodes. Higher order elements.
  *       Catching exceptions in the <code>main</code>; function.
- *       <br/> Keywords: DoFTools::make_hanging_node_constraints,
- *       AffineConstraints::distribute_local_to_global, KellyErrorEstimator,
- *       GridRefinement::refine_and_coarsen_fixed_number
+ *       <br/> Keywords: DoFTools::make_hanging_node_constraints(),
+ *       AffineConstraints::distribute_local_to_global(), KellyErrorEstimator,
+ *       GridRefinement::refine_and_coarsen_fixed_number()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -155,8 +155,8 @@
  *       boundary integrals. Verification of correctness of computed
  *       solutions. Computing the error between exact and numerical
  *       solution and output of the data in tables. Using counted pointers.
- *       <br/> Keywords: FEFaceValues, VectorTools::integrate_difference,
- *       VectorTools::compute_global_error, TableHandler
+ *       <br/> Keywords: FEFaceValues, VectorTools::integrate_difference(),
+ *       VectorTools::compute_global_error(), TableHandler
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -174,7 +174,7 @@
  *       the system of equations in parallel using multi-threading,
  *       implementing a refinement criterion based on a finite difference
  *       approximation of the gradient.
- *       <br/> Keywords: TensorFunction, WorkStream::run, SolverGMRES
+ *       <br/> Keywords: TensorFunction, WorkStream::run(), SolverGMRES
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -198,7 +198,7 @@
  *       <td>step-12</td>
  *       <td> Discontinuous Galerkin methods for linear advection problems.
  *       <br/> Keywords: FEInterfaceValues, MeshWorker::mesh_loop(),
- *       DoFTools::make_flux_sparsity_pattern
+ *       DoFTools::make_flux_sparsity_pattern()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -227,7 +227,7 @@
  *       <td> Multigrid preconditioning of the Laplace equation on adaptive
  *       meshes.
  *       <br/> Keywords: Multigrid, PreconditionMG, mg::Matrix,
- *       MGTransferPrebuilt, MeshWorker::mesh_loop, MGLevelObject,
+ *       MGTransferPrebuilt, MeshWorker::mesh_loop(), MGLevelObject,
  *       MGConstrainedDofs
  *       </td></tr>
  *
@@ -285,14 +285,14 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
- *       <br/> Keywords: MatrixCreator, VectorTools::project
+ *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-24</td>
  *       <td> A variant of step-23 with absorbing
  *       boundary conditions, and extracting practically useful data.
- *       <br/> Keywords: VectorTools::point_value
+ *       <br/> Keywords: VectorTools::point_value()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -300,7 +300,7 @@
  *       <td> The sine-Gordon
  *       soliton equation, which is a nonlinear variant of the time
  *       dependent wave equation covered in step-23 and step-24.
- *       <br/> Keywords: FunctionTime, VectorTools::integrate_difference
+ *       <br/> Keywords: FunctionTime, VectorTools::integrate_difference()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -420,16 +420,16 @@
  *       <td> Finite strain hyperelasticity based on a three-field formulation.
  *       <br/> Keywords: CellDataStorage, FEValuesExtractors, WorkStream::run,
  *       BlockSparseMatrix, BlockVector, ComponentSelectFunction,
- *       Physics::Elasticity, FullMatrix::extract_submatrix_from,
- *       FullMatrix::scatter_matrix_to, LinearOperator, SolverSelector,
+ *       Physics::Elasticity, FullMatrix::extract_submatrix_from(),
+ *       FullMatrix::scatter_matrix_to(), LinearOperator, SolverSelector,
  *       PreconditionSelector, ReductionControl, MappingQEulerian
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-45</td>
  *       <td> Periodic boundary conditions.
- *       <br/> Keywords: GridTools::collect_periodic_faces,
- *       GridTools::PeriodicFacePair, Triangulation::add_periodicity
+ *       <br/> Keywords: GridTools::collect_periodic_faces(),
+ *       GridTools::PeriodicFacePair, Triangulation::add_periodicity()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -476,7 +476,7 @@
  *   <tr valign="top">
  *       <td>step-54</td>
  *       <td> Using CAD files to describe the boundary of your domain.
- *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES,
+ *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES(),
  *       OpenCASCADE::NormalProjectionBoundary
  *       </td></tr>
  *
@@ -527,8 +527,8 @@
  *       <td>Block smoothers for geometric multigrid. A scalar convection
  *       diffusion equation is solved with different additive or
  *       multiplicative multigrid smoothers.
- *       <br/> Keywords: Multigrid, MeshWorker::mesh_loop,
- *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream
+ *       <br/> Keywords: Multigrid, MeshWorker::mesh_loop(),
+ *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream()
  *       </td></tr>
  *
  *   <tr valign="top">
