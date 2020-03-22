@@ -915,52 +915,49 @@ namespace SparsityTools
 
   void
   gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
-                          const std::vector<IndexSet> &owned,
+                          const std::vector<IndexSet> &owned_rows_per_processor,
                           const MPI_Comm &             mpi_comm,
                           const IndexSet &             ghost_range)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
+    gather_sparsity_pattern(dsp,
+                            owned_rows_per_processor[myid],
+                            mpi_comm,
+                            ghost_range);
+  }
 
-    AssertDimension(owned.size(), Utilities::MPI::n_mpi_processes(mpi_comm));
-#  ifdef DEBUG
-    for (const auto &set : owned)
-      Assert(set.is_contiguous(), ExcNotImplemented());
-#  endif
 
-    Assert(owned[myid].is_ascending_and_one_to_one(mpi_comm),
-           ExcNotImplemented());
 
-    std::vector<DynamicSparsityPattern::size_type> start_index(owned.size() +
-                                                               1);
-    start_index[0] = 0;
-    for (DynamicSparsityPattern::size_type i = 0; i < owned.size(); ++i)
-      start_index[i + 1] = start_index[i] + owned[i].n_elements();
-
+  void
+  gather_sparsity_pattern(DynamicSparsityPattern &dsp,
+                          const IndexSet &        locally_owned_rows,
+                          const MPI_Comm &        mpi_comm,
+                          const IndexSet &        locally_relevant_rows)
+  {
     using map_vec_t =
       std::map<unsigned int, std::vector<DynamicSparsityPattern::size_type>>;
 
     // 1. limit rows to non owned:
-    IndexSet requested_rows(ghost_range);
-    requested_rows.subtract_set(owned[myid]);
+    IndexSet requested_rows(locally_relevant_rows);
+    requested_rows.subtract_set(locally_owned_rows);
+
+    std::vector<unsigned int> index_owner =
+      Utilities::MPI::compute_index_owner(locally_owned_rows,
+                                          requested_rows,
+                                          mpi_comm);
 
     // 2. go through requested_rows, figure out the owner and add the row to
     // request
     map_vec_t rows_data;
-    {
-      unsigned int cpu_rank = 0;
-      for (const auto &row : requested_rows)
-        {
-          // calculate destination CPU
-          while (row >= start_index[cpu_rank + 1])
-            ++cpu_rank;
+    for (DynamicSparsityPattern::size_type i = 0;
+         i < requested_rows.n_elements();
+         ++i)
+      {
+        const DynamicSparsityPattern::size_type row =
+          requested_rows.nth_index_in_set(i);
 
-          // since we removed owned, we should not end up with
-          // our rows
-          Assert(cpu_rank != myid, ExcInternalError());
-
-          rows_data[cpu_rank].push_back(row);
-        }
-    }
+        rows_data[index_owner[i]].push_back(row);
+      }
 
     // 3. get what others ask us to send
     const auto rows_data_received =
@@ -1040,42 +1037,53 @@ namespace SparsityTools
     IndexSet owned(start_index.back());
     owned.add_range(start_index[myid], start_index[myid] + rows_per_cpu[myid]);
 
-    IndexSet myrange_non_owned(myrange);
-    myrange_non_owned.subtract_set(owned);
+    distribute_sparsity_pattern(dsp, owned, mpi_comm, myrange);
+  }
+
+
+
+  void
+  distribute_sparsity_pattern(DynamicSparsityPattern &dsp,
+                              const IndexSet &        locally_owned_rows,
+                              const MPI_Comm &        mpi_comm,
+                              const IndexSet &        locally_relevant_rows)
+  {
+    IndexSet requested_rows(locally_relevant_rows);
+    requested_rows.subtract_set(locally_owned_rows);
+
+    std::vector<unsigned int> index_owner =
+      Utilities::MPI::compute_index_owner(locally_owned_rows,
+                                          requested_rows,
+                                          mpi_comm);
 
     using map_vec_t =
       std::map<unsigned int, std::vector<DynamicSparsityPattern::size_type>>;
 
     map_vec_t send_data;
 
-    {
-      unsigned int dest_cpu = 0;
-      for (const auto &row : myrange_non_owned)
-        {
-          // calculate destination CPU
-          while (row >= start_index[dest_cpu + 1])
-            ++dest_cpu;
+    for (DynamicSparsityPattern::size_type i = 0;
+         i < requested_rows.n_elements();
+         ++i)
+      {
+        const DynamicSparsityPattern::size_type row =
+          requested_rows.nth_index_in_set(i);
 
-          // we removed owned, thus shall not hit ourselves
-          Assert(dest_cpu != myid, ExcInternalError());
+        const auto rlen = dsp.row_length(row);
 
-          const auto rlen = dsp.row_length(row);
+        // skip empty lines
+        if (!rlen)
+          continue;
 
-          // skip empty lines
-          if (!rlen)
-            continue;
-
-          // save entries
-          send_data[dest_cpu].push_back(row);  // row index
-          send_data[dest_cpu].push_back(rlen); // number of entries
-          for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
-            {
-              // columns
-              const auto column = dsp.column_number(row, c);
-              send_data[dest_cpu].push_back(column);
-            }
-        }
-    }
+        // save entries
+        send_data[index_owner[i]].push_back(row);  // row index
+        send_data[index_owner[i]].push_back(rlen); // number of entries
+        for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
+          {
+            // columns
+            const auto column = dsp.column_number(row, c);
+            send_data[index_owner[i]].push_back(column);
+          }
+      }
 
     const auto receive_data = Utilities::MPI::some_to_some(mpi_comm, send_data);
 
@@ -1099,6 +1107,8 @@ namespace SparsityTools
       }
   }
 
+
+
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const std::vector<IndexSet> &owned_set_per_cpu,
@@ -1106,59 +1116,60 @@ namespace SparsityTools
                               const IndexSet &             myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
+    distribute_sparsity_pattern(dsp,
+                                owned_set_per_cpu[myid],
+                                mpi_comm,
+                                myrange);
+  }
 
+
+
+  void
+  distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
+                              const IndexSet &             locally_owned_rows,
+                              const MPI_Comm &             mpi_comm,
+                              const IndexSet &locally_relevant_rows)
+  {
     using map_vec_t =
       std::map<BlockDynamicSparsityPattern::size_type,
                std::vector<BlockDynamicSparsityPattern::size_type>>;
     map_vec_t send_data;
 
-    {
-      unsigned int dest_cpu = 0;
+    IndexSet requested_rows(locally_relevant_rows);
+    requested_rows.subtract_set(locally_owned_rows);
 
-      BlockDynamicSparsityPattern::size_type n_local_rel_rows =
-        myrange.n_elements();
-      for (BlockDynamicSparsityPattern::size_type row_idx = 0;
-           row_idx < n_local_rel_rows;
-           ++row_idx)
-        {
-          BlockDynamicSparsityPattern::size_type row =
-            myrange.nth_index_in_set(row_idx);
+    std::vector<unsigned int> index_owner =
+      Utilities::MPI::compute_index_owner(locally_owned_rows,
+                                          requested_rows,
+                                          mpi_comm);
 
-          // calculate destination CPU, note that we start the search
-          // at last destination cpu, because even if the owned ranges
-          // are not contiguous, they hopefully consist of large blocks
-          while (!owned_set_per_cpu[dest_cpu].is_element(row))
-            {
-              ++dest_cpu;
-              if (dest_cpu == owned_set_per_cpu.size()) // wrap around
-                dest_cpu = 0;
-            }
+    for (DynamicSparsityPattern::size_type i = 0;
+         i < requested_rows.n_elements();
+         ++i)
+      {
+        const DynamicSparsityPattern::size_type row =
+          requested_rows.nth_index_in_set(i);
 
-          // skip myself
-          if (dest_cpu == myid)
-            continue;
+        BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
-          BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
+        // skip empty lines
+        if (!rlen)
+          continue;
 
-          // skip empty lines
-          if (!rlen)
-            continue;
+        // save entries
+        std::vector<BlockDynamicSparsityPattern::size_type> &dst =
+          send_data[index_owner[i]];
 
-          // save entries
-          std::vector<BlockDynamicSparsityPattern::size_type> &dst =
-            send_data[dest_cpu];
-
-          dst.push_back(rlen); // number of entries
-          dst.push_back(row);  // row index
-          for (BlockDynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
-            {
-              // columns
-              BlockDynamicSparsityPattern::size_type column =
-                dsp.column_number(row, c);
-              dst.push_back(column);
-            }
-        }
-    }
+        dst.push_back(rlen); // number of entries
+        dst.push_back(row);  // row index
+        for (BlockDynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
+          {
+            // columns
+            BlockDynamicSparsityPattern::size_type column =
+              dsp.column_number(row, c);
+            dst.push_back(column);
+          }
+      }
 
     unsigned int num_receive = 0;
     {
