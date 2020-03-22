@@ -109,11 +109,10 @@ test()
 
   BlockDynamicSparsityPattern bcsp(locally_relevant_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, bcsp, constraints, false);
-  SparsityTools::distribute_sparsity_pattern(
-    bcsp,
-    dof_handler.compute_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(bcsp,
+                                             locally_owned_dofs,
+                                             MPI_COMM_WORLD,
+                                             locally_relevant_dofs);
 
   typename LA::MPI::BlockSparseMatrix A;
   A.reinit(locally_owned_partitioning, bcsp, MPI_COMM_WORLD);

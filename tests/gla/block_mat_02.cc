@@ -124,7 +124,7 @@ test()
 
   SparsityTools::distribute_sparsity_pattern(
     sp,
-    stokes_dof_handler.compute_locally_owned_dofs_per_processor(),
+    stokes_dof_handler.locally_owned_dofs(),
     MPI_COMM_WORLD,
     stokes_relevant_set);
 

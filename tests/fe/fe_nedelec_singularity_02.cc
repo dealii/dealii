@@ -390,11 +390,10 @@ namespace nedelec_singularity
     DynamicSparsityPattern dsp(locally_relevant_dofs);
 
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      dsp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      mpi_communicator,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
 
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,

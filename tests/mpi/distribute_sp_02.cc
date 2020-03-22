@@ -39,14 +39,12 @@ test_mpi()
   if (myid == 0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
 
-  unsigned int          num_local = 10;
-  unsigned int          n         = numprocs * num_local;
-  std::vector<IndexSet> locally_owned_dofs_per_cpu(numprocs, IndexSet(n));
-  for (unsigned int i = 0; i < numprocs; ++i)
-    locally_owned_dofs_per_cpu[i].add_range((i)*num_local, (i + 1) * num_local);
+  unsigned int num_local = 10;
+  unsigned int n         = numprocs * num_local;
+  IndexSet     locally_owned_dofs(n);
+  locally_owned_dofs.add_range(myid * num_local, (myid + 1) * num_local);
 
-  IndexSet locally_rel(n);
-  locally_rel.add_range(myid * num_local, (myid + 1) * num_local);
+  IndexSet locally_rel(locally_owned_dofs);
   if (myid > 0)
     locally_rel.add_range((myid - 1) * num_local, (myid + 0) * num_local);
   if (myid < numprocs - 1)
@@ -68,7 +66,7 @@ test_mpi()
     }
 
   SparsityTools::distribute_sparsity_pattern(csp,
-                                             locally_owned_dofs_per_cpu,
+                                             locally_owned_dofs,
                                              MPI_COMM_WORLD,
                                              locally_rel);
   /*  {
@@ -113,14 +111,8 @@ test_mpi()
   for (unsigned int i = 0; i < n; ++i)
     csp.add(i, myid);
 
-  std::vector<IndexSet> locally_owned_dofs_per_cpu2(numprocs, IndexSet(n));
-  for (unsigned int i = 0; i < numprocs; ++i)
-    locally_owned_dofs_per_cpu2[i].add_range((i)*num_local,
-                                             (i + 1) * num_local);
-
-
   SparsityTools::distribute_sparsity_pattern(csp,
-                                             locally_owned_dofs_per_cpu2,
+                                             locally_owned_dofs,
                                              MPI_COMM_WORLD,
                                              locally_rel);
 

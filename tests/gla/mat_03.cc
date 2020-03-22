@@ -84,11 +84,10 @@ test()
                                   false,
                                   Utilities::MPI::this_mpi_process(
                                     MPI_COMM_WORLD));
-  SparsityTools::distribute_sparsity_pattern(
-    sp,
-    dof_handler.compute_n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    relevant);
+  SparsityTools::distribute_sparsity_pattern(sp,
+                                             owned,
+                                             MPI_COMM_WORLD,
+                                             relevant);
   sp.compress();
   matrix.reinit(owned, owned, sp, MPI_COMM_WORLD);
 
