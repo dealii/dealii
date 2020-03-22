@@ -59,7 +59,12 @@ main()
   prm.leave_subsection();
 
 
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::XML);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::XML, true);
+  deallog.get_file_stream() << std::endl;
+
+  prm.print_parameters(deallog.get_file_stream(),
+                       ParameterHandler::ShortXML,
+                       true);
   deallog.get_file_stream() << std::endl;
 
   return 0;
