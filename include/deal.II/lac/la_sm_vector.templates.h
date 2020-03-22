@@ -475,6 +475,8 @@ namespace LinearAlgebra
         std::fill_n(data.values.get() + partitioner->local_size(),
                     partitioner->n_ghost_indices(),
                     Number());
+
+      vector_is_ghosted = false;
     }
 
 
@@ -487,6 +489,8 @@ namespace LinearAlgebra
     {
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
+      Assert(vector_is_ghosted == false,
+             ExcMessage("Cannot call compress() on a ghosted vector"));
       partitioner_sm->compress_start(data.values.get(),
                                      data.others,
                                      communication_channel);
@@ -501,6 +505,7 @@ namespace LinearAlgebra
     {
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
+      vector_is_ghosted = false;
       partitioner_sm->compress_finish(data.values.get(), data.others);
     }
 
@@ -524,6 +529,7 @@ namespace LinearAlgebra
     {
       partitioner_sm->update_ghost_values_finish(data.values.get(),
                                                  data.others);
+      vector_is_ghosted = true;
     }
 
 
