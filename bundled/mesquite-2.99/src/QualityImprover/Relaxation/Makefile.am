@@ -1,0 +1,16 @@
+SRC_RELAXATIONSMOOTHERS_DIR = QualityImprover/Relaxation
+MSQ_INCLUDES += -I$(top_srcdir)/src/$(SRC_RELAXATIONSMOOTHERS_DIR)
+INCLUDED_MAKEFILES += $(SRC_RELAXATIONSMOOTHERS_DIR)/Makefile.am
+
+MSQ_SRCS += \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/Randomize.cpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/RelaxationSmoother.cpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/LaplacianSmoother.cpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/SmartLaplacianSmoother.cpp 
+
+MSQ_HDRS += \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/Randomize.hpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/RelaxationSmoother.hpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/LaplacianSmoother.hpp \
+	$(SRC_RELAXATIONSMOOTHERS_DIR)/SmartLaplacianSmoother.hpp 
+

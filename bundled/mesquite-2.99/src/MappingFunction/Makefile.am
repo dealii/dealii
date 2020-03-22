@@ -1,0 +1,14 @@
+SRC_MAPPINGFUNCTION_DIR = MappingFunction
+MSQ_INCLUDES += -I$(top_srcdir)/src/$(SRC_MAPPINGFUNCTION_DIR)
+INCLUDED_MAKEFILES += $(SRC_MAPPINGFUNCTION_DIR)/Makefile.am
+
+MSQ_SRCS += \
+	$(SRC_MAPPINGFUNCTION_DIR)/MappingFunction.cpp \
+	$(SRC_MAPPINGFUNCTION_DIR)/NodeSet.cpp \
+        $(SRC_MAPPINGFUNCTION_DIR)/Sample.cpp
+
+MSQ_HDRS += \
+	$(SRC_MAPPINGFUNCTION_DIR)/MappingFunction.hpp \
+	$(SRC_MAPPINGFUNCTION_DIR)/NodeSet.hpp  \
+        $(SRC_MAPPINGFUNCTION_DIR)/Sample.hpp
+

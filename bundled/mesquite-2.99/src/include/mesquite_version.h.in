@@ -1,0 +1,29 @@
+#ifndef MSQ_VERSION
+
+/* Mesquite Version */
+#define MSQ_VERSION @MSQ_VERSION@
+
+/* Mesquite Major Version */
+#define MSQ_VERSION_MAJOR @MSQ_VERSION_MAJOR@
+
+/* Mesquite Minor Version */
+#define MSQ_VERSION_MINOR @MSQ_VERSION_MINOR@
+
+/* Mesquite Patch Level */
+#define MSQ_VERSION_PATCH @MSQ_VERSION_PATCH@
+
+/* Mesquite Version String */
+#define MSQ_VERSION_STRING @MSQ_VERSION_STRING@
+
+/* Mesquite namespace */
+#define MESQUITE_NS @MESQUITE_NS@
+
+/* Mesquite namespace alias */
+#define MESQUITE_NS_ALIAS @MESQUITE_NS_ALIAS@
+
+#ifdef MESQUITE_NS_ALIAS
+namespace MESQUITE_NS {}
+namespace Mesquite = MESQUITE_NS;
+#endif
+
+#endif

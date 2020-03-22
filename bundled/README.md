@@ -19,6 +19,17 @@ and licensed under the Boost Software License Version 1.0. See
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
+mesquite_*
+----------
+
+Contains the Mesquite project licensed under the GNU Library Public License 
+version 2.1. See See `mesquite*/lgpl.txt` or 
+https://github.com/trilinos/mesquite/blob/master/lgpl.txt.
+
+A full version of the Mesquite project can be downloaded at
+https://github.com/trilinos/mesquite.
+
+
 muparser_*
 ----------
 

@@ -1,0 +1,36 @@
+SRC_OBJECTIVEFUNCTION_DIR = ObjectiveFunction
+MSQ_INCLUDES += -I$(top_srcdir)/src/$(SRC_OBJECTIVEFUNCTION_DIR)
+INCLUDED_MAKEFILES += $(SRC_OBJECTIVEFUNCTION_DIR)/Makefile.am
+
+MSQ_SRCS += \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFAdd.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFMultiply.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFScalarAdd.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFScalarMultiply.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/LInfTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/LPtoPTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/MaxTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/OFEvaluator.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/ObjectiveFunction.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/ObjectiveFunctionTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/PatchPowerMeanP.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/PMeanPTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/StdDevTemplate.cpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/VarianceTemplate.cpp
+
+MSQ_HDRS += \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFAdd.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFMultiply.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFScalarAdd.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/CompositeOFScalarMultiply.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/LInfTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/LPtoPTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/MaxTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/OFEvaluator.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/ObjectiveFunction.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/ObjectiveFunctionTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/PatchPowerMeanP.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/PMeanPTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/StdDevTemplate.hpp \
+	$(SRC_OBJECTIVEFUNCTION_DIR)/VarianceTemplate.hpp
+
