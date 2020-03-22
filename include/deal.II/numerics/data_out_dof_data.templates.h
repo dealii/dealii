@@ -443,10 +443,22 @@ namespace internal
 
 
 #if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
-    template <typename Number>
+    template <>
     inline void
-    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<Number>>::extract(
-      const LinearAlgebra::TpetraWrappers::Vector<Number> & /*vector*/,
+    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(
+      const LinearAlgebra::TpetraWrappers::Vector<double> & /*vector*/,
+      const std::vector<types::global_dof_index> & /*indices*/,
+      const ComponentExtractor /*extract_component*/,
+      std::vector<double> & /*values*/)
+    {
+      // TODO: we don't have element access
+      Assert(false, ExcNotImplemented());
+    }
+
+    template <>
+    inline void
+    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<float>>::extract(
+      const LinearAlgebra::TpetraWrappers::Vector<float> & /*vector*/,
       const std::vector<types::global_dof_index> & /*indices*/,
       const ComponentExtractor /*extract_component*/,
       std::vector<double> & /*values*/)
