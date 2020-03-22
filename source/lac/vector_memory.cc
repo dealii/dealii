@@ -16,6 +16,7 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_sm_vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -30,6 +31,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 #include "vector_memory.inst"
+
+template class GrowingVectorMemory<LinearAlgebra::SharedMPI::Vector<double>>;
 
 namespace internal
 {

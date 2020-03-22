@@ -318,9 +318,11 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::
     operator=(const Vector<Number, MemorySpaceType> &c)
     {
-      Assert(false, ExcNotImplemented());
-      (void)c;
-      return *this;
+#ifdef _MSC_VER
+      return this->operator=<Number>(c);
+#else
+      return this->template operator=<Number>(c);
+#endif
     }
 
 
@@ -331,8 +333,58 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::
     operator=(const Vector<Number2, MemorySpaceType> &c)
     {
-      Assert(false, ExcNotImplemented());
-      (void)c;
+      Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
+
+      // we update ghost values whenever one of the input or output vector
+      // already held ghost values or when we import data from a vector with
+      // the same local range but different ghost layout
+      bool must_update_ghost_values = c.vector_is_ghosted;
+
+      // check whether the two vectors use the same parallel partitioner. if
+      // not, check if all local ranges are the same (that way, we can
+      // exchange data between different parallel layouts). One variant which
+      // is included here and necessary for compatibility with the other
+      // distributed vector classes (Trilinos, PETSc) is the case when vector
+      // c does not have any ghosts (constructed without ghost elements given)
+      // but the current vector does: In that case, we need to exchange data
+      // also when none of the two vector had updated its ghost values before.
+      if (partitioner.get() == nullptr)
+        reinit(c, true);
+      else if (partitioner.get() != c.partitioner.get())
+        {
+          // local ranges are also the same if both partitioners are empty
+          // (even if they happen to define the empty range as [0,0) or [c,c)
+          // for some c!=0 in a different way).
+          int local_ranges_are_identical =
+            (partitioner->local_range() == c.partitioner->local_range() ||
+             (partitioner->local_range().second ==
+                partitioner->local_range().first &&
+              c.partitioner->local_range().second ==
+                c.partitioner->local_range().first));
+          if ((c.partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::min(local_ranges_are_identical,
+                                   c.partitioner->get_mpi_communicator()) ==
+                 0) ||
+              !local_ranges_are_identical)
+            reinit(c, true);
+          else
+            must_update_ghost_values |= vector_is_ghosted;
+
+          must_update_ghost_values |=
+            (c.partitioner->ghost_indices_initialized() == false &&
+             partitioner->ghost_indices_initialized() == true);
+        }
+      else
+        must_update_ghost_values |= vector_is_ghosted;
+
+      const size_type this_size = partitioner->local_size();
+      if (this_size > 0)
+        std::memcpy(this->begin(), c.begin(), this_size * sizeof(Number));
+
+      if (must_update_ghost_values)
+        update_ghost_values();
+      else
+        zero_out_ghosts();
       return *this;
     }
 
@@ -369,7 +421,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::compress(
       ::dealii::VectorOperation::values operation)
     {
-      Assert(false, ExcNotImplemented());
       compress_start(0, operation);
       compress_finish(operation);
     }
@@ -380,7 +431,6 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::update_ghost_values() const
     {
-      Assert(false, ExcNotImplemented());
       update_ghost_values_start();
       update_ghost_values_finish();
     }
@@ -721,8 +771,22 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::scale(const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)vv;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      AssertDimension(local_size(), v.local_size());
+
+      auto       values       = this->begin();
+      const auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        values[i] *= values_other[i];
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -732,9 +796,23 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::equ(const Number                     a,
                                          const VectorSpaceVector<Number> &vv)
     {
-      Assert(false, ExcNotImplemented());
-      (void)a;
-      (void)vv;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      AssertIsFinite(a);
+      AssertDimension(local_size(), v.local_size());
+
+      auto       values       = this->begin();
+      const auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        values[i] = a * values_other[i];
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -760,8 +838,7 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpaceType>::all_zero() const
     {
-      Assert(false, ExcNotImplemented());
-      return false;
+      return (linfty_norm() == 0) ? true : false;
     }
 
 
@@ -772,8 +849,20 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::inner_product_local(
       const Vector<Number2, MemorySpaceType> &v) const
     {
-      Assert(false, ExcNotImplemented());
-      (void)v;
+      if (PointerComparison::equal(this, &v))
+        return norm_sqr_local();
+
+      AssertDimension(partitioner->local_size(), v.partitioner->local_size());
+
+      real_type sum = Number();
+
+      auto values       = this->begin();
+      auto values_other = v.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        sum += values[i] * values_other[i];
+
+      return sum;
     }
 
 
@@ -782,9 +871,18 @@ namespace LinearAlgebra
     Number Vector<Number, MemorySpaceType>::
            operator*(const VectorSpaceVector<Number> &vv) const
     {
-      Assert(false, ExcNotImplemented());
-      (void)vv;
-      return 0;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+
+      Number local_result = inner_product_local(v);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_mpi_communicator());
+      else
+        return local_result;
     }
 
 
@@ -793,8 +891,16 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::norm_sqr_local() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      real_type sum = Number();
+
+      auto values = this->begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        sum += values[i] * values[i];
+
+      AssertIsFinite(sum);
+
+      return sum;
     }
 
 
@@ -843,8 +949,12 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::norm_sqr() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      real_type local_result = norm_sqr_local();
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_mpi_communicator());
+      else
+        return local_result;
     }
 
 
@@ -853,8 +963,7 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::l2_norm() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      return std::sqrt(norm_sqr());
     }
 
 
@@ -918,12 +1027,26 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpaceType> &v,
       const Vector<Number, MemorySpaceType> &w)
     {
-      Assert(false, ExcNotImplemented());
-      (void)a;
-      (void)v;
-      (void)w;
+      const size_type vec_size = partitioner->local_size();
+      AssertDimension(vec_size, v.local_size());
+      AssertDimension(vec_size, w.local_size());
 
-      return 0;
+      real_type sum = Number();
+
+      auto values   = this->begin();
+      auto values_v = v.begin();
+      auto values_w = w.begin();
+
+      for (unsigned int i = 0; i < partitioner->local_size(); i++)
+        {
+          const auto temp = values[i] + a * values_v[i];
+          values[i]       = temp;
+          sum += temp * values_w[i];
+        }
+
+      AssertIsFinite(sum);
+
+      return sum;
     }
 
 
@@ -935,11 +1058,21 @@ namespace LinearAlgebra
       const VectorSpaceVector<Number> &vv,
       const VectorSpaceVector<Number> &ww)
     {
-      Assert(false, ExcNotImplemented());
-      (void)a;
-      (void)vv;
-      (void)ww;
-      return 0;
+      // Downcast. Throws an exception if invalid.
+      using VectorType = Vector<Number, MemorySpaceType>;
+      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
+             ExcVectorTypeNotCompatible());
+      const VectorType &v = dynamic_cast<const VectorType &>(vv);
+      Assert((dynamic_cast<const VectorType *>(&ww) != nullptr),
+             ExcVectorTypeNotCompatible());
+      const VectorType &w = dynamic_cast<const VectorType &>(ww);
+
+      Number local_result = add_and_dot_local(a, v, w);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_mpi_communicator());
+      else
+        return local_result;
     }
 
 

@@ -831,7 +831,6 @@ namespace LinearAlgebra
     inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
     Vector<Number, MemorySpace>::get_partitioner() const
     {
-      Assert(false, ExcNotImplemented());
       return partitioner;
     }
 

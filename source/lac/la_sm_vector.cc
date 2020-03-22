@@ -34,8 +34,9 @@ namespace LinearAlgebra
     &Vector<S1, ::dealii::MemorySpace::Host>::operator= \
       <S2>(const Vector<S2, ::dealii::MemorySpace::Host> &)
 
-    TEMPL_COPY_CONSTRUCTOR(double, float);
-    TEMPL_COPY_CONSTRUCTOR(float, double);
+    // TODO
+    // TEMPL_COPY_CONSTRUCTOR(double, float);
+    // TEMPL_COPY_CONSTRUCTOR(float, double);
 
 #undef TEMPL_COPY_CONSTRUCTOR
   } // namespace SharedMPI
