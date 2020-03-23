@@ -116,6 +116,19 @@ namespace LinearAlgebra
                          [&data](Number *&) { MPI_Win_free(data.values_win); }};
           data.values_win = win;
         }
+
+        template <typename RealType>
+        static void
+        linfty_norm_local(const ::dealii::MemorySpace::MemorySpaceData<
+                            Number,
+                            ::dealii::MemorySpace::Host> &data,
+                          const unsigned int              size,
+                          RealType &                      max)
+        {
+          for (size_type i = 0; i < size; ++i)
+            max =
+              std::max(numbers::NumberTraits<Number>::abs(data.values[i]), max);
+        }
       };
     } // namespace internal
 
@@ -141,6 +154,9 @@ namespace LinearAlgebra
                                      allocated_size,
                                      data,
                                      comm_sm);
+
+      thread_loop_partitioner =
+        std::make_shared<::dealii::parallel::internal::TBBPartitioner>();
     }
 
 
@@ -192,6 +208,8 @@ namespace LinearAlgebra
       // call these methods and hence do not need to have the storage.
       import_data.values.reset();
       import_data.values_dev.reset();
+
+      thread_loop_partitioner = v.thread_loop_partitioner;
     }
 
 
@@ -272,9 +290,15 @@ namespace LinearAlgebra
     {
       reinit(v, true);
 
+      thread_loop_partitioner = v.thread_loop_partitioner;
+
       const size_type this_size = local_size();
       if (this_size > 0)
-        std::memcpy(this->begin(), v.begin(), this_size * sizeof(Number));
+        {
+          dealii::internal::VectorOperations::
+            functions<Number, Number, MemorySpaceType>::copy(
+              thread_loop_partitioner, partitioner->local_size(), v.data, data);
+        }
     }
 
 
@@ -407,9 +431,15 @@ namespace LinearAlgebra
       else
         must_update_ghost_values |= vector_is_ghosted;
 
+      thread_loop_partitioner = c.thread_loop_partitioner;
+
       const size_type this_size = partitioner->local_size();
       if (this_size > 0)
-        std::memcpy(this->begin(), c.begin(), this_size * sizeof(Number));
+        {
+          dealii::internal::VectorOperations::
+            functions<Number, Number2, MemorySpaceType>::copy(
+              thread_loop_partitioner, this_size, c.data, data);
+        }
 
       if (must_update_ghost_values)
         update_ghost_values();
@@ -563,8 +593,14 @@ namespace LinearAlgebra
     {
       const size_type this_size = local_size();
       if (this_size > 0)
-        std::fill_n(data.values.get(), this_size, s);
+        {
+          dealii::internal::VectorOperations::
+            functions<Number, Number, MemorySpaceType>::set(
+              thread_loop_partitioner, this_size, s, data);
+        }
 
+      // if we call Vector::operator=0, we want to zero out all the entries
+      // plus ghosts.
       if (s == Number())
         zero_out_ghosts();
 
@@ -611,11 +647,9 @@ namespace LinearAlgebra
 
       AssertDimension(local_size(), v.local_size());
 
-      auto       values       = this->begin();
-      const auto values_other = v.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        values[i] -= values_other[i];
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::subtract_vector(
+          thread_loop_partitioner, partitioner->local_size(), v.data, data);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -654,11 +688,9 @@ namespace LinearAlgebra
       if (a == Number(0.))
         return;
 
-      auto       values       = this->begin();
-      const auto values_other = v.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        values[i] += a * values_other[i];
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::add_av(
+          thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
     }
 
 
@@ -726,22 +758,22 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
+      AssertIsFinite(x);
       AssertIsFinite(a);
       AssertDimension(local_size(), v.local_size());
 
-      // nothing to do if a is zero
-      if (a == Number(0.))
-        return;
-
-      auto       values       = this->begin();
-      const auto values_other = v.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        values[i] = x * values[i] + a * values_other[i];
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::sadd_xav(
+          thread_loop_partitioner,
+          partitioner->local_size(),
+          x,
+          a,
+          v.data,
+          data);
     }
 
 
@@ -815,11 +847,9 @@ namespace LinearAlgebra
 
       AssertDimension(local_size(), v.local_size());
 
-      auto       values       = this->begin();
-      const auto values_other = v.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        values[i] *= values_other[i];
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::scale(
+          thread_loop_partitioner, local_size(), v.data, data);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -841,11 +871,10 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension(local_size(), v.local_size());
 
-      auto       values       = this->begin();
-      const auto values_other = v.begin();
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::equ_au(
+          thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
 
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        values[i] = a * values_other[i];
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -890,15 +919,9 @@ namespace LinearAlgebra
 
       AssertDimension(partitioner->local_size(), v.partitioner->local_size());
 
-      real_type sum = Number();
-
-      auto values       = this->begin();
-      auto values_other = v.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        sum += values[i] * values_other[i];
-
-      return sum;
+      return dealii::internal::VectorOperations::
+        functions<Number, Number2, MemorySpaceType>::dot(
+          thread_loop_partitioner, partitioner->local_size(), v.data, data);
     }
 
 
@@ -927,12 +950,12 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::norm_sqr_local() const
     {
-      real_type sum = Number();
+      real_type sum;
 
-      auto values = this->begin();
 
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        sum += values[i] * values[i];
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::norm_2(
+          thread_loop_partitioner, partitioner->local_size(), sum, data);
 
       AssertIsFinite(sum);
 
@@ -1030,12 +1053,12 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpaceType>::real_type
     Vector<Number, MemorySpaceType>::linfty_norm_local() const
     {
-      real_type max = Number();
+      real_type max = 0.;
 
-      auto values = this->begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        max = std::max(std::abs(values[i]), max);
+      const size_type local_size = partitioner->local_size();
+      internal::la_parallel_vector_templates_functions<
+        Number,
+        MemorySpaceType>::linfty_norm_local(data, local_size, max);
 
       return max;
     }
@@ -1067,18 +1090,9 @@ namespace LinearAlgebra
       AssertDimension(vec_size, v.local_size());
       AssertDimension(vec_size, w.local_size());
 
-      real_type sum = Number();
-
-      auto values   = this->begin();
-      auto values_v = v.begin();
-      auto values_w = w.begin();
-
-      for (unsigned int i = 0; i < partitioner->local_size(); i++)
-        {
-          const auto temp = values[i] + a * values_v[i];
-          values[i]       = temp;
-          sum += temp * values_w[i];
-        }
+      Number sum = dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::add_and_dot(
+          thread_loop_partitioner, vec_size, a, v.data, w.data, data);
 
       AssertIsFinite(sum);
 

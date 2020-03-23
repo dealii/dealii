@@ -78,9 +78,10 @@ namespace LinearAlgebra
   {
     template <typename Number>
     struct MemorySpaceData
+      : public ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace::Host>
     {
       void
-      copy_to(Number *begin, std::size_t n_elements)
+      copy_to(Number *begin, std::size_t n_elements) override
       {
         Assert(false, ExcNotImplemented());
         (void)begin;
@@ -88,19 +89,16 @@ namespace LinearAlgebra
       }
 
       void
-      copy_from(Number *begin, std::size_t n_elements)
+      copy_from(Number *begin, std::size_t n_elements) override
       {
         Assert(false, ExcNotImplemented());
         (void)begin;
         (void)n_elements;
       }
 
-      std::unique_ptr<Number[], std::function<void(Number *&)>> values;
       MPI_Win *values_win = nullptr;
 
       std::vector<Number *> others;
-
-      std::unique_ptr<Number[]> values_dev;
     };
 
 
@@ -484,6 +482,13 @@ namespace LinearAlgebra
       size_type allocated_size;
 
       mutable MemorySpaceData<Number> data;
+
+      /**
+       * For parallel loops with TBB, this member variable stores the affinity
+       * information of loops.
+       */
+      mutable std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        thread_loop_partitioner;
 
       // needed?
       mutable MemorySpaceData<Number> import_data;
