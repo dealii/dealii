@@ -206,8 +206,7 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      import_data.clear(); // TODO
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -246,7 +245,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-      const std::shared_ptr<const Partitioner<Number>> &        partitioner_sm)
+      const std::shared_ptr<const Partitioner> &                partitioner_sm)
     {
       clear_mpi_requests();
       this->partitioner    = partitioner;
@@ -265,8 +264,7 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      import_data.clear();
 
       vector_is_ghosted = false;
     }
@@ -523,6 +521,7 @@ namespace LinearAlgebra
              ExcMessage("Cannot call compress() on a ghosted vector"));
       partitioner_sm->compress_start(data.values.get(),
                                      data.others,
+                                     import_data,
                                      communication_channel);
     }
 
@@ -536,7 +535,9 @@ namespace LinearAlgebra
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
       vector_is_ghosted = false;
-      partitioner_sm->compress_finish(data.values.get(), data.others);
+      partitioner_sm->compress_finish(data.values.get(),
+                                      data.others,
+                                      import_data);
     }
 
 
@@ -548,6 +549,7 @@ namespace LinearAlgebra
     {
       partitioner_sm->update_ghost_values_start(data.values.get(),
                                                 data.others,
+                                                import_data,
                                                 communication_channel);
     }
 
@@ -558,7 +560,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::update_ghost_values_finish() const
     {
       partitioner_sm->update_ghost_values_finish(data.values.get(),
-                                                 data.others);
+                                                 data.others,
+                                                 import_data);
       vector_is_ghosted = true;
     }
 

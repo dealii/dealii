@@ -159,7 +159,7 @@ namespace LinearAlgebra
       void
       reinit(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-        const std::shared_ptr<const Partitioner<Number>> &partitioner_sm);
+        const std::shared_ptr<const Partitioner> &partitioner_sm);
 
       void
       swap(Vector<Number, MemorySpace> &v);
@@ -477,7 +477,7 @@ namespace LinearAlgebra
 
       std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
-      std::shared_ptr<const Partitioner<Number>> partitioner_sm;
+      std::shared_ptr<const Partitioner> partitioner_sm;
 
       size_type allocated_size;
 
@@ -491,7 +491,7 @@ namespace LinearAlgebra
         thread_loop_partitioner;
 
       // needed?
-      mutable MemorySpaceData<Number> import_data;
+      mutable dealii::AlignedVector<Number> import_data;
 
       mutable bool vector_is_ghosted;
 

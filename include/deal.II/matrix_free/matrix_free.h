@@ -2060,9 +2060,8 @@ private:
   // TODO: move it to DoFInfo
   mutable std::map<
     unsigned int,
-    std::map<
-      const MPI_Comm,
-      std::shared_ptr<const LinearAlgebra::SharedMPI::Partitioner<Number>>>>
+    std::map<const MPI_Comm,
+             std::shared_ptr<const LinearAlgebra::SharedMPI::Partitioner>>>
     partitioner_sm;
 
   /**
@@ -2205,7 +2204,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
 
   if (partitioner_sm[comp][comm_sm] == nullptr)
     partitioner_sm[comp][comm_sm] =
-      std::make_shared<LinearAlgebra::SharedMPI::Partitioner<Number>>(
+      std::make_shared<LinearAlgebra::SharedMPI::Partitioner>(
         part->get_communicator(),
         comm_sm,
         part->locally_owned_range(),

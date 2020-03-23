@@ -30,7 +30,6 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
-    template <typename Number = double>
     class Partitioner : public LinearAlgebra::CommunicationPatternBase
     {
     public:
@@ -228,17 +227,20 @@ namespace LinearAlgebra
                       send_sm_req.data(),
                       MPI_STATUSES_IGNORE);
         }
-
-        buffer.resize(send_remote_ptr.back());
       }
 
+      template <typename Number>
       void
       update_ghost_values_start(
-        Number *               data_this,
-        std::vector<Number *> &data_others,
-        const unsigned int     communication_channel = 0) const
+        Number *                       data_this,
+        std::vector<Number *> &        data_others,
+        dealii::AlignedVector<Number> &buffer,
+        const unsigned int             communication_channel = 0) const
       {
         (void)data_others;
+
+        if (send_remote_ptr.back() != buffer.size())
+          buffer.resize(send_remote_ptr.back());
 
         int dummy;
         for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
@@ -285,10 +287,14 @@ namespace LinearAlgebra
           }
       }
 
+      template <typename Number>
       void
-      update_ghost_values_finish(Number *               data_this,
-                                 std::vector<Number *> &data_others) const
+      update_ghost_values_finish(Number *                       data_this,
+                                 std::vector<Number *> &        data_others,
+                                 dealii::AlignedVector<Number> &buffer) const
       {
+        (void)buffer;
+
         for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
           {
             int i;
@@ -318,20 +324,27 @@ namespace LinearAlgebra
                     MPI_STATUSES_IGNORE);
       }
 
+      template <typename Number>
       void
-      update_ghost_values(Number *               data_this,
-                          std::vector<Number *> &data_others) const
+      update_ghost_values(Number *                       data_this,
+                          std::vector<Number *> &        data_others,
+                          dealii::AlignedVector<Number> &buffer) const
       {
-        update_ghost_values_start(data_this, data_others);
-        update_ghost_values_finish(data_this, data_others);
+        update_ghost_values_start(data_this, data_others, buffer);
+        update_ghost_values_finish(data_this, data_others, buffer);
       }
 
+      template <typename Number>
       void
-      compress_start(Number *               data_this,
-                     std::vector<Number *> &data_others,
-                     const unsigned int     communication_channel = 0) const
+      compress_start(Number *                       data_this,
+                     std::vector<Number *> &        data_others,
+                     dealii::AlignedVector<Number> &buffer,
+                     const unsigned int communication_channel = 0) const
       {
         (void)data_others;
+
+        if (send_remote_ptr.back() != buffer.size())
+          buffer.resize(send_remote_ptr.back());
 
         int dummy;
         for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
@@ -371,9 +384,11 @@ namespace LinearAlgebra
                     send_remote_req.data() + i);
       }
 
+      template <typename Number>
       void
-      compress_finish(Number *               data_this,
-                      std::vector<Number *> &data_others) const
+      compress_finish(Number *                       data_this,
+                      std::vector<Number *> &        data_others,
+                      dealii::AlignedVector<Number> &buffer) const
       {
         for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
           {
@@ -419,11 +434,14 @@ namespace LinearAlgebra
                     MPI_STATUSES_IGNORE);
       }
 
+      template <typename Number>
       void
-      compress(Number *data_this, std::vector<Number *> &data_others) const
+      compress(Number *                       data_this,
+               std::vector<Number *> &        data_others,
+               dealii::AlignedVector<Number> &buffer) const
       {
-        compress_start(data_this, data_others);
-        compress_finish(data_this, data_others);
+        compress_start(data_this, data_others, buffer);
+        compress_finish(data_this, data_others, buffer);
       }
 
     private:
@@ -431,8 +449,6 @@ namespace LinearAlgebra
       const MPI_Comm &comm_sm;
 
       unsigned int n_local_elements;
-
-      mutable AlignedVector<Number> buffer;
 
       std::vector<unsigned int>            recv_remote_ranks;
       std::vector<types::global_dof_index> recv_remote_ptr = {0};
