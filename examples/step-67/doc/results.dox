@@ -42,10 +42,21 @@ that we use a relatively fine mesh of $32^2$ cells with polynomials of degree
 step size: whereas it is 0.0069 up to time 5, it increases to 0.0096 for later
 times. The step size increases once the vortex with some motion on top of the
 speed of sound (and thus faster propagation) leaves the computational domain
-between times 5 and 6.5. Our time step formula recognizes this and only
-detects the acoustic limit in the last part of the simulation.
+between times 5 and 6.5. After that point, the flow is simply uniform
+in the same direction, and the maximum velocity of the gas is reduced
+compared to the previous state where the uniform velocity was overlaid
+by the vortex. Our time step formula recognizes this and only
+uses the acoustic limit in the last part of the simulation when
+determining the time step size.
 
-The summary of wall clock times shows that 1283 time steps have been performed
+The final block of output shows detailed information about the timing
+of individual parts of the programs; it breaks this down by showing
+the time taken by the fastest and the slowest processor, and the
+average time -- this is often useful in very large computations to
+find whether there are processors that are consistently overheated
+(and consequently are throttling their clock speed) or consistently
+slow for other reasons.
+The summary shows that 1283 time steps have been performed
 in 1.02 seconds (looking at the average time among all MPI processes), while
 the output of 11 files has taken additional 0.96 seconds. Broken down per time
 step and into the five Runge--Kutta stages, the compute time per evaluation is
@@ -102,8 +113,8 @@ processed per second and Runge--Kutta stage, we obtain @f[ \text{throughput} =
 \frac{n_\mathrm{time steps} n_\mathrm{stages}
 n_\mathrm{dofs}}{t_\mathrm{compute}} = \frac{10258 \cdot 5 \cdot
 9.4\,\text{MDoFs}}{205s} = 2360\, \text{MDoFs/s} @f] This throughput number is
-very high, given that simply copying one vector to another one runs at around
-10,000 MDoFs/s.
+very high, given that simply copying one vector to another one runs at
+only around 10,000 MDoFs/s.
 
 If we go to the next-larger size with 37.7 million DoFs, the overall
 simulation time is 2196 seconds, with 1978 seconds spent in the time

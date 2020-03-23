@@ -710,7 +710,9 @@ back to the standard nodal Gauss-Lobatto basis.
 The advantage of this particular way of applying the inverse mass matrix is
 the fact that it is of similar cost as the forward application of a mass
 matrix, and cheaper than the evaluation of the spatial operator $\mathcal L_h$
-which is more costly due to over-integration and face integrals. In fact, it
+which is more costly due to over-integration and face integrals. (We
+will demonstrate this with detailed timing information in the
+<a href="#Results">results section</a>.) In fact, it
 is so cheap that it is limited by the bandwidth of reading the source vector,
 reading the diagonal, and writing into the destination vector on most modern
 architectures. The hardware used for the result section allows to do the
