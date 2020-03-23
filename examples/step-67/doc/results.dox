@@ -30,7 +30,7 @@ Time:      10, dt:   0.0096, error rho:  7.231e-07, rho * u:  2.666e-07, energy:
 | compute errors                |        11 |  0.008066s    13 |   0.00952s |   0.01041s    20 |
 | compute transport speed       |       258 |   0.01012s    13 |   0.05392s |   0.08574s    25 |
 | output                        |        11 |    0.9597s    13 |    0.9613s |    0.9623s     6 |
-| rk time step total            |      1283 |    0.9827s    25 |     1.015s |      1.06s    13 |
+| rk time stepping total        |      1283 |    0.9827s    25 |     1.015s |      1.06s    13 |
 | rk_stage - integrals L_h      |      6415 |    0.8803s    26 |    0.9198s |    0.9619s    14 |
 | rk_stage - inv mass + vec upd |      6415 |   0.05677s    15 |   0.06487s |   0.07597s    13 |
 +-------------------------------------------+------------------+------------+------------------+
@@ -81,7 +81,7 @@ $p=5$, and the same system of 40 cores of dual-socket Intel Xeon Gold 6230):
 | compute errors                |        11 |    0.4239s    12 |    0.4318s |    0.4408s     9 |
 | compute transport speed       |      2053 |     3.962s    12 |     6.727s |     10.12s     7 |
 | output                        |        11 |     30.35s    12 |     30.36s |     30.37s     9 |
-| rk time step total            |     10258 |     201.7s     7 |     205.1s |     207.8s    12 |
+| rk time stepping total        |     10258 |     201.7s     7 |     205.1s |     207.8s    12 |
 | rk_stage - integrals L_h      |     51290 |     121.3s     6 |     126.6s |     136.3s    16 |
 | rk_stage - inv mass + vec upd |     51290 |     66.19s    16 |     77.52s |     81.84s    10 |
 +-------------------------------------------+------------------+------------+------------------+
@@ -125,7 +125,7 @@ in run time can be traced back to cache effects on the given hardware (with 40
 MB of L2 cache and 55 MB of L3 cache): While not all of the relevant data fits
 into caches for 9.4 million DoFs (one vector takes 75 MB and we have three
 vectors plus some additional data in MatrixFree), there is capacity for almost
-half of it nonetheless. Given that modern caches are more sophisticated than
+half of one vector nonetheless. Given that modern caches are more sophisticated than
 the naive least-recently-used strategy (where we would have little re-use as
 the data is used in a streaming-like fashion), we can assume that a sizeable
 fraction of data can indeed be delivered from caches for the 9.4 million DoFs
@@ -480,7 +480,7 @@ Time:       2, dt:  5.7e-05, norm rho:    0.01432, rho * u:    0.03969, energy: 
 | compute errors                |        41 |   0.01112s    35 |    0.0672s |    0.1337s     0 |
 | compute transport speed       |      6914 |     5.422s    35 |     15.96s |     29.99s     1 |
 | output                        |        41 |     37.24s    35 |      37.3s |     37.37s     0 |
-| rk time step total            |     34564 |     205.4s     1 |     219.5s |     230.1s    35 |
+| rk time stepping total        |     34564 |     205.4s     1 |     219.5s |     230.1s    35 |
 | rk_stage - integrals L_h      |    172820 |     153.6s     1 |     164.9s |     175.6s    27 |
 | rk_stage - inv mass + vec upd |    172820 |     47.13s    13 |     53.09s |     64.05s    33 |
 +-------------------------------------------+------------------+------------+------------------+
@@ -511,7 +511,7 @@ Number of degrees of freedom: 14,745,600 ( = 4 [vars] x 102,400 [cells] x 36 [do
 | compute errors                |        41 |   0.04537s    32 |     0.173s |    0.3489s     0 |
 | compute transport speed       |     13858 |     40.75s    32 |     85.99s |     149.8s     0 |
 | output                        |        41 |     153.8s    32 |     153.9s |     154.1s     0 |
-| rk time step total            |     69284 |      2386s     0 |      2450s |      2496s    32 |
+| rk time stepping total        |     69284 |      2386s     0 |      2450s |      2496s    32 |
 | rk_stage - integrals L_h      |    346420 |      1365s    32 |      1574s |      1718s    19 |
 | rk_stage - inv mass + vec upd |    346420 |     722.5s    10 |     870.7s |      1125s    32 |
 +-------------------------------------------+------------------+------------+------------------+
@@ -525,7 +525,7 @@ fitting in caches. An interesting effect, typical of programs with a mix of
 local communication (integrals L_h) and global communication (computation of
 transport speed) with some load imbalance, can be observed by looking at the
 MPI rank that measure the minimal and maximal time of different phases,
-respectively. Rank 0 reports the fastest throughput for the "rk time step
+respectively. Rank 0 reports the fastest throughput for the "rk time stepping
 total" part. At the same time, it appears to be slowest for the "compute
 transport speed" part, more almost a factor of 2 slower than the
 average. Since the latter involves global communication, we can attribute the
@@ -564,13 +564,13 @@ Time:       2, dt:  1.4e-05, norm rho:    0.01431, rho * u:    0.03969, energy: 
 | compute errors                |        41 |    0.1758s    30 |     0.672s |     1.376s     1 |
 | compute transport speed       |     27748 |     321.3s    34 |     678.8s |      1202s     1 |
 | output                        |        41 |     616.3s    32 |     616.4s |     616.4s    34 |
-| rk time step total            |    138733 | 1.983e+04s     1 | 2.036e+04s | 2.072e+04s    34 |
+| rk time stepping total        |    138733 | 1.983e+04s     1 | 2.036e+04s | 2.072e+04s    34 |
 | rk_stage - integrals L_h      |    693665 | 1.052e+04s    32 | 1.248e+04s | 1.387e+04s    19 |
 | rk_stage - inv mass + vec upd |    693665 |      6404s    10 |      7868s | 1.018e+04s    32 |
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
 
-The "rk time stop total" part corresponds to a throughput of 2010 MDoFs/s. The
+The "rk time stepping total" part corresponds to a throughput of 2010 MDoFs/s. The
 overall run time to perform 139k time steps is 20k seconds (5.7 hours) or 7
 time steps per second. More throughput can be achieved by adding more cores to
 the computation.
@@ -596,7 +596,7 @@ Time:       2, dt:  0.00011, norm rho:     0.0119, rho * u:    0.03142, energy: 
 | compute errors                |        41 |    0.6551s    34 |     3.216s |     7.281s     0 |
 | compute transport speed       |      3546 |       160s    34 |     393.2s |     776.9s     0 |
 | output                        |        41 |      1350s    34 |      1353s |      1357s     0 |
-| rk time step total            |     17723 | 1.519e+04s     0 | 1.558e+04s | 1.582e+04s    34 |
+| rk time stepping total        |     17723 | 1.519e+04s     0 | 1.558e+04s | 1.582e+04s    34 |
 | rk_stage - integrals L_h      |     88615 | 1.005e+04s    32 | 1.126e+04s |  1.23e+04s    11 |
 | rk_stage - inv mass + vec upd |     88615 |      3056s    11 |      4322s |      5759s    32 |
 +-------------------------------------------+------------------+------------+------------------+
@@ -643,7 +643,7 @@ Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy: 
 | compute errors                |        41 |     2.632s   178 |     7.221s |     16.56s     0 |
 | compute transport speed       |      7072 |       714s   193 |      1553s |      3351s     0 |
 | output                        |     35350 |      8065s   176 |      8070s |      8079s     0 |
-| rk time step total            |     35350 |  4.25e+04s     0 |  4.43e+04s | 4.515e+04s   193 |
+| rk time stepping total        |     35350 |  4.25e+04s     0 |  4.43e+04s | 4.515e+04s   193 |
 | rk_stage - integrals L_h      |    176750 | 2.936e+04s   134 | 3.222e+04s |  3.67e+04s    99 |
 | rk_stage - inv mass + vec upd |    176750 |      7004s    99 | 1.207e+04s |  1.55e+04s   132 |
 +-------------------------------------------+------------------+------------+------------------+

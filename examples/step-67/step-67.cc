@@ -2128,7 +2128,7 @@ namespace Euler_DG
               euler_operator.compute_cell_transport_speed(solution), 3);
 
         {
-          TimerOutput::Scope t(timer, "rk time step total");
+          TimerOutput::Scope t(timer, "rk time stepping total");
           integrator.perform_time_step(euler_operator,
                                        time,
                                        time_step,
