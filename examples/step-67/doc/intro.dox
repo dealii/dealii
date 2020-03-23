@@ -589,7 +589,7 @@ solution for <i>barely</i> resolved simulations. The fact that aliasing mostly
 affects coarse resolutions -- whereas finer meshes with the same scheme
 otherwise work fine -- is not surprising because well-resolved simulations
 have tend to be smooth on length-scales of a cell (i.e., they have
-small coefficients in the higher polynomial degrees that are missed by 
+small coefficients in the higher polynomial degrees that are missed by
 too few quadrature points, whereas the main solution contribution in the lower
 polynomial degrees is still well-captured -- this is simply a consequence of Taylor's
 theorem). To address this topic, various approaches have been proposed in the

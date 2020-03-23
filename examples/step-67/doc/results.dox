@@ -10,17 +10,17 @@ Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
 Number of degrees of freedom: 147,456 ( = 4 [vars] x 1,024 [cells] x 36 [dofs/cell/var] )
 Time step size: 0.00689325, minimal h: 0.3125, initial transport scaling: 0.102759
 
-Time:       0 , dt:   0.0069 , error rho:   2.76e-07 , rho * u:  1.259e-06 , energy: 2.987e-06
-Time:    1.01 , dt:   0.0069 , error rho:   1.37e-06 , rho * u:  2.252e-06 , energy: 4.153e-06
-Time:    2.01 , dt:   0.0069 , error rho:  1.561e-06 , rho * u:   2.43e-06 , energy: 4.493e-06
-Time:    3.01 , dt:   0.0069 , error rho:  1.714e-06 , rho * u:  2.591e-06 , energy: 4.762e-06
-Time:    4.01 , dt:   0.0069 , error rho:  1.843e-06 , rho * u:  2.625e-06 , energy: 4.985e-06
-Time:    5.01 , dt:   0.0069 , error rho:  1.496e-06 , rho * u:  1.961e-06 , energy: 4.142e-06
-Time:       6 , dt:   0.0083 , error rho:  1.007e-06 , rho * u:  7.119e-07 , energy: 2.972e-06
-Time:       7 , dt:   0.0095 , error rho:  9.096e-07 , rho * u:  3.786e-07 , energy: 2.626e-06
-Time:       8 , dt:   0.0096 , error rho:  8.439e-07 , rho * u:  3.338e-07 , energy:  2.43e-06
-Time:       9 , dt:   0.0096 , error rho:  7.822e-07 , rho * u:  2.984e-07 , energy: 2.248e-06
-Time:      10 , dt:   0.0096 , error rho:  7.231e-07 , rho * u:  2.666e-07 , energy: 2.074e-06
+Time:       0, dt:   0.0069, error rho:   2.76e-07, rho * u:  1.259e-06, energy: 2.987e-06
+Time:    1.01, dt:   0.0069, error rho:   1.37e-06, rho * u:  2.252e-06, energy: 4.153e-06
+Time:    2.01, dt:   0.0069, error rho:  1.561e-06, rho * u:   2.43e-06, energy: 4.493e-06
+Time:    3.01, dt:   0.0069, error rho:  1.714e-06, rho * u:  2.591e-06, energy: 4.762e-06
+Time:    4.01, dt:   0.0069, error rho:  1.843e-06, rho * u:  2.625e-06, energy: 4.985e-06
+Time:    5.01, dt:   0.0069, error rho:  1.496e-06, rho * u:  1.961e-06, energy: 4.142e-06
+Time:       6, dt:   0.0083, error rho:  1.007e-06, rho * u:  7.119e-07, energy: 2.972e-06
+Time:       7, dt:   0.0095, error rho:  9.096e-07, rho * u:  3.786e-07, energy: 2.626e-06
+Time:       8, dt:   0.0096, error rho:  8.439e-07, rho * u:  3.338e-07, energy:  2.43e-06
+Time:       9, dt:   0.0096, error rho:  7.822e-07, rho * u:  2.984e-07, energy: 2.248e-06
+Time:      10, dt:   0.0096, error rho:  7.231e-07, rho * u:  2.666e-07, energy: 2.074e-06
 
 +-------------------------------------------+------------------+------------+------------------+
 | Total wallclock time elapsed              |     2.249s    30 |     2.249s |     2.249s     8 |
@@ -447,19 +447,19 @@ Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
 Number of degrees of freedom: 3,686,400 ( = 4 [vars] x 25,600 [cells] x 36 [dofs/cell/var] )
 Time step size: 7.39876e-05, minimal h: 0.001875, initial transport scaling: 0.00110294
 
-Time:       0 , dt:  7.4e-05 , norm rho:   4.17e-16 , rho * u:  1.629e-16 , energy: 1.381e-15
-Time:    0.05 , dt:  6.3e-05 , norm rho:    0.02075 , rho * u:    0.03801 , energy:   0.08772
-Time:     0.1 , dt:  5.9e-05 , norm rho:    0.02211 , rho * u:    0.04515 , energy:   0.08953
-Time:    0.15 , dt:  5.7e-05 , norm rho:    0.02261 , rho * u:    0.04592 , energy:   0.08967
-Time:     0.2 , dt:  5.8e-05 , norm rho:    0.02058 , rho * u:    0.04361 , energy:   0.08222
-Time:    0.25 , dt:  5.9e-05 , norm rho:    0.01695 , rho * u:    0.04203 , energy:   0.06873
-Time:     0.3 , dt:  5.9e-05 , norm rho:    0.01653 , rho * u:     0.0401 , energy:   0.06604
-Time:    0.35 , dt:  5.7e-05 , norm rho:    0.01774 , rho * u:    0.04264 , energy:    0.0706
+Time:       0, dt:  7.4e-05, norm rho:   4.17e-16, rho * u:  1.629e-16, energy: 1.381e-15
+Time:    0.05, dt:  6.3e-05, norm rho:    0.02075, rho * u:    0.03801, energy:   0.08772
+Time:     0.1, dt:  5.9e-05, norm rho:    0.02211, rho * u:    0.04515, energy:   0.08953
+Time:    0.15, dt:  5.7e-05, norm rho:    0.02261, rho * u:    0.04592, energy:   0.08967
+Time:     0.2, dt:  5.8e-05, norm rho:    0.02058, rho * u:    0.04361, energy:   0.08222
+Time:    0.25, dt:  5.9e-05, norm rho:    0.01695, rho * u:    0.04203, energy:   0.06873
+Time:     0.3, dt:  5.9e-05, norm rho:    0.01653, rho * u:     0.0401, energy:   0.06604
+Time:    0.35, dt:  5.7e-05, norm rho:    0.01774, rho * u:    0.04264, energy:    0.0706
 
 ...
 
-Time:    1.95 , dt:  5.8e-05 , norm rho:    0.01488 , rho * u:    0.03923 , energy:   0.05185
-Time:       2 , dt:  5.7e-05 , norm rho:    0.01432 , rho * u:    0.03969 , energy:   0.04889
+Time:    1.95, dt:  5.8e-05, norm rho:    0.01488, rho * u:    0.03923, energy:   0.05185
+Time:       2, dt:  5.7e-05, norm rho:    0.01432, rho * u:    0.03969, energy:   0.04889
 
 +-------------------------------------------+------------------+------------+------------------+
 | Total wallclock time elapsed              |     273.6s    13 |     273.6s |     273.6s     0 |
@@ -542,8 +542,8 @@ Number of degrees of freedom: 58,982,400 ( = 4 [vars] x 409,600 [cells] x 36 [do
 
 ...
 
-Time:    1.95 , dt:  1.4e-05 , norm rho:    0.01488 , rho * u:    0.03923 , energy:   0.05183
-Time:       2 , dt:  1.4e-05 , norm rho:    0.01431 , rho * u:    0.03969 , energy:   0.04887
+Time:    1.95, dt:  1.4e-05, norm rho:    0.01488, rho * u:    0.03923, energy:   0.05183
+Time:       2, dt:  1.4e-05, norm rho:    0.01431, rho * u:    0.03969, energy:   0.04887
 
 +-------------------------------------------+------------------+------------+------------------+
 | Total wallclock time elapsed              | 2.166e+04s    26 | 2.166e+04s | 2.166e+04s    24 |
@@ -574,8 +574,8 @@ Number of degrees of freedom: 221,184,000 ( = 5 [vars] x 204,800 [cells] x 216 [
 
 ...
 
-Time:    1.95 , dt:  0.00011 , norm rho:    0.01131 , rho * u:    0.03056 , energy:   0.04091
-Time:       2 , dt:  0.00011 , norm rho:     0.0119 , rho * u:    0.03142 , energy:   0.04425
+Time:    1.95, dt:  0.00011, norm rho:    0.01131, rho * u:    0.03056, energy:   0.04091
+Time:       2, dt:  0.00011, norm rho:     0.0119, rho * u:    0.03142, energy:   0.04425
 
 +-------------------------------------------+------------------+------------+------------------+
 | Total wallclock time elapsed              | 1.734e+04s     4 | 1.734e+04s | 1.734e+04s    38 |
@@ -621,8 +621,8 @@ Number of degrees of freedom: 1,769,472,000 ( = 5 [vars] x 1,638,400 [cells] x 2
 
 ...
 
-Time:    1.95 , dt:  5.6e-05 , norm rho:    0.01129 , rho * u:     0.0306 , energy:   0.04086
-Time:       2 , dt:  5.6e-05 , norm rho:    0.01189 , rho * u:    0.03145 , energy:   0.04417
+Time:    1.95, dt:  5.6e-05, norm rho:    0.01129, rho * u:     0.0306, energy:   0.04086
+Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy:   0.04417
 
 +-------------------------------------------+------------------+------------+------------------+
 | Total wallclock time elapsed              | 5.396e+04s   151 | 5.396e+04s | 5.396e+04s     0 |
@@ -637,6 +637,7 @@ Time:       2 , dt:  5.6e-05 , norm rho:    0.01189 , rho * u:    0.03145 , ener
 | rk_stage - inv mass + vec upd |    176750 |      7004s    99 | 1.207e+04s |  1.55e+04s   132 |
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
+
 
 <h3>Possibilities for extensions</h3>
 
