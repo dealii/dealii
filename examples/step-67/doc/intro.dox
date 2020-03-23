@@ -4,7 +4,7 @@
 <i>
 This program was contributed by Martin Kronbichler. Many ideas presented here
 are the result of common code development with Niklas Fehn, Katharina Kormann,
-Peter Munch and Svenja Schoeder.
+Peter Munch, and Svenja Schoeder.
 
 This work was partly supported by the German Research Foundation (DFG) through
 the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
@@ -18,7 +18,9 @@ This tutorial program solves the Euler equations of fluid dynamics using an
 explicit time integrator with the matrix-free framework applied to a
 high-order discontinuous Galerkin discretization in space. For details about
 the Euler system and an alternative implicit approach, we also refer to the
-step-33 tutorial program.
+step-33 tutorial program. You might also want to look at step-69 for
+an alternative approach to solving these equations.
+
 
 <h3>The Euler equations</h3>
 
@@ -30,10 +32,10 @@ compressible inviscid gas,
 @f]
 where the $d+2$ components of the solution vector are $\mathbf{w}=(\rho, \rho
 u_1,\ldots,\rho u_d,E)^{\mathrm T}$. Here, $\rho$ denotes the fluid density,
-${\mathbf u}=(u_1,\ldots u_d)^\mathrm T$ the fluid velocity, and $E$ the
+${\mathbf u}=(u_1,\ldots, u_d)^\mathrm T$ the fluid velocity, and $E$ the
 energy density of the gas. The velocity is not directly solved for, but rather
 the variable $\rho \mathbf{u}$, the linear momentum (since this is the
-conserved quantity.
+conserved quantity).
 
 The Euler flux function, a $(d+2)\times d$ matrix, is defined as
 @f[
@@ -46,7 +48,8 @@ The Euler flux function, a $(d+2)\times d$ matrix, is defined as
   \end{pmatrix}
 @f]
 with $\mathbb{I}$ the $d\times d$ identity matrix and $\otimes$ the outer
-product, and the right hand side forcing is given by
+product; its components denote the mass, momentum, and energy fluxes, respectively.
+The right hand side forcing is given by
 @f[
   \mathbf G(\mathbf w)
   =
@@ -58,12 +61,17 @@ product, and the right hand side forcing is given by
 @f]
 where the vector $\mathbf g$ denotes the direction and magnitude of
 gravity. It could, however, also denote any other external force per unit mass
-that is acting on the fluid.
+that is acting on the fluid. (Think, for example, of the electrostatic
+forces exerted by an external electric field on charged particles.)
 
 The three blocks of equations, the second involving $d$ components, describe
-the conservation of mass, momentum, and energy. The pressure can be expressed
-by the other variables as $p=(\gamma - 1) \left(E-\frac 12 \rho
-\mathbf{u}\cdot \mathbf{u}\right)$ with the gas constant $\gamma = 1.4$.
+the conservation of mass, momentum, and energy. The pressure is not a
+solution variable but needs to be expressed through a "closure relationship"
+by the other variables; we here choose the relationship appropriate
+for a gas with molecules composed of two atoms, which at moderate
+temperatures is given by $p=(\gamma - 1) \left(E-\frac 12 \rho
+\mathbf{u}\cdot \mathbf{u}\right)$ with the constant $\gamma = 1.4$.
+
 
 <h3>High-order discontinuous Galerkin discretization</h3>
 
@@ -73,7 +81,7 @@ discretization, using a solution expansion of the form
 \mathbf{w}_h(\mathbf{x}, t) =
 \sum_{j=0}^{n_\mathbf{dofs}} \boldsymbol{\varphi}_j(\mathbf{x}) {w}_j(t).
 @f]
-Here, $\boldsymbol{\varphi}_j$ denotes the set of basis functions, written as
+Here, $\boldsymbol{\varphi}_j$ denotes the $j$th basis function, written
 in vector form with separate shape functions for the different components and
 letting $w_j(t)$ go through the density, momentum, and energy variables,
 respectively. In this form, the space dependence is contained in the shape
@@ -81,9 +89,10 @@ functions and the time dependence in the unknown coefficients $w_j$. As
 opposed to the continuous finite element method where some shape functions
 span across element boundaries, the shape functions are local to a single
 element in DG methods, with a discontinuity from one element to the next. The
-continuity of the solution is instead imposed weakly by the numerical fluxes
+connectio of the solution from one cell to its neighbors is instead
+imposed by the numerical fluxes
 specified below. This allows for some additional flexibility, for example to
-introduce directionality in the numerical method by e.g. upwinding.
+introduce directionality in the numerical method by, e.g., upwinding.
 
 DG methods are popular methods for solving problems of transport character
 because they combine low dispersion errors with controllable dissipation on
@@ -95,13 +104,13 @@ well-suited for modern hardware with the right implementation. At the same
 time, DG methods are no silver bullet. In particular when the solution
 develops discontinuities (shocks), as is typical for the Euler equations in
 some flow regimes, high-order DG methods tend to oscillatory solutions, like
-all (unlimited) high-order methods. This is a consequence of <a
+all high-order methods when not using flux- or slope-limiters. This is a consequence of <a
 href="https://en.wikipedia.org/wiki/Godunov%27s_theorem">Godunov's theorem</a>
 that states that any total variation limited (TVD) scheme that is linear (like
 a basic DG discretization) can at most be first-order accurate. Put
 differently, since DG methods aim for higher order accuracy, they cannot be
 TVD on solutions that develop shocks. Even though some communities claim that
-the numerical flux in DG methods can control dissipations, this is of limited
+the numerical flux in DG methods can control dissipation, this is of limited
 value unless <b>all</b> shocks in a problem align with cell boundaries. Any
 shock that passes through the interior of cells will again produce oscillatory
 components due to the high-order polynomials. In the finite element and DG
@@ -111,7 +120,7 @@ a troubled-cell indicator based e.g. on a modal decomposition of the
 solution), a switch to dissipative low-order finite volume methods on a
 subgrid, or the addition of some limiting procedures. Given the ample
 possibilities in this context, combined with the considerable implementation
-effort, we refrain from the regime of the Euler equations with pronounced
+effort, we here refrain from the regime of the Euler equations with pronounced
 shocks, and rather concentrate on the regime of subsonic flows with wave-like
 phenomena. For a method that works well with shocks (but is more expensive per
 unknown), we refer to the step-69 tutorial program.
@@ -125,7 +134,7 @@ gives
 \left(\mathbf{v},\mathbf{G}(\mathbf w)\right)_{K}.
 @f]
 
-We then integrate the second term by parts, moving the derivative $\nabla$
+We then integrate the second term by parts, moving the divergence
 from the solution slot to the test function slot, and producing an integral
 over the element boundary:
 @f[
@@ -143,8 +152,9 @@ coupling of the PDE is reflected in the discretization, despite independent
 basis functions on the cells. The connectivity to the neighbor is included by
 defining the numerical flux as a function $\widehat{\mathbf{F}}(\mathbf w^-,
 \mathbf w^+)$ of the solution from both sides of an interior face, $\mathbf
-w^-$ and $\mathbf w^+$. A basic property we require is the numerical flux to
-be <b>conservative</b>, i.e., we want all information that leaves a cell over
+w^-$ and $\mathbf w^+$. A basic property we require is that the numerical flux
+needs to be <b>conservative</b>. That is, we want all information (i.e.,
+mass, momentum, and energy) that leaves a cell over
 a face to enter the neighboring cell in its entirety and vice versa. This can
 be expressed as $\widehat{\mathbf{F}}(\mathbf w^-, \mathbf w^+) =
 \widehat{\mathbf{F}}(\mathbf w^+, \mathbf w^-)$, meaning that the numerical
@@ -189,22 +199,30 @@ the local Lax--Friedrichs flux
 @f]
 
 In the original definition of the Lax--Friedrichs flux, a factor $\lambda =
-\max\left(\|\mathbf{u}^-\|+c^-, \|\mathbf{u}^+\|+c^+\right)$ is used, stating
+\max\left(\|\mathbf{u}^-\|+c^-, \|\mathbf{u}^+\|+c^+\right)$ is used
+(corresponding to the maximal speed at which information is moving on
+the two sides of the interface), stating
 that the difference between the two states, $[\![\mathbf{w}]\!]$ is penalized
 by the largest eigenvalue in the Euler flux, which is $\|\mathbf{u}\|+c$,
 where $c=\sqrt{\gamma p / \rho}$ is the speed of sound. In the implementation
 below, we modify the penalty term somewhat, given that the penalty is of
 approximate nature anyway. We use
-@f[
+@f{align*}{
+\lambda
+&=
 \frac{1}{2}\max\left(\sqrt{\|\mathbf{u^-}\|^2+(c^-)^2},
-                     \sqrt{\|\mathbf{u}^+\|^2+(c^+)^2}\right).
-@f]
+                     \sqrt{\|\mathbf{u}^+\|^2+(c^+)^2}\right)
+\\
+&=
+\frac{1}{2}\sqrt{\max\left(\|\mathbf{u^-}\|^2+(c^-)^2,
+                           \|\mathbf{u}^+\|^2+(c^+)^2\right)}.
+@f}
 The additional factor $\frac 12$ reduces the penalty strength (which results
 in a reduced negative real part of the eigenvalues, and thus increases the
 admissible time step size). Using the squares within the sums allows us to
 reduce the number of expensive square root operations, which is 4 for the
-original Lax--Friedrichs definition, to a single one (as the square root can
-be taken out of the maximum). This simplification leads to at most a factor of
+original Lax--Friedrichs definition, to a single one.
+This simplification leads to at most a factor of
 2 in the reduction of the parameter $\lambda$, since $\|\mathbf{u}\|^2+c^2 \leq
 \|\mathbf{u}\|^2+2 c |\mathbf{u}\| + c^2 = \left(\|\mathbf{u}\|+c\right)^2
 \leq 2 \left(\|\mathbf{u}\|^2+c^2\right)$, with the last inequality following
@@ -265,18 +283,19 @@ configuration:
 
 The polynomial expansion of the solution is finally inserted to the weak form
 and test functions are replaced by the basis functions. This gives a discrete
-in space, continuous in time system with a finite number of unknown
-coefficient values $w_j$, $j=0,\ldots,n_\text{dofs}$. Regarding the choice of
+in space, continuous in time nonlinear system with a finite number of unknown
+coefficient values $w_j$, $j=1,\ldots,n_\text{dofs}$. Regarding the choice of
 the polynomial degree in the DG method, there is no consensus in literature as
 of 2019 as to what polynomial degrees are most efficient and the decision is
 problem-dependent. Higher order polynomials ensure better convergence rates
 and are thus superior for moderate to high accuracy requirements for
 <b>smooth</b> solutions. At the same time, the volume-to-surface ratio
-increases for higher degrees, which makes the effect of the numerical flux
+of where degrees of freedom are located,
+increases with higher degrees, and this makes the effect of the numerical flux
 weaker, typically reducing dissipation. However, in most of the cases the
 solution is not smooth, at least not compared to the resolution that can be
 afforded. This is true for example in incompressible fluid dynamics,
-compressible fluid dynamics, and the reated topic of wave propagation. In this
+compressible fluid dynamics, and the related topic of wave propagation. In this
 pre-asymptotic regime, the error is approximately proportional to the
 numerical resolution, and other factors such as dispersion errors or the
 dissipative behavior become more important. Very high order methods are often
@@ -318,8 +337,8 @@ We now denote by $\mathcal M$ the mass matrix with entries $\mathcal M_{ij} =
 \right]\right]_{i=1,\ldots,n_\text{dofs}}.
 @f]
 the operator evaluating the right-hand side of the Euler operator, given a
-global vector of unknowns $\mathbf{w}_h$ associated with the finite element
-interpolation. Note that $\mathcal L_h$ is explicitly time-dependent as the
+function $\mathbf{w}_h$ associated with a global vector of unknowns
+and the finite element in use. This function $\mathcal L_h$ is explicitly time-dependent as the
 numerical flux evaluated at the boundary will involve time-dependent data
 $\rho_\mathrm{D}$, $(\rho \mathbf{u})_\mathrm{D}$, and $E_\mathbf{D}$ on some
 parts of the boundary, depending on the assignment of boundary
@@ -329,7 +348,9 @@ in time system compactly as
 \mathcal M \frac{\partial \mathbf{w}_h}{\partial t} =
 \mathcal L_h(t, \mathbf{w}_h),
 @f]
-or, equivalently,
+where we have taken the liberty to also denote the global solution
+vector by $\mathbf{w}_h$ (in addition to the the corresponding finite
+element function). Equivalently, the system above has the form
 @f[
 \frac{\partial \mathbf{w}_h}{\partial t} =
 \mathcal M^{-1} \mathcal L_h(t, \mathbf{w}_h).
@@ -393,7 +414,7 @@ $\Delta t = t^{n+1}-t^n$:
 \\
 &\vdots \\
 \mathbf{k}_s &= \mathcal M^{-1} \mathcal L_h\left(t^n+c_s\Delta t,
-  \mathbf{w}_h^n + \sum_{j=1}^{s-1} a_{sj} \Delta t \mathbf{k}_j),
+  \mathbf{w}_h^n + \sum_{j=1}^{s-1} a_{sj} \Delta t \mathbf{k}_j\right),
 \\
 \mathbf{w}_h^{n+1} &= \mathbf{w}_h^n + \Delta t\left(b_1 \mathbf{k}_1 +
 b_2 \mathbf{k}_2 + \ldots + b_s \mathbf{k}_s\right).
@@ -405,7 +426,10 @@ end-of-step value $\mathbf{w}_h^{n+1}$ via some linear combination. The scalar
 coefficients in this scheme, $c_i$, $a_{ij}$, and $b_j$, are defined such that
 certain conditions are satisfied for higher order schemes, the most basic one
 being $c_i = \sum_{j=1}^{i-1}a_{ij}$. The parameters are typically collected in
-the form of a so-called Butcher tableau as (for a five-stage scheme)
+the form of a so-called <a
+href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#Explicit_Runge%E2%80%93Kutta_methods">Butcher
+tableau</a> that collects all of the coefficients that define the
+scheme. For a five-stage scheme, it would look like this:
 @f[
 \begin{array}{c|ccccc}
 0 \\
@@ -442,8 +466,8 @@ in each of the $s$ stages simplifies to
 \begin{aligned}
 \mathbf{k}_i &=
 \mathcal M^{-1} \mathcal L_h\left(t^n+c_i\Delta t, \mathbf{t}_{i} \right),\\
-\mathbf{t}_{i+1} &= \mathbf{w}_h^{n+1} + \Delta t a_i \mathbf{k}_i,\\
-\mathbf{w}_h^{n+1} &= \mathbf{w}_h^{n+1} + \Delta t b_i \mathbf{k}_i.
+\mathbf{t}_{i+1} &= \mathbf{w}_h^{n+1} + \Delta t \, a_i \mathbf{k}_i,\\
+\mathbf{w}_h^{n+1} &= \mathbf{w}_h^{n+1} + \Delta t \, b_i \mathbf{k}_i.
 \end{aligned}
 @f]
 Besides the vector $\mathbf w_h$ that is successively updated, this scheme
@@ -456,7 +480,9 @@ the same storage.
 The main advantages of low-storage variants are the reduced memory consumption
 on the one hand (if a very large number of unknowns must be fit in memory,
 holding all $\mathbf{k}_i$ to compute subsequent updates can be a limit
-already for $s$ in between five and eight) and the reduced memory access on
+already for $s$ in between five and eight -- recall that we are using
+an explicit scheme, so we do not need to store any matrices that are
+typically much larger than a few vectors), and the reduced memory access on
 the other. In this program, we are particularly interested in the latter
 aspect. Since cost of operator evaluation is only a small multiple of the cost
 of simply streaming the input and output vector from memory with the optimized
@@ -470,13 +496,14 @@ reference @cite KennedyCarpenterLewis2000, we also use a fourth-order accurate
 variant with seven stages that was optimized for acoustics setups from
 @cite TseliosSimos2007. Acoustic problems are one of the interesting aspects of
 the subsonic regime of the Euler equations where compressibility leads to the
-transmission of sound waves; often, one uses further simplifications into the
+transmission of sound waves; often, one uses further simplifications of the
 linearized Euler equations around a background state or the acoustic wave
 equation around a fixed frame.
 
+
 <h3>Fast evaluation of integrals by matrix-free techniques</h3>
 
-The major ingredient used in this program are the fast matrix-free techniques
+The major ingredients used in this program are the fast matrix-free techniques
 we use to evaluate the operator $\mathcal L_h$ and the inverse mass matrix
 $\mathcal M$. Actually, the term <i>matrix-free</i> is a slight misnomer,
 because we are working with a nonlinear operator and do not linearize the
@@ -501,7 +528,7 @@ changes is a template argument of the FEEvaluation and FEFaceEvaluation
 classes, the one to set the number of components. The access to the vector is
 the same as before, all handled transparently by the evaluator. We also note
 that the variant with a single evaluator chosen in the code below is not the
-only one -- we could also have used separate evalators for the separate
+only choice -- we could also have used separate evalators for the separate
 components $\rho$, $\rho \mathbf u$, and $E$; given that we treat all
 components similarly (also reflected in the way we state the equation as a
 vector system), this would be more complicated here. As before, the
@@ -510,7 +537,7 @@ on several cells (and faces), involving data types called
 VectorizedArray. Since the arithmetic operations are overloaded for this type,
 we do not have to bother with it all that much, except for the evaluation of
 functions through the Function interface, where we need to provide particular
-<i>vectorized</i> evaluations for several positions at once.
+<i>vectorized</i> evaluations for several quadrature point locations at once.
 
 A more substantial change in this program is the operation at quadrature
 points: Here, the multi-component evaluators provide us with return types not
@@ -521,7 +548,7 @@ the Laplacian of step-37, it now returns a type that is
 `Tensor<1,dim+2,Tensor<1,dim,VectorizedArray<Number>>>`, where the outer
 tensor collects the `dim+2` components of the Euler system, and the inner
 tensor the partial derivatives in the various directions. For example, the
-flux of the Euler system is of this type. In order to reduce the amount of
+flux $\mathbf{F}(\mathbf{w})$ of the Euler system is of this type. In order to reduce the amount of
 code we have to write for spelling out these types, we use the C++ `auto`
 keyword where possible.
 
@@ -533,16 +560,17 @@ $\mathbf{u}$ from the momentum variable $\rho \mathbf{u}$. Given that $\rho
 \mathbf{u}$ is represented as a $p$-degree polynomial, as is $\rho$, the
 velocity $\mathbf{u}$ is a rational expression in terms of the reference
 coordinates $\hat{\mathbf{x}}$. As we perform the multiplication $(\rho
-\mathbf{u})\otimes \mathbf{u}$, we obtain an expression that contains a
-rational expression of two polynomials, with polynomial degree $2p$ in the
+\mathbf{u})\otimes \mathbf{u}$, we obtain an expression that is the
+ratio of two polynomials, with polynomial degree $2p$ in the
 numerator and polynomial degree $p$ in the denominator. Combined with the
 gradient of the test function, the integrand is of degree $3p$ in the
-numerator and $p$ in the denominator already for affine (undeformed) cell
-geometries. For curved cells, additional polynomial and rational expression
+numerator and $p$ in the denominator already for affine cells, i.e.,
+for parallelograms/ parallelepipeds.
+For curved cells, additional polynomial and rational expressions
 appear when multiplying the integrand by the determinant of the Jacobian of
 the mapping. At this point, one usually needs to give up on insisting on exact
 integration, and take whatever accuracy the Gaussian (more precisely,
-Gauss--Legrende) quadrature provides. The situation is the similar to the one
+Gauss--Legrende) quadrature provides. The situation is then similar to the one
 for the Laplace equation, where the integrand contains rational expressions on
 non-affince cells and is also only integrated approximately. As these formulas
 only integrate polynomials exactly, we have to live with the <a
@@ -560,9 +588,10 @@ aliasing errors can introduce unphysical oscillations in the numerical
 solution for <i>barely</i> resolved simulations. The fact that aliasing mostly
 affects coarse resolutions -- whereas finer meshes with the same scheme
 otherwise work fine -- is not surprising because well-resolved simulations
-have small coefficients in the higher polynomial degrees that are missed by
+have tend to be smooth on length-scales of a cell (i.e., they have
+small coefficients in the higher polynomial degrees that are missed by 
 too few quadrature points, whereas the main solution contribution in the lower
-polynomial degrees is still well-captured (this is a consequence of Taylor's
+polynomial degrees is still well-captured -- this is simply a consequence of Taylor's
 theorem). To address this topic, various approaches have been proposed in the
 DG literature. One technique is filtering which damps the solution components
 pertaining to higher polynomial degrees. As the chosen nodal basis is not
@@ -570,8 +599,8 @@ hierarchical, this would mean to transform from the nodal basis into a
 hierarchical one (e.g., a modal one based on Legendre polynomials) where the
 contributions within a cell are split by polynomial degrees. In that basis,
 one could then multiply the solution coefficients associated with higher
-degrees and keep the lower ones intact (to not destroy consistency), and
-transform back to the nodal basis. However, filters reduce the accuracy of the
+degrees by a small number, keep the lower ones intact (to not destroy consistency), and
+then transform back to the nodal basis. However, filters reduce the accuracy of the
 method. Another, in some sense simpler, strategy is to use more quadrature
 points to capture non-linear terms more accurately. Using more than $p+1$
 quadrature points per coordinate directions is sometimes called
@@ -595,6 +624,7 @@ FEFaceEvaluation classes allow to seemlessly change the number of points by a
 template parameter, such that the program does not get more complicated
 because of that.
 
+
 <h3>Evaluation of the inverse mass matrix with matrix-free techniques</h3>
 
 The last ingredient is the evaluation of the inverse mass matrix $\mathcal
@@ -603,9 +633,12 @@ block-diagonal and thus easily inverted -- one only needs to invert the
 diagonal blocks. However, given the fact that matrix-free evaluation of
 integrals is closer in cost to the access of the vectors only, even the
 application of a block-diagonal matrix (e.g. via an array of LU factors) would
-be several times more expensive than evaluation of $\mathcal L_h$. As this is
+be several times more expensive than evaluation of $\mathcal L_h$
+simply because just storing and loading matrices of size
+`dofs_per_cell` times `dofs_per_cell` for higher order finite elements
+repeatedly is expensive. As this is
 clearly undesirable, part of the community has moved to bases where the mass
-matrix is diagonal, for example the L2-orthogonal Legendre basis using
+matrix is diagonal, for example the <i>L<sub>2</sub></i>-orthogonal Legendre basis using
 hierarchical polynomials or Lagrange polynomials on the points of the Gaussian
 quadrature (which is just another way of utilizing Legendre
 information). While the diagonal property breaks down for deformed elements,
@@ -613,8 +646,8 @@ the error made by taking a diagonal mass matrix and ignoring the rest (a
 variant of mass lumping, though not the one with an additional integration
 error as utilized in step-48) has been shown to not alter discretization
 accuracy. The Lagrange basis in the points of Gaussian quadrature is sometimes
-also referred to as a collocation setup, as the nodal points of the
-polynomials coincide with the points of quadrature, obviating some
+also referred to as a collocation setup , as the nodal points of the
+polynomials coincide (= are "co-located") with the points of quadrature, obviating some
 interpolation operations. Given the fact that we want to use more quadrature
 points for nonlinear terms in $\mathcal L_h$, however, the collocation
 property is lost. (More precisely, it is still used in FEEvaluation and
@@ -625,10 +658,15 @@ In this tutorial program, we use the collocation idea for the application of
 the inverse mass matrix, but with a slight twist. Rather than using the
 collocation via Lagrange polynomials in the points of Gaussian quadrature, we
 prefer a conventional Lagrange basis in Gauss-Lobatto points as those make the
-evaluation of face integrals cheap. One could of course also use the
+evaluation of face integrals cheap. This is because for Gauss-Lobatto
+points, some of the node points are located on the faces of the cell
+and it is not difficult to show that on any given face, the only shape
+functions with non-zero values are exactly the ones whose node points
+are in fact located on that face. One could of course also use the
 Gauss-Lobatto quadrature (with some additional integration error) as was done
-in step-48, but we do not want to sacrifice accuracy at that
-point. Instead, we use an idea described in the reference
+in step-48, but we do not want to sacrifice accuracy as these
+quadrature formulas are generally of lower order than the general
+Gauss quadrature formulas. Instead, we use an idea described in the reference
 @cite KronbichlerSchoeder2016 where it was proposed to change the basis for the
 sake of applying the inverse mass matrix. Let us denote by $S$ the matrix of
 shape functions evaluated at quadrature points, with shape functions in the row
@@ -664,8 +702,8 @@ $S_{\mathrm{1D}}^{-\mathrm{T}}$ rather than $S_{\mathrm{1D}}$.
 The class MatrixFreeOperators::CellwiseInverseMassMatrix implements this
 operation: It changes from the basis contained in the finite element (in this
 case, FE_DGQ) to the Lagrange basis in Gaussian quadrature points. Here, the
-diagonal mass matrix can be applied, which is nothing else than the inverse of
-the `JxW` factor (i.e., the quadrature weight times the determinant of the
+diagonal mass matrix can be evaluate, which is simply the inverse of
+the `JxW` factors (i.e., the quadrature weight times the determinant of the
 Jacobian from reference to real coordinates). Once this is done, we can change
 back to the standard nodal Gauss-Lobatto basis.
 
@@ -676,24 +714,26 @@ which is more costly due to over-integration and face integrals. In fact, it
 is so cheap that it is limited by the bandwidth of reading the source vector,
 reading the diagonal, and writing into the destination vector on most modern
 architectures. The hardware used for the result section allows to do the
-computations at least twice as fast as the streaming of the vectors from RAM
+computations at least twice as fast as the streaming of the vectors from
 memory.
+
 
 <h3>The test case</h3>
 
 In this tutorial program, we implement two test cases. The first case is a
 convergence test limited to two space dimensions. It runs a so-called
 isentropic vortex which is transported via a background flow field. The second
-case uses a more exciting setup: We start with a cylinder immersed into a
+case uses a more exciting setup: We start with a cylinder immersed in a
 channel, using the GridGenerator::channel_with_cylinder() function. Here, we
 impose a subsonic initial field at Mach number of $\mathrm{Ma}=0.307$ with a
-constant velocity in $x$ direction. At the top and bottom wall as well as at
+constant velocity in $x$ direction. At the top and bottom walls as well as at
 the cylinder, we impose a no-penetration (i.e., tangential flow)
 condition. This setup forces the flow to re-orient as compared to the initial
 condition, which results in a big sound wave propagating away from the
-cylinder. In upstream direction, the wave travels more slowly, including a
+cylinder. In upstream direction, the wave travels more slowly (as it
+has to move against the oncoming gas), including a
 discontinuity in density and pressure. In downstream direction, the transport
-is faster as sound propagation and fluid flow go in the same way, which smears
+is faster as sound propagation and fluid flow go in the same direction, which smears
 out the discontinuity somewhat. Once the sound wave hits the upper and lower
 walls, the sound is reflected back, creating some nice shapes as illustrated
-in the results section.
+in the <a href="#Results">results section</a> below.
