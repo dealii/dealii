@@ -70,6 +70,9 @@ namespace LinearAlgebra
       reinit(const IndexSet &is_locally_owned, const IndexSet &is_locally_ghost)
       {
         this->n_local_elements = is_locally_owned.n_elements();
+        this->n_ghost_elements = is_locally_ghost.n_elements();
+
+        this->n_mpi_processes_ = Utilities::MPI::n_mpi_processes(comm);
 
         std::vector<unsigned int> sm_ranks(
           Utilities::MPI::n_mpi_processes(comm_sm));
@@ -444,31 +447,52 @@ namespace LinearAlgebra
         compress_finish(data_this, data_others, buffer);
       }
 
+      std::size_t
+      local_size() const
+      {
+        return n_local_elements;
+      }
+
+      std::size_t
+      n_ghost_indices() const
+      {
+        return n_ghost_elements;
+      }
+
+      std::size_t
+      n_mpi_processes() const
+      {
+        return n_mpi_processes_;
+      }
+
     private:
       const MPI_Comm &comm;
       const MPI_Comm &comm_sm;
 
+      unsigned int n_mpi_processes_;
+
       unsigned int n_local_elements;
+      unsigned int n_ghost_elements;
 
       std::vector<unsigned int>            recv_remote_ranks;
       std::vector<types::global_dof_index> recv_remote_ptr = {0};
-      mutable std::vector<MPI_Request>     recv_remote_req;
+      mutable std::vector<MPI_Request>     recv_remote_req; // TODO: move
 
       std::vector<unsigned int>        recv_sm_ranks;
       std::vector<unsigned int>        recv_sm_ptr = {0};
-      mutable std::vector<MPI_Request> recv_sm_req;
+      mutable std::vector<MPI_Request> recv_sm_req; // TODO: move
       std::vector<unsigned int>        recv_sm_indices;
       std::vector<unsigned int>        recv_sm_offset;
 
       std::vector<unsigned int>        send_remote_ranks;
       std::vector<unsigned int>        send_remote_ptr = {0};
       std::vector<unsigned int>        send_remote_indices;
-      mutable std::vector<MPI_Request> send_remote_req;
+      mutable std::vector<MPI_Request> send_remote_req; // TODO: move
 
       std::vector<unsigned int>        send_sm_ranks;
       std::vector<unsigned int>        send_sm_ptr = {0};
       std::vector<unsigned int>        send_sm_indices;
-      mutable std::vector<MPI_Request> send_sm_req;
+      mutable std::vector<MPI_Request> send_sm_req; // TODO: move
       std::vector<unsigned int>        send_sm_offset;
     };
 

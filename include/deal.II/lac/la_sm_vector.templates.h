@@ -192,7 +192,7 @@ namespace LinearAlgebra
           partitioner    = v.partitioner;
           partitioner_sm = v.partitioner_sm;
           const size_type new_allocated_size =
-            partitioner->local_size() + partitioner->n_ghost_indices();
+            partitioner_sm->local_size() + partitioner_sm->n_ghost_indices();
           resize_val(new_allocated_size,
                      partitioner_sm->get_sm_mpi_communicator());
         }
@@ -253,7 +253,8 @@ namespace LinearAlgebra
 
       // set vector size and allocate memory
       const size_type new_allocated_size =
-        this->partitioner->local_size() + this->partitioner->n_ghost_indices();
+        this->partitioner_sm->local_size() +
+        this->partitioner_sm->n_ghost_indices();
       resize_val(new_allocated_size, partitioner_sm->get_sm_mpi_communicator());
 
       // initialize to zero
@@ -295,7 +296,10 @@ namespace LinearAlgebra
         {
           dealii::internal::VectorOperations::
             functions<Number, Number, MemorySpaceType>::copy(
-              thread_loop_partitioner, partitioner->local_size(), v.data, data);
+              thread_loop_partitioner,
+              partitioner_sm->local_size(),
+              v.data,
+              data);
         }
     }
 
@@ -431,7 +435,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = c.thread_loop_partitioner;
 
-      const size_type this_size = partitioner->local_size();
+      const size_type this_size = partitioner_sm->local_size();
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
@@ -500,8 +504,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::zero_out_ghosts() const
     {
       if (data.values != nullptr)
-        std::fill_n(data.values.get() + partitioner->local_size(),
-                    partitioner->n_ghost_indices(),
+        std::fill_n(data.values.get() + partitioner_sm->local_size(),
+                    partitioner_sm->n_ghost_indices(),
                     Number());
 
       vector_is_ghosted = false;
@@ -652,7 +656,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::subtract_vector(
-          thread_loop_partitioner, partitioner->local_size(), v.data, data);
+          thread_loop_partitioner, partitioner_sm->local_size(), v.data, data);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -693,7 +697,11 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_av(
-          thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
+          thread_loop_partitioner,
+          partitioner_sm->local_size(),
+          a,
+          v.data,
+          data);
     }
 
 
@@ -772,7 +780,7 @@ namespace LinearAlgebra
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::sadd_xav(
           thread_loop_partitioner,
-          partitioner->local_size(),
+          partitioner_sm->local_size(),
           x,
           a,
           v.data,
@@ -876,7 +884,11 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::equ_au(
-          thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
+          thread_loop_partitioner,
+          partitioner_sm->local_size(),
+          a,
+          v.data,
+          data);
 
 
       if (vector_is_ghosted)
@@ -920,11 +932,12 @@ namespace LinearAlgebra
       if (PointerComparison::equal(this, &v))
         return norm_sqr_local();
 
-      AssertDimension(partitioner->local_size(), v.partitioner->local_size());
+      AssertDimension(partitioner_sm->local_size(),
+                      v.partitioner_sm->local_size());
 
       return dealii::internal::VectorOperations::
         functions<Number, Number2, MemorySpaceType>::dot(
-          thread_loop_partitioner, partitioner->local_size(), v.data, data);
+          thread_loop_partitioner, partitioner_sm->local_size(), v.data, data);
     }
 
 
@@ -940,9 +953,9 @@ namespace LinearAlgebra
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
       Number local_result = inner_product_local(v);
-      if (partitioner->n_mpi_processes() > 1)
+      if (partitioner_sm->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
-                                   partitioner->get_mpi_communicator());
+                                   partitioner_sm->get_mpi_communicator());
       else
         return local_result;
     }
@@ -958,7 +971,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_2(
-          thread_loop_partitioner, partitioner->local_size(), sum, data);
+          thread_loop_partitioner, partitioner_sm->local_size(), sum, data);
 
       AssertIsFinite(sum);
 
@@ -1012,9 +1025,9 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::norm_sqr() const
     {
       real_type local_result = norm_sqr_local();
-      if (partitioner->n_mpi_processes() > 1)
+      if (partitioner_sm->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
-                                   partitioner->get_mpi_communicator());
+                                   partitioner_sm->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1058,7 +1071,7 @@ namespace LinearAlgebra
     {
       real_type max = 0.;
 
-      const size_type local_size = partitioner->local_size();
+      const size_type local_size = partitioner_sm->local_size();
       internal::la_parallel_vector_templates_functions<
         Number,
         MemorySpaceType>::linfty_norm_local(data, local_size, max);
@@ -1073,9 +1086,9 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::linfty_norm() const
     {
       const real_type local_result = linfty_norm_local();
-      if (partitioner->n_mpi_processes() > 1)
+      if (partitioner_sm->n_mpi_processes() > 1)
         return Utilities::MPI::max(local_result,
-                                   partitioner->get_mpi_communicator());
+                                   partitioner_sm->get_mpi_communicator());
       else
         return local_result;
     }
@@ -1089,7 +1102,7 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpaceType> &v,
       const Vector<Number, MemorySpaceType> &w)
     {
-      const size_type vec_size = partitioner->local_size();
+      const size_type vec_size = partitioner_sm->local_size();
       AssertDimension(vec_size, v.local_size());
       AssertDimension(vec_size, w.local_size());
 
@@ -1121,9 +1134,9 @@ namespace LinearAlgebra
       const VectorType &w = dynamic_cast<const VectorType &>(ww);
 
       Number local_result = add_and_dot_local(a, v, w);
-      if (partitioner->n_mpi_processes() > 1)
+      if (partitioner_sm->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
-                                   partitioner->get_mpi_communicator());
+                                   partitioner_sm->get_mpi_communicator());
       else
         return local_result;
     }
