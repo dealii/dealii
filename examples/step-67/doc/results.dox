@@ -154,7 +154,7 @@ similar for the density and energy variables):
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td align="center">2,304</td>
+    <td align="right">2,304</td>
     <td align="center">1.373e-01</td>
     <td>&nbsp;</td>
   </tr>
@@ -163,82 +163,82 @@ similar for the density and energy variables):
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td align="center">4,096</td>
+    <td align="right">4,096</td>
     <td align="center">9.130e-02</td>
     <td>&nbsp;</td>
-    <td align="center">9,216</td>
+    <td align="right">9,216</td>
     <td align="center">8.899e-03</td>
     <td>3.94</td>
   </tr>
   <tr>
     <td align="right">256</td>
-    <td align="center">9,216</td>
+    <td align="right">9,216</td>
     <td align="center">5.577e-02</td>
     <td>&nbsp;</td>
-    <td align="center">16,384</td>
+    <td align="right">16,384</td>
     <td align="center">7.381e-03</td>
     <td>3.64</td>
-    <td align="center">36,864</td>
+    <td align="right">36,864</td>
     <td align="center">2.082e-04</td>
     <td>5.42</td>
   </tr>
   <tr>
     <td align="right">1024</td>
-    <td align="center">36,864</td>
+    <td align="right">36,864</td>
     <td align="center">4.724e-03</td>
     <td>3.56</td>
-    <td align="center">65,536</td>
+    <td align="right">65,536</td>
     <td align="center">3.072e-04</td>
     <td>4.59</td>
-    <td align="center">147,456</td>
+    <td align="right">147,456</td>
     <td align="center">2.625e-06</td>
     <td>6.31</td>
   </tr>
   <tr>
     <td align="right">4096</td>
-    <td align="center">147,456</td>
+    <td align="right">147,456</td>
     <td align="center">6.205e-04</td>
     <td>2.92</td>
-    <td align="center">262,144</td>
+    <td align="right">262,144</td>
     <td align="center">1.880e-05</td>
     <td>4.03</td>
-    <td align="center">589,824</td>
+    <td align="right">589,824</td>
     <td align="center">3.268e-08</td>
     <td>6.33</td>
   </tr>
   <tr>
     <td align="right">16,384</td>
-    <td align="center">589,824</td>
+    <td align="right">589,824</td>
     <td align="center">8.279e-05</td>
     <td>2.91</td>
-    <td align="center">1,048,576</td>
+    <td align="right">1,048,576</td>
     <td align="center">1.224e-06</td>
     <td>3.94</td>
-    <td align="center">2,359,296</td>
+    <td align="right">2,359,296</td>
     <td align="center">9.252e-10</td>
     <td>5.14</td>
   </tr>
   <tr>
     <td align="right">65,536</td>
-    <td align="center">2,359,296</td>
+    <td align="right">2,359,296</td>
     <td align="center">1.105e-05</td>
     <td>2.91</td>
-    <td align="center">4,194,304</td>
+    <td align="right">4,194,304</td>
     <td align="center">7.871e-08</td>
     <td>3.96</td>
-    <td align="center">9,437,184</td>
+    <td align="right">9,437,184</td>
     <td align="center">1.369e-10</td>
     <td>2.77</td>
   </tr>
   <tr>
     <td align="right">262,144</td>
-    <td align="center">9,437,184</td>
+    <td align="right">9,437,184</td>
     <td align="center">1.615e-06</td>
     <td>2.77</td>
-    <td align="center">16,777,216</td>
+    <td align="right">16,777,216</td>
     <td align="center">4.961e-09</td>
     <td>3.99</td>
-    <td align="center">37,748,736</td>
+    <td align="right">37,748,736</td>
     <td align="center">7.091e-11</td>
     <td>0.95</td>
   </tr>
@@ -272,7 +272,7 @@ If we switch to the Harten-Lax-van Leer flux, the results are as follows:
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td align="center">2,304</td>
+    <td align="right">2,304</td>
     <td align="center">1.339e-01</td>
     <td>&nbsp;</td>
   </tr>
@@ -281,82 +281,82 @@ If we switch to the Harten-Lax-van Leer flux, the results are as follows:
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td align="center">4,096</td>
+    <td align="right">4,096</td>
     <td align="center">9.037e-02</td>
     <td>&nbsp;</td>
-    <td align="center">9,216</td>
+    <td align="right">9,216</td>
     <td align="center">8.849e-03</td>
     <td>3.92</td>
   </tr>
   <tr>
     <td align="right">256</td>
-    <td align="center">9,216</td>
+    <td align="right">9,216</td>
     <td align="center">4.204e-02</td>
     <td>&nbsp;</td>
-    <td align="center">16,384</td>
+    <td align="right">16,384</td>
     <td align="center">9.143e-03</td>
     <td>3.31</td>
-    <td align="center">36,864</td>
+    <td align="right">36,864</td>
     <td align="center">2.501e-04</td>
     <td>5.14</td>
   </tr>
   <tr>
     <td align="right">1024</td>
-    <td align="center">36,864</td>
+    <td align="right">36,864</td>
     <td align="center">4.913e-03</td>
     <td>3.09</td>
-    <td align="center">65,536</td>
+    <td align="right">65,536</td>
     <td align="center">3.257e-04</td>
     <td>4.81</td>
-    <td align="center">147,456</td>
+    <td align="right">147,456</td>
     <td align="center">3.260e-06</td>
     <td>6.26</td>
   </tr>
   <tr>
     <td align="right">4096</td>
-    <td align="center">147,456</td>
+    <td align="right">147,456</td>
     <td align="center">7.862e-04</td>
     <td>2.64</td>
-    <td align="center">262,144</td>
+    <td align="right">262,144</td>
     <td align="center">1.588e-05</td>
     <td>4.36</td>
-    <td align="center">589,824</td>
+    <td align="right">589,824</td>
     <td align="center">2.953e-08</td>
     <td>6.79</td>
   </tr>
   <tr>
     <td align="right">16,384</td>
-    <td align="center">589,824</td>
+    <td align="right">589,824</td>
     <td align="center">1.137e-04</td>
     <td>2.79</td>
-    <td align="center">1,048,576</td>
+    <td align="right">1,048,576</td>
     <td align="center">9.400e-07</td>
     <td>4.08</td>
-    <td align="center">2,359,296</td>
+    <td align="right">2,359,296</td>
     <td align="center">4.286e-10</td>
     <td>6.11</td>
   </tr>
   <tr>
     <td align="right">65,536</td>
-    <td align="center">2,359,296</td>
+    <td align="right">2,359,296</td>
     <td align="center">1.476e-05</td>
     <td>2.95</td>
-    <td align="center">4,194,304</td>
+    <td align="right">4,194,304</td>
     <td align="center">5.799e-08</td>
     <td>4.02</td>
-    <td align="center">9,437,184</td>
+    <td align="right">9,437,184</td>
     <td align="center">2.789e-11</td>
     <td>3.94</td>
   </tr>
   <tr>
     <td align="right">262,144</td>
-    <td align="center">9,437,184</td>
+    <td align="right">9,437,184</td>
     <td align="center">2.038e-06</td>
     <td>2.86</td>
-    <td align="center">16,777,216</td>
+    <td align="right">16,777,216</td>
     <td align="center">3.609e-09</td>
     <td>4.01</td>
-    <td align="center">37,748,736</td>
+    <td align="right">37,748,736</td>
     <td align="center">5.730e-11</td>
     <td>-1.04</td>
   </tr>
