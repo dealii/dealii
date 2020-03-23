@@ -17,8 +17,91 @@
 /**
  * @defgroup matrixfree Matrix-free infrastructure
  *
- * This module describes the matrix-free infrastructure in deal.II. In
- * essence, the framework provided by the FEEvaluation class on top of the
+ * This module describes the matrix-free infrastructure in deal.II.
+ * An outline of how the primary groups of classes in deal.II interact with the
+ * matrix-free infrastructure is given by the following clickable graph,
+ * with a more detailed description below:
+ *
+ * @dot
+digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+  node [fontname="FreeSans",fontsize=15,
+        shape=record,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+  subgraph base {
+    rank="same";
+  tria       [label="Triangulation",    URL="\ref grid", ];
+  fe         [label="FiniteElement",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  }
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  subgraph linalglibs {
+    rank="same";
+    simd     [label="SIMD",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+              shape=record,height=0.2,width=0.4,
+              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+    fevalues [label="FEEvaluation"];
+    mf       [label="MatrixFree loops"];
+    cuda     [label="CUDA",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+              shape=record,height=0.2,width=0.4,
+              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+    tbb      [label="TBB",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+              shape=record,height=0.2,width=0.4,
+              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  }
+  subgraph sol {
+    rank="same";
+    solvers [label="Solvers",   URL="\ref Solvers"];
+    gmg     [label="Geometric Multigrid", fontname="FreeSans",fontsize=12,
+             shape=record,height=0.2,width=0.4,
+             color="black", fontcolor="black", fillcolor="white", style="dashed"];
+  }
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> mf                [color="black",style="solid"];
+  mf -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+  node [fontname="FreeSans",fontsize=12,
+        shape=record,height=0.2,width=0.4,
+        color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  edge [color="gray", weight=1];
+  opencascade [label="OpenCASCADE"];
+  subgraph misclibs {
+  systems    [label="Operators"];
+  }
+  simd        -> fevalues [dir="none", color="transparent"];
+  fevalues    -> mf       [dir="none", color="transparent"];
+  mf          -> cuda     [dir="none", color="transparent"];
+  cuda        -> tbb      [dir="none", color="transparent"];
+  opencascade -> manifold [dir="none"];
+  gmg         -> solvers  [dir="none", style="dashed", color="black"];
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=ellipse,height=0.2,width=0.4,
+        color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  edge [color="gray", weight=1];
+  gmsh        [label="gmsh", URL="\ref Gmsh"];
+  visit       [label="VisIt"]
+  paraview    [label="ParaView"]
+  gmsh -> tria       [dir="none"];
+  output -> visit    [dir="none"];
+  output -> paraview [dir="none"];
+}
+ * @enddot
+ *
+ * In essence, the framework provided by the FEEvaluation class on top of the
  * data storage in MatrixFree is a specialized operator evaluation
  * framework. It is currently only compatible with a subset of the elements
  * provided by the library which have a special structure, namely those where
