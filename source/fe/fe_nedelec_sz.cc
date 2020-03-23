@@ -136,7 +136,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
         data_ptr   = std_cxx14::make_unique<InternalData>();
   auto &data       = dynamic_cast<InternalData &>(*data_ptr);
-  data.update_each = update_each(update_flags) | update_once(update_flags);
+  data.update_each = requires_update_flags(update_flags);
 
   // Useful quantities:
   const unsigned int degree(this->degree - 1); // Note: FE holds input degree+1
@@ -2175,30 +2175,6 @@ template <int dim, int spacedim>
 UpdateFlags
 FE_NedelecSZ<dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
-{
-  return update_once(flags) | update_each(flags);
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_NedelecSZ<dim, spacedim>::update_once(const UpdateFlags flags) const
-{
-  const bool values_once = (mapping_kind == mapping_none);
-
-  UpdateFlags out = update_default;
-  if (values_once && (flags & update_values))
-    out |= update_values;
-
-  return out;
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
