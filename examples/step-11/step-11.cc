@@ -442,9 +442,8 @@ namespace Step11
                            mapping.get_degree(),
                            DataOut<dim>::curved_inner_cells);
 
-    std::ofstream file(("solution-c=" + std::to_string(cycle) +
-                        ".p=" + std::to_string(mapping.get_degree()) + ".vtu")
-                         .c_str());
+    std::ofstream file("solution-c=" + std::to_string(cycle) +
+                       ".p=" + std::to_string(mapping.get_degree()) + ".vtu");
 
     data_out.write_vtu(file);
   }
