@@ -49,16 +49,12 @@
 // add -march=native or similar flags, making it fall to SSE2. This leads to
 // very strange errors as the size of data structures differs between the
 // compiled deal.II code sitting in libdeal_II.so and the user code if not
-// detected. The __SSE2__ flag ensures that we are actually on a x86-64
-// architecture as we do not want to emit the error on another architecture
-// with 256 bit vectors.
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__SSE2__) && \
-    !defined(__AVX__)
+// detected.
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && !defined(__AVX__)
 #    error \
       "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
-#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__SSE2__) && \
-    !defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && !defined(__AVX512F__)
 #    error \
       "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
