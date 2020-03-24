@@ -400,6 +400,8 @@ public:
    * This gives the number of elements collected in this class. In the general
    * case, there is only one element. Specializations use SIMD intrinsics and
    * can work on multiple elements at the same time.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 1;
 
@@ -942,6 +944,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
@@ -1494,6 +1498,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 16;
 
@@ -2142,6 +2148,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
@@ -2653,6 +2661,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
@@ -3198,6 +3208,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
 
@@ -3639,6 +3651,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
@@ -4118,6 +4132,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
 
@@ -4357,6 +4373,8 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
   DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
