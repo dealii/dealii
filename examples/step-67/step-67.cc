@@ -211,8 +211,8 @@ namespace Euler_DG
   // fact that only two vectors are needed per stage, namely the accumulated
   // part of the solution $\mathbf{w}$ (that will hold the solution
   // $\mathbf{w}^{n+1}$ at the new time $t^{n+1}$ after the last stage), the
-  // update vector $\mathbf{T}_i$ that gets evaluated during the stages, plus
-  // one vector $\mathbf{K}_i$ to hold the evaluation of the operator. Such a
+  // update vector $\mathbf{r}_i$ that gets evaluated during the stages, plus
+  // one vector $\mathbf{k}_i$ to hold the evaluation of the operator. Such a
   // Runge--Kutta setup reduces the memory storage and memory access. As the
   // memory bandwidth is often the performance-limiting factor on modern
   // hardware when the evaluation of the differential operator is
@@ -322,7 +322,7 @@ namespace Euler_DG
     }
 
     // The main function of the time integrator is to go through the stages,
-    // evaluate the operator, prepare the $\mathbf{T}_i$ vector for the next
+    // evaluate the operator, prepare the $\mathbf{r}_i$ vector for the next
     // evaluation, and update the solution vector $\mathbf{w}$. We hand off
     // the work to the `pde_operator` involved in order to be able to merge
     // the vector operations of the Runge--Kutta setup with the evaluation of
@@ -331,30 +331,30 @@ namespace Euler_DG
     //
     // We separately call the operator for the first stage because we need
     // slightly modified arguments there: Here, we evaluate the solution from
-    // the old solution $\mathbf{w}^n$ rather than a $\mathbf T_i$ vector, so
+    // the old solution $\mathbf{w}^n$ rather than a $\mathbf r_i$ vector, so
     // the first argument is `solution`. We here let the stage vector
-    // $\mathbf{T}_i$ also hold the temporary result of the evaluation, as it
+    // $\mathbf{r}_i$ also hold the temporary result of the evaluation, as it
     // is not used otherwise. For all subsequent stages, we use the vector
-    // `vec_Ki` as the second vector argument to store the result of the
+    // `vec_ki` as the second vector argument to store the result of the
     // operator evaluation. Finally, when we are at the last stage, we must
-    // skip the computation of the vector $\mathbf{T}_{s+1}$ as there is no
+    // skip the computation of the vector $\mathbf{r}_{s+1}$ as there is no
     // coefficient $a_s$ available (nor will it be used).
     template <typename VectorType, typename Operator>
     void perform_time_step(const Operator &pde_operator,
                            const double    current_time,
                            const double    time_step,
                            VectorType &    solution,
-                           VectorType &    vec_Ti,
-                           VectorType &    vec_Ki)
+                           VectorType &    vec_ri,
+                           VectorType &    vec_ki)
     {
       AssertDimension(ai.size() + 1, bi.size());
       pde_operator.perform_stage(current_time,
                                  bi[0] * time_step,
                                  ai[0] * time_step,
                                  solution,
-                                 vec_Ti,
+                                 vec_ri,
                                  solution,
-                                 vec_Ti);
+                                 vec_ri);
       double sum_previous_bi = 0;
       for (unsigned int stage = 1; stage < bi.size(); ++stage)
         {
@@ -364,10 +364,10 @@ namespace Euler_DG
                                      (stage == bi.size() - 1 ?
                                         0 :
                                         ai[stage] * time_step),
-                                     vec_Ti,
-                                     vec_Ki,
+                                     vec_ri,
+                                     vec_ki,
                                      solution,
-                                     vec_Ti);
+                                     vec_ri);
           sum_previous_bi += bi[stage - 1];
         }
     }
@@ -700,10 +700,10 @@ namespace Euler_DG
     perform_stage(const Number cur_time,
                   const Number factor_solution,
                   const Number factor_ai,
-                  const LinearAlgebra::distributed::Vector<Number> &current_Ti,
-                  LinearAlgebra::distributed::Vector<Number> &      vec_Ki,
+                  const LinearAlgebra::distributed::Vector<Number> &current_ri,
+                  LinearAlgebra::distributed::Vector<Number> &      vec_ki,
                   LinearAlgebra::distributed::Vector<Number> &      solution,
-                  LinearAlgebra::distributed::Vector<Number> &next_Ti) const;
+                  LinearAlgebra::distributed::Vector<Number> &next_ri) const;
 
     void project(const Function<dim> &                       function,
                  LinearAlgebra::distributed::Vector<Number> &solution) const;
@@ -1335,15 +1335,15 @@ namespace Euler_DG
 
 
   // This function implements EulerOperator::apply() followed by some updates
-  // to the vectors, namely `next_Ti = solution + factor_ai * K_i` and
-  // `solution += factor_solution * K_i`. Rather than performing these
+  // to the vectors, namely `next_ri = solution + factor_ai * k_i` and
+  // `solution += factor_solution * k_i`. Rather than performing these
   // steps through the vector interfaces, we here present an alternative
   // strategy that is faster on cache-based architectures. As the memory
   // consumed by the vectors is often much larger than what fits into caches,
   // the data has to effectively come from the slow RAM memory. The situation
   // can be improved by loop fusion, i.e., performing both the updates to
-  // `next_Ki` and `solution` within a single sweep. In that case, we would
-  // read the two vectors `rhs` and `solution` and write into `next_Ki` and
+  // `next_ki` and `solution` within a single sweep. In that case, we would
+  // read the two vectors `rhs` and `solution` and write into `next_ki` and
   // `solution`, compared to at least 4 reads and two writes in the baseline
   // case. Here, we go one step further and perform the loop immediately when
   // the mass matrix inversion has finished on a part of the
@@ -1360,7 +1360,7 @@ namespace Euler_DG
   // practice that we ensure that there is no overlapping, also called
   // aliasing, between the index ranges of the pointers we use inside the
   // loops). Note that we select a different code path for the last
-  // Runge--Kutta stage when we do not need to update the `next_Ti`
+  // Runge--Kutta stage when we do not need to update the `next_ri`
   // vector. This strategy gives a considerable speedup. Whereas the inverse
   // mass matrix and vector updates take more than 60% of the computational
   // time with default vector updates on a 40-core machine, the percentage is
@@ -1371,10 +1371,10 @@ namespace Euler_DG
     const Number                                      current_time,
     const Number                                      factor_solution,
     const Number                                      factor_ai,
-    const LinearAlgebra::distributed::Vector<Number> &current_Ti,
-    LinearAlgebra::distributed::Vector<Number> &      vec_Ki,
+    const LinearAlgebra::distributed::Vector<Number> &current_ri,
+    LinearAlgebra::distributed::Vector<Number> &      vec_ki,
     LinearAlgebra::distributed::Vector<Number> &      solution,
-    LinearAlgebra::distributed::Vector<Number> &      next_Ti) const
+    LinearAlgebra::distributed::Vector<Number> &      next_ri) const
   {
     {
       TimerOutput::Scope t(timer, "rk_stage - integrals L_h");
@@ -1388,8 +1388,8 @@ namespace Euler_DG
                 &EulerOperator::local_apply_face,
                 &EulerOperator::local_apply_boundary_face,
                 this,
-                vec_Ki,
-                current_Ti,
+                vec_ki,
+                current_ri,
                 true,
                 MatrixFree<dim, Number>::DataAccessOnFaces::values,
                 MatrixFree<dim, Number>::DataAccessOnFaces::values);
@@ -1401,8 +1401,8 @@ namespace Euler_DG
       data.cell_loop(
         &EulerOperator::local_apply_inverse_mass_matrix,
         this,
-        next_Ti,
-        vec_Ki,
+        next_ri,
+        vec_ki,
         std::function<void(const unsigned int, const unsigned int)>(),
         [&](const unsigned int start_range, const unsigned int end_range) {
           const Number ai = factor_ai;
@@ -1412,9 +1412,9 @@ namespace Euler_DG
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
-                  const Number K_i          = next_Ti.local_element(i);
+                  const Number k_i          = next_ri.local_element(i);
                   const Number sol_i        = solution.local_element(i);
-                  solution.local_element(i) = sol_i + bi * K_i;
+                  solution.local_element(i) = sol_i + bi * k_i;
                 }
             }
           else
@@ -1422,10 +1422,10 @@ namespace Euler_DG
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
-                  const Number K_i          = next_Ti.local_element(i);
+                  const Number k_i          = next_ri.local_element(i);
                   const Number sol_i        = solution.local_element(i);
-                  solution.local_element(i) = sol_i + bi * K_i;
-                  next_Ti.local_element(i)  = sol_i + ai * K_i;
+                  solution.local_element(i) = sol_i + bi * k_i;
+                  next_ri.local_element(i)  = sol_i + ai * k_i;
                 }
             }
         });
@@ -2044,13 +2044,15 @@ namespace Euler_DG
   // The EulerProblem::run() function puts all pieces together. It starts of
   // by calling the function that creates the mesh and sets up data structures
   // and initializing the time integrator and the two temporary vectors of the
-  // low-storage integrator. Before we start the time loop, we compute the
-  // time step size by the `EulerOperator::compute_cell_transport_speed()`
-  // function. For reasons of comparison, we compare the result obtained there
-  // with the minimal mesh size and print them to screen. For velocities and
-  // speeds of sound close to unity as in this tutorial program, the predicted
-  // effective mesh size will be close, but they could vary if scaling were
-  // different.
+  // low-storage integrator. We call these vectors `rk_register_1` and
+  // `rk_register_2`, and use the first vector to represent the quantity
+  // $\mathbf{r}_i$ and the second one for $\mathbf{k}_i$. Before we start the
+  // time loop, we compute the time step size by the
+  // `EulerOperator::compute_cell_transport_speed()` function. For reasons of
+  // comparison, we compare the result obtained there with the minimal mesh
+  // size and print them to screen. For velocities and speeds of sound close
+  // to unity as in this tutorial program, the predicted effective mesh size
+  // will be close, but they could vary if scaling were different.
   template <int dim>
   void EulerProblem<dim>::run()
   {

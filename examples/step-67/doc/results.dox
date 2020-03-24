@@ -45,9 +45,7 @@ speed of sound (and thus faster propagation) leaves the computational domain
 between times 5 and 6.5. After that point, the flow is simply uniform
 in the same direction, and the maximum velocity of the gas is reduced
 compared to the previous state where the uniform velocity was overlaid
-by the vortex. Our time step formula recognizes this and only
-uses the acoustic limit in the last part of the simulation when
-determining the time step size.
+by the vortex. Our time step formula recognizes this effect.
 
 The final block of output shows detailed information about the timing
 of individual parts of the programs; it breaks this down by showing
@@ -124,8 +122,8 @@ vector updates (797 vs 77.5 seconds). The reason for this non-optimal increase
 in run time can be traced back to cache effects on the given hardware (with 40
 MB of L2 cache and 55 MB of L3 cache): While not all of the relevant data fits
 into caches for 9.4 million DoFs (one vector takes 75 MB and we have three
-vectors plus some additional data in MatrixFree), there is capacity for almost
-half of one vector nonetheless. Given that modern caches are more sophisticated than
+vectors plus some additional data in MatrixFree), there is capacity for one and
+a half vector nonetheless. Given that modern caches are more sophisticated than
 the naive least-recently-used strategy (where we would have little re-use as
 the data is used in a streaming-like fashion), we can assume that a sizeable
 fraction of data can indeed be delivered from caches for the 9.4 million DoFs

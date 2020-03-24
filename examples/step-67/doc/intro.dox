@@ -79,7 +79,7 @@ For spatial discretization, we use a high-order discontinuous Galerkin (DG)
 discretization, using a solution expansion of the form
 @f[
 \mathbf{w}_h(\mathbf{x}, t) =
-\sum_{j=0}^{n_\mathbf{dofs}} \boldsymbol{\varphi}_j(\mathbf{x}) {w}_j(t).
+\sum_{j=1}^{n_\mathbf{dofs}} \boldsymbol{\varphi}_j(\mathbf{x}) {w}_j(t).
 @f]
 Here, $\boldsymbol{\varphi}_j$ denotes the $j$th basis function, written
 in vector form with separate shape functions for the different components and
@@ -89,7 +89,7 @@ functions and the time dependence in the unknown coefficients $w_j$. As
 opposed to the continuous finite element method where some shape functions
 span across element boundaries, the shape functions are local to a single
 element in DG methods, with a discontinuity from one element to the next. The
-connectio of the solution from one cell to its neighbors is instead
+connection of the solution from one cell to its neighbors is instead
 imposed by the numerical fluxes
 specified below. This allows for some additional flexibility, for example to
 introduce directionality in the numerical method by, e.g., upwinding.
@@ -252,7 +252,7 @@ simply use arithmetic means, $\bar{\mathbf{u}} = \frac{\mathbf{u}^- +
 \sqrt{\gamma p^{\pm} / \rho^{\pm}}$, in this tutorial program, and leave other
 variants to a possible extension. We also note that the HLL flux has been
 extended in the literature to the so-called HLLC flux, where C stands for the
-ability to represent so-called contact discontinuities.
+ability to represent contact discontinuities.
 
 At the boundaries with no neighboring state $\mathbf{w}^+$ available, it is
 common practice to deduce suitable exterior values from the boundary
@@ -379,15 +379,18 @@ polynomial degree $p$ and the physics of the Euler operator, i.e., the
 eigenvalues of the linearization of $\mathbf F(\mathbf w)$ with respect to
 $\mathbf{w}$. In this program, we set the time step as follows:
 @f[
-\Delta t = \frac{Cr}{p^{1.5}}\left(\frac{1}{\max\left[\frac{\|\mathbf{u}\|}{h_u} +
-           \frac{c}{h_c}\right]}\right),
+\Delta t = \frac{\mathrm{Cr}}{p^{1.5}}\left(\frac{1}
+           {\max\left[\frac{\|\mathbf{u}\|}{h_u} + \frac{c}{h_c}\right]}\right),
 @f]
 
-with the maximum taken over all quadrature points and all cells. The power
-$p^{1.5}$ used for the polynomial scaling is heuristic and represents the
-closest fit for polynomial degrees between 1 and 8, see e.g.
-@cite SchoederKormann2018. In the limit of higher degrees, $p>10$, a scaling
-of $p^2$ is more accurate, related to the inverse estimates typically used for
+with the maximum taken over all quadrature points and all cells. The
+dimensionless number $\mathrm{Cr}$ denotes the Courant number and can be
+chosen up to a maximally stable number $\mathrm{Cr}_\text{max}$, whose value
+depends on the selected time stepping method and its stability properties. The
+power $p^{1.5}$ used for the polynomial scaling is heuristic and represents
+the closest fit for polynomial degrees between 1 and 8, see e.g.  @cite
+SchoederKormann2018. In the limit of higher degrees, $p>10$, a scaling of
+$p^2$ is more accurate, related to the inverse estimates typically used for
 interior penalty methods. Regarding the <i>effective</i> mesh sizes $h_u$ and
 $h_c$ used in the formula, we note that the convective transport is
 directional. Thus an appropriate scaling is to use the element length in the
@@ -460,21 +463,21 @@ c_5 & b_1 & b_2 & b_3 & a_4 \\
 @f]
 With such a definition, the update to $\mathbf{w}_h^n$ shares the storage with
 the information for the intermediate values $\mathbf{k}_i$. Starting with
-$\mathbf{w}^{n+1}=\mathbf{w}^n$ and $\mathbf{t}_1 = \mathbf{w}^n$, the update
+$\mathbf{w}^{n+1}=\mathbf{w}^n$ and $\mathbf{r}_1 = \mathbf{w}^n$, the update
 in each of the $s$ stages simplifies to
 @f[
 \begin{aligned}
 \mathbf{k}_i &=
-\mathcal M^{-1} \mathcal L_h\left(t^n+c_i\Delta t, \mathbf{t}_{i} \right),\\
-\mathbf{t}_{i+1} &= \mathbf{w}_h^{n+1} + \Delta t \, a_i \mathbf{k}_i,\\
+\mathcal M^{-1} \mathcal L_h\left(t^n+c_i\Delta t, \mathbf{r}_{i} \right),\\
+\mathbf{r}_{i+1} &= \mathbf{w}_h^{n+1} + \Delta t \, a_i \mathbf{k}_i,\\
 \mathbf{w}_h^{n+1} &= \mathbf{w}_h^{n+1} + \Delta t \, b_i \mathbf{k}_i.
 \end{aligned}
 @f]
-Besides the vector $\mathbf w_h$ that is successively updated, this scheme
+Besides the vector $\mathbf w_h^{n+1}$ that is successively updated, this scheme
 only needs two auxiliary vectors, namely the vector $\mathbf{k}_i$ to hold the
-evaluation of the differential operator, and the vector $\mathbf{t}_i$ that
+evaluation of the differential operator, and the vector $\mathbf{r}_i$ that
 holds the right-hand side for the differential operator application. In
-subsequent stages $i$, the values $\mathbf{k}_i$ and $\mathbf{t}_i$ can use
+subsequent stages $i$, the values $\mathbf{k}_i$ and $\mathbf{r}_i$ can use
 the same storage.
 
 The main advantages of low-storage variants are the reduced memory consumption
@@ -587,12 +590,12 @@ variable-coefficient integrand. It has been shown in the DG literature that
 aliasing errors can introduce unphysical oscillations in the numerical
 solution for <i>barely</i> resolved simulations. The fact that aliasing mostly
 affects coarse resolutions -- whereas finer meshes with the same scheme
-otherwise work fine -- is not surprising because well-resolved simulations
-have tend to be smooth on length-scales of a cell (i.e., they have
+work fine -- is not surprising because well-resolved simulations
+tend to be smooth on length-scales of a cell (i.e., they have
 small coefficients in the higher polynomial degrees that are missed by
 too few quadrature points, whereas the main solution contribution in the lower
 polynomial degrees is still well-captured -- this is simply a consequence of Taylor's
-theorem). To address this topic, various approaches have been proposed in the
+theorem. To address this topic, various approaches have been proposed in the
 DG literature. One technique is filtering which damps the solution components
 pertaining to higher polynomial degrees. As the chosen nodal basis is not
 hierarchical, this would mean to transform from the nodal basis into a
@@ -608,11 +611,11 @@ over-integration or consistent integration. The latter name is most common in
 the context of the incompressible Navier-Stokes equations, where the
 $\mathbf{u}\otimes \mathbf{u}$ nonlinearity results in polynomial integrands
 of degree $3p$ (when also considering the test function), which can be
-integrated exactly with $\textbf{floor}\left(\frac{3p}{2}\right)+1$ quadrature
+integrated exactly with $\textrm{floor}\left(\frac{3p}{2}\right)+1$ quadrature
 points per direction as long as the element geometry is affine. In the context
 of the Euler equations with non-polynomial integrands, the choice is less
 clear. Depending on the variation in the various variables both
-$\textbf{floor}\left(\frac{3p}{2}\right)+1$ or $2p+1$ points (integrating
+$\textrm{floor}\left(\frac{3p}{2}\right)+1$ or $2p+1$ points (integrating
 exactly polynomials of degree $3p$ or $4p$, respectively) are common.
 
 To reflect this variability in the choice of quadrature in the program, we
@@ -646,7 +649,7 @@ the error made by taking a diagonal mass matrix and ignoring the rest (a
 variant of mass lumping, though not the one with an additional integration
 error as utilized in step-48) has been shown to not alter discretization
 accuracy. The Lagrange basis in the points of Gaussian quadrature is sometimes
-also referred to as a collocation setup , as the nodal points of the
+also referred to as a collocation setup, as the nodal points of the
 polynomials coincide (= are "co-located") with the points of quadrature, obviating some
 interpolation operations. Given the fact that we want to use more quadrature
 points for nonlinear terms in $\mathcal L_h$, however, the collocation
@@ -702,15 +705,15 @@ $S_{\mathrm{1D}}^{-\mathrm{T}}$ rather than $S_{\mathrm{1D}}$.
 The class MatrixFreeOperators::CellwiseInverseMassMatrix implements this
 operation: It changes from the basis contained in the finite element (in this
 case, FE_DGQ) to the Lagrange basis in Gaussian quadrature points. Here, the
-diagonal mass matrix can be evaluate, which is simply the inverse of
-the `JxW` factors (i.e., the quadrature weight times the determinant of the
+inverse of a diagonal mass matrix can be evaluated, which is simply the inverse
+of the `JxW` factors (i.e., the quadrature weight times the determinant of the
 Jacobian from reference to real coordinates). Once this is done, we can change
 back to the standard nodal Gauss-Lobatto basis.
 
 The advantage of this particular way of applying the inverse mass matrix is
-the fact that it is of similar cost as the forward application of a mass
-matrix, and cheaper than the evaluation of the spatial operator $\mathcal L_h$
-which is more costly due to over-integration and face integrals. (We
+a cost similar to the forward application of a mass matrix, which is cheaper
+than the evaluation of the spatial operator $\mathcal L_h$
+with over-integration and face integrals. (We
 will demonstrate this with detailed timing information in the
 <a href="#Results">results section</a>.) In fact, it
 is so cheap that it is limited by the bandwidth of reading the source vector,
