@@ -40,7 +40,7 @@ digraph G
   dh         [label="DoFHandler",       URL="\ref dofs"];
   subgraph linalglibs {
     rank="same";
-    simd     [label="SIMD",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+    simd     [label="SIMD", fontname="FreeSans",fontsize=12,
               shape=record,height=0.2,width=0.4,
               color="gray", fontcolor="gray", fillcolor="white", style="filled"];
     fevalues [label="FEEvaluation"];
@@ -81,12 +81,7 @@ digraph G
   subgraph misclibs {
   systems    [label="Operators"];
   }
-  simd        -> fevalues [dir="none", color="transparent"];
-  fevalues    -> mf       [dir="none", color="transparent"];
-  mf          -> cuda     [dir="none", color="transparent"];
-  cuda        -> tbb      [dir="none", color="transparent"];
   opencascade -> manifold [dir="none"];
-  gmg         -> solvers  [dir="none", style="dashed", color="black"];
 
   node [fontname="FreeSans",fontsize=12,
         shape=ellipse,height=0.2,width=0.4,
