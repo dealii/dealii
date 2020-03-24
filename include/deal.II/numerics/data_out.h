@@ -77,9 +77,10 @@ namespace internal
  * which are the objects that are later output by the functions of the base
  * classes. You can give a parameter to the function which determines how many
  * subdivisions in each coordinate direction are to be performed, i.e. of how
- * many subcells each patch shall consist. Default is one, but you may want to
- * choose a higher number for higher order elements, for example two for
- * quadratic elements, three for cubic elements three, and so on. The purpose
+ * many subcells each patch shall consist. The default is one, but you may want
+ * to choose a higher number for higher order elements, for example two for
+ * quadratic elements, three for cubic elements, and so on. (See
+ * step-11 for an example.) The purpose
  * of this parameter is because most graphics programs do not allow to specify
  * higher order polynomial functions in the file formats: only data at
  * vertices can be plotted and is then shown as a bilinear interpolation
@@ -279,8 +280,9 @@ public:
    *   structure that includes the
    *   DataOutBase::VtkFlags::write_higher_order_cells flag. When set, the
    *   subdivisions produced by this function will be interpreted as
-   *   support point for a higher order polynomial that will then actually
-   *   be visualized as such. On the other hand, this requires a
+   *   support points for a higher order polynomial that will then actually
+   *   be visualized as such. This is shown in step-11, for example. It
+   *   is worth noting, however, that this requires a
    *   sufficiently new version of one of the VTK-based visualization
    *   programs.
    */
