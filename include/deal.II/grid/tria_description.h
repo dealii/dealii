@@ -453,8 +453,8 @@ namespace TriangulationDescription
      * a serial triangulation and for its partitioning (by calling the
      * provided `std::functions' objects). Internally only selected processes (
      * every n-th/each root of a group of size group_size) create a serial
-     * triangulation and the ConstructionData for all processes in its group,
-     * which is communicated.
+     * triangulation and the TriangulationDescription::Description for all
+     * processes in its group, which is communicated.
      *
      * @note A reasonable group size is the size of a NUMA domain or the
      * size of a compute node.

@@ -113,7 +113,7 @@ namespace TriangulationDescription
                ExcMessage("MPI communicators do not match."));
 
       // First, figure out for what rank we are supposed to build the
-      // ConstructionData object
+      // TriangulationDescription::Description object
       unsigned int my_rank = my_rank_in;
       Assert(my_rank == numbers::invalid_unsigned_int ||
                my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
@@ -584,7 +584,7 @@ namespace TriangulationDescription
               std::vector<char> buffer;
               dealii::Utilities::pack(construction_data, buffer, false);
 
-              // 3c) send ConstructionData
+              // 3c) send TriangulationDescription::Description
               const auto ierr = MPI_Send(buffer.data(),
                                          buffer.size(),
                                          MPI_CHAR,
@@ -594,13 +594,15 @@ namespace TriangulationDescription
               AssertThrowMPI(ierr);
             }
 
-          // 4) create ConstructionData for this process (root of group)
+          // 4) create TriangulationDescription::Description for this process
+          // (root of group)
           return create_description_from_triangulation(
             tria, comm, construct_multilevel_hierarchy, my_rank);
         }
       else
         {
-          // 3a) recv packed ConstructionData from group-root process
+          // 3a) recv packed TriangulationDescription::Description from
+          // group-root process
           //     (counter-part of 3c of root process)
           MPI_Status status;
           auto       ierr = MPI_Probe(group_root, mpi_tag, comm, &status);
@@ -619,7 +621,8 @@ namespace TriangulationDescription
                           &status);
           AssertThrowMPI(ierr);
 
-          // 3b) unpack ConstructionData (counter-part of 3b of root process)
+          // 3b) unpack TriangulationDescription::Description (counter-part of
+          // 3b of root process)
           auto construction_data =
             dealii::Utilities::template unpack<Description<dim, spacedim>>(
               buf, false);
