@@ -41,7 +41,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;

@@ -49,7 +49,6 @@
 // In addition to checking the L2 errors of a projection, this test also
 // verifies that there is no loss in convergence order.
 
-using namespace dealii;
 // Like FESeries::linear_regression. Included here so that this test can also
 // be run with older versions of deal.II.
 double

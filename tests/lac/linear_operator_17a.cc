@@ -23,8 +23,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 int
 main()

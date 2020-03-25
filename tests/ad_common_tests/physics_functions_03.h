@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>

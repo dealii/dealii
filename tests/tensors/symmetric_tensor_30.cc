@@ -26,7 +26,6 @@ template <int dim>
 void
 check_2()
 {
-  using namespace dealii;
   Testing::rand(true, 42);
 
   SymmetricTensor<2, dim> change_with_brackets;
@@ -61,7 +60,6 @@ template <int dim>
 void
 check_4()
 {
-  using namespace dealii;
   Testing::rand(true, 42);
 
   SymmetricTensor<4, dim> change_with_brackets;

@@ -48,7 +48,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 static const unsigned int dim = 2;
 

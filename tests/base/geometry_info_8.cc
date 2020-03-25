@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 //
 // Test GeometryInfo<dim>::face_to_cell_vertices

@@ -83,7 +83,6 @@ argv=0x7fffffffdf48) at find_cell_10.cc:103
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test()

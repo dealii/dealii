@@ -27,7 +27,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = Differentiation::AD;
 
 template <typename Number>

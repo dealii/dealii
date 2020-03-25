@@ -41,7 +41,6 @@
 
 #include <deal.II/numerics/matrix_tools.h>
 
-using namespace dealii;
 
 
 void

@@ -30,7 +30,6 @@
 #include "../base/simplex.h"
 
 using namespace std;
-using namespace dealii;
 
 // We test the integration of singular kernels with a singularity of kind 1/R
 // We multiply this function with a polynomial up to degree 6.

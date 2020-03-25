@@ -36,8 +36,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 // Use local matrices for Laplacian / interior penalty DG
 template <int dim>

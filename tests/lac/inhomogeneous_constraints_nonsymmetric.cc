@@ -50,7 +50,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 template <int dim>
 class AdvectionProblem

@@ -27,7 +27,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 value_rank_0(TrilinosWrappers::SparseMatrix &a)

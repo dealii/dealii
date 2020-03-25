@@ -32,7 +32,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 template <int dim, typename NumberType>

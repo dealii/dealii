@@ -38,9 +38,6 @@ char logname[] = "output";
 #include "../tests.h"
 
 
-using namespace dealii;
-
-
 
 void
 test()

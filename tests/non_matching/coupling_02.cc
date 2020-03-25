@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Test that a coupling matrix can be constructed for each pair of dimension and
 // immersed dimension, with a non trivial component selection in the space_dh,

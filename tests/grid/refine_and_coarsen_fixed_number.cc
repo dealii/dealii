@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 int
 main(int argc, const char *argv[])

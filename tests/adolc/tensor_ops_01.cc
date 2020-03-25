@@ -28,7 +28,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim,
           typename number_t,

@@ -69,7 +69,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 namespace polytest
 {

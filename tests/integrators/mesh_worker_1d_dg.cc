@@ -37,7 +37,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 //! Solve the advection equation:  \dot{u} + \div{\mathbf{c} u} = 0.0,
@@ -52,8 +51,6 @@ using namespace dealii;
 
 namespace Advection
 {
-  using namespace dealii;
-
   /********************************************
    * ADVECTION PROBLEM
    ********************************************/

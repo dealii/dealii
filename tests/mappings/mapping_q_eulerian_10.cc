@@ -65,7 +65,6 @@ test()
           << std::endl;
 }
 
-using namespace dealii;
 int
 main()
 {

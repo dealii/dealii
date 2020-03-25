@@ -58,8 +58,6 @@
 
 namespace Step37
 {
-  using namespace dealii;
-
   const unsigned int degree_finite_element = 2;
 
   template <int dim>

@@ -30,8 +30,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class myIntegrator : public dealii::MeshWorker::LocalIntegrator<dim>

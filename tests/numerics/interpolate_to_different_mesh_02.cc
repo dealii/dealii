@@ -33,7 +33,6 @@
 #include "../tests.h"
 
 using namespace std;
-using namespace dealii;
 
 template <int spacedim>
 class F1 : public Function<spacedim>

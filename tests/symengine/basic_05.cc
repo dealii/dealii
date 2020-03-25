@@ -43,7 +43,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace dealii;
 namespace SE = SymEngine;
 
 int

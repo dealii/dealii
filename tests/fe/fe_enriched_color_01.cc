@@ -29,7 +29,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /*
  * Construct a class template which finds if a cell

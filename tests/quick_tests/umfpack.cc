@@ -41,7 +41,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void

@@ -23,7 +23,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 template <int dim, typename NumberType>

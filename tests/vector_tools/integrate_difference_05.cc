@@ -39,7 +39,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 // First dim components:
 // f_x = x^2+y(+z), f_y = x^2+y^2, f_z = z+xy

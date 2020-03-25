@@ -41,7 +41,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 // Function and its derivatives

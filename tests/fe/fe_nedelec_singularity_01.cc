@@ -89,7 +89,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 namespace nedelec_singularity
 {

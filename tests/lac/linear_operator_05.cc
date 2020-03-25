@@ -252,7 +252,6 @@ public:
   }
 };
 
-using namespace dealii;
 
 int
 main()

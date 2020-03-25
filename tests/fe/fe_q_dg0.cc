@@ -61,8 +61,6 @@
 
 namespace Step22
 {
-  using namespace dealii;
-
   template <int dim>
   struct InnerPreconditioner;
 
@@ -958,7 +956,6 @@ namespace Step22
 int
 main()
 {
-  using namespace dealii;
   using namespace Step22;
 
   initlog();

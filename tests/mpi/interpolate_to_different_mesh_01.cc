@@ -40,7 +40,6 @@
 
 // test VectorTools::interpolate_to_different_mesh in parallel
 
-using namespace dealii;
 
 namespace LA
 {

@@ -37,8 +37,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 // x+y(+z), x^2+y^2 (, z+xy)
 // div = 1+2y (+1)

@@ -28,8 +28,6 @@
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
-
   Utilities::MPI::MPI_InitFinalize mpi_context(argc, argv, 1);
   MPILogInitAll                    mpi_log;
 

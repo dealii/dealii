@@ -59,7 +59,6 @@ const double eps = 1e-10;
 // functions.
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 template <int dim>
 class EnrichmentFunction : public Function<dim>

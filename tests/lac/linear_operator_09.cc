@@ -30,7 +30,6 @@
 #include <deal.II/lac/petsc_block_vector.h>
 
 
-using namespace dealii;
 
 int
 main(int argc, char *argv[])

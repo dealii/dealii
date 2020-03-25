@@ -102,7 +102,6 @@ test()
   deallog << "OK" << std::endl;
 }
 
-using namespace dealii;
 int
 main()
 {

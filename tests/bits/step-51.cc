@@ -58,8 +58,6 @@ std::ofstream logfile("output");
 
 namespace Step51
 {
-  using namespace dealii;
-
   template <int dim>
   class SolutionBase
   {

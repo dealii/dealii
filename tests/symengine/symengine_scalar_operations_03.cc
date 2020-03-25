@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 

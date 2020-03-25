@@ -35,7 +35,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 // Define a class that fills all available entries in the info objects

@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Test that an ImmersedSurfaceQuadrature can be constructed for each dimension
 // and that quadrature points can be added to it.

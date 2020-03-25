@@ -50,7 +50,6 @@ const double eps = 1e-10;
 // argument for build_patches()
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 // uncomment when debugging
 // #define DATA_OUT_FE_ENRICHED

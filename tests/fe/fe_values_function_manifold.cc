@@ -60,7 +60,6 @@
 // error causes the Laplace solver to converge at order 2 instead of order 5,
 // resulting in much higher L2 errors when the grid is refined.
 
-using namespace dealii;
 
 static const unsigned int               fe_order          = 4;
 static const dealii::types::boundary_id boundary_id       = 0;

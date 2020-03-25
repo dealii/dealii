@@ -31,7 +31,6 @@
 
 #include "empty_info.h"
 
-using namespace dealii;
 
 
 // Define a class that fills all available entries in the info objects
