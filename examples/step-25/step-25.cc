@@ -688,7 +688,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step25;
 
       SineGordonProblem<1> sg_problem;

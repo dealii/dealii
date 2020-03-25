@@ -386,7 +386,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step54;
 
       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";

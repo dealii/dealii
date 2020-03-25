@@ -1174,7 +1174,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step21;
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(0);

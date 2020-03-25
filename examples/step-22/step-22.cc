@@ -1066,7 +1066,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step22;
 
       StokesProblem<2> flow_problem(1);

@@ -535,7 +535,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step24;
 
       TATForwardProblem<2> forward_problem_solver;

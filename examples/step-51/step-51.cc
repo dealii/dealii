@@ -1396,8 +1396,6 @@ int main()
 
   try
     {
-      using namespace dealii;
-
       // Now for the three calls to the main class in complete analogy to
       // step-7.
       {
