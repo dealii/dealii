@@ -16,6 +16,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/linear_operator.h>
+
 #include <deal.II/matrix_free/assemble_operator.h>
 
 #include "../tests.h"
@@ -24,56 +25,57 @@
 // Uses a FullMatrix as operator as well as for the result.
 // The pattern of the result is not important,
 // as long as it is a superset of the provided sparsity pattern.
-int main()
+int
+main()
 {
-   initlog();
+  initlog();
 
-   DynamicSparsityPattern pattern;
-   pattern.reinit(6, 6);
-   pattern.add(0, 0);
-   pattern.add(0, 1);
-   pattern.add(0, 5);
-   pattern.add(1, 0);
-   pattern.add(1, 1);
-   pattern.add(1, 2);
-   pattern.add(2, 1);
-   pattern.add(2, 2);
-   pattern.add(2, 3);
-   pattern.add(2, 5);
-   pattern.add(3, 2);
-   pattern.add(3, 3);
-   pattern.add(4, 4);
-   pattern.add(5, 0);
-   pattern.add(5, 2);
-   pattern.add(5, 5);
-   pattern.compress();
+  DynamicSparsityPattern pattern;
+  pattern.reinit(6, 6);
+  pattern.add(0, 0);
+  pattern.add(0, 1);
+  pattern.add(0, 5);
+  pattern.add(1, 0);
+  pattern.add(1, 1);
+  pattern.add(1, 2);
+  pattern.add(2, 1);
+  pattern.add(2, 2);
+  pattern.add(2, 3);
+  pattern.add(2, 5);
+  pattern.add(3, 2);
+  pattern.add(3, 3);
+  pattern.add(4, 4);
+  pattern.add(5, 0);
+  pattern.add(5, 2);
+  pattern.add(5, 5);
+  pattern.compress();
 
-   FullMatrix<double> M;
-   M.reinit(6, 6);
-   for (auto p : pattern)
-      M(p.row(), p.column()) = std::sin(123.0 + double(p.row() * p.column()));
-   //   M.print_formatted(std::cout, 2, false, 4);
+  FullMatrix<double> M;
+  M.reinit(6, 6);
+  for (auto p : pattern)
+    M(p.row(), p.column()) = std::sin(123.0 + double(p.row() * p.column()));
+  //   M.print_formatted(std::cout, 2, false, 4);
 
-   // Encapsulate M into a linear operator.
-   // This is merely to illustrate that assemble_operator does only require vmult(),
-   // as we could have used M directly.
-   auto op = linear_operator(M);
+  // Encapsulate M into a linear operator.
+  // This is merely to illustrate that assemble_operator does only require
+  // vmult(), as we could have used M directly.
+  auto op = linear_operator(M);
 
-   // Compute without cache.
-   FullMatrix<double> matrix;
-   matrix.reinit(6, 6);
-   auto cache = MatrixFreeUtils::assemble_operator(matrix, op, pattern);
-   deallog << "n = " << matrix.n_rows() << std::endl;
-   deallog << "n_vmults = " << cache->num_colors << std::endl;
-   //   matrix.print_formatted(deallog, 2, false, 4);
-   deallog << std::boolalpha << (M == matrix) << std::endl;
+  // Compute without cache.
+  FullMatrix<double> matrix;
+  matrix.reinit(6, 6);
+  auto cache = MatrixFreeUtils::assemble_operator(matrix, op, pattern);
+  deallog << "n = " << matrix.n_rows() << std::endl;
+  deallog << "n_vmults = " << cache->num_colors << std::endl;
+  //   matrix.print_formatted(deallog, 2, false, 4);
+  deallog << std::boolalpha << (M == matrix) << std::endl;
 
-   // Reuse cache.
-   FullMatrix<double> matrix2;
-   matrix2.reinit(6, 6);
-   MatrixFreeUtils::assemble_operator(matrix2, op, pattern, cache);
-   //   matrix2.print_formatted(deallog, 2, false, 4);
-   deallog << std::boolalpha << (M == matrix2) << std::endl;
+  // Reuse cache.
+  FullMatrix<double> matrix2;
+  matrix2.reinit(6, 6);
+  MatrixFreeUtils::assemble_operator(matrix2, op, pattern, cache);
+  //   matrix2.print_formatted(deallog, 2, false, 4);
+  deallog << std::boolalpha << (M == matrix2) << std::endl;
 
-   return 0;
+  return 0;
 }

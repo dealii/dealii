@@ -17,49 +17,52 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
+
 #include <deal.II/matrix_free/assemble_operator.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
 
+#include "../testmatrix.h"
+
 // Test case for MatrixFreeTools::assemble_operator.
-int main()
+int
+main()
 {
-   initlog();
+  initlog();
 
-   unsigned int nx = 16;
-   unsigned int ny = 16;
-   unsigned int n  = nx * ny;
+  unsigned int nx = 16;
+  unsigned int ny = 16;
+  unsigned int n  = nx * ny;
 
-   FDMatrix generator(nx, ny);
+  FDMatrix generator(nx, ny);
 
-   DynamicSparsityPattern dsp;
-   dsp.reinit(n, n);
-   generator.five_point_structure(dsp);
-   dsp.compress();
+  DynamicSparsityPattern dsp;
+  dsp.reinit(n, n);
+  generator.five_point_structure(dsp);
+  dsp.compress();
 
-   SparsityPattern pattern;
-   pattern.copy_from(dsp);
-   pattern.compress();
+  SparsityPattern pattern;
+  pattern.copy_from(dsp);
+  pattern.compress();
 
-   SparseMatrix<double> M;
-   M.reinit(pattern);
-   generator.five_point(M);
-   Assert(M.frobenius_norm() > 0, ExcInternalError());
-   // Encapsulate M into a linear operator.
-   // This is merely to illustrate that assemble_operator does only require vmult(),
-   // as we could have used M directly.
-   auto op = linear_operator(M);
+  SparseMatrix<double> M;
+  M.reinit(pattern);
+  generator.five_point(M);
+  Assert(M.frobenius_norm() > 0, ExcInternalError());
+  // Encapsulate M into a linear operator.
+  // This is merely to illustrate that assemble_operator does only require
+  // vmult(), as we could have used M directly.
+  auto op = linear_operator(M);
 
-   // Compute without cache.
-   SparseMatrix<double> matrix;
-   matrix.reinit(pattern);
-   auto cache = MatrixFreeUtils::assemble_operator(matrix, op, pattern);
-   deallog << "n = " << n << std::endl;
-   deallog << "n_vmults = " << cache->num_colors << std::endl;
-   // Compute difference
-   matrix.add(-1.0, M);
-   deallog << std::boolalpha << (0.0 == matrix.frobenius_norm()) << std::endl;
+  // Compute without cache.
+  SparseMatrix<double> matrix;
+  matrix.reinit(pattern);
+  auto cache = MatrixFreeUtils::assemble_operator(matrix, op, pattern);
+  deallog << "n = " << n << std::endl;
+  deallog << "n_vmults = " << cache->num_colors << std::endl;
+  // Compute difference
+  matrix.add(-1.0, M);
+  deallog << std::boolalpha << (0.0 == matrix.frobenius_norm()) << std::endl;
 
-   return 0;
+  return 0;
 }
