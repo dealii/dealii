@@ -1,0 +1,3 @@
+New: PreconditionChebychev can now report information about eigenvalue and
+degree estimation when calling PreconditionChebychev::estimate_eigenvalues().
+<br> (Timo Heister, 2020/03/23)
