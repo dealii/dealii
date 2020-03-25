@@ -169,10 +169,11 @@ namespace internal
     template <typename Functor>
     void
     parallel_for(
-      Functor &                                                  functor,
-      const size_type                                            start,
-      const size_type                                            end,
-      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      Functor &       functor,
+      const size_type start,
+      const size_type end,
+      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       const size_type vec_size = end - start;
@@ -197,12 +198,12 @@ namespace internal
           // vector entries). The number of chunks here is calculated inside
           // TBBForFunctor. See also GitHub issue #2496 for further discussion
           // of this strategy.
-          parallel::internal::parallel_for(static_cast<size_type>(0),
-                                           static_cast<size_type>(
-                                             generic_functor.n_chunks),
-                                           generic_functor,
-                                           1,
-                                           tbb_partitioner);
+          ::dealii::parallel::internal::parallel_for(
+            static_cast<size_type>(0),
+            static_cast<size_type>(generic_functor.n_chunks),
+            generic_functor,
+            1,
+            tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
         }
       else if (vec_size > 0)
@@ -303,7 +304,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -334,7 +335,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -368,7 +369,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -398,7 +399,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -426,7 +427,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -454,7 +455,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -489,7 +490,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -523,7 +524,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -561,7 +562,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -593,7 +594,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -624,7 +625,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -660,7 +661,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -702,7 +703,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -736,7 +737,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -1372,11 +1373,12 @@ namespace internal
     template <typename Operation, typename ResultType>
     void
     parallel_reduce(
-      const Operation &                                          op,
-      const size_type                                            start,
-      const size_type                                            end,
-      ResultType &                                               result,
-      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      const Operation &op,
+      const size_type  start,
+      const size_type  end,
+      ResultType &     result,
+      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       const size_type vec_size = end - start;
@@ -1403,12 +1405,12 @@ namespace internal
           // vector entries). The number of chunks here is calculated inside
           // TBBForFunctor. See also GitHub issue #2496 for further discussion
           // of this strategy.
-          parallel::internal::parallel_for(static_cast<size_type>(0),
-                                           static_cast<size_type>(
-                                             generic_functor.n_chunks),
-                                           generic_functor,
-                                           1,
-                                           tbb_partitioner);
+          ::dealii::parallel::internal::parallel_for(
+            static_cast<size_type>(0),
+            static_cast<size_type>(generic_functor.n_chunks),
+            generic_functor,
+            1,
+            tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
           result = generic_functor.do_sum();
         }
