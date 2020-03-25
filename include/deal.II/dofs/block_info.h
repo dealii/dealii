@@ -31,6 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
+
 namespace hp
 {
   template <int dim, int spacedim>
@@ -118,6 +119,12 @@ public:
              bool levels_only = false,
              bool active_only = false);
 
+  template <int dim, int spacedim>
+  void
+  initialize(const hp::DoFHandler<dim, spacedim> &,
+             bool levels_only = false,
+             bool active_only = false);
+
   /**
    * @brief Initialize block structure on cells and compute renumbering
    * between cell dofs and block cell dofs.
@@ -125,6 +132,10 @@ public:
   template <int dim, int spacedim>
   void
   initialize_local(const DoFHandler<dim, spacedim> &);
+
+  template <int dim, int spacedim>
+  void
+  initialize_local(const hp::DoFHandler<dim, spacedim> &);
 
   /**
    * Access the BlockIndices structure of the global system.

@@ -191,9 +191,9 @@ inline TriaIterator<DoFAccessor<structdim, DoFHandlerType, level_dof_access>>
 DoFAccessor<structdim, DoFHandlerType, level_dof_access>::child(
   const unsigned int i) const
 {
-  Assert(static_cast<unsigned int>(this->level()) <
-           this->dof_handler->levels.size(),
-         ExcMessage("DoFHandler not initialized"));
+  // Assert(static_cast<unsigned int>(this->level()) <
+  //         this->dof_handler->levels.size(),
+  //       ExcMessage("DoFHandler not initialized"));
 
   TriaIterator<TriaAccessor<structdim,
                             DoFHandlerType::dimension,
@@ -218,6 +218,20 @@ namespace internal
      */
     struct Implementation
     {
+      template <int dim, int spacedim>
+      static std::vector<std::unique_ptr<
+        dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>> &
+      get_level_object(dealii::DoFHandler<dim, spacedim> *dof_handler)
+      {
+        return dof_handler->levels;
+      }
+      template <int dim, int spacedim>
+      static std::vector<std::unique_ptr<dealii::internal::hp::DoFLevel>> &
+      get_level_object(dealii::hp::DoFHandler<dim, spacedim> *dof_handler)
+      {
+        return dof_handler->levels_hp;
+      }
+
       /**
        * Implementations of the get_dof_index/set_dof_index functions.
        */
@@ -430,9 +444,9 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 1> &)
       {
-        return dof_handler.levels[obj_level]->get_dof_index(obj_index,
-                                                            fe_index,
-                                                            local_index);
+        return dof_handler.levels_hp[obj_level]->get_dof_index(obj_index,
+                                                               fe_index,
+                                                               local_index);
       }
 
 
@@ -446,10 +460,10 @@ namespace internal
                     const std::integral_constant<int, 1> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.levels[obj_level]->set_dof_index(obj_index,
-                                                     fe_index,
-                                                     local_index,
-                                                     global_index);
+        dof_handler.levels_hp[obj_level]->set_dof_index(obj_index,
+                                                        fe_index,
+                                                        local_index,
+                                                        global_index);
       }
 
 
@@ -462,7 +476,7 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.get_dof_index(
+        return dof_handler.faces_hp->lines.get_dof_index(
           dof_handler, obj_index, fe_index, local_index, obj_level);
       }
 
@@ -477,12 +491,12 @@ namespace internal
                     const std::integral_constant<int, 1> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.faces->lines.set_dof_index(dof_handler,
-                                               obj_index,
-                                               fe_index,
-                                               local_index,
-                                               global_index,
-                                               obj_level);
+        dof_handler.faces_hp->lines.set_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index,
+                                                  global_index,
+                                                  obj_level);
       }
 
 
@@ -495,9 +509,9 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 2> &)
       {
-        return dof_handler.levels[obj_level]->get_dof_index(obj_index,
-                                                            fe_index,
-                                                            local_index);
+        return dof_handler.levels_hp[obj_level]->get_dof_index(obj_index,
+                                                               fe_index,
+                                                               local_index);
       }
 
 
@@ -511,10 +525,10 @@ namespace internal
                     const std::integral_constant<int, 2> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.levels[obj_level]->set_dof_index(obj_index,
-                                                     fe_index,
-                                                     local_index,
-                                                     global_index);
+        dof_handler.levels_hp[obj_level]->set_dof_index(obj_index,
+                                                        fe_index,
+                                                        local_index,
+                                                        global_index);
       }
 
 
@@ -527,7 +541,7 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.get_dof_index(
+        return dof_handler.faces_hp->lines.get_dof_index(
           dof_handler, obj_index, fe_index, local_index, obj_level);
       }
 
@@ -542,12 +556,12 @@ namespace internal
                     const std::integral_constant<int, 1> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.faces->lines.set_dof_index(dof_handler,
-                                               obj_index,
-                                               fe_index,
-                                               local_index,
-                                               global_index,
-                                               obj_level);
+        dof_handler.faces_hp->lines.set_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index,
+                                                  global_index,
+                                                  obj_level);
       }
 
 
@@ -560,7 +574,7 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 2> &)
       {
-        return dof_handler.faces->quads.get_dof_index(
+        return dof_handler.faces_hp->quads.get_dof_index(
           dof_handler, obj_index, fe_index, local_index, obj_level);
       }
 
@@ -575,12 +589,12 @@ namespace internal
                     const std::integral_constant<int, 2> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.faces->quads.set_dof_index(dof_handler,
-                                               obj_index,
-                                               fe_index,
-                                               local_index,
-                                               global_index,
-                                               obj_level);
+        dof_handler.faces_hp->quads.set_dof_index(dof_handler,
+                                                  obj_index,
+                                                  fe_index,
+                                                  local_index,
+                                                  global_index,
+                                                  obj_level);
       }
 
 
@@ -593,9 +607,9 @@ namespace internal
                     const unsigned int                         local_index,
                     const std::integral_constant<int, 3> &)
       {
-        return dof_handler.levels[obj_level]->get_dof_index(obj_index,
-                                                            fe_index,
-                                                            local_index);
+        return dof_handler.levels_hp[obj_level]->get_dof_index(obj_index,
+                                                               fe_index,
+                                                               local_index);
       }
 
 
@@ -609,10 +623,10 @@ namespace internal
                     const std::integral_constant<int, 3> &,
                     const types::global_dof_index global_index)
       {
-        dof_handler.levels[obj_level]->set_dof_index(obj_index,
-                                                     fe_index,
-                                                     local_index,
-                                                     global_index);
+        dof_handler.levels_hp[obj_level]->set_dof_index(obj_index,
+                                                        fe_index,
+                                                        local_index,
+                                                        global_index);
       }
 
 
@@ -776,8 +790,8 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 1> &)
       {
-        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-                                                                 fe_index);
+        return dof_handler.levels_hp[obj_level]->fe_index_is_active(obj_index,
+                                                                    fe_index);
       }
 
 
@@ -806,7 +820,7 @@ namespace internal
         (void)n;
         Assert(n == 0,
                ExcMessage("On cells, there can only be one active FE index"));
-        return dof_handler.levels[obj_level]->active_fe_index(obj_index);
+        return dof_handler.levels_hp[obj_level]->active_fe_index(obj_index);
       }
 
 
@@ -818,10 +832,10 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.fe_index_is_active(dof_handler,
-                                                           obj_index,
-                                                           fe_index,
-                                                           obj_level);
+        return dof_handler.faces_hp->lines.fe_index_is_active(dof_handler,
+                                                              obj_index,
+                                                              fe_index,
+                                                              obj_level);
       }
 
 
@@ -833,8 +847,8 @@ namespace internal
         const unsigned int obj_index,
         const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.n_active_fe_indices(dof_handler,
-                                                            obj_index);
+        return dof_handler.faces_hp->lines.n_active_fe_indices(dof_handler,
+                                                               obj_index);
       }
 
 
@@ -847,10 +861,10 @@ namespace internal
         const unsigned int                         n,
         const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.nth_active_fe_index(dof_handler,
-                                                            obj_level,
-                                                            obj_index,
-                                                            n);
+        return dof_handler.faces_hp->lines.nth_active_fe_index(dof_handler,
+                                                               obj_level,
+                                                               obj_index,
+                                                               n);
       }
 
 
@@ -863,8 +877,8 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 2> &)
       {
-        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-                                                                 fe_index);
+        return dof_handler.levels_hp[obj_level]->fe_index_is_active(obj_index,
+                                                                    fe_index);
       }
 
 
@@ -893,7 +907,7 @@ namespace internal
         (void)n;
         Assert(n == 0,
                ExcMessage("On cells, there can only be one active FE index"));
-        return dof_handler.levels[obj_level]->active_fe_index(obj_index);
+        return dof_handler.levels_hp[obj_level]->active_fe_index(obj_index);
       }
 
 
@@ -906,10 +920,10 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.fe_index_is_active(dof_handler,
-                                                           obj_index,
-                                                           fe_index,
-                                                           obj_level);
+        return dof_handler.faces_hp->lines.fe_index_is_active(dof_handler,
+                                                              obj_index,
+                                                              fe_index,
+                                                              obj_level);
       }
 
 
@@ -921,8 +935,8 @@ namespace internal
         const unsigned int obj_index,
         const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.n_active_fe_indices(dof_handler,
-                                                            obj_index);
+        return dof_handler.faces_hp->lines.n_active_fe_indices(dof_handler,
+                                                               obj_index);
       }
 
 
@@ -936,10 +950,10 @@ namespace internal
         const unsigned int                         n,
         const std::integral_constant<int, 1> &)
       {
-        return dof_handler.faces->lines.nth_active_fe_index(dof_handler,
-                                                            obj_level,
-                                                            obj_index,
-                                                            n);
+        return dof_handler.faces_hp->lines.nth_active_fe_index(dof_handler,
+                                                               obj_level,
+                                                               obj_index,
+                                                               n);
       }
 
 
@@ -952,10 +966,10 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 2> &)
       {
-        return dof_handler.faces->quads.fe_index_is_active(dof_handler,
-                                                           obj_index,
-                                                           fe_index,
-                                                           obj_level);
+        return dof_handler.faces_hp->quads.fe_index_is_active(dof_handler,
+                                                              obj_index,
+                                                              fe_index,
+                                                              obj_level);
       }
 
       template <int spacedim>
@@ -966,8 +980,8 @@ namespace internal
                          const unsigned int                         fe_index,
                          const std::integral_constant<int, 3> &)
       {
-        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-                                                                 fe_index);
+        return dof_handler.levels_hp[obj_level]->fe_index_is_active(obj_index,
+                                                                    fe_index);
       }
 
 
@@ -979,8 +993,8 @@ namespace internal
         const unsigned int obj_index,
         const std::integral_constant<int, 2> &)
       {
-        return dof_handler.faces->quads.n_active_fe_indices(dof_handler,
-                                                            obj_index);
+        return dof_handler.faces_hp->quads.n_active_fe_indices(dof_handler,
+                                                               obj_index);
       }
 
 
@@ -994,10 +1008,10 @@ namespace internal
         const unsigned int                         n,
         const std::integral_constant<int, 2> &)
       {
-        return dof_handler.faces->quads.nth_active_fe_index(dof_handler,
-                                                            obj_level,
-                                                            obj_index,
-                                                            n);
+        return dof_handler.faces_hp->quads.nth_active_fe_index(dof_handler,
+                                                               obj_level,
+                                                               obj_index,
+                                                               n);
       }
 
 
@@ -1027,7 +1041,7 @@ namespace internal
         (void)n;
         Assert(n == 0,
                ExcMessage("On cells, there can only be one active FE index"));
-        return dof_handler.levels[obj_level]->active_fe_index(obj_index);
+        return dof_handler.levels_hp[obj_level]->active_fe_index(obj_index);
       }
 
       /**
@@ -2049,12 +2063,12 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_indices(
   const unsigned int                    fe_index) const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
-  Assert(static_cast<unsigned int>(this->level()) <
-           this->dof_handler->levels.size(),
-         ExcMessage(
-           "The DoFHandler to which this accessor points has not "
-           "been initialized, i.e., it doesn't appear that DoF indices "
-           "have been distributed on it."));
+  // Assert(static_cast<unsigned int>(this->level()) <
+  //         this->dof_handler->levels.size(),
+  //       ExcMessage(
+  //         "The DoFHandler to which this accessor points has not "
+  //         "been initialized, i.e., it doesn't appear that DoF indices "
+  //         "have been distributed on it."));
 
   switch (structdim)
     {
@@ -2951,12 +2965,12 @@ namespace internal
         // writing to the last element of
         // this cell
         Assert(static_cast<unsigned int>(accessor.present_index) <
-                 accessor.dof_handler->levels[accessor.present_level]
+                 accessor.dof_handler->levels_hp[accessor.present_level]
                    ->cell_cache_offsets.size(),
                ExcInternalError());
-        Assert(accessor.dof_handler->levels[accessor.present_level]
+        Assert(accessor.dof_handler->levels_hp[accessor.present_level]
                    ->cell_cache_offsets[accessor.present_index] <=
-                 accessor.dof_handler->levels[accessor.present_level]
+                 accessor.dof_handler->levels_hp[accessor.present_level]
                    ->cell_dof_indices_cache.size(),
                ExcInternalError());
 
@@ -2972,9 +2986,9 @@ namespace internal
           .get_dof_indices(dof_indices, accessor.active_fe_index());
 
         types::global_dof_index *next_dof_index =
-          &accessor.dof_handler->levels[accessor.present_level]
+          &accessor.dof_handler->levels_hp[accessor.present_level]
              ->cell_dof_indices_cache
-               [accessor.dof_handler->levels[accessor.present_level]
+               [accessor.dof_handler->levels_hp[accessor.present_level]
                   ->cell_cache_offsets[accessor.present_index]];
         for (unsigned int i = 0; i < dofs_per_cell; ++i, ++next_dof_index)
           *next_dof_index = dof_indices[i];
@@ -3089,11 +3103,11 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        return accessor.dof_handler->levels[accessor.level()]->active_fe_index(
-          accessor.present_index);
+        return accessor.dof_handler->levels_hp[accessor.level()]
+          ->active_fe_index(accessor.present_index);
       }
 
 
@@ -3129,10 +3143,10 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        accessor.dof_handler->levels[accessor.level()]->set_active_fe_index(
+        accessor.dof_handler->levels_hp[accessor.level()]->set_active_fe_index(
           accessor.present_index, i);
       }
 
@@ -3163,11 +3177,11 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        return accessor.dof_handler->levels[accessor.level()]->future_fe_index(
-          accessor.present_index);
+        return accessor.dof_handler->levels_hp[accessor.level()]
+          ->future_fe_index(accessor.present_index);
       }
 
 
@@ -3202,10 +3216,10 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        accessor.dof_handler->levels[accessor.level()]->set_future_fe_index(
+        accessor.dof_handler->levels_hp[accessor.level()]->set_future_fe_index(
           accessor.present_index, i);
       }
 
@@ -3237,10 +3251,10 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        return accessor.dof_handler->levels[accessor.level()]
+        return accessor.dof_handler->levels_hp[accessor.level()]
           ->future_fe_index_set(accessor.present_index);
       }
 
@@ -3271,11 +3285,11 @@ namespace internal
           accessor.dof_handler != nullptr,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
+                 accessor.dof_handler->levels_hp.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        accessor.dof_handler->levels[accessor.level()]->clear_future_fe_index(
-          accessor.present_index);
+        accessor.dof_handler->levels_hp[accessor.level()]
+          ->clear_future_fe_index(accessor.present_index);
       }
     };
   } // namespace DoFCellAccessorImplementation
@@ -3470,8 +3484,9 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_indices(
   if (dofs_per_cell > 0)
     {
       const types::global_dof_index *cache =
-        this->dof_handler->levels[this->present_level]->get_cell_cache_start(
-          this->present_index, dofs_per_cell);
+        dealii::internal::DoFAccessorImplementation::Implementation::
+          get_level_object(this->dof_handler)[this->present_level]
+            ->get_cell_cache_start(this->present_index, dofs_per_cell);
       for (unsigned int i = 0; i < dofs_per_cell; ++i, ++cache)
         dof_indices[i] = *cache;
     }
@@ -3547,8 +3562,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
          typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
   const types::global_dof_index *cache =
-    this->dof_handler->levels[this->present_level]->get_cell_cache_start(
-      this->present_index, this->get_fe().dofs_per_cell);
+    dealii::internal::DoFAccessorImplementation::Implementation::
+      get_level_object(this->dof_handler)[this->present_level]
+        ->get_cell_cache_start(this->present_index,
+                               this->get_fe().dofs_per_cell);
   dealii::internal::DoFAccessorImplementation::Implementation::
     extract_subvector_to(values,
                          cache,
@@ -3610,8 +3627,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_dof_values(
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   const types::global_dof_index *cache =
-    this->dof_handler->levels[this->present_level]->get_cell_cache_start(
-      this->present_index, this->get_fe().dofs_per_cell);
+    dealii::internal::DoFAccessorImplementation::Implementation::
+      get_level_object(this->dof_handler)[this->present_level]
+        ->get_cell_cache_start(this->present_index,
+                               this->get_fe().dofs_per_cell);
 
   for (unsigned int i = 0; i < this->get_fe().dofs_per_cell; ++i, ++cache)
     internal::ElementAccess<OutputVector>::set(local_values(i), *cache, values);

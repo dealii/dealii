@@ -28,6 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #ifndef DOXYGEN
+template <int, int, typename T>
+class DoFHandlerBase;
 namespace hp
 {
   template <int, int>
@@ -372,6 +374,8 @@ namespace internal
       // class that needs to create these data structures.
       template <int, int>
       friend class dealii::hp::DoFHandler;
+      template <int, int, typename T>
+      friend class dealii::DoFHandlerBase;
       friend struct dealii::internal::hp::DoFHandlerImplementation::
         Implementation;
       friend struct dealii::internal::DoFCellAccessorImplementation::
