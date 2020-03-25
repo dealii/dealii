@@ -112,8 +112,8 @@
  *       problem. Object-orientation. Assembling matrices and
  *       vectors. Boundary values.
  *       <br/> Keywords: FEValues, VectorTools::interpolate_boundary_values(),
- *       MatrixTools::apply_boundary_values(), SolverCG, Vector<double>,
- *       SparseMatrix<double>, DataOut
+ *       MatrixTools::apply_boundary_values(), SolverCG, Vector,
+ *       SparseMatrix, DataOut
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -142,7 +142,7 @@
  *       <td>step-6</td>
  *       <td> Adaptive local
  *       refinement. Handling of hanging nodes. Higher order elements.
- *       Catching exceptions in the <code>main</code>; function.
+ *       Catching exceptions in the <code>main</code> function.
  *       <br/> Keywords: DoFTools::make_hanging_node_constraints(),
  *       AffineConstraints::distribute_local_to_global(), KellyErrorEstimator,
  *       GridRefinement::refine_and_coarsen_fixed_number()
@@ -228,7 +228,7 @@
  *       meshes.
  *       <br/> Keywords: Multigrid, PreconditionMG, mg::Matrix,
  *       MGTransferPrebuilt, MeshWorker::mesh_loop(), MGLevelObject,
- *       MGConstrainedDofs
+ *       MGConstrainedDoFs
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -268,7 +268,7 @@
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
  *       complicated block solvers. Simple time stepping.
- *       <br/> Keywords: TensorFunction, InverseMatrix, FE_RaviartThomas,
+ *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
  *       VectorTools::project()
  *       </td></tr>
  *
