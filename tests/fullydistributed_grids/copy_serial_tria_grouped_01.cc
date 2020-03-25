@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Create the ConstructionData with
+// Create the TriangulationDescription::Description with
 // create_description_from_triangulation_in_groups, i.e. by a set of
 // master processes.
 
@@ -42,7 +42,8 @@ template <int dim, int spacedim = dim>
 void
 test(int n_refinements, MPI_Comm comm)
 {
-  // 1) create ConstructionData with create_description_from_triangulation
+  // 1) create TriangulationDescription::Description with
+  // create_description_from_triangulation
   Triangulation<dim> basetria(
     Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_L(basetria);
@@ -56,7 +57,7 @@ test(int n_refinements, MPI_Comm comm)
     TriangulationDescription::Utilities::create_description_from_triangulation(
       basetria, comm, true);
 
-  // 2) create ConstructionData with
+  // 2) create TriangulationDescription::Description with
   // create_description_from_triangulation_in_groups
   auto construction_data_2 = TriangulationDescription::Utilities::
     create_description_from_triangulation_in_groups<dim, spacedim>(
@@ -74,7 +75,7 @@ test(int n_refinements, MPI_Comm comm)
       3 /* group size */,
       true);
 
-  // 3a) serialize first ConstructionData and print
+  // 3a) serialize first TriangulationDescription::Description and print
   {
     std::ostringstream            oss;
     boost::archive::text_oarchive oa(oss, boost::archive::no_header);
@@ -82,7 +83,7 @@ test(int n_refinements, MPI_Comm comm)
     deallog << oss.str() << std::endl;
   }
 
-  // 3b) serialize second ConstructionData and print
+  // 3b) serialize second TriangulationDescription::Description and print
   {
     std::ostringstream            oss;
     boost::archive::text_oarchive oa(oss, boost::archive::no_header);
@@ -93,7 +94,8 @@ test(int n_refinements, MPI_Comm comm)
   // 4) the result has to be identical
   AssertThrow((construction_data_1 == construction_data_2 &&
                construction_data_1.comm == construction_data_2.comm),
-              ExcMessage("ConstructionDatas are not the same!"));
+              ExcMessage(
+                "TriangulationDescription::Descriptions are not the same!"));
 }
 
 int

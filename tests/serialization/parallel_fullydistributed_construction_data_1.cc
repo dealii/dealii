@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check serialization for ConstructionData<dim, spacedim>
+// check serialization for TriangulationDescription::Description<dim, spacedim>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/tria.h>
@@ -47,7 +47,7 @@ test(MPI_Comm comm)
     TriangulationDescription::Utilities::create_description_from_triangulation(
       basetria, comm);
 
-  // compare equal ConstructionDatas
+  // compare equal TriangulationDescription::Descriptions
   auto t2 = t1;
   verify(t1, t2);
 
@@ -60,7 +60,7 @@ test(MPI_Comm comm)
     TriangulationDescription::Utilities::create_description_from_triangulation(
       basetria, comm);
 
-  // compare different ConstructionDatas
+  // compare different TriangulationDescription::Descriptions
   verify(t1, t3);
 }
 
