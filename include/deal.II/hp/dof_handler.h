@@ -956,16 +956,6 @@ namespace hp
                              locally_owned_mg_dofs_per_processor(const unsigned int level) const;
 
     /**
-     * Return a constant reference to the set of finite element objects that
-     * are used by this @p DoFHandler.
-     *
-     * @deprecated Use get_fe_collection() instead.
-     */
-    DEAL_II_DEPRECATED
-    const hp::FECollection<dim, spacedim> &
-    get_fe() const;
-
-    /**
      * Return a constant reference to the indexth finite element object that is
      * used by this @p DoFHandler.
      */
@@ -1716,18 +1706,6 @@ namespace hp
     else
       return mg_number_cache[level].get_locally_owned_dofs_per_processor(
         MPI_COMM_SELF);
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline const hp::FECollection<dim, spacedim> &
-  DoFHandler<dim, spacedim>::get_fe() const
-  {
-    Assert(fe_collection.size() > 0,
-           ExcMessage("No finite element collection is associated with "
-                      "this DoFHandler"));
-    return fe_collection;
   }
 
 

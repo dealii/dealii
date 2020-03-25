@@ -1,0 +1,4 @@
+Removed: The deprecated method hp::DoFHandler::get_fe() has been removed. Please use
+hp::DoFHandler::get_fe_collection() instead.
+<br>
+(Peter Munch, 2020/03/26)

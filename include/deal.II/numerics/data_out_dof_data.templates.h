@@ -1253,7 +1253,7 @@ namespace internal
       const VectorType *vector = &((*vectors)[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
-        this->dof_handler->get_fe()[0].dofs_per_cell;
+        this->dof_handler->get_fe(0).dofs_per_cell;
 
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
@@ -1292,7 +1292,7 @@ namespace internal
       const VectorType *vector = &((*vectors)[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
-        this->dof_handler->get_fe()[0].dofs_per_cell;
+        this->dof_handler->get_fe(0).dofs_per_cell;
 
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
