@@ -64,7 +64,8 @@ main()
   // Compute without cache.
   FullMatrix<double> matrix;
   matrix.reinit(6, 6);
-  auto cache = MatrixFreeUtils::assemble_operator(matrix, op, pattern);
+  MatrixFreeUtilities::GraphCache cache;
+  MatrixFreeUtilities::assemble_operator(matrix, op, pattern, cache);
   deallog << "n = " << matrix.n_rows() << std::endl;
   deallog << "n_vmults = " << cache->num_colors << std::endl;
   //   matrix.print_formatted(deallog, 2, false, 4);
@@ -73,7 +74,7 @@ main()
   // Reuse cache.
   FullMatrix<double> matrix2;
   matrix2.reinit(6, 6);
-  MatrixFreeUtils::assemble_operator(matrix2, op, pattern, cache);
+  MatrixFreeUtilities::assemble_operator(matrix2, op, pattern, cache);
   //   matrix2.print_formatted(deallog, 2, false, 4);
   deallog << std::boolalpha << (M == matrix2) << std::endl;
 
