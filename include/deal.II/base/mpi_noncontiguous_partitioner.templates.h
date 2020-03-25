@@ -193,7 +193,7 @@ namespace Utilities
           indices_has_clean.push_back(i);
 
       std::vector<types::global_dof_index> indices_want_clean;
-      indices_want_clean.reserve(indices_has.size());
+      indices_want_clean.reserve(indices_want.size());
 
       for (const auto &i : indices_want)
         if (i != numbers::invalid_dof_index)
