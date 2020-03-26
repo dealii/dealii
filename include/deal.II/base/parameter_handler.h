@@ -1410,37 +1410,6 @@ public:
                    const bool        sort_alphabetical = true) const;
 
   /**
-   * Print out the parameters of the present subsection as given by the
-   * <tt>subsection_path</tt> member variable. This variable is controlled by
-   * entering and leaving subsections through the enter_subsection() and
-   * leave_subsection() functions.
-   *
-   * If <tt>include_top_level_elements</tt> is <tt>true</tt>, also the higher
-   * subsection elements are printed. In <tt>XML</tt> format this is required
-   * to get a valid XML document and output starts with one root element
-   * <tt>ParameterHandler</tt>.
-   *
-   * Before printing, all parameters and subsections of the present subsection
-   * are sorted alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
-   * as they have been declared.
-   *
-   * In most cases, you will not want to use this function directly, but have
-   * it called recursively by the previous function.
-   *
-   * @deprecated This function is deprecated because, even though it only
-   *   outputs information, it is not a <code>const</code> function.
-   */
-  DEAL_II_DEPRECATED
-  void
-  print_parameters_section(std::ostream &     out,
-                           const OutputStyle  style,
-                           const unsigned int indent_level,
-                           const bool include_top_level_elements = false,
-                           const bool sort_alphabetical          = true);
-
-  /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
    * file style.
