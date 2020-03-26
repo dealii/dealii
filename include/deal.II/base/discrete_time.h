@@ -24,7 +24,9 @@ DEAL_II_NAMESPACE_OPEN
  * This class provides a means to keep track of the simulation time in a
  * time-dependent simulation. It manages stepping forward from a start time
  * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
- * the time step size during the simulation.
+ * the time step size during the simulation. This class provides the necessary
+ * interface to be incorporated in any time-dependent simulation. As an
+ * example, the usage of this class is demonstrated in step-21.
  *
  * This class provides a number of invariants that are guaranteed to be
  * true at all times.

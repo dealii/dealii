@@ -271,7 +271,7 @@
  *       complicated block solvers. Simple explicit (forward Euler) time 
  *       stepping.
  *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
- *       VectorTools::project()
+ *       VectorTools::project(), DiscreteTime
  *       </td></tr>
  *
  *   <tr valign="top">

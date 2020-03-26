@@ -66,6 +66,10 @@
 // such functionality:
 #include <deal.II/base/tensor_function.h>
 
+// Additionally, we use the class <code>DiscreteTime</code> to perform
+// operations related to time incrementation.
+#include <deal.II/base/discrete_time.h>
+
 // The last step is as in all previous programs:
 namespace Step21
 {
@@ -91,7 +95,9 @@ namespace Step21
   //
   // The rest of the class should be pretty much obvious. The
   // <code>viscosity</code> variable stores the viscosity $\mu$ that enters
-  // several of the formulas in the nonlinear equations.
+  // several of the formulas in the nonlinear equations. The variable
+  // <code>time</code> keeps track of the time information within the
+  // simulation.
   template <int dim>
   class TwoPhaseFlowProblem
   {
@@ -119,8 +125,7 @@ namespace Step21
 
     const unsigned int n_refinement_steps;
 
-    double       time_step;
-    unsigned int timestep_number;
+    DiscreteTime time;
     double       viscosity;
 
     BlockVector<double> solution;
@@ -500,7 +505,9 @@ namespace Step21
   // First for the constructor. We use $RT_k \times DQ_k \times DQ_k$
   // spaces. The time step is set to zero initially, but will be computed
   // before it is needed first, as described in a subsection of the
-  // introduction.
+  // introduction. The time object internally prevents itself from being
+  // incremented with $dt = 0$, forcing us to set a non-zero desired size for
+  // $dt$ before advancing time.
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem(const unsigned int degree)
     : degree(degree)
@@ -512,8 +519,7 @@ namespace Step21
          1)
     , dof_handler(triangulation)
     , n_refinement_steps(5)
-    , time_step(0)
-    , timestep_number(1)
+    , time(/*start time*/ 0., /*end time*/ 1., /*time step*/ 0.)
     , viscosity(0.2)
   {}
 
@@ -827,10 +833,11 @@ namespace Step21
               const Tensor<1, dim> grad_phi_i_s =
                 fe_values[saturation].gradient(i, q);
 
-              local_rhs(i) += (time_step * fractional_flow(old_s, viscosity) *
-                                 present_u * grad_phi_i_s +
-                               old_s * phi_i_s) *
-                              fe_values.JxW(q);
+              local_rhs(i) +=
+                (time.get_next_step_size() * fractional_flow(old_s, viscosity) *
+                   present_u * grad_phi_i_s +
+                 old_s * phi_i_s) *
+                fe_values.JxW(q);
             }
 
         // Secondly, we have to deal with the flux parts on the face
@@ -884,7 +891,7 @@ namespace Step21
 
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   local_rhs(i) -=
-                    time_step * normal_flux *
+                    time.get_next_step_size() * normal_flux *
                     fractional_flow((is_outflow_q_point == true ?
                                        old_solution_values_face[q](dim + 1) :
                                        neighbor_saturation[q]),
@@ -963,9 +970,11 @@ namespace Step21
     //
     // The maximal velocity we compute using a helper function to compute the
     // maximal velocity defined below, and with all this we can evaluate our
-    // new time step length:
-    time_step =
-      std::pow(0.5, double(n_refinement_steps)) / get_maximal_velocity();
+    // new time step length. The method DiscreteTime::set_next_time_step() is
+    // used to assign the new value of the time step to the DiscreteTime
+    // object.
+    time.set_next_step_size(std::pow(0.5, double(n_refinement_steps)) /
+                            get_maximal_velocity());
 
     // The next step is to assemble the right hand side, and then to pass
     // everything on for solution. At the end, we project back saturations
@@ -1005,7 +1014,7 @@ namespace Step21
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results() const
   {
-    if (timestep_number % 5 != 0)
+    if (time.get_step_number() % 5 != 0)
       return;
 
     std::vector<std::string> solution_names;
@@ -1031,7 +1040,8 @@ namespace Step21
     data_out.build_patches(degree + 1);
 
     std::ofstream output("solution-" +
-                         Utilities::int_to_string(timestep_number, 4) + ".vtk");
+                         Utilities::int_to_string(time.get_step_number(), 4) +
+                         ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -1118,13 +1128,15 @@ namespace Step21
   //
   // The second point worth mentioning is that we only compute the length of
   // the present time step in the middle of solving the linear system
-  // corresponding to each time step. We can therefore output the present end
+  // corresponding to each time step. We can therefore output the present
   // time of a time step only at the end of the time step.
-  //
-  // The function as it is here does actually not compute the results
-  // found on the web page. The reason is, that even on a decent
-  // computer it runs more than a day. If you want to reproduce these
-  // results, set the final time at the end of the do loop to 250.
+  // We increment time by calling the method DiscreteTime::advance_time()
+  // inside the loop. Since we are reporting the time and dt after we
+  // increment it, we have to call the method
+  // DiscreteTime::get_previous_step_size() instead of
+  // DiscreteTime::get_next_step_size(). After many steps, when the simulation
+  // reaches the end time, the last dt is chosen by the DiscreteTime class in
+  // such a way that the last step finishes exactly at the end time.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run()
   {
@@ -1141,11 +1153,9 @@ namespace Step21
                            old_solution);
     }
 
-    double time = 0;
-
     do
       {
-        std::cout << "Timestep " << timestep_number << std::endl;
+        std::cout << "Timestep " << time.get_step_number() + 1 << std::endl;
 
         assemble_system();
 
@@ -1153,13 +1163,13 @@ namespace Step21
 
         output_results();
 
-        time += time_step;
-        ++timestep_number;
-        std::cout << "   Now at t=" << time << ", dt=" << time_step << '.'
+        time.advance_time();
+        std::cout << "   Now at t=" << time.get_current_time()
+                  << ", dt=" << time.get_previous_step_size() << '.'
                   << std::endl
                   << std::endl;
       }
-    while (time <= 1.);
+    while (time.is_at_end() == false);
   }
 } // namespace Step21
 

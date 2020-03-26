@@ -250,6 +250,10 @@ cell term to get an equation as follows:
   (S^n,\sigma)_\Omega +
   \triangle t \sum_K  \left(F(S^n) q^{n+1}, \sigma\right)_K.
 @f}
+We introduce an object of type DiscreteTime in order to keep track of the
+current value of time and time step in the code. This class encapsulates many
+complexities regarding adjusting time step size and stopping at a specified
+final time.
 
 
 
