@@ -13,10 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_matrix_free_utilities_h
-#define dealii_matrix_free_utilities_h
+#ifndef dealii_matrix_free_tools_h
+#define dealii_matrix_free_tools_h
 
 #include <deal.II/base/config.h>
+
+
+
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace for utility functions in the context of matrix-free operator
@@ -24,5 +28,9 @@
  */
 namespace MatrixFreeTools
 {} // namespace MatrixFreeTools
+
+
+DEAL_II_NAMESPACE_CLOSE
+
 
 #endif
