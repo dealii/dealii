@@ -271,55 +271,6 @@ public:
   };
 
   /**
-   * Auxiliary class to represent <code>A-sigma*B</code> operator.
-   *
-   * @deprecated: Use LinearOperator to create a shifted operator by hand:
-   * <code>
-   *   const auto shift = linear_operator(A) - sigma * linear_operator(B);
-   * </code>
-   */
-  template <typename MatrixType>
-  class DEAL_II_DEPRECATED Shift : public dealii::Subscriptor
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    Shift(const MatrixType &A, const MatrixType &B, const double sigma)
-      : A(A)
-      , B(B)
-      , sigma(sigma)
-    {}
-
-    /**
-     * Apply <code>A-sigma * B</code>
-     */
-    void
-    vmult(VectorType &dst, const VectorType &src) const
-    {
-      B.vmult(dst, src);
-      dst *= (-sigma);
-      A.vmult_add(dst, src);
-    }
-
-    /**
-     * Apply <code>A^T-sigma * B^T</code>
-     */
-    void
-    Tvmult(VectorType &dst, const VectorType &src) const
-    {
-      B.Tvmult(dst, src);
-      dst *= (-sigma);
-      A.Tvmult_add(dst, src);
-    }
-
-  private:
-    const MatrixType &A;
-    const MatrixType &B;
-    const double      sigma;
-  };
-
-  /**
    * Standardized data struct to pipe additional data to the solver, should it
    * be needed.
    */
