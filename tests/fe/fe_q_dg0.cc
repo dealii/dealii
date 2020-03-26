@@ -602,7 +602,7 @@ namespace Step22
                     fe_v_face.reinit(cell, face_no);
 
                     const std::vector<Tensor<1, dim>> &normals =
-                      fe_v_face.get_all_normal_vectors();
+                      fe_v_face.get_normal_vectors();
                     const std::vector<Point<dim>> &quad_points =
                       fe_v_face.get_quadrature_points();
 

@@ -133,7 +133,7 @@ test(std::string filename)
     {
       fe_values.reinit(cell);
       cell->get_dof_indices(local_dof_indices);
-      cell_normals = fe_values.get_all_normal_vectors();
+      cell_normals = fe_values.get_normal_vectors();
 
       // The cell tangential is calculated
       // in the midpoint of the cell. For

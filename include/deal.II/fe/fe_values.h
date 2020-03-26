@@ -3138,20 +3138,6 @@ public:
    * vectors represent.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   *
-   * @deprecated Use get_normal_vectors() instead, which returns the exact
-   * same thing.
-   */
-  DEAL_II_DEPRECATED
-  const std::vector<Tensor<1, spacedim>> &
-  get_all_normal_vectors() const;
-
-  /**
-   * Return the normal vectors at all quadrature points represented by
-   * this object. See the normal_vector() function for what the normal
-   * vectors represent.
-   *
-   * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const;

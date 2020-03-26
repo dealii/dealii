@@ -232,7 +232,7 @@ DGTransportEquation<dim>::assemble_boundary_term(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -279,7 +279,7 @@ DGTransportEquation<dim>::assemble_face_term1(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -328,7 +328,7 @@ DGTransportEquation<dim>::assemble_face_term2(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);

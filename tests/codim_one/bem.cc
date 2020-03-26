@@ -212,7 +212,7 @@ BEM<spacedim>::assemble_system()
   for (; cell_i != endc; ++cell_i)
     {
       fe_values_i.reinit(cell_i);
-      cell_normals_i = fe_values_i.get_all_normal_vectors();
+      cell_normals_i = fe_values_i.get_normal_vectors();
       cell_i->get_dof_indices(local_dof_indices_i);
 
       cell_DLP_matrix  = 0.;
@@ -248,7 +248,7 @@ BEM<spacedim>::assemble_system()
       for (cell_j = dof_handler.begin_active(); cell_j != endc; ++cell_j)
         {
           fe_values_j.reinit(cell_j);
-          cell_normals_j = fe_values_j.get_all_normal_vectors();
+          cell_normals_j = fe_values_j.get_normal_vectors();
           cell_j->get_dof_indices(local_dof_indices_j);
 
           if (cell_j != cell_i)
@@ -369,7 +369,7 @@ BEM<spacedim>::solve()
       fe_values_q.reinit(cell);
       cell->get_dof_indices(local_dof_indices);
 
-      cell_normals = fe_values_q.get_all_normal_vectors();
+      cell_normals = fe_values_q.get_normal_vectors();
       for (unsigned int i = 0; i < q_iterated.size(); ++i)
         {
           cell_tangentials[i][0] = cell_normals[i][1];

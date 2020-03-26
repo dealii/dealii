@@ -155,7 +155,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
         fe_values.reinit(cell, face_nr, sub_nr);
 
         const std::vector<Tensor<1, dim>> &normals =
-          fe_values.get_all_normal_vectors();
+          fe_values.get_normal_vectors();
 
         unsigned int k = 0;
         for (unsigned int ny = 0; ny < ((dim > 2) ? nq : 1); ++ny)
