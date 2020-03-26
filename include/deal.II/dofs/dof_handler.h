@@ -1023,7 +1023,7 @@ public:
    * cells owned by other processors may be theirs, and degrees of freedom on
    * ghost cells are also not necessarily included.
    */
-  unsigned int
+  types::global_dof_index
   n_locally_owned_dofs() const;
 
   /**
@@ -1495,7 +1495,7 @@ DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
+types::global_dof_index
 DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 {
   return number_cache.n_locally_owned_dofs;
