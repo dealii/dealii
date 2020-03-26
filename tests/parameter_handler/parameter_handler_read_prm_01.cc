@@ -15,7 +15,7 @@
 
 
 
-// check ParameterHandler::parse_input_from_json
+// check ParameterHandler::parse_input for prm file
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -43,8 +43,9 @@ main()
   prm.leave_subsection();
 
   // read from json
-  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_read_json_02.prm");
-  prm.parse_input_from_json(in, true);
+  std::string source   = SOURCE_DIR;
+  std::string filename = source + "/prm/parameter_handler_read_prm_01.prm";
+  prm.parse_input(filename, "", true, true);
 
   AssertDimension(int1, 1);
   AssertDimension(int2, 2);

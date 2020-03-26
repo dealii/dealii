@@ -1,0 +1,12 @@
+set int1 = 1
+set int2 = 2
+subsection dummy
+ set int3 = 3
+ set int4 = 4
+end
+set int5 = 5
+set int6 = 6
+subsection dummy2
+  set int7 = 7
+  set int8 = 8
+end
