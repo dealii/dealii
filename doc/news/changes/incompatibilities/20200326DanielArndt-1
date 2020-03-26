@@ -1,0 +1,4 @@
+Removed: The deprecated function MGLevelObject::clear() has been removed.
+Use MGLevelObject::clear_elements() instead.
+<br>
+(Daniel Arndt, 2020/03/26)
