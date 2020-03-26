@@ -580,7 +580,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -606,7 +606,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -627,7 +627,8 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
-                 local_result, this->block(0).partitioner->get_communicator()) /
+                 local_result,
+                 this->block(0).partitioner->get_mpi_communicator()) /
                static_cast<real_type>(this->size());
       else
         return local_result / static_cast<real_type>(this->size());
@@ -647,7 +648,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -666,7 +667,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -693,10 +694,10 @@ namespace LinearAlgebra
         local_result += std::pow(this->block(i).lp_norm_local(p), p);
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
-        return std::pow(
-          Utilities::MPI::sum(local_result,
-                              this->block(0).partitioner->get_communicator()),
-          static_cast<real_type>(1.0 / p));
+        return std::pow(Utilities::MPI::sum(
+                          local_result,
+                          this->block(0).partitioner->get_mpi_communicator()),
+                        static_cast<real_type>(1.0 / p));
       else
         return std::pow(local_result, static_cast<real_type>(1.0 / p));
     }
@@ -716,7 +717,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::max(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
@@ -750,7 +751,7 @@ namespace LinearAlgebra
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
-          local_result, this->block(0).partitioner->get_communicator());
+          local_result, this->block(0).partitioner->get_mpi_communicator());
       else
         return local_result;
     }
