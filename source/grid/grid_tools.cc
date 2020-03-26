@@ -1068,12 +1068,24 @@ namespace GridTools
   }
 
 
-
+  template <>
   void
   rotate(const double angle, Triangulation<2> &triangulation)
   {
     transform(Rotate2d(angle), triangulation);
   }
+
+  template <>
+  void
+  rotate(const double angle, Triangulation<3> &triangulation)
+  {
+    (void)angle;
+    (void)triangulation;
+
+    AssertThrow(
+      false, ExcMessage("GridTools::rotate() is not available for dim = 3."));
+  }
+
 
   template <int dim>
   void
