@@ -24,7 +24,7 @@
 
 #include "../testmatrix.h"
 
-// Test case for MatrixFreeUtilities::assemble_operator.
+// Test case for MatrixFreeTools::assemble_operator.
 int
 main()
 {
@@ -57,8 +57,8 @@ main()
   // Compute without cache.
   SparseMatrix<double> matrix;
   matrix.reinit(pattern);
-  std::shared_ptr<MatrixFreeUtilities::GraphCache> cache;
-  MatrixFreeUtilities::assemble_operator(matrix, op, pattern, cache);
+  std::shared_ptr<MatrixFreeTools::GraphCache> cache;
+  MatrixFreeTools::assemble_operator(matrix, op, pattern, cache);
   deallog << "n = " << n << std::endl;
   deallog << "n_vmults = " << cache->num_colors << std::endl;
   // Compute difference
