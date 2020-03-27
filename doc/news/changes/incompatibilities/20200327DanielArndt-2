@@ -1,0 +1,4 @@
+Removed: The deprecated member function Triangulation::set_manifold() taking
+one parameter has been removed. Use Triangulation::reset_manifold() instead.
+<br>
+(Daniel Arndt, 2020/03/27)

@@ -10253,14 +10253,6 @@ Triangulation<dim, spacedim>::set_manifold(
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_manifold(const types::manifold_id m_number)
-{
-  reset_manifold(m_number);
-}
-
-
-template <int dim, int spacedim>
-void
 Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
 {
   AssertIndexRange(m_number, numbers::flat_manifold_id);
