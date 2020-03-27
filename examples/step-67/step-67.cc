@@ -50,9 +50,9 @@
 #include <iomanip>
 #include <iostream>
 
-// This includes the CellwiseInverseMassMatrix data structure for the
-// definition of the interface to mass matrix inversion, the only new include
-// file for this tutorial program.
+// The following file includes the CellwiseInverseMassMatrix data structure
+// that we will use for the mass matrix inversion, the only new include
+// file for this tutorial program:
 #include <deal.II/matrix_free/operators.h>
 
 
@@ -78,7 +78,8 @@ namespace Euler_DG
   constexpr unsigned int n_global_refinements = 3;
   constexpr unsigned int fe_degree            = 5;
   constexpr unsigned int n_q_points_1d        = fe_degree + 2;
-  using Number                                = double;
+
+  using Number = double;
 
   constexpr double gamma       = 1.4;
   constexpr double FINAL_TIME  = testcase == 0 ? 10 : 2.0;
@@ -119,7 +120,8 @@ namespace Euler_DG
   // We now define a class with the exact solution for the test case 0 and one
   // with a background flow field for test case 1 of the channel. Given that
   // the Euler equations are a problem with $d+2$ equations in $d$ dimensions,
-  // we need to select the function with the correct number of components.
+  // we need to tell the Function base class about the correct number of
+  // components.
   template <int dim>
   class ExactSolution : public Function<dim>
   {
@@ -144,12 +146,12 @@ namespace Euler_DG
   // some expression. Since `std::pow()` has pretty slow implementations on
   // some systems, we replace it by logarithm followed by exponentiation (of
   // base 2), which is mathematically equivalent but usually much better
-  // optimized. We note that this formula might lose accuracy in the last
-  // digits for very small numbers compared to `std::pow()`, we are happy with
+  // optimized. This formula might lose accuracy in the last digits
+  // for very small numbers compared to `std::pow()`, but we are happy with
   // it anyway, since small numbers map to data close to 1.
   //
   // For the channel test case, we simply select a density of 1, a velocity of
-  // 0.4 in x direction and zero in the other directions, and an energy that
+  // 0.4 in $x$ direction and zero in the other directions, and an energy that
   // corresponds to a speed of sound of 1.3 measured against the background
   // velocity field, computed from the relation $E = \frac{c^2}{\gamma (\gamma
   // -1)} + \frac 12 \rho \|u\|^2$.
@@ -157,45 +159,56 @@ namespace Euler_DG
   double ExactSolution<dim>::value(const Point<dim> & x,
                                    const unsigned int component) const
   {
-    double t = this->get_time();
-    if (testcase == 0)
+    const double t = this->get_time();
+
+    switch (testcase)
       {
-        Assert(dim == 2, ExcNotImplemented());
-        double     beta = 5;
-        Point<dim> x0;
-        x0[0] = 5.;
-        double radius_sqr =
-          (x - x0).norm_square() - 2. * (x[0] - x0[0]) * t + t * t;
-        double factor = beta / (numbers::PI * 2) * std::exp(1. - radius_sqr);
-        const double density_log = std::log2(
-          std::abs(1. - (gamma - 1.) / gamma * 0.25 * factor * factor));
-        const double density = std::exp2(density_log * (1. / (gamma - 1.)));
-        const double u       = 1. - factor * (x[1] - x0[1]);
-        const double v       = factor * (x[0] - t - x0[0]);
-        if (component == 0)
-          return density;
-        else if (component == 1)
-          return density * u;
-        else if (component == 2)
-          return density * v;
-        else
+        case 0:
           {
-            const double pressure =
-              std::exp2(density_log * (gamma / (gamma - 1.)));
-            return pressure / (gamma - 1.) +
-                   0.5 * (density * u * u + density * v * v);
+            Assert(dim == 2, ExcNotImplemented());
+            const double beta = 5;
+
+            Point<dim> x0;
+            x0[0] = 5.;
+            const double radius_sqr =
+              (x - x0).norm_square() - 2. * (x[0] - x0[0]) * t + t * t;
+            const double factor =
+              beta / (numbers::PI * 2) * std::exp(1. - radius_sqr);
+            const double density_log = std::log2(
+              std::abs(1. - (gamma - 1.) / gamma * 0.25 * factor * factor));
+            const double density = std::exp2(density_log * (1. / (gamma - 1.)));
+            const double u       = 1. - factor * (x[1] - x0[1]);
+            const double v       = factor * (x[0] - t - x0[0]);
+
+            if (component == 0)
+              return density;
+            else if (component == 1)
+              return density * u;
+            else if (component == 2)
+              return density * v;
+            else
+              {
+                const double pressure =
+                  std::exp2(density_log * (gamma / (gamma - 1.)));
+                return pressure / (gamma - 1.) +
+                       0.5 * (density * u * u + density * v * v);
+              }
           }
-      }
-    else
-      {
-        if (component == 0)
-          return 1.;
-        else if (component == 1)
-          return 0.4;
-        else if (component == dim + 1)
-          return 3.097857142857143;
-        else
-          return 0.;
+
+        case 1:
+          {
+            if (component == 0)
+              return 1.;
+            else if (component == 1)
+              return 0.4;
+            else if (component == dim + 1)
+              return 3.097857142857143;
+            else
+              return 0.;
+          }
+
+        default:
+          Assert(false, ExcNotImplemented());
       }
   }
 
@@ -204,7 +217,7 @@ namespace Euler_DG
   // @sect3{Low-storage explicit Runge--Kutta time integrators}
 
   // The next few lines implement a few low-storage variants of Runge--Kutta
-  // methods. These methods have specific Butcher tableaus with coefficients
+  // methods. These methods have specific Butcher tableaux with coefficients
   // $b_i$ and $a_i$ as shown in the introduction. As usual in Runge--Kutta
   // method, we can deduce time steps, $c_i = \sum_{j=1}^{i-2} b_i + a_{i-1}$
   // from those coefficients. The main advantage of this kind of scheme is the
@@ -236,84 +249,100 @@ namespace Euler_DG
   public:
     LowStorageRungeKuttaIntegrator(const LowStorageRungeKuttaScheme scheme)
     {
-      // First comes the three-stage scheme of order three by Kennedy et al
+      // First comes the three-stage scheme of order three by Kennedy et al.
       // (2000). While its stability region is significantly smaller than for
       // the other schemes, it only involves three stages, so it is very
       // competitive in terms of the work per stage.
-      if (scheme == stage_3_order_3)
+      switch (scheme)
         {
-          bi = {{0.245170287303492, 0.184896052186740, 0.569933660509768}};
-          ai = {{0.755726351946097, 0.386954477304099}};
+          case stage_3_order_3:
+            {
+              bi = {{0.245170287303492, 0.184896052186740, 0.569933660509768}};
+              ai = {{0.755726351946097, 0.386954477304099}};
+
+              break;
+            }
+
+            // The next scheme is a five-stage scheme of order four, again
+            // defined in the paper by Kennedy et al. (2000).
+          case stage_5_order_4:
+            {
+              bi = {{1153189308089. / 22510343858157.,
+                     1772645290293. / 4653164025191.,
+                     -1672844663538. / 4480602732383.,
+                     2114624349019. / 3568978502595.,
+                     5198255086312. / 14908931495163.}};
+              ai = {{970286171893. / 4311952581923.,
+                     6584761158862. / 12103376702013.,
+                     2251764453980. / 15575788980749.,
+                     26877169314380. / 34165994151039.}};
+
+              break;
+            }
+
+            // The following scheme of seven stages and order four has been
+            // explicitly derived for acoustics problems. It is a balance of
+            // accuracy for imaginary eigenvalues among fourth order schemes,
+            // combined with a large stability region. Since DG schemes are
+            // dissipative among the highest frequencies, this does not
+            // necessarily translate to the highest possible time step per
+            // stage. In the context of the present tutorial program, the
+            // numerical flux plays a crucial role in the dissipation and thus
+            // also the maximal stable time step size. For the modified
+            // Lax--Friedrichs flux, this scheme is similar to the
+            // `stage_5_order_4` scheme in terms of step size per stage if only
+            // stability is considered, but somewhat less efficient for the HLL
+            // flux.
+          case stage_7_order_4:
+            {
+              bi = {{0.0941840925477795334,
+                     0.149683694803496998,
+                     0.285204742060440058,
+                     -0.122201846148053668,
+                     0.0605151571191401122,
+                     0.345986987898399296,
+                     0.186627171718797670}};
+              ai = {{0.241566650129646868 + bi[0],
+                     0.0423866513027719953 + bi[1],
+                     0.215602732678803776 + bi[2],
+                     0.232328007537583987 + bi[3],
+                     0.256223412574146438 + bi[4],
+                     0.0978694102142697230 + bi[5]}};
+
+              break;
+            }
+
+            // The last scheme included here is the nine-stage scheme of order
+            // five from Kennedy et al. (2000). It is the most accurate among
+            // the schemes used here, but the higher order of accuracy
+            // sacrifices some stability, so the step length normalized per
+            // stage is less than for the fourth order schemes.
+          case stage_9_order_5:
+            {
+              bi = {{2274579626619. / 23610510767302.,
+                     693987741272. / 12394497460941.,
+                     -347131529483. / 15096185902911.,
+                     1144057200723. / 32081666971178.,
+                     1562491064753. / 11797114684756.,
+                     13113619727965. / 44346030145118.,
+                     393957816125. / 7825732611452.,
+                     720647959663. / 6565743875477.,
+                     3559252274877. / 14424734981077.}};
+              ai = {{1107026461565. / 5417078080134.,
+                     38141181049399. / 41724347789894.,
+                     493273079041. / 11940823631197.,
+                     1851571280403. / 6147804934346.,
+                     11782306865191. / 62590030070788.,
+                     9452544825720. / 13648368537481.,
+                     4435885630781. / 26285702406235.,
+                     2357909744247. / 11371140753790.}};
+
+              break;
+            }
+
+          default:
+            AssertThrow(false, ExcNotImplemented());
         }
-      // The next scheme is a five-stage scheme of order four, again defined
-      // in the paper by Kennedy et al. (2000).
-      else if (scheme == stage_5_order_4)
-        {
-          bi = {{1153189308089. / 22510343858157.,
-                 1772645290293. / 4653164025191.,
-                 -1672844663538. / 4480602732383.,
-                 2114624349019. / 3568978502595.,
-                 5198255086312. / 14908931495163.}};
-          ai = {{970286171893. / 4311952581923.,
-                 6584761158862. / 12103376702013.,
-                 2251764453980. / 15575788980749.,
-                 26877169314380. / 34165994151039.}};
-        }
-      // This scheme of seven stages and order four has been explicitly
-      // derived for acoustics problems. It is a balance of accuracy for
-      // imaginary eigenvalues among fourth order schemes, combined with a
-      // large stability region. Since DG schemes are dissipative among the
-      // highest frequencies, this does not necessarily translate to the
-      // highest possible time step per stage. In the context of the present
-      // tutorial program, the numerical flux plays a crucial role in the
-      // disspiation and thus also the maximal stable time step size. For the
-      // modified Lax--Friedrichs flux, this scheme is similar to the
-      // `stage_5_order_4` scheme in terms of step size per stage if only
-      // stability is considered, but somewhat less efficient for the HLL
-      // flux.
-      else if (scheme == stage_7_order_4)
-        {
-          bi = {{0.0941840925477795334,
-                 0.149683694803496998,
-                 0.285204742060440058,
-                 -0.122201846148053668,
-                 0.0605151571191401122,
-                 0.345986987898399296,
-                 0.186627171718797670}};
-          ai = {{0.241566650129646868 + bi[0],
-                 0.0423866513027719953 + bi[1],
-                 0.215602732678803776 + bi[2],
-                 0.232328007537583987 + bi[3],
-                 0.256223412574146438 + bi[4],
-                 0.0978694102142697230 + bi[5]}};
-        }
-      // The last scheme included here is the nine-stage scheme of order five
-      // from Kennedy et al. (2000). It is the most accurate among the schemes
-      // used here, but the higher order of accuracy sacrifices some
-      // stability, so the step length normalized per stage is less than for
-      // the fourth order schemes.
-      else if (scheme == stage_9_order_5)
-        {
-          bi = {{2274579626619. / 23610510767302.,
-                 693987741272. / 12394497460941.,
-                 -347131529483. / 15096185902911.,
-                 1144057200723. / 32081666971178.,
-                 1562491064753. / 11797114684756.,
-                 13113619727965. / 44346030145118.,
-                 393957816125. / 7825732611452.,
-                 720647959663. / 6565743875477.,
-                 3559252274877. / 14424734981077.}};
-          ai = {{1107026461565. / 5417078080134.,
-                 38141181049399. / 41724347789894.,
-                 493273079041. / 11940823631197.,
-                 1851571280403. / 6147804934346.,
-                 11782306865191. / 62590030070788.,
-                 9452544825720. / 13648368537481.,
-                 4435885630781. / 26285702406235.,
-                 2357909744247. / 11371140753790.}};
-        }
-      else
-        AssertThrow(false, ExcNotImplemented());
     }
 
     unsigned int n_stages() const
@@ -330,7 +359,7 @@ namespace Euler_DG
     // to delegate the vectors and coefficients.
     //
     // We separately call the operator for the first stage because we need
-    // slightly modified arguments there: Here, we evaluate the solution from
+    // slightly modified arguments there: We evaluate the solution from
     // the old solution $\mathbf{w}^n$ rather than a $\mathbf r_i$ vector, so
     // the first argument is `solution`. We here let the stage vector
     // $\mathbf{r}_i$ also hold the temporary result of the evaluation, as it
@@ -348,6 +377,7 @@ namespace Euler_DG
                            VectorType &    vec_ki)
     {
       AssertDimension(ai.size() + 1, bi.size());
+
       pde_operator.perform_stage(current_time,
                                  bi[0] * time_step,
                                  ai[0] * time_step,
