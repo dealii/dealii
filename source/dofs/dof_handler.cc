@@ -1296,16 +1296,6 @@ DoFHandler<dim, spacedim>::distribute_dofs(
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::distribute_mg_dofs(
-  const FiniteElement<dim, spacedim> &)
-{
-  this->distribute_mg_dofs();
-}
-
-
-
-template <int dim, int spacedim>
-void
 DoFHandler<dim, spacedim>::distribute_mg_dofs()
 {
   Assert(

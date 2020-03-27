@@ -408,7 +408,7 @@ do_test(const DoFHandler<dim> &dof)
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<double>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
                  MGTransferPrebuiltMF<LevelMatrixType>>

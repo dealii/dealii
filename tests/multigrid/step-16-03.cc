@@ -385,8 +385,7 @@ LaplaceProblem<dim>::solve()
   mg::Matrix<> mg_interface_up(mg_interface_matrices);
   mg::Matrix<> mg_interface_down(mg_interface_matrices);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
+  Multigrid<Vector<double>> mg(mg_matrix,
                                coarse_grid_solver,
                                mg_transfer,
                                mg_smoother,

@@ -273,12 +273,8 @@ LaplaceProblem<dim>::solve()
   mg_smoother.set_symmetric(true);
 
   mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
-  Multigrid<Vector<double>>  mg(mg_dof_handler,
-                               mg_matrix,
-                               mg_coarse,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>>  mg(
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
     preconditioner(mg_dof_handler, mg, mg_transfer);
 

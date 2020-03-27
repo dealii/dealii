@@ -652,12 +652,8 @@ namespace Step39
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgup(mg_matrix_dg_up);
 
-    Multigrid<TrilinosWrappers::MPI::Vector> mg(dof_handler,
-                                                mgmatrix,
-                                                coarse_grid_solver,
-                                                mg_transfer,
-                                                mg_smoother,
-                                                mg_smoother);
+    Multigrid<TrilinosWrappers::MPI::Vector> mg(
+      mgmatrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim,

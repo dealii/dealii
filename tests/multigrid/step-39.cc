@@ -601,7 +601,7 @@ namespace Step39
     mg::Matrix<Vector<double>> mgup(mg_matrix_dg_up);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
