@@ -78,7 +78,6 @@ test()
           << "Linfty=" << map_vector.linfty_norm() << std::endl;
 }
 
-using namespace dealii;
 int
 main(int argc, char *argv[])
 {

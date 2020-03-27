@@ -27,7 +27,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace dealii::Physics;
 
 template <int dim, typename Number>

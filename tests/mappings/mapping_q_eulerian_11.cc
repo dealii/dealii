@@ -60,8 +60,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class Displacement : public Function<dim>

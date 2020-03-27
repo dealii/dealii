@@ -30,7 +30,6 @@
 #include "../base/simplex.h"
 
 using namespace std;
-using namespace dealii;
 
 int
 main()

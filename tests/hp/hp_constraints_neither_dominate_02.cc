@@ -69,7 +69,6 @@ unsigned int counter = 0;
 
 const double eps = 1e-10;
 
-using namespace dealii;
 
 template <int dim>
 struct less_than_key

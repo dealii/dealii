@@ -54,7 +54,6 @@
 #include <vector>
 
 #include "../tests.h"
-using namespace dealii;
 
 
 // this is copied from GridGenerator

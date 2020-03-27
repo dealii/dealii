@@ -82,9 +82,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
-
   template <int dim>
   struct ScratchData
   {
@@ -556,7 +553,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(1 /*degree*/);

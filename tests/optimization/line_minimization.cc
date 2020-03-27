@@ -23,7 +23,6 @@
 #include <iostream>
 
 #include "../tests.h"
-using namespace dealii;
 
 /*
  * MWE in Maxima

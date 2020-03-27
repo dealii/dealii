@@ -45,8 +45,6 @@
 
 namespace Step38
 {
-  using namespace dealii;
-
   template <int spacedim>
   class Extract_Mesh_Test
   {
@@ -117,7 +115,6 @@ main()
   initlog();
 
   {
-    using namespace dealii;
     using namespace Step38;
 
     Extract_Mesh_Test<2> Test;

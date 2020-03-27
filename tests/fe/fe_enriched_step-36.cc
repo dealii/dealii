@@ -56,7 +56,6 @@
 
 const unsigned int dim = 3;
 
-using namespace dealii;
 
 /**
  * Coulomb potential

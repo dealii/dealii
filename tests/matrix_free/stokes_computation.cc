@@ -76,7 +76,6 @@ double pressure_scaling = 1.0;
 
 namespace StokesClass
 {
-  using namespace dealii;
   class QuietException
   {};
 

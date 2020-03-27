@@ -58,7 +58,6 @@
 
 // Finally, this is as in previous
 // programs:
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem

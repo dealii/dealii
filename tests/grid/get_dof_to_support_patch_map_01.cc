@@ -38,15 +38,12 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim>
 void
 test()
 {
-  using namespace dealii;
-
   Triangulation<dim> triangulation(
     Triangulation<dim>::limit_level_difference_at_vertices);
 
@@ -176,8 +173,6 @@ test()
 int
 main()
 {
-  using namespace dealii;
-
   initlog();
 
   deallog.push("1d");

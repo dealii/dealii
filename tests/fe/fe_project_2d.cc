@@ -52,7 +52,6 @@
  * Alexander Grayver
  */
 
-using namespace dealii;
 
 static const Point<2> vertices_nonaffine[] = {
   Point<2>(-1., -1.),

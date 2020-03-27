@@ -26,7 +26,6 @@
 
 // verify that all debug vectors have the correct size
 
-using namespace dealii;
 using namespace Algorithms;
 
 template <typename VectorType, int dim>

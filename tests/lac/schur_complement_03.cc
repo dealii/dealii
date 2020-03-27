@@ -59,7 +59,6 @@
 
 namespace Step22
 {
-  using namespace dealii;
   template <int dim>
   class StokesProblem
   {

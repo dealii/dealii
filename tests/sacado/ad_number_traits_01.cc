@@ -27,7 +27,6 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace dealii;
 namespace AD = Differentiation::AD;
 
 int

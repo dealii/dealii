@@ -48,7 +48,6 @@
           << var.block(1) << std::endl;
 
 
-using namespace dealii;
 
 int
 main()

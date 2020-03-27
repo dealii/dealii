@@ -46,8 +46,6 @@
 
 namespace Step48
 {
-  using namespace dealii;
-
   const unsigned int fe_degree = 4;
 
 

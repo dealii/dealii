@@ -59,8 +59,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   Functions::SlitSingularityFunction<2> exact_solution;
 
 
@@ -788,7 +786,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step39;
       initlog(__FILE__);
 

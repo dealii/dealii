@@ -73,8 +73,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -572,7 +570,6 @@ main(int argc, char *argv[])
     {
       deallog.depth_console(5);
 
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(3 /*degree*/);

@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test()

@@ -30,7 +30,6 @@
 
 #define PRINTME(name, var) deallog << "RHS vector: " << name << ": " << var;
 
-using namespace dealii;
 
 
 int

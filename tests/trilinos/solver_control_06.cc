@@ -56,7 +56,6 @@
 
 namespace LA = dealii::LinearAlgebraTrilinos;
 
-using namespace dealii;
 
 class Test_Solver_Output
 {

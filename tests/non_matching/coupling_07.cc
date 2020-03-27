@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Test that a coupling matrix can be constructed for each pair of dimension and
 // immersed dimension, and check that constants are projected correctly.

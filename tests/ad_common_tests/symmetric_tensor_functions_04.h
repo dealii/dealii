@@ -30,7 +30,6 @@
 
 #include <iostream>
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 double

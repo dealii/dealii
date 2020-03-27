@@ -46,7 +46,6 @@
 
 const double eps = 1e-10;
 
-using namespace dealii;
 
 template <int dim>
 void

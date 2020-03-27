@@ -44,7 +44,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 AffineConstraints<double>
 make_constraint_matrix(const DoFHandler<3> &dof_handler, int version)

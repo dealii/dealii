@@ -77,8 +77,6 @@
 
 namespace Maxwell
 {
-  using namespace dealii;
-
   // Dirichlet BCs / exact solution:.
   template <int dim>
   class ExactSolution : public Function<dim>

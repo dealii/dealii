@@ -38,7 +38,6 @@ plot2d([f,fs(0),fs(1),fs(2),fs(3)],[x,0,1]);
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test_1d()

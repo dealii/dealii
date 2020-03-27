@@ -24,8 +24,6 @@
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
-
   Utilities::MPI::MPI_InitFinalize init(argc, argv, 1);
 
   MPILogInitAll log;

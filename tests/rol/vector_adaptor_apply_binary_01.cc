@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Taken from deal.II's test: parallel_vector_07
 template <typename VectorType>

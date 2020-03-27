@@ -38,7 +38,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test(const double R)
@@ -88,7 +87,6 @@ test(const double R)
 }
 
 
-using namespace dealii;
 
 int
 main(int argc, char *argv[])

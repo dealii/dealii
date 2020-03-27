@@ -26,7 +26,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 using MaterialBase = TransferableQuadraturePointData;
 using QuadratureStorage =

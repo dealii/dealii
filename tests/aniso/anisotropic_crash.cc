@@ -32,7 +32,6 @@
 
 /// to generate random numbers
 
-using namespace dealii;
 
 int
 main()

@@ -46,7 +46,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 void create_coarse_grid(Triangulation<2> &coarse_grid)

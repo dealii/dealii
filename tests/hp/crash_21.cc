@@ -52,8 +52,6 @@
 
 namespace Step
 {
-  using namespace dealii;
-
   template <int dim>
   class Problem : public Subscriptor
   {
@@ -141,7 +139,6 @@ template <int dim>
 void
 test()
 {
-  using namespace dealii;
   using namespace Step;
 
   Problem<dim> problem;

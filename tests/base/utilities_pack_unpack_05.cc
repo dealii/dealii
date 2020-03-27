@@ -25,8 +25,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int N, int dim>
 void

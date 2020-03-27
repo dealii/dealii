@@ -108,7 +108,6 @@
 
 // Finally, this is as in previous
 // programs:
-using namespace dealii;
 
 
 // @sect3{The <code>LaplaceProblem</code> class template}

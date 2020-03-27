@@ -23,7 +23,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Test to check whether Zoltan PHG throws warning because
 // PHG_EDGE_SIZE_THRESHOLD value is low.

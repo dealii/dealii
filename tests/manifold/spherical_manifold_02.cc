@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 struct MappingEnum
 {
@@ -63,8 +62,6 @@ struct MappingEnum
 void
 test(MappingEnum::type mapping_name, unsigned int refinements = 1)
 {
-  using namespace dealii;
-
   deallog.depth_console(0);
 
   const unsigned int degree = 2; // Degree of shape functions

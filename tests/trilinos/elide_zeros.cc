@@ -89,8 +89,6 @@
 
 namespace LinearAdvectionTest
 {
-  using namespace dealii;
-
   template <int dim>
   class AdvectionProblem
   {
@@ -326,7 +324,6 @@ namespace LinearAdvectionTest
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
   initlog();
 
   Utilities::MPI::MPI_InitFinalize         mpi_initialization(argc, argv, 1);

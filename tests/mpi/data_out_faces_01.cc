@@ -44,8 +44,6 @@
 
 namespace pdd
 {
-  using namespace dealii;
-
   // @sect3{The <code>PDDProblem</code> class template}
 
   template <int dim>

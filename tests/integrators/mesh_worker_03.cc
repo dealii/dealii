@@ -37,7 +37,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 // Local integrators fill every matrix entry with 10*block_row + block_col
 template <int dim>

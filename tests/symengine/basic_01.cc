@@ -36,7 +36,6 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace dealii;
 namespace SE = SymEngine;
 
 SE::RCP<const SE::Number>

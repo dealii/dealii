@@ -25,7 +25,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace dealii::Physics;
 using namespace dealii::Physics::Elasticity;
 

@@ -32,7 +32,6 @@ main()
   initlog();
   deallog << std::boolalpha;
 
-  using namespace dealii;
 
   Triangulation<1> triangulation;
   GridGenerator::hyper_cube(triangulation);

@@ -45,9 +45,6 @@
 
 namespace ResFlow
 {
-  using namespace dealii;
-
-
   template <int dim>
   class FluxBoundaryValues : public Function<dim>
   {
@@ -241,7 +238,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace ResFlow;
 
       Assert(dim == 2 || dim == 3, ExcNotImplemented());

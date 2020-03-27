@@ -64,7 +64,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace LocalIntegrators;
 
 template <int dim>

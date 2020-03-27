@@ -104,7 +104,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 struct periodicity_tests

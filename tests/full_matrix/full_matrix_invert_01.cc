@@ -23,8 +23,6 @@
 #include "full_matrix_common.h"
 
 
-using namespace dealii;
-
 
 template <typename number>
 void

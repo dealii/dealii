@@ -22,7 +22,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 void
 check(const std::string &input, const std::string &expected)

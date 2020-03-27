@@ -76,8 +76,6 @@
 
 namespace Step56
 {
-  using namespace dealii;
-
   // In order to make it easy to switch between the different solvers that are
   // being used, we declare an enum that can be passed as an argument to the
   // constructor of the main class.
@@ -1128,7 +1126,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step56;
 
       const int degree = 1;

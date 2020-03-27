@@ -57,7 +57,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 void
 test(bool use_constraint_matrix)

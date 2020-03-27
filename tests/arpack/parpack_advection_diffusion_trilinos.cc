@@ -55,7 +55,6 @@
 
 const unsigned int dim = 2; // run in 2d to save time
 
-using namespace dealii;
 
 const double eps = 1e-10;
 

@@ -38,7 +38,6 @@
     deallog << "[block " << i << " ]  " << var.block(i);
 
 
-using namespace dealii;
 
 int
 main()

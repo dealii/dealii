@@ -45,7 +45,6 @@
 
 #include "../grid/mesh_3d.h"
 
-using namespace dealii;
 using namespace std;
 
 template <int dim>

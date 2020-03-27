@@ -43,7 +43,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /*
  * Call the version of make_flux_sparsity_pattern that takes both cell and face

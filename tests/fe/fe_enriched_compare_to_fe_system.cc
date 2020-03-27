@@ -57,7 +57,6 @@ const double eps = 1e-10;
 // in the same way for FE_System and FEEnriched.
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 template <int dim>
 class EnrichmentFunction : public Function<dim>

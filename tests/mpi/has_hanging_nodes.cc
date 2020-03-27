@@ -60,7 +60,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 //#define DISTRIBUTED
 

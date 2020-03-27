@@ -48,7 +48,6 @@
     deallog << "RHS vector: " << name << ": " << str << std::endl; \
   }
 
-using namespace dealii;
 
 
 int

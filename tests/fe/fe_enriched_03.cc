@@ -44,7 +44,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class EnrichmentFunction : public Function<dim>

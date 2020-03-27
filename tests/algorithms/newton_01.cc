@@ -24,7 +24,6 @@
 
 // test computing square root of 2 with newton's method
 
-using namespace dealii;
 
 class SquareRoot : public Subscriptor
 {

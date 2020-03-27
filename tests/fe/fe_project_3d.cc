@@ -51,7 +51,6 @@
  * Alexander Grayver, Maien Hamed
  */
 
-using namespace dealii;
 
 static const Point<3> vertices_affine[] = {
   Point<3>(-1., -1., -1.), Point<3>(0., -1., -1.),  Point<3>(1., -1., -1.),

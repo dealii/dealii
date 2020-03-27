@@ -45,7 +45,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 static const types::manifold_id circular_manifold_id = 1;
 static const types::manifold_id straight_manifold_id = 3;

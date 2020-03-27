@@ -66,7 +66,6 @@
 #include "../tests.h"
 namespace Step44
 {
-  using namespace dealii;
   namespace AD = dealii::Differentiation::AD;
   namespace Parameters
   {

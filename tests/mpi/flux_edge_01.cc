@@ -62,8 +62,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   template <int dim>
   class InteriorPenaltyProblem
   {
@@ -210,7 +208,6 @@ namespace Step39
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step39;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

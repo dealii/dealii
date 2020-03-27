@@ -32,7 +32,6 @@
 int
 main()
 {
-  using namespace dealii;
   initlog();
 
   // test the internal cross derivative function: the stencil should be order 2.
