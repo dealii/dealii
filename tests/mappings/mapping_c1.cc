@@ -100,7 +100,7 @@ main()
           // there should now be two
           // normal vectors, one for
           // each vertex of the face
-          Assert(c1_values.get_all_normal_vectors().size() == 2,
+          Assert(c1_values.get_normal_vectors().size() == 2,
                  ExcInternalError());
 
           // check that these two

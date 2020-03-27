@@ -190,7 +190,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
                   if (update_flags & update_normal_vectors)
                     data.patch_values_scalar.normals =
-                      this_fe_patch_values.get_all_normal_vectors();
+                      this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandlerType::active_cell_iterator dh_cell(
                     &cell_and_face->first->get_triangulation(),
@@ -234,7 +234,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
 
                   if (update_flags & update_normal_vectors)
                     data.patch_values_system.normals =
-                      this_fe_patch_values.get_all_normal_vectors();
+                      this_fe_patch_values.get_normal_vectors();
 
                   const typename DoFHandlerType::active_cell_iterator dh_cell(
                     &cell_and_face->first->get_triangulation(),

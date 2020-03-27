@@ -6403,9 +6403,8 @@ namespace VectorTools
       // the boundary function times the normal components of the shape
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec(first_vector_component);
-      const FiniteElement<2> &         fe = cell->get_fe();
-      const std::vector<Tensor<1, 2>> &normals =
-        fe_values.get_all_normal_vectors();
+      const FiniteElement<2> &         fe      = cell->get_fe();
+      const std::vector<Tensor<1, 2>> &normals = fe_values.get_normal_vectors();
       const unsigned int
                                   face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1,
                                                                       1,
@@ -6506,9 +6505,8 @@ namespace VectorTools
       // the boundary function times the normal components of the shape
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec(first_vector_component);
-      const FiniteElement<3> &         fe = cell->get_fe();
-      const std::vector<Tensor<1, 3>> &normals =
-        fe_values.get_all_normal_vectors();
+      const FiniteElement<3> &         fe      = cell->get_fe();
+      const std::vector<Tensor<1, 3>> &normals = fe_values.get_normal_vectors();
       const unsigned int
         face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {
           {1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
