@@ -440,13 +440,6 @@ namespace Utilities
       /**
        * Return the MPI communicator underlying the partitioner object.
        */
-      DEAL_II_DEPRECATED
-      const MPI_Comm &
-      get_communicator() const;
-
-      /**
-       * Return the MPI communicator underlying the partitioner object.
-       */
       virtual const MPI_Comm &
       get_mpi_communicator() const override;
 
@@ -940,14 +933,6 @@ namespace Utilities
       // class instead of Utilities::MPI::n_mpi_processes() in order to make
       // this query also work when MPI is not initialized.
       return n_procs;
-    }
-
-
-
-    inline const MPI_Comm &
-    Partitioner::get_communicator() const
-    {
-      return communicator;
     }
 
 
