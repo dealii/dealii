@@ -411,7 +411,9 @@ no-penetration condition on the cylinder walls, the flow that
 initially impinges head-on onto to cylinder has to rearrange,
 which creates a big sound wave. The following pictures show the pressure at
 times 0.1, 0.25, 0.5, and 1.0 (top left to bottom right) for the 2D case with
-5 levels of global refinement. We clearly see the discontinuity that
+5 levels of global refinement, using 102,400 cells with polynomial degree of
+5 and 14.7 million degrees of freedom over all 4 solution variables.
+We clearly see the discontinuity that
 propagates slowly in the upstream direction and more quickly in downstream
 direction in the first snapshot at time 0.1. At time 0.25, the sound wave has
 reached the top and bottom walls and reflected back to the interior. From the
@@ -441,7 +443,8 @@ many sound waves all over the place.
 </table>
 
 The next picture shows an elevation plot of the pressure at time 1.0 looking
-from the channel inlet towards the outlet -- here, we can see the large number
+from the channel inlet towards the outlet at the same resolution -- here,
+we can see the large number
 of reflections. In the figure, two types of waves are visible. The
 larger-amplitude waves correspond to various reflections that happened as the
 initial discontinuity hit the walls, whereas the small-amplitude waves of
@@ -453,8 +456,8 @@ the result of the transport accuracy of the high-order DG method.
 
 <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
 
-With 2 levels of global refinement, the mesh and its partitioning on 40 MPI
-processes looks as follows:
+With 2 levels of global refinement with 1,600 cells, the mesh and its
+partitioning on 40 MPI processes looks as follows:
 
 <img src="https://www.dealii.org/images/steps/developer/step-67.grid-owner.png" alt="" width="70%">
 
@@ -708,9 +711,8 @@ error can give rise to an increase in the numerical energy and eventually
 render the discretization unstable. This is because of the inexact numerical
 integration of the terms in the Euler equations, which both contain rational
 nonlinearities and higher-degree content from curved cells. A way out of this
-dilemma are so-called skew-symmetric formulations, see e.g. <a
-href=https://doi.org/10.1137%2F120890144>Gassner (2013)</a> for a simple
-variant. Skew symmetry means that switching the role of the solution
+dilemma are so-called skew-symmetric formulations, see @cite Gassner2013 for a
+simple variant. Skew symmetry means that switching the role of the solution
 $\mathbf{w}$ and test functions $\mathbf{v}$ in the weak form produces the
 exact negative of the original quantity, apart from some boundary terms. In
 the discrete setting, the challenge is to keep this skew symmetry also when

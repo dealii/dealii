@@ -388,8 +388,8 @@ dimensionless number $\mathrm{Cr}$ denotes the Courant number and can be
 chosen up to a maximally stable number $\mathrm{Cr}_\text{max}$, whose value
 depends on the selected time stepping method and its stability properties. The
 power $p^{1.5}$ used for the polynomial scaling is heuristic and represents
-the closest fit for polynomial degrees between 1 and 8, see e.g.  @cite
-SchoederKormann2018. In the limit of higher degrees, $p>10$, a scaling of
+the closest fit for polynomial degrees between 1 and 8, see e.g.
+@cite SchoederKormann2018. In the limit of higher degrees, $p>10$, a scaling of
 $p^2$ is more accurate, related to the inverse estimates typically used for
 interior penalty methods. Regarding the <i>effective</i> mesh sizes $h_u$ and
 $h_c$ used in the formula, we note that the convective transport is
