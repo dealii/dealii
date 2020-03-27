@@ -130,6 +130,7 @@ fraction of data can indeed be delivered from caches for the 9.4 million DoFs
 case. For the larger case, even with optimal caching less than 10 percent of
 data would fit into caches, with an associated loss in performance.
 
+
 <h3>Convergence rates for the analytical test case</h3>
 
 For the modified Lax--Friedrichs flux and measuring the error in the momentum
@@ -374,7 +375,10 @@ If we switch to the Harten-Lax-van Leer flux, the results are as follows:
 The tables show that we get optimal $\mathcal O\left(h^{p+1}\right)$
 convergence rates for both numerical fluxes. The errors are slighly smaller
 for the Lax--Friedrichs flux for $p=2$, but the picture is reversed for
-$p=3$. For $p=5$, we reach the roundoff accuracy of $10^{-11}$ with both
+$p=3$; in any case, the differences on this testcase are relatively
+small.
+
+For $p=5$, we reach the roundoff accuracy of $10^{-11}$ with both
 fluxes on the finest grids. Also note that the errors are absolute with a
 domain length of $10^2$, so relative errors are below $10^{-12}$. The HLL flux
 is somewhat better for the highest degree, which is due to a slight inaccuracy
@@ -392,20 +396,26 @@ volume case ($p=0$). Thus, any case that leads to shocks in the solution
 necessitates some form of limiting or artificial dissipation. For another
 alternative, see the step-69 tutorial program.
 
+
 <h3>Results for flow in channel around cylinder in 2D</h3>
 
 For the test case of the flow around a cylinder in a channel, we need to
-change the first code line to `constexpr unsigned int testcase = 1;`.  This
-test case starts with a background field of a constant velocity of Ma=0.31 and
-density around an obstacle in the form of a cylinder. Since we impose a
-no-penetration condition on the cylinder walls, the flow has to rearrange,
+change the first code line to
+@code
+  constexpr unsigned int testcase = 1;
+@endcode
+This test case starts with a background field of a constant velocity
+of Mach number 0.31 and a constant initial density; the flow will have
+to go around an obstacle in the form of a cylinder. Since we impose a
+no-penetration condition on the cylinder walls, the flow that
+initially impinges head-on onto to cylinder has to rearrange,
 which creates a big sound wave. The following pictures show the pressure at
 times 0.1, 0.25, 0.5, and 1.0 (top left to bottom right) for the 2D case with
 5 levels of global refinement. We clearly see the discontinuity that
 propagates slowly in the upstream direction and more quickly in downstream
 direction in the first snapshot at time 0.1. At time 0.25, the sound wave has
 reached the top and bottom walls and reflected back to the interior. From the
-different position of the reflected waves from lower and upper walls we can
+different distances of the reflected waves from lower and upper walls we can
 see the slight asymmetry of the Sch&auml;fer-Turek test case represented by
 GridGenerator::channel_with_cylinder() with somewhat more space above the
 cylinder compared to below. At later times, the picture is more chaotic with
@@ -434,8 +444,8 @@ The next picture shows an elevation plot of the pressure at time 1.0 looking
 from the channel inlet towards the outlet -- here, we can see the large number
 of reflections. In the figure, two types of waves are visible. The
 larger-amplitude waves correspond to various reflections that happened as the
-initial discontinuity hit the walls, whereas the small-amplitude waves of the
-size similar to the elements correspond to numerical artifacts. They have the
+initial discontinuity hit the walls, whereas the small-amplitude waves of
+size similar to the elements correspond to numerical artifacts. They have their
 origin in the finite resolution of the scheme and appear as the discontinuity
 travels through elements with high-order polynomials. This effect can be cured
 by increasing resolution. Apart from this effect, the rich wave structure is
@@ -484,11 +494,11 @@ Time:       2, dt:  5.7e-05, norm rho:    0.01432, rho * u:    0.03969, energy: 
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
 
-We note that the norms we print for the various quantities are the deviations
-$\rho'$, $(\rho u)'$, and $E'$ against the background field which is the
-initial condition. The distribution of run time is overall similar as in the
+The norms shown here for the various quantities are the deviations
+$\rho'$, $(\rho u)'$, and $E'$ against the background field (namely, the
+initial condition). The distribution of run time is overall similar as in the
 previous test case. The only slight difference is the larger proportion of
-time spent in L_h as compared to the inverse mass matrix and vector
+time spent in $\mathcal L_h$ as compared to the inverse mass matrix and vector
 updates. This is because the geometry is deformed and the matrix-free
 framework needs to load additional arrays for the geometry from memory that
 are compressed in the affine mesh case.
@@ -515,32 +525,34 @@ Number of degrees of freedom: 14,745,600 ( = 4 [vars] x 102,400 [cells] x 36 [do
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
 
-The effect on performance is similar as for the analytical test case -- in
+The effect on performance is similar to the analytical test case -- in
 theory, computation times should increase by a factor of 8, but we actually
 see an increase by a factor of 11 for the time steps (219.5 seconds versus
 2450 seconds). This can be traced back to caches, with the small case mostly
 fitting in caches. An interesting effect, typical of programs with a mix of
-local communication (integrals L_h) and global communication (computation of
+local communication (integrals $\mathcal L_h$) and global communication (computation of
 transport speed) with some load imbalance, can be observed by looking at the
-MPI rank that measure the minimal and maximal time of different phases,
+MPI ranks that encounter the minimal and maximal time of different phases,
 respectively. Rank 0 reports the fastest throughput for the "rk time stepping
 total" part. At the same time, it appears to be slowest for the "compute
-transport speed" part, more almost a factor of 2 slower than the
-average. Since the latter involves global communication, we can attribute the
+transport speed" part, almost a factor of 2 slower than the
+average and almost a factor of 4 compared to the faster rank.
+Since the latter involves global communication, we can attribute the
 slowness in this part to the fact that the local Runge--Kutta stages have
 advanced more quickly on this rank and need to wait until the other processors
 catch up. At this point, one can wonder about the reason for this imbalance:
-The number of cells is almost the same on all MPI processes due to the default
-weights. However, the matrix-free framework is faster on affine and Cartesian
+The number of cells is almost the same on all MPI processes.
+However, the matrix-free framework is faster on affine and Cartesian
 cells located towards the outlet of the channel, to which the lower MPI ranks
 are assigned. On the other hand, rank 32, which reports the highest run time
 for the Runga--Kutta stages, owns the curved cells near the cylinder, for
 which no data compression is possible. To improve throughput, we could assign
-different weights to different cell types, or even measure the run time for a
+different weights to different cell types when partitioning the
+parallel::distributed::Triangulation object, or even measure the run time for a
 few time steps and try to rebalance then.
 
 The throughput per Runge--Kutta stage can be computed to 2085 MDoFs/s for the
-14.7 million DoFs test case over 346k Runge--Kutta stages, slightly slower
+14.7 million DoFs test case over the 346,000 Runge--Kutta stages, slightly slower
 than the Cartesian mesh throughput of 2360 MDoFs/s reported above.
 
 Finally, if we add one additional refinement, we record the following output:
@@ -570,8 +582,10 @@ Time:       2, dt:  1.4e-05, norm rho:    0.01431, rho * u:    0.03969, energy: 
 
 The "rk time stepping total" part corresponds to a throughput of 2010 MDoFs/s. The
 overall run time to perform 139k time steps is 20k seconds (5.7 hours) or 7
-time steps per second. More throughput can be achieved by adding more cores to
+time steps per second -- not so bad for having nearly 60 million
+unknowns. More throughput can be achieved by adding more cores to
 the computation.
+
 
 <h3>Results for flow in channel around cylinder in 3D</h3>
 
@@ -609,7 +623,7 @@ n_\mathrm{dofs}}{t_\mathrm{compute}} =
 \frac{17723 \cdot 5 \cdot 221.2\,\text{M}}{15580s} = 1258\, \text{MDoFs/s}.
 @f]
 
-The throughput is lower than in 2D because the computation of the $L_h$ term
+The throughput is lower than in 2D because the computation of the $\mathcal L_h$ term
 is more expensive. This is due to over-integration with `degree+2` points and
 the larger fraction of face integrals (worse volume-to-surface ratio) with
 more expensive flux computations. If we only consider the inverse mass matrix
@@ -646,6 +660,9 @@ Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy: 
 | rk_stage - inv mass + vec upd |    176750 |      7004s    99 | 1.207e+04s |  1.55e+04s   132 |
 +-------------------------------------------+------------------+------------+------------------+
 @endcode
+This simulation had nearly 2 billion unknowns -- quite a large
+computation indeed, and still only needed around 1.5 seconds per time
+step.
 
 
 <h3>Possibilities for extensions</h3>
@@ -653,11 +670,12 @@ Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy: 
 The code presented here straight-forwardly extends to adaptive meshes, given
 appropriate indicators for setting the refinement flags. Large-scale
 adaptivity of a similar solver in the context of the acoustic wave equation
-has been derived by the <a href="https://github.com/kronbichler/exwave">exwave
-project</a>. However, in the present context the effect of adaptivity is often
+has been achieved by the <a href="https://github.com/kronbichler/exwave">exwave
+project</a>. However, in the present context, the benefits of adaptivity are often
 limited to early times and effects close to the origin of sound waves, as the
 waves eventually reflect and diffract. This leads to steep gradients all over
-the place, similar to turbulent flow.
+the place, similar to turbulent flow, and a more or less globally
+refined mesh.
 
 Another topic that we did not discuss in the results section is a comparison
 of different time integration schemes. The program provides four variants of
@@ -670,6 +688,7 @@ variants proposed here with standard Runge--Kutta integrators or to use vector
 operations that are run separate from the mass matrix operation and compare
 performance.
 
+
 <h4>More advanced numerical flux functions and skew-symmetric formulations</h4>
 
 As mentioned in the introduction, the modified Lax--Friedrichs flux and the
@@ -678,7 +697,7 @@ numerical fluxes available in the literature on the Euler equations. One
 example is the HLLC flux (Harten-Lax-van Leer-Contact) flux which adds the
 effect of rarefaction waves missing in the HLL flux, or the Roe flux. As
 mentioned in the introduction, the effect of numerical fluxes on high-order DG
-schemes is debatable.
+schemes is debatable (unlike for the case of low-order discretizations).
 
 A related improvement to increase the stability of the solver is to also
 consider the spatial integral terms. A shortcoming in the rather naive
@@ -704,6 +723,7 @@ convective form $(\mathbf v, \tilde{\mathbf{F}}(\mathbf w)\nabla
 the equation and the integration formula, and can in some cases by understood
 by special skew-symmetric finite difference schemes.
 
+
 <h4>Equipping the code for supersonic calculations</h4>
 
 As mentioned in the introduction, the solution to the Euler equations develops
@@ -711,7 +731,7 @@ shocks as the Mach number increases, which require additional mechanisms to
 stabilize the scheme, e.g. in the form of limiters. The main challenge besides
 actually implementing the limiter or artificial viscosity approach would be to
 load-balance the computations, as the additional computations involved for
-limiting the oscillations in troubled cells would make them heavier than the
+limiting the oscillations in troubled cells would make them more expensive than the
 plain DG cells without limiting. Furthermore, additional numerical fluxes that
 better cope with the discontinuities would also be an option.
 
@@ -753,7 +773,8 @@ quadrature points) or by a vector similar to the solution. Based on that
 vector, we would create an additional FEEvaluation object to read from it and
 provide the values of the field at quadrature points. If the background
 velocity is zero and the density is constant, the linearized Euler equations
-further simplify to the acoustic wave equation.
+further simplify and can equivalently be written in the form of the
+acoustic wave equation.
 
 A challenge in the context of sound propagation is often the definition of
 boundary conditions, as the computational domain needs to be of finite size,
@@ -762,14 +783,17 @@ larger) physical domain. Conventional Dirichlet or Neumann boundary conditions
 give rise to reflections of the sound waves that eventually propagate back to
 the region of interest and spoil the solution. Therefore, various variants of
 non-reflecting boundary conditions or sponge layers, often in the form of
-perfectly matched layers -- where the solution is damped without reflection --
-are common.
+<a
+href="https://en.wikipedia.org/wiki/Perfectly_matched_layer">perfectly
+matched layers</a> -- where the solution is damped without reflection
+-- are common.
+
 
 <h4>Extension to the compressible Navier-Stokes equation</h4>
 
 The solver presented in this tutorial program can also be extended to the
 compressible Navier--Stokes equations by adding viscous terms, as described in
 @cite FehnWallKronbichler2019. To keep as much of the performance obtained
-here despite the additional cost of elliptic terms e.g. via an interior
+here despite the additional cost of elliptic terms, e.g. via an interior
 penalty method, one can switch the basis from FE_DGQ to FE_DGQHermite like in
 the step-59 tutorial program.
