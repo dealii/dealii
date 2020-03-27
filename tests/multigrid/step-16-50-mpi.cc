@@ -454,12 +454,8 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(

@@ -51,7 +51,7 @@ do_test()
 
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
 
   Vector<double> global_dof_vector(dof_handler.n_dofs());
   VectorTools::interpolate(dof_handler,

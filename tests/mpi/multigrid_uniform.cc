@@ -410,13 +410,8 @@ namespace Step50
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
-    mg.set_debug(2);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(

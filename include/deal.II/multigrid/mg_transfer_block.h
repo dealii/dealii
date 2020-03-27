@@ -75,15 +75,6 @@ public:
   MGTransferBlockBase(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
-   * Constructor with constraint matrices as well as mg_constrained_dofs.
-   *
-   * @deprecated @p constraints is unused.
-   */
-  DEAL_II_DEPRECATED
-  MGTransferBlockBase(const AffineConstraints<double> &constraints,
-                      const MGConstrainedDoFs &        mg_constrained_dofs);
-
-  /**
    * Memory used by this object.
    */
   std::size_t
@@ -351,15 +342,6 @@ public:
    * Constructor with constraint matrices as well as mg_constrained_dofs.
    */
   MGTransferBlockSelect(const MGConstrainedDoFs &mg_constrained_dofs);
-
-  /**
-   * Constructor with constraint matrices as well as mg_constrained_dofs.
-   *
-   * @deprecated @p constraints is unused.
-   */
-  DEAL_II_DEPRECATED
-  MGTransferBlockSelect(const AffineConstraints<double> &constraints,
-                        const MGConstrainedDoFs &        mg_constrained_dofs);
 
   /**
    * Destructor.

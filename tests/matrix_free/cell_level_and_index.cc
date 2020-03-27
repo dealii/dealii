@@ -97,7 +97,7 @@ test(const bool adaptive_ref = true)
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
 
   AffineConstraints<double> constraints;
   constraints.close();

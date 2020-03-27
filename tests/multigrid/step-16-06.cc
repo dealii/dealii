@@ -374,7 +374,7 @@ void
 LaplaceProblem<dim>::solve()
 {
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> mg_transfer(
-    hanging_node_constraints, mg_constrained_dofs);
+    mg_constrained_dofs);
   mg_transfer.build(mg_dof_handler);
 
   SolverControl coarse_solver_control(1000, 1e-10, false, false);

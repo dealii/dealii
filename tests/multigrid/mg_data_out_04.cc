@@ -50,7 +50,7 @@ do_test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
 
   // Make FE vector
   IndexSet locally_relevant_dofs;
