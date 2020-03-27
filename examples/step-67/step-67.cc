@@ -710,17 +710,16 @@ namespace Euler_DG
     void reinit(const Mapping<dim> &   mapping,
                 const DoFHandler<dim> &dof_handler);
 
-    void
-    set_inflow_boundary(const types::boundary_id              boundary_id,
-                        const std::shared_ptr<Function<dim>> &inflow_function);
+    void set_inflow_boundary(const types::boundary_id       boundary_id,
+                             std::unique_ptr<Function<dim>> inflow_function);
 
     void set_subsonic_outflow_boundary(
-      const types::boundary_id              boundary_id,
-      const std::shared_ptr<Function<dim>> &outflow_energy);
+      const types::boundary_id       boundary_id,
+      std::unique_ptr<Function<dim>> outflow_energy);
 
     void set_wall_boundary(const types::boundary_id boundary_id);
 
-    void set_body_force(const std::shared_ptr<Function<dim>> &body_force);
+    void set_body_force(std::unique_ptr<Function<dim>> body_force);
 
     void apply(const double                                      current_time,
                const LinearAlgebra::distributed::Vector<Number> &src,
@@ -753,12 +752,12 @@ namespace Euler_DG
 
     TimerOutput &timer;
 
-    std::map<types::boundary_id, std::shared_ptr<Function<dim>>>
+    std::map<types::boundary_id, std::unique_ptr<Function<dim>>>
       inflow_boundaries;
-    std::map<types::boundary_id, std::shared_ptr<Function<dim>>>
+    std::map<types::boundary_id, std::unique_ptr<Function<dim>>>
                                    subsonic_outflow_boundaries;
     std::set<types::boundary_id>   wall_boundaries;
-    std::shared_ptr<Function<dim>> body_force;
+    std::unique_ptr<Function<dim>> body_force;
 
     void local_apply_inverse_mass_matrix(
       const MatrixFree<dim, Number> &                   data,
@@ -873,8 +872,8 @@ namespace Euler_DG
   // boundary to both an inflow and say a subsonic outflow.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::set_inflow_boundary(
-    const types::boundary_id              boundary_id,
-    const std::shared_ptr<Function<dim>> &inflow_function)
+    const types::boundary_id       boundary_id,
+    std::unique_ptr<Function<dim>> inflow_function)
   {
     AssertThrow(subsonic_outflow_boundaries.find(boundary_id) ==
                     subsonic_outflow_boundaries.end() &&
@@ -885,13 +884,13 @@ namespace Euler_DG
                            "it as inflow"));
     AssertThrow(inflow_function->n_components == dim + 2,
                 ExcMessage("Expected function with dim+2 components"));
-    inflow_boundaries[boundary_id] = inflow_function;
+    inflow_boundaries[boundary_id] = std::move(inflow_function);
   }
 
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::set_subsonic_outflow_boundary(
-    const types::boundary_id              boundary_id,
-    const std::shared_ptr<Function<dim>> &outflow_function)
+    const types::boundary_id       boundary_id,
+    std::unique_ptr<Function<dim>> outflow_function)
   {
     AssertThrow(inflow_boundaries.find(boundary_id) ==
                     inflow_boundaries.end() &&
@@ -902,7 +901,7 @@ namespace Euler_DG
                            "it as subsonic outflow"));
     AssertThrow(outflow_function->n_components == dim + 2,
                 ExcMessage("Expected function with dim+2 components"));
-    subsonic_outflow_boundaries[boundary_id] = outflow_function;
+    subsonic_outflow_boundaries[boundary_id] = std::move(outflow_function);
   }
 
   template <int dim, int degree, int n_points_1d>
@@ -922,10 +921,10 @@ namespace Euler_DG
 
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::set_body_force(
-    const std::shared_ptr<Function<dim>> &body_force)
+    std::unique_ptr<Function<dim>> body_force)
   {
     AssertDimension(body_force->n_components, dim);
-    this->body_force = body_force;
+    this->body_force = std::move(body_force);
   }
 
 
@@ -1950,20 +1949,20 @@ namespace Euler_DG
         triangulation.refine_global(2);
 
         euler_operator.set_inflow_boundary(
-          0, std::make_shared<ExactSolution<dim>>(0));
+          0, std_cxx14::make_unique<ExactSolution<dim>>(0));
       }
     else if (testcase == 1)
       {
         GridGenerator::channel_with_cylinder(triangulation, 0.03, 1, 0, true);
         euler_operator.set_inflow_boundary(
-          0, std::make_shared<ExactSolution<dim>>(0));
+          0, std_cxx14::make_unique<ExactSolution<dim>>(0));
         euler_operator.set_subsonic_outflow_boundary(
-          1, std::make_shared<ExactSolution<dim>>(0));
+          1, std_cxx14::make_unique<ExactSolution<dim>>(0));
         euler_operator.set_wall_boundary(2);
         euler_operator.set_wall_boundary(3);
         if (dim == 3)
           euler_operator.set_body_force(
-            std::make_shared<Functions::ConstantFunction<dim>>(
+            std_cxx14::make_unique<Functions::ConstantFunction<dim>>(
               std::vector<double>({0., 0., -0.2})));
       }
 
