@@ -812,8 +812,8 @@ namespace Utilities
     get_cpu_load();
 
     /**
-     * Return the current level of vectorization as described by
-     * DEAL_II_COMPILER_VECTORIZATION_LEVEL in vectorization.h as a string. The
+     * Return the instruction set extension for vectorization as described by
+     * DEAL_II_VECTORIZATION_WIDTH_IN_BITS in vectorization.h as a string. The
      * list of possible return values is:
      *
      * <table>
@@ -829,7 +829,7 @@ namespace Utilities
      * </tr>
      * <tr>
      *   <td>1</td>
-     *   <td>SSE2</td>
+     *   <td>SSE2/AltiVec</td>
      *   <td>128</td>
      * </tr>
      * <tr>

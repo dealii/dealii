@@ -1827,7 +1827,7 @@ namespace internal
                             const unsigned int *                 indices,
                             Number *                             dst_ptr)
   {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
     for (unsigned int v = 0; v < width; ++v)
       dst_ptr[indices[v]] += src[v];
 #else

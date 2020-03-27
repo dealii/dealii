@@ -44,18 +44,17 @@ test()
   do_test<dim, fe_degree, fe_degree + 1, double, VectorizedArray<double, 1>>(
     dof, constraints, true);
 
-#if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
-  (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
   do_test<dim, fe_degree, fe_degree + 1, double, VectorizedArray<double, 2>>(
     dof, constraints, true);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
   do_test<dim, fe_degree, fe_degree + 1, double, VectorizedArray<double, 4>>(
     dof, constraints, true);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
   do_test<dim, fe_degree, fe_degree + 1, double, VectorizedArray<double, 8>>(
     dof, constraints, true);
 #endif

@@ -30,31 +30,25 @@ static_assert(std::is_standard_layout<VectorizedArray<float>>::value &&
                 std::is_trivial<VectorizedArray<float>>::value,
               "VectorizedArray<float> must be a POD type");
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && !defined(DEAL_II_MSVC)
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+// For the specializations of VectorizedArray, we need to instantiate the
+// static constexpr variable for some compilers. On the other hand, MSCV wants
+// us explicitly to not do so, otherwise we get: "error C2908: explicit
+// specialization 'const unsigned int
+// dealii::VectorizedArray<double, 2>::n_array_elements' has already been
+// instantiated".
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && !defined(DEAL_II_MSVC)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
 const unsigned int VectorizedArray<double, 8>::n_array_elements;
-#  endif
-
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
-const unsigned int VectorizedArray<double, 4>::n_array_elements;
-#  endif
-
-#  if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
-    (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
-const unsigned int VectorizedArray<double, 2>::n_array_elements;
-#  endif
-
-
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
 const unsigned int VectorizedArray<float, 16>::n_array_elements;
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
+const unsigned int VectorizedArray<double, 4>::n_array_elements;
 const unsigned int VectorizedArray<float, 8>::n_array_elements;
 #  endif
 
-#  if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
-    (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
+const unsigned int VectorizedArray<double, 2>::n_array_elements;
 const unsigned int VectorizedArray<float, 4>::n_array_elements;
 #  endif
 #endif

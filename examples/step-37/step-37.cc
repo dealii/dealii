@@ -1157,8 +1157,7 @@ namespace Step37
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl;
     }
 

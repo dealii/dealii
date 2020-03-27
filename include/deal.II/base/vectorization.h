@@ -26,30 +26,35 @@
 #include <cmath>
 
 // Note:
-// The flag DEAL_II_COMPILER_VECTORIZATION_LEVEL is essentially constructed
+// The flag DEAL_II_VECTORIZATION_WIDTH_IN_BITS is essentially constructed
 // according to the following scheme (on x86-based architectures)
 // #ifdef __AVX512F__
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 512
 // #elif defined (__AVX__)
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 2
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 256
 // #elif defined (__SSE2__)
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 1
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128
 // #else
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0
 // #endif
-// In addition to checking the flags __AVX__ and __SSE2__, a CMake test,
-// 'check_01_cpu_features.cmake', ensures that these feature are not only
+// In addition to checking the flags __AVX512F__, __AVX__ and __SSE2__, a CMake
+// test, 'check_01_cpu_features.cmake', ensures that these feature are not only
 // present in the compilation unit but also working properly.
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
-    !defined(__AVX__)
+// These error messages try to detect the case that deal.II was compiled with
+// a wider instruction set extension as the current compilation unit, for
+// example because deal.II was compiled with AVX, but a user project does not
+// add -march=native or similar flags, making it fall to SSE2. This leads to
+// very strange errors as the size of data structures differs between the
+// compiled deal.II code sitting in libdeal_II.so and the user code if not
+// detected.
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && !defined(__AVX__)
 #    error \
       "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
-    !defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && !defined(__AVX512F__)
 #    error \
       "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
@@ -927,7 +932,7 @@ vectorized_transpose_and_store(const bool                            add_into,
 // for safety, also check that __AVX512F__ is defined in case the user manually
 // set some conflicting compile flags which prevent compilation
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX-512.
@@ -2131,7 +2136,7 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX.
@@ -3191,7 +3196,7 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
@@ -4115,9 +4120,9 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 
 
-#  endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
+#  endif // if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0 && defined(__SSE2__)
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && \
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__) && \
     defined(__VSX__)
 
 template <>
@@ -4981,7 +4986,7 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
  */
 enum class SIMDComparison : int
 {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
   equal                 = _CMP_EQ_OQ,
   not_equal             = _CMP_NEQ_OQ,
   less_than             = _CMP_LT_OQ,
@@ -5118,7 +5123,7 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
 //@}
 
 #ifndef DOXYGEN
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 16>
@@ -5152,7 +5157,7 @@ compare_and_apply_mask(const VectorizedArray<double, 8> &left,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 8>
@@ -5189,7 +5194,7 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>

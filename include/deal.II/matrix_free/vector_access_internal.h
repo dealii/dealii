@@ -460,7 +460,7 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, true>) const
     {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access(vec, indices[v] + constant_offset) += res[v];
 #else
