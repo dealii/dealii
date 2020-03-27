@@ -109,7 +109,7 @@
 // ParameterAcceptor. This facilitates the population of all the global
 // parameters into a single (global) ParameterHandler. More explanations
 // about the use of inheritance from ParameterAcceptor as a global
-// subscription mechanism can be found in step-59.
+// subscription mechanism can be found in step-60.
 namespace Step69
 {
   using namespace dealii;
