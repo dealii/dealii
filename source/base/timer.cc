@@ -261,22 +261,6 @@ Timer::last_cpu_time() const
 
 
 double
-Timer::get_lap_time() const
-{
-  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
-}
-
-
-
-double
-Timer::operator()() const
-{
-  return cpu_time();
-}
-
-
-
-double
 Timer::wall_time() const
 {
   wall_clock_type::duration current_elapsed_wall_time;
@@ -571,7 +555,7 @@ TimerOutput::print_summary() const
       if (output_type != wall_times)
         {
           double total_cpu_time =
-            Utilities::MPI::sum(timer_all(), mpi_communicator);
+            Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
 
           // check that the sum of all times is less or equal than the total
           // time. otherwise, we might have generated a lot of overhead in this
@@ -732,7 +716,7 @@ TimerOutput::print_summary() const
     {
       const double total_wall_time = timer_all.wall_time();
       double       total_cpu_time =
-        Utilities::MPI::sum(timer_all(), mpi_communicator);
+        Utilities::MPI::sum(timer_all.cpu_time(), mpi_communicator);
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.

@@ -43,7 +43,7 @@ main()
   Timer t;
   burn(50);
 
-  double s1 = t();
+  double s1 = t.cpu_time();
 
   if (s1 > 0.)
     deallog << "OK" << std::endl;
@@ -52,7 +52,7 @@ main()
 
   burn(50);
   t.stop();
-  double s2 = t();
+  double s2 = t.cpu_time();
 
   if (s2 > s1)
     deallog << "OK" << std::endl;
@@ -60,7 +60,7 @@ main()
     deallog << "ERROR - s2 should be greater than s1" << std::endl;
 
   burn(50);
-  double s3 = t();
+  double s3 = t.cpu_time();
 
   if (s3 == s2)
     deallog << "OK" << std::endl;
@@ -69,7 +69,7 @@ main()
 
   t.start();
   burn(50);
-  double s4 = t();
+  double s4 = t.cpu_time();
 
   if (s4 > s3)
     deallog << "OK" << std::endl;
@@ -79,7 +79,7 @@ main()
   t.stop();
   t.reset();
   burn(50);
-  double s5 = t();
+  double s5 = t.cpu_time();
 
   if (s5 == 0.)
     deallog << "OK" << std::endl;
@@ -90,7 +90,7 @@ main()
   burn(50);
   t.reset();
   burn(50);
-  double s6 = t();
+  double s6 = t.cpu_time();
 
   if (s6 == 0.)
     deallog << "OK" << std::endl;
