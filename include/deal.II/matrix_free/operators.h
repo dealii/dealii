@@ -1048,7 +1048,7 @@ namespace MatrixFreeOperators
                                             fe_degree,
                                             n_components,
                                             VectorizedArrayType>::
-      apply(fe_eval.get_shape_info().inverse_shape_values_eo,
+      apply(fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
             inverse_coefficients,
             n_actual_components,
             in_array,
@@ -1077,7 +1077,7 @@ namespace MatrixFreeOperators
                                             n_components,
                                             VectorizedArrayType>::
       transform_from_q_points_to_basis(
-        fe_eval.get_shape_info().inverse_shape_values_eo,
+        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
         n_actual_components,
         in_array,
         out_array);

@@ -3366,7 +3366,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(scratch_data_array != nullptr, ExcInternalError());
 
   const unsigned int tensor_dofs_per_component =
-    Utilities::fixed_power<dim>(this->data->fe_degree + 1);
+    Utilities::fixed_power<dim>(this->data->data.front().fe_degree + 1);
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   const unsigned int n_quadrature_points =
@@ -6654,7 +6654,8 @@ FEEvaluation<dim,
   // print error message when the dimensions do not match. Propose a possible
   // fix
   if ((static_cast<unsigned int>(fe_degree) != numbers::invalid_unsigned_int &&
-       static_cast<unsigned int>(fe_degree) != this->data->fe_degree) ||
+       static_cast<unsigned int>(fe_degree) !=
+         this->data->data.front().fe_degree) ||
       n_q_points != this->n_quadrature_points)
     {
       std::string message =
@@ -6680,7 +6681,8 @@ FEEvaluation<dim,
                    proposed_quad_comp = numbers::invalid_unsigned_int;
       if (dof_no != numbers::invalid_unsigned_int)
         {
-          if (static_cast<unsigned int>(fe_degree) == this->data->fe_degree)
+          if (static_cast<unsigned int>(fe_degree) ==
+              this->data->data.front().fe_degree)
             {
               proposed_dof_comp = dof_no;
               proposed_fe_comp  = first_selected_component;
@@ -6693,6 +6695,7 @@ FEEvaluation<dim,
                    ++nf)
                 if (this->matrix_info
                       ->get_shape_info(no, 0, nf, this->active_fe_index, 0)
+                      .data.front()
                       .fe_degree == static_cast<unsigned int>(fe_degree))
                   {
                     proposed_dof_comp = no;
@@ -6758,7 +6761,8 @@ FEEvaluation<dim,
         std::pow(1.001 * this->n_quadrature_points, 1. / dim));
       message += "Wrong template arguments:\n";
       message += "    Did you mean FEEvaluation<dim,";
-      message += Utilities::int_to_string(this->data->fe_degree) + ",";
+      message +=
+        Utilities::int_to_string(this->data->data.front().fe_degree) + ",";
       message += Utilities::int_to_string(proposed_n_q_points_1d);
       message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data";
@@ -6770,7 +6774,8 @@ FEEvaluation<dim,
         }
       message += ")?\n";
       std::string correct_pos;
-      if (this->data->fe_degree != static_cast<unsigned int>(fe_degree))
+      if (this->data->data.front().fe_degree !=
+          static_cast<unsigned int>(fe_degree))
         correct_pos = " ^";
       else
         correct_pos = "  ";
@@ -6780,7 +6785,8 @@ FEEvaluation<dim,
         correct_pos += "  \n";
       message += "                                 " + correct_pos;
 
-      Assert(static_cast<unsigned int>(fe_degree) == this->data->fe_degree &&
+      Assert(static_cast<unsigned int>(fe_degree) ==
+                 this->data->data.front().fe_degree &&
                n_q_points == this->n_quadrature_points,
              ExcMessage(message));
     }
@@ -6923,7 +6929,7 @@ FEEvaluation<dim,
   AssertIndexRange(q, n_q_points);
 
   const unsigned int n_q_points_1d_actual =
-    fe_degree == -1 ? this->data->n_q_points_1d : n_q_points_1d;
+    fe_degree == -1 ? this->data->data.front().n_q_points_1d : n_q_points_1d;
 
   // Cartesian mesh: not all quadrature points are stored, only the
   // diagonal. Hence, need to find the tensor product index and retrieve the
