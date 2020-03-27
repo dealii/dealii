@@ -6,7 +6,7 @@ Running the program with the default settings on a machine with 40 processes
 produces the following output:
 @code
 Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 147,456 ( = 4 [vars] x 1,024 [cells] x 36 [dofs/cell/var] )
 Time step size: 0.00689325, minimal h: 0.3125, initial transport scaling: 0.102759
 
@@ -462,7 +462,7 @@ When we run the code with 4 levels of global refinements on 40 cores, we get
 the following output:
 @code
 Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 3,686,400 ( = 4 [vars] x 25,600 [cells] x 36 [dofs/cell/var] )
 Time step size: 7.39876e-05, minimal h: 0.001875, initial transport scaling: 0.00110294
 
@@ -506,7 +506,7 @@ are compressed in the affine mesh case.
 Increasing the number of global refinements to 5, the output becomes:
 @code
 Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 14,745,600 ( = 4 [vars] x 102,400 [cells] x 36 [dofs/cell/var] )
 
 ...
@@ -558,7 +558,7 @@ than the Cartesian mesh throughput of 2360 MDoFs/s reported above.
 Finally, if we add one additional refinement, we record the following output:
 @code
 Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 58,982,400 ( = 4 [vars] x 409,600 [cells] x 36 [dofs/cell/var] )
 
 ...
@@ -592,7 +592,7 @@ the computation.
 Switching the channel test case to 3D with 3 global refinements, the output is
 @code
 Running with 40 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 221,184,000 ( = 5 [vars] x 204,800 [cells] x 216 [dofs/cell/var] )
 
 ...
@@ -639,7 +639,7 @@ steps becomes more tolerable by adding additional resources. We therefore use
 6 nodes with 40 cores each, resulting in a computation with 240 MPI processes:
 @code
 Running with 240 MPI processes
-Vectorization over 8 doubles = 512 bits (AVX512), VECTORIZATION_LEVEL=3
+Vectorization over 8 doubles = 512 bits (AVX512)
 Number of degrees of freedom: 1,769,472,000 ( = 5 [vars] x 1,638,400 [cells] x 216 [dofs/cell/var] )
 
 ...

@@ -2067,8 +2067,7 @@ namespace Euler_DG
             << (std::is_same<Number, double>::value ? "doubles" : "floats")
             << " = " << n_vect_bits << " bits ("
             << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
-            << std::endl;
+            << ")" << std::endl;
     }
 
     make_grid_and_dofs();
