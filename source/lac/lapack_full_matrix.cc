@@ -1846,26 +1846,6 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
 
 
 template <typename number>
-void
-LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
-                                                 const bool transposed) const
-{
-  solve(v, transposed);
-}
-
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
-                                                 const bool transposed) const
-{
-  solve(B, transposed);
-}
-
-
-
-template <typename number>
 number
 LAPACKFullMatrix<number>::determinant() const
 {
@@ -2390,7 +2370,7 @@ PreconditionLU<number>::vmult(Vector<number> &      dst,
                               const Vector<number> &src) const
 {
   dst = src;
-  matrix->apply_lu_factorization(dst, false);
+  matrix->solve(dst, false);
 }
 
 
@@ -2400,7 +2380,7 @@ PreconditionLU<number>::Tvmult(Vector<number> &      dst,
                                const Vector<number> &src) const
 {
   dst = src;
-  matrix->apply_lu_factorization(dst, true);
+  matrix->solve(dst, true);
 }
 
 
@@ -2412,7 +2392,7 @@ PreconditionLU<number>::vmult(BlockVector<number> &      dst,
   Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();
   *aux                = src;
-  matrix->apply_lu_factorization(*aux, false);
+  matrix->solve(*aux, false);
   dst = *aux;
 }
 
@@ -2425,7 +2405,7 @@ PreconditionLU<number>::Tvmult(BlockVector<number> &      dst,
   Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();
   *aux                = src;
-  matrix->apply_lu_factorization(*aux, true);
+  matrix->solve(*aux, true);
   dst = *aux;
 }
 

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Tests LAPACKFullMatrix::apply_lu_factorization in two different variants
+// Tests LAPACKFullMatrix::solve in two different variants
 
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -42,13 +42,13 @@ test()
   for (unsigned int transpose = 0; transpose < 2; ++transpose)
     {
       LAPACKFullMatrix<double> rhs(rhs_orig);
-      A.apply_lu_factorization(rhs, transpose);
+      A.solve(rhs, transpose);
       for (unsigned int i = 0; i < 3; ++i)
         {
           Vector<double> check(n);
           for (unsigned int j = 0; j < n; ++j)
             check(j) = rhs_orig(j, i);
-          A.apply_lu_factorization(check, transpose);
+          A.solve(check, transpose);
           for (unsigned int j = 0; j < n; ++j)
             Assert(std::abs(check(j) - rhs(j, i)) < 1e-13, ExcInternalError());
         }
