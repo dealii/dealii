@@ -26,8 +26,8 @@
 digraph G
 {
   graph[rankdir="TB",bgcolor="transparent"];
-  node [fontname="FreeSans",fontsize=15,
-        shape=record,height=0.2,width=0.4,
+  node [shape=box,fontname="FreeSans",fontsize=15,
+        height=0.2,width=0.4,
         color="black", fillcolor="white", style="filled"];
   edge [color="black", weight=10];
   subgraph base {
@@ -38,25 +38,28 @@ digraph G
   quadrature [label="Quadrature",       URL="\ref Quadrature"];
   }
   dh         [label="DoFHandler",       URL="\ref dofs"];
-  subgraph linalglibs {
-    rank="same";
-    simd     [label="SIMD", fontname="FreeSans",fontsize=12,
-              shape=record,height=0.2,width=0.4,
-              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
-    fevalues [label="FEEvaluation"];
-    mf       [label="MatrixFree loops"];
-    cuda     [label="CUDA",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
-              shape=record,height=0.2,width=0.4,
-              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
-    tbb      [label="TBB",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
-              shape=record,height=0.2,width=0.4,
-              color="gray", fontcolor="gray", fillcolor="white", style="filled"];
-  }
+  simd     [label="SIMD", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  fevalues [label="FEEvaluation", fillcolor="deepskyblue"];
+  mf       [label="MatrixFree loops", fillcolor="deepskyblue"];
+  cuda     [label="CUDA",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+  tbb      [label="TBB", fontname="FreeSans",fontsize=12,
+            height=0.2,width=0.4,
+            color="gray", fontcolor="gray", fillcolor="white", style="filled"];
+{rank=same
+  simd -> fevalues        [dir="none", color="transparent"];
+  fevalues -> mf          [dir="none", color="transparent"];
+  mf -> cuda              [dir="none", color="transparent"];
+  cuda -> tbb             [dir="none", color="transparent"];
+}
   subgraph sol {
     rank="same";
-    solvers [label="Solvers",   URL="\ref Solvers"];
+    solvers [label="Solvers",   URL="\ref Solvers", fillcolor="deepskyblue"];
     gmg     [label="Geometric Multigrid", fontname="FreeSans",fontsize=12,
-             shape=record,height=0.2,width=0.4,
+             height=0.2,width=0.4,
              color="black", fontcolor="black", fillcolor="white", style="dashed"];
   }
   output     [label="Graphical output", URL="\ref output"];
@@ -79,7 +82,7 @@ digraph G
   edge [color="gray", weight=1];
   opencascade [label="OpenCASCADE"];
   subgraph misclibs {
-  systems    [label="Operators"];
+  systems    [label="Operators", fillcolor="deepskyblue"];
   }
   opencascade -> manifold [dir="none"];
 
