@@ -531,7 +531,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step38;
 
       LaplaceBeltramiProblem<3> laplace_beltrami;

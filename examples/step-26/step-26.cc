@@ -655,7 +655,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step26;
 
       HeatEquation<2> heat_equation_solver;

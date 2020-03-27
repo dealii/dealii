@@ -3398,7 +3398,6 @@ namespace Step44
 // no different to the other tutorials.
 int main()
 {
-  using namespace dealii;
   using namespace Step44;
 
   try

@@ -1078,7 +1078,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step34;
 
       const unsigned int degree         = 1;

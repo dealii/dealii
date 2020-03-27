@@ -1033,7 +1033,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step46;
 
       FluidStructureProblem<2> flow_problem(1, 1);

@@ -1429,7 +1429,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step35;
 
       RunTimeParameters::Data_Storage data;

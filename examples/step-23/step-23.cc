@@ -605,7 +605,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step23;
 
       WaveEquation<2> wave_equation_solver;

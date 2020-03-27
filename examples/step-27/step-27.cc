@@ -738,7 +738,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step27;
 
       LaplaceProblem<2> laplace_problem;
