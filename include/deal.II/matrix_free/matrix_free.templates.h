@@ -529,7 +529,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   {
     unsigned int n_components = 0;
     for (unsigned int no = 0; no < dof_handler.size(); ++no)
-      n_components += dof_handler[no]->get_fe()[0].n_base_elements();
+      n_components += dof_handler[no]->get_fe(0).n_base_elements();
     const unsigned int n_quad             = quad.size();
     unsigned int       n_fe_in_collection = 0;
     for (unsigned int i = 0; i < n_components; ++i)
@@ -587,7 +587,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             additional_data.store_plain_indices;
           dof_info[no].global_base_element_offset =
             no > 0 ? dof_info[no - 1].global_base_element_offset +
-                       dof_handler[no - 1]->get_fe()[0].n_base_elements() :
+                       dof_handler[no - 1]->get_fe(0).n_base_elements() :
                      0;
         }
 

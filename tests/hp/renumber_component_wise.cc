@@ -69,7 +69,7 @@ check_renumbering(hp::DoFHandler<dim> &dof)
 {
   // Prepare a reordering of
   // components for later use
-  std::vector<unsigned int> order(dof.get_fe().n_components());
+  std::vector<unsigned int> order(dof.get_fe_collection().n_components());
   for (unsigned int i = 0; i < order.size(); ++i)
     order[i] = order.size() - i - 1;
 

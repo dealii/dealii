@@ -75,7 +75,7 @@ check_renumbering(hp::DoFHandler<dim> &dof)
   // components so that each
   // component maps to its natural
   // block
-  std::vector<unsigned int> order(dof.get_fe().n_components());
+  std::vector<unsigned int> order(dof.get_fe_collection().n_components());
   order[0] = 0;
   order[1] = 1;
   order[2] = 1;

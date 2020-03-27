@@ -286,7 +286,7 @@ namespace VectorTools
                 const ComponentMask &                component_mask)
     {
       Assert(component_mask.represents_n_components(
-               dof_handler.get_fe().n_components()),
+               dof_handler.get_fe_collection().n_components()),
              ExcMessage(
                "The number of components in the mask has to be either "
                "zero or equal to the number of components in the finite "
@@ -296,7 +296,7 @@ namespace VectorTools
              ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
 
       Assert(component_mask.n_selected_components(
-               dof_handler.get_fe().n_components()) > 0,
+               dof_handler.get_fe_collection().n_components()) > 0,
              ComponentMask::ExcNoComponentSelected());
 
       //
@@ -427,9 +427,10 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(n_components == function(cell)->n_components,
-                 ExcDimensionMismatch(dof_handler.get_fe().n_components(),
-                                      function(cell)->n_components));
+          Assert(
+            n_components == function(cell)->n_components,
+            ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
+                                 function(cell)->n_components));
           function(cell)->vector_value_list(generalized_support_points,
                                             function_values);
 
@@ -553,8 +554,9 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    Assert(dof_handler.get_fe().n_components() == function.n_components,
-           ExcDimensionMismatch(dof_handler.get_fe().n_components(),
+    Assert(dof_handler.get_fe_collection().n_components() ==
+             function.n_components,
+           ExcDimensionMismatch(dof_handler.get_fe_collection().n_components(),
                                 function.n_components));
 
     // Create a small lambda capture wrapping function and call the
