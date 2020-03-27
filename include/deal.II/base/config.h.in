@@ -395,6 +395,7 @@ _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")              \
 _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                        \
 _Pragma("GCC diagnostic ignored \"-Wsuggest-override\"")                \
 _Pragma("GCC diagnostic ignored \"-Wtautological-constant-out-of-range-compare\"") \
+_Pragma("GCC diagnostic ignored \"-Wtautological-overlap-compare\"")    \
 _Pragma("GCC diagnostic ignored \"-Wtype-limits\"")                     \
 _Pragma("GCC diagnostic ignored \"-Wundef\"")                           \
 _Pragma("GCC diagnostic ignored \"-Wunused-but-set-parameter\"")        \

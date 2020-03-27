@@ -667,8 +667,6 @@ namespace MatrixCreator
       {
         CopyData();
 
-        CopyData(CopyData const &data);
-
         unsigned int                                  dofs_per_cell;
         std::vector<types::global_dof_index>          dofs;
         std::vector<std::vector<bool>>                dof_is_on_face;
@@ -684,15 +682,6 @@ namespace MatrixCreator
       {}
 
 
-      template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType, number>::CopyData(CopyData const &data)
-        : dofs_per_cell(data.dofs_per_cell)
-        , dofs(data.dofs)
-        , dof_is_on_face(data.dof_is_on_face)
-        , cell(data.cell)
-        , cell_matrix(data.cell_matrix)
-        , cell_vector(data.cell_vector)
-      {}
     } // namespace AssemblerBoundary
   }   // namespace internal
 } // namespace MatrixCreator
