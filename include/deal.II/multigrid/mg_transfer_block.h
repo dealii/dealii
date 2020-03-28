@@ -22,7 +22,6 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/lac/block_matrix_array.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/sparsity_pattern.h>
