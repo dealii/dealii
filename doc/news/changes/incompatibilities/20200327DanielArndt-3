@@ -1,0 +1,5 @@
+Removed: The deprecated member function
+LAPACKFullMatrix::apply_lu_factorization() has been removed. Use
+LAPACKFullMatrix::solve() instead.
+<br>
+(Daniel Arndt, 2020/03/27)

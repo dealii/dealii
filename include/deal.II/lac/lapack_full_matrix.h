@@ -675,36 +675,6 @@ public:
   solve(LAPACKFullMatrix<number> &B, const bool transposed = false) const;
 
   /**
-   * Solve the linear system with right hand side given by applying
-   * forward/backward substitution to the previously computed LU
-   * factorization. Uses LAPACK function Xgetrs.
-   *
-   * The flag transposed indicates whether the solution of the transposed
-   * system is to be performed.
-   *
-   * @deprecated use solve() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  apply_lu_factorization(Vector<number> &v, const bool transposed) const;
-
-  /**
-   * Solve the linear system with multiple right hand sides (as many as there
-   * are columns in the matrix b) given by applying forward/backward
-   * substitution to the previously computed LU factorization. Uses LAPACK
-   * function Xgetrs.
-   *
-   * The flag transposed indicates whether the solution of the transposed
-   * system is to be performed.
-   *
-   * @deprecated use solve() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  apply_lu_factorization(LAPACKFullMatrix<number> &B,
-                         const bool                transposed) const;
-
-  /**
    * Compute eigenvalues of the matrix. After this routine has been called,
    * eigenvalues can be retrieved using the eigenvalue() function. The matrix
    * itself will be LAPACKSupport::unusable after this operation.
