@@ -702,27 +702,9 @@ namespace DoFRenumbering
    * some block, and another degree of freedom with index $j$ belonging to the
    * same block will be assigned new indices $n(i)$ and $n(j)$ with
    * $n(i)<n(j)$ if $i<j$ and $n(i)>n(j)$ if $i>j$.
-   */
-  template <int dim, int spacedim>
-  void
-  block_wise(DoFHandler<dim, spacedim> &dof_handler);
-
-  /**
-   * Sort the degrees of freedom by vector block. It does the same thing as
-   * the above function, only that it does this for one single level of a
-   * multilevel discretization. The non-multigrid part of the DoFHandler
-   * is not touched.
-   */
-  template <int dim, int spacedim>
-  void
-  block_wise(DoFHandler<dim, spacedim> &dof_handler, const unsigned int level);
-
-  /**
-   * Sort the degrees of freedom by block. It does the same thing as the above
-   * function.
    *
-   * This function only succeeds if each of the elements in the
-   * hp::FECollection attached to the hp::DoFHandler argument has exactly the
+   * @note This function only succeeds if each of the elements in the
+   * hp::FECollection attached to the DoFHandler argument has exactly the
    * same number of blocks (see
    * @ref GlossBlock "the glossary"
    * for more information). Note that this is not always given: while the
@@ -733,9 +715,19 @@ namespace DoFRenumbering
    * number of blocks and that subsequent blocks in one element have the same
    * meaning as in another element.
    */
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  block_wise(hp::DoFHandler<dim, spacedim> &dof_handler);
+  block_wise(DoFHandlerType &dof_handler);
+
+  /**
+   * Sort the degrees of freedom by vector block. It does the same thing as
+   * the above function, only that it does this for one single level of a
+   * multilevel discretization. The non-multigrid part of the DoFHandler
+   * is not touched.
+   */
+  template <typename DoFHandlerType>
+  void
+  block_wise(DoFHandlerType &dof_handler, const unsigned int level);
 
   /**
    * Compute the renumbering vector needed by the block_wise() functions.

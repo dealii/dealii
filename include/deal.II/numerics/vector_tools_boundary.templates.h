@@ -422,7 +422,7 @@ namespace VectorTools
   void
   interpolate_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        function_map,
     std::map<types::global_dof_index, number> &boundary_values,
@@ -851,7 +851,7 @@ namespace VectorTools
   void
   project_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        boundary_functions,
     const hp::QCollection<dim - 1> &           q,
@@ -867,7 +867,7 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const hp::DoFHandler<dim, spacedim> &dof,
+    const DoFHandler<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        boundary_function,
     const hp::QCollection<dim - 1> &           q,
@@ -1830,7 +1830,7 @@ namespace VectorTools
   void
 
   project_boundary_values_curl_conforming(
-    const hp::DoFHandler<dim> &       dof_handler,
+    const DoFHandler<dim> &           dof_handler,
     const unsigned int                first_vector_component,
     const Function<dim> &             boundary_function,
     const types::boundary_id          boundary_component,
@@ -1859,7 +1859,7 @@ namespace VectorTools
     std::vector<bool>                    dofs_processed;
     std::vector<double>                  dof_values;
     std::vector<types::global_dof_index> face_dof_indices;
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    typename DoFHandler<dim>::active_cell_iterator cell =
       dof_handler.begin_active();
 
     switch (dim)
@@ -2851,7 +2851,6 @@ namespace VectorTools
         }
     }
 
-
     template <int dim, typename DoFHandlerType, typename number>
     void
     compute_project_boundary_values_curl_conforming_l2(
@@ -3191,7 +3190,7 @@ namespace VectorTools
   template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
-    const hp::DoFHandler<dim> &            dof_handler,
+    const DoFHandler<dim> &                dof_handler,
     const unsigned int                     first_vector_component,
     const Function<dim, number> &          boundary_function,
     const types::boundary_id               boundary_component,
@@ -3601,7 +3600,7 @@ namespace VectorTools
   template <int dim>
   void
   project_boundary_values_div_conforming(
-    const hp::DoFHandler<dim> &            dof_handler,
+    const DoFHandler<dim> &                dof_handler,
     const unsigned int                     first_vector_component,
     const Function<dim> &                  boundary_function,
     const types::boundary_id               boundary_component,

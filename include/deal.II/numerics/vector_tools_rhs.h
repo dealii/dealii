@@ -88,7 +88,7 @@ namespace VectorTools
   void
   create_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
-    const hp::DoFHandler<dim, spacedim> &                      dof,
+    const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim> &                               q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
@@ -101,7 +101,7 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   void
   create_right_hand_side(
-    const hp::DoFHandler<dim, spacedim> &                      dof,
+    const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim> &                               q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
@@ -155,7 +155,7 @@ namespace VectorTools
   void
   create_boundary_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
-    const hp::DoFHandler<dim, spacedim> &                      dof,
+    const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim - 1> &                           q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
@@ -173,7 +173,7 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   void
   create_boundary_right_hand_side(
-    const hp::DoFHandler<dim, spacedim> &                      dof,
+    const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim - 1> &                           q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,

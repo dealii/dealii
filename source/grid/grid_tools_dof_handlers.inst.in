@@ -154,13 +154,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
 
       template std::pair<
-        hp::DoFHandler<deal_II_dimension,
-                       deal_II_space_dimension>::active_cell_iterator,
+        dealii::DoFHandler<deal_II_dimension,
+                           deal_II_space_dimension>::active_cell_iterator,
         Point<deal_II_dimension>>
       find_active_cell_around_point(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const Point<deal_II_space_dimension> &,
         const double);
 
@@ -217,7 +217,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     Container : DOFHANDLER_TEMPLATES)
+     Container : DOFHANDLER_TEMPLATE)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace GridTools
@@ -243,7 +243,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 // types are the same for sequential and parallel containers; consequently, we
 // get duplicate instantiation errors if we instantiate for *all* container
 // types, rather than only the sequential ones
-for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
+for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
      deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
@@ -283,6 +283,17 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
+    \}
+#endif
+  }
+
+for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
+     deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
       template void
       collect_periodic_faces<X>(
         const X &,

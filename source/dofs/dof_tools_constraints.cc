@@ -421,22 +421,6 @@ namespace DoFTools
       }
 
 
-      // a template that can determine statically whether a given DoFHandler
-      // class supports different finite element elements
-      template <typename>
-      struct DoFHandlerSupportsDifferentFEs
-      {
-        static const bool value = true;
-      };
-
-
-      template <int dim, int spacedim>
-      struct DoFHandlerSupportsDifferentFEs<dealii::DoFHandler<dim, spacedim>>
-      {
-        static const bool value = false;
-      };
-
-
       /**
        * A function that returns how many different finite elements a dof
        * handler uses. This is one for non-hp DoFHandlers and
@@ -444,18 +428,12 @@ namespace DoFTools
        */
       template <int dim, int spacedim>
       unsigned int
-      n_finite_elements(
-        const dealii::hp::DoFHandler<dim, spacedim> &dof_handler)
+      n_finite_elements(const DoFHandler<dim, spacedim> &dof_handler)
       {
-        return dof_handler.get_fe_collection().size();
-      }
-
-
-      template <typename DoFHandlerType>
-      unsigned int
-      n_finite_elements(const DoFHandlerType &)
-      {
-        return 1;
+        if (dof_handler.hp_capability_enabled == true)
+          return dof_handler.get_fe_collection().size();
+        else
+          return 1;
       }
 
 
@@ -542,25 +520,41 @@ namespace DoFTools
     } // namespace
 
 
-
-    template <typename number, int spacedim>
+    template <typename number>
     void
-    make_hp_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
-      AffineConstraints<number> & /*constraints*/)
+    make_hp_hanging_node_constraints(const dealii::DoFHandler<1> &,
+                                     AffineConstraints<number> &)
     {
-      // nothing to do for dof handlers in 1d
+      // nothing to do for regular dof handlers in 1d
     }
 
 
-    template <typename number, int spacedim>
+    template <typename number>
     void
-    make_oldstyle_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
-      AffineConstraints<number> & /*constraints*/,
-      std::integral_constant<int, 1>)
+    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1> &,
+                                           AffineConstraints<number> &,
+                                           std::integral_constant<int, 1>)
     {
-      // nothing to do for dof handlers in 1d
+      // nothing to do for regular dof handlers in 1d
+    }
+
+
+    template <typename number>
+    void
+    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
+                                     AffineConstraints<number> &)
+    {
+      // nothing to do for regular dof handlers in 1d
+    }
+
+
+    template <typename number>
+    void
+    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
+                                           AffineConstraints<number> &,
+                                           std::integral_constant<int, 1>)
+    {
+      // nothing to do for regular dof handlers in 1d
     }
 
 
@@ -584,16 +578,14 @@ namespace DoFTools
       // nothing to do for dof handlers in 1d
     }
 
-    template <typename DoFHandlerType, typename number>
+    template <int dim_, int spacedim, typename number>
     void
     make_oldstyle_hanging_node_constraints(
-      const DoFHandlerType &     dof_handler,
-      AffineConstraints<number> &constraints,
+      const DoFHandler<dim_, spacedim> &dof_handler,
+      AffineConstraints<number> &       constraints,
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2;
-
-      const unsigned int spacedim = DoFHandlerType::space_dimension;
 
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
@@ -606,9 +598,9 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandlerType::active_cell_iterator cell = dof_handler
-                                                             .begin_active(),
-                                                    endc = dof_handler.end();
+      typename DoFHandler<dim_, spacedim>::active_cell_iterator
+        cell = dof_handler.begin_active(),
+        endc = dof_handler.end();
       for (; cell != endc; ++cell)
         {
           // artificial cells can at best neighbor ghost cells, but we're not
@@ -668,8 +660,8 @@ namespace DoFTools
                        ExcDimensionMismatch(n_dofs_on_children,
                                             fe.constraints().m()));
 
-                const typename DoFHandlerType::line_iterator this_face =
-                  cell->face(face);
+                const typename DoFHandler<dim_, spacedim>::line_iterator
+                  this_face = cell->face(face);
 
                 // fill the dofs indices. Use same enumeration scheme as in
                 // @p{FiniteElement::constraints()}
@@ -734,11 +726,11 @@ namespace DoFTools
 
 
 
-    template <typename DoFHandlerType, typename number>
+    template <int dim_, int spacedim, typename number>
     void
     make_oldstyle_hanging_node_constraints(
-      const DoFHandlerType &     dof_handler,
-      AffineConstraints<number> &constraints,
+      const DoFHandler<dim_, spacedim> &dof_handler,
+      AffineConstraints<number> &       constraints,
       std::integral_constant<int, 3>)
     {
       const unsigned int dim = 3;
@@ -754,9 +746,9 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandlerType::active_cell_iterator cell = dof_handler
-                                                             .begin_active(),
-                                                    endc = dof_handler.end();
+      typename DoFHandler<dim_, spacedim>::active_cell_iterator
+        cell = dof_handler.begin_active(),
+        endc = dof_handler.end();
       for (; cell != endc; ++cell)
         {
           // artificial cells can at best neighbor ghost cells, but we're not
@@ -853,8 +845,8 @@ namespace DoFTools
                        ExcDimensionMismatch(n_dofs_on_children,
                                             fe.constraints().m()));
 
-                const typename DoFHandlerType::face_iterator this_face =
-                  cell->face(face);
+                const typename DoFHandler<dim_, spacedim>::face_iterator
+                  this_face = cell->face(face);
 
                 // fill the dofs indices. Use same enumeration scheme as in
                 // @p{FiniteElement::constraints()}
@@ -973,19 +965,16 @@ namespace DoFTools
 
 
 
-    template <typename DoFHandlerType, typename number>
+    template <int dim, int spacedim, typename number>
     void
-    make_hp_hanging_node_constraints(const DoFHandlerType &     dof_handler,
-                                     AffineConstraints<number> &constraints)
+    make_hp_hanging_node_constraints(
+      const DoFHandler<dim, spacedim> &dof_handler,
+      AffineConstraints<number> &      constraints)
     {
       // note: this function is going to be hard to understand if you haven't
       // read the hp paper. however, we try to follow the notation laid out
       // there, so go read the paper before you try to understand what is going
       // on here
-
-      const unsigned int dim = DoFHandlerType::dimension;
-
-      const unsigned int spacedim = DoFHandlerType::space_dimension;
 
 
       // a matrix to be used for constraints below. declared here and simply
@@ -1084,8 +1073,7 @@ namespace DoFTools
                 std::set<unsigned int> fe_ind_face_subface;
                 fe_ind_face_subface.insert(cell->active_fe_index());
 
-                if (DoFHandlerSupportsDifferentFEs<DoFHandlerType>::value ==
-                    true)
+                if (dof_handler.hp_capability_enabled)
                   for (unsigned int c = 0;
                        c < cell->face(face)->number_of_children();
                        ++c)
@@ -1132,8 +1120,9 @@ namespace DoFTools
                                   ->is_artificial())
                               continue;
 
-                            const typename DoFHandlerType::active_face_iterator
-                              subface = cell->face(face)->child(c);
+                            const typename DoFHandler<dim, spacedim>::
+                              active_face_iterator subface =
+                                cell->face(face)->child(c);
 
                             Assert(subface->n_active_fe_indices() == 1,
                                    ExcInternalError());
@@ -1223,8 +1212,7 @@ namespace DoFTools
                         //
                         // since this is something that can only happen for hp
                         // dof handlers, add a check here...
-                        Assert(DoFHandlerSupportsDifferentFEs<
-                                 DoFHandlerType>::value == true,
+                        Assert(dof_handler.hp_capability_enabled == true,
                                ExcInternalError());
 
                         const dealii::hp::FECollection<dim, spacedim>
@@ -1441,15 +1429,15 @@ namespace DoFTools
 
                 // Only if there is a neighbor with a different active_fe_index
                 // and the same h-level, some action has to be taken.
-                if ((DoFHandlerSupportsDifferentFEs<DoFHandlerType>::value ==
-                     true) &&
+                if ((dof_handler.hp_capability_enabled) &&
                     !cell->face(face)->at_boundary() &&
                     (cell->neighbor(face)->active_fe_index() !=
                      cell->active_fe_index()) &&
                     (!cell->face(face)->has_children() &&
                      !cell->neighbor_is_coarser(face)))
                   {
-                    const typename DoFHandlerType::level_cell_iterator
+                    const typename DoFHandler<dim,
+                                              spacedim>::level_cell_iterator
                       neighbor = cell->neighbor(face);
 
                     // see which side of the face we have to constrain
@@ -2481,9 +2469,9 @@ namespace DoFTools
                                const ComponentMask &component_mask,
                                const number         periodicity_factor)
   {
-    static const int space_dim = DoFHandlerType::space_dimension;
-    (void)space_dim;
-    AssertIndexRange(direction, space_dim);
+    static const int spacedim = DoFHandlerType::space_dimension;
+    (void)spacedim;
+    AssertIndexRange(direction, spacedim);
 
     Assert(b_id1 != b_id2,
            ExcMessage("The boundary indicators b_id1 and b_id2 must be "
@@ -2515,14 +2503,14 @@ namespace DoFTools
                                const ComponentMask &      component_mask,
                                const number               periodicity_factor)
   {
-    static const int dim       = DoFHandlerType::dimension;
-    static const int space_dim = DoFHandlerType::space_dimension;
+    static const int dim      = DoFHandlerType::dimension;
+    static const int spacedim = DoFHandlerType::space_dimension;
     (void)dim;
-    (void)space_dim;
+    (void)spacedim;
 
-    AssertIndexRange(direction, space_dim);
+    AssertIndexRange(direction, spacedim);
 
-    Assert(dim == space_dim, ExcNotImplemented());
+    Assert(dim == spacedim, ExcNotImplemented());
 
     std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
@@ -3082,6 +3070,10 @@ namespace DoFTools
     const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
     AffineConstraints<double> &                    constraints)
   {
+    Assert(coarse_grid.get_fe_collection().size() == 1 &&
+             fine_grid.get_fe_collection().size() == 1,
+           ExcMessage("This function is not yet implemented for DoFHandlers "
+                      "using hp capabilities."));
     // store the weights with which a dof on the parameter grid contributes to a
     // dof on the fine grid. see the long doc below for more info
     //
@@ -3263,6 +3255,10 @@ namespace DoFTools
     std::vector<std::map<types::global_dof_index, float>>
       &transfer_representation)
   {
+    Assert(coarse_grid.get_fe_collection().size() == 1 &&
+             fine_grid.get_fe_collection().size() == 1,
+           ExcMessage("This function is not yet implemented for DoFHandlers "
+                      "using hp capabilities."));
     // store the weights with which a dof on the parameter grid contributes to a
     // dof on the fine grid. see the long doc below for more info
     //

@@ -69,7 +69,12 @@ test_boundary_values(const FiniteElement<dim> & fe,
   BoundaryFunction<dim> boundary_function;
   constraints.clear();
   VectorTools::project_boundary_values_curl_conforming_l2(
-    dof_handler, 0, boundary_function, 0, constraints);
+    dof_handler,
+    0,
+    boundary_function,
+    0,
+    constraints,
+    StaticMappingQ1<dim>::mapping);
   constraints.close();
 }
 

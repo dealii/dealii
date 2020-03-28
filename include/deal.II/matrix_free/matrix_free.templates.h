@@ -54,51 +54,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
-{
-  template <
-    typename DoFHandlerType,
-    typename std::enable_if<
-      std::is_same<DoFHandlerType,
-                   ::dealii::DoFHandler<DoFHandlerType::dimension>>::value,
-      int>::type = 0>
-  const DoFHandlerType &
-  get_dof_handler(
-    const std::vector<
-      SmartPointer<const ::dealii::DoFHandler<DoFHandlerType::dimension>>>
-      &dof_handler,
-    const std::vector<
-      SmartPointer<const ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>>
-      &,
-    const unsigned int n_dof_handlers,
-    const unsigned int dof_handler_index)
-  {
-    (void)n_dof_handlers;
-    AssertDimension(dof_handler.size(), n_dof_handlers);
-    return *dof_handler[dof_handler_index];
-  }
-
-  template <
-    typename DoFHandlerType,
-    typename std::enable_if<
-      std::is_same<DoFHandlerType,
-                   ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>::value,
-      int>::type = 0>
-  const DoFHandlerType &
-  get_dof_handler(
-    const std::vector<
-      SmartPointer<const ::dealii::DoFHandler<DoFHandlerType::dimension>>> &,
-    const std::vector<
-      SmartPointer<const ::dealii::hp::DoFHandler<DoFHandlerType::dimension>>>
-      &                hp_dof_handler,
-    const unsigned int n_dof_handlers,
-    const unsigned int dof_handler_index)
-  {
-    (void)n_dof_handlers;
-    AssertDimension(hp_dof_handler.size(), n_dof_handlers);
-    return *hp_dof_handler[dof_handler_index];
-  }
-} // namespace internal
 
 // --------------------- MatrixFree -----------------------------------
 
@@ -185,10 +140,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
   const unsigned int dof_handler_index) const
 {
   AssertIndexRange(dof_handler_index, n_components());
-  return internal::get_dof_handler<DoFHandlerType>(dof_handlers.dof_handler,
-                                                   dof_handlers.hp_dof_handler,
-                                                   dof_handlers.n_dof_handlers,
-                                                   dof_handler_index);
+
+  auto dh = dynamic_cast<const DoFHandlerType *>(
+    &*dof_handlers.dof_handler[dof_handler_index]);
+
+  Assert(dh != nullptr, ExcNotImplemented());
+
+  return *dh;
 }
 
 
@@ -301,7 +259,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-typename hp::DoFHandler<dim>::active_cell_iterator
+typename DoFHandler<dim>::active_cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int macro_cell_number,
   const unsigned int vector_number,
@@ -313,15 +271,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
 
   Assert(dof_handlers.active_dof_handler == DoFHandlers::hp,
          ExcNotImplemented());
-  const hp::DoFHandler<dim> *dofh =
-    dof_handlers.hp_dof_handler[dof_handler_index];
+  const DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[dof_handler_index];
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[macro_cell_number * VectorizedArrayType::size() +
                      vector_number];
-  return typename hp::DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
-                                                     index.first,
-                                                     index.second,
-                                                     dofh);
+  return typename DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
+                                                 index.first,
+                                                 index.second,
+                                                 dofh);
 }
 
 
@@ -503,7 +460,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
         face_info,
-        DoFHandlerType<dim, dim>::is_hp_dof_handler ?
+        dof_handler[0]->hp_capability_enabled ?
           dof_info[0].cell_active_fe_index :
           std::vector<unsigned int>(),
         mapping,
@@ -606,30 +563,95 @@ namespace internal
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+template <typename DoFHandlerType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
-  const std::vector<const DoFHandler<dim> *> &dof_handler,
-  const AdditionalData &                      additional_data)
+  const std::vector<const DoFHandlerType *> &dof_handler,
+  const AdditionalData &                     additional_data)
 {
-  cell_level_index.clear();
-  dof_handlers.active_dof_handler = DoFHandlers::usual;
-  dof_handlers.n_dof_handlers     = dof_handler.size();
-  dof_handlers.dof_handler.resize(dof_handlers.n_dof_handlers);
-  for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_handlers.dof_handler[no] = dof_handler[no];
-
-  dof_info.resize(dof_handlers.n_dof_handlers);
-  for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length = VectorizedArrayType::size();
-
-  const unsigned int n_mpi_procs = task_info.n_procs;
-  const unsigned int my_pid      = task_info.my_pid;
-
-  const Triangulation<dim> &tria =
-    dof_handlers.dof_handler[0]->get_triangulation();
-  const unsigned int level = additional_data.mg_level;
-  if (level == numbers::invalid_unsigned_int)
+  if (dof_handler.front()->hp_capability_enabled == false)
     {
+      cell_level_index.clear();
+      dof_handlers.active_dof_handler = DoFHandlers::usual;
+      dof_handlers.n_dof_handlers     = dof_handler.size();
+      dof_handlers.dof_handler.resize(dof_handlers.n_dof_handlers);
+      for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
+        dof_handlers.dof_handler[no] = dof_handler[no];
+
+      dof_info.resize(dof_handlers.n_dof_handlers);
+      for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
+        dof_info[no].vectorization_length = VectorizedArrayType::size();
+
+      const unsigned int n_mpi_procs = task_info.n_procs;
+      const unsigned int my_pid      = task_info.my_pid;
+
+      const Triangulation<dim> &tria =
+        dof_handlers.dof_handler[0]->get_triangulation();
+      const unsigned int level = additional_data.mg_level;
+      if (level == numbers::invalid_unsigned_int)
+        {
+          if (n_mpi_procs == 1)
+            cell_level_index.reserve(tria.n_active_cells());
+          // For serial Triangulations always take all cells
+          const unsigned int subdomain_id =
+            (dynamic_cast<const parallel::TriangulationBase<dim> *>(
+               &dof_handler[0]->get_triangulation()) != nullptr) ?
+              my_pid :
+              numbers::invalid_subdomain_id;
+
+          // Go through cells on zeroth level and then successively step down
+          // into children. This gives a z-ordering of the cells, which is
+          // beneficial when setting up neighboring relations between cells for
+          // thread parallelization
+          for (const auto &cell : tria.cell_iterators_on_level(0))
+            internal::MatrixFreeFunctions::resolve_cell(cell,
+                                                        cell_level_index,
+                                                        subdomain_id);
+
+          Assert(n_mpi_procs > 1 ||
+                   cell_level_index.size() == tria.n_active_cells(),
+                 ExcInternalError());
+        }
+      else
+        {
+          AssertIndexRange(level, tria.n_global_levels());
+          if (level < tria.n_levels())
+            {
+              cell_level_index.reserve(tria.n_cells(level));
+              for (const auto &cell : tria.cell_iterators_on_level(level))
+                if (cell->level_subdomain_id() == my_pid)
+                  cell_level_index.emplace_back(cell->level(), cell->index());
+            }
+        }
+
+      // All these are cells local to this processor. Therefore, set
+      // cell_level_index_end_local to the size of cell_level_index.
+      cell_level_index_end_local = cell_level_index.size();
+    }
+  else
+    {
+      (void)additional_data;
+
+      cell_level_index.clear();
+      dof_handlers.active_dof_handler = DoFHandlers::hp;
+      Assert(additional_data.mg_level == numbers::invalid_unsigned_int,
+             ExcNotImplemented());
+      dof_handlers.n_dof_handlers = dof_handler.size();
+      dof_handlers.hp_dof_handler.resize(dof_handlers.n_dof_handlers);
+      for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
+        dof_handlers.hp_dof_handler[no] = dof_handler[no];
+
+      dof_info.resize(dof_handlers.n_dof_handlers);
+      for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
+        dof_info[no].vectorization_length = VectorizedArrayType::size();
+
+      const unsigned int n_mpi_procs = task_info.n_procs;
+      const unsigned int my_pid      = task_info.my_pid;
+
+      // if we have no level given, use the same as for the standard DoFHandler,
+      // otherwise we must loop through the respective level
+      const Triangulation<dim> &tria = dof_handler[0]->get_triangulation();
+
       if (n_mpi_procs == 1)
         cell_level_index.reserve(tria.n_active_cells());
       // For serial Triangulations always take all cells
@@ -651,78 +673,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
       Assert(n_mpi_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
              ExcInternalError());
+
+      // All these are cells local to this processor. Therefore, set
+      // cell_level_index_end_local to the size of cell_level_index.
+      cell_level_index_end_local = cell_level_index.size();
     }
-  else
-    {
-      AssertIndexRange(level, tria.n_global_levels());
-      if (level < tria.n_levels())
-        {
-          cell_level_index.reserve(tria.n_cells(level));
-          for (const auto &cell : tria.cell_iterators_on_level(level))
-            if (cell->level_subdomain_id() == my_pid)
-              cell_level_index.emplace_back(cell->level(), cell->index());
-        }
-    }
-
-  // All these are cells local to this processor. Therefore, set
-  // cell_level_index_end_local to the size of cell_level_index.
-  cell_level_index_end_local = cell_level_index.size();
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
-  const std::vector<const hp::DoFHandler<dim> *> &dof_handler,
-  const AdditionalData &                          additional_data)
-{
-  (void)additional_data;
-
-  cell_level_index.clear();
-  dof_handlers.active_dof_handler = DoFHandlers::hp;
-  Assert(additional_data.mg_level == numbers::invalid_unsigned_int,
-         ExcNotImplemented());
-  dof_handlers.n_dof_handlers = dof_handler.size();
-  dof_handlers.hp_dof_handler.resize(dof_handlers.n_dof_handlers);
-  for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_handlers.hp_dof_handler[no] = dof_handler[no];
-
-  dof_info.resize(dof_handlers.n_dof_handlers);
-  for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length = VectorizedArrayType::size();
-
-  const unsigned int n_mpi_procs = task_info.n_procs;
-  const unsigned int my_pid      = task_info.my_pid;
-
-  // if we have no level given, use the same as for the standard DoFHandler,
-  // otherwise we must loop through the respective level
-  const Triangulation<dim> &tria = dof_handler[0]->get_triangulation();
-
-  if (n_mpi_procs == 1)
-    cell_level_index.reserve(tria.n_active_cells());
-
-  // For serial Triangulations always take all cells
-  const unsigned int subdomain_id =
-    (dynamic_cast<const parallel::TriangulationBase<dim> *>(
-       &dof_handler[0]->get_triangulation()) != nullptr) ?
-      my_pid :
-      numbers::invalid_subdomain_id;
-
-  // go through cells on zeroth level and then successively step down into
-  // children. This gives a z-ordering of the cells, which is beneficial when
-  // setting up neighboring relations between cells for thread parallelization
-  for (const auto &cell : tria.cell_iterators_on_level(0))
-    internal::MatrixFreeFunctions::resolve_cell(cell,
-                                                cell_level_index,
-                                                subdomain_id);
-
-  Assert(n_mpi_procs > 1 || cell_level_index.size() == tria.n_active_cells(),
-         ExcInternalError());
-
-  // All these are cells local to this processor. Therefore, set
-  // cell_level_index_end_local to the size of cell_level_index.
-  cell_level_index_end_local = cell_level_index.size();
 }
 
 
@@ -770,7 +725,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
       std::vector<const FiniteElement<dim> *> fes;
       if (dof_handlers.active_dof_handler == DoFHandlers::hp)
         {
-          const hp::DoFHandler<dim> *  hpdof = dof_handlers.hp_dof_handler[no];
+          const DoFHandler<dim> *      hpdof = dof_handlers.hp_dof_handler[no];
           const hp::FECollection<dim> &fe    = hpdof->get_fe_collection();
           for (unsigned int f = 0; f < fe.size(); ++f)
             fes.push_back(&fe[f]);
@@ -949,8 +904,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           // hp case where we need to decode the FE index and similar
           else if (dof_handlers.active_dof_handler == DoFHandlers::hp)
             {
-              const hp::DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[no];
-              typename hp::DoFHandler<dim>::active_cell_iterator cell_it(
+              const DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[no];
+              typename DoFHandler<dim>::active_cell_iterator cell_it(
                 &dofh->get_triangulation(),
                 cell_level_index[counter].first,
                 cell_level_index[counter].second,

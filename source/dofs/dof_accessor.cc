@@ -108,7 +108,7 @@ void
 DoFCellAccessor<DoFHandlerType, lda>::update_cell_dof_indices_cache() const
 {
   Assert(static_cast<unsigned int>(this->present_level) <
-           this->dof_handler->levels.size(),
+           this->dof_handler->object_dof_indices.size(),
          ExcMessage("DoFHandler not initialized"));
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
@@ -125,7 +125,7 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_indices(
   const std::vector<types::global_dof_index> &local_dof_indices)
 {
   Assert(static_cast<unsigned int>(this->present_level) <
-           this->dof_handler->levels.size(),
+           this->dof_handler->object_dof_indices.size(),
          ExcMessage("DoFHandler not initialized"));
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());

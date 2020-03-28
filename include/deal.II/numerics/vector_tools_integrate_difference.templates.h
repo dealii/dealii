@@ -794,6 +794,8 @@ namespace VectorTools
       return diff;
     }
 
+
+
     template <int dim,
               class InVector,
               class OutVector,
@@ -1145,7 +1147,7 @@ namespace VectorTools
   void
   integrate_difference(
     const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-    const dealii::hp::DoFHandler<dim, spacedim> &            dof,
+    const dealii::DoFHandler<dim, spacedim> &                dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -1171,7 +1173,7 @@ namespace VectorTools
     !std::is_same<typename InVector::value_type, double>::value>::type
   integrate_difference(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
-    const dealii::hp::DoFHandler<dim, spacedim> &       dof,
+    const dealii::DoFHandler<dim, spacedim> &           dof,
     const InVector &                                    fe_function,
     const Function<spacedim> &                          exact_solution,
     OutVector &                                         difference,
@@ -1196,7 +1198,7 @@ namespace VectorTools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   integrate_difference(
-    const dealii::hp::DoFHandler<dim, spacedim> &            dof,
+    const dealii::DoFHandler<dim, spacedim> &                dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -1220,14 +1222,14 @@ namespace VectorTools
   template <int dim, class InVector, class OutVector, int spacedim>
   DEAL_II_DEPRECATED typename std::enable_if<
     !std::is_same<typename InVector::value_type, double>::value>::type
-  integrate_difference(const dealii::hp::DoFHandler<dim, spacedim> &dof,
-                       const InVector &                             fe_function,
-                       const Function<spacedim> &          exact_solution,
-                       OutVector &                         difference,
-                       const dealii::hp::QCollection<dim> &q,
-                       const NormType &                    norm,
-                       const Function<spacedim> *          weight,
-                       const double                        exponent)
+  integrate_difference(const dealii::DoFHandler<dim, spacedim> &dof,
+                       const InVector &                         fe_function,
+                       const Function<spacedim> &               exact_solution,
+                       OutVector &                              difference,
+                       const dealii::hp::QCollection<dim> &     q,
+                       const NormType &                         norm,
+                       const Function<spacedim> *               weight,
+                       const double                             exponent)
   {
     internal::do_integrate_difference(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,

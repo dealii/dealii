@@ -309,7 +309,12 @@ MaxwellProblem<dim>::setup_system()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   // FE_Nedelec boundary condition.
   VectorTools::project_boundary_values_curl_conforming_l2(
-    dof_handler, 0, ExactSolution<dim>(), 0, constraints);
+    dof_handler,
+    0,
+    ExactSolution<dim>(),
+    0,
+    constraints,
+    StaticMappingQ1<dim>::mapping);
 
   constraints.close();
   DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());

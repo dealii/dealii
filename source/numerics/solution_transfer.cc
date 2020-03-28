@@ -196,18 +196,14 @@ namespace internal
    * which no such interpolation is
    * implemented.
    */
-  template <typename DoFHandlerType>
-  void
-  extract_interpolation_matrices(const DoFHandlerType &,
-                                 dealii::Table<2, FullMatrix<double>> &)
-  {}
-
   template <int dim, int spacedim>
   void
-  extract_interpolation_matrices(
-    const dealii::hp::DoFHandler<dim, spacedim> &dof,
-    dealii::Table<2, FullMatrix<double>> &       matrices)
+  extract_interpolation_matrices(const dealii::DoFHandler<dim, spacedim> &dof,
+                                 dealii::Table<2, FullMatrix<double>> &matrices)
   {
+    if (dof.hp_capability_enabled == false)
+      return;
+
     const dealii::hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
     matrices.reinit(fe.size(), fe.size());
     for (unsigned int i = 0; i < fe.size(); ++i)

@@ -1706,7 +1706,7 @@ public:
    * different MPI processors need to be accessed at a certain time when
    * accessing remote data and overlapping communication with computation.
    */
-  typename hp::DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
   get_hp_cell_iterator(const unsigned int macro_cell_number,
                        const unsigned int vector_number,
                        const unsigned int dof_handler_index = 0) const;
@@ -2009,18 +2009,11 @@ private:
   /**
    * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
    */
+  template <typename DoFHandlerType>
   void
   initialize_dof_handlers(
-    const std::vector<const DoFHandler<dim> *> &dof_handlers,
-    const AdditionalData &                      additional_data);
-
-  /**
-   * Initializes the DoFHandlers based on a hp::DoFHandler<dim> argument.
-   */
-  void
-  initialize_dof_handlers(
-    const std::vector<const hp::DoFHandler<dim> *> &dof_handlers,
-    const AdditionalData &                          additional_data);
+    const std::vector<const DoFHandlerType *> &dof_handlers,
+    const AdditionalData &                     additional_data);
 
   /**
    * Setup connectivity graph with information on the dependencies between
@@ -2041,8 +2034,8 @@ private:
       , n_dof_handlers(0)
     {}
 
-    std::vector<SmartPointer<const DoFHandler<dim>>>     dof_handler;
-    std::vector<SmartPointer<const hp::DoFHandler<dim>>> hp_dof_handler;
+    std::vector<SmartPointer<const DoFHandler<dim>>> dof_handler;
+    std::vector<SmartPointer<const DoFHandler<dim>>> hp_dof_handler;
     enum ActiveDoFHandler
     {
       /**

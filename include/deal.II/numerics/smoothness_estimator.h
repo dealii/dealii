@@ -35,6 +35,9 @@ DEAL_II_NAMESPACE_OPEN
 template <typename Number>
 class Vector;
 
+template <int dim, int spacedim>
+class DoFHandler;
+
 namespace FESeries
 {
   template <int dim, int spacedim>
@@ -45,8 +48,6 @@ namespace FESeries
 
 namespace hp
 {
-  template <int dim, int spacedim>
-  class DoFHandler;
   template <int dim, int spacedim>
   class FECollection;
 } // namespace hp
@@ -157,11 +158,11 @@ namespace SmoothnessEstimator
      */
     template <int dim, int spacedim, typename VectorType>
     void
-    coefficient_decay(FESeries::Legendre<dim, spacedim> &  fe_legendre,
-                      const hp::DoFHandler<dim, spacedim> &dof_handler,
-                      const VectorType &                   solution,
-                      Vector<float> &             smoothness_indicators,
-                      const VectorTools::NormType regression_strategy =
+    coefficient_decay(FESeries::Legendre<dim, spacedim> &fe_legendre,
+                      const DoFHandler<dim, spacedim> &  dof_handler,
+                      const VectorType &                 solution,
+                      Vector<float> &                    smoothness_indicators,
+                      const VectorTools::NormType        regression_strategy =
                         VectorTools::Linfty_norm,
                       const double smallest_abs_coefficient = 1e-10,
                       const bool   only_flagged_cells       = false);
@@ -214,10 +215,10 @@ namespace SmoothnessEstimator
     template <int dim, int spacedim, typename VectorType>
     void
     coefficient_decay_per_direction(
-      FESeries::Legendre<dim, spacedim> &  fe_legendre,
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const VectorType &                   solution,
-      Vector<float> &                      smoothness_indicators,
+      FESeries::Legendre<dim, spacedim> &fe_legendre,
+      const DoFHandler<dim, spacedim> &  dof_handler,
+      const VectorType &                 solution,
+      Vector<float> &                    smoothness_indicators,
       const ComponentMask &coefficients_predicate   = ComponentMask(),
       const double         smallest_abs_coefficient = 1e-10,
       const bool           only_flagged_cells       = false);
@@ -390,11 +391,11 @@ namespace SmoothnessEstimator
      */
     template <int dim, int spacedim, typename VectorType>
     void
-    coefficient_decay(FESeries::Fourier<dim, spacedim> &   fe_fourier,
-                      const hp::DoFHandler<dim, spacedim> &dof_handler,
-                      const VectorType &                   solution,
-                      Vector<float> &             smoothness_indicators,
-                      const VectorTools::NormType regression_strategy =
+    coefficient_decay(FESeries::Fourier<dim, spacedim> &fe_fourier,
+                      const DoFHandler<dim, spacedim> & dof_handler,
+                      const VectorType &                solution,
+                      Vector<float> &                   smoothness_indicators,
+                      const VectorTools::NormType       regression_strategy =
                         VectorTools::Linfty_norm,
                       const double smallest_abs_coefficient = 1e-10,
                       const bool   only_flagged_cells       = false);
@@ -440,10 +441,10 @@ namespace SmoothnessEstimator
     template <int dim, int spacedim, typename VectorType>
     void
     coefficient_decay_per_direction(
-      FESeries::Fourier<dim, spacedim> &   fe_fourier,
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const VectorType &                   solution,
-      Vector<float> &                      smoothness_indicators,
+      FESeries::Fourier<dim, spacedim> &fe_fourier,
+      const DoFHandler<dim, spacedim> & dof_handler,
+      const VectorType &                solution,
+      Vector<float> &                   smoothness_indicators,
       const ComponentMask &coefficients_predicate   = ComponentMask(),
       const double         smallest_abs_coefficient = 1e-10,
       const bool           only_flagged_cells       = false);

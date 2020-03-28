@@ -20,7 +20,5 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension >= 2
     template class DataOutFaces<deal_II_dimension,
                                 DoFHandler<deal_II_dimension>>;
-    template class DataOutFaces<deal_II_dimension,
-                                hp::DoFHandler<deal_II_dimension>>;
 #endif
   }

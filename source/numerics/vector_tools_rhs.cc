@@ -51,31 +51,6 @@ namespace VectorTools
 
 
 
-  template <>
-  void
-  create_boundary_right_hand_side(const hp::MappingCollection<1, 1> &,
-                                  const hp::DoFHandler<1, 1> &,
-                                  const hp::QCollection<0> &,
-                                  const Function<1> &,
-                                  Vector<double> &,
-                                  const std::set<types::boundary_id> &)
-  {
-    Assert(false, ExcImpossibleInDim(1));
-  }
-
-
-
-  template <>
-  void
-  create_boundary_right_hand_side(const hp::MappingCollection<1, 2> &,
-                                  const hp::DoFHandler<1, 2> &,
-                                  const hp::QCollection<0> &,
-                                  const Function<2> &,
-                                  Vector<double> &,
-                                  const std::set<types::boundary_id> &)
-  {
-    Assert(false, ExcImpossibleInDim(1));
-  }
 } // namespace VectorTools
 
 // ---------------------------- explicit instantiations --------------------
