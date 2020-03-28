@@ -2229,8 +2229,9 @@ namespace Euler_DG
 
     double min_vertex_distance = std::numeric_limits<double>::max();
     for (const auto cell : triangulation.active_cell_iterators())
-      min_vertex_distance =
-        std::min(min_vertex_distance, cell->minimum_vertex_distance());
+      if (cell->is_locally_owned())
+        min_vertex_distance =
+          std::min(min_vertex_distance, cell->minimum_vertex_distance());
     min_vertex_distance =
       Utilities::MPI::min(min_vertex_distance, MPI_COMM_WORLD);
 
