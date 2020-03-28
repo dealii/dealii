@@ -1,0 +1,4 @@
+Fixed: step-52 now also outputs the time (and not just the time step)
+in the VTU output files.
+<br>
+(Wolfgang Bangerth, 2020/03/27)
