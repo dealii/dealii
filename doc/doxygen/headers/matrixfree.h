@@ -32,7 +32,7 @@ digraph G
   edge [color="black", weight=10];
   subgraph base {
     rank="same";
-  tria       [label="Triangulation",    URL="\ref grid", ];
+  tria       [label="Triangulation",    URL="\ref grid"];
   fe         [label="FiniteElement",    URL="\ref feall"];
   mapping    [label="Mapping",          URL="\ref mapping"];
   quadrature [label="Quadrature",       URL="\ref Quadrature"];
