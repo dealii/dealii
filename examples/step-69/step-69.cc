@@ -421,7 +421,8 @@ namespace Step69
   // <a href="https://en.wikipedia.org/wiki/Schlieren">Schlieren</a>
   // postprocessing is a standard method for enhancing the contrast of a
   // visualization inspired by actual experimental X-ray and shadowgraphy
-  // techniques of visualization.
+  // techniques of visualization. (See step-67 for another example where we
+  // create a Schlieren plot.)
   template <int dim>
   class SchlierenPostprocessor : public ParameterAcceptor
   {
