@@ -82,7 +82,7 @@ namespace Euler_DG
   using Number = double;
 
   constexpr double gamma       = 1.4;
-  constexpr double FINAL_TIME  = testcase == 0 ? 10 : 2.0;
+  constexpr double final_time  = testcase == 0 ? 10 : 2.0;
   constexpr double output_tick = testcase == 0 ? 1 : 0.05;
 
   // Next off are some details of the time integrator, namely a Courant number
@@ -374,7 +374,7 @@ namespace Euler_DG
                            const double    time_step,
                            VectorType &    solution,
                            VectorType &    vec_ri,
-                           VectorType &    vec_ki)
+                           VectorType &    vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
@@ -766,7 +766,7 @@ namespace Euler_DG
     void project(const Function<dim> &                       function,
                  LinearAlgebra::distributed::Vector<Number> &solution) const;
 
-    Tensor<1, 3> compute_errors(
+    std::array<double, 3> compute_errors(
       const Function<dim> &                             function,
       const LinearAlgebra::distributed::Vector<Number> &solution) const;
 
@@ -1039,9 +1039,15 @@ namespace Euler_DG
   // setups, one has to first copy out e.g. both the value and gradient at a
   // quadrature point and then queue results again by
   // FEEvaluationBase::submit_value() and FEEvaluationBase::submit_gradient().
+  //
+  // As a final note, we mention that we do not use the first MatrixFree
+  // argument of this function, which is a call-back from MatrixFree::loop().
+  // The interfaces imposes the present list of arguments, but since we are in
+  // a member function where the MatrixFree object is already available as the
+  // `data` variable, we stick with that to avoid confusion.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_cell(
-    const MatrixFree<dim, Number> &                   data,
+    const MatrixFree<dim, Number> &,
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
     const std::pair<unsigned int, unsigned int> &     cell_range) const
@@ -1166,7 +1172,7 @@ namespace Euler_DG
   // For faces located at the boundary, we need to impose the appropriate
   // boundary conditions. In this tutorial program, we implement four cases as
   // mentioned above. (A fifth case, for supersonic outflow conditions is
-  // discussed in the "Results" section below. The discontinuous Galerkin
+  // discussed in the "Results" section below.) The discontinuous Galerkin
   // method imposes boundary conditions not as constraints, but only
   // weakly. Thus, the various conditions are imposed by finding an appropriate
   // <i>exterior</i> quantity $\mathbf{w}^+$ that is then handed to the
@@ -1303,7 +1309,7 @@ namespace Euler_DG
   // coordinates. Once this is done, the basis is changed back to the nodal
   // Gauss-Lobatto basis again. All of these operations are done by the
   // `apply()` function below. What we need to provide is the local fields to
-  // operate on (which we extract from the global vecor by an FEEvaluation
+  // operate on (which we extract from the global vector by an FEEvaluation
   // object) and write the results back to the destination vector of the mass
   // matrix operation.
   //
@@ -1318,7 +1324,7 @@ namespace Euler_DG
   // exact integration, as explained in the introduction.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_inverse_mass_matrix(
-    const MatrixFree<dim, Number> &                   data,
+    const MatrixFree<dim, Number> &,
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
     const std::pair<unsigned int, unsigned int> &     cell_range) const
@@ -1528,21 +1534,21 @@ namespace Euler_DG
   //
   // The projection operation works as follows: If we denote the matrix of
   // shape functions evaluated at quadrature points by $S$, the projection on
-  // cell $\Omega_e$ is an operation of the form $\underbrace{S J^e S^\mathrm
-  // T}_{\mathcal M^e} \mathbf{w}^e = S J^e
-  // \tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q}$, where $J^e$ is the diagonal
+  // cell $K$ is an operation of the form $\underbrace{S J^K S^\mathrm
+  // T}_{\mathcal M^K} \mathbf{w}^K = S J^K
+  // \tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q}$, where $J^K$ is the diagonal
   // matrix containing the determinant of the Jacobian times the quadrature
-  // weight (JxW), $\mathcal M^e$ is the cell-wise mass matrix, and
+  // weight (JxW), $\mathcal M^K$ is the cell-wise mass matrix, and
   // $\tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q}$ is the evaluation of the
   // field to be projected onto quadrature points. (In reality the matrix $S$
   // has additional structure through the tensor product, as explained in the
   // introduction.) This system can now equivalently be written as
-  // $\mathbf{w}^e = \left(S J^e S^\mathrm T\right)^{-1} S J^e
+  // $\mathbf{w}^K = \left(S J^K S^\mathrm T\right)^{-1} S J^K
   // \tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q} = S^{-\mathrm T}
-  // \left(J^e\right)^{-1} S^{-1} S J^e
+  // \left(J^K\right)^{-1} S^{-1} S J^K
   // \tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q}$. Now, the term $S^{-1} S$ and
-  // then $\left(J^e\right)^{-1} J^e$ cancel, resulting in the final
-  // expression $\mathbf{w}^e = S^{-\mathrm T}
+  // then $\left(J^K\right)^{-1} J^K$ cancel, resulting in the final
+  // expression $\mathbf{w}^K = S^{-\mathrm T}
   // \tilde{\mathbf{w}}(\mathbf{x}_q)_{q=1:n_q}$. This operation is
   // implemented by
   // MatrixFreeOperators::CellwiseInverseMassMatrix::transform_from_q_points_to_basis().
@@ -1578,6 +1584,7 @@ namespace Euler_DG
   }
 
 
+
   // The next function again repeats functionality also provided by the
   // deal.II library, namely VectorTools::integrate_difference(). We here show
   // the explicit code to highlight how the vectorization across several cells
@@ -1602,19 +1609,19 @@ namespace Euler_DG
   // most cells, but can be less on the last cell batch if the number of cells
   // has a remainder compared to the SIMD width.
   template <int dim, int degree, int n_points_1d>
-  Tensor<1, 3> EulerOperator<dim, degree, n_points_1d>::compute_errors(
+  std::array<double, 3> EulerOperator<dim, degree, n_points_1d>::compute_errors(
     const Function<dim> &                             function,
     const LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     TimerOutput::Scope t(timer, "compute errors");
-    Tensor<1, 3>       errors_squared;
+    double             errors_squared[3] = {};
     FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data, 0, 0);
 
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
         phi.gather_evaluate(solution, true, false);
-        Tensor<1, 3, VectorizedArray<Number>> local_errors_squared;
+        VectorizedArray<Number> local_errors_squared[3] = {};
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             const auto error =
@@ -1633,9 +1640,9 @@ namespace Euler_DG
             errors_squared[d] += local_errors_squared[d][v];
       }
 
-    errors_squared = Utilities::MPI::sum(errors_squared, MPI_COMM_WORLD);
+    Utilities::MPI::sum(errors_squared, MPI_COMM_WORLD, errors_squared);
 
-    Tensor<1, 3> errors;
+    std::array<double, 3> errors;
     for (unsigned int d = 0; d < 3; ++d)
       errors[d] = std::sqrt(errors_squared[d]);
 
@@ -1844,8 +1851,8 @@ namespace Euler_DG
   // variables of density $\rho$, momentum $\rho \mathbf{u}$ and energy $E$,
   // then we compute the derived velocity $\mathbf u$, the pressure $p$, the
   // speed of sound $c=\sqrt{\gamma p / \rho}$, as well as the Schlieren plot
-  // in case it is enabled. (See step-69 for another example where we create
-  // a Schlieren plot.)
+  // showing $s = |\nabla \rho|^2$ in case it is enabled. (See step-69 for
+  // another example where we create a Schlieren plot.)
   template <int dim>
   void EulerProblem<dim>::Postprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
@@ -1861,7 +1868,7 @@ namespace Euler_DG
            ExcInternalError());
     Assert(inputs.solution_values[0].size() == dim + 2, ExcInternalError());
     Assert(computed_quantities[0].size() ==
-             2 * dim + 4 + (do_schlieren_plot == true ? 1 : 0),
+             dim + 2 + (do_schlieren_plot == true ? 1 : 0),
            ExcInternalError());
 
     for (unsigned int q = 0; q < n_evaluation_points; ++q)
@@ -1870,21 +1877,17 @@ namespace Euler_DG
         for (unsigned int d = 0; d < dim + 2; ++d)
           solution[d] = inputs.solution_values[q](d);
 
-        for (unsigned int d = 0; d < dim + 2; ++d)
-          computed_quantities[q](d) = solution[d];
-
         const double         density  = solution[0];
         const Tensor<1, dim> velocity = euler_velocity<dim>(solution);
         const double         pressure = euler_pressure<dim>(solution);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](dim + 2 + d) = velocity[d];
-        computed_quantities[q](2 * dim + 2) = pressure;
-        computed_quantities[q](2 * dim + 3) =
-          std::sqrt(gamma * pressure / density);
+          computed_quantities[q](d) = velocity[d];
+        computed_quantities[q](dim)     = pressure;
+        computed_quantities[q](dim + 1) = std::sqrt(gamma * pressure / density);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](2 * dim + 4) =
+          computed_quantities[q](dim + 2) =
             inputs.solution_gradients[q][0] * inputs.solution_gradients[q][0];
       }
   }
@@ -1895,10 +1898,6 @@ namespace Euler_DG
   std::vector<std::string> EulerProblem<dim>::Postprocessor::get_names() const
   {
     std::vector<std::string> names;
-    names.emplace_back("density");
-    for (unsigned int d = 0; d < dim; ++d)
-      names.emplace_back("momentum");
-    names.emplace_back("energy");
     for (unsigned int d = 0; d < dim; ++d)
       names.emplace_back("velocity");
     names.emplace_back("pressure");
@@ -1921,11 +1920,6 @@ namespace Euler_DG
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       interpretation;
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-    for (unsigned int d = 0; d < dim; ++d)
-      interpretation.push_back(
-        DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar);
     for (unsigned int d = 0; d < dim; ++d)
       interpretation.push_back(
         DataComponentInterpretation::component_is_part_of_vector);
@@ -2011,11 +2005,9 @@ namespace Euler_DG
             for (unsigned int d = 1; d < dim; ++d)
               upper_right[d] = 5;
 
-            std::vector<unsigned int> refinements(dim, 1);
-            GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                                      refinements,
-                                                      lower_left,
-                                                      upper_right);
+            GridGenerator::hyper_rectangle(triangulation,
+                                           lower_left,
+                                           upper_right);
             triangulation.refine_global(2);
 
             euler_operator.set_inflow_boundary(
@@ -2063,7 +2055,7 @@ namespace Euler_DG
     // not particularly intuitive. step-32 explains this in slightly more
     // detail.
     std::locale s = pcout.get_stream().getloc();
-    pcout.get_stream().imbue(std::locale("en_US.UTF-8"));
+    pcout.get_stream().imbue(std::locale(""));
     pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << " ( = " << (dim + 2) << " [vars] x "
           << triangulation.n_global_active_cells() << " [cells] x "
@@ -2082,20 +2074,21 @@ namespace Euler_DG
   //
   // The next step is to create output. This is similar to what is done in
   // step-33: We let the postprocessor defined above control most of the
-  // output. For the analytical solution test case, we also perform another
-  // projection of the analytical solution and print the difference between
-  // that field and the numerical solution. Once we have defined all
-  // quantities to be written, we build the patches for output. Similarly to
-  // step-65, we create a high-order VTK output by setting the appropriate
-  // flag, which enables us to visualize fields of high polynomial
-  // degrees. Finally, we call the `DataOutInterface::write_vtu_in_parallel()`
-  // function to write the result to the given file name. This function uses
-  // special MPI parallel write facilities, which are typically more optimized
-  // for parallel file systems than the standard library's `std::ofstream`
-  // variants used in most other tutorial programs. A particularly nice
-  // feature of the `write_vtu_in_parallel()` function is the fact that it can
-  // combine output from all MPI ranks into a single file, obviating a VTU
-  // master file (the "pvtu" file).
+  // output, except for the primal field that we write directly. For the
+  // analytical solution test case, we also perform another projection of the
+  // analytical solution and print the difference between that field and the
+  // numerical solution. Once we have defined all quantities to be written, we
+  // build the patches for output. Similarly to step-65, we create a
+  // high-order VTK output by setting the appropriate flag, which enables us
+  // to visualize fields of high polynomial degrees. Finally, we call the
+  // `DataOutInterface::write_vtu_in_parallel()` function to write the result
+  // to the given file name. This function uses special MPI parallel write
+  // facilities, which are typically more optimized for parallel file systems
+  // than the standard library's `std::ofstream` variants used in most other
+  // tutorial programs. A particularly nice feature of the
+  // `write_vtu_in_parallel()` function is the fact that it can combine output
+  // from all MPI ranks into a single file, obviating a VTU master file (the
+  // "pvtu" file).
   //
   // For parallel programs, it is often instructive to look at the partitioning
   // of cells among processors. To this end, one can pass a vector of numbers
@@ -2117,7 +2110,7 @@ namespace Euler_DG
   template <int dim>
   void EulerProblem<dim>::output_results(const unsigned int result_number)
   {
-    const Tensor<1, 3> errors =
+    const std::array<double, 3> errors =
       euler_operator.compute_errors(ExactSolution<dim>(time), solution);
     const std::string quantity_name = testcase == 0 ? "error" : "norm";
 
@@ -2139,6 +2132,25 @@ namespace Euler_DG
       data_out.set_flags(flags);
 
       data_out.attach_dof_handler(dof_handler);
+      {
+        std::vector<std::string> names;
+        names.emplace_back("density");
+        for (unsigned int d = 0; d < dim; ++d)
+          names.emplace_back("momentum");
+        names.emplace_back("energy");
+
+        std::vector<DataComponentInterpretation::DataComponentInterpretation>
+          interpretation;
+        interpretation.push_back(
+          DataComponentInterpretation::component_is_scalar);
+        for (unsigned int d = 0; d < dim; ++d)
+          interpretation.push_back(
+            DataComponentInterpretation::component_is_part_of_vector);
+        interpretation.push_back(
+          DataComponentInterpretation::component_is_scalar);
+
+        data_out.add_data_vector(dof_handler, solution, names, interpretation);
+      }
       data_out.add_data_vector(solution, postprocessor);
 
       LinearAlgebra::distributed::Vector<Number> reference;
@@ -2217,7 +2229,7 @@ namespace Euler_DG
 
     make_grid_and_dofs();
 
-    LowStorageRungeKuttaIntegrator integrator(lsrk_scheme);
+    const LowStorageRungeKuttaIntegrator integrator(lsrk_scheme);
 
     LinearAlgebra::distributed::Vector<Number> rk_register_1;
     LinearAlgebra::distributed::Vector<Number> rk_register_2;
@@ -2227,7 +2239,7 @@ namespace Euler_DG
     euler_operator.project(ExactSolution<dim>(time), solution);
 
     double min_vertex_distance = std::numeric_limits<double>::max();
-    for (const auto cell : triangulation.active_cell_iterators())
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         min_vertex_distance =
           std::min(min_vertex_distance, cell->minimum_vertex_distance());
@@ -2262,7 +2274,7 @@ namespace Euler_DG
     // mostly done by the TimerOutput::print_wall_time_statistics() function.
     unsigned int timestep_number = 0;
 
-    while (time < FINAL_TIME - 1e-12)
+    while (time < final_time - 1e-12)
       {
         ++timestep_number;
         if (timestep_number % 5 == 0)
@@ -2285,7 +2297,7 @@ namespace Euler_DG
 
         if (static_cast<int>(time / output_tick) !=
               static_cast<int>((time - time_step) / output_tick) ||
-            time >= FINAL_TIME - 1e-12)
+            time >= final_time - 1e-12)
           output_results(
             static_cast<unsigned int>(std::round(time / output_tick)));
       }
