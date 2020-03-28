@@ -1,0 +1,27 @@
+0:DEAL::Column partitioning:
+0:{[0,2]}
+0:DEAL::Column blocks:
+0:DEAL:: 3 2 2 3
+0:DEAL::Owned column blocks:
+0:{0}
+0:DEAL::diff norm: 0
+0:DEAL::diff trace: 0
+0:DEAL::Ok
+1:DEAL::Column partitioning:
+1:{[3,6]}
+1:DEAL::Column blocks:
+1:DEAL:: 3 2 2 3
+1:DEAL::Owned column blocks:
+1:{[1,2]}
+1:DEAL::diff norm: 0
+1:DEAL::diff trace: 0
+1:DEAL::Ok
+2:DEAL::Column partitioning:
+2:{[7,9]}
+2:DEAL::Column blocks:
+2:DEAL:: 3 2 2 3
+2:DEAL::Owned column blocks:
+2:{3}
+2:DEAL::diff norm: 0
+2:DEAL::diff trace: 0
+2:DEAL::Ok

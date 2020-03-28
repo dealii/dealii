@@ -1,0 +1,32 @@
+0:DEAL::Constraints:
+0:    0 = 0
+0:    1 = 0
+0:    2 = 0
+0:DEAL::Sparsity src:
+0:[0,0,2]
+0:[1,0,2]
+0:[2,0]
+0:DEAL::Sparsity dst:
+0:[0,0,2]
+0:[1,0,2]
+0:[2,0,2]
+0:DEAL::Internal sparsity src:
+0:[0,0,2]
+0:[1,0,2]
+0:[2,0]
+0:DEAL::Internal sparsity dst:
+0:[0,0,2]
+0:[1,0,2]
+0:[2,0,2]
+0:DEAL::Rows on cell: 0
+0:DEAL:: 3 6 4 7 5 8
+0:DEAL::Column: 0
+0:DEAL::Column: 1
+0:DEAL::Column: 3
+0:DEAL::Column: 4
+0:DEAL::Column: 5
+0:DEAL::Nonzero columns over 1 cells: 5
+0:DEAL::frobenius_norm src: 1.17969
+0:DEAL::frobenius_norm dst: 1.19454
+0:DEAL::linfty_norm diff:   0.00000
+0:DEAL::Ok

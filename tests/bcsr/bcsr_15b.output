@@ -1,0 +1,13 @@
+DEAL::has_update_ghost_values_start:
+DEAL::BlockCSRMatrix<Number> = 1
+DEAL::has_compress_start:
+DEAL::BlockCSRMatrix<Number> = 1
+DEAL::has_exchange_on_subset:
+DEAL::BlockCSRMatrix<Number> = 0
+DEAL::has_communication_block_size:
+DEAL::BlockCSRMatrix<Number> = 0
+DEAL::is_serial_or_dummy:
+DEAL::BlockCSRMatrix<Number> = 0
+DEAL::IsBlockVector:
+DEAL::BlockCSRMatrix<Number> = 0
+DEAL::OK

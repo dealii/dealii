@@ -1,0 +1,21 @@
+0:DEAL::n_owned_dofs: 9
+0:DEAL::n_row_blocks: 3
+0:DEAL::n_ghost_indices: 0
+0:DEAL::frobenius_norm src: 3.38641
+0:DEAL::frobenius_norm dst: 5.58101
+0:DEAL::linfty_norm diff:   4.54498e-16
+0:DEAL::Ok
+1:DEAL::n_owned_dofs: 6
+1:DEAL::n_row_blocks: 2
+1:DEAL::n_ghost_indices: 3
+1:DEAL::frobenius_norm src: 3.38641
+1:DEAL::frobenius_norm dst: 5.58101
+1:DEAL::linfty_norm diff:   4.54498e-16
+1:DEAL::Ok
+2:DEAL::n_owned_dofs: 6
+2:DEAL::n_row_blocks: 2
+2:DEAL::n_ghost_indices: 3
+2:DEAL::frobenius_norm src: 3.38641
+2:DEAL::frobenius_norm dst: 5.58101
+2:DEAL::linfty_norm diff:   4.54498e-16
+2:DEAL::Ok

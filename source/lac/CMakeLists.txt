@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_unity_include_src
   affine_constraints.cc
   block_matrix_array.cc
+  block_csr_matrix.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
   block_sparsity_pattern.cc
