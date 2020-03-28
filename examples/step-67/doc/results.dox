@@ -1,0 +1,801 @@
+<h1>Results</h1>
+
+<h3>Program output</h3>
+
+Running the program with the default settings on a machine with 40 processes
+produces the following output:
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 147,456 ( = 4 [vars] x 1,024 [cells] x 36 [dofs/cell/var] )
+Time step size: 0.00689325, minimal h: 0.3125, initial transport scaling: 0.102759
+
+Time:       0, dt:   0.0069, error rho:   2.76e-07, rho * u:  1.259e-06, energy: 2.987e-06
+Time:    1.01, dt:   0.0069, error rho:   1.37e-06, rho * u:  2.252e-06, energy: 4.153e-06
+Time:    2.01, dt:   0.0069, error rho:  1.561e-06, rho * u:   2.43e-06, energy: 4.493e-06
+Time:    3.01, dt:   0.0069, error rho:  1.714e-06, rho * u:  2.591e-06, energy: 4.762e-06
+Time:    4.01, dt:   0.0069, error rho:  1.843e-06, rho * u:  2.625e-06, energy: 4.985e-06
+Time:    5.01, dt:   0.0069, error rho:  1.496e-06, rho * u:  1.961e-06, energy: 4.142e-06
+Time:       6, dt:   0.0083, error rho:  1.007e-06, rho * u:  7.119e-07, energy: 2.972e-06
+Time:       7, dt:   0.0095, error rho:  9.096e-07, rho * u:  3.786e-07, energy: 2.626e-06
+Time:       8, dt:   0.0096, error rho:  8.439e-07, rho * u:  3.338e-07, energy:  2.43e-06
+Time:       9, dt:   0.0096, error rho:  7.822e-07, rho * u:  2.984e-07, energy: 2.248e-06
+Time:      10, dt:   0.0096, error rho:  7.231e-07, rho * u:  2.666e-07, energy: 2.074e-06
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              |     2.249s    30 |     2.249s |     2.249s     8 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        11 |  0.008066s    13 |   0.00952s |   0.01041s    20 |
+| compute transport speed       |       258 |   0.01012s    13 |   0.05392s |   0.08574s    25 |
+| output                        |        11 |    0.9597s    13 |    0.9613s |    0.9623s     6 |
+| rk time stepping total        |      1283 |    0.9827s    25 |     1.015s |      1.06s    13 |
+| rk_stage - integrals L_h      |      6415 |    0.8803s    26 |    0.9198s |    0.9619s    14 |
+| rk_stage - inv mass + vec upd |      6415 |   0.05677s    15 |   0.06487s |   0.07597s    13 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+The program output shows that all errors are small. This is due to the fact
+that we use a relatively fine mesh of $32^2$ cells with polynomials of degree
+5 for a solution that is smooth. An interesting pattern shows for the time
+step size: whereas it is 0.0069 up to time 5, it increases to 0.0096 for later
+times. The step size increases once the vortex with some motion on top of the
+speed of sound (and thus faster propagation) leaves the computational domain
+between times 5 and 6.5. After that point, the flow is simply uniform
+in the same direction, and the maximum velocity of the gas is reduced
+compared to the previous state where the uniform velocity was overlaid
+by the vortex. Our time step formula recognizes this effect.
+
+The final block of output shows detailed information about the timing
+of individual parts of the programs; it breaks this down by showing
+the time taken by the fastest and the slowest processor, and the
+average time -- this is often useful in very large computations to
+find whether there are processors that are consistently overheated
+(and consequently are throttling their clock speed) or consistently
+slow for other reasons.
+The summary shows that 1283 time steps have been performed
+in 1.02 seconds (looking at the average time among all MPI processes), while
+the output of 11 files has taken additional 0.96 seconds. Broken down per time
+step and into the five Runge--Kutta stages, the compute time per evaluation is
+0.16 milliseconds. This high performance is typical of matrix-free evaluators
+and a reason why explicit time integration is very competitive against
+implicit solvers, especially for large-scale simulations. The breakdown of
+computational times at the end of the program run shows that the evaluation of
+integrals in $\mathcal L_h$ contributes with around 0.92 seconds and the
+application of the inverse mass matrix with 0.06 seconds. Furthermore, the
+estimation of the transport speed for the time step size computation
+contributes with another 0.05 seconds of compute time.
+
+If we use three more levels of global refinement and 9.4 million DoFs in total,
+the final statistics are as follows (for the modified Lax--Friedrichs flux,
+$p=5$, and the same system of 40 cores of dual-socket Intel Xeon Gold 6230):
+@code
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              |     244.9s    12 |     244.9s |     244.9s    34 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        11 |    0.4239s    12 |    0.4318s |    0.4408s     9 |
+| compute transport speed       |      2053 |     3.962s    12 |     6.727s |     10.12s     7 |
+| output                        |        11 |     30.35s    12 |     30.36s |     30.37s     9 |
+| rk time stepping total        |     10258 |     201.7s     7 |     205.1s |     207.8s    12 |
+| rk_stage - integrals L_h      |     51290 |     121.3s     6 |     126.6s |     136.3s    16 |
+| rk_stage - inv mass + vec upd |     51290 |     66.19s    16 |     77.52s |     81.84s    10 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+Per time step, the solver now takes 0.02 seconds, about 25 times as long as
+for the small problem with 147k unknowns. Given that the problem involves 64
+times as many unknowns, the increase in computing time is not
+surprising. Since we also do 8 times as many time steps, the compute time
+should in theory increase by a factor of 512. The actual increase is 205 s /
+1.02 s = 202. This is because the small problem size cannot fully utilize the
+40 cores due to communication overhead. This becomes clear if we look into the
+details of the operations done per time step. The evaluation of the
+differential operator $\mathcal L_h$ with nearest neighbor communication goes
+from 0.92 seconds to 127 seconds, i.e., it increases with a factor of 138. On
+the other hand, the cost for application of the inverse mass matrix and the
+vector updates, which do not need to communicate between the MPI processes at
+all, has increased by a factor of 1195. The increase is more than the
+theoretical factor of 512 because the operation is limited by the bandwidth
+from RAM memory for the larger size while for the smaller size, all vectors
+fit into the caches of the CPU. The numbers show that the mass matrix
+evaluation and vector update part consume almost 40% of the time spent by the
+Runge--Kutta stages -- despite using a low-storage Runge--Kutta integrator and
+merging of vector operations! And despite using over-integration for the
+$\mathcal L_h$ operator. For simpler differential operators and more expensive
+time integrators, the proportion spent in the mass matrix and vector update
+part can also reach 70%. If we compute a throughput number in terms of DoFs
+processed per second and Runge--Kutta stage, we obtain @f[ \text{throughput} =
+\frac{n_\mathrm{time steps} n_\mathrm{stages}
+n_\mathrm{dofs}}{t_\mathrm{compute}} = \frac{10258 \cdot 5 \cdot
+9.4\,\text{MDoFs}}{205s} = 2360\, \text{MDoFs/s} @f] This throughput number is
+very high, given that simply copying one vector to another one runs at
+only around 10,000 MDoFs/s.
+
+If we go to the next-larger size with 37.7 million DoFs, the overall
+simulation time is 2196 seconds, with 1978 seconds spent in the time
+stepping. The increase in run time is a factor of 9.3 for the L_h operator
+(1179 versus 127 seconds) and a factor of 10.3 for the inverse mass matrix and
+vector updates (797 vs 77.5 seconds). The reason for this non-optimal increase
+in run time can be traced back to cache effects on the given hardware (with 40
+MB of L2 cache and 55 MB of L3 cache): While not all of the relevant data fits
+into caches for 9.4 million DoFs (one vector takes 75 MB and we have three
+vectors plus some additional data in MatrixFree), there is capacity for one and
+a half vector nonetheless. Given that modern caches are more sophisticated than
+the naive least-recently-used strategy (where we would have little re-use as
+the data is used in a streaming-like fashion), we can assume that a sizeable
+fraction of data can indeed be delivered from caches for the 9.4 million DoFs
+case. For the larger case, even with optimal caching less than 10 percent of
+data would fit into caches, with an associated loss in performance.
+
+
+<h3>Convergence rates for the analytical test case</h3>
+
+For the modified Lax--Friedrichs flux and measuring the error in the momentum
+variable, we obtain the following convergence table (the rates are very
+similar for the density and energy variables):
+
+<table align="center" class="doxtable">
+  <tr>
+    <th>&nbsp;</th>
+    <th colspan="3"><i>p</i>=2</th>
+    <th colspan="3"><i>p</i>=3</th>
+    <th colspan="3"><i>p</i>=5</th>
+  </tr>
+  <tr>
+    <th>n_cells</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+  </tr>
+  <tr>
+    <td align="right">16</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td align="right">2,304</td>
+    <td align="center">1.373e-01</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="right">64</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td align="right">4,096</td>
+    <td align="center">9.130e-02</td>
+    <td>&nbsp;</td>
+    <td align="right">9,216</td>
+    <td align="center">8.899e-03</td>
+    <td>3.94</td>
+  </tr>
+  <tr>
+    <td align="right">256</td>
+    <td align="right">9,216</td>
+    <td align="center">5.577e-02</td>
+    <td>&nbsp;</td>
+    <td align="right">16,384</td>
+    <td align="center">7.381e-03</td>
+    <td>3.64</td>
+    <td align="right">36,864</td>
+    <td align="center">2.082e-04</td>
+    <td>5.42</td>
+  </tr>
+  <tr>
+    <td align="right">1024</td>
+    <td align="right">36,864</td>
+    <td align="center">4.724e-03</td>
+    <td>3.56</td>
+    <td align="right">65,536</td>
+    <td align="center">3.072e-04</td>
+    <td>4.59</td>
+    <td align="right">147,456</td>
+    <td align="center">2.625e-06</td>
+    <td>6.31</td>
+  </tr>
+  <tr>
+    <td align="right">4096</td>
+    <td align="right">147,456</td>
+    <td align="center">6.205e-04</td>
+    <td>2.92</td>
+    <td align="right">262,144</td>
+    <td align="center">1.880e-05</td>
+    <td>4.03</td>
+    <td align="right">589,824</td>
+    <td align="center">3.268e-08</td>
+    <td>6.33</td>
+  </tr>
+  <tr>
+    <td align="right">16,384</td>
+    <td align="right">589,824</td>
+    <td align="center">8.279e-05</td>
+    <td>2.91</td>
+    <td align="right">1,048,576</td>
+    <td align="center">1.224e-06</td>
+    <td>3.94</td>
+    <td align="right">2,359,296</td>
+    <td align="center">9.252e-10</td>
+    <td>5.14</td>
+  </tr>
+  <tr>
+    <td align="right">65,536</td>
+    <td align="right">2,359,296</td>
+    <td align="center">1.105e-05</td>
+    <td>2.91</td>
+    <td align="right">4,194,304</td>
+    <td align="center">7.871e-08</td>
+    <td>3.96</td>
+    <td align="right">9,437,184</td>
+    <td align="center">1.369e-10</td>
+    <td>2.77</td>
+  </tr>
+  <tr>
+    <td align="right">262,144</td>
+    <td align="right">9,437,184</td>
+    <td align="center">1.615e-06</td>
+    <td>2.77</td>
+    <td align="right">16,777,216</td>
+    <td align="center">4.961e-09</td>
+    <td>3.99</td>
+    <td align="right">37,748,736</td>
+    <td align="center">7.091e-11</td>
+    <td>0.95</td>
+  </tr>
+</table>
+
+If we switch to the Harten-Lax-van Leer flux, the results are as follows:
+<table align="center" class="doxtable">
+  <tr>
+    <th>&nbsp;</th>
+    <th colspan="3"><i>p</i>=2</th>
+    <th colspan="3"><i>p</i>=3</th>
+    <th colspan="3"><i>p</i>=5</th>
+  </tr>
+  <tr>
+    <th>n_cells</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+    <th>n_dofs</th>
+    <th>error mom</th>
+    <th>rate</th>
+  </tr>
+  <tr>
+    <td align="right">16</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td align="right">2,304</td>
+    <td align="center">1.339e-01</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="right">64</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td align="right">4,096</td>
+    <td align="center">9.037e-02</td>
+    <td>&nbsp;</td>
+    <td align="right">9,216</td>
+    <td align="center">8.849e-03</td>
+    <td>3.92</td>
+  </tr>
+  <tr>
+    <td align="right">256</td>
+    <td align="right">9,216</td>
+    <td align="center">4.204e-02</td>
+    <td>&nbsp;</td>
+    <td align="right">16,384</td>
+    <td align="center">9.143e-03</td>
+    <td>3.31</td>
+    <td align="right">36,864</td>
+    <td align="center">2.501e-04</td>
+    <td>5.14</td>
+  </tr>
+  <tr>
+    <td align="right">1024</td>
+    <td align="right">36,864</td>
+    <td align="center">4.913e-03</td>
+    <td>3.09</td>
+    <td align="right">65,536</td>
+    <td align="center">3.257e-04</td>
+    <td>4.81</td>
+    <td align="right">147,456</td>
+    <td align="center">3.260e-06</td>
+    <td>6.26</td>
+  </tr>
+  <tr>
+    <td align="right">4096</td>
+    <td align="right">147,456</td>
+    <td align="center">7.862e-04</td>
+    <td>2.64</td>
+    <td align="right">262,144</td>
+    <td align="center">1.588e-05</td>
+    <td>4.36</td>
+    <td align="right">589,824</td>
+    <td align="center">2.953e-08</td>
+    <td>6.79</td>
+  </tr>
+  <tr>
+    <td align="right">16,384</td>
+    <td align="right">589,824</td>
+    <td align="center">1.137e-04</td>
+    <td>2.79</td>
+    <td align="right">1,048,576</td>
+    <td align="center">9.400e-07</td>
+    <td>4.08</td>
+    <td align="right">2,359,296</td>
+    <td align="center">4.286e-10</td>
+    <td>6.11</td>
+  </tr>
+  <tr>
+    <td align="right">65,536</td>
+    <td align="right">2,359,296</td>
+    <td align="center">1.476e-05</td>
+    <td>2.95</td>
+    <td align="right">4,194,304</td>
+    <td align="center">5.799e-08</td>
+    <td>4.02</td>
+    <td align="right">9,437,184</td>
+    <td align="center">2.789e-11</td>
+    <td>3.94</td>
+  </tr>
+  <tr>
+    <td align="right">262,144</td>
+    <td align="right">9,437,184</td>
+    <td align="center">2.038e-06</td>
+    <td>2.86</td>
+    <td align="right">16,777,216</td>
+    <td align="center">3.609e-09</td>
+    <td>4.01</td>
+    <td align="right">37,748,736</td>
+    <td align="center">5.730e-11</td>
+    <td>-1.04</td>
+  </tr>
+</table>
+
+The tables show that we get optimal $\mathcal O\left(h^{p+1}\right)$
+convergence rates for both numerical fluxes. The errors are slighly smaller
+for the Lax--Friedrichs flux for $p=2$, but the picture is reversed for
+$p=3$; in any case, the differences on this testcase are relatively
+small.
+
+For $p=5$, we reach the roundoff accuracy of $10^{-11}$ with both
+fluxes on the finest grids. Also note that the errors are absolute with a
+domain length of $10^2$, so relative errors are below $10^{-12}$. The HLL flux
+is somewhat better for the highest degree, which is due to a slight inaccuracy
+of the Lax--Friedrichs flux: The Lax--Friedrichs flux sets a Dirichlet
+condition on the solution that leaves the domain, which results in a small
+artificial reflection, which is accentuated for the Lax--Friedrichs
+flux. Apart from that, we see that the influence of the numerical flux is
+minor, as the polynomial part inside elements is the main driver of the
+accucary. The limited influence of the flux also has consequences when trying
+to approach more challenging setups with the higher-order DG setup: Taking for
+example the parameters and grid of step-33, we get oscillations (which in turn
+make density negative and make the solution explode) with both fluxes once the
+high-mass part comes near the boundary, as opposed to the low-order finite
+volume case ($p=0$). Thus, any case that leads to shocks in the solution
+necessitates some form of limiting or artificial dissipation. For another
+alternative, see the step-69 tutorial program.
+
+
+<h3>Results for flow in channel around cylinder in 2D</h3>
+
+For the test case of the flow around a cylinder in a channel, we need to
+change the first code line to
+@code
+  constexpr unsigned int testcase = 1;
+@endcode
+This test case starts with a background field of a constant velocity
+of Mach number 0.31 and a constant initial density; the flow will have
+to go around an obstacle in the form of a cylinder. Since we impose a
+no-penetration condition on the cylinder walls, the flow that
+initially impinges head-on onto to cylinder has to rearrange,
+which creates a big sound wave. The following pictures show the pressure at
+times 0.1, 0.25, 0.5, and 1.0 (top left to bottom right) for the 2D case with
+5 levels of global refinement, using 102,400 cells with polynomial degree of
+5 and 14.7 million degrees of freedom over all 4 solution variables.
+We clearly see the discontinuity that
+propagates slowly in the upstream direction and more quickly in downstream
+direction in the first snapshot at time 0.1. At time 0.25, the sound wave has
+reached the top and bottom walls and reflected back to the interior. From the
+different distances of the reflected waves from lower and upper walls we can
+see the slight asymmetry of the Sch&auml;fer-Turek test case represented by
+GridGenerator::channel_with_cylinder() with somewhat more space above the
+cylinder compared to below. At later times, the picture is more chaotic with
+many sound waves all over the place.
+
+<table align="center" class="doxtable" style="width:85%">
+  <tr>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
+    </td>
+  </tr>
+</table>
+
+The next picture shows an elevation plot of the pressure at time 1.0 looking
+from the channel inlet towards the outlet at the same resolution -- here,
+we can see the large number
+of reflections. In the figure, two types of waves are visible. The
+larger-amplitude waves correspond to various reflections that happened as the
+initial discontinuity hit the walls, whereas the small-amplitude waves of
+size similar to the elements correspond to numerical artifacts. They have their
+origin in the finite resolution of the scheme and appear as the discontinuity
+travels through elements with high-order polynomials. This effect can be cured
+by increasing resolution. Apart from this effect, the rich wave structure is
+the result of the transport accuracy of the high-order DG method.
+
+<img src="https://www.dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
+
+With 2 levels of global refinement with 1,600 cells, the mesh and its
+partitioning on 40 MPI processes looks as follows:
+
+<img src="https://www.dealii.org/images/steps/developer/step-67.grid-owner.png" alt="" width="70%">
+
+When we run the code with 4 levels of global refinements on 40 cores, we get
+the following output:
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 3,686,400 ( = 4 [vars] x 25,600 [cells] x 36 [dofs/cell/var] )
+Time step size: 7.39876e-05, minimal h: 0.001875, initial transport scaling: 0.00110294
+
+Time:       0, dt:  7.4e-05, norm rho:   4.17e-16, rho * u:  1.629e-16, energy: 1.381e-15
+Time:    0.05, dt:  6.3e-05, norm rho:    0.02075, rho * u:    0.03801, energy:   0.08772
+Time:     0.1, dt:  5.9e-05, norm rho:    0.02211, rho * u:    0.04515, energy:   0.08953
+Time:    0.15, dt:  5.7e-05, norm rho:    0.02261, rho * u:    0.04592, energy:   0.08967
+Time:     0.2, dt:  5.8e-05, norm rho:    0.02058, rho * u:    0.04361, energy:   0.08222
+Time:    0.25, dt:  5.9e-05, norm rho:    0.01695, rho * u:    0.04203, energy:   0.06873
+Time:     0.3, dt:  5.9e-05, norm rho:    0.01653, rho * u:     0.0401, energy:   0.06604
+Time:    0.35, dt:  5.7e-05, norm rho:    0.01774, rho * u:    0.04264, energy:    0.0706
+
+...
+
+Time:    1.95, dt:  5.8e-05, norm rho:    0.01488, rho * u:    0.03923, energy:   0.05185
+Time:       2, dt:  5.7e-05, norm rho:    0.01432, rho * u:    0.03969, energy:   0.04889
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              |     273.6s    13 |     273.6s |     273.6s     0 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        41 |   0.01112s    35 |    0.0672s |    0.1337s     0 |
+| compute transport speed       |      6914 |     5.422s    35 |     15.96s |     29.99s     1 |
+| output                        |        41 |     37.24s    35 |      37.3s |     37.37s     0 |
+| rk time stepping total        |     34564 |     205.4s     1 |     219.5s |     230.1s    35 |
+| rk_stage - integrals L_h      |    172820 |     153.6s     1 |     164.9s |     175.6s    27 |
+| rk_stage - inv mass + vec upd |    172820 |     47.13s    13 |     53.09s |     64.05s    33 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+The norms shown here for the various quantities are the deviations
+$\rho'$, $(\rho u)'$, and $E'$ against the background field (namely, the
+initial condition). The distribution of run time is overall similar as in the
+previous test case. The only slight difference is the larger proportion of
+time spent in $\mathcal L_h$ as compared to the inverse mass matrix and vector
+updates. This is because the geometry is deformed and the matrix-free
+framework needs to load additional arrays for the geometry from memory that
+are compressed in the affine mesh case.
+
+Increasing the number of global refinements to 5, the output becomes:
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 14,745,600 ( = 4 [vars] x 102,400 [cells] x 36 [dofs/cell/var] )
+
+...
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              |      2693s    32 |      2693s |      2693s    23 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        41 |   0.04537s    32 |     0.173s |    0.3489s     0 |
+| compute transport speed       |     13858 |     40.75s    32 |     85.99s |     149.8s     0 |
+| output                        |        41 |     153.8s    32 |     153.9s |     154.1s     0 |
+| rk time stepping total        |     69284 |      2386s     0 |      2450s |      2496s    32 |
+| rk_stage - integrals L_h      |    346420 |      1365s    32 |      1574s |      1718s    19 |
+| rk_stage - inv mass + vec upd |    346420 |     722.5s    10 |     870.7s |      1125s    32 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+The effect on performance is similar to the analytical test case -- in
+theory, computation times should increase by a factor of 8, but we actually
+see an increase by a factor of 11 for the time steps (219.5 seconds versus
+2450 seconds). This can be traced back to caches, with the small case mostly
+fitting in caches. An interesting effect, typical of programs with a mix of
+local communication (integrals $\mathcal L_h$) and global communication (computation of
+transport speed) with some load imbalance, can be observed by looking at the
+MPI ranks that encounter the minimal and maximal time of different phases,
+respectively. Rank 0 reports the fastest throughput for the "rk time stepping
+total" part. At the same time, it appears to be slowest for the "compute
+transport speed" part, almost a factor of 2 slower than the
+average and almost a factor of 4 compared to the faster rank.
+Since the latter involves global communication, we can attribute the
+slowness in this part to the fact that the local Runge--Kutta stages have
+advanced more quickly on this rank and need to wait until the other processors
+catch up. At this point, one can wonder about the reason for this imbalance:
+The number of cells is almost the same on all MPI processes.
+However, the matrix-free framework is faster on affine and Cartesian
+cells located towards the outlet of the channel, to which the lower MPI ranks
+are assigned. On the other hand, rank 32, which reports the highest run time
+for the Runga--Kutta stages, owns the curved cells near the cylinder, for
+which no data compression is possible. To improve throughput, we could assign
+different weights to different cell types when partitioning the
+parallel::distributed::Triangulation object, or even measure the run time for a
+few time steps and try to rebalance then.
+
+The throughput per Runge--Kutta stage can be computed to 2085 MDoFs/s for the
+14.7 million DoFs test case over the 346,000 Runge--Kutta stages, slightly slower
+than the Cartesian mesh throughput of 2360 MDoFs/s reported above.
+
+Finally, if we add one additional refinement, we record the following output:
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 58,982,400 ( = 4 [vars] x 409,600 [cells] x 36 [dofs/cell/var] )
+
+...
+
+Time:    1.95, dt:  1.4e-05, norm rho:    0.01488, rho * u:    0.03923, energy:   0.05183
+Time:       2, dt:  1.4e-05, norm rho:    0.01431, rho * u:    0.03969, energy:   0.04887
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              | 2.166e+04s    26 | 2.166e+04s | 2.166e+04s    24 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        41 |    0.1758s    30 |     0.672s |     1.376s     1 |
+| compute transport speed       |     27748 |     321.3s    34 |     678.8s |      1202s     1 |
+| output                        |        41 |     616.3s    32 |     616.4s |     616.4s    34 |
+| rk time stepping total        |    138733 | 1.983e+04s     1 | 2.036e+04s | 2.072e+04s    34 |
+| rk_stage - integrals L_h      |    693665 | 1.052e+04s    32 | 1.248e+04s | 1.387e+04s    19 |
+| rk_stage - inv mass + vec upd |    693665 |      6404s    10 |      7868s | 1.018e+04s    32 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+The "rk time stepping total" part corresponds to a throughput of 2010 MDoFs/s. The
+overall run time to perform 139k time steps is 20k seconds (5.7 hours) or 7
+time steps per second -- not so bad for having nearly 60 million
+unknowns. More throughput can be achieved by adding more cores to
+the computation.
+
+
+<h3>Results for flow in channel around cylinder in 3D</h3>
+
+Switching the channel test case to 3D with 3 global refinements, the output is
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 221,184,000 ( = 5 [vars] x 204,800 [cells] x 216 [dofs/cell/var] )
+
+...
+
+Time:    1.95, dt:  0.00011, norm rho:    0.01131, rho * u:    0.03056, energy:   0.04091
+Time:       2, dt:  0.00011, norm rho:     0.0119, rho * u:    0.03142, energy:   0.04425
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              | 1.734e+04s     4 | 1.734e+04s | 1.734e+04s    38 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        41 |    0.6551s    34 |     3.216s |     7.281s     0 |
+| compute transport speed       |      3546 |       160s    34 |     393.2s |     776.9s     0 |
+| output                        |        41 |      1350s    34 |      1353s |      1357s     0 |
+| rk time stepping total        |     17723 | 1.519e+04s     0 | 1.558e+04s | 1.582e+04s    34 |
+| rk_stage - integrals L_h      |     88615 | 1.005e+04s    32 | 1.126e+04s |  1.23e+04s    11 |
+| rk_stage - inv mass + vec upd |     88615 |      3056s    11 |      4322s |      5759s    32 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+The physics are similar to the 2D case, with a slight motion in the z
+direction due to the gravitational force. The throughput per Runge--Kutta
+stage in this case is
+@f[
+\text{throughput} = \frac{n_\mathrm{time steps} n_\mathrm{stages}
+n_\mathrm{dofs}}{t_\mathrm{compute}} =
+\frac{17723 \cdot 5 \cdot 221.2\,\text{M}}{15580s} = 1258\, \text{MDoFs/s}.
+@f]
+
+The throughput is lower than in 2D because the computation of the $\mathcal L_h$ term
+is more expensive. This is due to over-integration with `degree+2` points and
+the larger fraction of face integrals (worse volume-to-surface ratio) with
+more expensive flux computations. If we only consider the inverse mass matrix
+and vector update part, we record a throughput of 4857 MDoFs/s for the 2D case
+of the isentropic vortex with 37.7 million unknowns, whereas the 3D case
+runs with 4535 MDoFs/s. The performance is similar because both cases are in
+fact limited by the memory bandwidth.
+
+If we go to four levels of global refinement, we need to increase the number
+of processes to fit everything in memory -- the computation needs around 350
+GB of RAM memory in this case. Also, the time it takes to complete 35k time
+steps becomes more tolerable by adding additional resources. We therefore use
+6 nodes with 40 cores each, resulting in a computation with 240 MPI processes:
+@code
+Running with 240 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 1,769,472,000 ( = 5 [vars] x 1,638,400 [cells] x 216 [dofs/cell/var] )
+
+...
+
+Time:    1.95, dt:  5.6e-05, norm rho:    0.01129, rho * u:     0.0306, energy:   0.04086
+Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy:   0.04417
+
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              | 5.396e+04s   151 | 5.396e+04s | 5.396e+04s     0 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |        41 |     2.632s   178 |     7.221s |     16.56s     0 |
+| compute transport speed       |      7072 |       714s   193 |      1553s |      3351s     0 |
+| output                        |     35350 |      8065s   176 |      8070s |      8079s     0 |
+| rk time stepping total        |     35350 |  4.25e+04s     0 |  4.43e+04s | 4.515e+04s   193 |
+| rk_stage - integrals L_h      |    176750 | 2.936e+04s   134 | 3.222e+04s |  3.67e+04s    99 |
+| rk_stage - inv mass + vec upd |    176750 |      7004s    99 | 1.207e+04s |  1.55e+04s   132 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+This simulation had nearly 2 billion unknowns -- quite a large
+computation indeed, and still only needed around 1.5 seconds per time
+step.
+
+
+<h3>Possibilities for extensions</h3>
+
+The code presented here straight-forwardly extends to adaptive meshes, given
+appropriate indicators for setting the refinement flags. Large-scale
+adaptivity of a similar solver in the context of the acoustic wave equation
+has been achieved by the <a href="https://github.com/kronbichler/exwave">exwave
+project</a>. However, in the present context, the benefits of adaptivity are often
+limited to early times and effects close to the origin of sound waves, as the
+waves eventually reflect and diffract. This leads to steep gradients all over
+the place, similar to turbulent flow, and a more or less globally
+refined mesh.
+
+Another topic that we did not discuss in the results section is a comparison
+of different time integration schemes. The program provides four variants of
+low-storage Runga--Kutta integrators that each have slightly different
+accuracy and stability behavior. Among the schemes implemented here, the
+higher-order ones provide additional accuracy but come with slightly lower
+efficiency in terms of step size per stage before they violate the CFL
+condition. An interesting extension would be to compare the low-storage
+variants proposed here with standard Runge--Kutta integrators or to use vector
+operations that are run separate from the mass matrix operation and compare
+performance.
+
+
+<h4>More advanced numerical flux functions and skew-symmetric formulations</h4>
+
+As mentioned in the introduction, the modified Lax--Friedrichs flux and the
+HLL flux employed in this program are only two variants of a large body of
+numerical fluxes available in the literature on the Euler equations. One
+example is the HLLC flux (Harten-Lax-van Leer-Contact) flux which adds the
+effect of rarefaction waves missing in the HLL flux, or the Roe flux. As
+mentioned in the introduction, the effect of numerical fluxes on high-order DG
+schemes is debatable (unlike for the case of low-order discretizations).
+
+A related improvement to increase the stability of the solver is to also
+consider the spatial integral terms. A shortcoming in the rather naive
+implementation used above is the fact that the energy conservation of the
+original Euler equations (in the absence of shocks) only holds up to a
+discretization error. If the solution is under-resolved, the discretization
+error can give rise to an increase in the numerical energy and eventually
+render the discretization unstable. This is because of the inexact numerical
+integration of the terms in the Euler equations, which both contain rational
+nonlinearities and higher-degree content from curved cells. A way out of this
+dilemma are so-called skew-symmetric formulations, see @cite Gassner2013 for a
+simple variant. Skew symmetry means that switching the role of the solution
+$\mathbf{w}$ and test functions $\mathbf{v}$ in the weak form produces the
+exact negative of the original quantity, apart from some boundary terms. In
+the discrete setting, the challenge is to keep this skew symmetry also when
+the integrals are only computed approximately (in the continuous case,
+skew-symmetry is a consequence of integration by parts). Skew-symmetric
+numerical schemes balance spatial derivatives in the conservative form
+$(\nabla \mathbf v, \mathbf{F}(\mathbf w))_{K}$ with contributions in the
+convective form $(\mathbf v, \tilde{\mathbf{F}}(\mathbf w)\nabla
+\mathbf{w})_{K}$ for some $\tilde{\mathbf{F}}$. The precise terms depend on
+the equation and the integration formula, and can in some cases by understood
+by special skew-symmetric finite difference schemes.
+
+
+<h4>Equipping the code for supersonic calculations</h4>
+
+As mentioned in the introduction, the solution to the Euler equations develops
+shocks as the Mach number increases, which require additional mechanisms to
+stabilize the scheme, e.g. in the form of limiters. The main challenge besides
+actually implementing the limiter or artificial viscosity approach would be to
+load-balance the computations, as the additional computations involved for
+limiting the oscillations in troubled cells would make them more expensive than the
+plain DG cells without limiting. Furthermore, additional numerical fluxes that
+better cope with the discontinuities would also be an option.
+
+One ingredient also necessary for supersonic flows are appropriate boundary
+conditions. As opposed to the subsonic outflow boundaries discussed in the
+introduction and implemented in the program, all characteristics are outgoing
+for supersonic outflow boundaries, so we do not want to prescribe any external
+data,
+@f[
+\mathbf{w}^+ = \mathbf{w}^- = \begin{pmatrix} \rho^-\\
+(\rho \mathbf u)^- \\ E^-\end{pmatrix} \quad
+ \text{(Neumann)}.
+@f]
+
+In the code, we would simply add the additional statement
+@code
+            else if (supersonic_outflow_boundaries.find(boundary_id) !=
+                     supersonic_outflow_boundaries.end())
+              {
+                w_p        = w_m;
+                at_outflow = true;
+              }
+@endcode
+in the `local_apply_boundary_face()` function.
+
+<h4>Extension to the linearized Euler equations</h4>
+
+When the interest with an Euler solution is mostly in the propagation of sound
+waves, it often makes sense to linearize the Euler equations around a
+background state, i.e., a given density, velocity and energy (or pressure)
+field, and only compute the change against these fields. This is the setting
+of the wide field of aeroacoustics. Even though the resolution requirements
+are sometimes considerably reduced, implementation gets somewhat more
+complicated as the linearization gives rise to additional terms. From a code
+perspective, in the operator evaluation we also need to equip the code with
+the state to linearize against. This information can be provided either by
+analytical functions (that are evaluated in terms of the position of the
+quadrature points) or by a vector similar to the solution. Based on that
+vector, we would create an additional FEEvaluation object to read from it and
+provide the values of the field at quadrature points. If the background
+velocity is zero and the density is constant, the linearized Euler equations
+further simplify and can equivalently be written in the form of the
+acoustic wave equation.
+
+A challenge in the context of sound propagation is often the definition of
+boundary conditions, as the computational domain needs to be of finite size,
+whereas the actual simulation often spans an infinite (or at least much
+larger) physical domain. Conventional Dirichlet or Neumann boundary conditions
+give rise to reflections of the sound waves that eventually propagate back to
+the region of interest and spoil the solution. Therefore, various variants of
+non-reflecting boundary conditions or sponge layers, often in the form of
+<a
+href="https://en.wikipedia.org/wiki/Perfectly_matched_layer">perfectly
+matched layers</a> -- where the solution is damped without reflection
+-- are common.
+
+
+<h4>Extension to the compressible Navier-Stokes equation</h4>
+
+The solver presented in this tutorial program can also be extended to the
+compressible Navier--Stokes equations by adding viscous terms, as described in
+@cite FehnWallKronbichler2019. To keep as much of the performance obtained
+here despite the additional cost of elliptic terms, e.g. via an interior
+penalty method, one can switch the basis from FE_DGQ to FE_DGQHermite like in
+the step-59 tutorial program.

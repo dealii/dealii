@@ -118,8 +118,8 @@ digraph G
  * science education, including most of the deal.II developers, because it
  * appears to be wasteful to re-compute integrals over and over again, instead
  * of using precomputed data. However, as the tutorial programs step-37,
- * step-48, and step-59 show, these concepts usually outperform traditional
- * algorithms on modern computer architectures.
+ * step-48, step-59, step-64, and step-67 show, these concepts usually
+ * outperform traditional algorithms on modern computer architectures.
  *
  * The two main reasons that favor matrix-free computations are the
  * following:

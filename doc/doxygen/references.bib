@@ -10,7 +10,7 @@
   volume =  31,
   number =  4,
   pages =   {508--531}
-} 
+}
 
 %-------------------------------------------------------------------------------
 % Step 6
@@ -80,19 +80,19 @@
   pages =   {575--591}
 }
 
-@article{BR01, 
-  author =  {Roland Becker and Rolf Rannacher}, 
-  title =   {An optimal control approach to error estimation and mesh 
-             adaptation in finite element methods.}, 
-  journal = {Acta Numerica}, 
-  year =    2001, 
-  volume =  10, 
+@article{BR01,
+  author =  {Roland Becker and Rolf Rannacher},
+  title =   {An optimal control approach to error estimation and mesh
+             adaptation in finite element methods.},
+  journal = {Acta Numerica},
+  year =    2001,
+  volume =  10,
   pages =   {1--102}
 }
 
 @phdthesis{Bec95,
   author =  {Roland Becker},
-  title =   {An Adaptive Finite Element Method for the Incompressible 
+  title =   {An Adaptive Finite Element Method for the Incompressible
              {N}avier-{S}tokes Equations on Time-dependent Domains},
   school =  {Universit{\"a}t Heidelberg},
   type =    {Dissertation},
@@ -109,7 +109,7 @@
 
 @article{BR96r,
   author =  {Roland Becker and Rolf Rannacher},
-  title =   {A Feed-Back Approach to Error Control in Finite Element Methods: 
+  title =   {A Feed-Back Approach to Error Control in Finite Element Methods:
              Basic Analysis and Examples},
   journal = {East-West J. Numer. Math},
   volume =  4,
@@ -146,7 +146,7 @@
 
 @article{HH01,
   author =  {Ralf Hartmann and Paul Houston},
-  title =   {Adaptive Discontinuous {G}alerkin Finite Element Methods for 
+  title =   {Adaptive Discontinuous {G}alerkin Finite Element Methods for
              Nonlinear Hyperbolic Conservation Laws},
   publisher =   {SIAM}
   journal = {Journal on Scientific Computing},
@@ -158,7 +158,7 @@
 
 @article{HH01b,
   author =  {Ralf Hartmann and Paul Houston},
-  title =   {Adaptive Discontinuous {G}alerkin Finite Element Methods for the 
+  title =   {Adaptive Discontinuous {G}alerkin Finite Element Methods for the
              Compressible {E}uler Equations},
   journal = {Journal of Computational Physics},
   year =    2002,
@@ -177,7 +177,7 @@
 
 @article{RS97,
   author =  {Rolf Rannacher and Franz-Theo Suttmeier},
-  title =   {A feed-back approach to error control in finite element methods: 
+  title =   {A feed-back approach to error control in finite element methods:
              Application to linear elasticity},
   journal = {Computational Mechanics},
   year =    1997,
@@ -188,7 +188,7 @@
 
 @article{RS98c,
   author =  {Rolf Rannacher and Franz-Theo Suttmeier},
-  title =   {A posteriori error control in finite element methods via duality 
+  title =   {A posteriori error control in finite element methods via duality
              techniques: Application to perfect plasticity},
   journal = {Computational Mechanics},
   year =    1998,
@@ -199,7 +199,7 @@
 
 @article{RS99,
   author =  {Rolf Rannacher and Franz-Theo Suttmeier},
-  title =   {A posteriori error estimation and mesh adaptation for finite 
+  title =   {A posteriori error estimation and mesh adaptation for finite
              element models in elasto-plasticity},
   journal = {Computer Methods in Applied Mechanics and Engineering},
   year =    1999,
@@ -210,7 +210,7 @@
 
 @phdthesis{Sut96,
   author =  {Franz-Theo Suttmeier},
-  title =   {Adaptive Finite Element Approximation of Problems in 
+  title =   {Adaptive Finite Element Approximation of Problems in
              Elasto-Plasticity Theory},
   school =  {Universit{\"a}t Heidelberg},
   type =    {Dissertation},
@@ -457,6 +457,95 @@ MRREVIEWER = {Jose Luis Gracia},
 }
 
 % ------------------------------------
+% Step 67
+% ------------------------------------
+
+@article{KennedyCarpenterLewis2000,
+author = {Kennedy, Christopher A. and Carpenter, Mark H. and Lewis, R. Micheal},
+title = {Low-storage, explicit {R}unge--{K}utta schemes for the compressible {N}avier--{S}tokes equations},
+journal = {Applied Numerical Mathematics},
+volume = 35,
+year = 2000,
+pages = {177--219},
+doi = {10.1016/S0168-9274(99)00141-5},
+url = {https://doi.org/10.1016/S0168-9274(99)00141-5}
+}
+
+@article{TseliosSimos2007,
+author = {Tselios, Kostas and Simos, Theodore E.},
+title = {Optimized {R}unge--{K}utta methods with minimal dispersion and dissipation for problems arising from computational acoustics},
+journal = {Physics Letters A},
+volume = 363,
+year = 2007,
+pages = {38--48},
+doi = {10.1016/j.physleta.2006.10.072},
+url = {https://doi.org/10.1016/j.physleta.2006.10.072}
+}
+
+@article{KronbichlerSchoeder2016,
+author = {Kronbichler, Martin and Schoeder, Svenja and M\"uller, Christopher and Wall, Wolfgang A.},
+title = {Comparison of implicit and explicit hybridizable discontinuous {G}alerkin methods for the acoustic wave equation},
+journal = {International Journal for Numerical Methods in Engineering},
+volume = "106",
+number = 9,
+pages = "712--739",
+doi = {10.1002/nme.5137},
+url = {https://doi.org/10.1002/nme.5137},
+year = {2016}
+}
+
+@article{SchoederKormann2018,
+  title={Efficient explicit time stepping of high order discontinuous {G}alerkin schemes for waves},
+  author={Schoeder, Svenja and Kormann, Katharina and Wall, Wolfgang A. and  Kronbichler, Martin},
+  journal={SIAM J. Sci. Comput.},
+  pages = {C803--C826},
+  volume = 40,
+  number = 6,
+  year={2018},
+  doi={10.1137/18M1185399},
+  url={https://doi.org/10.1137/18M1185399}
+}
+
+
+@article{FehnWallKronbichler2019,
+author = {Fehn, Niklas and Wall, Wolfgang A. and Kronbichler, Martin},
+title = {A matrix-free high-order discontinuous {G}alerkin compressible {N}avier--{S}tokes solver:
+A performance comparison of compressible and incompressible formulations for turbulent incompressible flows},
+journal = {International Journal for Numerical Methods in Fluids},
+volume = {89},
+number = {3},
+pages = {71--102},
+year = {2019},
+doi = {10.1002/fld.4683},
+url = {https://doi.org/10.1002/fld.4683}
+}
+
+@article{KronbichlerKormann2019,
+author = {Kronbichler, Martin and Kormann, Katharina},
+title  = {Fast matrix-free evaluation of discontinuous {G}alerkin finite element operators},
+journal = {ACM Transactions on Mathematical Software},
+volume = {45},
+number = {3},
+pages = {29:1--29:40},
+year = {2019},
+doi = {10.1145/3325864},
+url = {https://doi.org/10.1145/3325864}
+}
+
+@article{Gassner2013,
+  doi = {10.1137/120890144},
+  url = {https://doi.org/10.1137/120890144},
+  year = {2013},
+  volume = {35},
+  number = {3},
+  pages = {A1233--A1253},
+  author = {Gregor J. Gassner},
+  title = {A Skew-Symmetric Discontinuous {G}alerkin Spectral Element Discretization and Its Relation to {SBP}-{SAT} Finite Difference Methods},
+  journal = {{SIAM} Journal on Scientific Computing}
+}
+
+
+% ------------------------------------
 % Step 69
 % ------------------------------------
 
@@ -563,6 +652,7 @@ year = {2008},
   doi = {10.1007/b79761},
   year = {2009}
 }
+
 
 % ------------------------------------
 % References used elsewhere
