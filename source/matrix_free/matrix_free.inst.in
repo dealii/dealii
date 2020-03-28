@@ -125,3 +125,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
   }
+
+for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template struct internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar_vectorized>;
+  }
