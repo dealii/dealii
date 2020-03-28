@@ -466,8 +466,8 @@ namespace internal
       compute_mapping_q(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<
-          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces);
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &faces);
 
       /**
        * Computes the information in the given cells, called within

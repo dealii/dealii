@@ -415,12 +415,12 @@ namespace internal
                            const unsigned int         offset,
                            VectorizedArrayType2 &     result)
     {
-      static_assert(VectorizedArrayType2::n_array_elements >=
-                      VectorizedArrayType1::n_array_elements,
+      static_assert(VectorizedArrayType2::size() >=
+                      VectorizedArrayType1::size(),
                     "Cannot convert to vectorized array of wider number type");
 
       DEAL_II_OPENMP_SIMD_PRAGMA
-      for (unsigned int v = 0; v < VectorizedArrayType1::n_array_elements; ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType1::size(); ++v)
         result[offset + v] = value[v];
     }
 
@@ -967,20 +967,15 @@ namespace internal
                   if (mapping_info.get_cell_type(cell) < general)
                     {
                       Point<dim, VectorizedArrayType> quad_point;
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         {
                           typename dealii::Triangulation<dim>::cell_iterator
                             cell_it(
                               &tria,
-                              cells[cell *
-                                      VectorizedArrayType::n_array_elements +
-                                    v]
+                              cells[cell * VectorizedArrayType::size() + v]
                                 .first,
-                              cells[cell *
-                                      VectorizedArrayType::n_array_elements +
-                                    v]
+                              cells[cell * VectorizedArrayType::size() + v]
                                 .second);
                           const Point<dim> p =
                             mapping.transform_unit_to_real_cell(cell_it,
@@ -1125,8 +1120,8 @@ namespace internal
         const ShapeInfo<VectorizedDouble> &shape_info,
         MappingInfoStorage<dim, dim, Number, VectorizedArrayType> &my_data)
       {
-        constexpr unsigned int n_lanes = VectorizedArrayType::n_array_elements;
-        constexpr unsigned int n_lanes_d = VectorizedDouble::n_array_elements;
+        constexpr unsigned int n_lanes   = VectorizedArrayType::size();
+        constexpr unsigned int n_lanes_d = VectorizedDouble::size();
 
         const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
         const unsigned int n_mapping_points =
@@ -1146,8 +1141,7 @@ namespace internal
             {
               if (cell_type[cell] > affine || process_cell[cell])
                 {
-                  unsigned int
-                    start_indices[VectorizedDouble::n_array_elements];
+                  unsigned int start_indices[n_lanes_d];
                   for (unsigned int v = 0; v < n_lanes_d; ++v)
                     start_indices[v] =
                       (cell * n_lanes + vv + v) * n_mapping_points * dim;
@@ -1935,17 +1929,17 @@ namespace internal
       compute_range_mapping_q(
         const unsigned int begin_face,
         const unsigned int end_face,
-        const std::vector<
-          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
-        const std::vector<GeometryType> &                             face_type,
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &                                faces,
+        const std::vector<GeometryType> &  face_type,
         const std::vector<bool> &          process_face,
         const UpdateFlags                  update_flags_faces,
         const AlignedVector<double> &      plain_quadrature_points,
         const ShapeInfo<VectorizedDouble> &shape_info,
         MappingInfoStorage<dim - 1, dim, Number, VectorizedArrayType> &my_data)
       {
-        constexpr unsigned int n_lanes = VectorizedArrayType::n_array_elements;
-        constexpr unsigned int n_lanes_d = VectorizedDouble::n_array_elements;
+        constexpr unsigned int n_lanes   = VectorizedArrayType::size();
+        constexpr unsigned int n_lanes_d = VectorizedDouble::size();
 
         const unsigned int n_q_points = my_data.descriptor[0].n_q_points;
         const unsigned int n_mapping_points =
@@ -1961,7 +1955,7 @@ namespace internal
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
             {
               // load the geometry field for all SIMD lanes
-              unsigned int start_indices[VectorizedDouble::n_array_elements];
+              unsigned int       start_indices[n_lanes_d];
               const unsigned int face_no = faces[face].interior_face_no;
               for (unsigned int v = 0; v < n_lanes_d; ++v)
                 if (faces[face].cells_interior[vv + v] !=
@@ -2356,8 +2350,7 @@ namespace internal
     MappingInfo<dim, Number, VectorizedArrayType>::compute_mapping_q(
       const dealii::Triangulation<dim> &                        tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
-      const std::vector<
-        FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces)
+      const std::vector<FaceToCellTopology<VectorizedArrayType::size()>> &faces)
     {
       // step 1: extract quadrature point data with the data appropriate for
       // MappingQGeneric
@@ -2489,7 +2482,7 @@ namespace internal
       // We want to use vectorization for computing the quantities, but must
       // evaluate the geometry in double precision; thus, for floats we need
       // to do things in two sweeps and convert the final result.
-      constexpr unsigned int n_lanes = VectorizedArrayType::n_array_elements;
+      constexpr unsigned int n_lanes = VectorizedArrayType::size();
       using VectorizedDouble =
         VectorizedArray<double,
                         ((std::is_same<Number, float>::value && n_lanes > 1) ?
