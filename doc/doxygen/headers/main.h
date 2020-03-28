@@ -41,7 +41,7 @@
         color="black", fillcolor="white", style="filled"];
   edge [color="black", weight=10];
 
-  tria       [label="Triangulation",    URL="\ref grid", ];
+  tria       [label="Triangulation",    URL="\ref grid"];
   fe         [label="Finite elements",    URL="\ref feall"];
   mapping    [label="Mapping",          URL="\ref mapping"];
   quadrature [label="Quadrature",       URL="\ref Quadrature"];
