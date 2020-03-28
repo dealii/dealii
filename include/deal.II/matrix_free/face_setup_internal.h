@@ -298,9 +298,9 @@ namespace internal
               // looking at the length of the lists of faces
 #  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
               MPI_Comm comm = MPI_COMM_SELF;
-              if (const parallel::TriangulationBase<dim> *ptria =
-                    dynamic_cast<const parallel::TriangulationBase<dim> *>(
-                      &triangulation))
+              if (const dealii::parallel::TriangulationBase<dim> *ptria =
+                    dynamic_cast<const dealii::parallel::TriangulationBase<dim>
+                                   *>(&triangulation))
                 comm = ptria->get_communicator();
 
               MPI_Status   status;
