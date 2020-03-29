@@ -480,11 +480,12 @@ namespace Utilities
 
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments. The exponent @p iexp
-   * must not be negative.
+   * calculations for constant expression arguments. The @p base must
+   * be an integer type and the exponent @p iexp must not be negative.
    */
-  constexpr unsigned int
-  pow(const unsigned int base, const int iexp)
+  template <typename T>
+  constexpr T
+  pow(const T base, const int iexp)
   {
 #if defined(DEBUG) && defined(DEAL_II_HAVE_CXX14_CONSTEXPR)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
@@ -515,6 +516,8 @@ namespace Utilities
     // // a^b = a*(a*a)^((b-1)/2 for b odd
     // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
     // </code>
+
+    static_assert(std::is_integral<T>::value, "Only integral types supported");
 
     return iexp <= 0 ? 1 :
                        (((iexp % 2 == 1) ? base : 1) *
