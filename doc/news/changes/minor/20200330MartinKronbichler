@@ -1,0 +1,6 @@
+Fixed: FEValues would previously detect cell similarities when combined with
+MappingFEField and MappingManifold when the underlying mesh had similarities,
+even though the deformed cells did not. This would lead to wrong Jacobians and
+transformed shape function gradients, among others, when running deal.II
+without threads. This is now fixed.
+<br> (Martin Kronbichler, 2020/03/30)
