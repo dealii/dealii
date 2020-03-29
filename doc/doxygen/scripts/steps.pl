@@ -162,38 +162,70 @@ foreach $step (@ARGV)
     my $source;
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
-        print "  $source -> $destination";
 
-        my $edge_attributes = "";
-
-        # Determine the style of the arrow that connects
-        # the two nodes. If the two nodes are of the same
-        # kind, use the same color as the nodes as this makes
-        # reading the flow of the graph a bit easier. Furthermore,
-        # set the edge weight to 5 (instead of the default of 1)
-        # to try and keep programs of the same kind together. The
-        # exception is the "basic" tutorial programs: these are
-        # going to be connected by edges of weight 100, ensuring
-        # that they are all essentially aligned vertically.
-        if ($kind_map{$source} eq $kind_map{$destination})
+        # We want to treat the step-6 -> step-40 edge differently. If
+        # it is printed like any other edge, i.e., with step-40
+        # directly below step-6, then we end up with a tangle of lines
+        # because there are so many sub-graphs that originate from
+        # step-6 (with the next node at the same level as step-40) but
+        # where step-40 then feeds with a long line into one of the
+        # programs further down. It looks better if we place step-40 a
+        # couple of levels further down in the graph so that the
+        # higher up parts of the graph consists of the sequential
+        # programs and the lower-down parts to the parallel ones.
+        #
+        # The way to do this is to insert a few invisible nodes (with
+        # invisible edges) between step-6 and step-40.
+        if ($source eq "Step6" && $destination eq "Step40")
         {
-            $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
-            if ($kind_map{$source} eq "basic")
-            {
-                $edge_attributes .= "weight=100,";
-            }
-            else
-            {
-                $edge_attributes .= "weight=5,";
-            }
+            print "  Step40a [style=\"invis\"];";
+            print "  Step40b [style=\"invis\"];";
+            print "  Step40c [style=\"invis\"];";
+
+            print "  Step6 -> Step40a [style=\"invis\"];";
+            print "  Step40a -> Step40b [style=\"invis\"];";
+            print "  Step40b -> Step40c [style=\"invis\"];";
+            print "  Step40c -> Step40 [style=\"invis\"];";
+
+            print "  Step6 -> Step40 [weight=100,color=\"$colors{$kind_map{$source}}\"];";
         }
 
-        # If the destination is a code gallery program, used a dashed line
-        if ($destination =~ /code_gallery/)
+        # All other edges in the graph
+        else
         {
-            $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\",";
+            print "  $source -> $destination";
+
+            my $edge_attributes = "";
+
+            # Determine the style of the arrow that connects
+            # the two nodes. If the two nodes are of the same
+            # kind, use the same color as the nodes as this makes
+            # reading the flow of the graph a bit easier. Furthermore,
+            # set the edge weight to 5 (instead of the default of 1)
+            # to try and keep programs of the same kind together. The
+            # exception is the "basic" tutorial programs: these are
+            # going to be connected by edges of weight 100, ensuring
+            # that they are all essentially aligned vertically.
+            if ($kind_map{$source} eq $kind_map{$destination})
+            {
+                $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
+                if ($kind_map{$source} eq "basic")
+                {
+                    $edge_attributes .= "weight=100,";
+                }
+                else
+                {
+                    $edge_attributes .= "weight=5,";
+                }
+            }
+
+            # If the destination is a code gallery program, used a dashed line
+            if ($destination =~ /code_gallery/)
+            {
+                $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\",";
+            }
+            print " [$edge_attributes];\n";
         }
-        print " [$edge_attributes]\n";
     }
 }
 
