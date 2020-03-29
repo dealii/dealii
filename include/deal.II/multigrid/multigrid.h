@@ -273,16 +273,6 @@ public:
   void set_cycle(Cycle);
 
   /**
-   * @deprecated Debug output will go away. Use signals instead.
-   *
-   * Set the debug level. Higher values will create more debugging output
-   * during the multigrid cycles.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_debug(const unsigned int);
-
-  /**
    * Connect a function to mg::Signals::coarse_solve.
    */
   boost::signals2::connection
@@ -438,11 +428,6 @@ private:
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
   SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
-
-  /**
-   * Level for debug output. Defaults to zero and can be set by set_debug().
-   */
-  unsigned int debug;
 
   template <int dim, class OtherVectorType, class TRANSFER>
   friend class PreconditionMG;
@@ -626,7 +611,6 @@ Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
   , edge_in(nullptr, typeid(*this).name())
   , edge_down(nullptr, typeid(*this).name())
   , edge_up(nullptr, typeid(*this).name())
-  , debug(0)
 {
   if (max_level == numbers::invalid_unsigned_int)
     maxlevel = matrix.get_maxlevel();
