@@ -462,9 +462,9 @@ template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingManifold<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const CellSimilarity::Similarity,
+  const Quadrature<dim> &                                  quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -540,39 +540,30 @@ MappingManifold<dim, spacedim>::fill_fe_values(
               output_data.JxW_values[point] =
                 std::sqrt(determinant(G)) * weights[point];
 
-              if (cell_similarity == CellSimilarity::inverted_translation)
+              if (update_flags & update_normal_vectors)
                 {
-                  // we only need to flip the normal
-                  if (update_flags & update_normal_vectors)
+                  Assert(spacedim == dim + 1,
+                         ExcMessage(
+                           "There is no (unique) cell normal for " +
+                           Utilities::int_to_string(dim) +
+                           "-dimensional cells in " +
+                           Utilities::int_to_string(spacedim) +
+                           "-dimensional space. This only works if the "
+                           "space dimension is one greater than the "
+                           "dimensionality of the mesh cells."));
+
+                  if (dim == 1)
+                    output_data.normal_vectors[point] =
+                      cross_product_2d(-DX_t[0]);
+                  else // dim == 2
+                    output_data.normal_vectors[point] =
+                      cross_product_3d(DX_t[0], DX_t[1]);
+
+                  output_data.normal_vectors[point] /=
+                    output_data.normal_vectors[point].norm();
+
+                  if (cell->direction_flag() == false)
                     output_data.normal_vectors[point] *= -1.;
-                }
-              else
-                {
-                  if (update_flags & update_normal_vectors)
-                    {
-                      Assert(spacedim == dim + 1,
-                             ExcMessage(
-                               "There is no (unique) cell normal for " +
-                               Utilities::int_to_string(dim) +
-                               "-dimensional cells in " +
-                               Utilities::int_to_string(spacedim) +
-                               "-dimensional space. This only works if the "
-                               "space dimension is one greater than the "
-                               "dimensionality of the mesh cells."));
-
-                      if (dim == 1)
-                        output_data.normal_vectors[point] =
-                          cross_product_2d(-DX_t[0]);
-                      else // dim == 2
-                        output_data.normal_vectors[point] =
-                          cross_product_3d(DX_t[0], DX_t[1]);
-
-                      output_data.normal_vectors[point] /=
-                        output_data.normal_vectors[point].norm();
-
-                      if (cell->direction_flag() == false)
-                        output_data.normal_vectors[point] *= -1.;
-                    }
                 }
             } // codim>0 case
         }
@@ -584,22 +575,20 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   if (update_flags & update_jacobians)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.jacobians[point] = data.contravariant[point];
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.jacobians[point] = data.contravariant[point];
     }
 
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.inverse_jacobians[point] =
-            data.covariant[point].transpose();
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.inverse_jacobians[point] =
+          data.covariant[point].transpose();
     }
 
-  return cell_similarity;
+  return CellSimilarity::invalid_next_cell;
 }
 
 
