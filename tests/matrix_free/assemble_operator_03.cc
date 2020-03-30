@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/convergence_table.h>
-#include <deal.II/base/graph_coloring.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -197,10 +196,10 @@ do_test_dim(ConvergenceTable &table)
 {
   for (unsigned int i = 0; i < 4; i++)
     {
-      //      do_test<dim, 1, 2, 1, Number>(table, i);   // linear (scalar)
-      //      do_test<dim, 2, 3, 1, Number>(table, i);   // quadratic (scalar)
+      do_test<dim, 1, 2, 1, Number>(table, i);   // linear (scalar)
+      do_test<dim, 2, 3, 1, Number>(table, i);   // quadratic (scalar)
       do_test<dim, 1, 2, dim, Number>(table, i); // linear (vector)
-      //      do_test<dim, 2, 3, dim, Number>(table, i); // quadratic (vector)
+      do_test<dim, 2, 3, dim, Number>(table, i); // quadratic (vector)
     }
 }
 
@@ -209,7 +208,7 @@ main()
 {
   ConvergenceTable table;
 
-  //   do_test_dim<2, double>(table); // 2D
+  do_test_dim<2, double>(table); // 2D
   do_test_dim<3, double>(table); // 3D
 
   table.write_text(std::cout);
