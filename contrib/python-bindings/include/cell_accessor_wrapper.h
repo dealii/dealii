@@ -71,39 +71,33 @@ namespace python
     std::string
     get_refine_flag() const;
 
-    /**
-     * Set the coarsen flag to true or false.
+    /*! @copydoc CellAccessor::set_coarsen_flag
      */
     void
     set_coarsen_flag(const bool coarsen_flag);
 
-    /**
-     * Get the coarsen flag.
+    /*! @copydoc CellAccessor::coarsen_flag_set
      */
     bool
     get_coarsen_flag() const;
 
-    /**
-     * Get the barycenter of the cell.
+    /*! @copydoc TriaAccessor::barycenter
      */
     PointWrapper
     get_barycenter() const;
 
-    /**
-     * Get the center of the cell.
+    /*! @copydoc TriaAccessor::center
      */
     PointWrapper
     get_center(const bool respect_manifold             = false,
                const bool interpolate_from_surrounding = false) const;
 
-    /**
-     * Set the material id.
+    /*! @copydoc CellAccessor::set_material_id
      */
     void
     set_material_id(const int material_id);
 
-    /**
-     * Get the material id.
+    /*! @copydoc CellAccessor::material_id
      */
     int
     get_material_id() const;
@@ -114,50 +108,37 @@ namespace python
     void
     set_vertex(const int i, PointWrapper &point_wrapper);
 
-    /**
-     * Return the ith vertex of the cell.
+    /*! @copydoc TriaAccessor::vertex
      */
     PointWrapper
     get_vertex(const int i) const;
 
-    /**
-     * Set the manifold id.
+    /*! @copydoc TriaAccessor::set_manifold_id
      */
     void
     set_manifold_id(const int manifold_id);
 
-    /**
-     * Get the manifold id.
+    /*! @copydoc TriaAccessor::manifold_id
      */
     int
     get_manifold_id() const;
 
-    /**
-     * Do as set_manifold_id() but also set the manifold indicators of
-     * the objects that bound the current object.
+    /*! @copydoc TriaAccessor::set_all_manifold_ids
      */
     void
     set_all_manifold_ids(const int manifold_id);
 
-    /**
-     * Return the ith neighbor of a cell. If the neighbor does not exist,
-     * i.e., if the ith face of the current object is at the boundary,
-     * then an exception is thrown.
+    /*! @copydoc CellAccessor::neighbor
      */
     CellAccessorWrapper
     neighbor(const int i) const;
 
-    /**
-     * Return whether the cell is at the boundary.
+    /*! @copydoc CellAccessor::at_boundary
      */
     bool
     at_boundary() const;
 
-    /**
-     * This is a slight variation to the at_boundary function:
-     * for 2 dimensions it is equivalent, for three
-     * dimensions it returns whether at least one of the 12
-     * lines of the hexahedron is at a boundary.
+    /*! @copydoc CellAccessor::has_boundary_lines
      */
     bool
     has_boundary_lines() const;
@@ -168,55 +149,37 @@ namespace python
     boost::python::list
     faces() const;
 
-    /**
-     * Compute the dim-dimensional measure of the object.
-     * For a dim-dimensional cell in dim-dimensional space,
-     * this equals its volume. On the other hand, for a 2d
-     * cell in 3d space, or if the current object pointed to
-     * is a 2d face of a 3d cell in 3d space, then the function
-     * computes the area the object occupies. For a
-     * one-dimensional object, return its length.
+    /*! @copydoc TriaAccessor::measure
      */
     double
     measure() const;
 
-    /**
-     * Test whether the cell has children (this is the criterion for activity of
-     * a cell).
+    /*! @copydoc CellAccessor::active
      */
     bool
     active() const;
 
-    /**
-     * Return the level within the mesh hierarchy at which this cell is
-     * located.
+    /*! @copydoc TriaAccessor::level
      */
     int
     level() const;
 
-    /**
-     * Return the index of the element presently pointed to on the present
-     * level.
+    /*! @copydoc TriaAccessor::index
      */
     int
     index() const;
 
-    /**
-     * Return whether the neighbor is coarser then the present cell.
+    /*! @copydoc CellAccessor::neighbor_is_coarser
      */
     bool
     neighbor_is_coarser(const unsigned int neighbor) const;
 
-    /**
-     * Return the how-many'th neighbor this cell is of cell->neighbor(neighbor),
-     * i.e. return the face_no such that
-     * cell->neighbor(neighbor)->neighbor(face_no)==cell.
+    /*! @copydoc CellAccessor::neighbor_of_neighbor
      */
     unsigned int
     neighbor_of_neighbor(const unsigned int neighbor) const;
 
-    /**
-     * Return the global index of i-th vertex of a cell.
+    /*! @copydoc TriaAccessor::vertex_index
      */
     unsigned int
     vertex_index(const unsigned int i) const;

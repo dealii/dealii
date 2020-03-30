@@ -48,14 +48,12 @@ namespace python
      */
     ~TriaAccessorWrapper();
 
-    /**
-     * Get the barycenter of the cell.
+    /*! @copydoc TriaAccessor::barycenter
      */
     PointWrapper
     get_barycenter() const;
 
-    /**
-     * Get the center of the cell.
+    /*! @copydoc TriaAccessor::center
      */
     PointWrapper
     get_center(const bool respect_manifold             = false,
@@ -67,56 +65,42 @@ namespace python
     void
     set_vertex(const int i, PointWrapper &point_wrapper);
 
-    /**
-     * Return the ith vertex of the cell.
+    /*! @copydoc TriaAccessor::vertex
      */
     PointWrapper
     get_vertex(const int i) const;
 
-    /**
-     * Set the manifold id.
+    /*! @copydoc TriaAccessor::set_manifold_id
      */
     void
     set_manifold_id(const int manifold_id);
 
-    /**
-     * Get the manifold id.
+    /*! @copydoc TriaAccessor::manifold_id
      */
     int
     get_manifold_id() const;
 
-    /**
-     * Set the boundary id.
+    /*! @copydoc TriaAccessor::set_boundary_id
      */
     void
     set_boundary_id(const int boundary_id);
 
-    /**
-     * Get the boundary id.
+    /*! @copydoc TriaAccessor::boundary_id
      */
     int
     get_boundary_id() const;
 
-    /**
-     * Set the boundary id for all objects.
+    /*! @copydoc TriaAccessor::set_all_boundary_ids
      */
     void
     set_all_boundary_ids(const int boundary_id);
 
-    /**
-     * Return whether the cell is at the boundary.
+    /*! @copydoc TriaAccessor::at_boundary
      */
     bool
     at_boundary() const;
 
-    /**
-     * Compute the dim-dimensional measure of the object.
-     * For a dim-dimensional cell in dim-dimensional space,
-     * this equals its volume. On the other hand, for a 2d
-     * cell in 3d space, or if the current object pointed to
-     * is a 2d face of a 3d cell in 3d space, then the function
-     * computes the area the object occupies. For a
-     * one-dimensional object, return its length.
+    /*! @copydoc TriaAccessor::measure
      */
     double
     measure() const;

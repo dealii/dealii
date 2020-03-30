@@ -52,27 +52,17 @@ namespace python
      */
     ~MappingQGenericWrapper();
 
-    /**
-     * Map the point p on the unit cell to the corresponding point on the real
-     * cell.
+    /*! @copydoc Mapping::transform_unit_to_real_cell
      */
     PointWrapper
     transform_unit_to_real_cell(CellAccessorWrapper &cell, PointWrapper &point);
 
-    /**
-     * Map the point p on the real cell to the corresponding point on the unit
-     * cell.
+    /*! @copydoc Mapping::transform_real_to_unit_cell
      */
     PointWrapper
     transform_real_to_unit_cell(CellAccessorWrapper &cell, PointWrapper &point);
 
-    /**
-     * Transform the point on the real cell to the corresponding point on the
-     * unit cell, and then projects it to a dim-1 point on the face with the
-     * given face number 'face_no'. Ideally the point 'point' is near the
-     * face 'face_no', but any point in the cell can technically be projected.
-     * The returned point is of dimension dim with dim-1 coodinate value
-     * explicitly set to zero.
+    /*! @copydoc Mapping::project_real_point_to_unit_point_on_face
      */
     PointWrapper
     project_real_point_to_unit_point_on_face(CellAccessorWrapper &cell,
