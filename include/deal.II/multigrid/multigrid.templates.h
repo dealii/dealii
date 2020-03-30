@@ -168,22 +168,6 @@ template <typename VectorType>
 void
 Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 {
-  char cychar = '?';
-  switch (cycle)
-    {
-      case v_cycle:
-        cychar = 'V';
-        break;
-      case f_cycle:
-        cychar = 'F';
-        break;
-      case w_cycle:
-        cychar = 'W';
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
-    }
-
   // Combine the defect from the initial copy_to_mg with the one that has come
   // from the finer level by the transfer
   defect2[level] += defect[level];
@@ -191,12 +175,16 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   if (level == minlevel)
     {
+      this->signals.coarse_solve(true, level);
       (*coarse)(level, solution[level], defect2[level]);
+      this->signals.coarse_solve(false, level);
       return;
     }
 
   // smoothing of the residual
+  this->signals.pre_smoother_step(true, level);
   pre_smooth->apply(level, solution[level], defect2[level]);
+  this->signals.pre_smoother_step(false, level);
 
   // compute residual on level, which includes the (CG) edge matrix
   matrix->vmult(level, t[level], solution[level]);
@@ -211,7 +199,9 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   else
     defect2[level - 1] = typename VectorType::value_type(0.);
 
+  this->signals.restriction(true, level);
   transfer->restrict_and_add(level, defect2[level - 1], t[level]);
+  this->signals.restriction(false, level);
 
   // Every cycle starts with a recursion of its type.
   level_step(level - 1, cycle);
@@ -230,7 +220,9 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     }
 
   // do coarse grid correction
+  this->signals.prolongation(true, level);
   transfer->prolongate(level, t[level], solution[level - 1]);
+  this->signals.prolongation(false, level);
   solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
@@ -247,7 +239,9 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     }
 
   // post-smoothing
+  this->signals.post_smoother_step(true, level);
   post_smooth->smooth(level, solution[level], defect2[level]);
+  this->signals.post_smoother_step(false, level);
 }
 
 
