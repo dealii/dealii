@@ -1,0 +1,327 @@
+
+DEAL:0::0 0_0: neighbor subdomain ids: 4_0: 1 1  1_0: 0 0  6_0: 1 1  2_0: 0 0  
+DEAL:0::0 1_0: neighbor subdomain ids: 0_0: 0 0  4_0: 1 1  7_0: 1 1  3_0: 0 0  
+DEAL:0::0 2_0: neighbor subdomain ids: 5_0: 1 1  3_0: 0 0  0_0: 0 0  6_0: 1 1  
+DEAL:0::0 3_0: neighbor subdomain ids: 2_0: 0 0  5_0: 1 1  1_0: 0 0  7_0: 1 1  
+DEAL:0::0 0_0: neighbor subdomain ids: 4_0: 0  1_0: 0  6_0: 1  2_0: 0  
+DEAL:0::0 1_0: neighbor subdomain ids: 0_0: 0  4_0: 0  7_0: 1  3_0: 0  
+DEAL:0::0 4_0: neighbor subdomain ids: 1_0: 0  0_0: 0  8_0: 1  5_0: 1  
+DEAL:0::0 2_0: neighbor subdomain ids: 5_0: 1  3_0: 0  0_0: 0  6_0: 1  
+DEAL:0::0 3_0: neighbor subdomain ids: 2_0: 0  5_0: 1  1_0: 0  7_0: 1  
+DEAL:0::0 0_1:0 neighbor subdomain ids: 4_1:1 0 0  0_1:1 0 0  6_1:2 1 1  0_1:2 0 0  
+DEAL:0::0 0_1:1 neighbor subdomain ids: 0_1:0 0 0  1_1:0 0 0  6_1:3 1 1  0_1:3 0 0  
+DEAL:0::0 0_1:2 neighbor subdomain ids: 4_1:3 0 0  0_1:3 0 0  0_1:0 0 0  2_1:0 0 0  
+DEAL:0::0 0_1:3 neighbor subdomain ids: 0_1:2 0 0  1_1:2 0 0  0_1:1 0 0  2_1:1 0 0  
+DEAL:0::0 1_1:0 neighbor subdomain ids: 0_1:1 0 0  1_1:1 0 0  7_1:2 1 1  1_1:2 0 0  
+DEAL:0::0 1_1:1 neighbor subdomain ids: 1_1:0 0 0  4_1:0 0 0  7_1:3 1 1  1_1:3 0 0  
+DEAL:0::0 1_1:2 neighbor subdomain ids: 0_1:3 0 0  1_1:3 0 0  1_1:0 0 0  3_1:0 0 0  
+DEAL:0::0 1_1:3 neighbor subdomain ids: 1_1:2 0 0  4_1:2 0 0  1_1:1 0 0  3_1:1 0 0  
+DEAL:0::0 4_1:0 neighbor subdomain ids: 1_1:1 0 0  4_1:1 0 0  8_1:2 1 1  4_1:2 0 0  
+DEAL:0::0 4_1:1 neighbor subdomain ids: 4_1:0 0 0  0_1:0 0 0  8_1:3 1 1  4_1:3 0 0  
+DEAL:0::0 4_1:2 neighbor subdomain ids: 1_1:3 0 0  4_1:3 0 0  4_1:0 0 0  5_1:0 1 1  
+DEAL:0::0 4_1:3 neighbor subdomain ids: 4_1:2 0 0  0_1:2 0 0  4_1:1 0 0  5_1:1 1 1  
+DEAL:0::0 2_1:0 neighbor subdomain ids: 5_1:1 1 1  2_1:1 0 0  0_1:2 0 0  2_1:2 0 0  
+DEAL:0::0 2_1:1 neighbor subdomain ids: 2_1:0 0 0  3_1:0 0 0  0_1:3 0 0  2_1:3 0 0  
+DEAL:0::0 2_1:2 neighbor subdomain ids: 5_1:3 1 1  2_1:3 0 0  2_1:0 0 0  6_1:0 1 1  
+DEAL:0::0 2_1:3 neighbor subdomain ids: 2_1:2 0 0  3_1:2 0 0  2_1:1 0 0  6_1:1 1 1  
+DEAL:0::0 3_1:0 neighbor subdomain ids: 2_1:1 0 0  3_1:1 0 0  1_1:2 0 0  3_1:2 0 0  
+DEAL:0::0 3_1:1 neighbor subdomain ids: 3_1:0 0 0  5_1:0 1 1  1_1:3 0 0  3_1:3 0 0  
+DEAL:0::0 3_1:2 neighbor subdomain ids: 2_1:3 0 0  3_1:3 0 0  3_1:0 0 0  7_1:0 1 1  
+DEAL:0::0 3_1:3 neighbor subdomain ids: 3_1:2 0 0  5_1:2 1 1  3_1:1 0 0  7_1:1 1 1  
+DEAL:0::0 0_0: neighbor subdomain ids: 8_0: 0 0  1_0: 0 0  12_0: 0 0  2_0: 0 0  18_0: 1 1  4_0: 0 0  
+DEAL:0::0 1_0: neighbor subdomain ids: 0_0: 0 0  8_0: 0 0  13_0: 1 1  3_0: 0 0  19_0: 1 1  5_0: 0 0  
+DEAL:0::0 8_0: neighbor subdomain ids: 1_0: 0 0  0_0: 0 0  16_0: 1 1  9_0: 0 0  22_0: 1 1  10_0: 0 0  
+DEAL:0::0 2_0: neighbor subdomain ids: 9_0: 0 0  3_0: 0 0  0_0: 0 0  12_0: 0 0  20_0: 1 1  6_0: 0 0  
+DEAL:0::0 3_0: neighbor subdomain ids: 2_0: 0 0  9_0: 0 0  1_0: 0 0  13_0: 1 1  21_0: 1 1  7_0: 0 0  
+DEAL:0::0 9_0: neighbor subdomain ids: 3_0: 0 0  2_0: 0 0  8_0: 0 0  16_0: 1 1  23_0: 1 1  11_0: 0 0  
+DEAL:0::0 12_0: neighbor subdomain ids: 16_0: 1 1  13_0: 1 1  2_0: 0 0  0_0: 0 0  24_0: 1 1  14_0: 1 1  
+DEAL:0::0 4_0: neighbor subdomain ids: 10_0: 0 0  5_0: 0 0  14_0: 1 1  6_0: 0 0  0_0: 0 0  18_0: 1 1  
+DEAL:0::0 5_0: neighbor subdomain ids: 4_0: 0 0  10_0: 0 0  15_0: 1 1  7_0: 0 0  1_0: 0 0  19_0: 1 1  
+DEAL:0::0 10_0: neighbor subdomain ids: 5_0: 0 0  4_0: 0 0  17_0: 1 1  11_0: 0 0  8_0: 0 0  22_0: 1 1  
+DEAL:0::0 6_0: neighbor subdomain ids: 11_0: 0 0  7_0: 0 0  4_0: 0 0  14_0: 1 1  2_0: 0 0  20_0: 1 1  
+DEAL:0::0 7_0: neighbor subdomain ids: 6_0: 0 0  11_0: 0 0  5_0: 0 0  15_0: 1 1  3_0: 0 0  21_0: 1 1  
+DEAL:0::0 11_0: neighbor subdomain ids: 7_0: 0 0  6_0: 0 0  10_0: 0 0  17_0: 1 1  9_0: 0 0  23_0: 1 1  
+DEAL:0::0 0_0: neighbor subdomain ids: 8_0: 0  1_0: 0  12_0: 0  2_0: 0  18_0: 1  4_0: 0  
+DEAL:0::0 1_0: neighbor subdomain ids: 0_0: 0  8_0: 0  13_0: 0  3_0: 0  19_0: 1  5_0: 0  
+DEAL:0::0 8_0: neighbor subdomain ids: 1_0: 0  0_0: 0  16_0: 1  9_0: 0  22_0: 1  10_0: 0  
+DEAL:0::0 2_0: neighbor subdomain ids: 9_0: 0  3_0: 0  0_0: 0  12_0: 0  20_0: 1  6_0: 0  
+DEAL:0::0 3_0: neighbor subdomain ids: 2_0: 0  9_0: 0  1_0: 0  13_0: 0  21_0: 1  7_0: 0  
+DEAL:0::0 9_0: neighbor subdomain ids: 3_0: 0  2_0: 0  8_0: 0  16_0: 1  23_0: 1  11_0: 0  
+DEAL:0::0 12_0: neighbor subdomain ids: 16_0: 1  13_0: 0  2_0: 0  0_0: 0  24_0: 1  14_0: 1  
+DEAL:0::0 13_0: neighbor subdomain ids: 12_0: 0  16_0: 1  3_0: 0  1_0: 0  25_0: 1  15_0: 1  
+DEAL:0::0 4_0: neighbor subdomain ids: 10_0: 0  5_0: 0  14_0: 1  6_0: 0  0_0: 0  18_0: 1  
+DEAL:0::0 5_0: neighbor subdomain ids: 4_0: 0  10_0: 0  15_0: 1  7_0: 0  1_0: 0  19_0: 1  
+DEAL:0::0 10_0: neighbor subdomain ids: 5_0: 0  4_0: 0  17_0: 1  11_0: 0  8_0: 0  22_0: 1  
+DEAL:0::0 6_0: neighbor subdomain ids: 11_0: 0  7_0: 0  4_0: 0  14_0: 1  2_0: 0  20_0: 1  
+DEAL:0::0 7_0: neighbor subdomain ids: 6_0: 0  11_0: 0  5_0: 0  15_0: 1  3_0: 0  21_0: 1  
+DEAL:0::0 11_0: neighbor subdomain ids: 7_0: 0  6_0: 0  10_0: 0  17_0: 1  9_0: 0  23_0: 1  
+DEAL:0::0 0_1:0 neighbor subdomain ids: 8_1:1 0 0  0_1:1 0 0  12_1:2 0 0  0_1:2 0 0  18_1:4 1 1  0_1:4 0 0  
+DEAL:0::0 0_1:1 neighbor subdomain ids: 0_1:0 0 0  1_1:0 0 0  12_1:3 0 0  0_1:3 0 0  18_1:5 1 1  0_1:5 0 0  
+DEAL:0::0 0_1:2 neighbor subdomain ids: 8_1:3 0 0  0_1:3 0 0  0_1:0 0 0  2_1:0 0 0  18_1:6 1 1  0_1:6 0 0  
+DEAL:0::0 0_1:3 neighbor subdomain ids: 0_1:2 0 0  1_1:2 0 0  0_1:1 0 0  2_1:1 0 0  18_1:7 1 1  0_1:7 0 0  
+DEAL:0::0 0_1:4 neighbor subdomain ids: 8_1:5 0 0  0_1:5 0 0  12_1:6 0 0  0_1:6 0 0  0_1:0 0 0  4_1:0 0 0  
+DEAL:0::0 0_1:5 neighbor subdomain ids: 0_1:4 0 0  1_1:4 0 0  12_1:7 0 0  0_1:7 0 0  0_1:1 0 0  4_1:1 0 0  
+DEAL:0::0 0_1:6 neighbor subdomain ids: 8_1:7 0 0  0_1:7 0 0  0_1:4 0 0  2_1:4 0 0  0_1:2 0 0  4_1:2 0 0  
+DEAL:0::0 0_1:7 neighbor subdomain ids: 0_1:6 0 0  1_1:6 0 0  0_1:5 0 0  2_1:5 0 0  0_1:3 0 0  4_1:3 0 0  
+DEAL:0::0 1_1:0 neighbor subdomain ids: 0_1:1 0 0  1_1:1 0 0  13_1:2 0 0  1_1:2 0 0  19_1:4 1 1  1_1:4 0 0  
+DEAL:0::0 1_1:1 neighbor subdomain ids: 1_1:0 0 0  8_1:0 0 0  13_1:3 0 0  1_1:3 0 0  19_1:5 1 1  1_1:5 0 0  
+DEAL:0::0 1_1:2 neighbor subdomain ids: 0_1:3 0 0  1_1:3 0 0  1_1:0 0 0  3_1:0 0 0  19_1:6 1 1  1_1:6 0 0  
+DEAL:0::0 1_1:3 neighbor subdomain ids: 1_1:2 0 0  8_1:2 0 0  1_1:1 0 0  3_1:1 0 0  19_1:7 1 1  1_1:7 0 0  
+DEAL:0::0 1_1:4 neighbor subdomain ids: 0_1:5 0 0  1_1:5 0 0  13_1:6 0 0  1_1:6 0 0  1_1:0 0 0  5_1:0 0 0  
+DEAL:0::0 1_1:5 neighbor subdomain ids: 1_1:4 0 0  8_1:4 0 0  13_1:7 0 0  1_1:7 0 0  1_1:1 0 0  5_1:1 0 0  
+DEAL:0::0 1_1:6 neighbor subdomain ids: 0_1:7 0 0  1_1:7 0 0  1_1:4 0 0  3_1:4 0 0  1_1:2 0 0  5_1:2 0 0  
+DEAL:0::0 1_1:7 neighbor subdomain ids: 1_1:6 0 0  8_1:6 0 0  1_1:5 0 0  3_1:5 0 0  1_1:3 0 0  5_1:3 0 0  
+DEAL:0::0 8_1:0 neighbor subdomain ids: 1_1:1 0 0  8_1:1 0 0  16_1:2 1 1  8_1:2 0 0  22_1:4 1 1  8_1:4 0 0  
+DEAL:0::0 8_1:1 neighbor subdomain ids: 8_1:0 0 0  0_1:0 0 0  16_1:3 1 1  8_1:3 0 0  22_1:5 1 1  8_1:5 0 0  
+DEAL:0::0 8_1:2 neighbor subdomain ids: 1_1:3 0 0  8_1:3 0 0  8_1:0 0 0  9_1:0 0 0  22_1:6 1 1  8_1:6 0 0  
+DEAL:0::0 8_1:3 neighbor subdomain ids: 8_1:2 0 0  0_1:2 0 0  8_1:1 0 0  9_1:1 0 0  22_1:7 1 1  8_1:7 0 0  
+DEAL:0::0 8_1:4 neighbor subdomain ids: 1_1:5 0 0  8_1:5 0 0  16_1:6 1 1  8_1:6 0 0  8_1:0 0 0  10_1:0 0 0  
+DEAL:0::0 8_1:5 neighbor subdomain ids: 8_1:4 0 0  0_1:4 0 0  16_1:7 1 1  8_1:7 0 0  8_1:1 0 0  10_1:1 0 0  
+DEAL:0::0 8_1:6 neighbor subdomain ids: 1_1:7 0 0  8_1:7 0 0  8_1:4 0 0  9_1:4 0 0  8_1:2 0 0  10_1:2 0 0  
+DEAL:0::0 8_1:7 neighbor subdomain ids: 8_1:6 0 0  0_1:6 0 0  8_1:5 0 0  9_1:5 0 0  8_1:3 0 0  10_1:3 0 0  
+DEAL:0::0 2_1:0 neighbor subdomain ids: 9_1:1 0 0  2_1:1 0 0  0_1:2 0 0  2_1:2 0 0  20_1:4 1 1  2_1:4 0 0  
+DEAL:0::0 2_1:1 neighbor subdomain ids: 2_1:0 0 0  3_1:0 0 0  0_1:3 0 0  2_1:3 0 0  20_1:5 1 1  2_1:5 0 0  
+DEAL:0::0 2_1:2 neighbor subdomain ids: 9_1:3 0 0  2_1:3 0 0  2_1:0 0 0  12_1:0 0 0  20_1:6 1 1  2_1:6 0 0  
+DEAL:0::0 2_1:3 neighbor subdomain ids: 2_1:2 0 0  3_1:2 0 0  2_1:1 0 0  12_1:1 0 0  20_1:7 1 1  2_1:7 0 0  
+DEAL:0::0 2_1:4 neighbor subdomain ids: 9_1:5 0 0  2_1:5 0 0  0_1:6 0 0  2_1:6 0 0  2_1:0 0 0  6_1:0 0 0  
+DEAL:0::0 2_1:5 neighbor subdomain ids: 2_1:4 0 0  3_1:4 0 0  0_1:7 0 0  2_1:7 0 0  2_1:1 0 0  6_1:1 0 0  
+DEAL:0::0 2_1:6 neighbor subdomain ids: 9_1:7 0 0  2_1:7 0 0  2_1:4 0 0  12_1:4 0 0  2_1:2 0 0  6_1:2 0 0  
+DEAL:0::0 2_1:7 neighbor subdomain ids: 2_1:6 0 0  3_1:6 0 0  2_1:5 0 0  12_1:5 0 0  2_1:3 0 0  6_1:3 0 0  
+DEAL:0::0 3_1:0 neighbor subdomain ids: 2_1:1 0 0  3_1:1 0 0  1_1:2 0 0  3_1:2 0 0  21_1:4 1 1  3_1:4 0 0  
+DEAL:0::0 3_1:1 neighbor subdomain ids: 3_1:0 0 0  9_1:0 0 0  1_1:3 0 0  3_1:3 0 0  21_1:5 1 1  3_1:5 0 0  
+DEAL:0::0 3_1:2 neighbor subdomain ids: 2_1:3 0 0  3_1:3 0 0  3_1:0 0 0  13_1:0 0 0  21_1:6 1 1  3_1:6 0 0  
+DEAL:0::0 3_1:3 neighbor subdomain ids: 3_1:2 0 0  9_1:2 0 0  3_1:1 0 0  13_1:1 0 0  21_1:7 1 1  3_1:7 0 0  
+DEAL:0::0 3_1:4 neighbor subdomain ids: 2_1:5 0 0  3_1:5 0 0  1_1:6 0 0  3_1:6 0 0  3_1:0 0 0  7_1:0 0 0  
+DEAL:0::0 3_1:5 neighbor subdomain ids: 3_1:4 0 0  9_1:4 0 0  1_1:7 0 0  3_1:7 0 0  3_1:1 0 0  7_1:1 0 0  
+DEAL:0::0 3_1:6 neighbor subdomain ids: 2_1:7 0 0  3_1:7 0 0  3_1:4 0 0  13_1:4 0 0  3_1:2 0 0  7_1:2 0 0  
+DEAL:0::0 3_1:7 neighbor subdomain ids: 3_1:6 0 0  9_1:6 0 0  3_1:5 0 0  13_1:5 0 0  3_1:3 0 0  7_1:3 0 0  
+DEAL:0::0 9_1:0 neighbor subdomain ids: 3_1:1 0 0  9_1:1 0 0  8_1:2 0 0  9_1:2 0 0  23_1:4 1 1  9_1:4 0 0  
+DEAL:0::0 9_1:1 neighbor subdomain ids: 9_1:0 0 0  2_1:0 0 0  8_1:3 0 0  9_1:3 0 0  23_1:5 1 1  9_1:5 0 0  
+DEAL:0::0 9_1:2 neighbor subdomain ids: 3_1:3 0 0  9_1:3 0 0  9_1:0 0 0  16_1:0 1 1  23_1:6 1 1  9_1:6 0 0  
+DEAL:0::0 9_1:3 neighbor subdomain ids: 9_1:2 0 0  2_1:2 0 0  9_1:1 0 0  16_1:1 1 1  23_1:7 1 1  9_1:7 0 0  
+DEAL:0::0 9_1:4 neighbor subdomain ids: 3_1:5 0 0  9_1:5 0 0  8_1:6 0 0  9_1:6 0 0  9_1:0 0 0  11_1:0 0 0  
+DEAL:0::0 9_1:5 neighbor subdomain ids: 9_1:4 0 0  2_1:4 0 0  8_1:7 0 0  9_1:7 0 0  9_1:1 0 0  11_1:1 0 0  
+DEAL:0::0 9_1:6 neighbor subdomain ids: 3_1:7 0 0  9_1:7 0 0  9_1:4 0 0  16_1:4 1 1  9_1:2 0 0  11_1:2 0 0  
+DEAL:0::0 9_1:7 neighbor subdomain ids: 9_1:6 0 0  2_1:6 0 0  9_1:5 0 0  16_1:5 1 1  9_1:3 0 0  11_1:3 0 0  
+DEAL:0::0 12_1:0 neighbor subdomain ids: 16_1:1 1 1  12_1:1 0 0  2_1:2 0 0  12_1:2 0 0  24_1:4 1 1  12_1:4 0 0  
+DEAL:0::0 12_1:1 neighbor subdomain ids: 12_1:0 0 0  13_1:0 0 0  2_1:3 0 0  12_1:3 0 0  24_1:5 1 1  12_1:5 0 0  
+DEAL:0::0 12_1:2 neighbor subdomain ids: 16_1:3 1 1  12_1:3 0 0  12_1:0 0 0  0_1:0 0 0  24_1:6 1 1  12_1:6 0 0  
+DEAL:0::0 12_1:3 neighbor subdomain ids: 12_1:2 0 0  13_1:2 0 0  12_1:1 0 0  0_1:1 0 0  24_1:7 1 1  12_1:7 0 0  
+DEAL:0::0 12_1:4 neighbor subdomain ids: 16_1:5 1 1  12_1:5 0 0  2_1:6 0 0  12_1:6 0 0  12_1:0 0 0  14_1:0 1 1  
+DEAL:0::0 12_1:5 neighbor subdomain ids: 12_1:4 0 0  13_1:4 0 0  2_1:7 0 0  12_1:7 0 0  12_1:1 0 0  14_1:1 1 1  
+DEAL:0::0 12_1:6 neighbor subdomain ids: 16_1:7 1 1  12_1:7 0 0  12_1:4 0 0  0_1:4 0 0  12_1:2 0 0  14_1:2 1 1  
+DEAL:0::0 12_1:7 neighbor subdomain ids: 12_1:6 0 0  13_1:6 0 0  12_1:5 0 0  0_1:5 0 0  12_1:3 0 0  14_1:3 1 1  
+DEAL:0::0 13_1:0 neighbor subdomain ids: 12_1:1 0 0  13_1:1 0 0  3_1:2 0 0  13_1:2 0 0  25_1:4 1 1  13_1:4 0 0  
+DEAL:0::0 13_1:1 neighbor subdomain ids: 13_1:0 0 0  16_1:0 1 1  3_1:3 0 0  13_1:3 0 0  25_1:5 1 1  13_1:5 0 0  
+DEAL:0::0 13_1:2 neighbor subdomain ids: 12_1:3 0 0  13_1:3 0 0  13_1:0 0 0  1_1:0 0 0  25_1:6 1 1  13_1:6 0 0  
+DEAL:0::0 13_1:3 neighbor subdomain ids: 13_1:2 0 0  16_1:2 1 1  13_1:1 0 0  1_1:1 0 0  25_1:7 1 1  13_1:7 0 0  
+DEAL:0::0 13_1:4 neighbor subdomain ids: 12_1:5 0 0  13_1:5 0 0  3_1:6 0 0  13_1:6 0 0  13_1:0 0 0  15_1:0 1 1  
+DEAL:0::0 13_1:5 neighbor subdomain ids: 13_1:4 0 0  16_1:4 1 1  3_1:7 0 0  13_1:7 0 0  13_1:1 0 0  15_1:1 1 1  
+DEAL:0::0 13_1:6 neighbor subdomain ids: 12_1:7 0 0  13_1:7 0 0  13_1:4 0 0  1_1:4 0 0  13_1:2 0 0  15_1:2 1 1  
+DEAL:0::0 13_1:7 neighbor subdomain ids: 13_1:6 0 0  16_1:6 1 1  13_1:5 0 0  1_1:5 0 0  13_1:3 0 0  15_1:3 1 1  
+DEAL:0::0 4_1:0 neighbor subdomain ids: 10_1:1 0 0  4_1:1 0 0  14_1:2 1 1  4_1:2 0 0  0_1:4 0 0  4_1:4 0 0  
+DEAL:0::0 4_1:1 neighbor subdomain ids: 4_1:0 0 0  5_1:0 0 0  14_1:3 1 1  4_1:3 0 0  0_1:5 0 0  4_1:5 0 0  
+DEAL:0::0 4_1:2 neighbor subdomain ids: 10_1:3 0 0  4_1:3 0 0  4_1:0 0 0  6_1:0 0 0  0_1:6 0 0  4_1:6 0 0  
+DEAL:0::0 4_1:3 neighbor subdomain ids: 4_1:2 0 0  5_1:2 0 0  4_1:1 0 0  6_1:1 0 0  0_1:7 0 0  4_1:7 0 0  
+DEAL:0::0 4_1:4 neighbor subdomain ids: 10_1:5 0 0  4_1:5 0 0  14_1:6 1 1  4_1:6 0 0  4_1:0 0 0  18_1:0 1 1  
+DEAL:0::0 4_1:5 neighbor subdomain ids: 4_1:4 0 0  5_1:4 0 0  14_1:7 1 1  4_1:7 0 0  4_1:1 0 0  18_1:1 1 1  
+DEAL:0::0 4_1:6 neighbor subdomain ids: 10_1:7 0 0  4_1:7 0 0  4_1:4 0 0  6_1:4 0 0  4_1:2 0 0  18_1:2 1 1  
+DEAL:0::0 4_1:7 neighbor subdomain ids: 4_1:6 0 0  5_1:6 0 0  4_1:5 0 0  6_1:5 0 0  4_1:3 0 0  18_1:3 1 1  
+DEAL:0::0 5_1:0 neighbor subdomain ids: 4_1:1 0 0  5_1:1 0 0  15_1:2 1 1  5_1:2 0 0  1_1:4 0 0  5_1:4 0 0  
+DEAL:0::0 5_1:1 neighbor subdomain ids: 5_1:0 0 0  10_1:0 0 0  15_1:3 1 1  5_1:3 0 0  1_1:5 0 0  5_1:5 0 0  
+DEAL:0::0 5_1:2 neighbor subdomain ids: 4_1:3 0 0  5_1:3 0 0  5_1:0 0 0  7_1:0 0 0  1_1:6 0 0  5_1:6 0 0  
+DEAL:0::0 5_1:3 neighbor subdomain ids: 5_1:2 0 0  10_1:2 0 0  5_1:1 0 0  7_1:1 0 0  1_1:7 0 0  5_1:7 0 0  
+DEAL:0::0 5_1:4 neighbor subdomain ids: 4_1:5 0 0  5_1:5 0 0  15_1:6 1 1  5_1:6 0 0  5_1:0 0 0  19_1:0 1 1  
+DEAL:0::0 5_1:5 neighbor subdomain ids: 5_1:4 0 0  10_1:4 0 0  15_1:7 1 1  5_1:7 0 0  5_1:1 0 0  19_1:1 1 1  
+DEAL:0::0 5_1:6 neighbor subdomain ids: 4_1:7 0 0  5_1:7 0 0  5_1:4 0 0  7_1:4 0 0  5_1:2 0 0  19_1:2 1 1  
+DEAL:0::0 5_1:7 neighbor subdomain ids: 5_1:6 0 0  10_1:6 0 0  5_1:5 0 0  7_1:5 0 0  5_1:3 0 0  19_1:3 1 1  
+DEAL:0::0 10_1:0 neighbor subdomain ids: 5_1:1 0 0  10_1:1 0 0  17_1:2 1 1  10_1:2 0 0  8_1:4 0 0  10_1:4 0 0  
+DEAL:0::0 10_1:1 neighbor subdomain ids: 10_1:0 0 0  4_1:0 0 0  17_1:3 1 1  10_1:3 0 0  8_1:5 0 0  10_1:5 0 0  
+DEAL:0::0 10_1:2 neighbor subdomain ids: 5_1:3 0 0  10_1:3 0 0  10_1:0 0 0  11_1:0 0 0  8_1:6 0 0  10_1:6 0 0  
+DEAL:0::0 10_1:3 neighbor subdomain ids: 10_1:2 0 0  4_1:2 0 0  10_1:1 0 0  11_1:1 0 0  8_1:7 0 0  10_1:7 0 0  
+DEAL:0::0 10_1:4 neighbor subdomain ids: 5_1:5 0 0  10_1:5 0 0  17_1:6 1 1  10_1:6 0 0  10_1:0 0 0  22_1:0 1 1  
+DEAL:0::0 10_1:5 neighbor subdomain ids: 10_1:4 0 0  4_1:4 0 0  17_1:7 1 1  10_1:7 0 0  10_1:1 0 0  22_1:1 1 1  
+DEAL:0::0 10_1:6 neighbor subdomain ids: 5_1:7 0 0  10_1:7 0 0  10_1:4 0 0  11_1:4 0 0  10_1:2 0 0  22_1:2 1 1  
+DEAL:0::0 10_1:7 neighbor subdomain ids: 10_1:6 0 0  4_1:6 0 0  10_1:5 0 0  11_1:5 0 0  10_1:3 0 0  22_1:3 1 1  
+DEAL:0::0 6_1:0 neighbor subdomain ids: 11_1:1 0 0  6_1:1 0 0  4_1:2 0 0  6_1:2 0 0  2_1:4 0 0  6_1:4 0 0  
+DEAL:0::0 6_1:1 neighbor subdomain ids: 6_1:0 0 0  7_1:0 0 0  4_1:3 0 0  6_1:3 0 0  2_1:5 0 0  6_1:5 0 0  
+DEAL:0::0 6_1:2 neighbor subdomain ids: 11_1:3 0 0  6_1:3 0 0  6_1:0 0 0  14_1:0 1 1  2_1:6 0 0  6_1:6 0 0  
+DEAL:0::0 6_1:3 neighbor subdomain ids: 6_1:2 0 0  7_1:2 0 0  6_1:1 0 0  14_1:1 1 1  2_1:7 0 0  6_1:7 0 0  
+DEAL:0::0 6_1:4 neighbor subdomain ids: 11_1:5 0 0  6_1:5 0 0  4_1:6 0 0  6_1:6 0 0  6_1:0 0 0  20_1:0 1 1  
+DEAL:0::0 6_1:5 neighbor subdomain ids: 6_1:4 0 0  7_1:4 0 0  4_1:7 0 0  6_1:7 0 0  6_1:1 0 0  20_1:1 1 1  
+DEAL:0::0 6_1:6 neighbor subdomain ids: 11_1:7 0 0  6_1:7 0 0  6_1:4 0 0  14_1:4 1 1  6_1:2 0 0  20_1:2 1 1  
+DEAL:0::0 6_1:7 neighbor subdomain ids: 6_1:6 0 0  7_1:6 0 0  6_1:5 0 0  14_1:5 1 1  6_1:3 0 0  20_1:3 1 1  
+DEAL:0::0 7_1:0 neighbor subdomain ids: 6_1:1 0 0  7_1:1 0 0  5_1:2 0 0  7_1:2 0 0  3_1:4 0 0  7_1:4 0 0  
+DEAL:0::0 7_1:1 neighbor subdomain ids: 7_1:0 0 0  11_1:0 0 0  5_1:3 0 0  7_1:3 0 0  3_1:5 0 0  7_1:5 0 0  
+DEAL:0::0 7_1:2 neighbor subdomain ids: 6_1:3 0 0  7_1:3 0 0  7_1:0 0 0  15_1:0 1 1  3_1:6 0 0  7_1:6 0 0  
+DEAL:0::0 7_1:3 neighbor subdomain ids: 7_1:2 0 0  11_1:2 0 0  7_1:1 0 0  15_1:1 1 1  3_1:7 0 0  7_1:7 0 0  
+DEAL:0::0 7_1:4 neighbor subdomain ids: 6_1:5 0 0  7_1:5 0 0  5_1:6 0 0  7_1:6 0 0  7_1:0 0 0  21_1:0 1 1  
+DEAL:0::0 7_1:5 neighbor subdomain ids: 7_1:4 0 0  11_1:4 0 0  5_1:7 0 0  7_1:7 0 0  7_1:1 0 0  21_1:1 1 1  
+DEAL:0::0 7_1:6 neighbor subdomain ids: 6_1:7 0 0  7_1:7 0 0  7_1:4 0 0  15_1:4 1 1  7_1:2 0 0  21_1:2 1 1  
+DEAL:0::0 7_1:7 neighbor subdomain ids: 7_1:6 0 0  11_1:6 0 0  7_1:5 0 0  15_1:5 1 1  7_1:3 0 0  21_1:3 1 1  
+DEAL:0::0 11_1:0 neighbor subdomain ids: 7_1:1 0 0  11_1:1 0 0  10_1:2 0 0  11_1:2 0 0  9_1:4 0 0  11_1:4 0 0  
+DEAL:0::0 11_1:1 neighbor subdomain ids: 11_1:0 0 0  6_1:0 0 0  10_1:3 0 0  11_1:3 0 0  9_1:5 0 0  11_1:5 0 0  
+DEAL:0::0 11_1:2 neighbor subdomain ids: 7_1:3 0 0  11_1:3 0 0  11_1:0 0 0  17_1:0 1 1  9_1:6 0 0  11_1:6 0 0  
+DEAL:0::0 11_1:3 neighbor subdomain ids: 11_1:2 0 0  6_1:2 0 0  11_1:1 0 0  17_1:1 1 1  9_1:7 0 0  11_1:7 0 0  
+DEAL:0::0 11_1:4 neighbor subdomain ids: 7_1:5 0 0  11_1:5 0 0  10_1:6 0 0  11_1:6 0 0  11_1:0 0 0  23_1:0 1 1  
+DEAL:0::0 11_1:5 neighbor subdomain ids: 11_1:4 0 0  6_1:4 0 0  10_1:7 0 0  11_1:7 0 0  11_1:1 0 0  23_1:1 1 1  
+DEAL:0::0 11_1:6 neighbor subdomain ids: 7_1:7 0 0  11_1:7 0 0  11_1:4 0 0  17_1:4 1 1  11_1:2 0 0  23_1:2 1 1  
+DEAL:0::0 11_1:7 neighbor subdomain ids: 11_1:6 0 0  6_1:6 0 0  11_1:5 0 0  17_1:5 1 1  11_1:3 0 0  23_1:3 1 1  
+
+DEAL:1::1 4_0: neighbor subdomain ids: 1_0: 0 0  0_0: 0 0  8_0: 1 1  5_0: 1 1  
+DEAL:1::1 5_0: neighbor subdomain ids: 3_0: 0 0  2_0: 0 0  4_0: 1 1  8_0: 1 1  
+DEAL:1::1 6_0: neighbor subdomain ids: 8_0: 1 1  7_0: 1 1  2_0: 0 0  0_0: 0 0  
+DEAL:1::1 7_0: neighbor subdomain ids: 6_0: 1 1  8_0: 1 1  3_0: 0 0  1_0: 0 0  
+DEAL:1::1 8_0: neighbor subdomain ids: 7_0: 1 1  6_0: 1 1  5_0: 1 1  4_0: 1 1  
+DEAL:1::1 5_0: neighbor subdomain ids: 3_0: 0  2_0: 0  4_0: 0  8_0: 1  
+DEAL:1::1 6_0: neighbor subdomain ids: 8_0: 1  7_0: 1  2_0: 0  0_0: 0  
+DEAL:1::1 7_0: neighbor subdomain ids: 6_0: 1  8_0: 1  3_0: 0  1_0: 0  
+DEAL:1::1 8_0: neighbor subdomain ids: 7_0: 1  6_0: 1  5_0: 1  4_0: 0  
+DEAL:1::1 5_1:0 neighbor subdomain ids: 3_1:1 0 0  5_1:1 1 1  4_1:2 0 0  5_1:2 1 1  
+DEAL:1::1 5_1:1 neighbor subdomain ids: 5_1:0 1 1  2_1:0 0 0  4_1:3 0 0  5_1:3 1 1  
+DEAL:1::1 5_1:2 neighbor subdomain ids: 3_1:3 0 0  5_1:3 1 1  5_1:0 1 1  8_1:0 1 1  
+DEAL:1::1 5_1:3 neighbor subdomain ids: 5_1:2 1 1  2_1:2 0 0  5_1:1 1 1  8_1:1 1 1  
+DEAL:1::1 6_1:0 neighbor subdomain ids: 8_1:1 1 1  6_1:1 1 1  2_1:2 0 0  6_1:2 1 1  
+DEAL:1::1 6_1:1 neighbor subdomain ids: 6_1:0 1 1  7_1:0 1 1  2_1:3 0 0  6_1:3 1 1  
+DEAL:1::1 6_1:2 neighbor subdomain ids: 8_1:3 1 1  6_1:3 1 1  6_1:0 1 1  0_1:0 0 0  
+DEAL:1::1 6_1:3 neighbor subdomain ids: 6_1:2 1 1  7_1:2 1 1  6_1:1 1 1  0_1:1 0 0  
+DEAL:1::1 7_1:0 neighbor subdomain ids: 6_1:1 1 1  7_1:1 1 1  3_1:2 0 0  7_1:2 1 1  
+DEAL:1::1 7_1:1 neighbor subdomain ids: 7_1:0 1 1  8_1:0 1 1  3_1:3 0 0  7_1:3 1 1  
+DEAL:1::1 7_1:2 neighbor subdomain ids: 6_1:3 1 1  7_1:3 1 1  7_1:0 1 1  1_1:0 0 0  
+DEAL:1::1 7_1:3 neighbor subdomain ids: 7_1:2 1 1  8_1:2 1 1  7_1:1 1 1  1_1:1 0 0  
+DEAL:1::1 8_1:0 neighbor subdomain ids: 7_1:1 1 1  8_1:1 1 1  5_1:2 1 1  8_1:2 1 1  
+DEAL:1::1 8_1:1 neighbor subdomain ids: 8_1:0 1 1  6_1:0 1 1  5_1:3 1 1  8_1:3 1 1  
+DEAL:1::1 8_1:2 neighbor subdomain ids: 7_1:3 1 1  8_1:3 1 1  8_1:0 1 1  4_1:0 0 0  
+DEAL:1::1 8_1:3 neighbor subdomain ids: 8_1:2 1 1  6_1:2 1 1  8_1:1 1 1  4_1:1 0 0  
+DEAL:1::1 13_0: neighbor subdomain ids: 12_0: 0 0  16_0: 1 1  3_0: 0 0  1_0: 0 0  25_0: 1 1  15_0: 1 1  
+DEAL:1::1 16_0: neighbor subdomain ids: 13_0: 1 1  12_0: 0 0  9_0: 0 0  8_0: 0 0  26_0: 1 1  17_0: 1 1  
+DEAL:1::1 14_0: neighbor subdomain ids: 17_0: 1 1  15_0: 1 1  6_0: 0 0  4_0: 0 0  12_0: 0 0  24_0: 1 1  
+DEAL:1::1 15_0: neighbor subdomain ids: 14_0: 1 1  17_0: 1 1  7_0: 0 0  5_0: 0 0  13_0: 1 1  25_0: 1 1  
+DEAL:1::1 17_0: neighbor subdomain ids: 15_0: 1 1  14_0: 1 1  11_0: 0 0  10_0: 0 0  16_0: 1 1  26_0: 1 1  
+DEAL:1::1 18_0: neighbor subdomain ids: 22_0: 1 1  19_0: 1 1  24_0: 1 1  20_0: 1 1  4_0: 0 0  0_0: 0 0  
+DEAL:1::1 19_0: neighbor subdomain ids: 18_0: 1 1  22_0: 1 1  25_0: 1 1  21_0: 1 1  5_0: 0 0  1_0: 0 0  
+DEAL:1::1 22_0: neighbor subdomain ids: 19_0: 1 1  18_0: 1 1  26_0: 1 1  23_0: 1 1  10_0: 0 0  8_0: 0 0  
+DEAL:1::1 20_0: neighbor subdomain ids: 23_0: 1 1  21_0: 1 1  18_0: 1 1  24_0: 1 1  6_0: 0 0  2_0: 0 0  
+DEAL:1::1 21_0: neighbor subdomain ids: 20_0: 1 1  23_0: 1 1  19_0: 1 1  25_0: 1 1  7_0: 0 0  3_0: 0 0  
+DEAL:1::1 23_0: neighbor subdomain ids: 21_0: 1 1  20_0: 1 1  22_0: 1 1  26_0: 1 1  11_0: 0 0  9_0: 0 0  
+DEAL:1::1 24_0: neighbor subdomain ids: 26_0: 1 1  25_0: 1 1  20_0: 1 1  18_0: 1 1  14_0: 1 1  12_0: 0 0  
+DEAL:1::1 25_0: neighbor subdomain ids: 24_0: 1 1  26_0: 1 1  21_0: 1 1  19_0: 1 1  15_0: 1 1  13_0: 1 1  
+DEAL:1::1 26_0: neighbor subdomain ids: 25_0: 1 1  24_0: 1 1  23_0: 1 1  22_0: 1 1  17_0: 1 1  16_0: 1 1  
+DEAL:1::1 16_0: neighbor subdomain ids: 13_0: 0  12_0: 0  9_0: 0  8_0: 0  26_0: 1  17_0: 1  
+DEAL:1::1 14_0: neighbor subdomain ids: 17_0: 1  15_0: 1  6_0: 0  4_0: 0  12_0: 0  24_0: 1  
+DEAL:1::1 15_0: neighbor subdomain ids: 14_0: 1  17_0: 1  7_0: 0  5_0: 0  13_0: 0  25_0: 1  
+DEAL:1::1 17_0: neighbor subdomain ids: 15_0: 1  14_0: 1  11_0: 0  10_0: 0  16_0: 1  26_0: 1  
+DEAL:1::1 18_0: neighbor subdomain ids: 22_0: 1  19_0: 1  24_0: 1  20_0: 1  4_0: 0  0_0: 0  
+DEAL:1::1 19_0: neighbor subdomain ids: 18_0: 1  22_0: 1  25_0: 1  21_0: 1  5_0: 0  1_0: 0  
+DEAL:1::1 22_0: neighbor subdomain ids: 19_0: 1  18_0: 1  26_0: 1  23_0: 1  10_0: 0  8_0: 0  
+DEAL:1::1 20_0: neighbor subdomain ids: 23_0: 1  21_0: 1  18_0: 1  24_0: 1  6_0: 0  2_0: 0  
+DEAL:1::1 21_0: neighbor subdomain ids: 20_0: 1  23_0: 1  19_0: 1  25_0: 1  7_0: 0  3_0: 0  
+DEAL:1::1 23_0: neighbor subdomain ids: 21_0: 1  20_0: 1  22_0: 1  26_0: 1  11_0: 0  9_0: 0  
+DEAL:1::1 24_0: neighbor subdomain ids: 26_0: 1  25_0: 1  20_0: 1  18_0: 1  14_0: 1  12_0: 0  
+DEAL:1::1 25_0: neighbor subdomain ids: 24_0: 1  26_0: 1  21_0: 1  19_0: 1  15_0: 1  13_0: 0  
+DEAL:1::1 26_0: neighbor subdomain ids: 25_0: 1  24_0: 1  23_0: 1  22_0: 1  17_0: 1  16_0: 1  
+DEAL:1::1 16_1:0 neighbor subdomain ids: 13_1:1 0 0  16_1:1 1 1  9_1:2 0 0  16_1:2 1 1  26_1:4 1 1  16_1:4 1 1  
+DEAL:1::1 16_1:1 neighbor subdomain ids: 16_1:0 1 1  12_1:0 0 0  9_1:3 0 0  16_1:3 1 1  26_1:5 1 1  16_1:5 1 1  
+DEAL:1::1 16_1:2 neighbor subdomain ids: 13_1:3 0 0  16_1:3 1 1  16_1:0 1 1  8_1:0 0 0  26_1:6 1 1  16_1:6 1 1  
+DEAL:1::1 16_1:3 neighbor subdomain ids: 16_1:2 1 1  12_1:2 0 0  16_1:1 1 1  8_1:1 0 0  26_1:7 1 1  16_1:7 1 1  
+DEAL:1::1 16_1:4 neighbor subdomain ids: 13_1:5 0 0  16_1:5 1 1  9_1:6 0 0  16_1:6 1 1  16_1:0 1 1  17_1:0 1 1  
+DEAL:1::1 16_1:5 neighbor subdomain ids: 16_1:4 1 1  12_1:4 0 0  9_1:7 0 0  16_1:7 1 1  16_1:1 1 1  17_1:1 1 1  
+DEAL:1::1 16_1:6 neighbor subdomain ids: 13_1:7 0 0  16_1:7 1 1  16_1:4 1 1  8_1:4 0 0  16_1:2 1 1  17_1:2 1 1  
+DEAL:1::1 16_1:7 neighbor subdomain ids: 16_1:6 1 1  12_1:6 0 0  16_1:5 1 1  8_1:5 0 0  16_1:3 1 1  17_1:3 1 1  
+DEAL:1::1 14_1:0 neighbor subdomain ids: 17_1:1 1 1  14_1:1 1 1  6_1:2 0 0  14_1:2 1 1  12_1:4 0 0  14_1:4 1 1  
+DEAL:1::1 14_1:1 neighbor subdomain ids: 14_1:0 1 1  15_1:0 1 1  6_1:3 0 0  14_1:3 1 1  12_1:5 0 0  14_1:5 1 1  
+DEAL:1::1 14_1:2 neighbor subdomain ids: 17_1:3 1 1  14_1:3 1 1  14_1:0 1 1  4_1:0 0 0  12_1:6 0 0  14_1:6 1 1  
+DEAL:1::1 14_1:3 neighbor subdomain ids: 14_1:2 1 1  15_1:2 1 1  14_1:1 1 1  4_1:1 0 0  12_1:7 0 0  14_1:7 1 1  
+DEAL:1::1 14_1:4 neighbor subdomain ids: 17_1:5 1 1  14_1:5 1 1  6_1:6 0 0  14_1:6 1 1  14_1:0 1 1  24_1:0 1 1  
+DEAL:1::1 14_1:5 neighbor subdomain ids: 14_1:4 1 1  15_1:4 1 1  6_1:7 0 0  14_1:7 1 1  14_1:1 1 1  24_1:1 1 1  
+DEAL:1::1 14_1:6 neighbor subdomain ids: 17_1:7 1 1  14_1:7 1 1  14_1:4 1 1  4_1:4 0 0  14_1:2 1 1  24_1:2 1 1  
+DEAL:1::1 14_1:7 neighbor subdomain ids: 14_1:6 1 1  15_1:6 1 1  14_1:5 1 1  4_1:5 0 0  14_1:3 1 1  24_1:3 1 1  
+DEAL:1::1 15_1:0 neighbor subdomain ids: 14_1:1 1 1  15_1:1 1 1  7_1:2 0 0  15_1:2 1 1  13_1:4 0 0  15_1:4 1 1  
+DEAL:1::1 15_1:1 neighbor subdomain ids: 15_1:0 1 1  17_1:0 1 1  7_1:3 0 0  15_1:3 1 1  13_1:5 0 0  15_1:5 1 1  
+DEAL:1::1 15_1:2 neighbor subdomain ids: 14_1:3 1 1  15_1:3 1 1  15_1:0 1 1  5_1:0 0 0  13_1:6 0 0  15_1:6 1 1  
+DEAL:1::1 15_1:3 neighbor subdomain ids: 15_1:2 1 1  17_1:2 1 1  15_1:1 1 1  5_1:1 0 0  13_1:7 0 0  15_1:7 1 1  
+DEAL:1::1 15_1:4 neighbor subdomain ids: 14_1:5 1 1  15_1:5 1 1  7_1:6 0 0  15_1:6 1 1  15_1:0 1 1  25_1:0 1 1  
+DEAL:1::1 15_1:5 neighbor subdomain ids: 15_1:4 1 1  17_1:4 1 1  7_1:7 0 0  15_1:7 1 1  15_1:1 1 1  25_1:1 1 1  
+DEAL:1::1 15_1:6 neighbor subdomain ids: 14_1:7 1 1  15_1:7 1 1  15_1:4 1 1  5_1:4 0 0  15_1:2 1 1  25_1:2 1 1  
+DEAL:1::1 15_1:7 neighbor subdomain ids: 15_1:6 1 1  17_1:6 1 1  15_1:5 1 1  5_1:5 0 0  15_1:3 1 1  25_1:3 1 1  
+DEAL:1::1 17_1:0 neighbor subdomain ids: 15_1:1 1 1  17_1:1 1 1  11_1:2 0 0  17_1:2 1 1  16_1:4 1 1  17_1:4 1 1  
+DEAL:1::1 17_1:1 neighbor subdomain ids: 17_1:0 1 1  14_1:0 1 1  11_1:3 0 0  17_1:3 1 1  16_1:5 1 1  17_1:5 1 1  
+DEAL:1::1 17_1:2 neighbor subdomain ids: 15_1:3 1 1  17_1:3 1 1  17_1:0 1 1  10_1:0 0 0  16_1:6 1 1  17_1:6 1 1  
+DEAL:1::1 17_1:3 neighbor subdomain ids: 17_1:2 1 1  14_1:2 1 1  17_1:1 1 1  10_1:1 0 0  16_1:7 1 1  17_1:7 1 1  
+DEAL:1::1 17_1:4 neighbor subdomain ids: 15_1:5 1 1  17_1:5 1 1  11_1:6 0 0  17_1:6 1 1  17_1:0 1 1  26_1:0 1 1  
+DEAL:1::1 17_1:5 neighbor subdomain ids: 17_1:4 1 1  14_1:4 1 1  11_1:7 0 0  17_1:7 1 1  17_1:1 1 1  26_1:1 1 1  
+DEAL:1::1 17_1:6 neighbor subdomain ids: 15_1:7 1 1  17_1:7 1 1  17_1:4 1 1  10_1:4 0 0  17_1:2 1 1  26_1:2 1 1  
+DEAL:1::1 17_1:7 neighbor subdomain ids: 17_1:6 1 1  14_1:6 1 1  17_1:5 1 1  10_1:5 0 0  17_1:3 1 1  26_1:3 1 1  
+DEAL:1::1 18_1:0 neighbor subdomain ids: 22_1:1 1 1  18_1:1 1 1  24_1:2 1 1  18_1:2 1 1  4_1:4 0 0  18_1:4 1 1  
+DEAL:1::1 18_1:1 neighbor subdomain ids: 18_1:0 1 1  19_1:0 1 1  24_1:3 1 1  18_1:3 1 1  4_1:5 0 0  18_1:5 1 1  
+DEAL:1::1 18_1:2 neighbor subdomain ids: 22_1:3 1 1  18_1:3 1 1  18_1:0 1 1  20_1:0 1 1  4_1:6 0 0  18_1:6 1 1  
+DEAL:1::1 18_1:3 neighbor subdomain ids: 18_1:2 1 1  19_1:2 1 1  18_1:1 1 1  20_1:1 1 1  4_1:7 0 0  18_1:7 1 1  
+DEAL:1::1 18_1:4 neighbor subdomain ids: 22_1:5 1 1  18_1:5 1 1  24_1:6 1 1  18_1:6 1 1  18_1:0 1 1  0_1:0 0 0  
+DEAL:1::1 18_1:5 neighbor subdomain ids: 18_1:4 1 1  19_1:4 1 1  24_1:7 1 1  18_1:7 1 1  18_1:1 1 1  0_1:1 0 0  
+DEAL:1::1 18_1:6 neighbor subdomain ids: 22_1:7 1 1  18_1:7 1 1  18_1:4 1 1  20_1:4 1 1  18_1:2 1 1  0_1:2 0 0  
+DEAL:1::1 18_1:7 neighbor subdomain ids: 18_1:6 1 1  19_1:6 1 1  18_1:5 1 1  20_1:5 1 1  18_1:3 1 1  0_1:3 0 0  
+DEAL:1::1 19_1:0 neighbor subdomain ids: 18_1:1 1 1  19_1:1 1 1  25_1:2 1 1  19_1:2 1 1  5_1:4 0 0  19_1:4 1 1  
+DEAL:1::1 19_1:1 neighbor subdomain ids: 19_1:0 1 1  22_1:0 1 1  25_1:3 1 1  19_1:3 1 1  5_1:5 0 0  19_1:5 1 1  
+DEAL:1::1 19_1:2 neighbor subdomain ids: 18_1:3 1 1  19_1:3 1 1  19_1:0 1 1  21_1:0 1 1  5_1:6 0 0  19_1:6 1 1  
+DEAL:1::1 19_1:3 neighbor subdomain ids: 19_1:2 1 1  22_1:2 1 1  19_1:1 1 1  21_1:1 1 1  5_1:7 0 0  19_1:7 1 1  
+DEAL:1::1 19_1:4 neighbor subdomain ids: 18_1:5 1 1  19_1:5 1 1  25_1:6 1 1  19_1:6 1 1  19_1:0 1 1  1_1:0 0 0  
+DEAL:1::1 19_1:5 neighbor subdomain ids: 19_1:4 1 1  22_1:4 1 1  25_1:7 1 1  19_1:7 1 1  19_1:1 1 1  1_1:1 0 0  
+DEAL:1::1 19_1:6 neighbor subdomain ids: 18_1:7 1 1  19_1:7 1 1  19_1:4 1 1  21_1:4 1 1  19_1:2 1 1  1_1:2 0 0  
+DEAL:1::1 19_1:7 neighbor subdomain ids: 19_1:6 1 1  22_1:6 1 1  19_1:5 1 1  21_1:5 1 1  19_1:3 1 1  1_1:3 0 0  
+DEAL:1::1 22_1:0 neighbor subdomain ids: 19_1:1 1 1  22_1:1 1 1  26_1:2 1 1  22_1:2 1 1  10_1:4 0 0  22_1:4 1 1  
+DEAL:1::1 22_1:1 neighbor subdomain ids: 22_1:0 1 1  18_1:0 1 1  26_1:3 1 1  22_1:3 1 1  10_1:5 0 0  22_1:5 1 1  
+DEAL:1::1 22_1:2 neighbor subdomain ids: 19_1:3 1 1  22_1:3 1 1  22_1:0 1 1  23_1:0 1 1  10_1:6 0 0  22_1:6 1 1  
+DEAL:1::1 22_1:3 neighbor subdomain ids: 22_1:2 1 1  18_1:2 1 1  22_1:1 1 1  23_1:1 1 1  10_1:7 0 0  22_1:7 1 1  
+DEAL:1::1 22_1:4 neighbor subdomain ids: 19_1:5 1 1  22_1:5 1 1  26_1:6 1 1  22_1:6 1 1  22_1:0 1 1  8_1:0 0 0  
+DEAL:1::1 22_1:5 neighbor subdomain ids: 22_1:4 1 1  18_1:4 1 1  26_1:7 1 1  22_1:7 1 1  22_1:1 1 1  8_1:1 0 0  
+DEAL:1::1 22_1:6 neighbor subdomain ids: 19_1:7 1 1  22_1:7 1 1  22_1:4 1 1  23_1:4 1 1  22_1:2 1 1  8_1:2 0 0  
+DEAL:1::1 22_1:7 neighbor subdomain ids: 22_1:6 1 1  18_1:6 1 1  22_1:5 1 1  23_1:5 1 1  22_1:3 1 1  8_1:3 0 0  
+DEAL:1::1 20_1:0 neighbor subdomain ids: 23_1:1 1 1  20_1:1 1 1  18_1:2 1 1  20_1:2 1 1  6_1:4 0 0  20_1:4 1 1  
+DEAL:1::1 20_1:1 neighbor subdomain ids: 20_1:0 1 1  21_1:0 1 1  18_1:3 1 1  20_1:3 1 1  6_1:5 0 0  20_1:5 1 1  
+DEAL:1::1 20_1:2 neighbor subdomain ids: 23_1:3 1 1  20_1:3 1 1  20_1:0 1 1  24_1:0 1 1  6_1:6 0 0  20_1:6 1 1  
+DEAL:1::1 20_1:3 neighbor subdomain ids: 20_1:2 1 1  21_1:2 1 1  20_1:1 1 1  24_1:1 1 1  6_1:7 0 0  20_1:7 1 1  
+DEAL:1::1 20_1:4 neighbor subdomain ids: 23_1:5 1 1  20_1:5 1 1  18_1:6 1 1  20_1:6 1 1  20_1:0 1 1  2_1:0 0 0  
+DEAL:1::1 20_1:5 neighbor subdomain ids: 20_1:4 1 1  21_1:4 1 1  18_1:7 1 1  20_1:7 1 1  20_1:1 1 1  2_1:1 0 0  
+DEAL:1::1 20_1:6 neighbor subdomain ids: 23_1:7 1 1  20_1:7 1 1  20_1:4 1 1  24_1:4 1 1  20_1:2 1 1  2_1:2 0 0  
+DEAL:1::1 20_1:7 neighbor subdomain ids: 20_1:6 1 1  21_1:6 1 1  20_1:5 1 1  24_1:5 1 1  20_1:3 1 1  2_1:3 0 0  
+DEAL:1::1 21_1:0 neighbor subdomain ids: 20_1:1 1 1  21_1:1 1 1  19_1:2 1 1  21_1:2 1 1  7_1:4 0 0  21_1:4 1 1  
+DEAL:1::1 21_1:1 neighbor subdomain ids: 21_1:0 1 1  23_1:0 1 1  19_1:3 1 1  21_1:3 1 1  7_1:5 0 0  21_1:5 1 1  
+DEAL:1::1 21_1:2 neighbor subdomain ids: 20_1:3 1 1  21_1:3 1 1  21_1:0 1 1  25_1:0 1 1  7_1:6 0 0  21_1:6 1 1  
+DEAL:1::1 21_1:3 neighbor subdomain ids: 21_1:2 1 1  23_1:2 1 1  21_1:1 1 1  25_1:1 1 1  7_1:7 0 0  21_1:7 1 1  
+DEAL:1::1 21_1:4 neighbor subdomain ids: 20_1:5 1 1  21_1:5 1 1  19_1:6 1 1  21_1:6 1 1  21_1:0 1 1  3_1:0 0 0  
+DEAL:1::1 21_1:5 neighbor subdomain ids: 21_1:4 1 1  23_1:4 1 1  19_1:7 1 1  21_1:7 1 1  21_1:1 1 1  3_1:1 0 0  
+DEAL:1::1 21_1:6 neighbor subdomain ids: 20_1:7 1 1  21_1:7 1 1  21_1:4 1 1  25_1:4 1 1  21_1:2 1 1  3_1:2 0 0  
+DEAL:1::1 21_1:7 neighbor subdomain ids: 21_1:6 1 1  23_1:6 1 1  21_1:5 1 1  25_1:5 1 1  21_1:3 1 1  3_1:3 0 0  
+DEAL:1::1 23_1:0 neighbor subdomain ids: 21_1:1 1 1  23_1:1 1 1  22_1:2 1 1  23_1:2 1 1  11_1:4 0 0  23_1:4 1 1  
+DEAL:1::1 23_1:1 neighbor subdomain ids: 23_1:0 1 1  20_1:0 1 1  22_1:3 1 1  23_1:3 1 1  11_1:5 0 0  23_1:5 1 1  
+DEAL:1::1 23_1:2 neighbor subdomain ids: 21_1:3 1 1  23_1:3 1 1  23_1:0 1 1  26_1:0 1 1  11_1:6 0 0  23_1:6 1 1  
+DEAL:1::1 23_1:3 neighbor subdomain ids: 23_1:2 1 1  20_1:2 1 1  23_1:1 1 1  26_1:1 1 1  11_1:7 0 0  23_1:7 1 1  
+DEAL:1::1 23_1:4 neighbor subdomain ids: 21_1:5 1 1  23_1:5 1 1  22_1:6 1 1  23_1:6 1 1  23_1:0 1 1  9_1:0 0 0  
+DEAL:1::1 23_1:5 neighbor subdomain ids: 23_1:4 1 1  20_1:4 1 1  22_1:7 1 1  23_1:7 1 1  23_1:1 1 1  9_1:1 0 0  
+DEAL:1::1 23_1:6 neighbor subdomain ids: 21_1:7 1 1  23_1:7 1 1  23_1:4 1 1  26_1:4 1 1  23_1:2 1 1  9_1:2 0 0  
+DEAL:1::1 23_1:7 neighbor subdomain ids: 23_1:6 1 1  20_1:6 1 1  23_1:5 1 1  26_1:5 1 1  23_1:3 1 1  9_1:3 0 0  
+DEAL:1::1 24_1:0 neighbor subdomain ids: 26_1:1 1 1  24_1:1 1 1  20_1:2 1 1  24_1:2 1 1  14_1:4 1 1  24_1:4 1 1  
+DEAL:1::1 24_1:1 neighbor subdomain ids: 24_1:0 1 1  25_1:0 1 1  20_1:3 1 1  24_1:3 1 1  14_1:5 1 1  24_1:5 1 1  
+DEAL:1::1 24_1:2 neighbor subdomain ids: 26_1:3 1 1  24_1:3 1 1  24_1:0 1 1  18_1:0 1 1  14_1:6 1 1  24_1:6 1 1  
+DEAL:1::1 24_1:3 neighbor subdomain ids: 24_1:2 1 1  25_1:2 1 1  24_1:1 1 1  18_1:1 1 1  14_1:7 1 1  24_1:7 1 1  
+DEAL:1::1 24_1:4 neighbor subdomain ids: 26_1:5 1 1  24_1:5 1 1  20_1:6 1 1  24_1:6 1 1  24_1:0 1 1  12_1:0 0 0  
+DEAL:1::1 24_1:5 neighbor subdomain ids: 24_1:4 1 1  25_1:4 1 1  20_1:7 1 1  24_1:7 1 1  24_1:1 1 1  12_1:1 0 0  
+DEAL:1::1 24_1:6 neighbor subdomain ids: 26_1:7 1 1  24_1:7 1 1  24_1:4 1 1  18_1:4 1 1  24_1:2 1 1  12_1:2 0 0  
+DEAL:1::1 24_1:7 neighbor subdomain ids: 24_1:6 1 1  25_1:6 1 1  24_1:5 1 1  18_1:5 1 1  24_1:3 1 1  12_1:3 0 0  
+DEAL:1::1 25_1:0 neighbor subdomain ids: 24_1:1 1 1  25_1:1 1 1  21_1:2 1 1  25_1:2 1 1  15_1:4 1 1  25_1:4 1 1  
+DEAL:1::1 25_1:1 neighbor subdomain ids: 25_1:0 1 1  26_1:0 1 1  21_1:3 1 1  25_1:3 1 1  15_1:5 1 1  25_1:5 1 1  
+DEAL:1::1 25_1:2 neighbor subdomain ids: 24_1:3 1 1  25_1:3 1 1  25_1:0 1 1  19_1:0 1 1  15_1:6 1 1  25_1:6 1 1  
+DEAL:1::1 25_1:3 neighbor subdomain ids: 25_1:2 1 1  26_1:2 1 1  25_1:1 1 1  19_1:1 1 1  15_1:7 1 1  25_1:7 1 1  
+DEAL:1::1 25_1:4 neighbor subdomain ids: 24_1:5 1 1  25_1:5 1 1  21_1:6 1 1  25_1:6 1 1  25_1:0 1 1  13_1:0 0 0  
+DEAL:1::1 25_1:5 neighbor subdomain ids: 25_1:4 1 1  26_1:4 1 1  21_1:7 1 1  25_1:7 1 1  25_1:1 1 1  13_1:1 0 0  
+DEAL:1::1 25_1:6 neighbor subdomain ids: 24_1:7 1 1  25_1:7 1 1  25_1:4 1 1  19_1:4 1 1  25_1:2 1 1  13_1:2 0 0  
+DEAL:1::1 25_1:7 neighbor subdomain ids: 25_1:6 1 1  26_1:6 1 1  25_1:5 1 1  19_1:5 1 1  25_1:3 1 1  13_1:3 0 0  
+DEAL:1::1 26_1:0 neighbor subdomain ids: 25_1:1 1 1  26_1:1 1 1  23_1:2 1 1  26_1:2 1 1  17_1:4 1 1  26_1:4 1 1  
+DEAL:1::1 26_1:1 neighbor subdomain ids: 26_1:0 1 1  24_1:0 1 1  23_1:3 1 1  26_1:3 1 1  17_1:5 1 1  26_1:5 1 1  
+DEAL:1::1 26_1:2 neighbor subdomain ids: 25_1:3 1 1  26_1:3 1 1  26_1:0 1 1  22_1:0 1 1  17_1:6 1 1  26_1:6 1 1  
+DEAL:1::1 26_1:3 neighbor subdomain ids: 26_1:2 1 1  24_1:2 1 1  26_1:1 1 1  22_1:1 1 1  17_1:7 1 1  26_1:7 1 1  
+DEAL:1::1 26_1:4 neighbor subdomain ids: 25_1:5 1 1  26_1:5 1 1  23_1:6 1 1  26_1:6 1 1  26_1:0 1 1  16_1:0 1 1  
+DEAL:1::1 26_1:5 neighbor subdomain ids: 26_1:4 1 1  24_1:4 1 1  23_1:7 1 1  26_1:7 1 1  26_1:1 1 1  16_1:1 1 1  
+DEAL:1::1 26_1:6 neighbor subdomain ids: 25_1:7 1 1  26_1:7 1 1  26_1:4 1 1  22_1:4 1 1  26_1:2 1 1  16_1:2 1 1  
+DEAL:1::1 26_1:7 neighbor subdomain ids: 26_1:6 1 1  24_1:6 1 1  26_1:5 1 1  22_1:5 1 1  26_1:3 1 1  16_1:3 1 1  
+
