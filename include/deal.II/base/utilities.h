@@ -508,6 +508,10 @@ namespace Utilities
     // if (iexp <= 0)
     //   return 1;
     //
+    // // avoid overflow of one additional recursion with pow(base * base, 0)
+    // if (iexp == 1)
+    //   return base;
+    //
     // // if the current exponent is not divisible by two,
     // // we need to account for that.
     // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
@@ -519,9 +523,11 @@ namespace Utilities
 
     static_assert(std::is_integral<T>::value, "Only integral types supported");
 
-    return iexp <= 0 ? 1 :
-                       (((iexp % 2 == 1) ? base : 1) *
-                        dealii::Utilities::pow(base * base, iexp / 2));
+    return iexp <= 0 ?
+             1 :
+             (iexp == 1 ? base :
+                          (((iexp % 2 == 1) ? base : 1) *
+                           dealii::Utilities::pow(base * base, iexp / 2)));
   }
 
   /**
