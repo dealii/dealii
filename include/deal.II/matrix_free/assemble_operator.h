@@ -31,7 +31,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
 // TODO distributed graph
 
 namespace MatrixFreeTools
@@ -155,10 +154,8 @@ namespace MatrixFreeTools
 
    * @param pattern The underlying sparsity pattern of @p linear_operator. Note that @p pattern can be a subset of the sparsity pattern from @p output_matrix.
 
-   * @param dummy_domain A vector used to initialize vectors in the domain of @p linear_operator by copying the structure of @p dummy_domain. Essentially, dummy_domain.size() == linear_operator.n_cols(). The type @p DomainVector needs to provide reinit(const DomainVector&, bool=false) to create a zero vector.
-
-   * @param dummy_range< Similar to @p dummy_domain, but for the result of the operator evaluation. Hence, dummy_range.size() == linear_operator.n_rows().
-
+   * @param domain_vector, @param range_vector Vectors used for the operator application. Need to be properly setup to be used as arguments to @p linear_operator.vmult(range_vector, domain_vector).
+   *
    * @param cache An already created CacheGraph object storing intermediate results. This allows to reuse the graph in case the sparsity pattern
    does not change. If cache is empty (nullptr), it will be created.
    */
@@ -171,11 +168,10 @@ namespace MatrixFreeTools
   assemble_operator(Matrix &                     output_matrix,
                     const Operator &             linear_operator,
                     const Pattern &              pattern,
-                    const DomainVector &         dummy_domain,
-                    const RangeVector &          dummy_range,
+                    DomainVector &               domain_vector,
+                    RangeVector &                range_vector,
                     std::shared_ptr<GraphCache> &cache)
   {
-    int counter = 0;
     // Early exit for empty pattern.
     if (pattern.n_nonzero_elements() == 0)
       return;
@@ -206,22 +202,20 @@ namespace MatrixFreeTools
           cache->entries_per_color[color];
 
         // Construct the test-vector e = sum e_i for i in entries.
-        DomainVector e;
-        e.reinit(dummy_domain, false);
+        domain_vector = 0;
         for (auto i : entries)
-          e[i] = 1.0;
+          domain_vector[i] = 1.0;
 
-        // Apply to operator. image = sum A*e_i for i in entries.
-        RangeVector image;
-        image.reinit(dummy_range, false);
-        linear_operator.vmult(image, e);
+        // Apply to operator. range_vector = sum A*e_i for i in entries.
+        range_vector.reinit(range_vector, false);
+        linear_operator.vmult(range_vector, domain_vector);
 
         // Split the result into its contributions from the single unit vectors,
         // i.e. A*e_i. This is possible, since for each row, only one column in
         // entry can store a value.
         for (vertices_size_type r = 0; r < pattern.n_rows(); r++)
           {
-            if (image[r] != 0.0)
+            if (range_vector[r] != 0.0)
               {
 #ifdef DEBUG
                 bool found = false;
@@ -230,7 +224,7 @@ namespace MatrixFreeTools
                   {
                     if (pattern.exists(r, c))
                       {
-                        output_matrix.set(r, c, image[r]);
+                        output_matrix.set(r, c, range_vector[r]);
 #ifdef DEBUG
                         // Verify that we can uniquely identify the column.
                         for (auto j : entries)
@@ -279,14 +273,14 @@ namespace MatrixFreeTools
                     const Operator &linear_operator,
                     const Pattern & pattern)
   {
-    Vector<typename Matrix::value_type> dummy_domain(pattern.n_cols());
-    Vector<typename Matrix::value_type> dummy_range(pattern.n_rows());
+    Vector<typename Matrix::value_type> domain_vector(pattern.n_cols());
+    Vector<typename Matrix::value_type> range_vector(pattern.n_rows());
     std::shared_ptr<GraphCache>         cache;
     assemble_operator(output_matrix,
                       linear_operator,
                       pattern,
-                      dummy_domain,
-                      dummy_range,
+                      domain_vector,
+                      range_vector,
                       cache);
     return cache;
   }
@@ -300,23 +294,22 @@ namespace MatrixFreeTools
             typename DomainVector,
             typename RangeVector>
   std::shared_ptr<GraphCache>
-  assemble_operator(Matrix &            output_matrix,
-                    const Operator &    linear_operator,
-                    const Pattern &     pattern,
-                    const DomainVector &dummy_domain,
-                    const RangeVector & dummy_range)
+  assemble_operator(Matrix &        output_matrix,
+                    const Operator &linear_operator,
+                    const Pattern & pattern,
+                    DomainVector &  domain_vector,
+                    RangeVector &   range_vector)
   {
     std::shared_ptr<GraphCache> cache;
     assemble_operator(output_matrix,
                       linear_operator,
                       pattern,
-                      dummy_domain,
-                      dummy_range,
+                      domain_vector,
+                      range_vector,
                       cache);
     return cache;
   }
 } // namespace MatrixFreeTools
-
 
 DEAL_II_NAMESPACE_CLOSE
 
