@@ -4516,7 +4516,7 @@ namespace parallel
       // to connect to a vertex that is 'dim' hops away from the locally owned
       // cell. Depending on the order of the periodic face map, we might
       // connect to that point by chance or miss it. However, after looping
-      // through all the periodict directions (which are at most as many as
+      // through all the periodic directions (which are at most as many as
       // the number of space dimensions) we can be sure that all connections
       // to vertices have been created.
       for (unsigned int repetition = 0; repetition < dim; ++repetition)
@@ -4591,6 +4591,11 @@ namespace parallel
              ExcMessage("The triangulation is empty!"));
       Assert(this->n_levels() == 1,
              ExcMessage("The triangulation is refined!"));
+
+      // call the base class for storing the periodicity information; we must
+      // do this before going to p4est and rebuilding the triangulation to get
+      // the level subdomain ids correct in the multigrid case
+      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
       for (const auto &face_pair : periodicity_vector)
         {
@@ -4721,7 +4726,6 @@ namespace parallel
         /* user_data_constructor = */ nullptr,
         /* user_pointer */ this);
 
-
       try
         {
           copy_local_forest_to_triangulation();
@@ -4732,9 +4736,6 @@ namespace parallel
           // cells
           Assert(false, ExcInternalError());
         }
-
-      // finally call the base class for storing the periodicity information
-      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
       // The range of ghost_owners might have changed so update that information
       this->update_number_cache();
