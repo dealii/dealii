@@ -207,7 +207,6 @@ namespace MatrixFreeTools
           domain_vector[i] = 1.0;
 
         // Apply to operator. range_vector = sum A*e_i for i in entries.
-        range_vector.reinit(range_vector, false);
         linear_operator.vmult(range_vector, domain_vector);
 
         // Split the result into its contributions from the single unit vectors,
