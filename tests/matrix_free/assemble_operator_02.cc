@@ -28,7 +28,7 @@
 int
 main()
 {
-  initlog();
+  initlog(true);
 
   unsigned int nx = 16;
   unsigned int ny = 16;

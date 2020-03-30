@@ -28,10 +28,10 @@
 int
 main()
 {
-  initlog();
+  initlog(true);
 
   DynamicSparsityPattern pattern;
-  pattern.reinit(6, 6);
+  pattern.reinit(8, 6);
   pattern.add(0, 0);
   pattern.add(0, 1);
   pattern.add(0, 5);
@@ -48,10 +48,13 @@ main()
   pattern.add(5, 0);
   pattern.add(5, 2);
   pattern.add(5, 5);
+  pattern.add(6, 4);
+  pattern.add(6, 5);
+  pattern.add(7, 5);
   pattern.compress();
 
   FullMatrix<double> M;
-  M.reinit(6, 6);
+  M.reinit(8, 6);
   for (auto p : pattern)
     M(p.row(), p.column()) = std::sin(123.0 + p.row() * p.column());
   //   M.print_formatted(std::cout, 2, false, 4);
@@ -63,7 +66,7 @@ main()
 
   // Compute without cache.
   FullMatrix<double> matrix;
-  matrix.reinit(6, 6);
+  matrix.reinit(8, 6);
   std::shared_ptr<MatrixFreeTools::GraphCache> cache;
   MatrixFreeTools::assemble_operator(matrix, op, pattern, cache);
   deallog << "n = " << matrix.n_rows() << std::endl;
@@ -73,7 +76,7 @@ main()
 
   // Reuse cache.
   FullMatrix<double> matrix2;
-  matrix2.reinit(6, 6);
+  matrix2.reinit(8, 6);
   MatrixFreeTools::assemble_operator(matrix2, op, pattern, cache);
   //   matrix2.print_formatted(deallog, 2, false, 4);
   deallog << std::boolalpha << (M == matrix2) << std::endl;
