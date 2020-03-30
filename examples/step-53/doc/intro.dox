@@ -8,6 +8,12 @@ implement it. These classes are grouped into the documentation module on @ref
 manifold "Manifold description for triangulations". See there for additional
 information.
 
+@note This tutorial is also available as a Jupyter Python notebook that
+  uses the deal.II python interface. The notebook is available in the
+  same directory as the original C++ program. Rendered notebook can also
+  be viewed on the <a
+href="https://github.com/dealii/dealii/blob/master/examples/step-53/step-53.ipynb">github</a>.
+
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
