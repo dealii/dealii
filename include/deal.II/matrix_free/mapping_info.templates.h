@@ -2687,7 +2687,7 @@ namespace internal
           my_data.normals_times_jacobians[0].resize_fast(max_size);
           my_data.normals_times_jacobians[1].resize_fast(max_size);
 
-          if (update_flags_cells & update_quadrature_points)
+          if (update_flags_common & update_quadrature_points)
             {
               my_data.quadrature_point_offsets.resize(face_type.size());
               my_data.quadrature_point_offsets[0] = 0;
