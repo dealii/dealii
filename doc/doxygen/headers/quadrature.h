@@ -38,7 +38,7 @@
   graph[rankdir="TB",bgcolor="transparent"];
 
   node [fontname="FreeSans",fontsize=15,
-        shape=record,height=0.2,width=0.4,
+        shape=box,height=0.2,width=0.4,
         color="black", fillcolor="white", style="filled"];
   edge [color="black", weight=10];
 
@@ -65,24 +65,13 @@
   manifold -> tria        [color="black",style="solid"];
   manifold -> mapping     [color="black",style="solid"];
 
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
 
-
-  node [fontname="FreeSans",fontsize=12,
-        shape=record,height=0.2,width=0.4,
-        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
-  edge [color="gray55", weight=1];
-
-  opencascade [label="OpenCASCADE"];
-  opencascade -> manifold [dir="none"];
-
-
-  node [fontname="FreeSans",fontsize=12,
-        shape=ellipse,height=0.2,width=0.4,
-        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
-  edge [color="gray55", weight=1];
-
-  gmsh        [label="gmsh", URL="\ref Gmsh"];
-  gmsh -> tria       [dir="none"];
 }
  * @enddot
  *
