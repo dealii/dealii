@@ -1,0 +1,4 @@
+Removed: The deprecated member function Multigrid::set_debug() has been removed.
+Use the various Multigrid::connect_* functions instead.
+<br>
+(Daniel Arndt, 2020/03/30)
