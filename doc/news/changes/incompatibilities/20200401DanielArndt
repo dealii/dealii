@@ -1,0 +1,4 @@
+Removed: The deprecated FilteredMatrix class has been removed.
+Use the LinearOperator class instead.
+<br>
+(Daniel Arndt, 2020/04/01)
