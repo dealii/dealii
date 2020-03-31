@@ -1187,6 +1187,15 @@ public:
      * AdditionalData::degree or estimated as described there).
      */
     unsigned int degree;
+    /**
+     * Constructor initializing with invalid values.
+     */
+    EigenvalueInformation()
+      : min_eigenvalue_estimate{std::numeric_limits<double>::max()}
+      , max_eigenvalue_estimate{std::numeric_limits<double>::lowest()}
+      , cg_iterations{0}
+      , degree{0}
+    {}
   };
 
   /**
