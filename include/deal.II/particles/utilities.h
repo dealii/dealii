@@ -159,6 +159,19 @@ namespace Particles
       const AffineConstraints<typename MatrixType::value_type> &constraints =
         AffineConstraints<typename MatrixType::value_type>(),
       const ComponentMask &space_comps = ComponentMask());
+
+
+    template <int dim,
+              int spacedim,
+              typename InputVectorType,
+              typename OutputVectorType>
+    void
+    interpolate_field_on_particles(
+      const DoFHandler<dim, spacedim> &                field_dh,
+      const Particles::ParticleHandler<dim, spacedim> &particle_handler,
+      const InputVectorType &                          field_vector,
+      OutputVectorType &                               interpolated_field,
+      const ComponentMask &field_comps = ComponentMask());
   } // namespace Utilities
 } // namespace Particles
 DEAL_II_NAMESPACE_CLOSE
