@@ -156,7 +156,7 @@ namespace Utilities
   /**
    * If the library is configured with ZLIB, then this function assumes that the
    * input string has been compressed using the compress() function, and returns
-   * the original decompresses string.
+   * the original decompressed string.
    *
    * If the library was not configured with ZLIB enabled, the returned string
    * is identical to the input string.
@@ -170,6 +170,37 @@ namespace Utilities
    */
   std::string
   decompress(const std::string &compressed_input);
+
+  /**
+   * Encodes the binary input as a base64 string.
+   *
+   * Base64 is a group of binary-to-text encoding schemes that represent binary
+   * data in an ASCII string format by translating it into a radix-64
+   * representation. Base64 is designed to carry data stored in binary formats
+   * across channels that only reliably support text content. It is used also
+   * to store binary formats in a machine independent way.
+   *
+   * @param binary_input A vector of characters, representing your input as
+   * binary data.
+   * @return A string containing the binary input as a base64 string.
+   *
+   * @author Luca Heltai, 2020.
+   */
+  std::string
+  encode_base64(const std::vector<unsigned char> &binary_input);
+
+  /**
+   * Decodes a base64 string into a binary output.
+   *
+   * This is the inverse of the encode_base64() function above.
+   *
+   * @param base64_input A string that contains the input in base64 format.
+   * @return A vector of characters that represents your input as binary data.
+   *
+   * @author Luca Heltai, 2020.
+   */
+  std::vector<unsigned char>
+  decode_base64(const std::string &base64_input);
 
   /**
    * Convert a number @p value to a string, with as many digits as given to
