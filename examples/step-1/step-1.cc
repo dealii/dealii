@@ -15,24 +15,25 @@
 
  */
 
+// clang-format off
 // @sect3{Include files}
 
 // The most fundamental class in the library is the Triangulation class, which
 // is declared here:
-#include <deal.II/grid/tria.h>
+%:include <deal.II/grid/tria.h>
 // We need the following two includes for loops over cells and/or faces:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+%:include <deal.II/grid/tria_accessor.h>
+%:include <deal.II/grid/tria_iterator.h>
 // Here are some functions to generate standard grids:
-#include <deal.II/grid/grid_generator.h>
+%:include <deal.II/grid/grid_generator.h>
 // Output of grids in various graphics formats:
-#include <deal.II/grid/grid_out.h>
+%:include <deal.II/grid/grid_out.h>
 
 // This is needed for C++ output:
-#include <iostream>
-#include <fstream>
+%:include <iostream>
+%:include <fstream>
 // And this for the declarations of the `sqrt` and `fabs` functions:
-#include <cmath>
+%:include <cmath>
 
 // The final step in importing deal.II is this: All deal.II functions and
 // classes are in a namespace <code>dealii</code>, to make sure they don't
@@ -48,7 +49,7 @@ using namespace dealii;
 // In the following, first function, we simply use the unit square as domain
 // and produce a globally refined grid from it.
 void first_grid()
-{
+<%
   // The first thing to do is to define an object for a triangulation of a
   // two-dimensional domain:
   Triangulation<2> triangulation;
@@ -74,7 +75,7 @@ void first_grid()
   GridOut       grid_out;
   grid_out.write_svg(triangulation, out);
   std::cout << "Grid written to grid-1.svg" << std::endl;
-}
+%>
 
 
 
@@ -83,7 +84,7 @@ void first_grid()
 // The grid in the following, second function is slightly more complicated in
 // that we use a ring domain and refine the result once globally.
 void second_grid()
-{
+<%
   // We start again by defining an object for a triangulation of a
   // two-dimensional domain:
   Triangulation<2> triangulation;
@@ -142,7 +143,7 @@ void second_grid()
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
   for (unsigned int step = 0; step < 5; ++step)
-    {
+    <%
       // Next, we need to loop over the active cells of the triangulation. You
       // can think of a triangulation as a collection of cells. If it were an
       // array, you would just get a pointer that you increment from one
@@ -193,8 +194,8 @@ void second_grid()
       // <a href="http://en.cppreference.com/w/cpp/language/range-for">range-
       // based for loops</a>, which wrap up all of the syntax shown above into a
       // much shorter form:
-      for (auto &cell : triangulation.active_cell_iterators())
-        {
+      for (auto bitand cell : triangulation.active_cell_iterators())
+        <%
           // @note See @ref Iterators for more information about the iterator
           // classes used in deal.II, and @ref CPP11 for more information about
           // range-based for loops and the `auto` keyword.
@@ -210,7 +211,7 @@ void second_grid()
           // have to audit our code for the hidden appearance of magic numbers
           // like a 4 that needs to be replaced by an 8:
           for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
-            {
+            <%
               // If this cell is at the inner boundary, then at least one of its
               // vertices must sit on the inner ring and therefore have a radial
               // distance from the center of exactly 0.5, up to floating point
@@ -222,12 +223,12 @@ void second_grid()
                 center.distance(cell->vertex(v));
 
               if (std::fabs(distance_from_center - inner_radius) < 1e-10)
-                {
+                <%
                   cell->set_refine_flag();
                   break;
-                }
-            }
-        }
+                %>
+            %>
+        %>
 
       // Now that we have marked all the cells that we want refined, we let
       // the triangulation actually do this refinement. The function that does
@@ -235,7 +236,7 @@ void second_grid()
       // coarsening, and the function does coarsening and refinement all at
       // once:
       triangulation.execute_coarsening_and_refinement();
-    }
+    %>
 
 
   // Finally, after these five iterations of refinement, we want to again
@@ -246,7 +247,7 @@ void second_grid()
   grid_out.write_svg(triangulation, out);
 
   std::cout << "Grid written to grid-2.svg" << std::endl;
-}
+%>
 
 
 
@@ -255,7 +256,7 @@ void second_grid()
 // Finally, the main function. There isn't much to do here, only to call the
 // two subfunctions, which produce the two grids.
 int main()
-{
+<%
   first_grid();
   second_grid();
-}
+%>

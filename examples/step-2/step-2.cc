@@ -18,16 +18,17 @@
  */
 
 
+// clang-format off
 // The first few includes are just like in the previous program, so do not
 // require additional comments:
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
+%:include <deal.II/grid/tria.h>
+%:include <deal.II/grid/tria_accessor.h>
+%:include <deal.II/grid/tria_iterator.h>
+%:include <deal.II/grid/grid_generator.h>
 
 // However, the next file is new. We need this include file for the
 // association of degrees of freedom ("DoF"s) to vertices, lines, and cells:
-#include <deal.II/dofs/dof_handler.h>
+%:include <deal.II/dofs/dof_handler.h>
 
 // The following include contains the description of the bilinear finite
 // element, including the facts that it has one degree of freedom on each
@@ -37,24 +38,24 @@
 // (In fact, the file contains the description of Lagrange elements in
 // general, i.e. also the quadratic, cubic, etc versions, and not only for 2d
 // but also 1d and 3d.)
-#include <deal.II/fe/fe_q.h>
+%:include <deal.II/fe/fe_q.h>
 // In the following file, several tools for manipulating degrees of freedom
 // can be found:
-#include <deal.II/dofs/dof_tools.h>
+%:include <deal.II/dofs/dof_tools.h>
 // We will use a sparse matrix to visualize the pattern of nonzero entries
 // resulting from the distribution of degrees of freedom on the grid. That
 // class can be found here:
-#include <deal.II/lac/sparse_matrix.h>
+%:include <deal.II/lac/sparse_matrix.h>
 // We will also need to use an intermediate sparsity pattern structure, which
 // is found in this file:
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
+%:include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // We will want to use a special algorithm to renumber degrees of freedom. It
 // is declared here:
-#include <deal.II/dofs/dof_renumbering.h>
+%:include <deal.II/dofs/dof_renumbering.h>
 
 // And this is again needed for C++ output:
-#include <fstream>
+%:include <fstream>
 
 // Finally, as in step-1, we import the deal.II namespace into the global
 // scope:
@@ -65,31 +66,31 @@ using namespace dealii;
 // This is the function that produced the circular grid in the previous step-1
 // example program with fewer refinements steps. The sole difference is that it
 // returns the grid it produces via its argument.
-void make_grid(Triangulation<2> &triangulation)
-{
+void make_grid(Triangulation<2> bitand triangulation)
+<%
   const Point<2> center(1, 0);
   const double   inner_radius = 0.5, outer_radius = 1.0;
   GridGenerator::hyper_shell(
     triangulation, center, inner_radius, outer_radius, 5);
 
   for (unsigned int step = 0; step < 3; ++step)
-    {
-      for (auto &cell : triangulation.active_cell_iterators())
+    <%
+      for (auto bitand cell : triangulation.active_cell_iterators())
         for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
-          {
+          <%
             const double distance_from_center =
               center.distance(cell->vertex(v));
 
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
-              {
+              <%
                 cell->set_refine_flag();
                 break;
-              }
-          }
+              %>
+          %>
 
       triangulation.execute_coarsening_and_refinement();
-    }
-}
+    %>
+%>
 
 // @sect3{Creation of a DoFHandler}
 
@@ -122,8 +123,8 @@ void make_grid(Triangulation<2> &triangulation)
 // <code>DoFHandler</code> object to allocate storage for the degrees of
 // freedom (in deal.II lingo: we <i>distribute degrees of
 // freedom</i>).
-void distribute_dofs(DoFHandler<2> &dof_handler)
-{
+void distribute_dofs(DoFHandler<2> bitand dof_handler)
+<%
   const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
 
@@ -197,7 +198,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // coarsest cells and moves on to the finer ones; since they are all
   // distributed symmetrically around the origin, this shows up again in the
   // sparsity pattern.
-}
+%>
 
 
 // @sect3{Renumbering of DoFs}
@@ -227,8 +228,8 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
 // more localized around the diagonal. The only interesting part of the
 // function is the first call to <code>DoFRenumbering::Cuthill_McKee</code>,
 // the rest is essentially as before:
-void renumber_dofs(DoFHandler<2> &dof_handler)
-{
+void renumber_dofs(DoFHandler<2> bitand dof_handler)
+<%
   DoFRenumbering::Cuthill_McKee(dof_handler);
 
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
@@ -240,7 +241,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
 
   std::ofstream out("sparsity_pattern2.svg");
   sparsity_pattern.print_svg(out);
-}
+%>
 
 // Again, the output is shown below. Note that the nonzero entries are
 // clustered far better around the diagonal than before. This effect is even
@@ -266,7 +267,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
 // and associate it to the triangulation, and finally call above two functions
 // on it:
 int main()
-{
+<%
   Triangulation<2> triangulation;
   make_grid(triangulation);
 
@@ -274,4 +275,4 @@ int main()
 
   distribute_dofs(dof_handler);
   renumber_dofs(dof_handler);
-}
+%>

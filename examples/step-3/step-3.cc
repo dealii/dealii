@@ -19,41 +19,42 @@
  */
 
 
+// clang-format off
 // @sect3{Many new include files}
 
 // These include files are already known to you. They declare the classes
 // which handle triangulations and enumeration of degrees of freedom:
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
+%:include <deal.II/grid/tria.h>
+%:include <deal.II/dofs/dof_handler.h>
 // And this is the file in which the functions are declared that create grids:
-#include <deal.II/grid/grid_generator.h>
+%:include <deal.II/grid/grid_generator.h>
 
 // The next three files contain classes which are needed for loops over all
 // cells and to get the information from the cell objects. The first two have
 // been used before to get geometric information from cells; the last one is
 // new and provides information about the degrees of freedom local to a cell:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
+%:include <deal.II/grid/tria_accessor.h>
+%:include <deal.II/grid/tria_iterator.h>
+%:include <deal.II/dofs/dof_accessor.h>
 
 // This file contains the description of the Lagrange interpolation finite
 // element:
-#include <deal.II/fe/fe_q.h>
+%:include <deal.II/fe/fe_q.h>
 
 // And this file is needed for the creation of sparsity patterns of sparse
 // matrices, as shown in previous examples:
-#include <deal.II/dofs/dof_tools.h>
+%:include <deal.II/dofs/dof_tools.h>
 
 // The next two files are needed for assembling the matrix using quadrature on
 // each cell. The classes declared in them will be explained below:
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/base/quadrature_lib.h>
+%:include <deal.II/fe/fe_values.h>
+%:include <deal.II/base/quadrature_lib.h>
 
 // The following three include files we need for the treatment of boundary
 // values:
-#include <deal.II/base/function.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+%:include <deal.II/base/function.h>
+%:include <deal.II/numerics/vector_tools.h>
+%:include <deal.II/numerics/matrix_tools.h>
 
 // We're now almost to the end. The second to last group of include files is
 // for the linear algebra which we employ to solve the system of equations
@@ -63,17 +64,17 @@
 // will then use a Conjugate Gradient solver to solve the problem, for which
 // we need a preconditioner (in this program, we use the identity
 // preconditioner which does nothing, but we need to include the file anyway):
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
+%:include <deal.II/lac/vector.h>
+%:include <deal.II/lac/full_matrix.h>
+%:include <deal.II/lac/sparse_matrix.h>
+%:include <deal.II/lac/dynamic_sparsity_pattern.h>
+%:include <deal.II/lac/solver_cg.h>
+%:include <deal.II/lac/precondition.h>
 
 // Finally, this is for output to a file and to the console:
-#include <deal.II/numerics/data_out.h>
-#include <fstream>
-#include <iostream>
+%:include <deal.II/numerics/data_out.h>
+%:include <fstream>
+%:include <iostream>
 
 // ...and this is to import the deal.II namespace into the global scope:
 using namespace dealii;
@@ -92,7 +93,7 @@ using namespace dealii;
 // run in which order. Everything else in the class, i.e. all the functions
 // that actually do anything, are in the private section of the class:
 class Step3
-{
+<%
 public:
   Step3();
 
@@ -127,7 +128,7 @@ private:
   // vectors.
   Vector<double> solution;
   Vector<double> system_rhs;
-};
+%>;
 
 // @sect4{Step3::Step3}
 
@@ -144,7 +145,7 @@ private:
 Step3::Step3()
   : fe(1)
   , dof_handler(triangulation)
-{}
+<%%>
 
 
 // @sect4{Step3::make_grid}
@@ -163,13 +164,13 @@ Step3::Step3()
 // number of cells using the <code>n_active_cells()</code> function on the
 // triangulation.
 void Step3::make_grid()
-{
+<%
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(5);
 
   std::cout << "Number of active cells: " << triangulation.n_active_cells()
             << std::endl;
-}
+%>
 
 // @note We call the Triangulation::n_active_cells() function, rather than
 // Triangulation::n_cells(). Here, <i>active</i> means the cells that aren't
@@ -194,7 +195,7 @@ void Step3::make_grid()
 // with each vertex. While we're at generating output, let us also take a look
 // at how many degrees of freedom are generated:
 void Step3::setup_system()
-{
+<%
   dof_handler.distribute_dofs(fe);
   std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
@@ -226,7 +227,7 @@ void Step3::setup_system()
   // hand side vector and the solution vector to the right values:
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
-}
+%>
 
 // @sect4{Step3::assemble_system}
 
@@ -265,7 +266,7 @@ void Step3::setup_system()
 // Using all this, we will assemble the linear system for this problem in the
 // following function:
 void Step3::assemble_system()
-{
+<%
   // Ok, let's start: we need a quadrature formula for the evaluation of the
   // integrals on each cell. Let's take a Gauss formula with two quadrature
   // points in each direction, i.e. a total of four points since we are in
@@ -298,7 +299,8 @@ void Step3::assemble_system()
   // have to list #update_JxW_values as well:
   FEValues<2> fe_values(fe,
                         quadrature_formula,
-                        update_values | update_gradients | update_JxW_values);
+                        update_values bitor update_gradients bitor
+                        update_JxW_values);
   // The advantage of this approach is that we can specify what kind of
   // information we actually need on each cell. It is easily understandable
   // that this approach can significantly speed up finite element computations,
@@ -396,8 +398,8 @@ void Step3::assemble_system()
   // triangulation by flagging them with refinement indicators. Here we're only
   // examining the cells without modifying them, so it's good practice to
   // declare `cell` as `const` in order to enforce this invariant.
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
+  for (const auto bitand cell : dof_handler.active_cell_iterators())
+    <%
       // We are now sitting on one cell, and we would like the values and
       // gradients of the shape functions be computed, as well as the
       // determinants of the Jacobian matrices of the mapping between
@@ -415,7 +417,7 @@ void Step3::assemble_system()
       // do by looping over all quadrature points, which we will
       // number by q_index.
       for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
-        {
+        <%
           // First assemble the matrix: For the Laplace problem, the
           // matrix on each cell is the integral over the gradients of
           // shape function i and j. Since we do not integrate, but
@@ -449,7 +451,7 @@ void Step3::assemble_system()
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
                             1 *                                 // f(x_q)
                             fe_values.JxW(q_index));            // dx
-        }
+        %>
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
       // have to find out which global numbers the degrees of freedom on this
@@ -461,14 +463,14 @@ void Step3::assemble_system()
       // obtained using local_dof_indices[i]:
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(local_dof_indices[i],
-                            local_dof_indices[j],
+          system_matrix.add(local_dof_indices<:i:>,
+                            local_dof_indices<:j:>,
                             cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        system_rhs(local_dof_indices[i]) += cell_rhs(i);
-    }
+        system_rhs(local_dof_indices<:i:>) += cell_rhs(i);
+    %>
 
 
   // Now almost everything is set up for the solution of the discrete
@@ -526,7 +528,7 @@ void Step3::assemble_system()
                                      system_matrix,
                                      solution,
                                      system_rhs);
-}
+%>
 
 
 // @sect4{Step3::solve}
@@ -539,7 +541,7 @@ void Step3::assemble_system()
 // number.  For this number of variables, direct methods are no longer usable
 // and you are forced to use methods like CG.
 void Step3::solve()
-{
+<%
   // First, we need to have an object that knows how to tell the CG algorithm
   // when to stop. This is done by using a SolverControl object, and as
   // stopping criterion we say: stop after a maximum of 1000 iterations (which
@@ -560,7 +562,7 @@ void Step3::solve()
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
   // Now that the solver has done its job, the solution variable contains the
   // nodal values of the solution function.
-}
+%>
 
 
 // @sect4{Step3::output_results}
@@ -571,7 +573,7 @@ void Step3::solve()
 // have no such postprocessing here, but we would like to write the solution
 // to a file.
 void Step3::output_results() const
-{
+<%
   // To write the output to a file, we need an object which knows about output
   // formats and the like. This is the DataOut class, and we need an object of
   // that type:
@@ -600,7 +602,7 @@ void Step3::output_results() const
   // formats):
   std::ofstream output("solution.vtk");
   data_out.write_vtk(output);
-}
+%>
 
 
 // @sect4{Step3::run}
@@ -611,13 +613,13 @@ void Step3::output_results() const
 // work. Since the names are mostly self-explanatory, there is not much to
 // comment about:
 void Step3::run()
-{
+<%
   make_grid();
   setup_system();
   assemble_system();
   solve();
   output_results();
-}
+%>
 
 
 // @sect3{The <code>main</code> function}
@@ -673,11 +675,11 @@ void Step3::run()
 // deeply and where you may get useful information by setting the
 // depth even higher.
 int main()
-{
+<%
   deallog.depth_console(2);
 
   Step3 laplace_problem;
   laplace_problem.run();
 
   return 0;
-}
+%>
