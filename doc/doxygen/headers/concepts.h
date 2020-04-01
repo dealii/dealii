@@ -121,7 +121,7 @@
  * Template functions in C++ cannot be virtual (which is the main reason why
  * this approach is not used in deal.II), so implementing this interface with
  * inheritance will not work, but it is still a good way to think about this
- * template concept. One can use the PointerMatrixAux class to implement
+ * template concept. One can use the LinearOperator class to implement
  * <code>vmult_add</code> and <code>Tvmult_add</code> instead of implementing
  * them manually.
  * </dd>
