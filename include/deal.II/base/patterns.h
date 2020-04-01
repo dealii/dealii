@@ -1411,9 +1411,9 @@ namespace Patterns
      */
     DeclException2(ExcNoMatch,
                    std::string,
-                   const Patterns::PatternBase *,
+                   std::string,
                    << "The string " << arg1 << " does not match the pattern \""
-                   << arg2->description() << "\"");
+                   << arg2 << "\"");
     //@}
   } // namespace Tools
 } // namespace Patterns
@@ -1544,7 +1544,8 @@ namespace Patterns
           str << (static_cast<bool>(value) ? "true" : "false");
         else
           str << value;
-        AssertThrow(p->match(str.str()), ExcNoMatch(str.str(), p.get()));
+        AssertThrow(p->match(str.str()),
+                    ExcNoMatch(str.str(), p->description()));
         return str.str();
       }
 
@@ -1553,7 +1554,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &p =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(p->match(s), ExcNoMatch(s, p.get()));
+        AssertThrow(p->match(s), ExcNoMatch(s, p->description()));
         T value;
         if (std::is_same<T, bool>::value)
           value = (s == "true");
@@ -1816,7 +1817,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, p->description()));
         return s;
       }
 
@@ -1825,7 +1826,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -1892,7 +1893,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(p->match(s), ExcNoMatch(s, p));
+        AssertThrow(p->match(s), ExcNoMatch(s, p->description()));
         return s;
       }
 
@@ -1901,7 +1902,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
         AssertThrow(p,
@@ -1966,7 +1967,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(p->match(s), ExcNoMatch(s, p));
+        AssertThrow(p->match(s), ExcNoMatch(s, p->description()));
         return s;
       }
 
@@ -1975,7 +1976,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -2062,7 +2063,7 @@ namespace Patterns
         for (unsigned int i = 1; i < expressions.size(); ++i)
           s = s + p->get_separator() + expressions[i];
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, p->description()));
         return s;
       }
 
@@ -2071,7 +2072,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -2159,7 +2160,7 @@ namespace Patterns
           p->get_separator() + " " +
           Convert<typename T::value_type>::to_string(t.imag(), base_p);
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, p->description()));
         return s;
       }
 
@@ -2171,7 +2172,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -2205,7 +2206,7 @@ namespace Patterns
                 const std::unique_ptr<Patterns::PatternBase> &pattern =
                   Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(t), ExcNoMatch(t, pattern.get()));
+        AssertThrow(pattern->match(t), ExcNoMatch(t, pattern->description()));
         return t;
       }
 
@@ -2214,7 +2215,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
         return s;
       }
     };
@@ -2249,7 +2250,7 @@ namespace Patterns
         std::unordered_map<Key, Value> m;
         m.insert(t);
         std::string s = Convert<decltype(m)>::to_string(m, pattern);
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
         return s;
       }
 
@@ -2294,7 +2295,7 @@ namespace Patterns
         std::string str;
         for (unsigned int i = 0; i < string_array.size(); ++i)
           str += (i ? " " + p->get_separator() + " " : "") + string_array[i];
-        AssertThrow(p->match(str), ExcNoMatch(str, p));
+        AssertThrow(p->match(str), ExcNoMatch(str, p->description()));
         return str;
       }
 
@@ -2303,7 +2304,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern->description()));
 
         auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
         AssertThrow(p,
