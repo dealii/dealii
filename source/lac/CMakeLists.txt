@@ -45,7 +45,6 @@ SET(_unity_include_src
   sparse_vanka.cc
   sparsity_pattern.cc
   sparsity_tools.cc
-  swappable_vector.cc
   vector.cc
   vector_memory.cc
   )
