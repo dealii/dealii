@@ -82,9 +82,10 @@
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 
-// For std::isnan, std::isinf, and std::ifstream
+// For std::isnan, std::isinf, std::ifstream, std::async, and std::future
 #include <cmath>
 #include <fstream>
+#include <future>
 
 // @sect3{Class template declarations}
 //
@@ -505,9 +506,11 @@ namespace Step69
     InitialValues<dim>          initial_values;
     TimeStepping<dim>           time_stepping;
     SchlierenPostprocessor<dim> schlieren_postprocessor;
+    DataOut<dim>                data_out;
 
-    std::thread output_thread;
     vector_type output_vector;
+
+    std::future<void> background_thread_state;
   };
 
   // @sect3{Implementation}
@@ -2571,28 +2574,43 @@ namespace Step69
     ParameterAcceptor::initialize("step-69.prm");
     pcout << "done" << std::endl;
 
-    // Next we create the triangulation:
+    // Next we create the triangulation, assemble all matrices, set up
+    // scratch space, and initialize the DataOut<dim> object:
 
-    print_head(pcout, "create triangulation");
-    discretization.setup();
+    {
+      print_head(pcout, "create triangulation");
+      discretization.setup();
 
-    pcout << "Number of active cells:       "
-          << discretization.triangulation.n_global_active_cells() << std::endl;
+      pcout << "Number of active cells:       "
+            << discretization.triangulation.n_global_active_cells()
+            << std::endl;
 
-    // Assemble all matrices:
+      print_head(pcout, "compute offline data");
+      offline_data.setup();
+      offline_data.assemble();
 
-    print_head(pcout, "compute offline data");
-    offline_data.setup();
-    offline_data.assemble();
+      pcout << "Number of degrees of freedom: "
+            << offline_data.dof_handler.n_dofs() << std::endl;
 
-    pcout << "Number of degrees of freedom: "
-          << offline_data.dof_handler.n_dofs() << std::endl;
+      print_head(pcout, "set up time step");
+      time_stepping.prepare();
+      schlieren_postprocessor.prepare();
 
-    // And set up scratch space:
+      data_out.attach_dof_handler(offline_data.dof_handler);
 
-    print_head(pcout, "set up time step");
-    time_stepping.prepare();
-    schlieren_postprocessor.prepare();
+      constexpr auto problem_dimension =
+        ProblemDescription<dim>::problem_dimension;
+      const auto &component_names = ProblemDescription<dim>::component_names;
+
+      for (unsigned int i = 0; i < problem_dimension; ++i)
+        {
+          output_vector[i].reinit(offline_data.partitioner);
+          data_out.add_data_vector(output_vector[i], component_names[i]);
+        }
+
+      data_out.add_data_vector(schlieren_postprocessor.schlieren,
+                               "schlieren_plot");
+    }
 
     // We will store the current time and state in the variable
     // <code>t</code> and vector <code>U</code>:
@@ -2686,9 +2704,10 @@ namespace Step69
 
     // We wait for any remaining background output thread to finish before
     // printing a summary and exiting.
-
-    if (output_thread.joinable())
-      output_thread.join();
+    if (background_thread_state.valid())
+      {
+        background_thread_state.wait();
+      }
 
     computing_timer.print_summary();
     pcout << timer_output.str() << std::endl;
@@ -2762,23 +2781,34 @@ namespace Step69
     pcout << "MainLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;
 
-    // We check whether the output thread is still running. If so, we have
-    // to wait to for it to finish because we would otherwise overwrite
-    // <code>output_vector</code> and rerun the
-    // <code>schlieren_postprocessor</code> before the output of the
-    // previous output cycle has been fully written back to disk.
+    // If the asynchronous writeback option is set we launch a background
+    // thread performing all the slow IO to disc. In that case we have to
+    // make sure that the background thread actually finished running. If
+    // not, we have to wait to for it to finish because we would otherwise
+    // overwrite <code>output_vector</code>, rerun the
+    // <code>schlieren_postprocessor</code> and
+    // DataOut<dim>::build_patches() prematurely before the output of the
+    // previous output cycle has been fully written out to disk.
+    //
+    // We launch said background thread with <a
+    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async</code></a>
+    // that returns a <a
+    // href="https://en.cppreference.com/w/cpp/thread/future"><code>std::future</code></a>
+    // object. This <code>std::future</code> object contains the return
+    // value of the function, which is in our case simply
+    // <code>void</code>.
 
-    if (output_thread.joinable())
+    if (background_thread_state.valid())
       {
         TimerOutput::Scope timer(computing_timer, "main_loop - stalled output");
-        output_thread.join();
+        background_thread_state.wait();
       }
 
     constexpr auto problem_dimension =
       ProblemDescription<dim>::problem_dimension;
 
-    // At this point we make a copy of the state vector and run the
-    // schlieren postprocessor.
+    // At this point we make a copy of the state vector, run the schlieren
+    // postprocessor, and run DataOut<dim>::build_patches()
 
     for (unsigned int i = 0; i < problem_dimension; ++i)
       {
@@ -2787,6 +2817,9 @@ namespace Step69
       }
 
     schlieren_postprocessor.compute_schlieren(output_vector);
+
+    data_out.build_patches(discretization.mapping,
+                           discretization.finite_element.degree - 1);
 
     // Next we create a lambda function for the background thread. We <a
     // href="https://en.cppreference.com/w/cpp/language/lambda">capture</a>
@@ -2815,26 +2848,6 @@ namespace Step69
               oa << it2;
         }
 
-      // The actual output code is standard. We create a (local) DataOut
-      // instance, attach all data vectors we want to output and finally
-      // call to DataOut<dim>::write_vtu_with_pvtu_record
-
-      DataOut<dim> data_out;
-      data_out.attach_dof_handler(offline_data.dof_handler);
-
-      constexpr auto problem_dimension =
-        ProblemDescription<dim>::problem_dimension;
-      const auto &component_names = ProblemDescription<dim>::component_names;
-
-      for (unsigned int i = 0; i < problem_dimension; ++i)
-        data_out.add_data_vector(output_vector[i], component_names[i]);
-
-      data_out.add_data_vector(schlieren_postprocessor.schlieren,
-                               "schlieren_plot");
-
-      data_out.build_patches(discretization.mapping,
-                             discretization.finite_element.degree - 1);
-
       DataOutBase::VtkFlags flags(t,
                                   cycle,
                                   true,
@@ -2844,18 +2857,20 @@ namespace Step69
       data_out.write_vtu_with_pvtu_record("", name, cycle, mpi_communicator, 6);
     };
 
-    // We launch the thread by creating a
+    // If the asynchronous writeback option is set we launch a new
+    // background thread with the help of
     // <a
-    // href="https://en.cppreference.com/w/cpp/thread/thread"><code>std::thread</code></a>
-    // object from the lambda function and moving it into the
-    // <code>output_thread</code> thread object. At this point we can
-    // return from the <code>output()</code> function and resume with the
-    // time stepping in the main loop - the thread will run in the
-    // background.
+    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async</code></a>
+    // function. The function returns a <a
+    // href="https://en.cppreference.com/w/cpp/thread/future"><code>std::future</code></a>
+    // object that we can use to query the status of the background thread.
+    // At this point we can return from the <code>output()</code> function
+    // and resume with the time stepping in the main loop - the thread will
+    // run in the background.
 
     if (!asynchronous_writeback)
       {
-        output_thread = std::move(std::thread(output_worker));
+        background_thread_state = std::async(std::launch::async, output_worker);
       }
     else
       {
