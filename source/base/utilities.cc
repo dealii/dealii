@@ -30,6 +30,7 @@
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 

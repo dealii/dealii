@@ -23,6 +23,11 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/geometry/algorithms/envelope.hpp>
+#include <boost/geometry/geometries/multi_point.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
