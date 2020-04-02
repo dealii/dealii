@@ -3523,7 +3523,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
   SymmetricTensor<2, dim, Number> result;
   for (unsigned int d = 0; d < dim; ++d)
     result[d][d] = t[d][d];
-  Number half = 0.5;
+
+  const Number half = internal::NumberType<Number>::value(0.5);
   for (unsigned int d = 0; d < dim; ++d)
     for (unsigned int e = d + 1; e < dim; ++e)
       result[d][e] = (t[d][e] + t[e][d]) * half;
