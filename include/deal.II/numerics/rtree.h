@@ -24,7 +24,9 @@
 #include <deal.II/boost_adaptors/point.h>
 #include <deal.II/boost_adaptors/segment.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <memory>
 

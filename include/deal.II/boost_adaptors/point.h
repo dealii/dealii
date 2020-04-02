@@ -20,8 +20,9 @@
 
 #include <deal.II/base/point.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 namespace boost
 {
