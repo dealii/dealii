@@ -4409,15 +4409,14 @@ namespace GridGenerator
   {
     const unsigned int dim = 2;
 
-    // equilibrate cell sizes at
-    // transition from the inner part
-    // to the radial cells
+    // the numbers 0.55647 and 0.42883 have been found by a search for the
+    // best aspect ratio (defined as the maximal between the minimal singular
+    // value of the Jacobian)
     const Point<dim> vertices[7] = {p + Point<dim>(0, 0) * radius,
                                     p + Point<dim>(+1, 0) * radius,
-                                    p + Point<dim>(+1, 0) * (radius / 2),
-                                    p + Point<dim>(0, +1) * (radius / 2),
-                                    p + Point<dim>(+1, +1) *
-                                          (radius / (2 * std::sqrt(2.0))),
+                                    p + Point<dim>(+1, 0) * (radius * 0.55647),
+                                    p + Point<dim>(0, +1) * (radius * 0.55647),
+                                    p + Point<dim>(+1, +1) * (radius * 0.42883),
                                     p + Point<dim>(0, +1) * radius,
                                     p + Point<dim>(+1, +1) *
                                           (radius / std::sqrt(2.0))};
@@ -5138,22 +5137,28 @@ namespace GridGenerator
   {
     const unsigned int dim = 3;
 
-    // equilibrate cell sizes at
-    // transition from the inner part
-    // to the radial cells
+    // the parameters a (intersection on the octant lines from center), b
+    // (intersection within the octant faces) and c (position inside the
+    // octant) have been derived by equilibrating the minimal singular value
+    // of the Jacobian of the four cells around the center point c and, as a
+    // secondary measure, to minimize the aspect ratios defined as the maximal
+    // divided by the minimal singular values throughout cells
+    const double     a            = 0.528;
+    const double     b            = 0.4533;
+    const double     c            = 0.3752;
     const Point<dim> vertices[15] = {
       center + Point<dim>(0, 0, 0) * radius,
       center + Point<dim>(+1, 0, 0) * radius,
-      center + Point<dim>(+1, 0, 0) * (radius / 2.),
-      center + Point<dim>(0, +1, 0) * (radius / 2.),
-      center + Point<dim>(+1, +1, 0) * (radius / (2 * std::sqrt(2.0))),
+      center + Point<dim>(+1, 0, 0) * (radius * a),
+      center + Point<dim>(0, +1, 0) * (radius * a),
+      center + Point<dim>(+1, +1, 0) * (radius * b),
       center + Point<dim>(0, +1, 0) * radius,
-      center + Point<dim>(+1, +1, 0) * (radius / std::sqrt(2.0)),
-      center + Point<dim>(0, 0, 1) * radius / 2.,
+      center + Point<dim>(+1, +1, 0) * radius / std::sqrt(2.0),
+      center + Point<dim>(0, 0, 1) * radius * a,
       center + Point<dim>(+1, 0, 1) * radius / std::sqrt(2.0),
-      center + Point<dim>(+1, 0, 1) * (radius / (2 * std::sqrt(2.0))),
-      center + Point<dim>(0, +1, 1) * (radius / (2 * std::sqrt(2.0))),
-      center + Point<dim>(+1, +1, 1) * (radius / (2 * std::sqrt(3.0))),
+      center + Point<dim>(+1, 0, 1) * (radius * b),
+      center + Point<dim>(0, +1, 1) * (radius * b),
+      center + Point<dim>(+1, +1, 1) * (radius * c),
       center + Point<dim>(0, +1, 1) * radius / std::sqrt(2.0),
       center + Point<dim>(+1, +1, 1) * (radius / (std::sqrt(3.0))),
       center + Point<dim>(0, 0, 1) * radius};
@@ -5219,6 +5224,7 @@ namespace GridGenerator
       }
     tria.set_manifold(0, SphericalManifold<3>(center));
   }
+
 
 
   // Implementation for 3D only
