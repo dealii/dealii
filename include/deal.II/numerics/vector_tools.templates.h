@@ -60,7 +60,6 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -3367,77 +3366,6 @@ namespace VectorTools
       return std::numeric_limits<number>::min();
     }
 
-
-
-    template <typename number>
-    void
-    invert_mass_matrix(
-      const SparseMatrix<number> &          mass_matrix,
-      const FilteredMatrix<Vector<number>> &filtered_mass_matrix,
-      FilteredMatrix<Vector<number>> &      filtered_preconditioner,
-      const Vector<number> &                rhs,
-      Vector<number> &                      boundary_projection)
-    {
-      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
-      // steps may not be sufficient, since roundoff errors may accumulate for
-      // badly conditioned matrices. This behavior can be observed, e.g. for
-      // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(5 * rhs.size(), 0., 1.e-12, false, false);
-      GrowingVectorMemory<Vector<number>> memory;
-      SolverCG<Vector<number>>            cg(control, memory);
-
-      PreconditionSSOR<SparseMatrix<number>> prec;
-      prec.initialize(mass_matrix, 1.2);
-      filtered_preconditioner.initialize(prec, true);
-      // solve
-      cg.solve(filtered_mass_matrix,
-               boundary_projection,
-               rhs,
-               filtered_preconditioner);
-      filtered_preconditioner.apply_constraints(boundary_projection, true);
-      filtered_preconditioner.clear();
-    }
-
-
-
-    template <typename number>
-    void
-    invert_mass_matrix(
-      const SparseMatrix<number> &          mass_matrix,
-      const FilteredMatrix<Vector<number>> &filtered_mass_matrix,
-      FilteredMatrix<Vector<number>> &      filtered_preconditioner,
-      const Vector<std::complex<number>> &  rhs,
-      Vector<std::complex<number>> &        boundary_projection)
-    {
-      auto solve_for_one_component = [&](const bool real_part) {
-        // copy the real or imaginary part out of the rhs vector
-        Vector<number> rhs_part(rhs.size());
-        for (unsigned int i = 0; i < rhs.size(); ++i)
-          rhs_part(i) = (real_part ? rhs(i).real() : rhs(i).imag());
-
-        // then solve the linear system for this part
-        Vector<number> boundary_projection_part(boundary_projection.size());
-        invert_mass_matrix(mass_matrix,
-                           filtered_mass_matrix,
-                           filtered_preconditioner,
-                           rhs_part,
-                           boundary_projection_part);
-
-        // finally copy the real or imaginary part of the
-        // solution back into the global solution vector
-        for (unsigned int i = 0; i < boundary_projection.size(); ++i)
-          if (real_part == true)
-            boundary_projection(i).real(boundary_projection_part(i));
-          else
-            boundary_projection(i).imag(boundary_projection_part(i));
-      };
-
-      // solve for real and imaginary parts of the solution separately
-      solve_for_one_component(true);
-      solve_for_one_component(false);
-    }
-
-
     template <int dim,
               int spacedim,
               template <int, int> class DoFHandlerType,
@@ -3572,42 +3500,6 @@ namespace VectorTools
         static_cast<const Function<spacedim, number> *>(nullptr),
         component_mapping);
 
-      // For certain weird elements,
-      // there might be degrees of
-      // freedom on the boundary, but
-      // their shape functions do not
-      // have support there. Let's
-      // eliminate them here.
-
-      // The Bogner-Fox-Schmidt element
-      // is an example for those.
-
-      // TODO: Maybe we should figure out if the element really needs this
-
-      FilteredMatrix<Vector<number>> filtered_mass_matrix(mass_matrix, true);
-      FilteredMatrix<Vector<number>> filtered_precondition;
-      std::vector<bool>              excluded_dofs(mass_matrix.m(), false);
-
-      // we assemble mass matrix with unit weight,
-      // thus it will be real-valued irrespectively of the underlying algebra
-      // with positive elements on diagonal.
-      // Thus in order to extend this filtering to complex-algebra simply take
-      // the real-part of element.
-      number max_element = 0.;
-      for (unsigned int i = 0; i < mass_matrix.m(); ++i)
-        if (real_part_bigger_than(mass_matrix.diag_element(i), max_element))
-          max_element = mass_matrix.diag_element(i);
-
-      for (unsigned int i = 0; i < mass_matrix.m(); ++i)
-        if (real_part_bigger_than(1.e-8 * max_element,
-                                  mass_matrix.diag_element(i)))
-          {
-            filtered_mass_matrix.add_constraint(i, 0.);
-            filtered_precondition.add_constraint(i, 0.);
-            mass_matrix.diag_element(i) = 1.;
-            excluded_dofs[i]            = true;
-          }
-
       Vector<number> boundary_projection(rhs.size());
 
       // cannot reduce residual in a useful way if we are close to the square
@@ -3616,16 +3508,11 @@ namespace VectorTools
         boundary_projection = 0;
       else
         {
-          invert_mass_matrix(mass_matrix,
-                             filtered_mass_matrix,
-                             filtered_precondition,
-                             rhs,
-                             boundary_projection);
+          invert_mass_matrix(mass_matrix, rhs, boundary_projection);
         }
       // fill in boundary values
       for (unsigned int i = 0; i < dof_to_boundary_mapping.size(); ++i)
-        if (dof_to_boundary_mapping[i] != numbers::invalid_dof_index &&
-            !excluded_dofs[dof_to_boundary_mapping[i]])
+        if (dof_to_boundary_mapping[i] != numbers::invalid_dof_index)
           {
             AssertIsFinite(boundary_projection(dof_to_boundary_mapping[i]));
 
