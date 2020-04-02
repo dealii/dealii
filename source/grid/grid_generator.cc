@@ -5333,6 +5333,99 @@ namespace GridGenerator
   }
 
 
+
+  template <int dim>
+  void
+  hyper_ball_balanced(Triangulation<dim> &tria,
+                      const Point<dim> &  p,
+                      const double        radius)
+  {
+    // We create the ball by duplicating the information in each dimension at
+    // a time by appropriate rotations, starting from the quarter ball. The
+    // rotations make sure we do not generate inverted cells that would appear
+    // if we tried the slightly simpler approach to simply mirror the cells.
+
+    Triangulation<dim> tria_piece;
+    GridGenerator::quarter_hyper_ball(tria_piece, p, radius);
+
+    for (unsigned int round = 0; round < dim; ++round)
+      {
+        Triangulation<dim> tria_copy;
+        tria_copy.copy_triangulation(tria_piece);
+        tria_piece.clear();
+        std::vector<Point<dim>> new_points(tria_copy.n_vertices());
+        if (round == 0)
+          for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+            {
+              // rotate by 90 degrees counterclockwise
+              new_points[v][0] = -tria_copy.get_vertices()[v][1];
+              new_points[v][1] = tria_copy.get_vertices()[v][0];
+              if (dim == 3)
+                new_points[v][2] = tria_copy.get_vertices()[v][2];
+            }
+        else if (round == 1)
+          {
+            for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+              {
+                // rotate by 180 degrees along the xy plane
+                new_points[v][0] = -tria_copy.get_vertices()[v][0];
+                new_points[v][1] = -tria_copy.get_vertices()[v][1];
+                if (dim == 3)
+                  new_points[v][2] = tria_copy.get_vertices()[v][2];
+              }
+          }
+        else if (round == 2)
+          for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+            {
+              // rotate by 180 degrees along the xz plane
+              Assert(dim == 3, ExcInternalError());
+              new_points[v][0] = -tria_copy.get_vertices()[v][0];
+              new_points[v][1] = tria_copy.get_vertices()[v][1];
+              new_points[v][2] = -tria_copy.get_vertices()[v][2];
+            }
+        else
+          Assert(false, ExcInternalError());
+
+
+        // the cell data is exactly the same as before
+        std::vector<CellData<dim>> cells;
+        cells.reserve(tria_copy.n_cells());
+        for (const auto &cell : tria_copy.cell_iterators())
+          {
+            CellData<dim> data;
+            for (unsigned int v : GeometryInfo<dim>::vertex_indices())
+              data.vertices[v] = cell->vertex_index(v);
+            data.material_id = cell->material_id();
+            data.manifold_id = cell->manifold_id();
+            cells.push_back(data);
+          }
+
+        Triangulation<dim> rotated_tria;
+        rotated_tria.create_triangulation(new_points, cells, SubCellData());
+
+        // merge the triangulations - this will make sure that the duplicate
+        // vertices in the interior are absorbed
+        if (round == dim - 1)
+          merge_triangulations(tria_copy, rotated_tria, tria, 1e-12 * radius);
+        else
+          merge_triangulations(tria_copy,
+                               rotated_tria,
+                               tria_piece,
+                               1e-12 * radius);
+      }
+
+    for (const auto &cell : tria.cell_iterators())
+      if (cell->center().norm_square() > 0.4 * radius)
+        cell->set_manifold_id(1);
+      else
+        cell->set_all_manifold_ids(numbers::flat_manifold_id);
+
+    tria.set_all_manifold_ids_on_boundary(0);
+    tria.set_manifold(0, SphericalManifold<dim>(p));
+  }
+
+
+
   template <>
   void hyper_shell(Triangulation<3> & tria,
                    const Point<3> &   p,
