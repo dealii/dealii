@@ -711,6 +711,25 @@ namespace Differentiation
 
       /**
        * Perform substitution of all symbols found in this object's @p expression
+       * that match a key in the @p substitution_values map.
+       *
+       * This function is like the one above, but takes in a SymEngine map
+       * (one that maps a `SymEngine::RCP<const SymEngine::Basic>` to another
+       * `SymEngine::RCP<const SymEngine::Basic>`) as an argument.
+       *
+       * @note The replacement value (the entry in the @p substitution_values
+       * that is paired with a key) need not necessarily be numerical, but may
+       * also be another symbolic type.
+       *
+       * @note With dictionary substitution, partial substitution is allowed
+       * (i.e. an incomplete substitution map can be used and the return type
+       * can be symbolic).
+       */
+      Expression
+      substitute(const SymEngine::map_basic_basic &substitution_values) const;
+
+      /**
+       * Perform substitution of all symbols found in this object's @p expression
        * that match the @p symbol. Each @p symbol will be substituted with
        * the given @p value.
        *
@@ -745,6 +764,22 @@ namespace Differentiation
       ReturnType
       substitute_and_evaluate(
         const types::substitution_map &substitution_values) const;
+
+      /**
+       * Full substitution and evaluation. This creates a Expression by
+       * symbol substitution and then immediately computes its numerical value.
+       *
+       * This function is like the one above, but takes in a SymEngine map
+       * (one that maps a `SymEngine::RCP<const SymEngine::Basic>` to another
+       * `SymEngine::RCP<const SymEngine::Basic>`) as an argument.
+       *
+       * @note All symbols must be resolved by the substitution map in order
+       * for this function to return successfully.
+       */
+      template <typename ReturnType>
+      ReturnType
+      substitute_and_evaluate(
+        const SymEngine::map_basic_basic &substitution_values) const;
 
       //@}
 
@@ -1251,6 +1286,15 @@ namespace Differentiation
     ReturnType
     Expression::substitute_and_evaluate(
       const types::substitution_map &substitution_values) const
+    {
+      return static_cast<ReturnType>(substitute(substitution_values));
+    }
+
+
+    template <typename ReturnType>
+    ReturnType
+    Expression::substitute_and_evaluate(
+      const SymEngine::map_basic_basic &substitution_values) const
     {
       return static_cast<ReturnType>(substitute(substitution_values));
     }
