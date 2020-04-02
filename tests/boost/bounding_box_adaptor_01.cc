@@ -17,6 +17,8 @@
 
 #include <deal.II/boost_adaptors/bounding_box.h>
 
+#include <boost/geometry/algorithms/equals.hpp>
+
 #include "../tests.h"
 
 namespace bg = boost::geometry;

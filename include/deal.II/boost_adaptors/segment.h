@@ -22,7 +22,7 @@
 
 #include <deal.II/boost_adaptors/point.h>
 
-#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/segment.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

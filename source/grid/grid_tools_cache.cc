@@ -20,8 +20,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
-#include <boost/geometry.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace GridTools
