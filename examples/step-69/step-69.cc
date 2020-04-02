@@ -495,7 +495,8 @@ namespace Step69
     std::string base_name;
     double      t_final;
     double      output_granularity;
-    bool        enable_compute_error;
+
+    bool asynchronous_writeback;
 
     bool resume;
 
@@ -2506,6 +2507,11 @@ namespace Step69
                   output_granularity,
                   "time interval for output");
 
+    asynchronous_writeback = true;
+    add_parameter("asynchronous writeback",
+                  asynchronous_writeback,
+                  "Write out solution in a background thread performing IO");
+
     resume = false;
     add_parameter("resume", resume, "Resume an interrupted computation.");
   }
@@ -2847,7 +2853,14 @@ namespace Step69
     // time stepping in the main loop - the thread will run in the
     // background.
 
-    output_thread = std::move(std::thread(output_worker));
+    if (!asynchronous_writeback)
+      {
+        output_thread = std::move(std::thread(output_worker));
+      }
+    else
+      {
+        output_worker();
+      }
   }
 
 } // namespace Step69
