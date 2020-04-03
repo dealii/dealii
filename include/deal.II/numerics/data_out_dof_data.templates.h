@@ -1690,27 +1690,28 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   // the 2nd, 4th, 6th component for the imaginary part of the vector field.
   // Rather, we need to put all real components of the same vector field into
   // consecutive components.
-  for (auto d = dof_data.begin(); d != dof_data.end(); ++d)
-    if ((*d)->is_complex_valued() == false || ((*d)->postprocessor != nullptr))
+  for (const auto &input_data : dof_data)
+    if (input_data->is_complex_valued() == false ||
+        (input_data->postprocessor != nullptr))
       {
-        for (unsigned int i = 0; i < (*d)->names.size(); ++i)
-          names.push_back((*d)->names[i]);
+        for (const auto &name : input_data->names)
+          names.push_back(name);
       }
     else
       {
         // OK, so we have a complex-valued vector. We then need to go through
         // all components and order them appropriately
-        for (unsigned int i = 0; i < (*d)->names.size();
+        for (unsigned int i = 0; i < input_data->names.size();
              /* increment of i happens below */)
           {
-            switch ((*d)->data_component_interpretation[i])
+            switch (input_data->data_component_interpretation[i])
               {
                 case DataComponentInterpretation::component_is_scalar:
                   {
                     // It's a scalar. Just output real and imaginary parts one
                     // after the other:
-                    names.push_back((*d)->names[i] + "_re");
-                    names.push_back((*d)->names[i] + "_im");
+                    names.push_back(input_data->names[i] + "_re");
+                    names.push_back(input_data->names[i] + "_im");
 
                     // Move forward by one component
                     ++i;
@@ -1724,9 +1725,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
                     // imaginary parts:
                     const unsigned int size = patch_space_dim;
                     for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
-                      names.push_back((*d)->names[i + vec_comp] + "_re");
+                      names.push_back(input_data->names[i + vec_comp] + "_re");
                     for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
-                      names.push_back((*d)->names[i + vec_comp] + "_im");
+                      names.push_back(input_data->names[i + vec_comp] + "_im");
 
                     // Move forward by dim components
                     i += size;
@@ -1741,12 +1742,14 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
                     const unsigned int size = patch_space_dim * patch_space_dim;
                     for (unsigned int tensor_comp = 0; tensor_comp < size;
                          ++tensor_comp)
-                      names.push_back((*d)->names[i + tensor_comp] + "_re");
+                      names.push_back(input_data->names[i + tensor_comp] +
+                                      "_re");
                     for (unsigned int tensor_comp = 0; tensor_comp < size;
                          ++tensor_comp)
-                      names.push_back((*d)->names[i + tensor_comp] + "_im");
+                      names.push_back(input_data->names[i + tensor_comp] +
+                                      "_im");
 
-                    // Move forward by dim components
+                    // Move forward by dim*dim components
                     i += size;
 
                     break;
@@ -1760,17 +1763,17 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
 
   // Do the same as above for cell-type data. This is simpler because it
   // is always scalar, and so we don't have to worry about whether some
-  // components together form vectors tensors.
-  for (auto d = cell_data.begin(); d != cell_data.end(); ++d)
+  // components together form vectors or tensors.
+  for (const auto &input_data : cell_data)
     {
-      Assert((*d)->names.size() == 1, ExcInternalError());
-      if (((*d)->is_complex_valued() == false) ||
-          ((*d)->postprocessor != nullptr))
-        names.push_back((*d)->names[0]);
+      Assert(input_data->names.size() == 1, ExcInternalError());
+      if ((input_data->is_complex_valued() == false) ||
+          (input_data->postprocessor != nullptr))
+        names.push_back(input_data->names[0]);
       else
         {
-          names.push_back((*d)->names[0] + "_re");
-          names.push_back((*d)->names[0] + "_im");
+          names.push_back(input_data->names[0] + "_re");
+          names.push_back(input_data->names[0] + "_im");
         }
     }
 
@@ -1796,28 +1799,25 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     ranges;
 
   // collect the ranges of dof and cell data
-  using data_iterator = typename std::vector<std::shared_ptr<
-    internal::DataOutImplementation::DataEntryBase<DoFHandlerType>>>::
-    const_iterator;
-
   unsigned int output_component = 0;
-  for (data_iterator d = dof_data.begin(); d != dof_data.end(); ++d)
-    for (unsigned int i = 0; i < (*d)->n_output_variables;)
+  for (const auto &input_data : dof_data)
+    for (unsigned int i = 0; i < input_data->n_output_variables;
+         /* i is updated below */)
       // see what kind of data we have here. note that for the purpose of the
       // current function all we care about is vector data
-      switch ((*d)->data_component_interpretation[i])
+      switch (input_data->data_component_interpretation[i])
         {
           case DataComponentInterpretation::component_is_scalar:
             {
-              // Just move one component forward by one (or two if the
+              // Just move component forward by one (or two if the
               // component happens to be complex-valued and we don't use a
-              // postprocessor
+              // postprocessor)
               // -- postprocessors always return real-valued things)
               ++i;
-              output_component +=
-                ((*d)->is_complex_valued() && ((*d)->postprocessor == nullptr) ?
-                   2 :
-                   1);
+              output_component += (input_data->is_complex_valued() &&
+                                       (input_data->postprocessor == nullptr) ?
+                                     2 :
+                                     1);
 
               break;
             }
@@ -1827,22 +1827,22 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // ensure that there is a continuous number of next space_dim
               // components that all deal with vectors
               Assert(
-                i + patch_space_dim <= (*d)->n_output_variables,
+                i + patch_space_dim <= input_data->n_output_variables,
                 Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
-                  i, (*d)->names[i]));
+                  i, input_data->names[i]));
               for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
                 Assert(
-                  (*d)->data_component_interpretation[i + dd] ==
+                  input_data->data_component_interpretation[i + dd] ==
                     DataComponentInterpretation::component_is_part_of_vector,
                   Exceptions::DataOutImplementation::
-                    ExcInvalidVectorDeclaration(i, (*d)->names[i]));
+                    ExcInvalidVectorDeclaration(i, input_data->names[i]));
 
               // all seems right, so figure out whether there is a common
               // name to these components. if not, leave the name empty and
               // let the output format writer decide what to do here
-              std::string name = (*d)->names[i];
+              std::string name = input_data->names[i];
               for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
-                if (name != (*d)->names[i + dd])
+                if (name != input_data->names[i + dd])
                   {
                     name = "";
                     break;
@@ -1853,8 +1853,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // complex-valued vector and it is not postprocessed, then we need
               // to do it twice -- once for the real parts and once for the
               // imaginary parts
-              if ((*d)->is_complex_valued() == false ||
-                  ((*d)->postprocessor != nullptr))
+              if (input_data->is_complex_valued() == false ||
+                  (input_data->postprocessor != nullptr))
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
@@ -1897,22 +1897,22 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // ensure that there is a continuous number of next
               // space_dim*space_dim components that all deal with tensors
               Assert(
-                i + size <= (*d)->n_output_variables,
+                i + size <= input_data->n_output_variables,
                 Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
-                  i, (*d)->names[i]));
+                  i, input_data->names[i]));
               for (unsigned int dd = 1; dd < size; ++dd)
                 Assert(
-                  (*d)->data_component_interpretation[i + dd] ==
+                  input_data->data_component_interpretation[i + dd] ==
                     DataComponentInterpretation::component_is_part_of_tensor,
                   Exceptions::DataOutImplementation::
-                    ExcInvalidTensorDeclaration(i, (*d)->names[i]));
+                    ExcInvalidTensorDeclaration(i, input_data->names[i]));
 
-              // all seems alright, so figure out whether there is a common
+              // all seems right, so figure out whether there is a common
               // name to these components. if not, leave the name empty and
               // let the output format writer decide what to do here
-              std::string name = (*d)->names[i];
+              std::string name = input_data->names[i];
               for (unsigned int dd = 1; dd < size; ++dd)
-                if (name != (*d)->names[i + dd])
+                if (name != input_data->names[i + dd])
                   {
                     name = "";
                     break;
@@ -1923,8 +1923,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // complex-valued tensor and it is not postprocessed, then we need
               // to do it twice -- once for the real parts and once for the
               // imaginary parts
-              if ((*d)->is_complex_valued() == false ||
-                  ((*d)->postprocessor != nullptr))
+              if (input_data->is_complex_valued() == false ||
+                  (input_data->postprocessor != nullptr))
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
