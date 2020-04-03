@@ -540,10 +540,10 @@ namespace Step69
     , computing_timer(computing_timer)
   {
     length = 4.;
-    add_parameter("length", length, "length of computational domain");
+    add_parameter("length", length, "Length of computational domain");
 
     height = 2.;
-    add_parameter("height", height, "height of computational domain");
+    add_parameter("height", height, "Height of computational domain");
 
     disk_position = 0.6;
     add_parameter("object position",
@@ -553,12 +553,12 @@ namespace Step69
     disk_diameter = 0.5;
     add_parameter("object diameter",
                   disk_diameter,
-                  "diameter of immersed disk");
+                  "Diameter of immersed disk");
 
     refinement = 5;
     add_parameter("refinement",
                   refinement,
-                  "number of refinement steps of the geometry");
+                  "Number of refinement steps of the geometry");
   }
 
   // Note that in the previous constructor we only passed the MPI
@@ -1833,7 +1833,7 @@ namespace Step69
     cfl_update = 0.80;
     add_parameter("cfl update",
                   cfl_update,
-                  "relative CFL constant used for update");
+                  "Relative CFL constant used for update");
   }
 
   // In the class member <code>prepare()</code> we initialize the temporary
