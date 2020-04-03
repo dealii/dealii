@@ -1571,16 +1571,15 @@ namespace internal
       std::vector<unsigned int> row_lengths(n_rows);
       std::vector<std::mutex> mutexes(n_rows / internal::bucket_size_threading +
                                       1);
-      parallel::apply_to_subranges(0,
-                                   task_info.n_active_cells,
-                                   [this,
-                                    &mutexes,
-                                    &row_lengths](const unsigned int begin,
-                                                  const unsigned int end) {
-                                     internal::compute_row_lengths(
-                                       begin, end, *this, mutexes, row_lengths);
-                                   },
-                                   20);
+      dealii::parallel::apply_to_subranges(
+        0,
+        task_info.n_active_cells,
+        [this, &mutexes, &row_lengths](const unsigned int begin,
+                                       const unsigned int end) {
+          internal::compute_row_lengths(
+            begin, end, *this, mutexes, row_lengths);
+        },
+        20);
 
       // disregard dofs that only sit on a single cell because they cannot
       // couple
@@ -1594,7 +1593,7 @@ namespace internal
       SparsityPattern connectivity_dof(n_rows,
                                        task_info.n_active_cells,
                                        row_lengths);
-      parallel::apply_to_subranges(
+      dealii::parallel::apply_to_subranges(
         0,
         task_info.n_active_cells,
         [this, &row_lengths, &mutexes, &connectivity_dof](
@@ -1614,7 +1613,7 @@ namespace internal
       // create a connectivity list between cells. The connectivity graph
       // should apply the renumbering, i.e., the entry for cell j is the entry
       // for cell renumbering[j] in the original ordering.
-      parallel::apply_to_subranges(
+      dealii::parallel::apply_to_subranges(
         0,
         task_info.n_active_cells,
         [this, &reverse_numbering, &connectivity_dof, &connectivity](

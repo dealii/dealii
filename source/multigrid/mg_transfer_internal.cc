@@ -215,8 +215,8 @@ namespace internal
         }
 
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &dof_handler.get_triangulation()));
+        (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                        *>(&dof_handler.get_triangulation()));
       AssertThrow(
         send_data_temp.size() == 0 || tria != nullptr,
         ExcMessage(
@@ -947,9 +947,9 @@ namespace internal
           // the base class for keeping ghosted transfer indices. To avoid
           // keeping two very similar vectors, we keep one single ghosted
           // vector that is augmented/filled here.
-          const parallel::TriangulationBase<dim, dim> *ptria =
-            (dynamic_cast<const parallel::TriangulationBase<dim, dim> *>(
-              &tria));
+          const dealii::parallel::TriangulationBase<dim, dim> *ptria =
+            (dynamic_cast<
+              const dealii::parallel::TriangulationBase<dim, dim> *>(&tria));
           const MPI_Comm communicator =
             ptria != nullptr ? ptria->get_communicator() : MPI_COMM_SELF;
 

@@ -1064,8 +1064,8 @@ namespace internal
           // mark all vertices on ghost cells
           std::vector<bool> include_vertex(
             dof_handler.get_triangulation().n_vertices(), false);
-          if (dynamic_cast<
-                const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          if (dynamic_cast<const dealii::parallel::
+                             DistributedTriangulationBase<dim, spacedim> *>(
                 &dof_handler.get_triangulation()) != nullptr)
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->is_ghost())
@@ -3289,8 +3289,9 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+        const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<
+            const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
@@ -3451,8 +3452,9 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+        const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<
+            const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
@@ -3475,10 +3477,12 @@ namespace internal
             std::vector<types::subdomain_id> saved_level_subdomain_ids;
             saved_level_subdomain_ids.resize(tr->n_cells(lvl));
             {
-              typename parallel::shared::Triangulation<dim,
-                                                       spacedim>::cell_iterator
-                cell = this->dof_handler->get_triangulation().begin(lvl),
-                endc = this->dof_handler->get_triangulation().end(lvl);
+              typename dealii::parallel::shared::Triangulation<dim, spacedim>::
+                cell_iterator cell =
+                                this->dof_handler->get_triangulation().begin(
+                                  lvl),
+                              endc =
+                                this->dof_handler->get_triangulation().end(lvl);
 
               const std::vector<types::subdomain_id> &true_level_subdomain_ids =
                 tr->get_true_level_subdomain_ids_of_cells(lvl);
@@ -3609,10 +3613,12 @@ namespace internal
 
             // finally, restore current level subdomain ids
             {
-              typename parallel::shared::Triangulation<dim,
-                                                       spacedim>::cell_iterator
-                cell = this->dof_handler->get_triangulation().begin(lvl),
-                endc = this->dof_handler->get_triangulation().end(lvl);
+              typename dealii::parallel::shared::Triangulation<dim, spacedim>::
+                cell_iterator cell =
+                                this->dof_handler->get_triangulation().begin(
+                                  lvl),
+                              endc =
+                                this->dof_handler->get_triangulation().end(lvl);
 
               for (unsigned int index = 0; cell != endc; ++cell, ++index)
                 cell->set_level_subdomain_id(saved_level_subdomain_ids[index]);
@@ -3645,15 +3651,16 @@ namespace internal
 
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
-        const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+        const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<
+            const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
-        typename parallel::shared::Triangulation<dim,
-                                                 spacedim>::active_cell_iterator
-          cell = this->dof_handler->get_triangulation().begin_active(),
-          endc = this->dof_handler->get_triangulation().end();
+        typename dealii::parallel::shared::Triangulation<dim, spacedim>::
+          active_cell_iterator
+            cell = this->dof_handler->get_triangulation().begin_active(),
+            endc = this->dof_handler->get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(
           tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids =
@@ -3821,7 +3828,8 @@ namespace internal
         template <int dim, int spacedim>
         void
         get_mg_dofindices_recursively(
-          const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
+          const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+            &tria,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &                                           dealii_cell,
           const typename CellId::binary_type &          quadrant,
@@ -3863,9 +3871,9 @@ namespace internal
         template <int dim, int spacedim>
         void
         find_marked_mg_ghost_cells_recursively(
-          const typename parallel::DistributedTriangulationBase<dim, spacedim>
-            &                tria,
-          const unsigned int tree_index,
+          const typename dealii::parallel::
+            DistributedTriangulationBase<dim, spacedim> &tria,
+          const unsigned int                             tree_index,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &dealii_cell,
           std::map<
@@ -3898,7 +3906,8 @@ namespace internal
         template <int dim, int spacedim>
         void
         set_mg_dofindices_recursively(
-          const parallel::DistributedTriangulationBase<dim, spacedim> &tria,
+          const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+            &tria,
           const typename DoFHandler<dim, spacedim>::level_cell_iterator
             &                                 dealii_cell,
           const typename CellId::binary_type &quadrant,
@@ -3964,9 +3973,9 @@ namespace internal
         template <int dim, int spacedim, class DoFHandlerType>
         void
         communicate_mg_ghost_cells(
-          const typename parallel::DistributedTriangulationBase<dim, spacedim>
-            &             tria,
-          DoFHandlerType &dof_handler)
+          const typename dealii::parallel::
+            DistributedTriangulationBase<dim, spacedim> &tria,
+          DoFHandlerType &                               dof_handler)
         {
           using QuadrantBufferType =
             std::vector<std::pair<unsigned int, typename CellId::binary_type>>;
@@ -4176,9 +4185,9 @@ namespace internal
 
         template <int spacedim>
         void
-        communicate_mg_ghost_cells(
-          const typename parallel::distributed::Triangulation<1, spacedim> &,
-          DoFHandler<1, spacedim> &)
+        communicate_mg_ghost_cells(const typename dealii::parallel::
+                                     distributed::Triangulation<1, spacedim> &,
+                                   DoFHandler<1, spacedim> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4187,9 +4196,9 @@ namespace internal
 
         template <int spacedim>
         void
-        communicate_mg_ghost_cells(
-          const typename parallel::distributed::Triangulation<1, spacedim> &,
-          hp::DoFHandler<1, spacedim> &)
+        communicate_mg_ghost_cells(const typename dealii::parallel::
+                                     distributed::Triangulation<1, spacedim> &,
+                                   hp::DoFHandler<1, spacedim> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4367,9 +4376,10 @@ namespace internal
           // different tags for phase 1 and 2, but the cost of a
           // barrier is negligible compared to everything else we do
           // here
-          if (const auto *triangulation = dynamic_cast<
-                const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-                &dof_handler.get_triangulation()))
+          if (const auto *triangulation =
+                dynamic_cast<const dealii::parallel::
+                               DistributedTriangulationBase<dim, spacedim> *>(
+                  &dof_handler.get_triangulation()))
             {
               const int ierr = MPI_Barrier(triangulation->get_communicator());
               AssertThrowMPI(ierr);
@@ -4411,10 +4421,12 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        parallel::DistributedTriangulationBase<dim, spacedim> *triangulation =
-          (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim>
-                          *>(const_cast<dealii::Triangulation<dim, spacedim> *>(
-            &dof_handler->get_triangulation())));
+        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+          *triangulation =
+            (dynamic_cast<
+              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         const types::subdomain_id subdomain_id =
@@ -4646,10 +4658,12 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        parallel::DistributedTriangulationBase<dim, spacedim> *triangulation =
-          (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim>
-                          *>(const_cast<dealii::Triangulation<dim, spacedim> *>(
-            &dof_handler->get_triangulation())));
+        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+          *triangulation =
+            (dynamic_cast<
+              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         AssertThrow((triangulation->is_multilevel_hierarchy_constructed()),
@@ -4882,10 +4896,12 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        parallel::DistributedTriangulationBase<dim, spacedim> *triangulation =
-          (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim>
-                          *>(const_cast<dealii::Triangulation<dim, spacedim> *>(
-            &dof_handler->get_triangulation())));
+        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+          *triangulation =
+            (dynamic_cast<
+              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
 
@@ -5139,9 +5155,9 @@ namespace internal
 
         constexpr int dim      = DoFHandlerType::dimension;
         constexpr int spacedim = DoFHandlerType::space_dimension;
-        const parallel::TriangulationBase<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &this->dof_handler->get_triangulation()));
+        const dealii::parallel::TriangulationBase<dim, spacedim> *tr =
+          (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                          *>(&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
         const unsigned int my_rank =
