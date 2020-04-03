@@ -53,6 +53,21 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
 }
 
 
+
+template <int dim, int spacedim>
+void
+BlockInfo::initialize(const hp::DoFHandler<dim, spacedim> &dof,
+                      bool                                 levels_only,
+                      bool                                 active_only)
+{
+  AssertThrow(false, ExcNotImplemented());
+  (void)dof;
+  (void)levels_only;
+  (void)active_only;
+}
+
+
+
 template <int dim, int spacedim>
 void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
@@ -70,6 +85,15 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
   bi_local.reinit(sizes);
 }
 
+
+
+template <int dim, int spacedim>
+void
+BlockInfo::initialize_local(const hp::DoFHandler<dim, spacedim> &dof)
+{
+  AssertThrow(false, ExcNotImplemented());
+  (void)dof;
+}
 
 // explicit instantiations
 #include "block_info.inst"
