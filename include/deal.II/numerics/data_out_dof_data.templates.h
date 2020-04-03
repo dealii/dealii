@@ -1541,40 +1541,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     dof_handler, &data_vector, deduced_names, data_component_interpretation);
 
   if (actual_type == type_dof_data)
-    {
-      // output vectors for which at least part of the data is to be interpreted
-      // as vector or tensor fields cannot be complex-valued, because we cannot
-      // visualize complex-valued vector fields
-      Assert(!((std::find(
-                  data_component_interpretation.begin(),
-                  data_component_interpretation.end(),
-                  DataComponentInterpretation::component_is_part_of_vector) !=
-                data_component_interpretation.end()) &&
-               new_entry->is_complex_valued()),
-             ExcMessage(
-               "Complex-valued vectors added to a DataOut-like object "
-               "cannot contain components that shall be interpreted as "
-               "vector fields because one can not visualize complex-valued "
-               "vector fields. However, you may want to try to output "
-               "this vector as a collection of scalar fields that can then "
-               "be visualized by their real and imaginary parts separately."));
-
-      Assert(!((std::find(
-                  data_component_interpretation.begin(),
-                  data_component_interpretation.end(),
-                  DataComponentInterpretation::component_is_part_of_tensor) !=
-                data_component_interpretation.end()) &&
-               new_entry->is_complex_valued()),
-             ExcMessage(
-               "Complex-valued vectors added to a DataOut-like object "
-               "cannot contain components that shall be interpreted as "
-               "tensor fields because one can not visualize complex-valued "
-               "tensor fields. However, you may want to try to output "
-               "this vector as a collection of scalar fields that can then "
-               "be visualized by their real and imaginary parts separately."));
-
-      dof_data.emplace_back(std::move(new_entry));
-    }
+    dof_data.emplace_back(std::move(new_entry));
   else
     cell_data.emplace_back(std::move(new_entry));
 }
@@ -1709,22 +1676,91 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   // Loop over all DoF-data datasets and push the names. If the
   // vector underlying a data set is complex-valued, then
   // expand it into its real and imaginary part. Note, however,
-  // that what comes back from a postprocess is *always*
+  // that what comes back from a postprocessor is *always*
   // real-valued, regardless of what goes in, so we don't
   // have this to do this name expansion for data sets that
   // have a postprocessor.
+  //
+  // The situation is made complicated when considering vector- and
+  // tensor-valued component sets. This is because if, for example, we have a
+  // complex-valued vector, we don't want to output Re(u_x), then Im(u_x), then
+  // Re(u_y), etc. That's because if we did this, then visualization programs
+  // will not easily be able to patch together the 1st, 3rd, 5th components into
+  // the vector representing the real part of a vector field, and similarly for
+  // the 2nd, 4th, 6th component for the imaginary part of the vector field.
+  // Rather, we need to put all real components of the same vector field into
+  // consecutive components.
   for (auto d = dof_data.begin(); d != dof_data.end(); ++d)
-    for (unsigned int i = 0; i < (*d)->names.size(); ++i)
-      if ((*d)->is_complex_valued() == false ||
-          ((*d)->postprocessor != nullptr))
-        names.push_back((*d)->names[i]);
-      else
-        {
-          names.push_back((*d)->names[i] + "_re");
-          names.push_back((*d)->names[i] + "_im");
-        }
+    if ((*d)->is_complex_valued() == false || ((*d)->postprocessor != nullptr))
+      {
+        for (unsigned int i = 0; i < (*d)->names.size(); ++i)
+          names.push_back((*d)->names[i]);
+      }
+    else
+      {
+        // OK, so we have a complex-valued vector. We then need to go through
+        // all components and order them appropriately
+        for (unsigned int i = 0; i < (*d)->names.size();
+             /* increment of i happens below */)
+          {
+            switch ((*d)->data_component_interpretation[i])
+              {
+                case DataComponentInterpretation::component_is_scalar:
+                  {
+                    // It's a scalar. Just output real and imaginary parts one
+                    // after the other:
+                    names.push_back((*d)->names[i] + "_re");
+                    names.push_back((*d)->names[i] + "_im");
 
-  // Do the same as above for cell-type data
+                    // Move forward by one component
+                    ++i;
+
+                    break;
+                  }
+
+                case DataComponentInterpretation::component_is_part_of_vector:
+                  {
+                    // It's a vector. First output all real parts, then all
+                    // imaginary parts:
+                    const unsigned int size = patch_space_dim;
+                    for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
+                      names.push_back((*d)->names[i + vec_comp] + "_re");
+                    for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
+                      names.push_back((*d)->names[i + vec_comp] + "_im");
+
+                    // Move forward by dim components
+                    i += size;
+
+                    break;
+                  }
+
+                case DataComponentInterpretation::component_is_part_of_tensor:
+                  {
+                    // It's a tensor. First output all real parts, then all
+                    // imaginary parts:
+                    const unsigned int size = patch_space_dim * patch_space_dim;
+                    for (unsigned int tensor_comp = 0; tensor_comp < size;
+                         ++tensor_comp)
+                      names.push_back((*d)->names[i + tensor_comp] + "_re");
+                    for (unsigned int tensor_comp = 0; tensor_comp < size;
+                         ++tensor_comp)
+                      names.push_back((*d)->names[i + tensor_comp] + "_im");
+
+                    // Move forward by dim components
+                    i += size;
+
+                    break;
+                  }
+
+                default:
+                  Assert(false, ExcInternalError());
+              }
+          }
+      }
+
+  // Do the same as above for cell-type data. This is simpler because it
+  // is always scalar, and so we don't have to worry about whether some
+  // components together form vectors tensors.
   for (auto d = cell_data.begin(); d != cell_data.end(); ++d)
     {
       Assert((*d)->names.size() == 1, ExcInternalError());
@@ -1773,8 +1809,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
         {
           case DataComponentInterpretation::component_is_scalar:
             {
-              // Just move one component forward by one (or two if the component
-              // happens to be complex-valued and we don't use a postprocessor
+              // Just move one component forward by one (or two if the
+              // component happens to be complex-valued and we don't use a
+              // postprocessor
               // -- postprocessors always return real-valued things)
               ++i;
               output_component +=
@@ -1800,9 +1837,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                   Exceptions::DataOutImplementation::
                     ExcInvalidVectorDeclaration(i, (*d)->names[i]));
 
-              // all seems alright, so figure out whether there is a common name
-              // to these components. if not, leave the name empty and let the
-              // output format writer decide what to do here
+              // all seems right, so figure out whether there is a common
+              // name to these components. if not, leave the name empty and
+              // let the output format writer decide what to do here
               std::string name = (*d)->names[i];
               for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
                 if (name != (*d)->names[i + dd])
@@ -1811,18 +1848,45 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                     break;
                   }
 
-              // finally add a corresponding range
-              ranges.emplace_back(std::forward_as_tuple(
-                output_component,
-                output_component + patch_space_dim - 1,
-                name,
-                DataComponentInterpretation::component_is_part_of_vector));
+              // Finally add a corresponding range. If this is a real-valued
+              // vector, then we only need to do this once. But if it is a
+              // complex-valued vector and it is not postprocessed, then we need
+              // to do it twice -- once for the real parts and once for the
+              // imaginary parts
+              if ((*d)->is_complex_valued() == false ||
+                  ((*d)->postprocessor != nullptr))
+                {
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + patch_space_dim - 1,
+                    name,
+                    DataComponentInterpretation::component_is_part_of_vector));
 
-              // increase the 'component' counter by the appropriate amount,
-              // same for 'i', since we have already dealt with all these
-              // components
-              output_component += patch_space_dim;
-              i += patch_space_dim;
+                  // increase the 'component' counter by the appropriate amount,
+                  // same for 'i', since we have already dealt with all these
+                  // components
+                  output_component += patch_space_dim;
+                  i += patch_space_dim;
+                }
+              else
+                {
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + patch_space_dim - 1,
+                    name + "_re",
+                    DataComponentInterpretation::component_is_part_of_vector));
+                  output_component += patch_space_dim;
+
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + patch_space_dim - 1,
+                    name + "_im",
+                    DataComponentInterpretation::component_is_part_of_vector));
+                  output_component += patch_space_dim;
+
+                  i += patch_space_dim;
+                }
+
 
               break;
             }
@@ -1843,9 +1907,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                   Exceptions::DataOutImplementation::
                     ExcInvalidTensorDeclaration(i, (*d)->names[i]));
 
-              // all seems alright, so figure out whether there is a common name
-              // to these components. if not, leave the name empty and let the
-              // output format writer decide what to do here
+              // all seems alright, so figure out whether there is a common
+              // name to these components. if not, leave the name empty and
+              // let the output format writer decide what to do here
               std::string name = (*d)->names[i];
               for (unsigned int dd = 1; dd < size; ++dd)
                 if (name != (*d)->names[i + dd])
@@ -1854,19 +1918,44 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                     break;
                   }
 
-              // finally add a corresponding range
-              ranges.emplace_back(std::forward_as_tuple(
-                output_component,
-                output_component + size - 1,
-                name,
-                DataComponentInterpretation::component_is_part_of_tensor));
+              // Finally add a corresponding range. If this is a real-valued
+              // tensor, then we only need to do this once. But if it is a
+              // complex-valued tensor and it is not postprocessed, then we need
+              // to do it twice -- once for the real parts and once for the
+              // imaginary parts
+              if ((*d)->is_complex_valued() == false ||
+                  ((*d)->postprocessor != nullptr))
+                {
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + size - 1,
+                    name,
+                    DataComponentInterpretation::component_is_part_of_tensor));
 
-              // increase the 'component' counter by the appropriate amount,
-              // same for 'i', since we have already dealt with all these
-              // components
-              output_component += size;
-              i += size;
+                  // increase the 'component' counter by the appropriate amount,
+                  // same for 'i', since we have already dealt with all these
+                  // components
+                  output_component += size;
+                  i += size;
+                }
+              else
+                {
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + size - 1,
+                    name + "_re",
+                    DataComponentInterpretation::component_is_part_of_tensor));
+                  output_component += size;
 
+                  ranges.emplace_back(std::forward_as_tuple(
+                    output_component,
+                    output_component + size - 1,
+                    name + "_im",
+                    DataComponentInterpretation::component_is_part_of_tensor));
+                  output_component += size;
+
+                  i += size;
+                }
               break;
             }
 
@@ -1875,7 +1964,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
         }
 
   // note that we do not have to traverse the list of cell data here because
-  // cell data is one value per (logical) cell and therefore cannot be a vector
+  // cell data is one value per (logical) cell and therefore cannot be a
+  // vector
 
   return ranges;
 }
