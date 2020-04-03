@@ -20,9 +20,6 @@
 
 #include <deal.II/base/point.h>
 
-#include <boost/geometry.hpp>
-
-
 namespace boost
 {
   namespace geometry

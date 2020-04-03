@@ -20,8 +20,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/geometry.hpp>
-
 #include "../tests.h"
 
 namespace bg = boost::geometry;
