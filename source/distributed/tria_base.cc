@@ -404,6 +404,28 @@ namespace parallel
 
 
   template <int dim, int spacedim>
+  std::vector<types::boundary_id>
+  TriangulationBase<dim, spacedim>::get_boundary_ids() const
+  {
+    return Utilities::MPI::compute_set_union(
+      dealii::Triangulation<dim, spacedim>::get_boundary_ids(),
+      this->mpi_communicator);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<types::manifold_id>
+  TriangulationBase<dim, spacedim>::get_manifold_ids() const
+  {
+    return Utilities::MPI::compute_set_union(
+      dealii::Triangulation<dim, spacedim>::get_manifold_ids(),
+      this->mpi_communicator);
+  }
+
+
+
+  template <int dim, int spacedim>
   DistributedTriangulationBase<dim, spacedim>::DistributedTriangulationBase(
     MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing

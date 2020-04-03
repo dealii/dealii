@@ -211,6 +211,24 @@ namespace parallel
     virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
     compute_vertices_with_ghost_neighbors() const;
 
+    /**
+     * @copydoc dealii::Triangulation::get_boundary_ids()
+     *
+     * @note This function involves a global communication gathering all current
+     *   IDs from all processes.
+     */
+    virtual std::vector<types::boundary_id>
+    get_boundary_ids() const override;
+
+    /**
+     * @copydoc dealii::Triangulation::get_manifold_ids()
+     *
+     * @note This function involves a global communication gathering all current
+     *   IDs from all processes.
+     */
+    virtual std::vector<types::manifold_id>
+    get_manifold_ids() const override;
+
   protected:
     /**
      * MPI communicator to be used for the triangulation. We create a unique
