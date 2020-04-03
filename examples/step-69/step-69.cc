@@ -2740,8 +2740,8 @@ namespace Step69
 
   // @sect5{Output and checkpointing}
   //
-  // Writing out the final vtk files is a quite IO intensive task that can
-  // stall the main loop quite a bit. In order to avoid this we use an <a
+  // Writing out the final vtk files is quite an IO intensive task that can
+  // stall the main loop for a while. In order to avoid this we use an <a
   // href="https://en.wikipedia.org/wiki/Asynchronous_I/O">asynchronous
   // IO</a> strategy by creating a background thread that will perform IO
   // while the main loop is allowed to continue. In order for this to work
@@ -2766,14 +2766,9 @@ namespace Step69
     // If the asynchronous writeback option is set we launch a background
     // thread performing all the slow IO to disc. In that case we have to
     // make sure that the background thread actually finished running. If
-    // not, we have to wait to for it to finish because we would otherwise
-    // overwrite <code>output_vector</code>, rerun the
-    // <code>schlieren_postprocessor</code> and
-    // DataOut<dim>::build_patches() prematurely before the output of the
-    // previous output cycle has been fully written out to disk.
-    //
-    // We launch said background thread with <a
-    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async</code></a>
+    // not, we have to wait to for it to finish. We launch said background
+    // thread with <a
+    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async()</code></a>
     // that returns a <a
     // href="https://en.cppreference.com/w/cpp/thread/future"><code>std::future</code></a>
     // object. This <code>std::future</code> object contains the return
@@ -2827,7 +2822,6 @@ namespace Step69
     // the <code>this</code> pointer as well as most of the arguments of
     // the output function by value so that we have access to them inside
     // the lambda function.
-
     const auto output_worker = [this, name, t, cycle, checkpoint, data_out]() {
       if (checkpoint)
         {
@@ -2869,7 +2863,6 @@ namespace Step69
     // At this point we can return from the <code>output()</code> function
     // and resume with the time stepping in the main loop - the thread will
     // run in the background.
-
     if (!asynchronous_writeback)
       {
         background_thread_state = std::async(std::launch::async, output_worker);
