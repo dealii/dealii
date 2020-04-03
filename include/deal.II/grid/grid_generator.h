@@ -1050,12 +1050,23 @@ namespace GridGenerator
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only certain numbers are allowed, 6 (or the default 0) for a
-   * surface based on a hexahedron (i.e. 6 panels on the inner sphere extruded
-   * in radial direction to form 6 cells), 12 for the rhombic dodecahedron,
-   * and 96. This choice dates from an older version of deal.II before the
-   * Manifold classes were implemented: today all three choices are roughly
-   * equivalent (after performing global refinement, of course).
+   * In 3d, only certain numbers are allowed
+   * <ul>
+   * <li> 6 (or the default 0) for a surface based on a hexahedron (i.e. 6
+   *      panels on the inner sphere extruded in radial direction to form 6
+   *      cells),
+   * <li> 12 for the rhombic dodecahedron,
+   * <li> 24 for the hexahedron-based surface refined once in the spherical
+   *      directions but not in the radial direction,
+   * <li> 48 for the rhombic dodecahedron refined once in the spherical
+   *      directions but not in the radial direction,
+   * <li> 96 for the rhombic dodecahedron refined once. This choice dates from
+   *      an older version of deal.II before the Manifold classes were
+   *      implemented: today this choce is equivalent to the rhombic
+   *      dodecahedron after performing one global refinement.
+   * </ul>
+   * The versions with 24 and 48 cells are useful if the shell is thin and the
+   * radial lengths should be made more similar to the circumferential lengths.
    *
    * The grids with 12 and 96 cells are plotted below:
    *
