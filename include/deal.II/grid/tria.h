@@ -1740,6 +1740,19 @@ public:
   get_boundary_ids() const;
 
   /**
+   * Return whether a specified boundary indicator @p bid is assigned
+   * to this triangulation.
+   *
+   * @ingroup boundary
+   *
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  bool
+  has_boundary_id(const types::boundary_id bid) const;
+
+
+  /**
    * Return a vector containing all manifold indicators assigned to the
    * objects of this Triangulation. Note, that each manifold indicator is
    * reported only once. The size of the return vector will represent the

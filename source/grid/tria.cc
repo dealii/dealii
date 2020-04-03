@@ -10416,6 +10416,19 @@ Triangulation<dim, spacedim>::get_boundary_ids() const
 }
 
 
+template <int dim, int spacedim>
+bool
+Triangulation<dim, spacedim>::has_boundary_id(
+  const types::boundary_id bid) const
+{
+  const auto boundary_ids = this->get_boundary_ids();
+  const bool has_id =
+    (std::find(boundary_ids.begin(), boundary_ids.end(), bid) !=
+     boundary_ids.end());
+
+  return has_id;
+}
+
 
 template <int dim, int spacedim>
 std::vector<types::manifold_id>
