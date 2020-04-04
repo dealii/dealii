@@ -10,7 +10,7 @@ subsection A - MainLoop
   # Final time
   set final time             = 4
 
-  # time interval for output
+  # Time interval for output
   set output granularity     = 0.02
 
   # Resume an interrupted computation.
@@ -19,19 +19,19 @@ end
 
 
 subsection B - Discretization
-  # height of computational domain
+  # Height of computational domain
   set height          = 2
 
-  # length of computational domain
+  # Length of computational domain
   set length          = 4
 
-  # diameter of immersed disc
+  # Diameter of immersed disc
   set object diameter = 0.5
 
   # x position of immersed disc center point
   set object position = 0.6
 
-  # number of refinement steps of the geometry
+  # Number of refinement steps of the geometry
   set refinement      = 5
 end
 
@@ -50,7 +50,7 @@ end
 
 
 subsection E - TimeStepping
-  # relative CFL constant used for update
+  # Relative CFL constant used for update
   set cfl update = 0.8
 end
 
