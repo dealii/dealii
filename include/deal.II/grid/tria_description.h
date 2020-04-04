@@ -414,12 +414,14 @@ namespace TriangulationDescription
      * The input triangulation can be either
      * a serial triangulation of type dealii::Triangulation which has been
      * colored (subdomain_id and/or level_subdomain_id has been set) or a
-     * distributed triangulation of type dealii::distributed::Triangulation,
-     * where the partitioning is adopted unaltered.
+     * distributed triangulation of type
+     * dealii::parallel::distributed::Triangulation, where the partitioning is
+     * adopted unaltered.
      *
      * @param tria Partitioned input triangulation.
      * @param comm MPI_Communicator to be used. In the case
-     *   of dealii::distributed::Triangulation, the communicators have to match.
+     *   of dealii::parallel::distributed::Triangulation, the communicators have
+     * to match.
      * @param construct_multilevel_hierarchy Signal if the multigrid levels
      *        should be constructed.
      * @param my_rank_in Construct Description for the specified rank (only
