@@ -25,10 +25,10 @@ subsection B - Discretization
   # Length of computational domain
   set length          = 4
 
-  # Diameter of immersed disc
+  # Diameter of immersed disk
   set object diameter = 0.5
 
-  # x position of immersed disc center point
+  # x position of immersed disk center point
   set object position = 0.6
 
   # Number of refinement steps of the geometry
