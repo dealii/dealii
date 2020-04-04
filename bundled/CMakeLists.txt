@@ -68,9 +68,45 @@ ENDIF()
 
 
 IF(FEATURE_MESQUITE_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${MESQUITE_FOLDER}) # /src
+  ADD_SUBDIRECTORY(${MESQUITE_FOLDER})
+
+  #
+  # Mesquite writes some files into the build directory, so we need to include
+  # those as well.
+  #
+  STRING(REGEX MATCH "mesquite-([0-9]+)\\.([0-9]+)([0-9]+)" MSQ_CONFIGURE_FOLDER  ${MESQUITE_FOLDER})
   
-  INSTALL(DIRECTORY ${MESQUITE_FOLDER}/include
+  INSTALL(DIRECTORY 
+      ${CMAKE_BINARY_DIR}/bundled/${MSQ_CONFIGURE_FOLDER}/include
+      ${MESQUITE_FOLDER}/src/include
+      ${MESQUITE_FOLDER}/src/Control
+      ${MESQUITE_FOLDER}/src/MappingFunction
+      ${MESQUITE_FOLDER}/src/MappingFunction/Linear
+      ${MESQUITE_FOLDER}/src/MappingFunction/Lagrange
+      ${MESQUITE_FOLDER}/src/Mesh
+      ${MESQUITE_FOLDER}/src/Misc
+      ${MESQUITE_FOLDER}/src/ObjectiveFunction
+      ${MESQUITE_FOLDER}/src/QualityAssessor
+      ${MESQUITE_FOLDER}/src/QualityImprover
+      ${MESQUITE_FOLDER}/src/QualityImprover/OptSolvers
+      ${MESQUITE_FOLDER}/src/QualityImprover/Relaxation
+      ${MESQUITE_FOLDER}/src/QualityMetric
+      ${MESQUITE_FOLDER}/src/QualityMetric/Debug
+      ${MESQUITE_FOLDER}/src/QualityMetric/Shape
+      ${MESQUITE_FOLDER}/src/QualityMetric/Smoothness
+      ${MESQUITE_FOLDER}/src/QualityMetric/Volume
+      ${MESQUITE_FOLDER}/src/QualityMetric/Untangle
+      ${MESQUITE_FOLDER}/src/QualityMetric/TMP
+      ${MESQUITE_FOLDER}/src/TargetCalculator
+      ${MESQUITE_FOLDER}/src/TargetMetric
+      ${MESQUITE_FOLDER}/src/TargetMetric/Misc
+      ${MESQUITE_FOLDER}/src/TargetMetric/Shape
+      ${MESQUITE_FOLDER}/src/TargetMetric/ShapeOrient
+      ${MESQUITE_FOLDER}/src/TargetMetric/ShapeSize
+      ${MESQUITE_FOLDER}/src/TargetMetric/ShapeSizeOrient
+      ${MESQUITE_FOLDER}/src/TargetMetric/Size
+      ${MESQUITE_FOLDER}/src/TargetMetric/Untangle
+      ${MESQUITE_FOLDER}/src/Wrappers
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
