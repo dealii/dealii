@@ -762,12 +762,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
           ++dataset_number;
         }
 
-      // Then do the cell data. only compute the number of a cell if needed;
-      // also make sure that we only access cell data if the
-      // first_cell/next_cell functions only return active cells
-      //
-      // At least, we don't have to worry about complex-valued vectors/tensors
-      // since cell data is always scalar.
+      // Then do the cell data. At least, we don't have to worry about
+      // complex-valued vectors/tensors since cell data is always scalar.
       if (this->cell_data.size() != 0)
         {
           Assert(!cell_and_index->first->has_children(), ExcNotImplemented());
