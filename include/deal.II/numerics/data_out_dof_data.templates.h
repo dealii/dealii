@@ -1690,6 +1690,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
   // the 2nd, 4th, 6th component for the imaginary part of the vector field.
   // Rather, we need to put all real components of the same vector field into
   // consecutive components.
+  //
+  // This sort of logic is also explained in some detail in
+  //   DataOut::build_one_patch().
   for (const auto &input_data : dof_data)
     if (input_data->is_complex_valued() == false ||
         (input_data->postprocessor != nullptr))
@@ -1853,6 +1856,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // complex-valued vector and it is not postprocessed, then we need
               // to do it twice -- once for the real parts and once for the
               // imaginary parts
+              //
+              // This sort of logic is also explained in some detail in
+              //   DataOut::build_one_patch().
               if (input_data->is_complex_valued() == false ||
                   (input_data->postprocessor != nullptr))
                 {
@@ -1923,6 +1929,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // complex-valued tensor and it is not postprocessed, then we need
               // to do it twice -- once for the real parts and once for the
               // imaginary parts
+              //
+              // This sort of logic is also explained in some detail in
+              //   DataOut::build_one_patch().
               if (input_data->is_complex_valued() == false ||
                   (input_data->postprocessor != nullptr))
                 {
