@@ -2746,197 +2746,12 @@ namespace internal
     struct Implementation
     {
       /**
-       * Implement the updating of the cache. Currently not implemented for
-       * hp::DoFHandler objects.
+       * Implement the updating of the cache.
        */
-      template <int spacedim, bool level_dof_access>
+      template <typename DoFHandlerType, bool level_dof_access>
       static void
       update_cell_dof_indices_cache(
-        const DoFCellAccessor<DoFHandler<1, spacedim>, level_dof_access>
-          &accessor)
-      {
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices. otherwise
-        // simply don't update the cache at
-        // all. the get_dof_indices
-        // function will then make sure we
-        // don't access the invalid data
-        if (accessor.has_children() && (accessor.get_fe().dofs_per_cell !=
-                                        accessor.get_fe().dofs_per_vertex *
-                                          GeometryInfo<1>::vertices_per_cell))
-          return;
-
-        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
-                           dofs_per_line   = accessor.get_fe().dofs_per_line,
-                           dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-
-        // make sure the cache is at least
-        // as big as we need it when
-        // writing to the last element of
-        // this cell
-        Assert(accessor.present_index * dofs_per_cell + dofs_per_cell <=
-                 accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_dof_indices_cache.size(),
-               ExcInternalError());
-
-        std::vector<types::global_dof_index>::iterator next =
-          (accessor.dof_handler->levels[accessor.present_level]
-             ->cell_dof_indices_cache.begin() +
-           accessor.present_index * dofs_per_cell);
-
-        for (unsigned int vertex : GeometryInfo<1>::vertex_indices())
-          for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-            *next++ = accessor.vertex_dof_index(vertex, d);
-        for (unsigned int d = 0; d < dofs_per_line; ++d)
-          *next++ = accessor.dof_index(d);
-      }
-
-
-
-      template <int spacedim, bool level_dof_access>
-      static void
-      update_cell_dof_indices_cache(
-        const DoFCellAccessor<DoFHandler<2, spacedim>, level_dof_access>
-          &accessor)
-      {
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices. otherwise
-        // simply don't update the cache at
-        // all. the get_dof_indices
-        // function will then make sure we
-        // don't access the invalid data
-        if (accessor.has_children() && (accessor.get_fe().dofs_per_cell !=
-                                        accessor.get_fe().dofs_per_vertex *
-                                          GeometryInfo<2>::vertices_per_cell))
-          return;
-
-        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
-                           dofs_per_line   = accessor.get_fe().dofs_per_line,
-                           dofs_per_quad   = accessor.get_fe().dofs_per_quad,
-                           dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-
-        // make sure the cache is at least
-        // as big as we need it when
-        // writing to the last element of
-        // this cell
-        Assert(accessor.present_index * dofs_per_cell + dofs_per_cell <=
-                 accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_dof_indices_cache.size(),
-               ExcInternalError());
-
-        std::vector<types::global_dof_index>::iterator next =
-          (accessor.dof_handler->levels[accessor.present_level]
-             ->cell_dof_indices_cache.begin() +
-           accessor.present_index * dofs_per_cell);
-
-        for (unsigned int vertex : GeometryInfo<2>::vertex_indices())
-          for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-            *next++ = accessor.vertex_dof_index(vertex, d);
-        for (unsigned int line = 0; line < GeometryInfo<2>::lines_per_cell;
-             ++line)
-          for (unsigned int d = 0; d < dofs_per_line; ++d)
-            *next++ = accessor.line(line)->dof_index(d);
-        for (unsigned int d = 0; d < dofs_per_quad; ++d)
-          *next++ = accessor.dof_index(d);
-      }
-
-
-      template <int spacedim, bool level_dof_access>
-      static void
-      update_cell_dof_indices_cache(
-        const DoFCellAccessor<DoFHandler<3, spacedim>, level_dof_access>
-          &accessor)
-      {
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices. otherwise
-        // simply don't update the cache at
-        // all. the get_dof_indices
-        // function will then make sure we
-        // don't access the invalid data
-        if (accessor.has_children() && (accessor.get_fe().dofs_per_cell !=
-                                        accessor.get_fe().dofs_per_vertex *
-                                          GeometryInfo<3>::vertices_per_cell))
-          return;
-
-        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
-                           dofs_per_line   = accessor.get_fe().dofs_per_line,
-                           dofs_per_quad   = accessor.get_fe().dofs_per_quad,
-                           dofs_per_hex    = accessor.get_fe().dofs_per_hex,
-                           dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-
-        // make sure the cache is at least
-        // as big as we need it when
-        // writing to the last element of
-        // this cell
-        Assert(accessor.present_index * dofs_per_cell + dofs_per_cell <=
-                 accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_dof_indices_cache.size(),
-               ExcInternalError());
-
-        std::vector<types::global_dof_index>::iterator next =
-          (accessor.dof_handler->levels[accessor.present_level]
-             ->cell_dof_indices_cache.begin() +
-           accessor.present_index * dofs_per_cell);
-
-        for (unsigned int vertex : GeometryInfo<3>::vertex_indices())
-          for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-            *next++ = accessor.vertex_dof_index(vertex, d);
-        // now copy dof numbers from the line. for
-        // lines with the wrong orientation, we have
-        // already made sure that we're ok by picking
-        // the correct vertices (this happens
-        // automatically in the vertex()
-        // function). however, if the line is in
-        // wrong orientation, we look at it in
-        // flipped orientation and we will have to
-        // adjust the shape function indices that we
-        // see to correspond to the correct
-        // (cell-local) ordering.
-        for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell;
-             ++line)
-          for (unsigned int d = 0; d < dofs_per_line; ++d)
-            *next++ = accessor.line(line)->dof_index(
-              accessor.dof_handler->get_fe()
-                .adjust_line_dof_index_for_line_orientation(
-                  d, accessor.line_orientation(line)));
-        // now copy dof numbers from the face. for
-        // faces with the wrong orientation, we
-        // have already made sure that we're ok by
-        // picking the correct lines and vertices
-        // (this happens automatically in the
-        // line() and vertex() functions). however,
-        // if the face is in wrong orientation, we
-        // look at it in flipped orientation and we
-        // will have to adjust the shape function
-        // indices that we see to correspond to the
-        // correct (cell-local) ordering. The same
-        // applies, if the face_rotation or
-        // face_orientation is non-standard
-        for (unsigned int quad = 0; quad < GeometryInfo<3>::faces_per_cell;
-             ++quad)
-          for (unsigned int d = 0; d < dofs_per_quad; ++d)
-            *next++ = accessor.quad(quad)->dof_index(
-              accessor.dof_handler->get_fe()
-                .adjust_quad_dof_index_for_face_orientation(
-                  d,
-                  accessor.face_orientation(quad),
-                  accessor.face_flip(quad),
-                  accessor.face_rotation(quad)));
-        for (unsigned int d = 0; d < dofs_per_hex; ++d)
-          *next++ = accessor.dof_index(d);
-      }
-
-
-      // implementation for the case of
-      // hp::DoFHandler objects.
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      update_cell_dof_indices_cache(
-        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor)
+        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
       {
         // caches are only for cells with DoFs, i.e., for active ones and not
         // FE_Nothing
@@ -2946,36 +2761,21 @@ namespace internal
         if (dofs_per_cell == 0)
           return;
 
-        // make sure the cache is at least
-        // as big as we need it when
-        // writing to the last element of
-        // this cell
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_cache_offsets.size(),
-               ExcInternalError());
-        Assert(accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_cache_offsets[accessor.present_index] <=
-                 accessor.dof_handler->levels[accessor.present_level]
-                   ->cell_dof_indices_cache.size(),
-               ExcInternalError());
-
         // call the get_dof_indices() function of DoFAccessor, which goes
         // through all the parts of the cell to get the indices by hand. the
         // corresponding function of DoFCellAccessor can then later use the
         // cache
         std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-        static_cast<
-          const dealii::DoFAccessor<dim,
-                                    dealii::hp::DoFHandler<dim, spacedim>,
-                                    level_dof_access> &>(accessor)
+        static_cast<const dealii::DoFAccessor<DoFHandlerType::dimension,
+                                              DoFHandlerType,
+                                              level_dof_access> &>(accessor)
           .get_dof_indices(dof_indices, accessor.active_fe_index());
 
         types::global_dof_index *next_dof_index =
-          &accessor.dof_handler->levels[accessor.present_level]
-             ->cell_dof_indices_cache
-               [accessor.dof_handler->levels[accessor.present_level]
-                  ->cell_cache_offsets[accessor.present_index]];
+          const_cast<types::global_dof_index *>(
+            accessor.dof_handler->levels[accessor.present_level]
+              ->get_cell_cache_start(accessor.present_index, dofs_per_cell));
+
         for (unsigned int i = 0; i < dofs_per_cell; ++i, ++next_dof_index)
           *next_dof_index = dof_indices[i];
       }
