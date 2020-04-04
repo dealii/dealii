@@ -20,16 +20,30 @@ for (deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension, deal_II_dimension> &, bool, bool);
     template void BlockInfo::initialize_local(
       const DoFHandler<deal_II_dimension, deal_II_dimension> &);
+    template void BlockInfo::initialize(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &, bool, bool);
+    template void BlockInfo::initialize_local(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &);
 
 #if deal_II_dimension < 3
     template void BlockInfo::initialize(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &, bool, bool);
     template void BlockInfo::initialize_local(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &);
+    template void BlockInfo::initialize(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
+      bool,
+      bool);
+    template void BlockInfo::initialize_local(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &);
 #endif
 
 #if deal_II_dimension == 3
     template void BlockInfo::initialize(const DoFHandler<1, 3> &, bool, bool);
     template void BlockInfo::initialize_local(const DoFHandler<1, 3> &);
+    template void BlockInfo::initialize(const hp::DoFHandler<1, 3> &,
+                                        bool,
+                                        bool);
+    template void BlockInfo::initialize_local(const hp::DoFHandler<1, 3> &);
 #endif
   }
