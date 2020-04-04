@@ -25,6 +25,7 @@ SET(_unity_include_src
   bounding_box.cc
   conditional_ostream.cc
   convergence_table.cc
+  discrete_time.cc
   event.cc
   exceptions.cc
   flow_function.cc
