@@ -4920,6 +4920,10 @@ namespace DataOutBase
     std::vector<bool> data_set_written(n_data_sets, false);
     for (const auto &nonscalar_data_range : nonscalar_data_ranges)
       {
+        AssertThrow(std::get<3>(nonscalar_data_range) !=
+                      DataComponentInterpretation::component_is_part_of_tensor,
+                    ExcNotImplemented());
+
         AssertThrow(std::get<1>(nonscalar_data_range) >=
                       std::get<0>(nonscalar_data_range),
                     ExcLowerRange(std::get<1>(nonscalar_data_range),
