@@ -771,11 +771,24 @@ namespace GridGenerator
 
   /**
    * This class produces a hyper-ball intersected with the positive orthant
-   * relative to @p center, which contains three elements in 2d and four in 3d.
+   * relative to @p center, which contains three elements in 2d and four in
+   * 3d. The interior points of the mesh are chosen to balance the minimal
+   * singular value of the Jacobian of the mapping from reference to real
+   * coordinates among the cells around the interior point, which corresponds
+   * to a high mesh quality.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
    * boundary and 1 for the cut plane. The manifold id for the curved boundary
    * is set to zero, and a SphericalManifold is attached to it.
+   *
+   * The resulting grid in 2D and 3D looks as follows:
+   * \htmlonly <style>div.image
+   * img[src="quarter_hyper_ball_2d.png"]{width:40%;}</style> \endhtmlonly
+   * @image html quarter_hyper_ball_2d.png
+   * \htmlonly <style>div.image
+   * img[src="quarter_hyper_ball_3d.png"]{width:40%;}</style> \endhtmlonly
+   * @image html quarter_hyper_ball_3d.png
+   *
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
