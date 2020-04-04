@@ -139,7 +139,7 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * @copydoc Triangulation::create_triangulation()
+       * @copydoc dealii::Triangulation::create_triangulation()
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other
