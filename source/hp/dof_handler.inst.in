@@ -13,114 +13,35 @@
 //
 // ---------------------------------------------------------------------
 
-
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
+#if deal_II_dimension <= deal_II_space_dimension
     namespace hp
     \{
-      template class DoFHandler<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-      template class DoFHandler<deal_II_dimension, deal_II_dimension + 1>;
-
-      template types::global_dof_index
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>::get_dof_index<1>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int) const;
-
-      template void
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<1>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
-
-#  if deal_II_dimension >= 2
-      template types::global_dof_index
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>::get_dof_index<2>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int) const;
-
-      template void
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<2>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
-#  endif
-#endif
-
-#if deal_II_dimension == 3
-      template class DoFHandler<1, 3>;
-
-      template types::global_dof_index
-      DoFHandler<1, 3>::get_dof_index<1>(const unsigned int,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const unsigned int) const;
-
-      template void
-      DoFHandler<1, 3>::set_dof_index<1>(const unsigned int,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const types::global_dof_index) const;
-#endif
-
-      template types::global_dof_index
-      DoFHandler<deal_II_dimension>::get_dof_index<1>(const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int) const;
-
-#if deal_II_dimension >= 2
-      template types::global_dof_index
-      DoFHandler<deal_II_dimension>::get_dof_index<2>(const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int) const;
-
-#  if deal_II_dimension >= 3
-      template types::global_dof_index
-      DoFHandler<deal_II_dimension>::get_dof_index<3>(const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int,
-                                                      const unsigned int) const;
-#  endif
-#endif
-
-      template void
-      DoFHandler<deal_II_dimension>::set_dof_index<1>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
-
-#if deal_II_dimension >= 2
-      template void
-      DoFHandler<deal_II_dimension>::set_dof_index<2>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
-
-#  if deal_II_dimension >= 3
-      template void
-      DoFHandler<deal_II_dimension>::set_dof_index<3>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
-#  endif
-#endif
+      template class DoFHandler<deal_II_dimension, deal_II_space_dimension>;
     \}
+#endif
+  }
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS;
+     deal_II_component : DIMENSIONS)
+  {
+#if deal_II_component <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    template types::global_dof_index
+    hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>::get_dof_index<
+      deal_II_component>(const unsigned int obj_level,
+                         const unsigned int obj_index,
+                         const unsigned int fe_index,
+                         const unsigned int local_index) const;
+
+    template void
+    hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>::set_dof_index<
+      deal_II_component>(const unsigned int            obj_level,
+                         const unsigned int            obj_index,
+                         const unsigned int            fe_index,
+                         const unsigned int            local_index,
+                         const types::global_dof_index global_index) const;
+#endif
   }
