@@ -1517,6 +1517,19 @@ namespace internal
         Assert(!evaluate_hessians || n_q_points == jacobian_grads.size(),
                ExcDimensionMismatch(n_q_points, jacobian_grads.size()));
 
+        // shortcut in case we have an identity interpolation and only request
+        // the quadrature points
+        if (evaluate_values && !evaluate_gradients & !evaluate_hessians &&
+            data.shape_info.element_type ==
+              internal::MatrixFreeFunctions::tensor_symmetric_collocation)
+          {
+            for (unsigned int q = 0; q < n_q_points; ++q)
+              quadrature_points[q] =
+                data.mapping_support_points[data.shape_info
+                                              .lexicographic_numbering[q]];
+            return;
+          }
+
         // prepare arrays
         if (evaluate_values || evaluate_gradients || evaluate_hessians)
           {
