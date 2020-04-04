@@ -132,6 +132,9 @@ namespace Utilities
           /// NoncontiguousPartitioner::update_values
           noncontiguous_partitioner_update_values,
 
+          // Utilities::MPI::compute_union
+          compute_union,
+
         };
       } // namespace Tags
     }   // namespace internal

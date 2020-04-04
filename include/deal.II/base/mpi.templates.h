@@ -28,6 +28,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include <set>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -411,6 +412,76 @@ namespace Utilities
         const ArrayView<T> &      minima)
     {
       internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
+    }
+
+
+
+    template <typename T>
+    std::vector<T>
+    compute_union(const std::vector<T> &vec, const MPI_Comm &comm)
+    {
+#ifdef DEAL_II_WITH_MPI
+      // 1) collect vector entries and create union
+      std::vector<T> result = vec;
+
+      if (this_mpi_process(comm) == 0)
+        {
+          for (unsigned int i = 1; i < n_mpi_processes(comm); i++)
+            {
+              MPI_Status status;
+              const auto ierr_1 = MPI_Probe(MPI_ANY_SOURCE,
+                                            internal::Tags::compute_union,
+                                            comm,
+                                            &status);
+              AssertThrowMPI(ierr_1);
+
+              int        amount;
+              const auto ierr_2 =
+                MPI_Get_count(&status,
+                              internal::mpi_type_id(vec.data()),
+                              &amount);
+              AssertThrowMPI(ierr_2);
+
+              const unsigned int old_size = result.size();
+              result.resize(old_size + amount);
+
+              const auto ierr_3 = MPI_Recv(result.data() + old_size,
+                                           amount,
+                                           MPI_INT,
+                                           status.MPI_SOURCE,
+                                           status.MPI_TAG,
+                                           comm,
+                                           MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr_3);
+
+              std::sort(result.begin(), result.end());
+              result.erase(std::unique(result.begin(), result.end()),
+                           result.end());
+            }
+        }
+      else
+        {
+          const auto ierr = MPI_Send(vec.data(),
+                                     vec.size(),
+                                     internal::mpi_type_id(vec.data()),
+                                     0,
+                                     internal::Tags::compute_union,
+                                     comm);
+          AssertThrowMPI(ierr);
+        }
+
+      // 2) broadcast result
+      int size = result.size();
+      MPI_Bcast(&size, 1, MPI_INT, 0, comm);
+      result.resize(size);
+      MPI_Bcast(
+        result.data(), size, internal::mpi_type_id(vec.data()), 0, comm);
+
+      return result;
+#else
+      (void)comm;
+      return vec;
+#endif
     }
 
   } // end of namespace MPI
