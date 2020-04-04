@@ -1768,6 +1768,22 @@ namespace GridGenerator
     const std::vector<types::manifold_id> &manifold_priorities = {});
 
   /**
+   * Overload of extrude_triangulation() to allow dimension independent
+   * code to compile. This function throws an error when called, as
+   * extrude_triangulation() is only implemented to extrude a dim=2 to a dim=3
+   * Triangulation.
+   */
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
+
+
+  /**
    * Overload of the previous function. Take a 2d Triangulation that is being
    * extruded. Differing from the previous function taking height and number of
    * slices for uniform extrusion, this function takes z-axis values
@@ -1794,6 +1810,21 @@ namespace GridGenerator
     Triangulation<3, 3> &                  result,
     const bool                             copy_manifold_ids   = false,
     const std::vector<types::manifold_id> &manifold_priorities = {});
+
+  /**
+   * Overload of extrude_triangulation() to allow dimension independent
+   * code to compile. This function throws an error when called, as
+   * extrude_triangulation() is only implemented to extrude a dim=2 to a dim=3
+   * Triangulation.
+   */
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
+
 
 
   /**

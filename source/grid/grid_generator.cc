@@ -6204,6 +6204,30 @@ namespace GridGenerator
   void
   extrude_triangulation(
     const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
+  {
+    (void)input;
+    (void)n_slices;
+    (void)height;
+    (void)result;
+    (void)copy_manifold_ids;
+    (void)manifold_priorities;
+
+    AssertThrow(false,
+                ExcMessage(
+                  "GridTools::extrude_triangulation() is only available "
+                  "for Triangulation<3, 3> as output triangulation."));
+  }
+
+
+
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
     const std::vector<double> &            slice_coordinates,
     Triangulation<3, 3> &                  result,
     const bool                             copy_manifold_ids,
@@ -6428,6 +6452,29 @@ namespace GridGenerator
                ++line_n)
             face->line(line_n)->set_manifold_id(*manifold_id_it);
   }
+
+
+
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids,
+    const std::vector<types::manifold_id> &manifold_priorities)
+  {
+    (void)input;
+    (void)slice_coordinates;
+    (void)result;
+    (void)copy_manifold_ids;
+    (void)manifold_priorities;
+
+    AssertThrow(false,
+                ExcMessage(
+                  "GridTools::extrude_triangulation() is only available "
+                  "for Triangulation<3, 3> as output triangulation."));
+  }
+
 
 
   template <>
