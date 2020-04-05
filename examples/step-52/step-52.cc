@@ -385,63 +385,51 @@ namespace Step52
 
     switch (method)
       {
-        case TimeStepping::FORWARD_EULER:
-          {
+          case TimeStepping::FORWARD_EULER: {
             method_name = "forward_euler";
             break;
           }
-        case TimeStepping::RK_THIRD_ORDER:
-          {
+          case TimeStepping::RK_THIRD_ORDER: {
             method_name = "rk3";
             break;
           }
-        case TimeStepping::RK_CLASSIC_FOURTH_ORDER:
-          {
+          case TimeStepping::RK_CLASSIC_FOURTH_ORDER: {
             method_name = "rk4";
             break;
           }
-        case TimeStepping::BACKWARD_EULER:
-          {
+          case TimeStepping::BACKWARD_EULER: {
             method_name = "backward_euler";
             break;
           }
-        case TimeStepping::IMPLICIT_MIDPOINT:
-          {
+          case TimeStepping::IMPLICIT_MIDPOINT: {
             method_name = "implicit_midpoint";
             break;
           }
-        case TimeStepping::SDIRK_TWO_STAGES:
-          {
+          case TimeStepping::SDIRK_TWO_STAGES: {
             method_name = "sdirk";
             break;
           }
-        case TimeStepping::HEUN_EULER:
-          {
+          case TimeStepping::HEUN_EULER: {
             method_name = "heun_euler";
             break;
           }
-        case TimeStepping::BOGACKI_SHAMPINE:
-          {
+          case TimeStepping::BOGACKI_SHAMPINE: {
             method_name = "bocacki_shampine";
             break;
           }
-        case TimeStepping::DOPRI:
-          {
+          case TimeStepping::DOPRI: {
             method_name = "dopri";
             break;
           }
-        case TimeStepping::FEHLBERG:
-          {
+          case TimeStepping::FEHLBERG: {
             method_name = "fehlberg";
             break;
           }
-        case TimeStepping::CASH_KARP:
-          {
+          case TimeStepping::CASH_KARP: {
             method_name = "cash_karp";
             break;
           }
-        default:
-          {
+          default: {
             break;
           }
       }
@@ -449,17 +437,33 @@ namespace Step52
     DataOut<2> data_out;
 
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "solution");
+    std::string solution_name = "solution_" + method_name;
+    data_out.add_data_vector(solution, solution_name);
 
     data_out.build_patches();
 
     data_out.set_flags(DataOutBase::VtkFlags(time, time_step));
 
-    const std::string filename = "solution-" + method_name + "-" +
-                                 Utilities::int_to_string(time_step, 3) +
-                                 ".vtu";
+    const std::string filename =
+      solution_name + Utilities::int_to_string(time_step, 3) + ".vtu";
     std::ofstream output(filename);
     data_out.write_vtu(output);
+
+    static std::vector<std::pair<double, std::string>> times_and_names;
+
+    static std::string method_name_prev = "";
+    if (method_name_prev != method_name)
+      {
+        std::cout << "Starting a new time-stepping scheme ..." << std::endl;
+        times_and_names.clear();
+      }
+    method_name_prev = method_name;
+
+    times_and_names.push_back(std::pair<double, std::string>(time, filename));
+
+    const std::string pvd_filename = "solution_" + method_name + ".pvd";
+    std::ofstream     pvd_output(pvd_filename);
+    DataOutBase::write_pvd_record(pvd_output, times_and_names);
   }
 
 
