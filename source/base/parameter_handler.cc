@@ -612,6 +612,51 @@ namespace
           }
       }
   }
+
+  // Recursively go through the @p source tree and collapse the nodes of the
+  // format:
+  //
+  //"key":
+  //      {
+  //          "value"              : "val",
+  //          "default_value"      : "...",
+  //          "documentation"      : "...",
+  //          "pattern"            : "...",
+  //          "pattern_description": "..."
+  //      },
+  //
+  // to
+  //
+  // "key" : "val";
+  //
+  // As an example a JSON file is shown. However, this function also works for
+  // XML since both formats are build around the same BOOST data structures.
+  //
+  // This function is strongly based on read_xml_recursively().
+  void
+  recursively_remove_documentation_from_tree(
+    boost::property_tree::ptree &source)
+  {
+    for (auto &p : source)
+      {
+        if (p.second.get_optional<std::string>("value"))
+          {
+            // save the value in a temporal variable
+            const auto temp = p.second.get<std::string>("value");
+            // clear node (children and value)
+            p.second.clear();
+            // set the correct value
+            p.second.put_value<std::string>(temp);
+          }
+        else if (p.second.get_optional<std::string>("alias"))
+          {}
+        else
+          {
+            // it must be a subsection
+            recursively_remove_documentation_from_tree(p.second);
+          }
+      }
+  }
 } // namespace
 
 
@@ -1147,20 +1192,16 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // Create entries copy and sort it, if needed.
   // In this way we ensure that the class state is never
   // modified by this function.
-  boost::property_tree::ptree  sorted_entries;
-  boost::property_tree::ptree *current_entries = entries.get();
+  boost::property_tree::ptree current_entries = *entries.get();
 
   // Sort parameters alphabetically, if needed.
   if (sort_alphabetical)
     {
-      sorted_entries  = *entries;
-      current_entries = &sorted_entries;
-
       // Dive recursively into the subsections,
       // starting from the top level.
       recursively_sort_parameters(path_separator,
                                   std::vector<std::string>(),
-                                  sorted_entries);
+                                  current_entries);
     }
 
   // we'll have to print some text that is padded with spaces;
@@ -1174,7 +1215,15 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // we treat XML and JSON is one step via BOOST, whereas all of the others are
   // done recursively in our own code. take care of the two special formats
   // first
-  if (style == XML)
+
+  // explicity eliminate the documentation from the tree if requested
+  if (style == ShortXML || style == ShortJSON)
+    {
+      // modify the copy of the tree
+      recursively_remove_documentation_from_tree(current_entries);
+    }
+
+  if (style == XML || style == ShortXML)
     {
       // call the writer function and exit as there is nothing
       // further to do down in this function
@@ -1186,15 +1235,15 @@ ParameterHandler::print_parameters(std::ostream &    out,
       // single top-level node "ParameterHandler" and
       // assign the existing tree under it
       boost::property_tree::ptree single_node_tree;
-      single_node_tree.add_child("ParameterHandler", *current_entries);
+      single_node_tree.add_child("ParameterHandler", current_entries);
 
       write_xml(out, single_node_tree);
       return out;
     }
 
-  if (style == JSON)
+  if (style == JSON || style == ShortJSON)
     {
-      write_json(out, *current_entries);
+      write_json(out, current_entries);
       return out;
     }
 
@@ -1225,7 +1274,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
 
   // dive recursively into the subsections
   recursively_print_parameters(
-    *current_entries,
+    current_entries,
     std::vector<std::string>(), // start at the top level
     style,
     0,

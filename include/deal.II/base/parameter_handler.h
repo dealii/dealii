@@ -884,7 +884,19 @@ public:
      * Write input for ParameterHandler without comments or changed default
      * values.
      */
-    ShortText = 193
+    ShortText = 193,
+
+    /**
+     * Write input for ParameterHandler without comments or changed default
+     * values as a XML file.
+     */
+    ShortXML = 194,
+
+    /**
+     * Write input for ParameterHandler without comments or changed default
+     * values as a JSON file.
+     */
+    ShortJSON = 195
   };
 
 
@@ -1340,13 +1352,17 @@ public:
   set(const std::string &entry_name, const bool new_value);
 
   /**
-   * Print all parameters with the given style to <tt>out</tt>.
+   * Print all parameters with the given style to @p out.
    *
    * Before printing, all current parameters and subsections are sorted
    * alphabetically by default.
    * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
+   * to <tt>false</tt>: in this case entries are printed in the same order
    * as they have been declared.
+   *
+   * In the case of <tt>XML</tt> or <tt>JSON</tt>, a reduced tree, only
+   * containing the values and skipping the documentation, can be
+   * printed by setting @p print_documentation to <tt>false</tt>.
    *
    * In <tt>Text</tt> format, the output is formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
