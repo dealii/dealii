@@ -69,24 +69,27 @@ enum class NeighborType
 };
 
 /**
- * A class that represents a bounding box in a space with arbitrary dimension
- * <tt>spacedim</tt>.
+ * A class that represents a box of arbitrary dimension <tt>spacedim</tt> and
+ * with sides parallel to the coordinate axes. That is, a region
  *
- * Objects of this class are used to represent bounding boxes. They are,
- * among other uses, useful in parallel distributed meshes to give a general
- * description of the owners of each portion of the mesh.
+ * @f[
+ * [x_0^L, x_0^U] \times ... \times [x_{spacedim-1}^L, x_{spacedim-1}^U],
+ * @f]
  *
- * Bounding boxes are represented by two vertices (bottom left and top right).
- * Geometrically, a bounding box is:
- * - 1 d: a segment (represented by its vertices in the proper order)
- * - 2 d: a rectangle (represented by the vertices V at bottom left, top right)
+ * where $(x_0^L , ..., x_{spacedim-1}^L) and $(x_0^U , ..., x_{spacedim-1}^U)
+ * denote the two vertices (bottom left and top right) which are used to
+ * represent the box.
+ *
+ * Geometrically, a bounding box is thus:
+ * - 1D: a segment (represented by its vertices in the proper order)
+ * - 2D: a rectangle (represented by the vertices V at bottom left, top right)
  * @code
  * .--------V
  * |        |
  * V--------.
  * @endcode
  *
- * - 3 d: a cuboid (in which case the two vertices V follow the convention and
+ * - 3D: a cuboid (in which case the two vertices V follow the convention and
  * are not owned by the same face)
  * @code
  *   .------V
@@ -96,9 +99,30 @@ enum class NeighborType
  * |      |/
  * V------.
  * @endcode
- * Notice that the sides are always parallel to the respective axis.
  *
- * @author Giovanni Alzetta, 2017.
+ * Bounding boxes are, for example, useful in parallel distributed meshes to
+ * give a general description of the owners of each portion of the mesh.
+ *
+ * Taking the cross section of a BoundingBox<spacedim> orthogonal to a given
+ * direction gives a box in one dimension lower: BoundingBox<spacedim - 1>.
+ * In 3D, the 2 coordinates of the cross section of BoundingBox<3> can be
+ * ordered in 2 different ways. That is, if we take the cross section orthogonal
+ * to the y direction we could either order a 3D-coordinate into a
+ * 2D-coordinate as $(x,z)$ or as $(z,x)$. This class uses the second
+ * convention, corresponding to the coordinates being ordered cyclicly
+ * $x \rightarrow y \rightarrow z \rightarrow x \rightarrow ... $
+ * To be precise, if we take a cross section:
+ *
+ * | Orthogonal to | Cross section coordinates ordered as |
+ * |:-------------:|:------------------------------------:|
+ * |      x        |               (y, z)                 |
+ * |      y        |               (z, x)                 |
+ * |      z        |               (x, y)                 |
+ *
+ * This is according to the convention set by the function
+ * <code>coordinate_to_one_dim_higher</code>.
+ *
+ * @author Giovanni Alzetta, 2017, Simon Sticko 2020.
  */
 template <int spacedim, typename Number = double>
 class BoundingBox
@@ -183,6 +207,56 @@ public:
   volume() const;
 
   /**
+   * Returns the point in the center of the box.
+   */
+  Point<spacedim, Number>
+  center() const;
+
+  /**
+   * Returns the side length of the box in @p direction.
+   */
+  Number
+  side_length(const unsigned int direction) const;
+
+  /**
+   * Return the lower bound of the box in @p direction.
+   */
+  Number
+  lower_bound(const unsigned int direction) const;
+
+  /**
+   * Return the upper bound of the box in @p direction.
+   */
+  Number
+  upper_bound(const unsigned int direction) const;
+
+  /**
+   * Return the bounds of the box in @p direction, as a one-dimensional box.
+   */
+  BoundingBox<1, Number>
+  bounds(const unsigned int direction) const;
+
+  /**
+   * Returns the indexth vertex of the box.
+   */
+  Point<spacedim, Number>
+  vertex(const unsigned int index) const;
+
+  /**
+   * Returns the indexth child of the box. Child is meant in the same way as for
+   * a cell.
+   */
+  BoundingBox<spacedim, Number>
+  child(const unsigned int index) const;
+
+  /**
+   * Returns the cross section of the box orthogonal to @p direction.
+   * This is a box in one dimension lower.
+   */
+  BoundingBox<spacedim - 1, Number>
+  cross_section(const unsigned int direction) const;
+
+  /**
    * Boost serialization function
    */
   template <class Archive>
@@ -192,6 +266,61 @@ public:
 private:
   std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
 };
+
+
+/**
+ * Returns the unit box [0,1]^dim.
+ */
+template <int dim, typename Number = double>
+BoundingBox<dim, Number>
+create_unit_box();
+
+
+/**
+ * This function defines a convention for how coordinates in dim
+ * dimensions should translate to the coordinates in dim + 1 dimensions,
+ * when one of the coordinates in dim + 1 dimensions is locked to a given
+ * value.
+ *
+ * The convention is the following: Starting from the locked coordinate we
+ * store the lower dimensional coordinates consecutively and wrapping
+ * around when going over the dimension. This relationship can be
+ * described by the following tables:
+ *
+ *                        2D
+ * ------------------------------------------------
+ * | locked in 2D | 1D coordinate | 2D coordinate |
+ * |--------------------------------------------- |
+ * |     x0       |      (a)      |   (x0,  a)    |
+ * |     x1       |      (a)      |   (a , x1)    |
+ * ------------------------------------------------
+ *
+ *                       3D
+ * --------------------------------------------------
+ * | locked in 3D | 2D coordinates | 3D coordinates |
+ * |----------------------------------------------- |
+ * |     x0       |    (a, b)      | (x0,  a,  b)   |
+ * |     x1       |    (a, b)      | ( b, x1,  a)   |
+ * |     x2       |    (a, b)      | ( a,  b, x2)   |
+ * --------------------------------------------------
+ *
+ * Given a locked coordinate, this function maps a coordinate index in dim
+ * dimension to a coordinate index in dim + 1 dimensions.
+ *
+ * @param locked_coordinate should be in the range [0, dim+1).
+ * @param coordiante_in_dim should be in the range [0, dim).
+ * @return A coordinate index in the range [0, dim+1)
+ */
+template <int dim>
+inline unsigned int
+coordinate_to_one_dim_higher(const unsigned int locked_coordinate,
+                             const unsigned int coordiante_in_dim)
+{
+  AssertIndexRange(locked_coordinate, dim + 1);
+  AssertIndexRange(coordiante_in_dim, dim);
+  return (locked_coordinate + coordiante_in_dim + 1) % (dim + 1);
+}
+
 
 /*------------------------ Inline functions: BoundingBox --------------------*/
 

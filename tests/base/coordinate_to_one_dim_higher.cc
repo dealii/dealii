@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/non_matching/quadrature_generator.h>
+#include <deal.II/base/bounding_box.h>
 
 #include "../tests.h"
 
@@ -33,9 +33,7 @@ print_what_each_coordinate_maps_to()
       deallog << "locked coordinate = " << locked << std::endl;
       for (unsigned int i = 0; i < dim; ++i)
         {
-          deallog << i << " -> "
-                  << NonMatching::internal::QuadratureGeneratorImplementation::
-                       coordinate_to_one_dim_higher<dim>(locked, i)
+          deallog << i << " -> " << coordinate_to_one_dim_higher<dim>(locked, i)
                   << std::endl;
         }
     }
