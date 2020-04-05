@@ -3146,6 +3146,11 @@ namespace FETools
     // order
     switch (dim)
       {
+        case 0:
+          {
+            h2l[0] = 0;
+            break;
+          }
         case 1:
           {
             h2l[0] = 0;
@@ -3289,6 +3294,17 @@ namespace FETools
 
 
   template <int dim>
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering(const unsigned int degree)
+  {
+    std::vector<unsigned int> h2l(Utilities::pow(degree + 1, dim));
+    hierarchic_to_lexicographic_numbering<dim>(degree, h2l);
+    return h2l;
+  }
+
+
+
+  template <int dim>
   void
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe,
                                         std::vector<unsigned int> &   h2l)
@@ -3308,6 +3324,16 @@ namespace FETools
     std::vector<unsigned int> h2l(fe.dofs_per_cell);
     hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
     return h2l;
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering(const unsigned int degree)
+  {
+    return Utilities::invert_permutation(
+      hierarchic_to_lexicographic_numbering<dim>(degree));
   }
 
 

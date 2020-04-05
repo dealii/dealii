@@ -909,12 +909,23 @@ namespace FETools
    * correct size, which is equal to the number of degrees of freedom in the
    * finite element.
    */
-
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering(unsigned int               degree,
                                         std::vector<unsigned int> &h2l);
 
+  /**
+   * Like the previous function but instead of returning its result through
+   * the last argument return it as a value.
+   */
+  template <int dim>
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering(unsigned int degree);
+
+  /**
+   * Like the previous functions but using a FiniteElementData instead of the
+   * polynomial degree.
+   */
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe_data,
@@ -932,6 +943,14 @@ namespace FETools
    * This is the reverse function to the above one, generating the map from
    * the lexicographic to the hierarchical numbering. All the remarks made
    * about the above function are also valid here.
+   */
+  template <int dim>
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering(unsigned int degree);
+
+  /**
+   * Like the previous functions but using a FiniteElementData instead of the
+   * polynomial degree.
    */
   template <int dim>
   void

@@ -21,4 +21,18 @@ DEAL_II_NAMESPACE_OPEN
 /*-------------- Explicit Instantiations -------------------------------*/
 #include "fe_tools.inst"
 
+// these do not fit into the templates of the dimension in the inst file
+namespace FETools
+{
+  template void
+  hierarchic_to_lexicographic_numbering<0>(unsigned int,
+                                           std::vector<unsigned int> &);
+
+  template std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering<0>(unsigned int);
+
+  template std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering<0>(unsigned int);
+} // namespace FETools
+
 DEAL_II_NAMESPACE_CLOSE
