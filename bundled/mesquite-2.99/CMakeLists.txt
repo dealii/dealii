@@ -18,6 +18,7 @@
 #
 
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wextra")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wunused-parameter")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
@@ -26,6 +27,14 @@ STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wformat")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wformat-invalid-specifier")
 
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wpointer-arith")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wswitch -Wsynth")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wwrite-strings")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Qunused-arguments")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-parentheses")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 #
 # Add header and source files
