@@ -9697,7 +9697,7 @@ namespace VectorTools
       {
         const Quadrature<dim> quad(fe.get_unit_support_points());
 
-        MappingQ<dim, spacedim> map_q(fe.degree);
+        MappingQGeneric<dim, spacedim> map_q(fe.degree);
         FEValues<dim, spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
         std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
 
