@@ -42,31 +42,6 @@ namespace internal
   {
     namespace
     {
-      // get the renumbering for faces
-      template <int dim>
-      inline std::vector<unsigned int>
-      face_lexicographic_to_hierarchic_numbering(const unsigned int degree)
-      {
-        std::vector<unsigned int> dpo(dim, 1U);
-        for (unsigned int i = 1; i < dpo.size(); ++i)
-          dpo[i] = dpo[i - 1] * (degree - 1);
-        const dealii::FiniteElementData<dim - 1> face_data(dpo, 1, degree);
-        std::vector<unsigned int> face_renumber(face_data.dofs_per_cell);
-        FETools::lexicographic_to_hierarchic_numbering(face_data,
-                                                       face_renumber);
-        return face_renumber;
-      }
-
-      // dummy specialization for dim == 1 to avoid linker errors
-      template <>
-      inline std::vector<unsigned int>
-      face_lexicographic_to_hierarchic_numbering<1>(const unsigned int)
-      {
-        return std::vector<unsigned int>();
-      }
-
-
-
       // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
       // tensorization on inner loops for performance reasons. this clears a
       // dim-array
@@ -208,8 +183,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-        q_deg);
+      FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
              fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
@@ -344,8 +318,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-        q_deg);
+      FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
              fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
@@ -468,9 +441,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
          ExcInternalError());
 
   {
-    std::vector<unsigned int>    renumber(q_dofs_per_cell);
-    const FiniteElementData<dim> fe(get_dpo_vector(q_degree), 1, q_degree);
-    FETools::hierarchic_to_lexicographic_numbering(fe, renumber);
+    std::vector<unsigned int> renumber =
+      FETools::hierarchic_to_lexicographic_numbering<dim>(q_degree);
     for (unsigned int i = q_dofs_per_cell; i < this->dofs_per_cell; ++i)
       renumber.push_back(i);
     this->poly_space.set_numbering(renumber);
@@ -932,8 +904,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
 
   // find renumbering of faces and assign from values of quadrature
   const std::vector<unsigned int> face_index_map =
-    internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-      q_degree);
+    FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_degree);
 
   // We can compute the support points by computing the tensor
   // product of the 1d set of points. We could do this by hand, but it's
