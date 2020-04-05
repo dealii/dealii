@@ -1,0 +1,9 @@
+Removed: The deprecated member functions Timer::get_data(),
+Timer::get_total_data(), Timer::print_data(), Timer::print_total_data() and
+Timer::operator(), Timer::get_lap_time() have been removed. Use
+Timer::get_last_lap_wall_time_data(), Timer::get_accumulated_wall_time_data(),
+Timer::print_last_lap_wall_time_data(),
+Timer::print_accumulated_wall_time_data() and
+Timer::cpu_time() and Timer::last_wall_time() instead.
+<br>
+(Daniel Arndt, 2020/03/27)

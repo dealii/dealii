@@ -199,8 +199,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
   const unsigned int vector_number,
   const unsigned int dof_handler_index) const
 {
-  const unsigned int vectorization_length =
-    VectorizedArrayType::n_array_elements;
   AssertIndexRange(dof_handler_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
@@ -220,7 +218,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
     }
 
   std::pair<unsigned int, unsigned int> index =
-    cell_level_index[macro_cell_number * vectorization_length + vector_number];
+    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
+                     vector_number];
   return typename DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
                                                  index.first,
                                                  index.second,
@@ -235,13 +234,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
   const unsigned int macro_cell_number,
   const unsigned int vector_number) const
 {
-  const unsigned int vectorization_length =
-    VectorizedArrayType::n_array_elements;
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
 
   std::pair<int, int> level_index_pair =
-    cell_level_index[macro_cell_number * vectorization_length + vector_number];
+    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
+                     vector_number];
   return level_index_pair;
 }
 
@@ -284,7 +282,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
     }
 
   const internal::MatrixFreeFunctions::FaceToCellTopology<
-    VectorizedArrayType::n_array_elements>
+    VectorizedArrayType::size()>
     face2cell_info = get_face_info(face_batch_number);
 
   const unsigned int cell_index =
@@ -308,8 +306,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const unsigned int vector_number,
   const unsigned int dof_handler_index) const
 {
-  constexpr unsigned int vectorization_length =
-    VectorizedArrayType::n_array_elements;
   AssertIndexRange(dof_handler_index, dof_handlers.n_dof_handlers);
   AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
@@ -319,7 +315,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
   const hp::DoFHandler<dim> *dofh =
     dof_handlers.hp_dof_handler[dof_handler_index];
   std::pair<unsigned int, unsigned int> index =
-    cell_level_index[macro_cell_number * vectorization_length + vector_number];
+    cell_level_index[macro_cell_number * VectorizedArrayType::size() +
+                     vector_number];
   return typename hp::DoFHandler<dim>::cell_iterator(&dofh->get_triangulation(),
                                                      index.first,
                                                      index.second,
@@ -334,17 +331,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
   const MatrixFree<dim, Number, VectorizedArrayType> &v)
 {
   clear();
-  dof_handlers              = v.dof_handlers;
-  dof_info                  = v.dof_info;
-  constraint_pool_data      = v.constraint_pool_data;
-  constraint_pool_row_index = v.constraint_pool_row_index;
-  mapping_info              = v.mapping_info;
-  shape_info                = v.shape_info;
-  cell_level_index          = v.cell_level_index;
-  task_info                 = v.task_info;
-  indices_are_initialized   = v.indices_are_initialized;
-  mapping_is_initialized    = v.mapping_is_initialized;
-  mg_level                  = v.mg_level;
+  dof_handlers               = v.dof_handlers;
+  dof_info                   = v.dof_info;
+  constraint_pool_data       = v.constraint_pool_data;
+  constraint_pool_row_index  = v.constraint_pool_row_index;
+  mapping_info               = v.mapping_info;
+  shape_info                 = v.shape_info;
+  cell_level_index           = v.cell_level_index;
+  cell_level_index_end_local = v.cell_level_index_end_local;
+  task_info                  = v.task_info;
+  face_info                  = v.face_info;
+  indices_are_initialized    = v.indices_are_initialized;
+  mapping_is_initialized     = v.mapping_is_initialized;
+  mg_level                   = v.mg_level;
 }
 
 
@@ -452,7 +451,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       std::vector<unsigned char> dummy2;
       task_info.collect_boundary_cells(cell_level_index.size(),
                                        cell_level_index.size(),
-                                       VectorizedArrayType::n_array_elements,
+                                       VectorizedArrayType::size(),
                                        dummy);
       task_info.create_blocks_serial(
         dummy, dummy, 1, dummy, false, dummy, dummy2);
@@ -478,9 +477,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           // if indices are not initialized, the cell_level_index might not be
           // divisible by the vectorization length. But it must be for
           // mapping_info...
-          while (cell_level_index.size() %
-                   VectorizedArrayType::n_array_elements !=
-                 0)
+          while (cell_level_index.size() % VectorizedArrayType::size() != 0)
             cell_level_index.push_back(cell_level_index.back());
         }
     }
@@ -532,7 +529,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   {
     unsigned int n_components = 0;
     for (unsigned int no = 0; no < dof_handler.size(); ++no)
-      n_components += dof_handler[no]->get_fe()[0].n_base_elements();
+      n_components += dof_handler[no]->get_fe(0).n_base_elements();
     const unsigned int n_quad             = quad.size();
     unsigned int       n_fe_in_collection = 0;
     for (unsigned int i = 0; i < n_components; ++i)
@@ -590,7 +587,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             additional_data.store_plain_indices;
           dof_info[no].global_base_element_offset =
             no > 0 ? dof_info[no - 1].global_base_element_offset +
-                       dof_handler[no - 1]->get_fe()[0].n_base_elements() :
+                       dof_handler[no - 1]->get_fe(0).n_base_elements() :
                      0;
         }
 
@@ -624,7 +621,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       std::vector<unsigned char> dummy2;
       task_info.collect_boundary_cells(cell_level_index.size(),
                                        cell_level_index.size(),
-                                       VectorizedArrayType::n_array_elements,
+                                       VectorizedArrayType::size(),
                                        dummy);
       task_info.create_blocks_serial(
         dummy, dummy, 1, dummy, false, dummy, dummy2);
@@ -652,9 +649,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           // if indices are not initialized, the cell_level_index might not be
           // divisible by the vectorization length. But it must be for
           // mapping_info...
-          while (cell_level_index.size() %
-                   VectorizedArrayType::n_array_elements !=
-                 0)
+          while (cell_level_index.size() % VectorizedArrayType::size() != 0)
             cell_level_index.push_back(cell_level_index.back());
         }
     }
@@ -679,6 +674,25 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       mapping_is_initialized = true;
     }
 }
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+void
+MatrixFree<dim, Number, VectorizedArrayType>::update_mapping(
+  const Mapping<dim> &mapping)
+{
+  AssertDimension(shape_info.size(1), mapping_info.cell_data.size());
+  mapping_info.update_mapping(
+    dof_handlers.active_dof_handler == DoFHandlers::hp ?
+      dof_handlers.hp_dof_handler[0]->get_triangulation() :
+      dof_handlers.dof_handler[0]->get_triangulation(),
+    cell_level_index,
+    face_info,
+    dof_info[0].cell_active_fe_index,
+    mapping);
+}
+
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
@@ -760,7 +774,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 
   dof_info.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length = VectorizedArrayType::n_array_elements;
+    dof_info[no].vectorization_length = VectorizedArrayType::size();
 
   // Go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
@@ -831,7 +845,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 
   dof_info.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
-    dof_info[no].vectorization_length = VectorizedArrayType::n_array_elements;
+    dof_info[no].vectorization_length = VectorizedArrayType::size();
 
   // go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
@@ -1118,11 +1132,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         subdomain_boundary_cells.push_back(counter);
     }
 
-  const unsigned int vectorization_length =
-    VectorizedArrayType::n_array_elements;
+  const unsigned int n_lanes = VectorizedArrayType::size();
   task_info.collect_boundary_cells(cell_level_index_end_local,
                                    n_active_cells,
-                                   vectorization_length,
+                                   n_lanes,
                                    subdomain_boundary_cells);
 
   // Finalize the creation of the ghost indices
@@ -1246,9 +1259,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               renumbering_fe_index.resize(dof_info[0].max_fe_index);
               unsigned int counter;
               n_macro_cells_before = 0;
-              for (counter = 0;
-                   counter < std::min(start_nonboundary * vectorization_length,
-                                      task_info.n_active_cells);
+              for (counter = 0; counter < std::min(start_nonboundary * n_lanes,
+                                                   task_info.n_active_cells);
                    counter++)
                 {
                   AssertIndexRange(counter, renumbering.size());
@@ -1263,17 +1275,15 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                 {
                   for (const auto jj : renumbering_fe_index[j])
                     renumbering[counter++] = jj;
-                  irregular_cells[renumbering_fe_index[j].size() /
-                                    vectorization_length +
+                  irregular_cells[renumbering_fe_index[j].size() / n_lanes +
                                   n_macro_cells_before] =
-                    renumbering_fe_index[j].size() % vectorization_length;
-                  n_macro_cells_before += (renumbering_fe_index[j].size() +
-                                           vectorization_length - 1) /
-                                          vectorization_length;
+                    renumbering_fe_index[j].size() % n_lanes;
+                  n_macro_cells_before +=
+                    (renumbering_fe_index[j].size() + n_lanes - 1) / n_lanes;
                   renumbering_fe_index[j].resize(0);
                 }
 
-              for (counter = start_nonboundary * vectorization_length;
+              for (counter = start_nonboundary * n_lanes;
                    counter < task_info.n_active_cells;
                    counter++)
                 {
@@ -1283,18 +1293,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                        dof_info[0].cell_active_fe_index[renumbering[counter]]]
                       .push_back(renumbering[counter]);
                 }
-              counter = start_nonboundary * vectorization_length;
+              counter = start_nonboundary * n_lanes;
               for (unsigned int j = 0; j < dof_info[0].max_fe_index; j++)
                 {
                   for (const auto jj : renumbering_fe_index[j])
                     renumbering[counter++] = jj;
-                  irregular_cells[renumbering_fe_index[j].size() /
-                                    vectorization_length +
+                  irregular_cells[renumbering_fe_index[j].size() / n_lanes +
                                   n_macro_cells_before] =
-                    renumbering_fe_index[j].size() % vectorization_length;
-                  n_macro_cells_before += (renumbering_fe_index[j].size() +
-                                           vectorization_length - 1) /
-                                          vectorization_length;
+                    renumbering_fe_index[j].size() % n_lanes;
+                  n_macro_cells_before +=
+                    (renumbering_fe_index[j].size() + n_lanes - 1) / n_lanes;
                 }
               AssertIndexRange(n_macro_cells_before,
                                task_info.cell_partition_data.back() +
@@ -1338,22 +1346,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                i < task_info.cell_partition_data.back() + n_ghost_slots - 1;
                ++i)
             irregular_cells[i] = 0;
-          irregular_cells.back() =
-            task_info.n_ghost_cells % vectorization_length;
+          irregular_cells.back() = task_info.n_ghost_cells % n_lanes;
         }
 
       {
         unsigned int n_cells = 0;
         for (unsigned int i = 0; i < task_info.cell_partition_data.back(); ++i)
-          n_cells +=
-            irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
+          n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
         AssertDimension(n_cells, task_info.n_active_cells);
         n_cells = 0;
         for (unsigned int i = task_info.cell_partition_data.back();
              i < n_ghost_slots + task_info.cell_partition_data.back();
              ++i)
-          n_cells +=
-            irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
+          n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
         AssertDimension(n_cells, task_info.n_ghost_cells);
       }
 
@@ -1377,13 +1382,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   {
     std::vector<std::pair<unsigned int, unsigned int>> cell_level_index_old;
     cell_level_index.swap(cell_level_index_old);
-    cell_level_index.reserve(task_info.cell_partition_data.back() *
-                             vectorization_length);
+    cell_level_index.reserve(task_info.cell_partition_data.back() * n_lanes);
     unsigned int position_cell = 0;
     for (unsigned int i = 0; i < task_info.cell_partition_data.back(); ++i)
       {
         unsigned int n_comp =
-          (irregular_cells[i] > 0) ? irregular_cells[i] : vectorization_length;
+          (irregular_cells[i] > 0) ? irregular_cells[i] : n_lanes;
         for (unsigned int j = 0; j < n_comp; ++j)
           cell_level_index.push_back(
             cell_level_index_old[renumbering[position_cell + j]]);
@@ -1392,7 +1396,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         // vectorization_length cells. This is needed for MappingInfo when the
         // transformation data is initialized. We just set the value to the
         // last valid cell in that case.
-        for (unsigned int j = n_comp; j < vectorization_length; ++j)
+        for (unsigned int j = n_comp; j < n_lanes; ++j)
           cell_level_index.push_back(
             cell_level_index_old[renumbering[position_cell + n_comp - 1]]);
         position_cell += n_comp;
@@ -1400,8 +1404,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     AssertDimension(position_cell,
                     task_info.n_active_cells + task_info.n_ghost_cells);
     AssertDimension(cell_level_index.size(),
-                    task_info.cell_partition_data.back() *
-                      vectorization_length);
+                    task_info.cell_partition_data.back() * n_lanes);
   }
 
   // set constraint pool from the std::map and reorder the indices
@@ -1497,7 +1500,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
       cell_level_index.resize(
         cell_level_index.size() +
-        VectorizedArrayType::n_array_elements *
+        VectorizedArrayType::size() *
           (task_info.refinement_edge_face_partition_data[1] -
            task_info.refinement_edge_face_partition_data[0]));
 
@@ -1509,48 +1512,48 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
       face_info.cell_and_face_to_plain_faces.reinit(
         TableIndices<3>(task_info.cell_partition_data.back(),
                         GeometryInfo<dim>::faces_per_cell,
-                        VectorizedArrayType::n_array_elements),
+                        VectorizedArrayType::size()),
         true);
       face_info.cell_and_face_to_plain_faces.fill(
         numbers::invalid_unsigned_int);
       face_info.cell_and_face_boundary_id.reinit(
         TableIndices<3>(task_info.cell_partition_data.back(),
                         GeometryInfo<dim>::faces_per_cell,
-                        VectorizedArrayType::n_array_elements),
+                        VectorizedArrayType::size()),
         true);
       face_info.cell_and_face_boundary_id.fill(numbers::invalid_boundary_id);
 
       for (unsigned int f = 0; f < task_info.ghost_face_partition_data.back();
            ++f)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements &&
+        for (unsigned int v = 0; v < VectorizedArrayType::size() &&
                                  face_info.faces[f].cells_interior[v] !=
                                    numbers::invalid_unsigned_int;
              ++v)
           {
             TableIndices<3> index(face_info.faces[f].cells_interior[v] /
-                                    VectorizedArrayType::n_array_elements,
+                                    VectorizedArrayType::size(),
                                   face_info.faces[f].interior_face_no,
                                   face_info.faces[f].cells_interior[v] %
-                                    VectorizedArrayType::n_array_elements);
+                                    VectorizedArrayType::size());
 
             // Assert(cell_and_face_to_plain_faces(index) ==
             // numbers::invalid_unsigned_int,
             //       ExcInternalError("Should only visit each face once"));
             face_info.cell_and_face_to_plain_faces(index) =
-              f * VectorizedArrayType::n_array_elements + v;
+              f * VectorizedArrayType::size() + v;
             if (face_info.faces[f].cells_exterior[v] !=
                 numbers::invalid_unsigned_int)
               {
                 TableIndices<3> index(face_info.faces[f].cells_exterior[v] /
-                                        VectorizedArrayType::n_array_elements,
+                                        VectorizedArrayType::size(),
                                       face_info.faces[f].exterior_face_no,
                                       face_info.faces[f].cells_exterior[v] %
-                                        VectorizedArrayType::n_array_elements);
+                                        VectorizedArrayType::size());
                 // Assert(cell_and_face_to_plain_faces(index) ==
                 // numbers::invalid_unsigned_int,
                 //       ExcInternalError("Should only visit each face once"));
                 face_info.cell_and_face_to_plain_faces(index) =
-                  f * VectorizedArrayType::n_array_elements + v;
+                  f * VectorizedArrayType::size() + v;
               }
             else
               face_info.cell_and_face_boundary_id(index) =
@@ -1569,8 +1572,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           std::vector<types::global_dof_index> ghost_indices;
           {
             for (unsigned int cell = 0;
-                 cell <
-                 VectorizedArrayType::n_array_elements * n_macro_cells_before;
+                 cell < VectorizedArrayType::size() * n_macro_cells_before;
                  ++cell)
               if (cell == 0 ||
                   cell_level_index[cell] != cell_level_index[cell - 1])
@@ -1633,15 +1635,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                          const bool,
                                          const bool)> &fu) {
               for (unsigned int f = 0; f < n_inner_face_batches(); ++f)
-                for (unsigned int v = 0;
-                     v < VectorizedArrayType::n_array_elements &&
-                     face_info.faces[f].cells_interior[v] !=
-                       numbers::invalid_unsigned_int;
+                for (unsigned int v = 0; v < VectorizedArrayType::size() &&
+                                         face_info.faces[f].cells_interior[v] !=
+                                           numbers::invalid_unsigned_int;
                      ++v)
                   {
                     AssertIndexRange(face_info.faces[f].cells_interior[v],
                                      n_macro_cells_before *
-                                       VectorizedArrayType::n_array_elements);
+                                       VectorizedArrayType::size());
                     const unsigned int p = face_info.faces[f].cells_exterior[v];
                     const unsigned int face_no =
                       face_info.faces[f].exterior_face_no;
@@ -1657,25 +1658,25 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                          const unsigned int,
                                          const bool,
                                          const bool)> &fu) {
+              const unsigned int n_lanes = VectorizedArrayType::size();
+
               for (unsigned int c = 0; c < n_cell_batches(); ++c)
                 for (const unsigned int d : GeometryInfo<dim>::face_indices())
-                  for (unsigned int v = 0;
-                       v < VectorizedArrayType::n_array_elements;
-                       ++v)
+                  for (unsigned int v = 0; v < n_lanes; ++v)
                     {
                       unsigned int f =
                         this->face_info.cell_and_face_to_plain_faces(c, d, v);
                       if (f == numbers::invalid_unsigned_int)
                         continue;
 
-                      const unsigned int v_len =
-                        VectorizedArrayType::n_array_elements;
-                      const unsigned int cell_this = c * v_len + v;
+                      const unsigned int cell_this = c * n_lanes + v;
 
-                      const unsigned int cell_m = this->get_face_info(f / v_len)
-                                                    .cells_interior[f % v_len];
-                      const unsigned int cell_p = this->get_face_info(f / v_len)
-                                                    .cells_exterior[f % v_len];
+                      const unsigned int cell_m =
+                        this->get_face_info(f / n_lanes)
+                          .cells_interior[f % n_lanes];
+                      const unsigned int cell_p =
+                        this->get_face_info(f / n_lanes)
+                          .cells_exterior[f % n_lanes];
 
                       const bool ext = cell_this == cell_m;
 
@@ -1684,10 +1685,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
                       const unsigned int p = ext ? cell_p : cell_m;
                       const unsigned int face_no =
-                        ext ? face_info.faces[f / v_len].exterior_face_no :
-                              face_info.faces[f / v_len].interior_face_no;
+                        ext ? face_info.faces[f / n_lanes].exterior_face_no :
+                              face_info.faces[f / n_lanes].interior_face_no;
 
-                      fu(p, face_no, f / v_len, v, ext, true);
+                      fu(p, face_no, f / n_lanes, v, ext, true);
                     }
             };
 
@@ -1704,6 +1705,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               bool all_nodal = true;
               for (unsigned int c = 0; c < di.n_base_elements; ++c)
                 if (!shape_info(di.global_base_element_offset + c, 0, 0, 0)
+                       .data.front()
                        .nodal_at_cell_boundaries)
                   all_nodal = false;
               if (all_nodal == false)
@@ -1834,14 +1836,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     // using AssertIndexRange, but that leads to an
                     // internal compiler error with GCC 7.4. Do things
                     // by hand instead.
-                    Assert(
-                      face_info.faces[f].cells_interior[v] <
-                        n_macro_cells_before *
-                          VectorizedArrayType::n_array_elements,
-                      ExcIndexRange(face_info.faces[f].cells_interior[v],
-                                    0,
-                                    n_macro_cells_before *
-                                      VectorizedArrayType::n_array_elements));
+                    Assert(face_info.faces[f].cells_interior[v] <
+                             n_macro_cells_before * VectorizedArrayType::size(),
+                           ExcIndexRange(face_info.faces[f].cells_interior[v],
+                                         0,
+                                         n_macro_cells_before *
+                                           VectorizedArrayType::size()));
                     if (flag ||
                         (di.index_storage_variants
                              [ext ? internal::MatrixFreeFunctions::DoFInfo::

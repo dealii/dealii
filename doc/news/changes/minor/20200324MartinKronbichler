@@ -1,0 +1,4 @@
+Changed: The SIMD vectorization capabilities in deal.II are now controlled by
+the macro DEAL_II_VECTORIZATION_WIDTH_IN_BITS containing the numbers of bits
+in the SIMD arrays (e.g., 256 for AVX or 512 for AVX-512).
+<br> (Martin Kronbichler, 2020/03/24)

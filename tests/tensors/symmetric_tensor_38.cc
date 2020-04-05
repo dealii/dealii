@@ -26,9 +26,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   const int                                        dim = 3;
   SymmetricTensor<2, dim, VectorizedArray<float>>  s1;
@@ -53,8 +52,7 @@ main()
         deallog << r1[i][j][0] << std::endl;
         AssertThrow(std::abs(r1[i][j][0] - factor_float * s1[i][j][0]) < 1.e-10,
                     ExcInternalError());
-        for (unsigned int k = 1; k < VectorizedArray<float>::n_array_elements;
-             ++k)
+        for (unsigned int k = 1; k < VectorizedArray<float>::size(); ++k)
           {
             AssertThrow(std::abs(r1[i][j][k] - r1[i][j][0]) < 1.e-10,
                         ExcInternalError());
@@ -62,8 +60,7 @@ main()
         deallog << r2[i][j][0] << std::endl;
         Assert(std::abs(r2[i][j][0] - factor_double * s2[i][j][0]) < 1.e-10,
                ExcInternalError());
-        for (unsigned int k = 1; k < VectorizedArray<double>::n_array_elements;
-             ++k)
+        for (unsigned int k = 1; k < VectorizedArray<double>::size(); ++k)
           {
             AssertThrow(std::abs(r2[i][j][k] - r2[i][j][0]) < 1.e-10,
                         ExcInternalError());

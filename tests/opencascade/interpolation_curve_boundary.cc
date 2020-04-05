@@ -44,8 +44,7 @@ using namespace OpenCASCADE;
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // The curve passing through the vertices of the unit square.
   std::vector<Point<3>> vertices;
@@ -77,7 +76,7 @@ main()
 
   // You can open the generated file with gmsh.
   GridOut gridout;
-  gridout.write_msh(tria, logfile);
+  gridout.write_msh(tria, deallog.get_file_stream());
 
   return 0;
 }

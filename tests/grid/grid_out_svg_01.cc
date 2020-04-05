@@ -23,7 +23,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 Triangulation<2, 2>
 create_grid()

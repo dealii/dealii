@@ -65,7 +65,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -210,7 +209,7 @@ template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
 do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 {
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     {
       deallog.push("float");
     }
@@ -377,7 +376,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.pop();
 
   fine_matrix.clear();
@@ -427,12 +426,8 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
-
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-    }
+  mpi_initlog();
+  deallog << std::setprecision(4);
 
   {
     deallog.push("2d");

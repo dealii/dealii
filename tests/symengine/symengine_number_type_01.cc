@@ -36,7 +36,6 @@
 
 #include "../serialization/serialization.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 namespace SE = ::SymEngine;
 

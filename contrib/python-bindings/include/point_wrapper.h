@@ -56,22 +56,17 @@ namespace python
      */
     ~PointWrapper();
 
-    /**
-     * Return the Euclidean distance of this point to the point p, i.e., the
-     * l2_norm of the difference between the vectors representing the two
-     * points.
+    /*! @copydoc Point::distance
      */
     double
     distance(const PointWrapper &p) const;
 
-    /**
-     * Return the l2_norm of the vector connecting the origin to the point.
+    /*! @copydoc Tensor::norm
      */
     double
     norm() const;
 
-    /**
-     * Return the sum of the absolute squares of all entries.
+    /*! @copydoc Tensor::norm_square
      */
     double
     norm_square() const;
@@ -97,7 +92,7 @@ namespace python
     operator!=(const PointWrapper &p) const;
 
     /**
-     * Test for equality of two tensors.
+     * Test for equality of two points.
      */
     bool
     operator==(const PointWrapper &p) const;

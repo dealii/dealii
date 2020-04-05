@@ -128,9 +128,8 @@ check_select(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   std::vector<unsigned int> v1(4);
   std::vector<unsigned int> v2(4);

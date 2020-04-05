@@ -68,9 +68,8 @@ check_solve(SolverControl &     solver_control,
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
 
   {

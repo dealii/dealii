@@ -24,7 +24,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int spacedim>
 void

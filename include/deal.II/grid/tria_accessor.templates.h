@@ -640,21 +640,22 @@ namespace internal
         // quad to take it, b) which line
         // therein it is if the face is
         // oriented correctly
-        static const unsigned int lookup_table[12][2] = {
-          {4, 0}, // take first four lines from bottom face
-          {4, 1},
-          {4, 2},
-          {4, 3},
+        static const unsigned int
+          lookup_table[GeometryInfo<3>::lines_per_cell][2] = {
+            {4, 0}, // take first four lines from bottom face
+            {4, 1},
+            {4, 2},
+            {4, 3},
 
-          {5, 0}, // second four lines from top face
-          {5, 1},
-          {5, 2},
-          {5, 3},
+            {5, 0}, // second four lines from top face
+            {5, 1},
+            {5, 2},
+            {5, 3},
 
-          {0, 0}, // the rest randomly
-          {1, 0},
-          {0, 1},
-          {1, 1}};
+            {0, 0}, // the rest randomly
+            {1, 0},
+            {0, 1},
+            {1, 1}};
 
         // respect non-standard faces by calling the
         // reordering function from GeometryInfo
@@ -858,21 +859,22 @@ namespace internal
         // quad to take it, b) which line
         // therein it is if the face is
         // oriented correctly
-        static const unsigned int lookup_table[12][2] = {
-          {4, 0}, // take first four lines from bottom face
-          {4, 1},
-          {4, 2},
-          {4, 3},
+        static const unsigned int
+          lookup_table[GeometryInfo<3>::lines_per_cell][2] = {
+            {4, 0}, // take first four lines from bottom face
+            {4, 1},
+            {4, 2},
+            {4, 3},
 
-          {5, 0}, // second four lines from top face
-          {5, 1},
-          {5, 2},
-          {5, 3},
+            {5, 0}, // second four lines from top face
+            {5, 1},
+            {5, 2},
+            {5, 3},
 
-          {0, 0}, // the rest randomly
-          {1, 0},
-          {0, 1},
-          {1, 1}};
+            {0, 0}, // the rest randomly
+            {1, 0},
+            {0, 1},
+            {1, 1}};
 
         const unsigned int quad_index     = lookup_table[line][0];
         const unsigned int std_line_index = lookup_table[line][1];

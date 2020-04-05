@@ -147,22 +147,6 @@ public:
                             const Point<dim> & p,
                             const unsigned int component) const override;
 
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed only
-   * for the reference cell. Make sure, that #mapping_kind is set by the
-   * derived class, such that this function can operate correctly.
-   */
-  UpdateFlags
-  update_once(const UpdateFlags flags) const;
-
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed in
-   * each cell cell. Make sure, that #mapping_kind is set by the derived
-   * class, such that this function can operate correctly.
-   */
-  UpdateFlags
-  update_each(const UpdateFlags flags) const;
-
 protected:
   /**
    * The mapping kind to be used to map shape functions from the reference

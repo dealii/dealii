@@ -120,7 +120,10 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
   const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
-  // depending on the requested output of curved cells, if necessary
+  // First fill the geometric information for the patch: Where are the
+  // nodes in question located.
+  //
+  // Depending on the requested output of curved cells, if necessary
   // append the quadrature points to the last rows of the patch.data
   // member. This is the case if we want to produce curved cells at the
   // boundary and this cell actually is at the boundary, or else if we
@@ -159,22 +162,25 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     }
 
 
+  // Next fill the information we get from DoF data
   if (scratch_data.n_datasets > 0)
     {
       // counter for data records
       unsigned int offset = 0;
 
       // first fill dof_data
-      for (unsigned int dataset = 0; dataset < this->dof_data.size(); ++dataset)
+      unsigned int dataset_number = 0;
+      for (const auto &dataset : this->dof_data)
         {
           const FEValuesBase<DoFHandlerType::dimension,
                              DoFHandlerType::space_dimension>
-            &this_fe_patch_values = scratch_data.get_present_fe_values(dataset);
+            &this_fe_patch_values =
+              scratch_data.get_present_fe_values(dataset_number);
           const unsigned int n_components =
             this_fe_patch_values.get_fe().n_components();
 
           const DataPostprocessor<DoFHandlerType::space_dimension>
-            *postprocessor = this->dof_data[dataset]->postprocessor;
+            *postprocessor = dataset->postprocessor;
 
           if (postprocessor != nullptr)
             {
@@ -184,7 +190,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 postprocessor->get_needed_update_flags();
 
               if ((n_components == 1) &&
-                  (this->dof_data[dataset]->is_complex_valued() == false))
+                  (dataset->is_complex_valued() == false))
                 {
                   // At each point there is only one component of value,
                   // gradient etc. Based on the 'if' statement above, we
@@ -193,21 +199,21 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   // components to the postprocessor, and we can safely
                   // call the function that evaluates a scalar field
                   if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values(
+                    dataset->get_function_values(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_values);
 
                   if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients(
+                    dataset->get_function_gradients(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
                       scratch_data.patch_values_scalar.solution_gradients);
 
                   if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians(
+                    dataset->get_function_hessians(
                       this_fe_patch_values,
                       internal::DataOutImplementation::ComponentExtractor::
                         real_part,
@@ -223,7 +229,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     &cell_and_index->first->get_triangulation(),
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
-                    this->dof_data[dataset]->dof_handler);
+                    dataset->dof_handler);
                   scratch_data.patch_values_scalar
                     .template set_cell<DoFHandlerType>(dh_cell);
 
@@ -231,7 +237,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   // deals with scalar inputs.
                   postprocessor->evaluate_scalar_field(
                     scratch_data.patch_values_scalar,
-                    scratch_data.postprocessed_values[dataset]);
+                    scratch_data.postprocessed_values[dataset_number]);
                 }
               else
                 {
@@ -244,26 +250,26 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   // we want to pass on to the postprocessor. If the field in
                   // question is real-valued, we'll just extract the (only)
                   // real component from the solution fields
-                  if (this->dof_data[dataset]->is_complex_valued() == false)
+                  if (dataset->is_complex_valued() == false)
                     {
                       scratch_data.resize_system_vectors(n_components);
 
                       if (update_flags & update_values)
-                        this->dof_data[dataset]->get_function_values(
+                        dataset->get_function_values(
                           this_fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           scratch_data.patch_values_system.solution_values);
 
                       if (update_flags & update_gradients)
-                        this->dof_data[dataset]->get_function_gradients(
+                        dataset->get_function_gradients(
                           this_fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           scratch_data.patch_values_system.solution_gradients);
 
                       if (update_flags & update_hessians)
-                        this->dof_data[dataset]->get_function_hessians(
+                        dataset->get_function_hessians(
                           this_fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
@@ -285,7 +291,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                           // scratch_data.patch_values_system output fields
                           if (update_flags & update_values)
                             {
-                              this->dof_data[dataset]->get_function_values(
+                              dataset->get_function_values(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -311,7 +317,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                           if (update_flags & update_gradients)
                             {
-                              this->dof_data[dataset]->get_function_gradients(
+                              dataset->get_function_gradients(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -337,7 +343,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                           if (update_flags & update_hessians)
                             {
-                              this->dof_data[dataset]->get_function_hessians(
+                              dataset->get_function_hessians(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -368,7 +374,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                           // that follow the real one
                           if (update_flags & update_values)
                             {
-                              this->dof_data[dataset]->get_function_values(
+                              dataset->get_function_values(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -394,7 +400,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                           if (update_flags & update_gradients)
                             {
-                              this->dof_data[dataset]->get_function_gradients(
+                              dataset->get_function_gradients(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -420,7 +426,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                           if (update_flags & update_hessians)
                             {
-                              this->dof_data[dataset]->get_function_hessians(
+                              dataset->get_function_hessians(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -450,7 +456,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                           // This is the vector-valued, complex-valued case. In
                           // essence, we just need to do the same as above,
-                          // i.e., call the functions in this->dof_data[dataset]
+                          // i.e., call the functions in dataset
                           // to retrieve first the real and then the imaginary
                           // part of the solution, then copy them to the
                           // scratch_data.patch_values_system. The difference to
@@ -481,7 +487,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                 Vector<double>(n_components));
 
                               // First get the real part into the tmp object
-                              this->dof_data[dataset]->get_function_values(
+                              dataset->get_function_values(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -508,7 +514,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                               // Then do the same with the imaginary part,
                               // copying past the end of the previous set of
                               // values.
-                              this->dof_data[dataset]->get_function_values(
+                              dataset->get_function_values(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -540,7 +546,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                     n_components));
 
                               // First the real part
-                              this->dof_data[dataset]->get_function_gradients(
+                              dataset->get_function_gradients(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -563,7 +569,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                 }
 
                               // Then the imaginary part
-                              this->dof_data[dataset]->get_function_gradients(
+                              dataset->get_function_gradients(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -595,7 +601,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                     n_components));
 
                               // First the real part
-                              this->dof_data[dataset]->get_function_hessians(
+                              dataset->get_function_hessians(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::real_part,
@@ -618,7 +624,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                                 }
 
                               // Then the imaginary part
-                              this->dof_data[dataset]->get_function_hessians(
+                              dataset->get_function_hessians(
                                 this_fe_patch_values,
                                 internal::DataOutImplementation::
                                   ComponentExtractor::imaginary_part,
@@ -648,7 +654,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     &cell_and_index->first->get_triangulation(),
                     cell_and_index->first->level(),
                     cell_and_index->first->index(),
-                    this->dof_data[dataset]->dof_handler);
+                    dataset->dof_handler);
                   scratch_data.patch_values_system
                     .template set_cell<DoFHandlerType>(dh_cell);
 
@@ -658,7 +664,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   // evaluate_vector_field() function.
                   postprocessor->evaluate_vector_field(
                     scratch_data.patch_values_system,
-                    scratch_data.postprocessed_values[dataset]);
+                    scratch_data.postprocessed_values[dataset_number]);
                 }
 
               // Now we need to copy the result of the postprocessor to
@@ -666,10 +672,11 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
               // by the functions in DataOutBase
               for (unsigned int q = 0; q < n_q_points; ++q)
                 for (unsigned int component = 0;
-                     component < this->dof_data[dataset]->n_output_variables;
+                     component < dataset->n_output_variables;
                      ++component)
                   patch.data(offset + component, q) =
-                    scratch_data.postprocessed_values[dataset][q](component);
+                    scratch_data.postprocessed_values[dataset_number][q](
+                      component);
             }
           else
             {
@@ -679,7 +686,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
               if (n_components == 1)
                 {
                   // first output the real part of the solution vector
-                  this->dof_data[dataset]->get_function_values(
+                  dataset->get_function_values(
                     this_fe_patch_values,
                     internal::DataOutImplementation::ComponentExtractor::
                       real_part,
@@ -689,9 +696,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                       scratch_data.patch_values_scalar.solution_values[q];
 
                   // and if there is one, also output the imaginary part
-                  if (this->dof_data[dataset]->is_complex_valued() == true)
+                  if (dataset->is_complex_valued() == true)
                     {
-                      this->dof_data[dataset]->get_function_values(
+                      dataset->get_function_values(
                         this_fe_patch_values,
                         internal::DataOutImplementation::ComponentExtractor::
                           imaginary_part,
@@ -707,8 +714,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
 
                   // same as above: first the real part
                   const unsigned int stride =
-                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
-                  this->dof_data[dataset]->get_function_values(
+                    (dataset->is_complex_valued() ? 2 : 1);
+                  dataset->get_function_values(
                     this_fe_patch_values,
                     internal::DataOutImplementation::ComponentExtractor::
                       real_part,
@@ -721,9 +728,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                           component);
 
                   // and if there is one, also output the imaginary part
-                  if (this->dof_data[dataset]->is_complex_valued() == true)
+                  if (dataset->is_complex_valued() == true)
                     {
-                      this->dof_data[dataset]->get_function_values(
+                      dataset->get_function_values(
                         this_fe_patch_values,
                         internal::DataOutImplementation::ComponentExtractor::
                           imaginary_part,
@@ -744,47 +751,51 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
           // of a complex-valued quantity and if it is not further
           // processed by a postprocessor, then we need two output
           // slots for each input variable.
-          offset += this->dof_data[dataset]->n_output_variables *
-                    (this->dof_data[dataset]->is_complex_valued() &&
-                         (this->dof_data[dataset]->postprocessor == nullptr) ?
+          offset += dataset->n_output_variables *
+                    (dataset->is_complex_valued() &&
+                         (dataset->postprocessor == nullptr) ?
                        2 :
                        1);
+
+          // Also update the dataset_number index that we carry along with the
+          // for-loop over all data sets.
+          ++dataset_number;
         }
 
-      // then do the cell data. only compute the number of a cell if needed;
+      // Then do the cell data. only compute the number of a cell if needed;
       // also make sure that we only access cell data if the
       // first_cell/next_cell functions only return active cells
+      //
+      // At least, we don't have to worry about complex-valued vectors/tensors
+      // since cell data is always scalar.
       if (this->cell_data.size() != 0)
         {
           Assert(!cell_and_index->first->has_children(), ExcNotImplemented());
 
-          for (unsigned int dataset = 0; dataset < this->cell_data.size();
-               ++dataset)
+          for (const auto &dataset : this->cell_data)
             {
               // as above, first output the real part
               {
                 const double value =
-                  this->cell_data[dataset]->get_cell_data_value(
-                    cell_and_index->second,
-                    internal::DataOutImplementation::ComponentExtractor::
-                      real_part);
+                  dataset->get_cell_data_value(cell_and_index->second,
+                                               internal::DataOutImplementation::
+                                                 ComponentExtractor::real_part);
                 for (unsigned int q = 0; q < n_q_points; ++q)
                   patch.data(offset, q) = value;
               }
 
               // and if there is one, also output the imaginary part
-              if (this->cell_data[dataset]->is_complex_valued() == true)
+              if (dataset->is_complex_valued() == true)
                 {
-                  const double value =
-                    this->cell_data[dataset]->get_cell_data_value(
-                      cell_and_index->second,
-                      internal::DataOutImplementation::ComponentExtractor::
-                        imaginary_part);
+                  const double value = dataset->get_cell_data_value(
+                    cell_and_index->second,
+                    internal::DataOutImplementation::ComponentExtractor::
+                      imaginary_part);
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     patch.data(offset + 1, q) = value;
                 }
 
-              offset += (this->cell_data[dataset]->is_complex_valued() ? 2 : 1);
+              offset += (dataset->is_complex_valued() ? 2 : 1);
             }
         }
     }

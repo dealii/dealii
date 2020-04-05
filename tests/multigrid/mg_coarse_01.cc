@@ -73,8 +73,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -471,12 +469,8 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
 
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
@@ -656,7 +650,6 @@ main(int argc, char *argv[])
     {
       deallog.depth_console(5);
 
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(3 /*degree*/);

@@ -31,7 +31,6 @@
 #define PRINTME(name, var) \
   deallog << "Solution vector: " << name << ": " << var;
 
-using namespace dealii;
 
 
 int

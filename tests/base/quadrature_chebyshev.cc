@@ -24,7 +24,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <typename quadrature_type, unsigned short startn>

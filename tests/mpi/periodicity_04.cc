@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -317,8 +316,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
-
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       MPILogInitAll log;

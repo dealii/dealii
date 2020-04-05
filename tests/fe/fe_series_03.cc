@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 std::pair<bool, unsigned int>
 pred_ind(const TableIndices<2> &ind)

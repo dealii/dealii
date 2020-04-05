@@ -771,11 +771,24 @@ namespace GridGenerator
 
   /**
    * This class produces a hyper-ball intersected with the positive orthant
-   * relative to @p center, which contains three elements in 2d and four in 3d.
+   * relative to @p center, which contains three elements in 2d and four in
+   * 3d. The interior points of the mesh are chosen to balance the minimal
+   * singular value of the Jacobian of the mapping from reference to real
+   * coordinates among the cells around the interior point, which corresponds
+   * to a high mesh quality.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
    * boundary and 1 for the cut plane. The manifold id for the curved boundary
    * is set to zero, and a SphericalManifold is attached to it.
+   *
+   * The resulting grid in 2D and 3D looks as follows:
+   * \htmlonly <style>div.image
+   * img[src="quarter_hyper_ball_2d.png"]{width:40%;}</style> \endhtmlonly
+   * @image html quarter_hyper_ball_2d.png
+   * \htmlonly <style>div.image
+   * img[src="quarter_hyper_ball_3d.png"]{width:40%;}</style> \endhtmlonly
+   * @image html quarter_hyper_ball_3d.png
+   *
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
@@ -1547,11 +1560,10 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   merge_triangulations(
-    const std::initializer_list<const Triangulation<dim, spacedim> *const>
-      &                           triangulations,
-    Triangulation<dim, spacedim> &result,
-    const double                  duplicated_vertex_tolerance = 1.0e-12,
-    const bool                    copy_manifold_ids           = false);
+    const std::vector<const Triangulation<dim, spacedim> *> &triangulations,
+    Triangulation<dim, spacedim> &                           result,
+    const double duplicated_vertex_tolerance = 1.0e-12,
+    const bool   copy_manifold_ids           = false);
 
   /**
    * \brief Replicate a given triangulation in multiple coordinate axes
@@ -1756,6 +1768,22 @@ namespace GridGenerator
     const std::vector<types::manifold_id> &manifold_priorities = {});
 
   /**
+   * Overload of extrude_triangulation() to allow dimension independent
+   * code to compile. This function throws an error when called, as
+   * extrude_triangulation() is only implemented to extrude a dim=2 to a dim=3
+   * Triangulation.
+   */
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const unsigned int                     n_slices,
+    const double                           height,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
+
+
+  /**
    * Overload of the previous function. Take a 2d Triangulation that is being
    * extruded. Differing from the previous function taking height and number of
    * slices for uniform extrusion, this function takes z-axis values
@@ -1782,6 +1810,21 @@ namespace GridGenerator
     Triangulation<3, 3> &                  result,
     const bool                             copy_manifold_ids   = false,
     const std::vector<types::manifold_id> &manifold_priorities = {});
+
+  /**
+   * Overload of extrude_triangulation() to allow dimension independent
+   * code to compile. This function throws an error when called, as
+   * extrude_triangulation() is only implemented to extrude a dim=2 to a dim=3
+   * Triangulation.
+   */
+  void
+  extrude_triangulation(
+    const Triangulation<2, 2> &            input,
+    const std::vector<double> &            slice_coordinates,
+    Triangulation<2, 2> &                  result,
+    const bool                             copy_manifold_ids   = false,
+    const std::vector<types::manifold_id> &manifold_priorities = {});
+
 
 
   /**

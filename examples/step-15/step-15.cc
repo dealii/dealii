@@ -696,7 +696,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step15;
 
       MinimalSurfaceProblem<2> laplace_problem_2d;

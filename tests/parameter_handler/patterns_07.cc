@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace Patterns::Tools;
 
 int

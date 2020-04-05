@@ -23,7 +23,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace dealii::GeometricUtilities::Coordinates;
 
 template <unsigned int dim, typename T>

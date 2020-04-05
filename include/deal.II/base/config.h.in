@@ -116,7 +116,27 @@
  */
 
 #cmakedefine DEAL_II_WORDS_BIGENDIAN
-#define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+/*
+ * This sets the largest number of vectorization bits detected for the given
+ * compiler flags and hardware (e.g. 256 for AVX on x86-64 architectures) for
+ * use in deal.II's instrinsics-based VectorizedArray class.
+ */
+#define DEAL_II_VECTORIZATION_WIDTH_IN_BITS @DEAL_II_VECTORIZATION_WIDTH_IN_BITS@
+
+/*
+ * Backward compatibility setting
+ */
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 512
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 256
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL 2
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS == 128
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL 1
+#else
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
+#endif
+
 #define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 
@@ -127,7 +147,7 @@
  */
 
 #cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
@@ -375,6 +395,7 @@ _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")              \
 _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                        \
 _Pragma("GCC diagnostic ignored \"-Wsuggest-override\"")                \
 _Pragma("GCC diagnostic ignored \"-Wtautological-constant-out-of-range-compare\"") \
+_Pragma("GCC diagnostic ignored \"-Wtautological-overlap-compare\"")    \
 _Pragma("GCC diagnostic ignored \"-Wtype-limits\"")                     \
 _Pragma("GCC diagnostic ignored \"-Wundef\"")                           \
 _Pragma("GCC diagnostic ignored \"-Wunused-but-set-parameter\"")        \

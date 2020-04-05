@@ -50,7 +50,6 @@ const double eps = 1e-10;
 // argument for build_patches()
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 // uncomment when debugging
 // #define DATA_OUT_FE_ENRICHED
@@ -186,10 +185,8 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
 

@@ -39,7 +39,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 double
 zvalue(const double x, const double y)

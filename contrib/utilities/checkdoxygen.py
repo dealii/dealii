@@ -59,6 +59,15 @@ def check_multiple_defined_headers(lines):
             thisheader = l                             # take this line
             thisheader = thisheader.replace(' ', '')   # remove all whitespace
             thisheader = thisheader.split('<h')[1]     # remove header tag '<h'
+
+            if thisheader[0] == '2':
+                # We do not use <h2> headers in tutorials because our script
+                # does not put them in the table of contents (for historical
+                # reasons). Instead, please use <h3>, <h4>, etc..
+                sys.exit("Error: Header <h2> detected in file '%s'. This is"
+                         " not allowed in tutorial programs. Please use <h3>"
+                         " instead." % (filename))
+
             if thisheader[0] in ['1', '2', '3', '4', '5']:  # make sure the next character is 1-5
                 thisheader = thisheader[2:]            # remove '*>'
                 if len(thisheader.split('</h'))==2:    # check for close header on the same line

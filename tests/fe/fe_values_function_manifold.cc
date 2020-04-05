@@ -60,7 +60,6 @@
 // error causes the Laplace solver to converge at order 2 instead of order 5,
 // resulting in much higher L2 errors when the grid is refined.
 
-using namespace dealii;
 
 static const unsigned int               fe_order          = 4;
 static const dealii::types::boundary_id boundary_id       = 0;
@@ -411,9 +410,8 @@ main(int argc, char **argv)
 
   static const int dim = 2;
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(10);
-  deallog.attach(logfile);
   for (unsigned int n_global_refines = 3; n_global_refines < 6;
        ++n_global_refines)
     {

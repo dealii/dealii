@@ -45,7 +45,6 @@
 // c++
 #include <iostream>
 
-using namespace dealii;
 
 template <int dim>
 class MyFunction : public dealii::Function<dim, std::complex<double>>

@@ -183,26 +183,49 @@ namespace Utilities
       const std::vector<types::global_dof_index> &indices_want,
       const MPI_Comm &                            communicator)
     {
+      // step 0) clean vectors from numbers::invalid_dof_index (indicating
+      //         padding)
+      std::vector<types::global_dof_index> indices_has_clean;
+      indices_has_clean.reserve(indices_has.size());
+
+      for (const auto &i : indices_has)
+        if (i != numbers::invalid_dof_index)
+          indices_has_clean.push_back(i);
+
+      std::vector<types::global_dof_index> indices_want_clean;
+      indices_want_clean.reserve(indices_want.size());
+
+      for (const auto &i : indices_want)
+        if (i != numbers::invalid_dof_index)
+          indices_want_clean.push_back(i);
+
       // step 0) determine "number of degrees of freedom" needed for IndexSet
-      const types::global_dof_index n_dofs = Utilities::MPI::max(
-        std::max(
-          [&indices_has]() {
-            const auto it = max_element(indices_has.begin(), indices_has.end());
-            return it == indices_has.end() ? 0 : (*it + 1);
-          }(),
-          [&indices_want]() {
-            const auto it =
-              max_element(indices_want.begin(), indices_want.end());
-            return it == indices_want.end() ? 0 : (*it + 1);
-          }()),
-        communicator);
+      const types::global_dof_index local_n_dofs_has =
+        indices_has_clean.empty() ?
+          0 :
+          (*std::max_element(indices_has_clean.begin(),
+                             indices_has_clean.end()) +
+           1);
+
+      const types::global_dof_index local_n_dofs_want =
+        indices_want_clean.empty() ?
+          0 :
+          (*std::max_element(indices_want_clean.begin(),
+                             indices_want_clean.end()) +
+           1);
+
+      const types::global_dof_index n_dofs =
+        Utilities::MPI::max(std::max(local_n_dofs_has, local_n_dofs_want),
+                            communicator);
 
       // step 1) convert vectors to indexsets (sorted!)
       IndexSet index_set_has(n_dofs);
-      index_set_has.add_indices(indices_has.begin(), indices_has.end());
+      index_set_has.add_indices(indices_has_clean.begin(),
+                                indices_has_clean.end());
 
       IndexSet index_set_want(n_dofs);
-      index_set_want.add_indices(indices_want.begin(), indices_want.end());
+      index_set_want.add_indices(indices_want_clean.begin(),
+                                 indices_want_clean.end());
 
       // step 2) setup internal data structures with indexset
       this->reinit(index_set_has, index_set_want, communicator);
@@ -214,7 +237,8 @@ namespace Utilities
           index_set_has.n_elements());
 
         for (types::global_dof_index i = 0; i < indices_has.size(); i++)
-          temp_map_send[index_set_has.index_within_set(indices_has[i])] = i;
+          if (indices_has[i] != numbers::invalid_dof_index)
+            temp_map_send[index_set_has.index_within_set(indices_has[i])] = i;
 
         for (auto &i : send_indices)
           i = temp_map_send[i];
@@ -225,7 +249,8 @@ namespace Utilities
           index_set_want.n_elements());
 
         for (types::global_dof_index i = 0; i < indices_want.size(); i++)
-          temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
+          if (indices_want[i] != numbers::invalid_dof_index)
+            temp_map_recv[index_set_want.index_within_set(indices_want[i])] = i;
 
         for (auto &i : recv_indices)
           i = temp_map_recv[i];

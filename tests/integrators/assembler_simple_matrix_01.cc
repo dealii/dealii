@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <class DOFINFO, typename MatrixType>
 void

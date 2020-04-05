@@ -455,6 +455,30 @@ protected:
   };
 
   /**
+   * Correct the shape Hessians by subtracting the terms corresponding to the
+   * Jacobian pushed forward gradient.
+   *
+   * Before the correction, the Hessians would be given by
+   * @f[
+   * D_{ijk} = \frac{d^2\phi_i}{d \hat x_J d \hat x_K} (J_{jJ})^{-1}
+   * (J_{kK})^{-1},
+   * @f]
+   * where $J_{iI}=\frac{d x_i}{d \hat x_I}$. After the correction, the
+   * correct Hessians would be given by
+   * @f[
+   * \frac{d^2 \phi_i}{d x_j d x_k} = D_{ijk} - H_{mjk} \frac{d \phi_i}{d x_m},
+   * @f]
+   * where $H_{ijk}$ is the Jacobian pushed-forward derivative.
+   */
+  void
+  correct_hessians(
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &                mapping_data,
+    const unsigned int n_q_points) const;
+
+  /**
    * Correct the shape third derivatives by subtracting the terms
    * corresponding to the Jacobian pushed forward gradient and second
    * derivative.
@@ -482,8 +506,8 @@ protected:
       &output_data,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                mapping_data,
-    const unsigned int n_q_points,
-    const unsigned int dof) const;
+    const unsigned int n_q_points) const;
+
 
   /**
    * The polynomial space. Its type is given by the template parameter

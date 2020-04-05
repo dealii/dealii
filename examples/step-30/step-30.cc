@@ -1000,7 +1000,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step30;
 
       // If you want to run the program in 3D, simply change the following

@@ -41,6 +41,7 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/bandwidth.hpp>
@@ -50,6 +51,7 @@
 #include <boost/graph/properties.hpp>
 #include <boost/random.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cmath>

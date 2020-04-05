@@ -120,8 +120,8 @@ namespace internal
                   MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
     {
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &dof_handler.get_triangulation()));
+        (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                        *>(&dof_handler.get_triangulation()));
       AssertThrow(
         tria != nullptr,
         ExcMessage(
@@ -148,8 +148,8 @@ namespace internal
                   MGLevelObject<PETScWrappers::MPI::Vector> &v)
     {
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-          &dof_handler.get_triangulation()));
+        (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                        *>(&dof_handler.get_triangulation()));
       AssertThrow(
         tria != nullptr,
         ExcMessage(
@@ -455,8 +455,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
           dst[level].reinit(ghosted_level_vector[level], false);
         else
           {
-            const parallel::TriangulationBase<dim, spacedim> *tria =
-              (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
+              (dynamic_cast<
+                const dealii::parallel::TriangulationBase<dim, spacedim> *>(
                 &dof_handler.get_triangulation()));
             dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                               tria != nullptr ? tria->get_communicator() :

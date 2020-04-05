@@ -67,3 +67,22 @@
     }
 }
 
+{
+    "int1": "1",
+    "int2": "2",
+    "Testing_25testing":
+    {
+        "double_2bdouble": "6.1415926",
+        "int_2aint": "2",
+        "string_26list": "< & > ; \/"
+    },
+    "ss1":
+    {
+        "double_201": "1.234",
+        "ss2":
+        {
+            "double_202": "4.321"
+        }
+    }
+}
+

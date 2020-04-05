@@ -146,6 +146,12 @@ namespace internal
         unsigned int n_q_points;
 
         /**
+         * Original one-dimensional quadrature formula applied on the given
+         * cell or face.
+         */
+        Quadrature<1> quadrature_1d;
+
+        /**
          * Quadrature formula applied on the given cell or face.
          */
         Quadrature<structdim> quadrature;
@@ -266,6 +272,12 @@ namespace internal
       AlignedVector<Point<spacedim, VectorizedArrayType>> quadrature_points;
 
       /**
+       * Clears all data fields except the descriptor vector.
+       */
+      void
+      clear_data_fields();
+
+      /**
        * Returns the quadrature index for a given number of quadrature
        * points. If not in hp mode or if the index is not found, this
        * function always returns index 0. Hence, this function does not
@@ -281,7 +293,7 @@ namespace internal
       template <typename StreamType>
       void
       print_memory_consumption(StreamType &    out,
-                               const SizeInfo &task_info) const;
+                               const TaskInfo &task_info) const;
 
       /**
        * Returns the memory consumption in bytes.
@@ -315,7 +327,7 @@ namespace internal
       initialize(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::n_array_elements> &   faces,
+        const FaceInfo<VectorizedArrayType::size()> &             faces,
         const std::vector<unsigned int> &              active_fe_index,
         const Mapping<dim> &                           mapping,
         const std::vector<dealii::hp::QCollection<1>> &quad,
@@ -323,6 +335,20 @@ namespace internal
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces,
         const UpdateFlags update_flags_faces_by_cells);
+
+      /**
+       * Update the information in the given cells and faces that is the
+       * result of a change in the given `mapping` class, keeping the cells,
+       * quadrature formulas and other unknowns unchanged. This call is only
+       * valid if MappingInfo::initialize() has been called before.
+       */
+      void
+      update_mapping(
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+        const FaceInfo<VectorizedArrayType::size()> &             faces,
+        const std::vector<unsigned int> &active_fe_index,
+        const Mapping<dim> &             mapping);
 
       /**
        * Return the type of a given cell as detected during initialization.
@@ -350,6 +376,29 @@ namespace internal
       void
       print_memory_consumption(StreamType &    out,
                                const TaskInfo &task_info) const;
+
+      /**
+       * The given update flags for computing the geometry on the cells.
+       */
+      UpdateFlags update_flags_cells;
+
+      /**
+       * The given update flags for computing the geometry on the boundary
+       * faces.
+       */
+      UpdateFlags update_flags_boundary_faces;
+
+      /**
+       * The given update flags for computing the geometry on the interior
+       * faces.
+       */
+      UpdateFlags update_flags_inner_faces;
+
+      /**
+       * The given update flags for computing the geometry on the faces for
+       * cell-centric loops.
+       */
+      UpdateFlags update_flags_faces_by_cells;
 
       /**
        * Stores whether a cell is Cartesian (cell type 0), has constant
@@ -393,6 +442,34 @@ namespace internal
       SmartPointer<const Mapping<dim>> mapping;
 
       /**
+       * Internal function to compute the geometry for the case the mapping is
+       * a MappingQ and a single quadrature formula per slot (non-hp case) is
+       * used. This method computes all data from the underlying cell
+       * quadrature points using the fast operator evaluation techniques from
+       * the matrix-free framework itself, i.e., it uses a polynomial
+       * description of the cell geometry (that is computed in a first step)
+       * and then computes all Jacobians and normal vectors based on this
+       * information. This optimized approach is much faster than going
+       * through FEValues and FEFaceValues, especially when several different
+       * quadrature formulas are involved, and consumes less memory.
+       *
+       * @param tria The triangulation to be used for setup
+       *
+       * @param cells The actual cells of the triangulation to be worked on,
+       * given as a tuple of the level and index within the level as used in
+       * the main initialization of the class
+       *
+       * @param faces The description of the connectivity from faces to cells
+       * as filled in the MatrixFree class
+       */
+      void
+      compute_mapping_q(
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &faces);
+
+      /**
        * Computes the information in the given cells, called within
        * initialize.
        */
@@ -400,10 +477,8 @@ namespace internal
       initialize_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags_cells);
+        const std::vector<unsigned int> &active_fe_index,
+        const Mapping<dim> &             mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -413,12 +488,9 @@ namespace internal
       initialize_faces(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<
-          FaceToCellTopology<VectorizedArrayType::n_array_elements>> &faces,
-        const Mapping<dim> &                                          mapping,
-        const std::vector<dealii::hp::QCollection<1>> &               quad,
-        const UpdateFlags update_flags_boundary_faces,
-        const UpdateFlags update_flags_inner_faces);
+        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
+          &                 faces,
+        const Mapping<dim> &mapping);
 
       /**
        * Computes the information in the given faces, called within
@@ -428,9 +500,7 @@ namespace internal
       initialize_faces_by_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const Mapping<dim> &                                      mapping,
-        const std::vector<dealii::hp::QCollection<1>> &           quad,
-        const UpdateFlags update_flags_faces_by_cells);
+        const Mapping<dim> &                                      mapping);
 
       /**
        * Helper function to determine which update flags must be set in the
@@ -487,7 +557,7 @@ namespace internal
      * comparator class within a std::map<> of the given arrays. Note that this
      * comparison operator does not satisfy all the mathematical properties one
      * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
-     * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is
+     * tolerance 0.15; the operator gives a<c, but neither a<b? nor b<c? is
      * satisfied). This is not a problem in the use cases for this class, but be
      * careful when using it in other contexts.
      */
@@ -497,39 +567,53 @@ namespace internal
     {
       FPArrayComparator(const Number scaling);
 
+      /**
+       * Compare two vectors of numbers (not necessarily of the same length)
+       */
       bool
       operator()(const std::vector<Number> &v1,
                  const std::vector<Number> &v2) const;
 
+      /**
+       * Compare two vectorized arrays (stored as tensors to avoid alignment
+       * issues).
+       */
       bool
       operator()(
-        const Tensor<1, VectorizedArrayType::n_array_elements, Number> &t1,
-        const Tensor<1, VectorizedArrayType::n_array_elements, Number> &t2)
-        const;
+        const Tensor<1, VectorizedArrayType::size(), Number> &t1,
+        const Tensor<1, VectorizedArrayType::size(), Number> &t2) const;
 
+      /**
+       * Compare two rank-1 tensors of vectorized arrays (stored as tensors to
+       * avoid alignment issues).
+       */
       template <int dim>
       bool
       operator()(
-        const Tensor<1,
-                     dim,
-                     Tensor<1, VectorizedArrayType::n_array_elements, Number>>
+        const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t1,
-        const Tensor<1,
-                     dim,
-                     Tensor<1, VectorizedArrayType::n_array_elements, Number>>
+        const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t2) const;
 
+      /**
+       * Compare two rank-2 tensors of vectorized arrays (stored as tensors to
+       * avoid alignment issues).
+       */
       template <int dim>
       bool
       operator()(
-        const Tensor<2,
-                     dim,
-                     Tensor<1, VectorizedArrayType::n_array_elements, Number>>
+        const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t1,
-        const Tensor<2,
-                     dim,
-                     Tensor<1, VectorizedArrayType::n_array_elements, Number>>
+        const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>
           &t2) const;
+
+      /**
+       * Compare two arrays of tensors.
+       */
+      template <int dim>
+      bool
+      operator()(const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
+                 const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const;
 
       Number tolerance;
     };

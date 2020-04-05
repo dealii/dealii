@@ -1,0 +1,5 @@
+Removed: The deprecated function Utilities::MPI_Partitioner::get_communicator()
+has been removed. Use Utilities::MPI::Partitioner::get_mpi_communicator()
+instead.
+<br>
+(Daniel Arndt, 2020/03/26)

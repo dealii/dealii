@@ -72,7 +72,7 @@ namespace Utilities
 
       /**
        * Fill the vector @p dst according to the precomputed communication
-       * pattern with values from @src.
+       * pattern with values from @p src.
        *
        * @pre The vectors only have to provide a method begin(), which allows
        *   to access their raw data.

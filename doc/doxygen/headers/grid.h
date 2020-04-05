@@ -18,7 +18,7 @@
  * @defgroup grid Grid classes
  *
  * This module groups classes that have to do with the topology and
- * geometry of meshes. A mesh can be thought of a collection of cells;
+ * geometry of meshes. A mesh can be thought of as a collection of cells;
  * if the mesh has been refined (possibly in an adaptive way), then
  * this collection is grouped into a hierarchy of refinement
  * levels. In addition to cells, the geometric objects that make up a
@@ -28,24 +28,87 @@
  * triangulations made up of linear, quadrilateral, and hexahedral
  * cells; triangles and tetrahedra are not supported.
  *
- * This collection of cells is managed by the Triangulation class. It holds
- * the relevant data in memory and offers interfaces to query it. Most things
- * you want to do on cells are performed in loops over all cells. For this
- * purpose, the Triangulation class offers the concept of iterators (see @ref
- * Iterators): although implemented differently, they behave like pointers to
- * cells or faces and can be queried for the geometric properties of cells as
- * well as information like neighboring cells or faces of a cell.
+ * This collection of cells is managed by the Triangulation class and
+ * derived classes such as parallel::distributed::Triangulation and
+ * parallel::shared::Triangulation. It holds the relevant data in
+ * memory and offers interfaces to query it. Most things you want to
+ * do on cells are performed in loops over all cells. For this
+ * purpose, the Triangulation class offers the concept of iterators
+ * (see @ref Iterators): although implemented differently, they behave
+ * like pointers to cells or faces and can be queried for the
+ * geometric properties of cells as well as information like
+ * neighboring cells or faces of a cell.
  *
  * It is worth noting that the Triangulation class only stores geometry
  * (i.e. the location of vertices and cells) and topology of a mesh
  * (i.e. which cells are neighbors of which other cells, etc). It has nothing
  * to do with finite elements or degrees of freedom that might be defined on a
- * mesh. These functions are performed by the DoFHandler class (see the @ref
- * dofs module) that gets a description of the finite element space and the
+ * mesh. These functions are performed by the DoFHandler class (see the
+ * @ref dofs module) that gets a description of the finite element space and the
  * allocates and manages degrees of freedom on vertices, faces, or cells, as
  * described by the finite element class. This separation makes it possible to
  * have multiple DoFHandler classes work on the same mesh at the same time.
  *
+ * In the grand scheme of things, triangulations in deal.II interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid", fillcolor="deepskyblue"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=record,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  opencascade [label="OpenCASCADE"];
+  opencascade -> manifold [dir="none"];
+
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=ellipse,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  gmsh        [label="gmsh", URL="\ref Gmsh"];
+  gmsh -> tria       [dir="none"];
+}
+ * @enddot
  *
  * <h3>Grid generation</h3>
  *

@@ -2812,7 +2812,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step14;
 
       // Describe the problem we want to solve here by passing a descriptor

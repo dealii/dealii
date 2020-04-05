@@ -28,7 +28,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <typename VECTOR>
 void

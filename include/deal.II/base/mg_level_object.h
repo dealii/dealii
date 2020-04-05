@@ -115,20 +115,6 @@ public:
    * function will fail with a compiler error if the @p Object
    * template type to this class does not provide a
    * <code>clear()</code> member function.
-   *
-   * @deprecated Use clear_elements () instead
-   */
-  DEAL_II_DEPRECATED
-  void
-  clear();
-
-  /**
-   * Call @p clear on all objects stored by this object. This function
-   * is only implemented for some @p Object classes, e.g., matrix
-   * types or the PreconditionBlockSOR and similar classes. Using this
-   * function will fail with a compiler error if the @p Object
-   * template type to this class does not provide a
-   * <code>clear()</code> member function.
    */
   void
   clear_elements();
@@ -234,15 +220,6 @@ MGLevelObject<Object>::operator=(const double d)
   for (v = objects.begin(); v != objects.end(); ++v)
     **v = d;
   return *this;
-}
-
-
-template <class Object>
-void
-MGLevelObject<Object>::clear() // DEPRECATED
-{
-  // Avoid code duplication in deprecated call by calling replacing function
-  clear_elements();
 }
 
 

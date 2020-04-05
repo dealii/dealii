@@ -875,7 +875,7 @@ namespace CUDAWrappers
 
     cudaError_t cuda_error =
       cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(),
-                         shape_info.shape_values.data(),
+                         shape_info.data.front().shape_values.data(),
                          size_shape_values,
                          0,
                          cudaMemcpyHostToDevice);
@@ -885,7 +885,7 @@ namespace CUDAWrappers
       {
         cuda_error =
           cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(),
-                             shape_info.shape_gradients.data(),
+                             shape_info.data.front().shape_gradients.data(),
                              size_shape_values,
                              0,
                              cudaMemcpyHostToDevice);
@@ -893,7 +893,7 @@ namespace CUDAWrappers
 
         cuda_error =
           cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(),
-                             shape_info_co.shape_gradients.data(),
+                             shape_info_co.data.front().shape_gradients.data(),
                              size_co_shape_values,
                              0,
                              cudaMemcpyHostToDevice);

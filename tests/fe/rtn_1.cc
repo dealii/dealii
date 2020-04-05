@@ -140,8 +140,7 @@ check_face_support_points(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   FE_RaviartThomasNodal<2> e20(0);
   check_support_points(e20);

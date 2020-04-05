@@ -23,33 +23,41 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#define SPLIT_INSTANTIATIONS_COUNT 3
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "mapping_info.inst"
+
+#if SPLIT_INSTANTIATIONS_INDEX == 0
 
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 1>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 1>>;
 
-#if (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)) || \
-  (DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__))
+#  if (DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)) || \
+    (DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__))
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 2>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 4>>;
-#endif
+#  endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 4>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 8>>;
-#endif
+#  endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<double, VectorizedArray<double, 8>>;
 template struct internal::MatrixFreeFunctions::
   FPArrayComparator<float, VectorizedArray<float, 16>>;
+#  endif
+
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

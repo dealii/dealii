@@ -38,7 +38,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /**
  * A 1D function given by input legendre coefficients

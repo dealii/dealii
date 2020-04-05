@@ -44,7 +44,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -76,9 +75,7 @@ public:
         fe_eval_plain.read_dof_values_plain(src);
 
         for (unsigned int i = 0; i < fe_eval.dofs_per_cell; ++i)
-          for (unsigned int j = 0;
-               j < VectorizedArray<Number>::n_array_elements;
-               ++j)
+          for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
             {
               error += std::fabs(fe_eval.get_dof_value(i)[j] -
                                  fe_eval_plain.get_dof_value(i)[j]);
@@ -193,7 +190,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
   {

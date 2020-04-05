@@ -799,7 +799,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
   this->mass_matrix        = mass_matrix;
   this->derivative_matrix  = derivative_matrix;
 
-  constexpr unsigned int macro_size = VectorizedArray<Number>::n_array_elements;
+  constexpr unsigned int macro_size = VectorizedArray<Number>::size();
   std::size_t            n_rows_max = (n_rows_1d > 0) ? n_rows_1d : 0;
   if (n_rows_1d == -1)
     for (unsigned int d = 0; d < dim; ++d)

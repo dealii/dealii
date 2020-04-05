@@ -26,30 +26,35 @@
 #include <cmath>
 
 // Note:
-// The flag DEAL_II_COMPILER_VECTORIZATION_LEVEL is essentially constructed
+// The flag DEAL_II_VECTORIZATION_WIDTH_IN_BITS is essentially constructed
 // according to the following scheme (on x86-based architectures)
 // #ifdef __AVX512F__
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 3
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 512
 // #elif defined (__AVX__)
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 2
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 256
 // #elif defined (__SSE2__)
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 1
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128
 // #else
-// #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
+// #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0
 // #endif
-// In addition to checking the flags __AVX__ and __SSE2__, a CMake test,
-// 'check_01_cpu_features.cmake', ensures that these feature are not only
+// In addition to checking the flags __AVX512F__, __AVX__ and __SSE2__, a CMake
+// test, 'check_01_cpu_features.cmake', ensures that these feature are not only
 // present in the compilation unit but also working properly.
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__SSE2__) && \
-    !defined(__AVX__)
+// These error messages try to detect the case that deal.II was compiled with
+// a wider instruction set extension as the current compilation unit, for
+// example because deal.II was compiled with AVX, but a user project does not
+// add -march=native or similar flags, making it fall to SSE2. This leads to
+// very strange errors as the size of data structures differs between the
+// compiled deal.II code sitting in libdeal_II.so and the user code if not
+// detected.
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && !defined(__AVX__)
 #    error \
       "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__SSE2__) && \
-    !defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && !defined(__AVX512F__)
 #    error \
       "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
@@ -77,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
 // that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
 
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 struct EnableIfScalar<VectorizedArray<Number, width>>
 {
   using type = VectorizedArray<typename EnableIfScalar<Number>::type, width>;
@@ -100,10 +105,22 @@ public:
    * @param data The actual VectorizedArray.
    * @param lane A pointer to the current lane.
    */
-  VectorizedArrayIterator(T &data, const unsigned int lane)
-    : data(data)
+  VectorizedArrayIterator(T &data, const std::size_t lane)
+    : data(&data)
     , lane(lane)
   {}
+
+  /**
+   * Compare for equality.
+   */
+  bool
+  operator==(const VectorizedArrayIterator<T> &other) const
+  {
+    Assert(this->data == other.data,
+           ExcMessage(
+             "You are trying to compare iterators into different arrays."));
+    return this->lane == other.lane;
+  }
 
   /**
    * Compare for inequality.
@@ -111,8 +128,17 @@ public:
   bool
   operator!=(const VectorizedArrayIterator<T> &other) const
   {
+    Assert(this->data == other.data,
+           ExcMessage(
+             "You are trying to compare iterators into different arrays."));
     return this->lane != other.lane;
   }
+
+  /**
+   * Copy assignment.
+   */
+  VectorizedArrayIterator<T> &
+  operator=(const VectorizedArrayIterator<T> &other) = default;
 
   /**
    * Dereferencing operator (const version): returns the value of the current
@@ -120,7 +146,8 @@ public:
    */
   const typename T::value_type &operator*() const
   {
-    return data[lane];
+    AssertIndexRange(lane, T::size());
+    return (*data)[lane];
   }
 
 
@@ -133,7 +160,8 @@ public:
                           typename T::value_type>::type &
   operator*()
   {
-    return data[lane];
+    AssertIndexRange(lane, T::size());
+    return (*data)[lane];
   }
 
   /**
@@ -144,20 +172,69 @@ public:
   VectorizedArrayIterator<T> &
   operator++()
   {
+    AssertIndexRange(lane + 1, T::size() + 1);
     lane++;
     return *this;
   }
 
+  /**
+   * This operator advances the iterator by @p offet lanes and returns a
+   * reference to <tt>*this</tt>.
+   */
+  VectorizedArrayIterator<T> &
+  operator+=(const std::size_t offset)
+  {
+    AssertIndexRange(lane + offset, T::size() + 1);
+    lane += offset;
+    return *this;
+  }
+
+  /**
+   * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator advances
+   * the iterator to the previous lane and returns a reference to
+   * <tt>*this</tt>.
+   */
+  VectorizedArrayIterator<T> &
+  operator--()
+  {
+    Assert(
+      lane > 0,
+      ExcMessage(
+        "You can't decrement an iterator that is already at the beginning of the range."));
+    --lane;
+    return *this;
+  }
+
+  /**
+   * Create new iterator, which is shifted by @p offset.
+   */
+  VectorizedArrayIterator<T>
+  operator+(const std::size_t &offset) const
+  {
+    AssertIndexRange(lane + offset, T::size() + 1);
+    return VectorizedArrayIterator<T>(*data, lane + offset);
+  }
+
+  /**
+   * Compute distance between this iterator and iterator @p other.
+   */
+  std::ptrdiff_t
+  operator-(const VectorizedArrayIterator<T> &other) const
+  {
+    return static_cast<std::ptrdiff_t>(lane) -
+           static_cast<ptrdiff_t>(other.lane);
+  }
+
 private:
   /**
-   * Reference to the actual VectorizedArray.
+   * Pointer to the actual VectorizedArray.
    */
-  T &data;
+  T *data;
 
   /**
    * Pointer to the current lane.
    */
-  unsigned int lane;
+  std::size_t lane;
 };
 
 
@@ -173,18 +250,17 @@ private:
  *
  * @author Peter Munch, 2019
  */
-template <typename T>
+template <typename T, std::size_t width>
 class VectorizedArrayBase
 {
 public:
   /**
-   * Return the number of elements in the array stored in the variable
-   * n_array_elements of VectorizedArray.
+   * Return the number of elements in the array.
    */
-  static constexpr unsigned int
+  static constexpr std::size_t
   size()
   {
-    return T::n_array_elements;
+    return width;
   }
 
   /**
@@ -212,8 +288,7 @@ public:
   VectorizedArrayIterator<T>
   end()
   {
-    return VectorizedArrayIterator<T>(static_cast<T &>(*this),
-                                      T::n_array_elements);
+    return VectorizedArrayIterator<T>(static_cast<T &>(*this), width);
   }
 
   /**
@@ -224,7 +299,7 @@ public:
   end() const
   {
     return VectorizedArrayIterator<const T>(static_cast<const T &>(*this),
-                                            T::n_array_elements);
+                                            width);
   }
 };
 
@@ -316,9 +391,9 @@ public:
  *
  * @author Katharina Kormann, Martin Kronbichler, Peter Munch, 2010, 2011, 2019
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 class VectorizedArray
-  : public VectorizedArrayBase<VectorizedArray<Number, width>>
+  : public VectorizedArrayBase<VectorizedArray<Number, width>, 1>
 {
 public:
   /**
@@ -330,10 +405,12 @@ public:
    * This gives the number of elements collected in this class. In the general
    * case, there is only one element. Specializations use SIMD intrinsics and
    * can work on multiple elements at the same time.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 1;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 1;
 
-  static_assert(width == n_array_elements,
+  static_assert(width == 1,
                 "You specified an illegal width that is not supported.");
 
   /**
@@ -430,7 +507,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load size() data items from memory into the calling class, starting at
    * the given address. The pointer `ptr` needs not be aligned by the amount
    * of bytes in the vectorized array, as opposed to casting a double address
    * to VectorizedArray<double>*.
@@ -443,8 +520,8 @@ public:
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The pointer `ptr` needs not be
+   * Write the content of the calling class into memory in form of
+   * size() data items to the given address. The pointer `ptr` needs not be
    * aligned by the amount of bytes in the vectorized array, as opposed to
    * casting a double address to VectorizedArray<double>*.
    */
@@ -457,7 +534,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of
-   * @p n_array_elements to the given address using non-temporal stores that
+   * size() data items to the given address using non-temporal stores that
    * bypass the processor's caches, using @p _mm_stream_pd store intrinsics on
    * supported CPUs. The destination of the store @p ptr must be aligned by
    * the amount of bytes in the vectorized array.
@@ -509,14 +586,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load size() data items from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -528,14 +605,14 @@ public:
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * Write the content of the calling class into memory in form of
+   * size() data items to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -607,17 +684,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -626,7 +703,7 @@ private:
 
 
 // We need to have a separate declaration for static const members
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 const unsigned int VectorizedArray<Number, width>::n_array_elements;
 
 
@@ -643,9 +720,9 @@ const unsigned int VectorizedArray<Number, width>::n_array_elements;
  *
  * @relatesalso VectorizedArray
  */
-template <
-  typename Number,
-  int width = internal::VectorizedArrayWidthSpecifier<Number>::max_width>
+template <typename Number,
+          std::size_t width =
+            internal::VectorizedArrayWidthSpecifier<Number>::max_width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              make_vectorized_array(const Number &u)
 {
@@ -668,7 +745,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
   static_assert(
     std::is_same<VectorizedArrayType,
                  VectorizedArray<typename VectorizedArrayType::value_type,
-                                 VectorizedArrayType::n_array_elements>>::value,
+                                 VectorizedArrayType::size()>>::value,
     "VectorizedArrayType is not a VectorizedArray.");
 
   VectorizedArrayType result = u;
@@ -678,32 +755,30 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 
 
 /**
- * Load @p n_array_elements from memory into the the VectorizedArray @p out,
+ * Load size() data items from memory into the the VectorizedArray @p out,
  * starting at the given addresses and with given offset, each entry from the
  * offset providing one element of the vectorized array.
  *
  * This operation corresponds to the following code:
  * @code
- * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+ * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
  *   out.data[v] = ptrs[v][offset];
  * @endcode
  */
-template <typename Number, int width, std::size_t width_>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
-gather(VectorizedArray<Number, width> &    out,
-       const std::array<Number *, width_> &ptrs,
-       const unsigned int                  offset)
+gather(VectorizedArray<Number, width> &   out,
+       const std::array<Number *, width> &ptrs,
+       const unsigned int                 offset)
 {
-  static_assert(width == width_, "Length of input vector do not match!");
-
-  for (unsigned int v = 0; v < width_; v++)
+  for (unsigned int v = 0; v < width; v++)
     out.data[v] = ptrs[v][offset];
 }
 
 
 
 /**
- * This method loads VectorizedArray::n_array_elements data streams from the
+ * This method loads VectorizedArray::size() data streams from the
  * given array @p in. The offsets to the input array are given by the array @p
  * offsets. From each stream, n_entries are read. The data is then transposed
  * and stored it into an array of VectorizedArray type. The output array @p
@@ -717,7 +792,7 @@ gather(VectorizedArray<Number, width> &    out,
  *
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
- *   for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+ *   for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
  *     out[i][v] = in[offsets[v]+i];
  * @endcode
  *
@@ -727,7 +802,7 @@ gather(VectorizedArray<Number, width> &    out,
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int              n_entries,
                               const Number *                  in,
@@ -735,9 +810,7 @@ vectorized_load_and_transpose(const unsigned int              n_entries,
                               VectorizedArray<Number, width> *out)
 {
   for (unsigned int i = 0; i < n_entries; ++i)
-    for (unsigned int v = 0;
-         v < VectorizedArray<Number, width>::n_array_elements;
-         ++v)
+    for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
       out[i][v] = in[offsets[v] + i];
 }
 
@@ -753,18 +826,14 @@ vectorized_load_and_transpose(const unsigned int              n_entries,
  * of pointers and no assumption can be made that they belong to the same array,
  * i.e., they can have their origin in different memory allocations.
  */
-template <typename Number, int width, std::size_t width_>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
-vectorized_load_and_transpose(const unsigned int                  n_entries,
-                              const std::array<Number *, width_> &in,
-                              VectorizedArray<Number, width> *    out)
+vectorized_load_and_transpose(const unsigned int                 n_entries,
+                              const std::array<Number *, width> &in,
+                              VectorizedArray<Number, width> *   out)
 {
-  static_assert(width == width_, "Length of input vector do not match!");
-
   for (unsigned int i = 0; i < n_entries; ++i)
-    for (unsigned int v = 0;
-         v < VectorizedArray<Number, width>::n_array_elements;
-         ++v)
+    for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
       out[i][v] = in[v][i];
 }
 
@@ -790,7 +859,7 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
  *
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
- *   for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+ *   for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
  *     out[offsets[v]+i] = in[i][v];
  * @endcode
  *
@@ -798,7 +867,7 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
  * action:
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
- *   for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+ *   for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
  *     out[offsets[v]+i] += in[i][v];
  * @endcode
  *
@@ -808,7 +877,7 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
@@ -818,15 +887,11 @@ vectorized_transpose_and_store(const bool                            add_into,
 {
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0;
-           v < VectorizedArray<Number, width>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
         out[offsets[v] + i] += in[i][v];
   else
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0;
-           v < VectorizedArray<Number, width>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
         out[offsets[v] + i] = in[i][v];
 }
 
@@ -842,26 +907,20 @@ vectorized_transpose_and_store(const bool                            add_into,
  * of pointers and no assumption can be made that they belong to the same array,
  * i.e., they can have their origin in different memory allocations.
  */
-template <typename Number, int width, std::size_t width_>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
                                const VectorizedArray<Number, width> *in,
-                               std::array<Number *, width_> &        out)
+                               std::array<Number *, width> &         out)
 {
-  static_assert(width == width_, "Length of input vector do not match!");
-
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0;
-           v < VectorizedArray<Number, width>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
         out[v][i] += in[i][v];
   else
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0;
-           v < VectorizedArray<Number, width>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
         out[v][i] = in[i][v];
 }
 
@@ -873,14 +932,14 @@ vectorized_transpose_and_store(const bool                            add_into,
 // for safety, also check that __AVX512F__ is defined in case the user manually
 // set some conflicting compile flags which prevent compilation
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX-512.
  */
 template <>
 class VectorizedArray<double, 8>
-  : public VectorizedArrayBase<VectorizedArray<double, 8>>
+  : public VectorizedArrayBase<VectorizedArray<double, 8>, 8>
 {
 public:
   /**
@@ -890,8 +949,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 8;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -1003,7 +1064,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load size() data items from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -1016,7 +1077,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
@@ -1040,14 +1101,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -1066,13 +1127,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -1164,17 +1225,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -1432,7 +1493,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 16>
-  : public VectorizedArrayBase<VectorizedArray<float, 16>>
+  : public VectorizedArrayBase<VectorizedArray<float, 16>, 16>
 {
 public:
   /**
@@ -1442,8 +1503,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 16;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 16;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -1555,7 +1618,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -1568,7 +1631,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
@@ -1592,14 +1655,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -1618,13 +1681,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -1716,17 +1779,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -2073,14 +2136,14 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX.
  */
 template <>
 class VectorizedArray<double, 4>
-  : public VectorizedArrayBase<VectorizedArray<double, 4>>
+  : public VectorizedArrayBase<VectorizedArray<double, 4>, 4>
 {
 public:
   /**
@@ -2090,8 +2153,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 4;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -2203,7 +2268,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -2216,7 +2281,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
@@ -2240,14 +2305,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -2271,13 +2336,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -2355,17 +2420,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -2591,7 +2656,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 8>
-  : public VectorizedArrayBase<VectorizedArray<float, 8>>
+  : public VectorizedArrayBase<VectorizedArray<float, 8>, 8>
 {
 public:
   /**
@@ -2601,8 +2666,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 8;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -2714,7 +2781,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -2727,7 +2794,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
@@ -2751,14 +2818,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -2782,13 +2849,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -2866,17 +2933,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -3129,14 +3196,14 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 
 /**
  * Specialization for double and SSE2.
  */
 template <>
 class VectorizedArray<double, 2>
-  : public VectorizedArrayBase<VectorizedArray<double, 2>>
+  : public VectorizedArrayBase<VectorizedArray<double, 2>, 2>
 {
 public:
   /**
@@ -3146,8 +3213,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 2;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -3255,7 +3324,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
@@ -3268,7 +3337,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
@@ -3292,14 +3361,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -3313,13 +3382,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -3397,17 +3466,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -3577,7 +3646,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  */
 template <>
 class VectorizedArray<float, 4>
-  : public VectorizedArrayBase<VectorizedArray<float, 4>>
+  : public VectorizedArrayBase<VectorizedArray<float, 4>, 4>
 {
 public:
   /**
@@ -3587,8 +3656,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 4;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -3697,7 +3768,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
@@ -3710,7 +3781,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address. The memory need not be aligned by
+   * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
@@ -3734,14 +3805,14 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
@@ -3755,13 +3826,13 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address and the given offsets, filling the
+   * size() to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
    * This operation corresponds to the following code (but uses a more
    * efficient implementation in case the hardware allows for that):
    * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
@@ -3838,17 +3909,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -4049,14 +4120,14 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 
 
-#  endif // if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0 && defined(__SSE2__)
+#  endif // if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0 && defined(__SSE2__)
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__) && \
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__) && \
     defined(__VSX__)
 
 template <>
 class VectorizedArray<double, 2>
-  : public VectorizedArrayBase<VectorizedArray<double, 2>>
+  : public VectorizedArrayBase<VectorizedArray<double, 2>, 2>
 {
 public:
   /**
@@ -4066,8 +4137,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 2;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -4164,7 +4237,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4176,7 +4249,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address.
+   * size() to the given address.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4275,17 +4348,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -4295,7 +4368,7 @@ private:
 
 template <>
 class VectorizedArray<float, 4>
-  : public VectorizedArrayBase<VectorizedArray<float, 4>>
+  : public VectorizedArrayBase<VectorizedArray<float, 4>, 4>
 {
 public:
   /**
@@ -4305,8 +4378,10 @@ public:
 
   /**
    * This gives the number of vectors collected in this class.
+   *
+   * @deprecated Use VectorizedArrayBase::size() instead.
    */
-  static const unsigned int n_array_elements = 4;
+  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -4403,7 +4478,7 @@ public:
   }
 
   /**
-   * Load @p n_array_elements from memory into the calling class, starting at
+   * Load @p size() from memory into the calling class, starting at
    * the given address.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4415,7 +4490,7 @@ public:
 
   /**
    * Write the content of the calling class into memory in form of @p
-   * n_array_elements to the given address.
+   * size() to the given address.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4514,17 +4589,17 @@ private:
   }
 
   // Make a few functions friends.
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::sqrt(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::abs(const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::max(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
-  template <typename Number2, int width2>
+  template <typename Number2, std::size_t width2>
   friend VectorizedArray<Number2, width2>
   std::min(const VectorizedArray<Number2, width2> &,
            const VectorizedArray<Number2, width2> &);
@@ -4546,13 +4621,12 @@ private:
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE bool
 operator==(const VectorizedArray<Number, width> &lhs,
            const VectorizedArray<Number, width> &rhs)
 {
-  for (unsigned int i = 0; i < VectorizedArray<Number, width>::n_array_elements;
-       ++i)
+  for (unsigned int i = 0; i < VectorizedArray<Number, width>::size(); ++i)
     if (lhs[i] != rhs[i])
       return false;
 
@@ -4565,7 +4639,7 @@ operator==(const VectorizedArray<Number, width> &lhs,
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator+(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
@@ -4579,7 +4653,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
@@ -4593,7 +4667,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator*(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
@@ -4607,7 +4681,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator/(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
@@ -4618,11 +4692,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Addition of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array.
+ * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
@@ -4632,13 +4706,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Addition of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array in case the scalar
+ * size() equal entries) and a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator+(const double u, const VectorizedArray<float, width> &v)
 {
@@ -4648,11 +4722,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Addition of a vectorized array and a scalar (expanded to a vectorized array
- * with @p n_array_elements equal entries).
+ * with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator+(const VectorizedArray<Number, width> &v, const Number &u)
 {
@@ -4661,13 +4735,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Addition of a vectorized array and a scalar (expanded to a vectorized array
- * with @p n_array_elements equal entries) in case the scalar is a double
+ * with @p size() equal entries) in case the scalar is a double
  * (needed in order to be able to write simple code with constants that are
  * usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator+(const VectorizedArray<float, width> &v, const double u)
 {
@@ -4676,11 +4750,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Subtraction of a vectorized array from a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries).
+ * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
@@ -4690,13 +4764,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Subtraction of a vectorized array from a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries) in case the scalar is a
+ * array with @p size() equal entries) in case the scalar is a
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator-(const double u, const VectorizedArray<float, width> &v)
 {
@@ -4706,11 +4780,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Subtraction of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) from a vectorized array.
+ * size() equal entries) from a vectorized array.
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
@@ -4720,13 +4794,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Subtraction of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) from a vectorized array in case the scalar
+ * size() equal entries) from a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator-(const VectorizedArray<float, width> &v, const double u)
 {
@@ -4736,11 +4810,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Multiplication of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array.
+ * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
@@ -4750,13 +4824,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Multiplication of a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array in case the scalar
+ * size() equal entries) and a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator*(const double u, const VectorizedArray<float, width> &v)
 {
@@ -4766,11 +4840,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Multiplication of a vectorized array and a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries).
+ * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator*(const VectorizedArray<Number, width> &v, const Number &u)
 {
@@ -4779,13 +4853,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Multiplication of a vectorized array and a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries) in case the scalar is a
+ * array with @p size() equal entries) in case the scalar is a
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator*(const VectorizedArray<float, width> &v, const double u)
 {
@@ -4794,11 +4868,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Quotient between a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array.
+ * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
@@ -4808,13 +4882,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Quotient between a scalar (expanded to a vectorized array with @p
- * n_array_elements equal entries) and a vectorized array in case the scalar
+ * size() equal entries) and a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator/(const double u, const VectorizedArray<float, width> &v)
 {
@@ -4824,11 +4898,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
 
 /**
  * Quotient between a vectorized array and a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries).
+ * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
@@ -4838,13 +4912,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 
 /**
  * Quotient between a vectorized array and a scalar (expanded to a vectorized
- * array with @p n_array_elements equal entries) in case the scalar is a
+ * array with @p size() equal entries) in case the scalar is a
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
  */
-template <int width>
+template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
                              operator/(const VectorizedArray<float, width> &v, const double u)
 {
@@ -4857,7 +4931,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator+(const VectorizedArray<Number, width> &u)
 {
@@ -4869,7 +4943,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
                              operator-(const VectorizedArray<Number, width> &u)
 {
@@ -4883,11 +4957,11 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number, int width>
+template <typename Number, std::size_t width>
 inline std::ostream &
 operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
 {
-  constexpr unsigned int n = VectorizedArray<Number, width>::n_array_elements;
+  constexpr unsigned int n = VectorizedArray<Number, width>::size();
   for (unsigned int i = 0; i < n - 1; ++i)
     out << p[i] << ' ';
   out << p[n - 1];
@@ -4912,7 +4986,7 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
  */
 enum class SIMDComparison : int
 {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
   equal                 = _CMP_EQ_OQ,
   not_equal             = _CMP_NEQ_OQ,
   less_than             = _CMP_LT_OQ,
@@ -5049,7 +5123,7 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
 //@}
 
 #ifndef DOXYGEN
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 16>
@@ -5083,7 +5157,7 @@ compare_and_apply_mask(const VectorizedArray<double, 8> &left,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 8>
@@ -5120,7 +5194,7 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
 
 #  endif
 
-#  if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>
@@ -5214,11 +5288,11 @@ namespace std
   /**
    * Compute the sine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{sin(x[0]), sin(x[1]), ...,
-   * sin(x[n_array_elements-1])}</tt>.
+   * sin(x[VectorizedArray::size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   sin(const ::dealii::VectorizedArray<Number, width> &x)
   {
@@ -5227,9 +5301,8 @@ namespace std
     // setting the individual elements and also circumvents a compiler
     // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
     // from April 2014, topic "matrix_free/step-48 Test").
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::sin(x[i]);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5242,17 +5315,16 @@ namespace std
   /**
    * Compute the cosine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
-   * cos(x[n_array_elements-1])}</tt>.
+   * cos(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   cos(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::cos(x[i]);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5265,17 +5337,16 @@ namespace std
   /**
    * Compute the tangent of a vectorized data field. The result is returned
    * as vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
-   * tan(x[n_array_elements-1])}</tt>.
+   * tan(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   tan(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::tan(x[i]);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5288,17 +5359,16 @@ namespace std
   /**
    * Compute the exponential of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
-   * exp(x[n_array_elements-1])}</tt>.
+   * exp(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   exp(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::exp(x[i]);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5311,17 +5381,16 @@ namespace std
   /**
    * Compute the natural logarithm of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
-   * log(x[n_array_elements-1])}</tt>.
+   * log(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   log(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::log(x[i]);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5334,11 +5403,11 @@ namespace std
   /**
    * Compute the square root of a vectorized data field. The result is
    * returned as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]),
-   * ..., sqrt(x[n_array_elements-1])}</tt>.
+   * ..., sqrt(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   sqrt(const ::dealii::VectorizedArray<Number, width> &x)
   {
@@ -5350,17 +5419,16 @@ namespace std
   /**
    * Raises the given number @p x to the power @p p for a vectorized data
    * field. The result is returned as vectorized array in the form
-   * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[n_array_elements-1],p)}</tt>.
+   * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[size()-1],p)}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   pow(const ::dealii::VectorizedArray<Number, width> &x, const Number p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number, width>::n_array_elements;
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::pow(x[i], p);
     ::dealii::VectorizedArray<Number, width> out;
@@ -5373,11 +5441,11 @@ namespace std
   /**
    * Compute the absolute value (modulus) of a vectorized data field. The
    * result is returned as vectorized array in the form <tt>{abs(x[0]),
-   * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
+   * abs(x[1]), ..., abs(x[size()-1])}</tt>.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   abs(const ::dealii::VectorizedArray<Number, width> &x)
   {
@@ -5393,7 +5461,7 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   max(const ::dealii::VectorizedArray<Number, width> &x,
       const ::dealii::VectorizedArray<Number, width> &y)
@@ -5410,13 +5478,26 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   inline ::dealii::VectorizedArray<Number, width>
   min(const ::dealii::VectorizedArray<Number, width> &x,
       const ::dealii::VectorizedArray<Number, width> &y)
   {
     return x.get_min(y);
   }
+
+
+
+  /**
+   * Iterator traits for VectorizedArrayIterator.
+   */
+  template <class T>
+  struct iterator_traits<dealii::VectorizedArrayIterator<T>>
+  {
+    using iterator_category = random_access_iterator_tag;
+    using value_type        = typename T::value_type;
+    using difference_type   = std::ptrdiff_t;
+  };
 
 } // namespace std
 

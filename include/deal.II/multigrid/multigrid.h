@@ -154,35 +154,6 @@ public:
   using const_vector_type = const VectorType;
 
   /**
-   * Constructor. The DoFHandler is used to check whether the provided
-   * minlevel and maxlevel are in the range of valid levels.
-   * If maxlevel is set to the default value, the highest valid
-   * level is used.
-   * <tt>transfer</tt> is an object performing prolongation and
-   * restriction.
-   *
-   * This function already initializes the vectors which will be used later in
-   * the course of the computations. You should therefore create objects of
-   * this type as late as possible.
-   *
-   * @deprecated Use the other constructor instead.
-   * The DoFHandler is actually not needed.
-   */
-  template <int dim>
-#ifndef _MSC_VER
-  DEAL_II_DEPRECATED
-#endif
-  Multigrid(const DoFHandler<dim> &             dof_handler,
-            const MGMatrixBase<VectorType> &    matrix,
-            const MGCoarseGridBase<VectorType> &coarse,
-            const MGTransferBase<VectorType> &  transfer,
-            const MGSmootherBase<VectorType> &  pre_smooth,
-            const MGSmootherBase<VectorType> &  post_smooth,
-            const unsigned int                  minlevel = 0,
-            const unsigned int maxlevel = numbers::invalid_unsigned_int,
-            Cycle              cycle    = v_cycle);
-
-  /**
    * Constructor. <tt>transfer</tt> is an object performing prolongation and
    * restriction. For levels in [minlevel, maxlevel] matrix has to contain
    * valid matrices. By default the maxlevel is set to the maximal valid level.
@@ -300,16 +271,6 @@ public:
    * Chance #cycle_type used in cycle().
    */
   void set_cycle(Cycle);
-
-  /**
-   * @deprecated Debug output will go away. Use signals instead.
-   *
-   * Set the debug level. Higher values will create more debugging output
-   * during the multigrid cycles.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_debug(const unsigned int);
 
   /**
    * Connect a function to mg::Signals::coarse_solve.
@@ -467,11 +428,6 @@ private:
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
   SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
-
-  /**
-   * Level for debug output. Defaults to zero and can be set by set_debug().
-   */
-  unsigned int debug;
 
   template <int dim, class OtherVectorType, class TRANSFER>
   friend class PreconditionMG;
@@ -637,40 +593,6 @@ private:
 
 
 template <typename VectorType>
-template <int dim>
-Multigrid<VectorType>::Multigrid(const DoFHandler<dim> &         dof_handler,
-                                 const MGMatrixBase<VectorType> &matrix,
-                                 const MGCoarseGridBase<VectorType> &coarse,
-                                 const MGTransferBase<VectorType> &  transfer,
-                                 const MGSmootherBase<VectorType> &  pre_smooth,
-                                 const MGSmootherBase<VectorType> &post_smooth,
-                                 const unsigned int                min_level,
-                                 const unsigned int                max_level,
-                                 Cycle                             cycle)
-  : cycle_type(cycle)
-  , minlevel(min_level)
-  , matrix(&matrix, typeid(*this).name())
-  , coarse(&coarse, typeid(*this).name())
-  , transfer(&transfer, typeid(*this).name())
-  , pre_smooth(&pre_smooth, typeid(*this).name())
-  , post_smooth(&post_smooth, typeid(*this).name())
-  , edge_down(nullptr, typeid(*this).name())
-  , edge_up(nullptr, typeid(*this).name())
-  , debug(0)
-{
-  const unsigned int dof_handler_max_level =
-    dof_handler.get_triangulation().n_global_levels() - 1;
-  if (max_level == numbers::invalid_unsigned_int)
-    maxlevel = dof_handler_max_level;
-  else
-    maxlevel = max_level;
-
-  reinit(minlevel, maxlevel);
-}
-
-
-
-template <typename VectorType>
 Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
                                  const MGCoarseGridBase<VectorType> &coarse,
                                  const MGTransferBase<VectorType> &  transfer,
@@ -689,7 +611,6 @@ Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType> &    matrix,
   , edge_in(nullptr, typeid(*this).name())
   , edge_down(nullptr, typeid(*this).name())
   , edge_up(nullptr, typeid(*this).name())
-  , debug(0)
 {
   if (max_level == numbers::invalid_unsigned_int)
     maxlevel = matrix.get_maxlevel();

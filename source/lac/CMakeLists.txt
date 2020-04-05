@@ -17,7 +17,6 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
   affine_constraints.cc
-  block_matrix_array.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
   block_sparsity_pattern.cc
@@ -30,7 +29,6 @@ SET(_unity_include_src
   la_vector.cc
   la_parallel_vector.cc
   la_parallel_block_vector.cc
-  matrix_lib.cc
   matrix_out.cc
   precondition_block.cc
   precondition_block_ez.cc
@@ -47,7 +45,6 @@ SET(_unity_include_src
   sparse_vanka.cc
   sparsity_pattern.cc
   sparsity_tools.cc
-  swappable_vector.cc
   vector.cc
   vector_memory.cc
   )

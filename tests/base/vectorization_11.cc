@@ -29,9 +29,9 @@ void
 do_test(const VectorizedArrayType                      array,
         const typename VectorizedArrayType::value_type number)
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     if (array[i] != number)
       deallog << "  problem in element " << i << std::endl;
 }
@@ -54,17 +54,17 @@ struct Tester<double>
     do_test(make_vectorized_array<double>(2.0), 2.0);
     do_test(VectorizedArray<double>(2.0), 2.0);
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
     do_test(make_vectorized_array<VectorizedArray<double, 8>>(2.0), 2.0);
     do_test(VectorizedArray<double, 8>(2.0), 2.0);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
     do_test(make_vectorized_array<VectorizedArray<double, 4>>(2.0), 2.0);
     do_test(VectorizedArray<double, 4>(2.0), 2.0);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
     do_test(make_vectorized_array<VectorizedArray<double, 2>>(2.0), 2.0);
     do_test(VectorizedArray<double, 2>(2.0), 2.0);
 #endif
@@ -83,17 +83,17 @@ struct Tester<float>
     do_test(make_vectorized_array<float>(2.0), 2.0);
     do_test(VectorizedArray<float>(2.0), 2.0);
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
     do_test(make_vectorized_array<VectorizedArray<float, 16>>(2.0), 2.0);
     do_test(VectorizedArray<float, 16>(2.0), 2.0);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
     do_test(make_vectorized_array<VectorizedArray<float, 8>>(2.0), 2.0);
     do_test(VectorizedArray<float, 8>(2.0), 2.0);
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
     do_test(make_vectorized_array<VectorizedArray<float, 4>>(2.0), 2.0);
     do_test(VectorizedArray<float, 4>(2.0), 2.0);
 #endif

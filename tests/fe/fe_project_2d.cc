@@ -52,7 +52,6 @@
  * Alexander Grayver
  */
 
-using namespace dealii;
 
 static const Point<2> vertices_nonaffine[] = {
   Point<2>(-1., -1.),
@@ -256,10 +255,8 @@ test(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(7);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(7) << std::fixed;
 
   const static unsigned dim      = 2;
   unsigned              order    = 1;

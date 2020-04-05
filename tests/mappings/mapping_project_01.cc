@@ -27,7 +27,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 void
 dim2_grid()
 {

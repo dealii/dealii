@@ -29,7 +29,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim>
@@ -43,19 +42,23 @@ test(const FiniteElement<dim> &fe,
   deallog << "Testing " << fe.get_name() << " with " << quadrature_name << "("
           << quad.size() << ")" << std::endl;
   deallog << "shape values: " << std::endl;
-  for (unsigned int i = 0; i < shape_info.fe_degree + 1; ++i)
+  const auto &univariate_shape_data = shape_info.get_shape_data(0, 0);
+  for (unsigned int i = 0; i < univariate_shape_data.fe_degree + 1; ++i)
     {
       for (unsigned int q = 0; q < quad.size(); ++q)
-        deallog << std::setw(15) << shape_info.shape_values[i * quad.size() + q]
+        deallog << std::setw(15)
+                << univariate_shape_data.shape_values[i * quad.size() + q]
                 << " ";
       deallog << std::endl;
     }
   deallog << "inverse shape values: " << std::endl;
-  for (unsigned int i = 0; i < shape_info.fe_degree + 1; ++i)
+  for (unsigned int i = 0; i < univariate_shape_data.fe_degree + 1; ++i)
     {
       for (unsigned int q = 0; q < quad.size(); ++q)
-        deallog << std::setw(15)
-                << shape_info.inverse_shape_values[i * quad.size() + q] << " ";
+        deallog
+          << std::setw(15)
+          << univariate_shape_data.inverse_shape_values[i * quad.size() + q]
+          << " ";
       deallog << std::endl;
     }
   deallog << "inverse shapes' * shapes: " << std::endl;
@@ -64,22 +67,24 @@ test(const FiniteElement<dim> &fe,
       for (unsigned int j = 0; j < quad.size(); ++j)
         {
           double sum = 0;
-          for (unsigned int k = 0; k < shape_info.fe_degree + 1; ++k)
-            sum += shape_info.inverse_shape_values[k * quad.size() + i] *
-                   shape_info.shape_values[k * quad.size() + j];
+          for (unsigned int k = 0; k < univariate_shape_data.fe_degree + 1; ++k)
+            sum +=
+              univariate_shape_data.inverse_shape_values[k * quad.size() + i] *
+              univariate_shape_data.shape_values[k * quad.size() + j];
           deallog << std::setw(15) << sum << " ";
         }
       deallog << std::endl;
     }
   deallog << "inverse shapes * shapes': " << std::endl;
-  for (unsigned int i = 0; i < shape_info.fe_degree + 1; ++i)
+  for (unsigned int i = 0; i < univariate_shape_data.fe_degree + 1; ++i)
     {
-      for (unsigned int j = 0; j < shape_info.fe_degree + 1; ++j)
+      for (unsigned int j = 0; j < univariate_shape_data.fe_degree + 1; ++j)
         {
           double sum = 0;
           for (unsigned int k = 0; k < quad.size(); ++k)
-            sum += shape_info.inverse_shape_values[i * quad.size() + k] *
-                   shape_info.shape_values[j * quad.size() + k];
+            sum +=
+              univariate_shape_data.inverse_shape_values[i * quad.size() + k] *
+              univariate_shape_data.shape_values[j * quad.size() + k];
           deallog << std::setw(15) << sum << " ";
         }
       deallog << std::endl;

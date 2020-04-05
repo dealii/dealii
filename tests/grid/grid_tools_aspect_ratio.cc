@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /*
  * The parameters left, right, refinements follow the hyper-rectangle

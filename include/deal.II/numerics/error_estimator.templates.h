@@ -364,7 +364,7 @@ namespace internal
     // change the sign. We take the outward normal.
 
     parallel_data.normal_vectors =
-      fe_face_values_cell.get_present_fe_values().get_all_normal_vectors();
+      fe_face_values_cell.get_present_fe_values().get_normal_vectors();
 
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
@@ -769,8 +769,7 @@ namespace internal
           }
 
         parallel_data.neighbor_normal_vectors =
-          fe_face_values_neighbor.get_present_fe_values()
-            .get_all_normal_vectors();
+          fe_face_values_neighbor.get_present_fe_values().get_normal_vectors();
       }
     else
       {
@@ -881,7 +880,7 @@ namespace internal
 
         // call generic evaluate function
         parallel_data.neighbor_normal_vectors =
-          fe_subface_values.get_present_fe_values().get_all_normal_vectors();
+          fe_subface_values.get_present_fe_values().get_normal_vectors();
 
         local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
           integrate_over_face(parallel_data, face, fe_face_values);

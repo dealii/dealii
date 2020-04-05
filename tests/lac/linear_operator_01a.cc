@@ -25,7 +25,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 // Dummy vectors with different, non convertible types:
 

@@ -28,7 +28,6 @@
 
 #include "../testmatrix.h"
 
-using namespace dealii;
 
 int
 main(int argc, char *argv[])

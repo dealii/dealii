@@ -54,7 +54,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -375,7 +374,7 @@ void
 LaplaceProblem<dim>::solve()
 {
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> mg_transfer(
-    hanging_node_constraints, mg_constrained_dofs);
+    mg_constrained_dofs);
   mg_transfer.build(mg_dof_handler);
 
   SolverControl coarse_solver_control(1000, 1e-10, false, false);
@@ -483,9 +482,8 @@ LaplaceProblem<dim>::run()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 

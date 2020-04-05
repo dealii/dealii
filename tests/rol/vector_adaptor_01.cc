@@ -21,7 +21,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <typename VectorType>
 void

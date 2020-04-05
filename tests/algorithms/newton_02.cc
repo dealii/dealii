@@ -26,7 +26,6 @@
 
 // verify that all debug vectors have the correct size
 
-using namespace dealii;
 using namespace Algorithms;
 
 template <typename VectorType, int dim>
@@ -121,9 +120,7 @@ test()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test<2>();
 }

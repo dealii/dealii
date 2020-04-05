@@ -44,7 +44,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -69,9 +68,6 @@
 
 
 
-using namespace dealii;
-
-
 template <int dim>
 class Displacement : public Function<dim>
 {
@@ -92,8 +88,7 @@ public:
   {
     Tensor<1, dim, VectorizedArray<NumberType>> shift_vec;
     Point<dim>                                  p;
-    for (unsigned int v = 0; v < VectorizedArray<NumberType>::n_array_elements;
-         ++v)
+    for (unsigned int v = 0; v < VectorizedArray<NumberType>::size(); ++v)
       {
         for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
@@ -256,8 +251,7 @@ test(const unsigned int n_ref = 0)
               const auto &qp = fe_eval.quadrature_point(q);
               const auto  v2 = qp + displacement_function.shift_value(qp);
               VectorizedArray<NumberType> dist = v1.distance(v2);
-              for (unsigned int v = 0;
-                   v < VectorizedArray<NumberType>::n_array_elements;
+              for (unsigned int v = 0; v < VectorizedArray<NumberType>::size();
                    ++v)
                 AssertThrow(dist[v] < 1e-8,
                             ExcMessage("distance: " + std::to_string(dist[v])));
@@ -336,7 +330,7 @@ test(const unsigned int n_ref = 0)
                 const auto  v2 = qp + displacement_function.shift_value(qp);
                 VectorizedArray<NumberType> dist = v1.distance(v2);
                 for (unsigned int v = 0;
-                     v < VectorizedArray<NumberType>::n_array_elements;
+                     v < VectorizedArray<NumberType>::size();
                      ++v)
                   AssertThrow(dist[v] < 1e-8,
                               ExcMessage(

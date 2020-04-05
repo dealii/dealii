@@ -38,9 +38,11 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/filtered_matrix.h>
+#include <deal.II/lac/constrained_linear_operator.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -54,20 +56,16 @@
 #include <vector>
 
 #include "../tests.h"
-using namespace dealii;
 
 
-// this is copied from GridGenerator
 void
-laplace_solve(const SparseMatrix<double> &          S,
-              const std::map<unsigned int, double> &m,
-              Vector<double> &                      u)
+laplace_solve(const SparseMatrix<double> &     S,
+              const AffineConstraints<double> &constraints,
+              Vector<double> &                 u)
 {
-  const unsigned int                       n_dofs = S.n();
-  FilteredMatrix<Vector<double>>           SF(S);
-  PreconditionJacobi<SparseMatrix<double>> prec;
-  prec.initialize(S, 1.2);
-  FilteredMatrix<Vector<double>> PF(prec);
+  const unsigned int n_dofs = S.n();
+  const auto         op     = linear_operator(S);
+  const auto constrained_op = constrained_linear_operator(constraints, op);
 
   SolverControl                       control(10000, 1.e-10, false, false);
   GrowingVectorMemory<Vector<double>> mem;
@@ -75,16 +73,16 @@ laplace_solve(const SparseMatrix<double> &          S,
 
   Vector<double> f(n_dofs);
 
-  SF.add_constraints(m);
-  SF.apply_constraints(f, true);
-  solver.solve(SF, u, f, PF);
+  const auto constrained_rhs = constrained_right_hand_side(constraints, op, f);
+  solver.solve(constrained_op, u, constrained_rhs, PreconditionIdentity());
+  constraints.distribute(u);
 }
 
 
-// create a rinf grid and compute a MappingQEuler to represent the inner
+// create a ring grid and compute a MappingQEuler to represent the inner
 // boundary
 void
-curved_grid(std::ofstream &out)
+curved_grid(std::ostream &out)
 {
   // number of cells in radial and
   // circumferential direction
@@ -152,27 +150,25 @@ curved_grid(std::ofstream &out)
   MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
   // set up the boundary values for
   // the laplace problem
-  std::vector<std::map<unsigned int, double>> m(2);
-  // fill these maps: on the inner boundary try
+  std::vector<AffineConstraints<double>> m(2);
+  // fill these constraints: on the inner boundary try
   // to approximate a circle, on the outer
   // boundary use straight lines
-  DoFHandler<2>::cell_iterator cell = dof_handler.begin_active(),
-                               endc = dof_handler.end();
   DoFHandler<2>::face_iterator face;
-  for (; cell != endc; ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       // fix all vertices
       for (const unsigned int vertex_no : GeometryInfo<2>::vertex_indices())
         {
           for (unsigned int i = 0; i < 2; ++i)
-            m[i][cell->vertex_dof_index(vertex_no, 0)] = 0.;
+            m[i].add_line(cell->vertex_dof_index(vertex_no, 0));
         }
 
       if (cell->at_boundary())
         for (const unsigned int face_no : GeometryInfo<2>::face_indices())
           {
             face = cell->face(face_no);
-            // insert a modifiued value for
+            // insert a modified value for
             // the middle point of boundary
             // faces
             if (face->at_boundary())
@@ -180,16 +176,24 @@ curved_grid(std::ofstream &out)
                 const double eps = 1e-4;
                 if (std::fabs(face->vertex(1).norm() - r_i) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
-                    m[i][face->dof_index(0)] =
-                      (face->center() * (r_i / face->center().norm() - 1))(i);
+                    {
+                      m[i].add_line(face->dof_index(0));
+                      m[i].set_inhomogeneity(face->dof_index(0),
+                                             (face->center() *
+                                              (r_i / face->center().norm() -
+                                               1))(i));
+                    }
                 else if (std::fabs(face->vertex(1).norm() - r_a) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
-                    m[i][face->dof_index(0)] = 0.;
+                    m[i].add_line(face->dof_index(0));
                 else
                   Assert(false, ExcInternalError());
               }
           }
     }
+  m[0].close();
+  m[1].close();
+
   // solve the 2 problems with
   // different right hand sides.
   Vector<double> us[2];
@@ -251,10 +255,8 @@ curved_grid(std::ofstream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
-  curved_grid(logfile);
+  curved_grid(deallog.get_file_stream());
 }

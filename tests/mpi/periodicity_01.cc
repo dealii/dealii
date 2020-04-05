@@ -65,8 +65,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -569,7 +567,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

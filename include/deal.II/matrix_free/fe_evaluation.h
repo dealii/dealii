@@ -179,7 +179,7 @@ public:
    * on the given cell. This call is slower than the ones done through a
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
-   * VectorizedArray::n_array_elements same copies are worked on).
+   * VectorizedArray::size() same copies are worked on).
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -211,7 +211,7 @@ public:
    * on the given cell. This call is slower than the ones done through a
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
-   * VectorizedArray::n_array_elements same copies are worked on).
+   * VectorizedArray::size() same copies are worked on).
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -246,7 +246,7 @@ public:
    * on the given cell. This call is slower than the ones done through a
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
-   * VectorizedArray::n_array_elements same copies are worked on).
+   * VectorizedArray::size() same copies are worked on).
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -258,10 +258,10 @@ public:
   template <typename VectorType>
   void
   distribute_local_to_global(
-    VectorType &                                              dst,
-    const unsigned int                                        first_index = 0,
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask =
-      std::bitset<VectorizedArrayType::n_array_elements>().flip()) const;
+    VectorType &                                    dst,
+    const unsigned int                              first_index = 0,
+    const std::bitset<VectorizedArrayType::size()> &mask =
+      std::bitset<VectorizedArrayType::size()>().flip()) const;
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -286,7 +286,7 @@ public:
    * on the given cell. This call is slower than the ones done through a
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
-   * VectorizedArray::n_array_elements same copies are worked on).
+   * VectorizedArray::size() same copies are worked on).
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -297,11 +297,10 @@ public:
    */
   template <typename VectorType>
   void
-  set_dof_values(
-    VectorType &                                              dst,
-    const unsigned int                                        first_index = 0,
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask =
-      std::bitset<VectorizedArrayType::n_array_elements>().flip()) const;
+  set_dof_values(VectorType &       dst,
+                 const unsigned int first_index = 0,
+                 const std::bitset<VectorizedArrayType::size()> &mask =
+                   std::bitset<VectorizedArrayType::size()>().flip()) const;
 
   //@}
 
@@ -606,16 +605,15 @@ public:
    * arbitrary data type.
    */
   template <typename T>
-  std::array<T, VectorizedArrayType::n_array_elements>
-  read_cell_data(
-    const AlignedVector<std::array<T, VectorizedArrayType::n_array_elements>>
-      &array) const;
+  std::array<T, VectorizedArrayType::size()>
+  read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
+                   &array) const;
 
   /**
    * Return the id of the cells this FEEvaluation or FEFaceEvaluation is
    * associated with.
    */
-  std::array<unsigned int, VectorizedArrayType::n_array_elements>
+  std::array<unsigned int, VectorizedArrayType::size()>
   get_cell_ids() const;
 
   //@}
@@ -838,11 +836,10 @@ protected:
    */
   template <typename VectorType, typename VectorOperation>
   void
-  read_write_operation(
-    const VectorOperation &                                   operation,
-    VectorType *                                              vectors[],
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask,
-    const bool apply_constraints = true) const;
+  read_write_operation(const VectorOperation &operation,
+                       VectorType *           vectors[],
+                       const std::bitset<VectorizedArrayType::size()> &mask,
+                       const bool apply_constraints = true) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -854,9 +851,9 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation_contiguous(
-    const VectorOperation &                                   operation,
-    VectorType *                                              vectors[],
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask) const;
+    const VectorOperation &                         operation,
+    VectorType *                                    vectors[],
+    const std::bitset<VectorizedArrayType::size()> &mask) const;
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -1757,9 +1754,7 @@ protected:
  *           phi.quadrature_point(q_index);
  *         // Need to evaluate function for each component in VectorizedArray
  *         VectorizedArray<double> f_value;
- *         for (unsigned int v=0;
- *              v<VectorizedArray<double>::n_array_elements;
- *              ++v)
+ *         for (unsigned int v=0; v<VectorizedArray<double>::size(); ++v)
  *           {
  *             Point<dim> p;
  *             for (unsigned int d=0; d<dim; ++d)
@@ -1848,12 +1843,12 @@ protected:
  *   {
  *     fe_eval.reinit(cell);
  *     for (unsigned int i=0; i<dofs_per_cell;
- *          i += VectorizedArray<double>::n_array_elements)
+ *          i += VectorizedArray<double>::size())
  *       {
  *         const unsigned int n_items =
- *           i+VectorizedArray<double>::n_array_elements > dofs_per_cell ?
+ *           i+VectorizedArray<double>::size() > dofs_per_cell ?
  *           (dofs_per_cell - i) :
- *           VectorizedArray<double>::n_array_elements;
+ *           VectorizedArray<double>::size();
  *
  *         // Set n_items unit vectors
  *         for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -3056,7 +3051,7 @@ inline FEEvaluationBase<dim,
   set_data_pointers();
   Assert(matrix_info->mapping_initialized() == true, ExcNotInitialized());
   AssertDimension(matrix_info->get_task_info().vectorization_length,
-                  VectorizedArrayType::n_array_elements);
+                  VectorizedArrayType::size());
   AssertDimension((is_face ? data->n_q_points_face : data->n_q_points),
                   n_quadrature_points);
   AssertDimension(n_quadrature_points,
@@ -3371,7 +3366,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(scratch_data_array != nullptr, ExcInternalError());
 
   const unsigned int tensor_dofs_per_component =
-    Utilities::fixed_power<dim>(this->data->fe_degree + 1);
+    Utilities::fixed_power<dim>(this->data->data.front().fe_degree + 1);
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   const unsigned int n_quadrature_points =
@@ -3564,15 +3559,15 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
-std::array<unsigned int, VectorizedArrayType::n_array_elements>
+std::array<unsigned int, VectorizedArrayType::size()>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_cell_ids() const
 {
-  const unsigned int v_len = VectorizedArrayType::n_array_elements;
-  std::array<unsigned int, VectorizedArrayType::n_array_elements> cells;
+  const unsigned int                n_lanes = VectorizedArrayType::size();
+  std::array<unsigned int, n_lanes> cells;
 
   // initialize array
-  for (unsigned int i = 0; i < v_len; ++i)
+  for (unsigned int i = 0; i < n_lanes; ++i)
     cells[i] = numbers::invalid_unsigned_int;
 
   if ((is_face == false) ||
@@ -3582,8 +3577,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
        this->is_interior_face))
     {
       // cell or interior face face (element-centric loop)
-      for (unsigned int i = 0; i < v_len; ++i)
-        cells[i] = cell * v_len + i;
+      for (unsigned int i = 0; i < n_lanes; ++i)
+        cells[i] = cell * n_lanes + i;
     }
   else if (is_face &&
            this->dof_access_index ==
@@ -3594,10 +3589,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       // look into the FaceInfo field that collects information from both
       // sides of a face once for the global mesh, and pick the face id that
       // is not the local one (cell_this).
-      for (unsigned int i = 0; i < v_len; i++)
+      for (unsigned int i = 0; i < n_lanes; i++)
         {
           // compute actual (non vectorized) cell ID
-          const unsigned int cell_this = this->cell * v_len + i;
+          const unsigned int cell_this = this->cell * n_lanes + i;
           // compute face ID
           unsigned int face_index =
             this->matrix_info->get_cell_and_face_to_plain_faces()(this->cell,
@@ -3608,10 +3603,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             continue; // invalid face ID: no neighbor on boundary
 
           // get cell ID on both sides of face
-          auto cell_m = this->matrix_info->get_face_info(face_index / v_len)
-                          .cells_interior[face_index % v_len];
-          auto cell_p = this->matrix_info->get_face_info(face_index / v_len)
-                          .cells_exterior[face_index % v_len];
+          auto cell_m = this->matrix_info->get_face_info(face_index / n_lanes)
+                          .cells_interior[face_index % n_lanes];
+          auto cell_p = this->matrix_info->get_face_info(face_index / n_lanes)
+                          .cells_exterior[face_index % n_lanes];
 
           // compare the IDs with the given cell ID
           if (cell_m == cell_this)
@@ -3627,7 +3622,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         is_interior_face ?
           &this->matrix_info->get_face_info(cell).cells_interior[0] :
           &this->matrix_info->get_face_info(cell).cells_exterior[0];
-      for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+      for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
         if (cells_[i] != numbers::invalid_unsigned_int)
           cells[i] = cells_[i];
     }
@@ -3655,10 +3650,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // 2) actually gather values
   VectorizedArrayType out = make_vectorized_array<Number>(Number(1.));
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (cells[i] != numbers::invalid_unsigned_int)
-      out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
-                    [cells[i] % VectorizedArrayType::n_array_elements];
+      out[i] = array[cells[i] / VectorizedArrayType::size()]
+                    [cells[i] % VectorizedArrayType::size()];
   return out;
 }
 
@@ -3670,11 +3665,10 @@ template <int dim,
           bool is_face,
           typename VectorizedArrayType>
 template <typename T>
-inline std::array<T, VectorizedArrayType::n_array_elements>
+inline std::array<T, VectorizedArrayType::size()>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_cell_data(
-    const AlignedVector<std::array<T, VectorizedArrayType::n_array_elements>>
-      &array) const
+  read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
+                   &array) const
 {
   Assert(matrix_info != nullptr, ExcNotImplemented());
   AssertDimension(array.size(),
@@ -3684,11 +3678,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto cells = this->get_cell_ids();
 
   // 2) actually gather values
-  std::array<T, VectorizedArrayType::n_array_elements> out;
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; ++i)
+  std::array<T, VectorizedArrayType::size()> out;
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (cells[i] != numbers::invalid_unsigned_int)
-      out[i] = array[cells[i] / VectorizedArrayType::n_array_elements]
-                    [cells[i] % VectorizedArrayType::n_array_elements];
+      out[i] = array[cells[i] / VectorizedArrayType::size()]
+                    [cells[i] % VectorizedArrayType::size()];
   return out;
 }
 
@@ -3780,11 +3774,10 @@ template <int dim,
 template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_write_operation(
-    const VectorOperation &                                   operation,
-    VectorType *                                              src[],
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask,
-    const bool apply_constraints) const
+  read_write_operation(const VectorOperation &operation,
+                       VectorType *           src[],
+                       const std::bitset<VectorizedArrayType::size()> &mask,
+                       const bool apply_constraints) const
 {
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization -> go to
@@ -3831,9 +3824,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // Case 3: standard operation with one index per degree of freedom -> go on
   // here
-  constexpr unsigned int n_vectorization =
-    VectorizedArrayType::n_array_elements;
-  Assert(mask.count() == n_vectorization,
+  constexpr unsigned int n_lanes = VectorizedArrayType::size();
+  Assert(mask.count() == n_lanes,
          ExcNotImplemented("Masking currently not implemented for "
                            "non-contiguous DoF storage"));
 
@@ -3851,13 +3843,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       const unsigned int *dof_indices =
         dof_info->dof_indices_interleaved.data() +
-        dof_info->row_starts[cell * n_fe_components * n_vectorization].first +
+        dof_info->row_starts[cell * n_fe_components * n_lanes].first +
         dof_info->component_dof_indices_offset[active_fe_index]
                                               [first_selected_component] *
-          n_vectorization;
+          n_lanes;
       if (n_components == 1 || n_fe_components == 1)
         for (unsigned int i = 0; i < dofs_per_component;
-             ++i, dof_indices += n_vectorization)
+             ++i, dof_indices += n_lanes)
           for (unsigned int comp = 0; comp < n_components; ++comp)
             operation.process_dof_gather(dof_indices,
                                          *src[comp],
@@ -3867,19 +3859,19 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component;
-               ++i, dof_indices += n_vectorization)
+               ++i, dof_indices += n_lanes)
             operation.process_dof_gather(
               dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
       return;
     }
 
-  const unsigned int *  dof_indices[n_vectorization];
+  const unsigned int *  dof_indices[n_lanes];
   VectorizedArrayType **values_dofs =
     const_cast<VectorizedArrayType **>(&this->values_dofs[0]);
 
   // Assign the appropriate cell ids for face/cell case and get the pointers
   // to the dof indices of the cells on all lanes
-  unsigned int        cells_copied[n_vectorization];
+  unsigned int        cells_copied[n_lanes];
   const unsigned int *cells;
   unsigned int        n_vectorization_actual =
     dof_info->n_vectorization_lanes_filled[dof_access_index][cell];
@@ -3889,7 +3881,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       if (dof_access_index ==
           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
         for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-          cells_copied[v] = cell * VectorizedArrayType::n_array_elements + v;
+          cells_copied[v] = cell * VectorizedArrayType::size() + v;
       cells = dof_access_index ==
                   internal::MatrixFreeFunctions::DoFInfo::dof_access_cell ?
                 &cells_copied[0] :
@@ -3913,21 +3905,20 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_vectorization; ++v)
+      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
         dof_indices[v] = nullptr;
     }
   else
     {
-      AssertIndexRange((cell + 1) * n_vectorization * n_fe_components,
+      AssertIndexRange((cell + 1) * n_lanes * n_fe_components,
                        dof_info->row_starts.size());
       const unsigned int n_components_read =
         n_fe_components > 1 ? n_components : 1;
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         {
           const std::pair<unsigned int, unsigned int> *my_index_start =
-            &dof_info
-               ->row_starts[(cell * n_vectorization + v) * n_fe_components +
-                            first_selected_component];
+            &dof_info->row_starts[(cell * n_lanes + v) * n_fe_components +
+                                  first_selected_component];
           if (my_index_start[n_components_read].second !=
               my_index_start[0].second)
             has_constraints = true;
@@ -3940,7 +3931,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           dof_indices[v] =
             dof_info->dof_indices.data() + my_index_start[0].first;
         }
-      for (unsigned int v = n_vectorization_actual; v < n_vectorization; ++v)
+      for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
         dof_indices[v] = nullptr;
     }
 
@@ -3948,7 +3939,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // through the list of DoFs directly
   if (!has_constraints)
     {
-      if (n_vectorization_actual < n_vectorization)
+      if (n_vectorization_actual < n_lanes)
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component; ++i)
             operation.process_empty(values_dofs[comp][i]);
@@ -3979,7 +3970,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // holds local number on cell, index iterates over the elements of
   // index_local_to_global and dof_indices points to the global indices stored
   // in index_local_to_global
-  if (n_vectorization_actual < n_vectorization)
+  if (n_vectorization_actual < n_lanes)
     for (unsigned int comp = 0; comp < n_components; ++comp)
       for (unsigned int i = 0; i < dofs_per_component; ++i)
         operation.process_empty(values_dofs[comp][i]);
@@ -4003,37 +3994,35 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           index_indicators =
             dof_info
-              ->row_starts[(cell * n_vectorization + v) * n_fe_components +
+              ->row_starts[(cell * n_lanes + v) * n_fe_components +
                            first_selected_component]
               .second;
           next_index_indicators =
             dof_info
-              ->row_starts[(cell * n_vectorization + v) * n_fe_components +
+              ->row_starts[(cell * n_lanes + v) * n_fe_components +
                            first_selected_component + 1]
               .second;
         }
 
       if (apply_constraints == false &&
           dof_info
-              ->row_starts[(cell * n_vectorization + v) * n_fe_components +
+              ->row_starts[(cell * n_lanes + v) * n_fe_components +
                            first_selected_component]
               .second !=
             dof_info
-              ->row_starts[(cell * n_vectorization + v) * n_fe_components +
+              ->row_starts[(cell * n_lanes + v) * n_fe_components +
                            first_selected_component + n_components_read]
               .second)
         {
-          Assert(
-            dof_info->row_starts_plain_indices[cell * n_vectorization + v] !=
-              numbers::invalid_unsigned_int,
-            ExcNotInitialized());
+          Assert(dof_info->row_starts_plain_indices[cell * n_lanes + v] !=
+                   numbers::invalid_unsigned_int,
+                 ExcNotInitialized());
           dof_indices[v] =
             dof_info->plain_dof_indices.data() +
             dof_info->component_dof_indices_offset[active_fe_index]
                                                   [first_selected_component] +
-            (is_face ?
-               dof_info->row_starts_plain_indices[cells[v]] :
-               dof_info->row_starts_plain_indices[cell * n_vectorization + v]);
+            (is_face ? dof_info->row_starts_plain_indices[cells[v]] :
+                       dof_info->row_starts_plain_indices[cell * n_lanes + v]);
           next_index_indicators = index_indicators;
         }
 
@@ -4157,8 +4146,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   else
                     next_index_indicators =
                       dof_info
-                        ->row_starts[(cell * n_vectorization + v) *
-                                       n_fe_components +
+                        ->row_starts[(cell * n_lanes + v) * n_fe_components +
                                      first_selected_component + comp + 2]
                         .second;
                 }
@@ -4209,9 +4197,9 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation_contiguous(
-    const VectorOperation &                                   operation,
-    VectorType *                                              src[],
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask) const
+    const VectorOperation &                         operation,
+    VectorType *                                    src[],
+    const std::bitset<VectorizedArrayType::size()> &mask) const
 {
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
@@ -4236,13 +4224,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   if (dof_info->index_storage_variants[ind][cell] ==
         internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
           interleaved_contiguous &&
-      n_lanes == VectorizedArrayType::n_array_elements)
+      n_lanes == VectorizedArrayType::size())
     {
       const unsigned int dof_index =
-        dof_indices_cont[cell * VectorizedArrayType::n_array_elements] +
+        dof_indices_cont[cell * VectorizedArrayType::size()] +
         dof_info->component_dof_indices_offset[active_fe_index]
                                               [first_selected_component] *
-          VectorizedArrayType::n_array_elements;
+          VectorizedArrayType::size();
       if (n_components == 1 || n_fe_components == 1)
         for (unsigned int comp = 0; comp < n_components; ++comp)
           operation.process_dofs_vectorized(data->dofs_per_component_on_cell,
@@ -4262,27 +4250,25 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // More general case: Must go through the components one by one and apply
   // some transformations
-  const unsigned int vectorization_populated =
+  const unsigned int n_filled_lanes =
     dof_info->n_vectorization_lanes_filled[ind][this->cell];
 
-  unsigned int dof_indices[VectorizedArrayType::n_array_elements];
-  for (unsigned int v = 0; v < vectorization_populated; ++v)
+  unsigned int dof_indices[VectorizedArrayType::size()];
+  for (unsigned int v = 0; v < n_filled_lanes; ++v)
     dof_indices[v] =
-      dof_indices_cont[cell * VectorizedArrayType::n_array_elements + v] +
+      dof_indices_cont[cell * VectorizedArrayType::size() + v] +
       dof_info->component_dof_indices_offset[active_fe_index]
                                             [first_selected_component] *
         dof_info->dof_indices_interleave_strides
-          [ind][cell * VectorizedArrayType::n_array_elements + v];
+          [ind][cell * VectorizedArrayType::size() + v];
 
-  for (unsigned int v = vectorization_populated;
-       v < VectorizedArrayType::n_array_elements;
-       ++v)
+  for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
     dof_indices[v] = numbers::invalid_unsigned_int;
 
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
-  if (vectorization_populated == VectorizedArrayType::n_array_elements &&
-      n_lanes == VectorizedArrayType::n_array_elements)
+  if (n_filled_lanes == VectorizedArrayType::size() &&
+      n_lanes == VectorizedArrayType::size())
     {
       if (dof_info->index_storage_variants[ind][cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
@@ -4312,12 +4298,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int i = 0; i < data->dofs_per_component_on_cell; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_dof_gather(
-                    dof_indices,
-                    *src[comp],
-                    i * VectorizedArrayType::n_array_elements,
-                    values_dofs[comp][i],
-                    vector_selector);
+                  operation.process_dof_gather(dof_indices,
+                                               *src[comp],
+                                               i * VectorizedArrayType::size(),
+                                               values_dofs[comp][i],
+                                               vector_selector);
               }
           else
             for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -4328,7 +4313,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                     dof_indices,
                     *src[0],
                     (comp * data->dofs_per_component_on_cell + i) *
-                      VectorizedArrayType::n_array_elements,
+                      VectorizedArrayType::size(),
                     values_dofs[comp][i],
                     vector_selector);
                 }
@@ -4341,7 +4326,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                  ExcNotImplemented());
           const unsigned int *offsets =
             &dof_info->dof_indices_interleave_strides
-               [ind][VectorizedArrayType::n_array_elements * cell];
+               [ind][VectorizedArrayType::size() * cell];
           if (n_components == 1 || n_fe_components == 1)
             for (unsigned int i = 0; i < data->dofs_per_component_on_cell; ++i)
               {
@@ -4352,9 +4337,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                values_dofs[comp][i],
                                                vector_selector);
                 DEAL_II_OPENMP_SIMD_PRAGMA
-                for (unsigned int v = 0;
-                     v < VectorizedArrayType::n_array_elements;
-                     ++v)
+                for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                   dof_indices[v] += offsets[v];
               }
           else
@@ -4368,9 +4351,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                values_dofs[comp][i],
                                                vector_selector);
                   DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int v = 0;
-                       v < VectorizedArrayType::n_array_elements;
-                       ++v)
+                  for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                     dof_indices[v] += offsets[v];
                 }
         }
@@ -4386,7 +4367,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           {
             if (n_components == 1 || n_fe_components == 1)
               {
-                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
                     for (unsigned int i = 0;
                          i < data->dofs_per_component_on_cell;
@@ -4397,7 +4378,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               }
             else
               {
-                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
                     for (unsigned int i = 0;
                          i < data->dofs_per_component_on_cell;
@@ -4413,12 +4394,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           {
             const unsigned int *offsets =
               &dof_info->dof_indices_interleave_strides
-                 [ind][VectorizedArrayType::n_array_elements * cell];
-            for (unsigned int v = 0; v < vectorization_populated; ++v)
-              AssertIndexRange(offsets[v],
-                               VectorizedArrayType::n_array_elements + 1);
+                 [ind][VectorizedArrayType::size() * cell];
+            for (unsigned int v = 0; v < n_filled_lanes; ++v)
+              AssertIndexRange(offsets[v], VectorizedArrayType::size() + 1);
             if (n_components == 1 || n_fe_components == 1)
-              for (unsigned int v = 0; v < vectorization_populated; ++v)
+              for (unsigned int v = 0; v < n_filled_lanes; ++v)
                 {
                   if (mask[v] == true)
                     for (unsigned int i = 0;
@@ -4430,7 +4410,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 }
             else
               {
-                for (unsigned int v = 0; v < vectorization_populated; ++v)
+                for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   if (mask[v] == true)
                     for (unsigned int i = 0;
                          i < data->dofs_per_component_on_cell;
@@ -4470,11 +4450,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         get_vector_component(const_cast<VectorType &>(src), d + first_index);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
-  read_write_operation(
-    reader,
-    src_data,
-    std::bitset<VectorizedArrayType::n_array_elements>().flip(),
-    true);
+  read_write_operation(reader,
+                       src_data,
+                       std::bitset<VectorizedArrayType::size()>().flip(),
+                       true);
 
 #  ifdef DEBUG
   dof_values_initialized = true;
@@ -4505,11 +4484,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         get_vector_component(const_cast<VectorType &>(src), d + first_index);
 
   internal::VectorReader<Number, VectorizedArrayType> reader;
-  read_write_operation(
-    reader,
-    src_data,
-    std::bitset<VectorizedArrayType::n_array_elements>().flip(),
-    false);
+  read_write_operation(reader,
+                       src_data,
+                       std::bitset<VectorizedArrayType::size()>().flip(),
+                       false);
 
 #  ifdef DEBUG
   dof_values_initialized = true;
@@ -4527,9 +4505,9 @@ template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   distribute_local_to_global(
-    VectorType &                                              dst,
-    const unsigned int                                        first_index,
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask) const
+    VectorType &                                    dst,
+    const unsigned int                              first_index,
+    const std::bitset<VectorizedArrayType::size()> &mask) const
 {
 #  ifdef DEBUG
   Assert(dof_values_initialized == true,
@@ -4562,10 +4540,9 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_dof_values(
-    VectorType &                                              dst,
-    const unsigned int                                        first_index,
-    const std::bitset<VectorizedArrayType::n_array_elements> &mask) const
+  set_dof_values(VectorType &                                    dst,
+                 const unsigned int                              first_index,
+                 const std::bitset<VectorizedArrayType::size()> &mask) const
 {
 #  ifdef DEBUG
   Assert(dof_values_initialized == true,
@@ -6677,7 +6654,8 @@ FEEvaluation<dim,
   // print error message when the dimensions do not match. Propose a possible
   // fix
   if ((static_cast<unsigned int>(fe_degree) != numbers::invalid_unsigned_int &&
-       static_cast<unsigned int>(fe_degree) != this->data->fe_degree) ||
+       static_cast<unsigned int>(fe_degree) !=
+         this->data->data.front().fe_degree) ||
       n_q_points != this->n_quadrature_points)
     {
       std::string message =
@@ -6703,7 +6681,8 @@ FEEvaluation<dim,
                    proposed_quad_comp = numbers::invalid_unsigned_int;
       if (dof_no != numbers::invalid_unsigned_int)
         {
-          if (static_cast<unsigned int>(fe_degree) == this->data->fe_degree)
+          if (static_cast<unsigned int>(fe_degree) ==
+              this->data->data.front().fe_degree)
             {
               proposed_dof_comp = dof_no;
               proposed_fe_comp  = first_selected_component;
@@ -6716,6 +6695,7 @@ FEEvaluation<dim,
                    ++nf)
                 if (this->matrix_info
                       ->get_shape_info(no, 0, nf, this->active_fe_index, 0)
+                      .data.front()
                       .fe_degree == static_cast<unsigned int>(fe_degree))
                   {
                     proposed_dof_comp = no;
@@ -6781,7 +6761,8 @@ FEEvaluation<dim,
         std::pow(1.001 * this->n_quadrature_points, 1. / dim));
       message += "Wrong template arguments:\n";
       message += "    Did you mean FEEvaluation<dim,";
-      message += Utilities::int_to_string(this->data->fe_degree) + ",";
+      message +=
+        Utilities::int_to_string(this->data->data.front().fe_degree) + ",";
       message += Utilities::int_to_string(proposed_n_q_points_1d);
       message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data";
@@ -6793,7 +6774,8 @@ FEEvaluation<dim,
         }
       message += ")?\n";
       std::string correct_pos;
-      if (this->data->fe_degree != static_cast<unsigned int>(fe_degree))
+      if (this->data->data.front().fe_degree !=
+          static_cast<unsigned int>(fe_degree))
         correct_pos = " ^";
       else
         correct_pos = "  ";
@@ -6803,7 +6785,8 @@ FEEvaluation<dim,
         correct_pos += "  \n";
       message += "                                 " + correct_pos;
 
-      Assert(static_cast<unsigned int>(fe_degree) == this->data->fe_degree &&
+      Assert(static_cast<unsigned int>(fe_degree) ==
+                 this->data->data.front().fe_degree &&
                n_q_points == this->n_quadrature_points,
              ExcMessage(message));
     }
@@ -6945,39 +6928,34 @@ FEEvaluation<dim,
 
   AssertIndexRange(q, n_q_points);
 
-  const unsigned int n_q_points_1d_actual =
-    fe_degree == -1 ? this->data->n_q_points_1d : n_q_points_1d;
-
-  // Cartesian mesh: not all quadrature points are stored, only the
-  // diagonal. Hence, need to find the tensor product index and retrieve the
-  // value from that
   const Point<dim, VectorizedArrayType> *quadrature_points =
     &this->mapping_data->quadrature_points
        [this->mapping_data->quadrature_point_offsets[this->cell]];
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+
+  // Cartesian/affine mesh: only first vertex of cell is stored, we must
+  // compute it through the Jacobian (which is stored in non-inverted and
+  // non-transposed form as index '1' in the jacobian field)
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      Point<dim, VectorizedArrayType> point;
-      switch (dim)
-        {
-          case 1:
-            return quadrature_points[q];
-          case 2:
-            point[0] = quadrature_points[q % n_q_points_1d_actual][0];
-            point[1] = quadrature_points[q / n_q_points_1d_actual][1];
-            return point;
-          case 3:
-            point[0] = quadrature_points[q % n_q_points_1d_actual][0];
-            point[1] = quadrature_points[(q / n_q_points_1d_actual) %
-                                         n_q_points_1d_actual][1];
-            point[2] = quadrature_points[q / (n_q_points_1d_actual *
-                                              n_q_points_1d_actual)][2];
-            return point;
-          default:
-            Assert(false, ExcNotImplemented());
-            return point;
-        }
+      Assert(this->jacobian != nullptr, ExcNotInitialized());
+      Point<dim, VectorizedArrayType> point = quadrature_points[0];
+
+      const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
+      if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        for (unsigned int d = 0; d < dim; ++d)
+          point[d] += jac[d][d] *
+                      static_cast<Number>(
+                        this->mapping_data->descriptor[this->active_quad_index]
+                          .quadrature.point(q)[d]);
+      else
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            point[d] += jac[d][e] * static_cast<Number>(
+                                      this->mapping_data
+                                        ->descriptor[this->active_quad_index]
+                                        .quadrature.point(q)[e]);
+      return point;
     }
-  // all other cases: just return the respective data as it is fully stored
   else
     return quadrature_points[q];
 }
@@ -7090,7 +7068,7 @@ FEEvaluation<
         input_vector.begin() +
         this->dof_info->dof_indices_contiguous
           [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-          [this->cell * VectorizedArrayType::n_array_elements]) %
+          [this->cell * VectorizedArrayType::size()]) %
           sizeof(VectorizedArrayType) ==
         0)
     {
@@ -7099,11 +7077,11 @@ FEEvaluation<
           input_vector.begin() +
           this->dof_info->dof_indices_contiguous
             [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-            [this->cell * VectorizedArrayType::n_array_elements] +
+            [this->cell * VectorizedArrayType::size()] +
           this->dof_info
               ->component_dof_indices_offset[this->active_fe_index]
                                             [this->first_selected_component] *
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
 
       evaluate(vec_values,
                evaluate_values,
@@ -7226,7 +7204,7 @@ FEEvaluation<
         destination.begin() +
         this->dof_info->dof_indices_contiguous
           [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-          [this->cell * VectorizedArrayType::n_array_elements]) %
+          [this->cell * VectorizedArrayType::size()]) %
           sizeof(VectorizedArrayType) ==
         0)
     {
@@ -7234,11 +7212,11 @@ FEEvaluation<
         destination.begin() +
         this->dof_info->dof_indices_contiguous
           [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-          [this->cell * VectorizedArrayType::n_array_elements] +
+          [this->cell * VectorizedArrayType::size()] +
         this->dof_info
             ->component_dof_indices_offset[this->active_fe_index]
                                           [this->first_selected_component] *
-          VectorizedArrayType::n_array_elements);
+          VectorizedArrayType::size());
       SelectEvaluator<dim,
                       fe_degree,
                       n_q_points_1d,
@@ -7326,8 +7304,8 @@ FEFaceEvaluation<dim,
       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior;
   Assert(this->mapping_data != nullptr, ExcNotInitialized());
-  const unsigned int n_vectors = VectorizedArrayType::n_array_elements;
-  const internal::MatrixFreeFunctions::FaceToCellTopology<n_vectors> &faces =
+  const internal::MatrixFreeFunctions::FaceToCellTopology<
+    VectorizedArrayType::size()> &faces =
     this->matrix_info->get_face_info(face_index);
   if (face_index >=
         this->matrix_info->get_task_info().face_partition_data.back() &&

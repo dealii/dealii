@@ -44,8 +44,7 @@ using namespace OpenCASCADE;
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // The circle passing through the
   // vertices of the unit square
@@ -90,7 +89,7 @@ main()
   // You can open the generated file
   // with paraview.
   GridOut gridout;
-  gridout.write_ucd(tria, logfile);
+  gridout.write_ucd(tria, deallog.get_file_stream());
 
   return 0;
 }

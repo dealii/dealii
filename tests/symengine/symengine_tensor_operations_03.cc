@@ -38,7 +38,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 // Function and its derivatives

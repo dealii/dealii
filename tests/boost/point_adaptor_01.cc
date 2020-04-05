@@ -17,6 +17,9 @@
 
 #include <deal.II/boost_adaptors/point.h>
 
+#include <boost/geometry/algorithms/equals.hpp>
+#include <boost/geometry/algorithms/make.hpp>
+
 #include "../tests.h"
 
 namespace bg = boost::geometry;

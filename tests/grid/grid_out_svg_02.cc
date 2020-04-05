@@ -24,7 +24,6 @@
 
 // Check SVG output with a GridGenerator function.
 
-using namespace dealii;
 
 Triangulation<2, 2>
 create_grid()

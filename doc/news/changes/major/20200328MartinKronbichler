@@ -1,0 +1,9 @@
+New: The step-67 tutorial program presents an explicit time integrator for the
+compressible Euler equations discretized with a high-order discontinuous
+Galerkin scheme using the matrix-free infrastructure. Besides the use of
+matrix-free evaluators for systems of equations and over-integration, it also
+presents MatrixFreeOperators::CellwiseInverseMassMatrix, a fast implementation
+of the action of the inverse mass matrix in the DG setting using tensor
+products.
+<br>
+(Martin Kronbichler, 2020/03/28)

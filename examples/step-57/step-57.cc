@@ -838,7 +838,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step57;
 
       StationaryNavierStokes<2> flow(/* degree = */ 1);

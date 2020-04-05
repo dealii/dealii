@@ -47,7 +47,7 @@ check_cells(const hp::DoFHandler<dim> &dof_handler)
       deallog << "cell=" << cell << std::endl;
       deallog << "n=" << cell->n_active_fe_indices() << std::endl;
       deallog << "x=";
-      for (unsigned int i = 0; i < dof_handler.get_fe().size(); ++i)
+      for (unsigned int i = 0; i < dof_handler.get_fe_collection().size(); ++i)
         deallog << cell->fe_index_is_active(i);
       deallog << std::endl;
 
@@ -74,7 +74,8 @@ check_faces(const hp::DoFHandler<dim> &dof_handler)
         deallog << "face=" << cell->face(f) << std::endl;
         deallog << "n=" << cell->face(f)->n_active_fe_indices() << std::endl;
         deallog << "x=";
-        for (unsigned int i = 0; i < dof_handler.get_fe().size(); ++i)
+        for (unsigned int i = 0; i < dof_handler.get_fe_collection().size();
+             ++i)
           deallog << cell->face(f)->fe_index_is_active(i);
         deallog << std::endl;
 
@@ -107,13 +108,14 @@ check_edges(const hp::DoFHandler<dim> &dof_handler)
         deallog << "edge=" << cell->line(e) << std::endl;
         deallog << "n=" << cell->line(e)->n_active_fe_indices() << std::endl;
         deallog << "x=";
-        for (unsigned int i = 0; i < dof_handler.get_fe().size(); ++i)
+        for (unsigned int i = 0; i < dof_handler.get_fe_collection().size();
+             ++i)
           deallog << cell->line(e)->fe_index_is_active(i);
         deallog << std::endl;
 
         Assert(cell->line(e)->n_active_fe_indices() >= 1, ExcInternalError());
         Assert(cell->line(e)->n_active_fe_indices() <=
-                 dof_handler.get_fe().size(),
+                 dof_handler.get_fe_collection().size(),
                ExcInternalError());
       }
 }

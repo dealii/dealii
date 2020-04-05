@@ -64,7 +64,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace LocalIntegrators;
 
 template <int dim>
@@ -511,12 +510,8 @@ LaplaceProblem<dim>::solve(bool use_mw)
   // if (use_mw)
   // mg_interface_down.initialize(mg_interface_out);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               coarse_grid_solver,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>

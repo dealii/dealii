@@ -384,10 +384,8 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
 
 
   // vector of solution vectors

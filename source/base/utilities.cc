@@ -28,8 +28,14 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <bitset>
@@ -421,6 +427,43 @@ namespace Utilities
 #else
     return compressed_input;
 #endif
+  }
+
+
+
+  std::string
+  encode_base64(const std::vector<unsigned char> &binary_input)
+  {
+    using namespace boost::archive::iterators;
+    using It = base64_from_binary<
+      transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
+    auto base64 = std::string(It(binary_input.begin()), It(binary_input.end()));
+    // Add padding.
+    return base64.append((3 - binary_input.size() % 3) % 3, '=');
+  }
+
+
+
+  std::vector<unsigned char>
+  decode_base64(const std::string &base64_input)
+  {
+    using namespace boost::archive::iterators;
+    using It =
+      transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
+    auto binary = std::vector<unsigned char>(It(base64_input.begin()),
+                                             It(base64_input.end()));
+    // Remove padding.
+    auto length = base64_input.size();
+    if (binary.size() > 2 && base64_input[length - 1] == '=' &&
+        base64_input[length - 2] == '=')
+      {
+        binary.erase(binary.end() - 2, binary.end());
+      }
+    else if (binary.size() > 1 && base64_input[length - 1] == '=')
+      {
+        binary.erase(binary.end() - 1, binary.end());
+      }
+    return binary;
   }
 
 
@@ -899,24 +942,24 @@ namespace Utilities
     const std::string
     get_current_vectorization_level()
     {
-      switch (DEAL_II_COMPILER_VECTORIZATION_LEVEL)
+      switch (DEAL_II_VECTORIZATION_WIDTH_IN_BITS)
         {
           case 0:
             return "disabled";
-          case 1:
+          case 128:
 #ifdef __ALTIVEC__
             return "AltiVec";
 #else
             return "SSE2";
 #endif
-          case 2:
+          case 256:
             return "AVX";
-          case 3:
+          case 512:
             return "AVX512";
           default:
             AssertThrow(false,
                         ExcInternalError(
-                          "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+                          "Invalid DEAL_II_VECTORIZATION_WIDTH_IN_BITS."));
             return "ERROR";
         }
     }

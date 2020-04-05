@@ -60,4 +60,48 @@
  * such a way that the bandwidth of associated matrices is minimized. Finally,
  * the DoFTools namespace offers a variety of algorithms around handling
  * degrees of freedom.
+ *
+ * In the grand scheme of things, the pieces of this module interact
+ * with a variety of other parts of the library:
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",bgcolor="transparent"];
+
+  node [fontname="FreeSans",fontsize=15,
+        shape=box,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
+
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs", fillcolor="deepskyblue"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
+
+  {
+    rank=same
+    mapping -> quadrature [dir="none", color="transparent"];
+    quadrature -> fe      [dir="none", color="transparent"];
+    fe -> tria            [dir="none", color="transparent"];
+  }
+
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+}
+ * @enddot
  */

@@ -27,37 +27,81 @@
  * the menu at the top of this page). These modules form around the building
  * blocks of any finite element program. An outline of how the primary groups
  * of classes in deal.II interact is given by the following clickable graph,
- * with a more detailed description below:
+ * with a more detailed description below (gray boxes denote a subset of the
+ * optional external libraries, gray ovals a subset of the optional external
+ * applications with which deal.II can interact):
  *
  * @dot
  digraph G
 {
   graph[rankdir="TB",bgcolor="transparent"];
 
-  edge [fontname="FreeSans",fontsize=15,labelfontname="FreeSans",labelfontsize=10];
   node [fontname="FreeSans",fontsize=15,
         shape=record,height=0.2,width=0.4,
         color="black", fillcolor="white", style="filled"];
+  edge [color="black", weight=10];
 
-  FE [label="FiniteElement",URL="\ref feall"];
-  Tria [label="Triangulation",URL="\ref grid"];
-  DoFHandler [label="DoFHandler",URL="\ref dofs"];
-  Quadrature [label="Quadrature",URL="\ref Quadrature"];
-  Mapping [label="Mapping",URL="\ref mapping"];
-  FEValues [label="FEValues",URL="\ref feaccess"];
-  Linear [label="Linear Systems",URL="\ref LAC"];
-  LinearSolver [label="Linear Solvers",URL="\ref Solvers"];
-  Output [label="Output",URL="\ref output"];
+  tria       [label="Triangulation",    URL="\ref grid"];
+  fe         [label="Finite elements",    URL="\ref feall"];
+  mapping    [label="Mapping",          URL="\ref mapping"];
+  quadrature [label="Quadrature",       URL="\ref Quadrature"];
+  dh         [label="DoFHandler",       URL="\ref dofs"];
+  fevalues   [label="FEValues",         URL="\ref feaccess"];
+  systems    [label="Linear systems",   URL="\ref LAC"];
+  solvers    [label="Linear solvers",   URL="\ref Solvers"];
+  output     [label="Graphical output", URL="\ref output"];
+  manifold   [label="Manifold",         URL="\ref manifold"];
 
-  Tria -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  FE -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  FE -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  Mapping -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  Quadrature -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  FEValues -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  DoFHandler -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  Linear -> LinearSolver [color="black",fontsize=10,style="solid",fontname="FreeSans"];
-  LinearSolver -> Output [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  tria -> dh              [color="black",style="solid"];
+  fe -> dh                [color="black",style="solid"];
+  fe -> fevalues          [color="black",style="solid"];
+  mapping -> fevalues     [color="black",style="solid"];
+  quadrature -> fevalues  [color="black",style="solid"];
+  dh -> systems           [color="black",style="solid"];
+  fevalues -> systems     [color="black",style="solid"];
+  systems -> solvers      [color="black",style="solid"];
+  solvers -> output       [color="black",style="solid"];
+  manifold -> tria        [color="black",style="solid"];
+  manifold -> mapping     [color="black",style="solid"];
+
+
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=record,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  opencascade [label="OpenCASCADE"];
+  subgraph linalglibs {
+    rank="same";
+    petsc       [label="PETSc",    URL="\ref PETScWrappers"];
+    trilinos    [label="Trilinos", URL="\ref TrilinosWrappers"];
+    cuda        [label="CUDA",     URL="\ref CUDAWrappers"];
+  }
+  umfpack     [label="UMFPACK"];
+
+  petsc -> systems        [dir="none"];
+  petsc -> solvers        [dir="none"];
+  trilinos -> systems     [dir="none"];
+  trilinos -> solvers     [dir="none"];
+  cuda -> systems         [dir="none"];
+  cuda -> solvers         [dir="none"];
+  umfpack -> solvers      [dir="none"];
+  opencascade -> manifold [dir="none"];
+
+
+  node [fontname="FreeSans",fontsize=12,
+        shape=ellipse,height=0.2,width=0.4,
+        color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
+  edge [color="gray55", weight=1];
+
+  gmsh        [label="gmsh", URL="\ref Gmsh"];
+  visit       [label="VisIt"]
+  paraview    [label="ParaView"]
+
+  gmsh -> tria       [dir="none"];
+  output -> visit    [dir="none"];
+  output -> paraview [dir="none"];
 }
  * @enddot
  *
@@ -93,6 +137,11 @@
  *   The classes that describe triangulations and cells are located
  *   and documented in the @ref grid module. Iterators are described
  *   in the @ref Iterators module.
+ *
+ *   <li> <b>%Manifold</b>: Manifolds describe the shape of cells and,
+ *   more generally, the geometry of the domain on which one wants
+ *   to solve an equation. They use the language of differential
+ *   geometry. More information can be found in @ref manifold.
  *
  *   <li> <b>Finite Element</b>: Finite element classes describe the
  *   properties of a finite element space as defined on the unit

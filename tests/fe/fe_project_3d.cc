@@ -51,7 +51,6 @@
  * Alexander Grayver, Maien Hamed
  */
 
-using namespace dealii;
 
 static const Point<3> vertices_affine[] = {
   Point<3>(-1., -1., -1.), Point<3>(0., -1., -1.),  Point<3>(1., -1., -1.),
@@ -409,10 +408,8 @@ test(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(7);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(7) << std::fixed;
 
   const static unsigned dim      = 3;
   unsigned              order    = 1;

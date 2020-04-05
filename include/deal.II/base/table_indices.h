@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <algorithm>
 #include <iterator>
@@ -54,88 +55,14 @@ public:
   constexpr TableIndices() = default;
 
   /**
-   * Constructor. This is the appropriate constructor for an
-   * object of type TableIndices<1> and initializes the single
-   * index with @p index0.
+   * Constructor. Initializes the indices stored by this object by the given
+   * arguments @p indices
    *
    * This constructor will result in a compiler error if
-   * the template argument @p N is different from one.
+   * the template argument @p N is different from the number of the arguments.
    */
-  constexpr explicit TableIndices(const std::size_t index0);
-
-  /**
-   * Constructor. This is the appropriate constructor for an
-   * object of type TableIndices<2> and initializes the
-   * indices stored by this object by the given arguments.
-   *
-   * This constructor will result in a compiler error if
-   * the template argument @p N is different from two.
-   */
-  constexpr TableIndices(const std::size_t index0, const std::size_t index1);
-
-  /**
-   * Constructor. This is the appropriate constructor for an
-   * object of type TableIndices<3> and initializes the
-   * indices stored by this object by the given arguments.
-   *
-   * This constructor will result in a compiler error if
-   * the template argument @p N is different from three.
-   */
-  constexpr TableIndices(const std::size_t index0,
-                         const std::size_t index1,
-                         const std::size_t index2);
-
-  /**
-   * Constructor. This is the appropriate constructor for an
-   * object of type TableIndices<4> and initializes the
-   * indices stored by this object by the given arguments.
-   *
-   * This constructor will result in a compiler error if
-   * the template argument @p N is different from four.
-   */
-  constexpr TableIndices(const std::size_t index0,
-                         const std::size_t index1,
-                         const std::size_t index2,
-                         const std::size_t index3);
-
-  /**
-   * Constructor. This is the appropriate constructor for an
-   * object of type TableIndices<5> and initializes the
-   * indices stored by this object by the given arguments.
-   *
-   * This constructor will result in a compiler error if
-   * the template argument @p N is different from five.
-   */
-  constexpr TableIndices(const std::size_t index0,
-                         const std::size_t index1,
-                         const std::size_t index2,
-                         const std::size_t index3,
-                         const std::size_t index4);
-
-  /**
-   * Convenience constructor that takes up to 9 arguments. It can be used to
-   * populate a TableIndices object upon creation, either completely, or
-   * partially.
-   *
-   * Index entries that are not set by these arguments (either because they
-   * are omitted, or because $N > 9$) are set to
-   * numbers::invalid_unsigned_int.
-   *
-   * Note that only the first <tt>N</tt> arguments are actually used.
-   *
-   * @deprecated Use the constructor with the appropriate number of arguments
-   *   to initialize the @p N indices instead.
-   */
-  DEAL_II_DEPRECATED
-  TableIndices(const std::size_t index0,
-               const std::size_t index1,
-               const std::size_t index2,
-               const std::size_t index3,
-               const std::size_t index4,
-               const std::size_t index5,
-               const std::size_t index6 = numbers::invalid_unsigned_int,
-               const std::size_t index7 = numbers::invalid_unsigned_int,
-               const std::size_t index8 = numbers::invalid_unsigned_int);
+  template <typename... T>
+  constexpr TableIndices(const T... indices);
 
   /**
    * Read-only access the value of the <tt>i</tt>th index.
@@ -185,153 +112,15 @@ protected:
 
 /* --------------------- Template and inline functions ---------------- */
 
-
-
 template <int N>
-constexpr TableIndices<N>::TableIndices(const std::size_t index0)
-  : indices{index0}
+template <typename... T>
+constexpr TableIndices<N>::TableIndices(const T... args)
+  : indices{static_cast<const unsigned int>(args)...}
 {
-  static_assert(
-    N == 1, "This constructor is only available for TableIndices<1> objects.");
-}
-
-
-
-template <int N>
-constexpr TableIndices<N>::TableIndices(const std::size_t index0,
-                                        const std::size_t index1)
-  : indices{index0, index1}
-{
-  static_assert(
-    N == 2, "This constructor is only available for TableIndices<2> objects.");
-}
-
-
-
-template <int N>
-constexpr TableIndices<N>::TableIndices(const std::size_t index0,
-                                        const std::size_t index1,
-                                        const std::size_t index2)
-  : indices{index0, index1, index2}
-{
-  static_assert(
-    N == 3, "This constructor is only available for TableIndices<3> objects.");
-}
-
-
-
-template <int N>
-constexpr TableIndices<N>::TableIndices(const std::size_t index0,
-                                        const std::size_t index1,
-                                        const std::size_t index2,
-                                        const std::size_t index3)
-  : indices{index0, index1, index2, index3}
-{
-  static_assert(
-    N == 4, "This constructor is only available for TableIndices<4> objects.");
-}
-
-
-
-template <int N>
-constexpr TableIndices<N>::TableIndices(const std::size_t index0,
-                                        const std::size_t index1,
-                                        const std::size_t index2,
-                                        const std::size_t index3,
-                                        const std::size_t index4)
-  : indices{index0, index1, index2, index3, index4}
-{
-  static_assert(
-    N == 5, "This constructor is only available for TableIndices<5> objects.");
-}
-
-
-
-template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1,
-                              const std::size_t index2,
-                              const std::size_t index3,
-                              const std::size_t index4,
-                              const std::size_t index5,
-                              const std::size_t index6,
-                              const std::size_t index7,
-                              const std::size_t index8)
-{
-  switch (N)
-    {
-      case 1:
-        Assert(index1 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 2:
-        Assert(index2 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 3:
-        Assert(index3 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 4:
-        Assert(index4 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 5:
-        Assert(index5 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 6:
-        Assert(index6 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 7:
-        Assert(index7 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        DEAL_II_FALLTHROUGH;
-      case 8:
-        Assert(index8 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
-        break;
-      default:;
-    }
-
-  // Always access "indices" with indices modulo N to avoid bogus compiler
-  // warnings (although such access is always in dead code...
-  switch (N)
-    {
-      default:
-        // For TableIndices of size 10 or larger als default initialize the
-        // remaining indices to numbers::invalid_unsigned_int:
-        for (unsigned int i = 0; i < N; ++i)
-          indices[i] = numbers::invalid_unsigned_int;
-        DEAL_II_FALLTHROUGH;
-      case 9:
-        indices[8 % N] = index8;
-        DEAL_II_FALLTHROUGH;
-      case 8:
-        indices[7 % N] = index7;
-        DEAL_II_FALLTHROUGH;
-      case 7:
-        indices[6 % N] = index6;
-        DEAL_II_FALLTHROUGH;
-      case 6:
-        indices[5 % N] = index5;
-        DEAL_II_FALLTHROUGH;
-      case 5:
-        indices[4 % N] = index4;
-        DEAL_II_FALLTHROUGH;
-      case 4:
-        indices[3 % N] = index3;
-        DEAL_II_FALLTHROUGH;
-      case 3:
-        indices[2 % N] = index2;
-        DEAL_II_FALLTHROUGH;
-      case 2:
-        indices[1 % N] = index1;
-        DEAL_II_FALLTHROUGH;
-      case 1:
-        indices[0 % N] = index0;
-    }
+  static_assert(internal::TemplateConstraints::all_true<
+                  std::is_integral<T>::value...>::value,
+                "Not all of the parameters have integral type!");
+  static_assert(sizeof...(T) == N, "Wrong number of constructor arguments!");
 }
 
 

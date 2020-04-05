@@ -1141,10 +1141,11 @@ namespace Step28
   // used to determine when convergence of the inverse power iteration has
   // occurred. In addition, we have a constructor of this class that sets all
   // these values to their default values, a function
-  // <code>declare_parameters</code> that described to the ParameterHandler
-  // class already used in step-19 what parameters are accepted in the input
-  // file, and a function <code>get_parameters</code> that can extract the
-  // values of these parameters from a ParameterHandler object.
+  // <code>declare_parameters</code> that describes to the ParameterHandler
+  // class what parameters are accepted in the input file, and a function
+  // <code>get_parameters</code> that can extract the values of these
+  // parameters from a ParameterHandler object. See also step-29 for another
+  // example of using ParameterHandler.
   template <int dim>
   class NeutronDiffusionProblem
   {

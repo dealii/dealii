@@ -684,16 +684,6 @@ public:
   MGTransferPrebuilt(const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
-   * Constructor with constraints. Equivalent to the default constructor
-   * followed by initialize_constraints().
-   *
-   * @deprecated @p constraints is unused.
-   */
-  DEAL_II_DEPRECATED
-  MGTransferPrebuilt(const AffineConstraints<double> &constraints,
-                     const MGConstrainedDoFs &        mg_constrained_dofs);
-
-  /**
    * Destructor.
    */
   virtual ~MGTransferPrebuilt() override = default;
@@ -703,16 +693,6 @@ public:
    */
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
-
-  /**
-   * Initialize the constraints to be used in build().
-   *
-   * @deprecated @p constraints is unused.
-   */
-  DEAL_II_DEPRECATED
-  void
-  initialize_constraints(const AffineConstraints<double> &constraints,
-                         const MGConstrainedDoFs &        mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.

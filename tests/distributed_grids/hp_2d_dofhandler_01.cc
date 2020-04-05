@@ -63,7 +63,7 @@ test()
 
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active();
 
-  const unsigned int dofs_per_cell = dofh.get_fe()[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = dofh.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
 

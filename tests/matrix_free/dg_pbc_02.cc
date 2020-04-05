@@ -35,8 +35,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 
 
 template <int dim>
@@ -103,9 +101,7 @@ test()
         n_inner_other_faces(2 * dim), n_boundary_faces(2 * dim);
       for (unsigned int f = 0; f < mf_data.n_inner_face_batches(); ++f)
         {
-          for (unsigned int v = 0;
-               v < VectorizedArray<double>::n_array_elements;
-               ++v)
+          for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
             if (mf_data.get_face_info(f).cells_interior[v] !=
                 numbers::invalid_unsigned_int)
               {
@@ -119,9 +115,7 @@ test()
            mf_data.n_inner_face_batches() + mf_data.n_boundary_face_batches();
            ++f)
         {
-          for (unsigned int v = 0;
-               v < VectorizedArray<double>::n_array_elements;
-               ++v)
+          for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
             if (mf_data.get_face_info(f).cells_interior[v] !=
                 numbers::invalid_unsigned_int)
               {

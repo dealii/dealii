@@ -40,5 +40,26 @@ higher order mappings; it is therefore clearly advantageous in this
 case to use a higher order mapping, not because it improves the order
 of convergence but just to reduce the constant before the convergence
 order. On the other hand, using a cubic mapping only improves the
-result further insignificantly, except for the case of very coarse
+result further by insignificant amounts, except on very coarse
 grids.
+
+We can also visualize the underlying meshes by using, for instance,
+ParaView. The image below shows initial meshes for different mapping
+degrees:
+
+<img src="https://www.dealii.org/images/steps/developer/step-11.cycle_0.png" alt="">
+
+Clearly, the effect is most pronounced when we go from the linear to
+quadratic mapping. This is also reflected in the error values given
+in the table above. The effect of going from quadratic to cubic degree
+is less dramatic, but still tangible owing to a more accurate
+description of the circular boundary.
+
+Next, let's look at the meshes after three global refinements
+
+<img src="https://www.dealii.org/images/steps/developer/step-11.cycle_3.png" alt="">
+
+Here, the differences are much less visible, especially for higher order
+mappings. Indeed, at this refinement level the error values reported
+in the table are essentially identical between mappings of degrees two
+and three.

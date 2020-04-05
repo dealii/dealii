@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim, int degree_p, typename BlockVectorType>
 class MatrixFreeTest : public MatrixFreeOperators::Base<dim, BlockVectorType>

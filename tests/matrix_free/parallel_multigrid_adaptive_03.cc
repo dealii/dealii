@@ -604,7 +604,7 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
     mg_interface_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<number>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,

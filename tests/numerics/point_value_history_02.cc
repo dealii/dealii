@@ -49,8 +49,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class Postprocess : public DataPostprocessor<dim>

@@ -61,7 +61,7 @@ namespace parallel
         &construction_data)
     {
       // check if the communicator of this parallel triangulation has been used
-      // to construct the ConstructionData
+      // to construct the TriangulationDescription::Description
       Assert(construction_data.comm == this->mpi_communicator,
              ExcMessage("MPI communicators do not match!"));
 

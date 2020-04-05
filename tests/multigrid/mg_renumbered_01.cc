@@ -58,7 +58,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim, typename number, int spacedim>
@@ -392,15 +391,10 @@ LaplaceProblem<dim>::test()
 
   mg::Matrix<Vector<double>> mg_matrix_renumbered(mg_matrices_renumbered);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               mg_coarse,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
 
-  Multigrid<Vector<double>> mg_renumbered(mg_dof_handler_renumbered,
-                                          mg_matrix_renumbered,
+  Multigrid<Vector<double>> mg_renumbered(mg_matrix_renumbered,
                                           mg_coarse_renumbered,
                                           mg_transfer_renumbered,
                                           mg_smoother_renumbered,

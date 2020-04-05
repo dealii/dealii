@@ -1,0 +1,4 @@
+Removed: The deprecated classes BlockMatrixArray (and derived classes) and MeanValueFilter
+have been removed. Use BlockLinearOperator instead.
+<br>
+(Daniel Arndt, 2020/03/28)

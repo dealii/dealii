@@ -68,10 +68,8 @@ test()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
-
-  deallog.attach(logfile);
 
   test();
 

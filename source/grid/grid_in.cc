@@ -371,36 +371,41 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // Now see if we know about this type of data set,
                       // if not, just ignore everything till the next SCALARS
                       // keyword
-                      std::string set = "";
-                      in >> keyword;
-                      for (const auto &set_cmp : data_sets)
-                        if (keyword == set_cmp)
-                          {
-                            set = keyword;
-                            break;
-                          }
-                      if (set.empty())
+                      std::string field_name;
+                      in >> field_name;
+                      if (std::find(data_sets.begin(),
+                                    data_sets.end(),
+                                    field_name) == data_sets.end())
+                        // The data set here is not one of the ones we know, so
                         // keep ignoring everything until the next SCALARS
-                        // keyword
+                        // keyword.
                         continue;
 
-                      // Now we got somewhere. Proceed from here.
-                      // Ignore everything till the end of the line.
-                      // SCALARS MaterialID 1
+                      // Now we got somewhere. Proceed from here, assert
+                      // that the type of the table is int, and ignore the
+                      // rest of the line.
+                      // SCALARS MaterialID int 1
                       // (the last number is optional)
-                      in.ignore(256, '\n');
+                      std::string line;
+                      std::getline(in, line);
+                      AssertThrow(
+                        line.substr(1,
+                                    std::min(static_cast<std::size_t>(3),
+                                             line.size() - 1)) == "int",
+                        ExcMessage(
+                          "While reading VTK file, material- and manifold IDs can only have type 'int'."));
 
                       in >> keyword;
                       AssertThrow(
                         keyword == "LOOKUP_TABLE",
                         ExcMessage(
-                          "While reading VTK file, missing keyword LOOKUP_TABLE"));
+                          "While reading VTK file, missing keyword 'LOOKUP_TABLE'."));
 
                       in >> keyword;
                       AssertThrow(
                         keyword == "default",
                         ExcMessage(
-                          "While reading VTK file, missing keyword default"));
+                          "While reading VTK file, missing keyword 'default'."));
 
                       // read material or manifold ids first for all cells,
                       // then for all faces, and finally for all lines. the
@@ -409,12 +414,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // the order used in the following blocks makes sense
                       for (unsigned int i = 0; i < cells.size(); i++)
                         {
-                          double id;
+                          int id;
                           in >> id;
-                          if (set == "MaterialID")
+                          if (field_name == "MaterialID")
                             cells[i].material_id =
                               static_cast<types::material_id>(id);
-                          else if (set == "ManifoldID")
+                          else if (field_name == "ManifoldID")
                             cells[i].manifold_id =
                               static_cast<types::manifold_id>(id);
                           else
@@ -425,12 +430,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         {
                           for (auto &boundary_quad : subcelldata.boundary_quads)
                             {
-                              double id;
+                              int id;
                               in >> id;
-                              if (set == "MaterialID")
+                              if (field_name == "MaterialID")
                                 boundary_quad.material_id =
                                   static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
+                              else if (field_name == "ManifoldID")
                                 boundary_quad.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else
@@ -438,12 +443,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             }
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
-                              double id;
+                              int id;
                               in >> id;
-                              if (set == "MaterialID")
+                              if (field_name == "MaterialID")
                                 boundary_line.material_id =
                                   static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
+                              else if (field_name == "ManifoldID")
                                 boundary_line.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else
@@ -454,12 +459,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         {
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
-                              double id;
+                              int id;
                               in >> id;
-                              if (set == "MaterialID")
+                              if (field_name == "MaterialID")
                                 boundary_line.material_id =
                                   static_cast<types::material_id>(id);
-                              else if (set == "ManifoldID")
+                              else if (field_name == "ManifoldID")
                                 boundary_line.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else

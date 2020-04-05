@@ -237,7 +237,7 @@ namespace internal
     {
       const Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
-           ++i, vec_ptr += VectorizedArrayType::n_array_elements)
+           ++i, vec_ptr += VectorizedArrayType::size())
         dof_values[i].load(vec_ptr);
     }
 
@@ -252,9 +252,9 @@ namespace internal
                             std::integral_constant<bool, false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
-          dof_values[i][v] = vector_access(
-            vec, dof_index + v + i * VectorizedArrayType::n_array_elements);
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          dof_values[i][v] =
+            vector_access(vec, dof_index + v + i * VectorizedArrayType::size());
     }
 
 
@@ -284,7 +284,7 @@ namespace internal
                                       std::integral_constant<bool, false>) const
     {
       for (unsigned int d = 0; d < dofs_per_cell; ++d)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
           dof_values[d][v] = vector_access(vec, dof_indices[v] + d);
     }
 
@@ -315,7 +315,7 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
-      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         res[v] = vector_access(vec, indices[v] + constant_offset);
     }
 
@@ -393,7 +393,7 @@ namespace internal
     {
       Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
-           ++i, vec_ptr += VectorizedArrayType::n_array_elements)
+           ++i, vec_ptr += VectorizedArrayType::size())
         {
           VectorizedArrayType tmp;
           tmp.load(vec_ptr);
@@ -413,10 +413,9 @@ namespace internal
                             std::integral_constant<bool, false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
           vector_access_add(vec,
-                            dof_index + v +
-                              i * VectorizedArrayType::n_array_elements,
+                            dof_index + v + i * VectorizedArrayType::size(),
                             dof_values[i][v]);
     }
 
@@ -445,7 +444,7 @@ namespace internal
                                       std::integral_constant<bool, false>) const
     {
       for (unsigned int d = 0; d < dofs_per_cell; ++d)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
           vector_access_add(vec, dof_indices[v] + d, dof_values[d][v]);
     }
 
@@ -461,8 +460,8 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, true>) const
     {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
-      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access(vec, indices[v] + constant_offset) += res[v];
 #else
       // only use gather in case there is also scatter.
@@ -485,7 +484,7 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
-      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access_add(vec, indices[v] + constant_offset, res[v]);
     }
 
@@ -558,7 +557,7 @@ namespace internal
     {
       Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
-           ++i, vec_ptr += VectorizedArrayType::n_array_elements)
+           ++i, vec_ptr += VectorizedArrayType::size())
         dof_values[i].store(vec_ptr);
     }
 
@@ -573,10 +572,8 @@ namespace internal
                             std::integral_constant<bool, false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
-          vector_access(vec,
-                        dof_index + v +
-                          i * VectorizedArrayType::n_array_elements) =
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          vector_access(vec, dof_index + v + i * VectorizedArrayType::size()) =
             dof_values[i][v];
     }
 
@@ -605,7 +602,7 @@ namespace internal
                                       std::integral_constant<bool, false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
           vector_access(vec, dof_indices[v] + i) = dof_values[i][v];
     }
 
@@ -632,7 +629,7 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
-      for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access(vec, indices[v] + constant_offset) = res[v];
     }
 

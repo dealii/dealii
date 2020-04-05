@@ -256,8 +256,7 @@ or the number of eigenvalues we want to solve for. We could go much
 further with this but stop at making only a few of the things that one
 could select at run time actual input file parameters. In order to see
 what could be done in this regard, take a look at @ref step_29
-"step-29", step-33, and in particular @ref step_19
-"step-19".</li>
+"step-29" and step-33.</li>
 
 <li>We use the FunctionParser class to make the potential $V(\mathbf
 x)$ a run-time parameter that can be specified in the input file as a

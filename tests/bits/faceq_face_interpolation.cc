@@ -146,9 +146,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(6);
-      deallog.attach(logfile);
 
       check<1>();
       check<2>();

@@ -163,14 +163,17 @@ namespace internal
                                         fe_degree + 1,
                                         n_q_points_1d,
                                         Number>;
-    Eval eval(variant == evaluate_evenodd ? shape_info.shape_values_eo :
-                                            shape_info.shape_values,
-              variant == evaluate_evenodd ? shape_info.shape_gradients_eo :
-                                            shape_info.shape_gradients,
-              variant == evaluate_evenodd ? shape_info.shape_hessians_eo :
-                                            shape_info.shape_hessians,
-              shape_info.fe_degree + 1,
-              shape_info.n_q_points_1d);
+    Eval eval(variant == evaluate_evenodd ?
+                shape_info.data.front().shape_values_eo :
+                shape_info.data.front().shape_values,
+              variant == evaluate_evenodd ?
+                shape_info.data.front().shape_gradients_eo :
+                shape_info.data.front().shape_gradients,
+              variant == evaluate_evenodd ?
+                shape_info.data.front().shape_hessians_eo :
+                shape_info.data.front().shape_hessians,
+              shape_info.data.front().fe_degree + 1,
+              shape_info.data.front().n_q_points_1d);
 
     const unsigned int temp_size =
       Eval::n_rows_of_product == numbers::invalid_unsigned_int ?
@@ -183,9 +186,10 @@ namespace internal
     if (temp_size == 0)
       {
         temp1 = scratch_data;
-        temp2 = temp1 +
-                std::max(Utilities::fixed_power<dim>(shape_info.fe_degree + 1),
-                         Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
+        temp2 = temp1 + std::max(Utilities::fixed_power<dim>(
+                                   shape_info.data.front().fe_degree + 1),
+                                 Utilities::fixed_power<dim>(
+                                   shape_info.data.front().n_q_points_1d));
       }
     else
       {
@@ -197,7 +201,7 @@ namespace internal
       temp_size == 0 ? shape_info.n_q_points : Eval::n_columns_of_product;
     const unsigned int dofs_per_comp =
       (type == MatrixFreeFunctions::truncated_tensor) ?
-        Utilities::fixed_power<dim>(shape_info.fe_degree + 1) :
+        Utilities::fixed_power<dim>(shape_info.data.front().fe_degree + 1) :
         shape_info.dofs_per_component_on_cell;
     const Number *values_dofs = values_dofs_actual;
     if (type == MatrixFreeFunctions::truncated_tensor)
@@ -205,7 +209,8 @@ namespace internal
         Number *values_dofs_tmp =
           scratch_data + 2 * (std::max(shape_info.dofs_per_component_on_cell,
                                        shape_info.n_q_points));
-        const int degree = fe_degree != -1 ? fe_degree : shape_info.fe_degree;
+        const int degree =
+          fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
         unsigned int count_p = 0, count_q = 0;
         for (int i = 0; i < (dim > 2 ? degree + 1 : 1); ++i)
           {
@@ -434,14 +439,17 @@ namespace internal
                                         fe_degree + 1,
                                         n_q_points_1d,
                                         Number>;
-    Eval eval(variant == evaluate_evenodd ? shape_info.shape_values_eo :
-                                            shape_info.shape_values,
-              variant == evaluate_evenodd ? shape_info.shape_gradients_eo :
-                                            shape_info.shape_gradients,
-              variant == evaluate_evenodd ? shape_info.shape_hessians_eo :
-                                            shape_info.shape_hessians,
-              shape_info.fe_degree + 1,
-              shape_info.n_q_points_1d);
+    Eval eval(variant == evaluate_evenodd ?
+                shape_info.data.front().shape_values_eo :
+                shape_info.data.front().shape_values,
+              variant == evaluate_evenodd ?
+                shape_info.data.front().shape_gradients_eo :
+                shape_info.data.front().shape_gradients,
+              variant == evaluate_evenodd ?
+                shape_info.data.front().shape_hessians_eo :
+                shape_info.data.front().shape_hessians,
+              shape_info.data.front().fe_degree + 1,
+              shape_info.data.front().n_q_points_1d);
 
     const unsigned int temp_size =
       Eval::n_rows_of_product == numbers::invalid_unsigned_int ?
@@ -454,9 +462,10 @@ namespace internal
     if (temp_size == 0)
       {
         temp1 = scratch_data;
-        temp2 = temp1 +
-                std::max(Utilities::fixed_power<dim>(shape_info.fe_degree + 1),
-                         Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
+        temp2 = temp1 + std::max(Utilities::fixed_power<dim>(
+                                   shape_info.data.front().fe_degree + 1),
+                                 Utilities::fixed_power<dim>(
+                                   shape_info.data.front().n_q_points_1d));
       }
     else
       {
@@ -468,7 +477,7 @@ namespace internal
       temp_size == 0 ? shape_info.n_q_points : Eval::n_columns_of_product;
     const unsigned int dofs_per_comp =
       (type == MatrixFreeFunctions::truncated_tensor) ?
-        Utilities::fixed_power<dim>(shape_info.fe_degree + 1) :
+        Utilities::fixed_power<dim>(shape_info.data.front().fe_degree + 1) :
         shape_info.dofs_per_component_on_cell;
     // expand dof_values to tensor product for truncated tensor products
     Number *values_dofs =
@@ -612,7 +621,8 @@ namespace internal
       {
         values_dofs -= dofs_per_comp * n_components;
         unsigned int count_p = 0, count_q = 0;
-        const int degree = fe_degree != -1 ? fe_degree : shape_info.fe_degree;
+        const int    degree =
+          fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
         for (int i = 0; i < (dim > 2 ? degree + 1 : 1); ++i)
           {
             for (int j = 0; j < (dim > 1 ? degree + 1 - i : 1); ++j)
@@ -630,7 +640,8 @@ namespace internal
             count_q += i * (degree + 1);
           }
         AssertDimension(count_q,
-                        Utilities::fixed_power<dim>(shape_info.fe_degree + 1));
+                        Utilities::fixed_power<dim>(
+                          shape_info.data.front().fe_degree + 1));
       }
   }
 
@@ -1039,8 +1050,9 @@ namespace internal
     const bool evaluate_gradients,
     const bool evaluate_hessians)
   {
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (fe_degree + 2) / 2 * (fe_degree + 1));
+    AssertDimension(
+      shape_info.data.front().shape_gradients_collocation_eo.size(),
+      (fe_degree + 2) / 2 * (fe_degree + 1));
 
     EvaluatorTensorProduct<evaluate_evenodd,
                            dim,
@@ -1048,8 +1060,8 @@ namespace internal
                            fe_degree + 1,
                            Number>
                            eval(AlignedVector<Number>(),
-           shape_info.shape_gradients_collocation_eo,
-           shape_info.shape_hessians_collocation_eo);
+           shape_info.data.front().shape_gradients_collocation_eo,
+           shape_info.data.front().shape_hessians_collocation_eo);
     constexpr unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 
     for (unsigned int c = 0; c < n_components; c++)
@@ -1115,8 +1127,9 @@ namespace internal
     const bool integrate_gradients,
     const bool add_into_values_array)
   {
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (fe_degree + 2) / 2 * (fe_degree + 1));
+    AssertDimension(
+      shape_info.data.front().shape_gradients_collocation_eo.size(),
+      (fe_degree + 2) / 2 * (fe_degree + 1));
 
     EvaluatorTensorProduct<evaluate_evenodd,
                            dim,
@@ -1124,8 +1137,8 @@ namespace internal
                            fe_degree + 1,
                            Number>
                            eval(AlignedVector<Number>(),
-           shape_info.shape_gradients_collocation_eo,
-           shape_info.shape_hessians_collocation_eo);
+           shape_info.data.front().shape_gradients_collocation_eo,
+           shape_info.data.front().shape_hessians_collocation_eo);
     constexpr unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
 
     for (unsigned int c = 0; c < n_components; c++)
@@ -1241,7 +1254,7 @@ namespace internal
           n_q_points_1d,
           1,
           Number,
-          Number>::do_forward(shape_info.shape_values_eo,
+          Number>::do_forward(shape_info.data.front().shape_values_eo,
                               values_dofs,
                               values_quad);
 
@@ -1292,8 +1305,9 @@ namespace internal
                       "of lower degree, so the evaluation results would be "
                       "wrong. Thus, this class does not permit the desired "
                       "operation."));
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (n_q_points_1d + 1) / 2 * n_q_points_1d);
+    AssertDimension(
+      shape_info.data.front().shape_gradients_collocation_eo.size(),
+      (n_q_points_1d + 1) / 2 * n_q_points_1d);
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
     for (unsigned int c = 0; c < n_components; c++)
@@ -1318,7 +1332,7 @@ namespace internal
           n_q_points_1d,
           1,
           Number,
-          Number>::do_backward(shape_info.shape_values_eo,
+          Number>::do_backward(shape_info.data.front().shape_values_eo,
                                add_into_values_array,
                                values_quad,
                                values_dofs);
@@ -1360,29 +1374,29 @@ namespace internal
     {
       const AlignedVector<Number> &val1 =
         symmetric_evaluate ?
-          data.shape_values_eo :
+          data.data.front().shape_values_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_values :
-             data.values_within_subface[subface_index % 2]);
+             data.data.front().shape_values :
+             data.data.front().values_within_subface[subface_index % 2]);
       const AlignedVector<Number> &val2 =
         symmetric_evaluate ?
-          data.shape_values_eo :
+          data.data.front().shape_values_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_values :
-             data.values_within_subface[subface_index / 2]);
+             data.data.front().shape_values :
+             data.data.front().values_within_subface[subface_index / 2]);
 
       const AlignedVector<Number> &grad1 =
         symmetric_evaluate ?
-          data.shape_gradients_eo :
+          data.data.front().shape_gradients_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_gradients :
-             data.gradients_within_subface[subface_index % 2]);
+             data.data.front().shape_gradients :
+             data.data.front().gradients_within_subface[subface_index % 2]);
       const AlignedVector<Number> &grad2 =
         symmetric_evaluate ?
-          data.shape_gradients_eo :
+          data.data.front().shape_gradients_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_gradients :
-             data.gradients_within_subface[subface_index / 2]);
+             data.data.front().shape_gradients :
+             data.data.front().gradients_within_subface[subface_index / 2]);
 
       using Eval =
         internal::EvaluatorTensorProduct<symmetric_evaluate ?
@@ -1395,18 +1409,20 @@ namespace internal
       Eval eval1(val1,
                  grad1,
                  AlignedVector<Number>(),
-                 data.fe_degree + 1,
-                 data.n_q_points_1d);
+                 data.data.front().fe_degree + 1,
+                 data.data.front().n_q_points_1d);
       Eval eval2(val2,
                  grad2,
                  AlignedVector<Number>(),
-                 data.fe_degree + 1,
-                 data.n_q_points_1d);
+                 data.data.front().fe_degree + 1,
+                 data.data.front().n_q_points_1d);
 
       const unsigned int size_deg =
         fe_degree > -1 ?
           Utilities::pow(fe_degree + 1, dim - 1) :
-          (dim > 1 ? Utilities::fixed_power<dim - 1>(data.fe_degree + 1) : 1);
+          (dim > 1 ?
+             Utilities::fixed_power<dim - 1>(data.data.front().fe_degree + 1) :
+             1);
 
       const unsigned int n_q_points = fe_degree > -1 ?
                                         Utilities::pow(n_q_points_1d, dim - 1) :
@@ -1454,9 +1470,10 @@ namespace internal
                         n_q_points_1d,
                         n_q_points_1d,
                         Number>
-                        eval_grad(AlignedVector<Number>(),
-                                  data.shape_gradients_collocation_eo,
-                                  AlignedVector<Number>());
+                        eval_grad(
+                          AlignedVector<Number>(),
+                          data.data.front().shape_gradients_collocation_eo,
+                          AlignedVector<Number>());
                       eval_grad.template gradients<0, true, false>(
                         values_quad, gradients_quad);
                       eval_grad.template gradients<1, true, false>(
@@ -1521,29 +1538,29 @@ namespace internal
     {
       const AlignedVector<Number> &val1 =
         symmetric_evaluate ?
-          data.shape_values_eo :
+          data.data.front().shape_values_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_values :
-             data.values_within_subface[subface_index % 2]);
+             data.data.front().shape_values :
+             data.data.front().values_within_subface[subface_index % 2]);
       const AlignedVector<Number> &val2 =
         symmetric_evaluate ?
-          data.shape_values_eo :
+          data.data.front().shape_values_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_values :
-             data.values_within_subface[subface_index / 2]);
+             data.data.front().shape_values :
+             data.data.front().values_within_subface[subface_index / 2]);
 
       const AlignedVector<Number> &grad1 =
         symmetric_evaluate ?
-          data.shape_gradients_eo :
+          data.data.front().shape_gradients_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_gradients :
-             data.gradients_within_subface[subface_index % 2]);
+             data.data.front().shape_gradients :
+             data.data.front().gradients_within_subface[subface_index % 2]);
       const AlignedVector<Number> &grad2 =
         symmetric_evaluate ?
-          data.shape_gradients_eo :
+          data.data.front().shape_gradients_eo :
           (subface_index >= GeometryInfo<dim>::max_children_per_cell ?
-             data.shape_gradients :
-             data.gradients_within_subface[subface_index / 2]);
+             data.data.front().shape_gradients :
+             data.data.front().gradients_within_subface[subface_index / 2]);
 
       using Eval =
         internal::EvaluatorTensorProduct<symmetric_evaluate ?
@@ -1553,13 +1570,23 @@ namespace internal
                                          fe_degree + 1,
                                          n_q_points_1d,
                                          Number>;
-      Eval eval1(val1, grad1, val1, data.fe_degree + 1, data.n_q_points_1d);
-      Eval eval2(val2, grad2, val1, data.fe_degree + 1, data.n_q_points_1d);
+      Eval eval1(val1,
+                 grad1,
+                 val1,
+                 data.data.front().fe_degree + 1,
+                 data.data.front().n_q_points_1d);
+      Eval eval2(val2,
+                 grad2,
+                 val1,
+                 data.data.front().fe_degree + 1,
+                 data.data.front().n_q_points_1d);
 
       const unsigned int size_deg =
         fe_degree > -1 ?
           Utilities::pow(fe_degree + 1, dim - 1) :
-          (dim > 1 ? Utilities::fixed_power<dim - 1>(data.fe_degree + 1) : 1);
+          (dim > 1 ?
+             Utilities::fixed_power<dim - 1>(data.data.front().fe_degree + 1) :
+             1);
 
       const unsigned int n_q_points = fe_degree > -1 ?
                                         Utilities::pow(n_q_points_1d, dim - 1) :
@@ -1609,9 +1636,10 @@ namespace internal
                         n_q_points_1d,
                         n_q_points_1d,
                         Number>
-                        eval_grad(AlignedVector<Number>(),
-                                  data.shape_gradients_collocation_eo,
-                                  AlignedVector<Number>());
+                        eval_grad(
+                          AlignedVector<Number>(),
+                          data.data.front().shape_gradients_collocation_eo,
+                          AlignedVector<Number>());
                       if (integrate_val)
                         eval_grad.template gradients<1, false, true>(
                           gradients_quad + n_q_points, values_quad);
@@ -1687,10 +1715,10 @@ namespace internal
                                        fe_degree + 1,
                                        0,
                                        Number>
-        evalf(data.shape_data_on_face[face_no % 2],
+        evalf(data.data.front().shape_data_on_face[face_no % 2],
               AlignedVector<Number>(),
               AlignedVector<Number>(),
-              data.fe_degree + 1,
+              data.data.front().fe_degree + 1,
               0);
 
       const unsigned int in_stride = do_evaluate ?
@@ -1739,7 +1767,7 @@ namespace internal
   void
   do_vectorized_read(const Number2 *src_ptr, VectorizedArrayType &dst)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst[v] = src_ptr[v];
   }
 
@@ -1763,7 +1791,7 @@ namespace internal
                        const unsigned int * indices,
                        VectorizedArrayType &dst)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst[v] = src_ptr[indices[v]];
   }
 
@@ -1787,7 +1815,7 @@ namespace internal
   void
   do_vectorized_add(const VectorizedArrayType src, Number2 *dst_ptr)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst_ptr[v] += src[v];
   }
 
@@ -1813,7 +1841,7 @@ namespace internal
                             const unsigned int *      indices,
                             Number2 *                 dst_ptr)
   {
-    for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst_ptr[indices[v]] += src[v];
   }
 
@@ -1827,7 +1855,7 @@ namespace internal
                             const unsigned int *                 indices,
                             Number *                             dst_ptr)
   {
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
     for (unsigned int v = 0; v < width; ++v)
       dst_ptr[indices[v]] += src[v];
 #else
@@ -1865,8 +1893,9 @@ namespace internal
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                          numbers::invalid_unsigned_int;
       const unsigned int dofs_per_face =
-        fe_degree > -1 ? static_dofs_per_face :
-                         Utilities::pow(data.fe_degree + 1, dim - 1);
+        fe_degree > -1 ?
+          static_dofs_per_face :
+          Utilities::pow(data.data.front().fe_degree + 1, dim - 1);
 
       // we allocate small amounts of data on the stack to signal the compiler
       // that this temporary data is only needed for the calculations but the
@@ -1972,8 +2001,9 @@ namespace internal
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                          numbers::invalid_unsigned_int;
       const unsigned int dofs_per_face =
-        fe_degree > -1 ? static_dofs_per_face :
-                         Utilities::pow(data.fe_degree + 1, dim - 1);
+        fe_degree > -1 ?
+          static_dofs_per_face :
+          Utilities::pow(data.data.front().fe_degree + 1, dim - 1);
 
       constexpr unsigned int stack_array_size_threshold = 100;
 
@@ -2062,8 +2092,9 @@ namespace internal
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
                          numbers::invalid_unsigned_int;
       const unsigned int dofs_per_face =
-        fe_degree > -1 ? static_dofs_per_face :
-                         Utilities::pow(data.fe_degree + 1, dim - 1);
+        fe_degree > -1 ?
+          static_dofs_per_face :
+          Utilities::pow(data.data.front().fe_degree + 1, dim - 1);
 
       constexpr unsigned int stack_array_size_threshold = 100;
 
@@ -2079,7 +2110,7 @@ namespace internal
 
       // case 1: contiguous and interleaved indices
       if (((evaluate_gradients == false &&
-            data.nodal_at_cell_boundaries == true) ||
+            data.data.front().nodal_at_cell_boundaries == true) ||
            (data.element_type ==
               MatrixFreeFunctions::tensor_symmetric_hermite &&
             fe_degree > 1)) &&
@@ -2089,13 +2120,14 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int dof_index =
-            dof_info.dof_indices_contiguous
-              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info
+              .dof_indices_contiguous[dof_access_index]
+                                     [cell * VectorizedArrayType::size()] +
             dof_info.component_dof_indices_offset[active_fe_index]
                                                  [first_selected_component] *
-              VectorizedArrayType::n_array_elements;
+              VectorizedArrayType::size();
 
           if (fe_degree > 1 && evaluate_gradients == true)
             {
@@ -2103,7 +2135,7 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 1 + side];
+                data.data.front().shape_data_on_face[0][fe_degree + 1 + side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
               const unsigned int *index_array =
@@ -2116,15 +2148,15 @@ namespace internal
                   AssertIndexRange(ind2, data.dofs_per_component_on_cell);
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
-                      do_vectorized_read(
-                        src_ptr + dof_index +
-                          (ind1 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements,
-                        temp1[i + 2 * comp * dofs_per_face]);
+                      do_vectorized_read(src_ptr + dof_index +
+                                           (ind1 +
+                                            comp * static_dofs_per_component) *
+                                             VectorizedArrayType::size(),
+                                         temp1[i + 2 * comp * dofs_per_face]);
                       do_vectorized_read(
                         src_ptr + dof_index +
                           (ind2 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         temp1[dofs_per_face + i + 2 * comp * dofs_per_face]);
                       temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
                         grad_weight *
@@ -2143,18 +2175,18 @@ namespace internal
                 {
                   const unsigned int ind = index_array[i];
                   for (unsigned int comp = 0; comp < n_components; ++comp)
-                    do_vectorized_read(
-                      src_ptr + dof_index +
-                        (ind + comp * static_dofs_per_component) *
-                          VectorizedArrayType::n_array_elements,
-                      temp1[i + 2 * comp * dofs_per_face]);
+                    do_vectorized_read(src_ptr + dof_index +
+                                         (ind +
+                                          comp * static_dofs_per_component) *
+                                           VectorizedArrayType::size(),
+                                       temp1[i + 2 * comp * dofs_per_face]);
                 }
             }
         }
 
       // case 2: contiguous and interleaved indices with fixed stride
       else if (((evaluate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2164,17 +2196,18 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (fe_degree > 1 && evaluate_gradients == true)
             {
               // we know that the gradient weights for the Hermite case on the
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 1 + side];
+                data.data.front().shape_data_on_face[0][fe_degree + 1 + side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
 
@@ -2183,29 +2216,28 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind1 =
-                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                    index_array[2 * i] * VectorizedArrayType::size();
                   const unsigned int ind2 =
-                    index_array[2 * i + 1] *
-                    VectorizedArrayType::n_array_elements;
+                    index_array[2 * i + 1] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
                       do_vectorized_gather(
                         src_ptr + ind1 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         indices,
                         temp1[i + 2 * comp * dofs_per_face]);
                       VectorizedArrayType grad;
                       do_vectorized_gather(
                         src_ptr + ind2 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements,
+                            VectorizedArrayType::size(),
                         indices,
                         grad);
                       temp1[i + dofs_per_face + 2 * comp * dofs_per_face] =
@@ -2223,15 +2255,15 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind =
-                    index_array[i] * VectorizedArrayType::n_array_elements;
+                    index_array[i] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     do_vectorized_gather(
                       src_ptr + ind +
                         comp * static_dofs_per_component *
-                          VectorizedArrayType::n_array_elements +
+                          VectorizedArrayType::size() +
                         dof_info.component_dof_indices_offset
                             [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::n_array_elements,
+                          VectorizedArrayType::size(),
                       indices,
                       temp1[i + 2 * comp * dofs_per_face]);
                 }
@@ -2240,7 +2272,7 @@ namespace internal
 
       // case 3: contiguous and interleaved indices with mixed stride
       else if (((evaluate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2250,14 +2282,12 @@ namespace internal
         {
           const unsigned int *strides =
             &dof_info.dof_indices_interleave_strides
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
-          unsigned int indices[VectorizedArrayType::n_array_elements];
-          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
-               ++v)
+               [dof_access_index][cell * VectorizedArrayType::size()];
+          unsigned int indices[VectorizedArrayType::size()];
+          for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             indices[v] =
               dof_info.dof_indices_contiguous
-                [dof_access_index]
-                [cell * VectorizedArrayType::n_array_elements + v] +
+                [dof_access_index][cell * VectorizedArrayType::size() + v] +
               dof_info.component_dof_indices_offset[active_fe_index]
                                                    [first_selected_component] *
                 strides[v];
@@ -2270,29 +2300,27 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 1 + side];
+                data.data.front().shape_data_on_face[0][fe_degree + 1 + side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
 
               const unsigned int *index_array =
                 &data.face_to_cell_index_hermite(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      unsigned int ind1[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind1[v] =
                           indices[v] + (comp * static_dofs_per_component +
                                         index_array[2 * i]) *
                                          strides[v];
-                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      unsigned int ind2[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind2[v] =
                           indices[v] + (comp * static_dofs_per_component +
@@ -2340,14 +2368,13 @@ namespace internal
                               dofs_per_face);
               const unsigned int *index_array =
                 &data.face_to_cell_index_nodal(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (nvec == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      unsigned int ind[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind[v] =
                           indices[v] +
@@ -2379,7 +2406,7 @@ namespace internal
 
       // case 4: contiguous indices without interleaving
       else if (((evaluate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2387,11 +2414,12 @@ namespace internal
                  MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                    contiguous &&
                dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
-                 VectorizedArrayType::n_array_elements)
+                 VectorizedArrayType::size())
         {
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (evaluate_gradients == true &&
               data.element_type ==
                 MatrixFreeFunctions::tensor_symmetric_hermite)
@@ -2400,7 +2428,7 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 1 + side];
+                data.data.front().shape_data_on_face[0][fe_degree + 1 + side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
 
@@ -2544,8 +2572,9 @@ namespace internal
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim) :
                          numbers::invalid_unsigned_int;
       const unsigned int dofs_per_face =
-        fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim - 1) :
-                         Utilities::pow(data.fe_degree + 1, dim - 1);
+        fe_degree > -1 ?
+          Utilities::pow(fe_degree + 1, dim - 1) :
+          Utilities::pow(data.data.front().fe_degree + 1, dim - 1);
 
       constexpr unsigned int stack_array_size_threshold = 100;
 
@@ -2597,7 +2626,7 @@ namespace internal
 
       // case 1: contiguous and interleaved indices
       if (((integrate_gradients == false &&
-            data.nodal_at_cell_boundaries == true) ||
+            data.data.front().nodal_at_cell_boundaries == true) ||
            (data.element_type ==
               internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
             fe_degree > 1)) &&
@@ -2607,13 +2636,14 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int dof_index =
-            dof_info.dof_indices_contiguous
-              [dof_access_index][cell * VectorizedArrayType::n_array_elements] +
+            dof_info
+              .dof_indices_contiguous[dof_access_index]
+                                     [cell * VectorizedArrayType::size()] +
             dof_info.component_dof_indices_offset[active_fe_index]
                                                  [first_selected_component] *
-              VectorizedArrayType::n_array_elements;
+              VectorizedArrayType::size();
 
           if (fe_degree > 1 && integrate_gradients == true)
             {
@@ -2621,7 +2651,7 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 2 - side];
+                data.data.front().shape_data_on_face[0][fe_degree + 2 - side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
               const unsigned int *index_array =
@@ -2641,16 +2671,16 @@ namespace internal
                       VectorizedArrayType grad =
                         grad_weight *
                         temp1[i + dofs_per_face + 2 * comp * dofs_per_face];
-                      do_vectorized_add(
-                        val,
-                        dst_ptr + dof_index +
-                          (ind1 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements);
-                      do_vectorized_add(
-                        grad,
-                        dst_ptr + dof_index +
-                          (ind2 + comp * static_dofs_per_component) *
-                            VectorizedArrayType::n_array_elements);
+                      do_vectorized_add(val,
+                                        dst_ptr + dof_index +
+                                          (ind1 +
+                                           comp * static_dofs_per_component) *
+                                            VectorizedArrayType::size());
+                      do_vectorized_add(grad,
+                                        dst_ptr + dof_index +
+                                          (ind2 +
+                                           comp * static_dofs_per_component) *
+                                            VectorizedArrayType::size());
                     }
                 }
             }
@@ -2664,18 +2694,18 @@ namespace internal
                 {
                   const unsigned int ind = index_array[i];
                   for (unsigned int comp = 0; comp < n_components; ++comp)
-                    do_vectorized_add(
-                      temp1[i + 2 * comp * dofs_per_face],
-                      dst_ptr + dof_index +
-                        (ind + comp * static_dofs_per_component) *
-                          VectorizedArrayType::n_array_elements);
+                    do_vectorized_add(temp1[i + 2 * comp * dofs_per_face],
+                                      dst_ptr + dof_index +
+                                        (ind +
+                                         comp * static_dofs_per_component) *
+                                          VectorizedArrayType::size());
                 }
             }
         }
 
       // case 2: contiguous and interleaved indices with fixed stride
       else if (((integrate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2685,17 +2715,18 @@ namespace internal
         {
           AssertDimension(
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell],
-            VectorizedArrayType::n_array_elements);
+            VectorizedArrayType::size());
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
           if (fe_degree > 1 && integrate_gradients == true)
             {
               // we know that the gradient weights for the Hermite case on the
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 2 - side];
+                data.data.front().shape_data_on_face[0][fe_degree + 2 - side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
 
@@ -2704,10 +2735,9 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind1 =
-                    index_array[2 * i] * VectorizedArrayType::n_array_elements;
+                    index_array[2 * i] * VectorizedArrayType::size();
                   const unsigned int ind2 =
-                    index_array[2 * i + 1] *
-                    VectorizedArrayType::n_array_elements;
+                    index_array[2 * i + 1] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     {
                       VectorizedArrayType val =
@@ -2722,19 +2752,19 @@ namespace internal
                         indices,
                         dst_ptr + ind1 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements);
+                            VectorizedArrayType::size());
                       do_vectorized_scatter_add(
                         grad,
                         indices,
                         dst_ptr + ind2 +
                           comp * static_dofs_per_component *
-                            VectorizedArrayType::n_array_elements +
+                            VectorizedArrayType::size() +
                           dof_info.component_dof_indices_offset
                               [active_fe_index][first_selected_component] *
-                            VectorizedArrayType::n_array_elements);
+                            VectorizedArrayType::size());
                     }
                 }
             }
@@ -2747,24 +2777,24 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
                   const unsigned int ind =
-                    index_array[i] * VectorizedArrayType::n_array_elements;
+                    index_array[i] * VectorizedArrayType::size();
                   for (unsigned int comp = 0; comp < n_components; ++comp)
                     do_vectorized_scatter_add(
                       temp1[i + 2 * comp * dofs_per_face],
                       indices,
                       dst_ptr + ind +
                         comp * static_dofs_per_component *
-                          VectorizedArrayType::n_array_elements +
+                          VectorizedArrayType::size() +
                         dof_info.component_dof_indices_offset
                             [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::n_array_elements);
+                          VectorizedArrayType::size());
                 }
             }
         }
 
       // case 3: contiguous and interleaved indices with mixed stride
       else if (((integrate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2774,18 +2804,16 @@ namespace internal
         {
           const unsigned int *strides =
             &dof_info.dof_indices_interleave_strides
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
-          unsigned int indices[VectorizedArrayType::n_array_elements];
-          for (unsigned int v = 0; v < VectorizedArrayType::n_array_elements;
-               ++v)
+               [dof_access_index][cell * VectorizedArrayType::size()];
+          unsigned int indices[VectorizedArrayType::size()];
+          for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             indices[v] =
               dof_info.dof_indices_contiguous
-                [dof_access_index]
-                [cell * VectorizedArrayType::n_array_elements + v] +
+                [dof_access_index][cell * VectorizedArrayType::size() + v] +
               dof_info.component_dof_indices_offset[active_fe_index]
                                                    [first_selected_component] *
                 strides[v];
-          const unsigned int nvec =
+          const unsigned int n_filled_lanes =
             dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
 
           if (fe_degree > 1 && integrate_gradients == true)
@@ -2794,29 +2822,27 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 2 - side];
+                data.data.front().shape_data_on_face[0][fe_degree + 2 - side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
 
               const unsigned int *index_array =
                 &data.face_to_cell_index_hermite(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind1[VectorizedArrayType::n_array_elements];
+                      unsigned int ind1[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind1[v] =
                           indices[v] + (comp * static_dofs_per_component +
                                         index_array[2 * i]) *
                                          strides[v];
-                      unsigned int ind2[VectorizedArrayType::n_array_elements];
+                      unsigned int ind2[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind2[v] =
                           indices[v] + (comp * static_dofs_per_component +
@@ -2834,7 +2860,7 @@ namespace internal
                     }
               else
                 {
-                  for (unsigned int v = 0; v < nvec; ++v)
+                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
@@ -2864,14 +2890,13 @@ namespace internal
                               dofs_per_face);
               const unsigned int *index_array =
                 &data.face_to_cell_index_nodal(face_no, 0);
-              if (nvec == VectorizedArrayType::n_array_elements)
+              if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind[VectorizedArrayType::n_array_elements];
+                      unsigned int ind[VectorizedArrayType::size()];
                       DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0;
-                           v < VectorizedArrayType::n_array_elements;
+                      for (unsigned int v = 0; v < VectorizedArrayType::size();
                            ++v)
                         ind[v] =
                           indices[v] +
@@ -2882,7 +2907,7 @@ namespace internal
                     }
               else
                 {
-                  for (unsigned int v = 0; v < nvec; ++v)
+                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
@@ -2899,7 +2924,7 @@ namespace internal
 
       // case 4: contiguous indices without interleaving
       else if (((integrate_gradients == false &&
-                 data.nodal_at_cell_boundaries == true) ||
+                 data.data.front().nodal_at_cell_boundaries == true) ||
                 (data.element_type ==
                    internal::MatrixFreeFunctions::tensor_symmetric_hermite &&
                  fe_degree > 1)) &&
@@ -2907,11 +2932,12 @@ namespace internal
                  internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                    contiguous &&
                dof_info.n_vectorization_lanes_filled[dof_access_index][cell] ==
-                 VectorizedArrayType::n_array_elements)
+                 VectorizedArrayType::size())
         {
           const unsigned int *indices =
-            &dof_info.dof_indices_contiguous
-               [dof_access_index][cell * VectorizedArrayType::n_array_elements];
+            &dof_info
+               .dof_indices_contiguous[dof_access_index]
+                                      [cell * VectorizedArrayType::size()];
 
           if (integrate_gradients == true &&
               data.element_type ==
@@ -2921,7 +2947,7 @@ namespace internal
               // right (side==1) are the negative from the value at the left
               // (side==0), so we only read out one of them.
               const VectorizedArrayType grad_weight =
-                data.shape_data_on_face[0][fe_degree + 2 - side];
+                data.data.front().shape_data_on_face[0][fe_degree + 2 - side];
               AssertDimension(data.face_to_cell_index_hermite.size(1),
                               2 * dofs_per_face);
               const unsigned int *index_array =
@@ -3062,9 +3088,10 @@ namespace internal
                                        fe_degree + 1,
                                        fe_degree + 1,
                                        Number>
-        evaluator(AlignedVector<Number>(),
-                  AlignedVector<Number>(),
-                  fe_eval.get_shape_info().inverse_shape_values_eo);
+        evaluator(
+          AlignedVector<Number>(),
+          AlignedVector<Number>(),
+          fe_eval.get_shape_info().data.front().inverse_shape_values_eo);
 
       for (unsigned int d = 0; d < n_components; ++d)
         {

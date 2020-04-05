@@ -56,7 +56,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 void
 test(bool use_inhomogeneity_for_rhs)

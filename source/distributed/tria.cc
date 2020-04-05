@@ -2813,12 +2813,43 @@ namespace parallel
         &connectivity);
 
       if (numcpus != Utilities::MPI::n_mpi_processes(this->mpi_communicator))
-        // We are changing the number of CPUs so we need to repartition.
-        // Note that p4est actually distributes the cells between the changed
-        // number of CPUs and so everything works without this call, but
-        // this command changes the distribution for some reason, so we
-        // will leave it in here.
-        repartition();
+        {
+          // We are changing the number of CPUs so we need to repartition.
+          // Note that p4est actually distributes the cells between the changed
+          // number of CPUs and so everything works without this call, but
+          // this command changes the distribution for some reason, so we
+          // will leave it in here.
+          if (this->signals.cell_weight.num_slots() == 0)
+            {
+              // no cell weights given -- call p4est's 'partition' without a
+              // callback for cell weights
+              dealii::internal::p4est::functions<dim>::partition(
+                parallel_forest,
+                /* prepare coarsening */ 1,
+                /* weight_callback */ nullptr);
+            }
+          else
+            {
+              // get cell weights for a weighted repartitioning.
+              const std::vector<unsigned int> cell_weights = get_cell_weights();
+
+              PartitionWeights<dim, spacedim> partition_weights(cell_weights);
+
+              // attach (temporarily) a pointer to the cell weights through
+              // p4est's user_pointer object
+              Assert(parallel_forest->user_pointer == this, ExcInternalError());
+              parallel_forest->user_pointer = &partition_weights;
+
+              dealii::internal::p4est::functions<dim>::partition(
+                parallel_forest,
+                /* prepare coarsening */ 1,
+                /* weight_callback */
+                &PartitionWeights<dim, spacedim>::cell_weight);
+
+              // reset the user pointer to its previous state
+              parallel_forest->user_pointer = this;
+            }
+        }
 
       try
         {
@@ -4485,7 +4516,7 @@ namespace parallel
       // to connect to a vertex that is 'dim' hops away from the locally owned
       // cell. Depending on the order of the periodic face map, we might
       // connect to that point by chance or miss it. However, after looping
-      // through all the periodict directions (which are at most as many as
+      // through all the periodic directions (which are at most as many as
       // the number of space dimensions) we can be sure that all connections
       // to vertices have been created.
       for (unsigned int repetition = 0; repetition < dim; ++repetition)
@@ -4560,6 +4591,11 @@ namespace parallel
              ExcMessage("The triangulation is empty!"));
       Assert(this->n_levels() == 1,
              ExcMessage("The triangulation is refined!"));
+
+      // call the base class for storing the periodicity information; we must
+      // do this before going to p4est and rebuilding the triangulation to get
+      // the level subdomain ids correct in the multigrid case
+      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
       for (const auto &face_pair : periodicity_vector)
         {
@@ -4690,7 +4726,6 @@ namespace parallel
         /* user_data_constructor = */ nullptr,
         /* user_pointer */ this);
 
-
       try
         {
           copy_local_forest_to_triangulation();
@@ -4701,9 +4736,6 @@ namespace parallel
           // cells
           Assert(false, ExcInternalError());
         }
-
-      // finally call the base class for storing the periodicity information
-      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
       // The range of ghost_owners might have changed so update that information
       this->update_number_cache();

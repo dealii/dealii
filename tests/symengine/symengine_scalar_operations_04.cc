@@ -21,7 +21,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 template <typename Number1, typename Number2>

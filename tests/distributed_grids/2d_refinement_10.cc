@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Purpose of this test:
 // Demonstrate that mesh smoothing option limit_level_difference_at_vertices

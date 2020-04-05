@@ -27,7 +27,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -90,7 +89,8 @@ do_test()
       deallog << "* owned on level " << level << std::endl;
       data_out.set_cell_selection(
         [level](const typename Triangulation<dim>::cell_iterator &cell) {
-          return (cell->level() == level && cell->is_locally_owned_on_level());
+          return (cell->level() == static_cast<int>(level) &&
+                  cell->is_locally_owned_on_level());
         });
       print(data_out, triangulation);
     }

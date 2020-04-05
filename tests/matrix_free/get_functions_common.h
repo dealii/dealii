@@ -161,7 +161,7 @@ public:
 
     // for doubles, use a stricter condition than
     // for floats for the relative error size
-    if (types_are_equal<Number, double>::value == true)
+    if (std::is_same<Number, double>::value == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;
@@ -184,7 +184,7 @@ public:
         const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
         deallog << "Error function Hessians: " << output4 << std::endl;
       }
-    else if (types_are_equal<Number, float>::value == true)
+    else if (std::is_same<Number, float>::value == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;
@@ -274,8 +274,7 @@ do_test(const DoFHandler<dim> &          dof,
 int
 main()
 {
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog();
 
   deallog << std::setprecision(3);
   {

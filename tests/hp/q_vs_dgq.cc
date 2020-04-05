@@ -33,8 +33,6 @@
 
 namespace Step27
 {
-  using namespace dealii;
-
   template <int dim>
   class MixedFECollection
   {

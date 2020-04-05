@@ -43,9 +43,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 
 template <int dim,
           int fe_degree,
@@ -235,7 +232,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

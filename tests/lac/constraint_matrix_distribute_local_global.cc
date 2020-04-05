@@ -31,7 +31,6 @@
 // (2) the case that all entries of the local matrix
 //     are zero while a dof is constrained.
 
-using namespace dealii;
 
 int
 main()

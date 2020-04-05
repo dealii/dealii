@@ -1,34 +1,37 @@
 # Listing of Parameters
 # ---------------------
 subsection A - MainLoop
+  # Write out solution in a background thread performing IO
+  set asynchronous writeback = true
+
   # Base name for all output files
-  set basename           = test
+  set basename               = test
 
   # Final time
-  set final time         = 4
+  set final time             = 4
 
-  # time interval for output
-  set output granularity = 0.02
+  # Time interval for output
+  set output granularity     = 0.02
 
   # Resume an interrupted computation.
-  set resume             = false
+  set resume                 = false
 end
 
 
 subsection B - Discretization
-  # height of computational domain
+  # Height of computational domain
   set height          = 2
 
-  # length of computational domain
+  # Length of computational domain
   set length          = 4
 
-  # diameter of immersed disc
+  # Diameter of immersed disk
   set object diameter = 0.5
 
-  # x position of immersed disc center point
+  # x position of immersed disk center point
   set object position = 0.6
 
-  # number of refinement steps of the geometry
+  # Number of refinement steps of the geometry
   set refinement      = 5
 end
 
@@ -47,7 +50,7 @@ end
 
 
 subsection E - TimeStepping
-  # relative CFL constant used for update
+  # Relative CFL constant used for update
   set cfl update = 0.8
 end
 

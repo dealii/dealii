@@ -25,7 +25,7 @@ template <typename DoFHandlerType>
 void
 check_this(const DoFHandlerType &dof_handler)
 {
-  std::vector<bool> mask(dof_handler.get_fe().n_components(), false);
+  std::vector<bool> mask(dof_handler.get_fe_collection().n_components(), false);
 
   // only select first component
   mask[0] = true;

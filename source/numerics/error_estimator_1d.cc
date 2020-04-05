@@ -460,8 +460,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 neighbor = neighbor->child(n == 0 ? 1 : 0);
 
             fe_face_values.reinit(cell, n);
-            Tensor<1, spacedim> normal = fe_face_values.get_present_fe_values()
-                                           .get_all_normal_vectors()[0];
+            Tensor<1, spacedim> normal =
+              fe_face_values.get_present_fe_values().get_normal_vectors()[0];
 
             if (neighbor.state() == IteratorState::valid)
               {
@@ -474,7 +474,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 fe_face_values.reinit(neighbor, n == 0 ? 1 : 0);
                 Tensor<1, spacedim> neighbor_normal =
                   fe_face_values.get_present_fe_values()
-                    .get_all_normal_vectors()[0];
+                    .get_normal_vectors()[0];
 
                 // extract the gradient in normal direction of all the
                 // components.

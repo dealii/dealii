@@ -25,11 +25,11 @@ template <typename VectorizedArrayType>
 void
 do_test()
 {
-  deallog << "  test " << VectorizedArrayType::n_array_elements
-          << " array elements" << std::endl;
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
 
   VectorizedArrayType left;
-  for (unsigned int i = 0; i < VectorizedArrayType::n_array_elements; i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
     left[i] = i + 1.;
 
   VectorizedArrayType right(3.);
@@ -75,17 +75,17 @@ main()
 {
   initlog();
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
   do_test<VectorizedArray<double, 8>>();
   do_test<VectorizedArray<float, 16>>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
   do_test<VectorizedArray<double, 4>>();
   do_test<VectorizedArray<float, 8>>();
 #endif
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
   do_test<VectorizedArray<double, 2>>();
   do_test<VectorizedArray<float, 4>>();
 #endif

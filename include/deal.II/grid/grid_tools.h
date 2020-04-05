@@ -41,6 +41,7 @@
 
 #  include <deal.II/numerics/rtree.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/archive/binary_iarchive.hpp>
 #  include <boost/archive/binary_oarchive.hpp>
 #  include <boost/geometry/index/detail/serialization.hpp>
@@ -54,7 +55,7 @@
 #    include <boost/iostreams/filtering_stream.hpp>
 #    include <boost/iostreams/stream.hpp>
 #  endif
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <bitset>
 #  include <list>
@@ -453,9 +454,12 @@ namespace GridTools
    * given angle (given in radians, rather than degrees). This function uses
    * the transform() function above, so the requirements on the triangulation
    * stated there hold for this function as well.
+   *
+   * @note This function is only supported for dim=2.
    */
+  template <int dim>
   void
-  rotate(const double angle, Triangulation<2> &triangulation);
+  rotate(const double angle, Triangulation<dim> &triangulation);
 
   /**
    * Rotate all vertices of the given @p triangulation in counter-clockwise

@@ -69,7 +69,6 @@
 
 const unsigned int dim = 2;
 
-using namespace dealii;
 
 const double eps = 1e-10;
 

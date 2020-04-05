@@ -27,7 +27,7 @@ template <typename Number>
 void
 test()
 {
-  constexpr unsigned int n = VectorizedArray<Number>::n_array_elements;
+  constexpr unsigned int n = VectorizedArray<Number>::size();
 
   VectorizedArray<Number> a;
   std::stringstream       test_stream;

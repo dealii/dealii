@@ -48,7 +48,7 @@ test()
 
   VectorizedArray<double> x[N], x_ref[N], y[M], y_ref[M];
   for (unsigned int i = 0; i < N; ++i)
-    for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       x[i][v] = random_value<double>();
 
   // compute reference
@@ -79,8 +79,7 @@ test()
   for (unsigned int i = 0; i < M; ++i)
     {
       deallog << y[i][0] - y_ref[i][0] << " ";
-      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements;
-           ++v)
+      for (unsigned int v = 1; v < VectorizedArray<double>::size(); ++v)
         AssertThrow(std::abs(y[i][v] - y_ref[i][v]) < 1e-12,
                     ExcInternalError());
     }
@@ -88,7 +87,7 @@ test()
 
 
   for (unsigned int i = 0; i < M; ++i)
-    for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+    for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       y[i][v] = random_value<double>();
 
   // compute reference
@@ -112,8 +111,7 @@ test()
   for (unsigned int i = 0; i < N; ++i)
     {
       deallog << x[i][0] - x_ref[i][0] << " ";
-      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements;
-           ++v)
+      for (unsigned int v = 1; v < VectorizedArray<double>::size(); ++v)
         AssertThrow(std::abs(x[i][v] - x_ref[i][v]) < 1e-12,
                     ExcInternalError());
     }

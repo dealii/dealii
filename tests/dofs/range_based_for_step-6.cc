@@ -53,8 +53,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
-
 
 
 template <int dim>
@@ -351,10 +349,8 @@ Step6<dim>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   Step6<2> laplace_problem_2d;
   laplace_problem_2d.run();

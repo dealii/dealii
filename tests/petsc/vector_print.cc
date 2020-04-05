@@ -29,8 +29,7 @@
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   try
     {
@@ -47,10 +46,10 @@ main(int argc, char **argv)
 
         // print with prescribed precision
         deallog << "across=false" << std::endl;
-        v.print(logfile, 10, true, false);
+        v.print(deallog.get_file_stream(), 10, true, false);
 
         deallog << "across=true" << std::endl;
-        v.print(logfile, 10, true, true);
+        v.print(deallog.get_file_stream(), 10, true, true);
 
         // print once more. should be the old precision again
         deallog << numbers::PI << std::endl;

@@ -44,7 +44,6 @@
 
 //#define FEQH_DEBUG_OUTPUT
 
-using namespace dealii;
 
 template <int dim>
 void

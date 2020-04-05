@@ -59,8 +59,6 @@
 
 namespace Step4
 {
-  using namespace dealii;
-
   template <int dim>
   class Step4
   {

@@ -34,9 +34,14 @@ STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
 
 #
-# Disable all fallthrough warnings:
+# Disable other warnings:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wimplicit-fallthrough=0")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wstringop-overflow=0")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-copy")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wtautological-overlap-compare=0")
+
+
 
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 INCLUDE_DIRECTORIES(

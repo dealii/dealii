@@ -37,7 +37,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace LocalIntegrators::Maxwell;
 
 template <int dim>

@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = Differentiation::AD;
 
 int

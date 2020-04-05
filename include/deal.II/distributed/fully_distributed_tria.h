@@ -87,13 +87,14 @@ namespace parallel
      *   and boundary_id of each cell.
      *
      * The ingredients listed above are bundled in the struct
-     * parallel::fullydistributed::ConstructionData. The user has to fill this
+     * TriangulationDescription::Description. The user has to fill this
      * data structure - in a pre-processing step - before actually creating the
-     * triangulation. Predefined functions to create ConstructionData
-     * can be found in the namespace dealii::fullydistributed::Utilities.
+     * triangulation. Predefined functions to create
+     * TriangulationDescription::Description can be found in the namespace
+     * TriangulationDescription::Utilities.
      *
-     * Once the ConstructionData `construction_data` has been constructed, the
-     * triangulation `tria` can be created by calling
+     * Once the TriangulationDescription::Description `construction_data` has
+     * been constructed, the triangulation `tria` can be created by calling
      * `tria.create_triangulation(construction_data);`.
      *
      * @note This triangulation supports: 1D/2D/3D, hanging nodes,
@@ -138,7 +139,7 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * @copydoc Triangulation::create_triangulation()
+       * @copydoc dealii::Triangulation::create_triangulation()
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other

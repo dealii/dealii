@@ -735,8 +735,8 @@ namespace MatrixCreator
  * depends on the original matrix, this is not possible without storing the
  * original matrix somewhere and applying the @p apply_boundary_conditions
  * function to a copy of it each time we want to solve. In that case, you can
- * use the FilteredMatrix class in the @p LAC sublibrary. There you can also
- * find a formal (mathematical) description of the process of modifying the
+ * use the constrained_linear_operator() function. In its documentation you can
+ * also find a formal (mathematical) description of the process of modifying the
  * matrix and right hand side vectors for boundary values.
  *
  *

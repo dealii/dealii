@@ -42,7 +42,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
@@ -133,8 +132,7 @@ operator()(const MatrixFree<dim, Number> &data,
       // FEEvaluations. Those are tested in other
       // functions and seen as reference here
       for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
             errors[0] +=
               std::fabs(fe_eval.get_value(q)[j] - fe_eval2.get_value(q)[j]);
@@ -197,7 +195,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

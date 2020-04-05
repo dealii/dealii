@@ -56,9 +56,8 @@ test_tensor_02()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog << "First test" << std::endl;
 

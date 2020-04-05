@@ -81,13 +81,11 @@ namespace internal
      * Maximal vector length of VectorizedArray for double.
      */
     constexpr static unsigned int max_width =
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
-      2;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
       8;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
       4;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
       2;
 #else
       1;
@@ -109,13 +107,13 @@ namespace internal
      * Maximal vector length of VectorizedArray for float.
      */
     constexpr static unsigned int max_width =
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__ALTIVEC__)
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ALTIVEC__)
       4;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && defined(__AVX512F__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
       16;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && defined(__AVX__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
       8;
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 1 && defined(__SSE2__)
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
       4;
 #else
       1;
@@ -128,7 +126,7 @@ namespace internal
 // forward declarations to support abs or sqrt operations on VectorizedArray
 #ifndef DOXYGEN
 template <typename Number,
-          int width =
+          std::size_t width =
             internal::VectorizedArrayWidthSpecifier<Number>::max_width>
 class VectorizedArray;
 template <typename T>
@@ -154,36 +152,36 @@ DEAL_II_NAMESPACE_CLOSE
 
 namespace std
 {
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
   sqrt(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
   abs(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
   max(const ::dealii::VectorizedArray<Number, width> &,
       const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, std::size_t width>
   DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number, width>
   min(const ::dealii::VectorizedArray<Number, width> &,
       const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   pow(const ::dealii::VectorizedArray<Number, width> &, const Number p);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   sin(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   cos(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   tan(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   exp(const ::dealii::VectorizedArray<Number, width> &);
-  template <typename Number, int width>
+  template <typename Number, size_t width>
   ::dealii::VectorizedArray<Number, width>
   log(const ::dealii::VectorizedArray<Number, width> &);
 } // namespace std

@@ -5,9 +5,17 @@ DEAL:2d::Hyper cube
 DEAL:2d::OK
 DEAL:2d::Parallelogram
 DEAL:2d::OK
+DEAL:2d::Deformed hyper cube
+DEAL:2d::Number of different Jacobians: 8
+DEAL:2d::Number of different Jacobians: 72
+DEAL:2d::OK
 DEAL:3d::General mesh
 DEAL:3d::OK
 DEAL:3d::Hyper cube
 DEAL:3d::OK
 DEAL:3d::Parallelogram
+DEAL:3d::OK
+DEAL:3d::Deformed hyper cube
+DEAL:3d::Number of different Jacobians: 4
+DEAL:3d::Number of different Jacobians: 108
 DEAL:3d::OK

@@ -21,11 +21,13 @@
 
 #include <deal.II/base/exceptions.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/variant.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
 #include <map>
@@ -180,8 +182,8 @@ namespace internal
  * <h3>Example</h3>
  *
  * This is a simple example demonstrating the usage of this class. The first
- * column includes the numbers <tt>i=1..n</tt>, the second $1^2$...$n^2$, the
- * third $sqrt(1)...sqrt(n)$, where the second and third columns are merged
+ * column includes the numbers $i=1 \dots n$, the second $1^2 \dots n^2$, the
+ * third $\sqrt{1}\dots\sqrt{n}$, where the second and third columns are merged
  * into one supercolumn with the superkey <tt>squares and roots</tt>.
  * Additionally the first column is aligned to the right (the default was
  * <tt>centered</tt>) and the precision of the square roots are set to be 6
@@ -189,22 +191,21 @@ namespace internal
  *
  * @code
  * TableHandler table;
- *
- * for (unsigned int i=1; i<=n; ++i)
+ * for (unsigned int i = 1; i <= n; ++i)
  *   {
  *     table.add_value("numbers", i);
- *     table.add_value("squares", i*i);
- *     table.add_value("square roots", std::sqrt(1.*i));
+ *     table.add_value("squares", i * i);
+ *     table.add_value("square roots", std::sqrt(i));
  *   }
- *                                  // merge the second and third column
+ * // merge the second and third column
  * table.add_column_to_supercolumn("squares", "squares and roots");
  * table.add_column_to_supercolumn("square roots", "squares and roots");
  *
- *                                  // additional settings
+ * // additional settings
  * table.set_tex_format("numbers", "r");
  * table.set_precision("square roots", 6);
  *
- *                                  // output
+ * // output
  * std::ofstream out_file("number_table.tex");
  * table.write_tex(out_file);
  * out_file.close();

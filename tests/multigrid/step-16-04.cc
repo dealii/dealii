@@ -56,7 +56,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -505,9 +504,8 @@ LaplaceProblem<dim>::run()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 

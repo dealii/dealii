@@ -53,8 +53,6 @@
 
 namespace Step37
 {
-  using namespace dealii;
-
   const unsigned int degree_finite_element = 2;
 
 
@@ -593,7 +591,7 @@ namespace Step37
     mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
       preconditioner(dof_handler, mg, mg_transfer);
 

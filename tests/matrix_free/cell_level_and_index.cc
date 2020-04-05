@@ -43,7 +43,7 @@ void
 compare_indices(const MatrixFree<dim, number> *mf_data)
 {
   const unsigned int     n_batches  = mf_data->n_macro_cells();
-  constexpr unsigned int batch_size = VectorizedArray<number>::n_array_elements;
+  constexpr unsigned int batch_size = VectorizedArray<number>::size();
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =
@@ -97,7 +97,7 @@ test(const bool adaptive_ref = true)
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
 
   AffineConstraints<double> constraints;
   constraints.close();

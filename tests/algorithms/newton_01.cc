@@ -24,7 +24,6 @@
 
 // test computing square root of 2 with newton's method
 
-using namespace dealii;
 
 class SquareRoot : public Subscriptor
 {
@@ -125,9 +124,7 @@ test()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test();
 }

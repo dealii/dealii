@@ -24,7 +24,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace Patterns::Tools;
 
 // Try conversion on map types

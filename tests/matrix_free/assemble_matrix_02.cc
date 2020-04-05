@@ -36,8 +36,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 
 const unsigned int degree_p = 1;
 
@@ -114,12 +112,12 @@ do_test(const DoFHandler<dim> &dof)
         const unsigned int dofs_per_cell_u = phi_u.dofs_per_cell;
         const unsigned int dofs_per_cell_p = phi_p.dofs_per_cell;
         for (unsigned int i = 0; i < dofs_per_cell_u;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell_u ?
+              i + VectorizedArray<double>::size() > dofs_per_cell_u ?
                 (dofs_per_cell_u - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell_u; ++j)
               phi_u.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)
@@ -150,12 +148,12 @@ do_test(const DoFHandler<dim> &dof)
           }
 
         for (unsigned int i = 0; i < dofs_per_cell_p;
-             i += VectorizedArray<double>::n_array_elements)
+             i += VectorizedArray<double>::size())
           {
             const unsigned int n_items =
-              i + VectorizedArray<double>::n_array_elements > dofs_per_cell_p ?
+              i + VectorizedArray<double>::size() > dofs_per_cell_p ?
                 (dofs_per_cell_p - i) :
-                VectorizedArray<double>::n_array_elements;
+                VectorizedArray<double>::size();
             for (unsigned int j = 0; j < dofs_per_cell_p; ++j)
               phi_p.begin_dof_values()[j] = VectorizedArray<double>();
             for (unsigned int v = 0; v < n_items; ++v)
@@ -215,7 +213,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

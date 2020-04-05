@@ -1,0 +1,7 @@
+Changed: The vertex positions of GridGenerator::quarter_hyper_ball() have been
+slightly changed. It concerns the points along the straight faces and in the
+interior. The new positions have been determined to balance the sizes and
+aspect ratios (expressed by the minimal and maximal singular values of the
+Jacobian from reference to real coordinates), producting a slightly better
+mesh quality.
+<br> (Martin Kronbichler, 2020/04/02)

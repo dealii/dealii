@@ -24,7 +24,8 @@
 
 #include <iostream>
 
-using namespace dealii;
+#include "../tests.h"
+
 using namespace Algorithms;
 
 
@@ -58,9 +59,7 @@ private:
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   FullMatrix<double> matrix(2);
   matrix(0, 0) = 0.;
@@ -69,7 +68,7 @@ main()
   matrix(1, 0) = -numbers::PI;
 
   OutputOperator<Vector<double>> out;
-  out.initialize_stream(logfile);
+  out.initialize_stream(deallog.get_file_stream());
 
   Explicit                          op_explicit(matrix);
   Implicit                          op_implicit(matrix);

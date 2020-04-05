@@ -1359,7 +1359,7 @@ namespace Step33
     // only prints something if verbose output has been requested) deals with
     // the interface we have in this program to the Trilinos library that
     // provides us with linear solvers. Similarly to including PETSc matrices
-    // in step-17, step-18, and step-19, all we need to do is to create a
+    // in step-17 and step-18, all we need to do is to create a
     // Trilinos sparse matrix instead of the standard deal.II class. The
     // system matrix is used for the Jacobian in each Newton step. Since we do
     // not intend to run this program in parallel (which wouldn't be too hard

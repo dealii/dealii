@@ -55,8 +55,6 @@
 
 namespace PhaseField
 {
-  using namespace dealii;
-
   typedef Vector<double> vectorType;
 
 

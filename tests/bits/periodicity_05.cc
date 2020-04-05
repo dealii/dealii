@@ -62,7 +62,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 class Deal2PeriodicBug
 {

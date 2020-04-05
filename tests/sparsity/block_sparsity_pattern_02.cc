@@ -28,10 +28,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   std::vector<types::global_dof_index> row_blocks(4);
   row_blocks[0] = 4;

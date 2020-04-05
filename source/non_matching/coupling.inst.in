@@ -18,7 +18,7 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
      Sparsity : SPARSITY_PATTERNS;
      S : REAL_AND_COMPLEX_SCALARS)
   {
-#if dim1 <= dim0 && dim0 <= spacedim
+#if dim1 <= spacedim && dim0 <= spacedim
     template void create_coupling_sparsity_pattern(
       const DoFHandler<dim0, spacedim> &space_dh,
       const DoFHandler<dim1, spacedim> &immersed_dh,
@@ -40,6 +40,18 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const ComponentMask &                   space_comps,
       const ComponentMask &                   immersed_comps,
       const Mapping<dim1, spacedim> &         immersed_mapping);
+
+    template void create_coupling_sparsity_pattern(
+      const double &                          epsilon,
+      const GridTools::Cache<dim0, spacedim> &cache0,
+      const GridTools::Cache<dim1, spacedim> &cache1,
+      const DoFHandler<dim0, spacedim> &      dh0,
+      const DoFHandler<dim1, spacedim> &      dh1,
+      const Quadrature<dim1> &                quad,
+      Sparsity &                              sparsity,
+      const AffineConstraints<S> &            constraints0,
+      const ComponentMask &                   comps0,
+      const ComponentMask &                   comps1);
 #endif
   }
 
@@ -47,7 +59,7 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
 for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
      Matrix : SPARSE_MATRICES)
   {
-#if dim1 <= dim0 && dim0 <= spacedim
+#if dim1 <= spacedim && dim0 <= spacedim
     template void create_coupling_mass_matrix(
       const DoFHandler<dim0, spacedim> &           space_dh,
       const DoFHandler<dim1, spacedim> &           immersed_dh,
@@ -69,5 +81,19 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const ComponentMask &                        space_comps,
       const ComponentMask &                        immersed_comps,
       const Mapping<dim1, spacedim> &              immersed_mapping);
+
+    template void create_coupling_mass_matrix(
+      Functions::CutOffFunctionBase<spacedim> & kernel,
+      const double &                                        epsilon,
+      const GridTools::Cache<dim0, spacedim> &              cache0,
+      const GridTools::Cache<dim1, spacedim> &              cache1,
+      const DoFHandler<dim0, spacedim> &                    dh0,
+      const DoFHandler<dim1, spacedim> &                    dh1,
+      const Quadrature<dim0> &                              quadrature0,
+      const Quadrature<dim1> &                              quadrature1,
+      Matrix &                                              matrix,
+      const AffineConstraints<typename Matrix::value_type> &constraints0,
+      const ComponentMask &                                 comps0,
+      const ComponentMask &                                 comps1);
 #endif
   }

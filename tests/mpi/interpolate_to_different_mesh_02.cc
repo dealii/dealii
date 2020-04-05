@@ -52,7 +52,6 @@
 // this is a slightly modified version from the example by Sam Cox from the
 // mailing
 
-using namespace dealii;
 
 namespace LA
 {

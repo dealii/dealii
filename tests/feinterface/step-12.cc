@@ -58,10 +58,6 @@
 
 namespace Step12
 {
-  using namespace dealii;
-
-
-
   template <int dim>
   struct ScratchData
   {

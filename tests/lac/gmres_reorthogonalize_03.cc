@@ -85,9 +85,8 @@ test(unsigned int variant)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   deallog.push("double");
   test<double>(0);

@@ -1,0 +1,8 @@
+Improved: The initialization of the mapping part of MatrixFree for mappings of
+type MappingQGeneric or derived classes has been made much faster. Apart from
+a single query per cell for the geometry via the MappingQGeneric class, all
+interpolations to metric terms at quadrature points are now done with
+matrix-free routines using sum factorization, providing similar performance as
+an operator evaluation.
+<br>
+(Martin Kronbichler, 2020/03/14)

@@ -273,6 +273,22 @@ namespace LinearAlgebra
   /*@}*/
 } // namespace LinearAlgebra
 
+// ---------------------------- Free functions --------------------------
+
+namespace LinearAlgebra
+{
+  /**
+   * Shift all entries of the vector by a constant factor so that the mean
+   * value of the vector becomes zero.
+   */
+  template <typename Number>
+  void
+  set_zero_mean_value(VectorSpaceVector<Number> &vector)
+  {
+    vector.add(-vector.mean_value());
+  }
+} // namespace LinearAlgebra
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

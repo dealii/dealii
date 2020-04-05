@@ -1,0 +1,4 @@
+New: The function ParameterHandler::print_parameters() can now also
+print a reduced parameter tree for XML and JSON file formats.
+<br>
+(Peter Munch, 2020/03/22)

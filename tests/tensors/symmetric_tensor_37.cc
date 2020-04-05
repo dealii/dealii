@@ -47,9 +47,8 @@ test_symm_tensor_contract_3(const T1<rank1, dim, number> &    l,
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(5);
-  deallog.attach(logfile);
 
   const int               dim = 3;
   Tensor<1, dim>          v1;

@@ -47,7 +47,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <int dim>
 class MixedElastoPlasticity
@@ -244,10 +243,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   check();
 }

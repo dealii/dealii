@@ -77,8 +77,6 @@
 
 namespace Maxwell
 {
-  using namespace dealii;
-
   // Dirichlet BCs / exact solution:.
   template <int dim>
   class ExactSolution : public Function<dim>
@@ -353,7 +351,7 @@ namespace Maxwell
     std::vector<Vector<double>> neumann_value_list(
       n_face_q_points, Vector<double>(fe.n_components()));
     std::vector<Tensor<1, dim>> normal_vector_list(
-      fe_face_values.get_all_normal_vectors());
+      fe_face_values.get_normal_vectors());
     Tensor<1, dim> neumann_value_vector;
     Tensor<1, dim> neumann_value;
     Tensor<1, dim> normal_vector;

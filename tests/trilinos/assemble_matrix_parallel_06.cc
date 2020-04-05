@@ -61,7 +61,6 @@
 
 std::ofstream logfile("output");
 
-using namespace dealii;
 
 
 namespace Assembly

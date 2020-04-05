@@ -53,7 +53,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -332,13 +331,10 @@ private:
               std::abs((phif.get_normal_vector(0) *
                         phif.inverse_jacobian(0))[dim - 1]) *
               (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
-            std::array<types::boundary_id,
-                       VectorizedArray<number>::n_array_elements>
+            std::array<types::boundary_id, VectorizedArray<number>::size()>
                                     boundary_ids = data.get_faces_by_cells_boundary_id(cell, face);
             VectorizedArray<number> factor_boundary;
-            for (unsigned int v = 0;
-                 v < VectorizedArray<number>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
               // interior face
               if (boundary_ids[v] == numbers::invalid_boundary_id)
                 factor_boundary[v] = 0.5;
@@ -513,7 +509,7 @@ do_test(const DoFHandler<dim> &dof, const bool also_test_parallel = false)
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<double>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
                  MGTransferMF<dim, LevelMatrixType>>

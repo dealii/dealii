@@ -36,7 +36,6 @@
 #include "../tests.h"
 
 using namespace std;
-using namespace dealii;
 
 template <unsigned int spacedim>
 void

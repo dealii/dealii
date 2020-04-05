@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test(const MPI_Comm &comm)

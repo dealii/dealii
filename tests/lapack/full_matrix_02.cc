@@ -15,7 +15,7 @@
 
 
 // LAPACKFullMatrix::compute_lu_factorization
-// LAPACKFullMatrix::apply_lu_factorization
+// LAPACKFullMatrix::solve
 
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -60,8 +60,8 @@ test(const unsigned int size, const bool nonsymmetric)
   M.vmult(v, u);
   M.Tvmult(y, x);
   M.compute_lu_factorization();
-  M.apply_lu_factorization(v, false);
-  M.apply_lu_factorization(y, true);
+  M.solve(v, false);
+  M.solve(y, true);
 
   v -= u;
   y -= x;

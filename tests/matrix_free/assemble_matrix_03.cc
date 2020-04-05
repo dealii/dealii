@@ -39,8 +39,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 
 namespace Assembly
 {
@@ -112,12 +110,12 @@ assemble_on_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
   FEEvaluation<dim, fe_degree> &fe_eval = data.fe_eval[0];
   fe_eval.reinit(cell);
   for (unsigned int i = 0; i < dofs_per_cell;
-       i += VectorizedArray<double>::n_array_elements)
+       i += VectorizedArray<double>::size())
     {
       const unsigned int n_items =
-        i + VectorizedArray<double>::n_array_elements > dofs_per_cell ?
+        i + VectorizedArray<double>::size() > dofs_per_cell ?
           (dofs_per_cell - i) :
-          VectorizedArray<double>::n_array_elements;
+          VectorizedArray<double>::size();
       for (unsigned int j = 0; j < dofs_per_cell; ++j)
         fe_eval.begin_dof_values()[j] = VectorizedArray<double>();
       for (unsigned int v = 0; v < n_items; ++v)
@@ -198,7 +196,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

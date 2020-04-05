@@ -21,6 +21,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/data_out_base.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -855,6 +856,42 @@ public:
                     &data_postprocessor);
 
   /**
+   * Add a multilevel data vector.
+   *
+   * This function adds the vector-valued multilevel vector @p data in the
+   * form of a vector on each level that belongs to the DoFHandler @p
+   * dof_handler to the graphical output. This function is typically used in
+   * conjunction with a call to set_cell_selection() that selects cells on a
+   * specific level and not the active cells (the default).
+   *
+   * A vector @p data can be obtained in several ways, for example by using
+   * Multigrid::solution or Multigrid::defect during or after a multigrid
+   * cycle or by interpolating a solution via
+   * MGTransferMatrixFree::interpolate_to_mg().
+   *
+   * The handling of @p names and @p data_component_interpretation is identical
+   * to the add_data_vector() function.
+   */
+  template <class VectorType>
+  void
+  add_mg_data_vector(
+    const DoFHandlerType &           dof_handler,
+    const MGLevelObject<VectorType> &data,
+    const std::vector<std::string> & names,
+    const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      &data_component_interpretation = std::vector<
+        DataComponentInterpretation::DataComponentInterpretation>());
+
+  /**
+   * Scalar version of the function above.
+   */
+  template <class VectorType>
+  void
+  add_mg_data_vector(const DoFHandlerType &           dof_handler,
+                     const MGLevelObject<VectorType> &data,
+                     const std::string &              name);
+
+  /**
    * Release the pointers to the data vectors. This allows output of a new set
    * of vectors without supplying the DoF handler again. Therefore, the
    * DataOut object can be used in an algebraic context. Note that besides the
@@ -998,6 +1035,11 @@ protected:
   // function.
   template <class, int, int>
   friend class DataOut_DoFData;
+
+  /**
+   */
+  template <int, class>
+  friend class MGDataOut;
 
 private:
   /**

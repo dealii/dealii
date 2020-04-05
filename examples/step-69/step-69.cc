@@ -82,8 +82,10 @@
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 
-// For std::isnan and std::isinf.
+// For std::isnan, std::isinf, std::ifstream, std::async, and std::future
 #include <cmath>
+#include <fstream>
+#include <future>
 
 // @sect3{Class template declarations}
 //
@@ -108,7 +110,7 @@
 // ParameterAcceptor. This facilitates the population of all the global
 // parameters into a single (global) ParameterHandler. More explanations
 // about the use of inheritance from ParameterAcceptor as a global
-// subscription mechanism can be found in step-59.
+// subscription mechanism can be found in step-60.
 namespace Step69
 {
   using namespace dealii;
@@ -138,7 +140,7 @@ namespace Step69
   // initialize everything that does not depend on parameters in the
   // constructor, and defer the creation of the mesh to the
   // <code>setup()</code> method that can be called once all parameters are
-  // read-in via ParameterAcceptor::initialize().
+  // read in via ParameterAcceptor::initialize().
   template <int dim>
   class Discretization : public ParameterAcceptor
   {
@@ -163,8 +165,8 @@ namespace Step69
 
     double length;
     double height;
-    double disc_position;
-    double disc_diameter;
+    double disk_position;
+    double disk_diameter;
 
     unsigned int refinement;
   };
@@ -179,7 +181,7 @@ namespace Step69
   // members of <code>OfflineData</code> have well-defined values
   // independent of the current time step. This means that they can be
   // initialized ahead of time (at <i>time step zero</i>) and are not meant
-  // to be modified at any other later time step. For instance, the
+  // to be modified at any later time step. For instance, the
   // sparsity pattern should not change as we advance in time (we are not
   // doing any form of adaptivity in space). Similarly, the entries of the
   // lumped mass matrix should not be modified as we advance in time
@@ -189,7 +191,7 @@ namespace Step69
   // contains a map from a global index of type types::global_dof_index of
   // a boundary degree of freedom to a tuple consisting of a normal vector,
   // the boundary id, and the position associated with the degree of
-  // freedom. We actually have to compute and store this geometric
+  // freedom. We have to compute and store this geometric
   // information in this class because we won't have access to geometric
   // (or cell-based) information later on in the algebraic loops over the
   // sparsity pattern.
@@ -420,7 +422,8 @@ namespace Step69
   // <a href="https://en.wikipedia.org/wiki/Schlieren">Schlieren</a>
   // postprocessing is a standard method for enhancing the contrast of a
   // visualization inspired by actual experimental X-ray and shadowgraphy
-  // techniques of visualization.
+  // techniques of visualization. (See step-67 for another example where we
+  // create a Schlieren plot.)
   template <int dim>
   class SchlierenPostprocessor : public ParameterAcceptor
   {
@@ -493,7 +496,8 @@ namespace Step69
     std::string base_name;
     double      t_final;
     double      output_granularity;
-    bool        enable_compute_error;
+
+    bool asynchronous_writeback;
 
     bool resume;
 
@@ -502,6 +506,10 @@ namespace Step69
     InitialValues<dim>          initial_values;
     TimeStepping<dim>           time_stepping;
     SchlierenPostprocessor<dim> schlieren_postprocessor;
+
+    vector_type output_vector;
+
+    std::future<void> background_thread_state;
   };
 
   // @sect3{Implementation}
@@ -532,25 +540,25 @@ namespace Step69
     , computing_timer(computing_timer)
   {
     length = 4.;
-    add_parameter("length", length, "length of computational domain");
+    add_parameter("length", length, "Length of computational domain");
 
     height = 2.;
-    add_parameter("height", height, "height of computational domain");
+    add_parameter("height", height, "Height of computational domain");
 
-    disc_position = 0.6;
+    disk_position = 0.6;
     add_parameter("object position",
-                  disc_position,
-                  "x position of immersed disc center point");
+                  disk_position,
+                  "x position of immersed disk center point");
 
-    disc_diameter = 0.5;
+    disk_diameter = 0.5;
     add_parameter("object diameter",
-                  disc_diameter,
-                  "diameter of immersed disc");
+                  disk_diameter,
+                  "Diameter of immersed disk");
 
     refinement = 5;
     add_parameter("refinement",
                   refinement,
-                  "number of refinement steps of the geometry");
+                  "Number of refinement steps of the geometry");
   }
 
   // Note that in the previous constructor we only passed the MPI
@@ -563,17 +571,17 @@ namespace Step69
   //
   // The <code>setup()</code> function is the last class member that has to
   // be implemented. It creates the actual triangulation that is a
-  // benchmark configuration consisting of a channel with a disc obstacle, see
+  // benchmark configuration consisting of a channel with a disk obstacle, see
   // @cite GuermondEtAl2018. We construct the geometry by modifying the
   // mesh generated by GridGenerator::hyper_cube_with_cylindrical_hole().
   // We refer to step-49, step-53, and step-54 for an overview how to
   // create advanced meshes.
   // We first create 4 temporary (non distributed) coarse triangulations
   // that we stitch together with the GridGenerator::merge_triangulation()
-  // function. We center the disc at $(0,0)$ with a diameter of
-  // <code>disc_diameter</code>. The lower left corner of the channel has
-  // coordinates (<code>-disc_position</code>, <code>-height/2</code>) and
-  // the upper right corner has (<code>length-disc_position</code>,
+  // function. We center the disk at $(0,0)$ with a diameter of
+  // <code>disk_diameter</code>. The lower left corner of the channel has
+  // coordinates (<code>-disk_position</code>, <code>-height/2</code>) and
+  // the upper right corner has (<code>length-disk_position</code>,
   // <code>height/2</code>).
   template <int dim>
   void Discretization<dim>::setup()
@@ -585,25 +593,25 @@ namespace Step69
     Triangulation<dim> tria1, tria2, tria3, tria4;
 
     GridGenerator::hyper_cube_with_cylindrical_hole(
-      tria1, disc_diameter / 2., disc_diameter, 0.5, 1, false);
+      tria1, disk_diameter / 2., disk_diameter, 0.5, 1, false);
 
     GridGenerator::subdivided_hyper_rectangle(
       tria2,
       {2, 1},
-      Point<2>(-disc_diameter, disc_diameter),
-      Point<2>(disc_diameter, height / 2.));
+      Point<2>(-disk_diameter, disk_diameter),
+      Point<2>(disk_diameter, height / 2.));
 
     GridGenerator::subdivided_hyper_rectangle(
       tria3,
       {2, 1},
-      Point<2>(-disc_diameter, -disc_diameter),
-      Point<2>(disc_diameter, -height / 2.));
+      Point<2>(-disk_diameter, -disk_diameter),
+      Point<2>(disk_diameter, -height / 2.));
 
     GridGenerator::subdivided_hyper_rectangle(
       tria4,
       {6, 4},
-      Point<2>(disc_diameter, -height / 2.),
-      Point<2>(length - disc_position, height / 2.));
+      Point<2>(disk_diameter, -height / 2.),
+      Point<2>(length - disk_position, height / 2.));
 
     GridGenerator::merge_triangulations({&tria1, &tria2, &tria3, &tria4},
                                         triangulation,
@@ -613,8 +621,8 @@ namespace Step69
     triangulation.set_manifold(0, PolarManifold<2>(Point<2>()));
 
     // We have to fix up the left edge that is currently located at
-    // $x=-$<code>disc_diameter</code> and has to be shifted to
-    // $x=-$<code>disc_position</code>. As a last step the boundary has to
+    // $x=-$<code>disk_diameter</code> and has to be shifted to
+    // $x=-$<code>disk_position</code>. As a last step the boundary has to
     // be colorized with <code>Boundaries::do_nothing</code> on the right,
     // <code>dirichlet</code> on the left and <code>free_slip</code> on the
     // upper and lower outer boundaries and the obstacle.
@@ -623,8 +631,8 @@ namespace Step69
       {
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           {
-            if (cell->vertex(v)[0] <= -disc_diameter + 1.e-6)
-              cell->vertex(v)[0] = -disc_position;
+            if (cell->vertex(v)[0] <= -disk_diameter + 1.e-6)
+              cell->vertex(v)[0] = -disk_position;
           }
       }
 
@@ -638,9 +646,9 @@ namespace Step69
               {
                 const auto center = face->center();
 
-                if (center[0] > length - disc_position - 1.e-6)
+                if (center[0] > length - disk_position - 1.e-6)
                   face->set_boundary_id(Boundaries::do_nothing);
-                else if (center[0] < -disc_position + 1.e-6)
+                else if (center[0] < -disk_position + 1.e-6)
                   face->set_boundary_id(Boundaries::dirichlet);
                 else
                   face->set_boundary_id(Boundaries::free_slip);
@@ -1504,7 +1512,7 @@ namespace Step69
   // guess for an upper bound on the maximum wavespeed. More precisely,
   // equations (2.11) (3.7), (3.8) and (4.3) of @cite GuermondPopov2016b
   // are enough to define a guaranteed upper bound on the maximum
-  // wavespeed. This estimate is returned by the a call to the function
+  // wavespeed. This estimate is returned by a call to the function
   // <code>lambda_max_two_rarefaction()</code>. At its core the
   // construction of such an upper bound uses the so-called two-rarefaction
   // approximation for the intermediate pressure $p^*$, see for instance
@@ -1825,7 +1833,7 @@ namespace Step69
     cfl_update = 0.80;
     add_parameter("cfl update",
                   cfl_update,
-                  "relative CFL constant used for update");
+                  "Relative CFL constant used for update");
   }
 
   // In the class member <code>prepare()</code> we initialize the temporary
@@ -2063,9 +2071,11 @@ namespace Step69
 
       // This is a good point to verify that the computed
       // <code>tau_max</code> is indeed a valid floating point number.
-      AssertThrow(!std::isnan(tau_max) && !std::isinf(tau_max) && tau_max > 0.,
-                  ExcMessage("I'm sorry, Dave. I'm afraid I can't "
-                             "do that. - We crashed."));
+      AssertThrow(
+        !std::isnan(tau_max.load()) && !std::isinf(tau_max.load()) &&
+          tau_max.load() > 0.,
+        ExcMessage(
+          "I'm sorry, Dave. I'm afraid I can't do that. - We crashed."));
     }
 
     // <b>Step 3</b>: Perform update.
@@ -2499,6 +2509,11 @@ namespace Step69
                   output_granularity,
                   "time interval for output");
 
+    asynchronous_writeback = true;
+    add_parameter("asynchronous writeback",
+                  asynchronous_writeback,
+                  "Write out solution in a background thread performing IO");
+
     resume = false;
     add_parameter("resume", resume, "Resume an interrupted computation.");
   }
@@ -2558,28 +2573,28 @@ namespace Step69
     ParameterAcceptor::initialize("step-69.prm");
     pcout << "done" << std::endl;
 
-    // Next we create the triangulation:
+    // Next we create the triangulation, assemble all matrices, set up
+    // scratch space, and initialize the DataOut<dim> object:
 
-    print_head(pcout, "create triangulation");
-    discretization.setup();
+    {
+      print_head(pcout, "create triangulation");
+      discretization.setup();
 
-    pcout << "Number of active cells:       "
-          << discretization.triangulation.n_global_active_cells() << std::endl;
+      pcout << "Number of active cells:       "
+            << discretization.triangulation.n_global_active_cells()
+            << std::endl;
 
-    // Assemble all matrices:
+      print_head(pcout, "compute offline data");
+      offline_data.setup();
+      offline_data.assemble();
 
-    print_head(pcout, "compute offline data");
-    offline_data.setup();
-    offline_data.assemble();
+      pcout << "Number of degrees of freedom: "
+            << offline_data.dof_handler.n_dofs() << std::endl;
 
-    pcout << "Number of degrees of freedom: "
-          << offline_data.dof_handler.n_dofs() << std::endl;
-
-    // And set up scratch space:
-
-    print_head(pcout, "set up time step");
-    time_stepping.prepare();
-    schlieren_postprocessor.prepare();
+      print_head(pcout, "set up time step");
+      time_stepping.prepare();
+      schlieren_postprocessor.prepare();
+    }
 
     // We will store the current time and state in the variable
     // <code>t</code> and vector <code>U</code>:
@@ -2632,7 +2647,7 @@ namespace Step69
     // With either the initial state set up, or an interrupted state
     // restored it is time to enter the main loop:
 
-    output(U, base_name + "-solution", t, output_cycle++);
+    output(U, base_name, t, output_cycle++);
 
     print_head(pcout, "enter main loop");
 
@@ -2666,10 +2681,15 @@ namespace Step69
 
         if (t > output_cycle * output_granularity)
           {
-            output(U, base_name + "-solution", t, output_cycle, true);
+            output(U, base_name, t, output_cycle, true);
             ++output_cycle;
           }
       }
+
+    // We wait for any remaining background output thread to finish before
+    // printing a summary and exiting.
+    if (background_thread_state.valid())
+      background_thread_state.wait();
 
     computing_timer.print_summary();
     pcout << timer_output.str() << std::endl;
@@ -2719,6 +2739,19 @@ namespace Step69
   }
 
   // @sect5{Output and checkpointing}
+  //
+  // Writing out the final vtk files is quite an IO intensive task that can
+  // stall the main loop for a while. In order to avoid this we use an <a
+  // href="https://en.wikipedia.org/wiki/Asynchronous_I/O">asynchronous
+  // IO</a> strategy by creating a background thread that will perform IO
+  // while the main loop is allowed to continue. In order for this to work
+  // we have to be mindful of two things:
+  //  - Before running the <code>output_worker</code> thread, we have to create
+  //    a copy of the state vector <code>U</code>. We store it in the
+  //    vector <code>output_vector</code>.
+  //  - We have to avoid any MPI communication in the background thread,
+  //    otherwise the program might deadlock. This implies that we have to
+  //    run the postprocessing outside of the worker thread.
 
   template <int dim>
   void MainLoop<dim>::output(const typename MainLoop<dim>::vector_type &U,
@@ -2730,57 +2763,114 @@ namespace Step69
     pcout << "MainLoop<dim>::output(t = " << t
           << ", checkpoint = " << checkpoint << ")" << std::endl;
 
-    TimerOutput::Scope scope(computing_timer, "main_loop - output");
+    // If the asynchronous writeback option is set we launch a background
+    // thread performing all the slow IO to disc. In that case we have to
+    // make sure that the background thread actually finished running. If
+    // not, we have to wait to for it to finish. We launch said background
+    // thread with <a
+    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async()</code></a>
+    // that returns a <a
+    // href="https://en.cppreference.com/w/cpp/thread/future"><code>std::future</code></a>
+    // object. This <code>std::future</code> object contains the return
+    // value of the function, which is in our case simply
+    // <code>void</code>.
 
-    if (checkpoint)
+    if (background_thread_state.valid())
       {
-        // We checkpoint the current state by doing the precise inverse
-        // operation to what we discussed for the <a href="Resume">resume
-        // logic</a>:
-
-        const unsigned int i =
-          discretization.triangulation.locally_owned_subdomain();
-        std::string name = base_name + "-checkpoint-" +
-                           Utilities::int_to_string(i, 4) + ".archive";
-
-        std::ofstream file(name, std::ios::binary | std::ios::trunc);
-
-        boost::archive::binary_oarchive oa(file);
-        oa << t << cycle;
-        for (const auto &it1 : U)
-          for (const auto &it2 : it1)
-            oa << it2;
+        TimerOutput::Scope timer(computing_timer, "main_loop - stalled output");
+        background_thread_state.wait();
       }
-
-    schlieren_postprocessor.compute_schlieren(U);
-
-    // The actual output code is standard. We create a (local) DataOut
-    // instance, attach all data vectors we want to output and finally
-    // call to DataOut<dim>::write_vtu_with_pvtu_record
-
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(offline_data.dof_handler);
 
     constexpr auto problem_dimension =
       ProblemDescription<dim>::problem_dimension;
+
+    // At this point we make a copy of the state vector, run the schlieren
+    // postprocessor, and run DataOut<dim>::build_patches() The actual
+    // output code is standard: We create a DataOut instance, attach all
+    // data vectors we want to output and call
+    // DataOut<dim>::build_patches(). There is one twist, however. In order
+    // to perform asynchronous IO on a background thread we create the
+    // DataOut<dim> object as a shared pointer that we pass on to the
+    // worker thread to ensure that once we exit this function and the
+    // worker thread finishes the DataOut<dim> object gets destroyed again.
+
+    for (unsigned int i = 0; i < problem_dimension; ++i)
+      {
+        output_vector[i] = U[i];
+        output_vector[i].update_ghost_values();
+      }
+
+    schlieren_postprocessor.compute_schlieren(output_vector);
+
+    auto data_out = std::make_shared<DataOut<dim>>();
+
+    data_out->attach_dof_handler(offline_data.dof_handler);
+
     const auto &component_names = ProblemDescription<dim>::component_names;
 
     for (unsigned int i = 0; i < problem_dimension; ++i)
-      data_out.add_data_vector(U[i], component_names[i]);
+      data_out->add_data_vector(output_vector[i], component_names[i]);
 
-    data_out.add_data_vector(schlieren_postprocessor.schlieren,
-                             "schlieren_plot");
+    data_out->add_data_vector(schlieren_postprocessor.schlieren,
+                              "schlieren_plot");
 
-    data_out.build_patches(discretization.mapping,
-                           discretization.finite_element.degree - 1);
+    data_out->build_patches(discretization.mapping,
+                            discretization.finite_element.degree - 1);
 
-    DataOutBase::VtkFlags flags(t,
-                                cycle,
-                                true,
-                                DataOutBase::VtkFlags::best_speed);
-    data_out.set_flags(flags);
+    // Next we create a lambda function for the background thread. We <a
+    // href="https://en.cppreference.com/w/cpp/language/lambda">capture</a>
+    // the <code>this</code> pointer as well as most of the arguments of
+    // the output function by value so that we have access to them inside
+    // the lambda function.
+    const auto output_worker = [this, name, t, cycle, checkpoint, data_out]() {
+      if (checkpoint)
+        {
+          // We checkpoint the current state by doing the precise inverse
+          // operation to what we discussed for the <a href="Resume">resume
+          // logic</a>:
 
-    data_out.write_vtu_with_pvtu_record("", name, cycle, mpi_communicator, 6);
+          const unsigned int i =
+            discretization.triangulation.locally_owned_subdomain();
+          std::string filename =
+            name + "-checkpoint-" + Utilities::int_to_string(i, 4) + ".archive";
+
+          std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+
+          boost::archive::binary_oarchive oa(file);
+          oa << t << cycle;
+          for (const auto &it1 : output_vector)
+            for (const auto &it2 : it1)
+              oa << it2;
+        }
+
+      DataOutBase::VtkFlags flags(t,
+                                  cycle,
+                                  true,
+                                  DataOutBase::VtkFlags::best_speed);
+      data_out->set_flags(flags);
+
+      data_out->write_vtu_with_pvtu_record(
+        "", name + "-solution", cycle, mpi_communicator, 6);
+    };
+
+    // If the asynchronous writeback option is set we launch a new
+    // background thread with the help of
+    // <a
+    // href="https://en.cppreference.com/w/cpp/thread/async"><code>std::async</code></a>
+    // function. The function returns a <a
+    // href="https://en.cppreference.com/w/cpp/thread/future"><code>std::future</code></a>
+    // object that we can use to query the status of the background thread.
+    // At this point we can return from the <code>output()</code> function
+    // and resume with the time stepping in the main loop - the thread will
+    // run in the background.
+    if (!asynchronous_writeback)
+      {
+        background_thread_state = std::async(std::launch::async, output_worker);
+      }
+    else
+      {
+        output_worker();
+      }
   }
 
 } // namespace Step69

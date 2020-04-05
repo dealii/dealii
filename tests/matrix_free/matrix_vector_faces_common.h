@@ -165,17 +165,14 @@ private:
           {
             value_type average_value =
               (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(0.5);
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             value_type average_valgrad =
               fe_eval.get_normal_derivative(q) +
               fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
               average_value * sigmaF -
               average_valgrad *
-                make_vectorized_array<number,
-                                      VectorizedArrayType::n_array_elements>(
-                  0.5);
+                make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -369,17 +366,14 @@ private:
           {
             value_type average_value =
               (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(0.5);
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             value_type average_valgrad =
               fe_eval.get_normal_derivative(q) +
               fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
               average_value * sigmaF -
               average_valgrad *
-                make_vectorized_array<number,
-                                      VectorizedArrayType::n_array_elements>(
-                  0.5);
+                make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -592,9 +586,7 @@ private:
             const VectorizedArrayType normal_times_advection =
               advection * phi_m.get_normal_vector(q);
             const value_type flux_times_normal =
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(
-                0.5) *
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
                std::abs(normal_times_advection) * (u_minus - u_plus));
             phi_m.submit_value(-flux_times_normal, q);
@@ -628,8 +620,7 @@ private:
                                 number,
                                 VectorizedArrayType>::value_type value_type;
     value_type                                                   u_plus;
-    u_plus =
-      make_vectorized_array<number, VectorizedArrayType::n_array_elements>(1.3);
+    u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -642,9 +633,7 @@ private:
             const VectorizedArrayType normal_times_advection =
               advection * fe_eval.get_normal_vector(q);
             const value_type flux_times_normal =
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(
-                0.5) *
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
                std::abs(normal_times_advection) * (u_minus - u_plus));
             fe_eval.submit_value(-flux_times_normal, q);
@@ -761,7 +750,7 @@ do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints,
         const bool                       also_test_parallel = false)
 {
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.push("float");
 
   deallog << "Testing " << dof.get_fe().get_name();
@@ -872,7 +861,7 @@ do_test(const DoFHandler<dim> &          dof,
     }
   deallog << std::endl;
 
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.pop();
 }
 

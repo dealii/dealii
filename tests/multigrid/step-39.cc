@@ -59,8 +59,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   Functions::SlitSingularityFunction<2> exact_solution;
 
 
@@ -603,7 +601,7 @@ namespace Step39
     mg::Matrix<Vector<double>> mgup(mg_matrix_dg_up);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
@@ -788,7 +786,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step39;
       initlog(__FILE__);
 

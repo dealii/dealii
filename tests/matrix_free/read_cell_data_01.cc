@@ -35,7 +35,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim,
           typename Number              = double,
@@ -180,8 +179,7 @@ private:
       }
   }
 
-  AlignedVector<std::array<CellId, VectorizedArrayType::n_array_elements>>
-    cell_ids;
+  AlignedVector<std::array<CellId, VectorizedArrayType::size()>> cell_ids;
 };
 
 

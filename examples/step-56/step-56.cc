@@ -1111,7 +1111,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step56;
 
       const int degree = 1;

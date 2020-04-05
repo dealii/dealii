@@ -59,8 +59,14 @@ main()
   prm.leave_subsection();
 
 
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::JSON);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::JSON, true);
   deallog.get_file_stream() << std::endl;
+
+  prm.print_parameters(deallog.get_file_stream(),
+                       ParameterHandler::ShortJSON,
+                       true);
+  deallog.get_file_stream() << std::endl;
+
 
   return 0;
 }

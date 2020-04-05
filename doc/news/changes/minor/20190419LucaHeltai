@@ -1,0 +1,5 @@
+New: Two new methods NonMatching::compute_coupling_sparsity_pattern() and 
+NonMatching::compute_coupling_mass_matrix() allow to construct the coupling between arbitrary grids,
+using a convolution kernel. 
+<br>
+(Luca Heltai, Wenyu Lei, 2019/04/19)

@@ -70,7 +70,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim>
@@ -319,8 +318,6 @@ main(int argc, char **argv)
 {
   try
     {
-      using namespace dealii;
-
       initlog();
 
 

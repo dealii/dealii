@@ -64,9 +64,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -411,7 +408,6 @@ test_mpi(MPI_Comm comm)
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
 

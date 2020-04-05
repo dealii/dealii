@@ -83,9 +83,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(2);
-      deallog.attach(logfile);
 
       CHECK_ALL(Q, 1);
       CHECK_ALL(Q, 2);

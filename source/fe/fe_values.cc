@@ -4196,18 +4196,6 @@ FEValuesBase<dim, spacedim>::get_cell() const
 
 template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
-FEValuesBase<dim, spacedim>::get_all_normal_vectors() const
-{
-  Assert(this->update_flags & update_normal_vectors,
-         (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
-           "update_normal_vectors")));
-  return get_normal_vectors();
-}
-
-
-
-template <int dim, int spacedim>
-const std::vector<Tensor<1, spacedim>> &
 FEValuesBase<dim, spacedim>::get_normal_vectors() const
 {
   Assert(this->update_flags & update_normal_vectors,

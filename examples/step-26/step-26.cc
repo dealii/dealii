@@ -291,7 +291,9 @@ namespace Step26
 
   // @sect4{<code>HeatEquation::output_results</code>}
   //
-  // Neither is there anything new in generating graphical output:
+  // Neither is there anything new in generating graphical output other than the
+  // fact that we tell the DataOut object what the current time and time step
+  // number is, so that this can be written into the output file:
   template <int dim>
   void HeatEquation<dim>::output_results() const
   {
@@ -301,6 +303,8 @@ namespace Step26
     data_out.add_data_vector(solution, "U");
 
     data_out.build_patches();
+
+    data_out.set_flags(DataOutBase::VtkFlags(time, timestep_number));
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
@@ -655,7 +659,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step26;
 
       HeatEquation<2> heat_equation_solver;

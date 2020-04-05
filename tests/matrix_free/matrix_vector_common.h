@@ -166,10 +166,7 @@ do_test(const DoFHandler<dim> &          dof,
 int
 main()
 {
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-
-  deallog << std::setprecision(3);
+  initlog();
 
   {
     deallog.push("2d");

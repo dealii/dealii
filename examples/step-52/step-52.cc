@@ -94,7 +94,8 @@ namespace Step52
                                           const double          tau,
                                           const Vector<double> &y);
 
-    void output_results(const unsigned int               time_step,
+    void output_results(const double                     time,
+                        const unsigned int               time_step,
                         TimeStepping::runge_kutta_method method) const;
 
     // The next three functions are the drivers for the explicit methods, the
@@ -376,7 +377,8 @@ namespace Step52
   // the number of the time step and the name of the time stepping method. Of
   // course, the (exact) result should really be the same for all time
   // stepping method, but the output here at least allows us to compare them.
-  void Diffusion::output_results(const unsigned int               time_step,
+  void Diffusion::output_results(const double                     time,
+                                 const unsigned int               time_step,
                                  TimeStepping::runge_kutta_method method) const
   {
     std::string method_name;
@@ -451,6 +453,8 @@ namespace Step52
 
     data_out.build_patches();
 
+    data_out.set_flags(DataOutBase::VtkFlags(time, time_step));
+
     const std::string filename = "solution-" + method_name + "-" +
                                  Utilities::int_to_string(time_step, 3) +
                                  ".vtu";
@@ -492,7 +496,7 @@ namespace Step52
 
     TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_runge_kutta(
       method);
-    output_results(0, method);
+    output_results(time, 0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
         time = explicit_runge_kutta.evolve_one_time_step(
@@ -506,7 +510,7 @@ namespace Step52
         constraint_matrix.distribute(solution);
 
         if ((i + 1) % 10 == 0)
-          output_results(i + 1, method);
+          output_results(time, i + 1, method);
       }
   }
 
@@ -532,7 +536,7 @@ namespace Step52
 
     TimeStepping::ImplicitRungeKutta<Vector<double>> implicit_runge_kutta(
       method);
-    output_results(0, method);
+    output_results(time, 0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
         time = implicit_runge_kutta.evolve_one_time_step(
@@ -549,7 +553,7 @@ namespace Step52
         constraint_matrix.distribute(solution);
 
         if ((i + 1) % 10 == 0)
-          output_results(i + 1, method);
+          output_results(time, i + 1, method);
       }
   }
 
@@ -598,7 +602,7 @@ namespace Step52
                                     max_delta,
                                     refine_tol,
                                     coarsen_tol);
-    output_results(0, method);
+    output_results(time, 0, method);
 
     // Now for the time loop. The last time step is chosen such that the final
     // time is exactly reached.
@@ -619,7 +623,7 @@ namespace Step52
         constraint_matrix.distribute(solution);
 
         if ((n_steps + 1) % 10 == 0)
-          output_results(n_steps + 1, method);
+          output_results(time, n_steps + 1, method);
 
         time_step = embedded_explicit_runge_kutta.get_status().delta_t_guess;
         ++n_steps;

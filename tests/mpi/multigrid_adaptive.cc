@@ -66,8 +66,6 @@
 
 namespace Step50
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -422,17 +420,48 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
+    auto print_coarse_solve = [](const bool start, const unsigned int level) {
+      if (start)
+        {
+          deallog << "V-cycle entering level " << level << std::endl;
+          deallog << "Coarse level           " << level << std::endl;
+        }
+    };
+
+    auto print_restriction = [](const bool start, const unsigned int level) {
+      if (start)
+        deallog << "Residual on      level " << level << std::endl;
+    };
+
+    auto print_pre_smoother_step = [](const bool         start,
+                                      const unsigned int level) {
+      if (start)
+        {
+          deallog << "V-cycle entering level " << level << std::endl;
+          deallog << "Smoothing on     level " << level << std::endl;
+        }
+    };
+
+    auto print_post_smoother_step = [](const bool         start,
+                                       const unsigned int level) {
+      if (start)
+        {
+          deallog << "Smoothing on     level " << level << std::endl;
+          deallog << "V-cycle leaving  level " << level << std::endl;
+        }
+    };
+
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
-    mg.set_debug(2);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
+
+    mg.connect_coarse_solve(print_coarse_solve);
+    mg.connect_restriction(print_restriction);
+    mg.connect_pre_smoother_step(print_pre_smoother_step);
+    mg.connect_post_smoother_step(print_post_smoother_step);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
       mg_dof_handler, mg, mg_transfer);
@@ -527,7 +556,6 @@ namespace Step50
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step50;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

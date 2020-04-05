@@ -94,45 +94,25 @@ namespace internal
       tensor_symmetric_plus_dg0 = 5
     };
 
+
+
     /**
-     * The class that stores the shape functions, gradients and Hessians
-     * evaluated for a tensor product finite element and tensor product
-     * quadrature formula on the unit cell. Because of this structure, only
-     * one-dimensional data is stored.
+     * This struct stores the shape functions, their gradients and Hessians
+     * evaluated for a one-dimensional section of a tensor product finite
+     * element and tensor product quadrature formula in reference
+     * coordinates. This data structure also includes the evaluation of
+     * quantities at the cell boundary and on the sub-interval $(0, 0.5)$ and
+     * $(0.5, 1)$ for face integrals.
      *
-     * @ingroup matrixfree
-     *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
+     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
-    struct ShapeInfo
+    struct UnivariateShapeData
     {
       /**
-       * Empty constructor. Does nothing.
+       * Empty constructor. Sets default configuration.
        */
-      ShapeInfo();
-
-      /**
-       * Constructor that initializes the data fields using the reinit method.
-       */
-      template <int dim>
-      ShapeInfo(const Quadrature<1> &     quad,
-                const FiniteElement<dim> &fe,
-                const unsigned int        base_element = 0);
-
-      /**
-       * Initializes the data fields. Takes a one-dimensional quadrature
-       * formula and a finite element as arguments and evaluates the shape
-       * functions, gradients and Hessians on the one-dimensional unit cell.
-       * This function assumes that the finite element is derived from a one-
-       * dimensional element by a tensor product and that the zeroth shape
-       * function in zero evaluates to one.
-       */
-      template <int dim>
-      void
-      reinit(const Quadrature<1> &     quad,
-             const FiniteElement<dim> &fe_dim,
-             const unsigned int        base_element = 0);
+      UnivariateShapeData();
 
       /**
        * Return the memory consumption of this class in bytes.
@@ -150,7 +130,7 @@ namespace internal
       /**
        * Stores the shape values of the 1D finite element evaluated on all 1D
        * quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * VectorizedArray<dim>::size equal elements. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
@@ -159,7 +139,7 @@ namespace internal
       /**
        * Stores the shape gradients of the 1D finite element evaluated on all
        * 1D quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * VectorizedArray<dim>::size equal elements. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
@@ -168,7 +148,7 @@ namespace internal
       /**
        * Stores the shape Hessians of the 1D finite element evaluated on all
        * 1D quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * VectorizedArray<dim>::size equal elements. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
@@ -276,6 +256,90 @@ namespace internal
       Quadrature<1> quadrature;
 
       /**
+       * Stores the degree of the element.
+       */
+      unsigned int fe_degree;
+
+      /**
+       * Stores the number of quadrature points per dimension.
+       */
+      unsigned int n_q_points_1d;
+
+      /**
+       * Indicates whether the basis functions are nodal in 0 and 1, i.e., the
+       * end points of the unit cell.
+       */
+      bool nodal_at_cell_boundaries;
+    };
+
+
+
+    /**
+     * This struct stores a tensor (Kronecker) product view of the finite
+     * element and quadrature formula used for evaluation. It is based on a
+     * single or a collection of UnivariateShapeData object(s) that describe
+     * one-dimensional ingredients, plus some additional information about how
+     * these are combined and how indices are laid out in the multi-dimensional
+     * case such as the hierarchical -> lexicographic ordering of FE_Q.
+     *
+     * @ingroup matrixfree
+     *
+     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
+     */
+    template <typename Number>
+    struct ShapeInfo
+    {
+      /**
+       * Encodes the type of element detected at construction. FEEvaluation
+       * will select the most efficient algorithm based on the given element
+       * type.
+       */
+      ElementType element_type;
+
+      /**
+       * Empty constructor. Does nothing.
+       */
+      ShapeInfo();
+
+      /**
+       * Constructor that initializes the data fields using the reinit method.
+       */
+      template <int dim>
+      ShapeInfo(const Quadrature<1> &     quad,
+                const FiniteElement<dim> &fe,
+                const unsigned int        base_element = 0);
+
+      /**
+       * Initializes the data fields. Takes a one-dimensional quadrature
+       * formula and a finite element as arguments and evaluates the shape
+       * functions, gradients and Hessians on the one-dimensional unit cell.
+       * This function assumes that the finite element is derived from a one-
+       * dimensional element by a tensor product and that the zeroth shape
+       * function in zero evaluates to one.
+       */
+      template <int dim>
+      void
+      reinit(const Quadrature<1> &     quad,
+             const FiniteElement<dim> &fe_dim,
+             const unsigned int        base_element = 0);
+
+      /**
+       * Return data of univariate shape functions which defines the
+       * dimension @p dimension of tensor product shape functions
+       * regarding vector component @p component of the underlying
+       * finite element.
+       */
+      const UnivariateShapeData<Number> &
+      get_shape_data(const unsigned int dimension = 0,
+                     const unsigned int component = 0) const;
+
+      /**
+       * Return the memory consumption of this class in bytes.
+       */
+      std::size_t
+      memory_consumption() const;
+
+      /**
        * Renumbering from deal.II's numbering of cell degrees of freedom to
        * lexicographic numbering used inside the FEEvaluation schemes of the
        * underlying element in the DoFHandler. For vector-valued elements, the
@@ -285,14 +349,28 @@ namespace internal
       std::vector<unsigned int> lexicographic_numbering;
 
       /**
-       * Stores the degree of the element.
+       * Stores data of univariate shape functions defining the
+       * underlying tensor product finite element.
        */
-      unsigned int fe_degree;
+      std::vector<UnivariateShapeData<Number>> data;
 
       /**
-       * Stores the number of quadrature points per dimension.
+       * Grants access to univariate shape function data of given
+       * dimension and vector component. Rows identify dimensions and
+       * columns identify vector components.
        */
-      unsigned int n_q_points_1d;
+      dealii::Table<2, UnivariateShapeData<Number> *> data_access;
+
+      /**
+       * Stores the number of space dimensions.
+       */
+      unsigned int n_dimensions;
+
+      /**
+       * Stores the number of vector components of the underlying
+       * vector-valued finite element.
+       */
+      unsigned int n_components;
 
       /**
        * Stores the number of quadrature points in @p dim dimensions for a
@@ -315,12 +393,6 @@ namespace internal
        * Stores the number of DoFs per face in @p dim dimensions.
        */
       unsigned int dofs_per_component_on_face;
-
-      /**
-       * Indicates whether the basis functions are nodal in 0 and 1, i.e., the
-       * end points of the unit cell.
-       */
-      bool nodal_at_cell_boundaries;
 
       /**
        * For nodal basis functions with nodes located at the boundary of the
@@ -405,7 +477,8 @@ namespace internal
        * also fill the shape_???_eo fields.
        */
       bool
-      check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
+      check_1d_shapes_symmetric(
+        UnivariateShapeData<Number> &univariate_shape_data);
 
       /**
        * Check whether symmetric 1D basis functions are such that the shape
@@ -414,7 +487,8 @@ namespace internal
        * that save some operations in the evaluation.
        */
       bool
-      check_1d_shapes_collocation() const;
+      check_1d_shapes_collocation(
+        const UnivariateShapeData<Number> &univariate_shape_data) const;
     };
 
 
@@ -427,15 +501,26 @@ namespace internal
                                         const FiniteElement<dim> &fe_in,
                                         const unsigned int base_element_number)
       : element_type(tensor_general)
-      , fe_degree(0)
-      , n_q_points_1d(0)
+      , n_dimensions(0)
+      , n_components(0)
       , n_q_points(0)
       , dofs_per_component_on_cell(0)
       , n_q_points_face(0)
       , dofs_per_component_on_face(0)
-      , nodal_at_cell_boundaries(false)
     {
       reinit(quad, fe_in, base_element_number);
+    }
+
+    template <typename Number>
+    inline const UnivariateShapeData<Number> &
+    ShapeInfo<Number>::get_shape_data(const unsigned int dimension,
+                                      const unsigned int component) const
+    {
+      AssertDimension(n_dimensions, data_access.size(0));
+      AssertDimension(n_components, data_access.size(1));
+      AssertIndexRange(dimension, n_dimensions);
+      AssertIndexRange(component, n_components);
+      return *(data_access(dimension, component));
     }
 
   } // end of namespace MatrixFreeFunctions

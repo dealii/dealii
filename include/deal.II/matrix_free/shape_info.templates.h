@@ -42,6 +42,16 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    template <typename Number>
+    UnivariateShapeData<Number>::UnivariateShapeData()
+      : element_type(tensor_general)
+      , fe_degree(0)
+      , n_q_points_1d(0)
+      , nodal_at_cell_boundaries(false)
+    {}
+
+
+
     // ----------------- actual ShapeInfo functions --------------------
 
     template <typename Number>
@@ -51,7 +61,7 @@ namespace internal
       return a;
     }
 
-    template <typename Number, int width>
+    template <typename Number, std::size_t width>
     Number
     get_first_array_element(const VectorizedArray<Number, width> a)
     {
@@ -61,13 +71,12 @@ namespace internal
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()
       : element_type(tensor_general)
-      , fe_degree(numbers::invalid_unsigned_int)
-      , n_q_points_1d(0)
+      , n_dimensions(0)
+      , n_components(0)
       , n_q_points(0)
       , dofs_per_component_on_cell(0)
       , n_q_points_face(0)
       , dofs_per_component_on_face(0)
-      , nodal_at_cell_boundaries(false)
     {}
 
 
@@ -79,15 +88,42 @@ namespace internal
                               const FiniteElement<dim> &fe_in,
                               const unsigned int        base_element_number)
     {
-      this->quadrature             = quad;
       const FiniteElement<dim> *fe = &fe_in.base_element(base_element_number);
+      n_dimensions                 = dim;
+      n_components                 = fe_in.n_components();
 
       Assert(fe->n_components() == 1,
              ExcMessage("FEEvaluation only works for scalar finite elements."));
 
-      fe_degree     = fe->degree;
-      n_q_points_1d = quad.size();
+      // assuming isotropy of dimensions and components
+      data.resize(1);
+      UnivariateShapeData<Number> &univariate_shape_data = data.front();
+      data_access.reinit(n_dimensions, n_components);
+      data_access.fill(&univariate_shape_data);
+      univariate_shape_data.quadrature    = quad;
+      univariate_shape_data.fe_degree     = fe->degree;
+      univariate_shape_data.n_q_points_1d = quad.size();
 
+      // grant write access to common univariate shape data
+      auto &shape_values    = univariate_shape_data.shape_values;
+      auto &shape_gradients = univariate_shape_data.shape_gradients;
+      auto &shape_hessians  = univariate_shape_data.shape_hessians;
+      auto &shape_gradients_collocation =
+        univariate_shape_data.shape_gradients_collocation;
+      auto &shape_hessians_collocation =
+        univariate_shape_data.shape_hessians_collocation;
+      auto &inverse_shape_values  = univariate_shape_data.inverse_shape_values;
+      auto &shape_data_on_face    = univariate_shape_data.shape_data_on_face;
+      auto &values_within_subface = univariate_shape_data.values_within_subface;
+      auto &gradients_within_subface =
+        univariate_shape_data.gradients_within_subface;
+      auto &hessians_within_subface =
+        univariate_shape_data.hessians_within_subface;
+      auto &nodal_at_cell_boundaries =
+        univariate_shape_data.nodal_at_cell_boundaries;
+
+      const unsigned int fe_degree     = fe->degree;
+      const unsigned int n_q_points_1d = quad.size();
       const unsigned int n_dofs_1d = std::min(fe->dofs_per_cell, fe_degree + 1);
 
       // renumber (this is necessary for FE_Q, for example, since there the
@@ -205,18 +241,18 @@ namespace internal
         dim > 1 ? Utilities::fixed_power<dim - 1>(fe_degree + 1) : 1;
 
       const unsigned int array_size = n_dofs_1d * n_q_points_1d;
-      this->shape_gradients.resize_fast(array_size);
-      this->shape_values.resize_fast(array_size);
-      this->shape_hessians.resize_fast(array_size);
+      shape_gradients.resize_fast(array_size);
+      shape_values.resize_fast(array_size);
+      shape_hessians.resize_fast(array_size);
 
-      this->shape_data_on_face[0].resize(3 * n_dofs_1d);
-      this->shape_data_on_face[1].resize(3 * n_dofs_1d);
-      this->values_within_subface[0].resize(array_size);
-      this->values_within_subface[1].resize(array_size);
-      this->gradients_within_subface[0].resize(array_size);
-      this->gradients_within_subface[1].resize(array_size);
-      this->hessians_within_subface[0].resize(array_size);
-      this->hessians_within_subface[1].resize(array_size);
+      shape_data_on_face[0].resize(3 * n_dofs_1d);
+      shape_data_on_face[1].resize(3 * n_dofs_1d);
+      values_within_subface[0].resize(array_size);
+      values_within_subface[1].resize(array_size);
+      gradients_within_subface[0].resize(array_size);
+      gradients_within_subface[1].resize(array_size);
+      hessians_within_subface[0].resize(array_size);
+      hessians_within_subface[1].resize(array_size);
 
       for (unsigned int i = 0; i < n_dofs_1d; ++i)
         {
@@ -255,18 +291,18 @@ namespace internal
             }
 
           // evaluate basis functions on the 1D faces, i.e., in zero and one
-          Point<dim> q_point             = unit_point;
-          q_point[0]                     = 0;
-          this->shape_data_on_face[0][i] = fe->shape_value(my_i, q_point);
-          this->shape_data_on_face[0][i + n_dofs_1d] =
+          Point<dim> q_point       = unit_point;
+          q_point[0]               = 0;
+          shape_data_on_face[0][i] = fe->shape_value(my_i, q_point);
+          shape_data_on_face[0][i + n_dofs_1d] =
             fe->shape_grad(my_i, q_point)[0];
-          this->shape_data_on_face[0][i + 2 * n_dofs_1d] =
+          shape_data_on_face[0][i + 2 * n_dofs_1d] =
             fe->shape_grad_grad(my_i, q_point)[0][0];
-          q_point[0]                     = 1;
-          this->shape_data_on_face[1][i] = fe->shape_value(my_i, q_point);
-          this->shape_data_on_face[1][i + n_dofs_1d] =
+          q_point[0]               = 1;
+          shape_data_on_face[1][i] = fe->shape_value(my_i, q_point);
+          shape_data_on_face[1][i + n_dofs_1d] =
             fe->shape_grad(my_i, q_point)[0];
-          this->shape_data_on_face[1][i + 2 * n_dofs_1d] =
+          shape_data_on_face[1][i + 2 * n_dofs_1d] =
             fe->shape_grad_grad(my_i, q_point)[0][0];
         }
 
@@ -391,9 +427,9 @@ namespace internal
         }
 
       if (element_type == tensor_general &&
-          check_1d_shapes_symmetric(n_q_points_1d))
+          check_1d_shapes_symmetric(univariate_shape_data))
         {
-          if (check_1d_shapes_collocation())
+          if (check_1d_shapes_collocation(univariate_shape_data))
             element_type = tensor_symmetric_collocation;
           else
             element_type = tensor_symmetric;
@@ -412,7 +448,7 @@ namespace internal
             }
         }
       else if (element_type == tensor_symmetric_plus_dg0)
-        check_1d_shapes_symmetric(n_q_points_1d);
+        check_1d_shapes_symmetric(univariate_shape_data);
 
       nodal_at_cell_boundaries = true;
       for (unsigned int i = 1; i < n_dofs_1d; ++i)
@@ -494,6 +530,8 @@ namespace internal
                     }
             }
         }
+
+      univariate_shape_data.element_type = this->element_type;
     }
 
 
@@ -501,10 +539,30 @@ namespace internal
     template <typename Number>
     bool
     ShapeInfo<Number>::check_1d_shapes_symmetric(
-      const unsigned int n_q_points_1d)
+      UnivariateShapeData<Number> &univariate_shape_data)
     {
       if (dofs_per_component_on_cell == 0)
         return false;
+
+      const auto n_q_points_1d   = univariate_shape_data.n_q_points_1d;
+      const auto fe_degree       = univariate_shape_data.fe_degree;
+      auto &     shape_values    = univariate_shape_data.shape_values;
+      auto &     shape_gradients = univariate_shape_data.shape_gradients;
+      auto &     shape_hessians  = univariate_shape_data.shape_hessians;
+      auto &     shape_gradients_collocation =
+        univariate_shape_data.shape_gradients_collocation;
+      auto &shape_hessians_collocation =
+        univariate_shape_data.shape_hessians_collocation;
+      auto &shape_values_eo    = univariate_shape_data.shape_values_eo;
+      auto &shape_gradients_eo = univariate_shape_data.shape_gradients_eo;
+      auto &shape_hessians_eo  = univariate_shape_data.shape_hessians_eo;
+      auto &shape_gradients_collocation_eo =
+        univariate_shape_data.shape_gradients_collocation_eo;
+      auto &shape_hessians_collocation_eo =
+        univariate_shape_data.shape_hessians_collocation_eo;
+      auto &inverse_shape_values = univariate_shape_data.inverse_shape_values;
+      auto &inverse_shape_values_eo =
+        univariate_shape_data.inverse_shape_values_eo;
 
       const double zero_tol =
         std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
@@ -616,10 +674,14 @@ namespace internal
 
     template <typename Number>
     bool
-    ShapeInfo<Number>::check_1d_shapes_collocation() const
+    ShapeInfo<Number>::check_1d_shapes_collocation(
+      const UnivariateShapeData<Number> &univariate_shape_data) const
     {
       if (dofs_per_component_on_cell != n_q_points)
         return false;
+
+      const auto fe_degree    = univariate_shape_data.fe_degree;
+      auto &     shape_values = univariate_shape_data.shape_values;
 
       const double zero_tol =
         std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
@@ -648,6 +710,16 @@ namespace internal
     template <typename Number>
     std::size_t
     ShapeInfo<Number>::memory_consumption() const
+    {
+      std::size_t memory = sizeof(*this);
+      for (const auto &univariate_shape_data : data)
+        memory += univariate_shape_data.memory_consumption();
+      return memory;
+    }
+
+    template <typename Number>
+    std::size_t
+    UnivariateShapeData<Number>::memory_consumption() const
     {
       std::size_t memory = sizeof(*this);
       memory += MemoryConsumption::memory_consumption(shape_values);

@@ -44,7 +44,6 @@
 #  include <deal.II/lac/sparse_direct.h>
 #endif
 
-using namespace dealii;
 
 
 template <class PRECONDITIONER,

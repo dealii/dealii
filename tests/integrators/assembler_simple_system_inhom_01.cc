@@ -68,8 +68,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 /*
  * Right hand side

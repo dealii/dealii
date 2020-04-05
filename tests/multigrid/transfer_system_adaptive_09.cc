@@ -177,9 +177,8 @@ check(const FiniteElement<dim> &fe, const unsigned int selected_block)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 5), 0);

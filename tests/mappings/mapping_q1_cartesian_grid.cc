@@ -33,7 +33,6 @@
 // transform_unit_to_real_cell, we lost nearly all digits of precision due to
 // roundoff.
 
-using namespace dealii;
 
 class RefineTest
 {

@@ -976,11 +976,7 @@ namespace Utilities
           if (std::uncaught_exception() == true)
 #  endif
             {
-              std::cerr
-                << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
-                << this_mpi_process(MPI_COMM_WORLD)
-                << ". Skipping MPI_Finalize() to avoid a deadlock."
-                << std::endl;
+              // do not try to call MPI_Finalize to avoid a deadlock.
             }
           else
             {

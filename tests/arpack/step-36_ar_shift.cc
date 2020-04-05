@@ -55,9 +55,6 @@
 
 namespace Step36
 {
-  using namespace dealii;
-
-
   template <int dim>
   class EigenvalueProblem
   {
@@ -333,7 +330,6 @@ main(int argc, char **argv)
 {
   try
     {
-      using namespace dealii;
       using namespace Step36;
 
       initlog();

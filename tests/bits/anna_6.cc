@@ -279,9 +279,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(2);
-      deallog.attach(logfile);
 
       ImposeBC<2>().run();
       ImposeBC<3>().run();

@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class MixedElastoPlasticity
@@ -211,10 +210,8 @@ MixedElastoPlasticity<dim>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-
-  deallog.attach(logfile);
 
   MixedElastoPlasticity<3> elasto_plasticity(1);
   elasto_plasticity.run();

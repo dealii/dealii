@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 std::vector<std::string>
 split_string(const std::string &text, const char delim = '|')

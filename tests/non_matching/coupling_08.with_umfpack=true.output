@@ -1,0 +1,41 @@
+
+DEAL::dim0: 1, dim1: 1, spacedim: 1
+DEAL::FE0             : FE_Q<1>(1)
+DEAL::FE1             : FE_Q<1>(1)
+DEAL::Dofs 0          : 9
+DEAL::Dofs 1          : 5
+DEAL::Constrained dofs: 0
+DEAL::Epsilon: 1.00000
+DEAL::Error on constants: 1.72490
+DEAL::dim0: 2, dim1: 1, spacedim: 2
+DEAL::FE0             : FE_Q<2>(1)
+DEAL::FE1             : FE_Q<1,2>(1)
+DEAL::Dofs 0          : 81
+DEAL::Dofs 1          : 5
+DEAL::Constrained dofs: 0
+DEAL::Epsilon: 1.00000
+DEAL::Error on constants: 1.87222
+DEAL::dim0: 2, dim1: 2, spacedim: 2
+DEAL::FE0             : FE_Q<2>(1)
+DEAL::FE1             : FE_Q<2>(1)
+DEAL::Dofs 0          : 81
+DEAL::Dofs 1          : 25
+DEAL::Constrained dofs: 0
+DEAL::Epsilon: 1.41421
+DEAL::Error on constants: 4.61731
+DEAL::dim0: 3, dim1: 2, spacedim: 3
+DEAL::FE0             : FE_Q<3>(1)
+DEAL::FE1             : FE_Q<2,3>(1)
+DEAL::Dofs 0          : 729
+DEAL::Dofs 1          : 25
+DEAL::Constrained dofs: 0
+DEAL::Epsilon: 1.41421
+DEAL::Error on constants: 4.79570
+DEAL::dim0: 3, dim1: 3, spacedim: 3
+DEAL::FE0             : FE_Q<3>(1)
+DEAL::FE1             : FE_Q<3>(1)
+DEAL::Dofs 0          : 729
+DEAL::Dofs 1          : 125
+DEAL::Constrained dofs: 0
+DEAL::Epsilon: 1.73205
+DEAL::Error on constants: 10.9402

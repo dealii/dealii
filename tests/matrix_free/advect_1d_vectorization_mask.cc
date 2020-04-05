@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -108,7 +107,7 @@ private:
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi(
       data, 0, 0, start_vector_component);
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -144,7 +143,7 @@ private:
                                       n_components,
                                       number>::value_type value_type;
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -201,7 +200,7 @@ private:
                                       n_components,
                                       number>::value_type value_type;
 
-    const unsigned int n_vect = VectorizedArray<number>::n_array_elements;
+    const unsigned int n_vect = VectorizedArray<number>::size();
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -226,7 +225,7 @@ private:
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask =
-              std::bitset<VectorizedArray<number>::n_array_elements>();
+              std::bitset<VectorizedArray<number>::size()>();
             mask[v] = true;
             fe_eval.distribute_local_to_global(dst, 0, mask);
           }
