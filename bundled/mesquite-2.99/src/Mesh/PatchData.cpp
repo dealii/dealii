@@ -1765,7 +1765,7 @@ void PatchData::fill( size_t num_vertex, const double* coords,
 {
   std::vector<size_t> lengths( num_elem );
   std::transform( types, types + num_elem, lengths.begin(), 
-                      std::ptr_fun(TopologyInfo::corners) );
+                  [](EntityTopology topo){return TopologyInfo::corners(topo);} );
   const size_t* len_ptr = num_elem ? arrptr(lengths) : 0;
   this->fill( num_vertex, coords, num_elem, types, len_ptr, conn, fixed, err );
   MSQ_CHKERR(err);
