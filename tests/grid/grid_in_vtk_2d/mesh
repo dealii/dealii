@@ -10,6 +10,6 @@ CELLS 1 5
 CELL_TYPES 1
 9
 CELL_DATA 1
-SCALARS MaterialID double
+SCALARS MaterialID int
 LOOKUP_TABLE default
 1

@@ -381,11 +381,19 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         // keyword.
                         continue;
 
-                      // Now we got somewhere. Proceed from here.
-                      // Ignore everything till the end of the line.
-                      // SCALARS MaterialID 1
+                      // Now we got somewhere. Proceed from here, assert
+                      // that the type of the table is int, and ignore the
+                      // rest of the line.
+                      // SCALARS MaterialID int 1
                       // (the last number is optional)
-                      in.ignore(256, '\n');
+                      std::string line;
+                      std::getline(in, line);
+                      AssertThrow(
+                        line.substr(1,
+                                    std::min(static_cast<std::size_t>(3),
+                                             line.size() - 1)) == "int",
+                        ExcMessage(
+                          "While reading VTK file, material- and manifold IDs can only have type 'int'."));
 
                       in >> keyword;
                       AssertThrow(
@@ -406,7 +414,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // the order used in the following blocks makes sense
                       for (unsigned int i = 0; i < cells.size(); i++)
                         {
-                          double id;
+                          int id;
                           in >> id;
                           if (field_name == "MaterialID")
                             cells[i].material_id =
@@ -422,7 +430,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         {
                           for (auto &boundary_quad : subcelldata.boundary_quads)
                             {
-                              double id;
+                              int id;
                               in >> id;
                               if (field_name == "MaterialID")
                                 boundary_quad.material_id =
@@ -435,7 +443,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             }
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
-                              double id;
+                              int id;
                               in >> id;
                               if (field_name == "MaterialID")
                                 boundary_line.material_id =
@@ -451,7 +459,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         {
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
-                              double id;
+                              int id;
                               in >> id;
                               if (field_name == "MaterialID")
                                 boundary_line.material_id =
