@@ -782,13 +782,16 @@ namespace GridGenerator
    * is set to zero, and a SphericalManifold is attached to it.
    *
    * The resulting grid in 2D and 3D looks as follows:
-   * \htmlonly <style>div.image
-   * img[src="quarter_hyper_ball_2d.png"]{width:40%;}</style> \endhtmlonly
-   * @image html quarter_hyper_ball_2d.png
-   * \htmlonly <style>div.image
-   * img[src="quarter_hyper_ball_3d.png"]{width:40%;}</style> \endhtmlonly
-   * @image html quarter_hyper_ball_3d.png
-   *
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       <img src="quarter_hyper_ball_2d.png" alt="" width="50%">
+   *     </td>
+   *     <td>
+   *       <img src="quarter_hyper_ball_3d.png" alt="" width="45%">
+   *     </td>
+   *   </tr>
+   * </table>
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
