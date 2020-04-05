@@ -230,7 +230,7 @@ namespace Utilities
     T
     sum(const T &t, const MPI_Comm &mpi_communicator)
     {
-      T return_value;
+      T return_value{};
       internal::all_reduce(MPI_SUM,
                            ArrayView<const T>(&t, 1),
                            mpi_communicator,
@@ -335,7 +335,7 @@ namespace Utilities
     T
     max(const T &t, const MPI_Comm &mpi_communicator)
     {
-      T return_value;
+      T return_value{};
       internal::all_reduce(MPI_MAX,
                            ArrayView<const T>(&t, 1),
                            mpi_communicator,
@@ -377,7 +377,7 @@ namespace Utilities
     T
     min(const T &t, const MPI_Comm &mpi_communicator)
     {
-      T return_value;
+      T return_value{};
       internal::all_reduce(MPI_MIN,
                            ArrayView<const T>(&t, 1),
                            mpi_communicator,
