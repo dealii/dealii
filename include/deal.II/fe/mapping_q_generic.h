@@ -611,13 +611,6 @@ protected:
   QGaussLobatto<1> line_support_points;
 
   /**
-   * An FE_Q object which is only needed in 3D, since it knows how to reorder
-   * shape functions/DoFs on non-standard faces. This is used to reorder
-   * support points in the same way.
-   */
-  const std::unique_ptr<FE_Q<dim>> fe_q;
-
-  /**
    * A vector of tables of weights by which we multiply the locations of the
    * support points on the perimeter of an object (line, quad, hex) to get the
    * location of interior support points.
