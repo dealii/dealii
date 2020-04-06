@@ -1,0 +1,3 @@
+Fixed: VectorTools::get_position_vector would return wrong positions for
+curved cells in the interior of the domain. This is now fixed.
+<br> (Martin Kronbichler, Doug Shi-Dong, 2020/04/05)
