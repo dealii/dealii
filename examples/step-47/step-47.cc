@@ -491,7 +491,7 @@ namespace Step47
       // In the formula above, $h_K$ is the size of cell $K$. But this
       // is not quite so straightforward either: If one uses highly
       // stretched cells, then a more involved theory says that $h$
-      // should be replaced be the diameter of cell $K$ normal to the
+      // should be replaced by the diameter of cell $K$ normal to the
       // direction of the edge in question.  It turns out that there
       // is a function in deal.II for that. Secondly, $h_K$ may be
       // different when viewed from the two different sides of a face.
@@ -521,8 +521,8 @@ namespace Step47
       // of the bilinear form were as follows:
       // @f{align*}{
       //  -\sum_{e \in \mathbb{F}} \int_{e}
-      //  \jump{ \frac{\partial^2 v_h}{\partial \mathbf n^2}}
-      //  \average{\frac{\partial u_h}{\partial \mathbf n}} \ ds
+      //  \jump{ \frac{\partial v_h}{\partial \mathbf n}}
+      //  \average{\frac{\partial^2 u_h}{\partial \mathbf n^2}} \ ds
       // -\sum_{e \in \mathbb{F}} \int_{e}
       // \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
       // \jump{\frac{\partial u_h}{\partial \mathbf n}} \ ds
@@ -796,7 +796,7 @@ namespace Step47
     // solution $u_h$, but given the Lagrange shape functions we use, $u_h$ of
     // course has kinks at the interfaces between cells, and consequently second
     // derivatives are singular at interfaces. As a consequence, we really only
-    // integrating over the interiors of the cells and ignore the interface
+    // integrate over the interior of cells and ignore the interface
     // contributions. This is *not* an equivalent norm to the energy norm for
     // the problem, but still gives us an idea of how fast the error converges.
     //

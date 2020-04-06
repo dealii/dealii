@@ -318,7 +318,7 @@ the following terms:
   \average{\frac{\partial^2 v_h}{\partial \mathbf n^2}}
   \jump{\frac{\partial u_h}{\partial \mathbf n}}
 + \sum_{e \in \mathbb{F}}
-  \frac{\sigma}{h_e}\int_e
+  \frac{\gamma}{h_e}\int_e
   \jump{\frac{\partial v_h}{\partial \mathbf n}}
   \jump{\frac{\partial u_h}{\partial \mathbf n}}.
 @f}
@@ -508,7 +508,7 @@ As a consequence, we then need choose as boundary conditions the following:
                 \pi\sin(\pi x) \cos(\pi y)
              \end{pmatrix}\right|_{\partial\Omega} \cdot \mathbf n.
 @f}
-The right hand side is easily computes as
+The right hand side is easily computed as
 @f{align*}{
   f = \Delta^2 u = 4 \pi^4 \sin(\pi x) \sin(\pi y).
 @f}
