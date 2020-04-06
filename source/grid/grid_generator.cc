@@ -4220,7 +4220,7 @@ namespace GridGenerator
         for (unsigned int j = 0; j < 4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-        cells[i].manifold_id = i == 2 ? 1 : numbers::flat_manifold_id;
+        cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
       }
 
     tria.create_triangulation(std::vector<Point<2>>(std::begin(vertices),

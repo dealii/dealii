@@ -31,21 +31,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:1d::Triangulation constructed from an unrefined Triangulation:
 # vtk DataFile Version 3.0
@@ -79,21 +79,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:1d::Triangulation constructed from a refined Triangulation:
 # vtk DataFile Version 3.0
@@ -127,21 +127,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:2d::Original Triangulation:
 # vtk DataFile Version 3.0
@@ -175,21 +175,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:2d::Triangulation constructed from an unrefined Triangulation:
 # vtk DataFile Version 3.0
@@ -223,21 +223,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:2d::Triangulation constructed from a refined Triangulation:
 # vtk DataFile Version 3.0
@@ -271,21 +271,21 @@ CELLS 14 52
 2 7 5
 
 CELL_TYPES 14
-9 9 9 9 9
-3 3 3 3 3 3 3 3 3
+9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 
 
 
 CELL_DATA 14
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-540 270 0 450 360
-0 0 -1 42 -1 -1 -1 0 -1
+540 270 0 450 360 
+0 0 -1 42 -1 -1 -1 0 -1 
 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-181 451 1 271 361
-42 0 42 42 42 42 42 42 42
+181 451 -1 271 361 
+42 0 42 42 42 42 42 42 42 
 
 DEAL:3d::Original Triangulation:
 # vtk DataFile Version 3.0
@@ -371,22 +371,22 @@ CELLS 58 254
 2 15 7
 
 CELL_TYPES 58
-12 12 12 12 12 12 12
-9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9
-3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+12 12 12 12 12 12 12 
+9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
 
 CELL_DATA 58
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-360 360 450 360 270 540 360
--1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1
--1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1
+360 360 450 360 270 540 360 
+-1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-361 361 271 361 451 181 361
-42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42
-42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42
+361 361 271 361 451 181 361 
+42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42 
+42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
 DEAL:3d::Triangulation constructed from an unrefined Triangulation:
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
@@ -471,22 +471,22 @@ CELLS 58 254
 2 15 7
 
 CELL_TYPES 58
-12 12 12 12 12 12 12
-9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9
-3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+12 12 12 12 12 12 12 
+9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
 
 CELL_DATA 58
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-360 360 450 360 270 540 360
--1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1
--1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1
+360 360 450 360 270 540 360 
+-1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-361 361 271 361 451 181 361
-42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42
-42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42
+361 361 271 361 451 181 361 
+42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42 
+42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
 DEAL:3d::Triangulation constructed from a refined Triangulation:
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
@@ -571,19 +571,19 @@ CELLS 58 254
 2 15 7
 
 CELL_TYPES 58
-12 12 12 12 12 12 12
-9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9
-3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+12 12 12 12 12 12 12 
+9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
 
 CELL_DATA 58
 SCALARS MaterialID int 1
 LOOKUP_TABLE default
-360 360 450 360 270 540 360
--1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1
--1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1
+360 360 450 360 270 540 360 
+-1 -1 -1 -1 -1 -1 0 0 0 -1 -1 42 -1 -1 0 -1 0 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 -1 0 0 -1 0 0 0 0 0 0 -1 -1 0 0 -1 0 -1 
 
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
-361 361 271 361 451 181 361
-42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42
-42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42
+361 361 271 361 451 181 361 
+42 42 42 42 42 42 42 0 42 42 42 42 42 42 42 42 42 42 42 
+42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
