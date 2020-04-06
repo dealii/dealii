@@ -48,6 +48,13 @@ namespace LinearAlgebra
   class ReadWriteVector;
 #  endif
 
+  /**
+   * A namespace for classes that provide wrappers for Trilinos' Tpetra vectors.
+   *
+   * This namespace provides wrappers for the Tpetra::Vector class from the
+   * Tpetra package (https://trilinos.github.io/tpetra.html) that is part of
+   * Trilinos.
+   */
   namespace TpetraWrappers
   {
     /**
