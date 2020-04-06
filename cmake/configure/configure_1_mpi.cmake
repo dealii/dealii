@@ -30,7 +30,8 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   IF(MPI_FOUND)
     SET(${var} TRUE)
 
-    IF(NOT MPI_HAVE_MPI_SEEK_SET)
+    # MPI_HAVE_MPI_SEEK_SET can not be verified during cross compiling
+    IF((NOT MPI_HAVE_MPI_SEEK_SET) AND (NOT CMAKE_CROSSCOMPILING))
       MESSAGE(STATUS
         "Could not find a sufficient MPI version: "
         "Your MPI implementation must define MPI_SEEK_SET.")
