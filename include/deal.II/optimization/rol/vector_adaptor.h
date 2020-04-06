@@ -396,7 +396,14 @@ namespace Rol
     if (vector_ptr->locally_owned_elements().is_element(i))
       vec_ptr->operator[](i) = 1.;
 
-    vec_ptr->compress(VectorOperation::insert);
+    if (vec_ptr->has_ghost_elements())
+      {
+        vec_ptr->update_ghost_values();
+      }
+    else
+      {
+        vec_ptr->compress(VectorOperation::insert);
+      }
 
     Teuchos::RCP<VectorAdaptor> e = Teuchos::rcp(new VectorAdaptor(vec_ptr));
 
@@ -417,7 +424,14 @@ namespace Rol
          iterator++)
       *iterator = f.apply(*iterator);
 
-    vector_ptr->compress(VectorOperation::insert);
+    if (vector_ptr->has_ghost_elements())
+      {
+        vector_ptr->update_ghost_values();
+      }
+    else
+      {
+        vector_ptr->compress(VectorOperation::insert);
+      }
   }
 
 
@@ -445,7 +459,14 @@ namespace Rol
          l_iterator++, r_iterator++)
       *l_iterator = f.apply(*l_iterator, *r_iterator);
 
-    vector_ptr->compress(VectorOperation::insert);
+    if (vector_ptr->has_ghost_elements())
+      {
+        vector_ptr->update_ghost_values();
+      }
+    else
+      {
+        vector_ptr->compress(VectorOperation::insert);
+      }
   }
 
 
