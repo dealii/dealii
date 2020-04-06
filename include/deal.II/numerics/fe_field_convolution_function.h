@@ -51,7 +51,7 @@ namespace Functions
    * where $f(y)$ is the finite element field function constructed using the
    * vector and the dof handler passed at construction time.
    *
-   * This function takes a CutOffFunctionBase object in input, that is used to
+   * This class also takes a CutOffFunctionBase object in input, that is used to
    * perform the convolution, and a radius, that is used to scale the
    * convolution kernel. This function may be called also for points
    * outside the domain, where it decays to zero according to what cut off
@@ -133,7 +133,7 @@ namespace Functions
   {
   public:
     /**
-     * Construct a vector function. A smart pointers is stored to the dof
+     * Construct a (possibly vector-valued) function. A SmartPointer is stored to the dof
      * handler and to the cache object, so you have to make sure they remain
      * valid for the entire lifetime of this object. The number of
      * components of this functions is equal to the number of components of the
