@@ -1033,7 +1033,7 @@ namespace Step63
   // The last thing to note is that since our problem is non-symmetric, we must
   // use an appropriate Krylov subspace method. We choose here to
   // use GMRES since it offers the guarantee of residual reduction in each
-  // iteration. The major disavantage of GMRES is that, for each iteration, we
+  // iteration. The major disavantage of GMRES is that, for each iteration,
   // the number of stored temporary vectors increases by one, and one also needs
   // to compute a scalar product with all previously stored vectors. This is
   // rather expensive. This requirement is relaxed by using the restarted GMRES
@@ -1047,7 +1047,7 @@ namespace Step63
   // iteration counts by using a powerful GMG preconditioner, so we have picked
   // the restart length such that all of the results shown below converge prior
   // to restart happening, and thus we have a standard GMRES method. If the user
-  // is interested, another sutaible method offered in deal.II would be
+  // is interested, another suitable method offered in deal.II would be
   // BiCGStab.
 
   template <int dim>
