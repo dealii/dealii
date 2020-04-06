@@ -1118,6 +1118,9 @@ namespace internal
         AlignedVector<std::array<Tensor<2, dim>, dim + 1>>
           &jacobians_on_stencil)
       {
+        if (begin_cell == end_cell)
+          return;
+
         const unsigned int mapping_degree = mapping_q.get_degree();
         FE_Nothing<dim>    dummy_fe;
         QGaussLobatto<dim> quadrature(mapping_degree + 1);
@@ -1258,7 +1261,7 @@ namespace internal
                 typename VectorizedArrayType,
                 typename VectorizedDouble>
       void
-      compute_range_mapping_q(
+      mapping_q_compute_range(
         const unsigned int                 begin_cell,
         const unsigned int                 end_cell,
         const std::vector<GeometryType> &  cell_type,
@@ -2074,7 +2077,7 @@ namespace internal
                 typename VectorizedArrayType,
                 typename VectorizedDouble>
       void
-      compute_range_mapping_q(
+      mapping_q_compute_range(
         const unsigned int begin_face,
         const unsigned int end_face,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
@@ -2519,15 +2522,33 @@ namespace internal
       {
         AlignedVector<std::array<Tensor<2, dim>, dim + 1>> jacobians_on_stencil(
           cell_array.size());
-        ExtractCellHelper::mapping_q_query_fe_values(0,
-                                                     cell_array.size(),
-                                                     *mapping_q,
-                                                     tria,
-                                                     cell_array,
-                                                     jacobian_size,
-                                                     preliminary_cell_type,
-                                                     plain_quadrature_points,
-                                                     jacobians_on_stencil);
+
+        // Create as many chunks of cells as we have threads and spawn the
+        // work
+        unsigned int work_per_chunk =
+          std::max(std::size_t(1),
+                   (cell_array.size() + MultithreadInfo::n_threads() - 1) /
+                     MultithreadInfo::n_threads());
+
+        // we manually use tasks here rather than parallel::apply_to_subranges
+        // because we want exactly as many loops as we have threads - the
+        // initialization of the loops with FEValues is expensive
+        std::size_t          offset = 0;
+        Threads::TaskGroup<> tasks;
+        for (unsigned int t = 0; t < MultithreadInfo::n_threads();
+             ++t, offset += work_per_chunk)
+          tasks += Threads::new_task(
+            &ExtractCellHelper::mapping_q_query_fe_values<dim>,
+            offset,
+            std::min(cell_array.size(), offset + work_per_chunk),
+            *mapping_q,
+            tria,
+            cell_array,
+            jacobian_size,
+            preliminary_cell_type,
+            plain_quadrature_points,
+            jacobians_on_stencil);
+        tasks.join_all();
         cell_data_index =
           ExtractCellHelper::mapping_q_find_compression(jacobian_size,
                                                         jacobians_on_stencil,
@@ -2639,18 +2660,25 @@ namespace internal
 
           // step 4b: go through the cells and compute the information using
           // similar evaluators as for the matrix-free integrals
-          ExtractCellHelper::compute_range_mapping_q<dim,
-                                                     Number,
-                                                     VectorizedArrayType,
-                                                     VectorizedDouble>(
-            0,
+          parallel::apply_to_subranges(
+            0U,
             cell_type.size(),
-            cell_type,
-            process_cell,
-            update_flags_cells,
-            plain_quadrature_points,
-            shape_infos[my_q],
-            my_data);
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractCellHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                cell_type,
+                process_cell,
+                update_flags_cells,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(cell_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
         }
 
       if (faces.empty())
@@ -2760,19 +2788,26 @@ namespace internal
 
           // step 6b: go through the faces and compute the information using
           // similar evaluators as for the matrix-free face integrals
-          ExtractFaceHelper::compute_range_mapping_q<dim,
-                                                     Number,
-                                                     VectorizedArrayType,
-                                                     VectorizedDouble>(
-            0,
+          parallel::apply_to_subranges(
+            0U,
             face_type.size(),
-            faces,
-            face_type,
-            process_face,
-            update_flags_common,
-            plain_quadrature_points,
-            shape_infos[my_q],
-            my_data);
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractFaceHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                faces,
+                face_type,
+                process_face,
+                update_flags_common,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
         }
 
       // step 6c: figure out if normal vectors are the same on some of the
@@ -2782,26 +2817,33 @@ namespace internal
         if (face_data[my_q].descriptor[0].n_q_points >
             face_data[quad_with_most_points].descriptor[0].n_q_points)
           quad_with_most_points = my_q;
-      for (unsigned int face = 0; face < face_type.size(); ++face)
-        if (face_type[face] == general)
-          {
-            const unsigned int n_q_points =
-              face_data[quad_with_most_points].descriptor[0].n_q_points;
-            const Tensor<1, dim, VectorizedArrayType> *normals =
-              face_data[quad_with_most_points].normal_vectors.data() +
-              face_data[quad_with_most_points].data_index_offsets[face];
-            VectorizedArrayType distance = 0.;
-            for (unsigned int q = 1; q < n_q_points; ++q)
-              distance += (normals[q] - normals[0]).norm_square();
-            bool all_small = true;
-            for (unsigned int v = 0; v < n_lanes; ++v)
-              if (distance[v] > 50. * std::numeric_limits<Number>::epsilon() *
-                                  std::numeric_limits<Number>::epsilon() *
-                                  n_q_points)
-                all_small = false;
-            if (all_small)
-              face_type[face] = flat_faces;
-          }
+      parallel::apply_to_subranges(
+        0U,
+        face_type.size(),
+        [&](const unsigned int begin, const unsigned int end) {
+          for (unsigned int face = begin; face < end; ++face)
+            if (face_type[face] == general)
+              {
+                const unsigned int n_q_points =
+                  face_data[quad_with_most_points].descriptor[0].n_q_points;
+                const Tensor<1, dim, VectorizedArrayType> *normals =
+                  face_data[quad_with_most_points].normal_vectors.data() +
+                  face_data[quad_with_most_points].data_index_offsets[face];
+                VectorizedArrayType distance = 0.;
+                for (unsigned int q = 1; q < n_q_points; ++q)
+                  distance += (normals[q] - normals[0]).norm_square();
+                bool all_small = true;
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  if (distance[v] >
+                      50. * std::numeric_limits<Number>::epsilon() *
+                        std::numeric_limits<Number>::epsilon() * n_q_points)
+                    all_small = false;
+                if (all_small)
+                  face_type[face] = flat_faces;
+              }
+        },
+        std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                 std::size_t(2U)));
 
       // step 7: compute the face data by cells. This still needs to be
       // transitioned to extracting the information from cell quadrature
