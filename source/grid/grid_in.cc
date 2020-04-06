@@ -4032,18 +4032,18 @@ namespace
 
     // Write out node numbers
     // Loop over all nodes
-    for (unsigned int ii = 0; ii < node_list.size(); ++ii)
+    for (const auto &node : node_list)
       {
         // Node number
-        output << node_list[ii][0] << "\t";
+        output << node[0] << "\t";
 
         // Node coordinates
         output.setf(std::ios::scientific, std::ios::floatfield);
         for (unsigned int jj = 1; jj < spacedim + 1; ++jj)
           {
             // invoke tolerance -> set points close to zero equal to zero
-            if (std::abs(node_list[ii][jj]) > tolerance)
-              output << static_cast<double>(node_list[ii][jj]) << "\t";
+            if (std::abs(node[jj]) > tolerance)
+              output << static_cast<double>(node[jj]) << "\t";
             else
               output << 0.0 << "\t";
           }

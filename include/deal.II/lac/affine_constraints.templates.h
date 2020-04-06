@@ -2539,14 +2539,14 @@ namespace internals
          << "Constr rows " << n_constraints() << std::endl
          << "Inhom  rows " << n_inhomogeneous_rows << std::endl
          << "Local: ";
-      for (size_type i = 0; i < total_row_indices.size(); ++i)
-        os << ' ' << std::setw(4) << total_row_indices[i].local_row;
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.local_row;
       os << std::endl << "Global:";
-      for (size_type i = 0; i < total_row_indices.size(); ++i)
-        os << ' ' << std::setw(4) << total_row_indices[i].global_row;
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.global_row;
       os << std::endl << "ConPos:";
-      for (size_type i = 0; i < total_row_indices.size(); ++i)
-        os << ' ' << std::setw(4) << total_row_indices[i].constraint_position;
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.constraint_position;
       os << std::endl;
     }
 

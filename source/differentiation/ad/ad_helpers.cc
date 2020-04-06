@@ -81,11 +81,9 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode,
                ScalarType>::reset_registered_independent_variables()
     {
-      for (typename std::vector<bool>::iterator it =
-             registered_independent_variable_values.begin();
-           it != registered_independent_variable_values.end();
-           ++it)
-        *it = false;
+      for (auto &&registered_independent_variable_value :
+           registered_independent_variable_values)
+        registered_independent_variable_value = false;
     }
 
 
@@ -95,11 +93,9 @@ namespace Differentiation
     HelperBase<ADNumberTypeCode, ScalarType>::
       reset_registered_dependent_variables(const bool flag)
     {
-      for (typename std::vector<bool>::iterator it =
-             registered_marked_dependent_variables.begin();
-           it != registered_marked_dependent_variables.end();
-           ++it)
-        *it = flag;
+      for (auto &&registered_marked_dependent_variable :
+           registered_marked_dependent_variables)
+        registered_marked_dependent_variable = flag;
     }
 
 

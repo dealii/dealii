@@ -1190,8 +1190,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         additional_data.cell_vectorization_categories_strict ||
         dof_handlers.active_dof_handler == DoFHandlers::hp;
       unsigned int dofs_per_cell = 0;
-      for (unsigned int no = 0; no < dof_info.size(); ++no)
-        dofs_per_cell = std::max(dofs_per_cell, dof_info[no].dofs_per_cell[0]);
+      for (const auto &info : dof_info)
+        dofs_per_cell = std::max(dofs_per_cell, info.dofs_per_cell[0]);
       task_info.create_blocks_serial(subdomain_boundary_cells,
                                      face_setup.cells_close_to_boundary,
                                      dofs_per_cell,
