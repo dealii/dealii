@@ -46,7 +46,7 @@ namespace LinearAlgebra
    * A namespace for classes that provide wrappers for Trilinos' Epetra vectors.
    *
    * This namespace provides wrappers for the Epetra_FEVector class from the
-   * Epetra package (https://trilinos.org/packages/epetra/) that is part of
+   * Epetra package (https://trilinos.github.io/epetra.html) that is part of
    * Trilinos.
    */
   namespace EpetraWrappers
