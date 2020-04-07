@@ -494,14 +494,17 @@ namespace internal
 
       // check that the names use only allowed characters
       for (const auto &name : names)
-        Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                      "0123456789_<>()") == std::string::npos,
-               Exceptions::DataOutImplementation::ExcInvalidCharacter(
-                 name,
-                 name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+        {
+          (void)name;
+          Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789_<>()")));
+                                        "0123456789_<>()") == std::string::npos,
+                 Exceptions::DataOutImplementation::ExcInvalidCharacter(
+                   name,
+                   name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                          "0123456789_<>()")));
+        }
     }
 
 
@@ -531,14 +534,17 @@ namespace internal
 
       // check that the names use only allowed characters
       for (const auto &name : names)
-        Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                      "0123456789_<>()") == std::string::npos,
-               Exceptions::DataOutImplementation::ExcInvalidCharacter(
-                 name,
-                 name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+        {
+          (void)name;
+          Assert(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789_<>()")));
+                                        "0123456789_<>()") == std::string::npos,
+                 Exceptions::DataOutImplementation::ExcInvalidCharacter(
+                   name,
+                   name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                          "0123456789_<>()")));
+        }
     }
 
 
