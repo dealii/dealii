@@ -381,15 +381,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
 #ifdef DEAL_II_WITH_MPI
-      for (size_type j = 0; j < compress_requests.size(); j++)
+      for (auto &compress_request : compress_requests)
         {
-          const int ierr = MPI_Request_free(&compress_requests[j]);
+          const int ierr = MPI_Request_free(&compress_request);
           AssertThrowMPI(ierr);
         }
       compress_requests.clear();
-      for (size_type j = 0; j < update_ghost_values_requests.size(); j++)
+      for (auto &update_ghost_values_request : update_ghost_values_requests)
         {
-          const int ierr = MPI_Request_free(&update_ghost_values_requests[j]);
+          const int ierr = MPI_Request_free(&update_ghost_values_request);
           AssertThrowMPI(ierr);
         }
       update_ghost_values_requests.clear();

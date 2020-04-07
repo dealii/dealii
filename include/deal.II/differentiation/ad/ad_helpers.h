@@ -3794,10 +3794,10 @@ namespace Differentiation
 #    ifdef DEBUG
       const std::vector<unsigned int> index_set(
         internal::extract_field_component_indices<dim>(extractor));
-      for (unsigned int i = 0; i < index_set.size(); ++i)
+      for (const unsigned int index : index_set)
         {
           Assert(
-            this->registered_independent_variable_values[index_set[i]] == false,
+            this->registered_independent_variable_values[index] == false,
             ExcMessage(
               "Overlapping indices for independent variables. "
               "One or more indices associated with the field that "

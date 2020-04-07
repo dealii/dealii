@@ -1520,8 +1520,8 @@ namespace hp
        MemoryConsumption::memory_consumption(number_cache) +
        MemoryConsumption::memory_consumption(vertex_dofs) +
        MemoryConsumption::memory_consumption(vertex_dof_offsets));
-    for (unsigned int i = 0; i < levels.size(); ++i)
-      mem += MemoryConsumption::memory_consumption(*levels[i]);
+    for (const auto &level : levels)
+      mem += MemoryConsumption::memory_consumption(*level);
     mem += MemoryConsumption::memory_consumption(*faces);
 
     return mem;

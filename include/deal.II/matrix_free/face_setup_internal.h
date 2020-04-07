@@ -738,9 +738,9 @@ namespace internal
                                     cells_close_to_boundary.end());
       std::vector<unsigned int> final_cells;
       final_cells.reserve(cells_close_to_boundary.size());
-      for (unsigned int i = 0; i < cells_close_to_boundary.size(); ++i)
-        if (at_processor_boundary[cells_close_to_boundary[i]] == false)
-          final_cells.push_back(cells_close_to_boundary[i]);
+      for (const unsigned int cell : cells_close_to_boundary)
+        if (at_processor_boundary[cell] == false)
+          final_cells.push_back(cell);
       cells_close_to_boundary = std::move(final_cells);
     }
 

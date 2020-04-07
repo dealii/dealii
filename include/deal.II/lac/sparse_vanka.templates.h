@@ -654,10 +654,8 @@ template <typename number>
 std::size_t
 SparseBlockVanka<number>::memory_consumption() const
 {
-  std::size_t mem = SparseVanka<number>::memory_consumption();
-  for (size_type i = 0; i < dof_masks.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(dof_masks[i]);
-  return mem;
+  return SparseVanka<number>::memory_consumption() +
+         MemoryConsumption::memory_consumption(dof_masks);
 }
 
 

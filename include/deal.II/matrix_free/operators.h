@@ -1101,8 +1101,8 @@ namespace MatrixFreeOperators
     Assert(data.get() != nullptr, ExcNotInitialized());
     typename Base<dim, VectorType, VectorizedArrayType>::size_type total_size =
       0;
-    for (unsigned int i = 0; i < selected_rows.size(); ++i)
-      total_size += data->get_vector_partitioner(selected_rows[i])->size();
+    for (const unsigned int selected_row : selected_rows)
+      total_size += data->get_vector_partitioner(selected_row)->size();
     return total_size;
   }
 
@@ -1115,8 +1115,8 @@ namespace MatrixFreeOperators
     Assert(data.get() != nullptr, ExcNotInitialized());
     typename Base<dim, VectorType, VectorizedArrayType>::size_type total_size =
       0;
-    for (unsigned int i = 0; i < selected_columns.size(); ++i)
-      total_size += data->get_vector_partitioner(selected_columns[i])->size();
+    for (const unsigned int selected_column : selected_columns)
+      total_size += data->get_vector_partitioner(selected_column)->size();
     return total_size;
   }
 
