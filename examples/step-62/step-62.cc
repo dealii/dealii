@@ -1105,17 +1105,10 @@ namespace step62
     // been described in step-40.
     if (parameters.save_vtu_files)
       {
-        std::vector<std::string> solution_names(1, "displacement_x");
-        if (dim >= 2)
-          {
-            solution_names.emplace_back("displacement_y");
-          }
-        if (dim == 3)
-          {
-            solution_names.emplace_back("displacement_z");
-          }
+        std::vector<std::string> solution_names(dim, "displacement");
         std::vector<DataComponentInterpretation::DataComponentInterpretation>
-          interpretation(dim, DataComponentInterpretation::component_is_scalar);
+          interpretation(
+            dim, DataComponentInterpretation::component_is_part_of_vector);
 
         DataOut<dim> data_out;
         data_out.add_data_vector(dof_handler,
