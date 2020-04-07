@@ -473,7 +473,7 @@ ParameterHandler::parse_input(std::istream &     input,
     }
 
   // While it does not make much sense for anyone to actually do this, allow
-  // the last line to end in a backslash. to do do, we need to parse
+  // the last line to end in a backslash. To do so, we need to parse
   // whatever was left in the stash of concatenated lines
   if (is_concatenated)
     scan_line_or_cleanup(fully_concatenated_line, filename, current_line_n);
@@ -740,6 +740,7 @@ void
 ParameterHandler::clear()
 {
   entries = std_cxx14::make_unique<boost::property_tree::ptree>();
+  entries_set_status.clear();
 }
 
 
@@ -748,7 +749,8 @@ void
 ParameterHandler::declare_entry(const std::string &          entry,
                                 const std::string &          default_value,
                                 const Patterns::PatternBase &pattern,
-                                const std::string &          documentation)
+                                const std::string &          documentation,
+                                const bool                   has_to_be_set)
 {
   entries->put(get_current_full_path(entry) + path_separator + "value",
                default_value);
@@ -756,6 +758,13 @@ ParameterHandler::declare_entry(const std::string &          entry,
                default_value);
   entries->put(get_current_full_path(entry) + path_separator + "documentation",
                documentation);
+
+  // initialize with false
+  const std::pair<bool, bool> set_status =
+    std::pair<bool, bool>(has_to_be_set, false);
+  entries_set_status.insert(
+    std::pair<std::string, std::pair<bool, bool>>(get_current_full_path(entry),
+                                                  set_status));
 
   patterns.reserve(patterns.size() + 1);
   patterns.emplace_back(pattern.clone());
@@ -1131,6 +1140,14 @@ ParameterHandler::set(const std::string &entry_string,
 
       // finally write the new value into the database
       entries->put(path + path_separator + "value", new_value);
+
+      auto map_iter = entries_set_status.find(path);
+      if (map_iter != entries_set_status.end())
+        map_iter->second = std::pair<bool, bool>(map_iter->second.first, true);
+      else
+        AssertThrow(false,
+                    ExcMessage("Could not find parameter " + path +
+                               " in map entries_set_status."));
     }
   else
     AssertThrow(false, ExcEntryUndeclared(entry_string));
@@ -1963,6 +1980,47 @@ ParameterHandler::operator==(const ParameterHandler &prm2) const
   write_json(o1, *entries);
   write_json(o2, *prm2.entries);
   return (o1.str() == o2.str());
+}
+
+
+
+std::set<std::string>
+ParameterHandler::get_entries_wrongly_not_set() const
+{
+  std::set<std::string> entries_wrongly_not_set;
+
+  for (auto it : entries_set_status)
+    if (it.second.first == true && it.second.second == false)
+      entries_wrongly_not_set.insert(it.first);
+
+  return entries_wrongly_not_set;
+}
+
+
+
+void
+ParameterHandler::assert_that_entries_have_been_set() const
+{
+  const std::set<std::string> entries_wrongly_not_set =
+    this->get_entries_wrongly_not_set();
+
+  if (entries_wrongly_not_set.size() > 0)
+    {
+      std::string list_of_missing_parameters = "\n\n";
+      for (const auto &it : entries_wrongly_not_set)
+        list_of_missing_parameters += "  " + it + "\n";
+      list_of_missing_parameters += "\n";
+
+      AssertThrow(
+        entries_wrongly_not_set.size() == 0,
+        ExcMessage(
+          "Not all entries of the parameter handler that were declared with "
+          "`has_to_be_set = true` have been set. The following parameters " +
+          list_of_missing_parameters +
+          " have not been set. "
+          "A possible reason might be that you did not add these parameter to "
+          "the input file or that their spelling is not correct."));
+    }
 }
 
 

@@ -1056,17 +1056,23 @@ public:
    * Declare a new entry with name <tt>entry</tt>, default and for which any
    * input has to match the <tt>pattern</tt> (default: any pattern).
    *
-   * The last parameter defaulting to an empty string is used to add a
-   * documenting text to each entry which will be printed as a comment when
-   * this class is asked to write out all declarations to a stream using the
-   * print_parameters() function.
-   *
    * The function generates an exception of type ExcValueDoesNotMatchPattern
    * if the default value doesn't match the given pattern, using the C++ throw
    * mechanism. However, this exception is only generated <i>after</i> the
    * entry has been created; if you have code where no sensible default value
    * for a parameter is possible, you can then catch and ignore this
    * exception.
+   *
+   * The parameter @p documentation defaulting to an empty string is used
+   * to add a documenting text to each entry which will be printed as a comment
+   * when this class is asked to write out all declarations to a stream using
+   * the print_parameters() function.
+   *
+   * The parameter @p has_to_be_set can be used in order to declare this
+   * parameter as a parameter whose default value has to be overwritten by
+   * one of the methods provided by this class. Whether a parameter has been set
+   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * and assert_that_entries_have_been_set().
    *
    * @note An entry can be declared more than once without generating an
    * error, for example to override an earlier default value.
@@ -1075,7 +1081,8 @@ public:
   declare_entry(const std::string &          entry,
                 const std::string &          default_value,
                 const Patterns::PatternBase &pattern = Patterns::Anything(),
-                const std::string &          documentation = "");
+                const std::string &          documentation = "",
+                const bool                   has_to_be_set = false);
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -1132,6 +1139,12 @@ public:
    *
    * By default, the pattern to use is obtained by calling the function
    * Patterns::Tools::Convert<T>::to_pattern(), but a custom one can be used.
+   *
+   * The parameter @p has_to_be_set can be used in order to declare this
+   * parameter as a parameter whose default value has to be overwritten by
+   * one of the methods provided by this class. Whether a parameter has been set
+   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * and assert_that_entries_have_been_set().
    */
   template <class ParameterType>
   void
@@ -1139,7 +1152,8 @@ public:
                 ParameterType &              parameter,
                 const std::string &          documentation = "",
                 const Patterns::PatternBase &pattern =
-                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
+                  *Patterns::Tools::Convert<ParameterType>::to_pattern(),
+                const bool has_to_be_set = false);
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -1489,6 +1503,25 @@ public:
   operator==(const ParameterHandler &prm2) const;
 
   /**
+   * Return a set of parameter names (including subsection names) corresponding
+   * to those entries of the parameter handler that have not been set by one of
+   * the functions parsing parameters from an input file or by an explicit call
+   * to one of the set() functions, but that have been declared as mandatory
+   * parameters that must be set (through the last argument of the
+   * declare_entry() function or add_parameter() function).
+   */
+  std::set<std::string>
+  get_entries_wrongly_not_set() const;
+
+  /**
+   * Asserts that those entries of the parameter handler with flag
+   * `has_to_be_set = true` have been set. An exception is invoked
+   * if at least one of these parameters has not been set.
+   */
+  void
+  assert_that_entries_have_been_set() const;
+
+  /**
    * @addtogroup Exceptions
    * @{
    */
@@ -1638,6 +1671,16 @@ private:
    * works around a problem with gcc 4.5.
    */
   std::unique_ptr<boost::property_tree::ptree> entries;
+
+  /**
+   * A map that stores a pair of boolean variables for each entry
+   * added to the parameter handler. The first bool describes whether the
+   * parameter has to be set according to the last argument of the functions
+   * declare_entry() or add_parameter(), and the second bool contains the
+   * information whether the parameter has been set by any of the functions
+   * parsing input parameters or by a set function of this class.
+   */
+  std::map<std::string, std::pair<bool, bool>> entries_set_status;
 
   /**
    * A list of patterns that are used to describe the parameters of this
@@ -2192,7 +2235,8 @@ void
 ParameterHandler::add_parameter(const std::string &          entry,
                                 ParameterType &              parameter,
                                 const std::string &          documentation,
-                                const Patterns::PatternBase &pattern)
+                                const Patterns::PatternBase &pattern,
+                                const bool                   has_to_be_set)
 {
   static_assert(std::is_const<ParameterType>::value == false,
                 "You tried to add a parameter using a type "
@@ -2202,7 +2246,8 @@ ParameterHandler::add_parameter(const std::string &          entry,
                 Patterns::Tools::Convert<ParameterType>::to_string(
                   parameter, pattern.clone()),
                 pattern,
-                documentation);
+                documentation,
+                has_to_be_set);
 
   std::string        path = get_current_full_path(entry);
   const unsigned int pattern_index =
