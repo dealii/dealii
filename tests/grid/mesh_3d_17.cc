@@ -111,7 +111,8 @@ void check(Triangulation<3> &tria)
                 // we used to abort in the
                 // following call, due to a
                 // wrong Assert condition:
-                cell->neighbor_child_on_subface(face_no, subface_no);
+                auto dummy =
+                  cell->neighbor_child_on_subface(face_no, subface_no);
               }
           }
       }

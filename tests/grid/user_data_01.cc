@@ -179,11 +179,11 @@ user_pointers(Triangulation<dim> &tr)
   // Create two pointer index clashes here
   try
     {
-      tr.begin()->user_index();
+      auto dummy = tr.begin()->user_index();
     }
   catch (...)
     {}
-  tr.begin()->user_pointer();
+  auto dummy = tr.begin()->user_pointer();
 
 
   // Check if save and load work
@@ -259,13 +259,13 @@ user_indices(Triangulation<dim> &tr)
   // Create two pointer index clashes here
   try
     {
-      tr.begin()->user_pointer();
+      auto dummy = tr.begin()->user_pointer();
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  tr.begin()->user_index();
+  auto dummy = tr.begin()->user_index();
 
 
 

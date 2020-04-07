@@ -132,7 +132,7 @@ check()
             {
               // find matching location
               unsigned int p = 0;
-              for (const auto c : coords)
+              for (const auto &c : coords)
                 {
                   Point<dim> point;
                   for (unsigned int d = 0; d < dim; ++d)
