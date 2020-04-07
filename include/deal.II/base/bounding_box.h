@@ -70,7 +70,7 @@ enum class NeighborType
 
 /**
  * A class that represents a box of arbitrary dimension <tt>spacedim</tt> and
- * with sides parallel to the coordinate axes. That is, a region
+ * with sides parallel to the coordinate axes, that is, a region
  *
  * @f[
  * [x_0^L, x_0^U] \times ... \times [x_{spacedim-1}^L, x_{spacedim-1}^U],
