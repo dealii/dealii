@@ -317,7 +317,7 @@ BoundingBox<spacedim, Number>::cross_section(const unsigned int direction) const
 
 template <int dim, typename Number>
 BoundingBox<dim, Number>
-create_unit_box()
+create_unit_bounding_box()
 {
   std::pair<Point<dim, Number>, Point<dim, Number>> lower_upper_corner;
   for (unsigned int i = 0; i < dim; ++i)

@@ -273,7 +273,7 @@ private:
  */
 template <int dim, typename Number = double>
 BoundingBox<dim, Number>
-create_unit_box();
+create_unit_bounding_box();
 
 
 /**

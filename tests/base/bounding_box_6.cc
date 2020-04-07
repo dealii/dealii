@@ -20,7 +20,7 @@
 // child
 // vertex
 // bounds
-// and the non-member but related function create_unit_box
+// and the non-member but related function create_unit_bounding_box
 // Each function is tested in the function named test_{member_function_name}.
 
 #include <deal.II/base/bounding_box.h>
@@ -189,10 +189,10 @@ test_bounds()
 // Test that we can call the create_unit_box function.
 template <int dim>
 void
-test_create_unit_box()
+test_create_unit_bounding_box()
 {
-  deallog << "test_create_unit_box" << std::endl;
-  BoundingBox<dim> box = create_unit_box<dim>();
+  deallog << "test_create_unit_bounding_box" << std::endl;
+  BoundingBox<dim> box = create_unit_bounding_box<dim>();
   print_box(box);
 }
 
@@ -222,7 +222,7 @@ run_test()
   test_bounds<dim>();
   deallog << std::endl;
 
-  test_create_unit_box<dim>();
+  test_create_unit_bounding_box<dim>();
   deallog << std::endl;
 
   deallog << std::endl;

@@ -24,7 +24,7 @@ DEAL::test_bounds
 DEAL::Bounds in direction 0
 DEAL::[-1.00000, 1.00000]
 DEAL::
-DEAL::test_create_unit_box
+DEAL::test_create_unit_bounding_box
 DEAL::[0.00000, 1.00000]
 DEAL::
 DEAL::
@@ -63,7 +63,7 @@ DEAL::[-1.00000, 1.00000]
 DEAL::Bounds in direction 1
 DEAL::[-2.00000, 2.00000]
 DEAL::
-DEAL::test_create_unit_box
+DEAL::test_create_unit_bounding_box
 DEAL::[0.00000, 1.00000]x[0.00000, 1.00000]
 DEAL::
 DEAL::
@@ -118,7 +118,7 @@ DEAL::[-2.00000, 2.00000]
 DEAL::Bounds in direction 2
 DEAL::[-3.00000, 3.00000]
 DEAL::
-DEAL::test_create_unit_box
+DEAL::test_create_unit_bounding_box
 DEAL::[0.00000, 1.00000]x[0.00000, 1.00000]x[0.00000, 1.00000]
 DEAL::
 DEAL::
