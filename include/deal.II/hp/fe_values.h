@@ -242,11 +242,10 @@ namespace hp
     /**
      * Constructor. Initialize this object with the given parameters.
      */
-    FEValues(
-      const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
-      const dealii::hp::FECollection<dim, spacedim> &     fe_collection,
-      const dealii::hp::QCollection<dim> &                q_collection,
-      const UpdateFlags                                   update_flags);
+    FEValues(const MappingCollection<dim, spacedim> &mapping_collection,
+             const FECollection<dim, spacedim> &     fe_collection,
+             const QCollection<dim> &                q_collection,
+             const UpdateFlags                       update_flags);
 
 
     /**
@@ -254,9 +253,9 @@ namespace hp
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
      */
-    FEValues(const hp::FECollection<dim, spacedim> &fe_collection,
-             const hp::QCollection<dim> &           q_collection,
-             const UpdateFlags                      update_flags);
+    FEValues(const FECollection<dim, spacedim> &fe_collection,
+             const QCollection<dim> &           q_collection,
+             const UpdateFlags                  update_flags);
 
 
     /**

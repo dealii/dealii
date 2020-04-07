@@ -27,8 +27,7 @@ namespace parallel
   template <int dim, int spacedim>
   CellWeights<dim, spacedim>::CellWeights(
     const hp::DoFHandler<dim, spacedim> &dof_handler,
-    const typename CellWeights<dim, spacedim>::WeightingFunction
-      &weighting_function)
+    const WeightingFunction &            weighting_function)
   {
     reinit(dof_handler, weighting_function);
   }

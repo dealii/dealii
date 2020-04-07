@@ -1685,6 +1685,11 @@ private:
   write_msh_lines(const Triangulation<1, 2> &tria,
                   const unsigned int         next_element_index,
                   std::ostream &             out) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Does
+   * nothing.
+   */
   unsigned int
   write_msh_lines(const Triangulation<1, 3> &tria,
                   const unsigned int         next_element_index,
@@ -1804,6 +1809,10 @@ private:
   write_ucd_lines(const Triangulation<1, 2> &tria,
                   const unsigned int         next_element_index,
                   std::ostream &             out) const;
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Does
+   * nothing.
+   */
   unsigned int
   write_ucd_lines(const Triangulation<1, 3> &tria,
                   const unsigned int         next_element_index,
@@ -1856,6 +1865,11 @@ private:
    */
   unsigned int
   n_boundary_faces(const Triangulation<1, 2> &tria) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Simply
+   * returns zero.
+   */
   unsigned int
   n_boundary_faces(const Triangulation<1, 3> &tria) const;
 
@@ -1888,6 +1902,11 @@ private:
    */
   unsigned int
   n_boundary_lines(const Triangulation<1, 2> &tria) const;
+
+  /**
+   * Declaration of the specialization of above function for 1d, 3sd. Simply
+   * returns zero.
+   */
   unsigned int
   n_boundary_lines(const Triangulation<1, 3> &tria) const;
 
