@@ -3123,17 +3123,15 @@ namespace FETools
 
 
   template <int dim>
-  void
-  hierarchic_to_lexicographic_numbering(const unsigned int         degree,
-                                        std::vector<unsigned int> &h2l)
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering(const unsigned int degree)
   {
     // number of support points in each direction
     const unsigned int n = degree + 1;
 
     const unsigned int dofs_per_cell = Utilities::fixed_power<dim>(n);
 
-    // Assert size matches degree
-    AssertDimension(h2l.size(), dofs_per_cell);
+    std::vector<unsigned int> h2l(dofs_per_cell);
 
     // polynomial degree
     const unsigned int dofs_per_line = degree - 1;
@@ -3289,17 +3287,19 @@ namespace FETools
         default:
           Assert(false, ExcNotImplemented());
       }
+
+    return h2l;
   }
 
 
 
   template <int dim>
-  std::vector<unsigned int>
-  hierarchic_to_lexicographic_numbering(const unsigned int degree)
+  void
+  hierarchic_to_lexicographic_numbering(const unsigned int         degree,
+                                        std::vector<unsigned int> &h2l)
   {
-    std::vector<unsigned int> h2l(Utilities::pow(degree + 1, dim));
-    hierarchic_to_lexicographic_numbering<dim>(degree, h2l);
-    return h2l;
+    AssertDimension(h2l.size(), Utilities::fixed_power<dim>(degree + 1));
+    h2l = hierarchic_to_lexicographic_numbering<dim>(degree);
   }
 
 
@@ -3321,9 +3321,7 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
   {
     Assert(fe.n_components() == 1, ExcInvalidFE());
-    std::vector<unsigned int> h2l(fe.dofs_per_cell);
-    hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
-    return h2l;
+    return hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1);
   }
 
 

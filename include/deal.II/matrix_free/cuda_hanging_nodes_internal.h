@@ -147,7 +147,7 @@ namespace CUDAWrappers
         fe_q.get_subface_interpolation_matrix(fe_q, 0, interpolation_matrix);
 
         std::vector<unsigned int> mapping =
-          FETools::lexicographic_to_hierarchic_numbering<1>(FE_Q<1>(fe_degree));
+          FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
         FullMatrix<double> mapped_matrix(fe_q.dofs_per_face,
                                          fe_q.dofs_per_face);
@@ -282,8 +282,7 @@ namespace CUDAWrappers
       std::vector<types::global_dof_index> neighbor_dofs(dofs_per_face);
 
       const auto lex_face_mapping =
-        FETools::lexicographic_to_hierarchic_numbering<dim - 1>(
-          FE_Q<dim - 1>(fe_degree));
+        FETools::lexicographic_to_hierarchic_numbering<dim - 1>(fe_degree);
 
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {

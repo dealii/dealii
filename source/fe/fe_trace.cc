@@ -50,9 +50,8 @@ FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
   Assert(degree > 0,
          ExcMessage("FE_Trace can only be used for polynomial degrees "
                     "greater than zero"));
-  std::vector<unsigned int> renumber(this->dofs_per_face);
-  FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree, renumber);
-  this->poly_space.set_numbering(renumber);
+  this->poly_space.set_numbering(
+    FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree));
 
   // Initialize face support points
   this->unit_face_support_points = fe_q.get_unit_face_support_points();
