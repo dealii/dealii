@@ -38,15 +38,15 @@ main(int argc, char **argv)
   Utilities::MPI::Partitioner part(owned, ghosted, MPI_COMM_WORLD);
 
   deallog << "ghost targets: ";
-  for (const auto p : part.ghost_targets())
+  for (const auto &p : part.ghost_targets())
     deallog << "p" << p.first << " n_indices=" << p.second << "   ";
   deallog << std::endl;
   deallog << "import targets: ";
-  for (const auto p : part.import_targets())
+  for (const auto &p : part.import_targets())
     deallog << "p" << p.first << " n_indices=" << p.second << "   ";
   deallog << std::endl;
   deallog << "import indices: ";
-  for (const auto p : part.import_indices())
+  for (const auto &p : part.import_indices())
     deallog << "[" << p.first << " " << p.second << ") ";
   deallog << std::endl;
 }

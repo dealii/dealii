@@ -81,7 +81,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
         for (unsigned int i = 0; i < dim; i++)
           c[i] = c[i] / delta;
 
-        const unsigned int lid = norm_point_to_lex(c);
+        const auto lid = static_cast<unsigned int>(norm_point_to_lex(c));
 
         for (unsigned int i = lid * n_points_cell;
              i < (lid + 1) * n_points_cell;

@@ -69,7 +69,6 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
                      unsigned int        start_comp,
                      Vector<double> &    vec)
 {
-  double ret = true;
   // Initialize
   QGaussLobatto<dim - 1> quadrature(3);
   FEFaceValues<dim>      fe_values(mapping,
@@ -138,6 +137,7 @@ test_boundary_values(DoFHandler<dim> &   dof_handler,
       num_cells++;
     }
   // Test if ok
+  bool ret = true;
   for (unsigned int bc = 0; bc < 6; ++bc)
     {
       for (unsigned int basis = 0; basis < dof_handler.n_dofs(); basis++)

@@ -55,14 +55,14 @@ test(const unsigned int degree)
   data.mapping_update_flags_boundary_faces =
     (update_gradients | update_JxW_values);
 
-  mf_data.reinit(
-    mapping,
-    std::vector<const DoFHandler<dim> *>({{&dof}}),
-    std::vector<const AffineConstraints<double> *>({{&constraints}}),
-    std::vector<Quadrature<1>>({{QGauss<1>(std::max(degree / 2, 1U)),
-                                 QGauss<1>(degree + 1),
-                                 QGauss<1>(3 * degree / 2)}}),
-    data);
+  mf_data.reinit(mapping,
+                 std::vector<const DoFHandler<dim> *>{&dof},
+                 std::vector<const AffineConstraints<double> *>{&constraints},
+                 std::vector<Quadrature<1>>{
+                   {QGauss<1>(std::max(degree / 2, 1U)),
+                    QGauss<1>(degree + 1),
+                    QGauss<1>(3 * degree / 2)}},
+                 data);
 
   deallog << std::setw(5) << degree;
   for (unsigned int index = 0; index < 3; ++index)

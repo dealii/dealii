@@ -103,7 +103,7 @@ test(unsigned n_refinements)
       for (TransferRep::value_type::const_iterator it = m.begin();
            it != m.end();
            ++it)
-        local_sum += it->second;
+        local_sum += static_cast<unsigned int>(it->second);
     }
 
   unsigned global_sum = Utilities::MPI::sum(local_sum, MPI_COMM_WORLD);
