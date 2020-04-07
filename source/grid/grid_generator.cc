@@ -5344,7 +5344,22 @@ namespace GridGenerator
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
 
-    const unsigned int n = (n_cells == 0) ? 6 : n_cells;
+    unsigned int n_refinement_steps = 0;
+    unsigned int n_cells_coarsened  = n_cells;
+    if (n_cells != 96 && n_cells > 12)
+      while (n_cells_coarsened > 12 && n_cells_coarsened % 4 == 0)
+        {
+          ++n_refinement_steps;
+          n_cells_coarsened /= 4;
+        }
+    Assert(n_cells == 0 || n_cells == 6 || n_cells == 12 || n_cells == 96 ||
+             (n_refinement_steps > 0 &&
+              (n_cells_coarsened == 6 || n_cells_coarsened == 12)),
+           ExcMessage("Invalid number of coarse mesh cells"));
+
+    const unsigned int n = n_refinement_steps > 0 ?
+                             4 * n_cells_coarsened :
+                             ((n_cells == 0) ? 6 : n_cells);
 
     const double             irad = inner_radius / std::sqrt(3.0);
     const double             orad = outer_radius / std::sqrt(3.0);
@@ -5447,19 +5462,60 @@ namespace GridGenerator
         case 48:
           {
             // These two meshes are created by first creating a mesh of the
-            // 6-cell/12-cell version, refining globally once, and finally
-            // removing the outer half of the cells
-            Triangulation<3> tmp;
-            hyper_shell(
-              tmp, p, inner_radius, 2 * outer_radius - inner_radius, n / 4);
-            tmp.refine_global(1);
-            std::set<Triangulation<3>::active_cell_iterator> cells_to_remove;
-            for (const auto &cell : tmp.active_cell_iterators())
-              if (cell->center(true).norm_square() >
-                  outer_radius * outer_radius)
-                cells_to_remove.insert(cell);
-            AssertDimension(cells_to_remove.size(), n);
-            create_triangulation_with_removed_cells(tmp, cells_to_remove, tria);
+            // 6-cell/12-cell version, refining globally, and removing the
+            // outer half of the cells. For 192 and more cells, we do this
+            // iteratively several times, always refining and removing the
+            // outer half. Thus, the outer radius for the start is larger and
+            // set as 2^n_refinement_steps such that it exactly gives the
+            // desired radius in the end. It would have been slightly less
+            // code to treat refinement steps recursively for 192 cells or
+            // beyond, but unfortunately we could end up with the 96 cell case
+            // which is not what we want. Thus, we need to implement a loop
+            // manually here.
+            Triangulation<3>   tmp;
+            const unsigned int outer_radius_factor = 1 << n_refinement_steps;
+            hyper_shell(tmp,
+                        p,
+                        inner_radius,
+                        outer_radius_factor * outer_radius -
+                          (outer_radius_factor - 1) * inner_radius,
+                        n / 4);
+            for (unsigned int r = 0; r < n_refinement_steps; ++r)
+              {
+                tmp.refine_global(1);
+                std::set<Triangulation<3>::active_cell_iterator>
+                  cells_to_remove;
+
+                // We remove all cells which do not have exactly four vertices
+                // at the inner radius (plus some tolerance).
+                for (const auto &cell : tmp.active_cell_iterators())
+                  {
+                    unsigned int n_vertices_inside = 0;
+                    for (const auto v : GeometryInfo<3>::vertex_indices())
+                      if ((cell->vertex(v) - p).norm_square() <
+                          inner_radius * inner_radius * (1 + 1e-12))
+                        ++n_vertices_inside;
+                    if (n_vertices_inside < 4)
+                      cells_to_remove.insert(cell);
+                  }
+
+                AssertDimension(cells_to_remove.size(),
+                                tmp.n_active_cells() / 2);
+                if (r == n_refinement_steps - 1)
+                  create_triangulation_with_removed_cells(tmp,
+                                                          cells_to_remove,
+                                                          tria);
+                else
+                  {
+                    Triangulation<3> copy;
+                    create_triangulation_with_removed_cells(tmp,
+                                                            cells_to_remove,
+                                                            copy);
+                    tmp = std::move(copy);
+                    tmp.set_all_manifold_ids(0);
+                    tmp.set_manifold(0, SphericalManifold<3>(p));
+                  }
+              }
             break;
           }
         case 96:
@@ -5479,6 +5535,9 @@ namespace GridGenerator
             Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
           }
       }
+
+    if (n_cells > 0)
+      AssertDimension(tria.n_global_active_cells(), n_cells);
 
     if (colorize)
       colorize_hyper_shell(tria, p, inner_radius, outer_radius);
