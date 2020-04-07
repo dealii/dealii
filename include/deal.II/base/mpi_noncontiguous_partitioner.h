@@ -33,7 +33,7 @@ namespace Utilities
   namespace MPI
   {
     /**
-     * A flexible Partitioner class, which does not impose an restrictions
+     * A flexible Partitioner class, which does not impose restrictions
      * regarding the order of the underlying index sets.
      *
      * @author Peter Munch, 2020
@@ -60,10 +60,12 @@ namespace Utilities
 
       /**
        * Constructor. Same as above but for vectors of indices @p indices_has
-       * and @p indices_want. This allows that the indices do not have to be
-       * sorted and the values are read and written automatically at the right
-       * position of the vector during update_values(), update_values_start(),
-       * and update_values_finish().
+       * and @p indices_want. This allows the indices to not be sorted and the
+       * values are read and written automatically at the right position of
+       * the vector during update_values(), update_values_start(), and
+       * update_values_finish(). It is allowed to include entries with the
+       * value numbers::invalid_dof_index which do not take part of the index
+       * exchange but are present in the data vectors as padding.
        */
       NoncontiguousPartitioner(
         const std::vector<types::global_dof_index> &indices_has,
@@ -87,7 +89,7 @@ namespace Utilities
       update_values(VectorType &dst, const VectorType &src) const;
 
       /**
-       * Start update. Data is packed as well as non-blocking send and receives
+       * Start update: Data is packed, non-blocking send and receives
        * are started.
        */
       template <typename VectorType>
@@ -104,8 +106,8 @@ namespace Utilities
       update_values_finish(VectorType &dst, const unsigned int tag) const;
 
       /**
-       * Returns the number of processes this process sends data to and
-       * number of processes this process received data from.
+       * Returns the number of processes this process sends data to and the
+       * number of processes this process receives data from.
        */
       std::pair<unsigned int, unsigned int>
       n_targets();
@@ -139,41 +141,69 @@ namespace Utilities
              const MPI_Comm &                            communicator);
 
     private:
-      /// MPI communicator
+      /**
+       * MPI communicator.
+       */
       MPI_Comm communicator;
 
-      /// CRS and MPI data structures for sending
-      /// The ranks this process sends data to.
+      /**
+       * The ranks this process sends data to.
+       */
       std::vector<unsigned int> send_ranks;
 
-      /// Offset of each process within send_buffer.
+      /**
+       * Offset of each process within send_buffer.
+       *
+       * @note Together with `send_indices` this forms a CRS data structure.
+       */
       std::vector<types::global_dof_index> send_ptr;
 
-      /// Local index of each entry in send_buffer
-      /// with in the destination vector.
+      /**
+       * Local index of each entry in send_buffer within the destination
+       * vector.
+       *
+       * @note Together with `send_ptr` this forms a CRS data structure.
+       */
       std::vector<types::global_dof_index> send_indices;
 
-      /// Buffer containing the values sorted accoding to the ranks.
+      /**
+       *  Buffer containing the values sorted accoding to the ranks.
+       */
       mutable std::vector<Number> send_buffers;
 
-      /// MPI requests.
+      /**
+       * MPI requests for sending.
+       */
       mutable std::vector<MPI_Request> send_requests;
 
-      /// CRS and MPI data structures for receiving
-      //// The ranks this process receives data from.
+      /**
+       * The ranks this process receives data from.
+       */
       std::vector<unsigned int> recv_ranks;
 
-      /// Offset of each process within recv_buffer.
+      /**
+       * Offset of each process within recv_buffer.
+       *
+       * @note Together with `recv_indices` this forms a CRS data structure.
+       */
       std::vector<types::global_dof_index> recv_ptr;
 
-      /// Local index of each entry in recv_buffer
-      /// with in the destination vector.
+      /**
+       * Local index of each entry in recv_buffer within the destination
+       * vector.
+       *
+       * @note Together with `recv_ptr` this forms a CRS data structure.
+       */
       std::vector<types::global_dof_index> recv_indices;
 
-      /// Buffer containing the values sorted accoding to the ranks.
+      /**
+       * Buffer containing the values sorted by rank.
+       */
       mutable std::vector<Number> recv_buffers;
 
-      /// MPI requests.
+      /**
+       * MPI requests for receiving.
+       */
       mutable std::vector<MPI_Request> recv_requests;
     };
 
