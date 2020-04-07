@@ -234,8 +234,8 @@ check(const FE_Q<dim> &fe)
   // identity. output the two maps to
   // generate some output for
   // automatic comparison
-  std::vector<unsigned int> l2h(fe.dofs_per_cell);
-  FETools::lexicographic_to_hierarchic_numbering(fe, l2h);
+  const std::vector<unsigned int> l2h =
+    FETools::lexicographic_to_hierarchic_numbering<dim>(fe.degree);
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
       Assert(l2h[hierarchic_to_lexicographic_numbering[i]] == i,
@@ -247,8 +247,8 @@ check(const FE_Q<dim> &fe)
   // finally, we also have the
   // forward map in the lib, so check
   // for equality
-  std::vector<unsigned int> h2l(fe.dofs_per_cell);
-  FETools::hierarchic_to_lexicographic_numbering(fe, h2l);
+  const std::vector<unsigned int> h2l =
+    FETools::hierarchic_to_lexicographic_numbering<dim>(fe.degree);
   AssertThrow(hierarchic_to_lexicographic_numbering == h2l, ExcInternalError());
 }
 

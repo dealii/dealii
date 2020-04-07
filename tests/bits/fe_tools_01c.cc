@@ -33,9 +33,9 @@
 
 
 // check invertability of the map from
-//   DoFTools::hierarchic_to_lexicographic_numbering
+//   FETools::hierarchic_to_lexicographic_numbering
 // to
-//   DoFTools::lexicographic_to_hierarchic_numbering
+//   FETools::lexicographic_to_hierarchic_numbering
 
 
 template <int dim>
@@ -44,11 +44,11 @@ check(const FE_Q<dim> &fe, const std::string &name)
 {
   deallog << "Checking " << name << " in " << dim << "d:" << std::endl;
 
-  std::vector<unsigned int> n1(fe.dofs_per_cell);
-  FETools::hierarchic_to_lexicographic_numbering(fe, n1);
+  const std::vector<unsigned int> n1 =
+    FETools::hierarchic_to_lexicographic_numbering<dim>(fe.degree);
 
-  std::vector<unsigned int> n2(fe.dofs_per_cell);
-  FETools::lexicographic_to_hierarchic_numbering(fe, n2);
+  const std::vector<unsigned int> n2 =
+    FETools::lexicographic_to_hierarchic_numbering<dim>(fe.degree);
 
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     {
