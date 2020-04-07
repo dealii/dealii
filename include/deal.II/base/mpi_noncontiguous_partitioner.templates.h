@@ -33,8 +33,7 @@ namespace Utilities
 {
   namespace MPI
   {
-    template <typename Number>
-    NoncontiguousPartitioner<Number>::NoncontiguousPartitioner(
+    NoncontiguousPartitioner::NoncontiguousPartitioner(
       const IndexSet &indexset_has,
       const IndexSet &indexset_want,
       const MPI_Comm &communicator)
@@ -44,8 +43,7 @@ namespace Utilities
 
 
 
-    template <typename Number>
-    NoncontiguousPartitioner<Number>::NoncontiguousPartitioner(
+    NoncontiguousPartitioner::NoncontiguousPartitioner(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
       const MPI_Comm &                            communicator)
@@ -55,47 +53,41 @@ namespace Utilities
 
 
 
-    template <typename Number>
     std::pair<unsigned int, unsigned int>
-    NoncontiguousPartitioner<Number>::n_targets()
+    NoncontiguousPartitioner::n_targets()
     {
       return {send_ranks.size(), recv_ranks.size()};
     }
 
 
 
-    template <typename Number>
     types::global_dof_index
-    NoncontiguousPartitioner<Number>::memory_consumption()
+    NoncontiguousPartitioner::memory_consumption()
     {
       return MemoryConsumption::memory_consumption(send_ranks) +
              MemoryConsumption::memory_consumption(send_ptr) +
              MemoryConsumption::memory_consumption(send_indices) +
-             MemoryConsumption::memory_consumption(send_buffers) +
-             MemoryConsumption::memory_consumption(send_requests) +
              MemoryConsumption::memory_consumption(recv_ranks) +
              MemoryConsumption::memory_consumption(recv_ptr) +
              MemoryConsumption::memory_consumption(recv_indices) +
-             MemoryConsumption::memory_consumption(recv_buffers) +
-             MemoryConsumption::memory_consumption(recv_requests);
+             MemoryConsumption::memory_consumption(buffers) +
+             MemoryConsumption::memory_consumption(requests);
     }
 
 
 
-    template <typename Number>
     const MPI_Comm &
-    NoncontiguousPartitioner<Number>::get_mpi_communicator() const
+    NoncontiguousPartitioner::get_mpi_communicator() const
     {
       return communicator;
     }
 
 
 
-    template <typename Number>
     void
-    NoncontiguousPartitioner<Number>::reinit(const IndexSet &indexset_has,
-                                             const IndexSet &indexset_want,
-                                             const MPI_Comm &communicator)
+    NoncontiguousPartitioner::reinit(const IndexSet &indexset_has,
+                                     const IndexSet &indexset_want,
+                                     const MPI_Comm &communicator)
     {
       this->communicator = communicator;
 
@@ -103,13 +95,11 @@ namespace Utilities
       send_ranks.clear();
       send_ptr.clear();
       send_indices.clear();
-      send_buffers.clear();
-      send_requests.clear();
       recv_ranks.clear();
       recv_ptr.clear();
       recv_indices.clear();
-      recv_buffers.clear();
-      recv_requests.clear();
+      buffers.clear();
+      requests.clear();
 
       // setup communication pattern
       std::vector<unsigned int> owning_ranks_of_ghosts(
@@ -150,15 +140,12 @@ namespace Utilities
 
             recv_ptr.push_back(recv_indices.size());
           }
-
-        recv_buffers.resize(recv_indices.size());
-        recv_requests.resize(recv_map.size());
       }
 
       {
         const auto targets_with_indexset = process.get_requesters();
 
-        send_ptr.push_back(send_indices.size() /*=0*/);
+        send_ptr.push_back(recv_ptr.back());
         for (const auto &target_with_indexset : targets_with_indexset)
           {
             send_ranks.push_back(target_with_indexset.first);
@@ -166,19 +153,15 @@ namespace Utilities
             for (const auto &cell_index : target_with_indexset.second)
               send_indices.push_back(indexset_has.index_within_set(cell_index));
 
-            send_ptr.push_back(send_indices.size());
+            send_ptr.push_back(send_indices.size() + recv_ptr.back());
           }
-
-        send_buffers.resize(send_indices.size());
-        send_requests.resize(targets_with_indexset.size());
       }
     }
 
 
 
-    template <typename Number>
     void
-    NoncontiguousPartitioner<Number>::reinit(
+    NoncontiguousPartitioner::reinit(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
       const MPI_Comm &                            communicator)
@@ -259,65 +242,104 @@ namespace Utilities
 
 
     template <typename Number>
-    template <typename VectorType>
     void
-    NoncontiguousPartitioner<Number>::update_values(VectorType &      dst,
-                                                    const VectorType &src) const
+    NoncontiguousPartitioner::export_to_ghosted_array(
+      const ArrayView<const Number> &src,
+      const ArrayView<Number> &      dst) const
     {
-      const auto tag = internal::Tags::noncontiguous_partitioner_update_values;
+      // allocate internal memory since needed
+      if (requests.size() != send_ranks.size() + recv_ranks.size())
+        requests.resize(send_ranks.size() + recv_ranks.size());
 
-      this->update_values_start(src, tag);
-      this->update_values_finish(dst, tag);
+      if (this->buffers.size() != send_ptr.back() * sizeof(Number))
+        this->buffers.resize(send_ptr.back() * sizeof(Number), 0);
+
+      // perform actual exchange
+      this->template export_to_ghosted_array<Number>(
+        0,
+        src,
+        ArrayView<Number>(reinterpret_cast<Number *>(this->buffers.data()),
+                          send_ptr.back()),
+        dst,
+        this->requests);
+    }
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::export_to_ghosted_array(
+      const unsigned int             communication_channel,
+      const ArrayView<const Number> &locally_owned_array,
+      const ArrayView<Number> &      temporary_storage,
+      const ArrayView<Number> &      ghost_array,
+      std::vector<MPI_Request> &     requests) const
+    {
+      this->template export_to_ghosted_array_start<Number>(
+        communication_channel,
+        locally_owned_array,
+        temporary_storage,
+        requests);
+      this->template export_to_ghosted_array_finish<Number>(temporary_storage,
+                                                            ghost_array,
+                                                            requests);
     }
 
 
 
     template <typename Number>
-    template <typename VectorType>
     void
-    NoncontiguousPartitioner<Number>::update_values_start(
-      const VectorType & src,
-      const unsigned int tag) const
+    NoncontiguousPartitioner::export_to_ghosted_array_start(
+      const unsigned int             communication_channel,
+      const ArrayView<const Number> &src,
+      const ArrayView<Number> &      buffers,
+      std::vector<MPI_Request> &     requests) const
     {
 #ifndef DEAL_II_WITH_MPI
+      (void)communication_channel;
       (void)src;
-      (void)tag;
+      (void)buffers;
+      (void)requests;
       Assert(false, ExcNeedsMPI());
 #else
+      AssertIndexRange(communication_channel, 10);
+
+      const auto tag =
+        communication_channel +
+        internal::Tags::noncontiguous_partitioner_update_ghost_values;
+
       // post recv
       for (types::global_dof_index i = 0; i < recv_ranks.size(); i++)
         {
-          const auto ierr = MPI_Irecv(recv_buffers.data() + recv_ptr[i],
-                                      recv_ptr[i + 1] - recv_ptr[i],
-                                      Utilities::MPI::internal::mpi_type_id(
-                                        recv_buffers.data()),
-                                      recv_ranks[i],
-                                      tag,
-                                      communicator,
-                                      &recv_requests[i]);
+          const auto ierr =
+            MPI_Irecv(buffers.data() + recv_ptr[i],
+                      recv_ptr[i + 1] - recv_ptr[i],
+                      Utilities::MPI::internal::mpi_type_id(buffers.data()),
+                      recv_ranks[i],
+                      tag,
+                      communicator,
+                      &requests[i + send_ranks.size()]);
           AssertThrowMPI(ierr);
         }
 
       auto src_iterator = src.begin();
 
       // post send
-      for (types::global_dof_index i = 0; i < send_ranks.size(); i++)
+      for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); i++)
         {
           // collect data to be send
-          for (types::global_dof_index j = send_ptr[i], c = 0;
-               j < send_ptr[i + 1];
+          for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
                j++)
-            send_buffers[send_ptr[i] + c++] = src_iterator[send_indices[j]];
+            buffers[j] = src_iterator[send_indices[k++]];
 
           // send data
-          const auto ierr = MPI_Isend(send_buffers.data() + send_ptr[i],
-                                      send_ptr[i + 1] - send_ptr[i],
-                                      Utilities::MPI::internal::mpi_type_id(
-                                        send_buffers.data()),
-                                      send_ranks[i],
-                                      tag,
-                                      communicator,
-                                      &send_requests[i]);
+          const auto ierr =
+            MPI_Isend(buffers.data() + send_ptr[i],
+                      send_ptr[i + 1] - send_ptr[i],
+                      Utilities::MPI::internal::mpi_type_id(buffers.data()),
+                      send_ranks[i],
+                      tag,
+                      communicator,
+                      &requests[i]);
           AssertThrowMPI(ierr);
         }
 #endif
@@ -326,28 +348,27 @@ namespace Utilities
 
 
     template <typename Number>
-    template <typename VectorType>
     void
-    NoncontiguousPartitioner<Number>::update_values_finish(
-      VectorType &       dst,
-      const unsigned int tag) const
+    NoncontiguousPartitioner::export_to_ghosted_array_finish(
+      const ArrayView<const Number> &buffers,
+      const ArrayView<Number> &      dst,
+      std::vector<MPI_Request> &     requests) const
     {
-      (void)tag;
-
 #ifndef DEAL_II_WITH_MPI
+      (void)buffers;
       (void)dst;
+      (void)requests;
       Assert(false, ExcNeedsMPI());
 #else
       auto dst_iterator = dst.begin();
 
       // receive all data packages and copy data from buffers
-      for (types::global_dof_index proc = 0; proc < recv_requests.size();
-           proc++)
+      for (types::global_dof_index proc = 0; proc < recv_ranks.size(); proc++)
         {
           int        i;
           MPI_Status status;
-          const auto ierr = MPI_Waitany(recv_requests.size(),
-                                        recv_requests.data(),
+          const auto ierr = MPI_Waitany(recv_ranks.size(),
+                                        requests.data() + send_ranks.size(),
                                         &i,
                                         &status);
           AssertThrowMPI(ierr);
@@ -355,13 +376,12 @@ namespace Utilities
           for (types::global_dof_index j = recv_ptr[i], c = 0;
                j < recv_ptr[i + 1];
                j++)
-            dst_iterator[recv_indices[j]] = recv_buffers[recv_ptr[i] + c++];
+            dst_iterator[recv_indices[j]] = buffers[recv_ptr[i] + c++];
         }
 
       // wait that all data packages have been sent
-      const auto ierr = MPI_Waitall(send_requests.size(),
-                                    send_requests.data(),
-                                    MPI_STATUSES_IGNORE);
+      const auto ierr =
+        MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 #endif
     }
