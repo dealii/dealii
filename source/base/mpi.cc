@@ -1128,7 +1128,12 @@ namespace Utilities
 
 
     template std::vector<unsigned int>
-    compute_union(const std::vector<unsigned int> &vec, const MPI_Comm &comm);
+    compute_set_union(const std::vector<unsigned int> &vec,
+                      const MPI_Comm &                 comm);
+
+
+    template std::set<unsigned int>
+    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
 
 #include "mpi.inst"
   } // end of namespace MPI

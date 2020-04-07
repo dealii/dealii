@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Create a distributed triangulation with multigrid levels and copy it.
+// Test the function compute_set_union() for set::vector and std::set.
 
 #include <deal.II/base/mpi.h>
 
@@ -32,11 +32,24 @@ test(const MPI_Comm comm)
   else
     vector = std::vector<unsigned int>{5, 8, 9, 10};
 
-  const auto result = Utilities::MPI::compute_union(vector, comm);
+  // test function for vector
+  {
+    const auto result = Utilities::MPI::compute_set_union(vector, comm);
 
-  for (auto i : result)
-    deallog << i << " ";
-  deallog << std::endl;
+    for (auto i : result)
+      deallog << i << " ";
+    deallog << std::endl;
+  }
+
+  // test function for set
+  {
+    const auto result = Utilities::MPI::compute_set_union(
+      std::set<unsigned int>(vector.begin(), vector.end()), comm);
+
+    for (auto i : result)
+      deallog << i << " ";
+    deallog << std::endl;
+  }
 }
 
 int

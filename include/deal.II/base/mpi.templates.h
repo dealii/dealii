@@ -418,7 +418,7 @@ namespace Utilities
 
     template <typename T>
     std::vector<T>
-    compute_union(const std::vector<T> &vec, const MPI_Comm &comm)
+    compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm)
     {
 #ifdef DEAL_II_WITH_MPI
       // 1) collect vector entries and create union
@@ -447,7 +447,7 @@ namespace Utilities
 
               const auto ierr_3 = MPI_Recv(result.data() + old_size,
                                            amount,
-                                           MPI_INT,
+                                           internal::mpi_type_id(vec.data()),
                                            status.MPI_SOURCE,
                                            status.MPI_TAG,
                                            comm,
@@ -482,6 +482,22 @@ namespace Utilities
       (void)comm;
       return vec;
 #endif
+    }
+
+
+
+    template <typename T>
+    std::set<T>
+    compute_set_union(const std::set<T> &set_in, const MPI_Comm &comm)
+    {
+      // convert vector to set
+      std::vector<T> vector_in(set_in.begin(), set_in.end());
+
+      // perform operation to vector
+      const std::vector<T> vector_out = compute_set_union(vector_in, comm);
+
+      // convert vector to set
+      return std::set<T>(vector_out.begin(), vector_out.end());
     }
 
   } // end of namespace MPI
