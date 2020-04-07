@@ -276,51 +276,54 @@ BoundingBox<dim, Number>
 create_unit_bounding_box();
 
 
-/**
- * This function defines a convention for how coordinates in dim
- * dimensions should translate to the coordinates in dim + 1 dimensions,
- * when one of the coordinates in dim + 1 dimensions is locked to a given
- * value.
- *
- * The convention is the following: Starting from the locked coordinate we
- * store the lower dimensional coordinates consecutively and wrapping
- * around when going over the dimension. This relationship can be
- * described by the following tables:
- *
- *                        2D
- * ------------------------------------------------
- * | locked in 2D | 1D coordinate | 2D coordinate |
- * |--------------------------------------------- |
- * |     x0       |      (a)      |   (x0,  a)    |
- * |     x1       |      (a)      |   (a , x1)    |
- * ------------------------------------------------
- *
- *                       3D
- * --------------------------------------------------
- * | locked in 3D | 2D coordinates | 3D coordinates |
- * |----------------------------------------------- |
- * |     x0       |    (a, b)      | (x0,  a,  b)   |
- * |     x1       |    (a, b)      | ( b, x1,  a)   |
- * |     x2       |    (a, b)      | ( a,  b, x2)   |
- * --------------------------------------------------
- *
- * Given a locked coordinate, this function maps a coordinate index in dim
- * dimension to a coordinate index in dim + 1 dimensions.
- *
- * @param locked_coordinate should be in the range [0, dim+1).
- * @param coordiante_in_dim should be in the range [0, dim).
- * @return A coordinate index in the range [0, dim+1)
- */
-template <int dim>
-inline unsigned int
-coordinate_to_one_dim_higher(const unsigned int locked_coordinate,
-                             const unsigned int coordiante_in_dim)
+namespace internal
 {
-  AssertIndexRange(locked_coordinate, dim + 1);
-  AssertIndexRange(coordiante_in_dim, dim);
-  return (locked_coordinate + coordiante_in_dim + 1) % (dim + 1);
-}
+  /**
+   * This function defines a convention for how coordinates in dim
+   * dimensions should translate to the coordinates in dim + 1 dimensions,
+   * when one of the coordinates in dim + 1 dimensions is locked to a given
+   * value.
+   *
+   * The convention is the following: Starting from the locked coordinate we
+   * store the lower dimensional coordinates consecutively and wrapping
+   * around when going over the dimension. This relationship can be
+   * described by the following tables:
+   *
+   *                        2D
+   * ------------------------------------------------
+   * | locked in 2D | 1D coordinate | 2D coordinate |
+   * |--------------------------------------------- |
+   * |     x0       |      (a)      |   (x0,  a)    |
+   * |     x1       |      (a)      |   (a , x1)    |
+   * ------------------------------------------------
+   *
+   *                       3D
+   * --------------------------------------------------
+   * | locked in 3D | 2D coordinates | 3D coordinates |
+   * |----------------------------------------------- |
+   * |     x0       |    (a, b)      | (x0,  a,  b)   |
+   * |     x1       |    (a, b)      | ( b, x1,  a)   |
+   * |     x2       |    (a, b)      | ( a,  b, x2)   |
+   * --------------------------------------------------
+   *
+   * Given a locked coordinate, this function maps a coordinate index in dim
+   * dimension to a coordinate index in dim + 1 dimensions.
+   *
+   * @param locked_coordinate should be in the range [0, dim+1).
+   * @param coordiante_in_dim should be in the range [0, dim).
+   * @return A coordinate index in the range [0, dim+1)
+   */
+  template <int dim>
+  inline unsigned int
+  coordinate_to_one_dim_higher(const unsigned int locked_coordinate,
+                               const unsigned int coordiante_in_dim)
+  {
+    AssertIndexRange(locked_coordinate, dim + 1);
+    AssertIndexRange(coordiante_in_dim, dim);
+    return (locked_coordinate + coordiante_in_dim + 1) % (dim + 1);
+  }
 
+} // namespace internal
 
 /*------------------------ Inline functions: BoundingBox --------------------*/
 

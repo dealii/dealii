@@ -301,7 +301,7 @@ BoundingBox<spacedim, Number>::cross_section(const unsigned int direction) const
   for (unsigned int d = 0; d < spacedim - 1; ++d)
     {
       const int index_to_write_from =
-        coordinate_to_one_dim_higher<spacedim - 1>(direction, d);
+        internal::coordinate_to_one_dim_higher<spacedim - 1>(direction, d);
 
       cross_section_lower_upper_corner.first[d] =
         boundary_points.first[index_to_write_from];
