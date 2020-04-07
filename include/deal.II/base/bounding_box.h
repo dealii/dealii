@@ -237,7 +237,8 @@ public:
   bounds(const unsigned int direction) const;
 
   /**
-   * Returns the indexth vertex of the box.
+   * Returns the indexth vertex of the box. Vertex is meant in the same way as
+   * for a cell, so that @p index $\in [0, 2^{\text{dim}} - 1]$.
    */
   Point<spacedim, Number>
   vertex(const unsigned int index) const;
@@ -269,7 +270,9 @@ private:
 
 
 /**
- * Returns the unit box [0,1]^dim.
+ * Returns the unit box $[0,1]^\text{dim}$.
+ *
+ * @relates BoundingBox
  */
 template <int dim, typename Number = double>
 BoundingBox<dim, Number>
@@ -312,6 +315,8 @@ namespace internal
    * @param locked_coordinate should be in the range [0, dim+1).
    * @param coordiante_in_dim should be in the range [0, dim).
    * @return A coordinate index in the range [0, dim+1)
+   *
+   * @relates BoundingBox
    */
   template <int dim>
   inline unsigned int
