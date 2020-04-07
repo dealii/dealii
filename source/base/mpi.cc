@@ -1126,6 +1126,15 @@ namespace Utilities
       locked = false;
     }
 
+
+    template std::vector<unsigned int>
+    compute_set_union(const std::vector<unsigned int> &vec,
+                      const MPI_Comm &                 comm);
+
+
+    template std::set<unsigned int>
+    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
+
 #include "mpi.inst"
   } // end of namespace MPI
 } // end of namespace Utilities

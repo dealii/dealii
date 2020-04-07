@@ -1024,6 +1024,24 @@ namespace Utilities
                         const IndexSet &indices_to_look_up,
                         const MPI_Comm &comm);
 
+    /**
+     * Compute the union of the input vectors @p vec of all processes in the
+     *   MPI communicator @p comm.
+     *
+     * @note This is a collective operation. The result will available on all
+     *   processes.
+     */
+    template <typename T>
+    std::vector<T>
+    compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm);
+
+    /**
+     * The same as above but for std::set.
+     */
+    template <typename T>
+    std::set<T>
+    compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
+
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
     namespace internal

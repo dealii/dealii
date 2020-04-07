@@ -1,0 +1,4 @@
+New: Add new function Utilities::MPI::compute_set_union(), which computes the union of given input 
+sets and vectors of all processes in a given MPI communicator.
+<br>
+(Peter Munch, 2020/04/04)
