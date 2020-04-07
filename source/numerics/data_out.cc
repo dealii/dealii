@@ -685,7 +685,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
               // efficiency reasons.
               if (n_components == 1)
                 {
-                  // first output the real part of the solution vector
+                  Assert(dataset->n_output_variables == 1, ExcInternalError());
+
+                  // First output the real part of the solution vector
                   dataset->get_function_values(
                     this_fe_patch_values,
                     internal::DataOutImplementation::ComponentExtractor::
@@ -694,8 +696,13 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     patch.data(offset, q) =
                       scratch_data.patch_values_scalar.solution_values[q];
+                  offset += 1;
 
-                  // and if there is one, also output the imaginary part
+                  // And if there is one, also output the imaginary part. Note
+                  // that the problem is scalar-valued, so we can freely add the
+                  // imaginary part after the real part without having to worry
+                  // that we are interleaving the real components of a vector
+                  // with the imaginary components of the same vector.
                   if (dataset->is_complex_valued() == true)
                     {
                       dataset->get_function_values(
@@ -704,70 +711,268 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                           imaginary_part,
                         scratch_data.patch_values_scalar.solution_values);
                       for (unsigned int q = 0; q < n_q_points; ++q)
-                        patch.data(offset + 1, q) =
+                        patch.data(offset, q) =
                           scratch_data.patch_values_scalar.solution_values[q];
+                      offset += 1;
                     }
                 }
               else
                 {
                   scratch_data.resize_system_vectors(n_components);
 
-                  // same as above: first the real part
-                  const unsigned int stride =
-                    (dataset->is_complex_valued() ? 2 : 1);
-                  dataset->get_function_values(
-                    this_fe_patch_values,
-                    internal::DataOutImplementation::ComponentExtractor::
-                      real_part,
-                    scratch_data.patch_values_system.solution_values);
-                  for (unsigned int component = 0; component < n_components;
-                       ++component)
-                    for (unsigned int q = 0; q < n_q_points; ++q)
-                      patch.data(offset + component * stride, q) =
-                        scratch_data.patch_values_system.solution_values[q](
-                          component);
-
-                  // and if there is one, also output the imaginary part
-                  if (dataset->is_complex_valued() == true)
+                  // So we have a multi-component DoFHandler here. That's more
+                  // complicated. If the vector is real-valued, then we can just
+                  // get everything at all quadrature points and copy them into
+                  // the output array. In fact, we don't have to worry at all
+                  // about the interpretation of the components.
+                  if (dataset->is_complex_valued() == false)
                     {
+                      dataset->get_function_values(
+                        this_fe_patch_values,
+                        internal::DataOutImplementation::ComponentExtractor::
+                          real_part,
+                        scratch_data.patch_values_system.solution_values);
+                      for (unsigned int component = 0; component < n_components;
+                           ++component)
+                        for (unsigned int q = 0; q < n_q_points; ++q)
+                          patch.data(offset + component, q) =
+                            scratch_data.patch_values_system.solution_values[q](
+                              component);
+
+                      // Increment the counter for the actual data record.
+                      offset += dataset->n_output_variables;
+                    }
+                  else
+                    // The situation is more complicated if the input vector is
+                    // complex-valued. The easiest approach would have been to
+                    // just have all real and then all imaginary components.
+                    // This would have been conceptually easy, but it has the
+                    // annoying downside that if you have a vector-valued
+                    // problem (say, [u v]) then the output order would have
+                    // been [u_re, v_re, u_im, v_im]. That's tolerable, but not
+                    // quite so nice because one typically thinks of real and
+                    // imaginary parts as belonging together. We would really
+                    // like the output order to be [u_re, u_im, v_re, v_im].
+                    // That, too, would have been easy to implement because one
+                    // just has to interleave real and imaginary parts.
+                    //
+                    // But that's also not what we want. That's because if one
+                    // were, for example, to solve a complex-valued Stokes
+                    // problem (e.g., computing eigenfunctions of the Stokes
+                    // operator), then one has solution components
+                    // [[u v] p] and the proper output order is
+                    //     [[u_re v_re] [u_im v_im] p_re p_im].
+                    // In other words, the order in which we want to output
+                    // data depends on the *interpretation* of components.
+                    //
+                    // Doing this requires a bit more code, and also needs to
+                    // be in sync with what we do in
+                    // DataOut_DoFData::get_dataset_names() and
+                    // DataOut_DoFData::get_nonscalar_data_ranges().
+                    {
+                      // Given this description, first get the real parts of
+                      // all components:
+                      dataset->get_function_values(
+                        this_fe_patch_values,
+                        internal::DataOutImplementation::ComponentExtractor::
+                          real_part,
+                        scratch_data.patch_values_system.solution_values);
+
+                      // Then we need to distribute them to the correct
+                      // location. This requires knowledge of the interpretation
+                      // of components as discussed above.
+                      {
+                        Assert(dataset->data_component_interpretation.size() ==
+                                 n_components,
+                               ExcInternalError());
+
+                        unsigned int destination = offset;
+                        for (unsigned int component = 0;
+                             component < n_components;
+                             /* component is updated below */)
+                          {
+                            switch (
+                              dataset->data_component_interpretation[component])
+                              {
+                                case DataComponentInterpretation::
+                                  component_is_scalar:
+                                  {
+                                    // OK, a scalar component. Put all of the
+                                    // values into the current row
+                                    // ('destination'); then move 'component'
+                                    // forward by one (so we treat the next
+                                    // component) and 'destination' forward by
+                                    // two (because we're going to put the
+                                    // imaginary part of the current component
+                                    // into the next slot).
+                                    for (unsigned int q = 0; q < n_q_points;
+                                         ++q)
+                                      patch.data(destination, q) =
+                                        scratch_data.patch_values_system
+                                          .solution_values[q](component);
+
+                                    ++component;
+                                    destination += 2;
+
+                                    break;
+                                  }
+
+                                case DataComponentInterpretation::
+                                  component_is_part_of_vector:
+                                  {
+                                    // A vector component. Put the
+                                    // DoFHandlerType::space_dimension
+                                    // components into the next set of
+                                    // contiguous rows
+                                    // ('destination+c'); then move 'component'
+                                    // forward by spacedim (so we get to the
+                                    // next component after the current vector)
+                                    // and 'destination' forward by two*spacedim
+                                    // (because we're going to put the imaginary
+                                    // part of the vector into the subsequent
+                                    // spacedim slots).
+                                    const unsigned int size =
+                                      DoFHandlerType::space_dimension;
+                                    for (unsigned int c = 0; c < size; ++c)
+                                      for (unsigned int q = 0; q < n_q_points;
+                                           ++q)
+                                        patch.data(destination + c, q) =
+                                          scratch_data.patch_values_system
+                                            .solution_values[q](component + c);
+
+                                    component += size;
+                                    destination += 2 * size;
+
+                                    break;
+                                  }
+
+                                case DataComponentInterpretation::
+                                  component_is_part_of_tensor:
+                                  {
+                                    // Same approach as for vectors above.
+                                    const unsigned int size =
+                                      DoFHandlerType::space_dimension *
+                                      DoFHandlerType::space_dimension;
+                                    for (unsigned int c = 0; c < size; ++c)
+                                      for (unsigned int q = 0; q < n_q_points;
+                                           ++q)
+                                        patch.data(destination + c, q) =
+                                          scratch_data.patch_values_system
+                                            .solution_values[q](component + c);
+
+                                    component += size;
+                                    destination += 2 * size;
+
+                                    break;
+                                  }
+
+                                default:
+                                  Assert(false, ExcNotImplemented());
+                              }
+                          }
+                      }
+
+                      // And now we need to do the same thing again for the
+                      // imaginary parts, starting at the top of the list of
+                      // components/destinations again.
                       dataset->get_function_values(
                         this_fe_patch_values,
                         internal::DataOutImplementation::ComponentExtractor::
                           imaginary_part,
                         scratch_data.patch_values_system.solution_values);
-                      for (unsigned int component = 0; component < n_components;
-                           ++component)
-                        for (unsigned int q = 0; q < n_q_points; ++q)
-                          patch.data(offset + component * stride + 1, q) =
-                            scratch_data.patch_values_system.solution_values[q](
-                              component);
+                      {
+                        unsigned int destination = offset;
+                        for (unsigned int component = 0;
+                             component < n_components;
+                             /* component is updated below */)
+                          {
+                            switch (
+                              dataset->data_component_interpretation[component])
+                              {
+                                case DataComponentInterpretation::
+                                  component_is_scalar:
+                                  {
+                                    // OK, a scalar component. Put all of the
+                                    // values into the row past the current one
+                                    // ('destination+1') since 'destination' is
+                                    // occupied by the real part.
+                                    for (unsigned int q = 0; q < n_q_points;
+                                         ++q)
+                                      patch.data(destination + 1, q) =
+                                        scratch_data.patch_values_system
+                                          .solution_values[q](component);
+
+                                    ++component;
+                                    destination += 2;
+
+                                    break;
+                                  }
+
+                                case DataComponentInterpretation::
+                                  component_is_part_of_vector:
+                                  {
+                                    // A vector component. Put the
+                                    // DoFHandlerType::space_dimension
+                                    // components into the set of contiguous
+                                    // rows that follow the real parts
+                                    // ('destination+spacedim+c').
+                                    const unsigned int size =
+                                      DoFHandlerType::space_dimension;
+                                    for (unsigned int c = 0; c < size; ++c)
+                                      for (unsigned int q = 0; q < n_q_points;
+                                           ++q)
+                                        patch.data(destination + size + c, q) =
+                                          scratch_data.patch_values_system
+                                            .solution_values[q](component + c);
+
+                                    component += size;
+                                    destination += 2 * size;
+
+                                    break;
+                                  }
+
+                                case DataComponentInterpretation::
+                                  component_is_part_of_tensor:
+                                  {
+                                    // Same as for vectors.
+                                    const unsigned int size =
+                                      DoFHandlerType::space_dimension *
+                                      DoFHandlerType::space_dimension;
+                                    for (unsigned int c = 0; c < size; ++c)
+                                      for (unsigned int q = 0; q < n_q_points;
+                                           ++q)
+                                        patch.data(destination + size + c, q) =
+                                          scratch_data.patch_values_system
+                                            .solution_values[q](component + c);
+
+                                    component += size;
+                                    destination += 2 * size;
+
+                                    break;
+                                  }
+
+                                default:
+                                  Assert(false, ExcNotImplemented());
+                              }
+                          }
+                      }
+
+                      // Increment the counter for the actual data record. We
+                      // need to move it forward a number of positions equal to
+                      // the number of components of this data set, times two
+                      // because we dealt with a complex-valued input vector
+                      offset += dataset->n_output_variables * 2;
                     }
                 }
             }
-
-          // Increment the counter for the actual data record. We need to
-          // move it forward a number of positions equal to the number
-          // of components of this data set; if the input consisted
-          // of a complex-valued quantity and if it is not further
-          // processed by a postprocessor, then we need two output
-          // slots for each input variable.
-          offset += dataset->n_output_variables *
-                    (dataset->is_complex_valued() &&
-                         (dataset->postprocessor == nullptr) ?
-                       2 :
-                       1);
 
           // Also update the dataset_number index that we carry along with the
           // for-loop over all data sets.
           ++dataset_number;
         }
 
-      // Then do the cell data. only compute the number of a cell if needed;
-      // also make sure that we only access cell data if the
-      // first_cell/next_cell functions only return active cells
-      //
-      // At least, we don't have to worry about complex-valued vectors/tensors
-      // since cell data is always scalar.
+      // Then do the cell data. At least, we don't have to worry about
+      // complex-valued vectors/tensors since cell data is always scalar.
       if (this->cell_data.size() != 0)
         {
           Assert(!cell_and_index->first->has_children(), ExcNotImplemented());
