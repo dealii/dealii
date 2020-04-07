@@ -1548,6 +1548,7 @@ namespace Polynomials
 
 // ------------------ explicit instantiations --------------- //
 
+#ifndef DOXYGEN
 namespace Polynomials
 {
   template class Polynomial<float>;
@@ -1571,5 +1572,6 @@ namespace Polynomials
   template class Monomial<double>;
   template class Monomial<long double>;
 } // namespace Polynomials
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

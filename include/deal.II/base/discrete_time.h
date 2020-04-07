@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  *   {
  *     // Insert simulation code here
  *   }
- * @code
+ * @endcode
  *
  * In the above example the time starts at $t = 0$. Assuming the time step
  * $dt = 0.3$ is not modified inside the loop, the time is advanced to

@@ -592,6 +592,7 @@ ChunkSparsityPattern::memory_consumption() const
 
 
 
+#ifndef DOXYGEN
 // explicit instantiations
 template void
 ChunkSparsityPattern::copy_from<DynamicSparsityPattern>(
@@ -616,5 +617,6 @@ ChunkSparsityPattern::copy_from<float>(const FullMatrix<float> &,
 template void
 ChunkSparsityPattern::copy_from<double>(const FullMatrix<double> &,
                                         const size_type);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

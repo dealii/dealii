@@ -109,8 +109,8 @@ namespace parallel
      * @param[in] weighting_function The function that determines each
      *    cell's weight during load balancing.
      */
-    CellWeights(const dealii::hp::DoFHandler<dim, spacedim> &dof_handler,
-                const WeightingFunction &weighting_function);
+    CellWeights(const hp::DoFHandler<dim, spacedim> &dof_handler,
+                const WeightingFunction &            weighting_function);
 
     /**
      * Destructor.
@@ -194,7 +194,7 @@ namespace parallel
      *    determine each cell's finite element.
      */
     DEAL_II_DEPRECATED
-    CellWeights(const dealii::hp::DoFHandler<dim, spacedim> &dof_handler);
+    CellWeights(const hp::DoFHandler<dim, spacedim> &dof_handler);
 
     /**
      * @copydoc CellWeights::constant_weighting()

@@ -25,12 +25,11 @@ namespace hp
 
   template <int dim, int q_dim, class FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
-    const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>
-      &mapping_collection,
-    const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-      &                                   fe_collection,
-    const dealii::hp::QCollection<q_dim> &q_collection,
-    const UpdateFlags                     update_flags)
+    const MappingCollection<dim, FEValuesType::space_dimension>
+      &                                                     mapping_collection,
+    const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+    const QCollection<q_dim> &                              q_collection,
+    const UpdateFlags                                       update_flags)
     : fe_collection(&fe_collection)
     , mapping_collection(&mapping_collection)
     , q_collection(q_collection)
@@ -46,10 +45,9 @@ namespace hp
 
   template <int dim, int q_dim, class FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
-    const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-      &                                   fe_collection,
-    const dealii::hp::QCollection<q_dim> &q_collection,
-    const UpdateFlags                     update_flags)
+    const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+    const QCollection<q_dim> &                              q_collection,
+    const UpdateFlags                                       update_flags)
     : fe_collection(&fe_collection)
     , mapping_collection(
         &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
@@ -104,10 +102,10 @@ namespace hp
 
   template <int dim, int spacedim>
   FEValues<dim, spacedim>::FEValues(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::FECollection<dim, spacedim> &     fe_collection,
-    const hp::QCollection<dim> &                q_collection,
-    const UpdateFlags                           update_flags)
+    const MappingCollection<dim, spacedim> &mapping,
+    const FECollection<dim, spacedim> &     fe_collection,
+    const QCollection<dim> &                q_collection,
+    const UpdateFlags                       update_flags)
     : hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(mapping,
                                                                   fe_collection,
                                                                   q_collection,
@@ -117,9 +115,9 @@ namespace hp
 
   template <int dim, int spacedim>
   FEValues<dim, spacedim>::FEValues(
-    const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection,
-    const UpdateFlags                      update_flags)
+    const FECollection<dim, spacedim> &fe_collection,
+    const QCollection<dim> &           q_collection,
+    const UpdateFlags                  update_flags)
     : hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>(fe_collection,
                                                                   q_collection,
                                                                   update_flags)

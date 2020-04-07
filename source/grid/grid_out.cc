@@ -3516,13 +3516,13 @@ GridOut::write_mesh_per_processor_as_vtu(
 
 
 unsigned int
-GridOut::n_boundary_faces(const Triangulation<1> &) const
+GridOut::n_boundary_faces(const Triangulation<1, 1> &) const
 {
   return 0;
 }
 
 unsigned int
-GridOut::n_boundary_lines(const Triangulation<1> &) const
+GridOut::n_boundary_lines(const Triangulation<1, 1> &) const
 {
   return 0;
 }
@@ -3669,7 +3669,7 @@ GridOut::write_msh_lines(const Triangulation<1, 3> &,
 
 
 unsigned int
-GridOut::write_msh_lines(const Triangulation<2> &,
+GridOut::write_msh_lines(const Triangulation<2, 2> &,
                          const unsigned int next_element_index,
                          std::ostream &) const
 {
@@ -3830,7 +3830,7 @@ GridOut::write_ucd_lines(const Triangulation<1, 3> &,
 
 
 unsigned int
-GridOut::write_ucd_lines(const Triangulation<2> &,
+GridOut::write_ucd_lines(const Triangulation<2, 2> &,
                          const unsigned int next_element_index,
                          std::ostream &) const
 {
