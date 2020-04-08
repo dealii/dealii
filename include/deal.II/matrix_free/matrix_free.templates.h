@@ -453,8 +453,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                                        cell_level_index.size(),
                                        VectorizedArrayType::size(),
                                        dummy);
-      task_info.create_blocks_serial(
-        dummy, dummy, 1, dummy, false, dummy, dummy2);
+      task_info.create_blocks_serial(dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
           dof_info[i].dimension = dim;
@@ -623,8 +622,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                                        cell_level_index.size(),
                                        VectorizedArrayType::size(),
                                        dummy);
-      task_info.create_blocks_serial(
-        dummy, dummy, 1, dummy, false, dummy, dummy2);
+      task_info.create_blocks_serial(dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1,
@@ -1193,7 +1191,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
       for (const auto &info : dof_info)
         dofs_per_cell = std::max(dofs_per_cell, info.dofs_per_cell[0]);
       task_info.create_blocks_serial(subdomain_boundary_cells,
-                                     face_setup.cells_close_to_boundary,
                                      dofs_per_cell,
                                      dof_info[0].cell_active_fe_index,
                                      strict_categories,

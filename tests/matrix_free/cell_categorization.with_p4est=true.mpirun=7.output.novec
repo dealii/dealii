@@ -13,14 +13,14 @@ DEAL:0::0_4:0012 with 0
 DEAL:0::0_4:0013 with 0
 DEAL:0::0_4:0020 with 1
 DEAL:0::0_4:0021 with 1
-DEAL:0::0_3:012 with 1
-DEAL:0::0_3:013 with 1
 DEAL:0::0_5:00220 with 2
 DEAL:0::0_5:00221 with 2
 DEAL:0::0_6:002220 with 2
 DEAL:0::0_6:002221 with 2
 DEAL:0::0_6:002222 with 2
-DEAL:0::0_3:022 with 4
+DEAL:0::0_6:002223 with 2
+DEAL:0::0_5:00223 with 2
+DEAL:0::0_4:0023 with 2
 DEAL:0::0_4:0111 with 0
 DEAL:0::0_4:0113 with 0
 DEAL:0::0_4:0211 with 2
@@ -31,9 +31,8 @@ DEAL:0::0_4:0110 with 0
 DEAL:0::0_4:0112 with 0
 DEAL:0::0_4:0030 with 1
 DEAL:0::0_4:0031 with 1
-DEAL:0::0_6:002223 with 2
-DEAL:0::0_5:00223 with 2
-DEAL:0::0_4:0023 with 2
+DEAL:0::0_3:012 with 1
+DEAL:0::0_3:013 with 1
 DEAL:0::0_4:0032 with 2
 DEAL:0::0_4:0033 with 2
 DEAL:0::0_5:02000 with 2
@@ -47,6 +46,7 @@ DEAL:0::0_5:02013 with 2
 DEAL:0::0_4:0210 with 2
 DEAL:0::0_4:0202 with 3
 DEAL:0::0_4:0203 with 3
+DEAL:0::0_3:022 with 4
 DEAL:0::
 DEAL:0::Number of cell batches: 47
 DEAL:0::0_4:0000 with 0
@@ -62,14 +62,14 @@ DEAL:0::0_4:0012 with 0
 DEAL:0::0_4:0013 with 0
 DEAL:0::0_4:0020 with 1
 DEAL:0::0_4:0021 with 1
-DEAL:0::0_3:012 with 1
-DEAL:0::0_3:013 with 1
 DEAL:0::0_5:00220 with 2
 DEAL:0::0_5:00221 with 2
 DEAL:0::0_6:002220 with 2
 DEAL:0::0_6:002221 with 2
 DEAL:0::0_6:002222 with 2
-DEAL:0::0_3:022 with 4
+DEAL:0::0_6:002223 with 2
+DEAL:0::0_5:00223 with 2
+DEAL:0::0_4:0023 with 2
 DEAL:0::0_4:0111 with 0
 DEAL:0::0_4:0113 with 0
 DEAL:0::0_4:0211 with 2
@@ -80,9 +80,8 @@ DEAL:0::0_4:0110 with 0
 DEAL:0::0_4:0112 with 0
 DEAL:0::0_4:0030 with 1
 DEAL:0::0_4:0031 with 1
-DEAL:0::0_6:002223 with 2
-DEAL:0::0_5:00223 with 2
-DEAL:0::0_4:0023 with 2
+DEAL:0::0_3:012 with 1
+DEAL:0::0_3:013 with 1
 DEAL:0::0_4:0032 with 2
 DEAL:0::0_4:0033 with 2
 DEAL:0::0_5:02000 with 2
@@ -96,6 +95,7 @@ DEAL:0::0_5:02013 with 2
 DEAL:0::0_4:0210 with 2
 DEAL:0::0_4:0202 with 3
 DEAL:0::0_4:0203 with 3
+DEAL:0::0_3:022 with 4
 DEAL:0::
 DEAL:0::Number of cell batches: 47
 DEAL:0::0_4:0000 with 100000000
@@ -116,17 +116,14 @@ DEAL:0::0_5:00221 with 100000000
 DEAL:0::0_6:002220 with 100000000
 DEAL:0::0_6:002221 with 100000000
 DEAL:0::0_6:002222 with 100000000
-DEAL:0::0_3:012 with 100000000
-DEAL:0::0_3:013 with 100000000
-DEAL:0::0_3:022 with 100000000
+DEAL:0::0_6:002223 with 100000000
+DEAL:0::0_5:00223 with 100000000
+DEAL:0::0_4:0023 with 100000000
 DEAL:0::0_4:0111 with 100000000
 DEAL:0::0_4:0113 with 100000000
 DEAL:0::0_4:0211 with 100000000
 DEAL:0::0_4:0212 with 100000000
 DEAL:0::0_4:0213 with 100000000
-DEAL:0::0_6:002223 with 100000000
-DEAL:0::0_5:00223 with 100000000
-DEAL:0::0_4:0023 with 100000000
 DEAL:0::0_4:0030 with 100000000
 DEAL:0::0_4:0031 with 100000000
 DEAL:0::0_4:0032 with 100000000
@@ -134,6 +131,8 @@ DEAL:0::0_4:0033 with 100000000
 DEAL:0::0_3:010 with 100000000
 DEAL:0::0_4:0110 with 100000000
 DEAL:0::0_4:0112 with 100000000
+DEAL:0::0_3:012 with 100000000
+DEAL:0::0_3:013 with 100000000
 DEAL:0::0_5:02000 with 100000000
 DEAL:0::0_5:02001 with 100000000
 DEAL:0::0_5:02002 with 100000000
@@ -145,57 +144,58 @@ DEAL:0::0_5:02013 with 100000000
 DEAL:0::0_4:0202 with 100000000
 DEAL:0::0_4:0203 with 100000000
 DEAL:0::0_4:0210 with 100000000
+DEAL:0::0_3:022 with 100000000
 DEAL:0::
 DEAL:0::Number of cell batches: 15
 DEAL:0::0_3:000 with 0
 DEAL:0::0_3:001 with 0
+DEAL:0::0_3:004 with 0
 DEAL:0::0_3:002 with 1
-DEAL:0::0_2:03 with 3
-DEAL:0::0_2:07 with 3
+DEAL:0::0_3:003 with 1
 DEAL:0::0_2:01 with 1
 DEAL:0::0_2:04 with 1
 DEAL:0::0_2:05 with 1
 DEAL:0::0_2:02 with 3
 DEAL:0::0_2:06 with 3
-DEAL:0::0_3:004 with 0
 DEAL:0::0_3:005 with 0
-DEAL:0::0_3:003 with 1
 DEAL:0::0_3:006 with 1
 DEAL:0::0_3:007 with 1
+DEAL:0::0_2:03 with 3
+DEAL:0::0_2:07 with 3
 DEAL:0::
 DEAL:0::Number of cell batches: 15
 DEAL:0::0_3:000 with 0
 DEAL:0::0_3:001 with 0
+DEAL:0::0_3:004 with 0
 DEAL:0::0_3:002 with 1
-DEAL:0::0_2:03 with 3
-DEAL:0::0_2:07 with 3
+DEAL:0::0_3:003 with 1
 DEAL:0::0_2:01 with 1
 DEAL:0::0_2:04 with 1
 DEAL:0::0_2:05 with 1
 DEAL:0::0_2:02 with 3
 DEAL:0::0_2:06 with 3
-DEAL:0::0_3:004 with 0
 DEAL:0::0_3:005 with 0
-DEAL:0::0_3:003 with 1
 DEAL:0::0_3:006 with 1
 DEAL:0::0_3:007 with 1
+DEAL:0::0_2:03 with 3
+DEAL:0::0_2:07 with 3
 DEAL:0::
 DEAL:0::Number of cell batches: 15
 DEAL:0::0_3:000 with 100000000
 DEAL:0::0_3:001 with 100000000
 DEAL:0::0_3:002 with 100000000
-DEAL:0::0_2:03 with 100000000
-DEAL:0::0_2:07 with 100000000
+DEAL:0::0_3:003 with 100000000
+DEAL:0::0_3:004 with 100000000
 DEAL:0::0_2:01 with 100000000
 DEAL:0::0_2:02 with 100000000
 DEAL:0::0_2:04 with 100000000
 DEAL:0::0_2:05 with 100000000
 DEAL:0::0_2:06 with 100000000
-DEAL:0::0_3:003 with 100000000
-DEAL:0::0_3:004 with 100000000
 DEAL:0::0_3:005 with 100000000
 DEAL:0::0_3:006 with 100000000
 DEAL:0::0_3:007 with 100000000
+DEAL:0::0_2:03 with 100000000
+DEAL:0::0_2:07 with 100000000
 DEAL:0::
 
 DEAL:1::Number of cell batches: 47
@@ -213,7 +213,7 @@ DEAL:1::0_3:033 with 4
 DEAL:1::0_3:123 with 4
 DEAL:1::0_3:132 with 4
 DEAL:1::0_4:2002 with 5
-DEAL:1::0_3:213 with 6
+DEAL:1::0_4:2003 with 5
 DEAL:1::0_3:102 with 1
 DEAL:1::0_4:0310 with 2
 DEAL:1::0_4:0311 with 2
@@ -231,7 +231,6 @@ DEAL:1::0_4:2032 with 7
 DEAL:1::0_4:2033 with 7
 DEAL:1::0_4:2122 with 7
 DEAL:1::0_4:2123 with 7
-DEAL:1::0_4:2003 with 5
 DEAL:1::0_4:2010 with 5
 DEAL:1::0_4:2011 with 5
 DEAL:1::0_4:2012 with 5
@@ -246,6 +245,7 @@ DEAL:1::0_5:20303 with 6
 DEAL:1::0_4:2031 with 6
 DEAL:1::0_4:2120 with 6
 DEAL:1::0_4:2121 with 6
+DEAL:1::0_3:213 with 6
 DEAL:1::
 DEAL:1::Number of cell batches: 47
 DEAL:1::0_3:100 with 0
@@ -262,7 +262,7 @@ DEAL:1::0_3:033 with 4
 DEAL:1::0_3:123 with 4
 DEAL:1::0_3:132 with 4
 DEAL:1::0_4:2002 with 5
-DEAL:1::0_3:213 with 6
+DEAL:1::0_4:2003 with 5
 DEAL:1::0_3:102 with 1
 DEAL:1::0_4:0310 with 2
 DEAL:1::0_4:0311 with 2
@@ -280,7 +280,6 @@ DEAL:1::0_4:2032 with 7
 DEAL:1::0_4:2033 with 7
 DEAL:1::0_4:2122 with 7
 DEAL:1::0_4:2123 with 7
-DEAL:1::0_4:2003 with 5
 DEAL:1::0_4:2010 with 5
 DEAL:1::0_4:2011 with 5
 DEAL:1::0_4:2012 with 5
@@ -295,6 +294,7 @@ DEAL:1::0_5:20303 with 6
 DEAL:1::0_4:2031 with 6
 DEAL:1::0_4:2120 with 6
 DEAL:1::0_4:2121 with 6
+DEAL:1::0_3:213 with 6
 DEAL:1::
 DEAL:1::Number of cell batches: 47
 DEAL:1::0_4:0312 with 100000000
@@ -311,7 +311,7 @@ DEAL:1::0_3:123 with 100000000
 DEAL:1::0_3:130 with 100000000
 DEAL:1::0_3:132 with 100000000
 DEAL:1::0_4:2002 with 100000000
-DEAL:1::0_3:213 with 100000000
+DEAL:1::0_4:2003 with 100000000
 DEAL:1::0_3:023 with 100000000
 DEAL:1::0_3:030 with 100000000
 DEAL:1::0_4:0310 with 100000000
@@ -329,7 +329,6 @@ DEAL:1::0_4:2033 with 100000000
 DEAL:1::0_3:211 with 100000000
 DEAL:1::0_4:2122 with 100000000
 DEAL:1::0_4:2123 with 100000000
-DEAL:1::0_4:2003 with 100000000
 DEAL:1::0_4:2010 with 100000000
 DEAL:1::0_4:2011 with 100000000
 DEAL:1::0_4:2012 with 100000000
@@ -344,12 +343,13 @@ DEAL:1::0_4:2031 with 100000000
 DEAL:1::0_3:210 with 100000000
 DEAL:1::0_4:2120 with 100000000
 DEAL:1::0_4:2121 with 100000000
+DEAL:1::0_3:213 with 100000000
 DEAL:1::
 DEAL:1::Number of cell batches: 24
 DEAL:1::0_2:10 with 1
 DEAL:1::0_2:20 with 6
-DEAL:1::0_2:34 with 6
-DEAL:1::0_2:36 with 8
+DEAL:1::0_2:22 with 8
+DEAL:1::0_2:23 with 8
 DEAL:1::0_2:11 with 1
 DEAL:1::0_2:14 with 1
 DEAL:1::0_2:15 with 1
@@ -367,15 +367,15 @@ DEAL:1::0_2:27 with 8
 DEAL:1::0_2:33 with 8
 DEAL:1::0_2:37 with 8
 DEAL:1::0_2:30 with 6
-DEAL:1::0_2:22 with 8
-DEAL:1::0_2:23 with 8
+DEAL:1::0_2:34 with 6
 DEAL:1::0_2:32 with 8
+DEAL:1::0_2:36 with 8
 DEAL:1::
 DEAL:1::Number of cell batches: 24
 DEAL:1::0_2:10 with 1
 DEAL:1::0_2:20 with 6
-DEAL:1::0_2:34 with 6
-DEAL:1::0_2:36 with 8
+DEAL:1::0_2:22 with 8
+DEAL:1::0_2:23 with 8
 DEAL:1::0_2:11 with 1
 DEAL:1::0_2:14 with 1
 DEAL:1::0_2:15 with 1
@@ -393,15 +393,15 @@ DEAL:1::0_2:27 with 8
 DEAL:1::0_2:33 with 8
 DEAL:1::0_2:37 with 8
 DEAL:1::0_2:30 with 6
-DEAL:1::0_2:22 with 8
-DEAL:1::0_2:23 with 8
+DEAL:1::0_2:34 with 6
 DEAL:1::0_2:32 with 8
+DEAL:1::0_2:36 with 8
 DEAL:1::
 DEAL:1::Number of cell batches: 24
 DEAL:1::0_2:10 with 100000000
 DEAL:1::0_2:20 with 100000000
-DEAL:1::0_2:34 with 100000000
-DEAL:1::0_2:36 with 100000000
+DEAL:1::0_2:22 with 100000000
+DEAL:1::0_2:23 with 100000000
 DEAL:1::0_2:11 with 100000000
 DEAL:1::0_2:12 with 100000000
 DEAL:1::0_2:13 with 100000000
@@ -418,10 +418,10 @@ DEAL:1::0_2:31 with 100000000
 DEAL:1::0_2:33 with 100000000
 DEAL:1::0_2:35 with 100000000
 DEAL:1::0_2:37 with 100000000
-DEAL:1::0_2:22 with 100000000
-DEAL:1::0_2:23 with 100000000
 DEAL:1::0_2:30 with 100000000
 DEAL:1::0_2:32 with 100000000
+DEAL:1::0_2:34 with 100000000
+DEAL:1::0_2:36 with 100000000
 DEAL:1::
 
 
@@ -430,10 +430,11 @@ DEAL:2::0_3:300 with 5
 DEAL:2::0_4:3102 with 5
 DEAL:2::0_4:3103 with 5
 DEAL:2::0_3:303 with 6
+DEAL:2::0_3:312 with 6
+DEAL:2::0_3:313 with 6
 DEAL:2::0_3:220 with 8
 DEAL:2::0_3:221 with 8
 DEAL:2::0_3:230 with 8
-DEAL:2::0_4:3313 with 8
 DEAL:2::0_3:222 with 9
 DEAL:2::0_4:2230 with 9
 DEAL:2::0_4:2231 with 9
@@ -444,7 +445,6 @@ DEAL:2::0_4:2330 with 9
 DEAL:2::0_4:2331 with 9
 DEAL:2::0_4:2332 with 9
 DEAL:2::0_4:2333 with 9
-DEAL:2::0_4:3323 with 9
 DEAL:2::0_3:301 with 5
 DEAL:2::0_4:3100 with 5
 DEAL:2::0_4:3101 with 5
@@ -454,8 +454,6 @@ DEAL:2::0_4:3311 with 7
 DEAL:2::0_3:231 with 8
 DEAL:2::0_4:3312 with 8
 DEAL:2::0_4:3321 with 9
-DEAL:2::0_3:312 with 6
-DEAL:2::0_3:313 with 6
 DEAL:2::0_4:3210 with 7
 DEAL:2::0_4:3211 with 7
 DEAL:2::0_4:3300 with 7
@@ -469,20 +467,23 @@ DEAL:2::0_5:33030 with 8
 DEAL:2::0_5:33031 with 8
 DEAL:2::0_5:33032 with 8
 DEAL:2::0_5:33033 with 8
+DEAL:2::0_4:3313 with 8
 DEAL:2::0_3:322 with 9
 DEAL:2::0_3:323 with 9
 DEAL:2::0_4:3320 with 9
 DEAL:2::0_4:3322 with 9
+DEAL:2::0_4:3323 with 9
 DEAL:2::
 DEAL:2::Number of cell batches: 47
 DEAL:2::0_3:300 with 5
 DEAL:2::0_4:3102 with 5
 DEAL:2::0_4:3103 with 5
 DEAL:2::0_3:303 with 6
+DEAL:2::0_3:312 with 6
+DEAL:2::0_3:313 with 6
 DEAL:2::0_3:220 with 8
 DEAL:2::0_3:221 with 8
 DEAL:2::0_3:230 with 8
-DEAL:2::0_4:3313 with 8
 DEAL:2::0_3:222 with 9
 DEAL:2::0_4:2230 with 9
 DEAL:2::0_4:2231 with 9
@@ -493,7 +494,6 @@ DEAL:2::0_4:2330 with 9
 DEAL:2::0_4:2331 with 9
 DEAL:2::0_4:2332 with 9
 DEAL:2::0_4:2333 with 9
-DEAL:2::0_4:3323 with 9
 DEAL:2::0_3:301 with 5
 DEAL:2::0_4:3100 with 5
 DEAL:2::0_4:3101 with 5
@@ -503,8 +503,6 @@ DEAL:2::0_4:3311 with 7
 DEAL:2::0_3:231 with 8
 DEAL:2::0_4:3312 with 8
 DEAL:2::0_4:3321 with 9
-DEAL:2::0_3:312 with 6
-DEAL:2::0_3:313 with 6
 DEAL:2::0_4:3210 with 7
 DEAL:2::0_4:3211 with 7
 DEAL:2::0_4:3300 with 7
@@ -518,10 +516,12 @@ DEAL:2::0_5:33030 with 8
 DEAL:2::0_5:33031 with 8
 DEAL:2::0_5:33032 with 8
 DEAL:2::0_5:33033 with 8
+DEAL:2::0_4:3313 with 8
 DEAL:2::0_3:322 with 9
 DEAL:2::0_3:323 with 9
 DEAL:2::0_4:3320 with 9
 DEAL:2::0_4:3322 with 9
+DEAL:2::0_4:3323 with 9
 DEAL:2::
 DEAL:2::Number of cell batches: 47
 DEAL:2::0_3:220 with 100000000
@@ -541,8 +541,8 @@ DEAL:2::0_3:300 with 100000000
 DEAL:2::0_3:303 with 100000000
 DEAL:2::0_4:3102 with 100000000
 DEAL:2::0_4:3103 with 100000000
-DEAL:2::0_4:3313 with 100000000
-DEAL:2::0_4:3323 with 100000000
+DEAL:2::0_3:312 with 100000000
+DEAL:2::0_3:313 with 100000000
 DEAL:2::0_3:231 with 100000000
 DEAL:2::0_3:301 with 100000000
 DEAL:2::0_3:302 with 100000000
@@ -552,8 +552,6 @@ DEAL:2::0_3:311 with 100000000
 DEAL:2::0_4:3311 with 100000000
 DEAL:2::0_4:3312 with 100000000
 DEAL:2::0_4:3321 with 100000000
-DEAL:2::0_3:312 with 100000000
-DEAL:2::0_3:313 with 100000000
 DEAL:2::0_3:320 with 100000000
 DEAL:2::0_4:3210 with 100000000
 DEAL:2::0_4:3211 with 100000000
@@ -569,13 +567,15 @@ DEAL:2::0_5:33031 with 100000000
 DEAL:2::0_5:33032 with 100000000
 DEAL:2::0_5:33033 with 100000000
 DEAL:2::0_4:3310 with 100000000
+DEAL:2::0_4:3313 with 100000000
 DEAL:2::0_4:3320 with 100000000
 DEAL:2::0_4:3322 with 100000000
+DEAL:2::0_4:3323 with 100000000
 DEAL:2::
 DEAL:2::Number of cell batches: 16
 DEAL:2::0_2:40 with 1
 DEAL:2::0_2:41 with 1
-DEAL:2::0_2:50 with 1
+DEAL:2::0_2:44 with 1
 DEAL:2::0_2:51 with 1
 DEAL:2::0_2:55 with 1
 DEAL:2::0_2:42 with 3
@@ -585,15 +585,15 @@ DEAL:2::0_2:47 with 3
 DEAL:2::0_2:52 with 3
 DEAL:2::0_2:53 with 3
 DEAL:2::0_2:57 with 3
-DEAL:2::0_2:44 with 1
 DEAL:2::0_2:45 with 1
+DEAL:2::0_2:50 with 1
 DEAL:2::0_2:54 with 1
 DEAL:2::0_2:56 with 3
 DEAL:2::
 DEAL:2::Number of cell batches: 16
 DEAL:2::0_2:40 with 1
 DEAL:2::0_2:41 with 1
-DEAL:2::0_2:50 with 1
+DEAL:2::0_2:44 with 1
 DEAL:2::0_2:51 with 1
 DEAL:2::0_2:55 with 1
 DEAL:2::0_2:42 with 3
@@ -603,15 +603,15 @@ DEAL:2::0_2:47 with 3
 DEAL:2::0_2:52 with 3
 DEAL:2::0_2:53 with 3
 DEAL:2::0_2:57 with 3
-DEAL:2::0_2:44 with 1
 DEAL:2::0_2:45 with 1
+DEAL:2::0_2:50 with 1
 DEAL:2::0_2:54 with 1
 DEAL:2::0_2:56 with 3
 DEAL:2::
 DEAL:2::Number of cell batches: 16
 DEAL:2::0_2:40 with 100000000
 DEAL:2::0_2:41 with 100000000
-DEAL:2::0_2:50 with 100000000
+DEAL:2::0_2:44 with 100000000
 DEAL:2::0_2:42 with 100000000
 DEAL:2::0_2:43 with 100000000
 DEAL:2::0_2:46 with 100000000
@@ -621,8 +621,8 @@ DEAL:2::0_2:52 with 100000000
 DEAL:2::0_2:53 with 100000000
 DEAL:2::0_2:55 with 100000000
 DEAL:2::0_2:57 with 100000000
-DEAL:2::0_2:44 with 100000000
 DEAL:2::0_2:45 with 100000000
+DEAL:2::0_2:50 with 100000000
 DEAL:2::0_2:54 with 100000000
 DEAL:2::0_2:56 with 100000000
 DEAL:2::
@@ -634,15 +634,15 @@ DEAL:3::1_3:003 with 1
 DEAL:3::1_2:01 with 1
 DEAL:3::1_3:020 with 3
 DEAL:3::1_3:021 with 3
+DEAL:3::1_3:030 with 3
+DEAL:3::1_3:031 with 3
 DEAL:3::1_3:022 with 4
 DEAL:3::1_4:0230 with 4
 DEAL:3::1_4:0231 with 4
 DEAL:3::1_4:0232 with 4
-DEAL:3::1_3:200 with 5
-DEAL:3::1_3:212 with 6
-DEAL:3::1_3:213 with 6
-DEAL:3::1_4:2023 with 7
-DEAL:3::1_4:2033 with 7
+DEAL:3::1_4:0233 with 4
+DEAL:3::1_3:032 with 4
+DEAL:3::1_3:033 with 4
 DEAL:3::0_4:3330 with 9
 DEAL:3::0_4:3333 with 9
 DEAL:3::1_3:000 with 0
@@ -660,13 +660,9 @@ DEAL:3::1_5:20323 with 7
 DEAL:3::0_4:3331 with 9
 DEAL:3::0_4:3332 with 9
 DEAL:3::1_2:10 with 1
-DEAL:3::1_3:030 with 3
-DEAL:3::1_3:031 with 3
 DEAL:3::1_3:120 with 3
 DEAL:3::1_3:121 with 3
-DEAL:3::1_4:0233 with 4
-DEAL:3::1_3:032 with 4
-DEAL:3::1_3:033 with 4
+DEAL:3::1_3:200 with 5
 DEAL:3::1_3:201 with 5
 DEAL:3::1_3:210 with 5
 DEAL:3::1_4:2110 with 5
@@ -674,8 +670,12 @@ DEAL:3::1_4:2112 with 5
 DEAL:3::1_4:2021 with 6
 DEAL:3::1_4:2030 with 6
 DEAL:3::1_4:2031 with 6
+DEAL:3::1_3:212 with 6
+DEAL:3::1_3:213 with 6
+DEAL:3::1_4:2023 with 7
 DEAL:3::1_5:20320 with 7
 DEAL:3::1_5:20321 with 7
+DEAL:3::1_4:2033 with 7
 DEAL:3::
 DEAL:3::Number of cell batches: 47
 DEAL:3::1_3:001 with 0
@@ -683,15 +683,15 @@ DEAL:3::1_3:003 with 1
 DEAL:3::1_2:01 with 1
 DEAL:3::1_3:020 with 3
 DEAL:3::1_3:021 with 3
+DEAL:3::1_3:030 with 3
+DEAL:3::1_3:031 with 3
 DEAL:3::1_3:022 with 4
 DEAL:3::1_4:0230 with 4
 DEAL:3::1_4:0231 with 4
 DEAL:3::1_4:0232 with 4
-DEAL:3::1_3:200 with 5
-DEAL:3::1_3:212 with 6
-DEAL:3::1_3:213 with 6
-DEAL:3::1_4:2023 with 7
-DEAL:3::1_4:2033 with 7
+DEAL:3::1_4:0233 with 4
+DEAL:3::1_3:032 with 4
+DEAL:3::1_3:033 with 4
 DEAL:3::0_4:3330 with 9
 DEAL:3::0_4:3333 with 9
 DEAL:3::1_3:000 with 0
@@ -709,13 +709,9 @@ DEAL:3::1_5:20323 with 7
 DEAL:3::0_4:3331 with 9
 DEAL:3::0_4:3332 with 9
 DEAL:3::1_2:10 with 1
-DEAL:3::1_3:030 with 3
-DEAL:3::1_3:031 with 3
 DEAL:3::1_3:120 with 3
 DEAL:3::1_3:121 with 3
-DEAL:3::1_4:0233 with 4
-DEAL:3::1_3:032 with 4
-DEAL:3::1_3:033 with 4
+DEAL:3::1_3:200 with 5
 DEAL:3::1_3:201 with 5
 DEAL:3::1_3:210 with 5
 DEAL:3::1_4:2110 with 5
@@ -723,8 +719,12 @@ DEAL:3::1_4:2112 with 5
 DEAL:3::1_4:2021 with 6
 DEAL:3::1_4:2030 with 6
 DEAL:3::1_4:2031 with 6
+DEAL:3::1_3:212 with 6
+DEAL:3::1_3:213 with 6
+DEAL:3::1_4:2023 with 7
 DEAL:3::1_5:20320 with 7
 DEAL:3::1_5:20321 with 7
+DEAL:3::1_4:2033 with 7
 DEAL:3::
 DEAL:3::Number of cell batches: 47
 DEAL:3::0_4:3330 with 100000000
@@ -738,11 +738,11 @@ DEAL:3::1_3:022 with 100000000
 DEAL:3::1_4:0230 with 100000000
 DEAL:3::1_4:0231 with 100000000
 DEAL:3::1_4:0232 with 100000000
-DEAL:3::1_3:200 with 100000000
-DEAL:3::1_4:2023 with 100000000
-DEAL:3::1_4:2033 with 100000000
-DEAL:3::1_3:212 with 100000000
-DEAL:3::1_3:213 with 100000000
+DEAL:3::1_4:0233 with 100000000
+DEAL:3::1_3:030 with 100000000
+DEAL:3::1_3:031 with 100000000
+DEAL:3::1_3:032 with 100000000
+DEAL:3::1_3:033 with 100000000
 DEAL:3::0_4:3331 with 100000000
 DEAL:3::0_4:3332 with 100000000
 DEAL:3::1_3:000 with 100000000
@@ -757,23 +757,23 @@ DEAL:3::1_5:20322 with 100000000
 DEAL:3::1_5:20323 with 100000000
 DEAL:3::1_4:2111 with 100000000
 DEAL:3::1_4:2113 with 100000000
-DEAL:3::1_4:0233 with 100000000
-DEAL:3::1_3:030 with 100000000
-DEAL:3::1_3:031 with 100000000
-DEAL:3::1_3:032 with 100000000
-DEAL:3::1_3:033 with 100000000
 DEAL:3::1_2:10 with 100000000
 DEAL:3::1_3:120 with 100000000
 DEAL:3::1_3:121 with 100000000
+DEAL:3::1_3:200 with 100000000
 DEAL:3::1_3:201 with 100000000
 DEAL:3::1_4:2021 with 100000000
+DEAL:3::1_4:2023 with 100000000
 DEAL:3::1_4:2030 with 100000000
 DEAL:3::1_4:2031 with 100000000
 DEAL:3::1_5:20320 with 100000000
 DEAL:3::1_5:20321 with 100000000
+DEAL:3::1_4:2033 with 100000000
 DEAL:3::1_3:210 with 100000000
 DEAL:3::1_4:2110 with 100000000
 DEAL:3::1_4:2112 with 100000000
+DEAL:3::1_3:212 with 100000000
+DEAL:3::1_3:213 with 100000000
 DEAL:3::
 DEAL:3::Number of cell batches: 15
 DEAL:3::0_2:60 with 6
@@ -829,11 +829,7 @@ DEAL:3::
 
 
 DEAL:4::Number of cell batches: 46
-DEAL:4::2_2:00 with 2
-DEAL:4::1_3:300 with 5
-DEAL:4::1_3:301 with 5
 DEAL:4::1_4:2210 with 7
-DEAL:4::2_2:03 with 7
 DEAL:4::1_4:2203 with 8
 DEAL:4::1_4:2212 with 8
 DEAL:4::1_4:2213 with 8
@@ -843,7 +839,11 @@ DEAL:4::1_5:22221 with 9
 DEAL:4::1_5:22223 with 9
 DEAL:4::1_4:2223 with 9
 DEAL:4::1_3:223 with 9
-DEAL:4::2_3:121 with 10
+DEAL:4::1_3:232 with 9
+DEAL:4::1_4:2330 with 9
+DEAL:4::1_4:2331 with 9
+DEAL:4::1_4:2332 with 9
+DEAL:4::1_4:2333 with 9
 DEAL:4::1_3:310 with 5
 DEAL:4::1_3:311 with 5
 DEAL:4::2_2:02 with 5
@@ -860,28 +860,24 @@ DEAL:4::1_5:22220 with 9
 DEAL:4::1_5:22222 with 9
 DEAL:4::2_3:122 with 10
 DEAL:4::2_3:123 with 11
+DEAL:4::2_2:00 with 2
+DEAL:4::1_3:300 with 5
+DEAL:4::1_3:301 with 5
 DEAL:4::2_2:01 with 5
 DEAL:4::1_3:303 with 6
 DEAL:4::1_3:312 with 6
+DEAL:4::2_2:03 with 7
 DEAL:4::2_2:10 with 7
 DEAL:4::1_3:320 with 8
 DEAL:4::1_3:321 with 8
 DEAL:4::2_3:120 with 8
-DEAL:4::1_3:232 with 9
-DEAL:4::1_4:2330 with 9
-DEAL:4::1_4:2331 with 9
-DEAL:4::1_4:2332 with 9
-DEAL:4::1_4:2333 with 9
 DEAL:4::1_3:322 with 9
 DEAL:4::1_3:323 with 9
 DEAL:4::2_2:11 with 10
+DEAL:4::2_3:121 with 10
 DEAL:4::
 DEAL:4::Number of cell batches: 46
-DEAL:4::2_2:00 with 2
-DEAL:4::1_3:300 with 5
-DEAL:4::1_3:301 with 5
 DEAL:4::1_4:2210 with 7
-DEAL:4::2_2:03 with 7
 DEAL:4::1_4:2203 with 8
 DEAL:4::1_4:2212 with 8
 DEAL:4::1_4:2213 with 8
@@ -891,7 +887,11 @@ DEAL:4::1_5:22221 with 9
 DEAL:4::1_5:22223 with 9
 DEAL:4::1_4:2223 with 9
 DEAL:4::1_3:223 with 9
-DEAL:4::2_3:121 with 10
+DEAL:4::1_3:232 with 9
+DEAL:4::1_4:2330 with 9
+DEAL:4::1_4:2331 with 9
+DEAL:4::1_4:2332 with 9
+DEAL:4::1_4:2333 with 9
 DEAL:4::1_3:310 with 5
 DEAL:4::1_3:311 with 5
 DEAL:4::2_2:02 with 5
@@ -908,21 +908,21 @@ DEAL:4::1_5:22220 with 9
 DEAL:4::1_5:22222 with 9
 DEAL:4::2_3:122 with 10
 DEAL:4::2_3:123 with 11
+DEAL:4::2_2:00 with 2
+DEAL:4::1_3:300 with 5
+DEAL:4::1_3:301 with 5
 DEAL:4::2_2:01 with 5
 DEAL:4::1_3:303 with 6
 DEAL:4::1_3:312 with 6
+DEAL:4::2_2:03 with 7
 DEAL:4::2_2:10 with 7
 DEAL:4::1_3:320 with 8
 DEAL:4::1_3:321 with 8
 DEAL:4::2_3:120 with 8
-DEAL:4::1_3:232 with 9
-DEAL:4::1_4:2330 with 9
-DEAL:4::1_4:2331 with 9
-DEAL:4::1_4:2332 with 9
-DEAL:4::1_4:2333 with 9
 DEAL:4::1_3:322 with 9
 DEAL:4::1_3:323 with 9
 DEAL:4::2_2:11 with 10
+DEAL:4::2_3:121 with 10
 DEAL:4::
 DEAL:4::Number of cell batches: 46
 DEAL:4::1_4:2203 with 100000000
@@ -935,11 +935,11 @@ DEAL:4::1_5:22221 with 100000000
 DEAL:4::1_5:22223 with 100000000
 DEAL:4::1_4:2223 with 100000000
 DEAL:4::1_3:223 with 100000000
-DEAL:4::1_3:300 with 100000000
-DEAL:4::1_3:301 with 100000000
-DEAL:4::2_2:00 with 100000000
-DEAL:4::2_2:03 with 100000000
-DEAL:4::2_3:121 with 100000000
+DEAL:4::1_3:232 with 100000000
+DEAL:4::1_4:2330 with 100000000
+DEAL:4::1_4:2331 with 100000000
+DEAL:4::1_4:2332 with 100000000
+DEAL:4::1_4:2333 with 100000000
 DEAL:4::1_4:2200 with 100000000
 DEAL:4::1_4:2201 with 100000000
 DEAL:4::1_4:2202 with 100000000
@@ -956,28 +956,28 @@ DEAL:4::1_2:33 with 100000000
 DEAL:4::2_2:02 with 100000000
 DEAL:4::2_3:122 with 100000000
 DEAL:4::2_3:123 with 100000000
-DEAL:4::1_3:232 with 100000000
-DEAL:4::1_4:2330 with 100000000
-DEAL:4::1_4:2331 with 100000000
-DEAL:4::1_4:2332 with 100000000
-DEAL:4::1_4:2333 with 100000000
+DEAL:4::1_3:300 with 100000000
+DEAL:4::1_3:301 with 100000000
 DEAL:4::1_3:303 with 100000000
 DEAL:4::1_3:312 with 100000000
 DEAL:4::1_3:320 with 100000000
 DEAL:4::1_3:321 with 100000000
 DEAL:4::1_3:322 with 100000000
 DEAL:4::1_3:323 with 100000000
+DEAL:4::2_2:00 with 100000000
 DEAL:4::2_2:01 with 100000000
+DEAL:4::2_2:03 with 100000000
 DEAL:4::2_2:10 with 100000000
 DEAL:4::2_2:11 with 100000000
 DEAL:4::2_3:120 with 100000000
+DEAL:4::2_3:121 with 100000000
 DEAL:4::
 DEAL:4::Number of cell batches: 22
+DEAL:4::1_1:0 with 2
 DEAL:4::1_1:1 with 2
-DEAL:4::1_2:60 with 6
-DEAL:4::1_2:64 with 6
+DEAL:4::1_1:2 with 7
 DEAL:4::1_1:3 with 7
-DEAL:4::1_2:62 with 8
+DEAL:4::0_3:777 with 9
 DEAL:4::1_1:5 with 2
 DEAL:4::1_2:61 with 6
 DEAL:4::1_2:65 with 6
@@ -990,18 +990,18 @@ DEAL:4::1_2:67 with 8
 DEAL:4::0_3:772 with 9
 DEAL:4::0_3:773 with 9
 DEAL:4::0_3:776 with 9
-DEAL:4::1_1:0 with 2
 DEAL:4::1_1:4 with 2
-DEAL:4::1_1:2 with 7
-DEAL:4::1_2:66 with 8
-DEAL:4::0_3:777 with 9
-DEAL:4::
-DEAL:4::Number of cell batches: 22
-DEAL:4::1_1:1 with 2
 DEAL:4::1_2:60 with 6
 DEAL:4::1_2:64 with 6
-DEAL:4::1_1:3 with 7
 DEAL:4::1_2:62 with 8
+DEAL:4::1_2:66 with 8
+DEAL:4::
+DEAL:4::Number of cell batches: 22
+DEAL:4::1_1:0 with 2
+DEAL:4::1_1:1 with 2
+DEAL:4::1_1:2 with 7
+DEAL:4::1_1:3 with 7
+DEAL:4::0_3:777 with 9
 DEAL:4::1_1:5 with 2
 DEAL:4::1_2:61 with 6
 DEAL:4::1_2:65 with 6
@@ -1014,18 +1014,18 @@ DEAL:4::1_2:67 with 8
 DEAL:4::0_3:772 with 9
 DEAL:4::0_3:773 with 9
 DEAL:4::0_3:776 with 9
-DEAL:4::1_1:0 with 2
 DEAL:4::1_1:4 with 2
-DEAL:4::1_1:2 with 7
+DEAL:4::1_2:60 with 6
+DEAL:4::1_2:64 with 6
+DEAL:4::1_2:62 with 8
 DEAL:4::1_2:66 with 8
-DEAL:4::0_3:777 with 9
 DEAL:4::
 DEAL:4::Number of cell batches: 22
+DEAL:4::0_3:777 with 100000000
+DEAL:4::1_1:0 with 100000000
 DEAL:4::1_1:1 with 100000000
+DEAL:4::1_1:2 with 100000000
 DEAL:4::1_1:3 with 100000000
-DEAL:4::1_2:60 with 100000000
-DEAL:4::1_2:62 with 100000000
-DEAL:4::1_2:64 with 100000000
 DEAL:4::0_3:770 with 100000000
 DEAL:4::0_3:771 with 100000000
 DEAL:4::0_3:772 with 100000000
@@ -1038,10 +1038,10 @@ DEAL:4::1_2:61 with 100000000
 DEAL:4::1_2:63 with 100000000
 DEAL:4::1_2:65 with 100000000
 DEAL:4::1_2:67 with 100000000
-DEAL:4::0_3:777 with 100000000
-DEAL:4::1_1:0 with 100000000
-DEAL:4::1_1:2 with 100000000
 DEAL:4::1_1:4 with 100000000
+DEAL:4::1_2:60 with 100000000
+DEAL:4::1_2:62 with 100000000
+DEAL:4::1_2:64 with 100000000
 DEAL:4::1_2:66 with 100000000
 DEAL:4::
 
@@ -1051,13 +1051,13 @@ DEAL:5::2_2:20 with 7
 DEAL:5::2_2:22 with 10
 DEAL:5::3_3:001 with 10
 DEAL:5::2_3:230 with 11
+DEAL:5::3_3:003 with 11
 DEAL:5::2_3:231 with 12
 DEAL:5::2_3:232 with 12
 DEAL:5::2_2:30 with 12
 DEAL:5::2_3:133 with 13
 DEAL:5::2_3:233 with 13
 DEAL:5::2_3:310 with 13
-DEAL:5::3_3:133 with 14
 DEAL:5::2_3:311 with 15
 DEAL:5::2_3:312 with 15
 DEAL:5::2_2:32 with 15
@@ -1081,7 +1081,6 @@ DEAL:5::2_3:333 with 18
 DEAL:5::3_3:100 with 10
 DEAL:5::3_3:101 with 10
 DEAL:5::3_3:110 with 10
-DEAL:5::3_3:003 with 11
 DEAL:5::3_2:01 with 11
 DEAL:5::3_3:102 with 11
 DEAL:5::3_3:103 with 11
@@ -1095,19 +1094,20 @@ DEAL:5::3_3:121 with 13
 DEAL:5::3_4:1302 with 13
 DEAL:5::3_4:1303 with 13
 DEAL:5::3_3:131 with 13
+DEAL:5::3_3:133 with 14
 DEAL:5::
 DEAL:5::Number of cell batches: 48
 DEAL:5::2_2:20 with 7
 DEAL:5::2_2:22 with 10
 DEAL:5::3_3:001 with 10
 DEAL:5::2_3:230 with 11
+DEAL:5::3_3:003 with 11
 DEAL:5::2_3:231 with 12
 DEAL:5::2_3:232 with 12
 DEAL:5::2_2:30 with 12
 DEAL:5::2_3:133 with 13
 DEAL:5::2_3:233 with 13
 DEAL:5::2_3:310 with 13
-DEAL:5::3_3:133 with 14
 DEAL:5::2_3:311 with 15
 DEAL:5::2_3:312 with 15
 DEAL:5::2_2:32 with 15
@@ -1131,7 +1131,6 @@ DEAL:5::2_3:333 with 18
 DEAL:5::3_3:100 with 10
 DEAL:5::3_3:101 with 10
 DEAL:5::3_3:110 with 10
-DEAL:5::3_3:003 with 11
 DEAL:5::3_2:01 with 11
 DEAL:5::3_3:102 with 11
 DEAL:5::3_3:103 with 11
@@ -1145,6 +1144,7 @@ DEAL:5::3_3:121 with 13
 DEAL:5::3_4:1302 with 13
 DEAL:5::3_4:1303 with 13
 DEAL:5::3_3:131 with 13
+DEAL:5::3_3:133 with 14
 DEAL:5::
 DEAL:5::Number of cell batches: 48
 DEAL:5::2_3:133 with 100000000
@@ -1163,7 +1163,7 @@ DEAL:5::2_2:32 with 100000000
 DEAL:5::2_3:330 with 100000000
 DEAL:5::2_3:332 with 100000000
 DEAL:5::3_3:001 with 100000000
-DEAL:5::3_3:133 with 100000000
+DEAL:5::3_3:003 with 100000000
 DEAL:5::2_3:130 with 100000000
 DEAL:5::2_3:131 with 100000000
 DEAL:5::2_3:132 with 100000000
@@ -1178,7 +1178,6 @@ DEAL:5::3_3:122 with 100000000
 DEAL:5::3_3:123 with 100000000
 DEAL:5::3_3:132 with 100000000
 DEAL:5::3_2:20 with 100000000
-DEAL:5::3_3:003 with 100000000
 DEAL:5::3_2:01 with 100000000
 DEAL:5::3_2:02 with 100000000
 DEAL:5::3_2:03 with 100000000
@@ -1195,63 +1194,64 @@ DEAL:5::3_4:1301 with 100000000
 DEAL:5::3_4:1302 with 100000000
 DEAL:5::3_4:1303 with 100000000
 DEAL:5::3_3:131 with 100000000
+DEAL:5::3_3:133 with 100000000
 DEAL:5::
 DEAL:5::Number of cell batches: 17
 DEAL:5::2_1:1 with 10
 DEAL:5::2_1:5 with 10
-DEAL:5::3_1:5 with 12
+DEAL:5::2_1:6 with 10
 DEAL:5::2_1:3 with 15
-DEAL:5::3_1:7 with 17
+DEAL:5::2_1:7 with 15
 DEAL:5::2_1:0 with 5
 DEAL:5::2_1:4 with 5
 DEAL:5::1_1:7 with 7
 DEAL:5::2_1:2 with 10
 DEAL:5::3_1:1 with 12
 DEAL:5::3_1:3 with 17
-DEAL:5::2_1:6 with 10
 DEAL:5::3_1:0 with 12
 DEAL:5::3_1:4 with 12
-DEAL:5::2_1:7 with 15
+DEAL:5::3_1:5 with 12
 DEAL:5::3_1:2 with 17
 DEAL:5::3_1:6 with 17
+DEAL:5::3_1:7 with 17
 DEAL:5::
 DEAL:5::Number of cell batches: 17
 DEAL:5::2_1:1 with 10
 DEAL:5::2_1:5 with 10
-DEAL:5::3_1:5 with 12
+DEAL:5::2_1:6 with 10
 DEAL:5::2_1:3 with 15
-DEAL:5::3_1:7 with 17
+DEAL:5::2_1:7 with 15
 DEAL:5::2_1:0 with 5
 DEAL:5::2_1:4 with 5
 DEAL:5::1_1:7 with 7
 DEAL:5::2_1:2 with 10
 DEAL:5::3_1:1 with 12
 DEAL:5::3_1:3 with 17
-DEAL:5::2_1:6 with 10
 DEAL:5::3_1:0 with 12
 DEAL:5::3_1:4 with 12
-DEAL:5::2_1:7 with 15
+DEAL:5::3_1:5 with 12
 DEAL:5::3_1:2 with 17
 DEAL:5::3_1:6 with 17
+DEAL:5::3_1:7 with 17
 DEAL:5::
 DEAL:5::Number of cell batches: 17
 DEAL:5::2_1:1 with 100000000
 DEAL:5::2_1:3 with 100000000
 DEAL:5::2_1:5 with 100000000
-DEAL:5::3_1:5 with 100000000
-DEAL:5::3_1:7 with 100000000
+DEAL:5::2_1:6 with 100000000
+DEAL:5::2_1:7 with 100000000
 DEAL:5::1_1:7 with 100000000
 DEAL:5::2_1:0 with 100000000
 DEAL:5::2_1:2 with 100000000
 DEAL:5::2_1:4 with 100000000
 DEAL:5::3_1:1 with 100000000
 DEAL:5::3_1:3 with 100000000
-DEAL:5::2_1:6 with 100000000
-DEAL:5::2_1:7 with 100000000
 DEAL:5::3_1:0 with 100000000
 DEAL:5::3_1:2 with 100000000
 DEAL:5::3_1:4 with 100000000
+DEAL:5::3_1:5 with 100000000
 DEAL:5::3_1:6 with 100000000
+DEAL:5::3_1:7 with 100000000
 DEAL:5::
 
 

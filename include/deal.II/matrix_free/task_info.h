@@ -156,10 +156,6 @@ namespace internal
        * to performing computations. These will be given a certain id in the
        * partitioning.
        *
-       * @param cells_close_to_boundary A list of cells that interact with
-       * boundaries between different subdomains and are involved in sending
-       * data to neighboring processes.
-       *
        * @param dofs_per_cell Gives an expected value for the number of degrees
        * of freedom on a cell, which is used to determine the block size for
        * interleaving cell and face integrals.
@@ -187,7 +183,6 @@ namespace internal
       void
       create_blocks_serial(
         const std::vector<unsigned int> &boundary_cells,
-        const std::vector<unsigned int> &cells_close_to_boundary,
         const unsigned int               dofs_per_cell,
         const std::vector<unsigned int> &cell_vectorization_categories,
         const bool                       cell_vectorization_categories_strict,
