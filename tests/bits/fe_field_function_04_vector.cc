@@ -95,13 +95,15 @@ test()
   fe_function.vector_value_list(points, m);
 
   for (unsigned int i = 0; i < m.size(); ++i)
-    {
-      Assert(std::fabs(m[i](0) - points[i].square()) <
-               1e-10 * std::fabs(m[i](0) + points[i].square()),
-             ExcInternalError());
+    deallog << points[i].square() << "  " << m[i](0) - points[i].square()
+            << std::endl;
+  deallog << std::endl;
 
-      Assert(std::fabs(m[i](1)) < 1e-10, ExcInternalError());
-    }
+  double sum = 0.;
+  for (const auto &d : m)
+    sum += std::abs(d(1));
+
+  deallog << "Sum of second component: " << sum << std::endl;
 
   deallog << "OK" << std::endl;
 }
@@ -111,6 +113,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(9);
 
   test<2>();
 
