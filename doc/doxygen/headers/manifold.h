@@ -76,7 +76,7 @@
  * </ul>
  * Many other examples, as well as much theoretical underpinning for the
  * implementation in deal.II, is provided in the
- * @ref GlossGeometryPaper "geometry paper".
+ * @ref geometry_paper "geometry paper".
  *
  * In deal.II, a Manifold is seen as a collection of points, together
  * with a notion of distance between points (on the manifold). New

@@ -256,7 +256,7 @@ private:
 std::ostream &
 operator<<(std::ostream &out, const ComponentMask &mask);
 
-
+#ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
 inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
@@ -413,7 +413,7 @@ ComponentMask::operator!=(const ComponentMask &mask) const
 {
   return component_mask != mask.component_mask;
 }
-
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -182,7 +182,14 @@ namespace Threads
     T data;
 #  endif
   };
+} // namespace Threads
+/**
+ * @}
+ */
 
+#  ifndef DOXYGEN
+namespace Threads
+{
   // ----------------- inline and template functions --------------------------
 
   template <typename T>
@@ -202,11 +209,11 @@ namespace Threads
   inline T &
   ThreadLocalStorage<T>::get()
   {
-#  ifdef DEAL_II_WITH_THREADS
+#    ifdef DEAL_II_WITH_THREADS
     return data.local();
-#  else
+#    else
     return data;
-#  endif
+#    endif
   }
 
 
@@ -214,12 +221,12 @@ namespace Threads
   inline T &
   ThreadLocalStorage<T>::get(bool &exists)
   {
-#  ifdef DEAL_II_WITH_THREADS
+#    ifdef DEAL_II_WITH_THREADS
     return data.local(exists);
-#  else
+#    else
     exists = true;
     return data;
-#  endif
+#    endif
   }
 
 
@@ -241,11 +248,11 @@ namespace Threads
 
   template <typename T>
   inline
-#  ifdef DEAL_II_WITH_THREADS
+#    ifdef DEAL_II_WITH_THREADS
     tbb::enumerable_thread_specific<T> &
-#  else
+#    else
     T &
-#  endif
+#    endif
     ThreadLocalStorage<T>::get_implementation()
   {
     return data;
@@ -257,18 +264,15 @@ namespace Threads
   inline void
   ThreadLocalStorage<T>::clear()
   {
-#  ifdef DEAL_II_WITH_THREADS
+#    ifdef DEAL_II_WITH_THREADS
     data.clear();
-#  else
+#    else
     data = T{};
-#  endif
+#    endif
   }
 } // namespace Threads
 
-/**
- * @}
- */
-
+#  endif // DOXYGEN
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE

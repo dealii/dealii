@@ -234,7 +234,7 @@ namespace LocalIntegrators
      *
      * @param M11 The internal matrix for the first cell obtained as result.
      * @param M12 The external matrix for the first cell obtained as result.
-     * @param M12 The external matrix for the second cell obtained as result.
+     * @param M21 The external matrix for the second cell obtained as result.
      * @param M22 The internal matrix for the second cell obtained as result.
      * @param fe1 The FEValues object describing the local trial function
      * space for the first cell. #update_values and #update_JxW_values must be
