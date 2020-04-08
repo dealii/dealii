@@ -118,13 +118,6 @@ public:
   ~FEEvaluationBase();
 
   /**
-   * @deprecated Use get_mapping_data_index_offset() instead.
-   */
-  DEAL_II_DEPRECATED
-  unsigned int
-  get_cell_data_number() const;
-
-  /**
    * Return the index offset within the geometry fields for the cell the @p
    * reinit() function has been called for. This index can be used to access
    * an index into a field that has the same compression behavior as the
@@ -3404,20 +3397,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   scratch_data =
     scratch_data_array->begin() + n_components_ * dofs_per_component +
     (n_components_ * (dim * dim + 2 * dim + 1) * n_quadrature_points);
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline unsigned int
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  get_cell_data_number() const
-{
-  return get_mapping_data_index_offset();
 }
 
 

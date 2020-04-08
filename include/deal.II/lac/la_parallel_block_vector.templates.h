@@ -391,21 +391,6 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void
-    BlockVector<Number>::equ(const Number               a,
-                             const BlockVector<Number> &v,
-                             const Number               b,
-                             const BlockVector<Number> &w)
-    {
-      AssertDimension(this->n_blocks(), v.n_blocks());
-      AssertDimension(this->n_blocks(), w.n_blocks());
-      for (unsigned int block = 0; block < this->n_blocks(); ++block)
-        this->block(block).equ(a, v.block(block), b, w.block(block));
-    }
-
-
-
-    template <typename Number>
     BlockVector<Number> &
     BlockVector<Number>::operator+=(const VectorSpaceVector<Number> &vv)
     {
@@ -518,22 +503,6 @@ namespace LinearAlgebra
       AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).sadd(x, v.block(block));
-    }
-
-
-
-    template <typename Number>
-    void
-    BlockVector<Number>::sadd(const Number               x,
-                              const Number               a,
-                              const BlockVector<Number> &v,
-                              const Number               b,
-                              const BlockVector<Number> &w)
-    {
-      AssertDimension(this->n_blocks(), v.n_blocks());
-      AssertDimension(this->n_blocks(), w.n_blocks());
-      for (unsigned int block = 0; block < this->n_blocks(); ++block)
-        this->block(block).sadd(x, a, v.block(block), b, w.block(block));
     }
 
 
