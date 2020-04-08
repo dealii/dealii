@@ -23,7 +23,11 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <boost/archive/binary_iarchive.hpp>
 #include <boost/io/ios_state.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -492,6 +496,34 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     AssertThrow(false,
                 ExcMessage(
                   "While reading VTK file, failed to find CELLS section"));
+}
+
+
+
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_vtu(std::istream &in)
+{
+  namespace pt = boost::property_tree;
+  pt::ptree tree;
+  pt::read_xml(in, tree);
+  auto section = tree.get_optional<std::string>("VTKFile.dealiiData");
+
+  AssertThrow(section,
+              ExcMessage(
+                "While reading a VTU file, failed to find dealiiData section. "
+                "Notice that we can only read grid files in .vtu format that "
+                "were created by the deal.II library, using a call to "
+                "GridOut::write_vtu(), where the flag "
+                "GridOutFlags::Vtu::serialize_triangulation is set to true."));
+
+  const auto decoded =
+    Utilities::decode_base64({section->begin(), section->end() - 1});
+  const auto string_archive =
+    Utilities::decompress({decoded.begin(), decoded.end()});
+  std::istringstream              in_stream(string_archive);
+  boost::archive::binary_iarchive ia(in_stream);
+  tria->load(ia, 0);
 }
 
 
@@ -3376,6 +3408,10 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
         read_vtk(in);
         return;
 
+      case vtu:
+        read_vtu(in);
+        return;
+
       case unv:
         read_unv(in);
         return;
@@ -3430,6 +3466,8 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
         return ".msh";
       case vtk:
         return ".vtk";
+      case vtu:
+        return ".vtu";
       case unv:
         return ".unv";
       case ucd:
@@ -3466,6 +3504,9 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
 
   if (format_name == "vtk")
     return vtk;
+
+  if (format_name == "vtu")
+    return vtu;
 
   // This is also the typical extension of Abaqus input files.
   if (format_name == "inp")
@@ -3512,7 +3553,7 @@ template <int dim, int spacedim>
 std::string
 GridIn<dim, spacedim>::get_format_names()
 {
-  return "dbmesh|msh|unv|vtk|ucd|abaqus|xda|netcdf|tecplot|assimp";
+  return "dbmesh|msh|unv|vtk|vtu|ucd|abaqus|xda|netcdf|tecplot|assimp";
 }
 
 

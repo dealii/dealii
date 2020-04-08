@@ -1,0 +1,4 @@
+New: GridOut::write_vtu() and GridIn::read_vtu() allow to save and restore a locally refined triangulation,
+using a xml section in the vtu file that is ignored by vtu readers.
+<br>
+(Luca Heltai, Nicola Giuliani, 2020/01/17)
