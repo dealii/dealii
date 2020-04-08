@@ -21,13 +21,21 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Provides a means to keep track of the simulation time in a time-dependent
- * simulation. It manages stepping forward from an initial time to a final
- * time. It also allows adjusting the time step size during the simulation.
- * It is guaranteed that at all times the current simulation time is in the
- * closed interval between the start time and the end time.
+ * This class provides a means to keep track of the simulation time in a
+ * time-dependent simulation. It manages stepping forward from a start time
+ * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
+ * the time step size during the simulation. It is guaranteed that at all times
+ * the current simulation time is in the closed interval between the start time
+ * and the end time.
  *
- * You can loop over all of the time steps by using a for loop
+ * The model this class follows is that one sets a *desired* time step length
+ * either through the constructor or using set_desired_next_step_size()
+ * function. This step size will then be used in all following calls to the
+ * advance_time() function, but may be adjusted slightly towards the end of the
+ * simulation to ensure that the simulation time hits the end time exactly. The
+ * adjustment is useful for the following reasons:
+ *
+ * Let's say that you loop over all of the time steps by using a for loop
  * @code
  *   for (DiscreteTime time(0., 1., 0.3);
  *        time.get_current_time() != time.get_end_time();
@@ -36,13 +44,39 @@ DEAL_II_NAMESPACE_OPEN
  *     // Insert simulation code here
  *   }
  * @endcode
+ * In the above example the time starts at $T_{\text{start}} = 0$ until
+ * $T_{\text{end}}=1$. Assuming the time step $dt = 0.3$ is not modified inside
+ * the loop, the time is advanced from $t = 0$ to $t = 0.3$, $t = 0.6$, $t =
+ * 0.9$ and finally it reaches the end time at $t = 1.0$. Here, the final step
+ * size needs to be reduced from its desired value of 0.3 to $dt = 0.1$ in order
+ * to ensure that we finish the simulation exactly at the specified end time. In
+ * fact, you should assume that not only the last time step length may be
+ * adjusted, but also previously ones -- for example, this class may take the
+ * liberty to spread the decrease in time step size out over several time steps
+ * and increment time from $t=0$, to $0.3$, $0.6$, $0.8$, and finally
+ * $t=T_{\text{end}}=1$ to avoid too large a change in time step size from one
+ * step to another.
  *
- * In the above example the time starts at $t = 0$. Assuming the time step
- * $dt = 0.3$ is not modified inside the loop, the time is advanced to
- * $t = 0.3$, $t = 0.6$, $t = 0.9$ and finally it reaches the end time at
- * $t = 1.0$. Note that the final step size is automatically reduced to
- * $dt = 0.1$ in order to ensure that we finish the simulation exactly at
- * the specified end time.
+ * The other situation in which the time step needs to be adjusted (this time to
+ * slightly larger values) is if a time increment falls just short of the final
+ * time. Imagine, for example, a similar situation as above, but with different
+ * end time:
+ * @code
+ *   for (DiscreteTime time(0., 1.21, 0.3);
+ *        time.get_current_time() != time.get_end_time();
+ *        time.advance_time())
+ *   {
+ *     // Insert simulation code here
+ *   }
+ * @endcode
+ * Here, the time step from $t=0.9$ to $t=1.2$ falls just short of the final
+ * time $T_{\text{end}}=1.21$. Instead of following up with a very small step of
+ * length $dt=0.01$, the class stretches the last time step (or last time steps)
+ * slightly to reach the desired end time.
+ *
+ * The examples above make clear that the time step size given to this class is
+ * only a *desired* step size. You can query the actual time step size using the
+ * get_next_step_size() function.
  *
  * @author Reza Rastak, 2019
  */
@@ -79,7 +113,11 @@ public:
   get_end_time() const;
 
   /**
-   * Return the size of the step from current time step to the next.
+   * Return the size of the step from current time step to the
+   * next. As discussed in the introduction to the class, this is the
+   * *actual* time step, and may differ from the *desired* time step
+   * set in the constructor or through the
+   * set_desired_next_step_size() function.
    */
   double
   get_next_step_size() const;
