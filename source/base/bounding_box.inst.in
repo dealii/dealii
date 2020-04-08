@@ -18,5 +18,5 @@ for (deal_II_dimension : SPACE_DIMENSIONS; number : REAL_SCALARS)
   {
     template class BoundingBox<deal_II_dimension, number>;
 
-    template BoundingBox<deal_II_dimension, number> create_unit_box();
+    template BoundingBox<deal_II_dimension, number> create_unit_bounding_box();
   }

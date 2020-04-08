@@ -33,7 +33,8 @@ print_what_each_coordinate_maps_to()
       deallog << "locked coordinate = " << locked << std::endl;
       for (unsigned int i = 0; i < dim; ++i)
         {
-          deallog << i << " -> " << coordinate_to_one_dim_higher<dim>(locked, i)
+          deallog << i << " -> "
+                  << internal::coordinate_to_one_dim_higher<dim>(locked, i)
                   << std::endl;
         }
     }
