@@ -57,6 +57,8 @@ main()
 {
   initlog();
 
+  deallog.get_file_stream() << std::setprecision(9);
+
   deallog.push("2d");
   test<2>(deallog.get_file_stream());
   deallog.pop();
