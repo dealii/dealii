@@ -752,6 +752,7 @@ private:
 };
 
 
+#ifndef DOXYGEN
 namespace internal
 {
   template <int rank, int dim, typename T, typename U>
@@ -864,10 +865,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator Number &()
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return value;
 }
 
@@ -877,10 +878,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator const Number &() const
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return value;
 }
 
@@ -896,7 +897,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 }
 
 
-#ifdef __INTEL_COMPILER
+#  ifdef __INTEL_COMPILER
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
@@ -905,7 +906,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   value = p.value;
   return *this;
 }
-#endif
+#  endif
 
 
 template <int dim, typename Number>
@@ -924,13 +925,13 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
-#if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
+#  if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
            "The Tensor equality operator for ADOL-C taped numbers has not yet "
            "been extended to support advanced branching."));
-#endif
+#  endif
 
   return numbers::values_are_equal(value, p.value);
 }
@@ -979,7 +980,7 @@ namespace internal
       val *= s;
     }
 
-#ifdef __CUDA_ARCH__
+#  ifdef __CUDA_ARCH__
     template <typename Number, typename OtherNumber>
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV void
                                                    multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
@@ -987,7 +988,7 @@ namespace internal
       printf("This function is not implemented for std::complex<Number>!\n");
       assert(false);
     }
-#endif
+#  endif
   } // namespace ComplexWorkaround
 } // namespace internal
 
@@ -1038,10 +1039,10 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   Tensor<0, dim, Number>::norm_square() const
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
 
@@ -1143,9 +1144,9 @@ namespace internal
                                       std::integral_constant<int, dim>)
     {
       // We cannot use Assert in a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
       AssertIndexRange(i, dim);
-#endif
+#  endif
       return values[i];
     }
 
@@ -1171,12 +1172,12 @@ namespace internal
                                       std::integral_constant<int, 0>)
     {
       // We cannot use Assert in a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
-#endif
+#  endif
       return Uninitialized<ArrayElementType>::value;
     }
   } // namespace TensorSubscriptor
@@ -1585,6 +1586,7 @@ Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 template <int rank_, int dim, typename Number>
 constexpr unsigned int Tensor<rank_, dim, Number>::n_independent_components;
 
+#endif // DOXYGEN
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
 

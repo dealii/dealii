@@ -235,6 +235,7 @@ std::ostream &
 operator<<(std::ostream &out, const BlockMask &mask);
 
 
+#ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
 inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
@@ -382,7 +383,7 @@ BlockMask::operator!=(const BlockMask &mask) const
 {
   return block_mask != mask.block_mask;
 }
-
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

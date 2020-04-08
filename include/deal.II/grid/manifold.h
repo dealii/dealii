@@ -176,7 +176,7 @@ namespace Manifolds
  * geometry, but their common uses can be easily described simply through
  * examples. An exhaustive discussion of how, where, and why this class
  * is used is provided in the
- * @ref GlossGeometryPaper "geometry paper".
+ * @ref geometry_paper "geometry paper".
  *
  *
  * <h3>Common use case: Creating a new vertex</h3>

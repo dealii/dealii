@@ -453,7 +453,7 @@ namespace TriangulationDescription
      * Construct a TriangulationDescription::Description. In contrast
      * to the function above, this function is also responsible for creating
      * a serial triangulation and for its partitioning (by calling the
-     * provided `std::functions' objects). Internally only selected processes (
+     * provided `std::function` objects). Internally only selected processes (
      * every n-th/each root of a group of size group_size) create a serial
      * triangulation and the TriangulationDescription::Description for all
      * processes in its group, which is communicated.
