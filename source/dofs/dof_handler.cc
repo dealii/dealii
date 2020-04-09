@@ -47,9 +47,6 @@ template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::space_dimension;
 
 template <int dim, int spacedim>
-const types::global_dof_index DoFHandler<dim, spacedim>::invalid_dof_index;
-
-template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
 
 

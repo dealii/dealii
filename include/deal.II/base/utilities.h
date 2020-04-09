@@ -467,49 +467,6 @@ namespace Utilities
   fixed_power(const T t);
 
   /**
-   * Calculate a fixed power of an integer number by a template expression
-   * where both the number <code>a</code> and the power <code>N</code> are
-   * compile-time constants. This computes the result of the power operation
-   * at compile time, enabling its use e.g. in other templates.
-   *
-   * Use this class as in <code>fixed_int_power@<5,2@>::%value</code> to
-   * compute 5<sup>2</sup>.
-   *
-   * @deprecated This template has been deprecated in favor of C++11's support
-   * for <code>constexpr</code> calculations, e.g., use
-   *
-   * @code
-   * constexpr int value = Utilities::pow(2, dim);
-   * @endcode
-   *
-   * instead of
-   *
-   * @code
-   * const int value = Utilities::fixed_int_power<2, dim>::value;
-   * @endcode
-   *
-   * to obtain a constant expression for <code>value</code>.
-   */
-  template <int a, int N>
-  struct DEAL_II_DEPRECATED fixed_int_power
-  {
-    static const int value = a * fixed_int_power<a, N - 1>::value;
-  };
-
-  /**
-   * Base case for the power operation with <code>N=0</code>, which gives the
-   * result 1.
-   *
-   * @deprecated This template is deprecated: see the note in the general
-   * version of this template for more information.
-   */
-  template <int a>
-  struct DEAL_II_DEPRECATED fixed_int_power<a, 0>
-  {
-    static const int value = 1;
-  };
-
-  /**
    * A replacement for <code>std::pow</code> that allows compile-time
    * calculations for constant expression arguments. The @p base must
    * be an integer type and the exponent @p iexp must not be negative.

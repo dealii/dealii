@@ -377,31 +377,6 @@ namespace LinearAlgebra
       sadd(const Number s, const BlockVector<Number> &V);
 
       /**
-       * Assignment <tt>*this = a*u + b*v</tt>.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      equ(const Number               a,
-          const BlockVector<Number> &u,
-          const Number               b,
-          const BlockVector<Number> &v);
-
-      /**
-       * Scaling and multiple addition.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      sadd(const Number               s,
-           const Number               a,
-           const BlockVector<Number> &V,
-           const Number               b,
-           const BlockVector<Number> &W);
-
-      /**
        * Return whether the vector contains only elements with value zero.
        * This function is mainly for internal consistency checks and should
        * seldom be used when not in debug mode since it uses quite some time.

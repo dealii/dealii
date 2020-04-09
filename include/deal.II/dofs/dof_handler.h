@@ -410,21 +410,6 @@ public:
   static const bool is_hp_dof_handler = false;
 
   /**
-   * When the arrays holding the DoF indices are set up, but before they are
-   * filled with actual values, they are set to an invalid value, in order to
-   * monitor possible problems. This invalid value is the constant defined
-   * here.
-   *
-   * Please note that you should not rely on it having a certain value, but
-   * rather take its symbolic name.
-   *
-   * @deprecated Use numbers::invalid_dof_index instead.
-   */
-  DEAL_II_DEPRECATED
-  static const types::global_dof_index invalid_dof_index =
-    numbers::invalid_dof_index;
-
-  /**
    * The default index of the finite element to be used on a given cell. Since
    * the present class only supports the same finite element to be used on all
    * cells, the index of the finite element needs to be the same on all cells
