@@ -1081,6 +1081,15 @@ public:
   parse_input_from_json(std::istream &input, const bool skip_undefined = false);
 
   /**
+   * Create a default input file by calling print_parameters() depending on the
+   * type of input file specified (prm, xml, json).
+   */
+  void
+  create_default_input_file(const std::string filename,
+                            const OutputStyle style) const;
+
+
+  /**
    * Clear all contents.
    */
   void

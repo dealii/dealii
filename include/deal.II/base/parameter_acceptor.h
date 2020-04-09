@@ -391,11 +391,14 @@ public:
    * @param prm The ParameterHandler to use
    */
   static void
-  initialize(const std::string &                 filename        = "",
-             const std::string &                 output_filename = "",
-             const ParameterHandler::OutputStyle output_style_for_prm_format =
-               ParameterHandler::ShortText,
-             ParameterHandler &prm = ParameterAcceptor::prm);
+  initialize(
+    const std::string &                 filename        = "",
+    const std::string &                 output_filename = "",
+    const ParameterHandler::OutputStyle output_style_for_output_filename =
+      ParameterHandler::DefaultStyle,
+    ParameterHandler &                  prm = ParameterAcceptor::prm,
+    const ParameterHandler::OutputStyle output_style_for_filename =
+      ParameterHandler::DefaultStyle);
 
   /**
    * Call declare_all_parameters(), read the parameters from the `input_stream`

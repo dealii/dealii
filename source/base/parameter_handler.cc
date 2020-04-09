@@ -775,6 +775,47 @@ ParameterHandler::parse_input_from_json(std::istream &in,
 
 
 void
+ParameterHandler::create_default_input_file(const std::string filename,
+                                            const OutputStyle style) const
+{
+  std::ofstream out(filename);
+  Assert(out, ExcIO());
+
+  std::string file_ending = filename.substr(filename.find_last_of(".") + 1);
+  boost::algorithm::to_lower(file_ending);
+
+  if (file_ending == "prm")
+    {
+      AssertThrow(style & PRM,
+                  ExcMessage("OutputStyle does not fit to filename ending."));
+      print_parameters(out, style);
+    }
+  else if (file_ending == "xml")
+    {
+      AssertThrow(style & XML,
+                  ExcMessage("OutputStyle does not fit to filename ending."));
+      print_parameters(out, style);
+    }
+  else if (file_ending == "json")
+    {
+      AssertThrow(style & JSON,
+                  ExcMessage("OutputStyle does not fit to filename ending."));
+      print_parameters(out, style);
+    }
+  else
+    {
+      AssertThrow(
+        false,
+        ExcMessage(
+          "Unknown input file. Supported types are .prm, .xml, and .json."));
+    }
+
+  out.close();
+}
+
+
+
+void
 ParameterHandler::clear()
 {
   entries = std_cxx14::make_unique<boost::property_tree::ptree>();

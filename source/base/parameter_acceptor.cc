@@ -56,54 +56,25 @@ void
 ParameterAcceptor::initialize(
   const std::string &                 filename,
   const std::string &                 output_filename,
-  const ParameterHandler::OutputStyle output_style_for_prm_format,
-  ParameterHandler &                  prm)
+  const ParameterHandler::OutputStyle output_style_for_output_filename,
+  ParameterHandler &                  prm,
+  const ParameterHandler::OutputStyle output_style_for_filename)
+
 {
   declare_all_parameters(prm);
   if (!filename.empty())
     {
-      // check the extension of input file
-      if (filename.substr(filename.find_last_of('.') + 1) == "prm")
+      std::ifstream is(filename);
+      if (!is)
         {
-          try
-            {
-              prm.parse_input(filename);
-            }
-          catch (const dealii::PathSearch::ExcFileNotFound &)
-            {
-              std::ofstream out(filename);
-              Assert(out, ExcIO());
-              prm.print_parameters(out, ParameterHandler::Text);
-              out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
-            }
+          prm.create_default_input_file(filename, output_style_for_filename);
+          AssertThrow(false,
+                      ExcMessage(
+                        "You specified <" + filename + "> as input file, " +
+                        "but it does not exist. We created it for you."));
         }
-      else if (filename.substr(filename.find_last_of('.') + 1) == "xml")
-        {
-          std::ifstream is(filename);
-          if (!is)
-            {
-              std::ofstream out(filename);
-              Assert(out, ExcIO());
-              prm.print_parameters(out, ParameterHandler::XML);
-              out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
-            }
-          prm.parse_input_from_xml(is);
-        }
-      else
-        AssertThrow(
-          false,
-          ExcMessage(
-            "Invalid extension of parameter file. Please use .prm or .xml"));
+
+      prm.parse_input(filename);
     }
 
   if (!output_filename.empty())
@@ -119,16 +90,16 @@ ParameterAcceptor::initialize(
                   << "# DEAL_II_PACKAGE_VERSION = " << DEAL_II_PACKAGE_VERSION
                   << std::endl;
           Assert(
-            output_style_for_prm_format == ParameterHandler::Text ||
-              output_style_for_prm_format == ParameterHandler::ShortText,
+            output_style_for_output_filename == ParameterHandler::Text ||
+              output_style_for_output_filename == ParameterHandler::ShortText,
             ExcMessage(
               "Only Text or ShortText can be specified in output_style_for_prm_format."))
-            prm.print_parameters(outfile, output_style_for_prm_format);
+            prm.print_parameters(outfile, output_style_for_output_filename);
         }
       else if (extension == "xml")
-        prm.print_parameters(outfile, ParameterHandler::XML);
+        prm.print_parameters(outfile, output_style_for_output_filename);
       else if (extension == "latex" || extension == "tex")
-        prm.print_parameters(outfile, ParameterHandler::LaTeX);
+        prm.print_parameters(outfile, output_style_for_output_filename);
       else
         AssertThrow(false, ExcNotImplemented());
     }
