@@ -2509,7 +2509,11 @@ namespace Step69
                   output_granularity,
                   "time interval for output");
 
+#ifdef DEAL_II_WITH_THREADS
     asynchronous_writeback = true;
+#else
+    asynchronous_writeback = false;
+#endif
     add_parameter("asynchronous writeback",
                   asynchronous_writeback,
                   "Write out solution in a background thread performing IO");
@@ -2863,9 +2867,17 @@ namespace Step69
     // At this point we can return from the <code>output()</code> function
     // and resume with the time stepping in the main loop - the thread will
     // run in the background.
-    if (!asynchronous_writeback)
+    if (asynchronous_writeback)
       {
+#ifdef DEAL_II_WITH_THREADS
         background_thread_state = std::async(std::launch::async, output_worker);
+#else
+        AssertThrow(
+          false,
+          ExcMessage(
+            "\"asynchronous_writeback\" was set to true but deal.II was built "
+            "without thread support (\"DEAL_II_WITH_THREADS=false\")."));
+#endif
       }
     else
       {
