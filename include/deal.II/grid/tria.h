@@ -1708,30 +1708,32 @@ public:
 
   /**
    * Return a vector containing all boundary indicators assigned to boundary
-   * faces of this Triangulation object. Note, that each boundary indicator is
-   * reported only once. The size of the return vector will represent the
-   * number of different indicators (which is greater or equal one).
+   * faces of active cells of this Triangulation object. Note, that each
+   * boundary indicator is reported only once. The size of the return vector
+   * will represent the number of different indicators (which is greater or
+   * equal one).
    *
    * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  std::vector<types::boundary_id>
+  virtual std::vector<types::boundary_id>
   get_boundary_ids() const;
 
   /**
    * Return a vector containing all manifold indicators assigned to the
-   * objects of this Triangulation. Note, that each manifold indicator is
-   * reported only once. The size of the return vector will represent the
-   * number of different indicators (which is greater or equal one).
+   * objects of the active cells of this Triangulation. Note, that each
+   * manifold indicator is reported only once. The size of the return vector
+   * will represent the number of different indicators (which is greater or
+   * equal one).
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  std::vector<types::manifold_id>
+  virtual std::vector<types::manifold_id>
   get_manifold_ids() const;
 
   /**
