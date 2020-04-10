@@ -1200,7 +1200,7 @@ private:
     // Initialize the hash and keep the first bucket open
     void internal_init() {
         // Initialize the array of segment pointers
-        memset(my_buckets, 0, sizeof(my_buckets));
+        memset((void*)my_buckets, 0, sizeof(my_buckets));
 
         // Initialize bucket 0
         raw_iterator dummy_node = my_solist.raw_begin();
