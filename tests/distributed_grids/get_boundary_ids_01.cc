@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// create a tria mesh and copy it
+// Test parallel::TriangulationBase::get_boundary_ids()
 
 #include <deal.II/distributed/tria.h>
 
@@ -29,7 +29,7 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 4);
 
-  for (auto cell : tria.active_cell_iterators())
+  for (auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
@@ -43,7 +43,7 @@ test()
             cell->face(face)->set_all_boundary_ids(4);
         }
 
-  for (auto i : tria.get_boundary_ids())
+  for (const auto i : tria.get_boundary_ids())
     deallog << i << " ";
   deallog << std::endl;
 }
