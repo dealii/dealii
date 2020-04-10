@@ -1,0 +1,12 @@
+# Listing of Parameters
+# ---------------------
+set assembler       = AMG
+set dim             = 2
+# Number of adaptive refinement steps.
+set n_steps         = 20
+set output          = true
+
+# Select how to refine. Options: global|kelly|estimator
+set refinement type = estimator
+set smoother dampen = 1.0
+set smoother steps  = 2
