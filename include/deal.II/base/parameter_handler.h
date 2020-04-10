@@ -1088,13 +1088,11 @@ public:
   create_default_input_file(const std::string filename,
                             const OutputStyle style) const;
 
-
   /**
    * Clear all contents.
    */
   void
   clear();
-
 
   /**
    * Declare a new entry with name <tt>entry</tt>, default and for which any
