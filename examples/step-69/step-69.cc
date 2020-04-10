@@ -2867,7 +2867,7 @@ namespace Step69
     // At this point we can return from the <code>output()</code> function
     // and resume with the time stepping in the main loop - the thread will
     // run in the background.
-    if (!asynchronous_writeback)
+    if (asynchronous_writeback)
       {
 #ifdef DEAL_II_WITH_THREADS
         background_thread_state = std::async(std::launch::async, output_worker);
