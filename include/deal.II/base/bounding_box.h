@@ -288,26 +288,21 @@ namespace internal
    * value.
    *
    * The convention is the following: Starting from the locked coordinate we
-   * store the lower dimensional coordinates consecutively and wrapping
-   * around when going over the dimension. This relationship can be
-   * described by the following tables:
+   * store the lower dimensional coordinates consecutively and wrap around
+   * when going over the dimension. This relationship is, in 2D,
    *
-   *                        2D
-   * ------------------------------------------------
    * | locked in 2D | 1D coordinate | 2D coordinate |
-   * |--------------------------------------------- |
+   * |:------------:|:-------------:|:-------------:|
    * |     x0       |      (a)      |   (x0,  a)    |
    * |     x1       |      (a)      |   (a , x1)    |
-   * ------------------------------------------------
    *
-   *                       3D
-   * --------------------------------------------------
+   * and, in 3D,
+   *
    * | locked in 3D | 2D coordinates | 3D coordinates |
-   * |----------------------------------------------- |
+   * |:-------------|:--------------:|:--------------:|
    * |     x0       |    (a, b)      | (x0,  a,  b)   |
    * |     x1       |    (a, b)      | ( b, x1,  a)   |
    * |     x2       |    (a, b)      | ( a,  b, x2)   |
-   * --------------------------------------------------
    *
    * Given a locked coordinate, this function maps a coordinate index in dim
    * dimension to a coordinate index in dim + 1 dimensions.
