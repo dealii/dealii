@@ -209,7 +209,7 @@
         </li>
 
         <li> If you are changing part of the <acronym>deal.II</acronym> code itself, you can re-compile the library using only the last two commands above in the previously created build directory. It is also possible to change the configuration used in this
-            directory by calling <code>cmake</code> a second time, possibly with different arguments. However, this sometimes leads to surprising results and you may not get exactly what you were hoping for. For more information, see <a href="users/cmake.html">here</a>.
+            directory by calling <code>cmake</code> a second time, possibly with different arguments. However, this sometimes leads to surprising results and you may not get exactly what you were hoping for. For more information, see <a href="users/cmake_dealii.html">here</a>.
         </li>
 
         <li>
@@ -298,7 +298,7 @@
     <p>
         <acronym>deal.II</acronym> has a large number of optional interfaces to other libraries. <b>By default, <code>cmake</code> will automatically
       enable support  for all external libraries it can find in default
-      paths.</b> However, this behavior can be changed using command line switches to the initial call to <code>cmake</code>. A detailed description can be found here: <a href="users/cmake.html">Detailed build system description</a>.
+      paths.</b> However, this behavior can be changed using command line switches to the initial call to <code>cmake</code>. A detailed description can be found here: <a href="users/cmake_dealii.html">Detailed build system description</a>.
     </p>
 
     <p>
@@ -435,7 +435,7 @@
                 <a href="http://www.netlib.org/lapack/" target="_top">LAPACK</a> (
                 <i>Linear Algebra Package</i>) are two packages that support low-level linear algebra operations on vectors and dense matrices. Both libraries should be packaged by almost all Linux distributions and found automatically whenever available.
                 (You might have to install development versions of the libraries for <acronym>deal.II</acronym> being able to use them). For details on how to set up <acronym>deal.II</acronym> with a non standard BLAS/LAPACK implementation, see the
-                <a href="users/cmake.html#advanced">advanced
+                <a href="users/cmake_dealii.html#advanced">advanced
             setup</a> section in the CMake ReadME.
             </p>
         </dd>
@@ -712,8 +712,8 @@
 
     <p>
         The <acronym>deal.II</acronym> <code>cmake</code> system allows far greater control over what exactly is configured or built than just the outline above. If you want to learn more about this, take a look
-        <a href="users/cmake.html">here</a>. You might also be interested in
-        <a href="users/cmakelists.html">CMake for user projects</a> or
+        <a href="users/cmake_dealii.html">here</a>. You might also be interested in
+        <a href="users/cmake_user.html">CMake for user projects</a> or
         <a href="developers/cmake-internals.html">build system internals</a>.
     </p>
 

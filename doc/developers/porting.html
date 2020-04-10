@@ -45,7 +45,7 @@ DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
 </pre>
           After that try to compile the library with minimal external
           dependencies (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, for
-          further information see the <a href="../users/cmake.html">deal.II CMake
+          further information see the <a href="../users/cmake_dealii.html">deal.II CMake
             documentation</a>).
         <li>
           For adding permanent support for the unknown compiler to the
@@ -212,7 +212,7 @@ make -jN install
       program at the target and then inspect <code>CMakeCache.txt</code>
       or you can obtain the flags using <code>mpic++ --showme:compile</code> and
       <code>mpic++ --showme:link</code>. The remaining configuration can be
-      adjusted at will, see <a href="cmake.html">the documentation</a>. Note
+      adjusted at will, see <a href="../users/cmake_dealii.html">the documentation</a>. Note
       that the <a href="https://en.wikipedia.org/wiki/Rpath">rpaths</a> of the
       examples might not be correct, this can be fixed using
       <code>LD_LIBRARY_PATH</code> or <code>chrpath</code>.

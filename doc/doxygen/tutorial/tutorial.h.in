@@ -54,7 +54,7 @@
  * <code>make run</code>. The latter command also compiles the program if
  * that has not already been done. The CMakeLists.txt files in the
  * different directories are based on the
- * <a href="../../users/cmakelists.html#cmakeauto" target="_top">autopilot
+ * <a href="../../users/cmake_user.html#cmakeauto" target="_top">autopilot
  * style CMakeLists.txt example</a>.
  *
  * @note Some of the tutorial programs also jointly form
