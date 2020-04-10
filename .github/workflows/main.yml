@@ -10,7 +10,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
@@ -38,7 +38,7 @@ jobs:
     runs-on: [macos-latest]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
@@ -67,7 +67,7 @@ jobs:
     runs-on: [macos-latest]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: setup
       run: |
         brew install openmpi
