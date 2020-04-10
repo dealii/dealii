@@ -143,7 +143,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
       This sets up all cached variables prior to the call to
       <code>PROJECT(deal.II)</code>. For details see the comment at the
       top. Furthermore, some bookkeeping for compiler and linker flags
-      takes place, see <a href="../users/cmake.html#configurebuild">the section
+      takes place, see <a href="../users/cmake_dealii.html#configurebuild">the section
         about compile flags</a>.
     <li> <code>setup_deal_ii.cmake</code>:
       This file is included immediately after the call to
@@ -417,7 +417,7 @@ SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
   module is used to determine whether an external dependency can be
   resolved or not. Depending on the current state of
   <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> (see
-  <a href="../users/cmake.html#configurefeature">here</a>) the
+  <a href="../users/cmake_dealii.html#configurefeature">here</a>) the
   configuration variables
 <pre>
 FEATURE_LIBRARIES
