@@ -249,7 +249,8 @@
  *       <td>step-18</td>
  *       <td> A time dependent problem; using a much
  *       simplified version of implementing elasticity; moving meshes; handling
- *       large scale output of parallel programs.
+ *       large scale output of parallel programs. Simple implicit (backward
+ *       Euler) time stepping.
  *       <br/> Keywords: parallel::shared::Triangulation,
  *       DataOutInterface::write_vtu_with_pvtu_record()
  *       </td></tr>
@@ -267,7 +268,8 @@
  *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
- *       complicated block solvers. Simple time stepping.
+ *       complicated block solvers. Simple explicit (forward Euler) time 
+ *       stepping.
  *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
  *       VectorTools::project()
  *       </td></tr>
@@ -285,6 +287,8 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
+ *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson 
+ *       method).
  *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
  *
@@ -292,6 +296,7 @@
  *       <td>step-24</td>
  *       <td> A variant of step-23 with absorbing
  *       boundary conditions, and extracting practically useful data.
+ *       Implicit time stepping.
  *       <br/> Keywords: VectorTools::point_value()
  *       </td></tr>
  *
@@ -300,13 +305,14 @@
  *       <td> The sine-Gordon
  *       soliton equation, which is a nonlinear variant of the time
  *       dependent wave equation covered in step-23 and step-24.
+ *       Fractional time stepping.
  *       <br/> Keywords: FunctionTime, VectorTools::integrate_difference()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-26</td>
  *       <td> The heat equation, solved on a mesh that is adapted
- *       every few time steps.
+ *       every few time steps. Fractional time stepping.
  *       <br/> Keywords: KellyErrorEstimator, SolutionTransfer,
  *       VectorTools::interpolate(), VectorTools::create_right_hand_side()
  *       </td></tr>
@@ -338,20 +344,20 @@
  *       <td>step-31</td>
  *       <td> Time-dependent Stokes flow driven by temperature
  *       differences in a fluid. Adaptive meshes that change between time
- *       steps.
+ *       steps. Implicit/explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-32</td>
  *       <td> A massively parallel solver for time-dependent Stokes flow driven
  *       by temperature differences in a fluid. Adapting methods for real-world
- *       equations.
+ *       equations. Implicit/explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-33</td>
  *       <td> A nonlinear hyperbolic conservation law: The Euler equations of
- *       compressible gas dynamics.
+ *       compressible gas dynamics. Fractional time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -413,11 +419,13 @@
  *   <tr valign="top">
  *       <td>step-43</td>
  *       <td> Advanced techniques for the simulation of porous media flow.
+ *       Explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-44</td>
  *       <td> Finite strain hyperelasticity based on a three-field formulation.
+ *       Implicit time stepping.
  *       <br/> Keywords: CellDataStorage, FEValuesExtractors, WorkStream::run,
  *       BlockSparseMatrix, BlockVector, ComponentSelectFunction,
  *       Physics::Elasticity, FullMatrix::extract_submatrix_from(),
@@ -465,7 +473,7 @@
  *   <tr valign="top">
  *       <td>step-52</td>
  *       <td> Solving the time dependent neutron diffusion equation using
- *       Runge-Kutta methods.
+ *       Runge-Kutta methods. Explicit and implicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -547,13 +555,14 @@
  *       <td>step-67</td>
  *        <td> Solving the Euler equations of compressible gas dynamics with an
  *        explicit time integrator and high-order discontinuous Galerkin
- *        methods based on matrix-free implementations
+ *        methods based on matrix-free implementations.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-69</td>
  *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
- *        wavespeed method for the compressible Euler equations
+ *        wavespeed method for the compressible Euler equations. Explicit time 
+ *        stepping.
  *       </td></tr>
  *
  * </table>
