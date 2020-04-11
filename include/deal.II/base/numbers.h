@@ -27,7 +27,8 @@
 
 #include <cmath>
 #include <complex>
-#include <cstdlib>
+#include <cstddef>
+#include <type_traits>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
