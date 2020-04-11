@@ -2053,7 +2053,6 @@ private:
     DoFHandlers()
       : active_dof_handler(usual)
       , n_dof_handlers(0)
-      , level(numbers::invalid_unsigned_int)
     {}
 
     std::vector<SmartPointer<const DoFHandler<dim>>>     dof_handler;
@@ -2070,7 +2069,6 @@ private:
       hp
     } active_dof_handler;
     unsigned int n_dof_handlers;
-    unsigned int level;
   };
 
   /**

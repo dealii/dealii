@@ -764,7 +764,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
 {
   cell_level_index.clear();
   dof_handlers.active_dof_handler = DoFHandlers::usual;
-  dof_handlers.level              = additional_data.mg_level;
   dof_handlers.n_dof_handlers     = dof_handler.size();
   dof_handlers.dof_handler.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
@@ -831,10 +830,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const std::vector<const hp::DoFHandler<dim> *> &dof_handler,
   const AdditionalData &                          additional_data)
 {
+  (void)additional_data;
+
   cell_level_index.clear();
   dof_handlers.active_dof_handler = DoFHandlers::hp;
-  dof_handlers.level              = additional_data.mg_level;
-  Assert(dof_handlers.level == numbers::invalid_unsigned_int,
+  Assert(additional_data.mg_level == numbers::invalid_unsigned_int,
          ExcNotImplemented());
   dof_handlers.n_dof_handlers = dof_handler.size();
   dof_handlers.hp_dof_handler.resize(dof_handlers.n_dof_handlers);
@@ -1039,7 +1039,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         {
           // read indices from standard DoFHandler in the usual way
           if (dof_handlers.active_dof_handler == DoFHandlers::usual &&
-              dof_handlers.level == numbers::invalid_unsigned_int)
+              additional_data.mg_level == numbers::invalid_unsigned_int)
             {
               const DoFHandler<dim> *dofh = &*dof_handlers.dof_handler[no];
               typename DoFHandler<dim>::active_cell_iterator cell_it(
@@ -1067,10 +1067,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             }
           // we are requested to use a multigrid level
           else if (dof_handlers.active_dof_handler == DoFHandlers::usual &&
-                   dof_handlers.level != numbers::invalid_unsigned_int)
+                   additional_data.mg_level != numbers::invalid_unsigned_int)
             {
               const DoFHandler<dim> *dofh = dof_handlers.dof_handler[no];
-              AssertIndexRange(dof_handlers.level,
+              AssertIndexRange(additional_data.mg_level,
                                dofh->get_triangulation().n_levels());
               typename DoFHandler<dim>::cell_iterator cell_it(
                 &dofh->get_triangulation(),
