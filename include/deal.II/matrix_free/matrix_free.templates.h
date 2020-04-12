@@ -349,171 +349,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename number2>
+template <typename number2, template <int, int> class DoFHandlerType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   const Mapping<dim> &                                   mapping,
-  const std::vector<const DoFHandler<dim> *> &           dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
-  const std::vector<IndexSet> &                          locally_owned_set,
-  const std::vector<hp::QCollection<1>> &                quad,
-  const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
-    &additional_data)
-{
-  // Store the level of the mesh to be worked on.
-  this->mg_level = additional_data.mg_level;
-
-  // Reads out the FE information and stores the shape function values,
-  // gradients and Hessians for quadrature points.
-  {
-    unsigned int n_fe = 0;
-    for (unsigned int no = 0; no < dof_handler.size(); ++no)
-      n_fe += dof_handler[no]->get_fe().n_base_elements();
-    const unsigned int n_quad = quad.size();
-    shape_info.reinit(TableIndices<4>(n_fe, n_quad, 1, 1));
-    for (unsigned int no = 0, c = 0; no < dof_handler.size(); no++)
-      for (unsigned int b = 0; b < dof_handler[no]->get_fe().n_base_elements();
-           ++b, ++c)
-        for (unsigned int nq = 0; nq < n_quad; nq++)
-          {
-            AssertDimension(quad[nq].size(), 1);
-            shape_info(c, nq, 0, 0)
-              .reinit(quad[nq][0], dof_handler[no]->get_fe(), b);
-          }
-  }
-
-  if (additional_data.initialize_indices == true)
-    {
-      clear();
-      Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
-      AssertDimension(dof_handler.size(), constraint.size());
-      AssertDimension(dof_handler.size(), locally_owned_set.size());
-
-      // set variables that are independent of FE
-      if (Utilities::MPI::job_supports_mpi() == true)
-        {
-          const parallel::TriangulationBase<dim> *dist_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim> *>(
-              &(dof_handler[0]->get_triangulation()));
-          task_info.communicator = dist_tria != nullptr ?
-                                     dist_tria->get_communicator() :
-                                     MPI_COMM_SELF;
-          task_info.my_pid =
-            Utilities::MPI::this_mpi_process(task_info.communicator);
-          task_info.n_procs =
-            Utilities::MPI::n_mpi_processes(task_info.communicator);
-        }
-      else
-        {
-          task_info.communicator = MPI_COMM_SELF;
-          task_info.my_pid       = 0;
-          task_info.n_procs      = 1;
-        }
-
-      initialize_dof_handlers(dof_handler, additional_data);
-      for (unsigned int no = 0; no < dof_handler.size(); ++no)
-        {
-          dof_info[no].store_plain_indices =
-            additional_data.store_plain_indices;
-          dof_info[no].global_base_element_offset =
-            no > 0 ? dof_info[no - 1].global_base_element_offset +
-                       dof_handler[no - 1]->get_fe().n_base_elements() :
-                     0;
-        }
-
-        // initialize the basic multithreading information that needs to be
-        // passed to the DoFInfo structure
-#ifdef DEAL_II_WITH_THREADS
-      if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
-          MultithreadInfo::n_threads() > 1)
-        {
-          task_info.scheme =
-            internal::MatrixFreeFunctions::TaskInfo::TasksParallelScheme(
-              static_cast<int>(additional_data.tasks_parallel_scheme));
-          task_info.block_size = additional_data.tasks_block_size;
-        }
-      else
-#endif
-        task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::none;
-
-      // set dof_indices together with constraint_indicator and
-      // constraint_pool_data. It also reorders the way cells are gone through
-      // (to separate cells with overlap to other processors from others
-      // without).
-      initialize_indices(constraint, locally_owned_set, additional_data);
-    }
-
-  // initialize bare structures
-  else if (dof_info.size() != dof_handler.size())
-    {
-      initialize_dof_handlers(dof_handler, additional_data);
-      std::vector<unsigned int>  dummy;
-      std::vector<unsigned char> dummy2;
-      task_info.collect_boundary_cells(cell_level_index.size(),
-                                       cell_level_index.size(),
-                                       VectorizedArrayType::size(),
-                                       dummy);
-      task_info.create_blocks_serial(dummy, 1, dummy, false, dummy, dummy2);
-      for (unsigned int i = 0; i < dof_info.size(); ++i)
-        {
-          dof_info[i].dimension = dim;
-          dof_info[i].n_base_elements =
-            dof_handler[i]->get_fe().n_base_elements();
-          dof_info[i].n_components.resize(dof_info[i].n_base_elements);
-          dof_info[i].start_components.resize(dof_info[i].n_base_elements + 1);
-          for (unsigned int c = 0; c < dof_info[i].n_base_elements; ++c)
-            {
-              dof_info[i].n_components[c] =
-                dof_handler[i]->get_fe().element_multiplicity(c);
-              for (unsigned int l = 0; l < dof_info[i].n_components[c]; ++l)
-                dof_info[i].component_to_base_index.push_back(c);
-              dof_info[i].start_components[c + 1] =
-                dof_info[i].start_components[c] + dof_info[i].n_components[c];
-            }
-          dof_info[i].dofs_per_cell.push_back(
-            dof_handler[i]->get_fe().dofs_per_cell);
-
-          // if indices are not initialized, the cell_level_index might not be
-          // divisible by the vectorization length. But it must be for
-          // mapping_info...
-          while (cell_level_index.size() % VectorizedArrayType::size() != 0)
-            cell_level_index.push_back(cell_level_index.back());
-        }
-    }
-
-  // Evaluates transformations from unit to real cell, Jacobian determinants,
-  // quadrature points in real space, based on the ordering of the cells
-  // determined in @p extract_local_to_global_indices. The algorithm assumes
-  // that the active FE index for the transformations is given the active FE
-  // index in the zeroth DoFHandler. TODO: how do things look like in the more
-  // general case?
-  if (additional_data.initialize_mapping == true)
-    {
-      std::vector<unsigned int> dummy;
-      mapping_info.initialize(
-        dof_handler[0]->get_triangulation(),
-        cell_level_index,
-        face_info,
-        dummy,
-        mapping,
-        quad,
-        additional_data.mapping_update_flags,
-        additional_data.mapping_update_flags_boundary_faces,
-        additional_data.mapping_update_flags_inner_faces,
-        additional_data.mapping_update_flags_faces_by_cells);
-
-      mapping_is_initialized = true;
-    }
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-template <typename number2>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
-  const Mapping<dim> &                                   mapping,
-  const std::vector<const hp::DoFHandler<dim> *> &       dof_handler,
+  const std::vector<const DoFHandlerType<dim, dim> *> &  dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraint,
   const std::vector<IndexSet> &                          locally_owned_set,
   const std::vector<hp::QCollection<1>> &                quad,
@@ -531,9 +371,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       n_components += dof_handler[no]->get_fe(0).n_base_elements();
     const unsigned int n_quad             = quad.size();
     unsigned int       n_fe_in_collection = 0;
-    for (unsigned int i = 0; i < n_components; ++i)
-      n_fe_in_collection = std::max(n_fe_in_collection,
-                                    dof_handler[i]->get_fe_collection().size());
+    for (unsigned int no = 0; no < dof_handler.size(); ++no)
+      n_fe_in_collection =
+        std::max(n_fe_in_collection,
+                 dof_handler[no]->get_fe_collection().size());
     unsigned int n_quad_in_collection = 0;
     for (unsigned int q = 0; q < n_quad; ++q)
       n_quad_in_collection = std::max(n_quad_in_collection, quad[q].size());
@@ -661,7 +502,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
         face_info,
-        dof_info[0].cell_active_fe_index,
+        DoFHandlerType<dim, dim>::is_hp_dof_handler ?
+          dof_info[0].cell_active_fe_index :
+          std::vector<unsigned int>(),
         mapping,
         quad,
         additional_data.mapping_update_flags,
