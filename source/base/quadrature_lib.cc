@@ -136,7 +136,7 @@ namespace internal
 } // namespace internal
 
 
-
+#ifndef DOXYGEN
 template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n)
   : Quadrature<1>(n)
@@ -157,7 +157,7 @@ QGaussLobatto<1>::QGaussLobatto(const unsigned int n)
       this->weights[i]              = 0.5 * w[i];
     }
 }
-
+#endif
 
 
 template <>

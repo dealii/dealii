@@ -308,7 +308,7 @@ Histogram::memory_consumption() const
 }
 
 
-
+#ifndef DOXYGEN
 // explicit instantiations for float
 template void
 Histogram::evaluate<float>(const std::vector<Vector<float>> &values,
@@ -331,5 +331,6 @@ template void
 Histogram::evaluate<double>(const Vector<double> &values,
                             const unsigned int    n_intervals,
                             const IntervalSpacing interval_spacing);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
