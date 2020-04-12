@@ -451,7 +451,7 @@ protected:
  * preconditioner from the right.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
+ * <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
  * vectors. Otherwise, FGMRES requires roughly the same number of operations
  * per iteration compared to GMRES, except one application of the
  * preconditioner less at each restart and at the end of solve().

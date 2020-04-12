@@ -279,11 +279,11 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * This array has (dim-1)*GeometryInfo%<dim%>::%faces_per_cell entries. The
+     * first GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
-     * GeometryInfo::faces_per_cell entries contain the vectors in the second
-     * tangential direction (only in 3d, since there we have 2 tangential
+     * GeometryInfo<dim>::faces_per_cell entries contain the vectors in the
+     * second tangential direction (only in 3d, since there we have 2 tangential
      * directions per face), etc.
      *
      * Filled once.

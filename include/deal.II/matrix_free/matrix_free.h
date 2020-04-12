@@ -1570,7 +1570,7 @@ public:
    * general. The cell range in @p cell_loop runs from zero to n_cell_batches()
    * (exclusive), so this is the appropriate size if you want to store arrays
    * of data for all cells to be worked on. This number is approximately
-   * `n_physical_cells()/VectorizedArray::size()` (depending on how
+   * `n_physical_cells()/VectorizedArray::%size()` (depending on how
    * many cell chunks that do not get filled up completely).
    */
   unsigned int
@@ -1582,7 +1582,7 @@ public:
    * general. The cell range in @p cell_loop runs from zero to
    * n_cell_batches() (exclusive), so this is the appropriate size if you want
    * to store arrays of data for all cells to be worked on. This number is
-   * approximately `n_physical_cells()/VectorizedArray::size()`
+   * approximately `n_physical_cells()/VectorizedArray::%size()`
    * (depending on how many cell chunks that do not get filled up completely).
    */
   unsigned int
