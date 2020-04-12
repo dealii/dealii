@@ -52,7 +52,7 @@ namespace Differentiation
      * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
-     * Mimics the function <code> std::pow(base,exponent) </code> using the
+     * Mimics the function <code> std::%pow(base,exponent) </code> using the
      * standard math library.
      */
     Expression
@@ -62,7 +62,7 @@ namespace Differentiation
      * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
-     * Mimics the function <code> std::pow(base,exponent) </code> using the
+     * Mimics the function <code> std::%pow(base,exponent) </code> using the
      * standard math library.
      *
      * This variant is used when the @p exponent is not a Expression.
@@ -81,7 +81,7 @@ namespace Differentiation
      * Return a symbolic number that represents a @p base value raised to the power of
      * an @p exponent.
      *
-     * Mimics the function <code> std::pow(base,exponent) </code> using the
+     * Mimics the function <code> std::%pow(base,exponent) </code> using the
      * standard math library.
      *
      * This variant is used when the @p base is not a Expression.
@@ -99,7 +99,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the square root of some value @p x.
      *
-     * Mimics the function <code> std::sqrt(x) </code> using the standard math
+     * Mimics the function <code> std::%sqrt(x) </code> using the standard math
      * library.
      */
     Expression
@@ -108,7 +108,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the cubic root of some value @p x.
      *
-     * Mimics the function <code> std::cbrt(x) </code> using the standard math
+     * Mimics the function <code> std::%cbrt(x) </code> using the standard math
      * library.
      */
     Expression
@@ -118,7 +118,7 @@ namespace Differentiation
      * Return a symbolic number that represents the Euler constant
      * $e \approx 2.71828$ raised to the given @p exponent.
      *
-     * Mimics the function <code> std::exp(exponent) </code> using the standard
+     * Mimics the function <code> std::%exp(exponent) </code> using the standard
      * math library.
      */
     Expression
@@ -127,7 +127,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the natural logarithm of a value @p x.
      *
-     * Mimics the function <code> std::log(x) </code> using the standard math
+     * Mimics the function <code> std::%log(x) </code> using the standard math
      * library.
      */
     Expression
@@ -137,7 +137,7 @@ namespace Differentiation
      * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
-     * Mimics the function <code> std::log(x,base) </code> using the standard
+     * Mimics the function <code> std::%log(x,base) </code> using the standard
      * math library.
      */
     Expression
@@ -147,7 +147,7 @@ namespace Differentiation
      * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
-     * Mimics the function <code> std::log(x,base) </code> using the standard
+     * Mimics the function <code> std::%log(x,base) </code> using the standard
      * math library.
      *
      * This variant is used when the @p base is not a Expression.
@@ -166,7 +166,7 @@ namespace Differentiation
      * Return a symbolic number that represents the logarithm of a value @p x taken with
      * respect to a @p base number.
      *
-     * Mimics the function <code> std::log(x,base) </code> using the standard
+     * Mimics the function <code> std::%log(x,base) </code> using the standard
      * math library.
      *
      * This variant is used when the @p value is not a Expression.
@@ -184,7 +184,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the base 10 logarithm of a value @p x.
      *
-     * Mimics the function <code> std::log10(x) </code> using the standard math
+     * Mimics the function <code> std::%log10(x) </code> using the standard math
      * library.
      */
     Expression
@@ -201,7 +201,7 @@ namespace Differentiation
      * Return a symbolic number that represents the sine function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::sin(x) </code> using the standard math
+     * Mimics the function <code> std::%sin(x) </code> using the standard math
      * library.
      */
     Expression
@@ -211,7 +211,7 @@ namespace Differentiation
      * Return a symbolic number that represents the cosine function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::cos(x) </code> using the standard math
+     * Mimics the function <code> std::%cos(x) </code> using the standard math
      * library.
      */
     Expression
@@ -221,7 +221,7 @@ namespace Differentiation
      * Return a symbolic number that represents the tangent function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::tan(x) </code> using the standard math
+     * Mimics the function <code> std::%tan(x) </code> using the standard math
      * library.
      */
     Expression
@@ -231,7 +231,7 @@ namespace Differentiation
      * Return a symbolic number that represents the cosecant function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::sin(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%sin(x) </code> using the standard
      * math library.
      */
     Expression
@@ -241,7 +241,7 @@ namespace Differentiation
      * Return a symbolic number that represents the secant function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::cos(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%cos(x) </code> using the standard
      * math library.
      */
     Expression
@@ -251,7 +251,7 @@ namespace Differentiation
      * Return a symbolic number that represents the cotangent function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::tan(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%tan(x) </code> using the standard
      * math library.
      */
     Expression
@@ -262,7 +262,7 @@ namespace Differentiation
      * the
      * given argument @p x.
      *
-     * Mimics the function <code> std::asin(x) </code> using the standard math
+     * Mimics the function <code> std::%asin(x) </code> using the standard math
      * library.
      */
     Expression
@@ -273,7 +273,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::acos(x) </code> using the standard math
+     * Mimics the function <code> std::%acos(x) </code> using the standard math
      * library.
      */
     Expression
@@ -284,7 +284,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::atan(x) </code> using the standard math
+     * Mimics the function <code> std::%atan(x) </code> using the standard math
      * library.
      */
     Expression
@@ -295,7 +295,7 @@ namespace Differentiation
      * with the
      * given arguments @p x and @p y.
      *
-     * Mimics the function <code> std::atan2(y,x) </code> using the standard
+     * Mimics the function <code> std::%atan2(y,x) </code> using the standard
      * math library.
      */
     Expression
@@ -306,7 +306,7 @@ namespace Differentiation
      * with the
      * given arguments @p x and @p y.
      *
-     * Mimics the function <code> std::atan2(y,x) </code> using the standard
+     * Mimics the function <code> std::%atan2(y,x) </code> using the standard
      * math library.
      *
      * This variant is used when the numerator @p y is not a Expression.
@@ -326,7 +326,7 @@ namespace Differentiation
      * with the
      * given arguments @p x and @p y.
      *
-     * Mimics the function <code> std::atan2(y,x) </code> using the standard
+     * Mimics the function <code> std::%atan2(y,x) </code> using the standard
      * math library.
      *
      * This variant is used when the denominator @p x is not a Expression.
@@ -346,7 +346,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::asin(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%asin(x) </code> using the standard
      * math library.
      */
     Expression
@@ -357,7 +357,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::acos(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%acos(x) </code> using the standard
      * math library.
      */
     Expression
@@ -368,7 +368,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::atan(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%atan(x) </code> using the standard
      * math library.
      */
     Expression
@@ -386,7 +386,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::sinh(x) </code> using the standard math
+     * Mimics the function <code> std::%sinh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -397,7 +397,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::cosh(x) </code> using the standard math
+     * Mimics the function <code> std::%cosh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -408,7 +408,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::tanh(x) </code> using the standard math
+     * Mimics the function <code> std::%tanh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -419,7 +419,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::sinh(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%sinh(x) </code> using the standard
      * math library.
      */
     Expression
@@ -430,7 +430,7 @@ namespace Differentiation
      * with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::cosh(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%cosh(x) </code> using the standard
      * math library.
      */
     Expression
@@ -441,7 +441,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::tanh(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%tanh(x) </code> using the standard
      * math library.
      */
     Expression
@@ -452,7 +452,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::asinh(x) </code> using the standard math
+     * Mimics the function <code> std::%asinh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -463,7 +463,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::acosh(x) </code> using the standard math
+     * Mimics the function <code> std::%acosh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -474,7 +474,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::atanh(x) </code> using the standard math
+     * Mimics the function <code> std::%atanh(x) </code> using the standard math
      * library.
      */
     Expression
@@ -485,7 +485,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::asin(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%asin(x) </code> using the standard
      * math library.
      */
     Expression
@@ -496,7 +496,7 @@ namespace Differentiation
      * function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::acos(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%acos(x) </code> using the standard
      * math library.
      */
     Expression
@@ -507,7 +507,7 @@ namespace Differentiation
      * cotangent function with the
      * given argument @p x.
      *
-     * Mimics the function <code> 1.0/std::atan(x) </code> using the standard
+     * Mimics the function <code> 1.0/std::%atan(x) </code> using the standard
      * math library.
      */
     Expression
@@ -523,7 +523,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the absolute value of value @p x.
      *
-     * Mimics the function <code> std::abs(x) </code> using the standard math
+     * Mimics the function <code> std::%abs(x) </code> using the standard math
      * library.
      */
     Expression
@@ -533,7 +533,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the absolute value of value @p x.
      *
-     * Mimics the function <code> std::fabs(x) </code> using the standard math
+     * Mimics the function <code> std::%fabs(x) </code> using the standard math
      * library.
      */
     Expression
@@ -555,7 +555,7 @@ namespace Differentiation
      * Return a symbolic number that represents the @p value of the first
      * argument that takes the @p sign of the second argument.
      *
-     * Mimics the function <code> std::copysign(value, sign) </code> using
+     * Mimics the function <code> std::%copysign(value, sign) </code> using
      * the standard math library.
      */
     Expression
@@ -565,7 +565,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the floor of value @p x.
      *
-     * Mimics the function <code> std::floor(x) </code> using the standard math
+     * Mimics the function <code> std::%floor(x) </code> using the standard math
      * library.
      */
     Expression
@@ -575,7 +575,7 @@ namespace Differentiation
     /**
      * Return a symbolic number that represents the ceiling of value @p x.
      *
-     * Mimics the function <code> std::ceil(x) </code> using the standard math
+     * Mimics the function <code> std::%ceil(x) </code> using the standard math
      * library.
      */
     Expression
@@ -585,7 +585,7 @@ namespace Differentiation
      * Return a symbolic number that represents the maximum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::max(a,b) </code> using the standard math
+     * Mimics the function <code> std::%max(a,b) </code> using the standard math
      * library.
      */
     Expression
@@ -595,7 +595,7 @@ namespace Differentiation
      * Return a symbolic number that represents the maximum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::max(a,b) </code> using the standard math
+     * Mimics the function <code> std::%max(a,b) </code> using the standard math
      * library.
      *
      * This variant is used when @p b is not a Expression.
@@ -614,7 +614,7 @@ namespace Differentiation
      * Return a symbolic number that represents the maximum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::max(a,b) </code> using the standard math
+     * Mimics the function <code> std::%max(a,b) </code> using the standard math
      * library.
      *
      * This variant is used when @p a is not a Expression.
@@ -633,7 +633,7 @@ namespace Differentiation
      * Return a symbolic number that represents the minimum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::min(a,b) </code> using the standard math
+     * Mimics the function <code> std::%min(a,b) </code> using the standard math
      * library.
      */
     Expression
@@ -643,7 +643,7 @@ namespace Differentiation
      * Return a symbolic number that represents the minimum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::min(a,b) </code> using the standard math
+     * Mimics the function <code> std::%min(a,b) </code> using the standard math
      * library.
      *
      * This variant is used when @p b is not a Expression.
@@ -662,7 +662,7 @@ namespace Differentiation
      * Return a symbolic number that represents the minimum of two
      * values @p a and @p b.
      *
-     * Mimics the function <code> std::min(a,b) </code> using the standard math
+     * Mimics the function <code> std::%min(a,b) </code> using the standard math
      * library.
      *
      * This variant is used when @p a is not a Expression.
@@ -681,7 +681,7 @@ namespace Differentiation
      * Return a symbolic number that represents error function with the
      * given argument @p x.
      *
-     * Mimics the function <code> std::erf(x) </code> using the standard math
+     * Mimics the function <code> std::%erf(x) </code> using the standard math
      * library.
      */
     Expression
@@ -691,7 +691,7 @@ namespace Differentiation
      * Return a symbolic number that represents complimentary error function
      * with the given argument @p x.
      *
-     * Mimics the function <code> std::erfc(x) </code> using the standard math
+     * Mimics the function <code> std::%erfc(x) </code> using the standard math
      * library.
      */
     Expression
