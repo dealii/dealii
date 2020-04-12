@@ -533,7 +533,7 @@ namespace internal
 
 
 /**
- * Declare dealii::BlockVector< Number > as serial vector.
+ * Declare dealii::BlockVector as serial vector.
  *
  * @author Uwe Koecher, 2017
  */

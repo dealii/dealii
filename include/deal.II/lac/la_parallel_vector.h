@@ -1733,7 +1733,7 @@ swap(LinearAlgebra::distributed::Vector<Number, MemorySpace> &u,
 
 
 /**
- * Declare dealii::LinearAlgebra::Vector< Number > as distributed vector.
+ * Declare dealii::LinearAlgebra::Vector as distributed vector.
  *
  * @author Uwe Koecher, 2017
  */
@@ -1753,7 +1753,7 @@ namespace internal
 
     /**
      * A helper class used internally in linear_operator.h. Specialization for
-     * LinearAlgebra::distributed::Vector<Number>.
+     * LinearAlgebra::distributed::Vector.
      */
     template <typename Number>
     class ReinitHelper<LinearAlgebra::distributed::Vector<Number>>
