@@ -2371,7 +2371,7 @@ namespace Step32
   // The task to be performed by the next three functions is to calculate a
   // mass matrix and a Laplace matrix on the temperature system. These will be
   // combined in order to yield the semi-implicit time stepping matrix that
-  // consists of the mass matrix plus a time step-dependent weight factor
+  // consists of the mass matrix plus a time \step-dependent weight factor
   // times the Laplace matrix. This function is again essentially the body of
   // the loop over all cells from step-31.
   //
@@ -2649,7 +2649,7 @@ namespace Step32
   // In the function that runs the WorkStream for actually calculating the
   // right hand side, we also generate the final matrix. As mentioned above,
   // it is a sum of the mass matrix and the Laplace matrix, times some time
-  // step-dependent weight. This weight is specified by the BDF-2 time
+  // \step-dependent weight. This weight is specified by the BDF-2 time
   // integration scheme, see the introduction in step-31. What is new in this
   // tutorial program (in addition to the use of MPI parallelization and the
   // WorkStream class), is that we now precompute the temperature

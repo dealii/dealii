@@ -119,7 +119,7 @@
  *    truncation of the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative,
  *    while for the complex-step method these existent higher-order terms are neglected. It can be shown that
  *    both of these methods are not subject to subtractive cancellation errors and that, within their
- *    finite-difference scheme, they are not numerically sensitive to the internal step-size chosen for the
+ *    finite-difference scheme, they are not numerically sensitive to the internal \step-size chosen for the
  *    numerical perturbation. The dual number approach thus produces exact first derivatives, while the
  *    complex-step approximation does not. The standard implementation of the dual numbers, however, cannot yield
  *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with numbers
