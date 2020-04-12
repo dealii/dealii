@@ -1250,8 +1250,8 @@ namespace Step69
     //
     // We have one more difficulty to overcome: In order to implement the
     // <code>on_subranges</code> lambda we need to name the iterator type
-    // of the object returned by <code>boost::irange<unsigned
-    // int>()</code>. This is unfortunately a very convoluted name exposing
+    // of the object returned by <code>boost::irange%<unsigned
+    // int%>()</code>. This is unfortunately a very convoluted name exposing
     // implementation details about <code>boost::irange</code>. For this
     // reason we resort to the <a
     // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
@@ -1314,7 +1314,7 @@ namespace Step69
     // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ on the entirety of the
     // boundary we should preserve the density and total (mechanical)
     // energy. This requires us to modify the $\mathbf{c}_{ij}$ vectors at
-    // the boundary as follows @cite GuermondEtAl2018:
+    // the boundary as follows @cite GuermondEtAl2018 :
     //
     // @f{align*}
     // \mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}

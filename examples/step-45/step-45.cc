@@ -428,7 +428,7 @@ namespace Step45
       // For setting up the constraints, we first store the periodicity
       // information in an auxiliary object of type
       // <code>std::vector@<GridTools::PeriodicFacePair<typename
-      // DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries
+      // DoFHandler@<dim@>::%cell_iterator@> </code>. The periodic boundaries
       // have the boundary indicators 2 (x=0) and 3 (y=0). All the other
       // parameters we have set up before. In this case the direction does not
       // matter. Due to $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is

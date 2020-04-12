@@ -1483,7 +1483,7 @@ namespace Step18
   // points, see @ref GlossSupport "support points"). For such a case, one
   // could construct a custom quadrature rule using
   // FiniteElement::get_unit_support_points(). The first
-  // <code>GeometryInfo@<dim@>::vertices_per_cell*fe.dofs_per_vertex</code>
+  // <code>GeometryInfo@<dim@>::%vertices_per_cell*fe.dofs_per_vertex</code>
   // quadrature points will then correspond to the vertices of the cell and
   // are ordered consistent with <code>cell-@>vertex(i)</code>, taking into
   // account that support points for vector elements will be duplicated

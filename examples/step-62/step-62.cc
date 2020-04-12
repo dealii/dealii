@@ -66,7 +66,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 // We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function `ElasticWave<dim>::store_frequency_step_data()`
+// that we use in the function `ElasticWave::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
 
 namespace step62
