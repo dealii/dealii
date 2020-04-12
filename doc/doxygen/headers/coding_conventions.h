@@ -225,12 +225,12 @@ instantiate these functions for any other template arguments anyway. </li>
 <li> If we can not enumerate all possible template arguments (e.g., vector
 types -- because users might want to define their own vector kinds) but at
 least know a few common usage cases, then the function is put into a
-<code>.templates.h</code> file. We #include it into the <code>.cc</code> file
+<code>.templates.h</code> file. We \#include it into the <code>.cc</code> file
 and instantiate the functions for all of the common arguments. For almost all
 users, this will be just fine -- they only use the (vector, matrix, ...) types
 we already instantiate, and for them the <code>.templates.h</code> file will not
 be of any interest. It will also not slow down their compilations because
-nothing they see will #include the <code>.templates.h</code> file. But users who
+nothing they see will \#include the <code>.templates.h</code> file. But users who
 define their own (vector, matrix, ...) types can instantiate the template
 functions with their own user-defined types by including the
 <code>.templates.h</code> files.
@@ -238,8 +238,8 @@ functions with their own user-defined types by including the
 <li> Finally, if we can not assume in advance which values template arguments
 will take (e.g., any class derived from Subscriptor can be used as an argument),
 the definitions of functions are provided at the bottom of the header
-file with declarations. The definitions should be guarded with <code>#ifndef
-DOXYGEN ... #endif</code> to prevent Doxygen from picking them up.</li>
+file with declarations. The definitions should be guarded with <code>\#ifndef
+DOXYGEN ... \#endif</code> to prevent Doxygen from picking them up.</li>
 
 </ol>
 

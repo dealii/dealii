@@ -73,7 +73,7 @@ inconvenience this causes.
        elements of a matrix or vector to zero without changing its size, the
        recommended way is to use the more obvious notation <code>vector=0</code> and <code>matrix=0</code>. To
        reset the elements of a table over arbitrary objects, use
-       <code>Table&lt;T&gt;::reset_values()</code>.
+       <code>Table::reset_values()</code>.
        <br>
        (WB 2004/05/10)
        </p>
@@ -136,8 +136,9 @@ inconvenience this causes.
   <li> <p> Moved and changed: The header file
        <tt>include/numerics/dof_renumbering.h</tt> has been moved to the
        directory <tt>include/dofs</tt>, where it logically
-       belongs. Furthermore, the sorting parameter of the function <code>DoFRenumbering</code><code>::component_wise</code> has changed its meaning. See
-       the reference documentation for details.
+       belongs. Furthermore, the sorting parameter of the function
+       <code>DoFRenumbering::component_wise()</code> has changed its meaning.
+       See the reference documentation for details.
        <br>
        (GK 2003/07/03)
        </p>

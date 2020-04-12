@@ -130,7 +130,7 @@ inconvenience this causes.
   <li> Changed: The project configuration no longer exports
   <code>[...]/include/deal.II</code>. Thus it is now mandatory to prefix
   all includes of deal.II headers with <code>deal.II/</code>, i.e.
-  <code>#include &lt;deal.II/[...]&gt;</code>.
+  <code>\#include &lt;deal.II/[...]&gt;</code>.
   <br>
   (Matthias Maier, 2015/01/19)
   </li>
@@ -244,7 +244,7 @@ inconvenience this causes.
     classes. You should use the versions with a VectorOperation
     argument instead.
   - Vector::scale.
-  - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
+  - TrilinosWrappers::*Vector*::%compress with an Epetra_CombineMode
     argument.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
@@ -1060,7 +1060,7 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/01/16)
   </li>
 
-  <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU
+  <li> New: MultithreadInfo::n_cpus() returns the correct number of CPU
   on FreeBSD.
   <br>
   (Bruno Turcksin, 2015/01/14)

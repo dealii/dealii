@@ -301,7 +301,7 @@ digraph G
  * access is thus not linear. Furthermore, the support for multi-component
  * systems becomes transparent if we provide a <i>start index</i> to every
  * single component separately. Thus, the `row_starts` field is of length
- * `n_cell_batches()*VectorizedArray<Number>::size()*n_components`.
+ * `n_cell_batches()*VectorizedArray<Number>::%size()*n_components`.
  * </li>
  * <li> The translation between components within a system of multiple base
  * elements is controlled by the four variables

@@ -374,8 +374,6 @@
  * parallel::distributed::Triangulation .
  * </dd>
  *
- * @see @ref boundary "The module on boundaries".
- *
  *
  * <dt class="glossary">@anchor GlossCoarseMesh <b>Coarse mesh</b></dt>
  * <dd>
@@ -707,7 +705,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossDimension <b>Dimensions @p dim and @p spacedim</b></dt>
+ * <dt class="glossary">@anchor GlossDimension <b>Dimensions `dim` and `spacedim`</b></dt>
  *
  * <dd> Many classes and functions in deal.II have two template parameters,
  * @p dim and @p spacedim. An example is the basic Triangulation class:
@@ -715,7 +713,7 @@
  *   template <int dim, int spacedim=dim>
  *   class Triangulation {...};
  * @endcode
- * In all of these contexts where you see @p dim and @p spacedim referenced,
+ * In all of these contexts where you see `dim` and `spacedim` referenced,
  * these arguments have the following meaning:
  *
  * <ul>

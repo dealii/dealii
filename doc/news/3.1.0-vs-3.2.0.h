@@ -704,8 +704,9 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: <code>FE*Values::get_quadrature</code>
-       returns a reference to the quadrature formula used by a
+       New: <code>FEValues::get_quadrature()</code> and
+       <code>FEFaceValuesBase::get_quadrature()</code>
+       return a reference to the quadrature formula used by a
        FEValues object.
        <br>
        (WB 2001/06/21)
