@@ -798,11 +798,11 @@ namespace DoFTools
    * allowing constraints to be imposed on the continuous part while also
    * building the flux terms needed for the discontinuous part.
    *
-   * The optional @param face_has_flux_coupling can be used to specify on which
+   * The optional @p face_has_flux_coupling can be used to specify on which
    * faces flux couplings occur. This allows for creating a sparser pattern when
    * using a bilinear form where flux terms only appear on a subset of the faces
    * in the triangulation. By default flux couplings are added over all internal
-   * faces. @param face_has_flux_coupling should be a function that takes an
+   * faces. @p face_has_flux_coupling should be a function that takes an
    * active_cell_iterator and a face index and should return true if there is a
    * flux coupling over the face. When using the ::dealii::DoFHandler we could,
    * for example, use
