@@ -367,6 +367,8 @@ public:
    * This function is a front-end for the same function in
    * MGTransferBlockBase.
    *
+   * @param dof The DoFHandler for the active degrees of freedom to use.
+   * @param mg_dof The DoFHandler for the level degrees of freedom to use.
    * @param selected Number of the block of the global vector to be copied from
    * and to the multilevel vector.
    *
