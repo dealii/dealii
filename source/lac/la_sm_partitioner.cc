@@ -34,6 +34,14 @@ namespace LinearAlgebra
         std::vector<unsigned int> recv_indices;
         std::vector<unsigned int> recv_len;
 
+        //        for(auto i : recv_sm_ptr)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+        //
+        //        for(auto i : recv_sm_indices)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+
         for (unsigned int i = 0; i + 1 < recv_sm_ptr.size(); i++)
           {
             if (recv_sm_ptr[i] != recv_sm_ptr[i + 1])
@@ -56,9 +64,24 @@ namespace LinearAlgebra
             recv_ptr.push_back(recv_indices.size());
           }
 
-        recv_sm_ptr     = recv_ptr;
+        recv_sm_ptr = recv_ptr;
+        recv_sm_ptr.shrink_to_fit();
         recv_sm_indices = recv_indices;
-        recv_sm_len     = recv_len;
+        recv_sm_indices.shrink_to_fit();
+        recv_sm_len = recv_len;
+        recv_sm_len.shrink_to_fit();
+
+        //        for(auto i : recv_sm_ptr)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+        //
+        //        for(auto i : recv_sm_indices)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+        //
+        //        for(auto i : recv_sm_len)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
       }
     } // namespace internal
 
@@ -260,6 +283,10 @@ namespace LinearAlgebra
                     MPI_STATUSES_IGNORE);
       }
 
+      const auto a =
+        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
+                            this->comm);
+
 #if DO_COMPRESS
       internal::compress(recv_sm_ptr, recv_sm_indices, recv_sm_len);
 #endif
@@ -283,6 +310,12 @@ namespace LinearAlgebra
 #if DO_COMPRESS
       internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
 #endif
+
+      const auto b =
+        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
+                            this->comm);
+
+      std::cout << "memory_consumption " << a << " " << b << std::endl;
     }
 
     template <typename Number>
@@ -549,6 +582,29 @@ namespace LinearAlgebra
     Partitioner::n_mpi_processes() const
     {
       return n_mpi_processes_;
+    }
+
+    std::size_t
+    Partitioner::memory_consumption() const
+    {
+      return 0                                                            //
+             + MemoryConsumption::memory_consumption(recv_remote_ranks)   //
+             + MemoryConsumption::memory_consumption(recv_remote_ptr)     //
+             + MemoryConsumption::memory_consumption(recv_sm_ranks)       //
+             + MemoryConsumption::memory_consumption(recv_sm_ptr)         //
+             + MemoryConsumption::memory_consumption(recv_sm_indices)     //
+             + MemoryConsumption::memory_consumption(recv_sm_len)         //
+             + MemoryConsumption::memory_consumption(recv_sm_offset)      //
+             + MemoryConsumption::memory_consumption(send_remote_ptr)     //
+             + MemoryConsumption::memory_consumption(send_remote_indices) //
+             + MemoryConsumption::memory_consumption(send_remote_len)     //
+             + MemoryConsumption::memory_consumption(send_remote_offset)  //
+             + MemoryConsumption::memory_consumption(send_sm_ranks)       //
+             + MemoryConsumption::memory_consumption(send_sm_ptr)         //
+             + MemoryConsumption::memory_consumption(send_sm_indices)     //
+             + MemoryConsumption::memory_consumption(send_sm_len)         //
+             + MemoryConsumption::memory_consumption(send_sm_offset)      //
+        ;
     }
 
   } // end of namespace SharedMPI

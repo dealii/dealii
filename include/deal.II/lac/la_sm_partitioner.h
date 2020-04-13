@@ -101,6 +101,9 @@ namespace LinearAlgebra
       std::size_t
       n_mpi_processes() const;
 
+      std::size_t
+      memory_consumption() const;
+
     private:
       const MPI_Comm &comm;
       const MPI_Comm &comm_sm;
