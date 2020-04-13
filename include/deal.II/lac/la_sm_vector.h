@@ -125,6 +125,8 @@ namespace LinearAlgebra
 
       Vector();
 
+      Vector(const bool do_ghost_value_update, const bool do_compress);
+
       Vector(const Vector<Number, MemorySpace> &in_vector);
 
       Vector(const size_type size);
@@ -494,6 +496,9 @@ namespace LinearAlgebra
       mutable dealii::AlignedVector<Number> import_data;
 
       mutable bool vector_is_ghosted;
+
+      bool do_ghost_value_update = true;
+      bool do_compress           = true;
 
       mutable std::mutex mutex;
 

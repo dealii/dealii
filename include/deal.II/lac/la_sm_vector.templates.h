@@ -280,6 +280,17 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(const bool do_ghost_value_update,
+                                            const bool do_compress)
+      : partitioner_old(new Utilities::MPI::Partitioner())
+      , allocated_size(0)
+      , do_ghost_value_update(do_ghost_value_update)
+      , do_compress(do_compress)
+    {}
+
+
+
+    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(
       const Vector<Number, MemorySpaceType> &v)
       : Subscriptor()
@@ -520,10 +531,12 @@ namespace LinearAlgebra
              ExcNotImplemented());
       Assert(vector_is_ghosted == false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
-      partitioner->compress_start(data.values.get(),
-                                  data.others,
-                                  import_data,
-                                  communication_channel);
+
+      if (do_compress)
+        partitioner->compress_start(data.values.get(),
+                                    data.others,
+                                    import_data,
+                                    communication_channel);
     }
 
 
@@ -536,7 +549,10 @@ namespace LinearAlgebra
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
       vector_is_ghosted = false;
-      partitioner->compress_finish(data.values.get(), data.others, import_data);
+      if (do_compress)
+        partitioner->compress_finish(data.values.get(),
+                                     data.others,
+                                     import_data);
     }
 
 
@@ -546,10 +562,11 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::update_ghost_values_start(
       const unsigned int communication_channel) const
     {
-      partitioner->update_ghost_values_start(data.values.get(),
-                                             data.others,
-                                             import_data,
-                                             communication_channel);
+      if (do_ghost_value_update)
+        partitioner->update_ghost_values_start(data.values.get(),
+                                               data.others,
+                                               import_data,
+                                               communication_channel);
     }
 
 
@@ -558,9 +575,10 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::update_ghost_values_finish() const
     {
-      partitioner->update_ghost_values_finish(data.values.get(),
-                                              data.others,
-                                              import_data);
+      if (do_ghost_value_update)
+        partitioner->update_ghost_values_finish(data.values.get(),
+                                                data.others,
+                                                import_data);
       vector_is_ghosted = true;
     }
 
