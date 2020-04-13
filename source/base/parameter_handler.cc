@@ -20,6 +20,7 @@
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -509,13 +510,38 @@ ParameterHandler::parse_input(std::istream &     input,
 void
 ParameterHandler::parse_input(const std::string &filename,
                               const std::string &last_line,
-                              const bool         skip_undefined)
+                              const bool         skip_undefined,
+                              const bool assert_mandatory_entries_are_found)
 {
-  PathSearch search("PARAMETERS");
+  std::filebuf fb;
+  if (fb.open(filename, std::ios::in))
+    {
+      std::istream is(&fb);
+      std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
+      boost::algorithm::to_lower(file_ending);
+      if (file_ending == "prm")
+        parse_input(is, filename, last_line, skip_undefined);
+      else if (file_ending == "xml")
+        parse_input_from_xml(is, skip_undefined);
+      else if (file_ending == "json")
+        parse_input_from_json(is, skip_undefined);
+      else
+        AssertThrow(
+          false,
+          ExcMessage(
+            "Unknown input file. Supported types are .prm, .xml, and .json."));
 
-  std::string   openname = search.find(filename);
-  std::ifstream file_stream(openname.c_str());
-  parse_input(file_stream, filename, last_line, skip_undefined);
+      fb.close();
+    }
+  else
+    {
+      AssertThrow(false,
+                  ExcMessage("Invalid filename " + filename +
+                             " provided. File does not exist."));
+    }
+
+  if (assert_mandatory_entries_are_found)
+    assert_that_entries_have_been_set();
 }
 
 

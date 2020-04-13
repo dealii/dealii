@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ParameterHandler>
+<int1><value>1</value></int1>
+<int2><value>2</value></int2>
+  <dummy>
+    <int3><value>3</value></int3>
+    <int4><value>4</value></int4>
+  </dummy>
+<int5><value>5</value></int5>
+<int6><value>6</value></int6>
+  <dummy2>
+    <int7><value>7</value></int7>
+    <int8><value>8</value></int8>
+  </dummy2>
+</ParameterHandler>

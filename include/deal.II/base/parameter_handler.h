@@ -965,52 +965,31 @@ public:
               const bool         skip_undefined = false);
 
   /**
-   * Parse the given file to provide values for known parameter fields. The
-   * PathSearch class "PARAMETERS" is used to find the file.
+   * Parse input from a specified parameter file @param filename independently
+   * of the type of input file (prm, xml, json) being used. The code path
+   * selected by this function is extracted from the ending of the filename,
+   * so the user has to make sure that the content of the input file is
+   * consistent with its name.
    *
-   * The function in essence reads the entire file into a stream and
-   * then calls the other parse_input() function with that stream. See
-   * there for more information.
+   * The parameter @p last_line will only be used for parameter files of .prm type.
+   * See the other parse_input function for documentation.
    *
-   * Previous versions of deal.II included a similar function named
-   * <code>read_input</code> which, if the parameter file could not be found
-   * by PathSearch::find, would not modify the calling ParameterHandler (i.e.,
-   * the parameters would all be set to their default values) and would
-   * (optionally) create a parameter file with default values. In order to
-   * obtain that behavior one should catch the PathSearch::ExcFileNotFound
-   * exception and then optionally call ParameterHandler::print_parameters,
-   * e.g.,
+   * The user can specify whether parameters in the input file not added to the
+   * parameter handler will be skipped by @p skip_undefined (enables partial
+   * parsing), and whether the code will assert that all parameters of the
+   * parameter handler declared with flag `has_to_be_set=true` are indeed found
+   * in the input file.
    *
-   * @code
-   * const std::string filename = "parameters.prm";
-   * const bool print_default_prm_file = true;
-   * try
-   *   {
-   *     parameter_handler.parse_input (filename);
-   *   }
-   * catch (const PathSearch::ExcFileNotFound &)
-   *   {
-   *     std::cerr << "ParameterHandler::parse_input: could not open file <"
-   *               << filename
-   *               << "> for reading."
-   *               << std::endl;
-   *     if (print_default_prm_file)
-   *       {
-   *         std::cerr << "Trying to make file <"
-   *                   << filename
-   *                   << "> with default values for you."
-   *                   << std::endl;
-   *         std::ofstream output (filename);
-   *         parameter_handler.print_parameters(
-   *           output, ParameterHandler::OutputStyle::Text);
-   *       }
-   *   }
-   * @endcode
+   * If the function is called with `skip_undefined=true`, it is recommended to
+   * also set `assert_mandatory_entries_are_found=true`. For example, this
+   * ensures that parameters with typos in the input file will not be skipped,
+   * while such mistakes would otherwise remain unrecognized.
    */
   virtual void
   parse_input(const std::string &filename,
-              const std::string &last_line      = "",
-              const bool         skip_undefined = false);
+              const std::string &last_line                          = "",
+              const bool         skip_undefined                     = false,
+              const bool         assert_mandatory_entries_are_found = false);
 
   /**
    * Parse input from a string to populate known parameter fields. The lines
