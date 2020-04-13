@@ -2150,34 +2150,6 @@ public:
   has_generalized_support_points() const;
 
   /**
-   * Return the equivalent to get_generalized_support_points(), except
-   * for faces.
-   *
-   * @deprecated In general, it is not possible to associate a unique
-   * subset of generalized support points describing degrees of freedom for
-   * a given face. Don't use this function
-   */
-  DEAL_II_DEPRECATED
-  const std::vector<Point<dim - 1>> &
-  get_generalized_face_support_points() const;
-
-  /**
-   * Return whether a finite element has defined generalized support points on
-   * faces. If the result is true, then a call to the
-   * get_generalized_face_support_points() function yields a non-empty array.
-   *
-   * For more information, see the documentation for the has_support_points()
-   * function.
-   *
-   * @deprecated In general, it is not possible to associate a unique
-   * subset of generalized support points describing degrees of freedom for
-   * a given face. Don't use this function
-   */
-  DEAL_II_DEPRECATED
-  bool
-  has_generalized_face_support_points() const;
-
-  /**
    * For a given degree of freedom, return whether it is logically associated
    * with a vertex, line, quad or hex.
    *

@@ -607,7 +607,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   // which returns the support
   // points on the face.
   Quadrature<dim - 1> quad_face_support(
-    source_fe.get_generalized_face_support_points());
+    source_fe.generalized_face_support_points);
 
   // Rule of thumb for FP accuracy,
   // that can be expected for a
@@ -711,7 +711,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // which returns the support
   // points on the face.
   Quadrature<dim - 1> quad_face_support(
-    source_fe.get_generalized_face_support_points());
+    source_fe.generalized_face_support_points);
 
   // Rule of thumb for FP accuracy,
   // that can be expected for a

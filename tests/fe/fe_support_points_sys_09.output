@@ -33,7 +33,3 @@ DEAL::0.211 0.211
 DEAL::0.789 0.211
 DEAL::0.211 0.789
 DEAL::0.789 0.789
-DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 0 generalized support points
-DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 1 generalized support points
-DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 2 generalized support points
-DEAL::FE_DGQ<2>(3)1FE_Nedelec<2>(1)2<2> face 3 generalized support points

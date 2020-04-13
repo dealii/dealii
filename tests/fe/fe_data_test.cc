@@ -255,9 +255,6 @@ test_fe_datas()
               << fe_data->get_unit_face_support_points().size() << std::endl;
       deallog << "generalized_support_points="
               << fe_data->get_generalized_support_points().size() << std::endl;
-      deallog << "generalized_face_support_points="
-              << fe_data->get_generalized_face_support_points().size()
-              << std::endl;
 
       deallog << "face_to_equivalent_cell_index:";
       for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)
