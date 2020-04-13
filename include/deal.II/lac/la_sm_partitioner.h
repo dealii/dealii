@@ -118,16 +118,20 @@ namespace LinearAlgebra
       std::vector<unsigned int>        recv_sm_ptr = {0};
       mutable std::vector<MPI_Request> recv_sm_req; // TODO: move
       std::vector<unsigned int>        recv_sm_indices;
+      std::vector<unsigned int>        recv_sm_len;
       std::vector<unsigned int>        recv_sm_offset;
 
       std::vector<unsigned int>        send_remote_ranks;
       std::vector<unsigned int>        send_remote_ptr = {0};
       std::vector<unsigned int>        send_remote_indices;
+      std::vector<unsigned int>        send_remote_len;
+      std::vector<unsigned int>        send_remote_offset;
       mutable std::vector<MPI_Request> send_remote_req; // TODO: move
 
       std::vector<unsigned int>        send_sm_ranks;
       std::vector<unsigned int>        send_sm_ptr = {0};
       std::vector<unsigned int>        send_sm_indices;
+      std::vector<unsigned int>        send_sm_len;
       mutable std::vector<MPI_Request> send_sm_req; // TODO: move
       std::vector<unsigned int>        send_sm_offset;
     };

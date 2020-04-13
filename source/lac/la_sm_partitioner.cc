@@ -15,12 +15,53 @@
 
 #include <deal.II/lac/la_sm_partitioner.h>
 
+#define DO_COMPRESS true
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
   namespace SharedMPI
   {
+    namespace internal
+    {
+      void
+      compress(std::vector<unsigned int> &recv_sm_ptr,
+               std::vector<unsigned int> &recv_sm_indices,
+               std::vector<unsigned int> &recv_sm_len)
+      {
+        std::vector<unsigned int> recv_ptr = {0};
+        std::vector<unsigned int> recv_indices;
+        std::vector<unsigned int> recv_len;
+
+        for (unsigned int i = 0; i + 1 < recv_sm_ptr.size(); i++)
+          {
+            if (recv_sm_ptr[i] != recv_sm_ptr[i + 1])
+              {
+                recv_indices.push_back(recv_sm_indices[recv_sm_ptr[i]]);
+                recv_len.push_back(1);
+
+                for (unsigned int j = recv_sm_ptr[i] + 1;
+                     j < recv_sm_ptr[i + 1];
+                     j++)
+                  if (recv_indices.back() + recv_len.back() !=
+                      recv_sm_indices[j])
+                    {
+                      recv_indices.push_back(recv_sm_indices[j]);
+                      recv_len.push_back(1);
+                    }
+                  else
+                    recv_len.back()++;
+              }
+            recv_ptr.push_back(recv_indices.size());
+          }
+
+        recv_sm_ptr     = recv_ptr;
+        recv_sm_indices = recv_indices;
+        recv_sm_len     = recv_len;
+      }
+    } // namespace internal
+
     Partitioner::Partitioner(const MPI_Comm &comm,
                              const MPI_Comm &comm_sm,
                              const IndexSet &is_locally_owned,
@@ -218,6 +259,30 @@ namespace LinearAlgebra
                     send_sm_req.data(),
                     MPI_STATUSES_IGNORE);
       }
+
+#if DO_COMPRESS
+      internal::compress(recv_sm_ptr, recv_sm_indices, recv_sm_len);
+#endif
+
+#if DO_COMPRESS
+      internal::compress(send_remote_ptr, send_remote_indices, send_remote_len);
+      send_remote_offset.clear();
+      send_remote_offset.push_back(0);
+
+      for (unsigned int r = 0, c = 0; r < send_remote_ranks.size(); r++)
+        {
+          for (unsigned int i = send_remote_ptr[r]; i < send_remote_ptr[r + 1];
+               i++)
+            c += send_remote_len[i];
+          send_remote_offset.push_back(c);
+        }
+#else
+      send_remote_offset = send_remote_ptr;
+#endif
+
+#if DO_COMPRESS
+      internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
+#endif
     }
 
     template <typename Number>
@@ -230,8 +295,8 @@ namespace LinearAlgebra
     {
       (void)data_others;
 
-      if (send_remote_ptr.back() != buffer.size())
-        buffer.resize(send_remote_ptr.back());
+      if (send_remote_offset.back() != buffer.size())
+        buffer.resize(send_remote_offset.back());
 
       int dummy;
       for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
@@ -261,14 +326,23 @@ namespace LinearAlgebra
                   comm,
                   recv_remote_req.data() + i);
 
+#if DO_COMPRESS
+      for (unsigned int i = 0, k = 0; i < send_remote_ranks.size(); i++)
+        {
+          for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
+               j++)
+            for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
+              buffer[k] = data_this[send_remote_indices[j] + l];
+#else
       for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
         {
           for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
                j++)
             buffer[j] = data_this[send_remote_indices[j]];
+#endif
 
-          MPI_Isend(buffer.data() + send_remote_ptr[i],
-                    send_remote_ptr[i + 1] - send_remote_ptr[i],
+          MPI_Isend(buffer.data() + send_remote_offset[i],
+                    send_remote_offset[i + 1] - send_remote_offset[i],
                     Utilities::MPI::internal::mpi_type_id(data_this),
                     send_remote_ranks[i],
                     communication_channel + 3,
@@ -298,10 +372,18 @@ namespace LinearAlgebra
             data_others[recv_sm_ranks[i]];
           Number *__restrict__ data_this_ptr = data_this;
 
+#if DO_COMPRESS
+          for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
+               j < recv_sm_ptr[i + 1];
+               j++)
+            for (unsigned int l = 0; l < recv_sm_len[j]; l++, k++)
+              data_this_ptr[k] = data_others_ptr[recv_sm_indices[j] + l];
+#else
           for (unsigned int j = recv_sm_ptr[i], k = recv_sm_offset[i];
                j < recv_sm_ptr[i + 1];
                j++, k++)
             data_this_ptr[k] = data_others_ptr[recv_sm_indices[j]];
+#endif
         }
 
       MPI_Waitall(send_sm_req.size(), send_sm_req.data(), MPI_STATUSES_IGNORE);
@@ -333,8 +415,8 @@ namespace LinearAlgebra
     {
       (void)data_others;
 
-      if (send_remote_ptr.back() != buffer.size())
-        buffer.resize(send_remote_ptr.back());
+      if (send_remote_offset.back() != buffer.size())
+        buffer.resize(send_remote_offset.back());
 
       int dummy;
       for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
@@ -365,8 +447,8 @@ namespace LinearAlgebra
                   recv_remote_req.data() + i);
 
       for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
-        MPI_Irecv(buffer.data() + send_remote_ptr[i],
-                  send_remote_ptr[i + 1] - send_remote_ptr[i],
+        MPI_Irecv(buffer.data() + send_remote_offset[i],
+                  send_remote_offset[i + 1] - send_remote_offset[i],
                   Utilities::MPI::internal::mpi_type_id(data_this),
                   send_remote_ranks[i],
                   communication_channel + 0,
@@ -391,6 +473,18 @@ namespace LinearAlgebra
           Number *__restrict__ data_others_ptr = data_others[send_sm_ranks[i]];
           Number *__restrict__ data_this_ptr   = data_this;
 
+#if DO_COMPRESS
+          for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
+               j < send_sm_ptr[i + 1];
+               j++)
+            {
+              for (unsigned int l = 0; l < send_sm_len[j]; l++, k++)
+                {
+                  data_this_ptr[send_sm_indices[j] + l] += data_others_ptr[k];
+                  data_others_ptr[k] = 0.0;
+                }
+            }
+#else
           for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
                j < send_sm_ptr[i + 1];
                j++, k++)
@@ -398,6 +492,7 @@ namespace LinearAlgebra
               data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
               data_others_ptr[k] = 0.0;
             }
+#endif
         }
 
       for (unsigned int c = 0; c < send_remote_ranks.size(); c++)
@@ -408,9 +503,17 @@ namespace LinearAlgebra
                       &i,
                       MPI_STATUS_IGNORE);
 
+#if DO_COMPRESS
+          for (unsigned int j = send_remote_ptr[i], k = send_remote_offset[i];
+               j < send_remote_ptr[i + 1];
+               j++)
+            for (unsigned int l = 0; l < send_remote_len[j]; l++)
+              data_this[send_remote_indices[j] + l] += buffer[k++];
+#else
           for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
                j++)
             data_this[send_remote_indices[j]] += buffer[j];
+#endif
         }
 
       MPI_Waitall(recv_sm_req.size(), recv_sm_req.data(), MPI_STATUSES_IGNORE);
