@@ -527,6 +527,7 @@ namespace LinearAlgebra
       const unsigned int                communication_channel,
       ::dealii::VectorOperation::values operation)
     {
+      (void)operation;
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
       Assert(vector_is_ghosted == false,
@@ -546,6 +547,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::compress_finish(
       ::dealii::VectorOperation::values operation)
     {
+      (void)operation;
       Assert(::dealii::VectorOperation::values::add == operation,
              ExcNotImplemented());
       vector_is_ghosted = false;
