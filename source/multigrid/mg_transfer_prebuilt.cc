@@ -270,27 +270,10 @@ MGTransferPrebuilt<VectorType>::build(
                                     dist_tria->get_communicator() :
                                     MPI_COMM_SELF;
 
-          // Compute # of locally owned MG dofs / processor for distribution
-          const std::vector<::dealii::IndexSet>
-            locally_owned_mg_dofs_per_processor =
-              dof_handler.compute_locally_owned_mg_dofs_per_processor(level +
-                                                                      1);
-          std::vector<::dealii::types::global_dof_index>
-            n_locally_owned_mg_dofs_per_processor(
-              locally_owned_mg_dofs_per_processor.size(), 0);
-
-          for (std::size_t index = 0;
-               index < n_locally_owned_mg_dofs_per_processor.size();
-               ++index)
-            {
-              n_locally_owned_mg_dofs_per_processor[index] =
-                locally_owned_mg_dofs_per_processor[index].n_elements();
-            }
-
           // Distribute sparsity pattern
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
-            n_locally_owned_mg_dofs_per_processor,
+            dof_handler.locally_owned_mg_dofs(level + 1),
             communicator,
             dsp.row_index_set());
         }

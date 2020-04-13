@@ -37,8 +37,6 @@ test()
   else
     owned.add_range(7, 10);
 
-  const auto rows_per_cpu = Utilities::MPI::all_gather(comm, owned);
-
   IndexSet ghost_range(owned);
   if (myid == 0)
     {
@@ -86,7 +84,7 @@ test()
   deallog << "Before gather_sparsity_pattern:" << std::endl;
   dsp.print(deallog.get_file_stream());
 
-  SparsityTools::gather_sparsity_pattern(dsp, rows_per_cpu, comm, ghost_range);
+  SparsityTools::gather_sparsity_pattern(dsp, owned, comm, ghost_range);
 
   deallog << "After gather_sparsity_pattern:" << std::endl;
   dsp.print(deallog.get_file_stream());

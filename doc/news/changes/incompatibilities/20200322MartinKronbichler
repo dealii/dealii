@@ -1,0 +1,6 @@
+Deprecated: SparsityTools::distribute_sparsity_pattern() and
+SparsityTools::gather_sparsity_pattern() taking the locally owned index sets
+of all processes as second arguments have been deprecated. Use the respective
+functions only providing the locally owned dofs of the calling process.
+<br>
+(Martin Kronbichler, 2020/03/22)

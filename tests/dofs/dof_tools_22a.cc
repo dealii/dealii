@@ -112,11 +112,10 @@ test()
                                        flux_coupling,
                                        Utilities::MPI::this_mpi_process(
                                          MPI_COMM_WORLD));
-  SparsityTools::distribute_sparsity_pattern(
-    sp,
-    dh.compute_n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    relevant_partitioning);
+  SparsityTools::distribute_sparsity_pattern(sp,
+                                             dh.locally_owned_dofs(),
+                                             MPI_COMM_WORLD,
+                                             relevant_partitioning);
 
   // Output
   MPI_Barrier(MPI_COMM_WORLD);
