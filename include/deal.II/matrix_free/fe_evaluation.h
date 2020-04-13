@@ -467,25 +467,43 @@ public:
   // specialization of the base class, in this case FEEvaluationAccess<dim,dim>.
   // For now, hack-in those functions manually only to fix documentation:
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_divergence()
+  /**
+   * Return the divergence of a vector-valued finite element at quadrature
+   * point number @p q_point after a call to @p evaluate(...,true,...).
+   *
    * @note Only available for n_components_==dim.
    */
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_symmetric_gradient()
+  /**
+   * Return the symmetric gradient of a vector-valued finite element at
+   * quadrature point number @p q_point after a call to @p
+   * evaluate(...,true,...). It corresponds to <tt>0.5
+   * (grad+grad<sup>T</sup>)</tt>.
+   *
    * @note Only available for n_components_==dim.
    */
   SymmetricTensor<2, dim, VectorizedArrayType>
   get_symmetric_gradient(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_curl()
+  /**
+   * Return the curl of the vector field, $\nabla \times v$ after a call to @p
+   * evaluate(...,true,...).
+   *
    * @note Only available for n_components_==dim.
    */
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_divergence()
+  /**
+   * Write a contribution that is tested by the divergence to the field
+   * containing the values on quadrature points with component @p q_point.
+   * Access to the same field as through @p get_gradient. If applied before
+   * the function @p integrate(...,true) is called, this specifies what is
+   * tested by all basis function gradients on the current cell and integrated
+   * over.
+   *
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
@@ -497,7 +515,14 @@ public:
   submit_divergence(const VectorizedArrayType div_in,
                     const unsigned int        q_point);
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_symmetric_gradient()
+  /**
+   * Write a contribution that is tested by the symmetric gradient to the field
+   * containing the values on quadrature points with component @p q_point.
+   * Access to the same field as through @p get_symmetric_gradient. If applied before
+   * the function @p integrate(...,true) is called, this specifies the
+   * symmetric gradient which is tested by all basis function symmetric
+   * gradients on the current cell and integrated over.
+   *
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
@@ -511,7 +536,10 @@ public:
     const SymmetricTensor<2, dim, VectorizedArrayType> grad_in,
     const unsigned int                                 q_point);
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_curl()
+  /**
+   * Write the components of a curl containing the values on quadrature point
+   * @p q_point. Access to the same data field as through @p get_gradient.
+   *
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
