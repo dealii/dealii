@@ -33,7 +33,7 @@
 
 
 // check
-//   DoFTools::lexicographic_to_hierarchic_numbering
+//   FETools::lexicographic_to_hierarchic_numbering
 
 
 template <int dim>
@@ -42,8 +42,8 @@ check(const FE_Q<dim> &fe, const std::string &name)
 {
   deallog << "Checking " << name << " in " << dim << "d:" << std::endl;
 
-  std::vector<unsigned int> n(fe.dofs_per_cell);
-  FETools::lexicographic_to_hierarchic_numbering(fe, n);
+  const std::vector<unsigned int> n =
+    FETools::lexicographic_to_hierarchic_numbering<dim>(fe.degree);
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     deallog << n[i] << " ";
   deallog << std::endl;

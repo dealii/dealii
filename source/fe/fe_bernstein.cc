@@ -367,10 +367,7 @@ FE_Bernstein<dim, spacedim>::renumber_bases(const unsigned int deg)
 {
   TensorProductPolynomials<dim> tpp(
     dealii::generate_complete_bernstein_basis<double>(deg));
-  std::vector<unsigned int>    renumber(Utilities::fixed_power<dim>(deg + 1));
-  const FiniteElementData<dim> fe(this->get_dpo_vector(deg), 1, deg);
-  FETools::hierarchic_to_lexicographic_numbering(fe, renumber);
-  tpp.set_numbering(renumber);
+  tpp.set_numbering(FETools::hierarchic_to_lexicographic_numbering<dim>(deg));
   return tpp;
 }
 

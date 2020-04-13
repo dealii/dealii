@@ -1,0 +1,8 @@
+Changed: The FETools::lexicographic_to_hierarchic_numbering() and
+FETools::hierarchic_to_lexicographic_numbering() functions now take a single
+integer for the degree of the associated FE_Q element and return the
+numbering. The old functions taking the result array as the last argument and
+the ones taking a FiniteElementData as an argument have been deprecated in
+favor of the simpler setup with the degree.
+<br>
+(Martin Kronbichler, 2020/04/07)
