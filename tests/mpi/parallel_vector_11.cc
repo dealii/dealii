@@ -116,7 +116,8 @@ test()
 
   if (myid == 0)
     deallog << "Check sadd (factor, factor, vector, factor, vector): ";
-  y.sadd(2., 3., v, 2., w);
+  y.sadd(2., 3., v);
+  y.add(2., w);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2000,
                 ExcInternalError());
@@ -126,7 +127,8 @@ test()
   if (myid == 0)
     deallog
       << "Check sadd (factor, factor, vector, factor, vector, factor, vector): ";
-  y.sadd(-1., 1., v, 2., w);
+  y.sadd(-1., 1., v);
+  y.add(2., w);
   y.add(2., x);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y.local_element(i) == 20000, ExcInternalError());
@@ -177,7 +179,8 @@ test()
 
   if (myid == 0)
     deallog << "Check equ (factor, vector, factor, vector): ";
-  y.equ(10., v, -2., w);
+  y.equ(10., v);
+  y.add(-2., w);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y.local_element(i) == 6. * (i + my_start) - 2000,
                 ExcInternalError());
@@ -186,7 +189,8 @@ test()
 
   if (myid == 0)
     deallog << "Check equ (factor, vector, factor, vector, factor, vector): ";
-  y.equ(10., v, -2., w);
+  y.equ(10., v);
+  y.add(-2., w);
   y.add(3., x);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y.local_element(i) == 6. * (i + my_start) + 28000,
