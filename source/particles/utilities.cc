@@ -211,82 +211,86 @@ namespace Particles
 
 
 
-    template <int dim,
-              int spacedim,
-              typename InputVectorType,
-              typename OutputVectorType>
-    void
-    interpolate_field_on_particles(
-      const DoFHandler<dim, spacedim> &                field_dh,
-      const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      const InputVectorType &                          field_vector,
-      OutputVectorType &                               interpolated_field,
-      const ComponentMask &                            field_comps)
-    {
-      if (particle_handler.n_locally_owned_particles() == 0)
-        {
-          interpolated_field.compress(VectorOperation::add);
-          return; // nothing else to do here
-        }
+    //    template <int dim,
+    //              int spacedim,
+    //              typename InputVectorType,
+    //              typename OutputVectorType>
+    //    void
+    //    interpolate_field_on_particles(
+    //      const DoFHandler<dim, spacedim> &                field_dh,
+    //      const Particles::ParticleHandler<dim, spacedim> &particle_handler,
+    //      const InputVectorType &                          field_vector,
+    //      OutputVectorType &                               interpolated_field,
+    //      const ComponentMask &                            field_comps)
+    //    {
+    //      if (particle_handler.n_locally_owned_particles() == 0)
+    //        {
+    //          interpolated_field.compress(VectorOperation::add);
+    //          return; // nothing else to do here
+    //        }
 
-      const auto &tria     = field_dh.get_triangulation();
-      const auto &fe       = field_dh.get_fe();
-      auto        particle = particle_handler.begin();
-      const auto  max_particles_per_cell =
-        particle_handler.n_global_max_particles_per_cell();
+    //      const auto &tria     = field_dh.get_triangulation();
+    //      const auto &fe       = field_dh.get_fe();
+    //      auto        particle = particle_handler.begin();
+    //      const auto  max_particles_per_cell =
+    //        particle_handler.n_global_max_particles_per_cell();
 
-      // Take care of components
-      const ComponentMask comps =
-        (field_comps.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                   field_comps);
-      AssertDimension(comps.size(), fe.n_components());
-      const auto n_comps = comps.n_selected_components();
+    //      // Take care of components
+    //      const ComponentMask comps =
+    //        (field_comps.size() == 0 ? ComponentMask(fe.n_components(), true)
+    //        :
+    //                                   field_comps);
+    //      AssertDimension(comps.size(), fe.n_components());
+    //      const auto n_comps = comps.n_selected_components();
 
-      AssertDimension(field_vector.size(), field_dh.n_dofs());
-      AssertDimension(interpolated_field.size(),
-                      particle_handler.get_next_free_particle_index() *
-                        n_comps);
-      // Add check on locally owned indices
+    //      AssertDimension(field_vector.size(), field_dh.n_dofs());
+    //      AssertDimension(interpolated_field.size(),
+    //                      particle_handler.get_next_free_particle_index() *
+    //                        n_comps);
+    //      // Add check on locally owned indices
 
-      // Global to local indices
-      std::vector<unsigned int> space_gtl(fe.n_components(),
-                                          numbers::invalid_unsigned_int);
-      for (unsigned int i = 0, j = 0; i < space_gtl.size(); ++i)
-        if (comps[i])
-          space_gtl[i] = j++;
+    //      // Global to local indices
+    //      std::vector<unsigned int> space_gtl(fe.n_components(),
+    //                                          numbers::invalid_unsigned_int);
+    //      for (unsigned int i = 0, j = 0; i < space_gtl.size(); ++i)
+    //        if (comps[i])
+    //          space_gtl[i] = j++;
 
-      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+    //      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
 
-      while (particle != particle_handler.end())
-        {
-          const auto &cell = particle->get_surrounding_cell(tria);
-          const auto &dh_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &field_dh);
-          dh_cell->get_dof_indices(dof_indices);
-          const auto pic         = particle_handler.particles_in_cell(cell);
-          const auto n_particles = particle_handler.n_particles_in_cell(cell);
+    //      while (particle != particle_handler.end())
+    //        {
+    //          const auto &cell = particle->get_surrounding_cell(tria);
+    //          const auto &dh_cell =
+    //            typename DoFHandler<dim, spacedim>::cell_iterator(*cell,
+    //            &field_dh);
+    //          dh_cell->get_dof_indices(dof_indices);
+    //          const auto pic         =
+    //          particle_handler.particles_in_cell(cell); const auto n_particles
+    //          = particle_handler.n_particles_in_cell(cell);
 
-          Assert(pic.begin() == particle, ExcInternalError());
-          for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
-            {
-              const auto &reference_location =
-                particle->get_reference_location();
+    //          Assert(pic.begin() == particle, ExcInternalError());
+    //          for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
+    //            {
+    //              const auto &reference_location =
+    //                particle->get_reference_location();
 
-              const auto id = particle->get_id();
+    //              const auto id = particle->get_id();
 
-              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-                {
-                  const auto comp_j =
-                    space_gtl[fe.system_to_component_index(j).first];
-                  if (comp_j != numbers::invalid_unsigned_int)
-                    interpolated_field[id * n_comps + comp_j] +=
-                      fe.shape_value(j, reference_location) *
-                      field_vector(dof_indices[j]);
-                }
-            }
-        }
-      interpolated_field.compress(VectorOperation::add);
-    }
+    //              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+    //                {
+    //                  const auto comp_j =
+    //                    space_gtl[fe.system_to_component_index(j).first];
+    //                  if (comp_j != numbers::invalid_unsigned_int)
+    //                    interpolated_field[id * n_comps + comp_j] +=
+    //                      fe.shape_value(j, reference_location) *
+    //                      field_vector(dof_indices[j]);
+    //                }
+    //            }
+    //        }
+    //      interpolated_field.compress(VectorOperation::add);
+    //    }
+
 
 #include "utilities.inst"
 
