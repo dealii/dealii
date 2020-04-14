@@ -1,0 +1,305 @@
+<h1>Results</h1>
+
+The directory in which this program is run does not contain a parameter file by
+default. On the other hand, this program wants to read its parameters from a
+file called parameters.prm -- and so, when you execute it the first time, you
+will get an exception that no such file can be found:
+
+@code
+----------------------------------------------------
+Exception on processing:
+
+--------------------------------------------------------
+An error occurred in line <74> of file <../source/base/parameter_acceptor.cc> in function
+    static void dealii::ParameterAcceptor::initialize(const std::string &, const std::string &, const ParameterHandler::OutputStyle, dealii::ParameterHandler &)
+The violated condition was:
+    false
+Additional information:
+    You specified <parameters.prm> as input parameter file, but it does not exist. We created it for you.
+--------------------------------------------------------
+
+Aborting!
+----------------------------------------------------
+@endcode
+
+However, as the error message already states, the code that triggers the
+exception will also generate a parameters.prm file that simply contains the
+default values for all parameters this program cares about. By inspection of the
+parameter file, we see the following:
+
+@code
+subsection Stokes Immersed Problem
+  set Final time                         = 1
+  set Homogeneous Dirichlet boundary ids = 0, 1, 2, 3
+  set Initial fluid refinement           = 4
+  set Initial solid refinement           = 4
+  set Particle insertion refinement      = 4
+  set Nitsche penalty term               = 1000
+  set Number of time steps               = 501
+  set Velocity degree                    = 2
+  set Viscosity                          = 1
+  subsection Angular velocity
+    set Function constants  = 
+    set Function expression = t < .5 ? 5 : -5
+    set Variable names      = x,y,t
+  end
+  subsection Grid generation
+    set Grid one generator                = hyper_cube
+    set Grid one generator arguments      = -1: 1: false
+    set Grid two generator                = hyper_rectangle
+    set Grid two generator arguments      = -.5, -.1: .5, .1: false
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 0.3, 0.3: 0.1: false
+  end
+  subsection Right hand side
+    set Function constants  = 
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+end
+@endcode
+
+If you now run the program, you will get a file called `used_parameters.prm`,
+containing a shorter version of the above parameters (without comments and
+documentation), documenting all parameters that were used to run your program:
+@code
+subsection Stokes Immersed Problem
+  set Final time                         = 1
+  set Homogeneous Dirichlet boundary ids = 0, 1, 2, 3
+  set Initial fluid refinement           = 4
+  set Initial solid refinement           = 4
+  set Particle insertion refinement      = 4
+  set Nitsche penalty term               = 1000
+  set Number of time steps               = 501
+  set Velocity degree                    = 2
+  set Viscosity                          = 1
+  subsection Angular velocity
+    set Function constants  = 
+    set Function expression = t < .5 ? 5 : -5
+    set Variable names      = x,y,t
+  end
+  subsection Grid generation
+    set Grid one generator                = hyper_cube
+    set Grid one generator arguments      = -1: 1: false
+    set Grid two generator                = hyper_rectangle
+    set Grid two generator arguments      = -.5, -.1: .5, .1: false
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 0.3, 0.3: 0.1: false
+  end
+  subsection Right hand side
+    set Function constants  = 
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+end
+@endcode
+
+The rationale behind creating first `parameters.prm` file (the first time the
+program is run) and then a `used_parameters.prm` (every other times you run the
+program), is because you may want to leave most parameters to their default
+values, and only modify a handful of them.
+
+For example, you could use the following (perfectly valid) parameter file with
+this tutorial program:
+@code
+SHORTER VERSION HERE
+@endcode
+
+and you would obtain exactly the same results as in test case 1 below.
+
+<h3> Test case 1: </h3>
+
+For the default problem the value of $u$ on $\Gamma$ is set to the constant $1$:
+this is like imposing a constant Dirichlet boundary condition on $\Gamma$, seen
+as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
+\Omega$ we have zero Dirichlet boundary conditions.
+
+
+<div class="twocolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_no_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+</div>
+
+The output of the program will look like the following:
+
+@code
+
+@endcode
+
+You may notice that, in terms of CPU time, assembling the coupling system is
+twice as expensive as assembling the standard Poisson system, even though the
+matrix is smaller. This is due to the non-matching nature of the discretization.
+Whether this is acceptable or not, depends on the applications.
+
+If the problem was set in a three-dimensional setting, and the immersed mesh was
+time dependent, it would be much more expensive to recreate the mesh at each
+step rather than use the technique we present here. Moreover, you may be able to
+create a very fast and optimized solver on a uniformly refined square or cubic
+grid, and embed the domain where you want to perform your computation using the
+technique presented here. This would require you to only have a surface
+representatio of your domain (a much cheaper and easier mesh to produce).
+
+To play around a little bit, we are going to complicate a little the fictitious
+domain as well as the boundary conditions we impose on it.
+
+<h3> Test case 2 and 3: </h3>
+
+If we use the following parameter file:
+@code
+subsection Distributed Lagrange<1,2>
+  set Coupling quadrature order                    = 3
+  set Embedded configuration finite element degree = 1
+  set Embedded space finite element degree         = 1
+  set Embedding space finite element degree        = 1
+  set Homogeneous Dirichlet boundary ids           = 0,1,2,3
+  set Initial embedded space refinement            = 8
+  set Initial embedding space refinement           = 4
+  set Local refinements steps near embedded domain = 4
+  set Use displacement in embedded interface       = false
+  set Verbosity level                              = 10
+  subsection Embedded configuration
+    set Function constants  = R=.3, Cx=.5, Cy=.5, r=.1, w=12
+    set Function expression = (R+r*cos(w*pi*x))*cos(2*pi*x)+Cx; (R+r*cos(w*pi*x))*sin(2*pi*x)+Cy
+    set Variable names      = x,y,t
+  end
+  subsection Embedded value
+    set Function constants  =
+    set Function expression = x-.5
+    set Variable names      = x,y,t
+  end
+  subsection Schur solver control
+    set Log frequency = 1
+    set Log history   = false
+    set Log result    = true
+    set Max steps     = 100000
+    set Reduction     = 1.e-12
+    set Tolerance     = 1.e-12
+  end
+end
+@endcode
+
+We get a "flowery" looking domain, where we impose a linear boundary condition
+$g=x-.5$. This test shows that the method is actually quite accurate in
+recovering an exactly linear function from its boundary conditions, and even
+though the meshes are not aligned, we obtain a pretty good result.
+
+Replacing $x-.5$ with $2(x-.5)^2-2(y-.5)^2$, i.e., modifying the parameter file
+such that we have
+@code
+  ...
+  subsection Embedded value
+    set Function constants  =
+    set Function expression = 2*(x-.5)^2-2*(y-.5)^2
+    set Variable names      = x,y,t
+  end
+@endcode
+produces the saddle on the right.
+
+<div class="twocolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.3_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.4_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+</div>
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4> Running with `spacedim` equal to three</h4>
+
+While the current tutorial program is written for `spacedim` equal to two, there
+are only minor changes you have to do in order for the program to run in
+different combinations of dimensions.
+
+If you want to run with `spacedim` equal to three and `dim` equal to two, then
+you will almost certainly want to perform the following changes:
+
+- use a different reference domain for the embedded grid, maybe reading it from
+  a file. It is not possible to construct a smooth closed surface with one
+  single parametrization of a square domain, therefore you'll most likely want
+  to use a reference domain that is topologically equivalent to a the boundary
+  of a sphere.
+
+- use a displacement instead of the deformation to map $\Gamma_0$ into $\Gamma$
+
+<h4> More general domains </h4>
+
+We have seen in other tutorials (for example in step-5 and step-54) how to read
+grids from input files. A nice generalization for this tutorial program would be
+to allow the user to select a grid to read from the parameter file itself,
+instead of hardcoding the mesh type in the tutorial program itself.
+
+<h4> Preconditioner</h4>
+
+At the moment, we have no preconditioner on the Schur complement. This is ok for
+two dimensional problems, where a few hundred iterations bring the residual down
+to the machine precision, but it's not going to work in three dimensions.
+
+It is not obvious what a good preconditioner would be here. The physical problem
+we are solving with the Schur complement, is to associate to the Dirichlet data
+$g$, the value of the Lagrange multiplier $\lambda$. $\lambda$ can be
+interpreted as the *jump* in the normal gradient that needs to be imposed on $u$
+across $\Gamma$, in order to obtain the Dirichlet data $g$.
+
+So $S$ is some sort of Neumann to Dirichlet map, and we would like to have a
+good approximation for the Dirichlet to Neumann map. A possibility would be to
+use a Boundary Element approximation of the problem on $\Gamma$, and construct a
+rough approximation of the hyper-singular operator for the Poisson problem
+associated to $\Gamma$, which is precisely a Dirichlet to Neumann map.
+
+<h4> Parallel Code </h4>
+
+The simple code proposed here can serve as a starting point for more
+complex problems which, to be solved, need to be run on parallel
+code, possibly using distributed meshes (see step-17, step-40, and the
+documentation for parallel::shared::Triangulation and
+parallel::distributed::Triangulation).
+
+When using non-matching grids in parallel a problem arises: to compute the
+matrix $C$ a process needs information about both meshes on the same portion of
+real space but, when working with distributed meshes, this information may not
+be available, because the locally owned part of the $\Omega$ triangulation
+stored on a given processor may not be physically co-located with the locally
+owned part of the $\Gamma$ triangulation stored on the same processor.
+
+Various strategies can be implemented to tackle this problem:
+
+- distribute the two meshes so that this constraint is satisfied;
+
+- use communication for the parts of real space where the constraint is not
+  satisfied;
+
+- use a distributed triangulation for the embedding space, and a shared
+  triangulation for the emdedded configuration.
+
+The latter strategy is clearly the easiest to implement, as most of the
+functions used in this tutorial program will work unchanged also in the parallel
+case. Of course one could use the reversal strategy (that is, have a distributed
+embedded Triangulation and a shared embedding Triangulation).
+
+However, this strategy is most likely going to be more expensive, since by
+definition the embedding grid is larger than the embedded grid, and it makes
+more sense to distribute the largest of the two grids, maintaining the smallest
+one shared among all processors.
