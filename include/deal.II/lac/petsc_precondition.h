@@ -80,6 +80,12 @@ namespace PETScWrappers
     void
     vmult(VectorBase &dst, const VectorBase &src) const;
 
+    /**
+     * Apply the transpose preconditioner once to the given src vector.
+     */
+    void
+    Tvmult(VectorBase &dst, const VectorBase &src) const;
+
 
     /**
      * Give access to the underlying PETSc object.
