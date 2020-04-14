@@ -449,17 +449,32 @@ namespace Step52
     DataOut<2> data_out;
 
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "solution");
+    std::string solution_name = "solution_" + method_name;
+    data_out.add_data_vector(solution, solution_name);
 
     data_out.build_patches();
 
     data_out.set_flags(DataOutBase::VtkFlags(time, time_step));
 
-    const std::string filename = "solution-" + method_name + "-" +
-                                 Utilities::int_to_string(time_step, 3) +
-                                 ".vtu";
+    const std::string filename =
+      solution_name + Utilities::int_to_string(time_step, 3) + ".vtu";
     std::ofstream output(filename);
     data_out.write_vtu(output);
+
+    static std::vector<std::pair<double, std::string>> times_and_names;
+
+    static std::string method_name_prev = "";
+    static std::string pvd_filename;
+    if (method_name_prev != method_name)
+      {
+        std::cout << "Starting a new time-stepping scheme ..." << std::endl;
+        times_and_names.clear();
+        method_name_prev = method_name;
+        pvd_filename     = "solution_" + method_name + ".pvd";
+      }
+    times_and_names.emplace_back(time, filename);
+    std::ofstream pvd_output(pvd_filename);
+    DataOutBase::write_pvd_record(pvd_output, times_and_names);
   }
 
 
