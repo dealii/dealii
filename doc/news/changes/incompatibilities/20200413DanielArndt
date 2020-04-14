@@ -1,4 +1,4 @@
-Removed: The deprecated member fucntions 
+Removed: The deprecated member functions 
 FiniteElement::has_generalized_face_support_points()
 and FiniteElement::get_generalized_face_support_points() have been removed.
 <br>
