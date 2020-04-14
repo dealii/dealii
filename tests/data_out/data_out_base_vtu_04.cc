@@ -37,7 +37,14 @@ void
 check(std::ostream &log, unsigned cell_order)
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_shell(triangulation, Point<dim>(), 0.5, 1, 6);
+  // choose some arbitrary radii to reduce possibility of roundoff effects in
+  // the double -> float transition and with binary (zlib compressed VTU)
+  // output
+  GridGenerator::hyper_shell(triangulation,
+                             Point<dim>(3.2323343428452032, 2.12432324033),
+                             0.53324387343224532,
+                             1.032354728342342875235,
+                             6);
   triangulation.refine_global(1);
 
   FE_Q<dim>       fe(cell_order);
@@ -67,6 +74,7 @@ int
 main()
 {
   initlog();
+  deallog.get_file_stream() << std::setprecision(9);
 
   unsigned cell_order = 3;
   check<2>(deallog.get_file_stream(), cell_order);
