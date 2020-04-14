@@ -277,11 +277,10 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                     }
                   else
                     {
-                      // The solution is complex-valued. We don't currently
-                      // know how to handle this in the most general case,
-                      // but we can deal with it as long as there is only a
-                      // scalar solution since then we can just collate the two
-                      // components of the scalar solution into one vector field
+                      // The solution is complex-valued. Let's cover the scalar
+                      // case first (i.e., one scalar but complex-valued field,
+                      // which we will have to split into its real and imaginar
+                      // parts).
                       if (n_components == 1)
                         {
                           scratch_data.resize_system_vectors(2);
@@ -668,7 +667,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                 }
 
               // Now we need to copy the result of the postprocessor to
-              // the Patch object where it can then be further processes
+              // the Patch object where it can then be further processed
               // by the functions in DataOutBase
               for (unsigned int q = 0; q < n_q_points; ++q)
                 for (unsigned int component = 0;
@@ -677,6 +676,10 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
                   patch.data(offset + component, q) =
                     scratch_data.postprocessed_values[dataset_number][q](
                       component);
+
+              // Move the counter for the output location forward as
+              // appropriate
+              offset += dataset->n_output_variables;
             }
           else
             {
