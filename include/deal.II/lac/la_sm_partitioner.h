@@ -104,6 +104,9 @@ namespace LinearAlgebra
       std::size_t
       memory_consumption() const;
 
+      std::vector<unsigned int>
+      get_sm_view() const;
+
     private:
       const MPI_Comm &comm;
       const MPI_Comm &comm_sm;
@@ -137,6 +140,8 @@ namespace LinearAlgebra
       std::vector<unsigned int>        send_sm_len;
       mutable std::vector<MPI_Request> send_sm_req; // TODO: move
       std::vector<unsigned int>        send_sm_offset;
+
+      std::vector<unsigned int> sm_view;
     };
 
   } // end of namespace SharedMPI

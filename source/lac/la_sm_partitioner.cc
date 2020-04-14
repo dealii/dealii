@@ -83,6 +83,62 @@ namespace LinearAlgebra
         //            std::cout << i << " ";
         //        std::cout << std::endl;
       }
+
+      template <typename Number = double>
+      std::vector<unsigned int>
+      create_sm_view(const MPI_Comm &           comm,
+                     const unsigned int         len,
+                     std::vector<unsigned int> &recv_sm_ranks,
+                     std::vector<unsigned int> &recv_sm_ptr,
+                     std::vector<unsigned int> &recv_sm_indices,
+                     std::vector<unsigned int> &recv_sm_offset)
+      {
+        std::vector<unsigned int> offsets(
+          Utilities::MPI::n_mpi_processes(comm) + 1);
+
+        const unsigned int my_rank = Utilities::MPI::this_mpi_process(comm);
+
+        unsigned int len_ = ((len * sizeof(Number) + 64 - 1) / sizeof(Number));
+
+        MPI_Allgather(&len_,
+                      1,
+                      Utilities::MPI::internal::mpi_type_id(offsets.data()),
+                      offsets.data() + 1,
+                      1,
+                      Utilities::MPI::internal::mpi_type_id(offsets.data()),
+                      comm);
+
+        for (unsigned int i = 1; i < offsets.size(); i++)
+          offsets[i] += offsets[i - 1];
+
+        //        for(auto i : offsets)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+
+        std::vector<unsigned int> recv_sm_indices_temp(
+          len, numbers::invalid_unsigned_int);
+
+        for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
+          for (unsigned int j = recv_sm_ptr[i], c = 0; j < recv_sm_ptr[i + 1];
+               j++, c++)
+            recv_sm_indices_temp[recv_sm_offset[i] + c] =
+              recv_sm_indices[j] + offsets[recv_sm_ranks[i]];
+
+        for (unsigned int i = 0; i < len; i++)
+          if (recv_sm_indices_temp[i] == numbers::invalid_unsigned_int)
+            recv_sm_indices_temp[i] = i + offsets[my_rank];
+
+
+        //        for(auto i : recv_sm_indices)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+        //        for(auto i : recv_sm_indices_temp)
+        //            std::cout << i << " ";
+        //        std::cout << std::endl;
+
+        return recv_sm_indices_temp;
+      }
+
     } // namespace internal
 
     Partitioner::Partitioner(const MPI_Comm &comm,
@@ -283,9 +339,17 @@ namespace LinearAlgebra
                     MPI_STATUSES_IGNORE);
       }
 
-      const auto a =
-        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
-                            this->comm);
+      //      const auto a =
+      //        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
+      //                            this->comm);
+
+      this->sm_view =
+        internal::create_sm_view(comm_sm,
+                                 this->local_size() + this->n_ghost_indices(),
+                                 recv_sm_ranks,
+                                 recv_sm_ptr,
+                                 recv_sm_indices,
+                                 recv_sm_offset);
 
 #if DO_COMPRESS
       internal::compress(recv_sm_ptr, recv_sm_indices, recv_sm_len);
@@ -311,11 +375,11 @@ namespace LinearAlgebra
       internal::compress(send_sm_ptr, send_sm_indices, send_sm_len);
 #endif
 
-      const auto b =
-        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
-                            this->comm);
-
-      std::cout << "memory_consumption " << a << " " << b << std::endl;
+      //      const auto b =
+      //        Utilities::MPI::sum(static_cast<double>(this->memory_consumption()),
+      //                            this->comm);
+      //
+      //      std::cout << "memory_consumption " << a << " " << b << std::endl;
     }
 
     template <typename Number>
@@ -606,6 +670,14 @@ namespace LinearAlgebra
              + MemoryConsumption::memory_consumption(send_sm_offset)      //
         ;
     }
+
+    std::vector<unsigned int>
+    Partitioner::get_sm_view() const
+    {
+      return sm_view;
+    }
+
+
 
   } // end of namespace SharedMPI
 } // end of namespace LinearAlgebra

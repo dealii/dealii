@@ -69,11 +69,14 @@ namespace LinearAlgebra
 
           MPI_Info info;
           MPI_Info_create(&info);
-          MPI_Info_set(info, "alloc_shared_noncontig", "true");
+          MPI_Info_set(info, "alloc_shared_noncontig", "false");
 
           const std::size_t align_by = 64;
 
-          MPI_Win_allocate_shared(new_alloc_size * sizeof(Number) + align_by,
+          MPI_Win_allocate_shared(((new_alloc_size * sizeof(Number) + align_by -
+                                    1) /
+                                   sizeof(Number)) *
+                                    sizeof(Number),
                                   sizeof(Number),
                                   info,
                                   comm_shared,
@@ -90,7 +93,9 @@ namespace LinearAlgebra
 
           Number *    ptr_unaligned = data.others[rank_sm];
           Number *    ptr_aligned   = ptr_unaligned;
-          std::size_t s = new_alloc_size * sizeof(Number) + align_by;
+          std::size_t s = ((new_alloc_size * sizeof(Number) + align_by - 1) /
+                           sizeof(Number)) *
+                          sizeof(Number);
 
           AssertThrow(std::align(align_by,
                                  new_alloc_size * sizeof(Number),

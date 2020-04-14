@@ -349,6 +349,12 @@ namespace LinearAlgebra
       bool
       is_ghost_entry(const types::global_dof_index global_index) const;
 
+      Number *
+      begin_sm();
+
+      Number *
+      begin_sm() const;
+
       iterator
       begin();
 
@@ -538,6 +544,18 @@ namespace LinearAlgebra
         }
 
         static inline Number *
+        begin_sm(MemorySpaceData<Number> &data)
+        {
+          return data.others[0];
+        }
+
+        static inline Number *
+        begin_sm(const MemorySpaceData<Number> &data)
+        {
+          return data.others[0];
+        }
+
+        static inline Number *
         get_values(MemorySpaceData<Number> &)
         {
           Assert(false, ExcNotImplemented());
@@ -638,6 +656,20 @@ namespace LinearAlgebra
       Assert(false, ExcNotImplemented());
       (void)global_index;
       return false;
+    }
+
+    template <typename Number, typename MemorySpace>
+    Number *
+    Vector<Number, MemorySpace>::begin_sm()
+    {
+      return internal::Policy<Number, MemorySpace>::begin_sm(data);
+    }
+
+    template <typename Number, typename MemorySpace>
+    Number *
+    Vector<Number, MemorySpace>::begin_sm() const
+    {
+      return internal::Policy<Number, MemorySpace>::begin_sm(data);
     }
 
 

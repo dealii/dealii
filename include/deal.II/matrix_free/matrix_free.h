@@ -1521,6 +1521,10 @@ public:
   const std::shared_ptr<const Utilities::MPI::Partitioner> &
   get_vector_partitioner(const unsigned int dof_handler_index = 0) const;
 
+  const std::shared_ptr<const LinearAlgebra::SharedMPI::Partitioner> &
+  get_vector_partitioner(const MPI_Comm &   sm_comm,
+                         const unsigned int dof_handler_index = 0) const;
+
   /**
    * Return the set of cells that are owned by the processor.
    */
@@ -2222,6 +2226,18 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_vector_partitioner(
 {
   AssertIndexRange(comp, n_components());
   return dof_info[comp].vector_partitioner;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+inline const std::shared_ptr<const LinearAlgebra::SharedMPI::Partitioner> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_vector_partitioner(
+  const MPI_Comm &   comm_sm,
+  const unsigned int comp) const
+{
+  AssertIndexRange(comp, n_components());
+  return partitioner_sm[comp][comm_sm];
 }
 
 
