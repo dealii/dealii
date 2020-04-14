@@ -22,6 +22,7 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/vector.h>
 
@@ -219,7 +220,18 @@ namespace LinearAlgebra
     {
       AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        this->block(i) = petsc_vec.block(i);
+        {
+          const auto &partitioner  = this->block(i).get_partitioner();
+          IndexSet    combined_set = partitioner->locally_owned_range();
+          combined_set.add_indices(partitioner->ghost_indices());
+          ReadWriteVector<Number> rw_vector(combined_set);
+          rw_vector.import(petsc_vec.block(i), VectorOperation::insert);
+          this->block(i).import(rw_vector, VectorOperation::insert);
+
+          if (this->block(i).has_ghost_elements() ||
+              petsc_vec.block(i).has_ghost_elements())
+            this->block(i).update_ghost_values();
+        }
 
       return *this;
     }
@@ -237,7 +249,18 @@ namespace LinearAlgebra
     {
       AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        this->block(i) = trilinos_vec.block(i);
+        {
+          const auto &partitioner  = this->block(i).get_partitioner();
+          IndexSet    combined_set = partitioner->locally_owned_range();
+          combined_set.add_indices(partitioner->ghost_indices());
+          ReadWriteVector<Number> rw_vector(combined_set);
+          rw_vector.import(trilinos_vec.block(i), VectorOperation::insert);
+          this->block(i).import(rw_vector, VectorOperation::insert);
+
+          if (this->block(i).has_ghost_elements() ||
+              trilinos_vec.block(i).has_ghost_elements())
+            this->block(i).update_ghost_values();
+        }
 
       return *this;
     }

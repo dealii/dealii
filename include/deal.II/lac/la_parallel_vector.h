@@ -411,38 +411,6 @@ namespace LinearAlgebra
       Vector<Number, MemorySpace> &
       operator=(const Vector<Number2, MemorySpace> &in_vector);
 
-#ifdef DEAL_II_WITH_PETSC
-      /**
-       * Copy the content of a PETSc vector into the calling vector. This
-       * function assumes that the vectors layouts have already been
-       * initialized to match.
-       *
-       * This operator is only available if deal.II was configured with PETSc.
-       *
-       * This function is deprecated. Use the interface through
-       * ReadWriteVector instead.
-       */
-      DEAL_II_DEPRECATED
-      Vector<Number, MemorySpace> &
-      operator=(const PETScWrappers::MPI::Vector &petsc_vec);
-#endif
-
-#ifdef DEAL_II_WITH_TRILINOS
-      /**
-       * Copy the content of a Trilinos vector into the calling vector. This
-       * function assumes that the vectors layouts have already been
-       * initialized to match.
-       *
-       * This operator is only available if deal.II was configured with
-       * Trilinos.
-       *
-       * This function is deprecated. Use the interface through
-       * ReadWriteVector instead.
-       */
-      DEAL_II_DEPRECATED
-      Vector<Number, MemorySpace> &
-      operator=(const TrilinosWrappers::MPI::Vector &trilinos_vec);
-#endif
       //@}
 
       /**
@@ -884,31 +852,6 @@ namespace LinearAlgebra
       void
       sadd(const Number s, const Vector<Number, MemorySpace> &V);
 
-      /**
-       * Scaling and multiple addition.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      sadd(const Number                       s,
-           const Number                       a,
-           const Vector<Number, MemorySpace> &V,
-           const Number                       b,
-           const Vector<Number, MemorySpace> &W);
-
-      /**
-       * Assignment <tt>*this = a*u + b*v</tt>.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      equ(const Number                       a,
-          const Vector<Number, MemorySpace> &u,
-          const Number                       b,
-          const Vector<Number, MemorySpace> &v);
-
       //@}
 
 
@@ -925,56 +868,11 @@ namespace LinearAlgebra
       local_size() const;
 
       /**
-       * Return the half-open interval that specifies the locally owned range
-       * of the vector. Note that <code>local_size() == local_range().second -
-       * local_range().first</code>.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      std::pair<size_type, size_type>
-      local_range() const;
-
-      /**
        * Return true if the given global index is in the local range of this
        * processor.
-       *
-       * This function is deprecated.
        */
-      DEAL_II_DEPRECATED
       bool
       in_local_range(const size_type global_index) const;
-
-      /**
-       * Return the number of ghost elements present on the vector.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      size_type
-      n_ghost_entries() const;
-
-      /**
-       * Return an index set that describes which elements of this vector are
-       * not owned by the current processor but can be written into or read
-       * from locally (ghost elements).
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      const IndexSet &
-      ghost_elements() const;
-
-      /**
-       * Return whether the given global index is a ghost index on the
-       * present processor. Returns false for indices that are owned locally
-       * and for indices not present at all.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      bool
-      is_ghost_entry(const types::global_dof_index global_index) const;
 
       /**
        * Make the @p Vector class a bit like the <tt>vector<></tt> class of
@@ -1541,16 +1439,6 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline std::pair<typename Vector<Number, MemorySpace>::size_type,
-                     typename Vector<Number, MemorySpace>::size_type>
-    Vector<Number, MemorySpace>::local_range() const
-    {
-      return partitioner->local_range();
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
     inline bool
     Vector<Number, MemorySpace>::in_local_range(
       const size_type global_index) const
@@ -1570,34 +1458,6 @@ namespace LinearAlgebra
                    partitioner->local_range().second);
 
       return is;
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline typename Vector<Number, MemorySpace>::size_type
-    Vector<Number, MemorySpace>::n_ghost_entries() const
-    {
-      return partitioner->n_ghost_indices();
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline const IndexSet &
-    Vector<Number, MemorySpace>::ghost_elements() const
-    {
-      return partitioner->ghost_indices();
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline bool
-    Vector<Number, MemorySpace>::is_ghost_entry(
-      const size_type global_index) const
-    {
-      return partitioner->is_ghost_entry(global_index);
     }
 
 

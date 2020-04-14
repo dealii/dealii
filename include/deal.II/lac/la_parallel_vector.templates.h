@@ -781,70 +781,6 @@ namespace LinearAlgebra
       }
     } // namespace petsc_helpers
 
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const PETScWrappers::MPI::Vector &petsc_vec)
-    {
-      // TODO: We would like to use the same compact infrastructure as for the
-      // Trilinos vector below, but the interface through ReadWriteVector does
-      // not support overlapping (ghosted) PETSc vectors, which we need for
-      // backward compatibility.
-
-      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
-             StandardExceptions::ExcInvalidState());
-
-      // get a representation of the vector and copy it
-      PetscScalar *  start_ptr;
-      PetscErrorCode ierr =
-        VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      const size_type vec_size = local_size();
-      petsc_helpers::copy_petsc_vector(start_ptr,
-                                       start_ptr + vec_size,
-                                       begin());
-
-      // restore the representation of the vector
-      ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      // spread ghost values between processes?
-      if (vector_is_ghosted || petsc_vec.has_ghost_elements())
-        update_ghost_values();
-
-      // return a reference to this object per normal c++ operator overloading
-      // semantics
-      return *this;
-    }
-
-#endif
-
-
-
-#ifdef DEAL_II_WITH_TRILINOS
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const TrilinosWrappers::MPI::Vector &trilinos_vec)
-    {
-#  ifdef DEAL_II_WITH_MPI
-      IndexSet combined_set = partitioner->locally_owned_range();
-      combined_set.add_indices(partitioner->ghost_indices());
-      ReadWriteVector<Number> rw_vector(combined_set);
-      rw_vector.import(trilinos_vec, VectorOperation::insert);
-      import(rw_vector, VectorOperation::insert);
-
-      if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
-        update_ghost_values();
-#  else
-      AssertThrow(false, ExcNotImplemented());
-#  endif
-
-      return *this;
-    }
-
 #endif
 
 
@@ -1619,39 +1555,6 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::sadd(
-      const Number                           x,
-      const Number                           a,
-      const Vector<Number, MemorySpaceType> &v,
-      const Number                           b,
-      const Vector<Number, MemorySpaceType> &w)
-    {
-      AssertIsFinite(x);
-      AssertIsFinite(a);
-      AssertIsFinite(b);
-
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
-
-      dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::sadd_xavbw(
-          thread_loop_partitioner,
-          partitioner->local_size(),
-          x,
-          a,
-          b,
-          v.data,
-          w.data,
-          data);
-
-      if (vector_is_ghosted)
-        update_ghost_values();
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator*=(const Number factor)
     {
@@ -1719,36 +1622,6 @@ namespace LinearAlgebra
         functions<Number, Number, MemorySpaceType>::equ_au(
           thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
 
-
-      if (vector_is_ghosted)
-        update_ghost_values();
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::equ(
-      const Number                           a,
-      const Vector<Number, MemorySpaceType> &v,
-      const Number                           b,
-      const Vector<Number, MemorySpaceType> &w)
-    {
-      AssertIsFinite(a);
-      AssertIsFinite(b);
-
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
-
-      dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::equ_aubv(
-          thread_loop_partitioner,
-          partitioner->local_size(),
-          a,
-          b,
-          v.data,
-          w.data,
-          data);
 
       if (vector_is_ghosted)
         update_ghost_values();

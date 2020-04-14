@@ -76,34 +76,36 @@ test()
   // the above)
   if (myid == 0)
     {
-      AssertDimension(v.n_ghost_entries(), 5);
+      AssertDimension(v.get_partitioner()->n_ghost_indices(), 5);
     }
   else if (myid == 1)
     {
-      AssertDimension(v.n_ghost_entries(), 8);
+      AssertDimension(v.get_partitioner()->n_ghost_indices(), 8);
     }
   else if (myid == 2)
     {
-      AssertDimension(v.n_ghost_entries(), 7);
+      AssertDimension(v.get_partitioner()->n_ghost_indices(), 7);
     }
   else
     {
-      AssertDimension(v.n_ghost_entries(), 10);
+      AssertDimension(v.get_partitioner()->n_ghost_indices(), 10);
     }
 
   // count that 13 is ghost only on non-owning
   // processors
   if (myid == 0)
     {
-      Assert(v.is_ghost_entry(13) == false, ExcInternalError());
+      Assert(v.get_partitioner()->is_ghost_entry(13) == false,
+             ExcInternalError());
     }
   else
     {
-      Assert(v.is_ghost_entry(13) == true, ExcInternalError());
+      Assert(v.get_partitioner()->is_ghost_entry(13) == true,
+             ExcInternalError());
     }
 
   // count that 27 is ghost nowhere
-  Assert(v.is_ghost_entry(27) == false, ExcInternalError());
+  Assert(v.get_partitioner()->is_ghost_entry(27) == false, ExcInternalError());
   if (myid == 0)
     {
       Assert(v.in_local_range(27) == true, ExcInternalError());
@@ -116,11 +118,13 @@ test()
   // element with number set is ghost
   if (myid == 1)
     {
-      Assert(v.is_ghost_entry(set) == false, ExcInternalError());
+      Assert(v.get_partitioner()->is_ghost_entry(set) == false,
+             ExcInternalError());
     }
   else
     {
-      Assert(v.is_ghost_entry(set) == true, ExcInternalError());
+      Assert(v.get_partitioner()->is_ghost_entry(set) == true,
+             ExcInternalError());
     }
 
   if (myid == 0)
