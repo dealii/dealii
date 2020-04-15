@@ -161,15 +161,14 @@ namespace Particles
         AffineConstraints<typename MatrixType::value_type>(),
       const ComponentMask &space_comps = ComponentMask());
 
-
-
     /**
-     * Interpolate a vector field to the particles of a particle_handler
+     * Interpolate a field to the position of the particles of a
+     * particle_handler
      *
      * Given a DoFHandler and a particle handler, interpolates a vector field
      * at the position of the particles. The result is stored in an output
      * vector whose size corresponds to the number of locally owned particles *
-     * number of components
+     * number of active components
      *
      * @param[in] dof_handler The DOF Handler which was used to generate the
      * field vector that is to be interpolated.
@@ -224,7 +223,6 @@ namespace Particles
       AssertDimension(interpolated_field.size(),
                       particle_handler.get_next_free_particle_index() *
                         n_comps);
-      // Add check on locally owned indices
 
       // Global to local indices
       std::vector<unsigned int> space_gtl(fe.n_components(),
