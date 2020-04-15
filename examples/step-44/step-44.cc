@@ -3343,7 +3343,7 @@ namespace Step44
 
   // @sect4{Solid::output_results}
   // Here we present how the results are written to file to be viewed
-  // using ParaView or Visit. The method is similar to that shown in previous
+  // using ParaView or VisIt. The method is similar to that shown in previous
   // tutorials so will not be discussed in detail.
   template <int dim>
   void Solid<dim>::output_results() const

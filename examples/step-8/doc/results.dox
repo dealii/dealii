@@ -2,7 +2,7 @@
 
 
 There is not much to be said about the results of this program, other than
-that they look nice. All images were made using Visit from the
+that they look nice. All images were made using VisIt from the
 output files that the program wrote to disk. The first two pictures show
 the $x$- and $y$-displacements as scalar components:
 
@@ -30,7 +30,7 @@ we said that this is not just a pressure and a concentration (two scalar
 quantities) but that the two components actually are the parts of a
 vector-valued quantity, namely the displacement. Absent this knowledge, the
 DataOut class assumes that all individual variables we print are separate
-scalars, and Visit and Paraview then faithfully assume that this is indeed what it is. In
+scalars, and VisIt and Paraview then faithfully assume that this is indeed what it is. In
 other words, once we have written the data as scalars, there is nothing in
 these programs that allows us to paste these two scalar fields back together as a
 vector field. Where we would have to attack this problem is at the root,
@@ -38,7 +38,7 @@ namely in <code>ElasticProblem::output_results()</code>. We won't do so here but
 instead refer the reader to the step-22 program where we show how to do this
 for a more general situation. That said, we couldn't help generating the data
 anyway that would show how this would look if implemented as discussed in
-step-22. The vector field then looks like this (Visit and Paraview
+step-22. The vector field then looks like this (VisIt and Paraview
 randomly select a few
 hundred vertices from which to draw the vectors; drawing them from each
 individual vertex would make the picture unreadable):

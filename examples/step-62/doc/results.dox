@@ -106,7 +106,7 @@ through the device.
 
 <h3>Mode profile</h3>
 
-We can inspect the mode profile with Paraview or Visit.
+We can inspect the mode profile with Paraview or VisIt.
 As we have discussed, at resonance all the mechanical
 energy is transmitted and the amplitude of motion is amplified inside the cavity.
 It can be observed that the PMLs are quite effective to truncate the solution.

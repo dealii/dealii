@@ -1325,7 +1325,7 @@ public:
 
   /**
    * Write triangulation in VTU format for each processor, and add a .pvtu file
-   * for visualization in Visit or Paraview that describes the collection of VTU
+   * for visualization in VisIt or Paraview that describes the collection of VTU
    * files as all part of the same simulation. The output is in the form
    * <tt>filename_without_extension.proc000*.vtu</tt> where * is
    * 0,1,...,n_proc-1 and <tt>filename_without_extension.pvtu</tt>. The input

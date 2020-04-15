@@ -1099,7 +1099,7 @@
  * trailing element of DataComponentInterpretation::component_is_scalar . The
  * array is then given as an extra argument to DataOut::add_data_vector to
  * explain how the data in the given solution vector is to be interpreted.
- * Visualization programs like Visit and Paraview will then offer to show
+ * Visualization programs like VisIt and Paraview will then offer to show
  * these <code>dim</code> components as vector fields, rather than as
  * individual scalar fields.
  *

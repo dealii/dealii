@@ -30,7 +30,7 @@ solution steps when you actually run the program.
 
 The program produces two files: <code>solution-2d.vtk</code> and
 <code>solution-3d.vtk</code>, which can be viewed using the programs
-Visit or Paraview (in case you do not have these programs, you can easily
+VisIt or Paraview (in case you do not have these programs, you can easily
 change the
 output format in the program to something which you can view more
 easily). Visualizing solutions is a bit of an art, but it can also be fun, so
@@ -86,7 +86,7 @@ A final remark on visualization: the idea of visualization is to give insight,
 which is not the same as displaying information. In particular, it is easy to
 overload a picture with information, but while it shows more information it
 makes it also more difficult to glean insight. As an example, the program I
-used to generate these pictures, Visit, by default puts tick marks on every
+used to generate these pictures, VisIt, by default puts tick marks on every
 axis, puts a big fat label "X Axis" on the $x$ axis and similar for the other
 axes, shows the file name from which the data was taken in the top left and
 the name of the user doing so and the time and date on the bottom right. None
