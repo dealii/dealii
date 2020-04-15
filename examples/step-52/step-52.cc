@@ -445,11 +445,11 @@ namespace Step52
             break;
           }
       }
+    const std::string solution_name = "solution_" + method_name;
 
     DataOut<2> data_out;
 
     data_out.attach_dof_handler(dof_handler);
-    std::string solution_name = "solution_" + method_name;
     data_out.add_data_vector(solution, solution_name);
 
     data_out.build_patches();
@@ -457,7 +457,7 @@ namespace Step52
     data_out.set_flags(DataOutBase::VtkFlags(time, time_step));
 
     const std::string filename =
-      solution_name + Utilities::int_to_string(time_step, 3) + ".vtu";
+      solution_name + "-" + Utilities::int_to_string(time_step, 3) + ".vtu";
     std::ofstream output(filename);
     data_out.write_vtu(output);
 
