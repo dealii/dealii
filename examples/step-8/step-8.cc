@@ -352,9 +352,9 @@ namespace Step8
                 for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                   {
                     cell_matrix(i, j) +=
-                      // The first term is (lambda d_i u_i, d_j v_j) + (mu d_i
-                      // u_j, d_j v_i).  Note that
-                      // <code>shape_grad(i,q_point)</code> returns the
+                      // The first term is $\lambda \partial_i u_i, \partial_j
+                      // v_j) + (\mu \partial_i u_j, \partial_j v_i)$. Note
+                      // that <code>shape_grad(i,q_point)</code> returns the
                       // gradient of the only nonzero component of the i-th
                       // shape function at quadrature point q_point. The
                       // component <code>comp(i)</code> of the gradient, which
@@ -371,17 +371,17 @@ namespace Step8
                          fe_values.shape_grad(j, q_point)[component_i] * //
                          mu_values[q_point])                             //
                         +                                                //
-                        // The second term is (mu nabla u_i, nabla v_j).  We
-                        // need not access a specific component of the
-                        // gradient, since we only have to compute the scalar
-                        // product of the two gradients, of which an
-                        // overloaded version of the operator* takes care, as
-                        // in previous examples.
+                        // The second term is $(\mu \nabla u_i, \nabla
+                        // v_j)$. We need not access a specific component of
+                        // the gradient, since we only have to compute the
+                        // scalar product of the two gradients, of which an
+                        // overloaded version of <tt>operator*</tt> takes
+                        // care, as in previous examples.
                         //
-                        // Note that by using the ?: operator, we only do this
-                        // if comp(i) equals comp(j), otherwise a zero is
-                        // added (which will be optimized away by the
-                        // compiler).
+                        // Note that by using the <tt>?:</tt> operator, we only
+                        // do this if <tt>component_i</tt> equals
+                        // <tt>component_j</tt>, otherwise a zero is added
+                        // (which will be optimized away by the compiler).
                         ((component_i == component_j) ?        //
                            (fe_values.shape_grad(i, q_point) * //
                             fe_values.shape_grad(j, q_point) * //
