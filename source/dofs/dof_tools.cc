@@ -1265,6 +1265,14 @@ namespace DoFTools
                          const ComponentMask &           component_mask,
                          std::vector<std::vector<bool>> &constant_modes)
   {
+    // If there are no locally owned DoFs, return with an empty
+    // constant_modes object:
+    if (dof_handler.n_locally_owned_dofs() == 0)
+      {
+        constant_modes = std::vector<std::vector<bool>>(0);
+        return;
+      }
+
     const unsigned int n_components = dof_handler.get_fe(0).n_components();
     Assert(component_mask.represents_n_components(n_components),
            ExcDimensionMismatch(n_components, component_mask.size()));
