@@ -2033,7 +2033,7 @@ namespace Step42
     // set of output files can be read at once. These <code>.pvtu</code>
     // are used by Paraview to describe an entire parallel computation's
     // output files. We then do the same again for the competitor of
-    // Paraview, the Visit visualization program, by creating a matching
+    // Paraview, the VisIt visualization program, by creating a matching
     // <code>.visit</code> file.
     const std::string master_name = data_out.write_vtu_with_pvtu_record(
       output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);

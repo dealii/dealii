@@ -938,13 +938,13 @@ private:
  * are then supposed to be interpreted as a tensor, one has to (i) use a
  * visualization program that can visualize tensors, and (ii) teach it
  * how to re-combine the scalar fields into tensors. In the case of
- * Visit -- see https://wci.llnl.gov/simulation/computer-codes/visit/ --
+ * VisIt -- see https://wci.llnl.gov/simulation/computer-codes/visit/ --
  * this is done by creating a new "Expression": in essence, one creates
  * a variable, say "grad_u", that is tensor-valued and whose value is
  * given by the expression <code>{{grad_u_xx,grad_u_xy},
  * {grad_u_yx, grad_u_yy}}</code>, where the referenced variables are
  * the names of scalar fields that, here, are produced by the example
- * below. Visit is then able to visualize this "new" variable as a
+ * below. VisIt is then able to visualize this "new" variable as a
  * tensor.)
  *
  * All derived classes have to do is implement a constructor and overload
@@ -1048,7 +1048,7 @@ private:
  *
  * These pictures show an ellipse representing the gradient tensor at, on
  * average, every tenth mesh point. You may want to read through the
- * documentation of the Visit visualization program (see
+ * documentation of the VisIt visualization program (see
  * https://wci.llnl.gov/simulation/computer-codes/visit/) for an interpretation
  * of how exactly tensors are visualizated.
  *

@@ -373,7 +373,7 @@ where <code>TTTT</code> is the timestep number (starting from 1) and
 0). These files contain the locally owned cells for the timestep and
 processor. The files <code>solution-TTTT.visit</code> is the visit record
 for timestep <code>TTTT</code>, while <code>solution-TTTT.pvtu</code> is
-the same for ParaView. (More recent versions of Visit can actually read
+the same for ParaView. (More recent versions of VisIt can actually read
 <code>.pvtu</code> files as well, but it doesn't hurt to output both
 kinds of record files.) Finally, the file
 <code>solution.pvd</code> is a special record only supported by ParaView that references

@@ -495,9 +495,9 @@ $\hat K$, and that it is one for squares and cubes.
 In practice, it might be interesting to visualize such quality measures.
 The function GridTools::compute_aspect_ratio_of_cells() provides one
 way to get this kind of information. Even better, visualization tools
-such as Visit often allow you to visualize this sort of information
+such as VisIt often allow you to visualize this sort of information
 for a variety of measures from within the visualization software
-itself; in the case of Visit, just add a "pseudo-color" plot and select
+itself; in the case of VisIt, just add a "pseudo-color" plot and select
 one of the mesh quality measures instead of the solution field.
 
 
