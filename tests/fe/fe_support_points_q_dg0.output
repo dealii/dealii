@@ -23,18 +23,6 @@ DEAL::1.00 0.00
 DEAL::0.00 1.00
 DEAL::1.00 1.00
 DEAL::0.500 0.500
-DEAL::Q_DG01<2> face 0 generalized support points
-DEAL::0.00 0.00
-DEAL::0.00 1.00
-DEAL::Q_DG01<2> face 1 generalized support points
-DEAL::1.00 0.00
-DEAL::1.00 1.00
-DEAL::Q_DG01<2> face 2 generalized support points
-DEAL::0.00 0.00
-DEAL::1.00 0.00
-DEAL::Q_DG01<2> face 3 generalized support points
-DEAL::0.00 1.00
-DEAL::1.00 1.00
 DEAL::Q_DG02<2> cell support points
 DEAL::0.00 0.00
 DEAL::1.00 0.00
@@ -73,22 +61,6 @@ DEAL::0.500 0.00
 DEAL::0.500 1.00
 DEAL::0.500 0.500
 DEAL::0.500 0.500
-DEAL::Q_DG02<2> face 0 generalized support points
-DEAL::0.00 0.00
-DEAL::0.00 1.00
-DEAL::0.00 0.500
-DEAL::Q_DG02<2> face 1 generalized support points
-DEAL::1.00 0.00
-DEAL::1.00 1.00
-DEAL::1.00 0.500
-DEAL::Q_DG02<2> face 2 generalized support points
-DEAL::0.00 0.00
-DEAL::1.00 0.00
-DEAL::0.500 0.00
-DEAL::Q_DG02<2> face 3 generalized support points
-DEAL::0.00 1.00
-DEAL::1.00 1.00
-DEAL::0.500 1.00
 DEAL::Q_DG03<2> cell support points
 DEAL::0.00 0.00
 DEAL::1.00 0.00
@@ -145,26 +117,6 @@ DEAL::0.724 0.276
 DEAL::0.276 0.724
 DEAL::0.724 0.724
 DEAL::0.500 0.500
-DEAL::Q_DG03<2> face 0 generalized support points
-DEAL::0.00 0.00
-DEAL::0.00 1.00
-DEAL::0.00 0.276
-DEAL::0.00 0.724
-DEAL::Q_DG03<2> face 1 generalized support points
-DEAL::1.00 0.00
-DEAL::1.00 1.00
-DEAL::1.00 0.276
-DEAL::1.00 0.724
-DEAL::Q_DG03<2> face 2 generalized support points
-DEAL::0.00 0.00
-DEAL::1.00 0.00
-DEAL::0.276 0.00
-DEAL::0.724 0.00
-DEAL::Q_DG03<2> face 3 generalized support points
-DEAL::0.00 1.00
-DEAL::1.00 1.00
-DEAL::0.276 1.00
-DEAL::0.724 1.00
 DEAL::Q_DG01<3> cell support points
 DEAL::0.00 0.00 0.00
 DEAL::1.00 0.00 0.00
@@ -215,36 +167,6 @@ DEAL::1.00 0.00 1.00
 DEAL::0.00 1.00 1.00
 DEAL::1.00 1.00 1.00
 DEAL::0.500 0.500 0.500
-DEAL::Q_DG01<3> face 0 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::0.00 1.00 0.00
-DEAL::0.00 0.00 1.00
-DEAL::0.00 1.00 1.00
-DEAL::Q_DG01<3> face 1 generalized support points
-DEAL::1.00 0.00 0.00
-DEAL::1.00 1.00 0.00
-DEAL::1.00 0.00 1.00
-DEAL::1.00 1.00 1.00
-DEAL::Q_DG01<3> face 2 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::0.00 0.00 1.00
-DEAL::1.00 0.00 0.00
-DEAL::1.00 0.00 1.00
-DEAL::Q_DG01<3> face 3 generalized support points
-DEAL::0.00 1.00 0.00
-DEAL::0.00 1.00 1.00
-DEAL::1.00 1.00 0.00
-DEAL::1.00 1.00 1.00
-DEAL::Q_DG01<3> face 4 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::1.00 0.00 0.00
-DEAL::0.00 1.00 0.00
-DEAL::1.00 1.00 0.00
-DEAL::Q_DG01<3> face 5 generalized support points
-DEAL::0.00 0.00 1.00
-DEAL::1.00 0.00 1.00
-DEAL::0.00 1.00 1.00
-DEAL::1.00 1.00 1.00
 DEAL::Q_DG02<3> cell support points
 DEAL::0.00 0.00 0.00
 DEAL::1.00 0.00 0.00
@@ -363,63 +285,3 @@ DEAL::0.500 0.500 0.00
 DEAL::0.500 0.500 1.00
 DEAL::0.500 0.500 0.500
 DEAL::0.500 0.500 0.500
-DEAL::Q_DG02<3> face 0 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::0.00 1.00 0.00
-DEAL::0.00 0.00 1.00
-DEAL::0.00 1.00 1.00
-DEAL::0.00 0.00 0.500
-DEAL::0.00 1.00 0.500
-DEAL::0.00 0.500 0.00
-DEAL::0.00 0.500 1.00
-DEAL::0.00 0.500 0.500
-DEAL::Q_DG02<3> face 1 generalized support points
-DEAL::1.00 0.00 0.00
-DEAL::1.00 1.00 0.00
-DEAL::1.00 0.00 1.00
-DEAL::1.00 1.00 1.00
-DEAL::1.00 0.00 0.500
-DEAL::1.00 1.00 0.500
-DEAL::1.00 0.500 0.00
-DEAL::1.00 0.500 1.00
-DEAL::1.00 0.500 0.500
-DEAL::Q_DG02<3> face 2 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::0.00 0.00 1.00
-DEAL::1.00 0.00 0.00
-DEAL::1.00 0.00 1.00
-DEAL::0.500 0.00 0.00
-DEAL::0.500 0.00 1.00
-DEAL::0.00 0.00 0.500
-DEAL::1.00 0.00 0.500
-DEAL::0.500 0.00 0.500
-DEAL::Q_DG02<3> face 3 generalized support points
-DEAL::0.00 1.00 0.00
-DEAL::0.00 1.00 1.00
-DEAL::1.00 1.00 0.00
-DEAL::1.00 1.00 1.00
-DEAL::0.500 1.00 0.00
-DEAL::0.500 1.00 1.00
-DEAL::0.00 1.00 0.500
-DEAL::1.00 1.00 0.500
-DEAL::0.500 1.00 0.500
-DEAL::Q_DG02<3> face 4 generalized support points
-DEAL::0.00 0.00 0.00
-DEAL::1.00 0.00 0.00
-DEAL::0.00 1.00 0.00
-DEAL::1.00 1.00 0.00
-DEAL::0.00 0.500 0.00
-DEAL::1.00 0.500 0.00
-DEAL::0.500 0.00 0.00
-DEAL::0.500 1.00 0.00
-DEAL::0.500 0.500 0.00
-DEAL::Q_DG02<3> face 5 generalized support points
-DEAL::0.00 0.00 1.00
-DEAL::1.00 0.00 1.00
-DEAL::0.00 1.00 1.00
-DEAL::1.00 1.00 1.00
-DEAL::0.00 0.500 1.00
-DEAL::1.00 0.500 1.00
-DEAL::0.500 0.00 1.00
-DEAL::0.500 1.00 1.00
-DEAL::0.500 0.500 1.00

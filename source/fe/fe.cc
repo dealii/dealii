@@ -1071,30 +1071,6 @@ FiniteElement<dim, spacedim>::has_face_support_points() const
 
 
 template <int dim, int spacedim>
-const std::vector<Point<dim - 1>> &
-FiniteElement<dim, spacedim>::get_generalized_face_support_points() const
-{
-  // a finite element may define
-  // support points, but only if
-  // there are as many as there are
-  // degrees of freedom on a face
-  return ((generalized_face_support_points.size() == 0) ?
-            unit_face_support_points :
-            generalized_face_support_points);
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::has_generalized_face_support_points() const
-{
-  return (generalized_face_support_points.size() != 0);
-}
-
-
-
-template <int dim, int spacedim>
 Point<dim - 1>
 FiniteElement<dim, spacedim>::unit_face_support_point(
   const unsigned int index) const

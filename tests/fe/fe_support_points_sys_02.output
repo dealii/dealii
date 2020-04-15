@@ -32,7 +32,3 @@ DEAL::1.00 0.500
 DEAL::0.00 1.00
 DEAL::0.500 1.00
 DEAL::1.00 1.00
-DEAL::FE_DGQ<2>(2)2<2> face 0 generalized support points
-DEAL::FE_DGQ<2>(2)2<2> face 1 generalized support points
-DEAL::FE_DGQ<2>(2)2<2> face 2 generalized support points
-DEAL::FE_DGQ<2>(2)2<2> face 3 generalized support points
