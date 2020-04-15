@@ -106,18 +106,27 @@ namespace CUDAWrappers
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
                                                  update_JxW_values,
-        const bool use_coloring = false,
-        const bool n_colors     = 1)
+        const bool use_coloring                      = false,
+        const bool n_colors                          = 1,
+        const bool overlap_communication_computation = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , n_colors(n_colors)
-      {}
-
-      /**
-       * Number of colors created by the graph coloring algorithm.
-       */
-      unsigned int n_colors;
+        , overlap_communication_computation(overlap_communication_computation)
+      {
+#  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
+        AssertThrow(
+          overlap_communication_computation == false,
+          ExcMessage(
+            "Overlapping communication and computation requires CUDA-aware MPI."));
+#  endif
+        if (overlap_communication_computation == true)
+          AssertThrow(
+            use_coloring == false || overlap_communication_computation == false,
+            ExcMessage(
+              "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+      }
       /**
        * Parallelization scheme used, parallelization over degrees of freedom or
        * over cells.
@@ -140,6 +149,17 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
+
+      /**
+       * Number of colors created by the graph coloring algorithm.
+       */
+      unsigned int n_colors;
+
+      /**
+       *  Overlap MPI communications with computation. This requires CUDA-aware
+       *  MPI and use_coloring must be false.
+       */
+      bool overlap_communication_computation;
     };
 
     /**
@@ -443,6 +463,12 @@ namespace CUDAWrappers
     bool use_coloring;
 
     /**
+     *  Overlap MPI communications with computation. This requires CUDA-aware
+     *  MPI and use_coloring must be false.
+     */
+    bool overlap_communication_computation;
+
+    /**
      * Total number of degrees of freedom.
      */
     types::global_dof_index n_dofs;
@@ -507,7 +533,7 @@ namespace CUDAWrappers
     types::global_dof_index *constrained_dofs;
 
     /**
-     *  Mask deciding where constraints are set on a given cell.
+     * Mask deciding where constraints are set on a given cell.
      */
     std::vector<unsigned int *> constraint_mask;
 
