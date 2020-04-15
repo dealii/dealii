@@ -73,6 +73,16 @@ namespace PETScWrappers
 
 
   void
+  PreconditionerBase::Tvmult(VectorBase &dst, const VectorBase &src) const
+  {
+    AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
+
+    const PetscErrorCode ierr = PCApplyTranspose(pc, src, dst);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
+
+  void
   PreconditionerBase::create_pc()
   {
     // only allow the creation of the
