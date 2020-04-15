@@ -513,32 +513,24 @@ ParameterHandler::parse_input(const std::string &filename,
                               const bool         skip_undefined,
                               const bool assert_mandatory_entries_are_found)
 {
-  std::filebuf fb;
-  if (fb.open(filename, std::ios::in))
-    {
-      std::istream is(&fb);
-      std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
-      boost::algorithm::to_lower(file_ending);
-      if (file_ending == "prm")
-        parse_input(is, filename, last_line, skip_undefined);
-      else if (file_ending == "xml")
-        parse_input_from_xml(is, skip_undefined);
-      else if (file_ending == "json")
-        parse_input_from_json(is, skip_undefined);
-      else
-        AssertThrow(
-          false,
-          ExcMessage(
-            "Unknown input file. Supported types are .prm, .xml, and .json."));
+  std::ifstream is(filename);
+  AssertThrow(is,
+              ExcMessage("Invalid filename " + filename +
+                         " provided. File does not exist or "
+                         "can not be read from."));
 
-      fb.close();
-    }
+  std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
+  boost::algorithm::to_lower(file_ending);
+  if (file_ending == "prm")
+    parse_input(is, filename, last_line, skip_undefined);
+  else if (file_ending == "xml")
+    parse_input_from_xml(is, skip_undefined);
+  else if (file_ending == "json")
+    parse_input_from_json(is, skip_undefined);
   else
-    {
-      AssertThrow(false,
-                  ExcMessage("Invalid filename " + filename +
-                             " provided. File does not exist."));
-    }
+    AssertThrow(false,
+                ExcMessage("Unknown input file name extension. Supported types "
+                           "are .prm, .xml, and .json."));
 
   if (assert_mandatory_entries_are_found)
     assert_that_entries_have_been_set();
