@@ -24,7 +24,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
-#include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -54,22 +54,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace MappingQGenericImplementation
-  {
-    namespace
-    {
-      template <int dim>
-      std::vector<unsigned int>
-      get_dpo_vector(const unsigned int degree)
-      {
-        std::vector<unsigned int> dpo(dim + 1, 1U);
-        for (unsigned int i = 1; i < dpo.size(); ++i)
-          dpo[i] = dpo[i - 1] * (degree - 1);
-        return dpo;
-      }
-    } // namespace
-  }   // namespace MappingQGenericImplementation
-
   namespace MappingQ1
   {
     namespace
@@ -238,12 +222,9 @@ namespace internal
 
         // then also construct the mapping from lexicographic to the Qp shape
         // function numbering
-        const std::vector<unsigned int> renumber(
-          FETools::lexicographic_to_hierarchic_numbering(FiniteElementData<dim>(
-            internal::MappingQGenericImplementation::get_dpo_vector<dim>(
-              data.polynomial_degree),
-            1,
-            data.polynomial_degree)));
+        const std::vector<unsigned int> renumber =
+          FETools::hierarchic_to_lexicographic_numbering<dim>(
+            data.polynomial_degree);
 
         std::vector<double>         values;
         std::vector<Tensor<1, dim>> grads;
@@ -301,23 +282,23 @@ namespace internal
 
               if (data.shape_values.size() != 0)
                 for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.shape(point, renumber[i]) = values[i];
+                  data.shape(point, i) = values[renumber[i]];
 
               if (data.shape_derivatives.size() != 0)
                 for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.derivative(point, renumber[i]) = grads[i];
+                  data.derivative(point, i) = grads[renumber[i]];
 
               if (data.shape_second_derivatives.size() != 0)
                 for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.second_derivative(point, renumber[i]) = grad2[i];
+                  data.second_derivative(point, i) = grad2[renumber[i]];
 
               if (data.shape_third_derivatives.size() != 0)
                 for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.third_derivative(point, renumber[i]) = grad3[i];
+                  data.third_derivative(point, i) = grad3[renumber[i]];
 
               if (data.shape_fourth_derivatives.size() != 0)
                 for (unsigned int i = 0; i < n_shape_functions; ++i)
-                  data.fourth_derivative(point, renumber[i]) = grad4[i];
+                  data.fourth_derivative(point, i) = grad4[renumber[i]];
             }
       }
 
@@ -750,18 +731,17 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
 
           if (tensor_product_quadrature)
             {
-              const FE_Q<dim> fe(polynomial_degree);
+              // use a 1D FE_DGQ and adjust the hierarchic -> lexicographic
+              // numbering manually (building an FE_Q<dim> is relatively
+              // expensive due to constraints)
+              const FE_DGQ<1> fe(polynomial_degree);
               shape_info.reinit(q.get_tensor_basis()[0], fe);
-
-              const unsigned int n_shape_values = fe.n_dofs_per_cell();
-              const unsigned int max_size =
-                std::max(n_q_points, n_shape_values);
-              const unsigned int vec_length =
-                dealii::VectorizedArray<double>::size();
-              const unsigned int n_comp = 1 + (spacedim - 1) / vec_length;
-
-              scratch.resize((dim - 1) * max_size);
-              values_dofs.resize(n_comp * n_shape_values);
+              shape_info.lexicographic_numbering =
+                FETools::lexicographic_to_hierarchic_numbering<dim>(
+                  polynomial_degree);
+              shape_info.n_q_points = q.size();
+              shape_info.dofs_per_component_on_cell =
+                Utilities::pow(polynomial_degree + 1, dim);
             }
         }
     }
@@ -817,18 +797,15 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize_face(
 
   if (dim > 1 && tensor_product_quadrature)
     {
-      const unsigned int  facedim = dim > 1 ? dim - 1 : 1;
-      const FE_Q<facedim> fe(polynomial_degree);
+      constexpr unsigned int facedim = dim - 1;
+      const FE_DGQ<1>        fe(polynomial_degree);
       shape_info.reinit(q.get_tensor_basis()[0], fe);
-
-      const unsigned int n_shape_values = fe.n_dofs_per_cell();
-      const unsigned int n_q_points     = q.size();
-      const unsigned int max_size       = std::max(n_q_points, n_shape_values);
-      const unsigned int vec_length     = VectorizedArray<double>::size();
-      const unsigned int n_comp         = 1 + (spacedim - 1) / vec_length;
-
-      scratch.resize((dim - 1) * max_size);
-      values_dofs.resize(n_comp * n_shape_values);
+      shape_info.lexicographic_numbering =
+        FETools::lexicographic_to_hierarchic_numbering<facedim>(
+          polynomial_degree);
+      shape_info.n_q_points = n_original_q_points;
+      shape_info.dofs_per_component_on_cell =
+        Utilities::pow(polynomial_degree + 1, dim);
     }
 
   if (dim > 1)
@@ -1126,10 +1103,10 @@ namespace internal
         if (polynomial_degree <= 1)
           return dealii::Table<2, double>();
 
-        QGaussLobatto<dim>        quadrature(polynomial_degree + 1);
-        std::vector<unsigned int> h2l(quadrature.size());
-        FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree,
-                                                            h2l);
+        QGaussLobatto<dim>              quadrature(polynomial_degree + 1);
+        const std::vector<unsigned int> h2l =
+          FETools::hierarchic_to_lexicographic_numbering<dim>(
+            polynomial_degree);
 
         dealii::Table<2, double> output(quadrature.size() -
                                           GeometryInfo<dim>::vertices_per_cell,
@@ -1493,11 +1470,11 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        const unsigned int n_shape_values = data.n_shape_functions;
-        const unsigned int n_q_points     = data.shape_info.n_q_points;
-        const unsigned int vec_length     = VectorizedArray<double>::size();
-        const unsigned int n_comp         = 1 + (spacedim - 1) / vec_length;
-        const unsigned int n_hessians     = (dim * (dim + 1)) / 2;
+        const unsigned int     n_shape_values = data.n_shape_functions;
+        const unsigned int     n_q_points     = data.shape_info.n_q_points;
+        constexpr unsigned int n_lanes        = VectorizedArray<double>::size();
+        constexpr unsigned int n_comp         = 1 + (spacedim - 1) / n_lanes;
+        constexpr unsigned int n_hessians     = (dim * (dim + 1)) / 2;
 
         const bool evaluate_values = update_flags & update_quadrature_points;
         const bool evaluate_gradients =
@@ -1536,6 +1513,7 @@ namespace internal
             data.values_dofs.resize(n_comp * n_shape_values);
             data.values_quad.resize(n_comp * n_q_points);
             data.gradients_quad.resize(n_comp * n_q_points * dim);
+            data.scratch.resize(2 * std::max(n_q_points, n_shape_values));
 
             if (evaluate_hessians)
               data.hessians_quad.resize(n_comp * n_q_points * n_hessians);
@@ -1545,8 +1523,8 @@ namespace internal
             for (unsigned int i = 0; i < n_shape_values; ++i)
               for (unsigned int d = 0; d < spacedim; ++d)
                 {
-                  const unsigned int in_comp  = d % vec_length;
-                  const unsigned int out_comp = d / vec_length;
+                  const unsigned int in_comp  = d % n_lanes;
+                  const unsigned int out_comp = d / n_lanes;
                   data.values_dofs[out_comp * n_shape_values + i][in_comp] =
                     data
                       .mapping_support_points[renumber_to_lexicographic[i]][d];
@@ -1571,10 +1549,10 @@ namespace internal
             for (unsigned int out_comp = 0; out_comp < n_comp; ++out_comp)
               for (unsigned int i = 0; i < n_q_points; ++i)
                 for (unsigned int in_comp = 0;
-                     in_comp < vec_length &&
-                     in_comp < spacedim - out_comp * vec_length;
+                     in_comp < n_lanes &&
+                     in_comp < spacedim - out_comp * n_lanes;
                      ++in_comp)
-                  quadrature_points[i][out_comp * vec_length + in_comp] =
+                  quadrature_points[i][out_comp * n_lanes + in_comp] =
                     data.values_quad[out_comp * n_q_points + i][in_comp];
           }
 
@@ -1588,14 +1566,14 @@ namespace internal
               for (unsigned int point = 0; point < n_q_points; ++point)
                 for (unsigned int j = 0; j < dim; ++j)
                   for (unsigned int in_comp = 0;
-                       in_comp < vec_length &&
-                       in_comp < spacedim - out_comp * vec_length;
+                       in_comp < n_lanes &&
+                       in_comp < spacedim - out_comp * n_lanes;
                        ++in_comp)
                     {
                       const unsigned int total_number = point * dim + j;
                       const unsigned int new_comp  = total_number / n_q_points;
                       const unsigned int new_point = total_number % n_q_points;
-                      data.contravariant[new_point][out_comp * vec_length +
+                      data.contravariant[new_point][out_comp * n_lanes +
                                                     in_comp][new_comp] =
                         data.gradients_quad[(out_comp * n_q_points + point) *
                                               dim +
@@ -1625,8 +1603,8 @@ namespace internal
               for (unsigned int point = 0; point < n_q_points; ++point)
                 for (unsigned int j = 0; j < n_hessians; ++j)
                   for (unsigned int in_comp = 0;
-                       in_comp < vec_length &&
-                       in_comp < spacedim - out_comp * vec_length;
+                       in_comp < n_lanes &&
+                       in_comp < spacedim - out_comp * n_lanes;
                        ++in_comp)
                     {
                       const unsigned int total_number = point * n_hessians + j;
@@ -1643,10 +1621,10 @@ namespace internal
                         data.hessians_quad[(out_comp * n_q_points + point) *
                                              n_hessians +
                                            j][in_comp];
-                      jacobian_grads[new_point][out_comp * vec_length + in_comp]
+                      jacobian_grads[new_point][out_comp * n_lanes + in_comp]
                                     [new_hessian_comp_i][new_hessian_comp_j] =
                                       value;
-                      jacobian_grads[new_point][out_comp * vec_length + in_comp]
+                      jacobian_grads[new_point][out_comp * n_lanes + in_comp]
                                     [new_hessian_comp_j][new_hessian_comp_i] =
                                       value;
                     }
@@ -2238,7 +2216,6 @@ template <int dim, int spacedim>
 MappingQGeneric<dim, spacedim>::MappingQGeneric(const unsigned int p)
   : polynomial_degree(p)
   , line_support_points(this->polynomial_degree + 1)
-  , fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr)
   , support_point_weights_perimeter_to_interior(
       internal::MappingQGenericImplementation::
         compute_support_point_weights_perimeter_to_interior(
@@ -2260,7 +2237,6 @@ MappingQGeneric<dim, spacedim>::MappingQGeneric(
   const MappingQGeneric<dim, spacedim> &mapping)
   : polynomial_degree(mapping.polynomial_degree)
   , line_support_points(mapping.line_support_points)
-  , fe_q(dim == 3 ? new FE_Q<dim>(*mapping.fe_q) : nullptr)
   , support_point_weights_perimeter_to_interior(
       mapping.support_point_weights_perimeter_to_interior)
   , support_point_weights_cell(mapping.support_point_weights_cell)
@@ -2301,12 +2277,8 @@ MappingQGeneric<dim, spacedim>::transform_unit_to_real_cell(
 
   // then also construct the mapping from lexicographic to the Qp shape function
   // numbering
-  const std::vector<unsigned int> renumber(
-    FETools::lexicographic_to_hierarchic_numbering(FiniteElementData<dim>(
-      internal::MappingQGenericImplementation::get_dpo_vector<dim>(
-        polynomial_degree),
-      1,
-      polynomial_degree)));
+  const std::vector<unsigned int> renumber =
+    FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree);
 
   const std::vector<Point<spacedim>> support_points =
     this->compute_mapping_support_points(cell);
@@ -2314,7 +2286,7 @@ MappingQGeneric<dim, spacedim>::transform_unit_to_real_cell(
   Point<spacedim> mapped_point;
   for (unsigned int i = 0; i < tensor_pols.n(); ++i)
     mapped_point +=
-      support_points[renumber[i]] * tensor_pols.compute_value(i, p);
+      support_points[i] * tensor_pols.compute_value(renumber[i], p);
 
   return mapped_point;
 }
