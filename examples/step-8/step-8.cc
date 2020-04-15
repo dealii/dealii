@@ -98,7 +98,7 @@ namespace Step8
 
     FESystem<dim> fe;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -230,16 +230,19 @@ namespace Step8
   void ElasticProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             constraints);
+    constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
                                     dsp,
-                                    hanging_node_constraints,
-                                    /*keep_constrained_dofs = */ true);
+                                    constraints,
+                                    /*keep_constrained_dofs = */ false);
     sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
@@ -409,43 +412,11 @@ namespace Step8
         // The transfer from local degrees of freedom into the global matrix
         // and right hand side vector does not depend on the equation under
         // consideration, and is thus the same as in all previous
-        // examples. The same holds for the elimination of hanging nodes from
-        // the matrix and right hand side, once we are done with assembling
-        // the entire linear system:
+        // examples.
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(local_dof_indices[i],
-                                local_dof_indices[j],
-                                cell_matrix(i, j));
-
-            system_rhs(local_dof_indices[i]) += cell_rhs(i);
-          }
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
-
-    hanging_node_constraints.condense(system_matrix);
-    hanging_node_constraints.condense(system_rhs);
-
-    // The interpolation of the boundary values needs a small modification:
-    // since the solution function is vector-valued, so need to be the
-    // boundary values. The <code>Functions::ZeroFunction</code> constructor
-    // accepts a parameter that tells it that it shall represent a vector
-    // valued, constant zero function with that many components. By default,
-    // this parameter is equal to one, in which case the
-    // <code>Functions::ZeroFunction</code> object would represent a scalar
-    // function. Since the solution vector has <code>dim</code> components, we
-    // need to pass <code>dim</code> as number of components to the zero
-    // function as well.
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       solution,
-                                       system_rhs);
   }
 
 
@@ -467,7 +438,7 @@ namespace Step8
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute(solution);
+    constraints.distribute(solution);
   }
 
 
