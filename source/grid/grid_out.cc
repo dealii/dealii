@@ -1142,9 +1142,8 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   for (const auto &cell : tria.active_cell_iterators())
     {
       out << cell->active_cell_index() + 1 << ' ' << elm_type << ' '
-          << static_cast<unsigned int>(cell->material_id()) << ' '
-          << cell->subdomain_id() << ' ' << GeometryInfo<dim>::vertices_per_cell
-          << ' ';
+          << cell->material_id() << ' ' << cell->subdomain_id() << ' '
+          << GeometryInfo<dim>::vertices_per_cell << ' ';
 
       // Vertex numbering follows UCD conventions.
 
@@ -1235,8 +1234,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
   // consecutively, starting with 1
   for (const auto &cell : tria.active_cell_iterators())
     {
-      out << cell->active_cell_index() + 1 << ' '
-          << static_cast<unsigned int>(cell->material_id()) << ' ';
+      out << cell->active_cell_index() + 1 << ' ' << cell->material_id() << ' ';
       switch (dim)
         {
           case 1:
@@ -1395,7 +1393,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
         {
             // TODO[GK]: Simplify after deprecation period is over
           case GridOutFlags::XFig::material_id:
-            out << static_cast<unsigned int>(cell->material_id()) + 32;
+            out << cell->material_id() + 32;
             break;
           case GridOutFlags::XFig::level_number:
             out << cell->level() + 8;
@@ -4004,9 +4002,9 @@ namespace internal
             out << "# cell " << cell << '\n';
 
           out << cell->vertex(0) << ' ' << cell->level() << ' '
-              << static_cast<unsigned int>(cell->material_id()) << '\n'
+              << cell->material_id() << '\n'
               << cell->vertex(1) << ' ' << cell->level() << ' '
-              << static_cast<unsigned int>(cell->material_id()) << '\n'
+              << cell->material_id() << '\n'
               << "\n\n";
         }
 
@@ -4069,10 +4067,9 @@ namespace internal
               // drawing pencil at the end
               for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                 out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i]) << ' '
-                    << cell->level() << ' '
-                    << static_cast<unsigned int>(cell->material_id()) << '\n';
+                    << cell->level() << ' ' << cell->material_id() << '\n';
               out << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n' // double new line for gnuplot 3d plots
                   << '\n';
             }
@@ -4104,8 +4101,7 @@ namespace internal
 
                       for (const Point<spacedim> &point : line_points)
                         out << point << ' ' << cell->level() << ' '
-                            << static_cast<unsigned int>(cell->material_id())
-                            << '\n';
+                            << cell->material_id() << '\n';
 
                       out << '\n' << '\n';
                     }
@@ -4114,11 +4110,9 @@ namespace internal
                       // if, however, the face is not at the boundary and we
                       // don't want to curve anything, then draw it as usual
                       out << face->vertex(0) << ' ' << cell->level() << ' '
-                          << static_cast<unsigned int>(cell->material_id())
-                          << '\n'
+                          << cell->material_id() << '\n'
                           << face->vertex(1) << ' ' << cell->level() << ' '
-                          << static_cast<unsigned int>(cell->material_id())
-                          << '\n'
+                          << cell->material_id() << '\n'
                           << '\n'
                           << '\n';
                     }
@@ -4181,49 +4175,49 @@ namespace internal
             {
               // front face
               out << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(1) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(5) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(4) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
               // back face
               out << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(3) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(7) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(6) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
 
               // now for the four connecting lines
               out << cell->vertex(0) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(2) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
               out << cell->vertex(1) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(3) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
               out << cell->vertex(5) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(7) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
               out << cell->vertex(4) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << cell->vertex(6) << ' ' << cell->level() << ' '
-                  << static_cast<unsigned int>(cell->material_id()) << '\n'
+                  << cell->material_id() << '\n'
                   << '\n';
             }
           else
@@ -4246,39 +4240,29 @@ namespace internal
                               mapping->transform_unit_to_real_cell(
                                 cell,
                                 q_projector->point(offset + i * n_points + j));
-                            out
-                              << p0 << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
-                            out
-                              << (mapping->transform_unit_to_real_cell(
-                                   cell,
-                                   q_projector->point(offset +
-                                                      (i + 1) * n_points + j)))
-                              << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
-                            out
-                              << (mapping->transform_unit_to_real_cell(
-                                   cell,
-                                   q_projector->point(
-                                     offset + (i + 1) * n_points + j + 1)))
-                              << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
-                            out
-                              << (mapping->transform_unit_to_real_cell(
-                                   cell,
-                                   q_projector->point(offset + i * n_points +
-                                                      j + 1)))
-                              << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
+                            out << p0 << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
+                            out << (mapping->transform_unit_to_real_cell(
+                                     cell,
+                                     q_projector->point(
+                                       offset + (i + 1) * n_points + j)))
+                                << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
+                            out << (mapping->transform_unit_to_real_cell(
+                                     cell,
+                                     q_projector->point(
+                                       offset + (i + 1) * n_points + j + 1)))
+                                << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
+                            out << (mapping->transform_unit_to_real_cell(
+                                     cell,
+                                     q_projector->point(offset + i * n_points +
+                                                        j + 1)))
+                                << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
                             // and the first point again
-                            out
-                              << p0 << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
+                            out << p0 << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
                             out << '\n' << '\n';
                           }
                     }
@@ -4322,13 +4306,10 @@ namespace internal
                                     << '\n';
                             }
                           else
-                            out
-                              << v0 << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n'
-                              << v1 << ' ' << cell->level() << ' '
-                              << static_cast<unsigned int>(cell->material_id())
-                              << '\n';
+                            out << v0 << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n'
+                                << v1 << ' ' << cell->level() << ' '
+                                << cell->material_id() << '\n';
 
                           out << '\n' << '\n';
                         }
