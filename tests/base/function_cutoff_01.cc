@@ -19,6 +19,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 

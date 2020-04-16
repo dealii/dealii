@@ -17,6 +17,7 @@
 
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_manifold.h>
 #include <deal.II/fe/mapping_q_generic.h>

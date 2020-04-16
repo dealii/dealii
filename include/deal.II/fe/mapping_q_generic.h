@@ -24,7 +24,6 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria_iterator.h>
