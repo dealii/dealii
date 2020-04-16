@@ -82,7 +82,6 @@ namespace Step8
   {
   public:
     ElasticProblem();
-    ~ElasticProblem();
     void run();
 
   private:
@@ -200,17 +199,6 @@ namespace Step8
   // perform more complex operations than just stacking together several
   // scalar finite elements of the same type into one; we will get to know
   // these possibilities in later examples.
-
-
-
-  // @sect4{ElasticProblem::~ElasticProblem destructor}
-
-  // The destructor, on the other hand, is exactly as in step-6:
-  template <int dim>
-  ElasticProblem<dim>::~ElasticProblem()
-  {
-    dof_handler.clear();
-  }
 
 
   // @sect4{ElasticProblem::setup_system}
