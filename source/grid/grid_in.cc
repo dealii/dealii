@@ -867,8 +867,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
           if (apply_all_indicators_to_manifolds)
             cells.back().manifold_id =
               static_cast<types::manifold_id>(material_id);
-          cells.back().material_id =
-            static_cast<types::material_id>(material_id);
+          cells.back().material_id = material_id;
 
           // transform from ucd to
           // consecutive numbering
@@ -1876,8 +1875,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 // numbers::invalid_material_id-1
                 AssertIndexRange(material_id, numbers::invalid_material_id);
 
-                cells.back().material_id =
-                  static_cast<types::material_id>(material_id);
+                cells.back().material_id = material_id;
 
                 // transform from ucd to
                 // consecutive numbering
