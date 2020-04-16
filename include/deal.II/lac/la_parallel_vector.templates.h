@@ -749,42 +749,6 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_PETSC
-
-    namespace petsc_helpers
-    {
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const PETSC_Number *petsc_start_ptr,
-                        const PETSC_Number *petsc_end_ptr,
-                        Number *            ptr)
-      {
-        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
-      }
-
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const std::complex<PETSC_Number> *petsc_start_ptr,
-                        const std::complex<PETSC_Number> *petsc_end_ptr,
-                        std::complex<Number> *            ptr)
-      {
-        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
-      }
-
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
-                        const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
-                        Number * /*ptr*/)
-      {
-        AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
-      }
-    } // namespace petsc_helpers
-
-#endif
-
-
-
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress(
