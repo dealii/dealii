@@ -58,28 +58,6 @@ namespace internal
     }
 
 
-    template <typename T>
-    void
-    print(const T &t, const char *format)
-    {
-      if (format != nullptr)
-        std::printf(format, t);
-      else
-        std::printf(" %5.2f", double(t));
-    }
-
-
-
-    template <typename T>
-    void
-    print(const std::complex<T> &t, const char *format)
-    {
-      if (format != nullptr)
-        std::printf(format, t.real(), t.imag());
-      else
-        std::printf(" %5.2f+%5.2fi", double(t.real()), double(t.imag()));
-    }
-
     // call std::copy, except for in
     // the case where we want to copy
     // from std::complex to a

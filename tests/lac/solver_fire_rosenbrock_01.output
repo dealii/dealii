@@ -1,10 +1,10 @@
 
 DEAL:FIRE::Starting value 5.423e+04
-DEAL:FIRE::Convergence step 17364 value 0
-DEAL::FIRE::Solution vector: 1.000  1.000  
-DEAL:FIRE::Starting value 2.711e+05
-DEAL:FIRE::Convergence step 18427 value 0
-DEAL::FIRE::Solution vector: 1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  
-DEAL:FIRE::Starting value 5.423e+05
-DEAL:FIRE::Convergence step 18843 value 0
-DEAL::FIRE::Solution vector: 1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000
+DEAL:FIRE::Convergence step 17364 value 9.913e-15
+1.000e+00 1.000e+00 
+DEAL:FIRE::FIRE::Solution vector: Starting value 2.711e+05
+DEAL:FIRE::Convergence step 18427 value 9.720e-15
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL:FIRE::FIRE::Solution vector: Starting value 5.423e+05
+DEAL:FIRE::Convergence step 18843 value 9.647e-15
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 

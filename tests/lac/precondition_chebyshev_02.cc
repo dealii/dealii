@@ -46,7 +46,8 @@ public:
     diagonal.reinit(f.m());
     for (unsigned int i = 0; i < f.m(); ++i)
       diagonal(i) = 1. / f(i, i);
-    diagonal.print(deallog);
+    deallog.get_file_stream() << "DEAL::";
+    diagonal.print(deallog.get_file_stream());
   }
 
   typename Vector<double>::size_type

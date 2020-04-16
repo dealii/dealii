@@ -215,7 +215,7 @@ test()
   Assert(tot_fun_calls == line_search_iterations + 1, ExcInternalError());
 
   deallog << "Limited memory BFGS solution:" << std::endl;
-  x.print(deallog);
+  x.print(deallog.get_file_stream());
 
   deallog << "Function value: " << func(x, x0) << std::endl;
 

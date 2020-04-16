@@ -865,16 +865,6 @@ public:
    */
   //@{
   /**
-   * Output of vector in user-defined format. For complex-valued vectors, the
-   * format should include specifiers for both the real and imaginary parts.
-   *
-   * This function is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  void
-  print(const char *format = nullptr) const;
-
-  /**
    * Print to a stream. @p precision denotes the desired precision with which
    * values shall be printed, @p scientific whether scientific notation shall
    * be used. If @p across is @p true then the vector is printed in a line,
@@ -885,20 +875,6 @@ public:
         const unsigned int precision  = 3,
         const bool         scientific = true,
         const bool         across     = true) const;
-
-  /**
-   * Print to a LogStream. <tt>width</tt> is used as argument to the std::setw
-   * manipulator, if printing across.  If @p across is @p true then the vector
-   * is printed in a line, while if @p false then the elements are printed on
-   * a separate line each.
-   *
-   * This function is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  void
-  print(LogStream &        out,
-        const unsigned int width  = 6,
-        const bool         across = true) const;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the
@@ -1399,17 +1375,6 @@ swap(Vector<Number> &u, Vector<Number> &v)
 template <typename number>
 inline std::ostream &
 operator<<(std::ostream &os, const Vector<number> &v)
-{
-  v.print(os);
-  return os;
-}
-
-/**
- * Output operator writing a vector to a LogStream.
- */
-template <typename number>
-inline LogStream &
-operator<<(LogStream &os, const Vector<number> &v)
 {
   v.print(os);
   return os;
