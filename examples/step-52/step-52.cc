@@ -692,21 +692,21 @@ namespace Step52
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Forward Euler:            error=" << solution.l2_norm()
+    std::cout << "   Forward Euler:            error=" << solution.l2_norm()
               << std::endl;
 
     explicit_method(TimeStepping::RK_THIRD_ORDER,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Third order Runge-Kutta:  error=" << solution.l2_norm()
+    std::cout << "   Third order Runge-Kutta:  error=" << solution.l2_norm()
               << std::endl;
 
     explicit_method(TimeStepping::RK_CLASSIC_FOURTH_ORDER,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Fourth order Runge-Kutta: error=" << solution.l2_norm()
+    std::cout << "   Fourth order Runge-Kutta: error=" << solution.l2_norm()
               << std::endl;
     std::cout << std::endl;
 
@@ -716,28 +716,28 @@ namespace Step52
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Backward Euler:           error=" << solution.l2_norm()
+    std::cout << "   Backward Euler:           error=" << solution.l2_norm()
               << std::endl;
 
     implicit_method(TimeStepping::IMPLICIT_MIDPOINT,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Implicit Midpoint:        error=" << solution.l2_norm()
+    std::cout << "   Implicit Midpoint:        error=" << solution.l2_norm()
               << std::endl;
 
     implicit_method(TimeStepping::CRANK_NICOLSON,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Crank-Nicolson:           error=" << solution.l2_norm()
+    std::cout << "   Crank-Nicolson:           error=" << solution.l2_norm()
               << std::endl;
 
     implicit_method(TimeStepping::SDIRK_TWO_STAGES,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "SDIRK:                    error=" << solution.l2_norm()
+    std::cout << "   SDIRK:                    error=" << solution.l2_norm()
               << std::endl;
     std::cout << std::endl;
 
@@ -747,7 +747,7 @@ namespace Step52
                                        n_time_steps,
                                        initial_time,
                                        final_time);
-    std::cout << "Heun-Euler:               error=" << solution.l2_norm()
+    std::cout << "   Heun-Euler:               error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
@@ -755,7 +755,7 @@ namespace Step52
                                        n_time_steps,
                                        initial_time,
                                        final_time);
-    std::cout << "Bogacki-Shampine:         error=" << solution.l2_norm()
+    std::cout << "   Bogacki-Shampine:         error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
@@ -763,7 +763,7 @@ namespace Step52
                                        n_time_steps,
                                        initial_time,
                                        final_time);
-    std::cout << "Dopri:                    error=" << solution.l2_norm()
+    std::cout << "   Dopri:                    error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
@@ -771,7 +771,7 @@ namespace Step52
                                        n_time_steps,
                                        initial_time,
                                        final_time);
-    std::cout << "Fehlberg:                 error=" << solution.l2_norm()
+    std::cout << "   Fehlberg:                 error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
@@ -779,7 +779,7 @@ namespace Step52
                                        n_time_steps,
                                        initial_time,
                                        final_time);
-    std::cout << "Cash-Karp:                error=" << solution.l2_norm()
+    std::cout << "   Cash-Karp:                error=" << solution.l2_norm()
               << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
   }
