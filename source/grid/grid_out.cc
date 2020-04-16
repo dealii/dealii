@@ -3318,12 +3318,12 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   out << "\n\nSCALARS ManifoldID int 1\n"
       << "LOOKUP_TABLE default\n";
 
-  // Now material id and boundary id
+  // Now manifold id
   if (vtk_flags.output_cells)
     {
       for (const auto &cell : tria.active_cell_iterators())
         {
-          out << static_cast<std::make_signed<types::boundary_id>::type>(
+          out << static_cast<std::make_signed<types::manifold_id>::type>(
                    cell->manifold_id())
               << ' ';
         }
@@ -3333,7 +3333,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &face : faces)
         {
-          out << static_cast<std::make_signed<types::boundary_id>::type>(
+          out << static_cast<std::make_signed<types::manifold_id>::type>(
                    face->manifold_id())
               << ' ';
         }
@@ -3343,7 +3343,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &edge : edges)
         {
-          out << static_cast<std::make_signed<types::boundary_id>::type>(
+          out << static_cast<std::make_signed<types::manifold_id>::type>(
                    edge->manifold_id())
               << ' ';
         }
