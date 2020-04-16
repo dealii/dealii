@@ -1664,7 +1664,7 @@ namespace Euler_DG
   // information to cross a single cell. For information transported along with
   // the medium, $\mathbf u$ is scaled by the mesh size,
   // so an estimate of the maximal velocity can be obtained by computing
-  // $\|J^{-\mathrm T} \mathbf{u}\|_\inf$, where $J$ is the Jacobian of the
+  // $\|J^{-\mathrm T} \mathbf{u}\|_\infty$, where $J$ is the Jacobian of the
   // transformation from real to the reference domain. Note that
   // FEEvaluationBase::inverse_jacobian() returns the inverse and transpose
   // Jacobian, representing the metric term from real to reference
