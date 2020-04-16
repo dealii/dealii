@@ -70,11 +70,10 @@ namespace Step8
   // the step-6 example.
   //
   // The only change is the use of a different class for the <code>fe</code>
-  // variable: Instead of a concrete finite element class such as
-  // <code>FE_Q</code>, we now use a more generic one,
-  // <code>FESystem</code>. In fact, <code>FESystem</code> is not really a
+  // variable: Instead of a concrete finite element class such as FE_Q, we now
+  // use a more generic one, FESystem. In fact, FESystem is not really a
   // finite element itself in that it does not implement shape functions of
-  // its own.  Rather, it is a class that can be used to stack several other
+  // its own. Rather, it is a class that can be used to stack several other
   // elements together to form one vector-valued finite element. In our case,
   // we will compose the vector-valued element of <code>FE_Q(1)</code>
   // objects, as shown below in the constructor of this class.
@@ -126,8 +125,8 @@ namespace Step8
   // subsequent calls would only have to do redundant checks). In addition,
   // checking and possibly resizing the vector is an operation that can not be
   // removed if we can't rely on the assumption that the vector already has
-  // the correct size; this is in contract to the <code>Assert</code> call
-  // that is completely removed if the program is compiled in optimized mode.
+  // the correct size; this is in contract to the Assert call that is
+  // completely removed if the program is compiled in optimized mode.
   //
   // Likewise, if by some accident someone tried to compile and run the
   // program in only one space dimension (in which the elastic equations do
@@ -149,8 +148,8 @@ namespace Step8
     // zero as well.
     //
     // For this, let us first define two objects that denote the centers of
-    // these areas. Note that upon construction of the <code>Point</code>
-    // objects, all components are set to zero.
+    // these areas. Note that upon construction of the Point objects, all
+    // components are set to zero.
     Point<dim> point_1, point_2;
     point_1(0) = 0.5;
     point_2(0) = -0.5;
@@ -188,19 +187,19 @@ namespace Step8
   // functions of a scalar element). Of course, the number of scalar finite
   // elements we would like to stack together equals the number of components
   // the solution function has, which is <code>dim</code> since we consider
-  // displacement in each space direction. The <code>FESystem</code> class can
-  // handle this: we pass it the finite element of which we would like to
-  // compose the system of, and how often it shall be repeated:
+  // displacement in each space direction. The FESystem class can handle this:
+  // we pass it the finite element of which we would like to compose the
+  // system of, and how often it shall be repeated:
 
   template <int dim>
   ElasticProblem<dim>::ElasticProblem()
     : dof_handler(triangulation)
     , fe(FE_Q<dim>(1), dim)
   {}
-  // In fact, the <code>FESystem</code> class has several more constructors
-  // which can perform more complex operations than just stacking together
-  // several scalar finite elements of the same type into one; we will get to
-  // know these possibilities in later examples.
+  // In fact, the FESystem class has several more constructors which can
+  // perform more complex operations than just stacking together several
+  // scalar finite elements of the same type into one; we will get to know
+  // these possibilities in later examples.
 
 
 
@@ -217,15 +216,15 @@ namespace Step8
   // @sect4{ElasticProblem::setup_system}
 
   // Setting up the system of equations is identical to the function used in
-  // the step-6 example. The <code>DoFHandler</code> class and all other
-  // classes used here are fully aware that the finite element we want to use
-  // is vector-valued, and take care of the vector-valuedness of the finite
-  // element themselves. (In fact, they do not, but this does not need to
-  // bother you: since they only need to know how many degrees of freedom
-  // there are per vertex, line and cell, and they do not ask what they
-  // represent, i.e. whether the finite element under consideration is
-  // vector-valued or whether it is, for example, a scalar Hermite element
-  // with several degrees of freedom on each vertex).
+  // the step-6 example. The DoFHandler class and all other classes used here
+  // are fully aware that the finite element we want to use is vector-valued,
+  // and take care of the vector-valuedness of the finite element
+  // themselves. (In fact, they do not, but this does not need to bother you:
+  // since they only need to know how many degrees of freedom there are per
+  // vertex, line and cell, and they do not ask what they represent,
+  // i.e. whether the finite element under consideration is vector-valued or
+  // whether it is, for example, a scalar Hermite element with several degrees
+  // of freedom on each vertex).
   template <int dim>
   void ElasticProblem<dim>::setup_system()
   {
@@ -260,15 +259,15 @@ namespace Step8
   // examples.
   //
   // The first parts of this function are the same as before, however: setting
-  // up a suitable quadrature formula, initializing an <code>FEValues</code>
-  // object for the (vector-valued) finite element we use as well as the
-  // quadrature object, and declaring a number of auxiliary arrays. In
-  // addition, we declare the ever same two abbreviations:
-  // <code>n_q_points</code> and <code>dofs_per_cell</code>. The number of
-  // degrees of freedom per cell we now obviously ask from the composed finite
-  // element rather than from the underlying scalar Q1 element. Here, it is
-  // <code>dim</code> times the number of degrees of freedom per cell of the
-  // Q1 element, though this is not explicit knowledge we need to care about:
+  // up a suitable quadrature formula, initializing an FEValues object for the
+  // (vector-valued) finite element we use as well as the quadrature object,
+  // and declaring a number of auxiliary arrays. In addition, we declare the
+  // ever same two abbreviations: <code>n_q_points</code> and
+  // <code>dofs_per_cell</code>. The number of degrees of freedom per cell we
+  // now obviously ask from the composed finite element rather than from the
+  // underlying scalar Q1 element. Here, it is <code>dim</code> times the
+  // number of degrees of freedom per cell of the Q1 element, though this is
+  // not explicit knowledge we need to care about:
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
@@ -478,9 +477,8 @@ namespace Step8
 
   // The output happens mostly as has been shown in previous examples
   // already. The only difference is that the solution function is vector
-  // valued. The <code>DataOut</code> class takes care of this automatically,
-  // but we have to give each component of the solution vector a different
-  // name.
+  // valued. The DataOut class takes care of this automatically, but we have
+  // to give each component of the solution vector a different name.
   //
   // To do this, the DataOut::add_vector() function wants a vector of
   // strings. Since the number of components is the same as the number
@@ -497,10 +495,10 @@ namespace Step8
   //
   // After listing the 1d, 2d, and 3d case, it is good style to let the
   // program die if we run upon a case which we did not consider. Remember
-  // that the <code>Assert</code> macro generates an exception if the
-  // condition in the first parameter is not satisfied. Of course, the
-  // condition <code>false</code> can never be satisfied, so the program
-  // will always abort whenever it gets to the default statement:
+  // that the Assert macro generates an exception if the condition in the
+  // first parameter is not satisfied. Of course, the condition
+  // <code>false</code> can never be satisfied, so the program will always
+  // abort whenever it gets to the default statement:
   template <int dim>
   void ElasticProblem<dim>::output_results(const unsigned int cycle) const
   {
@@ -568,13 +566,12 @@ namespace Step8
   // an initial grid that is totally unsuitable for the problem at hand.
   //
   // The unfortunate thing is that if the discrete solution is constant, then
-  // the error indicators computed by the <code>KellyErrorEstimator</code>
-  // class are zero for each cell as well, and the call to
-  // <code>refine_and_coarsen_fixed_number</code> on the
-  // <code>triangulation</code> object will not flag any cells for refinement
-  // (why should it if the indicated error is zero for each cell?). The grid
-  // in the next iteration will therefore consist of four cells only as well,
-  // and the same problem occurs again.
+  // the error indicators computed by the KellyErrorEstimator class are zero
+  // for each cell as well, and the call to
+  // Triangulation::refine_and_coarsen_fixed_number() will not flag any cells
+  // for refinement (why should it if the indicated error is zero for each
+  // cell?). The grid in the next iteration will therefore consist of four
+  // cells only as well, and the same problem occurs again.
   //
   // The conclusion needs to be: while of course we will not choose the
   // initial grid to be well-suited for the accurate solution of the problem,
