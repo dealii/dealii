@@ -3898,8 +3898,9 @@ namespace GridTools
 #    else
     constexpr int dim      = MeshType::dimension;
     constexpr int spacedim = MeshType::space_dimension;
-    auto tria = static_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-      &mesh.get_triangulation());
+    auto          tria =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &mesh.get_triangulation());
     Assert(
       tria != nullptr,
       ExcMessage(
