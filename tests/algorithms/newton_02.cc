@@ -17,6 +17,8 @@
 #include <deal.II/algorithms/newton.h>
 #include <deal.II/algorithms/operator.h>
 
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/numerics/vector_tools.h>

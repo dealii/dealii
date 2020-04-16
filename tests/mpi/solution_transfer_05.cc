@@ -56,7 +56,7 @@ test()
   const unsigned int    max_degree = 6 - dim;
   hp::FECollection<dim> fe_dgq;
   for (unsigned int deg = 1; deg <= max_degree; ++deg)
-    fe_dgq.push_back(FE_Q<dim>(deg));
+    fe_dgq.push_back(FE_DGQ<dim>(deg));
 
   hp::DoFHandler<dim> dgq_dof_handler(tria);
 

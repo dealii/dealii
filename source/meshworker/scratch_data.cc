@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/meshworker/scratch_data.h>
 
 DEAL_II_NAMESPACE_OPEN

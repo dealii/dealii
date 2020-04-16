@@ -69,7 +69,7 @@ run(unsigned int degree, unsigned int n_q_points)
   GridOut grid_out;
   grid_out.write_mesh_per_processor_as_vtu(tria, "mesh");
 
-  FE_Q<dim>              fe(degree);                       // dummy
+  FE_DGQ<dim>            fe(degree);                       // dummy
   QGaussLobatto<dim - 1> quad(n_q_points);                 // dummy
   UpdateFlags            flags = update_quadrature_points; // dummy
 

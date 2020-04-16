@@ -35,6 +35,7 @@
 // this was fixed with r24044 together with the no_flux_07 test that
 // reduces it to its essence
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
 

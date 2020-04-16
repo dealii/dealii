@@ -333,8 +333,8 @@ namespace Step10
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping(degree);
-        const FE_Q<dim>     fe(1);
+        const MappingQ<dim>   mapping(degree);
+        const FE_Nothing<dim> fe;
 
         DoFHandler<dim> dof_handler(triangulation);
 
