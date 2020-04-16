@@ -4036,7 +4036,7 @@ namespace internal
 
       // If we need to plot curved lines then generate a quadrature formula to
       // place points via the mapping
-      Quadrature<dim> *           q_projector = nullptr;
+      Quadrature<dim>             q_projector;
       std::vector<Point<dim - 1>> boundary_points;
       if (mapping != nullptr)
         {
@@ -4049,8 +4049,7 @@ namespace internal
           std::vector<double> dummy_weights(n_points, 1. / n_points);
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
-          q_projector = new Quadrature<dim>(
-            QProjector<dim>::project_to_all_faces(quadrature));
+          q_projector = QProjector<dim>::project_to_all_faces(quadrature);
         }
 
       for (const auto &cell : tria.active_cell_iterators())
@@ -4100,7 +4099,7 @@ namespace internal
                       for (unsigned int i = 0; i < n_points; ++i)
                         line_points.push_back(
                           mapping->transform_unit_to_real_cell(
-                            cell, q_projector->point(offset + i)));
+                            cell, q_projector.point(offset + i)));
                       internal::remove_colinear_points(line_points);
 
                       for (const Point<spacedim> &point : line_points)
@@ -4126,9 +4125,6 @@ namespace internal
                 }
             }
         }
-
-      if (q_projector != nullptr)
-        delete q_projector;
 
       // make sure everything now gets to disk
       out.flush();
