@@ -846,57 +846,113 @@ class ParameterHandler : public Subscriptor
 {
 public:
   /**
-   * List of possible output formats used for
-   * ParameterHandler::print_parameters().
+   * List of possible output formats used for functions like
+   * ParameterHandler::print_parameters(). The options can be categorized into
+   * two groups:
+   * - format options: PRM, LaTeX, Description, XML, JSON
+   * - stylistic options: Short, KeepDeclarationOrder
+   *
+   * A valid combination of options is given in the following table:
+   *
+   * Stylistic options    | Default | PRM | LaTeX | Description | XML | JSON
+   * -------------------- | ------- | --- | ----- | ----------- | --- | ----
+   * Default              |    X    |  X  |   X   |      X      |  X  |  X
+   * Short                |    X    |  X  |   -   |      X      |  X  |  X
+   * KeepDeclarationOrder |    X    |  X  |   X   |      X      |  X  |  X
+   *
+   * Valid combinations are checked at the beginning of the functions that
+   * accept an OutputStyle as an input argument.
+   *
+   * Furthermore, a number of shortcuts of commonly used option combinations are
+   * provided. E.g., ShortPRM prints the parameters in the PRM
+   * format, while skipping the documentation.
    */
   enum OutputStyle
   {
     /**
-     * Write human readable output suitable to be read by ParameterHandler
-     * again.
+     * Default stylistic style: print documentation and sort all parameters
+     * alphabetically.
      */
-    Text = 1,
-
-    /**
-     * Write parameters as a LaTeX table.
-     */
-    LaTeX = 2,
-    /**
-     * Write out declared parameters with description and possible values.
-     */
-    Description = 3,
-
-    /**
-     * Write out everything as an <a
-     * href="http://en.wikipedia.org/wiki/XML">XML</a> file.
-     *
-     * See the general documentation of this class for an example of output.
-     */
-    XML = 4,
-
-    /**
-     * Write out everything as a <a
-     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file.
-     */
-    JSON = 5,
+    DefaultStyle = 0x0000,
 
     /**
      * Write input for ParameterHandler without comments or changed default
      * values.
      */
-    ShortText = 193,
+    Short = 0x0001,
+
+    /**
+     * Keep the order of the parameters as they have been declared.
+     */
+    KeepDeclarationOrder = 0x0002,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     */
+    PRM = 0x0010,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     *
+     * @deprecated Use `PRM` instead of `Text`.
+     */
+    Text = PRM,
+
+    /**
+     * Write parameters as a LaTeX table.
+     */
+    LaTeX = 0x0020,
+
+    /**
+     * Write out declared parameters with description and possible values.
+     *
+     * @note This format is not suitable to be read back again.
+     */
+    Description = 0x0040,
+
+    /**
+     * Write out everything as an <a
+     * href="http://en.wikipedia.org/wiki/XML">XML</a> file suitable to be read
+     * by ParameterHandler::parse_input_from_xml() again.
+     *
+     * See the general documentation of this class for an example of output.
+     */
+    XML = 0x0080,
+
+    /**
+     * Write out everything as a <a
+     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file suitable to be
+     * read by ParameterHandler::parse_input_from_json() again.
+     */
+    JSON = 0x0100,
+
+    /**
+     * Write input for ParameterHandler without comments or changed default
+     * values.
+     */
+    ShortPRM = PRM | Short,
+
+    /**
+     * Write input for ParameterHandler without comments or changed default
+     * values.
+     *
+     * @deprecated Use `ShortPRM` instead of `ShortText`.
+     */
+    ShortText = ShortPRM,
 
     /**
      * Write input for ParameterHandler without comments or changed default
      * values as a XML file.
      */
-    ShortXML = 194,
+    ShortXML = XML | Short,
 
     /**
      * Write input for ParameterHandler without comments or changed default
      * values as a JSON file.
      */
-    ShortJSON = 195
+    ShortJSON = JSON | Short,
   };
 
 
@@ -1345,19 +1401,16 @@ public:
   set(const std::string &entry_name, const bool new_value);
 
   /**
-   * Print all parameters with the given style to @p out.
+   * Print all parameters with the given @p style to @p out.
    *
    * Before printing, all current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to <tt>false</tt>: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
    *
-   * In the case of <tt>XML</tt> or <tt>JSON</tt>, a reduced tree, only
-   * containing the values and skipping the documentation, can be
-   * printed by setting @p print_documentation to <tt>false</tt>.
-   *
-   * In <tt>Text</tt> format, the output is formatted in such a way that it is
+   * In <tt>PRM</tt>, <tt>XML</tt>, and <tt>JSON</tt> format, the output is
+   * formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
    * the parameters for a specific run, since if you output the parameters
    * using this function into a log file, you can always recover the results
@@ -1367,6 +1420,12 @@ public:
    * default value of entries if it is different from the actual value, as
    * well as the documenting string given to the declare_entry() function if
    * available.
+   *
+   * By using the flag <tt>Short</tt> in combination with <tt>PRM</tt>,
+   * <tt>XML</tt>, or <tt>JSON</tt> (or by using the shortcuts
+   * <tt>ShortPRM</tt>, <tt>ShortXML</tt>, or <tt>ShortJSON</tt>), a reduced
+   * output can be generated, only containing the values and skipping the
+   * documentation.
    *
    * In <tt>XML</tt> format, the output starts with one root element
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
@@ -1414,9 +1473,7 @@ public:
    * @endcode
    */
   std::ostream &
-  print_parameters(std::ostream &    out,
-                   const OutputStyle style,
-                   const bool        sort_alphabetical = true) const;
+  print_parameters(std::ostream &out, const OutputStyle style) const;
 
   /**
    * Print parameters to a logstream. This function allows to print all
@@ -1425,12 +1482,15 @@ public:
    *
    * All current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
    */
   void
-  log_parameters(LogStream &out, const bool sort_alphabetical = true);
+  log_parameters(LogStream &out, const OutputStyle style = DefaultStyle);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1440,15 +1500,19 @@ public:
    *
    * All current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
    *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
   void
-  log_parameters_section(LogStream &out, const bool sort_alphabetical = true);
+  log_parameters_section(LogStream &       out,
+                         const OutputStyle style = DefaultStyle);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1748,7 +1812,20 @@ private:
   friend class MultipleParameterLoop;
 };
 
-
+/**
+ * Global operator which returns an object in which all bits are set which are
+ * either set in the first or the second argument. This operator exists since
+ * if it did not then the result of the bit-or <tt>operator |</tt> would be an
+ * integer which would in turn trigger a compiler warning when we tried to
+ * assign it to an object of type ParameterHandler::OutputStyle.
+ */
+inline ParameterHandler::OutputStyle
+operator|(const ParameterHandler::OutputStyle f1,
+          const ParameterHandler::OutputStyle f2)
+{
+  return static_cast<ParameterHandler::OutputStyle>(
+    static_cast<unsigned int>(f1) | static_cast<unsigned int>(f2));
+}
 
 /**
  * The class MultipleParameterLoop offers an easy possibility to test several
