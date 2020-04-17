@@ -139,19 +139,15 @@ check_vectors(Vector<number1> &d1, Vector<number2> &d2)
 
   d2.equ(.25, d1);
   print(d2);
-
-  d1.ratio(d1, d2);
-  print(d1);
 }
 
 
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   Vector<double>      d1(N), d2(N);
   Vector<float>       f1(N), f2(N);

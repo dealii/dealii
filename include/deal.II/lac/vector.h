@@ -836,22 +836,6 @@ public:
   equ(const Number a, const Vector<Number2> &u);
 
   /**
-   * Compute the elementwise ratio of the two given vectors, that is let
-   * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-   * compute the cellwise ratio of true to estimated error.
-   *
-   * This vector is appropriately scaled to hold the result.
-   *
-   * If any of the <tt>b[i]</tt> is zero, the result is undefined. No attempt
-   * is made to catch such situations.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  DEAL_II_DEPRECATED
-  void
-  ratio(const Vector<Number> &a, const Vector<Number> &b);
-
-  /**
    * This function does nothing but exists for compatibility with the @p
    * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
    */

@@ -825,16 +825,6 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::ratio(const VectorBase &a, const VectorBase &b)
-  {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseDivide(vector, a, b);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
-  void
   VectorBase::write_ascii(const PetscViewerFormat format)
   {
     // TODO[TH]:assert(is_compressed())

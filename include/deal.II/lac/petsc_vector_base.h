@@ -691,20 +691,6 @@ namespace PETScWrappers
     equ(const PetscScalar a, const VectorBase &V);
 
     /**
-     * Compute the elementwise ratio of the two given vectors, that is let
-     * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-     * compute the cellwise ratio of true to estimated error.
-     *
-     * This vector is appropriately scaled to hold the result.
-     *
-     * If any of the <tt>b[i]</tt> is zero, the result is undefined. No
-     * attempt is made to catch such situations.
-     */
-    DEAL_II_DEPRECATED
-    void
-    ratio(const VectorBase &a, const VectorBase &b);
-
-    /**
      * Prints the PETSc vector object values using PETSc internal vector
      * viewer function <tt>VecView</tt>. The default format prints the
      * vector's contents, including indices of vector elements. For other
