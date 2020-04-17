@@ -1,4 +1,4 @@
-Removed: The outdated step-19 that was used to combine parallel visualization
+Removed: The outdated \step-19 that was used to combine parallel visualization
 output after a simulation has been removed. The DataOut class can be used for
 parallel output.
 <br>
