@@ -775,7 +775,7 @@ namespace Step50
         Amg_data.higher_order_elements = true;
         Amg_data.smoother_sweeps       = 2;
         Amg_data.aggregation_threshold = 0.02;
-        Amg_data.symmetric             = true;
+        // Amg_data.symmetric             = true;
 
         prec.initialize(system_matrix, Amg_data);
         solver.solve(system_matrix, solution, system_rhs, prec);
