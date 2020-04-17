@@ -29,6 +29,7 @@ namespace PETScWrappers
 {
   namespace MatrixIterators
   {
+#  ifndef DOXYGEN
     void
     MatrixBase::const_iterator::Accessor::visit_present_row()
     {
@@ -68,6 +69,7 @@ namespace PETScWrappers
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
+#  endif
   } // namespace MatrixIterators
 
 

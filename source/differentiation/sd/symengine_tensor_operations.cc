@@ -240,6 +240,7 @@ namespace Differentiation
     }
 
 
+#  ifndef DOXYGEN
     template <int dim>
     Tensor<1, dim, Expression>
     make_vector_of_symbolic_functions(const std::string &            sym,
@@ -247,6 +248,7 @@ namespace Differentiation
     {
       return internal::Symbol_Function_Tensor<1, dim>::create(sym, arguments);
     }
+#  endif
 
 
     template <int rank, int dim>
@@ -265,6 +267,7 @@ namespace Differentiation
     }
 
 
+#  ifndef DOXYGEN
     template <int rank, int dim>
     Tensor<rank, dim, Expression>
     make_tensor_of_symbolic_functions(const std::string &            sym,
@@ -284,6 +287,7 @@ namespace Differentiation
       return internal::Symbol_Function_SymmetricTensor<rank, dim>::create(
         sym, arguments);
     }
+#  endif // DOXYGEN
 
   } // namespace SD
 } // namespace Differentiation

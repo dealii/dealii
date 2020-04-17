@@ -17,13 +17,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "vector.inst"
+#ifndef DOXYGEN
+#  include "vector.inst"
 
-#ifndef DEAL_II_WITH_COMPLEX_VALUES
+#  ifndef DEAL_II_WITH_COMPLEX_VALUES
 // instantiate for std::complex<double> since we are using it internally in
 // FESeries.
 template class Vector<std::complex<double>>;
-#endif
+#  endif
 
 // instantiate for integers:
 template class Vector<int>;
@@ -44,36 +45,36 @@ template long double Vector<long double>::
 // arguments is covered by the default copy constructor and copy operator that
 // is declared separately)
 
-#define TEMPL_COPY_CONSTRUCTOR(S1, S2)             \
-  template Vector<S1>::Vector(const Vector<S2> &); \
-  template Vector<S1> &Vector<S1>::operator=<S2>(const Vector<S2> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)             \
+    template Vector<S1>::Vector(const Vector<S2> &); \
+    template Vector<S1> &Vector<S1>::operator=<S2>(const Vector<S2> &)
 
 TEMPL_COPY_CONSTRUCTOR(double, float);
 TEMPL_COPY_CONSTRUCTOR(float, double);
 
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
 TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
-#endif
+#  endif
 
-#undef TEMPL_COPY_CONSTRUCTOR
+#  undef TEMPL_COPY_CONSTRUCTOR
 
 
-#define TEMPL_OP_EQ(S1, S2)                            \
-  template void Vector<S1>::scale(const Vector<S2> &); \
-  template void Vector<S1>::equ(const S1, const Vector<S2> &)
+#  define TEMPL_OP_EQ(S1, S2)                            \
+    template void Vector<S1>::scale(const Vector<S2> &); \
+    template void Vector<S1>::equ(const S1, const Vector<S2> &)
 
 TEMPL_OP_EQ(double, float);
 TEMPL_OP_EQ(float, double);
 
 
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_OP_EQ(std::complex<double>, std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>, std::complex<double>);
+#  endif
+
+#  undef TEMPL_OP_EQ
 #endif
-
-#undef TEMPL_OP_EQ
-
 
 
 template <>

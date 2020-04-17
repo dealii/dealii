@@ -1192,6 +1192,7 @@ namespace TrilinosWrappers
   }
 
 
+#  ifndef DOXYGEN
   // explicit instantiations
   //
   template void
@@ -1245,6 +1246,7 @@ namespace TrilinosWrappers
                           const dealii::DynamicSparsityPattern &,
                           const MPI_Comm &,
                           bool);
+#  endif
 
 } // namespace TrilinosWrappers
 

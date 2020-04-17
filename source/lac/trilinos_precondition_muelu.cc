@@ -259,6 +259,7 @@ namespace TrilinosWrappers
 
 
 
+#    ifndef DOXYGEN
   // explicit instantiations
   template void
   PreconditionAMGMueLu::initialize(const ::dealii::SparseMatrix<double> &,
@@ -270,6 +271,7 @@ namespace TrilinosWrappers
                                    const AdditionalData &,
                                    const double,
                                    const ::dealii::SparsityPattern *);
+#    endif
 
 } // namespace TrilinosWrappers
 

@@ -1043,6 +1043,7 @@ SparsityPattern::memory_consumption() const
 
 
 
+#ifndef DOXYGEN
 // explicit instantiations
 template void
 SparsityPattern::copy_from<float>(const FullMatrix<float> &);
@@ -1055,7 +1056,7 @@ SparsityPattern::add_entries<const SparsityPattern::size_type *>(
   const size_type *,
   const size_type *,
   const bool);
-#ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
+#  ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void
 SparsityPattern::add_entries<
   std::vector<SparsityPattern::size_type>::const_iterator>(
@@ -1063,12 +1064,13 @@ SparsityPattern::add_entries<
   std::vector<size_type>::const_iterator,
   std::vector<size_type>::const_iterator,
   const bool);
-#endif
+#  endif
 template void
 SparsityPattern::add_entries<std::vector<SparsityPattern::size_type>::iterator>(
   const size_type,
   std::vector<size_type>::iterator,
   std::vector<size_type>::iterator,
   const bool);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -38,6 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+#  ifndef DOXYGEN
   namespace internal
   {
     VectorReference::operator TrilinosScalar() const
@@ -62,6 +63,7 @@ namespace TrilinosWrappers
       return (*(vector.vector))[0][local_index];
     }
   } // namespace internal
+#  endif
 
   namespace MPI
   {
@@ -882,15 +884,12 @@ namespace TrilinosWrappers
              this->local_size() *
                (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
     }
-  } /* end of namespace MPI */
-} /* end of namespace TrilinosWrappers */
 
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#  include "trilinos_vector.inst"
-  }
+    // explicit instantiations
+#  ifndef DOXYGEN
+#    include "trilinos_vector.inst"
+#  endif
+  } // namespace MPI
 } // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE

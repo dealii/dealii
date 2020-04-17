@@ -273,6 +273,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream &out) const
 }
 
 
+#ifndef DOXYGEN
 template <>
 void
 BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
@@ -299,6 +300,7 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
       k += block(ib, 0).n_rows();
     }
 }
+#endif
 
 
 template <class SparsityPatternBase>
