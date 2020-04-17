@@ -97,6 +97,12 @@ namespace parallel
     get_communicator() const;
 
     /**
+     * Return if multilevel hierarchy is supported and has been constructed.
+     */
+    virtual bool
+    is_multilevel_hierarchy_constructed() const = 0;
+
+    /**
      * Implementation of the same function as in the base class.
      *
      * @note This function copies the cells, but not the communicator,
@@ -361,12 +367,6 @@ namespace parallel
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
-
-    /**
-     * Return if multilevel hierarchy is supported and has been constructed.
-     */
-    virtual bool
-    is_multilevel_hierarchy_constructed() const = 0;
   };
 
 } // namespace parallel
