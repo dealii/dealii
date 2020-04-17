@@ -338,7 +338,7 @@ namespace SparsityTools
    * @param mpi_comm The MPI communicator shared between the processors that
    * participate in this operation.
    *
-   * @param locally_relevant_range The range of rows this MPI process needs to
+   * @param locally_relevant_rows The range of rows this MPI process needs to
    * gather. Only the part which is not included in the locally owned rows will
    * be used.
    */

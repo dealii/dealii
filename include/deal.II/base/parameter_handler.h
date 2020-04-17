@@ -965,7 +965,7 @@ public:
               const bool         skip_undefined = false);
 
   /**
-   * Parse input from a specified parameter file @param filename independently
+   * Parse input from a specified parameter file @p filename independently
    * of the type of input file (prm, xml, json) being used. The code path
    * selected by this function is extracted from the ending of the filename,
    * so the user has to make sure that the content of the input file is
