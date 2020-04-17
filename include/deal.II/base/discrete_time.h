@@ -45,17 +45,17 @@ DEAL_II_NAMESPACE_OPEN
  *   }
  * @endcode
  * In the above example the time starts at $T_{\text{start}} = 0$ until
- * $T_{\text{end}}=1$. Assuming the time step $dt = 0.3$ is not modified inside
- * the loop, the time is advanced from $t = 0$ to $t = 0.3$, $t = 0.6$, $t =
- * 0.9$ and finally it reaches the end time at $t = 1.0$. Here, the final step
- * size needs to be reduced from its desired value of 0.3 to $dt = 0.1$ in order
- * to ensure that we finish the simulation exactly at the specified end time. In
- * fact, you should assume that not only the last time step length may be
- * adjusted, but also previously ones -- for example, this class may take the
- * liberty to spread the decrease in time step size out over several time steps
- * and increment time from $t=0$, to $0.3$, $0.6$, $0.8$, and finally
- * $t=T_{\text{end}}=1$ to avoid too large a change in time step size from one
- * step to another.
+ * $T_{\text{end}}=1$. Assuming the (desired) time step $dt = 0.3$ is not
+ * modified inside the loop, the time is advanced from $t = 0$ to $t = 0.3$, $t
+ * = 0.6$, $t = 0.9$ and finally it reaches the end time at $t = 1.0$. Here, the
+ * final step size needs to be reduced from its desired value of 0.3 to $dt =
+ * 0.1$ in order to ensure that we finish the simulation exactly at the
+ * specified end time. In fact, you should assume that not only the last time
+ * step length may be adjusted, but also previously ones -- for example, this
+ * class may take the liberty to spread the decrease in time step size out over
+ * several time steps and increment time from $t=0$, to $0.3$, $0.6$, $0.8$, and
+ * finally $t=T_{\text{end}}=1$ to avoid too large a change in time step size
+ * from one step to another.
  *
  * The other situation in which the time step needs to be adjusted (this time to
  * slightly larger values) is if a time increment falls just short of the final
@@ -84,11 +84,23 @@ class DiscreteTime
 {
 public:
   /**
-   * Constructor
+   * Constructor. Sets the start and end time of the time period to be
+   * simulated, as well as the desired time step size discussed in the
+   * introduction.
    */
   DiscreteTime(const double start_time,
                const double end_time,
-               const double start_step_size);
+               const double desired_step_size);
+
+  /**
+   * Constructor. This variation of the constructor only sets the start
+   * and end time of the time period to be simulated, but leaves the
+   * desired time step size discussed in the introduction at an invalid
+   * value. As a consequence, you will need to call set_next_step_size()
+   * sometime after the constructor call and before the first time you
+   * call advance_time().
+   */
+  DiscreteTime(const double start_time, const double end_time);
 
   /**
    * Return the current time.

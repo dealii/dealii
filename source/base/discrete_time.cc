@@ -54,6 +54,13 @@ DiscreteTime::DiscreteTime(const double start_time,
 
 
 
+DiscreteTime::DiscreteTime(const double start_time, const double end_time)
+  : DiscreteTime(start_time, end_time, 0)
+  , start_step_size{numbers::signaling_nan<double>()}
+{}
+
+
+
 void
 DiscreteTime::set_next_step_size(const double next_step_size)
 {
