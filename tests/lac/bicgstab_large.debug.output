@@ -1,9 +1,9 @@
 
 DEAL:Bicgstab::Starting value 2.000
 DEAL:Bicgstab::Convergence step 4 value 0
-DEAL::1.000  0.1000 0.09091 0.02381 
+1.000  0.1000 0.09091 0.02381 
 DEAL::residual=0
 DEAL:Bicgstab::Starting value 2.000e+10
 DEAL:Bicgstab::Convergence step 4 value 0.001939
-DEAL::1.000  0.1000 0.09091 0.02381 
+1.000  0.1000 0.09091 0.02381 
 DEAL::residual=0.001937

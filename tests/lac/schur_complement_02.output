@@ -9,8 +9,8 @@ DEAL:SC_SparseMatrix:cg::Starting value 12.00000000
 DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
 DEAL:SC_SparseMatrix:cg::Starting value 18.00000000
 DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix::RHS vector: g1: -12.00000000 
-DEAL:SC_SparseMatrix::RHS vector: g2: -12.00000000 
-DEAL:SC_SparseMatrix::RHS vector: g3: -10.00000000 
-DEAL:SC_SparseMatrix::RHS vector: g4: -10.00000000 
-DEAL:SC_SparseMatrix::SparseMatrix OK
+DEAL:SC_SparseMatrix::RHS vector: g1: -1.200e+01 
+RHS vector: g2: -1.200e+01 
+RHS vector: g3: -1.000e+01 
+RHS vector: g4: -1.000e+01 
+SparseMatrix OK

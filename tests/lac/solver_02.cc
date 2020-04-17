@@ -55,7 +55,7 @@ test()
 
   PreconditionIdentity precond;
   solver.solve(mat, solvec, rhs, precond);
-  solvec.print(deallog);
+  solvec.print(deallog.get_file_stream());
 }
 
 int

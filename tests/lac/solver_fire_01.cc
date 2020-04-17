@@ -73,7 +73,7 @@ check_value(const double x, const double y, const double tol)
 
   deallog << "FIRE::Solution vector: ";
 
-  X.print(deallog);
+  X.print(deallog.get_file_stream());
 }
 
 int

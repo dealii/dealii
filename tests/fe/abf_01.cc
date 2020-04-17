@@ -643,7 +643,8 @@ main(int /*argc*/, char ** /*argv*/)
           solution);
 
   EvaluateDerivative(dof_handler, solution);
-  solution.print(deallog);
+  deallog.get_file_stream() << "DEAL::";
+  solution.print(deallog.get_file_stream());
 
   DataOut<2> *data_out = new DataOut<2>;
   data_out->attach_dof_handler(*dof_handler);

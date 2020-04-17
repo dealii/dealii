@@ -64,10 +64,10 @@ test_one_object(const TESTEE<dim> &f,
     Vector<Number> retune_value(n_component);
 
     f.vector_value(points[0], retune_value);
-    retune_value.print(deallog, /*precision =*/6);
+    retune_value.print(deallog.get_file_stream(), /*precision =*/6);
 
     f.vector_value(points[4], retune_value);
-    retune_value.print(deallog, /*precision =*/6);
+    retune_value.print(deallog.get_file_stream(), /*precision =*/6);
   }
 
   // value_list

@@ -3,19 +3,19 @@ DEAL:GMRES::Check 0	1.000
 DEAL:GMRES::Starting value 1.000
 DEAL:GMRES::Check 1	0.000
 DEAL:GMRES::Convergence step 1 value 0.000
-DEAL::0.000  0.000  1.000  
+0.000e+00 0.000e+00 1.000e+00 
 DEAL:cg::Check 0	1.000
 DEAL:cg::Starting value 1.000
 DEAL:cg::Check 1	0.000
 DEAL:cg::Convergence step 1 value 0.000
-DEAL::0.000  0.000  1.000  
+0.000e+00 0.000e+00 1.000e+00 
 DEAL:FGMRES::Check 0	1.000
 DEAL:FGMRES::Starting value 1.000
 DEAL:FGMRES::Check 1	0.000
 DEAL:FGMRES::Convergence step 1 value 0.000
-DEAL::0.000  0.000  1.000  
+0.000e+00 0.000e+00 1.000e+00 
 DEAL:IDR(s)::Check 0	1.000
 DEAL:IDR(s)::Starting value 1.000
 DEAL:IDR(s)::Check 1	0.000
 DEAL:IDR(s)::Convergence step 1 value 0.000
-DEAL::0.000  0.000  1.000  
+0.000e+00 0.000e+00 1.000e+00 

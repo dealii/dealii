@@ -848,19 +848,6 @@ Vector<Number>::operator==(const Vector<Number2> &v) const
 
 template <typename Number>
 void
-Vector<Number>::print(const char *format) const
-{
-  Assert(size() != 0, ExcEmptyObject());
-
-  for (size_type j = 0; j < size(); ++j)
-    internal::VectorOperations::print(values[j], format);
-  std::printf("\n");
-}
-
-
-
-template <typename Number>
-void
 Vector<Number>::print(std::ostream &     out,
                       const unsigned int precision,
                       const bool         scientific,
@@ -892,24 +879,6 @@ Vector<Number>::print(std::ostream &     out,
   out.precision(old_precision);
 }
 
-
-
-template <typename Number>
-void
-Vector<Number>::print(LogStream &        out,
-                      const unsigned int width,
-                      const bool         across) const
-{
-  Assert(size() != 0, ExcEmptyObject());
-
-  if (across)
-    for (size_type i = 0; i < size(); ++i)
-      out << std::setw(width) << values[i] << ' ';
-  else
-    for (size_type i = 0; i < size(); ++i)
-      out << values[i] << std::endl;
-  out << std::endl;
-}
 
 
 template <typename Number>

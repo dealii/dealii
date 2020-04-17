@@ -99,21 +99,21 @@ test(const FiniteElement<dim> &fe)
       for (unsigned int i = 0; i < n_dofs; ++i)
         cell_vector(i) +=
           fiv.average_gradient(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "average_gradient.norm(): " << cell_vector;
+    deallog << "average_gradient.norm(): " << cell_vector << std::flush;
 
     cell_vector = 0.0;
     for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
       for (unsigned int i = 0; i < n_dofs; ++i)
         cell_vector(i) +=
           fiv.average_hessian(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "average_hessian.norm(): " << cell_vector;
+    deallog << "average_hessian.norm(): " << cell_vector << std::flush;
 
     cell_vector = 0.0;
     for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
       for (unsigned int i = 0; i < n_dofs; ++i)
         cell_vector(i) +=
           fiv.jump_gradient(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-    deallog << "jump_gradient.norm(): " << cell_vector;
+    deallog << "jump_gradient.norm(): " << cell_vector << std::flush;
   }
 
 
@@ -137,21 +137,21 @@ test(const FiniteElement<dim> &fe)
           for (unsigned int i = 0; i < n_dofs; ++i)
             cell_vector(i) += fiv.average_gradient(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "average_gradient.norm(): " << cell_vector;
+        deallog << "average_gradient.norm(): " << cell_vector << std::flush;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
             cell_vector(i) += fiv.average_hessian(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "average_hessian.norm(): " << cell_vector;
+        deallog << "average_hessian.norm(): " << cell_vector << std::flush;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
             cell_vector(i) += fiv.jump_gradient(i, qpoint).norm() *
                               fiv.get_JxW_values()[qpoint];
-        deallog << "jump_gradient.norm(): " << cell_vector;
+        deallog << "jump_gradient.norm(): " << cell_vector << std::flush;
       }
 }
 

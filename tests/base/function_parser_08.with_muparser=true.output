@@ -1,4 +1,4 @@
 
 DEAL::Function 'erfc(x)+erfc(y)' @ 0.100000 -0.700000 is 2.56534
-DEAL::Function 'erfc(pi*z),sin(2*pi*y)*erfc(x^2)' @ 0.00000 1.00000 1.00000 is 8.87615e-06 -2.44929e-16 
-DEAL::
+DEAL::Function 'erfc(pi*z),sin(2*pi*y)*erfc(x^2)' @ 0.00000 1.00000 1.00000 is 8.876e-06 -2.449e-16 
+

@@ -48,10 +48,11 @@ check()
       const std::complex<number> prod_check = check.add_and_dot(factor, v2, v3);
       if (test == 0 && std::is_same<number, double>::value)
         {
-          deallog << "Vector add reference:   ";
-          v1.print(deallog);
-          deallog << "Vector check reference: ";
-          check.print(deallog);
+          deallog << "Vector add reference:   " << std::flush;
+          v1.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::Vector check reference: " << std::flush;
+          check.print(deallog.get_file_stream(), 7);
+          deallog << "DEAL::";
         }
 
       deallog << "Add and dot is ";

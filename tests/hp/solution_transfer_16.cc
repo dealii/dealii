@@ -62,7 +62,7 @@ main()
   solution = 10;
 
   deallog << "Initial Vector:" << std::endl;
-  solution.print(deallog);
+  solution.print(deallog.get_file_stream());
 
   // Coarsen all cells
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -89,5 +89,5 @@ main()
   solution_trans.interpolate(solution, new_solution);
 
   deallog << "Vector after solution transfer:" << std::endl;
-  new_solution.print(deallog);
+  new_solution.print(deallog.get_file_stream());
 }
