@@ -77,6 +77,6 @@ main(int argc, char **argv)
   VectorType v(N);
   v          = 1.0;
   auto niter = kinsol.solve(v);
-  deallog << v << std::endl;
+  v.print(deallog.get_file_stream());
   deallog << "Converged in " << niter << " iterations." << std::endl;
 }
