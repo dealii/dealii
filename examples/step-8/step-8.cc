@@ -538,9 +538,9 @@ namespace Step8
 
   // The <code>run</code> function does the same things as in step-6, for
   // example. This time, we use the square [-1,1]^d as domain, and we refine
-  // it twice globally before starting the first iteration.
+  // it globally four times before starting the first iteration.
   //
-  // The reason for refining twice is a bit accidental: we use the QGauss
+  // The reason for refining is a bit accidental: we use the QGauss
   // quadrature formula with two points in each direction for integration of the
   // right hand side; that means that there are four quadrature points on each
   // cell (in 2D). If we only refine the initial grid once globally, then there
@@ -569,8 +569,8 @@ namespace Step8
   // The conclusion needs to be: while of course we will not choose the
   // initial grid to be well-suited for the accurate solution of the problem,
   // we must at least choose it such that it has the chance to capture the
-  // important features of the solution. In this case, it needs to be able
-  // to see the right hand side. Thus, we refine twice globally. (Any larger
+  // important features of the solution. In this case, it needs to be able to
+  // see the right hand side. Thus, we refine globally four times. (Any larger
   // number of global refinement steps would of course also work.)
   template <int dim>
   void ElasticProblem<dim>::run()
