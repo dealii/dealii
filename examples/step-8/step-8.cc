@@ -222,6 +222,9 @@ namespace Step8
   void ElasticProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
+
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
@@ -238,9 +241,6 @@ namespace Step8
     sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
-
-    solution.reinit(dof_handler.n_dofs());
-    system_rhs.reinit(dof_handler.n_dofs());
   }
 
 
