@@ -2307,7 +2307,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximum $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>%TimeStepping<dim>::step()</code> we define $\max_j |\nabla r_j|$
+  // <code>%TimeStepping%<dim%>::%step()</code> we define $\max_j |\nabla r_j|$
   // and $\min_j |\nabla r_j|$ as atomic doubles in order to resolve any
   // conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max()</code> and
