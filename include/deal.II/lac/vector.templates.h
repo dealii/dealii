@@ -736,27 +736,6 @@ Vector<Number>::equ(const Number a, const Vector<Number2> &u)
 
 
 template <typename Number>
-void
-Vector<Number>::ratio(const Vector<Number> &a, const Vector<Number> &b)
-{
-  Assert(size() != 0, ExcEmptyObject());
-  Assert(a.size() == b.size(), ExcDimensionMismatch(a.size(), b.size()));
-
-  // no need to reinit with zeros, since
-  // we overwrite them anyway
-  reinit(a.size(), true);
-
-  internal::VectorOperations::Vectorization_ratio<Number> vector_ratio(
-    values.begin(), a.begin(), b.begin());
-  internal::VectorOperations::parallel_for(vector_ratio,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
-}
-
-
-
-template <typename Number>
 Vector<Number> &
 Vector<Number>::operator=(const BlockVector<Number> &v)
 {

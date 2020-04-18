@@ -1,0 +1,4 @@
+Removed: The deprecated member functions PETScWrappers::VectorBase::ratio() and
+Vector::ratio() have been removed.
+<br>
+(Daniel Arndt, 2020/04/17)
