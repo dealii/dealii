@@ -362,8 +362,8 @@ namespace Step23
   template <int dim>
   void WaveEquation<dim>::solve_u()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity());
 
@@ -376,8 +376,8 @@ namespace Step23
   template <int dim>
   void WaveEquation<dim>::solve_v()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(matrix_v, solution_v, system_rhs, PreconditionIdentity());
 

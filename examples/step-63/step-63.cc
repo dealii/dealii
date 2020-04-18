@@ -1083,8 +1083,8 @@ namespace Step63
 
     std::cout << "     Solving with GMRES to tol " << solve_tolerance << "..."
               << std::endl;
-    SolverGMRES<> solver(solver_control,
-                         SolverGMRES<>::AdditionalData(50, true));
+    SolverGMRES<Vector<double>> solver(
+      solver_control, SolverGMRES<Vector<double>>::AdditionalData(50, true));
 
     Timer time;
     time.start();

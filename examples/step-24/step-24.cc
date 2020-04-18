@@ -393,7 +393,7 @@ namespace Step24
   void TATForwardProblem<dim>::solve_p()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs_p.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
 
@@ -407,7 +407,7 @@ namespace Step24
   void TATForwardProblem<dim>::solve_v()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs_v.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
 

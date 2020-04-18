@@ -430,10 +430,10 @@ namespace Step65
   {
     TimerOutput::Scope scope(timer, "Solve linear system");
 
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    solver(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> solver(solver_control);
 
-    PreconditionJacobi<> preconditioner;
+    PreconditionJacobi<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix);
 
     solver.solve(system_matrix, solution, system_rhs, preconditioner);

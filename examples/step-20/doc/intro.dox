@@ -563,11 +563,11 @@ we can write:
 @code
     const auto op_M = linear_operator(M);
 
-    PreconditionJacobi<> preconditioner_M;
+    PreconditionJacobi<SparseMatrix<double>> preconditioner_M;
     preconditioner_M.initialize(M);
 
     ReductionControl reduction_control_M(2000, 1.0e-18, 1.0e-10);
-    SolverCG<>    solver_M(reduction_control_M);
+    SolverCG<Vector<double>>    solver_M(reduction_control_M);
 
     const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
 @endcode
@@ -679,7 +679,7 @@ With these prerequisites at hand, solving for $P$ and $U$ is a matter of
 creating another solver and inverse:
 @code
     SolverControl solver_control_S(2000, 1.e-12);
-    SolverCG<>    solver_S(solver_control_S);
+    SolverCG<Vector<double>>    solver_S(solver_control_S);
     PreconditionIdentity preconditioner_S;
 
     const auto op_S_inv = inverse_operator(op_S, solver_S, preconditioner_S);
@@ -751,7 +751,7 @@ using an IterationNumberControl that allows us to fix the number of CG
 iterations that are performed to a fixed small number (in our case 30):
 @code
     IterationNumberControl iteration_number_control_aS(30, 1.e-18);
-    SolverCG<>           solver_aS(iteration_number_control_aS);
+    SolverCG<Vector<double>>           solver_aS(iteration_number_control_aS);
     PreconditionIdentity preconditioner_aS;
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, preconditioner_aS);

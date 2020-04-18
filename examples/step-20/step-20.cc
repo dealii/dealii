@@ -609,9 +609,9 @@ namespace Step20
     const auto op_M = linear_operator(M);
     const auto op_B = linear_operator(B);
 
-    ReductionControl     reduction_control_M(2000, 1.0e-18, 1.0e-10);
-    SolverCG<>           solver_M(reduction_control_M);
-    PreconditionJacobi<> preconditioner_M;
+    ReductionControl         reduction_control_M(2000, 1.0e-18, 1.0e-10);
+    SolverCG<Vector<double>> solver_M(reduction_control_M);
+    PreconditionJacobi<SparseMatrix<double>> preconditioner_M;
 
     preconditioner_M.initialize(M);
 
@@ -625,8 +625,8 @@ namespace Step20
 
     // We now create a preconditioner out of <code>op_aS</code> that
     // applies a fixed number of 30 (inexpensive) CG iterations:
-    IterationNumberControl iteration_number_control_aS(30, 1.e-18);
-    SolverCG<>             solver_aS(iteration_number_control_aS);
+    IterationNumberControl   iteration_number_control_aS(30, 1.e-18);
+    SolverCG<Vector<double>> solver_aS(iteration_number_control_aS);
 
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, PreconditionIdentity());
@@ -637,8 +637,8 @@ namespace Step20
     // preconditioner we just declared.
     const auto schur_rhs = transpose_operator(op_B) * op_M_inv * F - G;
 
-    SolverControl solver_control_S(2000, 1.e-12);
-    SolverCG<>    solver_S(solver_control_S);
+    SolverControl            solver_control_S(2000, 1.e-12);
+    SolverCG<Vector<double>> solver_S(solver_control_S);
 
     const auto op_S_inv = inverse_operator(op_S, solver_S, preconditioner_S);
 

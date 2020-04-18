@@ -641,8 +641,8 @@ namespace Step30
   template <int dim>
   void DGMethod<dim>::solve(Vector<double> &solution)
   {
-    SolverControl      solver_control(1000, 1e-12, false, false);
-    SolverRichardson<> solver(solver_control);
+    SolverControl                    solver_control(1000, 1e-12, false, false);
+    SolverRichardson<Vector<double>> solver(solver_control);
 
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 

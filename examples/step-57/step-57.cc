@@ -235,7 +235,7 @@ namespace Step57
 
     {
       SolverControl solver_control(1000, 1e-6 * src.block(1).l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       dst.block(1) = 0.0;
       cg.solve(pressure_mass_matrix,

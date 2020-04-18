@@ -519,7 +519,7 @@ namespace Step14
     template <int dim>
     void Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
     {
-      Threads::Task<> rhs_task =
+      Threads::Task<void> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
       auto worker =
@@ -658,7 +658,7 @@ namespace Step14
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task =
+      Threads::Task<void> side_task =
         Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -682,10 +682,10 @@ namespace Step14
     template <int dim>
     void Solver<dim>::LinearSystem::solve(Vector<double> &solution) const
     {
-      SolverControl solver_control(5000, 1e-12);
-      SolverCG<>    cg(solver_control);
+      SolverControl            solver_control(5000, 1e-12);
+      SolverCG<Vector<double>> cg(solver_control);
 
-      PreconditionSSOR<> preconditioner;
+      PreconditionSSOR<SparseMatrix<double>> preconditioner;
       preconditioner.initialize(matrix, 1.2);
 
       cg.solve(matrix, solution, rhs, preconditioner);
@@ -1996,7 +1996,7 @@ namespace Step14
     template <int dim>
     void WeightedResidual<dim>::solve_problem()
     {
-      Threads::TaskGroup<> tasks;
+      Threads::TaskGroup<void> tasks;
       tasks +=
         Threads::new_task(&WeightedResidual<dim>::solve_primal_problem, *this);
       tasks +=

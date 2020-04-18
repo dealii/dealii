@@ -343,11 +343,11 @@ namespace Step15
   template <int dim>
   void MinimalSurfaceProblem<dim>::solve()
   {
-    SolverControl solver_control(system_rhs.size(),
+    SolverControl            solver_control(system_rhs.size(),
                                  system_rhs.l2_norm() * 1e-6);
-    SolverCG<>    solver(solver_control);
+    SolverCG<Vector<double>> solver(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     solver.solve(system_matrix, newton_update, system_rhs, preconditioner);

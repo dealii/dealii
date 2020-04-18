@@ -361,7 +361,7 @@ namespace Step56
     // First solve with the approximation for S
     {
       SolverControl solver_control(1000, 1e-6 * src.block(1).l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       dst.block(1) = 0.0;
       cg.solve(schur_complement_matrix,
@@ -384,8 +384,8 @@ namespace Step56
     // or just apply one preconditioner sweep
     if (do_solve_A == true)
       {
-        SolverControl solver_control(10000, utmp.l2_norm() * 1e-4);
-        SolverCG<>    cg(solver_control);
+        SolverControl            solver_control(10000, utmp.l2_norm() * 1e-4);
+        SolverCG<Vector<double>> cg(solver_control);
 
         dst.block(0) = 0.0;
         cg.solve(system_matrix.block(0, 0),
@@ -884,7 +884,7 @@ namespace Step56
         // Setup coarse grid solver
         FullMatrix<double> coarse_matrix;
         coarse_matrix.copy_from(mg_matrices[0]);
-        MGCoarseGridHouseholder<> coarse_grid_solver;
+        MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
         coarse_grid_solver.initialize(coarse_matrix);
 
         using Smoother = PreconditionSOR<SparseMatrix<double>>;

@@ -424,7 +424,7 @@ namespace Step16
   // us, and thus the difference between this function and the previous lies
   // only in the setup of the assembler and the different iterators in the loop.
   //
-  // We generate an AffineConstraints<> object for each level containing the
+  // We generate an AffineConstraints object for each level containing the
   // boundary and interface dofs as constrained entries. The corresponding
   // object is then used to generate the level matrices.
   template <int dim>
@@ -433,7 +433,7 @@ namespace Step16
     MappingQ1<dim>     mapping;
     const unsigned int n_levels = triangulation.n_levels();
 
-    std::vector<AffineConstraints<>> boundary_constraints(n_levels);
+    std::vector<AffineConstraints<double>> boundary_constraints(n_levels);
     for (unsigned int level = 0; level < n_levels; ++level)
       {
         IndexSet dofset;
@@ -527,7 +527,7 @@ namespace Step16
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);
-    MGCoarseGridHouseholder<> coarse_grid_solver;
+    MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
     coarse_grid_solver.initialize(coarse_matrix);
 
     // The next component of a multilevel solver or preconditioner is that we
@@ -583,8 +583,8 @@ namespace Step16
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    solver(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> solver(solver_control);
 
     solution = 0;
 
