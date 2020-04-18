@@ -51,7 +51,6 @@ SET(_unity_include_src
   fe_series_legendre.cc
   fe_system.cc
   fe_enriched.cc
-  fe_tools.cc
   fe_trace.cc
   mapping_c1.cc
   mapping_cartesian.cc
@@ -72,6 +71,7 @@ SET(_separate_src
   fe_values_inst6.cc
   mapping_fe_field.cc
   mapping_fe_field_inst2.cc
+  fe_tools.cc
   fe_tools_interpolate.cc
   fe_tools_extrapolate.cc
   mapping_q_generic.cc
