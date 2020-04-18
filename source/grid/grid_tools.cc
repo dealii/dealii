@@ -285,9 +285,9 @@ namespace GridTools
 
   // Generic functions for appending face data in 2D or 3D. TODO: we can
   // remove these once we have 'if constexpr'.
-  namespace
+  namespace internal
   {
-    void
+    inline void
     append_face_data(const CellData<1> &face_data, SubCellData &subcell_data)
     {
       subcell_data.boundary_lines.push_back(face_data);
@@ -295,7 +295,7 @@ namespace GridTools
 
 
 
-    void
+    inline void
     append_face_data(const CellData<2> &face_data, SubCellData &subcell_data)
     {
       subcell_data.boundary_quads.push_back(face_data);
@@ -378,13 +378,14 @@ namespace GridTools
         SubCellData subcell_data;
 
         for (const CellData<dim - 1> &face_cell_data : face_data)
-          append_face_data(face_cell_data, subcell_data);
+          internal::append_face_data(face_cell_data, subcell_data);
         return subcell_data;
       }
 
 
     private:
-      std::set<CellData<dim - 1>, CellDataComparator<dim - 1>> face_data;
+      std::set<CellData<dim - 1>, internal::CellDataComparator<dim - 1>>
+        face_data;
     };
 
 
@@ -404,7 +405,7 @@ namespace GridTools
         return SubCellData();
       }
     };
-  } // namespace
+  } // namespace internal
 
 
 
@@ -427,8 +428,9 @@ namespace GridTools
           std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
     vertices.resize(max_level_0_vertex_n + 1);
 
-    FaceDataHelper<dim>                          face_data;
-    std::set<CellData<1>, CellDataComparator<1>> line_data; // only used in 3D
+    internal::FaceDataHelper<dim> face_data;
+    std::set<CellData<1>, internal::CellDataComparator<1>>
+      line_data; // only used in 3D
 
     for (const auto &cell : tria.cell_iterators_on_level(0))
       {
@@ -739,8 +741,8 @@ namespace GridTools
 
 
 
-  // define some transformations in an anonymous namespace
-  namespace
+  // define some transformations
+  namespace internal
   {
     template <int spacedim>
     class Shift
@@ -807,7 +809,7 @@ namespace GridTools
     private:
       const double factor;
     };
-  } // namespace
+  } // namespace internal
 
 
   template <int dim, int spacedim>
@@ -815,7 +817,7 @@ namespace GridTools
   shift(const Tensor<1, spacedim> &   shift_vector,
         Triangulation<dim, spacedim> &triangulation)
   {
-    transform(Shift<spacedim>(shift_vector), triangulation);
+    transform(internal::Shift<spacedim>(shift_vector), triangulation);
   }
 
 
@@ -827,7 +829,7 @@ namespace GridTools
   {
     Assert(axis < 3, ExcMessage("Invalid axis given!"));
 
-    transform(Rotate3d(angle, axis), triangulation);
+    transform(internal::Rotate3d(angle, axis), triangulation);
   }
 
   template <int dim, int spacedim>
@@ -836,18 +838,18 @@ namespace GridTools
         Triangulation<dim, spacedim> &triangulation)
   {
     Assert(scaling_factor > 0, ExcScalingFactorNotPositive(scaling_factor));
-    transform(Scale<spacedim>(scaling_factor), triangulation);
+    transform(internal::Scale<spacedim>(scaling_factor), triangulation);
   }
 
 
-  namespace
+  namespace internal
   {
     /**
      * Solve the Laplace equation for the @p laplace_transform function for one
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    void
+    inline void
     laplace_solve(const SparseMatrix<double> &     S,
                   const AffineConstraints<double> &constraints,
                   Vector<double> &                 u)
@@ -870,7 +872,7 @@ namespace GridTools
 
       constraints.distribute(u);
     }
-  } // namespace
+  } // namespace internal
 
 
   // Implementation for dimensions except 1
@@ -948,7 +950,8 @@ namespace GridTools
     // solve linear systems in parallel
     Threads::TaskGroup<> tasks;
     for (unsigned int i = 0; i < dim; ++i)
-      tasks += Threads::new_task(&laplace_solve, S, constraints[i], us[i]);
+      tasks +=
+        Threads::new_task(&internal::laplace_solve, S, constraints[i], us[i]);
     tasks.join_all();
 
     // change the coordinates of the points of the triangulation
@@ -1539,7 +1542,7 @@ namespace GridTools
   }
 
 
-  namespace
+  namespace internal
   {
     template <int spacedim>
     bool
@@ -1557,7 +1560,7 @@ namespace GridTools
       // return if the scalar product of a is larger.
       return (scalar_product_a > scalar_product_b);
     }
-  } // namespace
+  } // namespace internal
 
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
@@ -1652,7 +1655,7 @@ namespace GridTools
           neighbor_permutation[i] = i;
 
         auto comp = [&](const unsigned int a, const unsigned int b) -> bool {
-          return compare_point_association<spacedim>(
+          return internal::compare_point_association<spacedim>(
             a,
             b,
             vertex_to_point,
@@ -2766,7 +2769,7 @@ namespace GridTools
   }
 
 
-  namespace
+  namespace internal
   {
     /**
      * recursive helper function for partition_triangulation_zorder
@@ -2798,7 +2801,7 @@ namespace GridTools
                                                    n_partitions);
         }
     }
-  } // namespace
+  } // namespace internal
 
   template <int dim, int spacedim>
   void
@@ -2853,11 +2856,11 @@ namespace GridTools
         typename Triangulation<dim, spacedim>::cell_iterator coarse_cell(
           &triangulation, 0, coarse_cell_idx);
 
-        set_subdomain_id_in_zorder_recursively(coarse_cell,
-                                               current_proc_idx,
-                                               current_cell_idx,
-                                               n_active_cells,
-                                               n_partitions);
+        internal::set_subdomain_id_in_zorder_recursively(coarse_cell,
+                                                         current_proc_idx,
+                                                         current_cell_idx,
+                                                         n_active_cells,
+                                                         n_partitions);
       }
 
     // if all children of a cell are active (e.g. we
@@ -2989,7 +2992,7 @@ namespace GridTools
 
 
 
-  namespace
+  namespace internal
   {
     template <int dim, int spacedim>
     double
@@ -3014,7 +3017,7 @@ namespace GridTools
             return -1e10;
         }
     }
-  } // namespace
+  } // namespace internal
 
 
   template <int dim, int spacedim>
@@ -3026,7 +3029,8 @@ namespace GridTools
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
         min_diameter =
-          std::min(min_diameter, diameter<dim, spacedim>(cell, mapping));
+          std::min(min_diameter,
+                   internal::diameter<dim, spacedim>(cell, mapping));
 
     double global_min_diameter = 0;
 
@@ -3053,7 +3057,8 @@ namespace GridTools
     double max_diameter = 0.;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
-        max_diameter = std::max(max_diameter, diameter(cell, mapping));
+        max_diameter =
+          std::max(max_diameter, internal::diameter(cell, mapping));
 
     double global_max_diameter = 0;
 
@@ -3522,8 +3527,9 @@ namespace GridTools
       &distorted_cells,
     Triangulation<dim, spacedim> & /*triangulation*/)
   {
-    static_assert(dim != 1 && spacedim != 1,
-                  "This function is only valid when dim != 1 or spacedim != 1.");
+    static_assert(
+      dim != 1 && spacedim != 1,
+      "This function is only valid when dim != 1 or spacedim != 1.");
     typename Triangulation<dim, spacedim>::DistortedCellList unfixable_subset;
 
     // loop over all cells that we have to fix up
@@ -5495,12 +5501,14 @@ namespace GridTools
         coinciding_vertex_groups[p.second].push_back(p.first);
     }
   }
-
-
 } /* namespace GridTools */
 
 
 // explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE
