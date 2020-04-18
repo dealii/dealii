@@ -10,16 +10,31 @@
 
 <h1>Introduction</h1>
 
-<h3>Smart ass title here.</h3>
+<h3>Non-matching grid simulations through a massively parallel and distributed Nitsche method</h3>
 
 
 In this tutorial we consider the case of two domains, $\Omega$ in
-$R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$, where $\Gamma$ is
-embedded in $\Omega$ ($\Gamma \subseteq \Omega$). We want to solve a partial
+$R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$ The domain $\Gamma$ is
+embedded (i.e. non-matching) in $\Omega$ ($\Gamma \subseteq \Omega$). We want to solve a partial
 differential equation on $\Omega$, enforcing some conditions on the solution of
-the problem *on the embedded domain* $\Gamma$.
+the problem *on the embedded domain* $\Gamma$ using the Nitsche method
+(Freund, 1995).
 
-There are two interesting scenarios:
+The technique we describe here is presented in the literature using one of many names:
+the <b>immersed finite element method</b> and the <b>fictitious boundary method</b> among others. The main principle is
+that the discretization of the two grids and of the two finite element spaces
+are kept completely independent. In the present tutorial, this approach is used to solve for the motion of a
+viscous fluid, described by the Stokes equation, that is agitated by a rigid (non-deformable) impeller.
+ Thus, the equations solved in $\Omega$ are the Stokes equations for a creeping
+flow (i.e. a flow where $\text{Re}\rightarrow 0$) and a no-slip boundary
+condition is applied on the moving *embedded domain* associated with
+the impeller : $\Gamma$. However, this tutorial could be readily extended
+to other equations (e.g. the Navier-Stokes equations, linear elasticity equation, etc.). It can
+can be seen as a natural extension of step-60 that enables the solution
+of large problems using distributed parallel computing architecture via MPI.
+
+There are two interesting scenarios that occur when one wants to enforce
+conditions on the embedded domain $\Gamma$:
 
 - the geometrical dimension `dim` of the embedded domain $\Gamma$ is the same of
 the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure of
@@ -30,120 +45,118 @@ than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
 zero; for example it is a curve embedded in a two dimensional domain, or a
 surface embedded in a three-dimensional domain.
 
-In both cases define the restriction operator $\gamma$ as the operator that,
-given a continuous function on $\Omega$, returns its (continuous) restriction on
-$\Gamma$, i.e.,
-
-\f[
-\gamma : C^0(\Omega) \mapsto C^0(\Gamma), \quad \text{ s.t. } \gamma u = u|_{\Gamma} \in C^0(\Gamma),
-\quad \forall u \in C^0(\Omega).
-\f]
-
-It is well known that the operator $\gamma$ can be extended to a continuous
-operator on $H^1(\Omega)$, mapping functions in $H^1(\Omega)$ to functions in
-$H^1(\Gamma)$ when the intrinsic dimension of $\Gamma$ is the same of $\Omega$.
-
-The same is true, with a less regular range space (namely $H^{1/2}(\Gamma)$),
-when the dimension of $\Gamma$ is one less with respect to $\Omega$, and
-$\Gamma$ does not have a boundary. In this second case, the operator $\gamma$ is
-also known as the *trace* operator, and it is well defined for Lipschitz
-co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$ (read  <a
-href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
-for further details on the trace operator).
-
-The co-dimension two case is a little more complicated, and in general it is not
-possible to construct a continuous trace operator, not even from $H^1(\Omega)$ to
-$L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one respectively in two
-and three dimensions.
-
-In this tutorial program we're not interested in further details on $\gamma$: we
-take the extension $\gamma$ for granted, assuming that the dimension of the
+In this tutorial program we are not interested in further details on $\Gamma$: we
+take the extension $\Gamma$ for granted, assuming that the dimension of the
 embedded domain (`dim`) is always smaller by one or equal with respect to the
 dimension of the embedding domain $\Omega$ (`spacedim`).
 
 We are going to solve the following differential problem: given a sufficiently
-regular function $g$ on $\Gamma$, find the solution $u$ to
+regular function $g$ on $\Gamma$, find the solution $(\textbf{u},p)$ to
 
-@f{eqnarray*}{
-- \Delta u + \gamma^T \lambda &=& 0  \text{ in } \Omega\\
-\gamma u &=& g  \text{ in } \Gamma \\
-u & = & 0 \text{ on } \partial\Omega.
+@f{eqnarray*}
+{
+  -\Delta \mathbf{u} + \nabla p &=& 0,\\
+  -\nabla \cdot \textbf{u} &=& 0,\\
+  \textbf{u} &=& \textbf{g}  \text{ in } \Gamma,\\
+  \textbf{u} &=& 0 \text{ on } \partial\Omega.
 @f}
 
-This is a constrained problem, where we are looking for a harmonic function $u$
-that satisfies homogeneous boundary conditions on $\partial\Omega$, subject to
-the constraint $\gamma u = g$ using a Lagrange multiplier.
+We are looking for a velocity field
+ $\mathbf{u}$ and a pressure field $p$ that satisfies the Stokes equations
+ on $\Omega$ and homogeneous boundary conditions on $\partial\Omega$.
+  Additionally,  the velocity field is subject to the condition
+  $\mathbf{u} = \mathbf{g}$ on  $\Gamma$ that is imposed weakly using
+Nitsche method. The application of Nitsche's method will be discussed
+furthermore once the variational formulation has been introduced.
 
-This problem has a physical interpretation: harmonic functions, i.e., functions
-that satisfy the Laplace equation, can be thought of as the displacements of a
-membrane whose boundary values are prescribed. The current situation then
-corresponds to finding the shape of a membrane for which not only the
-displacement at the boundary, but also on $\Gamma$ is prescribed. For example,
-if $\Gamma$ is a closed curve in 2d space, then that would model a soap film
-that is held in place by a wire loop along $\partial \Omega$ as well as a second
-loop along $\Gamma$. In cases where $\Gamma$ is a whole area, you can think of
-this as a membrane that is stretched over an obstacle where $\Gamma$ is the
-contact area. (If the contact area is not known we have a different problem --
-called the "obstacle problem" -- which is modeled in step-41.)
 
-As a first example we study the zero Dirichlet boundary condition on
-$\partial\Omega$. The same equations apply if we apply zero Neumann boundary
-conditions on $\partial\Omega$ or a mix of the two.
+The weak form of the Stokes equations is obtained by writing it in vector form as
 
-The variational formulation can be derived by introducing two infinite
-dimensional spaces $V(\Omega)$ and $Q^*(\Gamma)$, respectively for the solution
-$u$ and for the Lagrange multiplier $\lambda$.
+@f{eqnarray*}
+  \begin{pmatrix}
+    {-\Delta \textbf{u} + \nabla p}
+    \\
+    {-\nabla \cdot \textbf{u}}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+  {0
+  \\
+  0
+  \end{pmatrix},
+@f}
+forming the dot product from the left with a vector-valued test
+function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$ and integrating
+over the domain $\Omega$, yielding the following set of equations:
+@f{eqnarray*}
+  (\mathrm v,
+   -\Delta \textbf{u}} + \nabla p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, 0)_\Omega,
+@f}
+which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
+\\ q\end{pmatrix}$.
 
-Multiplying the first equation by $v \in V(\Omega)$ and the second by $q \in
-Q(\Gamma)$, integrating by parts when possible, and exploiting the boundary
+
+By integrating by parts when possible, and exploiting the boundary
 conditions on $\partial\Omega$, we obtain the following variational problem:
-
-Given a sufficiently regular function $g$ on $\Gamma$, find the solution $u$ to
 @f{eqnarray*}{
-(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& 0 \qquad \forall v \in V(\Omega) \\
-(\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} \qquad \forall q \in Q(\Gamma),
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega}&=& 0
 @f}
 
-where $(\cdot, \cdot)_{\Omega}$ and $(\cdot, \cdot)_{\Gamma}$ represent,
-respectively, $L^2$ scalar products in $\Omega$ and in $\Gamma$.
+where $(\cdot, \cdot)_{\Omega}$ represents the $L^2$ scalar product.
 
-Inspection of the variational formulation tells us that the space $V(\Omega)$
-can be taken to be $H^1_0(\Omega)$. The space $Q(\Gamma)$, in the co-dimension
-zero case, should be taken as $H^1(\Gamma)$, while in the co-dimension one case
-should be taken as $H^{1/2}(\Gamma)$.
+This variational formulation does not take into account the embedded domain. Contrarily
+to step-60, we do not enforce strongly the constraints of $\textbf{u}$ on $\Gamma$,
+but enforce them weakly through Nitsche's method. This is achieved by using the
+following modified formulation :
 
-The function $g$ should therefore be either in $H^1(\Gamma)$ (for the
-co-dimension zero case) or $H^{1/2}(\Gamma)$ (for the co-dimension one case).
-This leaves us with a Lagrange multiplier $\lambda$ in $Q^*(\Gamma)$, which is
-either $H^{-1}(\Gamma)$ or $H^{-1/2}(\Gamma)$.
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} - (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=&  -(\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+@f}
 
-There are two options for the discretization of the problem above. One could choose
-matching discretizations, where the Triangulation for $\Gamma$ is aligned with the
-Triangulation for $\Omega$, or one could choose to discretize the two domains in
-a completely independent way.
+It can be shown (e.g. see Freund, 1995) that there exist a positive constant
+$C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
+be consistent and stable. We note that the additional terms on the left-hand
+and right-hand side are equal since $\textbf{u}=\textbf{g}\text{ in } \Gamma$.
+It follows that :
 
-The first option is clearly more indicated for the simple problem we
-proposed above: it is sufficient to use a single Triangulation for $\Omega$ and
-then impose certain constraints depending $\Gamma$. An example of this approach
-is studied in step-40, where the solution has to stay above an obstacle and this
-is achieved imposing constraints on $\Omega$.
+@f{eqnarray*}{
+(\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
++ \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=& -(\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
++ \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+@f}
 
-To solve more complex problems, for example one where the domain $\Gamma$ is time
-dependent, the second option could be a more viable solution. Handling
-non aligned meshes is complex by itself: to illustrate how is done we study a
-simple problem.
+We note that an alternative formulation can be used :
 
-The technique we describe here is presented in the literature using one of many names:
-the <b>immersed finite element method</b>, the <b>fictitious boundary method</b>, the
-<b>distributed Lagrange multiplier method</b>, and others. The main principle is
-that the discretization of the two grids and of the two finite element spaces
-are kept completely independent. This technique is particularly efficient for
-the simulation of fluid-structure interaction problems, where the configuration
-of the embedded structure is part of the problem itself, and one solves a
-(possibly non-linear) elastic problem to determine the (time dependent)
-configuration of $\Gamma$, and a (possibly non-linear) flow problem in $\Omega
-\setminus \Gamma$, plus coupling conditions on the interface between the fluid
-and the solid.
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} + (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=&  (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+@f}
+
+in which case the stability and consistency condition becomes $\beta > 0$.
+
+In step-60, the imposition of the constraint in the strong form
+required the addition of new variables in the form of the Lagrange multipliers.
+This is not the case for this tutorial program. The imposition of the
+boundary condition using Nitsche's method only modifies the system matrix
+and the right-hand side without adding additional unknowns. However, the velocity
+vector $\textbf{u}$ on the embedded domain will not match exactly the prescribed
+velocity $\textbf{g}$. Furthermore, as in
+step-60, we still need to integrate over the non-matching embedded grid in order
+to construct the boundary term necessary to impose the boundary condition
+over $\Gamma$.
+
+
+---- Here now ----
 
 In this tutorial program we keep things a little simpler, and we assume that the
 configuration of the embedded domain is given in one of two possible ways:
@@ -289,34 +302,30 @@ and we construct $S$ using LinearOperator classes.
 
 <h3>The testcase</h3>
 
-The problem we solve here is identical to step-4, with the difference that we
-impose some constraints on an embedded domain $\Gamma$. The tutorial is written
-in a dimension independent way, and in the results section we show how to vary
-both `dim` and `spacedim`.
+The problem we solve here is a demonstration of the time-reversibility of Stokes
+flow. This is often illustrated in science vulgarization experiments with a
+Taylor-Couette flow and dye droplets that revert back to their original shape
+after the fluid has been displaced in a periodic manner.
 
-The tutorial is compiled for `dim` equal to one and `spacedim` equal to two. If
-you want to run the program in embedding dimension `spacedim` equal to three,
-you will most likely want to change the reference domain for $\Gamma$ to be, for
-example, something you read from file, or a closed sphere that you later deform
-to something more interesting.
+In the present problem, a very viscous fluid is agitated by the rotation of an impeller,
+which, in 2D, is modeled by a rectangular grid. The impeller rotates for a
+given number of revolutions and than, the flow is reversed such that the same number
+of revolutions is carried out in the opposite direction. We recall that since the Stokes
+equations are self-adjoint, creeping flows are reversible. Consequently,
+if the impeller motion is reversed in the opposite direction, the fluid should
+return to its original position. In the present case, this is illustrated by
+inserting a circle of passive tracer particles that are advected by the fluid
+and which return to their original position, thus demonstrating the time-reversibility
+of the flow.
 
-In the default scenario, $\Gamma$ has co-dimension one, and this tutorial
-program implements the Fictitious Boundary Method. As it turns out, the same
-techniques are used in the Variational Immersed Finite Element Method, and
-the coupling operator $C$ defined above is the same in almost all of these
-non-matching methods.
 
-The embedded domain is assumed to be included in $\Omega$, which we take as the
-unit square $[0,1]^2$. The definition of the fictitious domain $\Gamma$ can be
-modified through the parameter file, and can be given as a mapping from the
-reference interval $[0,1]$ to a curve in $\Omega$.
+In the default scenario, $\Gamma$ has co-dimension zero, and this tutorial
+program imposes motion of $\Gamma$ through Nitsche method. As it turns out,
+very similar approaches are used in other fictitious boundary method. Consequently,
+this step could be easily extended to account for a deformable embedded grid
+by using a Lagrange multiplier approach and by solving the complete fluid-structure interaction problem.
 
-If the curve is closed, then the results will be similar to running the same
-problem on a grid whose boundary is $\Gamma$. The program will happily run also
-with a non-closed $\Gamma$, although in those cases the mathematical
-formulation of the problem is more difficult, since $\Gamma$ will have a
-boundary by itself that has co-dimension two with respect to the domain
-$\Omega$.
+
 
 <h3>References</h3>
 
@@ -332,3 +341,6 @@ $\Omega$.
   Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
   229–232.
 
+- Freund, J., Stenberg, R. (1995). On weakly imposed boundary conditions for
+  second order problems. Proceedings of the Ninth International Conference on
+  Finite Elements in Fluids. 327-336.
