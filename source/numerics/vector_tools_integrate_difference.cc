@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/numerics/vector_tools.templates.h>
+#include <deal.II/numerics/vector_tools_integrate_difference.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
