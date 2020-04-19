@@ -736,9 +736,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: <code>DataOutBase&lt;2,3&gt;::write_tecplot_binary</code>
-       did not write the <code>z</code> coordinates. This is now
-       fixed.
+       Fixed: <code>DataOutBase::write_tecplot_binary()</code> with
+       dim=2 and spacedim=3 did not write the <code>z</code> coordinates.
+       This is now fixed.
        <br>
        (RH 2005/09/28)
        </p>
@@ -1206,7 +1206,7 @@ inconvenience this causes.
        </p>
 
    <li> <p>Fixed: A local variable in
-       <code>TriaAccessor&lt;3,3&gt;::measure</code> was
+       <code>TriaAccessor::measure()</code> was
        erroneously marked as static could lead to
        wrong results and crashes in multithreaded mode. This is now fixed.
        <br>
@@ -1382,10 +1382,13 @@ inconvenience this causes.
   <li> <p>
        Extended: <code >DerivativeApproximation</code> now offers access to the
        full tensor of derivatives of orders one, two and three. This
-       information can be requested for a single cell by means of the <code>DerivativeApproximation</code><code>::approximate_derivative_tensor</code> function. If the
-       norm of this tensor is required later on, the new <code >DerivativeApproximation</code><code>::derivative_norm</code> function can be used. Note, that
-       for second order derivatives, this returns the largest eigenvalue
-       instead of the Frobenius norm, which is returned by the <code >Tensor&lt;rank_,dim&gt;</code><code>::norm</code> function.
+       information can be requested for a single cell by means of the
+       <code>DerivativeApproximation::approximate_derivative_tensor()</code>
+       function. If the norm of this tensor is required later on, the new
+       <code>DerivativeApproximation::derivative_norm()</code> function can be
+       used. Note, that for second order derivatives, this returns the largest
+       eigenvalue instead of the Frobenius norm, which is returned by the
+       <code >Tensor::()norm</code> function.
        <br>
        (Tobias Leicht 2006/08/03)
        </p>
@@ -1422,7 +1425,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: <code >Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
+       Fixed: <code >Triangulation::fix_coarsen_flags()</code>
        has been modified to allow coarsening in all possible cases. Up
        to now, coarsening was forbidden, if the neighbor cell was not refined
        but had the <code>refine_flag</code> set, whereas it was allowed, if
@@ -1705,8 +1708,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: The <code>GridIn&lt;dim&gt;::read_netcdf(string
-       &filename)</code> function reads grids from NetCDF files. The
+       New: The <code>GridIn::read_netcdf()</code> function reads grids from NetCDF files. The
        only data format currently supported is the <tt>TAU grid
        format</tt>.
        <br>
@@ -1714,7 +1716,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The <code>GridIn&lt;dim&gt;::read(filename, format)</code>
+       Fixed: The <code>GridIn::read()</code>
        function ran into an exception when called with
        <tt>Default</tt> format and a filename which does not include
        <tt>/</tt>. This is now fixed.

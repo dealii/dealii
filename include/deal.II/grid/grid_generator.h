@@ -377,7 +377,7 @@ namespace GridGenerator
    * The indicators for the surfaces in the y-direction are 2 and 3, and the
    * ones for the z-direction are 5 and 6. The hole boundary has indicator 4.
    *
-   * @param tria the triangulation to be created. It needs to be empty upon
+   * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
    *
    * @author Denis Davydov, 2018

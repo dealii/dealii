@@ -159,6 +159,7 @@ IndexSet::do_compress() const
 
 
 
+#ifndef DOXYGEN
 IndexSet IndexSet::operator&(const IndexSet &is) const
 {
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
@@ -202,6 +203,7 @@ IndexSet IndexSet::operator&(const IndexSet &is) const
   result.compress();
   return result;
 }
+#endif
 
 
 

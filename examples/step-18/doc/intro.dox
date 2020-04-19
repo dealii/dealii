@@ -424,7 +424,7 @@ using the syntax
 @endcode
 This knowledge extends to the DoFHandler object built on such triangulations,
 which can then identify which degrees of freedom are locally owned
-(see @ref GlossLocallyOwnedDofs) via calls such as
+(see @ref GlossLocallyOwnedDof) via calls such as
 DoFHandler::compute_n_locally_owned_dofs_per_processor() and
 DoFTools::extract_locally_relevant_dofs(). Finally, the DataOut class
 also knows how to deal with such triangulations and will simply skip

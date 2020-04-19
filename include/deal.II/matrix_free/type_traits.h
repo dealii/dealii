@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifndef DOXYGEN
 namespace internal
 {
   //
@@ -322,6 +322,7 @@ namespace internal
 
 
 } // namespace internal
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

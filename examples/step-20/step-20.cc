@@ -755,7 +755,7 @@ namespace Step20
   // The last interesting function is the one in which we generate graphical
   // output. Note that all velocity components get the same solution name
   // "u". Together with using
-  // DataComponentInterpretation::::component_is_part_of_vector this will
+  // DataComponentInterpretation::component_is_part_of_vector this will
   // cause DataOut<dim>::write_vtu() to generate a vector representation of
   // the individual velocity components, see step-22 or the
   // @ref VVOutput "Generating graphical output"

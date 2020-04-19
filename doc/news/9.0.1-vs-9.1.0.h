@@ -138,7 +138,7 @@ inconvenience this causes.
   which returns the buffer of the packed data.
   parallel::distributed::Triangulation::notify_ready_to_unpack()
   requires `std::function<void(const cell_iterator &, const CellStatus,
-  const boost::iterator_range<std::vector<char>::const_iterator &>`, where
+  const boost::iterator_range<std::vector<char>::%const_iterator &>`, where
   the last argument describes an iterator range, from which the callback
   function is allowed to read.
   <br>

@@ -222,7 +222,7 @@ public:
     Pointer(VectorMemory<VectorType> &mem);
 
     /**
-     * Destructor, automatically releasing the vector from the memory #pool.
+     * Destructor, automatically releasing the vector from the memory pool.
      */
     ~Pointer() = default;
   };

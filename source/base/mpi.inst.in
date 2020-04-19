@@ -65,6 +65,7 @@ for (S : MPI_SCALARS)
                          const MPI_Comm &,
                          const ArrayView<S> &);
 
+#ifndef DOXYGEN
     // The fixed-length array (i.e., things declared like T(&values)[N])
     // versions of the functions above live in the header file mpi.h since the
     // length (N) is a compile-time constant. Those functions all call
@@ -84,6 +85,7 @@ for (S : MPI_SCALARS)
       const ArrayView<const S> &,
       const MPI_Comm &,
       const ArrayView<S> &);
+#endif
   }
 
 

@@ -432,6 +432,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria()
 
 
 
+#ifndef DOXYGEN
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   const double              time,
@@ -444,6 +445,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   , flags(flags)
   , refinement_flags(refinement_flags)
 {}
+#endif
 
 
 

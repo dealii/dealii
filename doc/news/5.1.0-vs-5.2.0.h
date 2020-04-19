@@ -139,7 +139,7 @@ inconvenience this causes.
 
 <ol>
   <li> <p> New:
-       The step-19 tutorial demonstrates handling of parameters from a
+       The \step-19 tutorial demonstrates handling of parameters from a
        parameter file, as well as some simple techniques for merging output
        from parallel computations.
        <br>
@@ -217,7 +217,7 @@ inconvenience this causes.
 
   <li> <p>
        New: If there are references to other example programs in any of the
-       step-XX programs, then they will now show up as crosslinks in the HTML
+       \step-XX programs, then they will now show up as crosslinks in the HTML
        version for simpler navigation of the tutorial.
        <br>
        (WB, 2005/04/04)
@@ -285,7 +285,7 @@ inconvenience this causes.
   <li> <p>
        Extended: The <code>ParameterHandler</code> class now does a much better
        job generating output in the <code>print_parameters()</code> function if
-       parameters have documentation strings attached to them. See the step-19
+       parameters have documentation strings attached to them. See the \step-19
        example program output for this.
        <br>
        (WB, 2005/09/12)

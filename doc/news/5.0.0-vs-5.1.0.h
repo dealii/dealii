@@ -171,7 +171,7 @@ inconvenience this causes.
 
   <li> <p>
        Fixed: <code
-       class="member">DataOutBase&lt;2,3&gt;::write_tecplot</code>
+       class="member">DataOutBase::write_tecplot</code> for dim=2 and spacedim=3
        sometimes did not write the variable name <code>z</code> when
        only outputting faces of cells. This is now fixed.
        <br>

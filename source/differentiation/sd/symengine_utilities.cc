@@ -30,6 +30,7 @@ namespace Differentiation
 
     namespace Utilities
     {
+#  ifndef DOXYGEN
       SE::map_basic_basic
       convert_expression_map_to_basic_map(
         const SD::types::substitution_map &substitution_map)
@@ -39,6 +40,7 @@ namespace Differentiation
           sub_map[entry.first.get_RCP()] = entry.second.get_RCP();
         return sub_map;
       }
+#  endif
 
 
       SE::vec_basic
@@ -53,6 +55,7 @@ namespace Differentiation
       }
 
 
+#  ifndef DOXYGEN
       SD::types::symbol_vector
       extract_symbols(const SD::types::substitution_map &substitution_values)
       {
@@ -64,6 +67,7 @@ namespace Differentiation
 
         return symbols;
       }
+#  endif
 
     } // namespace Utilities
 

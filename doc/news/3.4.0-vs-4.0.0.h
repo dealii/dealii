@@ -156,7 +156,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        Changed: Previously, we just set the preprocessor variable
        <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
        given as argument to <code>./configure</code>. Tests in the code
-       therefore looked like <code>#ifdef DEAL_II_USE_MT</code>. This has been
+       therefore looked like <code>\#ifdef DEAL_II_USE_MT</code>. This has been
        changed so that the variable is always defined, but its value is now
        equal to <code>1</code>
        when multithreading was requested, and zero otherwise. The reason for
@@ -164,8 +164,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        conditions, and need not interleave if-else clauses from regular code
        and the preprocessor, if conditions involve both the state of this
        preprocessor variable and the run-time state of your program. However,
-       this change requires that all appearances of <code>#ifdef
-       DEAL_II_USE_MT</code> be changed to <code>#if DEAL_II_USE_MT ==
+       this change requires that all appearances of <code>\#ifdef
+       DEAL_II_USE_MT</code> be changed to <code>\#if DEAL_II_USE_MT ==
        1</code>, since the variable is now defined unconditionally.
        <br>
        (WB 2002/11/14)
@@ -190,7 +190,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
-       Fixed: On CygWin, one header files has a <code>#define quad
+       Fixed: On CygWin, one header files has a <code>\#define quad
        quad_t</code>. This is annoying, since we have local variables and
        member functions with the name <code>quad</code>, and in fact it breaks
        compilation on those versions of CygWin that has this. Fortunately, the
@@ -492,7 +492,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> Changed: The class <code
-       class="member">Table&lt;2&gt;::fill</code> function, which is also
+       class="member">Table::fill()</code> function, which is also
        inherited from the <code>FullMatrix</code> class, used to
        work also when the size of the matrix was zero, by simply not copying
        something. This led to difficult to detect errors. It is therefore no
@@ -1276,7 +1276,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">Triangulation<1>::n_quads</code> now returns 0,
        instead of throwing an assertion, as before. The same holds for
        similar functions like <code
-       class="member">Triangulation&lt;dim&gt;::n_hexs</code> that now
+       class="member">Triangulation::n_hexs</code> that now
        returns 0 for <code>dim<3</code>.
        <br>
        (RH 2002/06/14)

@@ -235,6 +235,14 @@ namespace DataOutBase
       operator<(const EpsCell2d &) const;
     };
 
+    bool
+    EpsCell2d::operator<(const EpsCell2d &e) const
+    {
+      // note the "wrong" order in which we sort the elements
+      return depth > e.depth;
+    }
+
+
 
     /**
      * This is a helper function for the write_gmv() function. There, the data
@@ -2121,15 +2129,6 @@ namespace DataOutBase
     rgb_values.red = rgb_values.blue = rgb_values.green =
       1 - (x - xmin) / (xmax - xmin);
     return rgb_values;
-  }
-
-
-
-  bool
-  EpsCell2d::operator<(const EpsCell2d &e) const
-  {
-    // note the "wrong" order in which we sort the elements
-    return depth > e.depth;
   }
 
 

@@ -117,7 +117,7 @@ namespace internal
        * processed.
        *
        * You can clear all used flags using
-       * dealii::Triangulation::clear_user_flags().
+       * Triangulation::clear_user_flags().
        */
       std::vector<bool> user_flags;
 
@@ -193,7 +193,7 @@ namespace internal
 
       /**
        * Return an iterator to the next free slot for a single object. This
-       * function is only used by dealii::Triangulation::execute_refinement()
+       * function is only used by Triangulation::execute_refinement()
        * in 3D.
        *
        * @warning Interestingly, this function is not used for 1D or 2D
@@ -204,11 +204,11 @@ namespace internal
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-      next_free_single_object(const dealii::Triangulation<dim, spacedim> &tria);
+      next_free_single_object(const Triangulation<dim, spacedim> &tria);
 
       /**
        * Return an iterator to the next free slot for a pair of objects. This
-       * function is only used by dealii::Triangulation::execute_refinement()
+       * function is only used by Triangulation::execute_refinement()
        * in 3D.
        *
        * @warning Interestingly, this function is not used for 1D or 2D
@@ -219,16 +219,16 @@ namespace internal
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-      next_free_pair_object(const dealii::Triangulation<dim, spacedim> &tria);
+      next_free_pair_object(const Triangulation<dim, spacedim> &tria);
 
       /**
        * Return an iterator to the next free slot for a pair of hexes. Only
        * implemented for <code>G=Hexahedron</code>.
        */
       template <int dim, int spacedim>
-      typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator
-      next_free_hex(const dealii::Triangulation<dim, spacedim> &tria,
-                    const unsigned int                          level);
+      typename Triangulation<dim, spacedim>::raw_hex_iterator
+      next_free_hex(const Triangulation<dim, spacedim> &tria,
+                    const unsigned int                  level);
 
       /**
        * Clear all the data contained in this object.
@@ -331,7 +331,7 @@ namespace internal
                      << ", which is not as expected.");
 
       /**
-       * dealii::Triangulation objects can either access a user pointer or a
+       * Triangulation objects can either access a user pointer or a
        * user index. What you tried to do is trying to access one of those
        * after using the other.
        *
@@ -792,7 +792,7 @@ namespace internal
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
     TriaObjects<G>::next_free_single_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+      const Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.
@@ -845,7 +845,7 @@ namespace internal
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
     TriaObjects<G>::next_free_pair_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+      const Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.

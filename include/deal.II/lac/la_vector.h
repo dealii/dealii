@@ -509,7 +509,7 @@ namespace LinearAlgebra
 
 
 /**
- * Declare dealii::LinearAlgebra::Vector< Number > as serial vector.
+ * Declare dealii::LinearAlgebra::Vector as serial vector.
  *
  * @author Uwe Koecher, 2017
  */

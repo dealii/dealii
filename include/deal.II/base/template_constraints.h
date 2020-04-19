@@ -509,7 +509,7 @@ namespace internal
  *   multiply(1.234, 2.345);
  * @endcode
  * it will deduce @p T to be @p double, and because
- * <code>EnableIfScalar@<double@>::type</code> equals @p double, the compiler
+ * <code>EnableIfScalar@<double@>::%type</code> equals @p double, the compiler
  * will instantiate a function <code>double multiply(const double, const
  * double)</code> from the template above. On the other hand, in a context
  * like
@@ -518,7 +518,7 @@ namespace internal
  *   multiply(v1, v2);
  * @endcode
  * the compiler will deduce @p T to be <code>std::vector@<char@></code> but
- * because <code>EnableIfScalar@<std::vector@<char@>@>::type</code> does not
+ * because <code>EnableIfScalar@<std::vector@<char@>@>::%type</code> does not
  * exist the compiler does not consider the template for instantiation. This
  * technique is called "Substitution Failure is not an Error (SFINAE)". It
  * makes sure that the template function can not even be called, rather than

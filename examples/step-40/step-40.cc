@@ -30,9 +30,11 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-// uncomment the following #define if you have PETSc and Trilinos installed
+// uncomment the following \#define if you have PETSc and Trilinos installed
 // and you prefer using Trilinos in this example:
+// @code
 // #define FORCE_USE_OF_TRILINOS
+// @endcode
 
 // This will either import PETSc or TrilinosWrappers into the namespace
 // LA. Note that we are defining the macro USE_PETSC_LA so that we can detect

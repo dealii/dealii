@@ -356,8 +356,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Improved: <code>PreconditionBlockSOR</code><code
-       class="member">::Tvmult(...)</code> is implemented.
+       Improved: <code>PreconditionBlockSOR::Tvmult()</code> is implemented.
        <br>
        (GK 2000/07/07)
        </p>
@@ -834,9 +833,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: Function <code>VectorTools</code><code
-       class="member">::compute_mean_value</code> integrates the mean
-       value of one component of a finite element function.
+       New: Function <code>VectorTools::compute_mean_value()</code> integrates
+       the mean value of one component of a finite element function.
        <br>
        (GK 2000/07/12)
        </p>

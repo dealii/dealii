@@ -454,10 +454,12 @@ namespace internal
 
 
     // explicit instantiations
+#ifndef DOXYGEN
     template class TriaObjects<TriaObject<1>>;
     template class TriaObjects<TriaObject<2>>;
 
-#include "tria_objects.inst"
+#  include "tria_objects.inst"
+#endif
   } // namespace TriangulationImplementation
 } // namespace internal
 

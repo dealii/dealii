@@ -367,7 +367,7 @@ namespace Step69
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
   // <code>temp</code>, swaps its contents with the vector <code>U</code>,
-  // and returns the chosen step-size $\tau$.
+  // and returns the chosen \step-size $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
@@ -1250,8 +1250,8 @@ namespace Step69
     //
     // We have one more difficulty to overcome: In order to implement the
     // <code>on_subranges</code> lambda we need to name the iterator type
-    // of the object returned by <code>boost::irange<unsigned
-    // int>()</code>. This is unfortunately a very convoluted name exposing
+    // of the object returned by <code>boost::irange%<unsigned
+    // int%>()</code>. This is unfortunately a very convoluted name exposing
     // implementation details about <code>boost::irange</code>. For this
     // reason we resort to the <a
     // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
@@ -1314,7 +1314,7 @@ namespace Step69
     // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ on the entirety of the
     // boundary we should preserve the density and total (mechanical)
     // energy. This requires us to modify the $\mathbf{c}_{ij}$ vectors at
-    // the boundary as follows @cite GuermondEtAl2018:
+    // the boundary as follows @cite GuermondEtAl2018 :
     //
     // @f{align*}
     // \mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
@@ -2307,7 +2307,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximum $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>%TimeStepping<dim>::step()</code> we define $\max_j |\nabla r_j|$
+  // <code>%TimeStepping%<dim%>::%step()</code> we define $\max_j |\nabla r_j|$
   // and $\min_j |\nabla r_j|$ as atomic doubles in order to resolve any
   // conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max()</code> and

@@ -32,6 +32,7 @@ namespace PETScWrappers
 {
   namespace internal
   {
+#  ifndef DOXYGEN
     VectorReference::operator PetscScalar() const
     {
       AssertIndexRange(index, vector.size());
@@ -109,6 +110,7 @@ namespace PETScWrappers
 
       return value;
     }
+#  endif
   } // namespace internal
 
   VectorBase::VectorBase()

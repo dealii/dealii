@@ -256,6 +256,7 @@ namespace Differentiation
 
 #  ifdef DEAL_II_WITH_ADOLC
 
+#    ifndef DOXYGEN
     // Specialization for taped ADOL-C auto-differentiable numbers.
 
     template <typename ADNumberType>
@@ -273,6 +274,7 @@ namespace Differentiation
       , vbufsize(0u)
       , tbufsize(0u)
     {}
+#    endif
 
 
     template <typename ADNumberType>
@@ -1464,6 +1466,7 @@ namespace Differentiation
     }
 
 
+#  ifndef DOXYGEN
     template <typename ADNumberType>
     std::vector<double>
     TapedDrivers<
@@ -1477,6 +1480,7 @@ namespace Differentiation
       std::copy(in.begin(), in.end(), out.begin());
       return out;
     }
+#  endif
 
 
     // -------------   TapelessDrivers   -------------
@@ -1715,6 +1719,7 @@ namespace Differentiation
     // reverse mode to compute the first derivatives (and, if supported,
     // forward mode for the second).
 
+#  ifndef DOXYGEN
     template <typename ADNumberType, typename ScalarType>
     TapelessDrivers<
       ADNumberType,
@@ -1725,6 +1730,7 @@ namespace Differentiation
           NumberTypes::sacado_rad_dfad>::type>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
+#  endif
 
 
     template <typename ADNumberType, typename ScalarType>
@@ -1983,6 +1989,7 @@ namespace Differentiation
     // forward mode to compute the first (and, if supported, second)
     // derivatives.
 
+#  ifndef DOXYGEN
     template <typename ADNumberType, typename ScalarType>
     TapelessDrivers<
       ADNumberType,
@@ -1995,6 +2002,7 @@ namespace Differentiation
           NumberTypes::sacado_dfad_dfad>::type>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
+#  endif
 
 
     template <typename ADNumberType, typename ScalarType>

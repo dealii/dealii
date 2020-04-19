@@ -97,7 +97,7 @@ Quadrature<dim>::Quadrature(const Point<dim> &point)
 }
 
 
-
+#ifndef DOXYGEN
 template <>
 Quadrature<1>::Quadrature(const Point<1> &point)
   : quadrature_points(std::vector<Point<1>>(1, point))
@@ -112,6 +112,7 @@ Quadrature<0>::Quadrature(const SubQuadrature &, const Quadrature<1> &)
 {
   Assert(false, ExcImpossibleInDim(0));
 }
+#endif // DOXYGEN
 
 
 
@@ -160,7 +161,7 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
 }
 
 
-
+#ifndef DOXYGEN
 template <>
 Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
   : quadrature_points(q2.size())
@@ -180,7 +181,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
       ++present_index;
     }
 
-#ifdef DEBUG
+#  ifdef DEBUG
   if (size() > 0)
     {
       double sum = 0;
@@ -191,7 +192,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
       // near that.
       Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
     }
-#endif
+#  endif
 }
 
 
@@ -215,6 +216,7 @@ Quadrature<1>::Quadrature(const Quadrature<0> &)
   // copy constructor in 1d...
   Assert(false, ExcImpossibleInDim(1));
 }
+#endif // DOXYGEN
 
 
 
@@ -324,7 +326,7 @@ Quadrature<dim>::get_tensor_basis() const
 }
 
 
-
+#ifndef DOXYGEN
 template <>
 std::array<Quadrature<1>, 1>
 Quadrature<1>::get_tensor_basis() const
@@ -335,6 +337,7 @@ Quadrature<1>::get_tensor_basis() const
 
   return std::array<Quadrature<1>, 1>{{*this}};
 }
+#endif
 
 
 

@@ -75,7 +75,7 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-// #define USE_PETSC_LA PETSc is not quite supported yet
+// \#define USE_PETSC_LA PETSc is not quite supported yet
 
 namespace LA
 {
@@ -763,28 +763,22 @@ namespace Step50
 
     // With all this together, we can finally
     // get about solving the linear system in
-    // the usual way:
+    // the usual way (optionally comparing to Trilinos ML):
     SolverControl solver_control(500, 1e-8 * system_rhs.l2_norm(), false);
     SolverCG<VectorType> solver(solver_control);
 
     if (false)
       {
-        /*
-         // code to optionally compare to Trilinos ML
-         TrilinosWrappers::PreconditionAMG prec;
+        TrilinosWrappers::PreconditionAMG                 prec;
+        TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+        Amg_data.elliptic              = true;
+        Amg_data.higher_order_elements = true;
+        Amg_data.smoother_sweeps       = 2;
+        Amg_data.aggregation_threshold = 0.02;
+        // Amg_data.symmetric             = true;
 
-         TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-         //    Amg_data.constant_modes = constant_modes;
-         Amg_data.elliptic = true;
-         Amg_data.higher_order_elements = true;
-         Amg_data.smoother_sweeps = 2;
-         Amg_data.aggregation_threshold = 0.02;
-         // Amg_data.symmetric = true;
-
-         prec.initialize (system_matrix,
-                          Amg_data);
-         solver.solve (system_matrix, solution, system_rhs, prec);
-        */
+        prec.initialize(system_matrix, Amg_data);
+        solver.solve(system_matrix, solution, system_rhs, prec);
       }
     else
       {

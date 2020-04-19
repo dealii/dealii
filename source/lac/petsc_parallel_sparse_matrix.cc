@@ -607,6 +607,7 @@ namespace PETScWrappers
         }
     }
 
+#  ifndef DOXYGEN
     // explicit instantiations
     //
     template SparseMatrix::SparseMatrix(const MPI_Comm &,
@@ -671,6 +672,7 @@ namespace PETScWrappers
     SparseMatrix::do_reinit(const IndexSet &,
                             const IndexSet &,
                             const DynamicSparsityPattern &);
+#  endif
 
 
     PetscScalar

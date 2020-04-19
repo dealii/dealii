@@ -38,6 +38,7 @@ namespace TrilinosWrappers
 
 
 
+#  ifndef DOXYGEN
   void
   BlockSparseMatrix::reinit(const size_type n_block_rows,
                             const size_type n_block_columns)
@@ -63,6 +64,7 @@ namespace TrilinosWrappers
           this->sub_objects[r][c] = p;
         }
   }
+#  endif
 
 
 
@@ -366,6 +368,7 @@ namespace TrilinosWrappers
 
 
 
+#  ifndef DOXYGEN
   // -------------------- explicit instantiations -----------------------
   //
   template void
@@ -387,6 +390,7 @@ namespace TrilinosWrappers
                             const dealii::BlockDynamicSparsityPattern &,
                             const MPI_Comm &,
                             const bool);
+#  endif // DOXYGEN
 
 } // namespace TrilinosWrappers
 

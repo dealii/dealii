@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * values, using different balancing algorithms.
  *
  * From [Wikipedia](https://en.wikipedia.org/wiki/R-tree):
- * @quotation
+ * <blockquote>
  * R-trees are tree data structures used for spatial access methods, i.e., for
  * indexing multi-dimensional information such as geographical coordinates,
  * rectangles or polygons. The R-tree was proposed by Antonin Guttman in 1984
@@ -75,7 +75,7 @@ DEAL_II_NAMESPACE_OPEN
  * improving the way the tree is built and can be grouped into two objectives:
  * building an efficient tree from scratch (known as bulk-loading) and
  * performing changes on an existing tree (insertion and deletion).
- * @endquotation
+ * </blockquote>
  *
  * An RTree may store any type of @p LeafType as long as it is possible to extract
  * an @p Indexable that the RTree can handle and compare values. An @p Indexable

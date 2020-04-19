@@ -135,14 +135,20 @@ namespace parallel
 
     public:
       /**
-       * @copydoc dealii::CoarseningStrategies
+       * When data is transferred during coarsening, it is not trivial to decide
+       * how to handle data of child cells which will be coarsened. Or in other
+       * words, which data should be stored in the corresponding parent cell.
        *
-       * @deprecated Use dealii::CoarseningStrategies instead.
+       * In this struct, we offer a few strategies that cope with this
+       * problem. Such strategies can be passed to the CellDataTransfer and
+       * parallel::distributed::CellDataTransfer constructors.
+       *
+       * @deprecated Use the namespace dealii::CoarseningStrategies instead.
        */
       struct DEAL_II_DEPRECATED CoarseningStrategies
       {
         /**
-         * @copydoc dealii::CoarseningStrategies::check_equality
+         * @copydoc dealii::CoarseningStrategies::check_equality()
          *
          * @deprecated Use dealii::CoarseningStrategies::check_equality() instead.
          */
@@ -166,7 +172,7 @@ namespace parallel
         }
 
         /**
-         * @copydoc dealii::CoarseningStrategies::sum
+         * @copydoc dealii::CoarseningStrategies::sum()
          *
          * @deprecated Use dealii::CoarseningStrategies::sum() instead.
          */
@@ -186,7 +192,7 @@ namespace parallel
         }
 
         /**
-         * @copydoc dealii::CoarseningStrategies::mean
+         * @copydoc dealii::CoarseningStrategies::mean()
          *
          * @deprecated Use dealii::CoarseningStrategies::mean() instead.
          */

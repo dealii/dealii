@@ -721,7 +721,8 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
 
 
 /**
- * Declare dealii::LinearAlgebra::BlockVector< Number > as distributed vector.
+ * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
+ * vector.
  *
  * @author Uwe Koecher, 2017
  */

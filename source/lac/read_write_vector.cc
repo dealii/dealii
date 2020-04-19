@@ -40,6 +40,7 @@ namespace LinearAlgebra
 
 #undef TEMPL_COPY_CONSTRUCTOR
 
+#ifndef DOXYGEN
   template void
   ReadWriteVector<float>::import(
     const distributed::Vector<float, ::dealii::MemorySpace::Host> &,
@@ -51,7 +52,7 @@ namespace LinearAlgebra
     const distributed::Vector<double, ::dealii::MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const CommunicationPatternBase> &);
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
   template void
   ReadWriteVector<std::complex<float>>::import(
     const distributed::Vector<std::complex<float>, ::dealii::MemorySpace::Host>
@@ -65,6 +66,7 @@ namespace LinearAlgebra
       &,
     VectorOperation::values,
     const std::shared_ptr<const CommunicationPatternBase> &);
+#  endif
 #endif
 } // namespace LinearAlgebra
 

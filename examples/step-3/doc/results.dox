@@ -428,7 +428,6 @@ This is now going to look as follows:
    </td>
  </tr>
 </table>
-<li>
 
 For plotting the converge curves we need to re-run the C++ code multiple times with different values for <code>n_refinement_steps</code>
 starting from 1.
@@ -481,16 +480,13 @@ plt <- plt+scale_x_log10()+scale_y_log10()
 print(plt)
 
 dev.off()
-
+@endcode
 This results in the following plot that shows how the errors in the
 mean value and the solution value at the chosen point nicely converge
 to zero:
-@endcode
-</ul>
- <table style="width:50%" align="center">
+<table style="width:50%" align="center">
   <tr>
-     <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
-     <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
   </tr>
- </table>
-</ul>
+</table>
