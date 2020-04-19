@@ -70,6 +70,15 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return (settings & construct_multigrid_hierarchy);
+    }
+
+
+
+    template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::partition()
     {
@@ -439,7 +448,12 @@ namespace parallel
       return true;
     }
 
-
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return false;
+    }
 
     template <int dim, int spacedim>
     const std::vector<unsigned int> &

@@ -249,6 +249,12 @@ namespace parallel
       virtual ~Triangulation() override = default;
 
       /**
+       * Return if multilevel hierarchy is supported and has been constructed.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override;
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -422,6 +428,12 @@ namespace parallel
        * constructed (see also the class documentation).
        */
       Triangulation() = delete;
+
+      /**
+       * Return if multilevel hierarchy is supported and has been constructed.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override;
 
       /**
        * A dummy function to return empty vector.
