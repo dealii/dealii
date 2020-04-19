@@ -51,6 +51,8 @@
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
 
+#  include <boost/serialization/split_member.hpp>
+
 #  include <symengine/derivative.h>
 
 #  include <algorithm>
@@ -451,10 +453,38 @@ namespace Differentiation
       load(std::istream &stream);
 
       /**
+       * Write the data of this object to a stream for the purpose
+       * of serialization.
+       *
+       * This effectively saves the value stored in this object to the
+       * @p archive with the given @p version number.
+       */
+      template <class Archive>
+      void
+      save(Archive &archive, const unsigned int version) const;
+
+      /**
+       * Read the data of this object from a stream for the purpose
+       * of serialization.
+       *
+       * This effectively loads into this object the value stored in of the
+       * @p archive with the given @p version number.
+       * In doing so, the previous contents of this object are thrown away.
+       *
+       * @note When deserializing a symbolic expression, it is imperative that
+       * you first create or deserialize all of the symbolic variables used in
+       * the serialized expression.
+       */
+      template <class Archive>
+      void
+      load(Archive &archive, const unsigned int version);
+
+#  ifdef DOXYGEN
+      /**
        * Write and read the data of this object from a stream for the purpose
        * of serialization.
        *
-       * This effecively saves or loads the value stored into/out of the
+       * This effectively saves or loads the value stored into/out of the
        * @p archive with the given @p version number into this object.
        * If deserializing data, then the previous contents of this object
        * are thrown away.
@@ -466,6 +496,11 @@ namespace Differentiation
       template <class Archive>
       void
       serialize(Archive &archive, const unsigned int version);
+#  else
+      // This macro defines the serialize() method that is compatible with
+      // the templated save() and load() method that have been implemented.
+      BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
 
       //@}
 
@@ -1178,41 +1213,22 @@ namespace Differentiation
 
     template <class Archive>
     void
-    Expression::serialize(Archive &ar, const unsigned int /*version*/)
+    Expression::save(Archive &ar, const unsigned int /*version*/) const
     {
-      // This is a bit tricky... The SymEngine expression class is not
-      // serializable, and we're not sure if we're writing out or
-      // reading in here. So what we'll do is try to synchronise the
-      // current data with the stream, predicting if we're likely trying
-      // to write out data. We do this by checking if we're currently working
-      // with an object that has a trivial state. If not, then we're likely
-      // to output this object's contents.
-      const Expression default_constructed;
-      const bool       likely_writing_out =
-        (get_RCP()->__eq__(*default_constructed.get_RCP()) == false);
-
       std::stringstream sstream;
-      std::string       expr = default_constructed.get_RCP()->__str__();
+      sstream << *this;
+      const std::string expr = sstream.str();
+      ar &              expr;
+    }
 
-      // Output
-      if (likely_writing_out)
-        {
-          sstream << *this;
-          expr = sstream.str();
-        }
 
-      // Serialise
-      ar &expr;
-
-      // Input
-      if (!likely_writing_out)
-        {
-          sstream.clear();
-          sstream << expr;
-          sstream >> *this;
-
-          parse(expr);
-        }
+    template <class Archive>
+    void
+    Expression::load(Archive &ar, const unsigned int /*version*/)
+    {
+      std::string expr;
+      ar &        expr;
+      parse(expr);
     }
 
 
