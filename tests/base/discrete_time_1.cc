@@ -42,7 +42,7 @@ test_from_start_to_end()
 
   DiscreteTime time(/*start_time*/ 0.,
                     /*end_time*/ 1.5,
-                    /*start_step_size*/ 0.123);
+                    /*desired_start_step_size*/ 0.123);
 
   deallog << "Start time = " << time.get_start_time() << std::endl;
   deallog << "End time = " << time.get_end_time() << std::endl;
@@ -65,16 +65,16 @@ test_adjust_time_step_size()
 
   DiscreteTime time(/*start_time*/ 0.4,
                     /*end_time*/ 2.1,
-                    /*start_step_size*/ 0.15);
+                    /*desired_start_step_size*/ 0.15);
   print_time(time);
   time.advance_time();
   print_time(time);
-  time.set_next_step_size(0.36);
+  time.set_desired_next_step_size(0.36);
   time.advance_time();
   print_time(time);
   time.advance_time();
   print_time(time);
-  time.set_next_step_size(0.61);
+  time.set_desired_next_step_size(0.61);
   time.advance_time();
   print_time(time);
   time.advance_time(); // Here we reach the end time.

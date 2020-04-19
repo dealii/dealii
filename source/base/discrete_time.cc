@@ -44,20 +44,22 @@ namespace
 
 DiscreteTime::DiscreteTime(const double start_time,
                            const double end_time,
-                           const double start_step_size)
+                           const double desired_start_step_size)
   : start_time{start_time}
   , end_time{end_time}
-  , start_step_size{start_step_size}
   , current_time{start_time}
-  , next_time{calculate_next_time(start_time, start_step_size, end_time)}
+  , next_time{calculate_next_time(start_time,
+                                  desired_start_step_size,
+                                  end_time)}
   , previous_time{start_time}
+  , start_step_size{next_time - start_time}
   , step_number{0}
 {}
 
 
 
 void
-DiscreteTime::set_next_step_size(const double next_step_size)
+DiscreteTime::set_desired_next_step_size(const double next_step_size)
 {
   next_time = calculate_next_time(current_time, next_step_size, end_time);
 }

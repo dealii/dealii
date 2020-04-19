@@ -503,10 +503,12 @@ namespace Step21
   // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem}
 
   // First for the constructor. We use $RT_k \times DQ_k \times DQ_k$
-  // spaces. The time step is set to zero initially, but will be computed
-  // before it is needed first, as described in a subsection of the
-  // introduction. The time object internally prevents itself from being
-  // incremented with $dt = 0$, forcing us to set a non-zero desired size for
+  // spaces. For initializing the DiscreteTime object, we don't set the time
+  // step size in the constructor because we don't have its value yet.
+  // The time step size is initially set to zero, but it will be computed
+  // before it is needed to increment time, as described in a subsection of
+  // the introduction. The time object internally prevents itself from being
+  // incremented when $dt = 0$, forcing us to set a non-zero desired size for
   // $dt$ before advancing time.
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem(const unsigned int degree)
@@ -519,7 +521,7 @@ namespace Step21
          1)
     , dof_handler(triangulation)
     , n_refinement_steps(5)
-    , time(/*start time*/ 0., /*end time*/ 1., /*time step*/ 0.)
+    , time(/*start time*/ 0., /*end time*/ 1.)
     , viscosity(0.2)
   {}
 
@@ -970,11 +972,15 @@ namespace Step21
     //
     // The maximal velocity we compute using a helper function to compute the
     // maximal velocity defined below, and with all this we can evaluate our
-    // new time step length. The method DiscreteTime::set_next_time_step() is
-    // used to assign the new value of the time step to the DiscreteTime
-    // object.
-    time.set_next_step_size(std::pow(0.5, double(n_refinement_steps)) /
-                            get_maximal_velocity());
+    // new time step length. We use the method
+    // DiscreteTime::set_desired_next_time_step() to suggest the new
+    // calculated value of the time step to the DiscreteTime object. In most
+    // cases, the time object uses the exact provided value to increment time.
+    // It some case, the step size may be modified further by the time object.
+    // For example, if the calculated time increment overshoots the end time,
+    // it is truncated accordingly.
+    time.set_desired_next_step_size(std::pow(0.5, double(n_refinement_steps)) /
+                                    get_maximal_velocity());
 
     // The next step is to assemble the right hand side, and then to pass
     // everything on for solution. At the end, we project back saturations

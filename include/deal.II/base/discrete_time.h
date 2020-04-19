@@ -218,16 +218,26 @@ public:
   /**
    * Constructor.
    *
-   * @pre @p start_step_size must be non-negative.
+   * @param[in] start_time The time at the start of the simulation.
    *
-   * @note If @p start_step_size is specified as zero, it indicates that the
+   * @param[in] end_time The time at the end of the simulation.
+   *
+   * @param[in] desired_start_step_size A desired step size for incrementing
+   * time for the first step. It is not guaranteed that this value will be
+   * actually used as the size of the first step, as discussed in the
+   * introduction.
+   *
+   * @pre @p desired_start_step_size must be non-negative.
+   *
+   * @note @p desired_start_step_size is an optional parameter. If it is not
+   * provided or it is specified as zero, it indicates that the
    * desired size for the time step will be calculated at a different location
    * in the code. In this case, the created object cannot increment time until
    * the step size is changed by calling set_desired_next_step_size().
    */
   DiscreteTime(const double start_time,
                const double end_time,
-               const double start_step_size);
+               const double desired_start_step_size = 0.);
 
   /**
    * Return the current time.
@@ -310,9 +320,10 @@ public:
   get_step_number() const;
 
   /**
-   * Set the value of the next time step size. The next time advance_time()
-   * is called, the newly set @p time_step_size will be used to advance
-   * the simulation time. However, if the step is too large such that the next
+   * Set the *desired* value of the next time step size. By calling this
+   * method, we are indicating the the next time advance_time() is called, we
+   * would like @p time_step_size to be used to advance the simulation time.
+   * However, if the step is too large such that the next
    * simulation time exceeds the end time, the step size is truncated.
    * Additionally, if the step size is such that the next simulation time
    * approximates the end time (but falls just slightly short of it), the step
@@ -320,16 +331,16 @@ public:
    * end time.
    */
   void
-  set_next_step_size(const double time_step_size);
+  set_desired_next_step_size(const double time_step_size);
 
   /**
    * Advance the current time based on the value of the current step.
    * If you want to adjust the next time step size, call the method
-   * set_next_step_size() before calling this method.
+   * set_desired_next_step_size() before calling this method.
    * If you call this function repeatedly, the time
    * is increased with the same step size until it reaches the end
-   * time. See the documentation of set_next_step_size() for explanation
-   * of the rules for automatic adjustment of the step size.
+   * time. See the documentation of set_desired_next_step_size() for
+   * explanation of the rules for automatic adjustment of the step size.
    *
    * @pre Current time must be smaller than the end time. The object cannot
    * advance time if it is already at the end time. This rule is created to
@@ -362,11 +373,6 @@ private:
   const double end_time;
 
   /**
-   * The size of the first step.
-   */
-  const double start_step_size;
-
-  /**
    * The current time.
    */
   double current_time;
@@ -375,12 +381,13 @@ private:
    * The time at the next step.
    *
    * @note Internally, the next simulation time is stored instead of the
-   * current step size. For example, when the method set_next_step_size()
-   * is called, it computes the appropriate next simulation time and stores
-   * it. When advance_time() is called, the current_time is replaced by
-   * next_time. This choice for the internal state allows for simpler code
-   * and ensures than when we call advance_time() at the last step, the
-   * floating-point value of the time exactly matches the end time.
+   * current step size. For example, when the method
+   * set_desired_next_step_size() is called, it computes the appropriate next
+   * simulation time and stores it. When advance_time() is called, the
+   * current_time is replaced by next_time. This choice for the internal state
+   * allows for simpler code and ensures than when we call advance_time() at
+   * the last step, the floating-point value of the time exactly matches the
+   * end time.
    */
   double next_time;
 
@@ -388,6 +395,11 @@ private:
    * The previous time.
    */
   double previous_time;
+
+  /**
+   * The size of the first step.
+   */
+  const double start_step_size;
 
   /**
    * The step number i.e. the number of times the simulation time ha been
