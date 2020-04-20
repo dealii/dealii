@@ -1668,6 +1668,11 @@ namespace MGTools
           dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &tria))
       {
+        Assert(
+          tr->is_multilevel_hierarchy_constructed(),
+          ExcMessage(
+            "We can only compute the workload imbalance if the multilevel hierarchy has been constructed!"));
+
         const unsigned int n_proc =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());
         const unsigned int n_global_levels = tr->n_global_levels();

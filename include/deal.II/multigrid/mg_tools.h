@@ -290,6 +290,15 @@ namespace MGTools
    * globally refined meshes). Values greater than 1 estimate the slowdown
    * one should see in a geometric multigrid v-cycle as compared with the same
    * computation on a perfectly distributed mesh hierarchy.
+   *
+   * This function is a collective MPI call between all ranks of the
+   * Triangulation and therefore needs to be called from all ranks.
+   *
+   * @note This function requires that
+   * parallel::TriangulationBase::is_multilevel_hierarchy_constructed()
+   * is true, which can be controlled by setting the
+   * construct_multigrid_hierarchy flag when constructing the
+   * Triangulation.
    */
   template <int dim, int spacedim>
   double
