@@ -301,17 +301,12 @@ namespace OpenCASCADE
     std::vector<TopoDS_Edge>   edges;
     std::vector<TopoDS_Face>   faces;
     OpenCASCADE::extract_geometrical_shapes(shape, faces, edges, vertices);
-    bool mesh_is_present = true;
-    for (unsigned int i = 0; i < faces.size(); ++i)
-      {
+    const bool mesh_is_present =
+      std::none_of(faces.begin(), faces.end(), [&Loc](const TopoDS_Face &face) {
         Handle(Poly_Triangulation) theTriangulation =
-          BRep_Tool::Triangulation(faces[i], Loc);
-        if (theTriangulation.IsNull())
-          {
-            mesh_is_present = false;
-            break;
-          }
-      }
+          BRep_Tool::Triangulation(face, Loc);
+        return theTriangulation.IsNull();
+      });
     TopoDS_Shape shape_to_be_written = shape;
     if (!mesh_is_present)
       {

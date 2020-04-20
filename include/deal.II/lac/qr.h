@@ -46,7 +46,7 @@ class BaseQR
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
 protected:
   /**
@@ -243,7 +243,7 @@ public:
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
   /**
    * Default constructor.
@@ -352,7 +352,7 @@ public:
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
   /**
    * Default constructor.
