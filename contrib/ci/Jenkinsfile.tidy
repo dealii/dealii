@@ -46,7 +46,7 @@ pipeline
       {
         docker
         {
-          image 'tjhei/candi-base-clang'
+          image 'tjhei/candi-base:clang10'
         }
       }
 
