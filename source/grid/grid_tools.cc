@@ -187,233 +187,6 @@ namespace GridTools
 
 
 
-  template <>
-  double
-  cell_measure<1>(
-    const std::vector<Point<1>> &all_vertices,
-    const unsigned int (&vertex_indices)[GeometryInfo<1>::vertices_per_cell])
-  {
-    return all_vertices[vertex_indices[1]][0] -
-           all_vertices[vertex_indices[0]][0];
-  }
-
-
-
-  template <>
-  double
-  cell_measure<2>(
-    const std::vector<Point<2>> &all_vertices,
-    const unsigned int (&vertex_indices)[GeometryInfo<2>::vertices_per_cell])
-  {
-    /*
-      Get the computation of the measure by this little Maple script. We
-      use the blinear mapping of the unit quad to the real quad. However,
-      every transformation mapping the unit faces to straight lines should
-      do.
-
-      Remember that the area of the quad is given by
-      \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
-
-      # x and y are arrays holding the x- and y-values of the four vertices
-      # of this cell in real space.
-      x := array(0..3);
-      y := array(0..3);
-      z := array(0..3);
-      tphi[0] := (1-xi)*(1-eta):
-      tphi[1] :=     xi*(1-eta):
-      tphi[2] := (1-xi)*eta:
-      tphi[3] :=     xi*eta:
-      x_real := sum(x[s]*tphi[s], s=0..3):
-      y_real := sum(y[s]*tphi[s], s=0..3):
-      z_real := sum(z[s]*tphi[s], s=0..3):
-
-      Jxi := <diff(x_real,xi)  | diff(y_real,xi) | diff(z_real,xi)>;
-      Jeta := <diff(x_real,eta)| diff(y_real,eta)| diff(z_real,eta)>;
-      with(VectorCalculus):
-      J := CrossProduct(Jxi, Jeta);
-      detJ := sqrt(J[1]^2 + J[2]^2 +J[3]^2);
-
-      # measure := evalf (Int (Int (detJ, xi=0..1, method = _NCrule ) ,
-      eta=0..1, method = _NCrule  ) ): # readlib(C):
-
-      # C(measure, optimized);
-
-      additional optimizaton: divide by 2 only one time
-    */
-
-    const double x[4] = {all_vertices[vertex_indices[0]](0),
-                         all_vertices[vertex_indices[1]](0),
-                         all_vertices[vertex_indices[2]](0),
-                         all_vertices[vertex_indices[3]](0)};
-
-    const double y[4] = {all_vertices[vertex_indices[0]](1),
-                         all_vertices[vertex_indices[1]](1),
-                         all_vertices[vertex_indices[2]](1),
-                         all_vertices[vertex_indices[3]](1)};
-
-    return (-x[1] * y[0] + x[1] * y[3] + y[0] * x[2] + x[0] * y[1] -
-            x[0] * y[2] - y[1] * x[3] - x[2] * y[3] + x[3] * y[2]) /
-           2;
-  }
-
-
-
-  template <>
-  double
-  cell_measure<3>(
-    const std::vector<Point<3>> &all_vertices,
-    const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
-  {
-    // note that this is the
-    // cell_measure based on the new
-    // deal.II numbering. When called
-    // from inside GridReordering make
-    // sure that you reorder the
-    // vertex_indices before
-    const double x[8] = {all_vertices[vertex_indices[0]](0),
-                         all_vertices[vertex_indices[1]](0),
-                         all_vertices[vertex_indices[2]](0),
-                         all_vertices[vertex_indices[3]](0),
-                         all_vertices[vertex_indices[4]](0),
-                         all_vertices[vertex_indices[5]](0),
-                         all_vertices[vertex_indices[6]](0),
-                         all_vertices[vertex_indices[7]](0)};
-    const double y[8] = {all_vertices[vertex_indices[0]](1),
-                         all_vertices[vertex_indices[1]](1),
-                         all_vertices[vertex_indices[2]](1),
-                         all_vertices[vertex_indices[3]](1),
-                         all_vertices[vertex_indices[4]](1),
-                         all_vertices[vertex_indices[5]](1),
-                         all_vertices[vertex_indices[6]](1),
-                         all_vertices[vertex_indices[7]](1)};
-    const double z[8] = {all_vertices[vertex_indices[0]](2),
-                         all_vertices[vertex_indices[1]](2),
-                         all_vertices[vertex_indices[2]](2),
-                         all_vertices[vertex_indices[3]](2),
-                         all_vertices[vertex_indices[4]](2),
-                         all_vertices[vertex_indices[5]](2),
-                         all_vertices[vertex_indices[6]](2),
-                         all_vertices[vertex_indices[7]](2)};
-
-    /*
-      This is the same Maple script as in the barycenter method above
-      except of that here the shape functions tphi[0]-tphi[7] are ordered
-      according to the lexicographic numbering.
-
-      x := array(0..7):
-      y := array(0..7):
-      z := array(0..7):
-      tphi[0] := (1-xi)*(1-eta)*(1-zeta):
-      tphi[1] :=     xi*(1-eta)*(1-zeta):
-      tphi[2] := (1-xi)*    eta*(1-zeta):
-      tphi[3] :=     xi*    eta*(1-zeta):
-      tphi[4] := (1-xi)*(1-eta)*zeta:
-      tphi[5] :=     xi*(1-eta)*zeta:
-      tphi[6] := (1-xi)*    eta*zeta:
-      tphi[7] :=     xi*    eta*zeta:
-      x_real := sum(x[s]*tphi[s], s=0..7):
-      y_real := sum(y[s]*tphi[s], s=0..7):
-      z_real := sum(z[s]*tphi[s], s=0..7):
-      with (linalg):
-      J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real,
-      zeta)], [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
-      [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]):
-      detJ := det (J):
-
-      measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1),
-      zeta=0..1)):
-
-      readlib(C):
-
-      C(measure, optimized);
-
-      The C code produced by this maple script is further optimized by
-      hand. In particular, division by 12 is performed only once, not
-      hundred of times.
-    */
-
-    const double t3  = y[3] * x[2];
-    const double t5  = z[1] * x[5];
-    const double t9  = z[3] * x[2];
-    const double t11 = x[1] * y[0];
-    const double t14 = x[4] * y[0];
-    const double t18 = x[5] * y[7];
-    const double t20 = y[1] * x[3];
-    const double t22 = y[5] * x[4];
-    const double t26 = z[7] * x[6];
-    const double t28 = x[0] * y[4];
-    const double t34 =
-      z[3] * x[1] * y[2] + t3 * z[1] - t5 * y[7] + y[7] * x[4] * z[6] +
-      t9 * y[6] - t11 * z[4] - t5 * y[3] - t14 * z[2] + z[1] * x[4] * y[0] -
-      t18 * z[3] + t20 * z[0] - t22 * z[0] - y[0] * x[5] * z[4] - t26 * y[3] +
-      t28 * z[2] - t9 * y[1] - y[1] * x[4] * z[0] - t11 * z[5];
-    const double t37 = y[1] * x[0];
-    const double t44 = x[1] * y[5];
-    const double t46 = z[1] * x[0];
-    const double t49 = x[0] * y[2];
-    const double t52 = y[5] * x[7];
-    const double t54 = x[3] * y[7];
-    const double t56 = x[2] * z[0];
-    const double t58 = x[3] * y[2];
-    const double t64 = -x[6] * y[4] * z[2] - t37 * z[2] + t18 * z[6] -
-                       x[3] * y[6] * z[2] + t11 * z[2] + t5 * y[0] +
-                       t44 * z[4] - t46 * y[4] - t20 * z[7] - t49 * z[6] -
-                       t22 * z[1] + t52 * z[3] - t54 * z[2] - t56 * y[4] -
-                       t58 * z[0] + y[1] * x[2] * z[0] + t9 * y[7] + t37 * z[4];
-    const double t66 = x[1] * y[7];
-    const double t68 = y[0] * x[6];
-    const double t70 = x[7] * y[6];
-    const double t73 = z[5] * x[4];
-    const double t76 = x[6] * y[7];
-    const double t90 = x[4] * z[0];
-    const double t92 = x[1] * y[3];
-    const double t95 = -t66 * z[3] - t68 * z[2] - t70 * z[2] + t26 * y[5] -
-                       t73 * y[6] - t14 * z[6] + t76 * z[2] - t3 * z[6] +
-                       x[6] * y[2] * z[4] - z[3] * x[6] * y[2] + t26 * y[4] -
-                       t44 * z[3] - x[1] * y[2] * z[0] + x[5] * y[6] * z[4] +
-                       t54 * z[5] + t90 * y[2] - t92 * z[2] + t46 * y[2];
-    const double t102 = x[2] * y[0];
-    const double t107 = y[3] * x[7];
-    const double t114 = x[0] * y[6];
-    const double t125 =
-      y[0] * x[3] * z[2] - z[7] * x[5] * y[6] - x[2] * y[6] * z[4] +
-      t102 * z[6] - t52 * z[6] + x[2] * y[4] * z[6] - t107 * z[5] - t54 * z[6] +
-      t58 * z[6] - x[7] * y[4] * z[6] + t37 * z[5] - t114 * z[4] + t102 * z[4] -
-      z[1] * x[2] * y[0] + t28 * z[6] - y[5] * x[6] * z[4] -
-      z[5] * x[1] * y[4] - t73 * y[7];
-    const double t129 = z[0] * x[6];
-    const double t133 = y[1] * x[7];
-    const double t145 = y[1] * x[5];
-    const double t156 = t90 * y[6] - t129 * y[4] + z[7] * x[2] * y[6] -
-                        t133 * z[5] + x[5] * y[3] * z[7] - t26 * y[2] -
-                        t70 * z[3] + t46 * y[3] + z[5] * x[7] * y[4] +
-                        z[7] * x[3] * y[6] - t49 * z[4] + t145 * z[7] -
-                        x[2] * y[7] * z[6] + t70 * z[5] + t66 * z[5] -
-                        z[7] * x[4] * y[6] + t18 * z[4] + x[1] * y[4] * z[0];
-    const double t160 = x[5] * y[4];
-    const double t165 = z[1] * x[7];
-    const double t178 = z[1] * x[3];
-    const double t181 =
-      t107 * z[6] + t22 * z[7] + t76 * z[3] + t160 * z[1] - x[4] * y[2] * z[6] +
-      t70 * z[4] + t165 * y[5] + x[7] * y[2] * z[6] - t76 * z[5] - t76 * z[4] +
-      t133 * z[3] - t58 * z[1] + y[5] * x[0] * z[4] + t114 * z[2] - t3 * z[7] +
-      t20 * z[2] + t178 * y[7] + t129 * y[2];
-    const double t207 = t92 * z[7] + t22 * z[6] + z[3] * x[0] * y[2] -
-                        x[0] * y[3] * z[2] - z[3] * x[7] * y[2] - t165 * y[3] -
-                        t9 * y[0] + t58 * z[7] + y[3] * x[6] * z[2] +
-                        t107 * z[2] + t73 * y[0] - x[3] * y[5] * z[7] +
-                        t3 * z[0] - t56 * y[6] - z[5] * x[0] * y[4] +
-                        t73 * y[1] - t160 * z[6] + t160 * z[0];
-    const double t228 = -t44 * z[7] + z[5] * x[6] * y[4] - t52 * z[4] -
-                        t145 * z[4] + t68 * z[4] + t92 * z[5] - t92 * z[0] +
-                        t11 * z[3] + t44 * z[0] + t178 * y[5] - t46 * y[5] -
-                        t178 * y[0] - t145 * z[0] - t20 * z[5] - t37 * z[3] -
-                        t160 * z[7] + t145 * z[3] + x[4] * y[6] * z[2];
-
-    return (t34 + t64 + t95 + t125 + t156 + t181 + t207 + t228) / 12.;
-  }
-
-
   template <int dim>
   Vector<double>
   compute_aspect_ratio_of_cells(const Triangulation<dim> &triangulation,
@@ -512,9 +285,9 @@ namespace GridTools
 
   // Generic functions for appending face data in 2D or 3D. TODO: we can
   // remove these once we have 'if constexpr'.
-  namespace
+  namespace internal
   {
-    void
+    inline void
     append_face_data(const CellData<1> &face_data, SubCellData &subcell_data)
     {
       subcell_data.boundary_lines.push_back(face_data);
@@ -522,7 +295,7 @@ namespace GridTools
 
 
 
-    void
+    inline void
     append_face_data(const CellData<2> &face_data, SubCellData &subcell_data)
     {
       subcell_data.boundary_quads.push_back(face_data);
@@ -605,13 +378,14 @@ namespace GridTools
         SubCellData subcell_data;
 
         for (const CellData<dim - 1> &face_cell_data : face_data)
-          append_face_data(face_cell_data, subcell_data);
+          internal::append_face_data(face_cell_data, subcell_data);
         return subcell_data;
       }
 
 
     private:
-      std::set<CellData<dim - 1>, CellDataComparator<dim - 1>> face_data;
+      std::set<CellData<dim - 1>, internal::CellDataComparator<dim - 1>>
+        face_data;
     };
 
 
@@ -631,9 +405,7 @@ namespace GridTools
         return SubCellData();
       }
     };
-
-
-  } // namespace
+  } // namespace internal
 
 
 
@@ -656,8 +428,9 @@ namespace GridTools
           std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
     vertices.resize(max_level_0_vertex_n + 1);
 
-    FaceDataHelper<dim>                          face_data;
-    std::set<CellData<1>, CellDataComparator<1>> line_data; // only used in 3D
+    internal::FaceDataHelper<dim> face_data;
+    std::set<CellData<1>, internal::CellDataComparator<1>>
+      line_data; // only used in 3D
 
     for (const auto &cell : tria.cell_iterators_on_level(0))
       {
@@ -968,8 +741,8 @@ namespace GridTools
 
 
 
-  // define some transformations in an anonymous namespace
-  namespace
+  // define some transformations
+  namespace internal
   {
     template <int spacedim>
     class Shift
@@ -988,26 +761,6 @@ namespace GridTools
       const Tensor<1, spacedim> shift;
     };
 
-
-    // the following class is only
-    // needed in 2d, so avoid trouble
-    // with compilers warning otherwise
-    class Rotate2d
-    {
-    public:
-      explicit Rotate2d(const double angle)
-        : angle(angle)
-      {}
-      Point<2>
-      operator()(const Point<2> &p) const
-      {
-        return {std::cos(angle) * p(0) - std::sin(angle) * p(1),
-                std::sin(angle) * p(0) + std::cos(angle) * p(1)};
-      }
-
-    private:
-      const double angle;
-    };
 
     // Transformation to rotate around one of the cartesian axes.
     class Rotate3d
@@ -1056,7 +809,7 @@ namespace GridTools
     private:
       const double factor;
     };
-  } // namespace
+  } // namespace internal
 
 
   template <int dim, int spacedim>
@@ -1064,26 +817,7 @@ namespace GridTools
   shift(const Tensor<1, spacedim> &   shift_vector,
         Triangulation<dim, spacedim> &triangulation)
   {
-    transform(Shift<spacedim>(shift_vector), triangulation);
-  }
-
-
-  template <>
-  void
-  rotate(const double angle, Triangulation<2> &triangulation)
-  {
-    transform(Rotate2d(angle), triangulation);
-  }
-
-  template <>
-  void
-  rotate(const double angle, Triangulation<3> &triangulation)
-  {
-    (void)angle;
-    (void)triangulation;
-
-    AssertThrow(
-      false, ExcMessage("GridTools::rotate() is not available for dim = 3."));
+    transform(internal::Shift<spacedim>(shift_vector), triangulation);
   }
 
 
@@ -1095,7 +829,7 @@ namespace GridTools
   {
     Assert(axis < 3, ExcMessage("Invalid axis given!"));
 
-    transform(Rotate3d(angle, axis), triangulation);
+    transform(internal::Rotate3d(angle, axis), triangulation);
   }
 
   template <int dim, int spacedim>
@@ -1104,18 +838,18 @@ namespace GridTools
         Triangulation<dim, spacedim> &triangulation)
   {
     Assert(scaling_factor > 0, ExcScalingFactorNotPositive(scaling_factor));
-    transform(Scale<spacedim>(scaling_factor), triangulation);
+    transform(internal::Scale<spacedim>(scaling_factor), triangulation);
   }
 
 
-  namespace
+  namespace internal
   {
     /**
      * Solve the Laplace equation for the @p laplace_transform function for one
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    void
+    inline void
     laplace_solve(const SparseMatrix<double> &     S,
                   const AffineConstraints<double> &constraints,
                   Vector<double> &                 u)
@@ -1138,20 +872,7 @@ namespace GridTools
 
       constraints.distribute(u);
     }
-  } // namespace
-
-
-
-  // Implementation for 1D only
-  template <>
-  void
-  laplace_transform(const std::map<unsigned int, Point<1>> &,
-                    Triangulation<1> &,
-                    const Function<1> *,
-                    const bool)
-  {
-    Assert(false, ExcNotImplemented());
-  }
+  } // namespace internal
 
 
   // Implementation for dimensions except 1
@@ -1162,6 +883,9 @@ namespace GridTools
                     const Function<dim> *                     coefficient,
                     const bool solve_for_absolute_positions)
   {
+    if (dim == 1)
+      Assert(false, ExcNotImplemented());
+
     // first provide everything that is needed for solving a Laplace
     // equation.
     FE_Q<dim> q1(1);
@@ -1226,7 +950,8 @@ namespace GridTools
     // solve linear systems in parallel
     Threads::TaskGroup<> tasks;
     for (unsigned int i = 0; i < dim; ++i)
-      tasks += Threads::new_task(&laplace_solve, S, constraints[i], us[i]);
+      tasks +=
+        Threads::new_task(&internal::laplace_solve, S, constraints[i], us[i]);
     tasks.join_all();
 
     // change the coordinates of the points of the triangulation
@@ -1817,7 +1542,7 @@ namespace GridTools
   }
 
 
-  namespace
+  namespace internal
   {
     template <int spacedim>
     bool
@@ -1835,7 +1560,7 @@ namespace GridTools
       // return if the scalar product of a is larger.
       return (scalar_product_a > scalar_product_b);
     }
-  } // namespace
+  } // namespace internal
 
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
@@ -1930,7 +1655,7 @@ namespace GridTools
           neighbor_permutation[i] = i;
 
         auto comp = [&](const unsigned int a, const unsigned int b) -> bool {
-          return compare_point_association<spacedim>(
+          return internal::compare_point_association<spacedim>(
             a,
             b,
             vertex_to_point,
@@ -3044,7 +2769,7 @@ namespace GridTools
   }
 
 
-  namespace
+  namespace internal
   {
     /**
      * recursive helper function for partition_triangulation_zorder
@@ -3076,7 +2801,7 @@ namespace GridTools
                                                    n_partitions);
         }
     }
-  } // namespace
+  } // namespace internal
 
   template <int dim, int spacedim>
   void
@@ -3131,11 +2856,11 @@ namespace GridTools
         typename Triangulation<dim, spacedim>::cell_iterator coarse_cell(
           &triangulation, 0, coarse_cell_idx);
 
-        set_subdomain_id_in_zorder_recursively(coarse_cell,
-                                               current_proc_idx,
-                                               current_cell_idx,
-                                               n_active_cells,
-                                               n_partitions);
+        internal::set_subdomain_id_in_zorder_recursively(coarse_cell,
+                                                         current_proc_idx,
+                                                         current_cell_idx,
+                                                         n_active_cells,
+                                                         n_partitions);
       }
 
     // if all children of a cell are active (e.g. we
@@ -3267,7 +2992,7 @@ namespace GridTools
 
 
 
-  namespace
+  namespace internal
   {
     template <int dim, int spacedim>
     double
@@ -3292,7 +3017,7 @@ namespace GridTools
             return -1e10;
         }
     }
-  } // namespace
+  } // namespace internal
 
 
   template <int dim, int spacedim>
@@ -3304,7 +3029,8 @@ namespace GridTools
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
         min_diameter =
-          std::min(min_diameter, diameter<dim, spacedim>(cell, mapping));
+          std::min(min_diameter,
+                   internal::diameter<dim, spacedim>(cell, mapping));
 
     double global_min_diameter = 0;
 
@@ -3331,7 +3057,8 @@ namespace GridTools
     double max_diameter = 0.;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (!cell->is_artificial())
-        max_diameter = std::max(max_diameter, diameter(cell, mapping));
+        max_diameter =
+          std::max(max_diameter, internal::diameter(cell, mapping));
 
     double global_max_diameter = 0;
 
@@ -3748,16 +3475,6 @@ namespace GridTools
 
 
 
-      void
-      fix_up_faces(const dealii::Triangulation<1, 1>::cell_iterator &,
-                   std::integral_constant<int, 1>,
-                   std::integral_constant<int, 1>)
-      {
-        // nothing to do for the faces of cells in 1d
-      }
-
-
-
       // possibly fix up the faces of a cell by moving around its mid-points
       template <int dim, int spacedim>
       void
@@ -3810,6 +3527,9 @@ namespace GridTools
       &distorted_cells,
     Triangulation<dim, spacedim> & /*triangulation*/)
   {
+    static_assert(
+      dim != 1 && spacedim != 1,
+      "This function is only valid when dim != 1 or spacedim != 1.");
     typename Triangulation<dim, spacedim>::DistortedCellList unfixable_subset;
 
     // loop over all cells that we have to fix up
@@ -5781,12 +5501,14 @@ namespace GridTools
         coinciding_vertex_groups[p.second].push_back(p.first);
     }
   }
-
-
 } /* namespace GridTools */
 
 
 // explicit instantiations
+#define SPLIT_INSTANTIATIONS_COUNT 2
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

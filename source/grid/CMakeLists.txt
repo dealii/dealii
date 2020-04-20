@@ -17,12 +17,8 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
   cell_id.cc
-  grid_generator.cc
-  grid_generator_from_name.cc
-  grid_in.cc
-  grid_out.cc
   grid_refinement.cc
-  grid_tools_cache.cc
+  grid_reordering.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
@@ -35,8 +31,14 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
-  grid_reordering.cc
+  grid_generator_from_name.cc
+  grid_in.cc
+  grid_out.cc
+  grid_generator.cc
   grid_tools.cc
+  grid_tools_2.cc
+  grid_tools_cache.cc
+  grid_tools_nontemplates.cc
   grid_tools_dof_handlers.cc
   tria.cc
   )

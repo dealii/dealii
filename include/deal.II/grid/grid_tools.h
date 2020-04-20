@@ -3132,6 +3132,19 @@ namespace GridTools
 
 
 
+  // This specialization is defined here so that the general template in the
+  // source file doesn't need to have further 1D overloads for the internal
+  // functions it calls.
+  template <>
+  inline Triangulation<1, 1>::DistortedCellList
+  fix_up_distorted_child_cells(const Triangulation<1, 1>::DistortedCellList &,
+                               Triangulation<1, 1> &)
+  {
+    return {};
+  }
+
+
+
   template <int dim, typename Predicate, int spacedim>
   void
   transform(const Predicate &             predicate,
